@@ -4,7 +4,7 @@ export default async function SubmitLogin(user,password) {
         nombre: user,
         password: password
     }
-    console.log(data)
+
     try{
         const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/auth/login', {
             method: 'POST', 
@@ -16,14 +16,14 @@ export default async function SubmitLogin(user,password) {
 
 
         if(response.ok){
-            console.log('datos enviados')
-            return 
+            const responseData = await response.json(); // Convertir la respuesta a JSON
+            const token = responseData.token; // Obtener el token de la respuesta
+            return { estado: response.status, token: token }
         } else {
-            console.log('datos no enviados')
+            return { estado: `${response.status}`, token: null }
         }
     } catch{
-        console.log('error de red')
-        return { estado: '200' };
+        return { estado: '501' };
     }
 }
 
