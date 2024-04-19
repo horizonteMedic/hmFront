@@ -4,6 +4,7 @@ import LoginPage from './views/paciente/Login/Login.jsx';
 import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import './index.css';
 import '@tabler/core/dist/css/tabler.min.css';
+import '@tabler/core/dist/js/tabler.js';
 import Footer from './views/components/Footer.jsx';
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";

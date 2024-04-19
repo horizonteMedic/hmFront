@@ -1,6 +1,7 @@
-/* purge */
+import { useAuthStore } from "../../store/auth"
 
 export function Navbar() {
+    const setToken = useAuthStore(state => state.setToken)
     return (
         <>
     <header class="navbar navbar-expand-md d-print-none">
@@ -109,13 +110,13 @@ export function Navbar() {
                   <div class="mt-1 small text-muted">UI Designer</div>
                 </div>
               </a>
-              <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <a href="#" class="dropdown-item">Status</a>
-                <a href="./profile.html" class="dropdown-item">Profile</a>
-                <a href="#" class="dropdown-item">Feedback</a>
-                <div class="dropdown-divider"></div>
-                <a href="./settings.html" class="dropdown-item">Settings</a>
-                <a href="./sign-in.html" class="dropdown-item">Logout</a>
+              <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow ">
+                <a href="#" className="dropdown-item hover:!bg-gray-100 "><span>Perfil</span></a>
+                <a href="./profile.html" className="dropdown-item hover:!bg-gray-100">#</a>
+                <div className="dropdown-divider"></div>
+                <a onClick={()=>{
+                  setToken(null)
+                }} className="dropdown-item hover:!bg-gray-100">Cerrar Sesión</a>
               </div>
             </div>
           </div>
@@ -176,7 +177,8 @@ export function Navbar() {
                   </li>
                 </ul>
               </div>
-          </div>*/}
+          </div>
+          */}
         </div>
       </header>
 
