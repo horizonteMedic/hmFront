@@ -1,5 +1,3 @@
-/* purge */
-
 export function Navbar() {
     return (
         <>
