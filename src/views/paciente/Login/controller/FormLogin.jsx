@@ -1,9 +1,10 @@
 import { useState } from "react";
 import SubmitLogin from '../model/SubmitLogin'
 import EstadoSolicitud  from './EstadoLogin'
-import {useAuthStore} from '../../../store/auth' //Estado global para el token
+import {useAuthStore} from '../../../../store/auth' //Estado global para el token
 import { useNavigate } from "react-router-dom";
-import { Eyespassword } from "../Icons";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSearch, faCalendarAlt, faEye } from '@fortawesome/free-solid-svg-icons';
 
 export function FormLogin(){
     const [username, setUsername] = useState('');
@@ -55,7 +56,7 @@ export function FormLogin(){
           <span className="input-group-text">
             <a href="#" className="link-secondary" title="Show password" data-bs-toggle="tooltip">
               {/* agregar iconos */}
-              <Eyespassword/>
+              <FontAwesomeIcon icon={faEye} />            
             </a>
           </span>
         </div>

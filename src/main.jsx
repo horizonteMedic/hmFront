@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import LoginPage from './components/Login/Login.jsx';
-import Dashboard from './components/Dashboard/Dashboard.jsx';
-import ProtectedRoute from './components/routes/ProtectedRoute.jsx';
-import Triaje from './components/Triaje/Triaje.jsx'; 
+import LoginPage from './views/paciente/Login/Login.jsx';
+import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import './index.css';
+import '@tabler/core/dist/css/tabler.min.css';
+import Footer from './views/components/Footer.jsx';
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Dashboard from './views/paciente/Dashboard/Dashboard.jsx';
 
 const router = createBrowserRouter([
   
@@ -22,10 +23,6 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <Dashboard/>
-      },
-      {
-        path: "triaje", 
-        element: <Triaje/>
       }
     ]
   }
@@ -33,6 +30,7 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <RouterProvider router={router} />
+    <Footer/>
   </React.StrictMode>,
 );
