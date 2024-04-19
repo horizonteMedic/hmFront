@@ -17,7 +17,7 @@ export function FormLogin(){
 
     function Loginvnigate(token) {
         if (token !== null) {
-            navigate('/dashboard-paciente')
+            navigate('/dashboard-empleado')
         }
     }
 
