@@ -124,7 +124,7 @@ export function Navbar() {
               </div>
             </div>
           </div>
-          {/*<div class="collapse md:visible navbar-collapse" style={{}} id="navbar-menu">
+          <div class="collapse md:visible navbar-collapse" style={{}} id="navbar-menu">
               <div class="d-flex flex-column flex-md-row flex-fill align-items-stretch align-items-md-center">
                 <ul class="navbar-nav">
                   <li class="nav-item active">
@@ -182,7 +182,7 @@ export function Navbar() {
                 </ul>
               </div>
             </div>
-          */}
+          
         </div>
       </header>
       <div class="modal" id="exampleModal" tabindex="-1">

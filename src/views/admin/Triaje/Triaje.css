@@ -1,0 +1,102 @@
+.triage-card {
+    width: 50%; 
+    max-width: 40%; 
+    min-width: 4%; 
+    background-color: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 20px auto;
+    color: black;
+    font-size: 10px;
+  }
+  
+ 
+  @media screen and (max-width: 1024px) {
+    .triage-card {
+      max-width: none;
+      min-width: 80%; 
+    }
+  }
+  
+  .separator{
+    margin: 10px;
+  }
+  .card-body {
+    padding: 10px;
+  }
+  
+  .checkbox-group,
+  .radio-group {
+    margin-bottom: 10px;
+  }
+  
+  .custom-checkbox,
+  input[type='checkbox'],
+  input[type='radio'] {
+    display: none;
+  }
+  
+  .checkbox-group label,
+  .radio-group label {
+    display: flex;
+    align-items: center; 
+    position: relative;
+    cursor: pointer;
+  }
+  
+  .checkbox-group label:before,
+  .radio-group label:before {
+    content: '';
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    margin-right: 10px; 
+  }
+  .input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    left: 5px;
+    margin-bottom: 5px; 
+  }
+  
+  .rounded-input,
+  .rounded-select {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 5px;
+    margin-right: 10px;
+    margin-left: 10px;
+    width: calc(100% - 22px); 
+    margin-bottom: 5px;
+  }
+  
+  
+  .search-icon,
+  .calendar-icon {
+    cursor: pointer;
+    margin-right: 10px;
+  }
+  
+  .radio-group {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    margin-left: 10px; 
+  }
+  
+  input[type='radio'] {
+    margin-right: 5px;
+  }
+  
+  .white-select {
+    background-color: #fff;
+    color: #000;
+    cursor: pointer;
+    width: calc(100% - 22px);
+  }
+  
