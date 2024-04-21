@@ -48,7 +48,7 @@ export function FormLogin(){
         <label className="form-label">
           Password
           <span className="form-label-description">
-            <a href="./forgot-password.html">Olvide mi contraseña</a>
+            <a href="./forgot-password">Olvide mi contraseña</a>
           </span>
         </label>
         <div className="input-group left-0 input-group-flat">
