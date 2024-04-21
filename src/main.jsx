@@ -19,8 +19,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<LoginPagePaciente />} />
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
-        <Route path="/dashboard-paciente" element={<DashboardPaciente />}></Route>
-        <Route path="/dashboard-empleado" element={<DashboardEmpleado />}></Route>
+
+              <Route element={<ProtectedRoute/>}>
+                <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
+                <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>
+              </Route>
+              
       </Routes>
       <Footer />
     </Router>
