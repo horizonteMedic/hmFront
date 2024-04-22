@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../../components/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserLock, faCodeBranch , faFileLines,faGears, faBusinessTime} from '@fortawesome/free-solid-svg-icons';
 
@@ -17,7 +16,6 @@ const Card = ({ to, title, description, icon }) => {
 const Dashboard = () => {
   return (
     <div className="dashboard-container">
-      <Navbar />
       <div className="main-content flex flex-col items-center justify-center p-5">
         <h1 className="text-3xl font-bold mb-8">Bienvenido Administrador</h1>
         <div className="flex flex-wrap justify-center">
