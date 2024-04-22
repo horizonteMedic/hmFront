@@ -12,7 +12,7 @@ import Footer from './views/components/Footer.jsx';
 import ForgotPassword from './views/admin/Login/ForgotPassword.jsx'; 
 
 
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
 import DashboardAdmin from './views/admin/panel-de-control/PanelDeControl.jsx'
