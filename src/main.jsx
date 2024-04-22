@@ -21,9 +21,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPagePaciente />} />
+        {/* <Route path="/" element={<LoginPagePaciente />} /> */}
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
-        <Route path="/login-admin" element={<LoginPageAdmin />} />
+        <Route path="/" element={<LoginPageAdmin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
 
