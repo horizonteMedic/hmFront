@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
-import axios from 'axios'; // Importa axios para hacer solicitudes HTTP
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validar el formato del correo electrónico
+    setLoading(true);
     const isValidFormat = /\S+@\S+\.\S+/.test(email);
     if (!isValidFormat) {
       setIsValidEmail(false);
+      setLoading(false);
       return;
     }
 
     try {
-      // Enviar una solicitud POST a tu API para enviar el código de recuperación
       const response = await axios.post('URL_DE_TU_API', { email });
       
-      // Verificar si la solicitud fue exitosa
       if (response.status === 200) {
         setCodeSent(true);
       } else {
@@ -28,10 +27,11 @@ const ForgotPassword = () => {
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
     }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full">
         <div className="bg-white shadow-md rounded-lg p-8">
           <div className="flex justify-center mb-6">
@@ -44,14 +44,14 @@ const ForgotPassword = () => {
                 Correo electrónico
               </label>
               <input
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${isValidEmail ? '' : 'border-red-500'}`}
+                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${isValidEmail ? '' : 'border-red-500'} bg-white`}
                 id="email"
                 type="email"
                 placeholder="Correo electrónico"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  setIsValidEmail(/\S+@\S+\.\S+/.test(e.target.value)); // Validar el formato del correo electrónico
+                  setIsValidEmail(/\S+@\S+\.\S+/.test(e.target.value)); 
                 }}
                 required
               />
@@ -61,10 +61,21 @@ const ForgotPassword = () => {
             </div>
             <div className="flex justify-center">
               <button
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                 type="submit"
+                disabled={loading}
               >
-                Continuar
+                {loading ? 'Enviando...' : 'Continuar'}
+              </button>
+            </div>
+            <div className="flex justify-center mt-4">
+              <button
+                className="text-blue-500 hover:text-blue-700 text-sm"
+                onClick={() => {
+                  window.location.href = '/login-admin';
+                }}
+              >
+                Cancelar Acción
               </button>
             </div>
           </form>

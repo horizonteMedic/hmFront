@@ -26,7 +26,7 @@ const EstadoSolicitud = (estado) => {
     } if (estado === '500') {
         return <Error>Credenciales Incorrectas</Error>
     } else {
-        return <Entro>Ingresó con Exito</Entro>
+        return <Entro>Ingreso con Exito</Entro>
     }
 }
 

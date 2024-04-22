@@ -16,8 +16,8 @@ export default async function SubmitLogin(user,password) {
 
 
         if(response.ok){
-            const responseData = await response.json(); // Convertir la respuesta a JSON
-            const token = responseData.token; // Obtener el token de la respuesta
+            const responseData = await response.json(); 
+            const token = responseData.token; 
             return { estado: response.status, token: token }
         } else {
             return { estado: `${response.status}`, token: null }

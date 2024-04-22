@@ -1,19 +1,15 @@
+// Footer.js
 import React from 'react';
-
 import './Footer.css';
-const Footer = () => {
+function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer className="footer">
-      <div className="footer-content">
-        <p>© 2024 Todos los derechos reservados.</p>
-        <div className="footer-links">
-          <a href="#">Política de privacidad</a>
-          <a href="#">Términos de servicio</a>
-          <a href="#">Contacto</a>
-        </div>
-      </div>
+      <p>© {currentYear} Todos los derechos reservados.</p>
+      <p>Horizonte Medic</p>
     </footer>
   );
-};
+}
 
 export default Footer;

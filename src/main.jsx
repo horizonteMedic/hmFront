@@ -8,10 +8,8 @@ import LoginPageAdmin from './views/admin/Login/Login.jsx'
 import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import './index.css';
 import Footer from './views/components/Footer.jsx';
-import RegistroDePacientes from './views/empleado/RegistroPacientes/RegistroPacientes.jsx';
-import RegistroUsuario from './views/admin/Usuario/RegistroUsuario.jsx'//Admin
-import Triaje from './views/empleado/Triaje/Triaje.jsx'; 
-import ForgotPassword from './views/paciente/Login/ForgotPassword.jsx'; 
+
+import ForgotPassword from './views/admin/Login/ForgotPassword.jsx'; 
 
 
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
@@ -30,12 +28,17 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
 
         <Route element={<ProtectedRoute/>}>
-          <Route path="/registro-de-pacientes" element={<RegistroDePacientes />} /> 
-          <Route path="/triaje" element={<Triaje />} /> 
+          {/* dashboarsd para paciente y emmpleado */}
           <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
           <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>
-          <Route path="/panel-de-control" element={<DashboardAdmin />}/>
-          <Route path="/registrar-usuario" element={<RegistroUsuario />}/>
+          {/* panel de control del admin y vistas dentro de sus panel */}
+          <Route path="/panel-de-control" element={<DashboardAdmin />}/> 
+          <Route path="/accesos" element={<DashboardAdmin />}/> 
+          <Route path="/roles" element={<DashboardAdmin />}/> 
+          <Route path="/reporte-pacientes" element={<DashboardAdmin />}/> 
+          <Route path="/matriz-postulante" element={<DashboardAdmin />}/> 
+          <Route path="/configuracion" element={<DashboardAdmin />}/> 
+
         </Route>
 
 

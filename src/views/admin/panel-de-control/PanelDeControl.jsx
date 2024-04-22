@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/Navbar';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCodeBranch } from '@fortawesome/free-solid-svg-icons';
+import { faUserLock, faCodeBranch , faFileLines,faGears, faBusinessTime} from '@fortawesome/free-solid-svg-icons';
 
 const Card = ({ to, title, description, icon }) => {
   return (
@@ -16,18 +16,19 @@ const Card = ({ to, title, description, icon }) => {
 
 const Dashboard = () => {
   return (
-    <>
-    <Navbar/>
-    <div className="flex flex-col items-center justify-center min-h-[70vh] p-5">
-      <h1 className="text-3xl font-bold mb-8">Bienvenido Administrador</h1>
-      <div className="flex flex-wrap justify-center">
-        <Card to="/ruta1" title="Ruta 1" description="Descripción de la Ruta 1" />
-        <Card to="/ruta2" title="Ruta 2" description="Descripción de la Ruta 2" />
-        <Card to="/registrar-usuario" icon={<FontAwesomeIcon icon={faUser} size='2xl'/>} title="Usuarios" description="Gestiona los Usuarios" />
-        <Card to="/ruta4" icon={<FontAwesomeIcon icon={faCodeBranch} size='2xl' />} title="Roles" description="Asigna los roles correspondientes a tus usuarios" />
+    <div className="dashboard-container">
+      <Navbar />
+      <div className="main-content flex flex-col items-center justify-center p-5">
+        <h1 className="text-3xl font-bold mb-8">Bienvenido Administrador</h1>
+        <div className="flex flex-wrap justify-center">
+          <Card to="/roles" icon={<FontAwesomeIcon icon={faCodeBranch} size='2xl' />} title="Roles" description="Asigna los roles correspondientes a tus usuarios" />
+          <Card to="/accesos" icon={<FontAwesomeIcon icon={faUserLock} size='2xl'/>} title="Accesos" description="Gestiona los Usuarios" />
+          <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} size='2xl'/>} title="Reportes" description="Historial de Pacientes" />
+          <Card to="/matriz-postulante"  icon={<FontAwesomeIcon icon={faBusinessTime} size='2xl' />} title="Matriz Postulante" description="" />
+          <Card to="/configuracion" title="Configuración" icon={<FontAwesomeIcon icon={faGears} size='2xl' />} description=" " />
+        </div>
       </div>
     </div>
-    </>
   );
 };
 
