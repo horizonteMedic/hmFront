@@ -1,15 +1,14 @@
 import { useState } from "react";
 import SubmitLogin from '../model/SubmitLogin'
 import EstadoSolicitud  from './EstadoLogin'
-import {useAuthStore} from '../../../../store/auth' //Estado global para el token
+import {useAuthStore} from '../../../../store/auth'
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faCalendarAlt, faEye } from '@fortawesome/free-solid-svg-icons';
+import {faEye } from '@fortawesome/free-solid-svg-icons';
 
 export function FormLogin(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [sede, setSede] = useState('');
     const [estado, setEstado] = useState('');
     const navigate = useNavigate()
     const setToken = useAuthStore(state => state.setToken)

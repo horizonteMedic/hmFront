@@ -26,9 +26,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<LoginPagePaciente />} />
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
         <Route path="/login-admin" element={<LoginPageAdmin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        
-        <Route path="/ForgotPassword" element={<ForgotPassword />} /> 
 
         <Route element={<ProtectedRoute/>}>
           <Route path="/registro-de-pacientes" element={<RegistroDePacientes />} /> 
