@@ -5,4 +5,7 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   base: '/', // Define la ruta base aquí
   plugins: [react()],
+  build: {
+    outDir: 'build' // Especifica la carpeta de salida de la compilación
+  }
 })
