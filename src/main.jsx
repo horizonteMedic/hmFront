@@ -19,6 +19,8 @@ import Reporte from './views/admin/panel-de-control/Reportes/Reporte.jsx'
 import Matriz from './views/admin/panel-de-control/Matriz/Matriz.jsx'
 import Configuracion from './views/admin/panel-de-control/Configuracion/Configuracion.jsx';
 
+
+
 const App = () => {
   return (
     <React.StrictMode>

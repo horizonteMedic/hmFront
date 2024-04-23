@@ -19,11 +19,11 @@ const Dashboard = () => {
       <div className="main-content flex flex-col items-center justify-center p-5">
         <h1 className="text-3xl font-bold mb-8 text-center">Bienvenido Administrador</h1>
         <div className="flex flex-wrap justify-center">
-          <Card to="/roles" icon={<FontAwesomeIcon icon={faCodeBranch} size='2xl' />} title="Roles" description="Asigna los roles correspondientes a tus usuarios" />
-            <Card to="/accesos" icon={<FontAwesomeIcon icon={faUserLock} size='2xl'/>} title="Accesos" description="Gestiona los Usuarios" />
-            <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} size='2xl'/>} title="Reportes" description="Historial de Pacientes" />
-            <Card to="/matriz-postulante"  icon={<FontAwesomeIcon icon={faBusinessTime} size='2xl' />} title="Matriz Postulante" description="" />
-            <Card to="/configuracion" title="Configuración" icon={<FontAwesomeIcon icon={faGears} size='2xl' />} description=" " />
+          <Card to="/roles" icon={<FontAwesomeIcon icon={faCodeBranch} style={{color: "#fc6b03"}} size='2xl' />} title="Roles" description="Asigna los roles correspondientes a tus usuarios" />
+            <Card to="/accesos" icon={<FontAwesomeIcon icon={faUserLock} style={{color: "#fc6b03"}} size='2xl'/>} title="Accesos" description="Gestiona los Usuarios" />
+            <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} style={{color: "#fc6b03"}} size='2xl'/>} title="Reportes" description="Historial de Pacientes" />
+            <Card to="/matriz-postulante"  icon={<FontAwesomeIcon icon={faBusinessTime} style={{color: "#fc6b03"}} size='2xl' />} title="Matriz Postulante" description="" />
+            <Card to="/configuracion" title="Configuración" icon={<FontAwesomeIcon style={{color: "#fc6b03"}} icon={faGears} size='2xl' />} description=" " />
             
         </div>
       </div>
