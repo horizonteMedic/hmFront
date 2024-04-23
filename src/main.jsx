@@ -9,6 +9,8 @@ import Navbar from './views/components/Navbar.jsx';
 import LoginPageEmpleado from './views/empleado/Login/Login.jsx'; 
 import LoginPageAdmin from './views/admin/Login/Login.jsx';
 import ForgotPassword from './views/admin/Login/ForgotPassword.jsx'; 
+import VerificationCodeInput from './views/admin/Login/VerificationCodeInput.jsx'; 
+
 import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
@@ -40,6 +42,9 @@ const AppContent = () => {
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
         <Route path="/" element={<LoginPageAdmin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verificacion-codigo" element={<VerificationCodeInput />} />
+
+        
         <Route element={<ProtectedRoute/>}>
           <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
           <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>
