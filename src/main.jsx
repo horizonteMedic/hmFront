@@ -9,11 +9,13 @@ import Navbar from './views/components/Navbar.jsx';
 import LoginPageEmpleado from './views/empleado/Login/Login.jsx'; 
 import LoginPageAdmin from './views/admin/Login/Login.jsx';
 import ForgotPassword from './views/admin/Login/ForgotPassword.jsx'; 
+import VerificationCodeInput from './views/admin/Login/VerificationCodeInput.jsx'; 
+
 import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
 import DashboardAdmin from './views/admin/panel-de-control/PanelDeControl.jsx';
-import Accesos from './views/admin/panel-de-control/Accesos/Accesos.jsx';
+import Accesos from './views/admin/panel-de-control/Accesos/accesos.jsx';
 import Roles from './views/admin/panel-de-control/Roles/Roles.jsx';
 import Reporte from './views/admin/panel-de-control/Reportes/Reporte.jsx'
 import Matriz from './views/admin/panel-de-control/Matriz/Matriz.jsx'
@@ -42,6 +44,9 @@ const AppContent = () => {
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
         <Route path="/" element={<LoginPageAdmin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verificacion-codigo" element={<VerificationCodeInput />} />
+
+        
         <Route element={<ProtectedRoute/>}>
           <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
           <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>

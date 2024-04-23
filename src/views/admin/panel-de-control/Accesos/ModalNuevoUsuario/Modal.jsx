@@ -23,7 +23,7 @@ const Modal = ({ closeModal }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px]">
-        <h2 className="text-2xl font-bold mb-4">Nuevo Usuario</h2>
+        <h2 className="text-2xl font-bold mb-4">Registrar Empleado</h2>
         <form>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>

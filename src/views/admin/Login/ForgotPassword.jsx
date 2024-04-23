@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [codeSent, setCodeSent] = useState(false);
-  const [isValidEmail, setIsValidEmail] = useState(true);
+  const [isValidEmail, setIsValidEmail] = useState(false); // Inicialmente el correo no es válido
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -32,12 +32,19 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="max-w-md w-full">
+      <div className="max-w-md w-full mt-[-3em]">
         <div className="bg-white shadow-md rounded-lg p-8">
           <div className="flex justify-center mb-6">
             <img src="https://horizontemedic.com/images/Logo.png" alt="Logo" className="w-32" />
           </div>
           <h2 className="text-center text-2xl font-bold mb-4">Recuperar Contraseña</h2>
+          {codeSent && (
+            <div className="mt-6 bg-green-100 text-green-700 border-l-4 border-green-500 py-2 px-4 rounded-md">
+              <p className="text-center font-semibold">
+                Se le ha enviado un código para restablecer su contraseña a su correo.
+              </p>
+            </div>
+          )}
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -61,13 +68,14 @@ const ForgotPassword = () => {
             </div>
             <div className="flex justify-center">
               <button
-                className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading || !isValidEmail ? 'opacity-50 cursor-not-allowed' : ''}`}
                 type="submit"
-                disabled={loading}
+                disabled={loading || !isValidEmail} 
               >
                 {loading ? 'Enviando...' : 'Continuar'}
               </button>
             </div>
+            {/* Aquí se controla la habilitación del botón */}
             <div className="flex justify-center mt-4">
               <button
                 className="text-blue-500 hover:text-blue-700 text-sm"
@@ -79,13 +87,6 @@ const ForgotPassword = () => {
               </button>
             </div>
           </form>
-          {codeSent && (
-            <div className="mt-6 bg-green-100 text-green-700 border-l-4 border-green-500 py-2 px-4 rounded-md">
-              <p className="text-center font-semibold">
-                Se le ha enviado un código para restablecer su contraseña a su correo.
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>
