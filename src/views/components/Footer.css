@@ -1,4 +1,13 @@
-/* styles.css */
+.footer {
+  position: fixed; /* O absolute, según tus necesidades */
+  bottom: 0;
+  width: 100%;
+  padding: 20px;
+  color: white;
+  background-color: #084788;
+  text-align: center;
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;

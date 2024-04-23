@@ -13,7 +13,7 @@ import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
 import DashboardAdmin from './views/admin/panel-de-control/PanelDeControl.jsx';
-import Accesos from './views/admin/panel-de-control/Accesos/Accesos.jsx';
+import Accesos from './views/admin/panel-de-control/Accesos/accesos.jsx';
 import Roles from './views/admin/panel-de-control/Roles/Roles.jsx';
 import Reporte from './views/admin/panel-de-control/Reportes/Reporte.jsx'
 import Matriz from './views/admin/panel-de-control/Matriz/Matriz.jsx'
