@@ -9,7 +9,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-800 p-4 flex justify-between items-center">
+    <nav className="bg-gray-800 px-4 py-2 flex justify-between items-center">
       <div className="flex items-center">
         <Link to="/panel-de-control">
           <img src="img/Logo.png" alt="Logo" className="w-[150px] mr-4" />

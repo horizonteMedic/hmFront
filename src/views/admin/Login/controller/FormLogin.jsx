@@ -78,7 +78,7 @@ export function FormLogin() {
         </div>
         
         <div className="form-footer mt-6 flex justify-center"> {/* Agregamos la clase flex y justify-center para centrar horizontalmente el botón */}
-          <button type="submit" className="btn btn-primary py-1" style={{ backgroundColor: "#fc6b03", borderColor: "#fc6b03", width: "calc(100% - 15em)" }}>
+          <button type="submit" className="btn btn-primary py-1 min-w-20" style={{ backgroundColor: "#fc6b03", borderColor: "#fc6b03", width: "calc(100% - 15em)" }}>
             Ingresar
           </button>
         </div>

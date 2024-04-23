@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalNuevoUsuario/Modal'; 
-
+import { getFetch } from '../getFetch/getFetch';
 const Accesos = () => {
+  {/*fetch get
+  const { data } = getFetch('URL API')
+  */}
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -66,6 +69,7 @@ const Accesos = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} />}
     </div>
+    
   );
 };
 
