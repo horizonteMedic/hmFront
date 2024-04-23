@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalNuevoUsuario/Modal'; 
+
+import Modal from './ModalNuevoUsuario/Modal';
+import EditModal from './ModalEditUsuario/EditModal';
+import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; // Importa el nuevo modal de configuración
 import { getFetch } from '../getFetch/getFetch';
 const Accesos = () => {
   {/*fetch get
   const { data } = getFetch('URL API')
   */}
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false); // Nuevo estado para el modal de configuración
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -15,6 +21,22 @@ const Accesos = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const openEditModal = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
+  const openConfigurarAccesosModal = () => { // Función para abrir el modal de configuración
+    setIsConfigurarAccesosModalOpen(true);
+  };
+
+  const closeConfigurarAccesosModal = () => { // Función para cerrar el modal de configuración
+    setIsConfigurarAccesosModalOpen(false);
   };
 
   return (
@@ -51,8 +73,8 @@ const Accesos = () => {
               <tr>
                 <td className="border border-gray-300 px-2 py-1">1</td>
                 <td className="border border-gray-300 px-2 py-1">
-                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" />
-                  <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" />
+                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
+                  <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" onClick={openConfigurarAccesosModal} />
                 </td>
                 <td className="border border-gray-300 px-2 py-1">DNI</td>
                 <td className="border border-gray-300 px-2 py-1">12345678</td>
@@ -68,6 +90,8 @@ const Accesos = () => {
         </div>
       </div>
       {isModalOpen && <Modal closeModal={closeModal} />}
+      {isEditModalOpen && <EditModal closeModal={closeEditModal} />}
+      {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />} {/* Renderiza el modal de configuración cuando el estado es true */}
     </div>
     
   );

@@ -1,5 +1,4 @@
 
-import {Navbar} from "../../components/Navbar-client"
 export default function Dashboard(){
     return (
         <>
