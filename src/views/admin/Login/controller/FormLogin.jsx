@@ -5,6 +5,7 @@ import { useAuthStore } from "../../../../store/auth";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { Loading } from "../../../components/Loading";
 
 export function FormLogin() {
   const [username, setUsername] = useState("");
@@ -13,6 +14,7 @@ export function FormLogin() {
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar u ocultar la contraseña
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.setToken);
+  const [loading, setloadign] = useState(false);
 
   function Loginvnigate(token) {
     if (token !== null) {
@@ -22,6 +24,7 @@ export function FormLogin() {
 
   const handleSubmit = (event) => {
     event.preventDefault(); // Evitar que la página se recargue
+    setloadign(true)
 
     SubmitLogin(username, password)
       .then((data) => {
@@ -29,6 +32,7 @@ export function FormLogin() {
         setToken(data.token); //Guarda el token en el local storage
         Loginvnigate(data.token);
       })
+      .finally(()=> {setloadign(false)})
       .catch((error) => {
         console.error("Error al enviar los datos:", error);
       });
@@ -84,6 +88,7 @@ export function FormLogin() {
         </div>
       </form>
       {estado && EstadoSolicitud(estado)}
+      {loading && <Loading/>}
     </>
   );
 }
