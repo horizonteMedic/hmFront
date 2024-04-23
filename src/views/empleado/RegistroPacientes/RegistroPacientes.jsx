@@ -3,7 +3,6 @@ import './Registro.css'
 import DatePicker from 'react-datepicker';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
-import Navbar from "../../components/Navbar-client"; // Importa el componente Navbar
 import Footer from "../../components/Footer";
 
 import 'react-datepicker/dist/react-datepicker.css';
