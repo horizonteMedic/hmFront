@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
-import Modal from './ModalNuevoUsuario/Modal'; 
 
 import Modal from './ModalNuevoUsuario/Modal';
 import EditModal from './ModalEditUsuario/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; // Importa el nuevo modal de configuración
 import { getFetch } from '../getFetch/getFetch';
 const Accesos = () => {
+
   {/*fetch get
   const { data } = getFetch('URL API')
   */}
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false); // Nuevo estado para el modal de configuración
