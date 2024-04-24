@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
 import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
@@ -19,8 +19,6 @@ import Roles from './views/admin/panel-de-control/Roles/Roles.jsx';
 import Reporte from './views/admin/panel-de-control/Reportes/Reporte.jsx'
 import Matriz from './views/admin/panel-de-control/Matriz/Matriz.jsx'
 import Configuracion from './views/admin/panel-de-control/Configuracion/Configuracion.jsx';
-
-
 
 const App = () => {
   return (
@@ -62,4 +60,4 @@ const AppContent = () => {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+ReactDOM.render(<App />, document.getElementById('root'));
