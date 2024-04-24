@@ -15,12 +15,22 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
 }
+/* index.css */
+body {
+  font-family: 'Poppins', sans-serif;
+  /* Otros estilos globales aquí */
+}
+
 .color-azul{
   color: #084788;
 }
 .color-naranja{
   color: #fc6b03;
+}
+.sombreado{
+  background-color: #e1e7f0;
 }
 
 

@@ -29,11 +29,7 @@ const Navbar = () => {
   }
 
   return (
-<<<<<<< HEAD
     <nav className=" px-4 py-2 flex justify-between items-center" style={{ backgroundColor: '#084887' }}>
-=======
-    <nav className="bg-gray-800 px-4 py-1 flex justify-between items-center">
->>>>>>> c98acacdc331db01aa32570329eaed6a69bb6fa5
       <div className="flex items-center">
         <Link to="/panel-de-control">
           <img src="img/logo-blanco.png" alt="Logo" className="w-[150px] mr-4" />
