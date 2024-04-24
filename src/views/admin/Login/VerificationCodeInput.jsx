@@ -1,36 +1,34 @@
 import React, { useState } from 'react';
 
 const VerificationCodeInput = () => {
-  const [verificationCode, setVerificationCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [verificationError, setVerificationError] = useState('');
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '']);
+  const [selectedNumberIndex, setSelectedNumberIndex] = useState(0);
 
-  const handleSubmit = async (e) => {
+  const handleNumberClick = (number) => {
+    if (selectedNumberIndex >= 0 && selectedNumberIndex <= 4) {
+      const newVerificationCode = [...verificationCode];
+      newVerificationCode[selectedNumberIndex] = number;
+      setVerificationCode(newVerificationCode);
+      setSelectedNumberIndex(selectedNumberIndex + 1);
+    }
+  };
+
+  const handleBackspaceClick = () => {
+    if (selectedNumberIndex > 0) {
+      setSelectedNumberIndex(selectedNumberIndex - 1);
+      const newVerificationCode = [...verificationCode];
+      newVerificationCode[selectedNumberIndex - 1] = '';
+      setVerificationCode(newVerificationCode);
+    }
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    // Lógica de verificación del código en el backend
-    try {
-      // Aquí puedes hacer una solicitud al backend para verificar el código
-      // Por ejemplo:
-      // const response = await axios.post('URL_DE_TU_API_VERIFICACION', { verificationCode });
-      
-      // Simulando una respuesta exitosa para este ejemplo
-      // const { data } = response;
-      // if (data.codeValid) {
-      //   // El código es válido, puedes redirigir o mostrar un mensaje de éxito
-      // } else {
-      //   setVerificationError('El código de verificación es incorrecto.');
-      // }
-
-      // Simulación de la respuesta del backend
-      setLoading(false);
-      setVerificationError('');
-      alert('Código verificado con éxito.'); // Simplemente alerta para este ejemplo
-    } catch (error) {
-      console.error('Error al verificar el código:', error);
-      setVerificationError('Error al verificar el código. Inténtelo de nuevo.');
-      setLoading(false);
+    const code = verificationCode.join('');
+    if (code.trim() === '') {
+      alert('El código de verificación no puede estar vacío');
+    } else {
+      alert(`Código verificado: ${code}`);
     }
   };
 
@@ -39,36 +37,38 @@ const VerificationCodeInput = () => {
       <div className="max-w-md w-full mt-[-3em]">
         <div className="bg-white shadow-md rounded-lg p-8">
           <h2 className="text-center text-2xl font-bold mb-4">Digite el Código de Verificación</h2>
-          {verificationError && (
-            <div className="mt-6 bg-red-100 text-red-700 border-l-4 border-red-500 py-2 px-4 rounded-md">
-              <p className="text-center font-semibold">{verificationError}</p>
-            </div>
-          )}
-          <form onSubmit={handleSubmit}>
-            <div className="mb-6">
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="verificationCode">
-                Código de Verificación
-              </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="verificationCode"
-                type="text"
-                placeholder="Código de Verificación"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex justify-center">
+          <div className="flex justify-center mb-6">
+            {verificationCode.map((number, index) => (
+              <div key={index} className="w-10 h-10 bg-gray-200 mx-1 flex items-center justify-center rounded-md">
+                {number}
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap justify-center mb-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
               <button
-                className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                type="submit"
-                disabled={loading}
+                key={number}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline m-1"
+                onClick={() => handleNumberClick(number)}
               >
-                {loading ? 'Verificando...' : 'Verificar'}
+                {number}
               </button>
-            </div>
-          </form>
+            ))}
+            <button
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline m-1"
+              onClick={handleBackspaceClick}
+            >
+              Borrar
+            </button>
+          </div>
+          <div className="flex justify-center">
+            <button
+              className=" text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              onClick={handleSubmit} style={{ backgroundColor: "#fc6b03", borderColor: "#fc6b03",  }}
+            >
+              Verificar Código
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -10,7 +10,6 @@ import LoginPageEmpleado from './views/empleado/Login/Login.jsx';
 import LoginPageAdmin from './views/admin/Login/Login.jsx';
 import ForgotPassword from './views/admin/Login/ForgotPassword.jsx'; 
 import VerificationCodeInput from './views/admin/Login/VerificationCodeInput.jsx'; 
-
 import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
@@ -34,17 +33,17 @@ const App = () => {
 const AppContent = () => {
   const location = useLocation();
   const isLoginPage = location.pathname === '/' || location.pathname === '/login-empleado';
+  const isHiddenRoute = location.pathname === '/' || location.pathname === '/forgot-password' || location.pathname === '/verificacion-codigo';
 
   return (
     <>
-      {!isLoginPage && <Navbar />}
+      {!isHiddenRoute && <Navbar />}
       <Routes>
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
         <Route path="/" element={<LoginPageAdmin />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verificacion-codigo" element={<VerificationCodeInput />} />
 
-        
         <Route element={<ProtectedRoute/>}>
           <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
           <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>
@@ -56,7 +55,7 @@ const AppContent = () => {
           <Route path="/configuracion" element={<Configuracion />}/> 
         </Route>
       </Routes>
-      {!isLoginPage && <Footer />}
+      {!isLoginPage && !isHiddenRoute && <Footer />}
     </>
   );
 }
