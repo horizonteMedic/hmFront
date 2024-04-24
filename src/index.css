@@ -23,15 +23,30 @@ body {
   /* Otros estilos globales aquí */
 }
 
+/* para textos */
 .color-azul{
   color: #084788;
 }
 .color-naranja{
   color: #fc6b03;
 }
-.sombreado{
+.sombreado-gris{
   background-color: #e1e7f0;
 }
-
+.sombreado-verde{
+  background-color: #60F08E;
+}
+/* para compontentes */
+.naranja-btn{
+  background-color: #fc6b03;
+  color: white;
+}
+.azul-btn{
+  background-color: #084788;
+  color: white;
+}
+.pointer{
+  cursor: pointer;
+}
 
 

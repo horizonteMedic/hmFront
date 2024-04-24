@@ -45,6 +45,10 @@ const Accesos = () => {
       
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
         <h1 className="text-center text-2xl font-bold mb-4">Usuarios</h1>
+        <div className="flex justify-between mb-4">
+          <h2 className="text-lg font-semibold">Usuarios</h2>
+          <button className="naranja-btn px-4 py-2 rounded-md" onClick={openModal}>+ Registrar Empleado</button>
+        </div>
         <div className="overflow-x-auto mb-4">
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
@@ -75,7 +79,7 @@ const Accesos = () => {
                 <td className="border border-gray-300 px-2 py-1">John</td>
                 <td className="border border-gray-300 px-2 py-1">johndoe</td>
                 <td className="border border-gray-300 px-2 py-1">Admin</td>
-                <td className="border border-gray-300 px-2 py-1">Sí</td>
+                <td className=" justify-center flex  px-2 py-1 inline-block sombreado-verde"><strong>Sí</strong></td>
               </tr>
             </tbody>
           </table>
