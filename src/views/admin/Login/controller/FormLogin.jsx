@@ -44,6 +44,7 @@ export function FormLogin() {
         <div className="mb-3 mt-6">
           <label className="form-label"><strong>Usuario</strong></label>
           <input
+            required
             type="text"
             className="form-control"
             placeholder="Tu Usuario"
@@ -61,6 +62,7 @@ export function FormLogin() {
           </label>
           <div className="input-group left-0 input-group-flat">
             <input
+              required
               type={showPassword ? "text" : "password"} 
               className="form-control"
               placeholder="Tu password"

@@ -1,9 +1,12 @@
 /* styles.css */
 html, body, #root {
-  height: 100%;
+  height: auto;
+  min-height: 100vh;
   margin: 0;
 }
-
+#root{
+  position: relative;
+}
 .app {
   display: flex;
   flex-direction: column;
@@ -20,5 +23,10 @@ html, body, #root {
   color: white;
   background-color: #084788;
   text-align: center;
-  position: abosulte;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  padding-top: 10px;
+  left: 0;
+  right: 0;
 }
