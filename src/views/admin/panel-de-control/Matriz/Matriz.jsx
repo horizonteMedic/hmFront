@@ -4,7 +4,7 @@ const MatrizPostulante = () => {
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
-        <h1 className="text-center text-2xl font-bold mb-4">Matriz Postulante</h1>
+        <h1 className="text-center text-2xl font-bold mb-4 color-azul">Matriz Postulante</h1>
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div>
             <p className="font-semibold">R.U.C. Empresa</p>

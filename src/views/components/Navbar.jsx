@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 
@@ -9,6 +9,22 @@ const Navbar = () => {
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
+
+  useEffect(() => {
+    const closeMenu = () => {
+      if (showMenu) {
+        setShowMenu(false);
+      }
+    };
+
+    // Añadir el event listener para cerrar el menú al hacer clic fuera
+    document.getElementById('root').addEventListener('click', closeMenu);
+
+    // Limpiar el event listener al desmontar el componente
+    return () => {
+      document.getElementById('root').removeEventListener('click', closeMenu);
+    };
+  }, [showMenu]);
 
   const Logoutbutton = () => {
     return (
@@ -23,8 +39,6 @@ const Navbar = () => {
           Salir
         </div>
       </button>
-
-
     )
   }
 
@@ -42,7 +56,6 @@ const Navbar = () => {
         <NavLink to="/matriz-postulante" label="Matriz Postulante" />
         <NavLink to="/configuracion" label="Configuración" />
         <Logoutbutton/>
-
       </div>
       <div className="md:hidden">
         <button onClick={toggleMenu} className="text-white focus:outline-none">
@@ -70,17 +83,12 @@ const Navbar = () => {
 };
 
 const NavLink = ({ to, label }) => {
-
-
-
   return (
     <Link
       to={to}
       className="hvr-sweep-to-top before:bg-[#fc6b03] text-white px-4 py-2 ml-2 rounded block md:inline-block relative"
-
     >
       {label}
-      
     </Link>
   );
 };

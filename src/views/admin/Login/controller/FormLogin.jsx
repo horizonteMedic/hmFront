@@ -56,9 +56,7 @@ export function FormLogin() {
         <div className="mb-2">
           <label className="form-label d-flex justify-content-between align-items-center">
             <strong>Password</strong>
-            <span className="form-label-description">
-              <strong><a href="./forgot-password" style={{ color: "#084788" }}> Olvidé mi contraseña</a></strong>
-            </span>
+           
           </label>
           <div className="input-group left-0 input-group-flat">
             <input
@@ -90,6 +88,10 @@ export function FormLogin() {
               ingresar
             </button>
           </div>
+          <span className="text-center block mt-8">
+            <strong><a href="./forgot-password" style={{ color: "#084788" }}>Olvidé mi contraseña</a></strong>
+          </span>
+
       </form>
       {estado && EstadoSolicitud(estado)}
       {loading && <Loading/>}

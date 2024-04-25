@@ -23,10 +23,18 @@ html, body, #root {
   color: white;
   background-color: #084788;
   text-align: center;
+  padding-top: 10px;
   position: absolute;
   width: 100%;
   bottom: 0;
-  padding-top: 10px;
   left: 0;
   right: 0;
+}
+
+@media only screen and (max-width: 768px) {
+  .footer {
+    position: relative; /* Cambia el posicionamiento a relativo en dispositivos móviles */
+    margin-top: 20px; /* Agrega margen superior solo en dispositivos móviles */
+    bottom: auto; /* Elimina el posicionamiento en la parte inferior */
+  }
 }
