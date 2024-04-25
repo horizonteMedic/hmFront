@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserLock, faCodeBranch , faFileLines,faBoxesStacked, faBusinessTime} from '@fortawesome/free-solid-svg-icons';
+import { faUsersGear, faCalendarPlus , faFileCirclePlus, faBuildingCircleCheck} from '@fortawesome/free-solid-svg-icons';
 
 const Card = ({ to, title, description, icon }) => {
   return (
@@ -18,10 +18,10 @@ const Configuracion = () => {
     <div className="dashboard-container">
       <div className="main-content flex flex-col items-center justify-center p-5">
         <div className="flex flex-wrap justify-center text-center">
-          <Card to="/configuracion-roles" icon={<FontAwesomeIcon icon={faBoxesStacked} size='2xl' />} title="Configuración de vistas por Rol" />
-          <Card to="/accesos" icon={<FontAwesomeIcon icon={faUserLock} size='2xl'/>} title="Lista de archivos por servidores"  />
-          <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} size='2xl'/>} title="Agregar sedes" />
-          <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} size='2xl'/>} title="Agregar Campañas" />
+          <Card to="/configuracion-vistas-por-rol" icon={<FontAwesomeIcon icon={faUsersGear} size='2xl' />} title="Configuración de vistas por Rol" />
+          <Card to="/lista-archivos" icon={<FontAwesomeIcon icon={faFileCirclePlus} size='2xl'/>} title="Lista de archivos por servidores"  />
+          <Card to="/agregar-sede" icon={<FontAwesomeIcon icon={faBuildingCircleCheck} size='2xl'/>} title="Agregar sedes" />
+          <Card to="/agregar-campaña" icon={<FontAwesomeIcon icon={faCalendarPlus} size='2xl'/>} title="Agregar Campañas" />
 
         </div>
       </div>

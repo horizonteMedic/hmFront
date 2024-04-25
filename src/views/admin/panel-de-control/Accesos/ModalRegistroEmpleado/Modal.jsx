@@ -1,7 +1,8 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 const Modal = ({ closeModal }) => {
   const [startDate, setStartDate] = React.useState(null);
   const [sexo, setSexo] = React.useState('');
@@ -37,10 +38,15 @@ const Modal = ({ closeModal }) => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px]">
+      <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px] relative">
+        <FontAwesomeIcon
+          icon={faTimes}
+          className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
+          onClick={closeModal}
+        />
         <h2 className="text-2xl font-bold mb-4">Registrar Empleado</h2>
         <form>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-4 mb-4 md:grid-cols-3">
             {/* Primer columna */}
             <div>
               <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
@@ -232,13 +238,7 @@ const Modal = ({ closeModal }) => {
             </div>
           </div>
           <div className="flex justify-end">
-            <button
-              type="button"
-              className="inline-flex justify-center items-center px-4 py-2 naranja-btn rounded-md mr-2"
-              onClick={closeModal}
-            >
-              Cerrar
-            </button>
+            
             <button type="submit" className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
               Guardar
             </button>

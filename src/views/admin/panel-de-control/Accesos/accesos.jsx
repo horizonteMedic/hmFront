@@ -53,15 +53,17 @@ const Accesos = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
+        
         <h1 className="text-center text-2xl font-bold mb-4">Usuarios</h1>
         <div className="flex justify-between mb-4">
           <h2 className="text-lg font-semibold">Empleados Registrados</h2>
-          <button className="naranja-btn px-4 py-2 rounded-md" onClick={openModal}>+ Registrar Empleado</button>
-          <button className="azul-btn px-4 py-2 rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
-
+          <div className="flex">
+            <button className="naranja-btn px-4 py-2 rounded-md mr-2" onClick={openModal}>+ Registrar Empleado</button>
+            <button className="azul-btn px-4 py-2 rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
+          </div>
         </div>
+
         <div className="overflow-x-auto mb-4">
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>

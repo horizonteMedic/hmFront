@@ -3,6 +3,7 @@ import { Error } from './Estados';
 import { useLocation } from 'react-router-dom';
 import SubmitCodePass from '../model/SubmitCodePass';
 import { Loading } from "../../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 const VerificationCodeInput = (props) => {
   const location = useLocation();
@@ -11,6 +12,7 @@ const VerificationCodeInput = (props) => {
   const [selectedNumberIndex, setSelectedNumberIndex] = useState(0);
   const [estado, setEstado] = useState(false)
   const [loading, setloading] = useState(false);
+  const navigate = useNavigate();
 
 
   const handleNumberClick = (number) => {
@@ -35,7 +37,8 @@ const VerificationCodeInput = (props) => {
     if (data === null || data === 0) {
       setEstado(true);
     } else {
-      console.log('sigo firme'); 
+      navigate("/actualizar-password", { state: { email } });
+
     }
   }
 
