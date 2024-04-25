@@ -31,10 +31,3 @@ html, body, #root {
   right: 0;
 }
 
-@media only screen and (max-width: 768px) {
-  .footer {
-    position: relative; /* Cambia el posicionamiento a relativo en dispositivos móviles */
-    margin-top: 20px; /* Agrega margen superior solo en dispositivos móviles */
-    bottom: auto; /* Elimina el posicionamiento en la parte inferior */
-  }
-}
