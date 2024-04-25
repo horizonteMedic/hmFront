@@ -18,7 +18,7 @@ const Configuracion = () => {
     <div className="dashboard-container">
       <div className="main-content flex flex-col items-center justify-center p-5">
         <div className="flex flex-wrap justify-center text-center">
-          <Card to="/roles" icon={<FontAwesomeIcon icon={faBoxesStacked} size='2xl' />} title="Configuración de vistas por Rol" />
+          <Card to="/configuracion-roles" icon={<FontAwesomeIcon icon={faBoxesStacked} size='2xl' />} title="Configuración de vistas por Rol" />
           <Card to="/accesos" icon={<FontAwesomeIcon icon={faUserLock} size='2xl'/>} title="Lista de archivos por servidores"  />
           <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} size='2xl'/>} title="Agregar sedes" />
           <Card to="/reporte-pacientes" icon={<FontAwesomeIcon icon={faFileLines} size='2xl'/>} title="Agregar Campañas" />

@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
+import SubmitForgot from '../model/SubmitForgot';
+import { useNavigate } from "react-router-dom";
+import { Error } from './Estados';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [codeSent, setCodeSent] = useState(false);
   const [isValidEmail, setIsValidEmail] = useState(false); 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const [estado, setEstado] = useState(false)
+
+
+  //Si el correo es correcto, reenvia a la pestaña del pad
+  function Loginnavigate(id,email) {
+    if (id !== null) {
+
+      navigate("/verificacion-codigo", { state: { email } });
+    }
+    return setEstado(true)
+  }
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,18 +31,16 @@ const ForgotPassword = () => {
       setLoading(false);
       return;
     }
+    //Envio del correo a la API
+    SubmitForgot(email)
+      .then((data) => {
+        Loginnavigate(data.id,email)
+      })
+      .finally(()=> {setLoading(false)})
+      .catch((error) => {
+        console.error("Error al enviar los datos:", error);
+      });
 
-    try {
-      const response = await axios.post('URL_DE_TU_API', { email });
-      
-      if (response.status === 200) {
-        setCodeSent(true);
-      } else {
-        console.error('Error al enviar el código de recuperación.');
-      }
-    } catch (error) {
-      console.error('Error al enviar la solicitud:', error);
-    }
     setLoading(false);
   };
 
@@ -46,7 +60,7 @@ const ForgotPassword = () => {
               </p>
             </div>
           )}
-          <form onSubmit={handleSubmit}>
+          <form>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2 pb-2" htmlFor="email">
                 Correo electrónico
@@ -72,10 +86,7 @@ const ForgotPassword = () => {
               className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading || !isValidEmail ? 'opacity-50 cursor-not-allowed' : ''}`}
               type="submit"
               disabled={loading || !isValidEmail}
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = '/verificacion-codigo';
-              }}
+              onClick={handleSubmit}
             >
               {loading ? 'Enviando...' : 'Continuar'}
             </button>
@@ -91,6 +102,8 @@ const ForgotPassword = () => {
               </button>
             </div>
           </form>
+          {estado && <Error><p>Correo electronico Incorrecto</p></Error>}
+
         </div>
       </div>
     </div>
