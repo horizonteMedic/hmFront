@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
 
-import Modal from './ModalNuevoUsuario/Modal';
+import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditUsuario/EditModal';
-import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; // Importa el nuevo modal de configuración
+import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
+import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
+
 import { getFetch } from '../getFetch/getFetch';
 const Accesos = () => {
 
@@ -14,8 +16,9 @@ const Accesos = () => {
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false); // Nuevo estado para el modal de configuración
-
+  const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
+  const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); // Nuevo estado para el modal de registro de usuario
+  
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -39,6 +42,14 @@ const Accesos = () => {
   const closeConfigurarAccesosModal = () => { // Función para cerrar el modal de configuración
     setIsConfigurarAccesosModalOpen(false);
   };
+  
+  const openRegistroUsuarioModal = () => {
+    setIsRegistroUsuarioModalOpen(true);
+  };
+  
+  const closeRegistroUsuarioModal = () => {
+    setIsRegistroUsuarioModalOpen(false);
+  };
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -46,8 +57,10 @@ const Accesos = () => {
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
         <h1 className="text-center text-2xl font-bold mb-4">Usuarios</h1>
         <div className="flex justify-between mb-4">
-          <h2 className="text-lg font-semibold">Usuarios</h2>
+          <h2 className="text-lg font-semibold">Empleados Registrados</h2>
           <button className="naranja-btn px-4 py-2 rounded-md" onClick={openModal}>+ Registrar Empleado</button>
+          <button className="azul-btn px-4 py-2 rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
+
         </div>
         <div className="overflow-x-auto mb-4">
           <table className="w-full border border-gray-300 px-3 py-2">
@@ -88,6 +101,8 @@ const Accesos = () => {
       {isModalOpen && <Modal closeModal={closeModal} />}
       {isEditModalOpen && <EditModal closeModal={closeEditModal} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />} {/* Renderiza el modal de configuración cuando el estado es true */}
+      {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} />}
+
     </div>
     
   );
