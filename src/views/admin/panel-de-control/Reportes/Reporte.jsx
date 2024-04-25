@@ -29,7 +29,7 @@ const HistorialPaciente = () => {
   return (
     <div className="container mx-auto mt-4 mb-12">
       
-      <div className="overflow-hidden shadow-xl p-6 card border border-gray-300 p-4 rounded-lg">
+      <div className="overflow-hidden shadow-xl p-6 card border border-gray-300  rounded-lg">
         <div className="flex justify-between items-center mb-4">
           <span>Mostrar 10 registros</span>
           <div className="relative">

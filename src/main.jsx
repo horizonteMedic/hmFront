@@ -8,8 +8,8 @@ import Footer from './views/components/Footer.jsx';
 import Navbar from './views/components/Navbar.jsx';
 import LoginPageEmpleado from './views/empleado/Login/Login.jsx'; 
 import LoginPageAdmin from './views/admin/Login/Login.jsx';
-import ForgotPassword from './views/admin/Login/ForgotPassword.jsx'; 
-import VerificationCodeInput from './views/admin/Login/VerificationCodeInput.jsx'; 
+import ForgotPassword from './views/admin/Login/controller/ForgotPassword.jsx'; 
+import VerificationCodeInput from './views/admin/Login/controller/VerificationCodeInput.jsx'; 
 import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
@@ -19,7 +19,7 @@ import Roles from './views/admin/panel-de-control/Roles/Roles.jsx';
 import Reporte from './views/admin/panel-de-control/Reportes/Reporte.jsx'
 import Matriz from './views/admin/panel-de-control/Matriz/Matriz.jsx'
 import Configuracion from './views/admin/panel-de-control/Configuracion/Configuracion.jsx';
-
+import  Configrol  from './views/admin/panel-de-control/Config-roles/Config-Roles.jsx';
 
 
 const App = () => {
@@ -55,6 +55,7 @@ const AppContent = () => {
           <Route path="/reporte-pacientes" element={<Reporte />}/> 
           <Route path="/matriz-postulante" element={<Matriz />}/> 
           <Route path="/configuracion" element={<Configuracion />}/> 
+          <Route path="/configuracion-roles" element={<Configrol />}/> 
         </Route>
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}

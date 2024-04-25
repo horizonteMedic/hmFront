@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
+import { Error } from './Estados';
+import { useLocation } from 'react-router-dom';
+import SubmitCodePass from '../model/SubmitCodePass';
+import { Loading } from "../../../components/Loading";
 
-const VerificationCodeInput = () => {
-  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '']);
+const VerificationCodeInput = (props) => {
+  const location = useLocation();
+  const email = location.state.email;
+  const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
   const [selectedNumberIndex, setSelectedNumberIndex] = useState(0);
+  const [estado, setEstado] = useState(false)
+  const [loading, setloading] = useState(false);
+
 
   const handleNumberClick = (number) => {
-    if (selectedNumberIndex >= 0 && selectedNumberIndex <= 4) {
+    if (selectedNumberIndex >= 0 && selectedNumberIndex <= 5) {
       const newVerificationCode = [...verificationCode];
       newVerificationCode[selectedNumberIndex] = number;
       setVerificationCode(newVerificationCode);
@@ -22,21 +31,42 @@ const VerificationCodeInput = () => {
     }
   };
 
+  function NewPasswordNavigate(data) {
+    if (data === null || data === 0) {
+      setEstado(true);
+    } else {
+      console.log('sigo firme'); 
+    }
+  }
+
   const handleSubmit = (e) => {
+    setEstado(false)
     e.preventDefault();
     const code = verificationCode.join('');
     if (code.trim() === '') {
-      alert('El código de verificación no puede estar vacío');
+      setEstado(true)
     } else {
-      alert(`Código verificado: ${code}`);
+      setloading(true)
+      console.log(email)
+      SubmitCodePass(email,code)
+      .then((data) => {
+        console.log(data.id)
+        NewPasswordNavigate(data.id)
+      })
+      .finally(()=> {setloading(false)})
+      .catch((error) => {
+        console.error("Error al enviar los datos:", error);
+      });
     }
   };
 
   return (
+    <>
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full mt-[-3em]">
         <div className="bg-white shadow-md rounded-lg p-8">
           <h2 className="text-center text-2xl font-bold mb-4">Digite el Código de Verificación</h2>
+          <p className="text-center  font-bold mb-4">Se le envio su codigo al correo ingresado</p>
           <div className="flex justify-center mb-6">
             {verificationCode.map((number, index) => (
               <div key={index} className="w-10 h-10 bg-gray-200 mx-1 flex items-center justify-center rounded-md">
@@ -69,9 +99,12 @@ const VerificationCodeInput = () => {
               Verificar Código
             </button>
           </div>
+          {estado && <Error>Codigo Erroneo, por favor complete todos los campos</Error>}
         </div>
       </div>
     </div>
+   {loading && <Loading/>}
+   </>
   );
 };
 
