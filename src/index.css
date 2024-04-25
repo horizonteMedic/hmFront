@@ -17,13 +17,14 @@
   -moz-osx-font-smoothing: grayscale;
   
 }
-/* index.css */
 body {
   font-family: 'Poppins', sans-serif;
-  /* Otros estilos globales aquí */
 }
 
 /* para textos */
+.color-blanco{
+  color: #ffffff;
+}
 .color-azul{
   color: #084788;
 }
@@ -47,6 +48,9 @@ body {
 }
 .pointer{
   cursor: pointer;
+}
+.naranjabackgroud{
+  background-color: #fc6b03;
 }
 
 

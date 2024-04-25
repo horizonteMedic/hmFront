@@ -46,15 +46,15 @@ const Modal = ({ closeModal }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-        <div className="px-4 py-2 bg-gray-200 flex justify-between ">
-          <h2 className="text-lg font-bold">Historial Paciente - Energi s.a.c.</h2>
+        <div className="px-4 py-2 naranjabackgroud flex justify-between ">
+          <h2 className="text-lg font-bold color-blanco">Historial Paciente - Energi s.a.c.</h2>
           <button onClick={closeModal} className="text-xl" style={{ fontSize: '20px' }}>&times;</button>
         </div>
-        <div className="px-6 py-4 overflow-y-auto flex flex-wrap "> {/* Agrega flex-wrap para envolver los elementos */}
-          <div className="w-full md:w-1/6 mb-4"> {/* Divide en dos columnas en pantallas medianas */}
+        <div className="px-6 py-4 overflow-y-auto flex flex-wrap "> 
+          <div className="w-full md:w-1/6 mb-4"> 
             <span>DNI : </span><div className="bg-gray-200 rounded px-2 py-1 inline-block"><strong>711393409</strong></div>
           </div>
-          <div className="w-full md:w-1/2 mb-4"> {/* Divide en dos columnas en pantallas medianas */}
+          <div className="w-full md:w-1/2 mb-4"> 
             <span>Paciente : </span><div className="sombreado-gris rounded px-2 py-1 inline-block"><strong> MANTILLA HUAMAN CATALINO</strong></div>
           </div>
           <table className="w-full border border-gray-300">

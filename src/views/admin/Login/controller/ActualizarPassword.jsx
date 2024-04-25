@@ -48,12 +48,15 @@ const ActualizarPassword = () => {
                   onChange={(e) => setNuevaPassword(e.target.value)}
                   required
                 />
-                <FontAwesomeIcon
-                  icon={mostrarPassword ? faEyeSlash : faEye}
-                  className="absolute top-0 right-0 m-4 cursor-pointer"
-                  onClick={toggleMostrarPassword}
-                />
+                <div className="absolute inset-y-0 right-0 flex items-center">
+                  <FontAwesomeIcon
+                    icon={mostrarPassword ? faEyeSlash : faEye}
+                    className="m-4 cursor-pointer text-gray-400 hover:text-gray-600"
+                    onClick={toggleMostrarPassword}
+                  />
+                </div>
               </div>
+
             </div>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmarPassword">

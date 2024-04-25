@@ -17,12 +17,12 @@ const Breadcrumb = () => {
         {paths.map((path, index) => (
           <li key={index} className="flex items-center">
             <Link
-              to={`/${paths.slice(0, index + 1).join('/')}`}
+              to={`/${decodeURIComponent(path)}`}
               className={`${
                 index === paths.length - 1 ? 'font-semibold' : 'text-gray-500'
               }`}
             >
-              {index === paths.length - 1 ? path : path + ' / '}
+              {decodeURIComponent(path)}
             </Link>
             {index < paths.length - 1 && <span className="mx-2">/</span>}
           </li>
