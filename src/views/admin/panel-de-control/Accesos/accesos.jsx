@@ -8,11 +8,14 @@ import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig';
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
 
 import { getFetch } from '../getFetch/getFetch';
+import { Loading } from '../../../components/Loading';
+import { useAuthStore } from '../../../../store/auth';
 const Accesos = () => {
 
-  {/*fetch get
-  const { data } = getFetch('URL API')
-  */}
+  const token = useAuthStore(state => state.token);
+
+  //Consulta de la API
+  const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado',token)
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -51,6 +54,10 @@ const Accesos = () => {
     setIsRegistroUsuarioModalOpen(false);
   };
 
+  if (loading) {
+    return <Loading/>
+  }
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
@@ -72,8 +79,7 @@ const Accesos = () => {
                 <th className="border border-gray-300 px-2 py-1">Acciones</th>
                 <th className="border border-gray-300 px-2 py-1">Tipo Doc.</th>
                 <th className="border border-gray-300 px-2 py-1">Número</th>
-                <th className="border border-gray-300 px-2 py-1">Apellido Paterno</th>
-                <th className="border border-gray-300 px-2 py-1">Apellido Materno</th>
+                <th className="border border-gray-300 px-2 py-1">Apellidos</th>
                 <th className="border border-gray-300 px-2 py-1">Nombres</th>
                 <th className="border border-gray-300 px-2 py-1">Usuario</th>
                 <th className="border border-gray-300 px-2 py-1">Rol</th>
@@ -81,21 +87,22 @@ const Accesos = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="border border-gray-300 px-2 py-1">1</td>
+            {data?.map((item, index) => (
+                <tr key={index}>
+                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                 <td className="border border-gray-300 px-2 py-1">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
                   <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" onClick={openConfigurarAccesosModal} />
                 </td>
-                <td className="border border-gray-300 px-2 py-1">DNI</td>
-                <td className="border border-gray-300 px-2 py-1">12345678</td>
-                <td className="border border-gray-300 px-2 py-1">Doe</td>
-                <td className="border border-gray-300 px-2 py-1">Smith</td>
-                <td className="border border-gray-300 px-2 py-1">John</td>
+                <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
                 <td className="border border-gray-300 px-2 py-1">johndoe</td>
-                <td className="border border-gray-300 px-2 py-1">Admin</td>
-                <td className=" justify-center flex  px-2 py-1 inline-block sombreado-verde"><strong>Sí</strong></td>
+                <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
+                <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}><strong>{item.estado ? 'Activo' : 'Inactivo'}</strong></td>
               </tr>
+              ))}
             </tbody>
           </table>
         </div>

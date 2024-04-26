@@ -14,6 +14,7 @@ export function FormLogin() {
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar u ocultar la contraseña
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.setToken);
+  const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const [loading, setloadign] = useState(false);
 
   function Loginvnigate(token) {
@@ -22,6 +23,16 @@ export function FormLogin() {
     }
   }
 
+  const decodeToken = (token) => {
+    const payloadBase64 = token.split('.')[1]; // Obtiene la carga útil del token
+    const decodedPayload = atob(payloadBase64); // Decodifica la carga útil en base64
+    const UserLogued = JSON.parse(decodedPayload); // Analiza la carga útil como JSON
+    setuserlogued(UserLogued)
+    setToken(token)
+    Loginvnigate(token);
+
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault(); // Evitar que la página se recargue
     setloadign(true)
@@ -29,8 +40,7 @@ export function FormLogin() {
     SubmitLogin(username, password)
       .then((data) => {
         setEstado(data.estado);
-        setToken(data.token); //Guarda el token en el local storage
-        Loginvnigate(data.token);
+        decodeToken(data.token); //Guarda el token en el local storage
       })
       .finally(()=> {setloadign(false)})
       .catch((error) => {

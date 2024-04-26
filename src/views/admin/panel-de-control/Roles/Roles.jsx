@@ -1,17 +1,16 @@
 // views/admin/panel-de-control/Roles.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalNuevoRol/Modal'; 
 import {getFetch} from '../getFetch/getFetch'
+import { Loading } from '../../../components/Loading';
+import { useAuthStore } from '../../../../store/auth';
 
 const Roles = () => {
-
-  {/*fetch get
-  const { data } = getFetch('URL API')
-  */}
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+  const token = useAuthStore(state => state.token);
+
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -19,6 +18,15 @@ const Roles = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+  
+  const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol',token)
+  //Obtener datos de todos los roles
+  
+
+  if (loading) {
+    return <Loading/>
+  }
+  
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -48,16 +56,18 @@ const Roles = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="border border-gray-300 px-2 py-1">1</td>
+              {data?.map((item, index) => (
+                <tr key={index}>
+                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                 <td className="border border-gray-300 px-2 py-1">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" />
                   <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" />
                 </td>
-                <td className="border border-gray-300 px-2 py-1">DNI</td>
-                <td className="border border-gray-300 px-2 py-1">12345678</td>
-                <td className="border border-gray-300 px-2 py-1 bg-green-300">Activo</td>
+                <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
+                <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
               </tr>
+              ))}
             </tbody>
           </table>
         </div>

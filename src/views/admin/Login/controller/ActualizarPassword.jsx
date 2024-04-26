@@ -3,6 +3,34 @@ import { useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import SubmitPasswordActualizado from '../model/SubmitPasswordActualizado';
+import { Loading } from '../../../components/Loading';
+import { useNavigate } from "react-router-dom";
+
+
+const ModalCheck = ({ navigateLogin })  => {
+
+  return(
+    <>
+    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-md p-6 w-[400px]  relative">
+        <h2 className="text-2xl font-bold mb-4 text-center">¡Excelente!</h2>
+        <div className='flex flex-col justify-center items-center'>
+          <p className='p-3'>Su Contraseña ha sido cambiada con exito</p>
+          <button
+                className="naranja-btn  text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                type="submit" onClick={() => {
+                  navigateLogin()
+                }}
+              >
+                Actualizar Contraseña
+          </button>
+        </div>
+      </div>
+    </div>
+    </>
+  )
+}
+
 
 const ActualizarPassword = () => {
     const location = useLocation();
@@ -10,25 +38,44 @@ const ActualizarPassword = () => {
     const [nuevaPassword, setNuevaPassword] = useState('');
     const [confirmarPassword, setConfirmarPassword] = useState('');
     const [mostrarPassword, setMostrarPassword] = useState(false);
+    const [estado, setEstado] = useState(false)
+    const [modal, setModal] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const navigate = useNavigate();
+
 
     const toggleMostrarPassword = () => {
         setMostrarPassword(!mostrarPassword);
     };
 
+    function NavigateLogin() {
+        navigate("/");
+    }
+
+    function NewPasswordNavigate(data) {
+      if (data === null || data === 0) {
+        setEstado(true);
+      } else {
+        setIsModalOpen(true)
+      }
+    }
+
     const handleSubmit = (e) => {
+        setLoading(true)
         e.preventDefault();
         SubmitPasswordActualizado(email,confirmarPassword)
         .then((data) => {
-            console.log(data.id)
             NewPasswordNavigate(data.id)
         })
-        .finally(()=> {setloading(false)})
+        .finally(()=> {setLoading(false)})
         .catch((error) => {
             console.error("Error al enviar los datos:", error);
         });
   };
 
   return (
+    <>
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full mt-[-3em]">
         <div className="bg-white shadow-md rounded-lg p-8">
@@ -91,6 +138,9 @@ const ActualizarPassword = () => {
         </div>
       </div>
     </div>
+  {loading && <Loading/>}
+  {isModalOpen && <ModalCheck navigateLogin={NavigateLogin}/>}
+  </>
   );
 };
 
