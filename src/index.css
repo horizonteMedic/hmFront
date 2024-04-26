@@ -34,6 +34,11 @@ body {
 .sombreado-gris{
   background-color: #e1e7f0;
 }
+.sombreado-gris-oscuro{
+  background-color:  #e4e6eb;
+  padding: 5px;
+}
+
 .sombreado-verde{
   background-color: #60F08E;
 }

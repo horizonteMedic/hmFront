@@ -25,7 +25,7 @@ const Roles = () => {
       
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
       
-        <h1 className="text-center text-2xl font-bold mb-4 color-azul">Roles</h1>
+        <h1 className="text-center text-2xl font-bold mb-4 color-azul sombreado-gris-oscuro">Roles</h1>
         <div className="flex justify-between items-center mb-4">
         <div className="relative">
             <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />

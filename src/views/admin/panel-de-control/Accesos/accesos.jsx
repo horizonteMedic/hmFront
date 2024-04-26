@@ -55,7 +55,7 @@ const Accesos = () => {
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
         
-        <h1 className="text-center text-2xl font-bold mb-4 color-azul">Usuarios</h1>
+        <h1 className="text-center text-2xl font-bold mb-4 color-azul sombreado-gris-oscuro">Usuarios</h1>
         <div className="flex justify-between mb-4">
           <h2 className="text-lg font-semibold">Empleados Registrados</h2>
           <div className="flex">
