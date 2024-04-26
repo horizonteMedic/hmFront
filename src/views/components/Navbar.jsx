@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 
@@ -11,6 +11,22 @@ const Navbar = () => {
   const toggleMenu = () => {
     setShowMenu(!showMenu);
   };
+
+  useEffect(() => {
+    const closeMenu = () => {
+      if (showMenu) {
+        setShowMenu(false);
+      }
+    };
+
+    // Añadir el event listener para cerrar el menú al hacer clic fuera
+    document.getElementById('root').addEventListener('click', closeMenu);
+
+    // Limpiar el event listener al desmontar el componente
+    return () => {
+      document.getElementById('root').removeEventListener('click', closeMenu);
+    };
+  }, [showMenu]);
 
   const Logoutbutton = () => {
     return (
@@ -25,8 +41,6 @@ const Navbar = () => {
           Salir
         </div>
       </button>
-
-
     )
   }
 
@@ -34,7 +48,7 @@ const Navbar = () => {
     <nav className="bg-gray-800 px-4 py-1 flex justify-between items-center">
       <div className="flex items-center">
         <Link to="/panel-de-control">
-          <img src="img/logo-blanco.png" alt="Logo" className="w-[150px] p-6 mr-4" />
+          <img src="img/logoblanco.png" alt="Logo" className="w-[180px] p-4 mr-4" />
         </Link>
       </div>
       <div className="hidden md:flex items-center">
@@ -44,7 +58,6 @@ const Navbar = () => {
         <NavLink to="/matriz-postulante" label="Matriz Postulante" />
         <NavLink to="/configuracion" label="Configuración" />
         <Logoutbutton/>
-
       </div>
       <div className="md:hidden">
         <button onClick={toggleMenu} className="text-white focus:outline-none">
@@ -72,17 +85,12 @@ const Navbar = () => {
 };
 
 const NavLink = ({ to, label }) => {
-
-
-
   return (
     <Link
       to={to}
       className="hvr-sweep-to-top before:bg-[#fc6b03] text-white px-4 py-2 ml-2 rounded block md:inline-block relative"
-
     >
       {label}
-      
     </Link>
   );
 };

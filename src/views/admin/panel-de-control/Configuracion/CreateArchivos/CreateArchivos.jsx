@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import NuevoArchivoModal from './NuevoArchivoModal';
+import RuterConfig from '../RuterConfig';
 
 const ListaArchivosPorServidores = () => {
   const [showModal, setShowModal] = useState(false);
@@ -11,7 +12,9 @@ const ListaArchivosPorServidores = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      <h1 className="text-center text-2xl font-bold mb-4">Lista de Archivos por Servidores</h1>
+      <RuterConfig /> 
+
+      <h1 className="text-center text-2xl font-bold mb-4 color-azul">Lista de Archivos por Servidores</h1>
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
         <table className="min-w-full divide-y divide-gray-200 mb-4">
           <thead className="bg-gray-50">
@@ -40,7 +43,7 @@ const ListaArchivosPorServidores = () => {
         <div className="text-right">
           <button
             onClick={() => setShowModal(true)}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="azul-btn font-bold py-2 px-4 rounded"
           >
             Crear Nuevo Archivo
           </button>

@@ -32,17 +32,18 @@ const Roles = () => {
     <div className="container mx-auto mt-12 mb-12">
       
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
-      <div className="flex justify-between items-center mb-4">
+      
+        <h1 className="text-center text-2xl font-bold mb-4 color-azul sombreado-gris-oscuro">Roles</h1>
+        <div className="flex justify-between items-center mb-4">
         <div className="relative">
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-          <input type="text" id="search" className="border border-gray-300 px-10 py-2 rounded-md w-48 focus:outline-none" placeholder="Buscar" />
+            <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <input type="text" id="search" className="border border-gray-300 px-10 py-2 rounded-md w-48 focus:outline-none" placeholder="Buscar" />
+          </div>
+          <button onClick={openModal} className="flex items-center px-4 py-2 azul-btn rounded-md">
+            <FontAwesomeIcon icon={faPlus} className="mr-2" />
+            Agregar
+          </button>
         </div>
-        <button onClick={openModal} className="flex items-center px-4 py-2 azul-btn rounded-md">
-          <FontAwesomeIcon icon={faPlus} className="mr-2" />
-          Agregar
-        </button>
-      </div>
-        <h1 className="text-center text-2xl font-bold mb-4">Roles</h1>
         <div className="overflow-x-auto mb-4">
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>

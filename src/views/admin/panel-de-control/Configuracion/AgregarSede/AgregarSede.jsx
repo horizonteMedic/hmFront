@@ -1,10 +1,12 @@
 import React from 'react';
+import RuterConfig from '../RuterConfig';
 
 const AgregarSede = () => {
   return (
     <div className="container mx-auto mt-12 mb-12">
+      <RuterConfig /> 
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
-        <h1 className="text-center text-2xl font-bold mb-4">Agregar Sede</h1>
+        <h1 className="text-center text-2xl font-bold mb-4 color-azul">Agregar Sede</h1>
         
         <div className="mb-4">
           <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">

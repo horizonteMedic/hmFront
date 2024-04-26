@@ -114,7 +114,7 @@ const RegistroUsuarioModal = ({ closeModal }) => {
           </div>
         </div>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          className="azul-btn px-4 py-2 rounded-md"
           onClick={handleRegistrar}
         >
           Registrar Datos

@@ -14,7 +14,6 @@ export default async function SubmitLogin(user,password) {
             body: JSON.stringify(data)
         })
 
-
         if(response.ok){
             const responseData = await response.json(); 
             const token = responseData.token; 
