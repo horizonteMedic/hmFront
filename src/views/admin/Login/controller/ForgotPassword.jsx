@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import SubmitForgot from '../model/SubmitForgot';
 import { useNavigate } from "react-router-dom";
 import { Error } from './Estados';
+import { Loading } from "../../../components/Loading";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
@@ -41,10 +42,10 @@ const ForgotPassword = () => {
         console.error("Error al enviar los datos:", error);
       });
 
-    setLoading(false);
   };
 
   return (
+    <>
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full mt-[-3em]">
         <div className="bg-white shadow-md rounded-lg p-8">
@@ -53,13 +54,6 @@ const ForgotPassword = () => {
 
           </div>
           <p className="text-2xl font-semibold text-center mb-6 color-azul"><strong>Recuperar Contraseña</strong></p>
-          {codeSent && (
-            <div className="mt-6 bg-green-100 text-green-700 border-l-4 border-green-500 py-2 px-4 rounded-md">
-              <p className="text-center font-semibold">
-                Se le ha enviado un código para restablecer su contraseña a su correo.
-              </p>
-            </div>
-          )}
           <form>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2 pb-2" htmlFor="email">
@@ -107,6 +101,8 @@ const ForgotPassword = () => {
         </div>
       </div>
     </div>
+    {loading && <Loading/>}
+  </>
   );
 };
 

@@ -50,7 +50,6 @@ const VerificationCodeInput = (props) => {
       setEstado(true)
     } else {
       setloading(true)
-      console.log(email)
       SubmitCodePass(email,code)
       .then((data) => {
         console.log(data.id)

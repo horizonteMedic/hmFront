@@ -1,22 +1,24 @@
 import { useEffect, useState } from "react";
 
-export function getFetch(url) {
-    const [data, setData] = useState(null);
+export function getFetch(url, token) {
+    const [data, setData] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error al obtener los datos');
-            }
-            return response.json();
+        setLoading(true);
+        fetch(url,{
+            method: 'GET', 
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
         })
-        .then(data => {
-            console.log('Datos obtenidos:', data);
-            setData(data => setData(data));
-        })
-        .catch(error => console.error('Error en la solicitud Fetch:', error));
-    },[])
-
-    return {data}
+            .then((response => response.json()))
+            .then(data => {
+                setData(data);
+            })
+            .finally(() => setLoading(false))
+    }, [])
+    
+    return {data, loading}
+    
 }

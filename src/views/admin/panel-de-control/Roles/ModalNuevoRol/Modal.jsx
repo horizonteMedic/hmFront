@@ -3,19 +3,33 @@ import { useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-
+import { useAuthStore } from '../../../../../store/auth';
+import NewRol from '../model/NewRol';
+import { Loading } from '../../../../components/Loading';
+import { useNavigate } from 'react-router-dom';
 
 const Modal = ({ closeModal }) => {
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [estado, setEstado] = useState(false);
-  
+  const token = useAuthStore(state => state.token);
+  const userlogued = useAuthStore(state => state.userlogued);
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+
   
   const handleSubmit = async (event) => {
+    setLoading(true)
     event.preventDefault();
-
+    NewRol(rol, descripcion,estado,token,userlogued.sub)
+      .then(data => {
+        setLoading(false)
+        window.location.reload();
+      })
+      .catch(error => {
+        console.error('Error:', error)
+      })
     // Aquí puedes enviar los datos por fetch o realizar cualquier otra acción
-    
   };
 
   return (
@@ -27,7 +41,7 @@ const Modal = ({ closeModal }) => {
           onClick={closeModal}
         />
         <h2 className="text-2xl font-bold mb-4 text-center">Nuevo Rol</h2>
-        <form onSubmit={handleSubmit} autoComplete='off'>
+        <form onSubmit={handleSubmit} autoComplete='off' >
           <div className="flex flex-col items-start justify-center w-auto">
             <div className='flex py-3 justify-center items-center w-full'>
               <label htmlFor="tipoDocumento" className="text-left w-full block text-sm font-medium text-gray-700">
@@ -35,6 +49,7 @@ const Modal = ({ closeModal }) => {
               </label>
               <input
                 type="text"
+                required
                 id="numeroDocumento"
                 onChange={(e) => setRol(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
@@ -46,6 +61,7 @@ const Modal = ({ closeModal }) => {
               </label>
               <input
                 type="text"
+                required
                 id="numeroDocumento"
                 onChange={(e) => setDescripcion(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
@@ -69,6 +85,7 @@ const Modal = ({ closeModal }) => {
           </div>
         </form>
       </div>
+      {loading && <Loading/>}
     </div>
   );
 };
