@@ -55,22 +55,22 @@ const Modal = ({ closeModal }) => {
             <span>DNI : </span><div className="bg-gray-200 rounded px-2 py-1 inline-block"><strong>711393409</strong></div>
           </div>
           <div className="w-full md:w-1/2 mb-4"> 
-            <span>Paciente : </span><div className="sombreado-gris rounded px-2 py-1 inline-block"><strong> MANTILLA HUAMAN CATALINO</strong></div>
+            <span>Paciente : </span><div className="sombreado-verde rounded px-2 py-1 inline-block"><strong> MANTILLA HUAMAN CATALINO</strong></div>
           </div>
           <table className="w-full border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-2 py-1">ac.</th>
-                <th className="border border-gray-300 px-2 py-1">orden</th>
-                <th className="border border-gray-300 px-2 py-1">empresa</th>
-                <th className="border border-gray-300 px-2 py-1">contrata</th>
-                <th className="border border-gray-300 px-2 py-1">fecha apertura</th>
-                <th className="border border-gray-300 px-2 py-1">examen</th>
-                <th className="border border-gray-300 px-2 py-1">estado</th>
-                <th className="border border-gray-300 px-2 py-1">cargo</th>
-                <th className="border border-gray-300 px-2 py-1">área</th>
-                <th className="border border-gray-300 px-2 py-1">grupo sanguíneo</th>
-                <th className="border border-gray-300 px-2 py-1">archivos</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Acción</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Orden</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Empresa</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Contrata</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Fecha apertura</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Examen</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Estado</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Cargo</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Área</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Grupo sanguíneo</th>
+                <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>
               </tr>
             </thead>
             <tbody>

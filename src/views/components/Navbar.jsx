@@ -81,7 +81,7 @@ const Navbar = () => {
         </button>
       </div>
       {showMenu && (
-        <div className="md:hidden absolute right-0 top-16 bg-gray-800 w-48 py-2">
+        <div className="md:hidden absolute right-0 top-16 bg-gray-800 w-[50%]  py-2">
           <CustomNavLink to="/roles" label="Roles" icon={faUser} activeLink={activeLink} onClick={handleNavLinkClick} />
           <CustomNavLink to="/accesos" label="Accesos" icon={faLock} activeLink={activeLink} onClick={handleNavLinkClick} />
           <CustomNavLink to="/reporte-pacientes" label="Reportes" icon={faChartBar} activeLink={activeLink} onClick={handleNavLinkClick} />

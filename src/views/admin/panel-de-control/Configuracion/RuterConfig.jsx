@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCog, faList, faMapMarkerAlt, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 const RuterConfig = () => {
   const location = useLocation();
@@ -31,6 +33,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('configuracion-vistas-por-rol')}
           >
+            <FontAwesomeIcon icon={faCog} className="mr-2" />
             Configuración de Vistas por Rol
           </Link>
           <Link
@@ -40,6 +43,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('lista-archivos')}
           >
+            <FontAwesomeIcon icon={faList} className="mr-2" />
             Lista de Archivos
           </Link>
           <Link
@@ -49,6 +53,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('agregar-sede')}
           >
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
             Agregar Sede
           </Link>
           <Link
@@ -58,6 +63,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('agregar-campaña')}
           >
+            <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
             Agregar Campaña
           </Link>
         </div>
