@@ -107,7 +107,6 @@ const Accesos = () => {
                 <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
-                <td className="border border-gray-300 px-2 py-1">johndoe</td>
                 <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
                 <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}><strong>{item.estado ? 'Activo' : 'Inactivo'}</strong></td>
               </tr>

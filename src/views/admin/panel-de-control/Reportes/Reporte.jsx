@@ -45,7 +45,7 @@ const HistorialPaciente = () => {
         <div className="flex justify-between items-center ml-4 pt-3">
           <div>
             <span>Mostrar</span>
-            <select className="border border-gray-300 rounded-md ml-2 px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
+            <select className="border pointer border-gray-300 rounded-md ml-2 px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
               <option value={2}>2</option>
               <option value={5}>5</option>
               <option value={10}>10</option>
@@ -58,11 +58,11 @@ const HistorialPaciente = () => {
             <input
               type="text"
               placeholder="Buscar por nombre, apellido o DNI"
-              className="border border-gray-300 rounded-md ml-2 px-2 py-1"
+              className="border border-gray-300 rounded-md mr-4 px-2 py-1"
               value={searchTerm}
               onChange={handleSearch}
             />
-            <button className="ml-2 focus:outline-none">
+            <button className="mr-4 focus:outline-none">
               <FontAwesomeIcon icon={faSearch} className="text-blue-500 cursor-pointer" />
             </button>
           </div>
