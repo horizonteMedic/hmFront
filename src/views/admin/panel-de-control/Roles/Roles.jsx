@@ -1,15 +1,28 @@
 // views/admin/panel-de-control/Roles.jsx
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalNuevoRol/Modal'; 
 import {getFetch} from '../getFetch/getFetch'
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
+import EditModal from './ModalNuevoRol/EditRol';
+import Swal from 'sweetalert2'
+import DeleteRol from './model/DeleteRol';
 
 const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const token = useAuthStore(state => state.token);
+  const userlogued = useAuthStore(state => state.userlogued);
+
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false)
+
+
+  //Para Editar
+  const [id, setId] = useState('');
+  const [rol, setRol] = useState('');
+  const [descripcion, setDescripcion] = useState('');
+  const [estado, setEstado] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -18,6 +31,52 @@ const Roles = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const openEditModal = (id,nombre,descripcion,estado) => {
+    setId(id)
+    setRol(nombre)
+    setDescripcion(descripcion)
+    setEstado(estado)
+    setIsModalEditOpen(true)
+  }
+
+  const closeEditModal = () => {
+    setIsModalEditOpen(false)
+  }
+
+  const deleteRol = (id,token) => {
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "No puedes revertir esta accion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DeleteRol(id,token)
+          .then(()=>{
+            Swal.fire({
+              title: "Eliminado!",
+              text: "El Rol ha sido Eliminado.",
+              icon: "success"
+            }).then((result) => {
+              if (result.isConfirmed) window.location.reload();
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              title: "Error!",
+              text: "El Rol no se ha podido Eliminar!",
+              icon: "error"
+            });
+          }
+          )
+        
+      }
+    });
+  }
   
   const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol',token)
   //Obtener datos de todos los roles
@@ -60,8 +119,8 @@ const Roles = () => {
                 <tr key={index}>
                 <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                 <td className="border border-gray-300 px-2 py-1">
-                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" />
-                  <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" />
+                  <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol,item.nombre,item.descripcion,item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
+                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol,token)}} className="text-red-500 mr-2 cursor-pointer" />
                 </td>
                 <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
@@ -73,6 +132,8 @@ const Roles = () => {
         </div>
       </div>
       {isModalOpen && <Modal closeModal={closeModal} />}
+      {isModalEditOpen && <EditModal closeModal={closeEditModal} Id={id} Rol={rol} Descripcion={descripcion} 
+      Estado={estado} token={token} userlogued={userlogued.sub}/>}
     </div>
     
   );

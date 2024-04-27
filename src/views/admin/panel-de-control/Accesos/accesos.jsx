@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faCog, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'; // Agrega el icono de eliminación
+import { faSearch, faEdit, faCog, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditUsuario/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
+import UsersModal from './ModalViewUser/ModalViewUser';
 
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
@@ -16,12 +17,13 @@ const Accesos = () => {
   const token = useAuthStore(state => state.token);
   //Consulta de la API
   const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado',token)
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
   const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); // Nuevo estado para el modal de registro de usuario
-  
+  const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false)
+
+  const [idEmpleado, SetIdEmpleado] = useState('')
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -54,20 +56,11 @@ const Accesos = () => {
     setIsRegistroUsuarioModalOpen(false);
   };
 
-  // Función para eliminar un usuario
-  const deleteUser = async (employeeId) => {
-    if (employeeId) {
-      try {
-        const response = await deleteEmpleado(employeeId);
-        console.log(response);
-      } catch (error) {
-        console.error('Error al eliminar el usuario:', error.message);
-      }
-    } else {
-      console.error('El ID del empleado es undefined');
-    }
-  };
-  
+  const OpenViewUsersModal = (id) => {
+    
+    SetIdEmpleado(id)
+    isViewUsersModalOpen ? SetIsViewUsersModalOpen(false) : SetIsViewUsersModalOpen(true)
+  }
 
   if (loading) {
     return <Loading/>
@@ -102,28 +95,24 @@ const Accesos = () => {
               </tr>
             </thead>
             <tbody>
-  {data.map((item, index) => (
-    <tr key={index}>
-      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-      <td className="border border-gray-300 px-2 py-1">
-        <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
-        <FontAwesomeIcon icon={faCog} className="text-green-500  mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} />
-        <FontAwesomeIcon icon={faTrash} className="text-red-500  mr-2 cursor-pointer" onClick={() => deleteUser(item.id)} />
-      </td>
-      <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
-      <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
-      <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
-      <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
-      <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
-      <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>
-        <strong>{item.estado ? 'Activo' : 'Inactivo'}</strong>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
-
-
+            {data?.map((item, index) => (
+                <tr key={index}>
+                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                <td className="border border-gray-300 px-2 py-1">
+                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
+                  <FontAwesomeIcon icon={faCog} className="text-green-500 mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} />
+                  <FontAwesomeIcon icon={faUsers} className="text-orange-500 cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} />
+                </td>
+                <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
+                <td className="border border-gray-300 px-2 py-1">johndoe</td>
+                <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
+                <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}><strong>{item.estado ? 'Activo' : 'Inactivo'}</strong></td>
+              </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       </div>
@@ -132,6 +121,8 @@ const Accesos = () => {
       {isEditModalOpen && <EditModal closeModal={closeEditModal} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} />}
+      {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} token={token}/>}
+
     </div>
   );
 };

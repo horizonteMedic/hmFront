@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import NewUser from '../model/RegisterUser';
 
 const RegistroUsuarioModal = ({ closeModal }) => {
   const [documento, setDocumento] = useState('');
@@ -13,10 +14,13 @@ const RegistroUsuarioModal = ({ closeModal }) => {
   const [sede, setSede] = useState('');
 
   const handleRegistrar = () => {
-    // Aquí puedes realizar la lógica para registrar los datos del usuario
-    // Por ejemplo, enviar una solicitud al servidor
-    // y luego cerrar el modal
-    closeModal();
+    NewUser(username,password,estado,razonSocial,documento)
+      .then(data => {
+        closeModal();
+      })
+      .catch(error => {
+        console.error('Error', error)
+      })
   };
 
   return (
