@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faCog, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditUsuario/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
+import UsersModal from './ModalViewUser/ModalViewUser';
 
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
@@ -16,12 +17,13 @@ const Accesos = () => {
 
   //Consulta de la API
   const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado',token)
-  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
   const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); // Nuevo estado para el modal de registro de usuario
-  
+  const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false)
+
+  const [idEmpleado, SetIdEmpleado] = useState('')
   const openModal = () => {
     setIsModalOpen(true);
   };
@@ -53,6 +55,12 @@ const Accesos = () => {
   const closeRegistroUsuarioModal = () => {
     setIsRegistroUsuarioModalOpen(false);
   };
+
+  const OpenViewUsersModal = (id) => {
+    
+    SetIdEmpleado(id)
+    isViewUsersModalOpen ? SetIsViewUsersModalOpen(false) : SetIsViewUsersModalOpen(true)
+  }
 
   if (loading) {
     return <Loading/>
@@ -92,7 +100,8 @@ const Accesos = () => {
                 <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                 <td className="border border-gray-300 px-2 py-1">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
-                  <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" onClick={openConfigurarAccesosModal} />
+                  <FontAwesomeIcon icon={faCog} className="text-green-500 mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} />
+                  <FontAwesomeIcon icon={faUsers} className="text-orange-500 cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} />
                 </td>
                 <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
@@ -111,6 +120,7 @@ const Accesos = () => {
       {isEditModalOpen && <EditModal closeModal={closeEditModal} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />} {/* Renderiza el modal de configuración cuando el estado es true */}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} />}
+      {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} token={token}/>}
 
     </div>
     

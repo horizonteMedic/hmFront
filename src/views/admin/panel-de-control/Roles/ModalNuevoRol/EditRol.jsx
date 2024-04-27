@@ -1,36 +1,32 @@
-import React, { useEffect } from 'react';
-import { useState } from 'react';
-import 'react-datepicker/dist/react-datepicker.css';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import { useAuthStore } from '../../../../../store/auth';
-import NewRol from '../model/NewRol';
 import { Loading } from '../../../../components/Loading';
-import { useNavigate } from 'react-router-dom';
+import EditRol from '../model/EditRol';
 
-const Modal = ({ closeModal }) => {
-  const [rol, setRol] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [estado, setEstado] = useState(false);
-  const token = useAuthStore(state => state.token);
-  const userlogued = useAuthStore(state => state.userlogued);
-  const [loading, setLoading] = useState(false)
-  const navigate = useNavigate();
+const EditModal = ({ closeModal, Id, Rol, Descripcion, Estado, token, userlogued }) => {
+    
+    const [newrol, setNewRol] = useState(Rol);
+    const [newdescripcion, setNewDescripcion] = useState(Descripcion);
+    const [newestado, setNewEstado] = useState(Estado);
+    const [loading, setLoading] = useState(false)
 
-  
-  const handleSubmit = async (event) => {
-    setLoading(true)
-    event.preventDefault();
-    NewRol(rol, descripcion,estado,token,userlogued.sub)
-      .then(data => {
-        setLoading(false)
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error('Error:', error)
-      })
-    // Aquí puedes enviar los datos por fetch o realizar cualquier otra acción
-  };
+    const handleSubmit = async (event) => {
+        console.log(newrol)
+        console.log(newdescripcion)
+
+        setLoading(true)
+        event.preventDefault();
+        EditRol(Id,newrol,newdescripcion,newestado,token,userlogued)
+            .then(data => {
+                setLoading(false)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error)
+            })
+        // Aquí puedes enviar los datos por fetch o realizar cualquier otra acción
+      };
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -40,8 +36,8 @@ const Modal = ({ closeModal }) => {
           className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
           onClick={closeModal}
         />
-        <h2 className="text-2xl font-bold mb-4 text-center">Nuevo Rol</h2>
-        <form  autoComplete='off' >
+        <h2 className="text-2xl font-bold mb-4 text-center">Editar Rol</h2>
+        <form autoComplete='off' >
           <div className="flex flex-col items-start justify-center w-auto">
             <div className='flex py-3 justify-center items-center w-full'>
               <label htmlFor="tipoDocumento" className="text-left w-full block text-sm font-medium text-gray-700">
@@ -49,9 +45,10 @@ const Modal = ({ closeModal }) => {
               </label>
               <input
                 type="text"
+                value={newrol}
                 required
                 id="numeroDocumento"
-                onChange={(e) => setRol(e.target.value)}
+                onChange={(e) => setNewRol(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
               />
             </div>
@@ -62,8 +59,9 @@ const Modal = ({ closeModal }) => {
               <input
                 type="text"
                 required
+                value={newdescripcion}
                 id="numeroDocumento"
-                onChange={(e) => setDescripcion(e.target.value)}
+                onChange={(e) => setNewDescripcion(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
               />
             </div>
@@ -72,15 +70,16 @@ const Modal = ({ closeModal }) => {
               <input 
                 className="form-check-input !w-10 !ml-0 " 
                 type="checkbox" 
+                checked={newestado}
                 role="switch"
-                onChange={(e) => setEstado(e.target.checked)} 
+                onChange={(e) => setNewEstado(e.target.checked)} 
                 id="flexSwitchCheckDefault"/>
             </div>
           </div>
           <div className="flex justify-end">
             
-            <button type="submit" onSubmit={handleSubmit} className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
-              Guardar
+            <button type="submit" onClick={handleSubmit} className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
+              Guardar Cambios
             </button>
           </div>
         </form>
@@ -90,4 +89,4 @@ const Modal = ({ closeModal }) => {
   );
 };
 
-export default Modal;
+export default EditModal;
