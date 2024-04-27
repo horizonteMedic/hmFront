@@ -27,9 +27,11 @@ const HistorialPaciente = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
-        <h1 className="text-center text-2xl font-bold mb-4 color-azul sombreado-gris-oscuro">Reporte de Pacientes</h1>
-        <div className="flex justify-between items-center mb-4">
+      <div className="mx-auto bg-white  rounded-lg overflow-hidden shadow-xl  w-[90%]">
+        <div className="px-4 py-2 azulbackgroud flex justify-between ">
+          <h1 className="text-center text-2xl font-bold color-azul text-white">Reporte de Pacientes</h1>
+        </div>
+        <div className="flex justify-between items-center ml-4 pt-3">
           <div>
             <span>Mostrar</span>
             <select className="border border-gray-300 rounded-md ml-2 px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
@@ -38,13 +40,11 @@ const HistorialPaciente = () => {
               <option value={15}>15</option>
               <option value={20}>20</option>
             </select>
-            <span>registros</span>
+            <span> registros</span>
           </div>
-          {/* <div className="relative">
-            <input type="text" id="search" className="border border-gray-300 px-3 py-1 rounded-md focus:outline-none" placeholder="Buscar" />
-          </div> */}
+          
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto p-3">
           <table className="w-full border border-gray-300">
             <thead>
               <tr className="bg-gray-200">

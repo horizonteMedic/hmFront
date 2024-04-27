@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faCog, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faCog, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons'; // Agrega el icono de eliminación
 
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditUsuario/EditModal';
@@ -10,10 +10,10 @@ import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario';
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
+import deleteEmpleado from '../Accesos/model/DeleteEmpleado'; // Importa la función deleteEmpleado
+
 const Accesos = () => {
-
   const token = useAuthStore(state => state.token);
-
   //Consulta de la API
   const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado',token)
   
@@ -54,16 +54,32 @@ const Accesos = () => {
     setIsRegistroUsuarioModalOpen(false);
   };
 
+  // Función para eliminar un usuario
+  const deleteUser = async (employeeId) => {
+    if (employeeId) {
+      try {
+        const response = await deleteEmpleado(employeeId);
+        console.log(response);
+      } catch (error) {
+        console.error('Error al eliminar el usuario:', error.message);
+      }
+    } else {
+      console.error('El ID del empleado es undefined');
+    }
+  };
+  
+
   if (loading) {
     return <Loading/>
   }
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
-        
-        <h1 className="text-center text-2xl font-bold mb-4 color-azul sombreado-gris-oscuro">Usuarios</h1>
-        <div className="flex justify-between mb-4">
+      <div className="mx-auto bg-white  rounded-lg overflow-hidden shadow-xl  w-[90%]">
+        <div className="px-4 py-2 azulbackgroud flex justify-between ">
+          <h1 className="text-center text-2xl font-bold color-azul text-white">Usuarios con Accesos</h1>
+        </div>
+        <div className="flex justify-between p-6">
           <h2 className="text-lg font-semibold">Empleados Registrados</h2>
           <div className="flex">
             <button className="naranja-btn px-4 py-2 rounded-md mr-2" onClick={openModal}>+ Registrar Empleado</button>
@@ -71,7 +87,7 @@ const Accesos = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto mb-4">
+        <div className="overflow-x-auto mb-4 p-3">
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
               <tr className="bg-gray-200">
@@ -81,39 +97,42 @@ const Accesos = () => {
                 <th className="border border-gray-300 px-2 py-1">Número</th>
                 <th className="border border-gray-300 px-2 py-1">Apellidos</th>
                 <th className="border border-gray-300 px-2 py-1">Nombres</th>
-                <th className="border border-gray-300 px-2 py-1">Usuario</th>
                 <th className="border border-gray-300 px-2 py-1">Rol</th>
                 <th className="border border-gray-300 px-2 py-1">Vigente</th>
               </tr>
             </thead>
             <tbody>
-            {data?.map((item, index) => (
-                <tr key={index}>
-                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                <td className="border border-gray-300 px-2 py-1">
-                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
-                  <FontAwesomeIcon icon={faCog} className="text-green-500 cursor-pointer" onClick={openConfigurarAccesosModal} />
-                </td>
-                <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
-                <td className="border border-gray-300 px-2 py-1">johndoe</td>
-                <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
-                <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}><strong>{item.estado ? 'Activo' : 'Inactivo'}</strong></td>
-              </tr>
-              ))}
-            </tbody>
+  {data.map((item, index) => (
+    <tr key={index}>
+      <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+      <td className="border border-gray-300 px-2 py-1">
+        <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={openEditModal} />
+        <FontAwesomeIcon icon={faCog} className="text-green-500  mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} />
+        <FontAwesomeIcon icon={faTrash} className="text-red-500  mr-2 cursor-pointer" onClick={() => deleteUser(item.id)} />
+      </td>
+      <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
+      <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
+      <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
+      <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
+      <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
+      <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>
+        <strong>{item.estado ? 'Activo' : 'Inactivo'}</strong>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
+
+
           </table>
         </div>
       </div>
+      {/* Asegúrate de que los modales estén configurados correctamente */}
       {isModalOpen && <Modal closeModal={closeModal} />}
       {isEditModalOpen && <EditModal closeModal={closeEditModal} />}
-      {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />} {/* Renderiza el modal de configuración cuando el estado es true */}
+      {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} />}
-
     </div>
-    
   );
 };
 

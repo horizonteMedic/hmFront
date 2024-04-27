@@ -71,6 +71,22 @@ const Modal = ({ closeModal }) => {
     (distrito) => distrito.idProvincia === provincia
   )
 
+  const isFormValid = () => {
+    return tipoDocumento !== '' &&
+           nrodoc !== '' &&
+           nombres !== '' &&
+           apellidos !== '' &&
+           email !== '' &&
+           startDate !== null &&
+           sexo !== '' &&
+           celular !== '' &&
+           departamento !== '' &&
+           provincia !== '' &&
+           distrito !== '' &&
+           direccion !== '' &&
+           cargo !== '';
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     NewEmpleado(tipoDocumento,nrodoc,nombres
@@ -105,6 +121,7 @@ const Modal = ({ closeModal }) => {
                 value={tipoDocumento}
                 onChange={handleTipoDocumentoChange}
                 className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               >
                 <option value="">Seleccionar</option>
                 {ListTiposDoc?.map((option) => (
@@ -114,15 +131,22 @@ const Modal = ({ closeModal }) => {
             </div>
             <div>
               <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700">
-                Número de Documento
+                Documento de Identidad D.N.I
               </label>
               <input
                 type="text"
                 value={nrodoc}
-                onChange={(e) => setNrodoc(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+                  if (value.length <= 8) {
+                    setNrodoc(value);
+                  }
+                }}
                 id="numeroDocumento"
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
+
             </div>
             <div>
               <label htmlFor="primerNombre" className="block text-sm font-medium text-gray-700">
@@ -131,9 +155,18 @@ const Modal = ({ closeModal }) => {
               <input
                 type="text"
                 value={nombres}
-                onChange={(e) => setNombres(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  setNombres(
+                    value
+                      .split(' ')
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .join(' ')
+                  );
+                }}
                 id="primerNombre"
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             <div>
@@ -143,9 +176,18 @@ const Modal = ({ closeModal }) => {
               <input
                 type="text"
                 value={apellidos}
-                onChange={(e) => setApellidos(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  setApellidos(
+                    value
+                      .split(' ')
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .join(' ')
+                  );
+                }}
                 id="apellidos"
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             <div>
@@ -158,6 +200,7 @@ const Modal = ({ closeModal }) => {
                 id="email"
                 onChange={(e) => setEmail(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             {/* Segunda columna */}
@@ -171,8 +214,9 @@ const Modal = ({ closeModal }) => {
                 showYearDropdown
                 yearDropdownItemNumber={30}
                 scrollableYearDropdown
-                dateFormat="dd-MM-yyyy"
+                dateFormat="dd/MM/yyyy"
                 className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             <div>
@@ -184,6 +228,7 @@ const Modal = ({ closeModal }) => {
                 value={sexo}
                 onChange={handleSexoChange}
                 className=" pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               >
                 <option value="">Seleccionar</option>
                 {ListSexo?.map((option) => (
@@ -198,9 +243,15 @@ const Modal = ({ closeModal }) => {
               <input
                 type="text"
                 value={celular}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+                  if (value.length <= 9) {
+                    setCelular(value);
+                  }
+                }}
                 id="celular"
-                onChange={(e) => setCelular(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             <div>
@@ -212,6 +263,7 @@ const Modal = ({ closeModal }) => {
                 value={departamento}
                 onChange={handleDepartamentoChange}
                 className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               >
                 <option value="">Seleccionar</option>
                 {ListDepartamentos?.map((option) => (
@@ -228,6 +280,7 @@ const Modal = ({ closeModal }) => {
                 value={provincia}
                 onChange={handleProvinciaChange}
                 className=" pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               >
                 <option value="">Seleccionar</option>
                 {filterProvincias?.map((option) => (
@@ -244,6 +297,7 @@ const Modal = ({ closeModal }) => {
                 value={distrito}
                 onChange={handleDistritoChange}
                 className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               >
                 <option value="">Seleccionar</option>
                 {filterDistritos?.map((option) => (
@@ -262,6 +316,7 @@ const Modal = ({ closeModal }) => {
                 id="direccion"
                 onChange={(e) => setDireccion(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             <div>
@@ -271,9 +326,18 @@ const Modal = ({ closeModal }) => {
               <input
                 type="text"
                 value={cargo}
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  setCargo(
+                    value
+                      .split(' ')
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .join(' ')
+                  );
+                }}
                 id="cargo"
-                onChange={(e) => setCargo(e.target.value)}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
               />
             </div>
             <div>
@@ -296,12 +360,17 @@ const Modal = ({ closeModal }) => {
                 checked={activo}
                 onChange={handleActivoChange}
                 className=" pointer form-checkbox text-blue-500 focus:ring-blue-500 h-6 w-6 bg-white"
+                required
               />
             </div>
           </div>
           <div className="flex justify-end">
-            
-            <button onClick={handleSubmit} type="submit" className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
+            <button
+              onClick={handleSubmit}
+              type="submit"
+              className={`inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md ${isFormValid() ? '': 'cursor-not-allowed opacity-50'}`}
+              disabled={!isFormValid()}
+            >
               Guardar
             </button>
           </div>
@@ -312,3 +381,4 @@ const Modal = ({ closeModal }) => {
 };
 
 export default Modal;
+

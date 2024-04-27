@@ -48,7 +48,7 @@ const Modal = ({ closeModal }) => {
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 naranjabackgroud flex justify-between ">
           <h2 className="text-lg font-bold color-blanco">Historial Paciente - Energi s.a.c.</h2>
-          <button onClick={closeModal} className="text-xl" style={{ fontSize: '20px' }}>&times;</button>
+          <button onClick={closeModal} className="text-xl text-white" style={{ fontSize: '23px'   }}>&times;</button>
         </div>
         <div className="px-6 py-4 overflow-y-auto flex flex-wrap "> 
           <div className="w-full md:w-1/6 mb-4"> 

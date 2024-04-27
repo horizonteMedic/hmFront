@@ -30,11 +30,11 @@ const Roles = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl p-6 w-[90%]">
-      
-        <h1 className="text-center text-2xl font-bold mb-4 color-azul sombreado-gris-oscuro">Roles</h1>
-        <div className="flex justify-between items-center mb-4">
+      <div className="mx-auto bg-white  rounded-lg overflow-hidden shadow-xl  w-[90%]">
+        <div className="px-4 py-2 azulbackgroud flex justify-between ">
+          <h1 className="text-center text-2xl font-bold color-azul text-white">Roles</h1>
+        </div>
+        <div className=" flex justify-between items-center  p-6">
         <div className="relative">
             <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
             <input type="text" id="search" className="border border-gray-300 px-10 py-2 rounded-md w-48 focus:outline-none" placeholder="Buscar" />
@@ -44,7 +44,7 @@ const Roles = () => {
             Agregar
           </button>
         </div>
-        <div className="overflow-x-auto mb-4">
+        <div className="overflow-x-auto mb-4 p-3">
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
               <tr className="bg-gray-200">
