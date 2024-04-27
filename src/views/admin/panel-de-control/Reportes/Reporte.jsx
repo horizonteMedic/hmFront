@@ -28,7 +28,7 @@ const HistorialPaciente = () => {
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white  rounded-lg overflow-hidden shadow-xl  w-[90%]">
-        <div className="px-4 py-2 azulbackgroud flex justify-between ">
+        <div className="px-4 py-2 azuloscurobackground flex justify-between ">
           <h1 className="text-center text-2xl font-bold color-azul text-white">Reporte de Pacientes</h1>
         </div>
         <div className="flex justify-between items-center ml-4 pt-3">
