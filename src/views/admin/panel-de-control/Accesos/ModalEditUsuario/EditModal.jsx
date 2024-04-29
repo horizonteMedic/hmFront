@@ -11,7 +11,6 @@ import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxS
 const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
   Cip, Celular, Distrito, Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
   
-  
   const userlogued = useAuthStore(state => state.userlogued);
   const [tipoDocumento, setTipoDocumento] = React.useState(TipoDoc);
   const [nrodoc, setNrodoc] = useState(Nrodoc)
@@ -22,9 +21,10 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
   //Sexo
   const [sexo, setSexo] = React.useState('');
   const [celular, setCelular] = useState(Celular)
-  const [departamento, setDepartamento] = React.useState('');
-  const [provincia, setProvincia] = React.useState('');
-  const [distrito, setDistrito] = React.useState(Distrito);
+
+  const [departamento, setDepartamento] = React.useState(Distrito.slice(0, 2));
+  const [provincia, setProvincia] = React.useState(Distrito.slice(0, 4));
+  const [distrito, setDistrito] = React.useState(Distrito.slice(0, 6));
   //Se le pasa el distrito
   const [direccion, setDireccion] = useState(Direccion)
   const [cargo, setCargo] = useState(Cargo)
@@ -90,9 +90,9 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
   const handleSubmit = async (event) => {
     event.preventDefault();
     EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate, 
-      cip, celular, distrito, direccion, cargo, activo, FechaInicio, UserRegistro, User,userlogued.sub)
+      cip, celular, distrito, direccion, cargo, activo, FechaInicio, UserRegistro, userlogued.sub)
       .then(data => {
-        console.log('editao')
+        console.log('wtd')
       })
       .catch(error => {
         console.error('Error', error)
@@ -266,7 +266,7 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
               >
                 <option value="">Seleccionar</option>
                 {ListDepartamentos?.map((option) => (
-                  <option key={option.id} value={option.id}>{option.nombre}</option>
+                  <option key={option.id} value={option.id} selected={option.id === departamento}>{option.nombre}</option>
                 ))}
               </select>
             </div>
@@ -283,7 +283,7 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
               >
                 <option value="">Seleccionar</option>
                 {filterProvincias?.map((option) => (
-                  <option key={option.id} value={option.id}>{option.nombre}</option>
+                  <option key={option.id} value={option.id} selected={option.id === provincia}>{option.nombre}</option>
                 ))}
               </select>
             </div>
@@ -300,7 +300,7 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
               >
                 <option value="">Seleccionar</option>
                 {filterDistritos?.map((option) => (
-                  <option key={option.id} value={option.id}>{option.nombre}</option>
+                  <option key={option.id} value={option.id} selected={option.id === distrito}>{option.nombre}</option>
                 ))}
               </select>
             </div>
@@ -377,8 +377,7 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
             <button
               onClick={handleSubmit}
               type="submit"
-              className={`inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md ${isFormValid() ? '': 'cursor-not-allowed opacity-50'}`}
-              disabled={!isFormValid()}
+              className={`inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md `}
             >
               Guardar
             </button>

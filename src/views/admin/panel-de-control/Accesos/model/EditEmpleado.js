@@ -5,8 +5,17 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
     const year = currentDate.getFullYear(); // Obtiene el año actual
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
     const day = ('0' + currentDate.getDate()).slice(-2); 
-
     const actual = `${year}-${month}-${day}`
+
+    let FechaNac = ''
+
+    if (FechaNacimiento instanceof Date) {
+        const Fecha = FechaNacimiento ? FechaNacimiento.toISOString().split('T')[0] : '';
+        FechaNac = Fecha
+    } else {
+        FechaNac = FechaNacimiento
+    }
+    console.log(FechaNac)
     const data = {
         tipoDoc: TipoDoc,
         numDocumento: Nrodoc,
@@ -20,7 +29,7 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
         telFijo: null,
         direccion: Direccion,
         estado: Estado,
-        fechaNacimiento: FechaNacimiento,
+        fechaNacimiento: FechaNac,
         fechaRegistro: FechaInicio,
         userRegistro: UserRegistro,
         fechaActualizacion: actual,
@@ -28,13 +37,14 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
     }
 
     console.log('JOSN: ',JSON.stringify(data))
-        const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol/${ID}`, {
+        const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado/${ID}`, {
             method: 'PUT', 
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(data)
         })
+        console.log(response)
         if(response.ok){
             return
         } else {

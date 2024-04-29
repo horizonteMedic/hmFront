@@ -61,6 +61,7 @@ const Accesos = () => {
 
   const openEditModal = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado, 
     fechaNacimiento, fechaRegistro, usuarioRegistro) => {
+
     SetIdEmpleado(id)
     setTipoDocumento(tipoDocumento)
     setNrodoc(nroDocumento);
