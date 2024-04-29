@@ -1,4 +1,4 @@
-export default async function deleteEmpleado(empleadoId) {
+export default async function DeleteEmpleado(empleadoId) {
     try {
         const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado/${empleadoId}`, {
             method: 'DELETE',
@@ -6,7 +6,7 @@ export default async function deleteEmpleado(empleadoId) {
                 'Content-Type': 'application/json'
             }
         });
-
+        console.log('id',empleadoId,response)
         if(response.ok){
             const responseData = await response.json(); 
             return responseData;

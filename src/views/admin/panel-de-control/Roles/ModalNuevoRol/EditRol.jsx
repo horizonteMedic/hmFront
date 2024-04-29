@@ -4,20 +4,19 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Loading } from '../../../../components/Loading';
 import EditRol from '../model/EditRol';
 
-const EditModal = ({ closeModal, Id, Rol, Descripcion, Estado, token, userlogued }) => {
+const EditModal = ({ closeModal, Id, Rol, Descripcion, Estado, fechaRegistro, userRegistro, token, userlogued }) => {
     
     const [newrol, setNewRol] = useState(Rol);
     const [newdescripcion, setNewDescripcion] = useState(Descripcion);
     const [newestado, setNewEstado] = useState(Estado);
+    const [newfechainicio, setFechainicio] = useState(fechaRegistro);
+    const [newuserRegistro, setUserRegistro] = useState(userRegistro);
     const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (event) => {
-        console.log(newrol)
-        console.log(newdescripcion)
-
         setLoading(true)
         event.preventDefault();
-        EditRol(Id,newrol,newdescripcion,newestado,token,userlogued)
+        EditRol(Id,newrol,newdescripcion,newestado,newfechainicio,newuserRegistro,token,userlogued)
             .then(data => {
                 setLoading(false)
                 window.location.reload();

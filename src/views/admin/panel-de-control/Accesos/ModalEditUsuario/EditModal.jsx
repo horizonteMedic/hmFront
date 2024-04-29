@@ -5,33 +5,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import NewEmpleado from '../model/RegisterEmpleado';
 import { useAuthStore } from '../../../../../store/auth';
-
+import EditEmpleado from '../model/EditEmpleado';
 import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc } from '../model/Combobox';
 
-const editModal = ({ closeModal }) => {
+const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
+  Cip, Celular, Distrito, Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
+  
+  
   const userlogued = useAuthStore(state => state.userlogued);
-  const token = useAuthStore(state => state.token);
-
-  const [tipoDocumento, setTipoDocumento] = React.useState('');
-  const [nrodoc, setNrodoc] = useState('')
-  const [nombres, setNombres] = useState('')
-  const [apellidos, setApellidos] = useState('')
-  const [email, setEmail] = useState('')
-  const [startDate, setStartDate] = React.useState(null);
-  const formattedDate = startDate ? startDate.toISOString().split('T')[0] : '';
+  const [tipoDocumento, setTipoDocumento] = React.useState(TipoDoc);
+  const [nrodoc, setNrodoc] = useState(Nrodoc)
+  const [nombres, setNombres] = useState(Nombres)
+  const [apellidos, setApellidos] = useState(Apellidos)
+  const [email, setEmail] = useState(Email)
+  const [startDate, setStartDate] = React.useState(FechaNacimiento);
   //Sexo
   const [sexo, setSexo] = React.useState('');
-  const [celular, setCelular] = useState('')
+  const [celular, setCelular] = useState(Celular)
   const [departamento, setDepartamento] = React.useState('');
   const [provincia, setProvincia] = React.useState('');
-  const [distrito, setDistrito] = React.useState('');
+  const [distrito, setDistrito] = React.useState(Distrito);
   //Se le pasa el distrito
-  const [direccion, setDireccion] = useState('')
-  const [cargo, setCargo] = useState('')
+  const [direccion, setDireccion] = useState(Direccion)
+  const [cargo, setCargo] = useState(Cargo)
   //CIP
-  const [activo, setActivo] = React.useState(false);
+  const [activo, setActivo] = React.useState(Estado);
+  const [cip, setCip] = useState('')
 
-  const llamadaAPI = [activo,cargo,direccion]
   //Llamada de combobox
   const ListDepartamentos = ComboboxDepartamentos();
   const ListProvincias =  ComboboxProvincias()
@@ -89,11 +89,10 @@ const editModal = ({ closeModal }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    NewEmpleado(tipoDocumento,nrodoc,nombres
-      ,apellidos,cargo,distrito,email,celular,direccion,activo
-    ,formattedDate,userlogued.sub)
+    EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate, 
+      cip, celular, distrito, direccion, cargo, activo, FechaInicio, UserRegistro, User,userlogued.sub)
       .then(data => {
-        window.location.reload();
+        console.log('editao')
       })
       .catch(error => {
         console.error('Error', error)
@@ -346,6 +345,16 @@ const editModal = ({ closeModal }) => {
               </label>
               <input
                 type="text"
+                value={Cip}
+                onChange={(e) => {
+                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  setCip(
+                    value
+                      .split(' ')
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .join(' ')
+                  );
+                }}
                 id="cip"
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
               />

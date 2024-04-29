@@ -11,6 +11,7 @@ import Swal from 'sweetalert2'
 import DeleteRol from './model/DeleteRol';
 
 const Roles = () => {
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
@@ -23,6 +24,11 @@ const Roles = () => {
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [estado, setEstado] = useState(false);
+  const [fechainicio, setFechainicio] = useState('');
+  const [userRegistro, setUserRegistro] = useState('');
+
+  const URLApiGet = 'https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol'
+  const {data, loading} = getFetch(URLApiGet,token)
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -32,11 +38,13 @@ const Roles = () => {
     setIsModalOpen(false);
   };
 
-  const openEditModal = (id,nombre,descripcion,estado) => {
+  const openEditModal = (id,nombre,descripcion,estado,fechainicio,userRegistro) => {
     setId(id)
     setRol(nombre)
     setDescripcion(descripcion)
     setEstado(estado)
+    setFechainicio(fechainicio)
+    setUserRegistro(userRegistro)
     setIsModalEditOpen(true)
   }
 
@@ -78,7 +86,6 @@ const Roles = () => {
     });
   }
   
-  const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol',token)
   //Obtener datos de todos los roles
   
 
@@ -119,8 +126,10 @@ const Roles = () => {
                 <tr key={index}>
                 <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                 <td className="border border-gray-300 px-2 py-1">
-                  <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol,item.nombre,item.descripcion,item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
+                  <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol,item.nombre,item.descripcion,item.estado,item.fechaRegistro,item.userRegistro)}} className="text-blue-500 mr-2 cursor-pointer" />
                   <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol,token)}} className="text-red-500 mr-2 cursor-pointer" />
+                  <FontAwesomeIcon icon={faPlus} size='xl' onClick={() => {{/*MODAL PARA ASIGNAR VISTAS*/}}} className="text-green-500 mr-2 cursor-pointer" />
+
                 </td>
                 <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
@@ -133,7 +142,7 @@ const Roles = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Id={id} Rol={rol} Descripcion={descripcion} 
-      Estado={estado} token={token} userlogued={userlogued.sub}/>}
+      Estado={estado} fechaRegistro={fechainicio} userRegistro={userRegistro} token={token}  userlogued={userlogued.sub}/>}
     </div>
     
   );

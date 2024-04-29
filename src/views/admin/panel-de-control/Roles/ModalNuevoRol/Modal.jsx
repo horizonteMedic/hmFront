@@ -15,7 +15,6 @@ const Modal = ({ closeModal }) => {
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate();
 
   
   const handleSubmit = async (event) => {
@@ -79,7 +78,7 @@ const Modal = ({ closeModal }) => {
           </div>
           <div className="flex justify-end">
             
-            <button type="submit" onSubmit={handleSubmit} className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
+            <button type="submit" onClick={handleSubmit} className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
               Guardar
             </button>
           </div>

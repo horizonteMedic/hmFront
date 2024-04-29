@@ -1,4 +1,4 @@
-export default async function EditRol(id,rol,descripcion,estado,token,userlogued) {
+export default async function EditRol(id,rol,descripcion,estado,fecharegistro,userRegistro,token,userlogued) {
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
@@ -7,14 +7,15 @@ export default async function EditRol(id,rol,descripcion,estado,token,userlogued
 
     const data = {
         nombre: rol,
-        descripcion: descripcion,
         estado: estado,
+        fechaRegistro: fecharegistro,
+        userRegistro: userRegistro,
         fechaActualizacion: `${year}-${month}-${day}`,
-        userActualizacion: userlogued
+        userActualizacion: userlogued,
+        descripcion: descripcion
     }
-    console.log(data)
         const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol/${id}`, {
-            method: 'POST', 
+            method: 'PUT', 
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
