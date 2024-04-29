@@ -1,17 +1,15 @@
-// App.js
+// Footer.js
 import React from 'react';
 import './Footer.css';
-import Footer from './Footer';
+function Footer() {
+  const currentYear = new Date().getFullYear();
 
-function App() {
   return (
-    <div className="App">
-      <div className="content">
-        <p>hhhhh</p>
-      </div>
-      <Footer />
-    </div>
+    <footer className="footer">
+      <p>© {currentYear} Todos los derechos reservados.</p>
+      <p>Horizonte Medic</p>
+    </footer>
   );
 }
 
-export default App;
+export default Footer;
