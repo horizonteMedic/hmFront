@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <div className="content">
-        {/* Contenido de tu aplicación aquí */}
+        <p>hhhhh</p>
       </div>
       <Footer />
     </div>
