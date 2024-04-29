@@ -1,33 +1,47 @@
-/* styles.css */
-html, body, #root {
-  height: auto;
-  min-height: 100vh;
-  margin: 0;
-}
-#root{
-  position: relative;
-}
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.content {
-  flex: 1;
-  padding: 20px;
-}
+/* Footer.css */
 
 .footer {
-  padding: 20px;
-  color: white;
-  background-color: #084788;
-  text-align: center;
-  padding-top: 10px;
-  position: absolute;
-  width: 100%;
+  position: fixed;
   bottom: 0;
   left: 0;
-  right: 0;
+  width: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 20px;
 }
 
+@media (max-width: 767px) {
+  .footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 991px) {
+  .footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+  }
+}
+
+@media (min-width: 1200px) {
+  .footer {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+  }
+}
