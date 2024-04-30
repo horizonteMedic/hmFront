@@ -15,7 +15,6 @@ const Modal = ({ closeModal }) => {
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     setLoading(true)
