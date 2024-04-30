@@ -26,7 +26,7 @@ const RuterConfig = () => {
     <div className="flex justify-center mt-4 mb-5">
       <div className="w-full md:w-[90%] p-4">
         <div className="flex flex-col md:flex-row gap-4">
-          <Link
+          {/* <Link
             to="/configuracion-vistas-por-rol"
             className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
               activeButton === 'configuracion-vistas-por-rol' ? 'bg-yellow-300' : ''
@@ -35,7 +35,7 @@ const RuterConfig = () => {
           >
             <FontAwesomeIcon icon={faCog} className="mr-2" />
             Configuración de Vistas por Rol
-          </Link>
+          </Link> */}
           <Link
             to="/lista-archivos"
             className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${

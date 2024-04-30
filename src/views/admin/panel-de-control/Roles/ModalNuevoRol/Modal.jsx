@@ -17,7 +17,6 @@ const Modal = ({ closeModal }) => {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate();
 
-  
   const handleSubmit = async (event) => {
     setLoading(true)
     event.preventDefault();
@@ -29,7 +28,16 @@ const Modal = ({ closeModal }) => {
       .catch(error => {
         console.error('Error:', error)
       })
-    // Aquí puedes enviar los datos por fetch o realizar cualquier otra acción
+  };
+
+  const handleRolChange = (e) => {
+    const capitalized = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
+    setRol(capitalized);
+  };
+
+  const handleDescripcionChange = (e) => {
+    const capitalized = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
+    setDescripcion(capitalized);
   };
 
   return (
@@ -44,33 +52,35 @@ const Modal = ({ closeModal }) => {
         <form  autoComplete='off' >
           <div className="flex flex-col items-start justify-center w-auto">
             <div className='flex py-3 justify-center items-center w-full'>
-              <label htmlFor="tipoDocumento" className="text-left w-full block text-sm font-medium text-gray-700">
+              <label htmlFor="tipoDocumento" className="text-left w-full block ">
                 Nombre de Rol
               </label>
               <input
                 type="text"
                 required
                 id="numeroDocumento"
-                onChange={(e) => setRol(e.target.value)}
+                onChange={handleRolChange}
+                value={rol}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
               />
             </div>
             <div className='flex py-3 justify-center items-center w-full'>
-              <label htmlFor="numeroDocumento" className="text-left w-full block text-sm font-medium text-gray-700">
+              <label htmlFor="numeroDocumento" className="text-left w-full block ">
                 Descripción
               </label>
               <input
                 type="text"
                 required
                 id="numeroDocumento"
-                onChange={(e) => setDescripcion(e.target.value)}
+                onChange={handleDescripcionChange}
+                value={descripcion}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
               />
             </div>
             <div className="form-check py-4 form-switch pl-0 w-full flex justify-center items-center">
-              <label className="form-check-label mr-8"  htmlFor="flexSwitchCheckDefault"> Estado </label>
+              <label className=" form-check-label mr-8"  htmlFor="flexSwitchCheckDefault"> Estado </label>
               <input 
-                className="form-check-input !w-10 !ml-0 " 
+                className="pointer form-check-input !w-10 !ml-0 " 
                 type="checkbox" 
                 role="switch"
                 onChange={(e) => setEstado(e.target.checked)} 
@@ -79,7 +89,7 @@ const Modal = ({ closeModal }) => {
           </div>
           <div className="flex justify-end">
             
-            <button type="submit" onSubmit={handleSubmit} className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
+            <button type="submit" onClick={handleSubmit} className="inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md">
               Guardar
             </button>
           </div>

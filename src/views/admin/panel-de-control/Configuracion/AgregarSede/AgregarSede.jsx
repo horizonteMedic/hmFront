@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import RuterConfig from '../RuterConfig';
 
 const AgregarSede = () => {
+  const [estado, setEstado] = useState('activo'); // Estado por defecto
+
+  const handleEstadoChange = (e) => {
+    setEstado(e.target.checked ? 'activo' : 'inactivo');
+  };
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig /> 
@@ -23,30 +29,32 @@ const AgregarSede = () => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="region" className="block text-sm font-medium text-gray-700">
-              Selecciona Región:
+            <label htmlFor="codigo" className="block text-sm font-medium text-gray-700">
+              Código:
             </label>
-            <select
-              id="region"
-              name="region"
-              className="border pointer mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            >
-              <option value="">Selecciona una región</option>
-              <option value="region1">Región 1</option>
-              <option value="region2">Región 2</option>
-              <option value="region3">Región 3</option>
-            </select>
+            <input
+              id="codigo"
+              name="codigo"
+              type="number"
+              className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              placeholder="Ingrese el código de la sede"
+            />
           </div>
           <div className="mb-4">
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">
-              Descripción:
+            <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
+              Estado:
             </label>
-            <textarea
-              id="descripcion"
-              name="descripcion"
-              className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              placeholder="Ingrese la descripción de la campaña"
-            ></textarea>
+            <div className="mt-1">
+              <input
+                type="checkbox"
+                id="estado"
+                name="estado"
+                className="pointer focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                checked={estado === 'activo'}
+                onChange={handleEstadoChange}
+              />
+              <span className="ml-2 text-sm text-gray-600">Activo</span>
+            </div>
           </div>
           <button className="azul-btn font-bold py-2 px-4 rounded">
             Registrar Sede

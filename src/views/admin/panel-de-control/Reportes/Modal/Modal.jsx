@@ -7,6 +7,8 @@ const Modal = ({ closeModal }) => {
   const [isCAMUModalOpen, setIsCAMUModalOpen] = useState(false);
   const [isImagenModalOpen, setIsImagenModalOpen] = useState(false);
   const [isCovidModalOpen, setIsCovidModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileData, setFileData] = useState(null);
 
   const openLegajoModal = () => {
     setIsLegajoModalOpen(true);
@@ -43,6 +45,27 @@ const Modal = ({ closeModal }) => {
   const handleFileInputClick = () => {
     document.getElementById('fileInput').click();
   };
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file);
+    convertFileToBase64(file);
+  };
+
+  const convertFileToBase64 = (file) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setFileData(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const enviarArchivo = () => {
+    // Aquí puedes realizar la lógica para enviar el archivo en base64 al servidor
+    console.log('Enviando archivo:', fileData);
+    // Por ejemplo, puedes usar fetch para enviar el archivo
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -106,7 +129,6 @@ const Modal = ({ closeModal }) => {
                 <td className="border border-gray-300 px-2 py-1"></td>
                 <td className="border border-gray-300 px-2 py-1"></td>
               </tr>
-              {/* Repite el contenido de la tabla según sea necesario */}
             </tbody>
           </table>
         </div>
@@ -120,8 +142,16 @@ const Modal = ({ closeModal }) => {
             <button onClick={closeLegajoModal} className="absolute top-2 right-2 px-2 py-1 text-black rounded-full">X</button>
             <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
               Haga clic aquí para seleccionar un archivo
-              <input type="file" id="fileInput" className="hidden" />
+              <input
+                type="file"
+                id="fileInput"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
+            {selectedFile && (
+              <button onClick={enviarArchivo} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Enviar</button>
+            )}
           </div>
         </div>
       )}

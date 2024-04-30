@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal/Modal';
@@ -11,8 +11,15 @@ const HistorialPaciente = () => {
   ];
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [recordsPerPage, setRecordsPerPage] = useState(5); // Estado para almacenar la cantidad de registros por página
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para almacenar el término de búsqueda
+  const [recordsPerPage, setRecordsPerPage] = useState(5);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredPacientes, setFilteredPacientes] = useState([]);
+  const today = new Date();
+  const options = { timeZone: 'America/Lima' };
+  const formattedToday = today.toLocaleDateString('en-CA', options); 
+  today.setDate(today.getDate() - 1); 
+  const [startDate, setStartDate] = useState(formattedToday);
+  const [endDate, setEndDate] = useState(formattedToday);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -26,15 +33,38 @@ const HistorialPaciente = () => {
     setRecordsPerPage(parseInt(e.target.value));
   };
 
+  const handleStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const handleEndDateChange = (e) => {
+    setEndDate(e.target.value);
+  };
+
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString();
+    return `${day}-${month}-${year}`;
+  };
+  
 
-  const filteredPacientes = pacientes.filter((paciente) =>
-    paciente.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    paciente.apellidos.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    paciente.dni.includes(searchTerm)
-  );
+  useEffect(() => {
+    const filteredByDate = pacientes.filter(paciente => {
+      const examDate = new Date(paciente.fechaExamen).toISOString().split('T')[0];
+      return examDate >= startDate && examDate <= endDate;
+    });
+
+    const filteredByDNI = filteredByDate.filter(paciente => {
+      return paciente.dni.includes(searchTerm);
+    });
+
+    setFilteredPacientes(filteredByDNI);
+  }, [startDate, endDate, searchTerm]);
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -43,7 +73,7 @@ const HistorialPaciente = () => {
           <h1 className="text-center text-2xl font-bold color-azul text-white">Reporte de Pacientes</h1>
         </div>
         <div className="flex justify-between items-center ml-4 pt-3">
-          <div>
+          <div className="flex items-center">
             <span>Mostrar</span>
             <select className="border pointer border-gray-300 rounded-md ml-2 px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
               <option value={2}>2</option>
@@ -52,17 +82,30 @@ const HistorialPaciente = () => {
               <option value={15}>15</option>
               <option value={20}>20</option>
             </select>
-            <span> registros</span>
-          </div>
-          <div className="flex items-center">
+            <span className='ml-2'> registros </span>
+            <span className="ml-12"><strong>Fecha inicio: </strong></span>
+            <input
+              type="date"
+              className="pointer border border-gray-300 rounded-md ml-2 px-2 py-1"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+            <span className="ml-12"><strong>Fecha fin:</strong></span>
+            <input
+              type="date"
+              className=" pointer border border-gray-300 rounded-md ml-2 px-2 py-1"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+            
+            <span className="ml-12"><strong>Buscar por DNI: </strong></span>
             <input
               type="text"
-              placeholder="Buscar por nombre, apellido o DNI"
-              className="border border-gray-300 rounded-md mr-4 px-2 py-1"
+              className="pointer border border-gray-300 rounded-md ml-2 px-2 py-1"
               value={searchTerm}
               onChange={handleSearch}
             />
-            <button className="mr-4 focus:outline-none">
+            <button className="focus:outline-none ml-2">
               <FontAwesomeIcon icon={faSearch} className="text-blue-500 cursor-pointer" />
             </button>
           </div>
@@ -89,9 +132,10 @@ const HistorialPaciente = () => {
                   <td className="border border-gray-300 px-3 py-2">{paciente.dni}</td>
                   <td className="border border-gray-300 px-3 py-2">{paciente.apellidos}</td>
                   <td className="border border-gray-300 px-3 py-2">{paciente.nombres}</td>
-                  <td className="border border-gray-300 px-3 py-2">{paciente.fechaExamen}</td>
+                  <td className="border border-gray-300 px-3 py-2">{formatDate(paciente.fechaExamen)}</td>
                 </tr>
               ))}
+
             </tbody>
           </table>
         </div>

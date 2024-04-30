@@ -1,24 +1,23 @@
-// views/admin/panel-de-control/Roles.jsx
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash, faPlus, faLock } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalNuevoRol/Modal'; 
-import {getFetch} from '../getFetch/getFetch'
+import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
 import EditModal from './ModalNuevoRol/EditRol';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 import DeleteRol from './model/DeleteRol';
+import ModalAsignarAccesoRol from './ModalNuevoRol/AsignarAccesoRol'; // Importa el componente ModalAsignarAccesoRol
 
 const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalAccessOpen, setIsModalAccessOpen] = useState(false); // Estado para controlar el modal de asignación de acceso
+
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
-  const [isModalEditOpen, setIsModalEditOpen] = useState(false)
-
-
-  //Para Editar
+  const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [id, setId] = useState('');
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -32,7 +31,7 @@ const Roles = () => {
     setIsModalOpen(false);
   };
 
-  const openEditModal = (id,nombre,descripcion,estado) => {
+  const openEditModal = (id, nombre, descripcion, estado) => {
     setId(id)
     setRol(nombre)
     setDescripcion(descripcion)
@@ -44,7 +43,15 @@ const Roles = () => {
     setIsModalEditOpen(false)
   }
 
-  const deleteRol = (id,token) => {
+  const openAccessModal = () => {
+    setIsModalAccessOpen(true); // Función para abrir el modal de asignación de acceso
+  };
+
+  const closeAccessModal = () => {
+    setIsModalAccessOpen(false); // Función para cerrar el modal de asignación de acceso
+  };
+
+  const deleteRol = (id, token) => {
     Swal.fire({
       title: "¿Estas Seguro?",
       text: "No puedes revertir esta accion!",
@@ -55,8 +62,8 @@ const Roles = () => {
       confirmButtonText: "Si, Eliminar!"
     }).then((result) => {
       if (result.isConfirmed) {
-        DeleteRol(id,token)
-          .then(()=>{
+        DeleteRol(id, token)
+          .then(() => {
             Swal.fire({
               title: "Eliminado!",
               text: "El Rol ha sido Eliminado.",
@@ -71,21 +78,16 @@ const Roles = () => {
               text: "El Rol no se ha podido Eliminar!",
               icon: "error"
             });
-          }
-          )
-        
+          });
       }
     });
   }
-  
-  const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol',token)
-  //Obtener datos de todos los roles
-  
+
+  const { data, loading } = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
 
   if (loading) {
-    return <Loading/>
+    return <Loading />
   }
-  
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -93,16 +95,16 @@ const Roles = () => {
         <div className="px-4 py-2 azuloscurobackground flex justify-between ">
           <h1 className="text-center text-2xl font-bold color-azul text-white">Roles</h1>
         </div>
-        <div className=" flex justify-between items-center  p-6">
-        <div className="relative">
-            <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
-            <input type="text" id="search" className="border border-gray-300 px-10 py-2 rounded-md w-48 focus:outline-none" placeholder="Buscar" />
+          
+        <div className="flex items-center mt-2 mr-4">
+          <div className="relative ml-auto"> {/* Utilizamos ml-auto para alinear a la derecha */}
+            <button onClick={openModal} className="flex items-center px-4 py-2 azul-btn rounded-md">
+              <FontAwesomeIcon icon={faPlus} className="mr-2" />
+              Agregar
+            </button>
           </div>
-          <button onClick={openModal} className="flex items-center px-4 py-2 azul-btn rounded-md">
-            <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Agregar
-          </button>
         </div>
+          
         <div className="overflow-x-auto mb-4 p-3">
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
@@ -117,25 +119,25 @@ const Roles = () => {
             <tbody>
               {data?.map((item, index) => (
                 <tr key={index}>
-                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                <td className="border border-gray-300 px-2 py-1">
-                  <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol,item.nombre,item.descripcion,item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
-                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol,token)}} className="text-red-500 mr-2 cursor-pointer" />
-                </td>
-                <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
-                <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
-              </tr>
+                  <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                  <td className="border border-gray-300 px-2 py-1">
+                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol, token)}} className="text-red-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 mr-2 cursor-pointer" />
+                  </td>
+                  <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
+                  <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
+                  <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
+                </tr>
               ))}
             </tbody>
           </table>
         </div>
       </div>
       {isModalOpen && <Modal closeModal={closeModal} />}
-      {isModalEditOpen && <EditModal closeModal={closeEditModal} Id={id} Rol={rol} Descripcion={descripcion} 
-      Estado={estado} token={token} userlogued={userlogued.sub}/>}
+      {isModalEditOpen && <EditModal closeModal={closeEditModal} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
+      {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} />} {/* Modal de asignación de acceso */}
     </div>
-    
   );
 };
 

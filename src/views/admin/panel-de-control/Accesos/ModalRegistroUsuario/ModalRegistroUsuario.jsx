@@ -13,6 +13,12 @@ const RegistroUsuarioModal = ({ closeModal }) => {
   const [razonSocial, setRazonSocial] = useState('');
   const [sede, setSede] = useState('');
 
+  const capitalizeWords = (str) => {
+    return str.replace(/\b\w/g, function (char) {
+      return char.toUpperCase();
+    });
+  };
+
   const handleRegistrar = () => {
     NewUser(username,password,estado,razonSocial,documento)
       .then(data => {
@@ -21,6 +27,11 @@ const RegistroUsuarioModal = ({ closeModal }) => {
       .catch(error => {
         console.error('Error', error)
       })
+  };
+
+  const handleApellidosNombresChange = (e) => {
+    const inputValue = e.target.value;
+    setApellidosNombres(capitalizeWords(inputValue));
   };
 
   return (
@@ -50,7 +61,7 @@ const RegistroUsuarioModal = ({ closeModal }) => {
             <input
               type="text"
               value={apellidosNombres}
-              onChange={(e) => setApellidosNombres(e.target.value)}
+              onChange={handleApellidosNombresChange}
               className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
             />
           </div>
