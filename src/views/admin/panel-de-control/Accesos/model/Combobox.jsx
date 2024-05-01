@@ -111,4 +111,26 @@ const ComboboxTipoDoc = () => {
     return options;
   };
 
-export { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc }
+const ComboboxSedes = () => {
+    const [options, setOptions] = useState([]);
+    const token = useAuthStore((state) => state.token);
+    useEffect(() => { 
+          fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede',{
+          method: 'GET', 
+          headers: {
+              'Authorization': `Bearer ${token}`
+          },
+      })
+          .then(response => response.json())
+          .then((data) => {
+              setOptions(data);
+          })
+          .catch((error) => {
+              console.error('Error obteniendo opciones de tipo de documento:', error);
+          });
+      }, []);
+  
+    return options;
+  };
+
+export { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc, ComboboxSedes }

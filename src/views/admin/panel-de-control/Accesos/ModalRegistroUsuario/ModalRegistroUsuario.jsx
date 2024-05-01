@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import NewUser from '../model/RegisterUser';
+import { ComboboxSedes } from '../model/Combobox';
 
 const RegistroUsuarioModal = ({ closeModal }) => {
   const [documento, setDocumento] = useState('');
@@ -12,6 +13,8 @@ const RegistroUsuarioModal = ({ closeModal }) => {
   const [empresaContrata, setEmpresaContrata] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
   const [sede, setSede] = useState('');
+
+  const ListSedes = ComboboxSedes()
 
   const capitalizeWords = (str) => {
     return str.replace(/\b\w/g, function (char) {
@@ -124,7 +127,9 @@ const RegistroUsuarioModal = ({ closeModal }) => {
               className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
             >
               <option value="">Seleccione...</option>
-              {/* Opciones de sedes */}
+              {ListSedes?.map((option) => (
+                  <option key={option.id} value={option.nombreSede}>{option.nombreSede}</option>
+                ))}
             </select>
           </div>
         </div>
