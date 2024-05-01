@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Loading } from '../../../../components/Loading';
@@ -22,10 +22,20 @@ const Modal = ({children, closeModal}) => {
 
 const UsersModal = ({ closeModal, idEmpleado, token }) => {
 
-    const {data, loading} = ListUser(idEmpleado,token)
-
-    if (loading) {
-        return <Loading/>
+    const [data, setData] = useState([])
+    const [refres, setRefresh] = useState(0)
+    useEffect(() => {
+      ListUser(idEmpleado, token)
+      .then(response => {
+        setData(response)
+      })
+      .catch(error => {
+        throw new Error('Network response was not ok.',error);
+      })
+    },[refres])
+  
+    const Refresgpag = () => {
+      setRefresh(refres + +1)
     }
 
   return (
@@ -42,29 +52,14 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
               </tr>
             </thead>
             <tbody>
-            {Array.isArray(data) ? (
-                data.map((item, index) => (
+            {data.map((item, index) => (
                 <tr key={index}>
                     <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                     <td className="border border-gray-300 px-2 py-1">{item.username}</td>
-                    <td className="border border-gray-300 px-2 py-1">{item.estado}</td>
+                    <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
                     <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
                 </tr>
-                ))
-            ) : data ? (
-                // Si data es un objeto, mostrar los detalles del único usuario
-                <tr>
-                <td className="border border-gray-300 px-2 py-1">{data.idUser}</td>
-                <td className="border border-gray-300 px-2 py-1">{data.username}</td>
-                <td className={`border border-gray-300 px-2 py-1 ${data.estado ? 'bg-green-300' : 'bg-red-300'}`}>{data.estado  ? 'Activo' : 'Desactivado'}</td>
-                <td className="border border-gray-300 px-2 py-1">{data.ruc}</td>
-                </tr>
-            ) : (
-                // Si data es null, undefined u otro valor falsy, mostrar un mensaje de error o vacío
-                <tr>
-                <td colSpan="4" className="border border-gray-300 px-2 py-1">No hay datos disponibles</td>
-                </tr>
-            )}
+                ))}
             </tbody>
           </table>
         </Modal>
