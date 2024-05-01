@@ -15,7 +15,6 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
     } else {
         FechaNac = FechaNacimiento
     }
-    console.log(FechaNac)
     const data = {
         tipoDoc: TipoDoc,
         numDocumento: Nrodoc,
@@ -36,7 +35,6 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
         userActualizacion: User
     }
 
-    console.log('JOSN: ',JSON.stringify(data))
         const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado/${ID}`, {
             method: 'PUT', 
             headers: {
@@ -44,7 +42,6 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
             },
             body: JSON.stringify(data)
         })
-        console.log(response)
         if(response.ok){
             return
         } else {

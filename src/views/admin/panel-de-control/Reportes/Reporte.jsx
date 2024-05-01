@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { ComboboxSedes } from './Modal/Combobox';
 import Modal from './Modal/Modal';
 
 const HistorialPaciente = () => {
@@ -10,6 +11,8 @@ const HistorialPaciente = () => {
     { ac: '003', dni: '34567890', apellidos: 'Martínez', nombres: 'Ana', fechaExamen: '2024-04-10' }
   ];
 
+  const ListSedes = ComboboxSedes();
+  console.log(ListSedes)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,7 +100,6 @@ const HistorialPaciente = () => {
               value={endDate}
               onChange={handleEndDateChange}
             />
-            
             <span className="ml-12"><strong>Buscar por DNI: </strong></span>
             <input
               type="text"
@@ -108,6 +110,21 @@ const HistorialPaciente = () => {
             <button className="focus:outline-none ml-2">
               <FontAwesomeIcon icon={faSearch} className="text-blue-500 cursor-pointer" />
             </button>
+            <span className="ml-12"><strong>Sedes </strong></span>
+              <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
+                Tipo de Documento
+              </label>
+              <select
+                id="tipoDocumento"
+                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                required
+              >
+                <option value="">Seleccionar</option>
+                {ListSedes?.map((option) => (
+                  <option key={option.cod_sede} value={option.nombre_sede}>{option.nombre_sede}</option>
+                ))}
+              </select>
+            
           </div>
         </div>
         <div className="overflow-x-auto p-3">

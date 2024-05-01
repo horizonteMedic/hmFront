@@ -3,12 +3,12 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import NewEmpleado from '../model/RegisterEmpleado';
 import { useAuthStore } from '../../../../../store/auth';
 import EditEmpleado from '../model/EditEmpleado';
+import Swal from 'sweetalert2';
 import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc } from '../model/Combobox';
 
-const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
+const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
   Cip, Celular, Distrito, Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
   
   const userlogued = useAuthStore(state => state.userlogued);
@@ -38,6 +38,22 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
   const ListDistritos = ComboboxDistritos()
   const ListSexo = ComboboxSexo()
   const ListTiposDoc = ComboboxTipoDoc()
+
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha Editaro el Empleado con exito!",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        closeModal()
+        Refresgpag()
+      }
+    });
+  }
 
   const handleSexoChange = (event) => {
     setSexo(event.target.value);
@@ -71,28 +87,13 @@ const editModal = ({ closeModal, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email,
     (distrito) => distrito.idProvincia === provincia
   )
 
-  const isFormValid = () => {
-    return tipoDocumento !== '' &&
-           nrodoc !== '' &&
-           nombres !== '' &&
-           apellidos !== '' &&
-           email !== '' &&
-           startDate !== null &&
-           sexo !== '' &&
-           celular !== '' &&
-           departamento !== '' &&
-           provincia !== '' &&
-           distrito !== '' &&
-           direccion !== '' &&
-           cargo !== '';
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate, 
       cip, celular, distrito, direccion, cargo, activo, FechaInicio, UserRegistro, userlogued.sub)
       .then(data => {
-        console.log('wtd')
+        AleertSucces()
       })
       .catch(error => {
         console.error('Error', error)

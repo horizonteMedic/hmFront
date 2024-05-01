@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import NewEmpleado from '../model/RegisterEmpleado';
 import { useAuthStore } from '../../../../../store/auth';
+import Swal from 'sweetalert2'
 
 import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc } from '../model/Combobox';
 
-const Modal = ({ closeModal }) => {
+const Modal = ({ closeModal, Refresgpag }) => {
   const userlogued = useAuthStore(state => state.userlogued);
   const token = useAuthStore(state => state.token);
 
@@ -31,13 +32,28 @@ const Modal = ({ closeModal }) => {
   //CIP
   const [activo, setActivo] = React.useState(false);
 
-  const llamadaAPI = [activo,cargo,direccion]
   //Llamada de combobox
   const ListDepartamentos = ComboboxDepartamentos();
   const ListProvincias =  ComboboxProvincias()
   const ListDistritos = ComboboxDistritos()
   const ListSexo = ComboboxSexo()
   const ListTiposDoc = ComboboxTipoDoc()
+
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha creado a un Nuevo Empleado",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        closeModal()
+        Refresgpag()
+      }
+    });
+  }
 
   const handleSexoChange = (event) => {
     setSexo(event.target.value);
@@ -93,7 +109,7 @@ const Modal = ({ closeModal }) => {
       ,apellidos,cargo,distrito,email,celular,direccion,activo
     ,formattedDate,userlogued.sub)
       .then(data => {
-        window.location.reload();
+        AleertSucces()
       })
       .catch(error => {
         console.error('Error', error)

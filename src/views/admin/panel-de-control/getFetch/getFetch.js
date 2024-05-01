@@ -1,6 +1,17 @@
 import { useEffect, useState } from "react";
 
-export function getFetch(url, token) {
+export const getFetch = (url, token) => {
+    
+    const options = {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    return fetch(url,options).then(res => res.json()).then(response => response) 
+}
+/*export function getFetch(url, token) {
+
     const [data, setData] = useState(null)
     const [loading, setLoading] = useState(true)
 
@@ -20,5 +31,4 @@ export function getFetch(url, token) {
     }, [])
     
     return {data, loading}
-    
-}
+}*/

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faCog, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faCog, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditUsuario/EditModal';
@@ -18,7 +18,11 @@ import DeleteEmpleado from '../Accesos/model/DeleteEmpleado'; // Importa la func
 const Accesos = () => {
   const token = useAuthStore(state => state.token);
   //Consulta de la API
-  const {data, loading} = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado',token)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(0)
+ 
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
@@ -49,6 +53,23 @@ const Accesos = () => {
   const [fechainicio, setFechainicio] = useState('');
   const [userRegistro, setUserRegistro] = useState('');
   
+  useEffect(() => {
+    setLoading(true)
+    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado', token)
+    .then(response => {
+      setData(response)
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.',error);
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+  },[refres])
+
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
 
 
   const openModal = () => {
@@ -127,7 +148,7 @@ const Accesos = () => {
               text: "El Empleado ha sido Eliminado.",
               icon: "success"
             }).then((result) => {
-              if (result.isConfirmed) window.location.reload();
+              if (result.isConfirmed) Refresgpag()
             });
           })
           .catch(() => {
@@ -199,8 +220,8 @@ const Accesos = () => {
         </div>
       </div>
       {/* Asegúrate de que los modales estén configurados correctamente */}
-      {isModalOpen && <Modal closeModal={closeModal} />}
-      {isEditModalOpen && <EditModal closeModal={closeEditModal} ID={idEmpleado} TipoDoc={tipoDocumento} Nrodoc={nrodoc} Nombres={nombres}
+      {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
+      {isEditModalOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} ID={idEmpleado} TipoDoc={tipoDocumento} Nrodoc={nrodoc} Nombres={nombres}
       Apellidos={apellidos} Email={email} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
       Cargo={cargo} Estado={activo} FechaInicio={startDate} UserRegistro={userRegistro} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}

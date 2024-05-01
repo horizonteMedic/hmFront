@@ -13,6 +13,10 @@ import ModalAsignarAccesoRol from './ModalNuevoRol/AsignarAccesoRol'; // Importa
 const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalAccessOpen, setIsModalAccessOpen] = useState(false); // Estado para controlar el modal de asignación de acceso
+  
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(0)
 
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
@@ -21,7 +25,25 @@ const Roles = () => {
   const [id, setId] = useState('');
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
+
+  useEffect(() => {
+    setLoading(true)
+    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
+    .then(response => {
+      setData(response)
+    })
+    .catch(error => {
+
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+  },[refres])
+
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -69,7 +91,7 @@ const Roles = () => {
               text: "El Rol ha sido Eliminado.",
               icon: "success"
             }).then((result) => {
-              if (result.isConfirmed) window.location.reload();
+              if (result.isConfirmed) Refresgpag()
             });
           })
           .catch(() => {
@@ -83,7 +105,6 @@ const Roles = () => {
     });
   }
 
-  const { data, loading } = getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
 
   if (loading) {
     return <Loading />
@@ -134,8 +155,8 @@ const Roles = () => {
           </table>
         </div>
       </div>
-      {isModalOpen && <Modal closeModal={closeModal} />}
-      {isModalEditOpen && <EditModal closeModal={closeEditModal} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
+      {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
+      {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
       {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} />} {/* Modal de asignación de acceso */}
     </div>
   );

@@ -5,24 +5,36 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../../../store/auth';
 import NewRol from '../model/NewRol';
-import { Loading } from '../../../../components/Loading';
-import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
-const Modal = ({ closeModal }) => {
+const Modal = ({ closeModal, Refresgpag }) => {
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [estado, setEstado] = useState(false);
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-  const [loading, setLoading] = useState(false)
+
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha creado un Nuevo Rol!",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        closeModal()
+        Refresgpag()
+      }
+    });
+  }
 
   const handleSubmit = async (event) => {
-    setLoading(true)
     event.preventDefault();
     NewRol(rol, descripcion,estado,token,userlogued.sub)
       .then(data => {
-        setLoading(false)
-        window.location.reload();
+        AleertSucces()
       })
       .catch(error => {
         console.error('Error:', error)
@@ -94,7 +106,6 @@ const Modal = ({ closeModal }) => {
           </div>
         </form>
       </div>
-      {loading && <Loading/>}
     </div>
   );
 };

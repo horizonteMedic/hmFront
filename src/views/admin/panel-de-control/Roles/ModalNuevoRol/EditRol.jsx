@@ -3,23 +3,37 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Loading } from '../../../../components/Loading';
 import EditRol from '../model/EditRol';
+import Swal from 'sweetalert2';
 
-const EditModal = ({ closeModal, Id, Rol, Descripcion, Estado, fechaRegistro, userRegistro, token, userlogued }) => {
+const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fechaRegistro, userRegistro, token, userlogued }) => {
     
     const [newrol, setNewRol] = useState(Rol);
     const [newdescripcion, setNewDescripcion] = useState(Descripcion);
     const [newestado, setNewEstado] = useState(Estado);
     const [newfechainicio, setFechainicio] = useState(fechaRegistro);
     const [newuserRegistro, setUserRegistro] = useState(userRegistro);
-    const [loading, setLoading] = useState(false)
+
+    function AleertSucces() {
+      Swal.fire({
+        title: "¡Exito!",
+        text: "Se ha Editaro el Rol!",
+        icon: "success",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Aceptar"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          closeModal()
+          Refresgpag()
+        }
+      });
+    }
 
     const handleSubmit = async (event) => {
-        setLoading(true)
         event.preventDefault();
         EditRol(Id,newrol,newdescripcion,newestado,newfechainicio,newuserRegistro,token,userlogued)
             .then(data => {
-                setLoading(false)
-                window.location.reload();
+              AleertSucces();
             })
             .catch(error => {
                 console.error('Error:', error)
@@ -83,7 +97,6 @@ const EditModal = ({ closeModal, Id, Rol, Descripcion, Estado, fechaRegistro, us
           </div>
         </form>
       </div>
-      {loading && <Loading/>}
     </div>
   );
 };
