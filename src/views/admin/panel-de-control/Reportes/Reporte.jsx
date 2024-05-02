@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes } from './Modal/Combobox';
+import { GetListREport } from './model/getlistreport';
+import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
 
 const HistorialPaciente = () => {
@@ -12,7 +14,15 @@ const HistorialPaciente = () => {
   ];
 
   const ListSedes = ComboboxSedes();
+  const [sede, setSede] = useState('')
   console.log(ListSedes)
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(1)
+
+  const token = useAuthStore(state => state.token);
+  const userlogued = useAuthStore(state => state.userlogued);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,6 +33,28 @@ const HistorialPaciente = () => {
   today.setDate(today.getDate() - 1); 
   const [startDate, setStartDate] = useState(formattedToday);
   const [endDate, setEndDate] = useState(formattedToday);
+
+  useEffect(() => {
+    setLoading(true)
+    GetListREport(userlogued.sub,startDate,endDate,sede,token)
+    .then(response => {
+      console.log(response)
+      if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
+        console.log('no hay na')
+      }
+      else{
+        console.log('a')
+        setData(response)
+      }
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.',error);
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+  },[startDate])
+
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -117,11 +149,12 @@ const HistorialPaciente = () => {
               <select
                 id="tipoDocumento"
                 className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                onChange={(e) => setSede(e.target.value)}
                 required
               >
                 <option value="">Seleccionar</option>
                 {ListSedes?.map((option) => (
-                  <option key={option.cod_sede} value={option.nombre_sede}>{option.nombre_sede}</option>
+                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
                 ))}
               </select>
             
@@ -139,19 +172,20 @@ const HistorialPaciente = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredPacientes.slice(0, recordsPerPage).map((paciente, index) => (
+              {data?.map((item, index) => (
                 <tr key={index}>
                   <td className="border border-gray-300 px-3 py-2">
                     <button onClick={openModal} className="focus:outline-none">
                       <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
                     </button>
                   </td>
-                  <td className="border border-gray-300 px-3 py-2">{paciente.dni}</td>
-                  <td className="border border-gray-300 px-3 py-2">{paciente.apellidos}</td>
-                  <td className="border border-gray-300 px-3 py-2">{paciente.nombres}</td>
-                  <td className="border border-gray-300 px-3 py-2">{formatDate(paciente.fechaExamen)}</td>
+                  <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
+                  <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
+                  <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
+                  <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
                 </tr>
-              ))}
+                ))
+              }
 
             </tbody>
           </table>

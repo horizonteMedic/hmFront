@@ -34,7 +34,7 @@ const Roles = () => {
       setData(response)
     })
     .catch(error => {
-
+      throw new Error('Network response was not ok.',error);
     })
     .finally(() => {
       setLoading(false)

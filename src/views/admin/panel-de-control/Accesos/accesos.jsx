@@ -225,7 +225,7 @@ const Accesos = () => {
       Apellidos={apellidos} Email={email} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
       Cargo={cargo} Estado={activo} FechaInicio={startDate} UserRegistro={userRegistro} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
-      {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} />}
+      {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} />}
       {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} token={token}/>}
 
     </div>

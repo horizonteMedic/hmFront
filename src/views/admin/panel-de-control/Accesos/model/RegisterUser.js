@@ -4,11 +4,10 @@ export default async function NewUser(username, password, estado, ruc, idEmplead
         username: username,
         password: password,
         estado: estado,
-        ruc: null,
+        ruc: ruc,
         idEmpleado: idEmpleado
     }
 
-    console.log('data: ',JSON.stringify(data))
     const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/auth/register', {
         method: 'POST', 
         headers: {
@@ -16,7 +15,6 @@ export default async function NewUser(username, password, estado, ruc, idEmplead
         },
         body: JSON.stringify(data)
     })
-    console.log('respuesta',response)
     if(response.ok){
         return 
     } else {

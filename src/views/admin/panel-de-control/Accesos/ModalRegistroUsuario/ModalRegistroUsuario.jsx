@@ -2,19 +2,20 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import NewUser from '../model/RegisterUser';
-import { ComboboxSedes } from '../model/Combobox';
+import { ComboboxContratas } from '../model/Combobox';
+import { ListEmpleadoDNI } from '../model/ListUserID';
 
-const RegistroUsuarioModal = ({ closeModal }) => {
+const RegistroUsuarioModal = ({ closeModal, token }) => {
   const [documento, setDocumento] = useState('');
   const [apellidosNombres, setApellidosNombres] = useState('');
+  const [idEmpleado, SetIdEmpleado] = useState('')
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [estado, setEstado] = useState(false);
   const [empresaContrata, setEmpresaContrata] = useState('');
-  const [razonSocial, setRazonSocial] = useState('');
-  const [sede, setSede] = useState('');
+  const [ruc, setRuc] = useState('');
 
-  const ListSedes = ComboboxSedes()
+  const ListContratas = ComboboxContratas()
 
   const capitalizeWords = (str) => {
     return str.replace(/\b\w/g, function (char) {
@@ -22,10 +23,54 @@ const RegistroUsuarioModal = ({ closeModal }) => {
     });
   };
 
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha creado a un Nuevo Usuario",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        closeModal()
+        Refresgpag()
+      }
+    });
+  }
+  //Sirve para buscar al empleado por su DNI
+  const SearchDNI = () => {
+    ListEmpleadoDNI(documento,token)
+      .then(empleadoData => {
+        if (empleadoData.mensaje === 'No value present') {
+          setApellidosNombres('Empleado no Encontrado'); 
+        } else {
+          const { idEmpleado, apellidos, nombres } = empleadoData;
+          setApellidosNombres(`${apellidos} ${nombres}`);// Establece los apellidos y nombres en blanco
+          SetIdEmpleado(idEmpleado)
+        }
+      })
+      .catch(error => {
+        console.error('Error al buscar empleado:', error);
+        setApellidosNombres(''); // Establece los apellidos y nombres en blanco
+      });
+  }
+
+  const handleRuc = (e) => {
+    const selectedContrata = ListContratas.find(contrata => contrata.razonSocial === e.target.value);
+    if (selectedContrata) {
+      setEmpresaContrata(e.target.value);
+      setRuc(selectedContrata.ruc);
+    } else {
+      setEmpresaContrata('');
+      setRuc('');
+    }
+  };
+
   const handleRegistrar = () => {
-    NewUser(username,password,estado,razonSocial,documento)
+    NewUser(username,password,estado,ruc,idEmpleado)
       .then(data => {
-        closeModal();
+        AleertSucces()
       })
       .catch(error => {
         console.error('Error', error)
@@ -55,7 +100,7 @@ const RegistroUsuarioModal = ({ closeModal }) => {
               onChange={(e) => setDocumento(e.target.value)}
               className="border border-gray-300 px-2 py-1 mr-2 w-1/2"
             />
-            <button className="border border-gray-300 px-2 py-1">Buscar</button>
+            <button onClick={SearchDNI} className="border border-gray-300 px-2 py-1">Buscar</button>
           </div>
         </div>
         <div className="flex mb-4">
@@ -89,11 +134,11 @@ const RegistroUsuarioModal = ({ closeModal }) => {
             />
           </div>
           <div className="w-1/2">
-            <label className="block mb-1">Razon Social:</label>
+            <label className="block mb-1">RUC:</label>
             <input
               type="text"
-              value={razonSocial}
-              onChange={(e) => setRazonSocial(e.target.value)}
+              value={ruc}
+              onChange={(e) => setRuc(e.target.value)}
               className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
             />
           </div>
@@ -112,23 +157,12 @@ const RegistroUsuarioModal = ({ closeModal }) => {
             <label className="block mb-1">Seleccione la empresa/contrata:</label>
             <select
               value={empresaContrata}
-              onChange={(e) => setEmpresaContrata(e.target.value)}
+              onChange={handleRuc}
               className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
             >
               <option value="">Seleccione...</option>
-              {/* Opciones de empresas/contratas */}
-            </select>
-          </div>
-          <div className="w-1/2">
-            <label className="block mb-1">Seleccione la sede:</label>
-            <select
-              value={sede}
-              onChange={(e) => setSede(e.target.value)}
-              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-            >
-              <option value="">Seleccione...</option>
-              {ListSedes?.map((option) => (
-                  <option key={option.id} value={option.nombreSede}>{option.nombreSede}</option>
+              {ListContratas?.map((option) => (
+                  <option key={option.id} value={option.razonSocial}>{option.razonSocial}</option>
                 ))}
             </select>
           </div>
