@@ -1,30 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes } from './Modal/Combobox';
 import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
 
 const HistorialPaciente = () => {
+  const ListSedes = ComboboxSedes();
+  const [sede, setSede] = useState('');
+
+  useEffect(() => {
+    if (ListSedes.length > 0) {
+      setSede(ListSedes[0].cod_sede);
+    }
+  }, [ListSedes]);
+
   const pacientes = [
     { ac: '001', dni: '12345678', apellidos: 'García', nombres: 'María', fechaExamen: '2024-04-01' },
     { ac: '002', dni: '23456789', apellidos: 'Rodríguez', nombres: 'Juan', fechaExamen: '2024-04-05' },
     { ac: '003', dni: '34567890', apellidos: 'Martínez', nombres: 'Ana', fechaExamen: '2024-04-10' }
   ];
 
-  const ListSedes = ComboboxSedes();
-  const [sede, setSede] = useState('')
-  console.log(ListSedes)
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [refres, setRefresh] = useState(1)
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refres, setRefresh] = useState(1);
 
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [recordsPerPage, setRecordsPerPage] = useState(5);
+  const [recordsPerPage, setRecordsPerPage] = useState(15);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPacientes, setFilteredPacientes] = useState([]);
   const today = new Date();
@@ -33,28 +39,29 @@ const HistorialPaciente = () => {
   today.setDate(today.getDate() - 1); 
   const [startDate, setStartDate] = useState(formattedToday);
   const [endDate, setEndDate] = useState(formattedToday);
+  const [isReloading, setIsReloading] = useState(false);
+
+  const [currentPage, setCurrentPage] = useState(1); // Estado para el número de página actual
+  const [totalPages, setTotalPages] = useState(1); // Estado para el número total de páginas
 
   useEffect(() => {
-    setLoading(true)
-    GetListREport(userlogued.sub,startDate,endDate,sede,token)
+    setLoading(true);
+    GetListREport(userlogued.sub, startDate, endDate, sede, token)
     .then(response => {
-      console.log(response)
       if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
-        console.log('no hay na')
-      }
-      else{
-        console.log('a')
-        setData(response)
+        console.log('no hay na');
+      } else {
+        setData(response);
+        setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
       }
     })
     .catch(error => {
-      throw new Error('Network response was not ok.',error);
+      throw new Error('Network response was not ok.', error);
     })
     .finally(() => {
-      setLoading(false)
-    })
-  },[startDate])
-
+      setLoading(false);
+    });
+  }, [startDate, endDate, sede, token]);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -66,6 +73,7 @@ const HistorialPaciente = () => {
 
   const handleChangeRecordsPerPage = (e) => {
     setRecordsPerPage(parseInt(e.target.value));
+    setCurrentPage(1); // Restablece la página actual cuando se cambia la cantidad de registros por página
   };
 
   const handleStartDateChange = (e) => {
@@ -79,6 +87,7 @@ const HistorialPaciente = () => {
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, '0');
@@ -86,7 +95,6 @@ const HistorialPaciente = () => {
     const year = date.getFullYear().toString();
     return `${day}-${month}-${year}`;
   };
-  
 
   useEffect(() => {
     const filteredByDate = pacientes.filter(paciente => {
@@ -101,11 +109,43 @@ const HistorialPaciente = () => {
     setFilteredPacientes(filteredByDNI);
   }, [startDate, endDate, searchTerm]);
 
+  const reloadTable = () => {
+    setIsReloading(true); // Establece isReloading en true al iniciar la recarga
+
+    setLoading(true);
+    GetListREport(userlogued.sub, startDate, endDate, sede, token)
+      .then(response => {
+        if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
+          console.log('no hay na');
+        } else {
+          setData(response);
+          setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
+        }
+      })
+      .catch(error => {
+        throw new Error('Network response was not ok.', error);
+      })
+      .finally(() => {
+        setLoading(false);
+        setIsReloading(false); // Establece isReloading en false cuando la recarga ha finalizado
+      });
+  };
+  
+
+  const startIdx = (currentPage - 1) * recordsPerPage;
+  const endIdx = startIdx + recordsPerPage;
+  const currentData = data.slice(startIdx, endIdx);
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-        <div className="px-4 py-2 azuloscurobackground flex justify-between ">
+        <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> {/* Agrega items-center para centrar verticalmente el icono */}
           <h1 className="text-center text-2xl font-bold color-azul text-white">Reporte de Pacientes</h1>
+          <button onClick={reloadTable} className="focus:outline-none ml-3 relative"> {/* Agrega el botón de recarga */}
+    {loading && <div className="absolute inset-0 bg-gray-500 opacity-50 rounded-md"></div>}
+    <FontAwesomeIcon icon={faSyncAlt} className={`text-blue-500 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
+  </button>
+
         </div>
         <div className="flex justify-between items-center ml-4 pt-3">
           <div className="flex items-center">
@@ -118,77 +158,71 @@ const HistorialPaciente = () => {
               <option value={20}>20</option>
             </select>
             <span className='ml-2'> registros </span>
-            <span className="ml-12"><strong>Fecha inicio: </strong></span>
+            <span className="ml-6"><strong>Fecha inicio: </strong></span>
             <input
               type="date"
-              className="pointer border border-gray-300 rounded-md ml-2 px-2 py-1"
+              className="pointer border border-gray-300 rounded-md ml-2 px-2 py-1 w-36"
               value={startDate}
               onChange={handleStartDateChange}
             />
-            <span className="ml-12"><strong>Fecha fin:</strong></span>
+            <span className="ml-6"><strong>Fecha fin:</strong></span>
             <input
               type="date"
-              className=" pointer border border-gray-300 rounded-md ml-2 px-2 py-1"
+              className=" pointer border border-gray-300 rounded-md ml-2 px-2 py-1 w-36"
               value={endDate}
               onChange={handleEndDateChange}
             />
-            <span className="ml-12"><strong>Buscar por DNI: </strong></span>
-            <input
-              type="text"
-              className="pointer border border-gray-300 rounded-md ml-2 px-2 py-1"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            <button className="focus:outline-none ml-2">
-              <FontAwesomeIcon icon={faSearch} className="text-blue-500 cursor-pointer" />
-            </button>
-            <span className="ml-12"><strong>Sedes </strong></span>
-              <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
-                Tipo de Documento
-              </label>
-              <select
-                id="tipoDocumento"
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                onChange={(e) => setSede(e.target.value)}
-                required
-              >
-                <option value="">Seleccionar</option>
-                {ListSedes?.map((option) => (
-                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
-                ))}
-              </select>
-            
+            <span className="ml-6 mr-3"><strong> Sedes:  </strong> </span>
+            <select
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-90 focus:outline-none bg-white"
+              onChange={(e) => setSede(e.target.value)}
+              required
+              value={sede}
+            >
+              <option value=""> Seleccionar</option>
+              {ListSedes?.map((option) => (
+                <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+              ))}
+            </select>
           </div>
         </div>
         <div className="overflow-x-auto p-3">
-          <table className="w-full border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-3 py-2">Acción</th>
-                <th className="border border-gray-300 px-3 py-2">DNI</th>
-                <th className="border border-gray-300 px-3 py-2">Apellidos</th>
-                <th className="border border-gray-300 px-3 py-2">Nombres</th>
-                <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data?.map((item, index) => (
-                <tr key={index}>
-                  <td className="border border-gray-300 px-3 py-2">
-                    <button onClick={openModal} className="focus:outline-none">
-                      <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
-                    </button>
-                  </td>
-                  <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
-                  <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
-                  <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                  <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
-                </tr>
-                ))
-              }
+  {loading ? (
+    <p className="text-center">Cargando...</p>
+  ) : (
+    <table className="w-full border border-gray-300">
+      <thead>
+        <tr className="bg-gray-200">
+          <th className="border border-gray-300 px-3 py-2">Acción</th>
+          <th className="border border-gray-300 px-3 py-2">DNI</th>
+          <th className="border border-gray-300 px-3 py-2">Apellidos</th>
+          <th className="border border-gray-300 px-3 py-2">Nombres</th>
+          <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentData.map((item, index) => (
+          <tr key={index}>
+            <td className="border border-gray-300 px-3 py-2">
+              <button onClick={openModal} className="focus:outline-none">
+                <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
+              </button>
+            </td>
+            <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
+            <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
+            <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
+            <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
 
-            </tbody>
-          </table>
+        {/* Renderiza los botones de paginación */}
+        <div className="flex justify-center p-4">
+          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 bg-blue-500 text-white rounded-md">Anterior</button>
+          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 bg-blue-500 text-white rounded-md">Siguiente</button>
         </div>
       </div>
       {isModalOpen && <Modal closeModal={closeModal} />}
