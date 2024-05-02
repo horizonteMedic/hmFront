@@ -90,7 +90,7 @@ const RegistroUsuarioModal = ({ closeModal, token }) => {
           className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
           onClick={closeModal}
         />
-        <h1 className="text-2xl font-bold mb-4">Registro de Usuario</h1>
+        <h1 className="text-start font-bold mb-4">Registro de Usuario</h1>
         <div className="mb-4">
           <label className="block mb-1">N° de Documento:</label>
           <div className="flex">

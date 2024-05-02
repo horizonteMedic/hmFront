@@ -49,7 +49,7 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
           className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
           onClick={closeModal}
         />
-        <h2 className="text-2xl font-bold mb-4 text-center">Editar Rol</h2>
+        <h2 className="text-start font-bold mb-4 text-center">Editar Rol</h2>
         <form autoComplete='off' >
           <div className="flex flex-col items-start justify-center w-auto">
             <div className='flex py-3 justify-center items-center w-full'>

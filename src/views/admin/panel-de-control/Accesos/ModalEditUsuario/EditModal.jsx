@@ -108,7 +108,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
           className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
           onClick={closeModal}
         />
-        <h2 className="text-2xl font-bold mb-4 ">Editar Empleado</h2>
+        <h2 className="text-start font-bold mb-4 ">Editar Empleado</h2>
         <form>
           <div className="grid grid-cols-2 gap-4 mb-4 md:grid-cols-3">
             {/* Primer columna */}

@@ -74,7 +74,7 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
   return (
     <>
         <Modal closeModal={closeModal}>
-        <h1 className="text-2xl font-bold mb-4">Lista de Usuarios vinculados</h1>
+        <h1 className="text-start font-bold mb-4">Lista de Usuarios vinculados</h1>
         <table className="w-full border border-gray-300">
             <thead>
               <tr className="bg-gray-200">

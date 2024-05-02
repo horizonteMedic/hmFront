@@ -140,18 +140,17 @@ const HistorialPaciente = () => {
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> {/* Agrega items-center para centrar verticalmente el icono */}
-          <h1 className="text-center text-2xl font-bold color-azul text-white">Reporte de Pacientes</h1>
+          <h1 className="text-center text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
           <button onClick={reloadTable} className="focus:outline-none ml-3 relative"> {/* Agrega el botón de recarga */}
-    {loading && <div className="absolute inset-0 bg-gray-500 opacity-50 rounded-md"></div>}
-    <FontAwesomeIcon icon={faSyncAlt} className={`text-blue-500 cursor-pointer ${loading ? 'opacity-50' : ''}`} />
-  </button>
+            {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+            <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+          </button>
 
         </div>
         <div className="flex justify-between items-center ml-4 pt-3">
           <div className="flex items-center">
             <span>Mostrar</span>
             <select className="border pointer border-gray-300 rounded-md ml-2 px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-              <option value={2}>2</option>
               <option value={5}>5</option>
               <option value={10}>10</option>
               <option value={15}>15</option>

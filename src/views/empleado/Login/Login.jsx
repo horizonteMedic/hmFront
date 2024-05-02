@@ -12,7 +12,7 @@ export function LoginPage() {
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="max-w-md w-full">
                 <div className="bg-white shadow-md rounded-lg p-6">
-                    <h2 className="text-2xl font-semibold text-center mb-6">¡Bienvenido!</h2>
+                    <h2 className="text-start font-semibold text-center mb-6">¡Bienvenido!</h2>
 
                     <div className="mb-4">
                         <label htmlFor="sede" className="block text-sm font-medium text-gray-700 mb-1">Seleccionar Sede</label>

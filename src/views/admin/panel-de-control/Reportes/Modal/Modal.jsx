@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
+import LegajoModal from '../ModalsDeSubida/LegajoModal';
+import CAMUModal from '../ModalsDeSubida/CAMUModal';
+import ImagenModal from '../ModalsDeSubida/ImagenModal';
+import CovidModal from '../ModalsDeSubida/CovidModal';
+
 const Modal = ({ closeModal }) => {
   const [isLegajoModalOpen, setIsLegajoModalOpen] = useState(false);
   const [isCAMUModalOpen, setIsCAMUModalOpen] = useState(false);
@@ -134,70 +139,25 @@ const Modal = ({ closeModal }) => {
         </div>
       </div>
       
-      {/* Modal para Subir Legajo Médico */}
-      {isLegajoModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">{/* Ancho del modal ajustado al 50% del tamaño de la pantalla */}
-            <h2 className="px-4 py-2 bg-gray-200 text-lg font-bold">Subir Legajo Médico</h2>
-            <button onClick={closeLegajoModal} className="absolute top-2 right-2 px-2 py-1 text-black rounded-full">X</button>
-            <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
-              Haga clic aquí para seleccionar un archivo
-              <input
-                type="file"
-                id="fileInput"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </div>
-            {selectedFile && (
-              <button onClick={enviarArchivo} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Enviar</button>
-            )}
-          </div>
-        </div>
+       {/* Modal para Subir Legajo Médico */}
+       {isLegajoModalOpen && (
+        <LegajoModal closeModal={closeModal} />
       )}
 
       {/* Modal para Subir CAMU */}
       {isCAMUModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">{/* Ancho del modal ajustado al 50% del tamaño de la pantalla */}
-            <h2 className="px-4 py-2 bg-gray-200 text-lg font-bold">Subir CAMU</h2>
-            <button onClick={closeCAMUModal} className="absolute top-2 right-2 px-2 py-1 text-black rounded-full">X</button>
-            <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
-              Haga clic aquí para seleccionar un archivo
-              <input type="file" id="fileInput" className="hidden" />
-            </div>
-          </div>
-        </div>
+        <CAMUModal closeModal={closeModal} />
       )}
 
       {/* Modal para Subir Imagen */}
       {isImagenModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">{/* Ancho del modal ajustado al 50% del tamaño de la pantalla */}
-            <h2 className="px-4 py-2 bg-gray-200 text-lg font-bold">Subir Imagen</h2>
-            <button onClick={closeImagenModal} className="absolute top-2 right-2 px-2 py-1 text-black rounded-full">X</button>
-            <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
-              Haga clic aquí para seleccionar un archivo
-              <input type="file" id="fileInput" className="hidden" />
-            </div>
-          </div>
-        </div>
+        <ImagenModal closeModal={closeModal} />
       )}
 
       {/* Modal para Subir Archivo Covid */}
       {isCovidModalOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">
-            <h2 className="px-4 py-2 bg-gray-200 text-lg font-bold">Subir Archivo Covid</h2>
-            <button onClick={closeCovidModal} className="absolute top-2 right-2 px-2 py-1 text-black rounded-full">X</button>
-            <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
-              Haga clic aquí para seleccionar un archivo
-              <input type="file" id="fileInput" className="hidden" />
-            </div>
-          </div>
-        </div>
+        <CovidModal closeModal={closeModal} />
       )}
-
     </div>
   );
 };

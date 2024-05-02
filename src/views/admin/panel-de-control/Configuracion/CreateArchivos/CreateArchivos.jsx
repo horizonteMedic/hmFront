@@ -15,7 +15,7 @@ const ListaArchivosPorServidores = () => {
       <RuterConfig /> 
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between ">
-          <h1 className="text-center text-2xl font-bold color-azul text-white">Lista de archivo por servidores</h1>
+          <h1 className="text-center text-start font-bold color-azul text-white">Lista de archivo por servidores</h1>
         </div>
         <div className='container p-6'>
           <table className="min-w-full divide-y divide-gray-200 mb-4">

@@ -53,7 +53,7 @@ const ForgotPassword = () => {
             <img src="img/logo-color.png" alt="Logo" className="w-[45%]" />
 
           </div>
-          <p className="text-2xl font-semibold text-center mb-6 color-azul"><strong>Recuperar Contraseña</strong></p>
+          <p className="text-start font-semibold text-center mb-6 color-azul"><strong>Recuperar Contraseña</strong></p>
           <form>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2 pb-2" htmlFor="email">

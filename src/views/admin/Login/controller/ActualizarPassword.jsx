@@ -13,7 +13,7 @@ const ModalCheck = ({ navigateLogin })  => {
     <>
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="bg-white rounded-lg shadow-md p-6 w-[400px]  relative">
-        <h2 className="text-2xl font-bold mb-4 text-center">¡Excelente!</h2>
+        <h2 className="text-start font-bold mb-4 text-center">¡Excelente!</h2>
         <div className='flex flex-col justify-center items-center'>
           <p className='p-3'>Su Contraseña ha sido cambiada con exito</p>
           <button
@@ -79,7 +79,7 @@ const ActualizarPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full mt-[-3em]">
         <div className="bg-white shadow-md rounded-lg p-8">
-          <p className="text-2xl font-semibold text-center mb-6 color-azul"><strong>Actualizar Contraseña</strong></p>
+          <p className="text-start font-semibold text-center mb-6 color-azul"><strong>Actualizar Contraseña</strong></p>
           <form onSubmit={handleSubmit}>
             <div className="mb-6">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">

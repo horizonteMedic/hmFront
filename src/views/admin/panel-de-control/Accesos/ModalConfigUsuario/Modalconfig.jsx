@@ -4,7 +4,7 @@ const ConfigurarAccesosModal = ({ closeModal }) => {
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="bg-white rounded-lg shadow-md p-6 w-[400px]">
-        <h2 className="text-2xl font-bold mb-4">Configurar Accesos</h2>
+        <h2 className="text-start font-bold mb-4">Configurar Accesos</h2>
         <div>
           <label htmlFor="usuario" className="block text-sm font-medium text-gray-700 mb-2">Usuario</label>
           <input

@@ -171,7 +171,7 @@ const Accesos = () => {
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white  rounded-lg overflow-hidden shadow-xl  w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between ">
-          <h1 className="text-center text-2xl font-bold color-azul text-white">Usuarios con Accesos</h1>
+          <h1 className="text-center text-start font-bold color-azul text-white">Usuarios con Accesos</h1>
         </div>
         <div className="flex justify-between p-6">
           <h2 className="text-lg font-semibold">Empleados Registrados</h2>
