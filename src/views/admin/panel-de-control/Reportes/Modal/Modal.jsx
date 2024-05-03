@@ -5,6 +5,7 @@ import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
+import { ReadArchivos } from '../model/readArchivos';
 
 const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
 
@@ -24,8 +25,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
   const [orden, setOrden] = useState('');
  
   const [fileData, setFileData] = useState(null);
-
-  console.log(read)
   //Jala los datos de los pacientes
   useEffect(() => {
     setLoading(true);
@@ -100,42 +99,36 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
     setModalArchivos(false);
   };
 
-  const handleFileInputClick = () => {
-    document.getElementById('fileInput').click();
-  };
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-    convertFileToBase64(file);
-  };
-
-  const convertFileToBase64 = (base64,name) => {
-    console.log(base64,name)
-    const fileType = name.split('.').pop();
-
+  const ReadBase64 = (response) => {
+    const fileType = response.nombreArchivo.split('.').pop();
     // Convertir el base64 a un blob
-    const byteCharacters = atob(base64.split(',')[1]);
+
+    const byteCharacters = atob(response.fileBase64);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: `application/${fileType}` });
-
     // Crear un objeto URL para el blob
-    const url = URL.createObjectURL(blob);
-
-    // Crear un enlace <a> para descargar el archivo
     const link = document.createElement('a');
-    link.href = url;
-    link.download = name;
+    link.href = window.URL.createObjectURL(blob);
+    link.download = response.nombreArchivo;
 
-    // Hacer clic en el enlace para iniciar la descarga
-    link.click();
-
-    // Liberar el objeto URL
-    URL.revokeObjectURL(url);
+    // Disparar el clic en el enlace para iniciar la descarga
+      link.click();
+  }
+  
+  const GetBase64 = (historia,id_archivo) => {
+    console.log(historia,id_archivo)
+    ReadArchivos(historia,id_archivo,token)
+    .then(response => {
+      console.log(response);
+      ReadBase64(response)
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.', error);
+    }); 
   };
 
   const enviarArchivo = () => {
@@ -199,7 +192,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                       <td className="border border-gray-300 px-2 py-1">
                         {read.map((readItem, readIndex) => ( 
-                        <a key={readIndex} onClick={() => {convertFileToBase64(readItem.fileBase64,readItem.nombreArchivo)}}  download={`${readItem.nombreArchivo}`}>{filterArchivos() }</a>
+                        <a key={readIndex} className='cursor-pointer' title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>{filterArchivos() }</a>
                         ))}
                       </td>
                     </tr>

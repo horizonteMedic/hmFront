@@ -1,6 +1,8 @@
 import { URLAzure } from "../../../../config/config";
-
+//Sirve para subir los archivos base64 al sistemas
 export default async function NewArchivo(nombre,dni,historiaClinica,orden,id_tipo_archivo,user,token,fileBase64) {
+
+    const base64WithoutHeader = fileBase64.substring(fileBase64.indexOf(',') + 1);
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
@@ -20,9 +22,8 @@ export default async function NewArchivo(nombre,dni,historiaClinica,orden,id_tip
        fechaActualizacion: null,
        userActualizacion: null,
        id_tipo_archivo: id_tipo_archivo,
-       fileBase64: fileBase64
+       fileBase64: base64WithoutHeader
     }
-    console.log(data)
     const options = {
         method: 'POST', 
         headers: {
