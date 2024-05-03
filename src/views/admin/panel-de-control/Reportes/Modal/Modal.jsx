@@ -2,23 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
-import LegajoModal from '../ModalsDeSubida/LegajoModal';
-import CAMUModal from '../ModalsDeSubida/CAMUModal';
-import ImagenModal from '../ModalsDeSubida/ImagenModal';
-import CovidModal from '../ModalsDeSubida/CovidModal';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
+import ModalUpload from '../ModalsDeSubida/ModalUpload';
 
 const Modal = ({ closeModal, user,start,end,sede,dni,nombre,token }) => {
+
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false);
   const [listarchivos, setListarchivos] = useState([])
 
-  const [isLegajoModalOpen, setIsLegajoModalOpen] = useState(false);
-  const [isCAMUModalOpen, setIsCAMUModalOpen] = useState(false);
-  const [isImagenModalOpen, setIsImagenModalOpen] = useState(false);
-  const [isCovidModalOpen, setIsCovidModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [modalArchivos, setModalArchivos] = useState(false);
+  const [idarchivo, setIdarchivo] = useState('')
+  const [nombrearc, setNombrearc] = useState('')
+  const [extension, setExtension] = useState('')
+  const [color, setColor] = useState('')
+
+  //Datos para registrar archivos
+  const [historiaClinica, setHistoriaClinica] = useState('')
+  const [orden, setOrden] = useState('')
+
   const [fileData, setFileData] = useState(null);
 
   useEffect(() => {
@@ -42,45 +45,29 @@ const Modal = ({ closeModal, user,start,end,sede,dni,nombre,token }) => {
 
   useEffect(() => {
     GetlistArchivos(token)
-    .then(reponse => {
-      setListarchivos(reponse)
+    .then(response => {
+      setListarchivos(response)
+    })
     .catch(error => {
       throw new Error('Network response was not ok.', error);
     })
-    })
+    
   }, [])
 
-  const openLegajoModal = () => {
-    setIsLegajoModalOpen(true);
+  const openModalArchivos = (id,nombre,extension,color,historiaClinica,orden) => {
+    setIdarchivo(id)
+    setNombrearc(nombre)
+    setExtension(extension)
+    setColor(color)
+    setHistoriaClinica(historiaClinica)
+    setOrden(orden)
+    setModalArchivos(true);
   };
 
-  const closeLegajoModal = () => {
-    setIsLegajoModalOpen(false);
+  const closeModalArchivos = () => {
+    setModalArchivos(false);
   };
 
-  const openCAMUModal = () => {
-    setIsCAMUModalOpen(true);
-  };
-
-  const closeCAMUModal = () => {
-    setIsCAMUModalOpen(false);
-  };
-
-  const openImagenModal = () => {
-    setIsImagenModalOpen(true);
-  };
-
-  const closeImagenModal = () => {
-    setIsImagenModalOpen(false);
-  };
-
-  const openCovidModal = () => {
-    setIsCovidModalOpen(true);
-  };
-
-  const closeCovidModal = () => {
-    setIsCovidModalOpen(false);
-  };
 
   const handleFileInputClick = () => {
     document.getElementById('fileInput').click();
@@ -110,7 +97,7 @@ const Modal = ({ closeModal, user,start,end,sede,dni,nombre,token }) => {
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 naranjabackgroud flex justify-between ">
-          <h2 className="text-lg font-bold color-blanco">Historial Paciente - Energi s.a.c.</h2>
+          <h2 className="text-lg font-bold color-blanco">Historial Paciente</h2>
           <button onClick={closeModal} className="text-xl text-white" style={{ fontSize: '23px'   }}>&times;</button>
         </div>
         <div className="px-6 py-4 overflow-y-auto flex flex-wrap "> 
@@ -145,9 +132,10 @@ const Modal = ({ closeModal, user,start,end,sede,dni,nombre,token }) => {
                 <td className="border border-gray-300 px-2 py-1">
                   <div className="flex flex-col">
                   {listarchivos.map((archivoItem, archivoIndex) => (
-                    <div className="flex items-center" key={archivoIndex}>
-                      <FontAwesomeIcon icon={faArrowUp} className="text-red-500 cursor-pointer" onClick={openLegajoModal} />
-                      <div className="text-xs cursor-pointer ml-2" onClick={openLegajoModal}>Subir {archivoItem.nombre}</div>
+                    <div className="flex items-center" onClick={() => {openModalArchivos(archivoItem.id,archivoItem.nombre,archivoItem.extension,
+                    archivoItem.codigo,dataItem.historiaClinica,dataItem.orden)}} key={archivoIndex}>
+                      <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer" style={{ color: `${archivoItem.codigo}` }}  />
+                      <div className="text-xs cursor-pointer ml-2" >Subir {archivoItem.nombre}</div>
                     </div>
                     ))}
                 </div>
@@ -171,24 +159,10 @@ const Modal = ({ closeModal, user,start,end,sede,dni,nombre,token }) => {
       </div>
       
        {/* Modal para Subir Legajo Médico */}
-       {isLegajoModalOpen && (
-        <LegajoModal closeModal={closeModal} />
+       {modalArchivos && (
+        <ModalUpload closeModal={closeModal} id={idarchivo} nombre={nombrearc} extension={extension} color={color} historiaClinica={historiaClinica} orden={orden} dni={dni} user={user} token={token}/>
       )}
 
-      {/* Modal para Subir CAMU */}
-      {isCAMUModalOpen && (
-        <CAMUModal closeModal={closeModal} />
-      )}
-
-      {/* Modal para Subir Imagen */}
-      {isImagenModalOpen && (
-        <ImagenModal closeModal={closeModal} />
-      )}
-
-      {/* Modal para Subir Archivo Covid */}
-      {isCovidModalOpen && (
-        <CovidModal closeModal={closeModal} />
-      )}
     </div>
   );
 };
