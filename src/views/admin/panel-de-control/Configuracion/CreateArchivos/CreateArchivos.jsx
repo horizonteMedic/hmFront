@@ -4,11 +4,6 @@ import RuterConfig from '../RuterConfig';
 
 const ListaArchivosPorServidores = () => {
   const [showModal, setShowModal] = useState(false);
-  const [archivos, setArchivos] = useState([
-    { codigo: '001', nombre: 'Archivo1', extension: 'PDF' },
-    { codigo: '002', nombre: 'Archivo2', extension: 'Excel' },
-    { codigo: '003', nombre: 'Archivo3', extension: 'Word' },
-  ]);
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -30,16 +25,22 @@ const ListaArchivosPorServidores = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Extensión
                 </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Color
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Estado
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Fecha de Registro
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Usuario de Registro
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {archivos.map((archivo, index) => (
-                <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap">{archivo.codigo}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{archivo.nombre}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{archivo.extension}</td>
-                </tr>
-              ))}
+              {/* Los datos se cargarán dinámicamente desde la API */}
             </tbody>
           </table>
           <div className="text-right">
@@ -54,8 +55,6 @@ const ListaArchivosPorServidores = () => {
         <NuevoArchivoModal
           showModal={showModal}
           setShowModal={setShowModal}
-          archivos={archivos}
-          setArchivos={setArchivos}
         />
       </div>
     </div>
