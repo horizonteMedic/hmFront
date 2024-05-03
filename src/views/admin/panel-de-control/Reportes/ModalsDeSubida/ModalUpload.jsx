@@ -1,13 +1,32 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faCloudUploadAlt, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import NewArchivo from '../model/NewArchivo';
+import Swal from 'sweetalert2';
 
-const ModalUpload = ({ closeModal }) => {
+const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica, orden, dni, user, token }) => {
   const [filePreview, setFilePreview] = useState(null);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadError, setUploadError] = useState(false);
+
+  const [fileName, setFileName] = useState('')
+  
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha subido con exito el Archivo!",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        closeModal()
+      }
+    });
+  }
 
   const closeCAMUModal = () => {
     closeModal();
@@ -23,6 +42,10 @@ const ModalUpload = ({ closeModal }) => {
         setFileUploaded(true);
       };
       reader.readAsDataURL(file);
+      //Recupero el nombre del archivo
+      const fileName = file.name;
+      console.log(fileName)
+      setFileName(fileName);
     }
   };
 
@@ -32,25 +55,24 @@ const ModalUpload = ({ closeModal }) => {
 
   const handleUpload = () => {
     setUploading(true);
-
-    // Simulando una solicitud de carga (aquí puedes agregar tu lógica real de carga)
-    setTimeout(() => {
-      // Simulando éxito
+    NewArchivo(fileName,dni,historiaClinica,orden,id,user,token,filePreview)
+    .then(data => {
+      console.log('gane',data)
       setUploadSuccess(true);
       setUploading(false);
-
-      // Simulando el cierre del modal después de un breve período
-      setTimeout(() => {
-        closeModal();
-      }, 2000);
-    }, 2000);
+      AleertSucces()
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })
+    // Simulando una solicitud de carga (aquí puedes agregar tu lógica real de carga)
   };
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">
         <div className="flex justify-between items-center px-4 py-2 bg-gray-200">
-          <h2 className="text-lg font-bold">SUBIR ARCHIVO CAMU</h2>
+          <h2 className="text-lg font-bold">SUBIR ARCHIVO {nombre}</h2>
           <button onClick={closeCAMUModal} className="text-black">
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -84,7 +106,8 @@ const ModalUpload = ({ closeModal }) => {
         <button
           onClick={handleUpload}
           disabled={!fileUploaded || uploading}
-          className={`block w-full py-2 bg-blue-500 text-white font-bold uppercase rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600 ${(!fileUploaded || uploading) && 'opacity-50 cursor-not-allowed'}`}
+          style={{background: `${color}`}}
+          className={`block w-full py-2 text-white font-bold uppercase rounded hover:bg-red-600 focus:outline-none focus:bg-red-600 ${(!fileUploaded || uploading) && 'opacity-50 cursor-not-allowed'}`}
         >
           Subir <FontAwesomeIcon icon={faCloudUploadAlt} className="ml-2" />
         </button>
