@@ -4,8 +4,9 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import NewUser from '../model/RegisterUser';
 import { ComboboxContratas } from '../model/Combobox';
 import { ListEmpleadoDNI } from '../model/ListUserID';
+import Swal from 'sweetalert2';
 
-const RegistroUsuarioModal = ({ closeModal, token }) => {
+const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   const [documento, setDocumento] = useState('');
   const [apellidosNombres, setApellidosNombres] = useState('');
   const [idEmpleado, SetIdEmpleado] = useState('')

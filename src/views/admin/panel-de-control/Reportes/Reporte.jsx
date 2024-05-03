@@ -44,26 +44,33 @@ const HistorialPaciente = () => {
   const [currentPage, setCurrentPage] = useState(1); // Estado para el número de página actual
   const [totalPages, setTotalPages] = useState(1); // Estado para el número total de páginas
 
+  const [dnipicker, setDnipicker] = useState('')
+  const [nombrespicker, setNombrespicker] = useState('')
+
   useEffect(() => {
     setLoading(true);
-    GetListREport(userlogued.sub, startDate, endDate, sede, token)
-    .then(response => {
-      if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
-        console.log('no hay na');
-      } else {
-        setData(response);
-        setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
-      }
-    })
-    .catch(error => {
-      throw new Error('Network response was not ok.', error);
-    })
-    .finally(() => {
-      setLoading(false);
-    });
-  }, [startDate, endDate, sede, token]);
+    if (startDate && endDate && sede) {
+      GetListREport(userlogued.sub, startDate, endDate, sede, token)
+        .then(response => {
+          if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
+            setData([])
+          } else {
+            setData(response);
+            setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
+          }
+        })
+        .catch(error => {
+          throw new Error('Network response was not ok.', error);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  }, [startDate, endDate, sede]);
 
-  const openModal = () => {
+  const openModal = (dni,nombres,apellidos) => {
+    setDnipicker(dni)
+    setNombrespicker(`${nombres} ${apellidos}`)
     setIsModalOpen(true);
   };
 
@@ -117,6 +124,7 @@ const HistorialPaciente = () => {
       .then(response => {
         if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
           console.log('no hay na');
+          setData([])
         } else {
           setData(response);
           setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
@@ -140,7 +148,7 @@ const HistorialPaciente = () => {
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> {/* Agrega items-center para centrar verticalmente el icono */}
-          <h1 className="text-center text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
+          <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
           <button onClick={reloadTable} className="focus:outline-none ml-3 relative"> {/* Agrega el botón de recarga */}
             {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
             <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
@@ -203,7 +211,7 @@ const HistorialPaciente = () => {
         {currentData.map((item, index) => (
           <tr key={index}>
             <td className="border border-gray-300 px-3 py-2">
-              <button onClick={openModal} className="focus:outline-none">
+              <button onClick={() => {openModal(item.dni,item.apellidos,item.nombres)}} className="focus:outline-none">
                 <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
               </button>
             </td>
@@ -224,7 +232,7 @@ const HistorialPaciente = () => {
           <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 bg-blue-500 text-white rounded-md">Siguiente</button>
         </div>
       </div>
-      {isModalOpen && <Modal closeModal={closeModal} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} token={token} />}
     </div>
   );
 };

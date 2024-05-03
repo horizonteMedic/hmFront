@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -6,14 +6,49 @@ import LegajoModal from '../ModalsDeSubida/LegajoModal';
 import CAMUModal from '../ModalsDeSubida/CAMUModal';
 import ImagenModal from '../ModalsDeSubida/ImagenModal';
 import CovidModal from '../ModalsDeSubida/CovidModal';
+import { GetHistoryUser } from '../model/getHistoryUser';
+import { GetlistArchivos } from '../model/getlistArchivos';
 
-const Modal = ({ closeModal }) => {
+const Modal = ({ closeModal, user,start,end,sede,dni,nombre,token }) => {
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false);
+  const [listarchivos, setListarchivos] = useState([])
+
   const [isLegajoModalOpen, setIsLegajoModalOpen] = useState(false);
   const [isCAMUModalOpen, setIsCAMUModalOpen] = useState(false);
   const [isImagenModalOpen, setIsImagenModalOpen] = useState(false);
   const [isCovidModalOpen, setIsCovidModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileData, setFileData] = useState(null);
+
+  useEffect(() => {
+    setLoading(true);
+    GetHistoryUser(user, start,end,sede,dni,token)
+    .then(response => {
+      if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
+        console.log('no hay na');
+        setData([])
+      } else {
+        setData(response);
+      }
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.', error);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    GetlistArchivos(token)
+    .then(reponse => {
+      setListarchivos(reponse)
+    .catch(error => {
+      throw new Error('Network response was not ok.', error);
+    })
+    })
+  }, [])
 
   const openLegajoModal = () => {
     setIsLegajoModalOpen(true);
@@ -80,11 +115,14 @@ const Modal = ({ closeModal }) => {
         </div>
         <div className="px-6 py-4 overflow-y-auto flex flex-wrap "> 
           <div className="w-full md:w-1/6 mb-4"> 
-            <span>DNI : </span><div className="bg-gray-200 rounded px-2 py-1 inline-block"><strong>711393409</strong></div>
+            <span>DNI : </span><div className="bg-gray-200 rounded px-2 py-1 inline-block"><strong>{dni}</strong></div>
           </div>
           <div className="w-full md:w-1/2 mb-4"> 
-            <span>Paciente : </span><div className="sombreado-verde rounded px-2 py-1 inline-block"><strong> MANTILLA HUAMAN CATALINO</strong></div>
+            <span>Paciente : </span><div className="sombreado-verde rounded px-2 py-1 inline-block"><strong>{nombre}</strong></div>
           </div>
+          {loading ? (
+            <p className="text-center">Cargando...</p>
+          ) : (
           <table className="w-full border border-gray-300">
             <thead>
               <tr className="bg-gray-200">
@@ -102,40 +140,33 @@ const Modal = ({ closeModal }) => {
               </tr>
             </thead>
             <tbody>
-              <tr>
+              {data.map((dataItem, dataIndex) => (
+              <tr key={dataIndex}>
                 <td className="border border-gray-300 px-2 py-1">
                   <div className="flex flex-col">
-                    <div className="flex items-center">
+                  {listarchivos.map((archivoItem, archivoIndex) => (
+                    <div className="flex items-center" key={archivoIndex}>
                       <FontAwesomeIcon icon={faArrowUp} className="text-red-500 cursor-pointer" onClick={openLegajoModal} />
-                      <div className="text-xs cursor-pointer ml-2" onClick={openLegajoModal}>Subir Legajo Médico</div>
+                      <div className="text-xs cursor-pointer ml-2" onClick={openLegajoModal}>Subir {archivoItem.nombre}</div>
                     </div>
-                    <div className="flex items-center mt-2">
-                      <FontAwesomeIcon icon={faArrowUp} className="text-blue-500 cursor-pointer" onClick={openCAMUModal} />
-                      <div className="text-xs cursor-pointer ml-2" onClick={openCAMUModal}>Subir CAMU</div>
-                    </div>
-                    <div className="flex items-center mt-2">
-                      <FontAwesomeIcon icon={faArrowUp} className="text-yellow-500 cursor-pointer" onClick={openImagenModal} />
-                      <div className="text-xs cursor-pointer ml-2" onClick={openImagenModal}>Subir Imagen</div>
-                    </div>
-                    <div className="flex items-center mt-2">
-                      <FontAwesomeIcon icon={faArrowUp} className="text-green-500 cursor-pointer" onClick={openCovidModal} />
-                      <div className="text-xs cursor-pointer ml-2" onClick={openCovidModal}>Subir Archivo Covid</div>
-                    </div>
-                  </div>
+                    ))}
+                </div>
                 </td>
-                <td className="border border-gray-300 px-2 py-1">86932</td>
-                <td className="border border-gray-300 px-2 py-1">GRUPO TRANSPESA SAC</td>
-                <td className="border border-gray-300 px-2 py-1">N/A</td>
-                <td className="border border-gray-300 px-2 py-1">22-04-2024</td>
-                <td className="border border-gray-300 px-2 py-1">PRE-OCUPACIONAL</td>
-                <td className="border border-gray-300 px-2 py-1">PROCESO</td>
-                <td className="border border-gray-300 px-2 py-1">CONDUCTOR</td>
-                <td className="border border-gray-300 px-2 py-1">TRANSPORTE</td>
-                <td className="border border-gray-300 px-2 py-1"></td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.orden}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.empresa}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.contrata}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.fechaExamen}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.examen}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.estado}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.cargo}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.area}</td>
+                <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                 <td className="border border-gray-300 px-2 py-1"></td>
               </tr>
+              ))}
             </tbody>
           </table>
+          )}
         </div>
       </div>
       

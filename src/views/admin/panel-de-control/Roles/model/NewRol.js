@@ -1,4 +1,3 @@
-import { stringify } from "postcss";
 
 export default async function NewRol(rol,descripcion,estado,token,userlogued) {
 
