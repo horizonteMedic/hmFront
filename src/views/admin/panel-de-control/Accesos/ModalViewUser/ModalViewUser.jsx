@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faTrash, faCogs, faBuilding } from '@fortawesome/free-solid-svg-icons'; // Agregado faBuilding
+
+import { faTimes, faTrash, faTentArrowDownToLine, faBuilding } from '@fortawesome/free-solid-svg-icons'; // Agregado faBuilding
 import Swal from 'sweetalert2';
 import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser';
 import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; // Importamos el nuevo modal
@@ -97,7 +98,7 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
                                     <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                                     <td className="border border-gray-300 px-2 py-1">
                                         <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser) }} className="text-red-500 cursor-pointer" />
-                                        <FontAwesomeIcon icon={faCogs} onClick={handleConfigIconClick} className="text-blue-500 ml-2 cursor-pointer" />
+                                        <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={handleConfigIconClick} className="text-blue-500 ml-2 cursor-pointer" />
                                         {/* Agregamos el icono para asignar empresa contratante */}
                                         <FontAwesomeIcon icon={faBuilding} onClick={handleAsignarEmpresaContrataIconClick} className="text-green-500 ml-2 cursor-pointer" />
                                     </td>
@@ -108,6 +109,21 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
                             ))}
                         </tbody>
                     </table>
+                    {/* Cuadro de leyenda horizontal o vertical */}
+                    <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
+                        <div className="flex items-center mb-2 md:mb-0">
+                            <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+                            <p className="text-sm ml-2 md:ml-4">Eliminar Usuario</p>
+                        </div>
+                        <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                            <FontAwesomeIcon icon={faTentArrowDownToLine} className="text-blue-500" />
+                            <p className="text-sm ml-2 md:ml-4">Asiganación de Sede </p>
+                        </div>
+                        <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                            <FontAwesomeIcon icon={faBuilding} className="text-green-500" />
+                            <p className="text-sm ml-2 md:ml-4">Asignar Empresa/Contrata</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 

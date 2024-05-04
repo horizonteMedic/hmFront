@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxSexo, ComboboxTipoDoc } from '../model/Combobox';
 
 const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
-  Cip, Celular, Distrito, Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
+  Cip, Celular, Distrito, Sexo , Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
   
   const userlogued = useAuthStore(state => state.userlogued);
   const [tipoDocumento, setTipoDocumento] = React.useState(TipoDoc);
@@ -19,7 +19,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
   const [email, setEmail] = useState(Email)
   const [startDate, setStartDate] = React.useState(FechaNacimiento);
   //Sexo
-  const [sexo, setSexo] = React.useState('');
+  const [sexo, setSexo] = React.useState(Sexo); // Aquí estableces el estado sexo con el valor recibido de las propiedades
   const [celular, setCelular] = useState(Celular)
 
   const [departamento, setDepartamento] = React.useState(Distrito.slice(0, 2));
@@ -90,7 +90,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate, 
+    EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate, sexo,
       cip, celular, distrito, direccion, cargo, activo, FechaInicio, UserRegistro, userlogued.sub)
       .then(data => {
         AleertSucces()

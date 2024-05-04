@@ -224,6 +224,27 @@ const Accesos = () => {
           </table>
           
         </div>
+
+        {/* Leyenda de iconos */}
+        <div className="flex justify-center bg-gray-100 rounded-lg p-4 md:px-6 md:py-4 md:mx-4 md:my-2">
+          <div className="flex items-center ml-6 md:ml-8 ">
+            <FontAwesomeIcon icon={faEdit} className="text-blue-500" />
+            <p className="text-sm ml-2 md:ml-4">Editar</p>
+          </div>
+          <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={faCog} className="text-green-500" />
+            <p className="text-sm ml-2 md:ml-4">Configurar Accesos</p>
+          </div>
+          <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={faUsers} className="text-orange-500" />
+            <p className="text-sm ml-2 md:ml-4">Ver Usuarios</p>
+          </div>
+          <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+            <p className="text-sm ml-2 md:ml-4">Eliminar</p>
+          </div>
+        </div>
+
       </div>
       {/* Asegúrate de que los modales estén configurados correctamente */}
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
@@ -233,7 +254,6 @@ const Accesos = () => {
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag}/>}
       {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} token={token}/>}
-
     </div>
   );
 };
