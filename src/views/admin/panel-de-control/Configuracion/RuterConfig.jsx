@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faList, faMapMarkerAlt, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faHandshake, faList, faMapMarkerAlt, faNotesMedical, faPlusCircle, faTentArrowDownToLine } from '@fortawesome/free-solid-svg-icons';
 
 const RuterConfig = () => {
   const location = useLocation();
@@ -45,7 +45,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('agregar-sede')}
           >
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+            <FontAwesomeIcon icon={faTentArrowDownToLine} className="mr-2" />
             Agregar Sede
           </Link>
           <Link
@@ -55,7 +55,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('agregar-campaña')}
           >
-            <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
+            <FontAwesomeIcon icon={faNotesMedical} className="mr-2" />
             Agregar Campaña
           </Link>
           <Link
@@ -65,7 +65,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('administrar-empresas')}
           >
-            <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
+            <FontAwesomeIcon icon={faBuilding} className="mr-2" />
             Agregar Empresa
           </Link>
           <Link
@@ -75,7 +75,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('administrar-contratas')}
           >
-            <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
+            <FontAwesomeIcon icon={faHandshake} className="mr-2" />
             Agregar Contrata
           </Link>
         </div>
