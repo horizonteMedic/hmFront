@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
+import { GetArchivosSubidos } from '../model/getArchivosSubidos';
+import { ReadArchivos } from '../model/readArchivos';
 
 const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  //Los tipos de archivos que se pueden subir
   const [listarchivos, setListarchivos] = useState([]);
+  //Los archivos ya subidos
+  const [read, setRead] = useState([])
+
   const [modalArchivos, setModalArchivos] = useState(false);
   const [idarchivo, setIdarchivo] = useState('');
   const [nombrearc, setNombrearc] = useState('');
@@ -17,9 +23,9 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
   const [color, setColor] = useState('');
   const [historiaClinica, setHistoriaClinica] = useState('');
   const [orden, setOrden] = useState('');
-
+ 
   const [fileData, setFileData] = useState(null);
-
+  //Jala los datos de los pacientes
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, token)
@@ -39,6 +45,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
       });
   }, []);
 
+  //Jala los tipos de archivos disponibles para la subida
   useEffect(() => {
     GetlistArchivos(token)
       .then(response => {
@@ -49,6 +56,34 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
       });
 
   }, []);
+
+  //Jala los archivos ya subidos a ese paciente
+  useEffect(() => {
+      if (data && data.length > 0) {
+        GetArchivosSubidos(data[0].historiaClinica, token)
+          .then(response => {
+            setRead(response);
+          })
+          .catch(error => {
+            throw new Error('Network response was not ok.', error);
+          });
+      }
+  }, [data])
+
+  const filterArchivos = () => {
+    if (listarchivos && read) {
+      if (listarchivos[0].id === read[0].id_tipo_archivo) {
+        if (listarchivos[0].extension == 'pdf') {
+          return (
+            <FontAwesomeIcon icon={faFilePdf} size='xl' style={{ color: `${listarchivos[0].codigo}` }} />
+          )
+        } else {
+          <FontAwesomeIcon icon={faFileImage} size='xl' style={{ color: `${listarchivos[0].codigo}` }} />
+        }
+      }
+    }
+    return
+  }
 
   const openModalArchivos = (id, nombre, extension, color, historiaClinica, orden) => {
     setIdarchivo(id);
@@ -64,22 +99,36 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
     setModalArchivos(false);
   };
 
-  const handleFileInputClick = () => {
-    document.getElementById('fileInput').click();
-  };
+  const ReadBase64 = (response) => {
+    const fileType = response.nombreArchivo.split('.').pop();
+    // Convertir el base64 a un blob
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file);
-    convertFileToBase64(file);
-  };
+    const byteCharacters = atob(response.fileBase64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: `application/${fileType}` });
+    // Crear un objeto URL para el blob
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = response.nombreArchivo;
 
-  const convertFileToBase64 = (file) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setFileData(event.target.result);
-    };
-    reader.readAsDataURL(file);
+    // Disparar el clic en el enlace para iniciar la descarga
+      link.click();
+  }
+  
+  const GetBase64 = (historia,id_archivo) => {
+    console.log(historia,id_archivo)
+    ReadArchivos(historia,id_archivo,token)
+    .then(response => {
+      console.log(response);
+      ReadBase64(response)
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.', error);
+    }); 
   };
 
   const enviarArchivo = () => {
@@ -142,7 +191,9 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.area}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                       <td className="border border-gray-300 px-2 py-1">
-                        <a href={fileData} download={`${nombrearc}.${extension}`}>Descargar</a>
+                        {read.map((readItem, readIndex) => ( 
+                        <a key={readIndex} className='cursor-pointer' title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>{filterArchivos() }</a>
+                        ))}
                       </td>
                     </tr>
                   ))}

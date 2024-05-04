@@ -38,6 +38,8 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = e.target.result;
+        
+
         setFilePreview(base64String);
         setFileUploaded(true);
       };

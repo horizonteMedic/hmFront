@@ -1,5 +1,4 @@
-import { URLAzure } from "../../../../config/config";
-
+// registroArchivo.js
 
 const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaRegistro, userRegistro, token) => {
   const data = {
@@ -8,18 +7,17 @@ const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaR
     color: color,
     codigo: codigo,
     estado: estado,
-    fechaRegistro: fechaRegistro,
+    fechaRegistro: `${year}-${month}-${day}`,
     userRegistro: userRegistro,
     fechaActualizacion: null,
     userActualizacion: null
   };
 
-  try {
-    const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/tipoArchivo', {
-      method: 'POST',
+  const options = {
+      method: 'POST', 
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data),
     });
@@ -28,9 +26,9 @@ const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaR
       throw new Error('Error al crear el archivo.');
     }
 
-    return await response.json();
+    return await response.json(); // Devuelve la respuesta como JSON
   } catch (error) {
-    throw new Error(error.message); 
+    throw new Error(error.message); // Propaga el error para que sea manejado por quien llama a esta función
   }
 };
 
