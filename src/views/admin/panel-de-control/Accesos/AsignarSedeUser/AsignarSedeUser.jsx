@@ -9,7 +9,6 @@ const ConfigModal = ({ closeModal }) => {
         { id: 2, name: "Sede B" },
         { id: 3, name: "Sede C" },
         { id: 4, name: "Sede D" },
-        // Agrega más sedes si es necesario
     ];
 
     const handleCheckboxChange = (e) => {
@@ -22,20 +21,22 @@ const ConfigModal = ({ closeModal }) => {
     };
 
     const handleSave = () => {
-        // Aquí puedes hacer lo que necesites con las sedes seleccionadas
         console.log("Sedes seleccionadas:", selectedSedes);
-        // Puedes enviar las sedes seleccionadas a una función para guardarlas en el backend, por ejemplo
     };
 
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-            <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[600px] relative">
-                <FontAwesomeIcon
-                    icon={faTimes}
-                    className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500 hover:text-gray-700"
-                    onClick={closeModal}
-                />
-                <h1 className="text-lg font-bold mb-4">Asignación de Sede</h1>
+            <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[500px] h-auto relative">
+
+            <FontAwesomeIcon
+                icon={faTimes}
+                className="absolute top-0 right-0 m-3 cursor-pointer  color-blanco"
+                onClick={closeModal}
+            />
+            <div className="p azuloscurobackground flex justify-between p-3.5">
+                <h1 className="text-start font-bold color-azul text-white">Asignar Sede</h1>
+            </div>
+            <div className='container p-4'>
                 <div className="overflow-y-auto max-h-[300px]">
                     {sedes.map(sede => (
                         <div key={sede.id} className="flex items-center mb-2">
@@ -51,9 +52,11 @@ const ConfigModal = ({ closeModal }) => {
                         </div>
                     ))}
                 </div>
-                <button onClick={handleSave} className="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Guardar</button>
+                <button onClick={handleSave} className="mt-4 naranjabackgroud text-white py-2 px-4 rounded focus:outline-none focus:bg-blue-600 transition-colors duration-300 ease-in-out">Guardar</button>
             </div>
         </div>
+    </div>
+
     );
 };
 

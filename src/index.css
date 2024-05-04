@@ -48,7 +48,7 @@ body {
   color: white;
 }
 .azul-btn{
-  background-color: #084788;
+  background-color: #233245;
   color: white;
 }
 .pointer{
@@ -57,11 +57,9 @@ body {
 .naranjabackgroud{
   background-color: #fc6b03;
 }
-.azulbackgroud{
-  background-color: #084788;
-}
+
 .azuloscurobackground{
-  background-color: #1f2a38;
+  background-color: #233245;
 }
 .tamañouno{
   font-size: 13px;

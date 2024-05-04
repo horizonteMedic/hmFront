@@ -76,7 +76,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, idUser, token }) => {
                             onClick={openCrearModal}
                             className="mb-3 naranjabackgroud text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                            Crear Nueva Empresa / Contrata
+                            Asignar Nueva Empresa / Contrata
                         </button>
                     </div>
                     {showCrearModal && (

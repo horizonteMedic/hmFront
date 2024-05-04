@@ -20,11 +20,13 @@ import Roles from './views/admin/panel-de-control/Roles/Roles.jsx';
 import Reporte from './views/admin/panel-de-control/Reportes/Reporte.jsx'
 import Matriz from './views/admin/panel-de-control/Matriz/Matriz.jsx'
 import Configuracion from './views/admin/panel-de-control/Configuracion/Configuracion.jsx';
-import  ConfiguracionVistaPorRol  from './views/admin/panel-de-control/Configuracion/Confi-vista-rol/ConfiguracionVistasPorRol.jsx';
 import AgregarSede from './views/admin/panel-de-control/Configuracion/AgregarSede/AgregarSede.jsx';
-import Breadcrumb from './views/components/Breadcrumb.jsx'; // Importa el componente de migas de pan
+import Breadcrumb from './views/components/Breadcrumb.jsx'; 
 import AgregarCampaña from './views/admin/panel-de-control/Configuracion/AgregarCampaña/AgregarCampaña.jsx'
 import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateArchivos/CreateArchivos.jsx'
+import AgregarEmpresas from './views/admin/panel-de-control/Configuracion/AgregarEmpresas/AgregarEmpresas.jsx'
+import AgregarContratas from './views/admin/panel-de-control/Configuracion/AgregarContratas/AgregarContratas.jsx'
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -62,10 +64,12 @@ const AppContent = () => {
           <Route path="/reporte-pacientes" element={<Reporte />}/> 
           <Route path="/matriz-postulante" element={<Matriz />}/> 
           <Route path="/configuracion" element={<Configuracion />}/> 
-          <Route path="/configuracion-vistas-por-rol" element={<ConfiguracionVistaPorRol />} />
           <Route path="/agregar-sede" element={<AgregarSede />} />
           <Route path="/agregar-campaña" element={<AgregarCampaña />} />
           <Route path="/lista-archivos" element={<CreateArchivo />} />
+          <Route path="/agregar-empresas" element={<AgregarEmpresas />} />
+          <Route path="/agregar-contrata" element={<AgregarContratas />} />
+
 
           
         </Route>
