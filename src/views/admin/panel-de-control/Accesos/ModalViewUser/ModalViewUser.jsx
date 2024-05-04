@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faTrash, faCogs } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrash, faCogs, faBuilding } from '@fortawesome/free-solid-svg-icons'; // Agregado faBuilding
 import Swal from 'sweetalert2';
-import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser'; // Importa el componente del modal de configuración/asignación
-import { ListUser, DeleteUsers } from '../model/ListUserID'; // Importa ListUser y DeleteUsers desde su ubicación correcta
+import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser';
+import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; // Importamos el nuevo modal
+import { ListUser, DeleteUsers } from '../model/ListUserID';
 
 const UsersModal = ({ closeModal, idEmpleado, token }) => {
     const [data, setData] = useState([]);
-    const [showAsignarSedeUser, setShowAsignarSedeUser] = useState(false); // Estado para controlar la visibilidad del modal de configuración/asignación
+    const [showAsignarSedeUser, setShowAsignarSedeUser] = useState(false);
+    const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false); // Estado para controlar la visibilidad del nuevo modal
 
     useEffect(() => {
         ListUser(idEmpleado, token)
@@ -61,14 +63,16 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
         });
     };
 
-    // Función para manejar el clic en el icono de configuración/asignación
     const handleConfigIconClick = () => {
-        setShowAsignarSedeUser(true); // Abre el modal de configuración/asignación
+        setShowAsignarSedeUser(true);
+    };
+
+    const handleAsignarEmpresaContrataIconClick = () => {
+        setShowAsignarEmpresaContrataModal(true); // Abrir el nuevo modal
     };
 
     return (
         <>
-            {/* Modal de lista de usuarios */}
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
                 <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px] relative">
                     <FontAwesomeIcon
@@ -77,7 +81,6 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
                         onClick={closeModal}
                     />
                     <h1 className="text-start font-bold mb-4">Lista de Usuarios vinculados</h1>
-                    {/* Tabla de usuarios */}
                     <table className="w-full border border-gray-300">
                         <thead>
                             <tr className="bg-gray-200">
@@ -94,8 +97,9 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
                                     <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                                     <td className="border border-gray-300 px-2 py-1">
                                         <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser) }} className="text-red-500 cursor-pointer" />
-                                        {/* Icono de configuración/asignación */}
                                         <FontAwesomeIcon icon={faCogs} onClick={handleConfigIconClick} className="text-blue-500 ml-2 cursor-pointer" />
+                                        {/* Agregamos el icono para asignar empresa contratante */}
+                                        <FontAwesomeIcon icon={faBuilding} onClick={handleAsignarEmpresaContrataIconClick} className="text-green-500 ml-2 cursor-pointer" />
                                     </td>
                                     <td className="border border-gray-300 px-2 py-1">{item.username}</td>
                                     <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
@@ -107,8 +111,9 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
                 </div>
             </div>
 
-            {/* Modal de configuración/asignación */}
             {showAsignarSedeUser && <AsignarSedeUser closeModal={() => setShowAsignarSedeUser(false)} />}
+            {/* Renderizamos el nuevo modal */}
+            {showAsignarEmpresaContrataModal && <AsignarEmpresaContrataModal closeModal={() => setShowAsignarEmpresaContrataModal(false)} />}
         </>
     );
 };

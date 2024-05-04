@@ -1,4 +1,5 @@
-// registroArchivo.js
+import { URLAzure } from "../../../../config/config";
+
 
 const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaRegistro, userRegistro, token) => {
   const data = {
@@ -27,9 +28,9 @@ const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaR
       throw new Error('Error al crear el archivo.');
     }
 
-    return await response.json(); // Devuelve la respuesta como JSON
+    return await response.json();
   } catch (error) {
-    throw new Error(error.message); // Propaga el error para que sea manejado por quien llama a esta función
+    throw new Error(error.message); 
   }
 };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // Importa los nuevos iconos
 import NewUser from '../model/RegisterUser';
 import { ComboboxContratas } from '../model/Combobox';
 import { ListEmpleadoDNI } from '../model/ListUserID';
@@ -9,14 +9,15 @@ import Swal from 'sweetalert2';
 const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   const [documento, setDocumento] = useState('');
   const [apellidosNombres, setApellidosNombres] = useState('');
-  const [idEmpleado, SetIdEmpleado] = useState('')
+  const [idEmpleado, SetIdEmpleado] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [estado, setEstado] = useState(false);
   const [empresaContrata, setEmpresaContrata] = useState('');
   const [ruc, setRuc] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
 
-  const ListContratas = ComboboxContratas()
+  const ListContratas = ComboboxContratas();
 
   const capitalizeWords = (str) => {
     return str.replace(/\b\w/g, function (char) {
@@ -34,28 +35,28 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
       confirmButtonText: "Aceptar"
     }).then((result) => {
       if (result.isConfirmed) {
-        closeModal()
-        Refresgpag()
+        closeModal();
+        Refresgpag();
       }
     });
   }
-  //Sirve para buscar al empleado por su DNI
+
   const SearchDNI = () => {
-    ListEmpleadoDNI(documento,token)
+    ListEmpleadoDNI(documento, token)
       .then(empleadoData => {
         if (empleadoData.mensaje === 'No value present') {
-          setApellidosNombres('Empleado no Encontrado'); 
+          setApellidosNombres('Empleado no Encontrado');
         } else {
           const { idEmpleado, apellidos, nombres } = empleadoData;
-          setApellidosNombres(`${apellidos} ${nombres}`);// Establece los apellidos y nombres en blanco
-          SetIdEmpleado(idEmpleado)
+          setApellidosNombres(`${apellidos} ${nombres}`);
+          SetIdEmpleado(idEmpleado);
         }
       })
       .catch(error => {
         console.error('Error al buscar empleado:', error);
-        setApellidosNombres(''); // Establece los apellidos y nombres en blanco
+        setApellidosNombres('');
       });
-  }
+  };
 
   const handleRuc = (e) => {
     const selectedContrata = ListContratas.find(contrata => contrata.razonSocial === e.target.value);
@@ -69,13 +70,13 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   };
 
   const handleRegistrar = () => {
-    NewUser(username,password,estado,ruc,idEmpleado)
+    NewUser(username, password, estado, ruc, idEmpleado)
       .then(data => {
-        AleertSucces()
+        AleertSucces();
       })
       .catch(error => {
-        console.error('Error', error)
-      })
+        console.error('Error', error);
+      });
   };
 
   const handleApellidosNombresChange = (e) => {
@@ -88,7 +89,7 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
       <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px] relative">
         <FontAwesomeIcon
           icon={faTimes}
-          className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
+          className="absolute top-0 tamañouno right-0 m-4 cursor-pointer "
           onClick={closeModal}
         />
         <h1 className="text-start font-bold mb-4">Registro de Usuario</h1>
@@ -127,12 +128,20 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
         <div className="flex mb-4">
           <div className="w-1/2 mr-2">
             <label className="block mb-1">Asignar Password:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-            />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+                />
+                <FontAwesomeIcon
+                  icon={showPassword ? faEyeSlash : faEye}
+                  className="absolute top-1/2 right-0 transform -translate-y-1/2 mr-4 cursor-pointer text-gray-500"
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              </div>
+
           </div>
           <div className="w-1/2">
             <label className="block mb-1">RUC:</label>

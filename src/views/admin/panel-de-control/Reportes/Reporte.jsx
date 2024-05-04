@@ -238,16 +238,16 @@ const HistorialPaciente = () => {
 
         {/* Renderiza los botones de paginación */}
         <div className="flex justify-center p-4">
-          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 bg-blue-500 text-white rounded-md">
+          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
             <FontAwesomeIcon icon={faChevronLeft} />
           </button>
           {/* Mostrar números de página */}
           {visiblePages().map((page) => (
-            <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
+            <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
               {page}
             </button>
           ))}
-          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 bg-blue-500 text-white rounded-md">
+          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
         </div>

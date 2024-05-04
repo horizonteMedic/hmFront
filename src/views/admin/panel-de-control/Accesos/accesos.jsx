@@ -222,6 +222,7 @@ const Accesos = () => {
               ))}
             </tbody>
           </table>
+          
         </div>
       </div>
       {/* Asegúrate de que los modales estén configurados correctamente */}
