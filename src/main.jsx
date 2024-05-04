@@ -24,8 +24,8 @@ import AgregarSede from './views/admin/panel-de-control/Configuracion/AgregarSed
 import Breadcrumb from './views/components/Breadcrumb.jsx'; 
 import AgregarCampaña from './views/admin/panel-de-control/Configuracion/AgregarCampaña/AgregarCampaña.jsx'
 import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateArchivos/CreateArchivos.jsx'
-import AgregarEmpresas from './views/admin/panel-de-control/Configuracion/AgregarEmpresas/AgregarEmpresas.jsx'
-import AgregarContratas from './views/admin/panel-de-control/Configuracion/AgregarContratas/AgregarContratas.jsx'
+import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
+import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
 
 const App = () => {
   return (
@@ -67,8 +67,8 @@ const AppContent = () => {
           <Route path="/agregar-sede" element={<AgregarSede />} />
           <Route path="/agregar-campaña" element={<AgregarCampaña />} />
           <Route path="/lista-archivos" element={<CreateArchivo />} />
-          <Route path="/agregar-empresas" element={<AgregarEmpresas />} />
-          <Route path="/agregar-contrata" element={<AgregarContratas />} />
+          <Route path="/administrar-empresas" element={<AdministrarEmpresas />} />
+          <Route path="/administrar-contratas" element={<AdministrarContratas />} />
 
 
           
