@@ -1,5 +1,3 @@
-// registroArchivo.js
-
 const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaRegistro, userRegistro, token) => {
   const data = {
     nombre: nombre,
@@ -13,11 +11,12 @@ const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaR
     userActualizacion: null
   };
 
-  const options = {
+  try {
+    const response = await fetch('your_api_url_here', {
       method: 'POST', 
       headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify(data),
     });
