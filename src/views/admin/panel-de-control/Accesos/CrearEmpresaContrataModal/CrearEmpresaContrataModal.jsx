@@ -39,7 +39,7 @@ const CrearEmpresaContrataModal = ({ closeModal }) => {
                 onClick={closeModal}
             />
             <div className="p azuloscurobackground flex justify-between p-3.5">
-                <h1 className="text-start font-bold color-azul text-white">Creación de Empresas / Contratas</h1>
+                <h1 className="text-start font-bold color-azul text-white">Asignación de Empresas / Contratas</h1>
             </div>
             <div className='container p-4'>
                 <div className="mb-4">

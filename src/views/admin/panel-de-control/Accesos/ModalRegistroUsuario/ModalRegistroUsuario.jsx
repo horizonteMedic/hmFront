@@ -86,13 +86,17 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px] relative">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[880px] relative">
+
         <FontAwesomeIcon
-          icon={faTimes}
-          className="absolute top-0 tamañouno right-0 m-4 cursor-pointer "
-          onClick={closeModal}
+            icon={faTimes}
+            className="absolute top-0 right-0 m-3 cursor-pointer  color-blanco"
+            onClick={closeModal}
         />
-        <h1 className="text-start font-bold mb-4">Registro de Usuario</h1>
+      <div className="p azuloscurobackground flex justify-between p-3.5">
+        <h1 className="text-start font-bold color-azul text-white">Registro de Usuario</h1>
+      </div>
+      <div className='container p-4'>
         <div className="mb-4">
           <label className="block mb-1">N° de Documento:</label>
           <div className="flex">
@@ -137,7 +141,7 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
                 />
                 <FontAwesomeIcon
                   icon={showPassword ? faEyeSlash : faEye}
-                  className="absolute top-1/2 right-0 transform -translate-y-1/2 mr-4 cursor-pointer text-gray-500"
+                  className="absolute top-1/2 right-0 transform -translate-y-1/2 mr-4 cursor-pointer color-naranja"
                   onClick={() => setShowPassword(!showPassword)}
                 />
               </div>
@@ -178,13 +182,15 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
           </div>
         </div>
         <button
-          className="azul-btn px-4 py-2 rounded-md"
+          className="naranja-btn px-4 py-2 rounded-md"
           onClick={handleRegistrar}
         >
           Registrar Datos
         </button>
       </div>
     </div>
+  </div>
+
   );
 };
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faList, faMapMarkerAlt, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faHandshake, faList, faMapMarkerAlt, faNotesMedical, faPlusCircle, faTentArrowDownToLine } from '@fortawesome/free-solid-svg-icons';
 
 const RuterConfig = () => {
   const location = useLocation();
@@ -9,14 +9,16 @@ const RuterConfig = () => {
 
   useEffect(() => {
     const decodedPathname = decodeURIComponent(location.pathname);
-    if (decodedPathname === '/configuracion-vistas-por-rol') {
-      setActiveButton('configuracion-vistas-por-rol');
-    } else if (decodedPathname === '/lista-archivos') {
+    if (decodedPathname === '/lista-archivos') {
       setActiveButton('lista-archivos');
     } else if (decodedPathname === '/agregar-sede') {
       setActiveButton('agregar-sede');
     } else if (decodedPathname === '/agregar-campaña') {
       setActiveButton('agregar-campaña');
+    } else if (decodedPathname === '/administrar-empresas') {
+      setActiveButton('administrar-empresas');
+    } else if (decodedPathname === '/administrar-contratas') {
+      setActiveButton('administrar-contratas');
     } else {
       setActiveButton(null);
     }
@@ -26,16 +28,6 @@ const RuterConfig = () => {
     <div className="flex justify-center mt-4 mb-5">
       <div className="w-full md:w-[90%] p-4">
         <div className="flex flex-col md:flex-row gap-4">
-          {/* <Link
-            to="/configuracion-vistas-por-rol"
-            className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
-              activeButton === 'configuracion-vistas-por-rol' ? 'bg-yellow-300' : ''
-            }`}
-            onClick={() => setActiveButton('configuracion-vistas-por-rol')}
-          >
-            <FontAwesomeIcon icon={faCog} className="mr-2" />
-            Configuración de Vistas por Rol
-          </Link> */}
           <Link
             to="/lista-archivos"
             className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
@@ -53,7 +45,7 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('agregar-sede')}
           >
-            <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
+            <FontAwesomeIcon icon={faTentArrowDownToLine} className="mr-2" />
             Agregar Sede
           </Link>
           <Link
@@ -63,8 +55,28 @@ const RuterConfig = () => {
             }`}
             onClick={() => setActiveButton('agregar-campaña')}
           >
-            <FontAwesomeIcon icon={faPlusCircle} className="mr-2" />
+            <FontAwesomeIcon icon={faNotesMedical} className="mr-2" />
             Agregar Campaña
+          </Link>
+          <Link
+            to="/administrar-empresas"
+            className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
+              activeButton === 'administrar-empresas' ? 'bg-yellow-300' : ''
+            }`}
+            onClick={() => setActiveButton('administrar-empresas')}
+          >
+            <FontAwesomeIcon icon={faBuilding} className="mr-2" />
+            Agregar Empresa
+          </Link>
+          <Link
+            to="/administrar-contratas"
+            className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
+              activeButton === 'administrar-contratas' ? 'bg-yellow-300' : ''
+            }`}
+            onClick={() => setActiveButton('administrar-contratas')}
+          >
+            <FontAwesomeIcon icon={faHandshake} className="mr-2" />
+            Agregar Contrata
           </Link>
         </div>
       </div>

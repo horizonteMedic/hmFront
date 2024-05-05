@@ -56,9 +56,12 @@ const AgregarCampana = () => {
               placeholder="Ingrese la descripción de la campaña"
             ></textarea>
           </div>
-          <button className="azul-btn font-bold py-2 px-4 rounded">
-            Registrar Campaña
-          </button>
+          <div className="flex justify-end">
+            <button className="azul-btn font-bold py-2 px-4 rounded">
+              Registrar Campaña
+            </button>
+          </div>
+
         </div>
       </div>
     </div>

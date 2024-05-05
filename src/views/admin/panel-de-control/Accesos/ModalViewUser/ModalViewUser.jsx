@@ -75,53 +75,58 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
     return (
         <>
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-                <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px] relative">
+                <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[880px] relative">
+
                     <FontAwesomeIcon
                         icon={faTimes}
-                        className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
+                        className="absolute top-0 right-0 m-3 cursor-pointer  color-blanco"
                         onClick={closeModal}
                     />
-                    <h1 className="text-start font-bold mb-4">Lista de Usuarios vinculados</h1>
-                    <table className="w-full border border-gray-300">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="border border-gray-300 px-2 py-1">Nro.</th>
-                                <th className="border border-gray-300 px-2 py-1">Acciones</th>
-                                <th className="border border-gray-300 px-2 py-1">Username</th>
-                                <th className="border border-gray-300 px-2 py-1">Estado</th>
-                                <th className="border border-gray-300 px-2 py-1">Ruc</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data.map((item, index) => (
-                                <tr key={index}>
-                                    <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                                    <td className="border border-gray-300 px-2 py-1">
-                                        <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser) }} className="text-red-500 cursor-pointer" />
-                                        <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={handleConfigIconClick} className="text-blue-500 ml-2 cursor-pointer" />
-                                        {/* Agregamos el icono para asignar empresa contratante */}
-                                        <FontAwesomeIcon icon={faBuilding} onClick={handleAsignarEmpresaContrataIconClick} className="text-green-500 ml-2 cursor-pointer" />
-                                    </td>
-                                    <td className="border border-gray-300 px-2 py-1">{item.username}</td>
-                                    <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
-                                    <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
+                <div className="p azuloscurobackground flex justify-between p-3.5">
+                    <h1 className="text-start font-bold color-azul text-white">Lista de Usuarios vinculados</h1>
+                </div>
+                    <div className='container p-4'>
+                        <table className="w-full border border-gray-300">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="border border-gray-300 px-2 py-1">Nro.</th>
+                                    <th className="border border-gray-300 px-2 py-1">Acciones</th>
+                                    <th className="border border-gray-300 px-2 py-1">Username</th>
+                                    <th className="border border-gray-300 px-2 py-1">Estado</th>
+                                    <th className="border border-gray-300 px-2 py-1">Ruc</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {/* Cuadro de leyenda horizontal o vertical */}
-                    <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
-                        <div className="flex items-center mb-2 md:mb-0">
-                            <FontAwesomeIcon icon={faTrash} className="text-red-500" />
-                            <p className="text-sm ml-2 md:ml-4">Eliminar Usuario</p>
-                        </div>
-                        <div className="flex items-center mb-2 md:mb-0 md:ml-6">
-                            <FontAwesomeIcon icon={faTentArrowDownToLine} className="text-blue-500" />
-                            <p className="text-sm ml-2 md:ml-4">Asiganación de Sede </p>
-                        </div>
-                        <div className="flex items-center mb-2 md:mb-0 md:ml-6">
-                            <FontAwesomeIcon icon={faBuilding} className="text-green-500" />
-                            <p className="text-sm ml-2 md:ml-4">Asignar Empresa/Contrata</p>
+                            </thead>
+                            <tbody>
+                                {data.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                                        <td className="border border-gray-300 px-2 py-1">
+                                            <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser) }} className="text-red-500 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={handleConfigIconClick} className="text-blue-500 ml-2 cursor-pointer" />
+                                            {/* Agregamos el icono para asignar empresa contratante */}
+                                            <FontAwesomeIcon icon={faBuilding} onClick={handleAsignarEmpresaContrataIconClick} className="text-green-500 ml-2 cursor-pointer" />
+                                        </td>
+                                        <td className="border border-gray-300 px-2 py-1">{item.username}</td>
+                                        <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {/* Cuadro de leyenda horizontal o vertical */}
+                        <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
+                            <div className="flex items-center mb-2 md:mb-0">
+                                <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+                                <p className="text-sm ml-2 md:ml-4">Eliminar Usuario</p>
+                            </div>
+                            <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                                <FontAwesomeIcon icon={faTentArrowDownToLine} className="text-blue-500" />
+                                <p className="text-sm ml-2 md:ml-4">Asiganación de Sede </p>
+                            </div>
+                            <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                                <FontAwesomeIcon icon={faBuilding} className="text-green-500" />
+                                <p className="text-sm ml-2 md:ml-4">Asignar Empresa/Contrata</p>
+                            </div>
                         </div>
                     </div>
                 </div>

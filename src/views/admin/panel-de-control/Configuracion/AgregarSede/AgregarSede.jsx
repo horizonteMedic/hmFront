@@ -97,10 +97,13 @@ const AgregarSede = () => {
               <span className="ml-2 text-sm text-gray-600">Activo</span>
             </div>
           </div>
-          <button onClick={handleSubmit} className="azul-btn font-bold py-2 px-4 rounded">
-            Registrar Sede
-          </button>
+          <div className="flex justify-end">
+            <button onClick={handleSubmit} className="azul-btn font-bold py-2 px-4 rounded">
+              Registrar Sede
+            </button>
+          </div>
         </div>
+
       </div>
       {loading && <Loading/>}
     </div>

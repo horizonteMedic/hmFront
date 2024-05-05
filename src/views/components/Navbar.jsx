@@ -54,7 +54,7 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="bg-gray-800 px-4 py-1 flex justify-between items-center">
+    <nav className="azuloscurobackground px-4 py-1 flex justify-between items-center">
       <div className="flex items-center">
       <Link to="/panel-de-control" onClick={handleLogoClick}>
         <img src="img/logoblanco.png" alt="Logo" className="w-[180px] p-4 mr-4" />
