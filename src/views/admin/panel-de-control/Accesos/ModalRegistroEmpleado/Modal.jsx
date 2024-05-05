@@ -106,7 +106,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     NewEmpleado(tipoDocumento,nrodoc,nombres
-      ,apellidos,cargo,distrito,email,celular,direccion,activo
+      ,apellidos,cargo,distrito,sexo,email,celular,direccion,activo
     ,formattedDate,userlogued.sub)
       .then(data => {
         AleertSucces()
@@ -228,7 +228,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
                 showYearDropdown
-                yearDropdownItemNumber={30}
+                yearDropdownItemNumber={25}
                 scrollableYearDropdown
                 dateFormat="dd/MM/yyyy"
                 className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"

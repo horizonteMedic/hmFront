@@ -1,5 +1,5 @@
 export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
-    Cip, Celular, Distrito, Direccion, Cargo, Estado, FechaInicio, UserRegistro, User) {
+    Cip, Celular, Distrito, sexo, Direccion, Cargo, Estado, FechaInicio, UserRegistro, User) {
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
@@ -22,6 +22,7 @@ export default async function EditEmpleado(ID, TipoDoc, Nrodoc, Nombres, Apellid
         apellidos: Apellidos,
         cargo: Cargo,
         ubigeo: Distrito,
+        sexo: sexo,
         cip: Cip,
         correoElect: Email,
         celular: Celular,

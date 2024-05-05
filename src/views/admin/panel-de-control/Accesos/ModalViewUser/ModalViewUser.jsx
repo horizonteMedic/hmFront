@@ -40,14 +40,14 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Si, Eliminar!"
+            confirmButtonText: "Si, Deshabilitar!"
         }).then((result) => {
             if (result.isConfirmed) {
                 DeleteUsers(id, token)
                     .then(() => {
                         Swal.fire({
-                            title: "Eliminado!",
-                            text: "El Usuario ha sido Eliminado.",
+                            title: "Deshabilitar!",
+                            text: "El Usuario ha sido Deshabilitar.",
                             icon: "success"
                         }).then(() => {
                             Refresgpag();

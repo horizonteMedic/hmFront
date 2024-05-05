@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faCog, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import Modal from './ModalRegistroEmpleado/Modal';
-import EditModal from './ModalEditUsuario/EditModal';
+import EditModal from './ModalEditEmpleado/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
 import UsersModal from './ModalViewUser/ModalViewUser';
@@ -21,7 +21,6 @@ const Accesos = () => {
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [refres, setRefresh] = useState(0)
- 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -81,8 +80,7 @@ const Accesos = () => {
   };
 
   const openEditModal = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado, 
-    fechaNacimiento, fechaRegistro, usuarioRegistro) => {
-
+    fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
     SetIdEmpleado(id)
     setTipoDocumento(tipoDocumento)
     setNrodoc(nroDocumento);
@@ -91,7 +89,7 @@ const Accesos = () => {
     setEmail(correoElectronico);
     setStartDate(fechaNacimiento)
     //Fecha seteada
-    //setSexo(sexo);
+    setSexo(sexo);
     setCip(cip)
     setCelular(celular);
     setDistrito(ubigeo);
@@ -202,7 +200,7 @@ const Accesos = () => {
                 <td className="border border-gray-300 px-2 py-1">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
                   item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
-                  item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.userRegistro)}} 
+                  item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} 
                   title="Editar" />
                   <FontAwesomeIcon icon={faCog} className="text-green-500 mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} 
                   title="Configurar Accesos" />
@@ -249,7 +247,7 @@ const Accesos = () => {
       {/* Asegúrate de que los modales estén configurados correctamente */}
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isEditModalOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} ID={idEmpleado} TipoDoc={tipoDocumento} Nrodoc={nrodoc} Nombres={nombres}
-      Apellidos={apellidos} Email={email} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
+      Apellidos={apellidos} Email={email} Sexo={sexo} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
       Cargo={cargo} Estado={activo} FechaInicio={startDate} UserRegistro={userRegistro} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag}/>}
