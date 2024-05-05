@@ -16,30 +16,6 @@ const ListaArchivosPorServidores = () => {
   const [showModal, setShowModal] = useState(false);
   const [archivos, setArchivos] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Obtener el token y el usuario logueado
-        const token = 'tu_token_aqui'; // Reemplaza 'tu_token_aqui' con tu lógica para obtener el token
-        const userlogued = 'tu_usuario_aqui'; // Reemplaza 'tu_usuario_aqui' con tu lógica para obtener el usuario logueado
-
-        // Llamar a la función para obtener los archivos
-        const archivosData = await getListArchivos(token);
-
-        // Filtrar los archivos del usuario logueado
-        const archivosUsuario = archivosData.filter(archivo => archivo.userRegistro === userlogued);
-
-        // Actualizar el estado de archivos con los datos obtenidos
-        setArchivos(archivosUsuario);
-      } catch (error) {
-        console.error('Error al obtener los archivos:', error);
-      }
-    };
-
-    // Llamar a la función para obtener los archivos cuando el componente se monta
-    fetchData();
-  }, []); // El segundo argumento [] asegura que useEffect solo se ejecute una vez al montar el componente
-
   const AbrirModal =() =>{
     setShowModal(true)
   }

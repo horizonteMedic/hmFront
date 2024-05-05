@@ -29,16 +29,20 @@ function ListEmpleadoDNI(DNI, token) {
 }
 
 //BorrarUsuarios -- Desabilitarlos
-function DeleteUsers(ID, token) {
+function DeleteUsers(ID, user,idempleado,token) {
     
     const data = {
+        username: user,
+        password: null,
         estado: false,
+        id_empleado: idempleado
     }
-
+    console.log(JSON.stringify(data))
     const url = `${URLAzure}/api/v01/ct/usuario/${ID}`
     const options = {
         method: 'PUT',
         headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)

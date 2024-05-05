@@ -1,15 +1,16 @@
 import { json } from 'react-router-dom'
 import {URLAzure} from '../../../../config/config'
 
-export function GetListREport(user,fechai,fechaf,sede,token) {
+export function GetListREport(user,fechai,fechaf,sede,rucEmpresa,rucContrata,token) {
     const data = {
         userName: user,
         fechaInicio: fechai,
         fechaFin: fechaf,
         sedeUser: sede,
-        tipoUsuario: null,
-        rucUser: null
+        rucEmpresa: rucEmpresa,
+        rucContrata: rucContrata
     }
+
     const options = {
         method: 'POST', 
         headers: {

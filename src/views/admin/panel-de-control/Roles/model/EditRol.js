@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../../config/config";
+
 export default async function EditRol(id,rol,descripcion,estado,fecharegistro,userRegistro,token,userlogued) {
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual
@@ -14,7 +16,7 @@ export default async function EditRol(id,rol,descripcion,estado,fecharegistro,us
         userActualizacion: userlogued,
         descripcion: descripcion
     }
-        const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol/${id}`, {
+        const response = await fetch(`${URLAzure}/api/v01/ct/rol/${id}`, {
             method: 'PUT', 
             headers: {
                 'Content-Type': 'application/json',

@@ -17,6 +17,8 @@ import DeleteEmpleado from '../Accesos/model/DeleteEmpleado'; // Importa la func
 
 const Accesos = () => {
   const token = useAuthStore(state => state.token);
+  const userlogued = useAuthStore(state => state.userlogued);
+
   //Consulta de la API
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
@@ -51,7 +53,6 @@ const Accesos = () => {
   const [activo, setActivo] = React.useState(false);
   const [fechainicio, setFechainicio] = useState('');
   const [userRegistro, setUserRegistro] = useState('');
-  
   useEffect(() => {
     setLoading(true)
     getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado', token)
@@ -128,7 +129,8 @@ const Accesos = () => {
   }
 
   //Delete Empleado
-  const deleteEmpleado = (id) => {
+  const deleteEmpleado = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
+    fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
     Swal.fire({
       title: "¿Estas Seguro?",
       text: "No puedes revertir esta accion!",
@@ -136,14 +138,15 @@ const Accesos = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, Eliminar!"
+      confirmButtonText: "Si, Deshabilitar!"
     }).then((result) => {
       if (result.isConfirmed) {
-        DeleteEmpleado(id)
+        DeleteEmpleado(id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
+          fechaNacimiento, fechaRegistro, sexo, usuarioRegistro,userlogued.sub)
           .then(()=>{
             Swal.fire({
-              title: "Eliminado!",
-              text: "El Empleado ha sido Eliminado.",
+              title: "Deshabilitado!",
+              text: "El Empleado ha sido Deshabilitado.",
               icon: "success"
             }).then((result) => {
               if (result.isConfirmed) Refresgpag()
@@ -152,7 +155,7 @@ const Accesos = () => {
           .catch(() => {
             Swal.fire({
               title: "Error!",
-              text: "El Empleado no se ha podido Eliminar!",
+              text: "El Empleado no se ha podido Deshabilitado!",
               icon: "error"
             });
           }
@@ -196,7 +199,7 @@ const Accesos = () => {
             <tbody>
             {data?.map((item, index) => (
                 <tr key={index}>
-                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.id_empleado}</td>
                 <td className="border border-gray-300 px-2 py-1">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
                   item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
@@ -206,7 +209,8 @@ const Accesos = () => {
                   title="Configurar Accesos" />
                   <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-2  cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
                   title="Ver Usuarios" />
-                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado)}} className="text-red-500 cursor-pointer" 
+                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
+                  item.direccion, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} className="text-red-500 cursor-pointer" 
                   title="Eliminar" />
 
                 </td>

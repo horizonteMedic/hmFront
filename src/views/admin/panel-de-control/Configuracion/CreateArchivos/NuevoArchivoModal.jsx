@@ -15,7 +15,7 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
   function AleertSucces() {
     Swal.fire({
       title: "¡Exito!",
-      text: "Se ha creado un Nuevo Rol!",
+      text: "Se ha creado un Nuevo Tipo de ARchivo!",
       icon: "success",
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
