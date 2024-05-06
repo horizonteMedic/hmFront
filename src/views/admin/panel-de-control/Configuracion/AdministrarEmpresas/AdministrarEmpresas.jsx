@@ -5,34 +5,28 @@ import { useAuthStore } from '../../../../../store/auth';
 import AgregarEmpresaModal from '../AdministrarEmpresas/AgregarEmpresaModal/AgregarEmpresaModal'
 
 const AdministrarEmpresa = () => {
-  const [empresas, setEmpresas] = useState([]);
+  const [data, setData] = useState([])
   const [loading, setLoading] = useState(false);
+  const [refres, setRefresh] = useState(0)
+
   const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
   useEffect(() => {
-    setLoading(true);
-    getEmpresas()
+    setLoading(true)
+    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/empresa', token)
       .then(response => {
-        setEmpresas(response);
+        setData(response)
       })
       .catch(error => {
-        console.error('Error al obtener las empresas:', error);
+        throw new Error('Network response was not ok.',error);
       })
       .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+        setLoading(false)
+      })
+  },[refres])
 
-  const getEmpresas = async () => {
-    try {
-      const response = await getFetch('URL_DE_TU_API_AQUI', token);
-      return response;
-    } catch (error) {
-      throw new Error('Error al obtener las empresas:', error);
-    }
-  };
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -56,38 +50,38 @@ const AdministrarEmpresa = () => {
                       Acciones
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nombre
+                      RUC
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ruc
+                      Razon Social
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Descripción
+                      Direccion
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Activo
+                      Telefono
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Creado por
+                      Responsable
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha de creación
+                      Email
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {empresas.map((empresa, index) => (
+                  {data.map((item, index) => (
                     <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{/* Insertar Orden */}</td>
+                      <td className="border border-gray-300 px-2 py-1">{index+1}</td>
                       <td className="border border-gray-300 px-2 py-1">
                         {/* Insertar botones de acciones (eliminar, editar) */}
                       </td>
-                      <td className="border border-gray-300 px-2 py-1">{empresa.nombre}</td>
-                      <td className="border border-gray-300 px-2 py-1">{empresa.ruc}</td>
-                      <td className="border border-gray-300 px-2 py-1">{empresa.descripcion}</td>
-                      <td className="border border-gray-300 px-2 py-1">{empresa.activo ? 'Activo' : 'Inactivo'}</td>
-                      <td className="border border-gray-300 px-2 py-1">{empresa.creadoPor}</td>
-                      <td className="border border-gray-300 px-2 py-1">{empresa.fechaCreacion}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.rucEmpresa}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.razonEmpresa}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.direccionEmpresa}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.telefonoEmpresa}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.responsableEmpresa}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.emailEmpresa}</td>
                     </tr>
                   ))}
                 </tbody>

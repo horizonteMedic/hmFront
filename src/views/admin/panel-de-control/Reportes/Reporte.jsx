@@ -52,6 +52,7 @@ const HistorialPaciente = () => {
     if (startDate && endDate && sede) {
       GetListREport(userlogued.sub, startDate, endDate, sede, token)
         .then(response => {
+          console.log(response)
           if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
             setData([])
           } else {

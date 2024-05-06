@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faCog, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import Modal from './ModalRegistroEmpleado/Modal';
-import EditModal from './ModalEditUsuario/EditModal';
+import EditModal from './ModalEditEmpleado/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
 import UsersModal from './ModalViewUser/ModalViewUser';
@@ -17,11 +17,12 @@ import DeleteEmpleado from '../Accesos/model/DeleteEmpleado'; // Importa la func
 
 const Accesos = () => {
   const token = useAuthStore(state => state.token);
+  const userlogued = useAuthStore(state => state.userlogued);
+
   //Consulta de la API
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [refres, setRefresh] = useState(0)
- 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -52,7 +53,6 @@ const Accesos = () => {
   const [activo, setActivo] = React.useState(false);
   const [fechainicio, setFechainicio] = useState('');
   const [userRegistro, setUserRegistro] = useState('');
-  
   useEffect(() => {
     setLoading(true)
     getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado', token)
@@ -81,8 +81,7 @@ const Accesos = () => {
   };
 
   const openEditModal = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado, 
-    fechaNacimiento, fechaRegistro, usuarioRegistro) => {
-
+    fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
     SetIdEmpleado(id)
     setTipoDocumento(tipoDocumento)
     setNrodoc(nroDocumento);
@@ -91,7 +90,7 @@ const Accesos = () => {
     setEmail(correoElectronico);
     setStartDate(fechaNacimiento)
     //Fecha seteada
-    //setSexo(sexo);
+    setSexo(sexo);
     setCip(cip)
     setCelular(celular);
     setDistrito(ubigeo);
@@ -130,7 +129,8 @@ const Accesos = () => {
   }
 
   //Delete Empleado
-  const deleteEmpleado = (id) => {
+  const deleteEmpleado = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
+    fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
     Swal.fire({
       title: "¿Estas Seguro?",
       text: "No puedes revertir esta accion!",
@@ -138,14 +138,15 @@ const Accesos = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, Eliminar!"
+      confirmButtonText: "Si, Deshabilitar!"
     }).then((result) => {
       if (result.isConfirmed) {
-        DeleteEmpleado(id)
+        DeleteEmpleado(id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
+          fechaNacimiento, fechaRegistro, sexo, usuarioRegistro,userlogued.sub)
           .then(()=>{
             Swal.fire({
-              title: "Eliminado!",
-              text: "El Empleado ha sido Eliminado.",
+              title: "Deshabilitado!",
+              text: "El Empleado ha sido Deshabilitado.",
               icon: "success"
             }).then((result) => {
               if (result.isConfirmed) Refresgpag()
@@ -154,7 +155,7 @@ const Accesos = () => {
           .catch(() => {
             Swal.fire({
               title: "Error!",
-              text: "El Empleado no se ha podido Eliminar!",
+              text: "El Empleado no se ha podido Deshabilitado!",
               icon: "error"
             });
           }
@@ -198,17 +199,18 @@ const Accesos = () => {
             <tbody>
             {data?.map((item, index) => (
                 <tr key={index}>
-                <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                <td className="border border-gray-300 px-2 py-1">{item.id_empleado}</td>
                 <td className="border border-gray-300 px-2 py-1">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
                   item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
-                  item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.userRegistro)}} 
+                  item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} 
                   title="Editar" />
                   <FontAwesomeIcon icon={faCog} className="text-green-500 mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} 
                   title="Configurar Accesos" />
                   <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-2  cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
                   title="Ver Usuarios" />
-                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado)}} className="text-red-500 cursor-pointer" 
+                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
+                  item.direccion, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} className="text-red-500 cursor-pointer" 
                   title="Eliminar" />
 
                 </td>
@@ -249,7 +251,7 @@ const Accesos = () => {
       {/* Asegúrate de que los modales estén configurados correctamente */}
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isEditModalOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} ID={idEmpleado} TipoDoc={tipoDocumento} Nrodoc={nrodoc} Nombres={nombres}
-      Apellidos={apellidos} Email={email} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
+      Apellidos={apellidos} Email={email} Sexo={sexo} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
       Cargo={cargo} Estado={activo} FechaInicio={startDate} UserRegistro={userRegistro} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag}/>}

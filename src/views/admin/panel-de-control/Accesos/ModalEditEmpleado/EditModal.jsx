@@ -10,21 +10,21 @@ import { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, ComboboxS
 
 const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apellidos, Email, FechaNacimiento, 
   Cip, Celular, Distrito, Sexo , Direccion, Cargo, Estado, FechaInicio, UserRegistro}) => {
-  
+
   const userlogued = useAuthStore(state => state.userlogued);
-  const [tipoDocumento, setTipoDocumento] = React.useState(TipoDoc);
+  const [tipoDocumento, setTipoDocumento] = useState(TipoDoc);
   const [nrodoc, setNrodoc] = useState(Nrodoc)
   const [nombres, setNombres] = useState(Nombres)
   const [apellidos, setApellidos] = useState(Apellidos)
   const [email, setEmail] = useState(Email)
-  const [startDate, setStartDate] = React.useState(FechaNacimiento);
+  const [startDate, setStartDate] = useState(FechaNacimiento);
   //Sexo
-  const [sexo, setSexo] = React.useState(Sexo); // Aquí estableces el estado sexo con el valor recibido de las propiedades
+  const [sexo, setSexo] = useState(Sexo); // Aquí estableces el estado sexo con el valor recibido de las propiedades
   const [celular, setCelular] = useState(Celular)
 
-  const [departamento, setDepartamento] = React.useState(Distrito.slice(0, 2));
-  const [provincia, setProvincia] = React.useState(Distrito.slice(0, 4));
-  const [distrito, setDistrito] = React.useState(Distrito.slice(0, 6));
+  const [departamento, setDepartamento] = useState(Distrito.slice(0, 2));
+  const [provincia, setProvincia] = useState(Distrito.slice(0, 4));
+  const [distrito, setDistrito] = useState(Distrito.slice(0, 6));
   //Se le pasa el distrito
   const [direccion, setDireccion] = useState(Direccion)
   const [cargo, setCargo] = useState(Cargo)
@@ -90,8 +90,8 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate, sexo,
-      cip, celular, distrito, direccion, cargo, activo, FechaInicio, UserRegistro, userlogued.sub)
+    EditEmpleado(ID, tipoDocumento, nrodoc, nombres, apellidos, email, startDate,
+      cip, celular, distrito, sexo, direccion, cargo, activo, FechaInicio, UserRegistro, userlogued.sub)
       .then(data => {
         AleertSucces()
       })

@@ -15,7 +15,6 @@ export default async function NewRol(rol,descripcion,estado,token,userlogued) {
         fechaActualizacion: null,
         userActualizacion: null 
     }
-
         const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', {
             method: 'POST', 
             headers: {

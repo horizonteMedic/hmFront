@@ -1,5 +1,6 @@
 import { URLAzure } from "../../../../config/config"
 
+//Mira todos los Usuarios de un empleado
 function ListUser(id, token) {
     
     const url = `${URLAzure}/api/v01/ct/usuario/busquedaIdEmpleado/${id}`
@@ -13,6 +14,7 @@ function ListUser(id, token) {
         
 }
 
+//FUnciona para registrar un nuevo usuario, esta funcion permite ver a los empleados por su DNI
 function ListEmpleadoDNI(DNI, token) {
     
     const url = `${URLAzure}/api/v01/st/empleado/busquedaPorNroDoc/${DNI}`
@@ -26,15 +28,24 @@ function ListEmpleadoDNI(DNI, token) {
         
 }
 
-//BorrarUsuarios
-function DeleteUsers(ID, token) {
+//BorrarUsuarios -- Desabilitarlos
+function DeleteUsers(ID, user,idempleado,token) {
     
+    const data = {
+        username: user,
+        password: null,
+        estado: false,
+        id_empleado: idempleado
+    }
+    console.log(JSON.stringify(data))
     const url = `${URLAzure}/api/v01/ct/usuario/${ID}`
     const options = {
-        method: 'DELETE',
+        method: 'PUT',
         headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify(data)
     }
     return fetch(url,options).then(res => res.json()).then(response => response) 
 }

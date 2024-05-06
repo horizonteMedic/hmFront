@@ -5,34 +5,32 @@ import { useAuthStore } from '../../../../../store/auth';
 import AgregarContrataModal from '../AdministrarContratas/AgregarContrataModal/AgregarContrataModal';
 
 const AdministrarContratas = () => {
-  const [contratas, setContratas] = useState([]);
+  const [data, setData] = useState([])
   const [loading, setLoading] = useState(false);
+  const [refres, setRefresh] = useState(0)
+
+
   const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
   useEffect(() => {
-    setLoading(true);
-    getContratas()
+    setLoading(true)
+    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/contrata', token)
       .then(response => {
-        setContratas(response);
+        setData(response)
       })
       .catch(error => {
-        console.error('Error al obtener las contratas:', error);
+        throw new Error('Network response was not ok.',error);
       })
       .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+        setLoading(false)
+      })
+  },[refres])
 
-  const getContratas = async () => {
-    try {
-      const response = await getFetch('URL_DE_TU_API_AQUI', token);
-      return response;
-    } catch (error) {
-      throw new Error('Error al obtener las contratas:', error);
-    }
-  };
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -56,34 +54,38 @@ const AdministrarContratas = () => {
                       Acciones
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nombre
+                      RUC
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Descripción
+                      Razon Social
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Activo
+                      Direccion
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Creado por
+                      Telefono
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha de creación
+                      Responsable
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {contratas.map((contrata, index) => (
+                  {data.map((item, index) => (
                     <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{/* Insertar Orden */}</td>
+                      <td className="border border-gray-300 px-2 py-1">{index +1}</td>
                       <td className="border border-gray-300 px-2 py-1">
                         {/* Insertar botones de acciones (eliminar, editar) */}
                       </td>
-                      <td className="border border-gray-300 px-2 py-1">{contrata.nombre}</td>
-                      <td className="border border-gray-300 px-2 py-1">{contrata.descripcion}</td>
-                      <td className="border border-gray-300 px-2 py-1">{contrata.activo ? 'Activo' : 'Inactivo'}</td>
-                      <td className="border border-gray-300 px-2 py-1">{contrata.creadoPor}</td>
-                      <td className="border border-gray-300 px-2 py-1">{contrata.fechaCreacion}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.rucContrata}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.razonContrata}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.direccionContrata}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.telefonoContrata}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.responsableContrata}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.emailContrata}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -3,14 +3,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import CrearEmpresaContrataModal from '../CrearEmpresaContrataModal/CrearEmpresaContrataModal'; // Importa el nuevo componente
 
-const AsignarEmpresaContrataModal = ({ closeModal, idUser, token }) => {
+const AsignarEmpresaContrataModal = ({ closeModal, id, user, token }) => {
     const [empresas, setEmpresas] = useState([]);
     const [selectedEmpresa, setSelectedEmpresa] = useState('');
     const [selectedUser, setSelectedUser] = useState('');
     const [showCrearModal, setShowCrearModal] = useState(false); // Estado para controlar la visualización del modal de creación
 
-    useEffect(() => {
-    }, [token]);
+    
 
     const handleEmpresaChange = (event) => {
         setSelectedEmpresa(event.target.value);
@@ -45,16 +44,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, idUser, token }) => {
                     <h1 className="text-start font-bold color-azul text-white">Listado de Empresas y Contratas</h1>
                 </div>
                 <div className='container p-4'>
-                    <h1 className="text-start font-bold mb-3">Usuario:</h1>
-                    <div className="mb-4">
-                        <input
-                            type="text"
-                            className="w-full border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
-                            value={selectedUser}
-                            onChange={handleUserChange}
-                            placeholder="Usuario por lectura de la API"
-                        />
-                    </div>
+                    <h1 className="text-start font-bold mb-3">Usuario: {user}</h1>
                     <table className="w-full border border-gray-300 mb-4">
                         <thead>
                             <tr className="bg-gray-200">
