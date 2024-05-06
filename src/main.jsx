@@ -11,7 +11,7 @@ import LoginPageAdmin from './views/admin/Login/Login.jsx';
 import ForgotPassword from './views/admin/Login/controller/ForgotPassword.jsx'; 
 import VerificationCodeInput from './views/admin/Login/controller/VerificationCodeInput.jsx'; 
 import ActualizarPassword from './views/admin/Login/controller/ActualizarPassword.jsx'
-import ProtectedRoute from './views/ProtectedRoute/ProtectedRoute.jsx';
+import {ProtectedRoute,ProtectedLogin} from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
 import DashboardAdmin from './views/admin/panel-de-control/PanelDeControl.jsx';
@@ -49,8 +49,11 @@ const AppContent = () => {
       {!isHiddenRoute && !isLoginPage && <Navbar />}
       {showBreadcrumb && <Breadcrumb />} 
       <Routes>
+        <Route element={<ProtectedLogin/>}>
+          <Route path="/" element={<LoginPageAdmin />} />
+        </Route>
         <Route path="/login-empleado" element={<LoginPageEmpleado />} />
-        <Route path="/" element={<LoginPageAdmin />} />
+    
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verificacion-codigo" element={<VerificationCodeInput />} />
         <Route path="/actualizar-password" element={<ActualizarPassword />} />
