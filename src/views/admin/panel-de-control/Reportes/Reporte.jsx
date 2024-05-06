@@ -25,10 +25,8 @@ const HistorialPaciente = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refres, setRefresh] = useState(1);
-
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
   const [searchTerm, setSearchTerm] = useState('');
@@ -40,24 +38,24 @@ const HistorialPaciente = () => {
   const [startDate, setStartDate] = useState(formattedToday);
   const [endDate, setEndDate] = useState(formattedToday);
   const [isReloading, setIsReloading] = useState(false);
-
-  const [currentPage, setCurrentPage] = useState(1); // Estado para el número de página actual
-  const [totalPages, setTotalPages] = useState(1); // Estado para el número total de páginas
-
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1); 
   const [dnipicker, setDnipicker] = useState('')
   const [nombrespicker, setNombrespicker] = useState('')
-
+  const [empresa, setEmpresa] = useState('');
+  const [contrata, setContrata] = useState('');
+  
   useEffect(() => {
     setLoading(true);
     if (startDate && endDate && sede) {
-      GetListREport(userlogued.sub, startDate, endDate, sede, token)
+      GetListREport(userlogued.sub, startDate, endDate, sede, empresa, contrata, token)
         .then(response => {
           console.log(response)
           if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
             setData([])
           } else {
             setData(response);
-            setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
+            setTotalPages(Math.ceil(response.length / recordsPerPage)); 
           }
         })
         .catch(error => {
@@ -67,8 +65,11 @@ const HistorialPaciente = () => {
           setLoading(false);
         });
     }
-  }, [startDate, endDate, sede]);
+  }, [startDate, endDate, sede, empresa, contrata]);
+  
 
+
+    
   const openModal = (dni,nombres,apellidos) => {
     setDnipicker(dni)
     setNombrespicker(`${nombres} ${apellidos}`)
@@ -81,7 +82,7 @@ const HistorialPaciente = () => {
 
   const handleChangeRecordsPerPage = (e) => {
     setRecordsPerPage(parseInt(e.target.value));
-    setCurrentPage(1); // Restablece la página actual cuando se cambia la cantidad de registros por página
+    setCurrentPage(1); 
   };
 
   const handleStartDateChange = (e) => {
@@ -118,7 +119,7 @@ const HistorialPaciente = () => {
   }, [startDate, endDate, searchTerm]);
 
   const reloadTable = () => {
-    setIsReloading(true); // Establece isReloading en true al iniciar la recarga
+    setIsReloading(true);
 
     setLoading(true);
     GetListREport(userlogued.sub, startDate, endDate, sede, token)
@@ -128,7 +129,7 @@ const HistorialPaciente = () => {
           setData([])
         } else {
           setData(response);
-          setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcula el número total de páginas
+          setTotalPages(Math.ceil(response.length / recordsPerPage)); 
         }
       })
       .catch(error => {
@@ -136,14 +137,14 @@ const HistorialPaciente = () => {
       })
       .finally(() => {
         setLoading(false);
-        setIsReloading(false); // Establece isReloading en false cuando la recarga ha finalizado
+        setIsReloading(false); 
       });
   };
   const visiblePages = () => {
-    const totalVisiblePages = 5; // Número de páginas visibles
+    const totalVisiblePages = 5; 
     const halfVisiblePages = Math.floor(totalVisiblePages / 2);
     let startPage = currentPage - halfVisiblePages;
-    startPage = Math.max(startPage, 1); // No puede ser menor que 1
+    startPage = Math.max(startPage, 1); 
     const endPage = startPage + totalVisiblePages - 1;
     return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
   };
@@ -164,78 +165,103 @@ const HistorialPaciente = () => {
 
         </div>
         <div className="flex flex-col justify-between items-center md:flex-row mr-12 ml-12 pt-3">
-      <div className="flex flex-col justify-between items-center md:flex-row w-full md:w-auto mb-4 md:mb-0 md:mr-4"> 
-        <span className="mr-2 md:mr-4">Mostrar</span>
-        <select className="border pointer border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={15}>15</option>
-          <option value={20}>20</option>
-        </select>
-        <span className='mr-2 md:mr-4'>registros</span>
-      </div>
-      <div className="flex flex-col justify-between items-center md:flex-row w-full md:w-auto focus:outline-none"> 
-        <span className="mr-2 md:mr-4"><strong>Fecha inicio:</strong></span>
-        <input
-          type="date"
-          className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 w-full md:w-auto focus:outline-none md:mr-4"
-          value={startDate}
-          onChange={handleStartDateChange}
-        />
-        <span className="mr-2 md:mr-4"><strong>Fecha fin:</strong></span>
-        <input
-          type="date"
-          className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 w-full md:w-auto focus:outline-none md:mr-4"
-          value={endDate}
-          onChange={handleEndDateChange}
-        />
-        <span className="mr-2 md:mr-4"><strong>Sedes:</strong></span>
-        <select
-          className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
-          onChange={(e) => setSede(e.target.value)}
-          required
-          value={sede}
-        >
-          <option value="">Seleccionar</option>
-          {ListSedes?.map((option) => (
-            <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
-          ))}
-        </select>
-      </div>
-    </div>
+          <div className="flex flex-col justify-between items-center md:flex-row w-full md:w-auto mb-4 md:mb-0 md:mr-4"> 
+            <span className="mr-2 md:mr-4">Mostrar</span>
+            <select className="border pointer border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+            </select>
+            <span className='mr-2 md:mr-4'>registros</span>
+          </div>
+          <div className=" items-center md:flex-row w-full md:w-auto focus:outline-none"> 
+            <span className="mr-2 md:mr-4"><strong>Fecha inicio:</strong></span>
+            <input
+              type="date"
+              className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 w-full md:w-auto focus:outline-none md:mr-4"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+            <span className="mr-2 md:mr-4"><strong>Fecha fin:</strong></span>
+            <input
+              type="date"
+              className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 w-full md:w-auto focus:outline-none md:mr-4"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+             <span className="mr-2 md:mr-4"><strong>Sedes:</strong></span>
+              <select
+                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
+                onChange={(e) => setSede(e.target.value)}
+                required
+                value={sede}
+              >
+                <option value="">Seleccionar</option>
+                {ListSedes?.map((option) => (
+                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+                ))}
+              </select>
+              <span className="mr-2 ml-2 md:mr-4"><strong>Empresa:</strong></span>
+              <select
+                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
+                onChange={(e) => {
+                  setEmpresa(e.target.value);
+                  setContrata('');
+                }}
+                value={empresa}
+              >
+                <option value="">Seleccionar</option>
+                {/* api*/}
+              </select>
+              <span className="mr-2 ml-2 md:mr-4"><strong>Contrata:</strong></span>
+              <select
+                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
+                onChange={(e) => {
+                  setContrata(e.target.value);
+                  setEmpresa('');
+                }}
+                value={contrata}
+              >
+                <option value="">Seleccionar</option>
+                {/* api*/}
+              </select>
+          </div>
+
+        </div>
 
         <div className="overflow-x-auto p-3">
-  {loading ? (
-    <p className="text-center">Cargando...</p>
-  ) : (
-    <table className="w-full border border-gray-300">
-      <thead>
-        <tr className="bg-gray-200">
-          <th className="border border-gray-300 px-3 py-2">Acción</th>
-          <th className="border border-gray-300 px-3 py-2">DNI</th>
-          <th className="border border-gray-300 px-3 py-2">Apellidos</th>
-          <th className="border border-gray-300 px-3 py-2">Nombres</th>
-          <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
-        </tr>
-      </thead>
-      <tbody>
-        {currentData.map((item, index) => (
-          <tr key={index}>
-            <td className="border border-gray-300 px-3 py-2">
-              <button onClick={() => {openModal(item.dni,item.apellidos,item.nombres)}} className="focus:outline-none">
-                <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
-              </button>
-            </td>
-            <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
-            <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
-            <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-            <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
-</div>
+          {loading ? (
+            <p className="text-center">Cargando...</p>
+          ) : (
+            <table className="w-full border border-gray-300">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border border-gray-300 px-3 py-2">Acción</th>
+                  <th className="border border-gray-300 px-3 py-2">DNI</th>
+                  <th className="border border-gray-300 px-3 py-2">Apellidos</th>
+                  <th className="border border-gray-300 px-3 py-2">Nombres</th>
+                  <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentData.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-300 px-3 py-2">
+                      <button onClick={() => {openModal(item.dni,item.apellidos,item.nombres)}} className="focus:outline-none">
+                        <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
+                      </button>
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
 
         {/* Renderiza los botones de paginación */}
         <div className="flex justify-center p-4">
