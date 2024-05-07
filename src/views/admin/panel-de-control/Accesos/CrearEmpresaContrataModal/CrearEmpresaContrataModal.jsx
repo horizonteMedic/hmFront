@@ -5,7 +5,7 @@ import { ComboboxEmpresa, ComboboxContrata } from '../model/Combobox';
 import { AsignarEmpresaoContrata } from '../model/AsignarEoCUser';
 import Swal from 'sweetalert2';
 //ASignar Empresa o Contrata
-const CrearEmpresaContrataModal = ({ closeModal, id, user, token }) => {
+const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) => {
     const [tipo, setTipo] = useState('');
     const [data, setData] = useState([])
     const [razonSocial, setRazonSocial] = useState('');
@@ -26,7 +26,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token }) => {
         }).then((result) => {
           if (result.isConfirmed) {
             closeModal();
-
+            Refresgpag();
           }
         });
       }
@@ -131,6 +131,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token }) => {
                     <label>RUC:</label>
                     <input
                         type="text"
+                        disabled
                         value={ruc}
                         onChange={handleRucChange}
                         className="w-full border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"

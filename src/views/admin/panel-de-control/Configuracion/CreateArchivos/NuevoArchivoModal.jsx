@@ -10,6 +10,7 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
   const [color, setColor] = useState('')
   const [codigo, setCodigo] = useState('')
   const [estado, setEstado] = useState(false)
+  const [creating, setCreating] = useState(false);
 
 
   function AleertSucces() {
@@ -57,16 +58,18 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
   };
 
   const handleSubmit = (e) => {
+    setCreating(true)
     e.preventDefault();
     NewwTipoArchivo(nombre,extension,color,codigo,estado,userlogued,token)
       .then(data => {
-          console.log(data)
           AleertSucces()
         })
         .catch(error => {
           console.error('Error:', error)
         })    
-    setShowModal(false);
+        .finally(() => {
+          setCreating(false)
+        })
   };
 
 
@@ -108,7 +111,7 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
                 className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
                 onClick={CerrarModal}
               />
-              <form onSubmit={handleSubmit}>
+              <form>
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="mb-4">
                     <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
@@ -130,6 +133,7 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
                       onChange={(e) => setExtension(e.target.value)}
                       className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
+                      <option value="seleccione">Seleccione...</option>
                       {extensiones.map((ext) => (
                         <option key={ext} value={ext}>
                           {ext}
@@ -145,6 +149,7 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
                       onChange={handleColor}
                       className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                     >
+                      <option value="seleccione">Seleccione...</option>
                       {colores.map((option) => (
                         <option key={`${option.nombre}-${option.codigo}`} value={option.nombre} >
                           {option.nombre}
@@ -167,10 +172,12 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
                 </div>
                 <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                   <button
+                    onClick={handleSubmit}
+                    disabled={creating}
                     type="submit"
                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2  azul-btn focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
                   >
-                    Crear Archivo
+                    {creating ? 'Creando Archivo...' : 'Crear Archivo'}
                   </button>
                 </div>
               </form>

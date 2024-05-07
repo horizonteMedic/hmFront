@@ -41,7 +41,6 @@ const ListaArchivosPorServidores = () => {
     })
   },[refres])
 
-  console.log(data)
 
   return (
     <div className="container mx-auto mt-12 mb-12">

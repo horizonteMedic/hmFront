@@ -1,4 +1,12 @@
-const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaRegistro, userRegistro, token) => {
+import {URLAzure} from '../../../../../config/config'
+
+const registrarArchivo = async (nombre, extension, color, codigo, estado, userRegistro, token) => {
+
+  const currentDate = new Date(); // Obtiene la fecha y hora actual
+    const year = currentDate.getFullYear(); // Obtiene el año actual
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
+    const day = ('0' + currentDate.getDate()).slice(-2); 
+
   const data = {
     nombre: nombre,
     extension: extension,
@@ -11,24 +19,16 @@ const registrarArchivo = async (nombre, extension, color, codigo, estado, fechaR
     userActualizacion: null
   };
 
-  try {
-    const response = await fetch('your_api_url_here', {
-      method: 'POST', 
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al crear el archivo.');
+  const url = `${URLAzure}/api/v01/ct/tipoArchivo`
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
     }
-
-    return await response.json(); // Devuelve la respuesta como JSON
-  } catch (error) {
-    throw new Error(error.message); // Propaga el error para que sea manejado por quien llama a esta función
-  }
+    return fetch(url,options).then(res => res.json()).then(response => response) 
 };
 
 export default registrarArchivo;
