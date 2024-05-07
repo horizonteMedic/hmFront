@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faCog, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faCog, faUsers, faTrash,faCheckCircle,faBan } from '@fortawesome/free-solid-svg-icons';
 
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
@@ -193,7 +193,7 @@ const Accesos = () => {
                 <th className="border border-gray-300 px-2 py-1">Apellidos</th>
                 <th className="border border-gray-300 px-2 py-1">Nombres</th>
                 <th className="border border-gray-300 px-2 py-1">Rol</th>
-                <th className="border border-gray-300 px-2 py-1">Vigente</th>
+                <th className="border border-gray-300 px-2 py-1 text-center w-[5%]">Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -219,8 +219,10 @@ const Accesos = () => {
                 <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
-                <td className={`justify-center flex  px-2 py-1  ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}><strong>{item.estado ? 'Activo' : 'Inactivo'}</strong></td>
-              </tr>
+                <td className="border border-gray-300 px-2 py-1 text-center">
+                    {item.estado ? <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" /> : <FontAwesomeIcon icon={faBan} className="text-red-500" />}
+                  </td>              
+                </tr>
               ))}
             </tbody>
           </table>
@@ -244,6 +246,14 @@ const Accesos = () => {
           <div className="flex items-center ml-6 md:ml-8">
             <FontAwesomeIcon icon={faTrash} className="text-red-500" />
             <p className="text-sm ml-2 md:ml-4">Eliminar</p>
+          </div>
+          <div className="flex items-center ml-2 md:ml-4">
+            <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
+            <p className="text-sm ml-2 md:ml-4">Activo</p>
+          </div>
+          <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={faBan} className="text-red-500" />
+            <p className="text-sm ml-2 md:ml-4">Inactivo</p>
           </div>
         </div>
 
