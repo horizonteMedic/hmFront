@@ -14,7 +14,7 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   const [estado, setEstado] = useState(false);
   const [empresaContrata, setEmpresaContrata] = useState('');
   const [ruc, setRuc] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
 
 
   const capitalizeWords = (str) => {

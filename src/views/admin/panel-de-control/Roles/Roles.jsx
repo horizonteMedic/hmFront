@@ -8,12 +8,11 @@ import { useAuthStore } from '../../../../store/auth';
 import EditModal from './ModalNuevoRol/EditRol';
 import Swal from 'sweetalert2';
 import DeleteRol from './model/DeleteRol';
-import ModalAsignarAccesoRol from './ModalNuevoRol/AsignarAccesoRol'; // Importa el componente ModalAsignarAccesoRol
+import ModalAsignarAccesoRol from './ModalNuevoRol/AsignarAccesoRol'; 
 
 const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isModalAccessOpen, setIsModalAccessOpen] = useState(false); // Estado para controlar el modal de asignación de acceso
-  
+  const [isModalAccessOpen, setIsModalAccessOpen] = useState(false); 
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [refres, setRefresh] = useState(0)
@@ -65,11 +64,11 @@ const Roles = () => {
   }
 
   const openAccessModal = () => {
-    setIsModalAccessOpen(true); // Función para abrir el modal de asignación de acceso
+    setIsModalAccessOpen(true);
   };
 
   const closeAccessModal = () => {
-    setIsModalAccessOpen(false); // Función para cerrar el modal de asignación de acceso
+    setIsModalAccessOpen(false); 
   };
 
   const deleteRol = (id, rol,descripcion,fechaRegistro,userRegistro) => {
@@ -117,7 +116,7 @@ const Roles = () => {
         </div>
           
         <div className="flex items-center mt-2 mr-4">
-          <div className="relative ml-auto"> {/* Utilizamos ml-auto para alinear a la derecha */}
+          <div className="relative ml-auto"> 
             <button onClick={openModal} className="flex items-center px-4 py-2 azul-btn rounded-md">
               <FontAwesomeIcon icon={faPlus} className="mr-2" />
               Agregar
@@ -147,7 +146,9 @@ const Roles = () => {
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                   <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
-                  <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
+                  <td className={`border border-gray-300 px-2 py-1 text-center fw-bold ${item.estado ? 'bg-green-300' : 'bg-red-300'} w-[5%]`}>
+                    {item.estado ? 'Activo' : 'Inactivo'}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -172,7 +173,7 @@ const Roles = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
-      {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} />} {/* Modal de asignación de acceso */}
+      {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} />} 
     </div>
   );
 };
