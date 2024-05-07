@@ -21,8 +21,8 @@ const Configuracion = () => {
           <Card to="/lista-archivos" icon={<FontAwesomeIcon icon={faList} className="color-naranja" size='2xl'/>} title="Lista de archivos por servidores"  />
           <Card to="/agregar-sede" icon={<FontAwesomeIcon icon={faTentArrowDownToLine} className="color-naranja" size='2xl'/>} title="Agregar sedes" />
           <Card to="/agregar-campaña" icon={<FontAwesomeIcon icon={faNotesMedical} className="color-naranja" size='2xl'/>} title="Agregar Campañas" />
-          <Card to="/administrar-empresas" icon={<FontAwesomeIcon icon={faBuilding} className="color-naranja" size='2xl'/>} title="Agregar Empresas" />
-          <Card to="/administrar-contratas" icon={<FontAwesomeIcon icon={faHandshake} className="color-naranja" size='2xl'/>} title="Agregar Contratas" />
+          <Card to="/administrar-empresas" icon={<FontAwesomeIcon icon={faBuilding} className="color-naranja" size='2xl'/>} title="Administrar Empresas" />
+          <Card to="/administrar-contratas" icon={<FontAwesomeIcon icon={faHandshake} className="color-naranja" size='2xl'/>} title="Administrar Contratas" />
         </div>
       </div>
     </div>

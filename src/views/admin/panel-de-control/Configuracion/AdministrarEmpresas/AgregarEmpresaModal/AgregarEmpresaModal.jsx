@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 
 const AgregarEmpresaModal = ({ setShowModal }) => {
-  const [nombre, setNombre] = useState('');
   const [ruc, setRuc] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [activo, setActivo] = useState(true);
+  const [razonSocial, setRazonSocial] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [responsable, setResponsable] = useState('');
+  const [email, setEmail] = useState('');
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -12,10 +13,11 @@ const AgregarEmpresaModal = ({ setShowModal }) => {
 
   const handleSaveEmpresa = () => {
     // Aquí puedes agregar la lógica para guardar la empresa en la base de datos
-    console.log('Nombre:', nombre);
     console.log('RUC:', ruc);
-    console.log('Descripción:', descripcion);
-    console.log('Activo:', activo);
+    console.log('Razon Social:', razonSocial);
+    console.log('Telefono:', telefono);
+    console.log('Responsable:', responsable);
+    console.log('Email:', email);
 
     setShowModal(false);
   };
@@ -32,16 +34,6 @@ const AgregarEmpresaModal = ({ setShowModal }) => {
         <h2 className="text-2xl font-bold mb-4">Agregar Empresa</h2>
         <form>
           <div className="mb-4">
-            <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
-            <input
-              type="text"
-              id="nombre"
-              className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
             <label htmlFor="ruc" className="block text-sm font-medium text-gray-700">RUC</label>
             <input
               type="text"
@@ -52,29 +44,49 @@ const AgregarEmpresaModal = ({ setShowModal }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
-            <textarea
-              id="descripcion"
+            <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700">Razon Social</label>
+            <input
+              type="text"
+              id="razonSocial"
               className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-            ></textarea>
+              value={razonSocial}
+              onChange={(e) => setRazonSocial(e.target.value)}
+            />
           </div>
           <div className="mb-4">
-            <label htmlFor="activo" className="block text-sm font-medium text-gray-700">Activo</label>
-            <select
-              id="activo"
+            <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Telefono</label>
+            <input
+              type="tel"
+              id="telefono"
+              maxLength="9"
               className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={activo}
-              onChange={(e) => setActivo(e.target.value === 'true')}
-            >
-              <option value="true">Activo</option>
-              <option value="false">Inactivo</option>
-            </select>
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="responsable" className="block text-sm font-medium text-gray-700">Responsable</label>
+            <input
+              type="text"
+              id="responsable"
+              className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={responsable}
+              onChange={(e) => setResponsable(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              type="email"
+              id="email"
+              className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
         </form>
         <div className="flex justify-end mt-4">
-          <button onClick={handleSaveEmpresa} className="azul-btn text-white font-bold py-2 px-4 rounded">Guardar</button>
+          <button onClick={handleSaveEmpresa} className="azul-btn text-white font-bold py-2 px-4 rounded">Agregar</button>
         </div>
       </div>
     </div>
