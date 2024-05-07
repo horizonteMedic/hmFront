@@ -108,9 +108,9 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
         <button
           onClick={handleUpload}
           disabled={!fileUploaded || uploading}
-          style={{background: `${color}`}}
+          style={{background: color}}
           className={`block w-full py-2 text-white font-bold uppercase rounded hover:bg-red-600 focus:outline-none focus:bg-red-600 ${(!fileUploaded || uploading) && 'opacity-50 cursor-not-allowed'}`}
-        >
+          >
           Subir <FontAwesomeIcon icon={faCloudUploadAlt} className="ml-2" />
         </button>
       </div>
@@ -118,4 +118,4 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
   );
 };
 
-export default ModalUpload;
+export default ModalUpload;
