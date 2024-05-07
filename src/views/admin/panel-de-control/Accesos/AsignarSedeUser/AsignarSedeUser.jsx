@@ -59,8 +59,7 @@ const ConfigModal = ({ closeModal }) => {
                         </table>
                     </div>
                     <div className="flex justify-end">
-                        <button onClick={() => setShowAddSedeModal(true)} className="ml-4 mr-4 naranjabackgroud text-white py-2 px-4 rounded focus:outline-none focus:bg-blue-600 transition-colors duration-300 ease-in-out">Agregar otra sede</button>
-                        <button onClick={handleSave} className="azul-btn text-white py-2 px-4 rounded focus:outline-none ">Asignar</button>
+                        <button onClick={() => setShowAddSedeModal(true)} className="ml-4 mr-4 naranjabackgroud text-white py-2 px-4 rounded ">Agregar otra sede</button>
                     </div>
                 </div>
             </div>
