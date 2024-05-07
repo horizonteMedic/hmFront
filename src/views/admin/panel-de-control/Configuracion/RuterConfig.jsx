@@ -66,7 +66,7 @@ const RuterConfig = () => {
             onClick={() => setActiveButton('administrar-empresas')}
           >
             <FontAwesomeIcon icon={faBuilding} className="mr-2" />
-            Agregar Empresa
+            Administrar Empresas
           </Link>
           <Link
             to="/administrar-contratas"
@@ -76,7 +76,7 @@ const RuterConfig = () => {
             onClick={() => setActiveButton('administrar-contratas')}
           >
             <FontAwesomeIcon icon={faHandshake} className="mr-2" />
-            Agregar Contrata
+            Administrar Contratas
           </Link>
         </div>
       </div>

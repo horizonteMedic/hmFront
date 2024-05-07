@@ -54,18 +54,17 @@ const ListaArchivosPorServidores = () => {
         {loading ? (
           <p className="text-center">Cargando...</p>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200 mb-4">
+          <div className="overflow-y-auto">
+          <table  className="table-auto min-w-full divide-y divide-gray-200 mb-4"> 
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Código
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Nombre
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Extensión
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Extensión</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha de Registro</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -74,7 +73,12 @@ const ListaArchivosPorServidores = () => {
                     <td className="border border-gray-300 px-2 py-1">{item.id}</td>
                     <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                     <td className="border border-gray-300 px-2 py-1">{item.extension}</td>
-                    <td className="border border-gray-300 px-2 py-1 flex items-center">{item.color} <div style={{background: `${item.codigo}`}} className='ml-2 rounded-full h-2 w-2'/></td>
+                    <td className="border border-gray-300 px-2 py-1 flex items-center">
+                      <div style={{ backgroundColor: `${item.codigo}` }} className="w-full h-6 mr-2 rounded-lg flex items-center justify-center shadow">
+                        <span className="text-xs font-semibold text-white">{item.color}</span>
+                      </div>
+                    </td>
+
                     <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activo' : 'Inactivo'}</td>
                     <td className="border border-gray-300 px-2 py-1">{item.fechaRegistro}</td>
                     <td className="border border-gray-300 px-2 py-1">{item.userRegistro}</td>
@@ -82,6 +86,8 @@ const ListaArchivosPorServidores = () => {
                 ))}
             </tbody>
           </table>
+        </div>
+        
           )}
           <div className="text-right">
             <button

@@ -7,7 +7,7 @@ import './Navbar.css';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
-  const [activeLink, setActiveLink] = useState(""); // Nuevo estado para la ruta activa
+  const [activeLink, setActiveLink] = useState(""); 
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
 
@@ -22,21 +22,18 @@ const Navbar = () => {
       }
     };
 
-    // Añadir el event listener para cerrar el menú al hacer clic fuera
     document.getElementById('root').addEventListener('click', closeMenu);
-
-    // Limpiar el event listener al desmontar el componente
     return () => {
       document.getElementById('root').removeEventListener('click', closeMenu);
     };
   }, [showMenu]);
 
   const handleNavLinkClick = (to) => {
-    setActiveLink(to === "/panel-de-control" ? "" : to); // Desactiva cualquier enlace activo si se hace clic en el logo
+    setActiveLink(to === "/panel-de-control" ? "" : to);
   };
   
   const handleLogoClick = () => {
-    setActiveLink(""); // Desactiva cualquier enlace activo al hacer clic en el logo
+    setActiveLink(""); 
   };
   
   const Logoutbutton = () => {
@@ -81,7 +78,7 @@ const Navbar = () => {
         </button>
       </div>
       {showMenu && (
-        <div className="md:hidden absolute right-0 top-16 bg-gray-800 w-[50%]  py-2">
+        <div className="md:hidden absolute right-0 top-16 bg-gray-800 w-[50%]  py-2" style={{ zIndex: 999 }}>
           <CustomNavLink to="/roles" label="Roles" icon={faUser} activeLink={activeLink} onClick={handleNavLinkClick} />
           <CustomNavLink to="/accesos" label="Accesos" icon={faLock} activeLink={activeLink} onClick={handleNavLinkClick} />
           <CustomNavLink to="/reporte-pacientes" label="Reportes" icon={faChartBar} activeLink={activeLink} onClick={handleNavLinkClick} />
