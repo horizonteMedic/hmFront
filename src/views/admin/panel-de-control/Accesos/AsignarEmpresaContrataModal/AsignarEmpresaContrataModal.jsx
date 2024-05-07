@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import CrearEmpresaContrataModal from '../CrearEmpresaContrataModal/CrearEmpresaContrataModal'; // Importa el nuevo componente
 
+//Primer Modal
 const AsignarEmpresaContrataModal = ({ closeModal, id, user, token }) => {
     const [empresas, setEmpresas] = useState([]);
     const [selectedEmpresa, setSelectedEmpresa] = useState('');
@@ -70,7 +71,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, token }) => {
                         </button>
                     </div>
                     {showCrearModal && (
-                        <CrearEmpresaContrataModal closeModal={closeCrearModal} />
+                        <CrearEmpresaContrataModal closeModal={closeCrearModal} id={id} user={user} token={token}/>
                     )}
                 </div>
             </div>

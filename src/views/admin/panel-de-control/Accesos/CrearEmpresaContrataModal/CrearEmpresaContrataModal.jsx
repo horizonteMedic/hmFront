@@ -1,19 +1,71 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-
-const CrearEmpresaContrataModal = ({ closeModal }) => {
-    const [tipo, setTipo] = useState('empresa');
+import { ComboboxEmpresa, ComboboxContrata } from '../model/Combobox';
+import { AsignarEmpresaoContrata } from '../model/AsignarEoCUser';
+import Swal from 'sweetalert2';
+//ASignar Empresa o Contrata
+const CrearEmpresaContrataModal = ({ closeModal, id, user, token }) => {
+    const [tipo, setTipo] = useState('');
+    const [data, setData] = useState([])
     const [razonSocial, setRazonSocial] = useState('');
     const [ruc, setRuc] = useState('');
     const [estado, setEstado] = useState(false);
 
+    const ListEmpresa = ComboboxEmpresa()
+    const ListContrata = ComboboxContrata()
+
+    function AleertSucces() {
+        Swal.fire({
+          title: "¡Exito!",
+          text: "Se ha creado a un Nuevo Usuario",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Aceptar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            closeModal();
+
+          }
+        });
+      }
+
     const handleTipoChange = (event) => {
+        setData([])
         setTipo(event.target.value);
+        setRuc('')
+        if (event.target.value === 'EMPRESA') {
+            setData(ListEmpresa)
+        } else if (event.target.value === 'CONTRATA') {
+            setData(ListContrata)
+        } else {
+            setData([])
+        }
     };
 
-    const handleRazonSocialChange = (event) => {
-        setRazonSocial(event.target.value);
+    const handleRazonSocialChange = (e) => {
+
+        const selectedEmpresa = ListEmpresa.find(empresa => empresa.razonSocial === e.target.value);
+        const selectedContrata = ListContrata.find(contrata => contrata.razonSocial === e.target.value);
+
+            if (selectedEmpresa) {
+                setRazonSocial(e.target.value);
+                setRuc(selectedEmpresa.ruc);
+                return
+            } else {
+                setRazonSocial('');
+                setRuc('');
+            }
+        
+            if (selectedContrata) {
+                setRazonSocial(e.target.value);
+                setRuc(selectedContrata.ruc);
+                return
+            } else {
+                setRazonSocial('');
+                setRuc('');
+            }
     };
 
     const handleRucChange = (event) => {
@@ -25,8 +77,13 @@ const CrearEmpresaContrataModal = ({ closeModal }) => {
     };
 
     const registrarEmpresaContrata = () => {
-        // Aquí iría la lógica para enviar los datos al servidor
-        closeModal();
+        AsignarEmpresaoContrata(ruc, id, tipo, estado, user,token)
+        .then(data => {
+          AleertSucces()
+        })
+        .catch(error => {
+          console.error('Error', error);
+        });
     };
 
     return (
@@ -51,18 +108,24 @@ const CrearEmpresaContrataModal = ({ closeModal }) => {
                         onChange={handleTipoChange}
                         className=" pointer border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
                     >
-                        <option value="empresa">Empresa</option>
-                        <option value="contrata">Contrata</option>
+                        <option value="seleccione">Seleccione...</option>
+                        <option value="EMPRESA">Empresa</option>
+                        <option value="CONTRATA">Contrata</option>
                     </select>
                 </div>
                 <div className="mb-4">
                     <label>Razón Social:</label>
-                    <input
+                    <select
                         type="text"
                         value={razonSocial}
                         onChange={handleRazonSocialChange}
                         className="w-full border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
-                    />
+                        >
+                        <option value="">Seleccione...</option>
+                        {data?.map((option, index) => (
+                            <option key={index} value={option.razonSocial}>{option.razonSocial}</option>
+                            ))}
+                    </select>
                 </div>
                 <div className="mb-4">
                     <label>RUC:</label>

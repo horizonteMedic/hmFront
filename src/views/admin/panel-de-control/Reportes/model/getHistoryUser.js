@@ -1,16 +1,17 @@
 import { json } from 'react-router-dom'
 import {URLAzure} from '../../../../config/config'
 
-export function GetHistoryUser(user,fechai,fechaf,sede,dniUser,token) {
+export function GetHistoryUser(user,fechai,fechaf,sede,dniUser,empresa,contrata,token) {
     const data = {
         userName: user,
         fechaInicio: fechai,
         fechaFin: fechaf,
         sedeUser: sede,
         dniUser: dniUser,
-        tipoUsuario: null,
-        rucUser: null
+        rucEmpresa: empresa,
+        rucContrata: contrata
     }
+    console.log(JSON.stringify(data))
     const options = {
         method: 'POST', 
         headers: {

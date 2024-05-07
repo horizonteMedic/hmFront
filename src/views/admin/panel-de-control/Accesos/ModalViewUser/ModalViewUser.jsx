@@ -137,7 +137,7 @@ const UsersModal = ({ closeModal, idEmpleado, token }) => {
 
             {showAsignarSedeUser && <AsignarSedeUser closeModal={() => setShowAsignarSedeUser(false)} />}
             {/* Renderizamos el nuevo modal */}
-            {showAsignarEmpresaContrataModal && <AsignarEmpresaContrataModal closeModal={() => setShowAsignarEmpresaContrataModal(false)} id={iduser} user={username}/>}
+            {showAsignarEmpresaContrataModal && <AsignarEmpresaContrataModal closeModal={() => setShowAsignarEmpresaContrataModal(false)} id={iduser} user={username} token={token}/>}
         </>
     );
 };

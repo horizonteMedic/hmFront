@@ -7,7 +7,7 @@ import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos } from '../model/readArchivos';
 
-const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
+const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token }) => {
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, token }) => {
   //Jala los datos de los pacientes
   useEffect(() => {
     setLoading(true);
-    GetHistoryUser(user, start, end, sede, dni, token)
+    GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
       .then(response => {
         if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
           console.log('no hay na');

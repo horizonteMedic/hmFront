@@ -1,20 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { ComboboxSedes } from './Modal/Combobox';
+import { ComboboxSedes, ComboboxEmpresas, ComboboxContratas } from './Modal/Combobox';
 import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
 
 const HistorialPaciente = () => {
   const ListSedes = ComboboxSedes();
+  const ListEmpresa = ComboboxEmpresas();
+  {/*const ListContrata = ComboboxContratas();*/}
   const [sede, setSede] = useState('');
+  const [empresauser, setEmpresauser] = useState([])
+  const [contrataauser, setContratauser] = useState([])
 
   useEffect(() => {
     if (ListSedes.length > 0) {
       setSede(ListSedes[0].cod_sede);
     }
-  }, [ListSedes]);
+    if (ListEmpresa.length > 0) {
+      setEmpresauser(ListEmpresa[0].razonSocial)
+      setEmpresa(ListEmpresa[0].ruc)
+      return
+    }
+    {/*if (ListContrata.length > 0) {
+      console.log('wasoo')
+      setContratauser(ListContrata[0].razonSocial)
+      return
+    }*/}
+  }, [ListSedes,ListEmpresa]);
 
   const pacientes = [
     { ac: '001', dni: '12345678', apellidos: 'García', nombres: 'María', fechaExamen: '2024-04-01' },
@@ -44,13 +58,13 @@ const HistorialPaciente = () => {
   const [nombrespicker, setNombrespicker] = useState('')
   const [empresa, setEmpresa] = useState('');
   const [contrata, setContrata] = useState('');
-  
+
+  //Carga los datos iniciales
   useEffect(() => {
     setLoading(true);
     if (startDate && endDate && sede) {
       GetListREport(userlogued.sub, startDate, endDate, sede, empresa, contrata, token)
         .then(response => {
-          console.log(response)
           if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
             setData([])
           } else {
@@ -63,11 +77,24 @@ const HistorialPaciente = () => {
         })
         .finally(() => {
           setLoading(false);
+          SecondPlane()
         });
     }
   }, [startDate, endDate, sede, empresa, contrata]);
   
-
+  //Carga los datos de las otras sedes
+  const SecondPlane = async () => {
+    if (startDate && endDate && sede) {
+        // Filtrar las sedes distintas a la primera
+        const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
+        // Realizar las peticiones para obtener los datos de las otras sedes
+        const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token));
+        const otrasSedesData = await Promise.all(fetchPromises);
+        const allData = otrasSedesData.reduce((acc, data) => acc.concat(data), []);
+        setData(prevData => [...prevData, ...allData]);
+      }
+    }
+  
 
     
   const openModal = (dni,nombres,apellidos) => {
@@ -212,7 +239,9 @@ const HistorialPaciente = () => {
                 value={empresa}
               >
                 <option value="">Seleccionar</option>
-                {/* api*/}
+                {ListEmpresa?.map((option,index) => (
+                  <option key={index} value={option.ruc}>{option.razonSocial}</option>
+                ))}
               </select>
               <span className="mr-2 ml-2 md:mr-4"><strong>Contrata:</strong></span>
               <select
@@ -224,7 +253,9 @@ const HistorialPaciente = () => {
                 value={contrata}
               >
                 <option value="">Seleccionar</option>
-                {/* api*/}
+                {/*ListContrata?.map((option,index) => (
+                  <option key={index} value={option.ruc}>{option.razonSocial}</option>
+                ))*/}
               </select>
           </div>
 
@@ -242,6 +273,7 @@ const HistorialPaciente = () => {
                   <th className="border border-gray-300 px-3 py-2">Apellidos</th>
                   <th className="border border-gray-300 px-3 py-2">Nombres</th>
                   <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
+                  <th className="border border-gray-300 px-3 py-2">Sucursal</th>
                 </tr>
               </thead>
               <tbody>
@@ -256,6 +288,7 @@ const HistorialPaciente = () => {
                     <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
                   </tr>
                 ))}
               </tbody>
@@ -279,7 +312,7 @@ const HistorialPaciente = () => {
           </button>
         </div>
       </div>
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} token={token} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} />}
     </div>
   );
 };

@@ -134,11 +134,33 @@ const ComboboxSedes = () => {
     return options;
   };
 
-const ComboboxContratas = () => {
+const ComboboxEmpresa = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
-          fetch(`${URLAzure}/api/v01/ct/empresasContratas/listadoEmpresasContratas`,{
+          fetch(`${URLAzure}/api/v01/ct/sistemaArchivos/listadoEmpresasOcontratas/EMPRESA`,{
+          method: 'GET', 
+          headers: {
+              'Authorization': `Bearer ${token}`
+          },
+      })
+          .then(response => response.json())
+          .then((data) => {
+              setOptions(data);
+          })
+          .catch((error) => {
+              console.error('Error obteniendo opciones de tipo de documento:', error);
+          });
+      }, []);
+  
+    return options;
+  };
+
+const ComboboxContrata = () => {
+    const [options, setOptions] = useState([]);
+    const token = useAuthStore((state) => state.token);
+    useEffect(() => { 
+          fetch(`${URLAzure}/api/v01/ct/sistemaArchivos/listadoEmpresasOcontratas/CONTRATA`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`
@@ -157,4 +179,4 @@ const ComboboxContratas = () => {
   };
 
 export { ComboboxDepartamentos, ComboboxProvincias, ComboboxDistritos, 
-    ComboboxSexo, ComboboxTipoDoc, ComboboxSedes, ComboboxContratas }
+    ComboboxSexo, ComboboxTipoDoc, ComboboxSedes, ComboboxEmpresa, ComboboxContrata }

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons'; // Importa los nuevos iconos
 import NewUser from '../model/RegisterUser';
-import { ComboboxContratas } from '../model/Combobox';
 import { ListEmpleadoDNI } from '../model/ListUserID';
 import Swal from 'sweetalert2';
 
@@ -17,7 +16,6 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   const [ruc, setRuc] = useState('');
   const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
 
-  const ListContratas = ComboboxContratas();
 
   const capitalizeWords = (str) => {
     return str.replace(/\b\w/g, function (char) {
@@ -58,16 +56,6 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
       });
   };
 
-  const handleRuc = (e) => {
-    const selectedContrata = ListContratas.find(contrata => contrata.razonSocial === e.target.value);
-    if (selectedContrata) {
-      setEmpresaContrata(e.target.value);
-      setRuc(selectedContrata.ruc);
-    } else {
-      setEmpresaContrata('');
-      setRuc('');
-    }
-  };
 
   const handleRegistrar = () => {
     NewUser(username, password, estado, ruc, idEmpleado)
@@ -147,15 +135,7 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
               </div>
 
           </div>
-          <div className="w-1/2">
-            <label className="block mb-1">RUC:</label>
-            <input
-              type="text"
-              value={ruc}
-              onChange={(e) => setRuc(e.target.value)}
-              className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-            />
-          </div>
+    
         </div>
         <div className="mb-4">
           <label className="block mb-1">Estado:</label>
@@ -166,21 +146,7 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
             className="pointer mr-2"
           />
         </div>
-        <div className="flex mb-4">
-          <div className="w-1/2 mr-2">
-            <label className="block mb-1">Seleccione la empresa/contrata:</label>
-            <select
-              value={empresaContrata}
-              onChange={handleRuc}
-              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-            >
-              <option value="">Seleccione...</option>
-              {ListContratas?.map((option) => (
-                  <option key={option.id} value={option.razonSocial}>{option.razonSocial}</option>
-                ))}
-            </select>
-          </div>
-        </div>
+        
         <button
           className="naranja-btn px-4 py-2 rounded-md"
           onClick={handleRegistrar}
