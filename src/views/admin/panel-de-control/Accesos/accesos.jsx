@@ -255,7 +255,7 @@ const Accesos = () => {
       Cargo={cargo} Estado={activo} FechaInicio={startDate} UserRegistro={userRegistro} />}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
       {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag}/>}
-      {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} token={token}/>}
+      {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} userlogued={userlogued.sub} token={token}/>}
     </div>
   );
 };

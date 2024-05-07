@@ -1,12 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import AddNewSedeUserModal from '../AddNewSedeUserModal/AddNewSedeUserModal'; // Importa el nuevo componente
+import { ListSedesxUsername } from '../model/ListSedesUser';
 
-const ConfigModal = ({ closeModal }) => {
+const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
+    const [data, setData] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [refres, setRefresh] = useState(0)
+
     const [userName, setUserName] = useState('');
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
+
+    useEffect(() => {
+        setLoading(true)
+        ListSedesxUsername(id, token)
+        .then(response => {
+          setData(response)
+        })
+        .catch(error => {
+          throw new Error('Network response was not ok.',error);
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+      },[refres])
+    
+    const Refresgpag = () => {
+        setRefresh(refres + +1)
+    }
 
     const handleSave = () => {
         const newUserTableData = [...userTableData, { name: userName }];
@@ -29,16 +52,12 @@ const ConfigModal = ({ closeModal }) => {
                 </div>
                 <div className='container p-4'>
                     <div>
-                        <label htmlFor="userName" className="block mb-2">Usuario:</label>
-                        <input 
-                            type="text"
-                            id="userName"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            className="border border-gray-400 p-2 rounded-md mb-4 w-full"
-                        />
+                        <label htmlFor="userName" className="block mb-2">Usuario: {user}</label>
                     </div>
                     <div>
+                        {loading ? (
+                            <p className="text-center">Cargando...</p>
+                        ) : (
                         <table className="w-full mb-4">
                             <thead>
                                 <tr>
@@ -48,15 +67,16 @@ const ConfigModal = ({ closeModal }) => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {userTableData.map((userData, index) => (
+                                {data.map((item, index) => (
                                     <tr key={index}>
-                                        <td className="border border-gray-400 px-4 py-2">{index + 1}</td>
-                                        <td className="border border-gray-400 px-4 py-2">{userData.name}</td>
-                                        <td className="border border-gray-400 px-4 py-2">{/* Aquí debería ir la fecha de registro */}</td>
+                                        <td className="border border-gray-400 px-4 py-2">{item.idUsuarioSede}</td>
+                                        <td className="border border-gray-400 px-4 py-2">{item.sede}</td>
+                                        <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                        )}
                     </div>
                     <div className="flex justify-end">
                         <button onClick={() => setShowAddSedeModal(true)} className="ml-4 mr-4 naranjabackgroud text-white py-2 px-4 rounded focus:outline-none focus:bg-blue-600 transition-colors duration-300 ease-in-out">Agregar otra sede</button>
@@ -65,7 +85,7 @@ const ConfigModal = ({ closeModal }) => {
                 </div>
             </div>
             {showAddSedeModal && (
-                <AddNewSedeUserModal closeModal={() => setShowAddSedeModal(false)} />
+                <AddNewSedeUserModal closeModal={() => setShowAddSedeModal(false)} Refresgpag={Refresgpag} id_user={id} userlogued={userlogued} token={token}/>
             )}
         </div>
 

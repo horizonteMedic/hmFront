@@ -1,11 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getFetch } from '../../getFetch/getFetch';
+import { AsignarSedexUsuario } from '../model/AsignarSedexUser';
+import Swal from 'sweetalert2';
+const AddNewSedeUserModal = ({ closeModal,Refresgpag, id_user,userlogued, token }) => {
+    const [data, setData] = useState([])
+    const [loading, setLoading] = useState(false)
+    const [creating, setCreating] = useState(false);
 
-const AddNewSedeUserModal = ({ closeModal }) => {
     const [selectedSede, setSelectedSede] = useState('');
+    
+    function AleertSucces() {
+        Swal.fire({
+          title: "¡Exito!",
+          text: "Se ha asigando una Nueva Sede al Usuario",
+          icon: "success",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Aceptar"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            closeModal();
+            Refresgpag();
+          }
+        });
+      }
+
+    useEffect(() => {
+        setLoading(true)
+        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede', token)
+        .then(response => {
+          setData(response)
+        })
+        .catch(error => {
+          throw new Error('Network response was not ok.',error);
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+      },[])
 
     const handleSaveSede = () => {
-        console.log("Sede seleccionada:", selectedSede);
-        closeModal();
+        setCreating(true)
+        AsignarSedexUsuario(id_user,selectedSede,userlogued,token)
+        .then(data => {
+          AleertSucces()
+        })
+        .catch(error => {
+          console.error('Error', error);
+        })
+        .finally(() =>{
+            setCreating(false)
+        })
     };
 
     return (
@@ -24,15 +69,18 @@ const AddNewSedeUserModal = ({ closeModal }) => {
                             onChange={(e) => setSelectedSede(e.target.value)}
                             className="border border-gray-400 p-2 rounded-md mb-4 w-full"
                         >
-                            <option value="">Selecciona una sede</option>
-                            <option value="sedeA">Sede A</option>
-                            <option value="sedeB">Sede B</option>
-                            <option value="sedeC">Sede C</option>
+                            <option value="">Seleccione una Sede</option>
+                            {data?.map((option, index) => (
+                                <option key={index} value={option.id}>{option.nombreSede}</option>
+                            ))}
                         </select>
                     </div>
                     <div className="flex justify-end">
                         <button onClick={closeModal} className="mr-4 azul-btn py-2 px-4 rounded focus:outline-none">Cancelar</button>
-                        <button onClick={handleSaveSede} className="naranjabackgroud text-white py-2 px-4 rounded focus:outline-none focus:bg-blue-600 transition-colors duration-300 ease-in-out">Asignar</button>
+                        <button onClick={handleSaveSede}
+                        disabled={creating}
+                        className="naranjabackgroud text-white py-2 px-4 rounded focus:outline-none focus:bg-blue-600 transition-colors duration-300 ease-in-out"
+                        >{creating ? 'Realizando Asignacion...' : 'Asignar'}</button>
                     </div>
                 </div>
             </div>

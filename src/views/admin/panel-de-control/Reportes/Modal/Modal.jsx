@@ -78,7 +78,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
             <FontAwesomeIcon icon={faFilePdf} size='xl' style={{ color: `${listarchivos[0].codigo}` }} />
           )
         } else {
-          <FontAwesomeIcon icon={faFileImage} size='xl' style={{ color: `${listarchivos[0].codigo}` }} />
+            <FontAwesomeIcon icon={faFileImage} size='xl' style={{ color: `${listarchivos[0].codigo}` }} />
         }
       }
     }
@@ -98,6 +98,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const closeModalArchivos = () => {
     setModalArchivos(false);
   };
+
 
   const ReadBase64 = (response) => {
     const fileType = response.nombreArchivo.split('.').pop();
@@ -119,6 +120,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
       link.click();
   }
   
+
   const GetBase64 = (historia,id_archivo) => {
     console.log(historia,id_archivo)
     ReadArchivos(historia,id_archivo,token)
