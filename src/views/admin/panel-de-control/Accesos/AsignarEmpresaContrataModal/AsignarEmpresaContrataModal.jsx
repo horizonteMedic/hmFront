@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import CrearEmpresaContrataModal from '../CrearEmpresaContrataModal/CrearEmpresaContrataModal'; // Importa el nuevo componente
 import { ListEoCUsername } from '../model/ListarEoCUser';
 
-//Primer Modal
-const AsignarEmpresaContrataModal = ({ closeModal, id, user,userlogued, token }) => {
+// Primer Modal
+const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }) => {
 
-    //Consulta de la API
-    const [data, setData] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [refres, setRefresh] = useState(0)
+    // Consulta de la API
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [refres, setRefresh] = useState(0);
 
     const [empresas, setEmpresas] = useState([]);
     const [selectedEmpresa, setSelectedEmpresa] = useState('');
@@ -18,23 +18,22 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user,userlogued, token })
     const [showCrearModal, setShowCrearModal] = useState(false); // Estado para controlar la visualización del modal de creación
 
     useEffect(() => {
-        setLoading(true)
+        setLoading(true);
         ListEoCUsername(id, token)
-        .then(response => {
-          setData(response)
-        })
-        .catch(error => {
-          throw new Error('Network response was not ok.',error);
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-      },[refres])
-    
+            .then(response => {
+                setData(response);
+            })
+            .catch(error => {
+                throw new Error('Network response was not ok.', error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [refres]);
+
     const Refresgpag = () => {
-        setRefresh(refres + +1)
-    }
-    
+        setRefresh(refres + +1);
+    };
 
     const handleEmpresaChange = (event) => {
         setSelectedEmpresa(event.target.value);
@@ -73,28 +72,32 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user,userlogued, token })
                     {loading ? (
                         <p className="text-center">Cargando...</p>
                     ) : (
-                    <table className="w-full border border-gray-300 mb-4">
-                        <thead>
-                            <tr className="bg-gray-200">
-                                <th className="border border-gray-300 px-2 py-1">Tipo</th>
-                                <th className="border border-gray-300 px-2 py-1">Razón Social</th>
-                                <th className="border border-gray-300 px-2 py-1">RUC</th>
-                                <th className="border border-gray-300 px-2 py-1">Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data?.map((item, index) => (
-                            <tr key={index}>
-                                <td className="border border-gray-300 px-2 py-1">{item.tipo}</td>
-                                <td className="border border-gray-300 px-2 py-1">{item.razonSocial}</td>
-                                <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
-                                <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activo' : 'Inactivo'}</td>
-                            </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                        <table className="w-full border border-gray-300 mb-4">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="border border-gray-300 px-2 py-1">Tipo</th>
+                                    <th className="border border-gray-300 px-2 py-1">Razón Social</th>
+                                    <th className="border border-gray-300 px-2 py-1">RUC</th>
+                                    <th className="border border-gray-300 px-2 py-1">Estado</th>
+                                    <th className="border border-gray-300 px-2 py-1">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data?.map((item, index) => (
+                                    <tr key={index}>
+                                        <td className="border border-gray-300 px-2 py-1">{item.tipo}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{item.razonSocial}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
+                                        <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activo' : 'Inactivo'}</td>
+                                        <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" />
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     )}
-                    <div className="flex justify-center"> 
+                    <div className="flex justify-center">
                         <button
                             onClick={openCrearModal}
                             className="mb-3 naranjabackgroud text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -103,7 +106,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user,userlogued, token })
                         </button>
                     </div>
                     {showCrearModal && (
-                        <CrearEmpresaContrataModal closeModal={closeCrearModal} id={id} user={userlogued} token={token} Refresgpag={Refresgpag}/>
+                        <CrearEmpresaContrataModal closeModal={closeCrearModal} id={id} user={userlogued} token={token} Refresgpag={Refresgpag} />
                     )}
                 </div>
             </div>

@@ -1,35 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import AddNewSedeUserModal from '../AddNewSedeUserModal/AddNewSedeUserModal'; // Importa el nuevo componente
 import { ListSedesxUsername } from '../model/ListSedesUser';
 
 const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
-    const [data, setData] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [refres, setRefresh] = useState(0)
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [refres, setRefresh] = useState(0);
 
     const [userName, setUserName] = useState('');
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
 
     useEffect(() => {
-        setLoading(true)
+        setLoading(true);
         ListSedesxUsername(id, token)
-        .then(response => {
-          setData(response)
-        })
-        .catch(error => {
-          throw new Error('Network response was not ok.',error);
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-      },[refres])
-    
+            .then(response => {
+                setData(response);
+            })
+            .catch(error => {
+                throw new Error('Network response was not ok.', error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [refres]);
+
     const Refresgpag = () => {
-        setRefresh(refres + +1)
-    }
+        setRefresh(refres + +1);
+    };
 
     const handleSave = () => {
         const newUserTableData = [...userTableData, { name: userName }];
@@ -58,24 +58,28 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
                         {loading ? (
                             <p className="text-center">Cargando...</p>
                         ) : (
-                        <table className="w-full mb-4">
-                            <thead>
-                                <tr>
-                                    <th className="border border-gray-400 px-4 py-2">Id</th>
-                                    <th className="border border-gray-400 px-4 py-2">Sede</th>
-                                    <th className="border border-gray-400 px-4 py-2">Fecha de registro</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.map((item, index) => (
-                                    <tr key={index}>
-                                        <td className="border border-gray-400 px-4 py-2">{item.idUsuarioSede}</td>
-                                        <td className="border border-gray-400 px-4 py-2">{item.sede}</td>
-                                        <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
+                            <table className="w-full mb-4">
+                                <thead>
+                                    <tr>
+                                        <th className="border border-gray-400 px-4 py-2">Id</th>
+                                        <th className="border border-gray-400 px-4 py-2">Sede</th>
+                                        <th className="border border-gray-400 px-4 py-2">Fecha de registro</th>
+                                        <th className="border border-gray-400 px-4 py-2">Acción</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {data.map((item, index) => (
+                                        <tr key={index}>
+                                            <td className="border border-gray-400 px-4 py-2">{item.idUsuarioSede}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{item.sede}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
+                                            <td className="border border-gray-400 px-4 py-2 text-center">
+                                                <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         )}
                     </div>
                     <div className="flex justify-end">
@@ -84,7 +88,7 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
                 </div>
             </div>
             {showAddSedeModal && (
-                <AddNewSedeUserModal closeModal={() => setShowAddSedeModal(false)} Refresgpag={Refresgpag} id_user={id} userlogued={userlogued} token={token}/>
+                <AddNewSedeUserModal closeModal={() => setShowAddSedeModal(false)} Refresgpag={Refresgpag} id_user={id} userlogued={userlogued} token={token} />
             )}
         </div>
 
