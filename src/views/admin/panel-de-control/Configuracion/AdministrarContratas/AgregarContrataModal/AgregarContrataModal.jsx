@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
+import { registrarContrata } from '../../model/AdministrarContrata';
 
-const AgregarContrataModal = ({ setShowModal }) => {
+const AgregarContrataModal = ({ setShowModal,Refresgpag,token }) => {
+
+  const [creating, setCreating] = useState(false);
+
   const [ruc, setRuc] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
   const [direccion, setDireccion] = useState('');
@@ -12,16 +17,34 @@ const AgregarContrataModal = ({ setShowModal }) => {
     setShowModal(false);
   };
 
-  const handleSaveContrata = () => {
-    // Aquí puedes agregar la lógica para guardar la contrata en la base de datos
-    console.log('RUC:', ruc);
-    console.log('Razon Social:', razonSocial);
-    console.log('Dirección:', direccion);
-    console.log('Telefono:', telefono);
-    console.log('Responsable:', responsable);
-    console.log('Email:', email);
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha creado una Nueva Contrata",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleCloseModal();
+        Refresgpag();
+      }
+    });
+  }
 
-    setShowModal(false);
+  const handleSaveContrata = () => {
+    setCreating(true)
+    registrarContrata(ruc,razonSocial,direccion,telefono,responsable,email,token)
+        .then(data => {
+          AleertSucces()
+        })
+        .catch(error => {
+          console.error('Error', error);
+        })
+        .finally(() =>{
+            setCreating(false)
+        })
   };
 
   return (
@@ -98,7 +121,7 @@ const AgregarContrataModal = ({ setShowModal }) => {
           </div>
         </form>
         <div className="flex justify-end mt-4">
-          <button onClick={handleSaveContrata} className="azul-btn text-white font-bold py-2 px-4 rounded">Guardar</button>
+          <button onClick={handleSaveContrata} disabled={creating} className="azul-btn text-white font-bold py-2 px-4 rounded">{creating ? 'Creando Contrata...' : 'Registar'}</button>
         </div>
       </div>
     </div>

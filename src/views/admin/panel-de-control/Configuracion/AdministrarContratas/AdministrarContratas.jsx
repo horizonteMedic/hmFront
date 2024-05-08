@@ -6,6 +6,8 @@ import AgregarContrataModal from '../AdministrarContratas/AgregarContrataModal/A
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import EditModal from '../AdministrarContratas/EditModal/EditModal';
+import { DeleteContrata } from '../model/AdministrarContrata';
+import Swal from 'sweetalert2';
 
 const AdministrarContratas = () => {
   const [data, setData] = useState([]);
@@ -17,8 +19,13 @@ const AdministrarContratas = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
+  const [ruc, setRuc] = useState('');
+  const [razonSocial, setRazonSocial] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [responsable, setResponsable] = useState('');
+  const [email, setEmail] = useState('');
   const token = useAuthStore(state => state.token);
-  const userlogued = useAuthStore(state => state.userlogued);
 
   const visiblePages = () => {
     const totalVisiblePages = 5;
@@ -44,6 +51,10 @@ const AdministrarContratas = () => {
       });
   }, [refres, recordsPerPage, token]);
 
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
+
   const handlePageClick = (page) => {
     setCurrentPage(page);
   };
@@ -53,6 +64,48 @@ const AdministrarContratas = () => {
     setCurrentPage(1);
     setTotalPages(Math.ceil(data.length / parseInt(e.target.value)));
   };
+
+  const Edit = (ruc,razon,direccion,telefono,responsable,email) => {
+    setRuc(ruc)
+    setRazonSocial(razon)
+    setDireccion(direccion)
+    setTelefono(telefono)
+    setResponsable(responsable)
+    setEmail(email)
+    setShowEditModal(true)
+  }
+
+  const deleteRol = (id) => {
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "No puedes revertir esta accion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DeleteContrata(id,token)
+          .then(() => {
+            Swal.fire({
+              title: "Eliminado!",
+              text: "La Contrata ha sido eliminado.",
+              icon: "success"
+            }).then((result) => {
+              if (result.isConfirmed) Refresgpag()
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              title: "Error!",
+              text: "La Contrata no se ha podido Eliminar!",
+              icon: "error"
+            });
+          });
+      }
+    });
+  }
 
   return (
     <div className="container mx-auto mt-12 mb-12">
@@ -102,8 +155,10 @@ const AdministrarContratas = () => {
                       <tr key={index}>
                         <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
                         <td className="border border-gray-300 px-2 py-1 text-center">
-                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => setShowEditModal(true)} />
-                          <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" />
+                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => Edit(item.rucContrata,item.razonContrata
+                            ,item.direccionContrata,item.telefonoContrata,item.responsableContrata,item.emailContrata
+                          )} />
+                          <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" onClick={() =>{deleteRol(item.rucContrata)}} />
                         </td>
 
                         <td className="border border-gray-300 px-2 py-1">{item.rucContrata}</td>
@@ -134,9 +189,9 @@ const AdministrarContratas = () => {
           )}
         </div>
       </div>
-      {showModal && <AgregarContrataModal setShowModal={setShowModal} />}
+      {showModal && <AgregarContrataModal setShowModal={setShowModal} Refresgpag={Refresgpag} token={token}/>}
       {/* Renderizado condicional del modal de edición */}
-      {showEditModal && <EditModal setShowEditModal={setShowEditModal} />}
+      {showEditModal && <EditModal setShowEditModal={setShowEditModal} Refresgpag={Refresgpag} token={token} ruc={ruc} razon={razonSocial} direccion={direccion} telefono={telefono} responsable={responsable} email={email} />}
     </div>
   );
 };

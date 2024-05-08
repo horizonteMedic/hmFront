@@ -4,7 +4,9 @@ import { getFetch } from '../../getFetch/getFetch';
 import { useAuthStore } from '../../../../../store/auth';
 import AgregarEmpresaModal from '../AdministrarEmpresas/AgregarEmpresaModal/AgregarEmpresaModal';
 import EditModal from '../AdministrarEmpresas/EditModal/EditModal';
-
+//Model
+import Swal from 'sweetalert2';
+import { DeleteEmpresa } from '../model/AdministrarEmpresas';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -18,8 +20,14 @@ const AdministrarEmpresa = () => {
   const [totalPages, setTotalPages] = useState(1); // Estado para el número total de páginas
   const [showEditModal, setShowEditModal] = useState(false); // Estado para el modal de edición
 
+  //Edit
+  const [ruc, setRuc] = useState('');
+  const [razonSocial, setRazonSocial] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [telefono, setTelefono] = useState('');
+  const [responsable, setResponsable] = useState('');
+  const [email, setEmail] = useState('');
   const token = useAuthStore(state => state.token);
-  const userlogued = useAuthStore(state => state.userlogued);
 
   const visiblePages = () => {
     const totalVisiblePages = 5; 
@@ -44,6 +52,52 @@ const AdministrarEmpresa = () => {
         setLoading(false);
       });
   }, [refres, recordsPerPage]); // Actualiza la carga de datos cuando cambia refres o recordsPerPage
+
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
+
+  const Edit = (ruc,razon,direccion,telefono,responsable,email) => {
+    setRuc(ruc)
+    setRazonSocial(razon)
+    setDireccion(direccion)
+    setTelefono(telefono)
+    setResponsable(responsable)
+    setEmail(email)
+    setShowEditModal(true)
+  }
+
+  const deleteRol = (id) => {
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "No puedes revertir esta accion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DeleteEmpresa(id,token)
+          .then(() => {
+            Swal.fire({
+              title: "Eliminado!",
+              text: "La Empresa ha sido eliminado.",
+              icon: "success"
+            }).then((result) => {
+              if (result.isConfirmed) Refresgpag()
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              title: "Error!",
+              text: "La Empresa no se ha podido Eliminar!",
+              icon: "error"
+            });
+          });
+      }
+    });
+  }
 
   const handleChangeRecordsPerPage = (e) => {
     setRecordsPerPage(parseInt(e.target.value)); // Actualiza el estado con el nuevo número de registros por página
@@ -118,8 +172,10 @@ const AdministrarEmpresa = () => {
                     <tr key={index}>
                       <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">
-                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => setShowEditModal(true)} />
-                          <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" />
+                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => Edit(item.rucEmpresa,item.razonEmpresa
+                            ,item.direccionEmpresa,item.telefonoEmpresa,item.responsableEmpresa,item.emailEmpresa
+                          )} />
+                          <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" onClick={() => {deleteRol(item.rucEmpresa)}} />
                         </td>
                       <td className="border border-gray-300 px-2 py-1">{item.rucEmpresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.razonEmpresa}</td>
@@ -148,8 +204,8 @@ const AdministrarEmpresa = () => {
           </button>
         </div>
       </div>
-      {showModal && <AgregarEmpresaModal setShowModal={setShowModal} />} {/* Mostrar el modal si showModal es true */}
-      {showEditModal && <EditModal setShowEditModal={setShowEditModal} />}
+      {showModal && <AgregarEmpresaModal setShowModal={setShowModal} Refresgpag={Refresgpag} token={token}/>} {/* Mostrar el modal si showModal es true */}
+      {showEditModal && <EditModal setShowEditModal={setShowEditModal} Refresgpag={Refresgpag} token={token} ruc={ruc} razon={razonSocial} direccion={direccion} telefono={telefono} responsable={responsable} email={email} />}
 
     </div>
   );
