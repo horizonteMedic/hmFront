@@ -121,7 +121,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
                         onChange={handleRazonSocialChange}
                         className="w-full border pointer border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
                         >
-                        <option value="">Seleccione...</option>
+                        <option value="">{data ? 'Seleccione una Sede...' : 'Espera un momento'}</option>
                         {data?.map((option, index) => (
                             <option key={index} value={option.razonSocial}>{option.razonSocial}</option>
                             ))}

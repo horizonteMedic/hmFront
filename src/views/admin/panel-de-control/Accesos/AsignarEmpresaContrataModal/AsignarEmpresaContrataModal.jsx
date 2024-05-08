@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import CrearEmpresaContrataModal from '../CrearEmpresaContrataModal/CrearEmpresaContrataModal'; // Importa el nuevo componente
-import { ListEoCUsername } from '../model/ListarEoCUser';
-
+import { ListEoCUsername, DeleteEoCxUser } from '../model/ListarEoCUser';
+import Swal from 'sweetalert2';
 // Primer Modal
 const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }) => {
 
@@ -16,7 +16,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
     const [selectedEmpresa, setSelectedEmpresa] = useState('');
     const [selectedUser, setSelectedUser] = useState('');
     const [showCrearModal, setShowCrearModal] = useState(false); // Estado para controlar la visualización del modal de creación
-
+    console.log(data)
     useEffect(() => {
         setLoading(true);
         ListEoCUsername(id, token)
@@ -35,18 +35,6 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
         setRefresh(refres + +1);
     };
 
-    const handleEmpresaChange = (event) => {
-        setSelectedEmpresa(event.target.value);
-    };
-
-    const handleUserChange = (event) => {
-        setSelectedUser(event.target.value);
-    };
-
-    const asignarEmpresaContrata = () => {
-        closeModal();
-    };
-
     const openCrearModal = () => {
         setShowCrearModal(true);
     };
@@ -54,6 +42,39 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
     const closeCrearModal = () => {
         setShowCrearModal(false);
     };
+
+    const deleteEoCUser = (id) => {
+        console.log(id)
+        Swal.fire({
+          title: "¿Estas Seguro?",
+          text: "No puedes revertir esta accion!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Si, Eliminar!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            DeleteEoCxUser(id,token)
+              .then(() => {
+                Swal.fire({
+                  title: "Eliminado!",
+                  text: "Esta Asignacion ha sido eliminada.",
+                  icon: "success"
+                }).then((result) => {
+                  if (result.isConfirmed) Refresgpag()
+                });
+              })
+              .catch(() => {
+                Swal.fire({
+                  title: "Error!",
+                  text: "La asignacion no se ha podido Eliminar!",
+                  icon: "error"
+                });
+              });
+          }
+        });
+      }
 
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -90,7 +111,7 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
                                         <td className="border border-gray-300 px-2 py-1">{item.ruc}</td>
                                         <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activo' : 'Inactivo'}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
-                                            <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" />
+                                            <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteEoCUser(item.id)}}/>
                                         </td>
                                     </tr>
                                 ))}

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import AddNewSedeUserModal from '../AddNewSedeUserModal/AddNewSedeUserModal'; // Importa el nuevo componente
-import { ListSedesxUsername } from '../model/ListSedesUser';
+import { ListSedesxUsername, DeleteSedesxUser } from '../model/ListSedesUser';
+import Swal from 'sweetalert2';
 
 const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
     const [data, setData] = useState([]);
@@ -13,6 +14,7 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
 
+    console.log(data)
     useEffect(() => {
         setLoading(true);
         ListSedesxUsername(id, token)
@@ -31,12 +33,37 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
         setRefresh(refres + +1);
     };
 
-    const handleSave = () => {
-        const newUserTableData = [...userTableData, { name: userName }];
-        setUserTableData(newUserTableData);
-        console.log("Nuevo usuario y sus sedes:", newUserTableData);
-        setUserName('');
-    };
+    const deleteSedeUser = (id) => {
+        Swal.fire({
+          title: "¿Estas Seguro?",
+          text: "No puedes revertir esta accion!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Si, Eliminar!"
+        }).then((result) => {
+          if (result.isConfirmed) {
+            DeleteSedesxUser(id,token)
+              .then(() => {
+                Swal.fire({
+                  title: "Eliminado!",
+                  text: "Esta Sede asignada ha sido eliminada.",
+                  icon: "success"
+                }).then((result) => {
+                  if (result.isConfirmed) Refresgpag()
+                });
+              })
+              .catch(() => {
+                Swal.fire({
+                  title: "Error!",
+                  text: "La asignacion no se ha podido Eliminar!",
+                  icon: "error"
+                });
+              });
+          }
+        });
+      }
 
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -74,7 +101,7 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
                                             <td className="border border-gray-400 px-4 py-2">{item.sede}</td>
                                             <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
                                             <td className="border border-gray-400 px-4 py-2 text-center">
-                                                <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" />
+                                                <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteSedeUser(item.idUsuarioSede)}} />
                                             </td>
                                         </tr>
                                     ))}

@@ -13,4 +13,16 @@ export function ListSedesxUsername(id_user, token) {
         
 }
 
+export function DeleteSedesxUser(id_user, token) {
+
+    const url = `${URLAzure}/api/v01/ct/usuarioSede/${id_user}`
+    const options = {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    return fetch(url,options).then(res => res.json()).then(response => response) 
+        
+}
 
