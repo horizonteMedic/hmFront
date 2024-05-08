@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { isTokenExpired, useAuthStore } from './store/auth.js';
 import { createRoot } from 'react-dom/client'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
@@ -27,6 +28,8 @@ import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateAr
 import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
 
+
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -38,12 +41,24 @@ const App = () => {
 }
 
 const AppContent = () => {
+  const token = useAuthStore(state => state.token);
+  const setToken = useAuthStore((state) => state.setToken);
+  const setuserlogued = useAuthStore((state) => state.setuserlogued);
+
+
   const location = useLocation();
   const showNavbarRoutes = ['/', '/login-empleado'];
   const isLoginPage = showNavbarRoutes.includes(location.pathname);
   const isHiddenRoute = ['/forgot-password', '/verificacion-codigo'].includes(location.pathname);
   const showBreadcrumb = !isLoginPage && !isHiddenRoute;
 
+  useEffect(() => {
+    if (isTokenExpired(token)) {
+      // El token ha caducado, realizar acciones necesarias
+      setToken(null);
+      setuserlogued(null);
+    }
+  },[])
   return (
     <>
       {!isHiddenRoute && !isLoginPage && <Navbar />}

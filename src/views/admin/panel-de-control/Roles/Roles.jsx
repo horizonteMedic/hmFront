@@ -71,7 +71,7 @@ const Roles = () => {
     setIsModalAccessOpen(false); 
   };
 
-  const deleteRol = (id, rol,descripcion,fechaRegistro,userRegistro) => {
+  const deleteRol = (id) => {
     Swal.fire({
       title: "¿Estas Seguro?",
       text: "No puedes revertir esta accion!",
@@ -79,14 +79,15 @@ const Roles = () => {
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Si, Deshabilitar!"
+      confirmButtonText: "Si, Eliminar!"
     }).then((result) => {
       if (result.isConfirmed) {
-        DeleteRol(id, rol,descripcion,fechaRegistro,userRegistro,token,userlogued.sub)
+  
+        DeleteRol(id,token)
           .then(() => {
             Swal.fire({
-              title: "Deshabilitado!",
-              text: "El Rol ha sido Deshabilitado.",
+              title: "Eliminado!",
+              text: "El Rol ha sido Eliminado.",
               icon: "success"
             }).then((result) => {
               if (result.isConfirmed) Refresgpag()
@@ -95,7 +96,7 @@ const Roles = () => {
           .catch(() => {
             Swal.fire({
               title: "Error!",
-              text: "El Rol no se ha podido Deshabilitar!",
+              text: "El Rol no se ha podido Eliminar!",
               icon: "error"
             });
           });
@@ -140,9 +141,9 @@ const Roles = () => {
                 <tr key={index}>
                   <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                   <td className="border border-gray-300 px-2 py-1">
-                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-4 cursor-pointer" />
-                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol, item.nombre, item.descripcion, item.fechaRegistro, item.userRegistro)}} className="text-red-500 mr-4 cursor-pointer" />
-                    <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 cursor-pointer" />
+                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 mr-2 cursor-pointer" />
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                   <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>

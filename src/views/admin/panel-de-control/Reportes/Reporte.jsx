@@ -9,7 +9,7 @@ import Modal from './Modal/Modal';
 const HistorialPaciente = () => {
   const ListSedes = ComboboxSedes();
   const ListEmpresa = ComboboxEmpresas();
-  {/*const ListContrata = ComboboxContratas();*/}
+  const ListContrata = ComboboxContratas();
   const [sede, setSede] = useState('');
   const [empresauser, setEmpresauser] = useState([])
   const [contrataauser, setContratauser] = useState([])
@@ -23,11 +23,12 @@ const HistorialPaciente = () => {
       setEmpresa(ListEmpresa[0].ruc)
       return
     }
-    {/*if (ListContrata.length > 0) {
+    if (ListContrata.length > 0) {
       console.log('wasoo')
       setContratauser(ListContrata[0].razonSocial)
+      setEmpresa(ListContrata[0].ruc)
       return
-    }*/}
+    }
   }, [ListSedes,ListEmpresa]);
 
   const pacientes = [
@@ -253,9 +254,9 @@ const HistorialPaciente = () => {
                 value={contrata}
               >
                 <option value="">Seleccionar</option>
-                {/*ListContrata?.map((option,index) => (
+                {ListContrata?.map((option,index) => (
                   <option key={index} value={option.ruc}>{option.razonSocial}</option>
-                ))*/}
+                ))}
               </select>
           </div>
 
