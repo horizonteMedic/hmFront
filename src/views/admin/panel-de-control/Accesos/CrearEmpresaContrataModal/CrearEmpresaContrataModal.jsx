@@ -119,7 +119,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
                         type="text"
                         value={razonSocial}
                         onChange={handleRazonSocialChange}
-                        className="w-full border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
+                        className="w-full border pointer border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
                         >
                         <option value="">Seleccione...</option>
                         {data?.map((option, index) => (
@@ -137,14 +137,14 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
                         className="w-full border border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
                     />
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 ">
                     <label>
                         Estado:
                         <input
                             type="checkbox"
                             checked={estado}
                             onChange={handleEstadoChange}
-                            className="ml-2 pointer"
+                            className="ml-2 pointer "
                         />
                     </label>
                 </div>
