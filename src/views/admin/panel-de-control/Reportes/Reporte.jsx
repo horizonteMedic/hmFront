@@ -183,81 +183,80 @@ const HistorialPaciente = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-        <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
-          <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
-          <button onClick={reloadTable} className="focus:outline-none ml-3 relative">
-            {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
-            <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
-          </button>
-
+    <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
+      <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
+        <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
+        <button onClick={reloadTable} className="focus:outline-none ml-3 relative">
+          {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+          <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+        </button>
+      </div>
+      <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4">
+        <div className="flex flex-col mb-4 md:mb-0">
+          <span className="mr-2">Mostrar</span>
+          <select className="border pointer border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+          </select>
+          <span className='mr-2'>registros</span>
         </div>
-        <div className="flex flex-col justify-between items-center md:flex-row mr-12 ml-12 pt-3">
-          <div className="flex flex-col justify-between items-center md:flex-row w-full md:w-auto mb-4 md:mb-0 md:mr-4"> 
-            <span className="mr-2 md:mr-4">Mostrar</span>
-            <select className="border pointer border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-              <option value={20}>20</option>
-            </select>
-            <span className='mr-2 md:mr-4'>registros</span>
-          </div>
-          <div className=" items-center md:flex-row w-full md:w-auto focus:outline-none"> 
-            <span className="mr-2 md:mr-4"><strong>Fecha inicio:</strong></span>
-            <input
-              type="date"
-              className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 w-full md:w-auto focus:outline-none md:mr-4"
-              value={startDate}
-              onChange={handleStartDateChange}
-            />
-            <span className="mr-2 md:mr-4"><strong>Fecha fin:</strong></span>
-            <input
-              type="date"
-              className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 w-full md:w-auto focus:outline-none md:mr-4"
-              value={endDate}
-              onChange={handleEndDateChange}
-            />
-             <span className="mr-2 md:mr-4"><strong>Sedes:</strong></span>
-              <select
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
-                onChange={(e) => setSede(e.target.value)}
-                required
-                value={sede}
-              >
-                <option value="">Seleccionar</option>
-                {ListSedes?.map((option) => (
-                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
-                ))}
-              </select>
-              <span className="mr-2 ml-2 md:mr-4"><strong>Empresa:</strong></span>
-              <select
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
-                onChange={(e) => {
-                  setEmpresa(e.target.value);
-                  setContrata('');
-                }}
-                value={empresa}
-              >
-                <option value="">Seleccionar</option>
-                {ListEmpresa?.map((option,index) => (
-                  <option key={index} value={option.ruc}>{option.razonSocial}</option>
-                ))}
-              </select>
-              <span className="mr-2 ml-2 md:mr-4"><strong>Contrata:</strong></span>
-              <select
-                className="pointer border border-gray-300 px-3 py-2 rounded-md w-full md:w-auto focus:outline-none" 
-                onChange={(e) => {
-                  setContrata(e.target.value);
-                  setEmpresa('');
-                }}
-                value={contrata}
-              >
-                <option value="">Seleccionar</option>
-                {ListContrata?.map((option,index) => (
-                  <option key={index} value={option.ruc}>{option.razonSocial}</option>
-                ))}
-              </select>
+        <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0">
+          <span className="mr-2"><strong>Fecha inicio:</strong></span>
+          <input
+            type="date"
+            className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+            value={startDate}
+            onChange={handleStartDateChange}
+          />
+          <span className="mr-2"><strong>Fecha fin:</strong></span>
+          <input
+            type="date"
+            className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+            value={endDate}
+            onChange={handleEndDateChange}
+          />
+          <span className="mr-2"><strong>Sedes:</strong></span>
+          <select
+            className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
+            onChange={(e) => setSede(e.target.value)}
+            required
+            value={sede}
+          >
+            <option value="">Seleccionar</option>
+            {ListSedes?.map((option) => (
+              <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+            ))}
+          </select>
+          <span className="mr-2"><strong>Empresa:</strong></span>
+          <select
+            className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
+            onChange={(e) => {
+              setEmpresa(e.target.value);
+              setContrata('');
+            }}
+            value={empresa}
+          >
+            <option value="">Seleccionar</option>
+            {ListEmpresa?.map((option,index) => (
+              <option key={index} value={option.ruc}>{option.razonSocial}</option>
+            ))}
+          </select>
+          <span className="mr-2"><strong>Contrata:</strong></span>
+          <select
+            className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0"
+            onChange={(e) => {
+              setContrata(e.target.value);
+              setEmpresa('');
+            }}
+            value={contrata}
+          >
+            <option value="">Seleccionar</option>
+            {ListContrata?.map((option,index) => (
+              <option key={index} value={option.ruc}>{option.razonSocial}</option>
+            ))}
+          </select>
           </div>
 
         </div>

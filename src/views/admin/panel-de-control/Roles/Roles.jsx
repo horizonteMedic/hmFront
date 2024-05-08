@@ -148,8 +148,12 @@ const Roles = () => {
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                   <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    {item.estado ? <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" /> : <FontAwesomeIcon icon={faBan} className="text-red-500" />}
+                    <div style={{ borderRadius: '1rem' }} className={`py-1 px-2 ${item.estado ? 'bg-green-500' : 'bg-red-500'} text-white fw-bold`}>
+                      {item.estado ? 'Activo' : 'Inactivo'}
+                    </div>
                   </td>
+
+
                 </tr>
               ))}
             </tbody>
@@ -169,14 +173,14 @@ const Roles = () => {
             <FontAwesomeIcon icon={faLock} className="text-gray-500" />
             <p className="text-sm ml-2 md:ml-4">Asignar Acceso</p>
           </div>
-          <div className="flex items-center ml-2 md:ml-4">
+          {/* <div className="flex items-center ml-2 md:ml-4">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
             <p className="text-sm ml-2 md:ml-4">Activo</p>
           </div>
           <div className="flex items-center ml-6 md:ml-8">
             <FontAwesomeIcon icon={faBan} className="text-red-500" />
             <p className="text-sm ml-2 md:ml-4">Inactivo</p>
-          </div>
+          </div> */}
         </div>
 
       </div>

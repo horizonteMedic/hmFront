@@ -120,7 +120,7 @@ const AdministrarEmpresa = () => {
                       <td className="border border-gray-300 px-2 py-1 text-center">
                           <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => setShowEditModal(true)} />
                           <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" />
-                        </td>
+                      </td>
                       <td className="border border-gray-300 px-2 py-1">{item.rucEmpresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.razonEmpresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.direccionEmpresa}</td>
