@@ -33,11 +33,10 @@ function DeleteUsers(ID, user,idempleado,token) {
     
     const data = {
         username: user,
-        password: null,
         estado: false,
         id_empleado: idempleado
     }
-    console.log(JSON.stringify(data))
+    
     const url = `${URLAzure}/api/v01/ct/usuario/${ID}`
     const options = {
         method: 'PUT',

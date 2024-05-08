@@ -69,7 +69,7 @@ const AddNewSedeUserModal = ({ closeModal,Refresgpag, id_user,userlogued, token 
                             onChange={(e) => setSelectedSede(e.target.value)}
                             className="border border-gray-400 p-2 rounded-md mb-4 w-full"
                         >
-                            <option value="">Seleccione una Sede</option>
+                            <option value="">{data ? 'Seleccione una Sede...' : 'Espera un momento'}</option>
                             {data?.map((option, index) => (
                                 <option key={index} value={option.id}>{option.nombreSede}</option>
                             ))}
