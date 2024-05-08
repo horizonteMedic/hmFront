@@ -19,7 +19,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [color, setColor] = useState('');
   const [historiaClinica, setHistoriaClinica] = useState('');
   const [orden, setOrden] = useState('');
- 
+ console.log(data)
   const [fileData, setFileData] = useState(null);
   useEffect(() => {
     setLoading(true);
@@ -111,6 +111,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     link.href = window.URL.createObjectURL(blob);
     link.download = response.nombreArchivo;
       link.click();
+      URL.revokeObjectURL(link.href);
   }
   
 
@@ -118,7 +119,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     console.log(historia,id_archivo)
     ReadArchivos(historia,id_archivo,token)
     .then(response => {
-      console.log(response);
+      console.log(response)
       ReadBase64(response)
     })
     .catch(error => {
@@ -126,9 +127,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     }); 
   };
 
-  const enviarArchivo = () => {
-    console.log('Enviando archivo:', fileData);
-  };
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
@@ -160,6 +158,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
                     <th className="border border-gray-300 px-2 py-1 text-center">Cargo</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Área</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Grupo sanguíneo</th>
+                    <th className="border border-gray-300 px-2 py-1 text-center">Historia Clinica</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>
                   </tr>
                 </thead>
@@ -185,6 +184,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
                       <td className="border border-gray-300 px-2 py-1">{dataItem.cargo}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.area}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
+                      <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
                       <td className="border border-gray-300 px-2 py-1">
                         {read.map((readItem, readIndex) => ( 
                           <a key={readIndex} className='cursor-pointer' title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>

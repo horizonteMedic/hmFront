@@ -9,6 +9,7 @@ export function GetListREport(user,fechai,fechaf,sede,rucEmpresa,rucContrata,tok
         rucEmpresa: rucEmpresa,
         rucContrata: rucContrata
     }
+    console.log(JSON.stringify(data))
     const options = {
         method: 'POST', 
         headers: {
