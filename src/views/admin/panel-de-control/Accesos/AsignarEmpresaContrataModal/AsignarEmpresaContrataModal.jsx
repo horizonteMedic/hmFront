@@ -16,7 +16,6 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
     const [selectedEmpresa, setSelectedEmpresa] = useState('');
     const [selectedUser, setSelectedUser] = useState('');
     const [showCrearModal, setShowCrearModal] = useState(false); // Estado para controlar la visualización del modal de creación
-    console.log(data)
     useEffect(() => {
         setLoading(true);
         ListEoCUsername(id, token)
@@ -44,7 +43,6 @@ const AsignarEmpresaContrataModal = ({ closeModal, id, user, userlogued, token }
     };
 
     const deleteEoCUser = (id) => {
-        console.log(id)
         Swal.fire({
           title: "¿Estas Seguro?",
           text: "No puedes revertir esta accion!",

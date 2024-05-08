@@ -34,7 +34,6 @@ export default async function NewEmpleado(tipoDoc,doc,nombres,apellidos,cargo,ub
             },
             body: JSON.stringify(data)
         })
-        console.log('respuesta',response)
         if(response.ok){
             const responseData = await response.json(); 
             const data = responseData.data; 

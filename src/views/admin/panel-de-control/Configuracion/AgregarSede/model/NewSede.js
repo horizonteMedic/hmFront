@@ -14,7 +14,6 @@ export default async function NewSede(Nombre,Codigo,Estado,token,user) {
         fechaActualizacion: null,
         userActualizacion: null 
     }
-    console.log(data)
         const response = await fetch('https://servicios-web-hm.azurewebsites.net/api//v01/ct/sede', {
             method: 'POST', 
             headers: {
@@ -23,7 +22,6 @@ export default async function NewSede(Nombre,Codigo,Estado,token,user) {
             },
             body: JSON.stringify(data)
         })
-        console.log(response)
         if(response.ok){
             return 
         } else {

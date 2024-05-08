@@ -1,17 +1,54 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import Swal from 'sweetalert2';
+import { EditArchivo } from '../model/EditArchivos';
 
-const EditModal = ({ setShowEditModal, archivo }) => {
+const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued }) => {
   const [datosEditados, setDatosEditados] = useState({
-    codigo: archivo.codigo,
+    id: archivo.id,
     nombre: archivo.nombre,
     extension: archivo.extension,
     color: archivo.color,
+    codigo: archivo.codigo,
     estado: archivo.estado,
     fechaRegistro: archivo.fechaRegistro,
     userRegistro: archivo.userRegistro
   });
+  const [creating, setCreating] = useState(false);
+
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha creado un Nuevo Tipo de ARchivo!",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowEditModal()
+        Refresgpag()
+      }
+    });
+  }
+
+  const colores = [
+    { nombre: 'Negro', codigo: '#000000' },
+    { nombre: 'Rojo', codigo: '#FF0000' },
+    { nombre: 'Verde', codigo: '#00FF00' },
+    { nombre: 'Azul', codigo: '#0000FF' },
+    { nombre: 'Amarillo', codigo: '#FFFF00' },
+    { nombre: 'Cyan', codigo: '#00FFFF' },
+    { nombre: 'Magenta', codigo: '#FF00FF' },
+    { nombre: 'Gris', codigo: '#808080' },
+    { nombre: 'Marrón', codigo: '#A52A2A' },
+    { nombre: 'Oro', codigo: '#FFD700' },
+    { nombre: 'Plata', codigo: '#C0C0C0' },
+    { nombre: 'Verde lima', codigo: '#00FF00' },
+    { nombre: 'Azul cielo', codigo: '#87CEEB' },
+    { nombre: 'Rosado', codigo: '#FFC0CB' }
+  ];
 
   const handleChange = e => {
     setDatosEditados({
@@ -20,12 +57,30 @@ const EditModal = ({ setShowEditModal, archivo }) => {
     });
   };
 
+  const handleColor = (e) => {
+    const selectedColor = colores.find(colores => colores.nombre === e.target.value);
+    if (selectedColor) {
+      setDatosEditados({
+        ...datosEditados,
+        color: selectedColor.nombre,
+        codigo: selectedColor.codigo,
+      });
+    } 
+  };
+
   const handleSubmit = e => {
+    setCreating(true)
     e.preventDefault();
-    // Aquí debes enviar los datos editados al servidor
-    // Por ejemplo, podrías hacer una llamada a una API para guardar los cambios
-    console.log('Datos editados:', datosEditados);
-    // setShowEditModal(false); // Cerrar el modal después de editar
+    EditArchivo(datosEditados,userlogued,token)
+    .then(data => {
+      AleertSucces()
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })    
+    .finally(() => {
+      setCreating(false)
+    })
   };
 
   return (
@@ -40,11 +95,7 @@ const EditModal = ({ setShowEditModal, archivo }) => {
           <h1 className="text-start font-bold color-azul text-white">Editar Archivo</h1>
         </div>
         <div className='container p-4'>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label htmlFor="codigo" className="block text-sm font-medium text-gray-700">Código:</label>
-              <input type="text" id="codigo" name="codigo" value={datosEditados.codigo} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-            </div>
+          <form>
             <div className="mb-4">
               <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre:</label>
               <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
@@ -55,25 +106,28 @@ const EditModal = ({ setShowEditModal, archivo }) => {
             </div>
             <div className="mb-4">
               <label htmlFor="color" className="block text-sm font-medium text-gray-700">Color:</label>
-              <input type="text" id="color" name="color" value={datosEditados.color} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <select type="text" id="color" name="color" onChange={handleColor} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" >
+                <option value={datosEditados.color}>{datosEditados.color}</option>
+                {colores.map((option) => (
+                  <option key={`${option.nombre}-${option.codigo}`} value={option.nombre} >
+                    {option.nombre}
+                  </option>
+                ))}
+              </select>
+              <div className='flex justify-center mt-2'>
+                <div className='mt-2 w-12 h-12' style={{ background: datosEditados.codigo }} />
+              </div>
             </div>
             <div className="mb-4">
               <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado:</label>
               <select id="estado" name="estado" value={datosEditados.estado} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <option value="Activo">Activo</option>
-                <option value="Inactivo">Inactivo</option>
+                <option value={true}>Activo</option>
+                <option value={false}>Inactivo</option>
               </select>
             </div>
-            <div className="mb-4">
-              <label htmlFor="fechaRegistro" className="block text-sm font-medium text-gray-700">Fecha de Registro:</label>
-              <input type="text" id="fechaRegistro" name="fechaRegistro" value={datosEditados.fechaRegistro} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="userRegistro" className="block text-sm font-medium text-gray-700">Responsable:</label>
-              <input type="text" id="userRegistro" name="userRegistro" value={datosEditados.userRegistro} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
-            </div>
             <div className="flex justify-end">
-              <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">Guardar Cambios</button>
+              <button type="submit" onClick={handleSubmit} disabled={creating}
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">{creating ? 'Editando Archivo...' : 'Editar Archivo'}</button>
             </div>
           </form>
         </div>

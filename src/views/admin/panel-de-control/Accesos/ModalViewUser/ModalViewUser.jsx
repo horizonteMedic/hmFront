@@ -14,7 +14,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     
     const [iduser, setIduser] = useState('')
     const [username, setUsername] = useState('')
-
+    console.log(data)
     useEffect(() => {
         ListUser(idEmpleado, token)
             .then(response => {

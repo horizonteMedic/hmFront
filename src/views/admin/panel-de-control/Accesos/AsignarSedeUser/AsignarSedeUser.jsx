@@ -14,7 +14,6 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
 
-    console.log(data)
     useEffect(() => {
         setLoading(true);
         ListSedesxUsername(id, token)

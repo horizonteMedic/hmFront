@@ -24,7 +24,6 @@ export default async function NewArchivo(nombre,dni,historiaClinica,orden,id_tip
        id_tipo_archivo: id_tipo_archivo,
        fileBase64: base64WithoutHeader
     }
-    console.log(JSON.stringify(data))
     const options = {
         method: 'POST', 
         headers: {

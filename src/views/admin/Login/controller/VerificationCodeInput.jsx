@@ -52,7 +52,6 @@ const VerificationCodeInput = (props) => {
       setloading(true)
       SubmitCodePass(email,code)
       .then((data) => {
-        console.log(data.id)
         NewPasswordNavigate(data.id)
       })
       .finally(()=> {setloading(false)})

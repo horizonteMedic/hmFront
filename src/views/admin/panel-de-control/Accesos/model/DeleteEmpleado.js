@@ -2,7 +2,6 @@ import { URLAzure } from "../../../../config/config";
 
 export default async function DeleteEmpleado(empleadoId, TipoDoc, Nrodoc, Nombres, Apellidos, Cargo, Distrito, Cip, Email, Celular, Direccion,  
     FechaNacimiento, fechaRegistro, sexo, UserRegistro, User) {
-        console.log(sexo,UserRegistro)
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10

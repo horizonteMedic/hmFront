@@ -46,7 +46,6 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
       reader.readAsDataURL(file);
       //Recupero el nombre del archivo
       const fileName = file.name;
-      console.log(fileName)
       setFileName(fileName);
     }
   };
@@ -59,7 +58,6 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
     setUploading(true);
     NewArchivo(fileName,dni,historiaClinica,orden,id,user,token,filePreview)
     .then(data => {
-      console.log('gane',data)
       setUploadSuccess(true);
       setUploading(false);
       AleertSucces()

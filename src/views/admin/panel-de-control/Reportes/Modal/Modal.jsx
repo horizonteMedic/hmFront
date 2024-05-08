@@ -19,14 +19,12 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [color, setColor] = useState('');
   const [historiaClinica, setHistoriaClinica] = useState('');
   const [orden, setOrden] = useState('');
- console.log(data)
   const [fileData, setFileData] = useState(null);
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
       .then(response => {
         if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
-          console.log('no hay na');
           setData([]);
         } else {
           setData(response);
@@ -107,7 +105,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: `application/${fileType}` });
-    console.log(blob)
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
     link.download = response.nombreArchivo;
@@ -117,10 +114,8 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   
 
   const GetBase64 = (historia,id_archivo) => {
-    console.log(historia,id_archivo)
     ReadArchivos(historia,id_archivo,token)
     .then(response => {
-      console.log(response)
       ReadBase64(response)
     })
     .catch(error => {

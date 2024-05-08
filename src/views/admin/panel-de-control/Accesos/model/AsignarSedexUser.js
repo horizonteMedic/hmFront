@@ -13,7 +13,6 @@ export function AsignarSedexUsuario(id_user,id_sede,user,token) {
         userRegistro: user,
         fechaRegistro: `${year}-${month}-${day}`
     }
-    console.log(JSON.stringify(data), token)
     const url = `${URLAzure}/api/v01/ct/usuarioSede`
     const options = {
         method: 'POST',

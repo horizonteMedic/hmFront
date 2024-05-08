@@ -24,7 +24,6 @@ const HistorialPaciente = () => {
       return
     }
     if (ListContrata.length > 0) {
-      console.log('wasoo')
       setContratauser(ListContrata[0].razonSocial)
       setEmpresa(ListContrata[0].ruc)
       return
@@ -91,7 +90,8 @@ const HistorialPaciente = () => {
         // Realizar las peticiones para obtener los datos de las otras sedes
         const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token));
         const otrasSedesData = await Promise.all(fetchPromises);
-        const allData = otrasSedesData.reduce((acc, data) => acc.concat(data), []);
+        const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
+        const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
         setData(prevData => [...prevData, ...allData]);
       }
     }
@@ -121,17 +121,6 @@ const HistorialPaciente = () => {
     setEndDate(e.target.value);
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear().toString();
-    return `${day}-${month}-${year}`;
-  };
 
   useEffect(() => {
     const filteredByDate = pacientes.filter(paciente => {
@@ -153,7 +142,6 @@ const HistorialPaciente = () => {
     GetListREport(userlogued.sub, startDate, endDate, sede, token)
       .then(response => {
         if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
-          console.log('no hay na');
           setData([])
         } else {
           setData(response);

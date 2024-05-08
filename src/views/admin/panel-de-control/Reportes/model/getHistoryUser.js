@@ -11,7 +11,6 @@ export function GetHistoryUser(user,fechai,fechaf,sede,dniUser,empresa,contrata,
         rucEmpresa: empresa,
         rucContrata: contrata
     }
-    console.log(JSON.stringify(data))
     const options = {
         method: 'POST', 
         headers: {
