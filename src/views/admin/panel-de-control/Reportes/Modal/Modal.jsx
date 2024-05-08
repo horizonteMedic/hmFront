@@ -8,14 +8,10 @@ import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos } from '../model/readArchivos';
 
 const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token }) => {
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-  //Los tipos de archivos que se pueden subir
   const [listarchivos, setListarchivos] = useState([]);
-  //Los archivos ya subidos
   const [read, setRead] = useState([])
-
   const [modalArchivos, setModalArchivos] = useState(false);
   const [idarchivo, setIdarchivo] = useState('');
   const [nombrearc, setNombrearc] = useState('');
@@ -25,7 +21,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [orden, setOrden] = useState('');
  
   const [fileData, setFileData] = useState(null);
-  //Jala los datos de los pacientes
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
@@ -45,7 +40,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
       });
   }, []);
 
-  //Jala los tipos de archivos disponibles para la subida
   useEffect(() => {
     GetlistArchivos(token)
       .then(response => {
@@ -57,7 +51,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
 
   }, []);
 
-  //Jala los archivos ya subidos a ese paciente
   useEffect(() => {
       if (data && data.length > 0) {
         GetArchivosSubidos(data[0].historiaClinica, token)
@@ -69,22 +62,26 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
           });
       }
   }, [data])
-  const filterArchivos = () => {
-    if (listarchivos && read) {
-      if (listarchivos[0].id === read[0].id_tipo_archivo) {
-        if (listarchivos[0].extension === 'pdf') {
-          return (
-            <FontAwesomeIcon icon={faFilePdf} size='xl' style={{ color: listarchivos[0].codigo }} />
-          )
-        } else {
-          return (
-            <FontAwesomeIcon icon={faFileImage} size='xl' style={{ color: listarchivos[0].codigo }} />
-          )
-        }
+
+  const filterArchivos = (readItem) => {
+    const archivoEncontrado = listarchivos.find(archivo => archivo.id === readItem.id_tipo_archivo);
+    if (archivoEncontrado) {
+      if (archivoEncontrado.extension === 'pdf') {
+        return (
+          <>
+            <FontAwesomeIcon icon={faFilePdf} size='xl' className="mr-1"  style={{ color: archivoEncontrado.codigo }} />
+          </>
+        );
+      } else if (archivoEncontrado.extension === 'jpg' || archivoEncontrado.extension === 'png') {
+        return (
+          <>
+            <FontAwesomeIcon icon={faFileImage} size='xl' className="ml-1" style={{ color: archivoEncontrado.codigo }} />
+          </>
+        );
       }
     }
     return null;
-  }
+  };
   
   const openModalArchivos = (id, nombre, extension, color, historiaClinica, orden) => {
     setIdarchivo(id);
@@ -103,8 +100,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
 
   const ReadBase64 = (response) => {
     const fileType = response.nombreArchivo.split('.').pop();
-    // Convertir el base64 a un blob
-
     const byteCharacters = atob(response.fileBase64);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
@@ -112,12 +107,10 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: `application/${fileType}` });
-    // Crear un objeto URL para el blob
+    console.log(blob)
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
     link.download = response.nombreArchivo;
-
-    // Disparar el clic en el enlace para iniciar la descarga
       link.click();
   }
   
@@ -178,7 +171,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
                         <div className="flex flex-col">
                           {listarchivos.map((archivoItem, archivoIndex) => (
                             <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem.id, archivoItem.nombre, archivoItem.extension, archivoItem.codigo, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
-                                <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer" style={{ color: archivoItem.codigo }} />   
+                                <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer" style={{ color: archivoItem.codigo }} />
                               <div className="text-xs cursor-pointer ml-2" >Subir {archivoItem.nombre}</div>
                             </div>
                           ))}
@@ -195,9 +188,12 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                       <td className="border border-gray-300 px-2 py-1">
                         {read.map((readItem, readIndex) => ( 
-                        <a key={readIndex} className='cursor-pointer' title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>{filterArchivos() }</a>
+                          <a key={readIndex} className='cursor-pointer' title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
+                            {filterArchivos(readItem)}
+                          </a>
                         ))}
                       </td>
+
                     </tr>
                   ))}
                 </tbody>

@@ -3,6 +3,8 @@ import RuterConfig from '../RuterConfig';
 import { getFetch } from '../../getFetch/getFetch';
 import { useAuthStore } from '../../../../../store/auth';
 import AgregarEmpresaModal from '../AdministrarEmpresas/AgregarEmpresaModal/AgregarEmpresaModal';
+import EditModal from '../AdministrarEmpresas/EditModal/EditModal';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,6 +16,8 @@ const AdministrarEmpresa = () => {
   const [recordsPerPage, setRecordsPerPage] = useState(10); // Nuevo estado para el número de registros por página
   const [currentPage, setCurrentPage] = useState(1); // Estado para la página actual
   const [totalPages, setTotalPages] = useState(1); // Estado para el número total de páginas
+  const [showEditModal, setShowEditModal] = useState(false); // Estado para el modal de edición
+
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
@@ -113,8 +117,8 @@ const AdministrarEmpresa = () => {
                   {data.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => ( // Solo mapea los primeros registros hasta el número seleccionado por página
                     <tr key={index}>
                       <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
-                      <td className="border border-gray-300 px-2 py-1">
-                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" />
+                      <td className="border border-gray-300 px-2 py-1 text-center">
+                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => setShowEditModal(true)} />
                           <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" />
                         </td>
                       <td className="border border-gray-300 px-2 py-1">{item.rucEmpresa}</td>
@@ -145,6 +149,8 @@ const AdministrarEmpresa = () => {
         </div>
       </div>
       {showModal && <AgregarEmpresaModal setShowModal={setShowModal} />} {/* Mostrar el modal si showModal es true */}
+      {showEditModal && <EditModal setShowEditModal={setShowEditModal} />}
+
     </div>
   );
 };

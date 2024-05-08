@@ -140,9 +140,9 @@ const Roles = () => {
                 <tr key={index}>
                   <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                   <td className="border border-gray-300 px-2 py-1">
-                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol, item.nombre, item.descripcion, item.fechaRegistro, item.userRegistro)}} className="text-red-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-4 cursor-pointer" />
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol, item.nombre, item.descripcion, item.fechaRegistro, item.userRegistro)}} className="text-red-500 mr-4 cursor-pointer" />
+                    <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 cursor-pointer" />
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
                   <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>

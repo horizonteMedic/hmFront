@@ -5,6 +5,7 @@ import { useAuthStore } from '../../../../../store/auth';
 import AgregarContrataModal from '../AdministrarContratas/AgregarContrataModal/AgregarContrataModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import EditModal from '../AdministrarContratas/EditModal/EditModal';
 
 const AdministrarContratas = () => {
   const [data, setData] = useState([]);
@@ -20,10 +21,10 @@ const AdministrarContratas = () => {
   const userlogued = useAuthStore(state => state.userlogued);
 
   const visiblePages = () => {
-    const totalVisiblePages = 5; 
+    const totalVisiblePages = 5;
     const halfVisiblePages = Math.floor(totalVisiblePages / 2);
     let startPage = currentPage - halfVisiblePages;
-    startPage = Math.max(startPage, 1); 
+    startPage = Math.max(startPage, 1);
     const endPage = startPage + totalVisiblePages - 1;
     return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
   };
@@ -83,7 +84,7 @@ const AdministrarContratas = () => {
                 </button>
               </div>
               <div className="overflow-y-auto">
-                <table className="table-auto min-w-full divide-y divide-gray-200 mb-4"> 
+                <table className="table-auto min-w-full divide-y divide-gray-200 mb-4">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Orden</th>
@@ -100,8 +101,8 @@ const AdministrarContratas = () => {
                     {data.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => (
                       <tr key={index}>
                         <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
-                        <td className="border border-gray-300 px-2 py-1">
-                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={() => setShowEditModal(true)} />
+                        <td className="border border-gray-300 px-2 py-1 text-center">
+                          <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => setShowEditModal(true)} />
                           <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" />
                         </td>
 
