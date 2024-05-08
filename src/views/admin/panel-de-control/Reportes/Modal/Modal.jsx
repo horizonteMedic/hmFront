@@ -153,7 +153,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
                     <th className="border border-gray-300 px-2 py-1 text-center">Orden</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Empresa</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Contrata</th>
-                    <th className="border border-gray-300 px-2 py-1 text-center">Fecha apertura</th>
+                    <th className="border border-gray-300 px-2 py-1 text-center">Fecha Examen</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Examen</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Estado</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Cargo</th>
@@ -193,7 +193,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
                           </a>
                         ))}
                       </td>
-
                     </tr>
                   ))}
                 </tbody>

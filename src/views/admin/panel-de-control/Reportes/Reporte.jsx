@@ -191,18 +191,18 @@ const HistorialPaciente = () => {
           <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
         </button>
       </div>
-      <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4">
-        <div className="flex flex-col mb-4 md:mb-0">
-          <span className="mr-2">Mostrar</span>
+      {/* filtros */}
+      <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4 flex-wrap">
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+          <span className="mr-2 fw-bold">Mostrar</span>
           <select className="border pointer border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={15}>15</option>
             <option value={20}>20</option>
           </select>
-          <span className='mr-2'>registros</span>
         </div>
-        <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0">
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Fecha inicio:</strong></span>
           <input
             type="date"
@@ -210,6 +210,8 @@ const HistorialPaciente = () => {
             value={startDate}
             onChange={handleStartDateChange}
           />
+        </div>
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Fecha fin:</strong></span>
           <input
             type="date"
@@ -217,6 +219,8 @@ const HistorialPaciente = () => {
             value={endDate}
             onChange={handleEndDateChange}
           />
+        </div>
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Sedes:</strong></span>
           <select
             className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
@@ -229,6 +233,8 @@ const HistorialPaciente = () => {
               <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
             ))}
           </select>
+        </div>
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Empresa:</strong></span>
           <select
             className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
@@ -243,6 +249,8 @@ const HistorialPaciente = () => {
               <option key={index} value={option.ruc}>{option.razonSocial}</option>
             ))}
           </select>
+        </div>
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Contrata:</strong></span>
           <select
             className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0"
@@ -257,10 +265,8 @@ const HistorialPaciente = () => {
               <option key={index} value={option.ruc}>{option.razonSocial}</option>
             ))}
           </select>
-          </div>
-
         </div>
-
+      </div>
         <div className="overflow-x-auto p-3">
           {loading ? (
             <p className="text-center">Cargando...</p>

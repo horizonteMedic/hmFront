@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faTrash, faCheck, faTimes, faBan } from '@fortawesome/free-solid-svg-icons';
 import NuevoArchivoModal from './NuevoArchivoModal';
 import EditModal from '../CreateArchivos/EditModal/EditModal';
 
@@ -60,7 +60,13 @@ const ListaArchivosPorServidores = () => {
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold color-azul text-white">Lista de archivo por servidores</h1>
         </div>
+        <div className="text-right mt-3 mr-3">
+            <button onClick={abrirModal} className="azul-btn text-white font-bold py-2 px-4 rounded" >
+              Crear Nuevo Archivo
+            </button>
+          </div>
         <div className="container p-6">
+
           {loading ? (
             <p className="text-center">Cargando...</p>
           ) : (
@@ -94,7 +100,14 @@ const ListaArchivosPorServidores = () => {
                           <span className="text-xs font-semibold text-white">{item.color}</span>
                         </div>
                       </td>
-                      <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activo' : 'Inactivo'}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center">
+                        {item.estado ? (
+                          <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} className="text-red-500" />
+                        )}
+                      </td>
+                 
                       <td className="border border-gray-300 px-2 py-1">{item.fechaRegistro}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.userRegistro}</td>
                    
@@ -102,16 +115,28 @@ const ListaArchivosPorServidores = () => {
                   ))}
                 </tbody>
               </table>
+              <div className="flex justify-center bg-gray-100 rounded-lg p-4 md:px-6 md:py-4 md:mx-4 md:my-2">
+                <div className="flex items-center ml-2 md:ml-4">
+                  <FontAwesomeIcon icon={faEdit} className="text-blue-500" />
+                  <p className="text-sm ml-2 md:ml-4">Editar</p>
+                </div>
+                <div className="flex items-center ml-6 md:ml-8">
+                  <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+                  <p className="text-sm ml-2 md:ml-4">Eliminar</p>
+                </div>
+                <div className="flex items-center ml-2 md:ml-4">
+                  <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                  <p className="text-sm ml-2 md:ml-4">Activo</p>
+                </div>
+                <div className="flex items-center ml-6 md:ml-8">
+                  <FontAwesomeIcon icon={faBan} className="text-red-500" />
+                  <p className="text-sm ml-2 md:ml-4">Inactivo</p>
+                </div>
+              </div>
             </div>
+            
           )}
-          <div className="text-right">
-            <button
-              onClick={abrirModal}
-              className="azul-btn font-bold py-2 px-4 rounded"
-            >
-              Crear Nuevo Archivo
-            </button>
-          </div>
+         
         </div>
         {showModal && <NuevoArchivoModal CerrarModal={cerrarModal} Refresgpag={refrescarPagina} token={token} userlogued={userlogued.sub} />}
         {showEditModal && <EditModal setShowEditModal={setShowEditModal} archivo={archivoToEdit} />}
