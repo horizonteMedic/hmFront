@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUp, faFilePdf, faFileImage } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUp, faFilePdf, faFileImage, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
@@ -19,14 +19,12 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [color, setColor] = useState('');
   const [historiaClinica, setHistoriaClinica] = useState('');
   const [orden, setOrden] = useState('');
- console.log(data)
   const [fileData, setFileData] = useState(null);
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
       .then(response => {
         if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
-          console.log('no hay na');
           setData([]);
         } else {
           setData(response);
@@ -75,7 +73,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
       } else if (archivoEncontrado.extension === 'jpg' || archivoEncontrado.extension === 'png') {
         return (
           <>
-            <FontAwesomeIcon icon={faFileImage} size='xl' className="ml-1" style={{ color: archivoEncontrado.codigo }} />
+            <FontAwesomeIcon icon={faFileImage} size='xl' className="mr-2" style={{ color: archivoEncontrado.codigo }} />
           </>
         );
       }
@@ -97,36 +95,38 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     setModalArchivos(false);
   };
 
-
   const ReadBase64 = (response) => {
     const fileType = response.nombreArchivo.split('.').pop();
     const byteCharacters = atob(response.fileBase64);
     const byteNumbers = new Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: `application/${fileType}` });
-    console.log(blob)
-    const link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    link.download = response.nombreArchivo;
-      link.click();
-      URL.revokeObjectURL(link.href);
-  }
+  
+    const fileDataUri = URL.createObjectURL(blob);
+    setFileData({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` });
+  };
   
 
   const GetBase64 = (historia,id_archivo) => {
-    console.log(historia,id_archivo)
     ReadArchivos(historia,id_archivo,token)
     .then(response => {
-      console.log(response)
       ReadBase64(response)
     })
     .catch(error => {
       throw new Error('Network response was not ok.', error);
     }); 
   };
+useEffect(() => {
+  if (data && data.length > 0) {
+    const pdfFiles = read.filter(item => item.extension === 'pdf');
+    if (pdfFiles.length > 0) {
+      GetBase64(data[0].historiaClinica, pdfFiles[0].id_tipo_archivo);
+    }
+  }
+}, [data, read]);
 
 
   return (
@@ -204,6 +204,27 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
       {modalArchivos && (
         <ModalUpload closeModal={closeModal} id={idarchivo} nombre={nombrearc} extension={extension} color={color} historiaClinica={historiaClinica} orden={orden} dni={dni} user={user} token={token} />
       )}
+   {fileData && (
+  <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+    <div className="bg-white rounded-lg overflow-hidden shadow-xl w-full md:w-[85%]">
+      <div className="px-4 py-2 naranjabackgroud flex justify-between">
+        <h2 className="text-lg font-bold color-blanco">{nombrearc}</h2>
+        <button onClick={() => setFileData(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+      </div>
+      <div className="px-6 py-4 overflow-y-auto flex justify-center items-center">
+        <img src={fileData.uri} alt={fileData.name} className="h-auto md:max-w-[80%]" />
+      </div>
+      <div className="flex justify-center ">
+        <a href={fileData.uri} download={fileData.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+          <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+        </a>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
 
     </div>
   );
