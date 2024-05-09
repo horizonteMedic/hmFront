@@ -193,7 +193,7 @@ const Accesos = () => {
                 <th className="border border-gray-300 px-2 py-1">Número</th>
                 <th className="border border-gray-300 px-2 py-1">Apellidos</th>
                 <th className="border border-gray-300 px-2 py-1">Nombres</th>
-                <th className="border border-gray-300 px-2 py-1">Rol</th>
+                <th className="border border-gray-300 px-2 py-1">Cargo</th>
                 <th className="border border-gray-300 px-2 py-1 text-center w-[5%]">Estado</th>
               </tr>
             </thead>

@@ -20,7 +20,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
   function AleertSucces() {
     Swal.fire({
       title: "¡Exito!",
-      text: "Se ha creado un Nuevo Tipo de ARchivo!",
+      text: "Se ha Editado el Tipo de Archivo!",
       icon: "success",
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",

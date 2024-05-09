@@ -1,20 +1,65 @@
 import React, { useState } from 'react';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { editSede } from '../../model/AdministrarSedes';
+import Swal from 'sweetalert2';
+const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued }) => {
+  const [creating, setCreating] = useState(false);
+  const [datosEditados, setDatosEditados] = useState({
+    id: item.id,
+    nombre: item.nombreSede,
+    codigo: item.codigoSede,
+    estado: item.estado,
+    fechaRegistro: item.fechaRegistro,
+    userRegistro: item.userRegistro
+  });
+  
+  const handleChange = e => {
+    const { name, value, } = e.target;
+    const capitalizedValue = value.replace(/\b\w/g, char => char.toUpperCase());
+    setDatosEditados({
+      ...datosEditados,
+      [name]: capitalizedValue,
+    });
+  };
 
-const EditSedeModal = ({ setShowEditModal, Refresgpag, token, nombre, codigo, estado, fecha, responsable }) => {
-  const [newNombre, setNewNombre] = useState(nombre);
-  const [newCodigo, setNewCodigo] = useState(codigo);
-  const [newEstado, setNewEstado] = useState(estado);
-  const [newFecha, setNewFecha] = useState(fecha);
-  const [newResponsable, setNewResponsable] = useState(responsable);
+  const handleChangeStado = e => {
+    const { name,checked } = e.target;
+    setDatosEditados({
+      ...datosEditados,
+      [name]: checked,
+    });
+  };
 
-  const handleEdit = () => {
-    // Aquí debes implementar la lógica para editar la sede
-    // Por ejemplo, llamar a una función que envíe los datos al servidor
-    // y luego cerrar el modal y refrescar la página
-    // Puedes usar Refresgpag() para refrescar la página después de editar
-    // y setShowEditModal(false) para cerrar el modal
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha Editado la Sede!",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setShowEditModal()
+        Refresgpag()
+      }
+    });
+  }
+
+  const handleEdit = (e) => {
+    setCreating(true)
+    e.preventDefault();
+    editSede(datosEditados,userlogued,token)
+    .then(data => {
+      AleertSucces()
+    })
+    .catch(error => {
+      console.error('Error:', error)
+    })    
+    .finally(() => {
+      setCreating(false)
+    })
   };
 
   return (
@@ -27,26 +72,26 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, nombre, codigo, es
         <div className="p-4">
           <label className="block mb-2">
             Nombre:
-            <input type="text" className="border border-gray-300 rounded-md px-2 py-1 w-full" value={newNombre} onChange={(e) => setNewNombre(e.target.value)} />
+            <input type="text" name='nombre' className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.nombre} onChange={handleChange} />
           </label>
           <label className="block mb-2">
             Código:
-            <input type="text" className="border border-gray-300 rounded-md px-2 py-1 w-full" value={newCodigo} onChange={(e) => setNewCodigo(e.target.value)} />
+            <input type="text" name='codigo' className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.codigo} onChange={handleChange} />
           </label>
-          <label className="block mb-2">
-            Estado:
-            <input type="text" className="border border-gray-300 rounded-md px-2 py-1 w-full" value={newEstado} onChange={(e) => setNewEstado(e.target.value)} />
-          </label>
-          <label className="block mb-2">
-            Fecha:
-            <input type="text" className="border border-gray-300 rounded-md px-2 py-1 w-full" value={newFecha} onChange={(e) => setNewFecha(e.target.value)} />
-          </label>
-          <label className="block mb-2">
-            Responsable:
-            <input type="text" className="border border-gray-300 rounded-md px-2 py-1 w-full" value={newResponsable} onChange={(e) => setNewResponsable(e.target.value)} />
-          </label>
+          <div className="mb-4">
+            <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado</label>
+            <input
+                type="checkbox"
+                name='estado'
+                id="activo"
+                checked={datosEditados.estado}
+                onChange={handleChangeStado}
+                className=" pointer form-checkbox text-blue-500 focus:ring-blue-500 h-6 w-6 bg-white"
+                required
+              />
+          </div>
           <div className='flex justify-end mt-3'>
-            <button onClick={handleEdit} className=" azul-btn font-bold py-2 px-4 rounded">Guardar Cambios</button>
+            <button onClick={handleEdit} disabled={creating} className=" azul-btn font-bold py-2 px-4 rounded">{creating ? 'Editando Sede...' : 'Editar Sede'}</button>
 
           </div>
         </div>

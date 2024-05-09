@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { faTimes, faTrash, faTentArrowDownToLine, faBuilding } from '@fortawesome/free-solid-svg-icons'; // Agregado faBuilding
+import { faTimes, faTrash, faTentArrowDownToLine, faBuilding, faLock } from '@fortawesome/free-solid-svg-icons'; // Agregado faBuilding
 import Swal from 'sweetalert2';
 import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser';
 import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; // Importamos el nuevo modal
 import { ListUser, DeleteUsers } from '../model/ListUserID';
+import TableRoles from '../RolesUsuario/TableRoles';
 
 const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const [data, setData] = useState([]);
     const [showAsignarSedeUser, setShowAsignarSedeUser] = useState(false);
     const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false); // Estado para controlar la visibilidad del nuevo modal
-    
+    const [openModalRol, setOpenModalRol] = useState(false)
     const [iduser, setIduser] = useState('')
     const [username, setUsername] = useState('')
     console.log(data)
@@ -79,6 +80,12 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
         setShowAsignarEmpresaContrataModal(true); // Abrir el nuevo modal
     };
 
+    const handleAsignarRol = (id,username) => {
+        setIduser(id)
+        setUsername(username)
+        setOpenModalRol(true); // Abrir el nuevo modal Rol
+    };
+
     return (
         <>
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -111,6 +118,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                             <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={()=> {handleConfigIconClick(item.idUser,item.username)}} className="text-blue-500 ml-2 cursor-pointer" />
                                             {/* Agregamos el icono para asignar empresa contratante */}
                                             <FontAwesomeIcon icon={faBuilding} onClick={() => {handleAsignarEmpresaContrataIconClick(item.idUser,item.username)}} className="text-green-500 ml-2 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faLock} onClick={() => {handleAsignarRol(item.idUser,item.username)}} className="text-gray-500  ml-2 cursor-pointer" />
                                         </td>
                                         <td className="border border-gray-300 px-2 py-1">{item.username}</td>
                                         <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
@@ -140,6 +148,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
             {showAsignarSedeUser && <AsignarSedeUser closeModal={() => setShowAsignarSedeUser(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
             {/* Renderizamos el nuevo modal */}
             {showAsignarEmpresaContrataModal && <AsignarEmpresaContrataModal closeModal={() => setShowAsignarEmpresaContrataModal(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
+            {openModalRol && <TableRoles closeModal={() => setOpenModalRol(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
         </>
     );
 };

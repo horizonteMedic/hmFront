@@ -33,7 +33,7 @@ const AdministrarSedes = () => {
     const endPage = startPage + totalVisiblePages - 1;
     return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
   };
-
+ 
   useEffect(() => {
     setLoading(true);
     getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede', token)
@@ -194,11 +194,8 @@ const AdministrarSedes = () => {
           setShowEditModal={setShowEditModal}
           Refresgpag={Refresgpag}
           token={token}
-          nombre={nombre}
-          codigo={codigo}
-          estado={estado}
-          fecha={fecha}
-          responsable={responsable}
+          item={item}
+          userlogued={userlogued.sub}
         />
       )}    </div>
   );

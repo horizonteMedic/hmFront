@@ -186,7 +186,7 @@ const Roles = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
-      {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} />} 
+      {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} token={token} />} 
     </div>
   );
 };

@@ -1,6 +1,31 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
+import { getFetch } from '../../getFetch/getFetch';
 
-const ModalAsignarAccesoRol = ({ closeModal }) => {
+const ModalAsignarAccesoRol = ({ closeModal, token }) => {
+
+  const [data, setData] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(0)
+
+  useEffect(() => {
+    setLoading(true)
+    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/opcionesInterfaz', token)
+    .then(response => {
+      setData(response)
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.',error);
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+  },[refres])
+  
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
+  console.log(data)
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-full max-w-md">

@@ -29,17 +29,24 @@ export function registrarSede (datos, token,user) {
     return fetch(url,options).then(res => res.json()).then(response => response) 
 };
 
-export function editSede (sede, token) {
+export function editSede (sede,user, token) {
+
+    const currentDate = new Date(); // Obtiene la fecha y hora actual
+    const year = currentDate.getFullYear(); // Obtiene el año actual
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
+    const day = ('0' + currentDate.getDate()).slice(-2); 
 
     const data = {
-        razonContrata: razonContrata,
-        direccionContrata: direccionContrata,
-        telefonoContrata: telefonoContrata,
-        responsableContrata: responsableContrata,
-        emailContrata: emailContrata
+        nombreSede: sede.nombre,
+        codigoSede: sede.codigo,
+        estado: sede.estado,
+        fechaRegistro: sede.fechaRegistro,
+        userRegistro: sede.userRegistro,
+        fechaActualizacion: `${year}-${month}-${day}`,
+        userActualizacion: user
     };
   
-    const url = `${URLAzure}/api//v01/ct/sede/${id}`
+    const url = `${URLAzure}/api//v01/ct/sede/${sede.id}`
       const options = {
           method: 'PUT',
           headers: {
