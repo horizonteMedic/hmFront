@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+import { registrarSede } from '../../model/AdministrarSedes';
 
-const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
+const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
   const [creating, setCreating] = useState(false);
   const [nombre, setNombre] = useState('');
   const [codigo, setCodigo] = useState('');
-  const [estado, setEstado] = useState('');
-  const [fecha, setFecha] = useState('');
-  const [responsable, setResponsable] = useState('');
+  const [estado, setEstado] = useState(false);
 
   const handleCloseModal = () => {
     setShowModal(false);
@@ -23,7 +22,7 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
       confirmButtonText: "Aceptar"
     }).then((result) => {
       if (result.isConfirmed) {
-        handleCloseModal();
+        setShowModal();
         Refresgpag();
       }
     });
@@ -31,8 +30,8 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
 
   const handleSaveSede = () => {
     setCreating(true);
-    const newSede = { nombre, codigo, estado, fecha, responsable };
-    postFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede', token, newSede)
+    const newSede = { nombre, codigo, estado };
+    registrarSede(newSede,token,userlogued)
       .then(() => {
         showAlert('¡Éxito!', 'Se ha asignado una Nueva Empresa', 'success');
       })
@@ -72,6 +71,7 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
             <input
               type="text"
               required
+              maxLength={4}
               id="codigo"
               className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               value={codigo}
@@ -81,35 +81,13 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
           <div className="mb-4">
             <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado</label>
             <input
-              type="text"
-              required
-              id="estado"
-              className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={estado}
-              onChange={(e) => setEstado(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">Fecha</label>
-            <input
-              type="text"
-              required
-              id="fecha"
-              className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="responsable" className="block text-sm font-medium text-gray-700">Responsable</label>
-            <input
-              type="text"
-              required
-              id="responsable"
-              className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              value={responsable}
-              onChange={(e) => setResponsable(e.target.value)}
-            />
+                type="checkbox"
+                id="activo"
+                checked={estado}
+                onChange={(e) => setEstado(e.target.checked)}
+                className=" pointer form-checkbox text-blue-500 focus:ring-blue-500 h-6 w-6 bg-white"
+                required
+              />
           </div>
         </form>
         <div className="flex justify-end mt-4">

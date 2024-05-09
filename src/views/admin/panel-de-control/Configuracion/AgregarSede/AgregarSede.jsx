@@ -5,6 +5,7 @@ import { useAuthStore } from '../../../../../store/auth';
 import AgregarSedeModal from '../AgregarSede/ModalAgregarSede/ModalAgregarSede';
 import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { DeleteSede } from '../model/AdministrarSedes';
 import EditSedeModal from '../AgregarSede/EditSedeModal/EditSedeModal';
 
 import Swal from 'sweetalert2';
@@ -20,11 +21,8 @@ const AdministrarSedes = () => {
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Edit
-  const [nombre, setNombre] = useState('');
-  const [codigo, setCodigo] = useState('');
-  const [estado, setEstado] = useState('');
-  const [fecha, setFecha] = useState('');
-  const [responsable, setResponsable] = useState('');
+  const [item, setItem] = useState({})
+  const userlogued = useAuthStore(state => state.userlogued);
   const token = useAuthStore(state => state.token);
 
   const visiblePages = () => {
@@ -55,13 +53,9 @@ const AdministrarSedes = () => {
     setRefresh(refres + 1);
   };
 
-  const Edit = (nombre, codigo, estado, fecha, responsable) => {
-    setNombre(nombre);
-    setCodigo(codigo);
-    setEstado(estado);
-    setFecha(fecha);
-    setResponsable(responsable);
-    setShowEditModal(true); // Mostrar modal de edición
+  const Edit = (item) => {
+    setItem(item)
+    setShowEditModal(true);
   };
   
 
@@ -76,25 +70,23 @@ const AdministrarSedes = () => {
       confirmButtonText: "Sí, Eliminar"
     }).then((result) => {
       if (result.isConfirmed) {
-        // Aquí debes llamar a tu función para eliminar la sede
-        // Ejemplo:
-        // deleteSedeFunction(id, token)
-        //   .then(() => {
-        //     Swal.fire({
-        //       title: "Eliminado",
-        //       text: "La Sede ha sido eliminada.",
-        //       icon: "success"
-        //     }).then((result) => {
-        //       if (result.isConfirmed) Refresgpag();
-        //     });
-        //   })
-        //   .catch(() => {
-        //     Swal.fire({
-        //       title: "Error",
-        //       text: "La Sede no se ha podido eliminar.",
-        //       icon: "error"
-        //     });
-        //   });
+        DeleteSede(id,token)
+        .then(() => {
+          Swal.fire({
+            title: "Eliminado!",
+            text: "La Sede ha sido eliminado.",
+            icon: "success"
+          }).then((result) => {
+            if (result.isConfirmed) Refresgpag()
+          });
+        })
+        .catch(() => {
+          Swal.fire({
+            title: "Error!",
+            text: "La Sede no se ha podido Eliminar!",
+            icon: "error"
+          });
+        });
       }
     });
   };
@@ -159,24 +151,20 @@ const AdministrarSedes = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Fecha
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Responsable
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {data.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => (
                     <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.id}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">
-                        <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => Edit(item.nombre, item.codigo, item.estado, item.fecha, item.responsable)} />
-                        <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" onClick={() => { deleteSede(item.id) }} />
+                        <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => {Edit(item)}} />
+                        <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" onClick={() => {deleteSede(item.id)}} />
                       </td>
-                      <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.codigo}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.estado}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.fecha}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.responsable}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.nombreSede}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.codigoSede}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activado' : 'Desactivado'}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.fechaRegistro}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -199,7 +187,7 @@ const AdministrarSedes = () => {
         </div>
       </div>
       {/* Mostrar el modal para agregar una sede */}
-      {showModal && <AgregarSedeModal setShowModal={setShowModal} Refresgpag={Refresgpag} token={token} />}
+      {showModal && <AgregarSedeModal setShowModal={setShowModal} Refresgpag={Refresgpag} token={token} userlogued={userlogued.sub} />}
       {/* Mostrar el modal de edición */}
       {showEditModal && (
         <EditSedeModal
@@ -212,8 +200,7 @@ const AdministrarSedes = () => {
           fecha={fecha}
           responsable={responsable}
         />
-      )}
-    </div>
+      )}    </div>
   );
 };
 
