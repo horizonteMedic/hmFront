@@ -46,7 +46,7 @@ const RuterConfig = () => {
             onClick={() => setActiveButton('agregar-sede')}
           >
             <FontAwesomeIcon icon={faTentArrowDownToLine} className="mr-2" />
-            Agregar Sede
+            Administrar Sedes
           </Link>
           <Link
             to="/agregar-campaña"

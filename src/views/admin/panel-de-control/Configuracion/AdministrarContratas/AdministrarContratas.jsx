@@ -4,7 +4,7 @@ import { getFetch } from '../../getFetch/getFetch';
 import { useAuthStore } from '../../../../../store/auth';
 import AgregarContrataModal from '../AdministrarContratas/AgregarContrataModal/AgregarContrataModal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faEdit, faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import EditModal from '../AdministrarContratas/EditModal/EditModal';
 import { DeleteContrata } from '../model/AdministrarContrata';
 import Swal from 'sweetalert2';
@@ -158,7 +158,7 @@ const AdministrarContratas = () => {
                           <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => Edit(item.rucContrata,item.razonContrata
                             ,item.direccionContrata,item.telefonoContrata,item.responsableContrata,item.emailContrata
                           )} />
-                          <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" onClick={() =>{deleteRol(item.rucContrata)}} />
+                          <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() =>{deleteRol(item.rucContrata)}} />
                         </td>
 
                         <td className="border border-gray-300 px-2 py-1">{item.rucContrata}</td>
@@ -171,6 +171,16 @@ const AdministrarContratas = () => {
                     ))}
                   </tbody>
                 </table>
+                <div className="flex justify-center bg-gray-100 rounded-lg p-4 md:px-6 md:py-4 md:mx-4 md:my-2">
+                  <div className="flex items-center ml-2 md:ml-4">
+                    <FontAwesomeIcon icon={faEdit} className="text-blue-500" />
+                    <p className="text-sm ml-2 md:ml-4">Editar</p>
+                  </div>
+                  <div className="flex items-center ml-6 md:ml-8">
+                    <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+                    <p className="text-sm ml-2 md:ml-4">Eliminar</p>
+                  </div>
+                </div>
               </div>
               <div className="flex justify-center p-4">
                 <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">

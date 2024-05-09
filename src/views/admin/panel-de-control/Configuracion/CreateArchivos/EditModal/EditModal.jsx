@@ -91,7 +91,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
         <FontAwesomeIcon
           icon={faTimes}
-          className="absolute top-0 right-0 m-3 cursor-pointer text-gray-500"
+          className="absolute top-0 right-0 m-3 cursor-pointer text-white"
           onClick={() => setShowEditModal(false)}
         />
         <div className="p-3 azuloscurobackground flex justify-between">
@@ -101,15 +101,15 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
           <form>
             <div className="mb-4">
               <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre:</label>
-              <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className=" pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div className="mb-4">
               <label htmlFor="extension" className="block text-sm font-medium text-gray-700">Extensión:</label>
-              <input type="text" id="extension" name="extension" value={datosEditados.extension} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <input type="text" id="extension" name="extension" value={datosEditados.extension} onChange={handleChange} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div className="mb-4">
               <label htmlFor="color" className="block text-sm font-medium text-gray-700">Color:</label>
-              <select type="text" id="color" name="color" onChange={handleColor} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" >
+              <select type="text" id="color" name="color" onChange={handleColor} className=" pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" >
                 <option value={datosEditados.color}>{datosEditados.color}</option>
                 {colores.map((option) => (
                   <option key={`${option.nombre}-${option.codigo}`} value={option.nombre} >
@@ -122,8 +122,8 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
               </div>
             </div>
             <div className="mb-4">
-              <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado:</label>
-              <select id="estado" name="estado" value={datosEditados.estado} onChange={handleChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+              <label htmlFor="estado" className="  block text-sm font-medium text-gray-700">Estado:</label>
+              <select id="estado" name="estado" value={datosEditados.estado} onChange={handleChange} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 <option value={true}>Activo</option>
                 <option value={false}>Inactivo</option>
               </select>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { registrarEmpresa } from '../../model/AdministrarEmpresas';
 import Swal from 'sweetalert2';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
 
   const [creating, setCreating] = useState(false);
@@ -33,32 +35,64 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
   }
 
   const handleSaveEmpresa = () => {
-    setCreating(true)
-    registrarEmpresa(ruc,razonSocial,direccion,telefono,responsable,email,token)
-        .then(data => {
-          AleertSucces()
-        })
-        .catch(error => {
-          console.error('Error', error);
-        })
-        .finally(() =>{
-            setCreating(false)
-        })
+    // Validar que todos los campos requeridos estén completos
+    if (!ruc || !razonSocial || !direccion || !telefono || !responsable || !email) {
+      let errorMessage = 'Por favor, complete los siguientes campos:';
+      if (!ruc) errorMessage += '\n- RUC';
+      if (!razonSocial) errorMessage += '\n- Razón Social';
+      if (!direccion) errorMessage += '\n- Dirección';
+      if (!telefono) errorMessage += '\n- Teléfono';
+      if (!responsable) errorMessage += '\n- Responsable';
+      if (!email) errorMessage += '\n- Email';
+
+      Swal.fire({
+        title: 'Error',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    setCreating(true);
+    registrarEmpresa(ruc, razonSocial, direccion, telefono, responsable, email, token)
+      .then(() => {
+        AleertSucces();
+      })
+      .catch((error) => {
+        console.error('Error', error);
+        Swal.fire({
+          title: 'Error',
+          text: 'Ha ocurrido un error al crear la empresa',
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Aceptar'
+        });
+      })
+      .finally(() => {
+        setCreating(false);
+      });
   };
 
+
   return (
-    <div className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center">
-      <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-      <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-md w-full p-4 relative">
-        <button onClick={handleCloseModal} className="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-800">
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-        <h2 className="text-2xl font-bold mb-4">Agregar Empresa</h2>
+    <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
+        <FontAwesomeIcon
+          icon={faTimes}
+          className="absolute top-0 right-0 m-3 cursor-pointer text-white "
+          onClick={handleCloseModal}
+        />
+        <div className="p-3 azuloscurobackground flex justify-between">
+          <h1 className="text-start font-bold color-azul text-white">Agregar Nueva Empresa</h1>
+        </div>
+        <div className="container p-4">
         <form>
           <div className="mb-4">
-            <label htmlFor="ruc" className="block text-sm font-medium text-gray-700">RUC</label>
+            <label htmlFor="ruc" className="block ">RUC</label>
             <input
               type="text"
               required
@@ -69,7 +103,7 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700">Razon Social</label>
+            <label htmlFor="razonSocial" className="block">Razon Social</label>
             <input
               type="text"
               required
@@ -80,7 +114,7 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="Direccion" className="block text-sm font-medium text-gray-700">Direccion</label>
+            <label htmlFor="Direccion" className="block ">Direccion</label>
             <input
               type="text"
               id="Direccion"
@@ -91,7 +125,7 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Telefono</label>
+            <label htmlFor="telefono" className="block">Telefono</label>
             <input
               type="tel"
               id="telefono"
@@ -102,7 +136,7 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="responsable" className="block text-sm font-medium text-gray-700">Responsable</label>
+            <label htmlFor="responsable" className="block">Responsable</label>
             <input
               type="text"
               id="responsable"
@@ -112,7 +146,7 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
             />
           </div>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label htmlFor="email" className="block ">Email</label>
             <input
               type="email"
               id="email"
@@ -123,10 +157,12 @@ const AgregarEmpresaModal = ({ setShowModal, Refresgpag, token }) => {
           </div>
         </form>
         <div className="flex justify-end mt-4">
-          <button 
-          disabled={creating}
-          onClick={handleSaveEmpresa} className="azul-btn text-white font-bold py-2 px-4 rounded">{creating ? 'Creando Empresa...' : 'Registar'}</button>
+          <button
+            disabled={creating}
+            onClick={handleSaveEmpresa} className="azul-btn text-white font-bold py-2 px-4 rounded">{creating ? 'Creando Empresa...' : 'Registar'}</button>
+          </div>
         </div>
+        
       </div>
     </div>
   );

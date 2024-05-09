@@ -8,7 +8,7 @@ import EditModal from '../AdministrarEmpresas/EditModal/EditModal';
 import Swal from 'sweetalert2';
 import { DeleteEmpresa } from '../model/AdministrarEmpresas';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faChevronRight, faEdit, faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 const AdministrarEmpresa = () => {
   const [data, setData] = useState([]);
@@ -175,7 +175,7 @@ const AdministrarEmpresa = () => {
                           <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => Edit(item.rucEmpresa,item.razonEmpresa
                             ,item.direccionEmpresa,item.telefonoEmpresa,item.responsableEmpresa,item.emailEmpresa
                           )} />
-                          <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 cursor-pointer" onClick={() => {deleteRol(item.rucEmpresa)}} />
+                          <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() => {deleteRol(item.rucEmpresa)}} />
                         </td>
                       <td className="border border-gray-300 px-2 py-1">{item.rucEmpresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.razonEmpresa}</td>
@@ -187,6 +187,16 @@ const AdministrarEmpresa = () => {
                   ))}
                 </tbody>
               </table>
+              <div className="flex justify-center bg-gray-100 rounded-lg p-4 md:px-6 md:py-4 md:mx-4 md:my-2">
+                <div className="flex items-center ml-2 md:ml-4">
+                  <FontAwesomeIcon icon={faEdit} className="text-blue-500" />
+                  <p className="text-sm ml-2 md:ml-4">Editar</p>
+                </div>
+                <div className="flex items-center ml-6 md:ml-8">
+                  <FontAwesomeIcon icon={faTrash} className="text-red-500" />
+                  <p className="text-sm ml-2 md:ml-4">Eliminar</p>
+                </div>
+              </div>
             </div>
           )}
         </div>
