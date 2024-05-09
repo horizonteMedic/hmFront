@@ -13,11 +13,11 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
     setShowModal(false);
   };
 
-  const AleertSucces = () => {
+  const showAlert = (title, text, icon) => {
     Swal.fire({
-      title: "¡Exito!",
-      text: "Se ha asigando una Nueva Empresa",
-      icon: "success",
+      title: title,
+      text: text,
+      icon: icon,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Aceptar"
@@ -34,10 +34,11 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token }) => {
     const newSede = { nombre, codigo, estado, fecha, responsable };
     postFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede', token, newSede)
       .then(() => {
-        AleertSucces();
+        showAlert('¡Éxito!', 'Se ha asignado una Nueva Empresa', 'success');
       })
       .catch(error => {
         console.error('Error', error);
+        showAlert('Error', 'Ha ocurrido un error al crear la sede', 'error');
       })
       .finally(() => {
         setCreating(false);

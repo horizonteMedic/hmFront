@@ -5,6 +5,7 @@ import { useAuthStore } from '../../../../../store/auth';
 import AgregarSedeModal from '../AgregarSede/ModalAgregarSede/ModalAgregarSede';
 import { faChevronLeft, faChevronRight, faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import EditSedeModal from '../AgregarSede/EditSedeModal/EditSedeModal';
 
 import Swal from 'sweetalert2';
 
@@ -60,8 +61,9 @@ const AdministrarSedes = () => {
     setEstado(estado);
     setFecha(fecha);
     setResponsable(responsable);
-    setShowEditModal(true);
+    setShowEditModal(true); // Mostrar modal de edición
   };
+  
 
   const deleteSede = (id) => {
     Swal.fire({
@@ -199,7 +201,18 @@ const AdministrarSedes = () => {
       {/* Mostrar el modal para agregar una sede */}
       {showModal && <AgregarSedeModal setShowModal={setShowModal} Refresgpag={Refresgpag} token={token} />}
       {/* Mostrar el modal de edición */}
-      {showEditModal && <EditSedeModal setShowEditModal={setShowEditModal} Refresgpag={Refresgpag} token={token} nombre={nombre} codigo={codigo} estado={estado} fecha={fecha} responsable={responsable} />}
+      {showEditModal && (
+        <EditSedeModal
+          setShowEditModal={setShowEditModal}
+          Refresgpag={Refresgpag}
+          token={token}
+          nombre={nombre}
+          codigo={codigo}
+          estado={estado}
+          fecha={fecha}
+          responsable={responsable}
+        />
+      )}
     </div>
   );
 };

@@ -51,11 +51,14 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
   ];
 
   const handleChange = e => {
+    const { name, value } = e.target;
+    const capitalizedValue = value.replace(/\b\w/g, char => char.toUpperCase());
     setDatosEditados({
       ...datosEditados,
-      [e.target.name]: e.target.value,
+      [name]: capitalizedValue,
     });
   };
+  
 
   const handleColor = (e) => {
     const selectedColor = colores.find(colores => colores.nombre === e.target.value);
@@ -127,7 +130,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
             </div>
             <div className="flex justify-end">
               <button type="submit" onClick={handleSubmit} disabled={creating}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600">{creating ? 'Editando Archivo...' : 'Editar Archivo'}</button>
+              className="px-4 py-2  rounded-md azul-btn">{creating ? 'Editando Archivo...' : 'Editar Archivo'}</button>
             </div>
           </form>
         </div>

@@ -72,8 +72,10 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
         })
   };
 
-
-
+  const capitalizeFirstLetter = (string) => {
+    return string.replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+  
   // Array de opciones para el select de extensiones
   const extensiones = [
     'pdf',
@@ -97,20 +99,18 @@ const NuevoArchivoModal = ({ CerrarModal,Refresgpag, token, userlogued }) => {
   return (
     <>
 
-        <div className="fixed z-10 inset-0 overflow-y-auto flex items-center justify-center">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center w-[90%]">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">
-              &#8203;
-            </span>
-            <div className="inline-block align-middle bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <FontAwesomeIcon
+<div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
+      <FontAwesomeIcon
                 icon={faTimes}
                 className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
                 onClick={CerrarModal}
-              />
+        />
+        <div className="p-3 azuloscurobackground flex justify-between">
+          <h1 className="text-start font-bold color-azul text-white">Editar Archivo</h1>
+        </div>
+        <div className='container p-4'>
+            
               <form>
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="mb-4">
