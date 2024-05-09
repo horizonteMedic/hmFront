@@ -102,7 +102,7 @@ const ListaArchivosPorServidores = () => {
               <table className="table-auto min-w-full divide-y divide-gray-200 mb-4">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th> */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Extensión</th>
@@ -115,7 +115,7 @@ const ListaArchivosPorServidores = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {data?.map(item => (
                     <tr key={item.id}>
-                      <td className="border border-gray-300 px-2 py-1">{item.id}</td>
+                      {/* <td className="border border-gray-300 px-2 py-1">{item.id}</td> */}
                       <td className="border border-gray-300 px-2 py-1 text-center">
                         <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => handleEdit(item)} />
                         <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() => {deleteArchivo(item.id)}} />

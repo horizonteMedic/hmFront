@@ -6,7 +6,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
   const [nombre, setNombre] = useState('');
   const [codigo, setCodigo] = useState('');
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
   const [creating, setCreating] = useState(false);
 
   const handleCloseModal = () => {

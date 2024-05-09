@@ -10,7 +10,7 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
   const [extension, setExtension] = useState('');
   const [color, setColor] = useState('');
   const [codigo, setCodigo] = useState('');
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
   const [creating, setCreating] = useState(false);
   const extensiones = [  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'mp4', 'avi', 'mov',  'zip',  'rar', '7z',
 ];

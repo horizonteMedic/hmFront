@@ -55,7 +55,7 @@ const AddNewSedeUserModal = ({ closeModal,Refresgpag, id_user,userlogued, token 
 
     return (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-            <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[500px] h-auto relative">
+            <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] h-auto relative">
 
                 <div className="p azuloscurobackground flex justify-between p-3.5">
                     <h1 className="text-start font-bold color-azul text-white">Agregar Nueva Sede</h1>
@@ -67,9 +67,9 @@ const AddNewSedeUserModal = ({ closeModal,Refresgpag, id_user,userlogued, token 
                             id="sedeName"
                             value={selectedSede}
                             onChange={(e) => setSelectedSede(e.target.value)}
-                            className="border border-gray-400 p-2 rounded-md mb-4 w-full"
+                            className="border border-gray-400 p-2 rounded-md mb-4 w-full pointer"
                         >
-                            <option value="">{data ? 'Seleccione una Sede...' : 'Espera un momento'}</option>
+                            <option value="">{data ? 'Seleccione...' : 'Espera un momento'}</option>
                             {data?.map((option, index) => (
                                 <option key={index} value={option.id}>{option.nombreSede}</option>
                             ))}

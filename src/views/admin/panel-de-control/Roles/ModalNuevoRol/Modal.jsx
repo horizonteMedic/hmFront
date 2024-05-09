@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 const Modal = ({ closeModal, Refresgpag }) => {
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
 
@@ -32,7 +32,11 @@ const Modal = ({ closeModal, Refresgpag }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    NewRol(rol, descripcion,estado,token,userlogued.sub)
+    if (!rol || !descripcion) {
+      showAlert('Error', 'Por favor, complete todos los campos.', 'error');
+      return;
+    }
+    NewRol(rol, descripcion, estado, token, userlogued.sub)
       .then(data => {
         AleertSucces()
       })
@@ -40,6 +44,18 @@ const Modal = ({ closeModal, Refresgpag }) => {
         console.error('Error:', error)
       })
   };
+  
+  const showAlert = (title, text, icon) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: icon,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    });
+  };
+  
 
   const handleRolChange = (e) => {
     const capitalized = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
@@ -66,40 +82,42 @@ const Modal = ({ closeModal, Refresgpag }) => {
         <div className='container p-4'>
           <form  autoComplete='off' >
             <div className="flex flex-col items-start justify-center w-auto">
-              <div className='flex py-3 justify-center items-center w-full'>
-                <label htmlFor="tipoDocumento" className="text-left w-full block ">
-                  Nombre de Rol
-                </label>
-                <input
-                  type="text"
-                  required
-                  id="numeroDocumento"
-                  onChange={handleRolChange}
-                  value={rol}
-                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                />
-              </div>
-              <div className='flex py-3 justify-center items-center w-full'>
-                <label htmlFor="numeroDocumento" className="text-left w-full block ">
-                  Descripción
-                </label>
-                <input
-                  type="text"
-                  required
-                  id="numeroDocumento"
-                  onChange={handleDescripcionChange}
-                  value={descripcion}
-                  className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-                />
-              </div>
+            <div className='flex py-2 items-center w-full'>
+              <label htmlFor="tipoDocumento" className="text-left w-32">
+                Nombre de Rol
+              </label>
+              <input
+                type="text"
+                required
+                id="numeroDocumento"
+                onChange={handleRolChange}
+                value={rol}
+                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+              />
+            </div>
+            <div className='flex py-2 items-center w-full'>
+              <label htmlFor="numeroDocumento" className="text-left w-32">
+                Descripción
+              </label>
+              <input
+                type="text"
+                required
+                id="numeroDocumento"
+                onChange={handleDescripcionChange}
+                value={descripcion}
+                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+              />
+            </div>
+
               <div className="form-check py-4 form-switch pl-0 w-full flex justify-start items-center">
                 <label className=" form-check-label mr-8"  htmlFor="flexSwitchCheckDefault"> Estado </label>
                 <input 
-                  className="pointer form-check-input !w-10 !ml-0 " 
-                  type="checkbox" 
-                  role="switch"
-                  onChange={(e) => setEstado(e.target.checked)} 
+                type="checkbox"
+                className="form-checkbox h-5 w-5 pointer text-blue-600"
+                checked={estado}
+                onChange={(e) => setEstado(e.target.checked)}
                   id="flexSwitchCheckDefault"/>
+               
               </div>
             </div>
             <div className="flex justify-end">

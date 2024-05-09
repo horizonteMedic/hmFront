@@ -30,7 +30,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
   const [direccion, setDireccion] = useState('')
   const [cargo, setCargo] = useState('')
   //CIP
-  const [activo, setActivo] = React.useState(false);
+  const [activo, setActivo] = React.useState(true);
 
   //Llamada de combobox
   const ListDepartamentos = ComboboxDepartamentos();
@@ -133,7 +133,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
             <div className="grid grid-cols-2 gap-4 mb-4 md:grid-cols-3">
               {/* Primer columna */}
               <div>
-                <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="tipoDocumento" className="block font-medium text-gray-700">
                   Tipo de Documento
                 </label>
                 <select
@@ -150,7 +150,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 </select>
               </div>
               <div>
-                <label htmlFor="numeroDocumento" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="numeroDocumento" className="block  font-medium ">
                   Documento de Identidad D.N.I
                 </label>
                 <input
@@ -169,7 +169,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
 
             </div>
             <div>
-              <label htmlFor="primerNombre" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="primerNombre" className="block  font-medium ">
                 Nombres
               </label>
               <input
@@ -190,7 +190,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="apellidos" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="apellidos" className="block t font-medium ">
                 Apellidos
               </label>
               <input
@@ -211,7 +211,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block font-medium ">
                 Email
               </label>
               <input
@@ -225,7 +225,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
             </div>
             {/* Segunda columna */}
             <div>
-              <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="fechaNacimiento" className="block font-medium ">
                 Fecha de Nacimiento
               </label>
               <DatePicker
@@ -240,7 +240,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="sexo" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="sexo" className="block font-medium ">
                 Sexo
               </label>
               <select
@@ -257,7 +257,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               </select>
             </div>
             <div>
-              <label htmlFor="celular" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="celular" className="block font-medium ">
                 Celular
               </label>
               <input
@@ -275,7 +275,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="departamento" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="departamento" className="block font-medium text-gray-700">
                 Departamento
               </label>
               <select
@@ -292,7 +292,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               </select>
             </div>
             <div>
-              <label htmlFor="provincia" className=" block text-sm font-medium text-gray-700">
+              <label htmlFor="provincia" className=" block font-medium ">
                 Provincia
               </label>
               <select
@@ -309,7 +309,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               </select>
             </div>
             <div>
-              <label htmlFor="distrito" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="distrito" className="block font-medium ">
                 Distrito
               </label>
               <select
@@ -327,7 +327,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
             </div>
             {/* Tercera columna */}
             <div>
-              <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="direccion" className="block font-medium ">
                 Dirección
               </label>
               <input
@@ -340,7 +340,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="cargo" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="cargo" className="block font-medium ">
                 Cargo
               </label>
               <input
@@ -361,7 +361,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="cip" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="cip" className="block  font-medium text-gray-700">
                 CIP
               </label>
               <input
@@ -371,7 +371,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
               />
             </div>
             <div>
-              <label htmlFor="activo" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="activo" className="block  font-medium text-gray-700">
                 Activo
               </label>
               <input

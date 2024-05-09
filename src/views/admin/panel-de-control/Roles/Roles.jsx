@@ -116,11 +116,11 @@ const Roles = () => {
           <h1 className="text-start font-bold color-azul text-white">Roles</h1>
         </div>
           
-        <div className="flex items-center mt-2 mr-4">
+        <div className="flex items-center pt-3 mr-4">
           <div className="relative ml-auto"> 
             <button onClick={openModal} className="flex items-center px-4 py-2 azul-btn rounded-md">
               <FontAwesomeIcon icon={faPlus} className="mr-2" />
-              Agregar
+              Agregar Nuevo rol
             </button>
           </div>
         </div>
@@ -129,7 +129,7 @@ const Roles = () => {
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-2 py-1">Nro.</th>
+                {/* <th className="border border-gray-300 px-2 py-1">Nro.</th> */}
                 <th className="border border-gray-300 px-2 py-1">Acciones</th>
                 <th className="border border-gray-300 px-2 py-1">Nombres</th>
                 <th className="border border-gray-300 px-2 py-1">Descripción</th>
@@ -139,10 +139,10 @@ const Roles = () => {
             <tbody>
               {data?.map((item, index) => (
                 <tr key={index}>
-                  <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                  <td className="border border-gray-300 px-2 py-1">
-                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
+                  {/* <td className="border border-gray-300 px-2 py-1">{index + 1}</td> */}
+                  <td className="border border-gray-300 px-2 py-1 text-center">
+                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-4 cursor-pointer" />
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-4 cursor-pointer" />
                     <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 mr-2 cursor-pointer" />
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>

@@ -1,38 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faCog, faUsers, faTrash,faCheckCircle,faBan } from '@fortawesome/free-solid-svg-icons';
-
+import { faEdit, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
 import UsersModal from './ModalViewUser/ModalViewUser';
-
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
-
 import Swal from 'sweetalert2'
-import DeleteEmpleado from '../Accesos/model/DeleteEmpleado'; // Importa la función deleteEmpleado
+import DeleteEmpleado from '../Accesos/model/DeleteEmpleado'; 
 
 const Accesos = () => {
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-
-  //Consulta de la API
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
   const [refres, setRefresh] = useState(0)
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
-  const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); // Nuevo estado para el modal de registro de usuario
+  const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); 
   const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false)
-
   const [idEmpleado, SetIdEmpleado] = useState('')
 
-  //Para Editar
   const [tipoDocumento, setTipoDocumento] = React.useState('');
   const [nrodoc, setNrodoc] = useState('')
   const [nombres, setNombres] = useState('')
@@ -40,16 +32,13 @@ const Accesos = () => {
   const [email, setEmail] = useState('')
   const [startDate, setStartDate] = React.useState(null);
   const [cip, setCip] = useState('')
-  //Sexo
   const [sexo, setSexo] = React.useState('');
   const [celular, setCelular] = useState('')
   const [departamento, setDepartamento] = React.useState('');
   const [provincia, setProvincia] = React.useState('');
   const [distrito, setDistrito] = React.useState('');
-  //Se le pasa el distrito
   const [direccion, setDireccion] = useState('')
   const [cargo, setCargo] = useState('')
-  //CIP
   const [activo, setActivo] = React.useState(false);
   const [fechainicio, setFechainicio] = useState('');
   const [userRegistro, setUserRegistro] = useState('');
@@ -103,16 +92,15 @@ const Accesos = () => {
     setIsEditModalOpen(true);
   };
 
-  //Editar Empleado
   const closeEditModal = () => {
     setIsEditModalOpen(false);
   };
 
-  const openConfigurarAccesosModal = () => { // Función para abrir el modal de configuración
+  const openConfigurarAccesosModal = () => { 
     setIsConfigurarAccesosModalOpen(true);
   };
 
-  const closeConfigurarAccesosModal = () => { // Función para cerrar el modal de configuración
+  const closeConfigurarAccesosModal = () => { 
     setIsConfigurarAccesosModalOpen(false);
   };
   
@@ -128,8 +116,6 @@ const Accesos = () => {
     SetIdEmpleado(id)
     isViewUsersModalOpen ? SetIsViewUsersModalOpen(false) : SetIsViewUsersModalOpen(true)
   }
-
-  //Delete Empleado
   const deleteEmpleado = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
     fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
     Swal.fire({
@@ -187,7 +173,7 @@ const Accesos = () => {
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
               <tr className="bg-gray-200">
-                <th className="border border-gray-300 px-2 py-1">Nro.</th>
+                {/* <th className="border border-gray-300 px-2 py-1">Nro.</th> */}
                 <th className="border border-gray-300 px-2 py-1">Acciones</th>
                 <th className="border border-gray-300 px-2 py-1">Tipo Doc.</th>
                 <th className="border border-gray-300 px-2 py-1">Número</th>
@@ -200,14 +186,12 @@ const Accesos = () => {
             <tbody>
             {data?.map((item, index) => (
                 <tr key={index}>
-                <td className="border border-gray-300 px-2 py-1">{item.id_empleado}</td>
-                <td className="border border-gray-300 px-2 py-1">
+                {/* <td className="border border-gray-300 px-2 py-1">{item.id_empleado}</td> */}
+                <td className="border border-gray-300 px-2 py-1  text-center">
                   <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
                   item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
                   item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} 
                   title="Editar" />
-                  {/* <FontAwesomeIcon icon={faCog} className="text-green-500 mr-2 cursor-pointer" onClick={openConfigurarAccesosModal} 
-                  title="Configurar Accesos" /> */}
                   <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-4  cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
                   title="Ver Usuarios" />
                   <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 

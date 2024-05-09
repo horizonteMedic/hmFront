@@ -15,8 +15,8 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
 
     function AleertSucces() {
       Swal.fire({
-        title: "¡Exito!",
-        text: "Se ha Editaro el Rol!",
+        title: "¡Éxito!",
+        text: "¡Se ha editado el Rol!",
         icon: "success",
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
@@ -40,6 +40,10 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
             })
       };
 
+    const capitalizeFirstLetter = (value) => {
+        return value.replace(/\b\w/g, (char) => char.toUpperCase());
+    };
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
   <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
@@ -61,10 +65,10 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
             </label>
             <input
               type="text"
-              value={newrol}
+              value={capitalizeFirstLetter(newrol)}
               required
               id="numeroDocumento"
-              onChange={(e) => setNewRol(e.target.value)}
+              onChange={(e) => setNewRol(capitalizeFirstLetter(e.target.value))}
               className="border border-gray-300 px-3 py-2 rounded-md w-2/3 focus:outline-none bg-white"
             />
           </div>
@@ -75,16 +79,16 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
             <input
               type="text"
               required
-              value={newdescripcion}
+              value={capitalizeFirstLetter(newdescripcion)}
               id="numeroDocumento"
-              onChange={(e) => setNewDescripcion(e.target.value)}
+              onChange={(e) => setNewDescripcion(capitalizeFirstLetter(e.target.value))}
               className="border border-gray-300 px-3 py-2 rounded-md w-2/3 focus:outline-none bg-white"
             />
           </div>
           <div className="form-check py-4 form-switch pl-0 w-full flex justify-start items-center">
             <label className="form-check-label mr-8" htmlFor="flexSwitchCheckDefault">Estado</label>
             <input
-              className="pointer form-check-input !w-10 !ml-0"
+              className="pointer  !w-10 !ml-0"
               type="checkbox"
               checked={newestado}
               role="switch"

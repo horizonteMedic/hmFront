@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { faTimes, faTrash, faTentArrowDownToLine, faBuilding, faLock } from '@fortawesome/free-solid-svg-icons'; // Agregado faBuilding
+import { faTimes, faTrash, faTentArrowDownToLine, faBuilding, faLock } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser';
-import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; // Importamos el nuevo modal
+import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; 
 import { ListUser, DeleteUsers } from '../model/ListUserID';
 import TableRoles from '../RolesUsuario/TableRoles';
 
 const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const [data, setData] = useState([]);
     const [showAsignarSedeUser, setShowAsignarSedeUser] = useState(false);
-    const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false); // Estado para controlar la visibilidad del nuevo modal
+    const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false); 
     const [openModalRol, setOpenModalRol] = useState(false)
     const [iduser, setIduser] = useState('')
     const [username, setUsername] = useState('')
@@ -77,19 +76,19 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const handleAsignarEmpresaContrataIconClick = (id,username) => {
         setIduser(id)
         setUsername(username)
-        setShowAsignarEmpresaContrataModal(true); // Abrir el nuevo modal
+        setShowAsignarEmpresaContrataModal(true); 
     };
 
     const handleAsignarRol = (id,username) => {
         setIduser(id)
         setUsername(username)
-        setOpenModalRol(true); // Abrir el nuevo modal Rol
+        setOpenModalRol(true);  
     };
 
     return (
         <>
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-                <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[880px] relative">
+                <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[600px] relative">
 
                     <FontAwesomeIcon
                         icon={faTimes}
@@ -113,20 +112,22 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                 {data.map((item, index) => (
                                     <tr key={index}>
                                         <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
-                                        <td className="border border-gray-300 px-2 py-1">
-                                            <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 cursor-pointer" />
-                                            <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={()=> {handleConfigIconClick(item.idUser,item.username)}} className="text-blue-500 ml-2 cursor-pointer" />
-                                            {/* Agregamos el icono para asignar empresa contratante */}
-                                            <FontAwesomeIcon icon={faBuilding} onClick={() => {handleAsignarEmpresaContrataIconClick(item.idUser,item.username)}} className="text-green-500 ml-2 cursor-pointer" />
-                                            <FontAwesomeIcon icon={faLock} onClick={() => {handleAsignarRol(item.idUser,item.username)}} className="text-gray-500  ml-2 cursor-pointer" />
+                                        <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 mr-3 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={()=> {handleConfigIconClick(item.idUser,item.username)}} className="text-blue-500 mr-3 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faBuilding} onClick={() => {handleAsignarEmpresaContrataIconClick(item.idUser,item.username)}} className="text-green-500 mr-3 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faLock} onClick={() => {handleAsignarRol(item.idUser,item.username)}} className="text-gray-500  cursor-pointer" />
                                         </td>
                                         <td className="border border-gray-300 px-2 py-1">{item.username}</td>
-                                        <td className={`border border-gray-300 px-2 py-1 ${item.estado ? 'bg-green-300' : 'bg-red-300'}`}>{item.estado ? 'Activo' : 'Inactivo'}</td>
+                                        <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <div style={{ borderRadius: '1rem' }} className={`py-1 px-2 ${item.estado ? 'bg-green-500' : 'bg-red-500'} text-white fw-bold`}>
+                                            {item.estado ? 'Activo' : 'Inactivo'}
+                                            </div>
+                                        </td>                                    
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                        {/* Cuadro de leyenda horizontal o vertical */}
                         <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
                             <div className="flex items-center mb-2 md:mb-0">
                                 <FontAwesomeIcon icon={faTrash} className="text-red-500" />

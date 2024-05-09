@@ -29,13 +29,6 @@ const HistorialPaciente = () => {
       return
     }
   }, [ListSedes,ListEmpresa]);
-
-  const pacientes = [
-    { ac: '001', dni: '12345678', apellidos: 'García', nombres: 'María', fechaExamen: '2024-04-01' },
-    { ac: '002', dni: '23456789', apellidos: 'Rodríguez', nombres: 'Juan', fechaExamen: '2024-04-05' },
-    { ac: '003', dni: '34567890', apellidos: 'Martínez', nombres: 'Ana', fechaExamen: '2024-04-10' }
-  ];
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refres, setRefresh] = useState(1);
@@ -44,7 +37,6 @@ const HistorialPaciente = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filteredPacientes, setFilteredPacientes] = useState([]);
   const today = new Date();
   const options = { timeZone: 'America/Lima' };
   const formattedToday = today.toLocaleDateString('en-CA', options); 
@@ -58,8 +50,22 @@ const HistorialPaciente = () => {
   const [nombrespicker, setNombrespicker] = useState('')
   const [empresa, setEmpresa] = useState('');
   const [contrata, setContrata] = useState('');
+  const [filteredData, setFilteredData] = useState([]);
 
-  //Carga los datos iniciales
+
+  
+useEffect(() => {
+  const results = data.filter(item =>
+    (typeof item.dni === 'number' && item.dni.toString().includes(searchTerm)) ||
+    ((typeof item.apellidos === 'string' || item.apellidos instanceof String) && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    ((typeof item.nombres === 'string' || item.nombres instanceof String) && item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  
+  
+  setFilteredData(results);
+}, [data, searchTerm]);
+
+
   useEffect(() => {
     setLoading(true);
     if (startDate && endDate && sede) {
@@ -82,12 +88,9 @@ const HistorialPaciente = () => {
     }
   }, [startDate, endDate, sede, empresa, contrata]);
   
-  //Carga los datos de las otras sedes
   const SecondPlane = async () => {
     if (startDate && endDate && sede) {
-        // Filtrar las sedes distintas a la primera
         const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
-        // Realizar las peticiones para obtener los datos de las otras sedes
         const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token));
         const otrasSedesData = await Promise.all(fetchPromises);
         const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
@@ -122,18 +125,6 @@ const HistorialPaciente = () => {
   };
 
 
-  useEffect(() => {
-    const filteredByDate = pacientes.filter(paciente => {
-      const examDate = new Date(paciente.fechaExamen).toISOString().split('T')[0];
-      return examDate >= startDate && examDate <= endDate;
-    });
-
-    const filteredByDNI = filteredByDate.filter(paciente => {
-      return paciente.dni.includes(searchTerm);
-    });
-
-    setFilteredPacientes(filteredByDNI);
-  }, [startDate, endDate, searchTerm]);
 
   const reloadTable = () => {
     setIsReloading(true);
@@ -254,9 +245,20 @@ const HistorialPaciente = () => {
             ))}
           </select>
         </div>
+      <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+        <span className="mr-2"><strong>Buscar:</strong></span>
+          <input
+            type="text"
+            className="border rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+            placeholder="Buscar por DNI o nombre"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+      </div>
+
       </div>
         <div className="overflow-x-auto p-3">
-          {loading ? (
+        {loading ? (
             <p className="text-center">Cargando...</p>
           ) : (
             <table className="w-full border border-gray-300">
@@ -271,10 +273,10 @@ const HistorialPaciente = () => {
                 </tr>
               </thead>
               <tbody>
-                {currentData.map((item, index) => (
+                {filteredData.map((item, index) => (
                   <tr key={index}>
                     <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => {openModal(item.dni,item.apellidos,item.nombres)}} className="focus:outline-none">
+                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres) }} className="focus:outline-none">
                         <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
                       </button>
                     </td>
@@ -289,8 +291,6 @@ const HistorialPaciente = () => {
             </table>
           )}
         </div>
-
-        {/* Renderiza los botones de paginación */}
         <div className="flex justify-center p-4">
           <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
             <FontAwesomeIcon icon={faChevronLeft} />

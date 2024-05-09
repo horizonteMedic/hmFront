@@ -11,7 +11,7 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   const [idEmpleado, SetIdEmpleado] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [estado, setEstado] = useState(false);
+  const [estado, setEstado] = useState(true);
   const [empresaContrata, setEmpresaContrata] = useState('');
   const [ruc, setRuc] = useState('');
   const [showPassword, setShowPassword] = useState(false);

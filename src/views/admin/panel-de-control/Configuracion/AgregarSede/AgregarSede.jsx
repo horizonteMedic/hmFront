@@ -3,7 +3,7 @@ import RuterConfig from '../RuterConfig';
 import { getFetch } from '../../getFetch/getFetch';
 import { useAuthStore } from '../../../../../store/auth';
 import AgregarSedeModal from '../AgregarSede/ModalAgregarSede/ModalAgregarSede';
-import { faChevronLeft, faChevronRight, faEdit, faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBan, faCheck, faChevronLeft, faChevronRight, faEdit, faTrash, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { DeleteSede } from '../model/AdministrarSedes';
 import EditSedeModal from '../AgregarSede/EditSedeModal/EditSedeModal';
@@ -133,9 +133,9 @@ const AdministrarSedes = () => {
               <table className="table-auto min-w-full divide-y divide-gray-200 mb-4">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Orden
-                    </th>
+                    </th> */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Acciones
                     </th>
@@ -156,14 +156,20 @@ const AdministrarSedes = () => {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {data.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => (
                     <tr key={index}>
-                      <td className="border border-gray-300 px-2 py-1">{item.id}</td>
+                      {/* <td className="border border-gray-300 px-2 py-1">{item.id}</td> */}
                       <td className="border border-gray-300 px-2 py-1 text-center">
                         <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => {Edit(item)}} />
                         <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() => {deleteSede(item.id)}} />
                       </td>
                       <td className="border border-gray-300 px-2 py-1">{item.nombreSede}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.codigoSede}</td>
-                      <td className="border border-gray-300 px-2 py-1">{item.estado ? 'Activado' : 'Desactivado'}</td>
+                      <td className="border border-gray-300 px-2 py-1 text-center">
+                        {item.estado ? (
+                          <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} className="text-red-500" />
+                        )}
+                      </td>
                       <td className="border border-gray-300 px-2 py-1">{item.fechaRegistro}</td>
                     </tr>
                   ))}
@@ -177,6 +183,14 @@ const AdministrarSedes = () => {
                 <div className="flex items-center ml-6 md:ml-8">
                   <FontAwesomeIcon icon={faTrash} className="text-red-500" />
                   <p className="text-sm ml-2 md:ml-4">Eliminar</p>
+                </div>
+                <div className="flex items-center ml-2 md:ml-4">
+                  <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                  <p className="text-sm ml-2 md:ml-4">Activo</p>
+                </div>
+                <div className="flex items-center ml-6 md:ml-8">
+                  <FontAwesomeIcon icon={faBan} className="text-red-500" />
+                  <p className="text-sm ml-2 md:ml-4">Inactivo</p>
                 </div>
               </div>
             </div>

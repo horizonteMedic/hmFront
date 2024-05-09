@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import AddNewSedeUserModal from '../AddNewSedeUserModal/AddNewSedeUserModal'; // Importa el nuevo componente
+import AddNewSedeUserModal from '../AddNewSedeUserModal/AddNewSedeUserModal'; 
 import { ListSedesxUsername, DeleteSedesxUser } from '../model/ListSedesUser';
 import Swal from 'sweetalert2';
 
@@ -12,7 +12,7 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
 
     const [userName, setUserName] = useState('');
     const [userTableData, setUserTableData] = useState([]);
-    const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
+    const [showAddSedeModal, setShowAddSedeModal] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -78,7 +78,7 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
                 </div>
                 <div className='container p-4'>
                     <div>
-                        <label htmlFor="userName" className="block mb-2">Usuario: {user}</label>
+                        <label htmlFor="userName" className="fw-bold block mb-2">Usuario: {user}</label>
                     </div>
                     <div>
                         {loading ? (
