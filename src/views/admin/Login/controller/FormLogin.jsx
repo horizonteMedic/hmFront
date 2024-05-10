@@ -61,7 +61,13 @@ export function FormLogin() {
             autoComplete="off"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === " ") {
+                e.preventDefault();
+              }
+            }}
           />
+
         </div>
         <div className="mb-2">
           <label className="form-label d-flex justify-content-between align-items-center">
