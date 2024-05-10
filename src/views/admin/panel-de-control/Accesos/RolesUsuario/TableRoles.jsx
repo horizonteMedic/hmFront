@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import AddNewRol from './AddNewRol'; // Importa el nuevo componente
-import { ListSedesxUsername, DeleteSedesxUser } from '../model/ListSedesUser';
+import { ListRolesxUsername, DeleteRolUser } from '../model/ListarRolesUser';
 import Swal from 'sweetalert2';
 
 const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
@@ -13,10 +13,10 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
     const [userName, setUserName] = useState('');
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
-
-   {/* useEffect(() => {
+    console.log(data)
+   useEffect(() => {
         setLoading(true);
-        ListSedesxUsername(id, token)
+        ListRolesxUsername(id, token)
             .then(response => {
                 setData(response);
             })
@@ -26,7 +26,7 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [refres]);*/}
+    }, [refres]);
 
     const Refresgpag = () => {
         setRefresh(refres + +1);
@@ -43,7 +43,7 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
           confirmButtonText: "Si, Eliminar!"
         }).then((result) => {
           if (result.isConfirmed) {
-            DeleteSedesxUser(id,token)
+            DeleteRolUser(id,token)
               .then(() => {
                 Swal.fire({
                   title: "Eliminado!",
@@ -96,11 +96,11 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
                                 <tbody>
                                     {data.map((item, index) => (
                                         <tr key={index}>
-                                            <td className="border border-gray-400 px-4 py-2">{item.idUsuarioSede}</td>
-                                            <td className="border border-gray-400 px-4 py-2">{item.sede}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{item.nombre}</td>
+                                            <td className="border border-gray-400 px-4 py-2">{item.descripcion}</td>
                                             <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
                                             <td className="border border-gray-400 px-4 py-2 text-center">
-                                                <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteSedeUser(item.idUsuarioSede)}} />
+                                                <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteSedeUser(item.idRol)}} />
                                             </td>
                                         </tr>
                                     ))}

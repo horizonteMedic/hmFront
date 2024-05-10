@@ -26,7 +26,7 @@ const AddNewRol = ({ closeModal,Refresgpag, id_user,userlogued, token }) => {
 
     useEffect(() => {
         setLoading(true)
-        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
+        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol/listadoRolesHabilitados', token)
         .then(response => {
           setData(response)
         })
@@ -69,7 +69,7 @@ const AddNewRol = ({ closeModal,Refresgpag, id_user,userlogued, token }) => {
                             onChange={(e) => setSelectedRol(e.target.value)}
                             className="border border-gray-400 p-2 rounded-md mb-4 w-full"
                         >
-                            <option value="">{data ? 'Seleccione una Sede...' : 'Espera un momento'}</option>
+                            <option value="">{data ? 'Seleccione un Rol...' : 'Espera un momento'}</option>
                             {data?.map((option, index) => (
                                 <option key={index} value={option.idRol}>{option.nombre}</option>
                             ))}

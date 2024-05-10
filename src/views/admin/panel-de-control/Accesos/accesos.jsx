@@ -42,7 +42,7 @@ const Accesos = () => {
   const [activo, setActivo] = React.useState(false);
   const [fechainicio, setFechainicio] = useState('');
   const [userRegistro, setUserRegistro] = useState('');
-    console.log(data)
+
   useEffect(() => {
     setLoading(true)
     getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado', token)
