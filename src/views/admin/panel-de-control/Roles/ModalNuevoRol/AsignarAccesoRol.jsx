@@ -193,6 +193,15 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
       });
   };
 
+  const isNodeAssigned = (nodeId) => {
+    const assignedNode = dataasignacion.find(item => item.id_opcion_interfaz === nodeId);
+    if (assignedNode) {
+      return { assigned: true, id: assignedNode.id };
+    } else {
+      return { assigned: false, id: null };
+    }
+  };
+  
   
   const treeData = buildTree(data);
 
@@ -204,6 +213,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
           <button onClick={closeModal} className="text-gray-600 hover:text-gray-800">
             Cerrar
           </button>
+
         </div>
         <div className="p-4">
           <div className="modal-body relative">
