@@ -188,11 +188,11 @@ const Accesos = () => {
                 <tr key={index}>
                 {/* <td className="border border-gray-300 px-2 py-1">{item.id_empleado}</td> */}
                 <td className="border border-gray-300 px-2 py-1  text-center">
-                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
+                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
                   item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
                   item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} 
                   title="Editar" />
-                  <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-4  cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
+                  <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-2 cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
                   title="Ver Usuarios" />
                   <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
                   item.direccion, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} className="text-red-500 cursor-pointer" 

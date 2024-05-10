@@ -8,7 +8,7 @@ import { useAuthStore } from '../../../../store/auth';
 import EditModal from './ModalNuevoRol/EditRol';
 import Swal from 'sweetalert2';
 import DeleteRol from './model/DeleteRol';
-import ModalAsignarAccesoRol from './ModalNuevoRol/AsignarAccesoRol'; 
+import ModalAsignarVistasPorRol from './ModalNuevoRol/AsignarAccesoRol'; 
 
 const Roles = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -141,8 +141,8 @@ const Roles = () => {
                 <tr key={index}>
                   {/* <td className="border border-gray-300 px-2 py-1">{index + 1}</td> */}
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-4 cursor-pointer" />
-                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-4 cursor-pointer" />
+                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
                     <FontAwesomeIcon icon={faLock} onClick={openAccessModal} className="text-gray-500 mr-2 cursor-pointer" />
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
@@ -186,8 +186,9 @@ const Roles = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
-      {isModalAccessOpen && <ModalAsignarAccesoRol closeModal={closeAccessModal} token={token} />} 
-    </div>
+  {/* Modal para asignar vistas por rol */}
+      {isModalAccessOpen && <ModalAsignarVistasPorRol closeModal={closeAccessModal} />}
+    </div>   
   );
 };
 

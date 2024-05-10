@@ -1,4 +1,20 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faCogs, faFileAlt, faBuilding, faLock, faList, faTentArrowDownToLine, faHandshake, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
+
+const iconMapping = {
+  'Sistema': faCogs,
+  'Roles': faUser,
+  'Accesos': faLock,
+  'Reportes': faFileAlt,
+  'Matriz Postulante': faList,
+  'Configuración': faCogs,
+  'Lista de Archivos': faFileAlt,
+  'Administrar Sedes': faTentArrowDownToLine,
+  'Agregar Campaña': faNotesMedical,
+  'Administrar Empresas': faBuilding,
+  'Administrar Contratas': faHandshake
+};
 
 const ArrowIcon = ({ isOpen, toggle }) => {
   return (
@@ -22,12 +38,107 @@ const ArrowIcon = ({ isOpen, toggle }) => {
   );
 };
 
-const ModalAsignarAccesoRol = ({ closeModal, token }) => {
+const TreeNode = ({ node, isParent }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleContent = () => {
+  const handleToggle = () => {
     setIsOpen(!isOpen);
   };
+
+  const handleCheckbox = (e) => {
+    // Handle checkbox logic here
+    e.stopPropagation(); // Prevent parent node from toggling
+  };
+
+  return (
+    <div className={`mt-2 mb-2 ${isParent ? '' : ''}`}>
+      <div className="flex items-center">
+        <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
+        <button
+          className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
+          onClick={handleToggle}
+          style={{ backgroundColor: isParent ? '#233245 '  : '#fc6b03' }}
+        >
+          <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
+          {node.label}
+        </button>
+        <input
+          type="checkbox"
+          className="ml-auto pointer"
+          onClick={handleCheckbox}
+        />
+      </div>
+      {isOpen && (
+        <div style={{ marginLeft: 20 }}>
+          {node.children.map((child) => (
+            <TreeNode key={child.id} node={child} isParent={false} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const MyTreeView = ({ closeModal }) => {
+  const treeData = [
+    {
+      id: 1,
+      label: 'Sistema',
+      children: [
+        {
+          id: 2,
+          label: 'Roles',
+          children: [],
+        },
+        {
+          id: 3,
+          label: 'Accesos',
+          children: [],
+        },
+        {
+          id: 4,
+          label: 'Reportes',
+          children: [],
+        },
+        {
+          id: 5,
+          label: 'Matriz Postulante',
+          children: [],
+        },
+      ],
+    },
+    {
+      id: 6,
+      label: 'Configuración',
+      children: [
+        {
+          id: 7,
+          label: 'Lista de Archivos',
+          children: [],
+        },
+        {
+          id: 8,
+          label: 'Administrar Sedes',
+          children: [],
+        },
+        {
+          id: 9,
+          label: 'Agregar Campaña',
+          children: [],
+        },
+        {
+          id: 10,
+          label: 'Administrar Empresas',
+          children: [],
+        },
+        {
+          id: 11,
+          label: 'Administrar Contratas',
+          children: [],
+        },
+      ],
+    },
+  ];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -42,80 +153,19 @@ const ModalAsignarAccesoRol = ({ closeModal, token }) => {
           <div className="modal-body relative">
             <div className="tree smart-form">
               <ul role="tree">
-                <li className="parent_li" role="treeitem">
-                  <label className="flex items-center">
-                    <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                    <span className="ml-1">SISTEMA</span>
-                    <ArrowIcon isOpen={isOpen} toggle={toggleContent} />
-                  </label>
-                  {isOpen && (
-                    <ul role="group" className="ml-4 mt-2">
-                      <li className="parent_li" role="treeitem">
-                        <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                          <span className="ml-1">Roles</span>
-                        </label>
-                      </li>
-                      <li className="parent_li" role="treeitem">
-                        <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                          <span className="ml-1">Accesos</span>
-                        </label>
-                      </li>
-                      <li className="parent_li" role="treeitem">
-                        <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                          <span className="ml-1">Reportes</span>
-                        </label>
-                      </li>
-                      <li className="parent_li" role="treeitem">
-                        <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                          <span className="ml-1">M. Postulante</span>
-                        </label>
-                      </li>
-                      <li className="parent_li" role="treeitem">
-                        <label className="flex items-center">
-                          <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                          <span className="ml-1">Configuración</span>
-                          <ArrowIcon isOpen={false} toggle={() => {}} /> {/* Flecha sin funcionalidad */}
-                        </label>
-                        {/* Contenido que se muestra al abrir Configuración */}
-                        <ul role="group" className="ml-4 mt-2">
-                          <li className="parent_li" role="treeitem">
-                            <label className="flex items-center">
-                              <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                              <span className="ml-1">Archivos</span>
-                            </label>
-                          </li>
-                          <li className="parent_li" role="treeitem">
-                            <label className="flex items-center">
-                              <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                              <span className="ml-1">Agregar Sede</span>
-                            </label>
-                          </li>
-                          <li className="parent_li" role="treeitem">
-                            <label className="flex items-center">
-                              <input type="checkbox" className="form-checkbox text-green-500 mr-2" />
-                              <span className="ml-1">Agregar Campaña</span>
-                            </label>
-                          </li>
-                        </ul>
-                        {/* Fin del contenido */}
-                      </li>
-                    </ul>
-                  )}
-                </li>
+                {treeData.map((node) => (
+                  <TreeNode key={node.id} node={node} isParent={true} />
+                ))}
               </ul>
             </div>
           </div>
         </div>
         <div className="px-4 py-2 flex justify-end bg-gray-200">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Asignar</button>
+          <button className="px-4 py-2 azul-btn rounded-md">Asignar</button>
         </div>
       </div>
     </div>
   );
 };
 
-export default ModalAsignarAccesoRol;
+export default MyTreeView;
