@@ -26,7 +26,6 @@ const Roles = () => {
   const [descripcion, setDescripcion] = useState('');
   const [estado, setEstado] = useState(true);
 
-  console.log(data)
   useEffect(() => {
     setLoading(true)
     getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)

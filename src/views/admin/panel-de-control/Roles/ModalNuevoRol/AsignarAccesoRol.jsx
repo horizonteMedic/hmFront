@@ -41,35 +41,69 @@ const ArrowIcon = ({ isOpen, toggle }) => {
   );
 };
 
-const TreeNode = ({ node, isParent,isChecked,ID_ROL,userlogued,token,Refresgpag}) => {
+const TreeNode = ({ node, isParent, asigned ,ID_ROL,userlogued,token,Refresgpag}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { assigned, id } = isChecked;
-  
+  const [isChecked, setIsChecked] = useState(false);
+  const [idAsignation, setIdAsignation] = useState('')
+
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
+  useEffect(() => {
+    const assignedNode = asigned.find(item => item.id_opcion_interfaz === node.id);
+    setIsChecked(assignedNode ? true : false);
+    setIdAsignation(assignedNode ? assignedNode.id : '');
+  }, [node.id]);
 
-  function AleertSucces() {
+  function AleertSuccesCreate() {
     Swal.fire({
-      title: "¡Exito!",
-      text: "Se ha asignado esta vista al Rol",
-      icon: "success",
+      title: "¿Estas Seguro?",
+      text: "Deseas asignar esta vista a este Rol?",
+      icon: "warning",
+      showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Aceptar"
+      confirmButtonText: "Si, Asignar!"
     }).then((result) => {
       if (result.isConfirmed) {
-        Refresgpag()
+        Swal.fire({
+          title: "Asignado!",
+          text: "Se ha asignado correctamente.",
+          icon: "success"
+        }).then((result) => {
+          if (result.isConfirmed) Refresgpag()
+        });
       }
     });
   }
 
+  function AleertSuccesDelete() {
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "Deseas quitar esta vista al Rol?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Eliminado!",
+          text: "Se ha quitado la asignacion.",
+          icon: "success"
+        }).then((result) => {
+          if (result.isConfirmed) Refresgpag()
+        });
+      }
+    });
+  }
 
   const handleClick = () => {
-    if (assigned) {
-      DeleteVistaxRol(id,token)
+    if (isChecked) {
+      DeleteVistaxRol(idAsignation,token)
         .then(data => {
-          AleertSucces();
+          AleertSuccesDelete();
         })
         .catch(error => {
           console.error('Error:', error);
@@ -82,7 +116,7 @@ const TreeNode = ({ node, isParent,isChecked,ID_ROL,userlogued,token,Refresgpag}
       };
       NewVistaxRol(datos, userlogued, token)
         .then(data => {
-          AleertSucces();
+          AleertSuccesCreate();
         })
         .catch(error => {
           console.error('Error:', error);
@@ -104,14 +138,15 @@ const TreeNode = ({ node, isParent,isChecked,ID_ROL,userlogued,token,Refresgpag}
         </button>
         <input
           type="checkbox"
+          disabled
           className="ml-auto pointer"
-          checked={assigned} 
+          checked={isChecked} 
         />
       </div>
       {isOpen && (
         <div style={{ marginLeft: 20 }}>
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} isParent={false} isChecked={isChecked} ID_ROL={ID_ROL} userlogued={userlogued} token={token} Refresgpag={Refresgpag} />
+            <TreeNode key={child.id} node={child} isParent={false} asigned={asigned} ID_ROL={ID_ROL} userlogued={userlogued} token={token} Refresgpag={Refresgpag} />
           ))}
         </div>
       )}
@@ -158,15 +193,6 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
       });
   };
 
-  const isNodeAssigned = (nodeId) => {
-    const assignedNode = dataasignacion.find(item => item.id_opcion_interfaz === nodeId);
-    if (assignedNode) {
-      return { assigned: true, id: assignedNode.id };
-    } else {
-      return { assigned: false, id: null };
-    }
-  };
-  
   
   const treeData = buildTree(data);
 
@@ -184,7 +210,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
             <div className="tree smart-form">
               <ul role="tree">
                 {treeData.map((node) => (
-                  <TreeNode key={node.id} node={node} isParent={true} id_asignacion={dataasignacion.id} isChecked={isNodeAssigned(node.id)} ID_ROL={ID_ROL} userlogued={userlogued} token={token} Refresgpag={Refresgpag} />
+                  <TreeNode key={node.id} node={node} isParent={true} asigned={dataasignacion} ID_ROL={ID_ROL} userlogued={userlogued} token={token} Refresgpag={Refresgpag} />
                 ))}
               </ul>
             </div>
