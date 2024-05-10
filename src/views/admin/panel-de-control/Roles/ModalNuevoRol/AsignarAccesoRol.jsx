@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faCogs, faFileAlt, faBuilding, faLock, faList, faTentArrowDownToLine, faHandshake, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
+import { getFetch } from '../../getFetch/getFetch';
+import { ListViewxRol, NewVistaxRol, DeleteVistaxRol } from '../model/ListViewxRol';
+import Swal from 'sweetalert2';
 
 const iconMapping = {
   'Sistema': faCogs,
-  'Roles': faUser,
-  'Accesos': faLock,
+  'Menú de Roles': faUser,
+  'Menú de Accesos': faLock,
   'Reportes': faFileAlt,
   'Matriz Postulante': faList,
-  'Configuración': faCogs,
-  'Lista de Archivos': faFileAlt,
+  'Configuracion': faCogs,
+  'Administrar Archivos': faFileAlt,
   'Administrar Sedes': faTentArrowDownToLine,
   'Agregar Campaña': faNotesMedical,
   'Administrar Empresas': faBuilding,
@@ -38,16 +41,53 @@ const ArrowIcon = ({ isOpen, toggle }) => {
   );
 };
 
-const TreeNode = ({ node, isParent }) => {
+const TreeNode = ({ node, isParent,isChecked,ID_ROL,userlogued,token,Refresgpag}) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  const { assigned, id } = isChecked;
+  
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleCheckbox = (e) => {
-    // Handle checkbox logic here
-    e.stopPropagation(); // Prevent parent node from toggling
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha asignado esta vista al Rol",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Refresgpag()
+      }
+    });
+  }
+
+
+  const handleClick = () => {
+    if (assigned) {
+      DeleteVistaxRol(id,token)
+        .then(data => {
+          AleertSucces();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    } else {
+      const datos = {
+        descripcion: `Acceso a ${node.label}`,
+        id_rol: ID_ROL,
+        id_opcion_interfaz: node.id
+      };
+      NewVistaxRol(datos, userlogued, token)
+        .then(data => {
+          AleertSucces();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
   };
 
   return (
@@ -56,7 +96,7 @@ const TreeNode = ({ node, isParent }) => {
         <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
         <button
           className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
-          onClick={handleToggle}
+          onClick={handleClick}
           style={{ backgroundColor: isParent ? '#233245 '  : '#fc6b03' }}
         >
           <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
@@ -65,13 +105,13 @@ const TreeNode = ({ node, isParent }) => {
         <input
           type="checkbox"
           className="ml-auto pointer"
-          onClick={handleCheckbox}
+          checked={assigned} 
         />
       </div>
       {isOpen && (
         <div style={{ marginLeft: 20 }}>
           {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} isParent={false} />
+            <TreeNode key={child.id} node={child} isParent={false} isChecked={isChecked} ID_ROL={ID_ROL} userlogued={userlogued} token={token} Refresgpag={Refresgpag} />
           ))}
         </div>
       )}
@@ -79,66 +119,56 @@ const TreeNode = ({ node, isParent }) => {
   );
 };
 
-const MyTreeView = ({ closeModal }) => {
-  const treeData = [
-    {
-      id: 1,
-      label: 'Sistema',
-      children: [
-        {
-          id: 2,
-          label: 'Roles',
-          children: [],
-        },
-        {
-          id: 3,
-          label: 'Accesos',
-          children: [],
-        },
-        {
-          id: 4,
-          label: 'Reportes',
-          children: [],
-        },
-        {
-          id: 5,
-          label: 'Matriz Postulante',
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 6,
-      label: 'Configuración',
-      children: [
-        {
-          id: 7,
-          label: 'Lista de Archivos',
-          children: [],
-        },
-        {
-          id: 8,
-          label: 'Administrar Sedes',
-          children: [],
-        },
-        {
-          id: 9,
-          label: 'Agregar Campaña',
-          children: [],
-        },
-        {
-          id: 10,
-          label: 'Administrar Empresas',
-          children: [],
-        },
-        {
-          id: 11,
-          label: 'Administrar Contratas',
-          children: [],
-        },
-      ],
-    },
-  ];
+const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
+  const [data, setData] = useState([])
+  const [dataasignacion, setDataasignacion] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(0)
+
+  useEffect(() => {
+    setLoading(true);
+    // Realizar las dos solicitudes a la API en paralelo usando Promise.all
+    Promise.all([
+      getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/opcionesInterfaz', token),
+      ListViewxRol(ID_ROL, token)
+    ])
+    .then(([opcionesInterfazResponse, listViewxRolResponse]) => {
+      // Establecer los datos para cada solicitud
+      setData(opcionesInterfazResponse);
+      setDataasignacion(listViewxRolResponse);
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.', error);
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+  }, [])
+
+  const buildTree = (data, parentId = null) => {
+    return data
+      .filter(item => item.idPadre === parentId)
+      .map(item => {
+        return {
+          id: item.id,
+          label: item.nombre,
+          children: buildTree(data, item.id),
+          descripcion: item.descripcion
+        };
+      });
+  };
+
+  const isNodeAssigned = (nodeId) => {
+    const assignedNode = dataasignacion.find(item => item.id_opcion_interfaz === nodeId);
+    if (assignedNode) {
+      return { assigned: true, id: assignedNode.id };
+    } else {
+      return { assigned: false, id: null };
+    }
+  };
+  
+  
+  const treeData = buildTree(data);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
@@ -154,7 +184,7 @@ const MyTreeView = ({ closeModal }) => {
             <div className="tree smart-form">
               <ul role="tree">
                 {treeData.map((node) => (
-                  <TreeNode key={node.id} node={node} isParent={true} />
+                  <TreeNode key={node.id} node={node} isParent={true} id_asignacion={dataasignacion.id} isChecked={isNodeAssigned(node.id)} ID_ROL={ID_ROL} userlogued={userlogued} token={token} Refresgpag={Refresgpag} />
                 ))}
               </ul>
             </div>

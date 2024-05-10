@@ -4,13 +4,14 @@ import EstadoSolicitud from "./EstadoLogin";
 import { useAuthStore } from "../../../../store/auth";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faL } from "@fortawesome/free-solid-svg-icons";
 import { Loading } from "../../../components/Loading";
 
 export function FormLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [estado, setEstado] = useState("");
+  const [inhabilitado, setInhabilitado] = useState(false)
   const [showPassword, setShowPassword] = useState(false); // Estado para mostrar u ocultar la contraseña
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.setToken);
@@ -36,15 +37,18 @@ export function FormLogin() {
   const handleSubmit = (event) => {
     event.preventDefault(); // Evitar que la página se recargue
     setloadign(true)
-
     SubmitLogin(username, password)
       .then((data) => {
-        setEstado(data.estado);
-        decodeToken(data.token); //Guarda el token en el local storage
+        console.log(data) //Guarda el token en el local storage
+        if (data.id === 1) {
+          decodeToken(data.mensaje)
+        } else {
+          setInhabilitado(true)
+        }
       })
       .finally(()=> {setloadign(false)})
-      .catch((error) => {
-        console.error("Error al enviar los datos:", error);
+      .catch((data) => {
+        setEstado('Error en el Servidor, intente mas tarde');
       });
   };
 
@@ -110,6 +114,11 @@ export function FormLogin() {
 
       </form>
       {estado && EstadoSolicitud(estado)}
+      {inhabilitado && <div className="text-red-800 bg-pink-100 text-lg p-2 mt-3 rounded-lg transition duration-100 ease-in-out flex justify-center items-center">
+                <p>
+                Usuario inhabilitado o sin rol, contactar con un administrador!!
+                </p>
+            </div>}
       {loading && <Loading/>}
     </>
   );

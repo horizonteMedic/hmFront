@@ -27,7 +27,7 @@ const AddNewSedeUserModal = ({ closeModal,Refresgpag, id_user,userlogued, token 
 
     useEffect(() => {
         setLoading(true)
-        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede', token)
+        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede/listadoSedesHabilitados', token)
         .then(response => {
           setData(response)
         })
