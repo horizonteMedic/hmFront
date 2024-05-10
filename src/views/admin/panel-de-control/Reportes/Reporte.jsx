@@ -54,17 +54,20 @@ const HistorialPaciente = () => {
 
 
   
-useEffect(() => {
-  const results = data.filter(item =>
-    (typeof item.dni === 'number' && item.dni.toString().includes(searchTerm)) ||
-    ((typeof item.apellidos === 'string' || item.apellidos instanceof String) && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    ((typeof item.nombres === 'string' || item.nombres instanceof String) && item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  useEffect(() => {
+    let results = data;
   
+    if (searchTerm) {
+      results = data.filter(item =>
+        (typeof item.dni === 'number' && item.dni.toString().includes(searchTerm)) ||
+        ((typeof item.apellidos === 'string' || item.apellidos instanceof String) && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        ((typeof item.nombres === 'string' || item.nombres instanceof String) && item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
   
-  setFilteredData(results);
-}, [data, searchTerm]);
-
+    setFilteredData(results);
+  }, [data, searchTerm]);
+  
 
   useEffect(() => {
     setLoading(true);
@@ -113,7 +116,8 @@ useEffect(() => {
 
   const handleChangeRecordsPerPage = (e) => {
     setRecordsPerPage(parseInt(e.target.value));
-    setCurrentPage(1); 
+    setCurrentPage(1);
+    setTotalPages(Math.ceil(data.length / parseInt(e.target.value)));
   };
 
   const handleStartDateChange = (e) => {
@@ -147,6 +151,10 @@ useEffect(() => {
         setIsReloading(false); 
       });
   };
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+  
   const visiblePages = () => {
     const totalVisiblePages = 5; 
     const halfVisiblePages = Math.floor(totalVisiblePages / 2);
@@ -174,12 +182,14 @@ useEffect(() => {
       <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4 flex-wrap">
         <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2 fw-bold">Mostrar</span>
-          <select className="border pointer border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
-            <option value={20}>20</option>
-          </select>
+          <select className="border pointer border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={15}>15</option>
+                    <option value={20}>20</option>
+                    <option value={25}>25</option>
+                    <option value={-1}>Todos</option>
+                  </select>
         </div>
         <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Fecha inicio:</strong></span>
@@ -273,7 +283,8 @@ useEffect(() => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData.map((item, index) => (
+              {searchTerm ? (
+                filteredData.map((item, index) => (
                   <tr key={index}>
                     <td className="border border-gray-300 px-3 py-2">
                       <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres) }} className="focus:outline-none">
@@ -286,8 +297,26 @@ useEffect(() => {
                     <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
                   </tr>
-                ))}
+                ))
+              ) : (
+                currentData.map((item, index) => (
+                  <tr key={index}>
+                    <td className="border border-gray-300 px-3 py-2">
+                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres) }} className="focus:outline-none">
+                        <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
+                      </button>
+                    </td>
+                    <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
+                    <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
+                  </tr>
+                ))
+              )}
+
               </tbody>
+
             </table>
           )}
         </div>
