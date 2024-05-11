@@ -35,21 +35,36 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
     if (file) {
+      const fileName = file.name;
+      const fileExtension = fileName.split('.').pop().toLowerCase();
+  
+      if (extension === 'pdf' && fileExtension !== 'pdf') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al subir archivo',
+          text: 'El archivo debe ser un PDF',
+        });
+        return;
+      } else if (extension !== 'pdf' && !['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al subir archivo',
+          text: 'El archivo debe ser una imagen (jpg, jpeg, png)',
+        });
+        return;
+      }
+  
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = e.target.result;
-        
-
         setFilePreview(base64String);
         setFileUploaded(true);
       };
       reader.readAsDataURL(file);
-      //Recupero el nombre del archivo
-      const fileName = file.name;
       setFileName(fileName);
     }
   };
-
+  
   const handleFileInputClick = () => {
     document.getElementById('fileInput').click();
   };
