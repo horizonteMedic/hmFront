@@ -10,6 +10,8 @@ const Navbar = () => {
   const [activeLink, setActiveLink] = useState(""); 
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
+  const listView = useAuthStore(state => state.listView);
+  const allowedRoutes = listView.map(item => `${item.id}`);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -36,6 +38,14 @@ const Navbar = () => {
     setActiveLink(""); 
   };
   
+  const filteredNavLinks = [
+    { to: "/roles", id:"52", label: "Roles", icon: faUser },
+    { to: "/accesos", id:"53", label: "Accesos", icon: faLock },
+    { to: "/reporte-pacientes", id:"54", label: "Reportes", icon: faChartBar },
+    { to: "/matriz-postulante", id:"55", label: "Matriz Postulante", icon: faList },
+    { to: "/configuracion", id:"56", label: "Configuración", icon: faCog }
+  ].filter(navLink => allowedRoutes.includes(navLink.id));
+  
   const Logoutbutton = () => {
     return (
       <button onClick={() => { setToken(null); setuserlogued(null); }} className="group ml-4 min-w-8 flex items-center justify-start w-8 h-8  rounded-full cursor-pointer relative overflow-hidden transition-all duration-700 shadow-md bg-[#fc6b03] hover:w-28    hover:rounded-xl">
@@ -59,11 +69,17 @@ const Navbar = () => {
 
       </div>
       <div className="hidden md:flex items-center">
-        <CustomNavLink to="/roles" label="Roles" icon={faUser} activeLink={activeLink} onClick={handleNavLinkClick} />
-        <CustomNavLink to="/accesos" label="Accesos" icon={faLock} activeLink={activeLink} onClick={handleNavLinkClick} />
-        <CustomNavLink to="/reporte-pacientes" label="Reportes" icon={faChartBar} activeLink={activeLink} onClick={handleNavLinkClick} />
-        <CustomNavLink to="/matriz-postulante" label="Matriz Postulante" icon={faList} activeLink={activeLink} onClick={handleNavLinkClick} />
-        <CustomNavLink to="/configuracion" label="Configuración" icon={faCog} activeLink={activeLink} onClick={handleNavLinkClick} />
+      {filteredNavLinks.map((navLink, index) => (
+          <CustomNavLink
+            key={index}
+            to={navLink.to}
+            id={navLink.id}
+            label={navLink.label}
+            icon={navLink.icon}
+            activeLink={activeLink} 
+            onClick={handleNavLinkClick}
+          />
+        ))}
         <Logoutbutton />
       </div>
       <div className="md:hidden">
@@ -79,11 +95,17 @@ const Navbar = () => {
       </div>
       {showMenu && (
         <div className="md:hidden absolute right-0 top-16 bg-gray-800 w-[50%]  py-2" style={{ zIndex: 999 }}>
-          <CustomNavLink to="/roles" label="Roles" icon={faUser} activeLink={activeLink} onClick={handleNavLinkClick} />
-          <CustomNavLink to="/accesos" label="Accesos" icon={faLock} activeLink={activeLink} onClick={handleNavLinkClick} />
-          <CustomNavLink to="/reporte-pacientes" label="Reportes" icon={faChartBar} activeLink={activeLink} onClick={handleNavLinkClick} />
-          <CustomNavLink to="/matriz-postulante" label="Matriz Postulante" icon={faList} activeLink={activeLink} onClick={handleNavLinkClick} />
-          <CustomNavLink to="/configuracion" label="Configuración" icon={faCog} activeLink={activeLink} onClick={handleNavLinkClick} />
+          {filteredNavLinks.map((navLink, index) => (
+          <CustomNavLink
+            key={index}
+            to={navLink.to}
+            id={navLink.id}
+            label={navLink.label}
+            icon={navLink.icon}
+            activeLink={activeLink} 
+            onClick={handleNavLinkClick}
+          />
+        ))}
           <Logoutbutton />
         </div>
       )}
@@ -91,10 +113,11 @@ const Navbar = () => {
   );
 };
 
-const CustomNavLink = ({ to, label, icon, activeLink, onClick }) => {
+const CustomNavLink = ({ to, id,label, icon, activeLink, onClick }) => {
   return (
     <RouterNavLink
       to={to}
+      id={id}
       onClick={() => onClick(to)} // Actualiza el estado de la ruta activa al hacer clic en el enlace
       className={`hvr-sweep-to-top before:bg-[#fc6b03] text-white px-4 py-2 ml-2 rounded block md:inline-block relative ${activeLink === to ? 'activeLink' : ''}`}
     >
