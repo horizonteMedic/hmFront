@@ -6,6 +6,8 @@ export const useAuthStore = create(
     persist((set) => ({
     token: null,
     userlogued: null,
+    listView: [],
+    setlistView: (listView) => set({listView}),
     setuserlogued: (userlogued) => set({userlogued}),
     setToken: (token) => set({token}),
     }),

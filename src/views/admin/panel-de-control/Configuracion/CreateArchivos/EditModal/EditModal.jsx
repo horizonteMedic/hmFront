@@ -16,6 +16,8 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
     userRegistro: archivo.userRegistro
   });
   const [creating, setCreating] = useState(false);
+  const extensiones = [  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'mp4', 'avi', 'mov',  'zip',  'rar', '7z',
+  ];
 
   function AleertSucces() {
     Swal.fire({
@@ -52,10 +54,9 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
 
   const handleChange = e => {
     const { name, value } = e.target;
-    const capitalizedValue = value.replace(/\b\w/g, char => char.toUpperCase());
     setDatosEditados({
       ...datosEditados,
-      [name]: capitalizedValue,
+      [name]: value,
     });
   };
   
@@ -104,7 +105,14 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
             </div>
             <div className="mb-4">
               <label htmlFor="extension" className="block text-sm font-medium text-gray-700">Extensión:</label>
-              <input type="text" id="extension" name="extension" value={datosEditados.extension} onChange={handleChange} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <select name='extension' id="extension" className="border mt-1 block w-full pl-3 pr-10 py-2 pointer text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"  onChange={handleChange}>
+              <option >{datosEditados.extension}</option>
+              {extensiones.map((ext) => (
+                  <option key={ext} value={ext}>
+                    {ext}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="mb-4">
               <label htmlFor="color" className="block text-sm font-medium text-gray-700">Color:</label>

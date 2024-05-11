@@ -15,7 +15,6 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
     const [userName, setUserName] = useState('');
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
-    console.log(data)
 
     useEffect(() => {
         setLoading(true);
@@ -30,7 +29,6 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
                 setLoading(false);
             });
     }, [refres]);
-    console.log(data)
 
     useEffect(() => {
         getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
@@ -110,7 +108,6 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
                                 <tbody>
                                 {data?.map((item, index) => {
                                     const dataRole = datroles.find(role => role.idRol === item.id_rol);
-                                    console.log(dataRole)
                                     return (
                                     <tr key={index}>
                                         <td className="border border-gray-400 px-4 py-2">{dataRole.nombre}</td>

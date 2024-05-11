@@ -13,7 +13,6 @@ export function ListRolesxUsername(id_user, token) {
 }
 
 export function DeleteRolUser(id_rol,token) {
-    console.log(id_rol)
     //Primero buscara la asignacion por el idROL
     const url = `${URLAzure}/api/v01/ct/usuarioRol/${id_rol}`
     const options = {
@@ -23,6 +22,6 @@ export function DeleteRolUser(id_rol,token) {
             'Authorization': `Bearer ${token}`
         }
     }
-    return fetch(url,options).then(res => res.json()).then(response => {console.log(response)}) 
+    return fetch(url,options).then(res => res.json()).then(response => response) 
     
 }

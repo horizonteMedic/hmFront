@@ -16,6 +16,7 @@ export function FormLogin() {
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
+  const setlistView = useAuthStore((state) => state.setlistView);
   const [loading, setloadign] = useState(false);
 
   function Loginvnigate(token) {
@@ -28,6 +29,8 @@ export function FormLogin() {
     const payloadBase64 = token.split('.')[1]; // Obtiene la carga útil del token
     const decodedPayload = atob(payloadBase64); // Decodifica la carga útil en base64
     const UserLogued = JSON.parse(decodedPayload); // Analiza la carga útil como JSON
+    const listadoVistas = UserLogued['listado vistas'];
+    setlistView(listadoVistas)
     setuserlogued(UserLogued)
     setToken(token)
     Loginvnigate(token);
@@ -39,7 +42,6 @@ export function FormLogin() {
     setloadign(true)
     SubmitLogin(username, password)
       .then((data) => {
-        console.log(data) //Guarda el token en el local storage
         if (data.id === 1) {
           decodeToken(data.mensaje)
         } else {
