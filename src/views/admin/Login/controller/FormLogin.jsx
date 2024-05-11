@@ -12,7 +12,7 @@ export function FormLogin() {
   const [password, setPassword] = useState("");
   const [estado, setEstado] = useState("");
   const [inhabilitado, setInhabilitado] = useState(false)
-  const [showPassword, setShowPassword] = useState(false); // Estado para mostrar u ocultar la contraseña
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
@@ -26,9 +26,9 @@ export function FormLogin() {
   }
 
   const decodeToken = (token) => {
-    const payloadBase64 = token.split('.')[1]; // Obtiene la carga útil del token
-    const decodedPayload = atob(payloadBase64); // Decodifica la carga útil en base64
-    const UserLogued = JSON.parse(decodedPayload); // Analiza la carga útil como JSON
+    const payloadBase64 = token.split('.')[1]; 
+    const decodedPayload = atob(payloadBase64); 
+    const UserLogued = JSON.parse(decodedPayload); 
     const listadoVistas = UserLogued['listado vistas'];
     setlistView(listadoVistas)
     setuserlogued(UserLogued)
@@ -38,7 +38,7 @@ export function FormLogin() {
   };
 
   const handleSubmit = (event) => {
-    event.preventDefault(); // Evitar que la página se recargue
+    event.preventDefault(); 
     setloadign(true)
     SubmitLogin(username, password)
       .then((data) => {
@@ -89,6 +89,8 @@ export function FormLogin() {
               autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={(e) => setUsername(e.target.value.trim())}
+
             />
             <span className="input-group-text">
               <button
@@ -115,13 +117,13 @@ export function FormLogin() {
           </span>
 
       </form>
-      {estado && EstadoSolicitud(estado)}
-      {inhabilitado && <div className="text-red-800 bg-pink-100 text-lg p-2 mt-3 rounded-lg transition duration-100 ease-in-out flex justify-center items-center">
-                <p>
-                Usuario inhabilitado o sin rol, contactar con un administrador!!
-                </p>
+        {estado && EstadoSolicitud(estado)}
+        {inhabilitado && <div className="text-red-800 bg-pink-100 text-lg p-2 mt-3 rounded-lg transition duration-100 ease-in-out flex justify-center items-center">
+            <p>
+            Usuario inhabilitado o sin rol, contactar con un administrador!!
+            </p>
             </div>}
-      {loading && <Loading/>}
+        {loading && <Loading/>}
     </>
   );
 }

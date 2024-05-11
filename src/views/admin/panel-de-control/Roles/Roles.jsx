@@ -180,7 +180,6 @@ const Roles = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
-  {/* Modal para asignar vistas por rol */}
       {isModalAccessOpen && <ModalAsignarVistasPorRol closeModal={closeAccessModal} token={token} Refresgpag={Refresgpag} userlogued={userlogued.sub} ID_ROL={id} />}
     </div>   
   );

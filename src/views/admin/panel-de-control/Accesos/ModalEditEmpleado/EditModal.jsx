@@ -18,21 +18,15 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
   const [apellidos, setApellidos] = useState(Apellidos)
   const [email, setEmail] = useState(Email)
   const [startDate, setStartDate] = useState(FechaNacimiento);
-  //Sexo
-  const [sexo, setSexo] = useState(Sexo); // Aquí estableces el estado sexo con el valor recibido de las propiedades
+  const [sexo, setSexo] = useState(Sexo);
   const [celular, setCelular] = useState(Celular)
-
   const [departamento, setDepartamento] = useState(Distrito.slice(0, 2));
   const [provincia, setProvincia] = useState(Distrito.slice(0, 4));
   const [distrito, setDistrito] = useState(Distrito.slice(0, 6));
-  //Se le pasa el distrito
   const [direccion, setDireccion] = useState(Direccion)
   const [cargo, setCargo] = useState(Cargo)
-  //CIP
   const [activo, setActivo] = React.useState(Estado);
   const [cip, setCip] = useState('')
-
-  //Llamada de combobox
   const ListDepartamentos = ComboboxDepartamentos();
   const ListProvincias =  ComboboxProvincias()
   const ListDistritos = ComboboxDistritos()
@@ -79,7 +73,6 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
     setDistrito(event.target.value);
   };
 
-  //Filtos de Provincias y Distritos
   const filterProvincias = ListProvincias.filter(
     (provincia) => provincia.idDepartamento === departamento
   )
@@ -102,16 +95,19 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-md p-6 w-[400px] md:w-[880px] relative">
-        <FontAwesomeIcon
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[800px] relative">
+
+      <FontAwesomeIcon
           icon={faTimes}
-          className="absolute top-0 right-0 m-4 cursor-pointer text-gray-500"
+          className="absolute top-0 right-0 m-3 cursor-pointer  color-blanco"
           onClick={closeModal}
-        />
-        <h2 className="text-start font-bold mb-4 ">Editar Empleado</h2>
+      />
+      <div className="p azuloscurobackground flex justify-between p-3.5">
+        <h1 className="text-start font-bold color-azul text-white">Lista de Usuarios vinculados</h1>
+      </div>
+      <div className='container p-4'>
         <form>
           <div className="grid grid-cols-2 gap-4 mb-4 md:grid-cols-3">
-            {/* Primer columna */}
             <div>
               <label htmlFor="tipoDocumento" className="block text-sm font-medium text-gray-700">
                 Tipo de Documento
@@ -137,7 +133,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={nrodoc}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+                  const value = e.target.value.replace(/\D/g, ''); 
                   if (value.length <= 8) {
                     setNrodoc(value);
                   }
@@ -156,11 +152,11 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={nombres}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  const value = e.target.value.toLowerCase(); 
                   setNombres(
                     value
                       .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                       .join(' ')
                   );
                 }}
@@ -177,11 +173,11 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={apellidos}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  const value = e.target.value.toLowerCase();
                   setApellidos(
                     value
                       .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) 
                       .join(' ')
                   );
                 }}
@@ -203,7 +199,6 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 required
               />
             </div>
-            {/* Segunda columna */}
             <div>
               <label htmlFor="fechaNacimiento" className="block text-sm font-medium text-gray-700">
                 Fecha de Nacimiento
@@ -244,7 +239,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={celular}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+                  const value = e.target.value.replace(/\D/g, ''); 
                   if (value.length <= 9) {
                     setCelular(value);
                   }
@@ -305,7 +300,6 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 ))}
               </select>
             </div>
-            {/* Tercera columna */}
             <div>
               <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">
                 Dirección
@@ -327,11 +321,11 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={cargo}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  const value = e.target.value.toLowerCase(); 
                   setCargo(
                     value
                       .split(' ')
-                      .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalizar cada palabra
+                      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
                       .join(' ')
                   );
                 }}
@@ -380,12 +374,14 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
               type="submit"
               className={`inline-flex justify-center items-center px-4 py-2 azul-btn rounded-md `}
             >
-              Guardar
+              Guardar Cambios
             </button>
           </div>
         </form>
       </div>
     </div>
+  </div>
+  
   );
 };
 
