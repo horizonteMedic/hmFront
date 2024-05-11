@@ -87,7 +87,7 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">
         <div className="flex justify-between items-center px-4 py-2 bg-gray-200">
-          <h2 className="text-lg font-bold">SUBIR ARCHIVO {nombre}</h2>
+          <h2 className=" "> <strong>SUBIR ARCHIVO:</strong> {nombre}</h2>
           <button onClick={closeCAMUModal} className="text-black">
             <FontAwesomeIcon icon={faTimes} />
           </button>
