@@ -19,7 +19,8 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [color, setColor] = useState('');
   const [historiaClinica, setHistoriaClinica] = useState('');
   const [orden, setOrden] = useState('');
-  const [fileData, setFileData] = useState(null);
+  const [currentFile, setCurrentFile] = useState(null);
+
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
@@ -95,7 +96,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     setModalArchivos(false);
   };
 
-  const ReadBase64 = (response) => {
+  const ReadFileBase64 = (response) => {
     const fileType = response.nombreArchivo.split('.').pop();
     const byteCharacters = atob(response.fileBase64);
     const byteNumbers = new Array(byteCharacters.length);
@@ -106,19 +107,21 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     const blob = new Blob([byteArray], { type: `application/${fileType}` });
   
     const fileDataUri = URL.createObjectURL(blob);
-    setFileData({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` });
+    setCurrentFile({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` });
   };
   
 
-  const GetBase64 = (historia,id_archivo) => {
-    ReadArchivos(historia,id_archivo,token)
-    .then(response => {
-      ReadBase64(response)
-    })
-    .catch(error => {
-      throw new Error('Network response was not ok.', error);
-    }); 
+  const GetBase64 = (historia, id_archivo) => {
+    ReadArchivos(historia, id_archivo, token)
+      .then(response => {
+        ReadFileBase64(response);
+      })
+      .catch(error => {
+        throw new Error('Network response was not ok.', error);
+      });
   };
+  
+  
 useEffect(() => {
   if (data && data.length > 0) {
     const pdfFiles = read.filter(item => item.extension === 'pdf');
@@ -204,24 +207,32 @@ useEffect(() => {
       {modalArchivos && (
         <ModalUpload closeModal={closeModal} id={idarchivo} nombre={nombrearc} extension={extension} color={color} historiaClinica={historiaClinica} orden={orden} dni={dni} user={user} token={token} />
       )}
-        {fileData && (
-          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-            <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[700px] h-[auto]">
-              <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                <h2 className="text-lg font-bold color-blanco">{nombrearc}</h2>
-                <button onClick={() => setFileData(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-              </div>
+      {currentFile && (
+        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[700px] h-[auto]">
+            <div className="px-4 py-2 naranjabackgroud flex justify-between">
+              <h2 className="text-lg font-bold color-blanco">{currentFile.name}</h2>
+              <button onClick={() => setCurrentFile(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+            </div>
+            {currentFile.type === 'application/pdf' ? (
               <div className="px-6 py-4 overflow-hidden flex justify-center items-center">
-                <img src={fileData.uri} alt={fileData.name} className="h-[100%] w-auto max-w-full" />
+                <embed src={currentFile.uri} type="application/pdf" className="h-[500px]  w-[500px] max-w-full" />
               </div>
-              <div className="flex justify-center">
-                <a href={fileData.uri} download={fileData.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-                  <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-                </a>
+            ) : (
+              <div className="px-6 py-4 overflow-hidden flex justify-center items-center">
+                <img src={currentFile.uri} alt={currentFile.name} className="h-[100%] w-auto max-w-full" />
               </div>
+            )}
+            <div className="flex justify-center">
+              <a href={currentFile.uri} download={currentFile.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+              </a>
             </div>
           </div>
-        )}
+        </div>
+      )}
+
+
     </div>
   );
 };
