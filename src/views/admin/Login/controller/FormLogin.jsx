@@ -89,8 +89,6 @@ export function FormLogin() {
               autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              onBlur={(e) => setUsername(e.target.value.trim())}
-
             />
             <span className="input-group-text">
               <button
@@ -117,13 +115,13 @@ export function FormLogin() {
           </span>
 
       </form>
-        {estado && EstadoSolicitud(estado)}
-        {inhabilitado && <div className="text-red-800 bg-pink-100 text-lg p-2 mt-3 rounded-lg transition duration-100 ease-in-out flex justify-center items-center">
-            <p>
-            Usuario inhabilitado o sin rol, contactar con un administrador!!
-            </p>
+      {estado && EstadoSolicitud(estado)}
+      {inhabilitado && <div className="text-red-800 bg-pink-100 text-lg p-2 mt-3 rounded-lg transition duration-100 ease-in-out flex justify-center items-center">
+                <p>
+                Usuario inhabilitado o sin rol, contactar con un administrador!!
+                </p>
             </div>}
-        {loading && <Loading/>}
+      {loading && <Loading/>}
     </>
   );
 }
