@@ -79,14 +79,14 @@ const VerificationCodeInput = (props) => {
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map((number) => (
               <button
                 key={number}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline m-1"
+                className="azul-btn  font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline m-1"
                 onClick={() => handleNumberClick(number)}
               >
                 {number}
               </button>
             ))}
             <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline m-1"
+              className="azul-btn e font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline m-1"
               onClick={handleBackspaceClick}
             >
               Borrar

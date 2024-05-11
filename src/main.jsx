@@ -49,7 +49,7 @@ const AppContent = () => {
   const location = useLocation();
   const showNavbarRoutes = ['/', '/login-empleado'];
   const isLoginPage = showNavbarRoutes.includes(location.pathname);
-  const isHiddenRoute = ['/forgot-password', '/verificacion-codigo'].includes(location.pathname);
+  const isHiddenRoute = ['/forgot-password', '/verificacion-codigo', '/actualizar-password'].includes(location.pathname);
   const showBreadcrumb = !isLoginPage && !isHiddenRoute;
 
   useEffect(() => {

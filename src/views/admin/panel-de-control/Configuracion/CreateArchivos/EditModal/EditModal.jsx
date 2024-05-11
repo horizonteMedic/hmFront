@@ -19,16 +19,16 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
 
   function AleertSucces() {
     Swal.fire({
-      title: "¡Exito!",
-      text: "Se ha Editado el Tipo de Archivo!",
+      title: "¡Éxito!",
+      text: "Se ha editado el Tipo de Archivo.",
       icon: "success",
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Aceptar"
     }).then((result) => {
       if (result.isConfirmed) {
-        setShowEditModal()
-        Refresgpag()
+        setShowEditModal();
+        Refresgpag();
       }
     });
   }
@@ -59,7 +59,6 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
     });
   };
   
-
   const handleColor = (e) => {
     const selectedColor = colores.find(colores => colores.nombre === e.target.value);
     if (selectedColor) {
@@ -72,18 +71,18 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
   };
 
   const handleSubmit = e => {
-    setCreating(true)
+    setCreating(true);
     e.preventDefault();
-    EditArchivo(datosEditados,userlogued,token)
+    EditArchivo(datosEditados, userlogued, token)
     .then(data => {
-      AleertSucces()
+      AleertSucces();
     })
     .catch(error => {
-      console.error('Error:', error)
+      console.error('Error:', error);
     })    
     .finally(() => {
-      setCreating(false)
-    })
+      setCreating(false);
+    });
   };
 
   return (
@@ -101,7 +100,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
           <form>
             <div className="mb-4">
               <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre:</label>
-              <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className=" pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div className="mb-4">
               <label htmlFor="extension" className="block text-sm font-medium text-gray-700">Extensión:</label>
@@ -109,7 +108,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
             </div>
             <div className="mb-4">
               <label htmlFor="color" className="block text-sm font-medium text-gray-700">Color:</label>
-              <select type="text" id="color" name="color" onChange={handleColor} className=" pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" >
+              <select id="color" name="color" onChange={handleColor} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" >
                 <option value={datosEditados.color}>{datosEditados.color}</option>
                 {colores.map((option) => (
                   <option key={`${option.nombre}-${option.codigo}`} value={option.nombre} >
@@ -122,15 +121,25 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
               </div>
             </div>
             <div className="mb-4">
-              <label htmlFor="estado" className="  block text-sm font-medium text-gray-700">Estado:</label>
-              <select id="estado" name="estado" value={datosEditados.estado} onChange={handleChange} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                <option value={true}>Activo</option>
-                <option value={false}>Inactivo</option>
-              </select>
+              <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado:</label>
+              <input
+                id="estado"
+                name="estado"
+                type="checkbox"
+                checked={datosEditados.estado}
+                onChange={() => setDatosEditados({ ...datosEditados, estado: !datosEditados.estado })}
+                className="pointer mt-1 p-2 block border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
             <div className="flex justify-end">
-              <button type="submit" onClick={handleSubmit} disabled={creating}
-              className="px-4 py-2  rounded-md azul-btn">{creating ? 'Editando Archivo...' : 'Editar Archivo'}</button>
+              <button
+                type="submit"
+                onClick={handleSubmit}
+                disabled={creating}
+                className="px-4 py-2  rounded-md azul-btn"
+              >
+                {creating ? 'Editando Archivo...' : 'Editar Archivo'}
+              </button>
             </div>
           </form>
         </div>
