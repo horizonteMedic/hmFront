@@ -10,7 +10,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
     const [data, setData] = useState([])
     const [razonSocial, setRazonSocial] = useState('');
     const [ruc, setRuc] = useState('');
-    const [estado, setEstado] = useState(false);
+    const [estado, setEstado] = useState(true);
 
     const ListEmpresa = ComboboxEmpresa()
     const ListContrata = ComboboxContrata()
@@ -121,7 +121,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
                         onChange={handleRazonSocialChange}
                         className="w-full border pointer border-gray-300 rounded-md py-2 px-3 text-sm text-gray-700"
                         >
-                        <option value="">{data ? 'Seleccione una Sede...' : 'Espera un momento'}</option>
+                        <option value="">{data ? 'Seleccione una Opción...' : 'Espera un momento'}</option>
                         {data?.map((option, index) => (
                             <option key={index} value={option.razonSocial}>{option.razonSocial}</option>
                             ))}
