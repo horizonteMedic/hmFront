@@ -4,9 +4,11 @@ import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import AddNewRol from './AddNewRol'; // Importa el nuevo componente
 import { ListRolesxUsername, DeleteRolUser } from '../model/ListarRolesUser';
 import Swal from 'sweetalert2';
+import { getFetch } from '../../getFetch/getFetch';
 
 const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
     const [data, setData] = useState([]);
+    const [datroles, setDataroles] = useState([])
     const [loading, setLoading] = useState(false);
     const [refres, setRefresh] = useState(0);
 
@@ -14,7 +16,8 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
     console.log(data)
-   useEffect(() => {
+
+    useEffect(() => {
         setLoading(true);
         ListRolesxUsername(id, token)
             .then(response => {
@@ -27,6 +30,17 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
                 setLoading(false);
             });
     }, [refres]);
+    console.log(data)
+
+    useEffect(() => {
+        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
+        .then(response => {
+          setDataroles(response)
+        })
+        .catch(error => {
+          throw new Error('Network response was not ok.',error);
+        })
+      },[refres])
 
     const Refresgpag = () => {
         setRefresh(refres + +1);
@@ -47,7 +61,7 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
               .then(() => {
                 Swal.fire({
                   title: "Eliminado!",
-                  text: "Esta Sede asignada ha sido eliminada.",
+                  text: "Este Rol ha sido eliminada del Usuario.",
                   icon: "success"
                 }).then((result) => {
                   if (result.isConfirmed) Refresgpag()
@@ -94,16 +108,20 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {data.map((item, index) => (
-                                        <tr key={index}>
-                                            <td className="border border-gray-400 px-4 py-2">{item.nombre}</td>
-                                            <td className="border border-gray-400 px-4 py-2">{item.descripcion}</td>
-                                            <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
-                                            <td className="border border-gray-400 px-4 py-2 text-center">
-                                                <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteSedeUser(item.idRol)}} />
-                                            </td>
-                                        </tr>
-                                    ))}
+                                {data?.map((item, index) => {
+                                    const dataRole = datroles.find(role => role.idRol === item.id_rol);
+                                    console.log(dataRole)
+                                    return (
+                                    <tr key={index}>
+                                        <td className="border border-gray-400 px-4 py-2">{dataRole.nombre}</td>
+                                        <td className="border border-gray-400 px-4 py-2">{dataRole.descripcion}</td>
+                                        <td className="border border-gray-400 px-4 py-2">{item.fechaRegistro}</td>
+                                        <td className="border border-gray-400 px-4 py-2 text-center">
+                                            <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() => {deleteSedeUser(item.idUserRol)}} />
+                                        </td>
+                                    </tr>
+                                    )})}
+                                 
                                 </tbody>
                             </table>
                         )}

@@ -16,6 +16,7 @@ export function AsignarRolUser(nerrol,user,token) {
         id_user: nerrol.id_user,
         id_rol: nerrol.selectedRol
     }
+    console.log(JSON.stringify(data))
     const url = `${URLAzure}/api/v01/ct/usuarioRol`
     const options = {
         method: 'POST',

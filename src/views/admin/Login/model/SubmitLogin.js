@@ -16,4 +16,4 @@ export default async function SubmitLogin(user,password) {
     return fetch(`${URLAzure}/api/v01/st/auth/login`,options)
     .then(res => res.json()).then(response => response)
 }
-
+    

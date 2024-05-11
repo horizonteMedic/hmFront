@@ -31,7 +31,6 @@ export function NewVistaxRol(datos,user,token) {
         id_rol: datos.id_rol,
         id_opcion_interfaz: datos.id_opcion_interfaz
     }
-    console.log(JSON.stringify(data))
     const options = {
         method: 'POST', 
         headers: {
