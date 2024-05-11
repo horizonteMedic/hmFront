@@ -204,29 +204,24 @@ useEffect(() => {
       {modalArchivos && (
         <ModalUpload closeModal={closeModal} id={idarchivo} nombre={nombrearc} extension={extension} color={color} historiaClinica={historiaClinica} orden={orden} dni={dni} user={user} token={token} />
       )}
-{fileData && (
-  <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-    <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[130vh] h-[auto]">
-      <div className="px-4 py-2 naranjabackgroud flex justify-between">
-        <h2 className="text-lg font-bold color-blanco">{nombrearc}</h2>
-        <button onClick={() => setFileData(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
-      </div>
-      <div className="px-6 py-4 overflow-hidden flex justify-center items-center">
-        <img src={fileData.uri} alt={fileData.name} className="h-[100%] w-auto max-w-full" />
-      </div>
-      <div className="flex justify-center">
-        <a href={fileData.uri} download={fileData.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
-          <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
-        </a>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
-
-
+        {fileData && (
+          <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[700px] h-[auto]">
+              <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                <h2 className="text-lg font-bold color-blanco">{nombrearc}</h2>
+                <button onClick={() => setFileData(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+              </div>
+              <div className="px-6 py-4 overflow-hidden flex justify-center items-center">
+                <img src={fileData.uri} alt={fileData.name} className="h-[100%] w-auto max-w-full" />
+              </div>
+              <div className="flex justify-center">
+                <a href={fileData.uri} download={fileData.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
