@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCogs, faFileAlt, faBuilding, faLock, faList, faTentArrowDownToLine, faHandshake, faNotesMedical } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCogs, faFileAlt, faBuilding, faLock, faList, faTentArrowDownToLine, faHandshake, faNotesMedical, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { getFetch } from '../../getFetch/getFetch';
 import { ListViewxRol, NewVistaxRol, DeleteVistaxRol } from '../model/ListViewxRol';
 import Swal from 'sweetalert2';
@@ -129,19 +129,24 @@ const TreeNode = ({ node, isParent, asigned ,ID_ROL,userlogued,token,Refresgpag}
       <div className="flex items-center">
         <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
         <button
-          className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
-          onClick={handleClick}
-          style={{ backgroundColor: isParent ? '#233245 '  : '#fc6b03' }}
-        >
-          <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
-          {node.label}
-        </button>
-        <input
-          type="checkbox"
-          disabled
-          className="ml-auto pointer"
-          checked={isChecked} 
-        />
+  className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
+  onClick={handleClick}
+  style={{ 
+    backgroundColor: isParent ? '#233245 '  : '#fc6b03',
+  }}
+>
+  <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
+  {node.label}
+</button>
+<input
+  type="checkbox"
+  className="ml-auto pointer"
+  checked={isChecked}
+  style={{ 
+    pointerEvents: 'none',
+  }}
+/>
+
       </div>
       {isOpen && (
         <div style={{ marginLeft: 20 }}>
@@ -207,13 +212,16 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
-      <div className="bg-white rounded-lg overflow-hidden shadow-xl w-full max-w-md">
-        <div className="px-4 py-2 flex justify-between bg-gray-200">
-          <h2 className="text-lg font-semibold">Asignar Acceso</h2>
-          <button onClick={closeModal} className="text-gray-600 hover:text-gray-800">
-            Cerrar
-          </button>
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
 
+        <FontAwesomeIcon
+          icon={faTimes}
+          className="absolute top-0 right-0 m-3 cursor-pointer color-blanco"
+          onClick={closeModal}
+        />
+      
+        <div className="p azuloscurobackground flex justify-between p-3.5">
+          <p className="text-start font-bold color-azul text-white">Asignar Acceso</p>
         </div>
         <div className="p-4">
           <div className="modal-body relative">
@@ -225,9 +233,6 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
               </ul>
             </div>
           </div>
-        </div>
-        <div className="px-4 py-2 flex justify-end bg-gray-200">
-          <button className="px-4 py-2 azul-btn rounded-md">Asignar</button>
         </div>
       </div>
     </div>

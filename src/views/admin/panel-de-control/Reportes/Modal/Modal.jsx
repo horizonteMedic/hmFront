@@ -173,8 +173,8 @@ useEffect(() => {
                         <div className="flex flex-col">
                           {listarchivos.map((archivoItem, archivoIndex) => (
                             <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem.id, archivoItem.nombre, archivoItem.extension, archivoItem.codigo, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
-                                <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer" style={{ color: archivoItem.codigo }} />
-                              <div className="text-xs cursor-pointer ml-2" >Subir {archivoItem.nombre}</div>
+                                <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer pt-2" style={{ color: archivoItem.codigo }} />
+                              <div className="text-sm fw-semi-bold cursor-pointer ml-2 pt-2" >Subir {archivoItem.nombre}</div>
                             </div>
                           ))}
                         </div>
