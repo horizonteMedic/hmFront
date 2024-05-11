@@ -15,7 +15,6 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
   const extensiones = [  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'mp4', 'avi', 'mov',  'zip',  'rar', '7z',
 ];
 
-
   function AlertSuccess() {
     Swal.fire({
       title: '¡Éxito!',

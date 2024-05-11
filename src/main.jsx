@@ -12,7 +12,7 @@ import LoginPageAdmin from './views/admin/Login/Login.jsx';
 import ForgotPassword from './views/admin/Login/controller/ForgotPassword.jsx'; 
 import VerificationCodeInput from './views/admin/Login/controller/VerificationCodeInput.jsx'; 
 import ActualizarPassword from './views/admin/Login/controller/ActualizarPassword.jsx'
-import {ProtectedRoute,ProtectedLogin} from './views/ProtectedRoute/ProtectedRoute.jsx';
+import {ProtectedRoute,ProtectedLogin,ProtectedPanel} from './views/ProtectedRoute/ProtectedRoute.jsx';
 import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
 import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
 import DashboardAdmin from './views/admin/panel-de-control/PanelDeControl.jsx';
@@ -44,7 +44,7 @@ const AppContent = () => {
   const token = useAuthStore(state => state.token);
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
-
+  const setlistView = useAuthStore((state) => state.setlistView)
 
   const location = useLocation();
   const showNavbarRoutes = ['/', '/login-empleado'];
@@ -57,8 +57,12 @@ const AppContent = () => {
       // El token ha caducado, realizar acciones necesarias
       setToken(null);
       setuserlogued(null);
+      setlistView([])
     }
-  },[])
+  },[token])
+
+  
+
   return (
     <>
       {!isHiddenRoute && !isLoginPage && <Navbar />}
@@ -73,11 +77,14 @@ const AppContent = () => {
         <Route path="/verificacion-codigo" element={<VerificationCodeInput />} />
         <Route path="/actualizar-password" element={<ActualizarPassword />} />
 
+        <Route element={<ProtectedPanel/>}>
+          <Route path="/panel-de-control" element={<DashboardAdmin />}/> 
+        </Route>
+
         <Route element={<ProtectedRoute/>}>
           <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
           <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>
-          <Route path="/panel-de-control" element={<DashboardAdmin />}/> 
-          <Route path="/accesos" element={<Accesos />}/> 
+          <Route path="/accesos" element={ <Accesos />}  /> 
           <Route path="/roles" element={<Roles />}/> 
           <Route path="/reporte-pacientes" element={<Reporte />}/> 
           <Route path="/matriz-postulante" element={<Matriz />}/> 

@@ -37,7 +37,7 @@ function DeleteUsers(ID, user,idempleado,token) {
         id_empleado: idempleado
     }
     
-    const url = `${URLAzure}/api/v01/ct/usuario/${ID}`
+    const url = `${URLAzure}/api/v01/ct/usuario/actualizacionParcial/${ID}`
     const options = {
         method: 'PUT',
         headers: {
@@ -49,4 +49,25 @@ function DeleteUsers(ID, user,idempleado,token) {
     return fetch(url,options).then(res => res.json()).then(response => response) 
 }
 
-export {ListUser,ListEmpleadoDNI,DeleteUsers}
+//Habilitar Usuarios
+function EnabledUsers(ID, user,idempleado,token) {
+    
+    const data = {
+        username: user,
+        estado: true,
+        id_empleado: idempleado
+    }
+    
+    const url = `${URLAzure}/api/v01/ct/usuario/actualizacionParcial/${ID}`
+    const options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+    }
+    return fetch(url,options).then(res => res.json()).then(response => response) 
+}
+
+export {ListUser,ListEmpleadoDNI,DeleteUsers,EnabledUsers}
