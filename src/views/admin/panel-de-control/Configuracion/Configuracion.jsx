@@ -19,11 +19,11 @@ const Configuracion = () => {
   const allowedRoutes = listView.map(item => `${item.id}`);
 
   const filteredCards = [
-    { to: "/lista-archivos", id:"57",  icon: <FontAwesomeIcon icon={faList}  className="color-naranja" size='2xl' />, title: "Roles"},
-    { to: "/agregar-sede", id:"58", icon: <FontAwesomeIcon icon={faTentArrowDownToLine}  className="color-naranja" size='2xl'/>, title: "Accesos"},
-    { to: "/agregar-campaña", id:"59", icon: <FontAwesomeIcon icon={faNotesMedical}  className="color-naranja" size='2xl'/>, title: "Reportes"},
-    { to: "/administrar-empresas", id:"60", icon: <FontAwesomeIcon icon={faBuilding}  className="color-naranja" size='2xl' />, title: "Matriz Postulante"},
-    { to: "/administrar-contratas", id:"61", icon: <FontAwesomeIcon  className="color-naranja" size='2xl' icon={faHandshake} />, title: "Configuración" }
+    { to: "/lista-archivos", id:"57",  icon: <FontAwesomeIcon icon={faList}  className="color-naranja" size='2xl' />, title: "Administrar Archivos"},
+    { to: "/agregar-sede", id:"58", icon: <FontAwesomeIcon icon={faTentArrowDownToLine}  className="color-naranja" size='2xl'/>, title: "Administrar Sedes"},
+    { to: "/agregar-campaña", id:"59", icon: <FontAwesomeIcon icon={faNotesMedical}  className="color-naranja" size='2xl'/>, title: "Campañas"},
+    { to: "/administrar-empresas", id:"60", icon: <FontAwesomeIcon icon={faBuilding}  className="color-naranja" size='2xl' />, title: "Administrar Empresas"},
+    { to: "/administrar-contratas", id:"61", icon: <FontAwesomeIcon  className="color-naranja" size='2xl' icon={faHandshake} />, title: "Administrar Contratas" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   return (
