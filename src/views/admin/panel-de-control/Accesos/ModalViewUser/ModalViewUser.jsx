@@ -9,11 +9,13 @@ import TableRoles from '../RolesUsuario/TableRoles';
 
 const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const [data, setData] = useState([]);
+    const [refresh, setRefresh] = useState(0)
     const [showAsignarSedeUser, setShowAsignarSedeUser] = useState(false);
     const [showAsignarEmpresaContrataModal, setShowAsignarEmpresaContrataModal] = useState(false); 
     const [openModalRol, setOpenModalRol] = useState(false)
     const [iduser, setIduser] = useState('')
     const [username, setUsername] = useState('')
+
     useEffect(() => {
         ListUser(idEmpleado, token)
             .then(response => {
@@ -22,16 +24,10 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
             .catch(error => {
                 throw new Error('Network response was not ok.', error);
             });
-    }, []);
+    }, [refresh]);
 
     const Refresgpag = () => {
-        ListUser(idEmpleado, token)
-            .then(response => {
-                setData(response);
-            })
-            .catch(error => {
-                throw new Error('Network response was not ok.', error);
-            });
+        setRefresh(refresh + 1)
     };
 
     const DeleteAlert = (id,username,id_empleado) => {
@@ -144,8 +140,10 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                     <tr key={index}>
                                         <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
-                                            <FontAwesomeIcon icon={faCircleCheck} onClick={() => { EnableAlert(item.idUser,item.username,item.id_empleado) }} className="text-green-500 mr-3 cursor-pointer"/>
-                                            <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 mr-3 cursor-pointer" />
+                                            {item.estado ? <FontAwesomeIcon icon={faTrash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 mr-3 cursor-pointer" />                        
+                                            : <FontAwesomeIcon icon={faCircleCheck} onClick={() => { EnableAlert(item.idUser,item.username,item.id_empleado) }} className="text-green-500 mr-3 cursor-pointer"/>
+                                            }
+                                            
                                             <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={()=> {handleConfigIconClick(item.idUser,item.username)}} className="text-blue-500 mr-3 cursor-pointer" />
                                             <FontAwesomeIcon icon={faBuilding} onClick={() => {handleAsignarEmpresaContrataIconClick(item.idUser,item.username)}} className="text-green-500 mr-3 cursor-pointer" />
                                             <FontAwesomeIcon icon={faLock} onClick={() => {handleAsignarRol(item.idUser,item.username)}} className="text-gray-500  cursor-pointer" />
@@ -161,9 +159,13 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                             </tbody>
                         </table>
                         <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
+                            <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                                <FontAwesomeIcon icon={faCircleCheck} className="text-green-500" />
+                                <p className="text-sm ml-2 md:ml-4">Habilitar Usuario</p>
+                            </div>
                             <div className="flex items-center mb-2 md:mb-0">
                                 <FontAwesomeIcon icon={faTrash} className="text-red-500" />
-                                <p className="text-sm ml-2 md:ml-4">Eliminar Usuario</p>
+                                <p className="text-sm ml-2 md:ml-4">Deshabilitar Usuario</p>
                             </div>
                             <div className="flex items-center mb-2 md:mb-0 md:ml-6">
                                 <FontAwesomeIcon icon={faTentArrowDownToLine} className="text-blue-500" />
@@ -172,6 +174,10 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                             <div className="flex items-center mb-2 md:mb-0 md:ml-6">
                                 <FontAwesomeIcon icon={faBuilding} className="text-green-500" />
                                 <p className="text-sm ml-2 md:ml-4">Asignar Empresa/Contrata</p>
+                            </div>
+                            <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                                <FontAwesomeIcon icon={faLock} className="text-gray-500" />
+                                <p className="text-sm ml-2 md:ml-4">Asignar Roles</p>
                             </div>
                         </div>
                     </div>

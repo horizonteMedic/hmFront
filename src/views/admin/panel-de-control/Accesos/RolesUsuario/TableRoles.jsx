@@ -12,33 +12,30 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
     const [loading, setLoading] = useState(false);
     const [refres, setRefresh] = useState(0);
 
-    const [userName, setUserName] = useState('');
-    const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false); // Estado para controlar la visualización del modal
 
     useEffect(() => {
         setLoading(true);
-        ListRolesxUsername(id, token)
-            .then(response => {
-                setData(response);
-            })
-            .catch(error => {
-                throw new Error('Network response was not ok.', error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, [refres]);
 
-    useEffect(() => {
-        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
-        .then(response => {
-          setDataroles(response)
+        Promise.all([
+            ListRolesxUsername(id, token),
+            getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
+        ])
+        .then(([rolesByUsernameResponse, rolesResponse]) => {
+            // Guarda los datos en el estado
+            setData(rolesByUsernameResponse);
+            setDataroles(rolesResponse);
+            
         })
         .catch(error => {
-          throw new Error('Network response was not ok.',error);
+            throw new Error('Network response was not ok.', error);
         })
-      },[refres])
+        .finally(() => {
+            setLoading(false);
+        });
+
+        
+    }, [refres]);
 
     const Refresgpag = () => {
         setRefresh(refres + +1);
@@ -124,7 +121,7 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
                         )}
                     </div>
                     <div className="flex justify-end">
-                        <button onClick={() => setShowAddSedeModal(true)} className="ml-4 mr-4 naranjabackgroud text-white py-2 px-4 rounded ">Agregar otra Rol</button>
+                        <button onClick={() => setShowAddSedeModal(true)} disabled={data.length === 0 ? false : true}   className={`ml-4 mr-4 naranjabackgroud text-white py-2 px-4 rounded ${data.length === 0 ? '' : 'opacity-60'}`}>Agregar otra Rol</button>
                     </div>
                 </div>
             </div>
