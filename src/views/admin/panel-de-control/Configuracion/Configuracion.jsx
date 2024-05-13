@@ -25,7 +25,7 @@ const Configuracion = () => {
     { to: "/administrar-empresas", id:"60", icon: <FontAwesomeIcon icon={faBuilding}  className="color-naranja" size='2xl' />, title: "Administrar Empresas"},
     { to: "/administrar-contratas", id:"61", icon: <FontAwesomeIcon  className="color-naranja" size='2xl' icon={faHandshake} />, title: "Administrar Contratas" }
   ].filter(card => allowedRoutes.includes(card.id));
-
+  
   return (
     <div className="dashboard-container">
       <div className="main-content flex flex-col items-center justify-center p-5">
