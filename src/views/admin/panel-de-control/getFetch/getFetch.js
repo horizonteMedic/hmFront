@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../config/config"
+
 export const getFetch = (url, token) => {
     
     const options = {
@@ -6,5 +8,6 @@ export const getFetch = (url, token) => {
             'Authorization': `Bearer ${token}`
         }
     }
-    return fetch(url,options).then(res => res.json()).then(response => response) 
+   
+    return fetch(URLAzure+url,options).then(res => res.json()).then(response => response) 
 }

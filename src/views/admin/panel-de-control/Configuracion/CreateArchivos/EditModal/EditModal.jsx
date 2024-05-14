@@ -8,6 +8,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
   const [datosEditados, setDatosEditados] = useState({
     id: archivo.id,
     nombre: archivo.nombre,
+    nomenclatura: archivo.nomenclatura,
     extension: archivo.extension,
     color: archivo.color,
     codigo: archivo.codigo,
@@ -15,6 +16,7 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
     fechaRegistro: archivo.fechaRegistro,
     userRegistro: archivo.userRegistro
   });
+  
   const [creating, setCreating] = useState(false);
   const extensiones = [  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'mp4', 'avi', 'mov',  'zip',  'rar', '7z',
   ];
@@ -72,8 +74,21 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
   };
 
   const handleSubmit = e => {
-    setCreating(true);
     e.preventDefault();
+    if (!datosEditados.nombre || !datosEditados.extension || !datosEditados.color || !datosEditados.codigo || !datosEditados.nomenclatura) {
+      Swal.fire({
+        title: '¡Error!',
+        text: 'Por favor, complete todos los campos.',
+        icon: 'error',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Aceptar'
+      });
+      return;
+    }
+
+    setCreating(true);
+    
     EditArchivo(datosEditados, userlogued, token)
     .then(data => {
       AleertSucces();
@@ -101,7 +116,11 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
           <form>
             <div className="mb-4">
               <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre:</label>
-              <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className="pointer mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+              <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className="text mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="nomenclatura" className="block text-sm font-medium text-gray-700">Nombre:</label>
+              <input type="text" id="nomenclatura" required name="nomenclatura" value={datosEditados.nomenclatura} onChange={handleChange} className="text mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div className="mb-4">
               <label htmlFor="extension" className="block text-sm font-medium text-gray-700">Extensión:</label>

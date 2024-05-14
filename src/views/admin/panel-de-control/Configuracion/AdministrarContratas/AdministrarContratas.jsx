@@ -38,7 +38,7 @@ const AdministrarContratas = () => {
 
   useEffect(() => {
     setLoading(true);
-    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/contrata', token)
+    getFetch('/api/v01/ct/contrata', token)
       .then(response => {
         setData(response);
         setTotalPages(Math.ceil(response.length / recordsPerPage));

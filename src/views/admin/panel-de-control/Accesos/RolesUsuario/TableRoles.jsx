@@ -19,7 +19,7 @@ const TableRoles = ({ closeModal, id, user, userlogued, token }) => {
 
         Promise.all([
             ListRolesxUsername(id, token),
-            getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
+            getFetch('/api/v01/ct/rol', token)
         ])
         .then(([rolesByUsernameResponse, rolesResponse]) => {
             // Guarda los datos en el estado

@@ -7,18 +7,16 @@ import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos } from '../model/readArchivos';
 
-const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token }) => {
+const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token, name, apell }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listarchivos, setListarchivos] = useState([]);
   const [read, setRead] = useState([])
+  const [reload, setReload] = useState(0)
+  const [openview, setOpenview] = useState(false)
+
   const [modalArchivos, setModalArchivos] = useState(false);
-  const [idarchivo, setIdarchivo] = useState('');
-  const [nombrearc, setNombrearc] = useState('');
-  const [extension, setExtension] = useState('');
-  const [color, setColor] = useState('');
-  const [historiaClinica, setHistoriaClinica] = useState('');
-  const [orden, setOrden] = useState('');
+  const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
 
   useEffect(() => {
@@ -60,7 +58,11 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
             throw new Error('Network response was not ok.', error);
           });
       }
-  }, [data])
+  }, [data, reload])
+
+  const reloadread = () => {
+    setReload( reload +1)
+  }
 
   const filterArchivos = (readItem) => {
     const archivoEncontrado = listarchivos.find(archivo => archivo.id === readItem.id_tipo_archivo);
@@ -82,13 +84,15 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
     return null;
   };
   
-  const openModalArchivos = (id, nombre, extension, color, historiaClinica, orden) => {
-    setIdarchivo(id);
-    setNombrearc(nombre);
-    setExtension(extension);
-    setColor(color);
-    setHistoriaClinica(historiaClinica);
-    setOrden(orden);
+  const openModalArchivos = (archivoItem,historiaClinica, orden)  => {
+    const combinedParam = {
+      archivoItem: archivoItem,
+      historiaClinica: historiaClinica,
+      orden: orden,
+      nombres: name,
+      apellidos: apell
+    };  
+    setDatosarc(combinedParam)
     setModalArchivos(true);
   };
 
@@ -112,13 +116,17 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   
 
   const GetBase64 = (historia, id_archivo) => {
+    setOpenview(true)
     ReadArchivos(historia, id_archivo, token)
       .then(response => {
         ReadFileBase64(response);
       })
       .catch(error => {
         throw new Error('Network response was not ok.', error);
-      });
+      })
+      .finally(() =>{
+        setOpenview(false)
+      })
   };
   
   
@@ -172,7 +180,7 @@ useEffect(() => {
                       <td className="border border-gray-300 px-2 py-1">
                         <div className="flex flex-col">
                           {listarchivos.map((archivoItem, archivoIndex) => (
-                            <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem.id, archivoItem.nombre, archivoItem.extension, archivoItem.codigo, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
+                            <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
                                 <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer pt-2" style={{ color: archivoItem.codigo }} />
                               <div className="text-sm fw-semi-bold cursor-pointer ml-2 pt-2" >Subir {archivoItem.nombre}</div>
                             </div>
@@ -191,7 +199,7 @@ useEffect(() => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
                       <td className="border border-gray-300 px-2 py-1">
                         {read.map((readItem, readIndex) => ( 
-                          <a key={readIndex} className='cursor-pointer' title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
+                          <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} disabled={openview} title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
                             {filterArchivos(readItem)}
                           </a>
                         ))}
@@ -205,7 +213,7 @@ useEffect(() => {
       </div>
 
       {modalArchivos && (
-        <ModalUpload closeModal={closeModal} id={idarchivo} nombre={nombrearc} extension={extension} color={color} historiaClinica={historiaClinica} orden={orden} dni={dni} user={user} token={token} />
+        <ModalUpload closeModal={closeModalArchivos} combinedParam={datosarc} dni={dni} user={user} token={token} reloadread={reloadread}/>
       )}
       {currentFile && (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">

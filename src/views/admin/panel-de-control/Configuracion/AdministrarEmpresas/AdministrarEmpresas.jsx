@@ -40,7 +40,7 @@ const AdministrarEmpresa = () => {
 
   useEffect(() => {
     setLoading(true);
-    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/empresa', token)
+    getFetch('/api/v01/ct/empresa', token)
       .then(response => {
         setData(response);
         setTotalPages(Math.ceil(response.length / recordsPerPage)); // Calcular el número total de páginas

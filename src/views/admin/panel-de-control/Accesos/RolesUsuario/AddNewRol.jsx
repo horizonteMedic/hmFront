@@ -26,7 +26,7 @@ const AddNewRol = ({ closeModal,Refresgpag, id_user,userlogued, token }) => {
 
     useEffect(() => {
         setLoading(true)
-        getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol/listadoRolesHabilitados', token)
+        getFetch('/api/v01/ct/rol/listadoRolesHabilitados', token)
         .then(response => {
           setData(response)
         })

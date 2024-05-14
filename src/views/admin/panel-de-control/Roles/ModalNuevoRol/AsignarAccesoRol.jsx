@@ -129,23 +129,23 @@ const TreeNode = ({ node, isParent, asigned ,ID_ROL,userlogued,token,Refresgpag}
       <div className="flex items-center">
         <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
         <button
-  className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
-  onClick={handleClick}
-  style={{ 
-    backgroundColor: isParent ? '#233245 '  : '#fc6b03',
-  }}
->
-  <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
-  {node.label}
-</button>
-<input
-  type="checkbox"
-  className="ml-auto pointer"
-  checked={isChecked}
-  style={{ 
-    pointerEvents: 'none',
-  }}
-/>
+          className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
+          onClick={handleClick}
+          style={{ 
+            backgroundColor: isParent ? '#233245 '  : '#fc6b03',
+          }}
+        >
+          <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
+          {node.label}
+        </button>
+        <input
+          type="checkbox"
+          className="ml-auto pointer"
+          checked={isChecked}
+          style={{ 
+            pointerEvents: 'none',
+          }}
+        />
 
       </div>
       {isOpen && (
@@ -169,7 +169,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
     setLoading(true);
     // Realizar las dos solicitudes a la API en paralelo usando Promise.all
     Promise.all([
-      getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/opcionesInterfaz', token),
+      getFetch('/api/v01/ct/opcionesInterfaz', token),
       ListViewxRol(ID_ROL, token)
     ])
     .then(([opcionesInterfazResponse, listViewxRolResponse]) => {
@@ -198,14 +198,6 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
       });
   };
 
-  const isNodeAssigned = (nodeId) => {
-    const assignedNode = dataasignacion.find(item => item.id_opcion_interfaz === nodeId);
-    if (assignedNode) {
-      return { assigned: true, id: assignedNode.id };
-    } else {
-      return { assigned: false, id: null };
-    }
-  };
   
   
   const treeData = buildTree(data);

@@ -32,7 +32,7 @@ const ListaArchivosPorServidores = () => {
 
   useEffect(() => {
     setLoading(true);
-    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/tipoArchivo', token)
+    getFetch('/api/v01/ct/tipoArchivo', token)
       .then(response => {
         setData(response);
       })
@@ -105,6 +105,7 @@ const ListaArchivosPorServidores = () => {
                     {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th> */}
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomenclatura</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Extensión</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Color</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
@@ -122,6 +123,7 @@ const ListaArchivosPorServidores = () => {
                       </td>
 
                       <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.nomenclatura}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.extension}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">
                         <div style={{ backgroundColor: item.codigo }} className="w-full h-6 mr-2 rounded-lg flex items-center justify-center shadow">
