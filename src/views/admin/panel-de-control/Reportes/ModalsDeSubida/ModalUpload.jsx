@@ -73,10 +73,15 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
 
       const nombre = `${datosarch.nombres.split(' ')[0]}`
       const apellido = `${datosarch.apellidos.split(' ')[0]}`
+      const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}.${datosarch.extension}`
 
-      console.log(`${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}.${datosarch.extension}`)
-      if (condition) {
-        
+      if (fileName.toLowerCase() != CodigoSave.toLowerCase()) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al subir archivo',
+          text: 'El Nombre del Archivo deben ser iguales',
+        });
+        return;
       }
 
       const reader = new FileReader();
