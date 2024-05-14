@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faUsers, faTrash, faUserSlash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faUsers, faTrash, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
@@ -9,8 +9,6 @@ import UsersModal from './ModalViewUser/ModalViewUser';
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
-import Swal from 'sweetalert2'
-import DeleteEmpleado from '../Accesos/model/DeleteEmpleado'; 
 
 const Accesos = () => {
   const token = useAuthStore(state => state.token);
@@ -116,40 +114,7 @@ const Accesos = () => {
     SetIdEmpleado(id)
     isViewUsersModalOpen ? SetIsViewUsersModalOpen(false) : SetIsViewUsersModalOpen(true)
   }
-  const deleteEmpleado = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
-    fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
-    Swal.fire({
-      title: "¿Estas Seguro?",
-      text: "No puedes revertir esta accion!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Si, Deshabilitar!"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        DeleteEmpleado(id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion,  
-          fechaNacimiento, fechaRegistro, sexo, usuarioRegistro,userlogued.sub)
-          .then(()=>{
-            Swal.fire({
-              title: "Deshabilitado!",
-              text: "El Empleado ha sido Deshabilitado.",
-              icon: "success"
-            }).then((result) => {
-              if (result.isConfirmed) Refresgpag()
-            });
-          })
-          .catch(() => {
-            Swal.fire({
-              title: "Error!",
-              text: "El Empleado no se ha podido Deshabilitado!",
-              icon: "error"
-            });
-          }
-          )
-      }
-    });
-  }
+
 
   if (loading) {
     return <Loading/>
@@ -180,7 +145,6 @@ const Accesos = () => {
                 <th className="border border-gray-300 px-2 py-1">Apellidos</th>
                 <th className="border border-gray-300 px-2 py-1">Nombres</th>
                 <th className="border border-gray-300 px-2 py-1">Cargo</th>
-                <th className="border border-gray-300 px-2 py-1 text-center w-[5%]">Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -194,21 +158,13 @@ const Accesos = () => {
                   title="Editar" />
                   <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-2 cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
                   title="Ver Usuarios" />
-                  {/* <FontAwesomeIcon icon={faUserSlash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
-                  item.direccion, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} className="text-red-500 cursor-pointer" 
-                  title="Eliminar" /> */}
 
                 </td>
                 <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>
-                <td className="border border-gray-300 px-2 py-1 text-center">
-                  <div style={{ borderRadius: '1rem' }} className={`py-1 px-2 ${item.estado ? 'bg-green-500' : 'bg-red-500'} text-white fw-bold`}>
-                    {item.estado ? 'Activo' : 'Inactivo'}
-                  </div>
-                </td>             
+                <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>   
                 </tr>
               ))}
             </tbody>
@@ -230,10 +186,6 @@ const Accesos = () => {
             <FontAwesomeIcon icon={faUsers} className="text-orange-500" />
             <p className="text-sm ml-2 md:ml-4">Ver Usuarios</p>
           </div>
-          {/* <div className="flex items-center ml-6 md:ml-8">
-            <FontAwesomeIcon icon={faUserSlash} className="text-red-500" />
-            <p className="text-sm ml-2 md:ml-4">Desabilitar</p>
-          </div> */}
           {/* <div className="flex items-center ml-2 md:ml-4">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
             <p className="text-sm ml-2 md:ml-4">Activo</p>

@@ -13,20 +13,25 @@ const HistorialPaciente = () => {
   const [sede, setSede] = useState('');
   const [empresauser, setEmpresauser] = useState([])
   const [contrataauser, setContratauser] = useState([])
-
+  console.log(ListEmpresa)
   useEffect(() => {
     if (ListSedes.length > 0) {
       setSede(ListSedes[0].cod_sede);
     }
     if (ListEmpresa.length > 0) {
-      setEmpresauser(ListEmpresa[0].razonSocial)
-      setEmpresa(ListEmpresa[0].ruc)
-      return
+      console.log(ListEmpresa)
+      if (!(ListEmpresa[0].ruc === '0')) {
+        setEmpresauser(ListEmpresa[0].razonSocial)
+        setEmpresa(ListEmpresa[0].ruc)
+        return
+      }
     }
     if (ListContrata.length > 0) {
-      setContratauser(ListContrata[0].razonSocial)
-      setEmpresa(ListContrata[0].ruc)
-      return
+      if (!(ListContrata[0].ruc === '0')) {
+        setContratauser(ListContrata[0].razonSocial)
+        setContrata(ListContrata[0].ruc)
+        return
+      }
     }
   }, [ListSedes,ListEmpresa]);
   const [data, setData] = useState([]);
@@ -51,7 +56,8 @@ const HistorialPaciente = () => {
   const [empresa, setEmpresa] = useState('');
   const [contrata, setContrata] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-
+  console.log(empresa)
+  console.log(contrata)
 
   
   useEffect(() => {
@@ -226,11 +232,12 @@ const HistorialPaciente = () => {
         <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Empresa:</strong></span>
           <select
-            className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
+            className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4 ${ListEmpresa.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
             onChange={(e) => {
               setEmpresa(e.target.value);
               setContrata('');
             }}
+            disabled={ListEmpresa.some(option => option.ruc === '0')}
             value={empresa}
           >
             <option value="">Seleccionar</option>
@@ -242,11 +249,12 @@ const HistorialPaciente = () => {
         <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
           <span className="mr-2"><strong>Contrata:</strong></span>
           <select
-            className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0"
+            className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 ${ListContrata.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
             onChange={(e) => {
               setContrata(e.target.value);
               setEmpresa('');
             }}
+            disabled={ListContrata.some(option => option.ruc === '0')}
             value={contrata}
           >
             <option value="">Seleccionar</option>
