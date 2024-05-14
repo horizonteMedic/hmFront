@@ -27,6 +27,10 @@ import AgregarCampaña from './views/admin/panel-de-control/Configuracion/Agrega
 import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateArchivos/CreateArchivos.jsx'
 import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
+// MINERA VISTAS
+import LabortorioClinicoMinera from './views/admin/panel-de-control/Minera/LabortorioClinicoMinera/Labortorio-clinico-minera.jsx'
+import ReportesMinera from './views/admin/panel-de-control/Minera/ReportesMinera/reportes-minera.jsx'
+import TriajeMinera from './views/admin/panel-de-control/Minera/TriajeMinera/triaje-minera.jsx'
 
 
 
@@ -94,10 +98,12 @@ const AppContent = () => {
           <Route path="/lista-archivos" element={<CreateArchivo />} />
           <Route path="/administrar-empresas" element={<AdministrarEmpresas />} />
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
-
-
           
         </Route>
+        {/* Minera */}
+          <Route path="/laboratorio-clinico-minera" element={<LabortorioClinicoMinera />} />
+          <Route path="/reportes-minera" element={<ReportesMinera />} />
+          <Route path="/triaje-minera" element={<TriajeMinera />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
     </>

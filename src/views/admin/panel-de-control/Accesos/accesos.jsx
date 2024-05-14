@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faUsers, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faUsers, faTrash, faUserSlash } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
 import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
@@ -194,9 +194,9 @@ const Accesos = () => {
                   title="Editar" />
                   <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-2 cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
                   title="Ver Usuarios" />
-                  <FontAwesomeIcon icon={faTrash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
+                  {/* <FontAwesomeIcon icon={faUserSlash} onClick={() => {deleteEmpleado(item.id_empleado,item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
                   item.direccion, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} className="text-red-500 cursor-pointer" 
-                  title="Eliminar" />
+                  title="Eliminar" /> */}
 
                 </td>
                 <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
@@ -230,10 +230,10 @@ const Accesos = () => {
             <FontAwesomeIcon icon={faUsers} className="text-orange-500" />
             <p className="text-sm ml-2 md:ml-4">Ver Usuarios</p>
           </div>
-          <div className="flex items-center ml-6 md:ml-8">
-            <FontAwesomeIcon icon={faTrash} className="text-red-500" />
-            <p className="text-sm ml-2 md:ml-4">Eliminar</p>
-          </div>
+          {/* <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={faUserSlash} className="text-red-500" />
+            <p className="text-sm ml-2 md:ml-4">Desabilitar</p>
+          </div> */}
           {/* <div className="flex items-center ml-2 md:ml-4">
             <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
             <p className="text-sm ml-2 md:ml-4">Activo</p>

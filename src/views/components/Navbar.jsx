@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser,  faChartBar, faList,faLock, faCog, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faUser,  faChartBar, faList,faLock, faCog, faSignOutAlt, faFlaskVial, faUserNurse } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -44,6 +44,7 @@ const Navbar = () => {
     { to: "/reporte-pacientes", id:"54", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", id:"55", label: "Matriz Postulante", icon: faList },
     { to: "/configuracion", id:"56", label: "Configuración", icon: faCog }
+
   ].filter(navLink => allowedRoutes.includes(navLink.id));
   
   const Logoutbutton = () => {
@@ -80,6 +81,11 @@ const Navbar = () => {
             onClick={handleNavLinkClick}
           />
         ))}
+        <CustomNavLink to="/laboratorio-clinico-minera" id="57" label="Laboratorio Clinico" icon={faFlaskVial} activeLink={activeLink}   onClick={handleNavLinkClick}/>
+        <CustomNavLink to="/reportes-minera" id="58" label="Reportes 2" icon={faChartBar} activeLink={activeLink}   onClick={handleNavLinkClick}/>
+        <CustomNavLink to="/triaje-minera" id="59" label="Triaje" icon={faUserNurse} activeLink={activeLink}   onClick={handleNavLinkClick}/>
+        
+          
         <Logoutbutton />
       </div>
       <div className="md:hidden">
