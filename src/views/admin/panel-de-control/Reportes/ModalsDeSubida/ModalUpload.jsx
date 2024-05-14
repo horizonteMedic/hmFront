@@ -75,7 +75,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
       const apellido = `${datosarch.apellidos.split(' ')[0]}`
       const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}.${datosarch.extension}`
 
-      if (fileName.toLowerCase() != CodigoSave.toLowerCase()) {
+      if (fileName.toUpperCase() != CodigoSave.toUpperCase()) {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
