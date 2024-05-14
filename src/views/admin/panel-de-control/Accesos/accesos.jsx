@@ -43,7 +43,7 @@ const Accesos = () => {
 
   useEffect(() => {
     setLoading(true)
-    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado', token)
+    getFetch('/api/v01/st/empleado', token)
     .then(response => {
       setData(response)
     })

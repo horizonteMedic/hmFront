@@ -9,7 +9,7 @@ const protectedRoutes = {
     '/configuracion': 56,
     '/lista-archivos': 57,
     '/agregar-sede': 58,
-    '/agregar-campaña': 59,
+    '/agregar-campa%C3%B1a': 59,
     '/administrar-empresas': 60,
     '/administrar-contratas': 61
 
@@ -29,9 +29,8 @@ export function ProtectedRoute(){
         const routeId = protectedRoutes[route];
         return listView.some(view => view.id === routeId);
     };
-
+    
     const isAccessAllowed = isRouteAllowed(location.pathname);
-
     return isAccessAllowed ? <Outlet /> : <Navigate to="/panel-de-control" />;
 }
 

@@ -13,13 +13,11 @@ const HistorialPaciente = () => {
   const [sede, setSede] = useState('');
   const [empresauser, setEmpresauser] = useState([])
   const [contrataauser, setContratauser] = useState([])
-  console.log(ListEmpresa)
   useEffect(() => {
     if (ListSedes.length > 0) {
       setSede(ListSedes[0].cod_sede);
     }
     if (ListEmpresa.length > 0) {
-      console.log(ListEmpresa)
       if (!(ListEmpresa[0].ruc === '0')) {
         setEmpresauser(ListEmpresa[0].razonSocial)
         setEmpresa(ListEmpresa[0].ruc)
@@ -56,9 +54,8 @@ const HistorialPaciente = () => {
   const [empresa, setEmpresa] = useState('');
   const [contrata, setContrata] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-  console.log(empresa)
-  console.log(contrata)
-
+  const [name, setName] = useState('')
+  const [apell, setApell] = useState('')
   
   useEffect(() => {
     let results = data;
@@ -112,6 +109,9 @@ const HistorialPaciente = () => {
     
   const openModal = (dni,nombres,apellidos) => {
     setDnipicker(dni)
+    //cambian por ser primero apellido
+    setName(apellidos)
+    setApell(nombres)
     setNombrespicker(`${nombres} ${apellidos}`)
     setIsModalOpen(true);
   };
@@ -343,7 +343,7 @@ const HistorialPaciente = () => {
           </button>
         </div>
       </div>
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} />}
     </div>
   );
 };

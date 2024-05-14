@@ -36,7 +36,7 @@ const AdministrarSedes = () => {
  
   useEffect(() => {
     setLoading(true);
-    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede', token)
+    getFetch('/api/v01/ct/sede', token)
       .then(response => {
         setData(response);
         setTotalPages(Math.ceil(response.length / recordsPerPage));

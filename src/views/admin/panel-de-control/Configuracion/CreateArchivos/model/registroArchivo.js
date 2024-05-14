@@ -1,6 +1,6 @@
 import {URLAzure} from '../../../../../config/config'
 
-const registrarArchivo = async (nombre, extension, color, codigo, estado, userRegistro, token) => {
+const registrarArchivo = async (nombre, nomenclatura, extension, color, codigo, estado, userRegistro, token) => {
 
   const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
@@ -10,6 +10,7 @@ const registrarArchivo = async (nombre, extension, color, codigo, estado, userRe
   const data = {
     nombre: nombre,
     extension: extension,
+    nomenclatura: nomenclatura,
     color: color,
     codigo: codigo,
     estado: estado,

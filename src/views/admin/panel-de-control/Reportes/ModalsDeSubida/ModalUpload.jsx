@@ -4,7 +4,21 @@ import { faTimes, faCloudUploadAlt, faCheckCircle, faTimesCircle } from '@fortaw
 import NewArchivo from '../model/NewArchivo';
 import Swal from 'sweetalert2';
 
-const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica, orden, dni, user, token }) => {
+const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }) => {
+
+  const [datosarch, setDatosarch] = useState({
+      id: combinedParam.archivoItem.id,
+      nombre: combinedParam.archivoItem.nombre,
+      extension: combinedParam.archivoItem.extension,
+      color: combinedParam.archivoItem.color,
+      codigo: combinedParam.archivoItem.codigo,
+      nomenclatura: combinedParam.archivoItem.nomenclatura,
+      historiaClinica: combinedParam.historiaClinica,
+      orden: combinedParam.orden,
+      nombres: combinedParam.nombres,
+      apellidos: combinedParam.apellidos
+  });
+
   const [filePreview, setFilePreview] = useState(null);
   const [fileUploaded, setFileUploaded] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -23,6 +37,7 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
       confirmButtonText: "Aceptar"
     }).then((result) => {
       if (result.isConfirmed) {
+        reloadread()
         closeModal()
       }
     });
@@ -32,20 +47,22 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
     closeModal();
   };
 
+  console.log(combinedParam)
+
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const fileName = file.name;
       const fileExtension = fileName.split('.').pop().toLowerCase();
-  
-      if (extension === 'pdf' && fileExtension !== 'pdf') {
+      
+      if (datosarch.extension === 'pdf' && fileExtension !== 'pdf') {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
           text: 'El archivo debe ser un PDF',
         });
         return;
-      } else if (extension !== 'pdf' && !['jpg', 'jpeg', 'png'].includes(fileExtension)) {
+      } else if (datosarch.extension !== 'pdf' && !['jpg', 'jpeg', 'png'].includes(fileExtension)) {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
@@ -53,7 +70,20 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
         });
         return;
       }
-  
+
+      const nombre = `${datosarch.nombres.split(' ')[0]}`
+      const apellido = `${datosarch.apellidos.split(' ')[0]}`
+      const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}.${datosarch.extension}`
+
+      if (fileName.toUpperCase() != CodigoSave.toUpperCase()) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al subir archivo',
+          text: 'El Nombre del Archivo deben ser iguales',
+        });
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64String = e.target.result;
@@ -71,7 +101,7 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
 
   const handleUpload = () => {
     setUploading(true);
-    NewArchivo(fileName,dni,historiaClinica,orden,id,user,token,filePreview)
+    NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
     .then(data => {
       setUploadSuccess(true);
       setUploading(false);
@@ -87,7 +117,7 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[40%] relative">
         <div className="flex justify-between items-center px-4 py-2 bg-gray-200">
-          <h2 className=" "> <strong>SUBIR ARCHIVO:</strong> {nombre}</h2>
+          <h2 className=" "> <strong>SUBIR ARCHIVO:</strong> {datosarch.nombre}</h2>
           <button onClick={closeCAMUModal} className="text-black">
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -121,7 +151,7 @@ const ModalUpload = ({ closeModal, id, nombre, extension, color, historiaClinica
         <button
           onClick={handleUpload}
           disabled={!fileUploaded || uploading}
-          style={{background: color}}
+          style={{background: datosarch.codigo}}
           className={`block w-full py-2 text-white font-bold uppercase rounded hover:bg-red-600 focus:outline-none focus:bg-red-600 ${(!fileUploaded || uploading) && 'opacity-50 cursor-not-allowed'}`}
           >
           Subir <FontAwesomeIcon icon={faCloudUploadAlt} className="ml-2" />

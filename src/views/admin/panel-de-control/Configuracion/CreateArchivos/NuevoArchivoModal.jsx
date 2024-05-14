@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 // Componente NuevoArchivoModal mejorado
 const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
   const [nombre, setNombre] = useState('');
+  const [nomenclatura, setNomenclatura] = useState('')
   const [extension, setExtension] = useState('');
   const [color, setColor] = useState('');
   const [codigo, setCodigo] = useState('');
@@ -58,7 +59,7 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!nombre || !extension || !color || !codigo) {
+    if (!nombre || !extension || !color || !codigo || !nomenclatura) {
       Swal.fire({
         title: '¡Error!',
         text: 'Por favor, complete todos los campos.',
@@ -71,7 +72,7 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
     }
   
     setCreating(true);
-    NewwTipoArchivo(nombre, extension, color, codigo, estado, userlogued, token)
+    NewwTipoArchivo(nombre, nomenclatura, extension, color, codigo, estado, userlogued, token)
       .then(() => AlertSuccess())
       .catch((error) => console.error('Error:', error))
       .finally(() => setCreating(false));
@@ -98,6 +99,19 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
               <input
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
+                type="text"
+                className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500  rounded-md"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="nomenclatura" className="block ">
+                Nomenclatura:
+              </label>
+              <input
+                value={nomenclatura}
+                maxLength={10}
+                required
+                onChange={(e) => setNomenclatura(e.target.value)}
                 type="text"
                 className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500  rounded-md"
               />

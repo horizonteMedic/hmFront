@@ -28,7 +28,7 @@ const Roles = () => {
 
   useEffect(() => {
     setLoading(true)
-    getFetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/rol', token)
+    getFetch('/api/v01/ct/rol', token)
     .then(response => {
       setData(response)
     })

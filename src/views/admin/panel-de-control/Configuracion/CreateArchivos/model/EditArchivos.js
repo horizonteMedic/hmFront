@@ -10,6 +10,7 @@ export function EditArchivo (datosEditados, userRegistro, token) {
   const data = {
     nombre: datosEditados.nombre,
     extension: datosEditados.extension,
+    nomenclatura: datosEditados.nomenclatura,
     color: datosEditados.color,
     codigo: datosEditados.codigo,
     estado: datosEditados.estado,
