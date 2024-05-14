@@ -81,10 +81,11 @@ const Navbar = () => {
             onClick={handleNavLinkClick}
           />
         ))}
-        <CustomNavLink to="/laboratorio-clinico-minera" id="57" label="Laboratorio Clinico" icon={faFlaskVial} activeLink={activeLink}   onClick={handleNavLinkClick}/>
+        {/* No tocar porfavor en mantenimiento */}
+        {/* <CustomNavLink to="/laboratorio-clinico-minera" id="57" label="Laboratorio Clinico" icon={faFlaskVial} activeLink={activeLink}   onClick={handleNavLinkClick}/>
         <CustomNavLink to="/reportes-minera" id="58" label="Reportes 2" icon={faChartBar} activeLink={activeLink}   onClick={handleNavLinkClick}/>
         <CustomNavLink to="/triaje-minera" id="59" label="Triaje" icon={faUserNurse} activeLink={activeLink}   onClick={handleNavLinkClick}/>
-        
+         */}
           
         <Logoutbutton />
       </div>
