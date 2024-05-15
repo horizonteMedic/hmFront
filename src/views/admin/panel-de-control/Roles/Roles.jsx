@@ -30,7 +30,8 @@ const Roles = () => {
  
   const [isModalRolesAsignadosOpen, setIsModalRolesAsignadosOpen] = useState(false);
 
-  const openRolesAsignadosModal = () => {
+  const openRolesAsignadosModal = (idRol) => {
+    setId(idRol)
     setIsModalRolesAsignadosOpen(true);
   };
   
@@ -156,7 +157,7 @@ const Roles = () => {
                     <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
                     <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
                     <FontAwesomeIcon icon={faLock} onClick={() => {openAccessModal(item.idRol)}} className="text-gray-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faUsers} onClick={openRolesAsignadosModal} className="color-naranja mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faUsers} onClick={() => {openRolesAsignadosModal(item.idRol)}} className="color-naranja mr-2 cursor-pointer" />
 
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
@@ -198,7 +199,7 @@ const Roles = () => {
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
       {isModalAccessOpen && <ModalAsignarVistasPorRol closeModal={closeAccessModal} token={token} Refresgpag={Refresgpag} userlogued={userlogued.sub} ID_ROL={id} />}
-      {isModalRolesAsignadosOpen && <ModalRolesAsignados closeModal={closeRolesAsignadosModal} data={data} />}
+      {isModalRolesAsignadosOpen && <ModalRolesAsignados closeModal={closeRolesAsignadosModal} data={data} id={id} userlogued={userlogued.sub} token={token} />}
 
     </div>   
   );
