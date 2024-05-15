@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 
 const ModalRolesAsignados = ({ closeModal, data }) => {
   
@@ -35,13 +35,35 @@ const ModalRolesAsignados = ({ closeModal, data }) => {
               <label htmlFor="estado" className="ml-2 text-sm text-gray-700">Activo</label>
             </div>
           </div>
+          
           <div className="flex justify-end">
             <button className="azul-btn font-bold py-2 px-4 rounded">
               Guardar datos
             </button>
           </div>
         </div>
+        <div className='p-4'>
+          <table className="w-full border border-gray-300 mb-4">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border border-gray-300 px-2 py-1">Rol</th>
+                  <th className="border border-gray-300 px-2 py-1">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr >
+                  <td className="border border-gray-300 px-2 py-1">Aquí rol</td>
+                  <td className="border border-gray-300 px-2 py-1 text-center">
+                      <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteEoCUser(item.id)}}/>
+                  </td>
+                </tr>
+              </tbody>
+          </table>
+          
+        </div>
+       
       </div>
+      
     </div>
   );
 };

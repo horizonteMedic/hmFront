@@ -213,7 +213,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
         />
       
         <div className="p azuloscurobackground flex justify-between p-3.5">
-          <p className="text-start font-bold color-azul text-white">Asignar Acceso</p>
+          <p className="text-start font-bold color-azul text-white">Asignar vistas</p>
         </div>
         <div className="p-4">
           <div className="modal-body relative">
