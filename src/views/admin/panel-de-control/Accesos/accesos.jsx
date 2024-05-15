@@ -43,7 +43,7 @@ const Accesos = () => {
 
   useEffect(() => {
     setLoading(true)
-    getFetch('/api/v01/st/empleado', token)
+    getFetch(`/api/v01/st/empleado/listadoBusquedaUsername/${userlogued.sub}`, token)
     .then(response => {
       setData(response)
     })

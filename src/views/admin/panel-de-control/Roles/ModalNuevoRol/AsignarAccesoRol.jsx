@@ -45,7 +45,7 @@ const TreeNode = ({ node, isParent, asigned ,ID_ROL,userlogued,token,Refresgpag}
   const [isOpen, setIsOpen] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [idAsignation, setIdAsignation] = useState('')
-
+ 
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
@@ -201,7 +201,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL }) => {
   
   
   const treeData = buildTree(data);
-
+  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
