@@ -42,7 +42,6 @@ const HistorialPaciente = () => {
   const AccessUpload= views.some(view => view.id === 102);
   const AccesDownload = views.some(view => view.id === 103);
   const AccesDelete = views.some(view => view.id === 104);
-  console.log(views)
   const Acces = {
     Upload: AccessUpload,
     Download: AccesDownload,
@@ -188,105 +187,110 @@ const HistorialPaciente = () => {
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-    <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-      <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
-        <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
-        <button onClick={reloadTable} className="focus:outline-none ml-3 relative">
-          {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
-          <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
-        </button>
-      </div>
-      {/* filtros */}
-      <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4 flex-wrap">
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2 fw-bold">Mostrar</span>
-          <select className="border pointer border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-                    <option value={5}>5</option>
-                    <option value={10}>10</option>
-                    <option value={15}>15</option>
-                    <option value={20}>20</option>
-                    <option value={25}>25</option>
-                    <option value={-1}>Todos</option>
-                  </select>
-        </div>
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2"><strong>Fecha inicio:</strong></span>
-          <input
-            type="date"
-            className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
-            value={startDate}
-            onChange={handleStartDateChange}
-          />
-        </div>
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2"><strong>Fecha fin:</strong></span>
-          <input
-            type="date"
-            className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
-            value={endDate}
-            onChange={handleEndDateChange}
-          />
-        </div>
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2"><strong>Sedes:</strong></span>
-          <select
-            className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
-            onChange={(e) => setSede(e.target.value)}
-            required
-            value={sede}
-          >
-            <option value="">Seleccionar</option>
-            {ListSedes?.map((option) => (
-              <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2"><strong>Empresa:</strong></span>
-          <select
-            className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4 ${ListEmpresa.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
-            onChange={(e) => {
-              setEmpresa(e.target.value);
-              setContrata('');
-            }}
-            disabled={ListEmpresa.some(option => option.ruc === '0')}
-            value={empresa}
-          >
-            <option value="">Seleccionar</option>
-            {ListEmpresa?.map((option,index) => (
-              <option key={index} value={option.ruc}>{option.razonSocial}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-          <span className="mr-2"><strong>Contrata:</strong></span>
-          <select
-            className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 ${ListContrata.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
-            onChange={(e) => {
-              setContrata(e.target.value);
-              setEmpresa('');
-            }}
-            disabled={ListContrata.some(option => option.ruc === '0')}
-            value={contrata}
-          >
-            <option value="">Seleccionar</option>
-            {ListContrata?.map((option,index) => (
-              <option key={index} value={option.ruc}>{option.razonSocial}</option>
-            ))}
-          </select>
-        </div>
-      <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
-        <span className="mr-2"><strong>Buscar:</strong></span>
-          <input
-            type="text"
-            className="border rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
-            placeholder="Buscar por DNI o nombre"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-      </div>
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
+        
+        <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
 
-      </div>
+          <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
+          <button onClick={reloadTable} className="focus:outline-none ml-3 relative">
+            {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+            <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+          </button>
+        </div>
+   
+        {/* filtros */}
+        <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4 flex-wrap">
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2 fw-bold">Mostrar</span>
+            <select className="border pointer border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={15}>15</option>
+                      <option value={20}>20</option>
+                      <option value={25}>25</option>
+                      <option value={-1}>Todos</option>
+                    </select>
+          </div>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2"><strong>Fecha inicio:</strong></span>
+            <input
+              type="date"
+              className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+              value={startDate}
+              onChange={handleStartDateChange}
+            />
+          </div>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2"><strong>Fecha fin:</strong></span>
+            <input
+              type="date"
+              className="pointer border border-gray-300 rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+              value={endDate}
+              onChange={handleEndDateChange}
+            />
+          </div>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2"><strong>Sedes:</strong></span>
+            <select
+              className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
+              onChange={(e) => setSede(e.target.value)}
+              required
+              value={sede}
+            >
+              <option value="">Seleccionar</option>
+              {ListSedes?.map((option) => (
+                <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2"><strong>Empresa:</strong></span>
+            <select
+              className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4 ${ListEmpresa.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
+              onChange={(e) => {
+                setEmpresa(e.target.value);
+                setContrata('');
+              }}
+              disabled={ListEmpresa.some(option => option.ruc === '0')}
+              value={empresa}
+            >
+              <option value="">Seleccionar</option>
+              {ListEmpresa?.map((option,index) => (
+                <option key={index} value={option.ruc}>{option.razonSocial}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2"><strong>Contrata:</strong></span>
+            <select
+              className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 ${ListContrata.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
+              onChange={(e) => {
+                setContrata(e.target.value);
+                setEmpresa('');
+              }}
+              disabled={ListContrata.some(option => option.ruc === '0')}
+              value={contrata}
+            >
+              <option value="">Seleccionar</option>
+              {ListContrata?.map((option,index) => (
+                <option key={index} value={option.ruc}>{option.razonSocial}</option>
+              ))}
+            </select>
+          </div>
+        <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+          <span className="mr-2"><strong>Buscar:</strong></span>
+            <input
+              type="text"
+              className="border rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+              placeholder="Buscar por DNI o nombre"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+        </div>
+      
+
+
+        </div>
         <div className="overflow-x-auto p-3">
         {loading ? (
             <p className="text-center">Cargando...</p>
@@ -355,6 +359,7 @@ const HistorialPaciente = () => {
           </button>
         </div>
       </div>
+      
       {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
     </div>
   );

@@ -64,8 +64,8 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="bg-white rounded-lg overflow-hidden shadow-xl w-96">
-        <div className="px-4 py-2 flex justify-between items-center azuloscurobackground">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
+        <div className="px-4 py-2 azuloscurobackground flex justify-between items-center">
           <h2 className="text-white font-bold">Editar Sede</h2>
           <FontAwesomeIcon icon={faTimes} className="cursor-pointer text-white" onClick={() => setShowEditModal(false)} />
         </div>
@@ -74,11 +74,11 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
             Nombre:
             <input type="text" name='nombre' className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.nombre} onChange={handleChange} />
           </label>
-          <label className="block mb-2">
+          <label className="block mb-2 mt-4">
             Código:
             <input type="text" name='codigo' className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.codigo} onChange={handleChange} />
           </label>
-          <div className="mb-4">
+          <div className="mb-4 mt-4">
             <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado</label>
             <input
                 type="checkbox"

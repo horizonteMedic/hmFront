@@ -14,6 +14,7 @@ const ViewModal = ({ fileURL, closeModal }) => {
           )}
         </div>
       </div>
+      
     </div>
   );
 };

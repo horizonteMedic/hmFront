@@ -19,7 +19,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [modalArchivos, setModalArchivos] = useState(false);
   const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
-  console.log(Acces.Delete)
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
@@ -245,6 +244,14 @@ useEffect(() => {
               </table>
             )}
         </div>
+        
+        {Acces.Delete && (
+          <div className="flex justify-center bg-gray-100 rounded-lg p-3">
+            <div className="flex items-center">
+              <p className="color-rojo fw-bold text-sm text-center">Para eliminar un archivo, hacer click derecho sobre el</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {modalArchivos && (
@@ -273,6 +280,7 @@ useEffect(() => {
             </div>
           </div>
         </div>
+        
       )}
 
 

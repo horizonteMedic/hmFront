@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { AsignedRolxRol } from '../model/AsingRolxRol';
 import Swal from 'sweetalert2';
+import { getFetch } from '../../getFetch/getFetch';
 
 const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
   
@@ -28,7 +29,6 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
       setLoading(false)
     })
   },[refres])
-
   const Refresgpag = () => {
     setRefresh(refres + +1)
   }
@@ -116,13 +116,38 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
               <label htmlFor="estado" className="ml-2 text-sm text-gray-700">Activo</label>
             </div>
           </div>
+          
           <div className="flex justify-end">
             <button className="azul-btn font-bold py-2 px-4 rounded" disabled={creating} onClick={handlesubmit}>
               Guardar datos
             </button>
           </div>
         </div>
+
+        <div className='p-4'>
+          <table className="w-full border border-gray-300 mb-4">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="border border-gray-300 px-2 py-1">Rol</th>
+                  <th className="border border-gray-300 px-2 py-1">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+              {dataAsigned?.map((item, index) => (
+                <tr key={index}>
+                  <td className="border border-gray-300 px-2 py-1">{item.idRolAsignado}</td>
+                  <td className="border border-gray-300 px-2 py-1 text-center">
+                      <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteEoCUser(item.id)}}/>
+                  </td>
+                </tr>
+                ))}
+              </tbody>
+          </table>
+          
+        </div>
+       
       </div>
+      
     </div>
   );
 };
