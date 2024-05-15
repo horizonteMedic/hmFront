@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../config/config";
+
 export default async function SubmitLogin(user,password) {
 
     const data = {
@@ -6,7 +8,7 @@ export default async function SubmitLogin(user,password) {
     }
 
     try{
-        const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/auth/login', {
+        const response = await fetch(`${URLAzure}/api/v01/st/auth/login`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'

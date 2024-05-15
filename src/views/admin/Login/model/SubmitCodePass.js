@@ -1,6 +1,8 @@
+import { URLAzure } from "../../../config/config";
+
 export default async function SubmitCodePass(email,code) {
     try{
-        const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/st/email/usarCodigo/${email}/${code}`, {
+        const response = await fetch(`${URLAzure}/api/v01/st/email/usarCodigo/${email}/${code}`, {
             method: 'GET'
         })
         if(response.ok){

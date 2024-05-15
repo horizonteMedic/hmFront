@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from "../../../../../store/auth"
 import { URLAzure } from '../../../../config/config';
 
+
 const ComboboxDepartamentos = () => {
   const [options, setOptions] = useState([]);
   const token = useAuthStore((state) => state.token);
   useEffect(() => { 
-        fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/departamento',{
+        fetch(`${URLAzure}/api/v01/ct/departamento`,{
         method: 'GET', 
         headers: {
             'Authorization': `Bearer ${token}`
@@ -28,7 +29,7 @@ const ComboboxProvincias = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
-          fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/provincia',{
+          fetch(`${URLAzure}/api/v01/ct/provincia`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`
@@ -50,7 +51,7 @@ const ComboboxDistritos = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
-          fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/distrito',{
+          fetch(`${URLAzure}/api/v01/ct/distrito`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`
@@ -72,7 +73,7 @@ const ComboboxSexo = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
-          fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/detalleParametros/detalleParametrizable/Sexo',{
+          fetch(`${URLAzure}/api/v01/ct/detalleParametros/detalleParametrizable/Sexo`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`
@@ -94,7 +95,7 @@ const ComboboxTipoDoc = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
-          fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/detalleParametros/detalleParametrizable/Tipo de Documento',{
+          fetch(`${URLAzure}/api/v01/ct/detalleParametros/detalleParametrizable/Tipo de Documento`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`
@@ -116,7 +117,7 @@ const ComboboxSedes = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
-          fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/sede',{
+          fetch(`${URLAzure}/api/v01/ct/sede`,{
           method: 'GET', 
           headers: {
               'Authorization': `Bearer ${token}`

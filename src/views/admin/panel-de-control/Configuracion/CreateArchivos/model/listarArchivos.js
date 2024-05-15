@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../../../config/config";
+
 export function getListArchivos(token) {
     const options = {
       method: 'GET',
@@ -6,7 +8,7 @@ export function getListArchivos(token) {
       }
     };
   
-    return fetch('https://servicios-web-hm.azurewebsites.net/api/v01/ct/tipoArchivo', options)
+    return fetch(`${URLAzure}/api/v01/ct/tipoArchivo`, options)
       .then(response => {
         if (!response.ok) {
           throw new Error('Error al obtener los archivos');

@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../../config/config";
+
 export default async function NewEmpleado(tipoDoc,doc,nombres,apellidos,cargo,ubigeo,sexo,correo,celular
     ,direccion,estado,formattedDate,userlogued) {
 
@@ -27,7 +29,7 @@ export default async function NewEmpleado(tipoDoc,doc,nombres,apellidos,cargo,ub
         userActualizacion: null 
     }
     
-        const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/empleado', {
+        const response = await fetch(`${URLAzure}/api/v01/st/empleado`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'

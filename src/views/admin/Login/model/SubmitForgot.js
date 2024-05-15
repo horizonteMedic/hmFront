@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../config/config"
+
 export default async function SubmitForgot(email) {
     const asunto = 'Codigo de recuperación de contraseña'
     const mensaje = 'mensaje de prueba'
@@ -8,7 +10,7 @@ export default async function SubmitForgot(email) {
         mensaje: mensaje
     }
     try{
-        const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/email/enviar-correo', {
+        const response = await fetch(`${URLAzure}/api/v01/st/email/enviar-correo`, {
             method: 'POST', 
             headers: {
                 'Content-Type': 'application/json'
