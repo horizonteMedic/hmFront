@@ -7,9 +7,7 @@ import { useAuthStore } from '../../../store/auth';
 const Card = ({ to, id, icon }) => {
   return (
     <Link to={to} id={id} className="flex justify-center items-center w-24 h-24 flex-shrink-0 m-4 p-6 bg-gray-200 rounded-[10px] transition duration-300 transform hover:shadow-lg hover:bg-[#233245] hover:scale-110">
-      <svg xmlns="http://www.w3.org/2000/svg" className="text-[#233245] fill-current w-8 h-8 transition-colors duration-300 transform hover:text-white" viewBox="0 0 24 24">
-        {icon}
-      </svg>
+      {icon}
     </Link>
   );
 };

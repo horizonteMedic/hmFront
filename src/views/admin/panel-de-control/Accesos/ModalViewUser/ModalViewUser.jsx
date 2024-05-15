@@ -143,7 +143,6 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                             {item.estado ? <FontAwesomeIcon icon={faUserSlash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 mr-3 cursor-pointer" />                        
                                             : <FontAwesomeIcon icon={faCircleCheck} onClick={() => { EnableAlert(item.idUser,item.username,item.id_empleado) }} className="text-green-500 mr-3 cursor-pointer"/>
                                             }
-                                            
                                             <FontAwesomeIcon icon={faTentArrowDownToLine} onClick={()=> {handleConfigIconClick(item.idUser,item.username)}} className="text-blue-500 mr-3 cursor-pointer" />
                                             <FontAwesomeIcon icon={faBuilding} onClick={() => {handleAsignarEmpresaContrataIconClick(item.idUser,item.username)}} className="text-green-500 mr-3 cursor-pointer" />
                                             <FontAwesomeIcon icon={faLock} onClick={() => {handleAsignarRol(item.idUser,item.username)}} className="text-gray-500  cursor-pointer" />
@@ -159,11 +158,12 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                             </tbody>
                         </table>
                         <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
+                            
                             <div className="flex items-center mb-2 md:mb-0 md:ml-6">
                                 <FontAwesomeIcon icon={faCircleCheck} className="text-green-500" />
                                 <p className="text-sm ml-2 md:ml-4">Habilitar Usuario</p>
                             </div>
-                            <div className="flex items-center mb-2 md:mb-0">
+                            <div className="flex items-center mb-2 md:mb-0 md:ml-6">
                                 <FontAwesomeIcon icon={faUserSlash} className="text-red-500" />
                                 <p className="text-sm ml-2 md:ml-4">Deshabilitar Usuario</p>
                             </div>
