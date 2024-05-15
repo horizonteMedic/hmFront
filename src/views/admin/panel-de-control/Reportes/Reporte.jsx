@@ -41,9 +41,12 @@ const HistorialPaciente = () => {
 
   const AccessUpload= views.some(view => view.id === 102);
   const AccesDownload = views.some(view => view.id === 103);
+  const AccesDelete = views.some(view => view.id === 104);
+  console.log(views)
   const Acces = {
     Upload: AccessUpload,
-    Download: AccesDownload
+    Download: AccesDownload,
+    Delete: AccesDelete
   }
   
   const [isModalOpen, setIsModalOpen] = useState(false);
