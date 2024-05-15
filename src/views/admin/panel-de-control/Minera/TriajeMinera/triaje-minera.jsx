@@ -9,7 +9,7 @@ const TriajeMinera = () => {
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold text-white">Triaje</h1>
         </div>
-        <div className="overflow-x-auto mb-4 p-3">
+        <div className="overflow-x-auto mb-4 p-5">
           <form>
             <div className="grid gap-4 mb-4 grid-cols-3">
               {/* Columna 1 */}
@@ -20,9 +20,9 @@ const TriajeMinera = () => {
                 </div>
                 
                 <div className="flex items-center space-x-2 mb-4">
-                  <input type="checkbox" id="ocupacional" name="ocupacional" />
+                  <input type="checkbox" id="ocupacional" name="ocupacional" className='pointer'/>
                   <label htmlFor="ocupacional">Ocupacional</label>
-                  <input type="checkbox" id="asistencial" name="asistencial" />
+                  <input type="checkbox" id="asistencial" name="asistencial" className='pointer'/>
                   <label htmlFor="asistencial">Asistencial</label>
                 </div>
                 <div className="flex items-center space-x-2 mb-4">
@@ -37,9 +37,9 @@ const TriajeMinera = () => {
                     <FontAwesomeIcon icon={faSearch}  />
                   </button>
 
-                  <input type="checkbox" id="recibo" name="recibo" />
+                  <input type="checkbox" id="recibo" name="recibo" className='pointer' />
                   <label htmlFor="recibo">Recibo</label>
-                  <input type="checkbox" id="nroOrden" name="nroOrden" />
+                  <input type="checkbox" id="nroOrden" name="nroOrden" className='pointer' />
                   <label htmlFor="nroOrden">Nro Orden</label>
                 </div>
                 <div className="flex items-center space-x-2 mb-4 mb-4">
