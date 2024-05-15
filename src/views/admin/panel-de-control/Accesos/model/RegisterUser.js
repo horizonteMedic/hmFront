@@ -1,3 +1,5 @@
+import { URLAzure } from "../../../../config/config";
+
 export default async function NewUser(username, password, estado, ruc, idEmpleado) {
 
     const data = {
@@ -8,7 +10,7 @@ export default async function NewUser(username, password, estado, ruc, idEmplead
         idEmpleado: idEmpleado
     }
 
-    const response = await fetch('https://servicios-web-hm.azurewebsites.net/api/v01/st/auth/register', {
+    const response = await fetch(`${URLAzure}/api/v01/st/auth/register`, {
         method: 'POST', 
         headers: {
             'Content-Type': 'application/json'

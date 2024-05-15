@@ -37,6 +37,15 @@ const HistorialPaciente = () => {
   const [refres, setRefresh] = useState(1);
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
+  const views = useAuthStore(state => state.listView);
+
+  const AccessUpload= views.some(view => view.id === 102);
+  const AccesDownload = views.some(view => view.id === 103);
+  const Acces = {
+    Upload: AccessUpload,
+    Download: AccesDownload
+  }
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
   const [searchTerm, setSearchTerm] = useState('');
@@ -343,7 +352,7 @@ const HistorialPaciente = () => {
           </button>
         </div>
       </div>
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
     </div>
   );
 };

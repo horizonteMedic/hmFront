@@ -1,6 +1,8 @@
+import { URLAzure } from "../../../config/config";
+
 export default async function SubmitPasswordActualizado(email,password) {
     try{
-        const response = await fetch(`https://servicios-web-hm.azurewebsites.net/api/v01/st/email/actualizarPassword/${email}/${password}`, {
+        const response = await fetch(`${URLAzure}/api/v01/st/email/actualizarPassword/${email}/${password}`, {
             method: 'GET'
         })
         if(response.ok){

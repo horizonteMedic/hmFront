@@ -7,7 +7,7 @@ import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos } from '../model/readArchivos';
 
-const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token, name, apell }) => {
+const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listarchivos, setListarchivos] = useState([]);
@@ -18,7 +18,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [modalArchivos, setModalArchivos] = useState(false);
   const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
-
+  console.log(Acces)
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
@@ -160,7 +160,7 @@ useEffect(() => {
               <table className="w-full border border-gray-300">
                 <thead>
                   <tr className="bg-gray-200">
-                    <th className="border border-gray-300 px-2 py-1 text-center">Acción</th>
+                    {Acces.Upload && <th className="border border-gray-300 px-2 py-1 text-center">Acción</th>}
                     <th className="border border-gray-300 px-2 py-1 text-center">Orden</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Empresa</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Contrata</th>
@@ -171,13 +171,13 @@ useEffect(() => {
                     <th className="border border-gray-300 px-2 py-1 text-center">Área</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Grupo sanguíneo</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Historia Clinica</th>
-                    <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>
+                    {Acces.Download && <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {data.map((dataItem, dataIndex) => (
                     <tr key={dataIndex}>
-                      <td className="border border-gray-300 px-2 py-1">
+                      {Acces.Upload && <td className="border border-gray-300 px-2 py-1">
                         <div className="flex flex-col">
                           {listarchivos.map((archivoItem, archivoIndex) => (
                             <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
@@ -186,7 +186,7 @@ useEffect(() => {
                             </div>
                           ))}
                         </div>
-                      </td>
+                      </td>}
                       <td className="border border-gray-300 px-2 py-1">{dataItem.orden}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.empresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.contrata}</td>
@@ -197,13 +197,13 @@ useEffect(() => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.area}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
-                      <td className="border border-gray-300 px-2 py-1">
+                      {Acces.Download && <td className="border border-gray-300 px-2 py-1">
                         {read.map((readItem, readIndex) => ( 
                           <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} disabled={openview} title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
                             {filterArchivos(readItem)}
                           </a>
                         ))}
-                      </td>
+                      </td>}
                     </tr>
                   ))}
                 </tbody>
