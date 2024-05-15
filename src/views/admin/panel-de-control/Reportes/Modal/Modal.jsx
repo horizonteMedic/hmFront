@@ -246,12 +246,13 @@ useEffect(() => {
             )}
         </div>
         
-        <div className="flex justify-center bg-gray-100 rounded-lg p-3">
-          
-          <div className="flex items-center ">
-            <p className=" color-rojo  fw-bold text-sm text-center  ">Para eliminar un archivo, hacer click derecho sobre el</p>
+        {Acces.Delete && (
+          <div className="flex justify-center bg-gray-100 rounded-lg p-3">
+            <div className="flex items-center">
+              <p className="color-rojo fw-bold text-sm text-center">Para eliminar un archivo, hacer click derecho sobre el</p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {modalArchivos && (
