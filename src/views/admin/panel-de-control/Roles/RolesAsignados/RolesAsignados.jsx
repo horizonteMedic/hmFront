@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
-const ModalRolesAsignados = ({ closeModal }) => {
+const ModalRolesAsignados = ({ closeModal, data }) => {
+  
+  const [listRol, setListRol] = useState(data)
+  const [estado, setEstadp] = useState(true)
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
@@ -19,12 +23,15 @@ const ModalRolesAsignados = ({ closeModal }) => {
             <label htmlFor="roles" className="block text-sm font-medium text-gray-700 mb-1">Mostrar todos los roles:</label>
             <select id="roles" name="roles" className="pointer border border-gray-300 rounded-md px-3 py-1 w-full">
               <option value="todos">Todos los roles</option>
+              {listRol?.map((item) => (
+                <option key={item.idRol} value={item.idRol}>{item.nombre}</option>
+              ))}
             </select>
           </div>
           <div className="mb-4">
             <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">Estado:</label>
             <div className="flex items-center">
-              <input id="estado" name="estado" type="checkbox" className="pointer form-checkbox h-5 w-5 text-purple-500" />
+              <input id="estado" name="estado" type="checkbox" checked={estado} className="pointer form-checkbox h-5 w-5 text-purple-500" />
               <label htmlFor="estado" className="ml-2 text-sm text-gray-700">Activo</label>
             </div>
           </div>

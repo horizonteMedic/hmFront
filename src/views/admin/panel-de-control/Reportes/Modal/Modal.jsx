@@ -5,7 +5,8 @@ import { GetHistoryUser } from '../model/getHistoryUser';
 import { GetlistArchivos } from '../model/getlistArchivos';
 import ModalUpload from '../ModalsDeSubida/ModalUpload';
 import { GetArchivosSubidos } from '../model/getArchivosSubidos';
-import { ReadArchivos } from '../model/readArchivos';
+import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
+import Swal from 'sweetalert2';
 
 const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
   const [data, setData] = useState([]);
@@ -18,7 +19,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [modalArchivos, setModalArchivos] = useState(false);
   const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
-  console.log(Acces)
+  console.log(Acces.Delete)
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
@@ -128,6 +129,40 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
         setOpenview(false)
       })
   };
+
+  const DeleteBase64 = (id) => {
+
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "No puedes revertir esta accion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DeleteArchivos64(id,token)
+          .then(() => {
+            Swal.fire({
+              title: "Eliminado!",
+              text: "El Archivo a sido eliminado de la base de datos.",
+              icon: "success"
+            }).then((result) => {
+              if (result.isConfirmed) reloadread()
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              title: "Error!",
+              text: "El Archivo no se ha podido eliminar!",
+              icon: "error"
+            });
+          });
+      }
+    })
+    
+  };
   
   
 useEffect(() => {
@@ -199,7 +234,7 @@ useEffect(() => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
                       {Acces.Download && <td className="border border-gray-300 px-2 py-1">
                         {read.map((readItem, readIndex) => ( 
-                          <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} disabled={openview} title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
+                          <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id); } } : {})} disabled={openview} title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
                             {filterArchivos(readItem)}
                           </a>
                         ))}

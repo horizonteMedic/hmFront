@@ -47,7 +47,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
     closeModal();
   };
 
-  console.log(combinedParam)
+  
 
   const handleFileInputChange = (event) => {
     const file = event.target.files[0];
