@@ -16,7 +16,6 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
   const [ruc, setRuc] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-
   const capitalizeWords = (str) => {
     return str.replace(/\b\w/g, function (char) {
       return char.toUpperCase();
@@ -56,8 +55,18 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
       });
   };
 
-
   const handleRegistrar = () => {
+    if (!documento || !apellidosNombres || !username || !password || !idEmpleado) {
+      Swal.fire({
+        title: "Error",
+        text: "Todos los campos son obligatorios.",
+        icon: "error",
+        confirmButtonColor: "#d33",
+        confirmButtonText: "Aceptar"
+      });
+      return;
+    }
+
     NewUser(username, password, estado, ruc, idEmpleado)
       .then(data => {
         AleertSucces();
@@ -72,54 +81,60 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
     setApellidosNombres(capitalizeWords(inputValue));
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      SearchDNI();
+    }
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[880px] relative">
-
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] md:w-[880px] relative">
         <FontAwesomeIcon
-            icon={faTimes}
-            className="absolute top-0 right-0 m-3 cursor-pointer  color-blanco"
-            onClick={closeModal}
+          icon={faTimes}
+          className="absolute top-0 right-0 m-3 cursor-pointer color-blanco"
+          onClick={closeModal}
         />
-      <div className="p azuloscurobackground flex justify-between p-3.5">
-        <h1 className="text-start font-bold color-azul text-white">Registro de Usuario</h1>
-      </div>
-      <div className='container p-4'>
-        <div className="mb-4">
-          <label className="block mb-1">N° de Documento:</label>
-          <div className="flex">
-            <input
-              type="text"
-              value={documento}
-              onChange={(e) => setDocumento(e.target.value)}
-              className="border border-gray-300 px-2 py-1 mr-2 w-1/2"
-            />
-            <button onClick={SearchDNI} className="border border-gray-300 px-2 py-1">Buscar</button>
-          </div>
+        <div className="p azuloscurobackground flex justify-between p-3.5">
+          <h1 className="text-start font-bold color-azul text-white">Registro de Usuario</h1>
         </div>
-        <div className="flex mb-4">
-          <div className="w-1/2 mr-2">
-            <label className="block mb-1">Apellidos y Nombres:</label>
-            <input
-              type="text"
-              value={apellidosNombres}
-              onChange={handleApellidosNombresChange}
-              className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-            />
+        <div className='container p-4'>
+          <div className="mb-4">
+            <label className="block mb-1">N° de Documento:</label>
+            <div className="flex">
+              <input
+                type="text"
+                value={documento}
+                onChange={(e) => setDocumento(e.target.value)}
+                onKeyDown={handleKeyDown} // Añadir evento onKeyDown
+                className="border border-gray-300 px-2 py-1 mr-2 w-1/2"
+              />
+              <button onClick={SearchDNI} className="border border-gray-300 px-2 py-1">Buscar</button>
+            </div>
           </div>
-          <div className="w-1/2">
-            <label className="block mb-1">Asignar Username:</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
-            />
+          <div className="flex mb-4">
+            <div className="w-1/2 mr-2">
+              <label className="block mb-1">Apellidos y Nombres:</label>
+              <input
+                type="text"
+                value={apellidosNombres}
+                onChange={handleApellidosNombresChange}
+                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block mb-1">Asignar Username:</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
+              />
+            </div>
           </div>
-        </div>
-        <div className="flex mb-4">
-          <div className="w-1/2 mr-2">
-            <label className="block mb-1">Asignar Password:</label>
+          <div className="flex mb-4">
+            <div className="w-1/2 mr-2">
+              <label className="block mb-1">Asignar Password:</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -133,30 +148,26 @@ const RegistroUsuarioModal = ({ closeModal, token, Refresgpag }) => {
                   onClick={() => setShowPassword(!showPassword)}
                 />
               </div>
-
+            </div>
           </div>
-    
+          <div className="mb-4">
+            <label className="block mb-1">Estado:</label>
+            <input
+              type="checkbox"
+              checked={estado}
+              onChange={(e) => setEstado(e.target.checked)}
+              className="pointer mr-2"
+            />
+          </div>
+          <button
+            className="naranja-btn px-4 py-2 rounded-md"
+            onClick={handleRegistrar}
+          >
+            Registrar Datos
+          </button>
         </div>
-        <div className="mb-4">
-          <label className="block mb-1">Estado:</label>
-          <input
-            type="checkbox"
-            checked={estado}
-            onChange={(e) => setEstado(e.target.checked)}
-            className="pointer mr-2"
-          />
-        </div>
-        
-        <button
-          className="naranja-btn px-4 py-2 rounded-md"
-          onClick={handleRegistrar}
-        >
-          Registrar Datos
-        </button>
       </div>
     </div>
-  </div>
-
   );
 };
 

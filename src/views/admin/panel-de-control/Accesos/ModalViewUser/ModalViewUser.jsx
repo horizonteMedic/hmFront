@@ -115,7 +115,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     return (
         <>
             <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-                <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[600px] relative">
+                <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md  w-[400px] md:w-[800px] relative">
 
                     <FontAwesomeIcon
                         icon={faTimes}
