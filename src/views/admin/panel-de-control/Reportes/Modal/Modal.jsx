@@ -19,7 +19,6 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   const [modalArchivos, setModalArchivos] = useState(false);
   const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
-  console.log(Acces.Delete)
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)

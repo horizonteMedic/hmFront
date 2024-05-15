@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faUsers, faTrash, faUserXmark } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
-import ConfigurarAccesosModal from './ModalConfigUsuario/Modalconfig'; 
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
 import UsersModal from './ModalViewUser/ModalViewUser';
 import { getFetch } from '../getFetch/getFetch';

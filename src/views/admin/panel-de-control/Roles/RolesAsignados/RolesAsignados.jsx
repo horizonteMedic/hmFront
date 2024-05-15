@@ -1,11 +1,92 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { AsignedRolxRol } from '../model/AsingRolxRol';
+import Swal from 'sweetalert2';
+import { getFetch } from '../../getFetch/getFetch';
 
-const ModalRolesAsignados = ({ closeModal, data }) => {
+const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
   
   const [listRol, setListRol] = useState(data)
-  const [estado, setEstadp] = useState(true)
+  const [dataAsigned, setDataAsigned] = useState([])
+
+  const [rolhijo, setRolhijo] = useState('')
+  const [estado, setEstado] = useState(true)
+  const [creating, setCreating] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(0)
+
+  useEffect(() => {
+    setLoading(true)
+    getFetch(`/api/v01/ct/rolAsignado/busquedaRolesPorIdRol/${id}`, token)
+    .then(response => {
+      setDataAsigned(response)
+    })
+    .catch(error => {
+      throw new Error('Network response was not ok.',error);
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+  },[refres])
+  const Refresgpag = () => {
+    setRefresh(refres + +1)
+  }
+
+  const showAlert = (title, text, icon) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: icon,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    });
+  };
+
+
+
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha asignado correctamente!",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Refresgpag()
+        closeModal()
+      }
+    });
+  }
+  
+  const handlesubmit = (event) => {
+    event.preventDefault();
+    setCreating(true)
+    if (!rolhijo) {
+      showAlert('Error', 'Por favor, complete todos los campos.', 'error');
+      return;
+    }
+  
+    const datos = {
+      RolPadre: id,
+      RolHijo: rolhijo,
+      estado: estado
+    }
+    
+    AsignedRolxRol(datos,userlogued,token)
+      .then(data => {
+        AleertSucces()
+      })
+      .catch(error => {
+        console.error('Error:', error)
+      })
+      .finally(() => {
+        setCreating(false)
+      })
+  }
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -21,7 +102,7 @@ const ModalRolesAsignados = ({ closeModal, data }) => {
         <div className='container p-4'>
           <div className="mb-4">
             <label htmlFor="roles" className="block text-sm font-medium text-gray-700 mb-1">Mostrar todos los roles:</label>
-            <select id="roles" name="roles" className="pointer border border-gray-300 rounded-md px-3 py-1 w-full">
+            <select id="roles" name="roles" onChange={(e) => {setRolhijo(e.target.value)}} className="pointer border border-gray-300 rounded-md px-3 py-1 w-full">
               <option value="todos">Todos los roles</option>
               {listRol?.map((item) => (
                 <option key={item.idRol} value={item.idRol}>{item.nombre}</option>
@@ -31,17 +112,18 @@ const ModalRolesAsignados = ({ closeModal, data }) => {
           <div className="mb-4">
             <label htmlFor="estado" className="block text-sm font-medium text-gray-700 mb-1">Estado:</label>
             <div className="flex items-center">
-              <input id="estado" name="estado" type="checkbox" checked={estado} className="pointer form-checkbox h-5 w-5 text-purple-500" />
+              <input id="estado" name="estado" type="checkbox" checked={estado} onChange={(e) => setEstado(e.target.checked)} className="pointer form-checkbox h-5 w-5 text-purple-500" />
               <label htmlFor="estado" className="ml-2 text-sm text-gray-700">Activo</label>
             </div>
           </div>
           
           <div className="flex justify-end">
-            <button className="azul-btn font-bold py-2 px-4 rounded">
+            <button className="azul-btn font-bold py-2 px-4 rounded" disabled={creating} onClick={handlesubmit}>
               Guardar datos
             </button>
           </div>
         </div>
+
         <div className='p-4'>
           <table className="w-full border border-gray-300 mb-4">
               <thead>
@@ -51,12 +133,14 @@ const ModalRolesAsignados = ({ closeModal, data }) => {
                 </tr>
               </thead>
               <tbody>
-                <tr >
-                  <td className="border border-gray-300 px-2 py-1">Aquí rol</td>
+              {dataAsigned?.map((item, index) => (
+                <tr key={index}>
+                  <td className="border border-gray-300 px-2 py-1">{item.idRolAsignado}</td>
                   <td className="border border-gray-300 px-2 py-1 text-center">
                       <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteEoCUser(item.id)}}/>
                   </td>
                 </tr>
+                ))}
               </tbody>
           </table>
           

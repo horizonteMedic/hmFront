@@ -8,6 +8,7 @@ const AddNewRol = ({ closeModal,Refresgpag, id_user,userlogued, token }) => {
     const [creating, setCreating] = useState(false);
 
     const [selectedRol, setSelectedRol] = useState('');
+
     function AleertSucces() {
         Swal.fire({
           title: "¡Exito!",
@@ -26,7 +27,7 @@ const AddNewRol = ({ closeModal,Refresgpag, id_user,userlogued, token }) => {
 
     useEffect(() => {
         setLoading(true)
-        getFetch('/api/v01/ct/rol/listadoRolesHabilitados', token)
+        getFetch(`/api/v01/ct/rol/busquedaRolesPorUserName/${userlogued}`, token)
         .then(response => {
           setData(response)
         })
