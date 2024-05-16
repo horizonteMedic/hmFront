@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faTentArrowDownToLine, faBuilding, faLock, faCircleCheck, faUserSlash } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTentArrowDownToLine, faBuilding, faLock, faCircleCheck, faUserSlash, faEdit } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 import AsignarSedeUser from '../AsignarSedeUser/AsignarSedeUser';
 import AsignarEmpresaContrataModal from '../AsignarEmpresaContrataModal/AsignarEmpresaContrataModal'; 
 import { ListUser, DeleteUsers, EnabledUsers } from '../model/ListUserID';
 import TableRoles from '../RolesUsuario/TableRoles';
+import EditUserModal from '../ModalEditUser/EditUser';
 
 const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const [data, setData] = useState([]);
@@ -15,6 +16,9 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
     const [openModalRol, setOpenModalRol] = useState(false)
     const [iduser, setIduser] = useState('')
     const [username, setUsername] = useState('')
+    //Edit
+    const [itemdata, setItemdata] = useState(null)
+    const [openEditUser, setOpenEditUser] = useState(false)
 
     useEffect(() => {
         ListUser(idEmpleado, token)
@@ -111,6 +115,11 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
         setUsername(username)
         setOpenModalRol(true);  
     };
+    
+    const handleEdit = (item) => {
+        setItemdata(item)
+        setOpenEditUser(true);  
+    };
 
     return (
         <>
@@ -140,6 +149,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                     <tr key={index}>
                                         <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
+                                            <FontAwesomeIcon icon={faEdit} onClick={()=> {handleEdit(item)}} className="text-blue-500 mr-3 cursor-pointer" />
                                             {item.estado ? <FontAwesomeIcon icon={faUserSlash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 mr-3 cursor-pointer" />                        
                                             : <FontAwesomeIcon icon={faCircleCheck} onClick={() => { EnableAlert(item.idUser,item.username,item.id_empleado) }} className="text-green-500 mr-3 cursor-pointer"/>
                                             }
@@ -159,6 +169,10 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                         </table>
                         <div className="mt-4 flex flex-col md:flex-row items-center justify-center md:justify-center bg-gray-100 rounded-lg p-3 mx-auto md:mx-0">
                             
+                        <div className="flex items-center mb-2 md:mb-0 md:ml-6">
+                                <FontAwesomeIcon icon={faEdit} className="text-purple-500" />
+                                <p className="text-sm ml-2 md:ml-4">Editar Usuario</p>
+                            </div>
                             <div className="flex items-center mb-2 md:mb-0 md:ml-6">
                                 <FontAwesomeIcon icon={faCircleCheck} className="text-green-500" />
                                 <p className="text-sm ml-2 md:ml-4">Habilitar Usuario</p>
@@ -188,6 +202,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
             {/* Renderizamos el nuevo modal */}
             {showAsignarEmpresaContrataModal && <AsignarEmpresaContrataModal closeModal={() => setShowAsignarEmpresaContrataModal(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
             {openModalRol && <TableRoles closeModal={() => setOpenModalRol(false)} id={iduser} user={username} userlogued={userlogued} token={token}/>}
+            {openEditUser && <EditUserModal closeModal={() => setOpenEditUser(false)} datos={itemdata} Refresgpag={Refresgpag} token={token} />}
         </>
     );
 };

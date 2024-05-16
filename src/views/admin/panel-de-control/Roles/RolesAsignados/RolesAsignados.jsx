@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
-import { AsignedRolxRol } from '../model/AsingRolxRol';
+import { AsignedRolxRol, DeleteAsignedRolxRol } from '../model/AsingRolxRol';
 import Swal from 'sweetalert2';
 import { getFetch } from '../../getFetch/getFetch';
 
@@ -29,6 +29,7 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
       setLoading(false)
     })
   },[refres])
+
   const Refresgpag = () => {
     setRefresh(refres + +1)
   }
@@ -57,7 +58,7 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         Refresgpag()
-        closeModal()
+        
       }
     });
   }
@@ -86,6 +87,38 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
       .finally(() => {
         setCreating(false)
       })
+  }
+
+  const deleteRol = (id) => {
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "No puedes revertir esta accion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        DeleteAsignedRolxRol(id,token)
+          .then(() => {
+            Swal.fire({
+              title: "Eliminado!",
+              text: "La Asignacion ha sido eliminada!.",
+              icon: "success"
+            }).then((result) => {
+              if (result.isConfirmed) Refresgpag()
+            });
+          })
+          .catch(() => {
+            Swal.fire({
+              title: "Error!",
+              text: "La Asignacion no se ha podido Eliminar!",
+              icon: "error"
+            });
+          });
+      }
+    });
   }
 
   return (
@@ -123,7 +156,9 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
             </button>
           </div>
         </div>
-
+        {loading ? (
+            <p className="text-center">Cargando...</p>
+          ) : (
         <div className='p-4'>
           <table className="w-full border border-gray-300 mb-4">
               <thead>
@@ -133,19 +168,23 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
                 </tr>
               </thead>
               <tbody>
-              {dataAsigned?.map((item, index) => (
+              {dataAsigned?.map((item, index) => {
+               
+                const dataRole = data.find(role => role.idRol === item.idRolAsignar);
+                return (
                 <tr key={index}>
-                  <td className="border border-gray-300 px-2 py-1">{item.idRolAsignado}</td>
+                  <td className="border border-gray-300 px-2 py-1">{dataRole.nombre}</td>
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                      <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteEoCUser(item.id)}}/>
+                      <FontAwesomeIcon icon={faTrashAlt} className="text-red-500 pointer" onClick={() =>{deleteRol(item.idRolAsignado)}}/>
                   </td>
                 </tr>
-                ))}
+                )
+              })}
               </tbody>
           </table>
           
         </div>
-       
+          )}
       </div>
       
     </div>
