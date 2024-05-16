@@ -63,7 +63,7 @@ const EditUserModal = ({ closeModal, datos, Refresgpag, token }) => {
       <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
         <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[400px] relative">
           <div className="px-4 py-2 azuloscurobackground flex justify-between items-center">
-            <h2 className="text-white font-bold">Editar Sede</h2>
+            <h2 className="text-white font-bold">Editar Usuario</h2>
             <FontAwesomeIcon icon={faTimes} className="cursor-pointer text-white" onClick={() => {closeModal()}} />
           </div>
           <div className="p-4">

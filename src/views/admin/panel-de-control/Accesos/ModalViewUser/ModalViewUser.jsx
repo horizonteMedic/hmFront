@@ -149,7 +149,7 @@ const UsersModal = ({ closeModal, userlogued,idEmpleado, token }) => {
                                     <tr key={index}>
                                         <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
                                         <td className="border border-gray-300 px-2 py-1 text-center">
-                                            <FontAwesomeIcon icon={faEdit} onClick={()=> {handleEdit(item)}} className="text-blue-500 mr-3 cursor-pointer" />
+                                            <FontAwesomeIcon icon={faEdit} onClick={()=> {handleEdit(item)}} className="text-purple-500 mr-3 cursor-pointer" />
                                             {item.estado ? <FontAwesomeIcon icon={faUserSlash} onClick={() => { DeleteAlert(item.idUser,item.username,item.id_empleado) }} className="text-red-500 mr-3 cursor-pointer" />                        
                                             : <FontAwesomeIcon icon={faCircleCheck} onClick={() => { EnableAlert(item.idUser,item.username,item.id_empleado) }} className="text-green-500 mr-3 cursor-pointer"/>
                                             }
