@@ -4,21 +4,16 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 const TriajeMinera = () => {
   return (
-    <div className="container mx-auto mt-12 mb-12">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
+    <div className="container mx-auto mt-12 mb-12 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-full sm:w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold text-white">Triaje</h1>
         </div>
         <div className="overflow-x-auto mb-4 p-5">
           <form>
-            <div className="grid gap-4 mb-4 grid-cols-3">
+            <div className="grid gap-4 mb-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {/* Columna 1 */}
-              <div className="border-r border-gray-300 pr-4">
-              <div>
-                <div>
-                  <p className='mb-4 fw-bold'>Datos:</p>
-                </div>
-                
+              <div className="pr-4">
                 <div className="flex items-center space-x-2 mb-4">
                   <input type="checkbox" id="ocupacional" name="ocupacional" className='pointer'/>
                   <label htmlFor="ocupacional">Ocupacional</label>
@@ -33,16 +28,14 @@ const TriajeMinera = () => {
                     name="nro"
                     className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white"
                   />
-                  <button className="flex items-center justify-center  rounded-full naranja-btn w-10 h-10">
-                    <FontAwesomeIcon icon={faSearch}  />
-                  </button>
-
+                </div>
+                <div className="flex items-center space-x-2 mb-4">
                   <input type="checkbox" id="recibo" name="recibo" className='pointer' />
                   <label htmlFor="recibo">Recibo</label>
                   <input type="checkbox" id="nroOrden" name="nroOrden" className='pointer' />
                   <label htmlFor="nroOrden">Nro Orden</label>
                 </div>
-                <div className="flex items-center space-x-2 mb-4 mb-4">
+                <div className="flex items-center space-x-2 mb-4">
                   <label htmlFor="expmedico" className="block text-gray-700 w-36">
                     Expediente Médico:
                   </label>
@@ -53,7 +46,7 @@ const TriajeMinera = () => {
                     className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                   />
                 </div>
-                <div className="flex items-center space-x-2 mb-4 mb-4">
+                <div className="flex items-center space-x-2 mb-4">
                   <label htmlFor="empresa" className="block text-gray-700 w-36">
                     Empresa:
                   </label>
@@ -124,7 +117,6 @@ const TriajeMinera = () => {
                   />
                 </div>
               </div>
-              </div>
             
               {/* Columna 2 */}
               <div className="pl-4">
@@ -188,9 +180,8 @@ const TriajeMinera = () => {
                 </div>
               </div>
               {/* Columna 3 */}
-              <div>
               <div className='pt-5'>
-              <div className="flex items-center space-x-2 mb-4">
+                <div className="flex items-center space-x-2 mb-4">
                   <label htmlFor="cadera" className="block text-gray-700 w-36">
                     Cadera:
                   </label>
@@ -245,7 +236,6 @@ const TriajeMinera = () => {
                     className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                   />
                 </div>
-              </div>
               </div>
             </div>
           </form>

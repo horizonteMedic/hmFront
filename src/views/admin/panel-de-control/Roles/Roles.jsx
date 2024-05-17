@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faEdit, faTrash, faPlus, faLock, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faEdit, faTrash, faPlus, faLock, faUsers, faPaperclip, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalNuevoRol/Modal'; 
 import { getFetch } from '../getFetch/getFetch';
 import { Loading } from '../../../components/Loading';
@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import DeleteRol from './model/DeleteRol';
 import ModalAsignarVistasPorRol from './ModalNuevoRol/AsignarAccesoRol'; 
 import ModalRolesAsignados from './RolesAsignados/RolesAsignados'; 
+import ModalArchivo from './ModalAsignarArchivosRol/ModalAsignarArchivosRol'; 
 
 
 const Roles = () => {
@@ -38,7 +39,19 @@ const Roles = () => {
   const closeRolesAsignadosModal = () => {
     setIsModalRolesAsignadosOpen(false);
   };
-  
+
+
+  // para asignar archivos por rol
+  const [isModalArchivoOpen, setIsModalArchivoOpen] = useState(false);
+    const openArchivoModal = () => {
+      setIsModalArchivoOpen(true);
+    };
+
+    const closeArchivoModal = () => {
+      setIsModalArchivoOpen(false);
+    };
+  // ----------------------------
+
   useEffect(() => {
     setLoading(true)
     getFetch('/api/v01/ct/rol', token)
@@ -158,6 +171,7 @@ const Roles = () => {
                     <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
                     <FontAwesomeIcon icon={faLock} onClick={() => {openAccessModal(item.idRol)}} className="text-gray-500 mr-2 cursor-pointer" />
                     <FontAwesomeIcon icon={faUsers} onClick={() => {openRolesAsignadosModal(item.idRol)}} className="color-naranja mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faPaperclip} onClick={openArchivoModal} className="color-azul mr-2 cursor-pointer" />
 
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
@@ -167,8 +181,6 @@ const Roles = () => {
                       {item.estado ? 'Activo' : 'Inactivo'}
                     </div>
                   </td>
-
-
                 </tr>
               ))}
             </tbody>
@@ -192,7 +204,10 @@ const Roles = () => {
             <FontAwesomeIcon icon={ faUsers} className="color-naranja" />
             <p className="text-sm ml-2 md:ml-4">Asignar Roles</p>
           </div>
-         
+          <div className="flex items-center ml-6 md:ml-8">
+            <FontAwesomeIcon icon={ faPaperclip} className="color-azul" />
+            <p className="text-sm ml-2 md:ml-4">Asignar Archivos</p>
+          </div>
         </div>
 
       </div>
@@ -200,6 +215,7 @@ const Roles = () => {
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
       {isModalAccessOpen && <ModalAsignarVistasPorRol closeModal={closeAccessModal} token={token} Refresgpag={Refresgpag} userlogued={userlogued.sub} ID_ROL={id} />}
       {isModalRolesAsignadosOpen && <ModalRolesAsignados closeModal={closeRolesAsignadosModal} data={data} id={id} userlogued={userlogued.sub} token={token} />}
+      {isModalArchivoOpen && <ModalArchivo closeModal={closeArchivoModal} />}
 
     </div>   
   );
