@@ -1,6 +1,7 @@
 import {URLAzure} from '../../../../config/config'
 
-export function GetlistArchivos(token) {
+//Actualizacion, ahora busca por iduser los archivos habilitados
+export function GetlistArchivos(token,id) {
 
     const options = {
         method: 'GET', 
@@ -10,7 +11,7 @@ export function GetlistArchivos(token) {
         }
     }
 
-    return fetch(`${URLAzure}/api/v01/ct/tipoArchivo/listadoArchivosHabilitados`,options)
+    return fetch(`${URLAzure}/api/v01/ct/tipoArchivo/listadoTiposArchivosPorIdUser/${id}`,options)
     .then(res => res.json()).then(response => response)
 }
 

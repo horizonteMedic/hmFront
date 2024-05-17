@@ -8,7 +8,7 @@ import { GetArchivosSubidos } from '../model/getArchivosSubidos';
 import { ReadArchivos, DeleteArchivos64 } from '../model/readArchivos';
 import Swal from 'sweetalert2';
 
-const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
+const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empresa, contrata, token, name, apell, Acces }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [listarchivos, setListarchivos] = useState([]);
@@ -38,7 +38,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
   }, []);
 
   useEffect(() => {
-    GetlistArchivos(token)
+    GetlistArchivos(token, iduser)
       .then(response => {
         setListarchivos(response);
       })
@@ -50,7 +50,7 @@ const Modal = ({ closeModal, user, start, end, sede, dni, nombre, empresa, contr
 
   useEffect(() => {
       if (data && data.length > 0) {
-        GetArchivosSubidos(data[0].historiaClinica, token)
+        GetArchivosSubidos(data[0].historiaClinica, iduser, token)
           .then(response => {
             setRead(response);
           })
