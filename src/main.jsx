@@ -29,7 +29,7 @@ import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/Ad
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
 // MINERA VISTAS
 import LabortorioClinicoMinera from './views/admin/panel-de-control/Minera/LabortorioClinicoMinera/Labortorio-clinico-minera.jsx'
-import ReportesMinera from './views/admin/panel-de-control/Minera/ReportesMinera/reportes-minera.jsx'
+import RegistroDePacientes from './views/admin/panel-de-control/Minera/RegistroDePacientes/Registro-de-pacientes.jsx'
 import TriajeMinera from './views/admin/panel-de-control/Minera/TriajeMinera/triaje-minera.jsx'
 
 
@@ -102,7 +102,7 @@ const AppContent = () => {
         </Route>
         {/* Minera */}
           <Route path="/laboratorio-clinico-minera" element={<LabortorioClinicoMinera />} />
-          <Route path="/reportes-minera" element={<ReportesMinera />} />
+          <Route path="/Registro-de-pacientes" element={<RegistroDePacientes />} />
           <Route path="/triaje-minera" element={<TriajeMinera />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}

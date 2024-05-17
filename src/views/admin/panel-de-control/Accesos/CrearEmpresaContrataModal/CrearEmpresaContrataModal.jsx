@@ -63,7 +63,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
 
   function AleertSucces() {
     Swal.fire({
-      title: "¡Exito!",
+      title: "¡Éxito!",
       text: "Se ha creado a un Nuevo Usuario",
       icon: "success",
       confirmButtonColor: "#3085d6",
@@ -104,45 +104,45 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
             <select
               value={tipo}
               onChange={handleTipoChange}
-              className="pointer border border-gray-300 rounded-md py-2 px-3 "
+              className="pointer border border-gray-300 rounded-xl py-2 px-3 "
             >
-              <option value="seleccione">Seleccione...</option>
+              <option value="seleccione">Empresa o Contrata</option>
               <option value="EMPRESA">Empresa</option>
               <option value="CONTRATA">Contrata</option>
             </select>
           </div>
           <div className="mb-4">
-  <label>Razón Social:</label>
-  <input
-    type="text"
-    value={searchTerm}
-    onChange={handleSearch}
-    placeholder="Buscar razón social..."
-    className="w-full border pointer border-gray-300 rounded-md py-2 px-3 "
-  />
-  {searchTerm && (
-    <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-      {filteredData.map((option, index) => (
-        <div
-          key={index}
-          className="cursor-pointer p-2 hover:bg-gray-200"
-          onClick={() => {
-            setRazonSocial(option.razonSocial);
-            setRuc(option.ruc);
-            setSearchTerm('');
-            setFilteredData([]);
-          }}
-        >
-          {option.razonSocial}
-        </div>
-      ))}
-    </div>
-  )}
-  {razonSocial && (
-    <div className="text-sm mt-1">Seleccionado: <strong>{razonSocial}</strong></div>
-  )}
-</div>
-
+            <label>Razón Social:</label>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearch}
+              placeholder="Seleccione"
+              className="w-full border pointer border-gray-300 rounded-md py-2 px-3"
+              disabled={!tipo || tipo === 'seleccione'}
+            />
+            {searchTerm && (
+              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+                {filteredData.map((option, index) => (
+                  <div
+                    key={index}
+                    className="cursor-pointer p-2 hover:bg-gray-200"
+                    onClick={() => {
+                      setRazonSocial(option.razonSocial);
+                      setRuc(option.ruc);
+                      setSearchTerm('');
+                      setFilteredData([]);
+                    }}
+                  >
+                    {option.razonSocial}
+                  </div>
+                ))}
+              </div>
+            )}
+            {razonSocial && (
+              <div className="text-sm mt-1">Seleccionado: <strong>{razonSocial}</strong></div>
+            )}
+          </div>
           <div className="mb-4">
             <label>RUC:</label>
             <input
@@ -164,7 +164,6 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
               className="pointer"
             />
           </div>
-
           <div className="flex justify-center">
             <button
               onClick={registrarEmpresaContrata}
