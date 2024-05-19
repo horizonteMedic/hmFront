@@ -360,7 +360,7 @@ const HistorialPaciente = () => {
         </div>
       </div>
       
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
     </div>
   );
 };

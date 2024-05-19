@@ -1,6 +1,6 @@
 import {URLAzure} from '../../../../config/config'
 //Esto es para ver los archivos ya subidos del paciente
-export function GetArchivosSubidos(historia,token) {
+export function GetArchivosSubidos(historia,id,token) {
 
     const options = {
         method: 'GET', 
@@ -10,7 +10,7 @@ export function GetArchivosSubidos(historia,token) {
         }
     }
 
-    return fetch(`${URLAzure}/api/v01/ct/archivos/busquedaPorHC/${historia}`,options)
+    return fetch(`${URLAzure}/api/v01/ct/archivos/busquedaPorHC/${historia}/${id}`,options)
     .then(res => res.json()).then(response => response)
 }
 
