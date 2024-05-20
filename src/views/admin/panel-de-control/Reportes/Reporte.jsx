@@ -69,20 +69,27 @@ const HistorialPaciente = () => {
   const [apell, setApell] = useState('')
   //NUEVA API FECHA DE EXAMEN
   const [fecha_examen, Setfecha_examnen] = useState('')
+
   useEffect(() => {
-    let results = data;
-
-    if (searchTerm) {
-      results = data.filter(item =>
-        (typeof item.dni === 'number' && item.dni.toString().includes(searchTerm)) ||
-        ((typeof item.apellidos === 'string' || item.apellidos instanceof String) && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        ((typeof item.nombres === 'string' || item.nombres instanceof String) && item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-
-    }
-    setFilteredData(results);
     
-  }, [data, searchTerm]);
+    let results = []
+
+    if (searchTerm.length > 4) {
+      const isNumber = !isNaN(searchTerm[0]);
+
+      if (isNumber) {
+          // Filtrar por dni si searchTerm comienza con un número
+          results = data.filter(item => item.dni.toString().includes(searchTerm));
+          setFilteredData(results)
+      } else {
+          results = data.filter(item => item.apellidos.toLowerCase().includes(searchTerm.toLowerCase()) || item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
+          setFilteredData(results)
+      }
+      return
+    }
+    
+    
+  }, [searchTerm]);
   
 
   useEffect(() => {
