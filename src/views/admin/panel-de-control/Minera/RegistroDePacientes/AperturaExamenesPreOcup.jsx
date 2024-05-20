@@ -2,14 +2,13 @@ import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faTrashAlt, faCheck, faSyncAlt } from '@fortawesome/free-solid-svg-icons'; // Agregamos los iconos necesarios
+import { faPlus, faTrashAlt, faCheck, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
 const AperturaExamenesPreOcup = () => {
   const [startDate, setStartDate] = useState(new Date());
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes manejar la lógica para enviar los datos del formulario
     console.log('Formulario enviado');
   };
 
