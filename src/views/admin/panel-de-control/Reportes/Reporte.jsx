@@ -67,19 +67,21 @@ const HistorialPaciente = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [name, setName] = useState('')
   const [apell, setApell] = useState('')
-  
+  //NUEVA API FECHA DE EXAMEN
+  const [fecha_examen, Setfecha_examnen] = useState('')
   useEffect(() => {
     let results = data;
-  
+
     if (searchTerm) {
       results = data.filter(item =>
         (typeof item.dni === 'number' && item.dni.toString().includes(searchTerm)) ||
         ((typeof item.apellidos === 'string' || item.apellidos instanceof String) && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
         ((typeof item.nombres === 'string' || item.nombres instanceof String) && item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
       );
+
     }
-  
     setFilteredData(results);
+    
   }, [data, searchTerm]);
   
 
@@ -100,6 +102,7 @@ const HistorialPaciente = () => {
         })
         .finally(() => {
           setLoading(false);
+          console.log('ajajaj termine 1')
           SecondPlane()
         });
     }
@@ -112,18 +115,21 @@ const HistorialPaciente = () => {
         const otrasSedesData = await Promise.all(fetchPromises);
         const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
         const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
+        
         setData(prevData => [...prevData, ...allData]);
+        
       }
     }
   
 
     
-  const openModal = (dni,nombres,apellidos) => {
+  const openModal = (dni,nombres,apellidos, fecha_examen) => {
     setDnipicker(dni)
     //cambian por ser primero apellido
     setName(apellidos)
     setApell(nombres)
     setNombrespicker(`${nombres} ${apellidos}`)
+    Setfecha_examnen(fecha_examen)
     setIsModalOpen(true);
   };
 
@@ -311,7 +317,7 @@ const HistorialPaciente = () => {
                 filteredData.map((item, index) => (
                   <tr key={index}>
                     <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres) }} className="focus:outline-none">
+                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen) }} className="focus:outline-none">
                         <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
                       </button>
                     </td>
@@ -326,7 +332,7 @@ const HistorialPaciente = () => {
                 currentData.map((item, index) => (
                   <tr key={index}>
                     <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres) }} className="focus:outline-none">
+                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen) }} className="focus:outline-none">
                         <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
                       </button>
                     </td>
@@ -360,7 +366,7 @@ const HistorialPaciente = () => {
         </div>
       </div>
       
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={startDate} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
     </div>
   );
 };
