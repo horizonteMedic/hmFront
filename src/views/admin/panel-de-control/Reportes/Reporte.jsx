@@ -73,7 +73,9 @@ const HistorialPaciente = () => {
   useEffect(() => {
     
     let results = []
-
+    if (data === null) {
+      return
+    }
     if (searchTerm.length > 4) {
       const isNumber = !isNaN(searchTerm[0]);
 
@@ -82,8 +84,14 @@ const HistorialPaciente = () => {
           results = data.filter(item => item.dni.toString().includes(searchTerm));
           setFilteredData(results)
       } else {
-          results = data.filter(item => item.apellidos.toLowerCase().includes(searchTerm.toLowerCase()) || item.nombres.toLowerCase().includes(searchTerm.toLowerCase()))
-          setFilteredData(results)
+          if (data && data.length > 0) {
+            console.log(data)
+            results = data.filter(item =>  (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (typeof item.nombres === 'string' && item.nombres.toLowerCase().includes(searchTerm.toLowerCase())))
+            setFilteredData(results)
+            return
+          }
+        return
       }
       return
     }
