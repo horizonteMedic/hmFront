@@ -85,7 +85,7 @@ const HistorialPaciente = () => {
           setFilteredData(results)
       } else {
           if (data && data.length > 0) {
-            console.log(data)
+
             results = data.filter(item =>  (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (typeof item.nombres === 'string' && item.nombres.toLowerCase().includes(searchTerm.toLowerCase())))
             setFilteredData(results)
@@ -93,8 +93,10 @@ const HistorialPaciente = () => {
           }
         return
       }
+      
       return
     }
+    setFilteredData([])
     
     
   }, [searchTerm]);
@@ -117,7 +119,6 @@ const HistorialPaciente = () => {
         })
         .finally(() => {
           setLoading(false);
-          console.log('ajajaj termine 1')
           SecondPlane()
         });
     }
