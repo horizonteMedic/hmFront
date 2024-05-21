@@ -98,7 +98,7 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
               </label>
               <input
                 value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                onChange={(e) => setNombre(e.target.value.toUpperCase())}
                 type="text"
                 className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500  rounded-md"
               />
@@ -111,7 +111,7 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
                 value={nomenclatura}
                 maxLength={10}
                 required
-                onChange={(e) => setNomenclatura(e.target.value)}
+                onChange={(e) => setNomenclatura(e.target.value.toUpperCase())}
                 type="text"
                 className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500  rounded-md"
               />
@@ -144,7 +144,7 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
                 <option value="seleccione">Seleccione...</option>
                 {colores.map((option) => (
                   <option key={`${option.nombre}-${option.codigo}`} value={option.nombre}>
-                    {option.nombre}
+                    {option.nombre.toUpperCase()}
                   </option>
                 ))}
               </select>

@@ -58,12 +58,12 @@ const Modal = ({ closeModal, Refresgpag }) => {
   
 
   const handleRolChange = (e) => {
-    const capitalized = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
+    const capitalized = e.target.value.toUpperCase();
     setRol(capitalized);
   };
 
   const handleDescripcionChange = (e) => {
-    const capitalized = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
+    const capitalized = e.target.value.toUpperCase();
     setDescripcion(capitalized);
   };
 

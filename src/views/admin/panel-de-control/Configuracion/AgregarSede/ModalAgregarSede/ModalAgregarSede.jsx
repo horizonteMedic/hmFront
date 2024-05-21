@@ -76,7 +76,7 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
                 id="nombre"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
+                onChange={(e) => setNombre(e.target.value.toUpperCase())}
               />
             </div>
             <div className="mb-4">
@@ -88,7 +88,7 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
                 id="codigo"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={codigo}
-                onChange={(e) => setCodigo(e.target.value)}
+                onChange={(e) => setCodigo(e.target.value.toUpperCase())}
               />
             </div>
             <div className="mb-4">

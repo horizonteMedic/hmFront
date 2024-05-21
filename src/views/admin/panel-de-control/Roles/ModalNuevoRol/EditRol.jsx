@@ -68,7 +68,7 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
                   value={capitalizeFirstLetter(newrol)}
                   required
                   id="numeroDocumento"
-                  onChange={(e) => setNewRol(capitalizeFirstLetter(e.target.value))}
+                  onChange={(e) => setNewRol(capitalizeFirstLetter(e.target.value.toUpperCase()))}
                   className="border border-gray-300 px-3 py-2 rounded-md w-2/3 focus:outline-none bg-white"
                 />
               </div>
@@ -81,7 +81,7 @@ const EditModal = ({ closeModal, Refresgpag, Id, Rol, Descripcion, Estado, fecha
                   required
                   value={capitalizeFirstLetter(newdescripcion)}
                   id="numeroDocumento"
-                  onChange={(e) => setNewDescripcion(capitalizeFirstLetter(e.target.value))}
+                  onChange={(e) => setNewDescripcion(capitalizeFirstLetter(e.target.value.toUpperCase()))}
                   className="border border-gray-300 px-3 py-2 rounded-md w-2/3 focus:outline-none bg-white"
                 />
               </div>
