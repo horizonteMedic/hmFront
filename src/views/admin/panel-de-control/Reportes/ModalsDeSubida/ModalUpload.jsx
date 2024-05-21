@@ -124,10 +124,14 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
         </div>
         <div className="mx-auto my-8 w-[90%] h-[200px] border-dashed border-4 border-gray-400 flex justify-center items-center cursor-pointer" onClick={handleFileInputClick}>
           {filePreview ? (
-            <img src={filePreview} alt="Vista previa del archivo" className="max-w-full max-h-full" />
-          ) : (
-            <span>Haga clic aquí para seleccionar un archivo</span>
-          )}
+              <img src={filePreview} alt="Vista previa del archivo" className="max-w-full max-h-full" />
+            ) : (
+              <div className="text-center">
+                <h2 style={{ fontSize: '24px', fontWeight:'bold' }}>{datosarch.nombre}.{datosarch.extension}</h2>
+                <span>Haga clic aquí para seleccionar un archivo</span>
+              </div>
+            )}
+
           <input type="file" id="fileInput" className="hidden" onChange={handleFileInputChange} />
         </div>
         {uploading && (
