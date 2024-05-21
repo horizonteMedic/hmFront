@@ -162,7 +162,15 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
     })
     
   };
-  
+  const generateLegend = () => {
+    const legend = listarchivos.map((archivo, index) => (
+      <div key={index} className="flex items-center mb-4"> 
+        <FontAwesomeIcon icon={archivo.extension === 'pdf' ? faFilePdf : faFileImage} style={{ color: archivo.codigo }} className="mr-1 ml-4" /> 
+        <span className="text-sm">{archivo.nombre}</span>
+      </div>
+    ));
+    return legend;
+  };
   
 useEffect(() => {
   if (data && data.length > 0) {
@@ -242,7 +250,14 @@ useEffect(() => {
                   ))}
                 </tbody>
               </table>
+
             )}
+            
+        </div>
+        <div className="flex justify-center bg-gray-100 rounded-lg p-3">
+          <div className="flex flex-wrap">
+            {generateLegend()}
+          </div>
         </div>
         
         {Acces.Delete && (

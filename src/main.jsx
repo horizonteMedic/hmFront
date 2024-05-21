@@ -7,14 +7,11 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import './index.css';
 import Footer from './views/components/Footer.jsx';
 import Navbar from './views/components/Navbar.jsx';
-import LoginPageEmpleado from './views/empleado/Login/Login.jsx'; 
 import LoginPageAdmin from './views/admin/Login/Login.jsx';
 import ForgotPassword from './views/admin/Login/controller/ForgotPassword.jsx'; 
 import VerificationCodeInput from './views/admin/Login/controller/VerificationCodeInput.jsx'; 
 import ActualizarPassword from './views/admin/Login/controller/ActualizarPassword.jsx'
 import {ProtectedRoute,ProtectedLogin,ProtectedPanel} from './views/ProtectedRoute/ProtectedRoute.jsx';
-import DashboardPaciente from './views/paciente/Dashboard/Dashboard.jsx';
-import DashboardEmpleado from './views/empleado/panel-de-control/PanelDeControl.jsx';
 import DashboardAdmin from './views/admin/panel-de-control/PanelDeControl.jsx';
 import Accesos from './views/admin/panel-de-control/Accesos/accesos.jsx';
 import Roles from './views/admin/panel-de-control/Roles/Roles.jsx';
@@ -27,12 +24,6 @@ import AgregarCampaña from './views/admin/panel-de-control/Configuracion/Agrega
 import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateArchivos/CreateArchivos.jsx'
 import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
-// MINERA VISTAS
-import LabortorioClinicoMinera from './views/admin/panel-de-control/Minera/LabortorioClinicoMinera/Labortorio-clinico-minera.jsx'
-import RegistroDePacientes from './views/admin/panel-de-control/Minera/RegistroDePacientes/Registro-de-pacientes.jsx'
-import TriajeMinera from './views/admin/panel-de-control/Minera/TriajeMinera/triaje-minera.jsx'
-
-
 
 const App = () => {
   return (
@@ -49,24 +40,19 @@ const AppContent = () => {
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView)
-
   const location = useLocation();
-  const showNavbarRoutes = ['/', '/login-empleado'];
+  const showNavbarRoutes = ['/'];
   const isLoginPage = showNavbarRoutes.includes(location.pathname);
   const isHiddenRoute = ['/forgot-password', '/verificacion-codigo', '/actualizar-password'].includes(location.pathname);
   const showBreadcrumb = !isLoginPage && !isHiddenRoute;
 
   useEffect(() => {
     if (isTokenExpired(token)) {
-      // El token ha caducado, realizar acciones necesarias
       setToken(null);
       setuserlogued(null);
       setlistView([])
     }
   },[token])
-
-  
-
   return (
     <>
       {!isHiddenRoute && !isLoginPage && <Navbar />}
@@ -75,8 +61,6 @@ const AppContent = () => {
         <Route element={<ProtectedLogin/>}>
           <Route path="/" element={<LoginPageAdmin />} />
         </Route>
-        <Route path="/login-empleado" element={<LoginPageEmpleado />} />
-    
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/verificacion-codigo" element={<VerificationCodeInput />} />
         <Route path="/actualizar-password" element={<ActualizarPassword />} />
@@ -86,8 +70,6 @@ const AppContent = () => {
         </Route>
 
         <Route element={<ProtectedRoute/>}>
-          <Route path="/dashboard-paciente" element={<DashboardPaciente />}/>
-          <Route path="/dashboard-empleado" element={<DashboardEmpleado />}/>
           <Route path="/accesos" element={ <Accesos />}  /> 
           <Route path="/roles" element={<Roles />}/> 
           <Route path="/reporte-pacientes" element={<Reporte />}/> 
@@ -98,12 +80,7 @@ const AppContent = () => {
           <Route path="/lista-archivos" element={<CreateArchivo />} />
           <Route path="/administrar-empresas" element={<AdministrarEmpresas />} />
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
-          
         </Route>
-        {/* Minera */}
-          <Route path="/laboratorio-clinico-minera" element={<LabortorioClinicoMinera />} />
-          <Route path="/Registro-de-pacientes" element={<RegistroDePacientes />} />
-          <Route path="/triaje-minera" element={<TriajeMinera />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
     </>
