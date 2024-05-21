@@ -16,7 +16,7 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
   
   const handleChange = e => {
     const { name, value, } = e.target;
-    const capitalizedValue = value.replace(/\b\w/g, char => char.toUpperCase());
+    const capitalizedValue = value.toUpperCase();
     setDatosEditados({
       ...datosEditados,
       [name]: capitalizedValue,
@@ -76,7 +76,7 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
           </label>
           <label className="block mb-2 mt-4">
             Código:
-            <input type="text" name='codigo' className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.codigo} onChange={handleChange} />
+            <input type="text" name='codigo' maxLength={4} className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.codigo} onChange={handleChange} />
           </label>
           <div className="mb-4 mt-4">
             <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado</label>

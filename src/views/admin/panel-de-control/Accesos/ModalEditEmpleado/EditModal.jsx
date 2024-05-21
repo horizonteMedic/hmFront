@@ -152,7 +152,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={nombres}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); 
+                  const value = e.target.value.toUpperCase(); 
                   setNombres(
                     value
                       .split(' ')
@@ -173,7 +173,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={apellidos}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase();
+                  const value = e.target.value.toUpperCase();
                   setApellidos(
                     value
                       .split(' ')
@@ -194,7 +194,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="email"
                 value={email}
                 id="email"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toUpperCase())}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                 required
               />
@@ -308,7 +308,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={direccion}
                 id="direccion"
-                onChange={(e) => setDireccion(e.target.value)}
+                onChange={(e) => setDireccion(e.target.value.toUpperCase())}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                 required
               />
@@ -321,7 +321,7 @@ const editModal = ({ closeModal, Refresgpag, ID, TipoDoc, Nrodoc, Nombres, Apell
                 type="text"
                 value={cargo}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); 
+                  const value = e.target.value.toUpperCase(); 
                   setCargo(
                     value
                       .split(' ')

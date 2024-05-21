@@ -176,7 +176,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 type="text"
                 value={nombres}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  const value = e.target.value.toUpperCase(); // Convertir todo a minúsculas
                   setNombres(
                     value
                       .split(' ')
@@ -197,7 +197,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 type="text"
                 value={apellidos}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  const value = e.target.value.toUpperCase(); // Convertir todo a minúsculas
                   setApellidos(
                     value
                       .split(' ')
@@ -218,7 +218,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 type="email"
                 value={email}
                 id="email"
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toUpperCase())}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                 required
               />
@@ -334,7 +334,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 type="text"
                 value={direccion}
                 id="direccion"
-                onChange={(e) => setDireccion(e.target.value)}
+                onChange={(e) => setDireccion(e.target.value.toUpperCase())}
                 className="border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none bg-white"
                 required
               />
@@ -347,7 +347,7 @@ const Modal = ({ closeModal, Refresgpag }) => {
                 type="text"
                 value={cargo}
                 onChange={(e) => {
-                  const value = e.target.value.toLowerCase(); // Convertir todo a minúsculas
+                  const value = e.target.value.toUpperCase(); // Convertir todo a minúsculas
                   setCargo(
                     value
                       .split(' ')

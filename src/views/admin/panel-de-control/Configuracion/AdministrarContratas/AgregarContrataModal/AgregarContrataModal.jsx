@@ -97,7 +97,11 @@ const AgregarContrataModal = ({ setShowModal,Refresgpag,token }) => {
                 id="ruc"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={ruc}
-                onChange={(e) => setRuc(e.target.value)}
+                onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+                        if (value.length <= 20) {
+                          setRuc(value);
+                        }}}
               />
             </div>
             <div className="mb-4">
@@ -107,7 +111,7 @@ const AgregarContrataModal = ({ setShowModal,Refresgpag,token }) => {
                 id="razonSocial"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={razonSocial}
-                onChange={(e) => setRazonSocial(e.target.value)}
+                onChange={(e) => setRazonSocial(e.target.value.toUpperCase())}
               />
             </div>
             <div className="mb-4">
@@ -117,7 +121,7 @@ const AgregarContrataModal = ({ setShowModal,Refresgpag,token }) => {
                 id="direccion"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={direccion}
-                onChange={(e) => setDireccion(e.target.value)}
+                onChange={(e) => setDireccion(e.target.value.toUpperCase())}
               />
             </div>
             <div className="mb-4">
@@ -138,7 +142,7 @@ const AgregarContrataModal = ({ setShowModal,Refresgpag,token }) => {
                 id="responsable"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={responsable}
-                onChange={(e) => setResponsable(e.target.value)}
+                onChange={(e) => setResponsable(e.target.value.toUpperCase())}
               />
             </div>
             <div className="mb-4">
@@ -148,7 +152,7 @@ const AgregarContrataModal = ({ setShowModal,Refresgpag,token }) => {
                 id="email"
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value.toUpperCase())}
               />
             </div>
           </form>

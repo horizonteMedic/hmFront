@@ -58,6 +58,14 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
     const { name, value } = e.target;
     setDatosEditados({
       ...datosEditados,
+      [name]: value.toUpperCase(),
+    });
+  };
+
+  const handleChangextn = e => {
+    const { name, value } = e.target;
+    setDatosEditados({
+      ...datosEditados,
       [name]: value,
     });
   };
@@ -119,12 +127,12 @@ const EditModal = ({ setShowEditModal, archivo, Refresgpag, token, userlogued })
               <input type="text" id="nombre" name="nombre" value={datosEditados.nombre} onChange={handleChange} className="text mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div className="mb-4">
-              <label htmlFor="nomenclatura" className="block text-sm font-medium text-gray-700">Nombre:</label>
+              <label htmlFor="nomenclatura" className="block text-sm font-medium text-gray-700">Nomenclatura:</label>
               <input type="text" id="nomenclatura" required name="nomenclatura" value={datosEditados.nomenclatura} onChange={handleChange} className="text mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
             </div>
             <div className="mb-4">
               <label htmlFor="extension" className="block text-sm font-medium text-gray-700">Extensión:</label>
-              <select name='extension' id="extension" className="border mt-1 block w-full pl-3 pr-10 py-2 pointer text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"  onChange={handleChange}>
+              <select name='extension' id="extension" className="border mt-1 block w-full pl-3 pr-10 py-2 pointer text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"  onChange={handleChangextn}>
               <option >{datosEditados.extension}</option>
               {extensiones.map((ext) => (
                   <option key={ext} value={ext}>

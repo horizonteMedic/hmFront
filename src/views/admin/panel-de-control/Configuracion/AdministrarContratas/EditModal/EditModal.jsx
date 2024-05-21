@@ -58,12 +58,12 @@ const EditModal = ({ setShowEditModal,Refresgpag,ruc,token, razon,direccion,tele
           <div className="mb-4">
               <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700">Razón Social</label>
               <input type="text" value={arazonSocial}
-              onChange={(e) => setRazonSocial(e.target.value)} id="razonSocial" name="razonSocial" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
+              onChange={(e) => setRazonSocial(e.target.value.toUpperCase())} id="razonSocial" name="razonSocial" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
             </div>
             <div className="mb-4">
               <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">Dirección</label>
               <input type="text" id="direccion" value={adireccion}
-              onChange={(e) => setDireccion(e.target.value)} name="direccion" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
+              onChange={(e) => setDireccion(e.target.value.toUpperCase())} name="direccion" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
             </div>
             <div className="mb-4">
               <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Teléfono</label>
@@ -73,12 +73,12 @@ const EditModal = ({ setShowEditModal,Refresgpag,ruc,token, razon,direccion,tele
             <div className="mb-4">
               <label htmlFor="responsable" className="block text-sm font-medium text-gray-700">Responsable</label>
               <input type="text" id="responsable" value={aresponsable}
-              onChange={(e) => setResponsable(e.target.value)} name="responsable" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
+              onChange={(e) => setResponsable(e.target.value.toUpperCase())} name="responsable" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
             </div>
             <div className="mb-4">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
               <input type="email" id="email" value={aemail}
-              onChange={(e) => setEmail(e.target.value)} name="email" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
+              onChange={(e) => setEmail(e.target.value.toUpperCase())} name="email" className="border border-gray-300 rounded-md px-3 py-2 w-full" />
             </div>
             <div className="flex justify-end">
               <button type="button" disabled={creating} className="azul-btn px-4 py-2 rounded-md" onClick={handleSaveContrata}>{creating ? 'Editando Contrata...' : 'Editar'}</button>
