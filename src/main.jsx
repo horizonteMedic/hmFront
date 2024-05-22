@@ -24,6 +24,7 @@ import AgregarCampaña from './views/admin/panel-de-control/Configuracion/Agrega
 import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateArchivos/CreateArchivos.jsx'
 import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
+import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/Protocolos.jsx'
 
 const App = () => {
   return (
@@ -80,6 +81,8 @@ const AppContent = () => {
           <Route path="/lista-archivos" element={<CreateArchivo />} />
           <Route path="/administrar-empresas" element={<AdministrarEmpresas />} />
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
+          <Route path="/protocolos" element={<Protocolos />} />
+
         </Route>
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}

@@ -11,9 +11,8 @@ const protectedRoutes = {
     '/agregar-sede': 58,
     '/agregar-campa%C3%B1a': 59,
     '/administrar-empresas': 60,
-    '/administrar-contratas': 61
-
-    // Agrega más rutas aquí según sea necesario
+    '/administrar-contratas': 61,
+    '/protocolos': 152
   };
 
 export function ProtectedRoute(){

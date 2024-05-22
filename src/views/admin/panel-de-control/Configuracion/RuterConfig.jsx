@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faHandshake, faList, faMapMarkerAlt, faNotesMedical, faPlusCircle, faTentArrowDownToLine } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faHandshake, faList, faMapMarkerAlt, faNetworkWired, faNotesMedical, faPlusCircle, faTentArrowDownToLine } from '@fortawesome/free-solid-svg-icons';
 
 const RuterConfig = () => {
   const location = useLocation();
@@ -19,6 +19,8 @@ const RuterConfig = () => {
       setActiveButton('administrar-empresas');
     } else if (decodedPathname === '/administrar-contratas') {
       setActiveButton('administrar-contratas');
+    } else if (decodedPathname === '/protocolos') {
+      setActiveButton('protocolos');
     } else {
       setActiveButton(null);
     }
@@ -48,7 +50,7 @@ const RuterConfig = () => {
             <FontAwesomeIcon icon={faTentArrowDownToLine} className="mr-2" />
             Administrar Sedes
           </Link>
-          <Link
+          {/* <Link
             to="/agregar-campaña"
             className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
               activeButton === 'agregar-campaña' ? 'bg-yellow-300' : ''
@@ -57,7 +59,7 @@ const RuterConfig = () => {
           >
             <FontAwesomeIcon icon={faNotesMedical} className="mr-2" />
             Agregar Campaña
-          </Link>
+          </Link> */}
           <Link
             to="/administrar-empresas"
             className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
@@ -78,6 +80,16 @@ const RuterConfig = () => {
             <FontAwesomeIcon icon={faHandshake} className="mr-2" />
             Administrar Contratas
           </Link>
+          {/* <Link
+            to="/protocolos"
+            className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
+              activeButton === 'protocolos' ? 'bg-yellow-300' : ''
+            }`}
+            onClick={() => setActiveButton('protocolos')}
+          >
+            <FontAwesomeIcon icon={faNetworkWired} className="mr-2" />
+            Protocolos
+          </Link> */}
         </div>
       </div>
     </div>

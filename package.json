@@ -1,6 +1,6 @@
 {
   "name": "horizonte",
-  "homepage": "https://sistema.horizontemedic.com" ,
+  "homepage": "https://sistema.horizontemedic.com",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -31,6 +31,7 @@
     "react-datepicker": "^6.8.0",
     "react-dom": "^18.2.0",
     "react-input-color": "^4.0.1",
+    "react-joyride": "^2.8.2",
     "react-router-dom": "^6.23.0",
     "styled-components": "^6.1.10",
     "sweetalert2": "^11.10.8",
