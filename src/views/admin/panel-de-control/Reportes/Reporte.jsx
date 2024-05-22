@@ -69,6 +69,7 @@ const HistorialPaciente = () => {
   const [apell, setApell] = useState('')
   //NUEVA API FECHA DE EXAMEN
   const [fecha_examen, Setfecha_examnen] = useState('')
+  const [cod_sucursal, SetCod_sucursal] = useState('')
 
   useEffect(() => {
     
@@ -139,13 +140,14 @@ const HistorialPaciente = () => {
   
 
     
-  const openModal = (dni,nombres,apellidos, fecha_examen) => {
+  const openModal = (dni,nombres,apellidos, fecha_examen, sede_sucursal) => {
     setDnipicker(dni)
     //cambian por ser primero apellido
     setName(apellidos)
     setApell(nombres)
     setNombrespicker(`${nombres} ${apellidos}`)
     Setfecha_examnen(fecha_examen)
+    SetCod_sucursal(sede_sucursal)
     setIsModalOpen(true);
   };
 
@@ -333,7 +335,7 @@ const HistorialPaciente = () => {
                 filteredData.map((item, index) => (
                   <tr key={index}>
                     <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen) }} className="focus:outline-none">
+                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen, item.codigo_sucursal) }} className="focus:outline-none">
                         <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
                       </button>
                     </td>
@@ -348,7 +350,7 @@ const HistorialPaciente = () => {
                 currentData.map((item, index) => (
                   <tr key={index}>
                     <td className="border border-gray-300 px-3 py-2">
-                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen) }} className="focus:outline-none">
+                      <button onClick={() => { openModal(item.dni, item.apellidos, item.nombres, item.fecha_examen, item.codigo_sucursal) }} className="focus:outline-none">
                         <FontAwesomeIcon icon={faPlus} className="text-blue-500 cursor-pointer" />
                       </button>
                     </td>
@@ -382,7 +384,7 @@ const HistorialPaciente = () => {
         </div>
       </div>
       
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={sede} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_sucursal} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
     </div>
   );
 };
