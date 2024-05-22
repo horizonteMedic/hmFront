@@ -164,6 +164,7 @@ const HistorialPaciente = () => {
   };
 
   const handleEndDateChange = (e) => {
+    
     setEndDate(e.target.value);
   };
 
