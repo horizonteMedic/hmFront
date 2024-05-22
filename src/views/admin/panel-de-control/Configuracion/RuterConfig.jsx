@@ -80,7 +80,7 @@ const RuterConfig = () => {
             <FontAwesomeIcon icon={faHandshake} className="mr-2" />
             Administrar Contratas
           </Link>
-          {/* <Link
+          <Link
             to="/protocolos"
             className={`flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-[4em] focus:outline-none focus:shadow-outline block text-center ${
               activeButton === 'protocolos' ? 'bg-yellow-300' : ''
@@ -89,7 +89,7 @@ const RuterConfig = () => {
           >
             <FontAwesomeIcon icon={faNetworkWired} className="mr-2" />
             Protocolos
-          </Link> */}
+          </Link>
         </div>
       </div>
     </div>

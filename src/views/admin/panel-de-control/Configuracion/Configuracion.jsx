@@ -22,7 +22,7 @@ const Configuracion = () => {
     // { to: "/agregar-campaña", id:"59", icon: <FontAwesomeIcon icon={faNotesMedical}  className="color-naranja" size='2xl'/>, title: "Campañas"},
     { to: "/administrar-empresas", id:"60", icon: <FontAwesomeIcon icon={faBuilding}  className="color-naranja" size='2xl' />, title: "Administrar Empresas"},
     { to: "/administrar-contratas", id:"61", icon: <FontAwesomeIcon  className="color-naranja" size='2xl' icon={faHandshake} />, title: "Administrar Contratas" },
-    // { to: "/protocolos", id:"152", icon: <FontAwesomeIcon  className="color-naranja" size='2xl' icon={faNetworkWired} />, title: "Protocolos" }
+    { to: "/protocolos", id:"152", icon: <FontAwesomeIcon  className="color-naranja" size='2xl' icon={faNetworkWired} />, title: "Protocolos" }
 
   ].filter(card => allowedRoutes.includes(card.id));
   
