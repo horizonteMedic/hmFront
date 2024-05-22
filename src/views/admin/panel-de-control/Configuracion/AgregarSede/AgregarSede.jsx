@@ -34,6 +34,12 @@ const AdministrarSedes = () => {
     return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
   };
  
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   useEffect(() => {
     setLoading(true);
     getFetch('/api/v01/ct/sede', token)
@@ -161,7 +167,7 @@ const AdministrarSedes = () => {
                         <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-4 cursor-pointer" onClick={() => {Edit(item)}} />
                         <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() => {deleteSede(item.id)}} />
                       </td>
-                      <td className="border border-gray-300 px-2 py-1">{item.nombreSede}</td>
+                      <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombreSede)}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.codigoSede}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">
                         {item.estado ? (

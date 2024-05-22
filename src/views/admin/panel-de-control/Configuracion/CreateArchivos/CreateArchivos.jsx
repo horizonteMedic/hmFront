@@ -18,6 +18,12 @@ const ListaArchivosPorServidores = () => {
   const [showEditModal, setShowEditModal] = useState(false); 
   const [archivoToEdit, setArchivoToEdit] = useState(null); // Estado para el archivo a editar
 
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   const abrirModal = () => {
     setShowModal(true);
   };
@@ -122,7 +128,7 @@ const ListaArchivosPorServidores = () => {
                         <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() => {deleteArchivo(item.id)}} />
                       </td>
 
-                      <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
+                      <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombre)}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.nomenclatura}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.extension}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">
