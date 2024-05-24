@@ -184,21 +184,26 @@ useEffect(() => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-        <div className="px-4 py-2 naranjabackgroud flex justify-between ">
-          <h2 className="text-lg font-bold color-blanco">Historial Paciente</h2>
+      <div className="bg-white rounded-lg overflow-hidden shadow-xl w-full max-w-[90%] mx-4">
+        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+          <h2 className="text-lg font-bold text-white">Historial Paciente</h2>
           <button onClick={closeModal} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
         </div>
-        <div className="px-6 py-4 overflow-y-auto flex flex-wrap ">
-          <div className="w-full md:w-1/6 mb-4">
-            <span>DNI : </span><div className="bg-gray-200 rounded px-2 py-1 inline-block"><strong>{dni}</strong></div>
-          </div>
-          <div className="w-full md:w-1/2 mb-4">
-            <span>Paciente : </span><div className="sombreado-verde rounded px-2 py-1 inline-block"><strong>{nombre}</strong></div>
+        <div className="px-6 py-4 overflow-y-auto max-h-[60vh]">
+          <div className="flex flex-wrap mb-4">
+            <div className="w-full md:w-1/6 mb-4">
+              <span>DNI : </span>
+              <div className="bg-gray-200 rounded px-2 py-1 inline-block"><strong>{dni}</strong></div>
+            </div>
+            <div className="w-full md:w-1/2 mb-4">
+              <span>Paciente : </span>
+              <div className="bg-green-200 rounded px-2 py-1 inline-block"><strong>{nombre}</strong></div>
+            </div>
           </div>
           {loading ? (
             <p className="text-center">Cargando...</p>
           ) : (
+            <div className="overflow-x-auto">
               <table className="w-full border border-gray-300">
                 <thead>
                   <tr className="bg-gray-200">
@@ -219,16 +224,18 @@ useEffect(() => {
                 <tbody>
                   {data.map((dataItem, dataIndex) => (
                     <tr key={dataIndex}>
-                      {Acces.Upload && <td className="border border-gray-300 px-2 py-1">
-                        <div className="flex flex-col">
-                          {listarchivos.map((archivoItem, archivoIndex) => (
-                            <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
+                      {Acces.Upload && (
+                        <td className="border border-gray-300 px-2 py-1">
+                          <div className="flex flex-col">
+                            {listarchivos.map((archivoItem, archivoIndex) => (
+                              <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
                                 <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer pt-2" style={{ color: archivoItem.codigo }} />
-                              <div className="text-sm fw-semi-bold cursor-pointer ml-2 pt-2" >Subir {archivoItem.nombre}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </td>}
+                                <div className="text-sm fw-semi-bold cursor-pointer ml-2 pt-2">Subir {archivoItem.nombre}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      )}
                       <td className="border border-gray-300 px-2 py-1">{dataItem.orden}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.empresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.contrata}</td>
@@ -239,55 +246,52 @@ useEffect(() => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.area}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
-                      {Acces.Download && <td className="border border-gray-300 px-2 py-1">
-                        {read.map((readItem, readIndex) => ( 
-                          <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id); } } : {})} disabled={openview} title={readItem.nombreArchivo}  onClick={() => {GetBase64(dataItem.historiaClinica,readItem.id_tipo_archivo)}}>
-                            {filterArchivos(readItem)}
-                          </a>
-                        ))}
-                      </td>}
+                      {Acces.Download && (
+                        <td className="border border-gray-300 px-2 py-1">
+                          {read.map((readItem, readIndex) => (
+                            <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id); } } : {})} disabled={openview} title={readItem.nombreArchivo} onClick={() => { GetBase64(dataItem.historiaClinica, readItem.id_tipo_archivo) }}>
+                              {filterArchivos(readItem)}
+                            </a>
+                          ))}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
               </table>
-
-            )}
-            
+            </div>
+          )}
         </div>
-        <div className="flex justify-center bg-gray-100 rounded-lg p-3">
+        <div className="flex justify-center bg-gray-100 p-3">
           <div className="flex flex-wrap">
             {generateLegend()}
           </div>
         </div>
-        
         {Acces.Delete && (
-          <div className="flex justify-center bg-gray-100 rounded-lg p-3">
+          <div className="flex justify-center bg-gray-100 p-3">
             <div className="flex items-center">
-              <p className="color-rojo fw-bold text-sm text-center">Para eliminar un archivo, hacer click derecho sobre el</p>
+              <p className="text-red-500 font-bold text-sm text-center">Para eliminar un archivo, hacer click derecho sobre el</p>
             </div>
           </div>
         )}
       </div>
-
       {modalArchivos && (
-        <ModalUpload closeModal={closeModalArchivos} combinedParam={datosarc} dni={dni} user={user} token={token} reloadread={reloadread}/>
+        <ModalUpload closeModal={closeModalArchivos} combinedParam={datosarc} dni={dni} user={user} token={token} reloadread={reloadread} />
       )}
       {currentFile && (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[700px] h-[auto]">
+          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[700px] h-[auto] max-h-[90%]">
             <div className="px-4 py-2 naranjabackgroud flex justify-between">
               <h2 className="text-lg font-bold color-blanco">{currentFile.name}</h2>
               <button onClick={() => setCurrentFile(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
             </div>
-            {currentFile.type === 'application/pdf' ? (
-              <div className="px-6 py-4 overflow-hidden flex justify-center items-center">
-                <embed src={currentFile.uri} type="application/pdf" className="h-[500px]  w-[500px] max-w-full" />
-              </div>
-            ) : (
-              <div className="px-6 py-4 overflow-hidden flex justify-center items-center">
-                <img src={currentFile.uri} alt={currentFile.name} className="h-[100%] w-auto max-w-full" />
-              </div>
-            )}
+            <div className="px-6 py-4 overflow-y-auto flex justify-center items-center">
+              {currentFile.type === 'application/pdf' ? (
+                <embed src={currentFile.uri} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+              ) : (
+                <img src={currentFile.uri} alt={currentFile.name} className="h-auto w-auto max-w-full" />
+              )}
+            </div>
             <div className="flex justify-center">
               <a href={currentFile.uri} download={currentFile.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
                 <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
@@ -295,11 +299,9 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        
       )}
-
-
     </div>
+
   );
 };
 
