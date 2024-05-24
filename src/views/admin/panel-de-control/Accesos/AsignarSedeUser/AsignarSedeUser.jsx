@@ -13,7 +13,7 @@ const ConfigModal = ({ closeModal, id, user, userlogued, token }) => {
     const [userName, setUserName] = useState('');
     const [userTableData, setUserTableData] = useState([]);
     const [showAddSedeModal, setShowAddSedeModal] = useState(false);
-
+   
     useEffect(() => {
         setLoading(true);
         ListSedesxUsername(id, token)

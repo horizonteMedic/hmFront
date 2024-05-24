@@ -102,7 +102,7 @@ const HistorialPaciente = () => {
     
   }, [searchTerm]);
   
-
+console.log(ListSedes)
   useEffect(() => {
     setLoading(true);
     if (startDate && endDate && sede) {
@@ -327,7 +327,6 @@ const HistorialPaciente = () => {
                   <th className="border border-gray-300 px-3 py-2">DNI</th>
                   <th className="border border-gray-300 px-3 py-2">Apellidos</th>
                   <th className="border border-gray-300 px-3 py-2">Nombres</th>
-                  <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
                   <th className="border border-gray-300 px-3 py-2">Sucursal</th>
                 </tr>
               </thead>
@@ -343,7 +342,6 @@ const HistorialPaciente = () => {
                     <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
                   </tr>
                 ))
@@ -358,7 +356,6 @@ const HistorialPaciente = () => {
                     <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
                   </tr>
                 ))

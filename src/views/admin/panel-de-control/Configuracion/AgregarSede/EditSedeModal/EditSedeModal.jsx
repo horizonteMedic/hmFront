@@ -9,6 +9,7 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
     id: item.id,
     nombre: item.nombreSede,
     codigo: item.codigoSede,
+    capacidadPaciente: item.capacidadPaciente,
     estado: item.estado,
     fechaRegistro: item.fechaRegistro,
     userRegistro: item.userRegistro
@@ -22,7 +23,7 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
       [name]: capitalizedValue,
     });
   };
-
+  
   const handleChangeStado = e => {
     const { name,checked } = e.target;
     setDatosEditados({
@@ -47,15 +48,38 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
     });
   }
 
+  const errorAlert = (title, text, icon) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: icon,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    });
+  };
+
   const handleEdit = (e) => {
-    setCreating(true)
     e.preventDefault();
+    
+    if (!datosEditados.nombre || !datosEditados.codigo || !datosEditados.capacidadPaciente) {
+      let errorMessage = 'Por favor, complete los siguientes campos:';
+      if (!datosEditados.nombre) errorMessage += '\n- Nombre';
+      if (!datosEditados.codigo) errorMessage += '\n- Código';
+      if (!datosEditados.capacidadPaciente) errorMessage += '\n- Capacidad';
+      errorAlert('Error', errorMessage, 'error');
+      return;
+    }
+  
+    setCreating(true)
+    
     editSede(datosEditados,userlogued,token)
     .then(data => {
       AleertSucces()
     })
     .catch(error => {
       console.error('Error:', error)
+      errorAlert('Error', 'Ha ocurrido un error al crear la sede', 'error');
     })    
     .finally(() => {
       setCreating(false)
@@ -77,6 +101,18 @@ const EditSedeModal = ({ setShowEditModal, Refresgpag, token, item,userlogued })
           <label className="block mb-2 mt-4">
             Código:
             <input type="text" name='codigo' maxLength={4} className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.codigo} onChange={handleChange} />
+          </label>
+          <label className="block mb-2 mt-4">
+            Capacidad:
+            <input type="text" name='capacidad' className="border border-gray-300 rounded-md px-2 py-1 w-full" value={datosEditados.capacidadPaciente} 
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+              if (value.length <= 8) {
+                setDatosEditados({
+                  ...datosEditados,
+                  capacidadPaciente: value
+                });
+              }}} />
           </label>
           <div className="mb-4 mt-4">
             <label htmlFor="estado" className="block text-sm font-medium text-gray-700">Estado</label>

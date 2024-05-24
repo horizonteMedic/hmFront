@@ -10,6 +10,7 @@ export function registrarSede (datos, token,user) {
   const data = {
     nombreSede: datos.nombre,
     codigoSede: datos.codigo,
+    capacidadPaciente: datos.capacidad,
     estado: datos.estado,
     fechaRegistro: `${year}-${month}-${day}`,
     userRegistro: user,
@@ -39,6 +40,7 @@ export function editSede (sede,user, token) {
     const data = {
         nombreSede: sede.nombre,
         codigoSede: sede.codigo,
+        capacidadPaciente: sede.capacidadPaciente,
         estado: sede.estado,
         fechaRegistro: sede.fechaRegistro,
         userRegistro: sede.userRegistro,
