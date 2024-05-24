@@ -1,6 +1,7 @@
 import {URLAzure} from '../../../../config/config'
 
-export function GetListREport(user,fechai,fechaf,sede,rucEmpresa,rucContrata,token) {
+export function GetListREport(user,fechai,fechaf,sede,rucEmpresa,rucContrata,token, abort = {}) {
+    const {signal } = abort
     const data = {
         userName: user,
         fechaInicio: fechai,
@@ -15,9 +16,15 @@ export function GetListREport(user,fechai,fechaf,sede,rucEmpresa,rucContrata,tok
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
+        signal,
         body: JSON.stringify(data)
     }
     return fetch(`${URLAzure}/api/v01/ct/sistemaArchivos/listadoHistorialPacientesConFiltros`,options)
-    .then(res => res.json()).then(response => response)
+    .then(response => 
+        {if (!response.ok) {
+            throw new Error('Network response was not ok.');
+          }
+          return response.json();}
+    ).then(response => response)
 }
 
