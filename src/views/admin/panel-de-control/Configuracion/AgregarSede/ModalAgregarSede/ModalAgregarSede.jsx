@@ -7,6 +7,7 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
   const [nombre, setNombre] = useState('');
   const [codigo, setCodigo] = useState('');
   const [estado, setEstado] = useState(true);
+  const [capacidad, setCapacidad] = useState(0);
   const [creating, setCreating] = useState(false);
 
   const handleCloseModal = () => {
@@ -29,25 +30,36 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
     });
   };
 
+  const errorAlert = (title, text, icon) => {
+    Swal.fire({
+      title: title,
+      text: text,
+      icon: icon,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    });
+  };
+
   const handleSaveSede = () => {
-    if (!nombre || !codigo) {
+    if (!nombre || !codigo || !capacidad) {
       let errorMessage = 'Por favor, complete los siguientes campos:';
       if (!nombre) errorMessage += '\n- Nombre';
       if (!codigo) errorMessage += '\n- Código';
-
-      showAlert('Error', errorMessage, 'error');
+      if (!capacidad) errorMessage += '\n- Capacidad';
+      errorAlert('Error', errorMessage, 'error');
       return;
     }
   
     setCreating(true);
-    const newSede = { nombre, codigo, estado };
+    const newSede = { nombre, codigo, estado, capacidad };
     registrarSede(newSede, token, userlogued)
       .then(() => {
         showAlert('¡Éxito!', 'Se ha asignado una Nueva Empresa', 'success');
       })
       .catch((error) => {
         console.error('Error', error);
-        showAlert('Error', 'Ha ocurrido un error al crear la sede', 'error');
+        errorAlert('Error', 'Ha ocurrido un error al crear la sede', 'error');
       })
       .finally(() => {
         setCreating(false);
@@ -89,6 +101,22 @@ const AgregarSedeModal = ({ setShowModal, Refresgpag, token, userlogued }) => {
                 className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value.toUpperCase())}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="codigo" className="block ">Capacidad</label>
+              <input
+                type="text"
+                required
+                id="capacidad"
+                className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                value={capacidad}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+                  if (value.length <= 8) {
+                    setCapacidad(value);
+                  }
+                  }}
               />
             </div>
             <div className="mb-4">
