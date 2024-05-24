@@ -152,6 +152,9 @@ const AdministrarSedes = () => {
                       Código
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Capacidad
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Estado
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -169,6 +172,7 @@ const AdministrarSedes = () => {
                       </td>
                       <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombreSede)}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.codigoSede}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.capacidadPaciente}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">
                         {item.estado ? (
                           <FontAwesomeIcon icon={faCheck} className="text-green-500" />

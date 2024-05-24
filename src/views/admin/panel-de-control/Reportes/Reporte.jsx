@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes, ComboboxEmpresas, ComboboxContratas } from './Modal/Combobox';
@@ -35,6 +35,10 @@ const HistorialPaciente = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [refres, setRefresh] = useState(1);
+  const hasFetchedData = useRef(false)
+  const abortController = useRef(null);
+  const secondPlaneAbortController = useRef(null);
+
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
   const views = useAuthStore(state => state.listView);
@@ -69,7 +73,7 @@ const HistorialPaciente = () => {
   const [apell, setApell] = useState('')
   //NUEVA API FECHA DE EXAMEN
   const [fecha_examen, Setfecha_examnen] = useState('')
-  const [cod_sucursal, SetCod_sucursal] = useState('')
+  const [cod_suc, SetCod_suc] = useState('')
 
   useEffect(() => {
     
@@ -89,6 +93,8 @@ const HistorialPaciente = () => {
 
             results = data.filter(item =>  (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (typeof item.nombres === 'string' && item.nombres.toLowerCase().includes(searchTerm.toLowerCase())))
+            console.log('aqui busque')
+            console.log(results)
             setFilteredData(results)
             return
           }
@@ -103,22 +109,33 @@ const HistorialPaciente = () => {
   }, [searchTerm]);
   
 
+//Esto trae todos los datos cuando se entra a la vista de reportes
   useEffect(() => {
+
+    if (abortController.current) {
+      abortController.current.abort(); // Cancela la solicitud anterior si existe
+    }
+
+    abortController.current = new AbortController(); // Crea un nuevo controlador de abortos
+    const { signal } = abortController.current;
+
     setLoading(true);
     if (startDate && endDate && sede) {
-      GetListREport(userlogued.sub, startDate, endDate, sede, empresa, contrata, token)
+      GetListREport(userlogued.sub, startDate, endDate, sede, empresa, contrata, token, { signal })
         .then(response => {
           if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
             setData([])
           } else {
+            console.log('traigo la data primero jajajajjajajaj', response)
             setData(response);
             setTotalPages(Math.ceil(response.length / recordsPerPage)); 
           }
         })
         .catch(error => {
-          throw new Error('Network response was not ok.', error);
+          console.error('Calma, se va a estabilizar',);
         })
         .finally(() => {
+          if (abortController.current.signal.aborted) return;
           setLoading(false);
           SecondPlane()
         });
@@ -126,28 +143,42 @@ const HistorialPaciente = () => {
   }, [startDate, endDate, sede, empresa, contrata]);
   
   const SecondPlane = async () => {
+    
+    if (secondPlaneAbortController.current) {
+      secondPlaneAbortController.current.abort(); // Cancela la solicitud anterior si existe
+    }
+    secondPlaneAbortController.current = new AbortController(); // Crea un nuevo controlador de abortos
+    const { signal } = secondPlaneAbortController.current;
+
     if (startDate && endDate && sede) {
+      
+      console.log('se jeceasccsa')
         const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
-        const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token));
-        const otrasSedesData = await Promise.all(fetchPromises);
-        const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
-        const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
-        
-        setData(prevData => [...prevData, ...allData]);
-        
+        const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token, {signal}));
+        try{
+          const otrasSedesData = await Promise.all(fetchPromises);
+          const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
+          const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
+          console.log('traigo data',allData)
+          setData(prevData => [...prevData, ...allData]);
+        }catch (error){
+          if (error.name !== 'AbortError') {
+            console.error('Calma, se va a estabilizar',);
+          }
+        }
       }
     }
   
 
     
-  const openModal = (dni,nombres,apellidos, fecha_examen, sede_sucursal) => {
+  const openModal = (dni,nombres,apellidos, fecha_examen, cod_suc) => {
     setDnipicker(dni)
     //cambian por ser primero apellido
     setName(apellidos)
     setApell(nombres)
     setNombrespicker(`${nombres} ${apellidos}`)
     Setfecha_examnen(fecha_examen)
-    SetCod_sucursal(sede_sucursal)
+    SetCod_suc(cod_suc)
     setIsModalOpen(true);
   };
 
@@ -162,10 +193,12 @@ const HistorialPaciente = () => {
   };
 
   const handleStartDateChange = (e) => {
+    setData([])
     setStartDate(e.target.value);
   };
 
   const handleEndDateChange = (e) => {
+    setData([])
     setEndDate(e.target.value);
   };
 
@@ -208,7 +241,6 @@ const HistorialPaciente = () => {
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
   const currentData = data.slice(startIdx, endIdx);
-
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -257,7 +289,9 @@ const HistorialPaciente = () => {
             <span className="mr-2"><strong>Sedes:</strong></span>
             <select
               className="pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4"
-              onChange={(e) => setSede(e.target.value)}
+              onChange={(e) => {
+                
+                setSede(e.target.value)}}
               required
               value={sede}
             >
@@ -326,7 +360,6 @@ const HistorialPaciente = () => {
                   <th className="border border-gray-300 px-3 py-2">DNI</th>
                   <th className="border border-gray-300 px-3 py-2">Apellidos</th>
                   <th className="border border-gray-300 px-3 py-2">Nombres</th>
-                  <th className="border border-gray-300 px-3 py-2">Fecha Examen</th>
                   <th className="border border-gray-300 px-3 py-2">Sucursal</th>
                 </tr>
               </thead>
@@ -342,7 +375,6 @@ const HistorialPaciente = () => {
                     <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
                   </tr>
                 ))
@@ -357,7 +389,6 @@ const HistorialPaciente = () => {
                     <td className="border border-gray-300 px-3 py-2">{item.dni}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.apellidos}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.nombres}</td>
-                    <td className="border border-gray-300 px-3 py-2">{item.fecha_examen}</td>
                     <td className="border border-gray-300 px-3 py-2">{item.codigo_sucursal}</td>
                   </tr>
                 ))
@@ -384,7 +415,7 @@ const HistorialPaciente = () => {
         </div>
       </div>
       
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_sucursal} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
     </div>
   );
 };
