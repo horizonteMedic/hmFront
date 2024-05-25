@@ -54,13 +54,14 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
     if (file) {
       const fileName = file.name;
       const fileExtension = fileName.split('.').pop().toLowerCase();
-      
+      const fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
       if (datosarch.extension === 'pdf' && fileExtension !== 'pdf') {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
           text: 'El archivo debe ser un PDF',
         });
+        closeModal()
         return;
       } else if (datosarch.extension !== 'pdf' && !['jpg', 'jpeg', 'png'].includes(fileExtension)) {
         Swal.fire({
@@ -68,19 +69,27 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
           title: 'Error al subir archivo',
           text: 'El archivo debe ser una imagen (jpg, jpeg, png)',
         });
+        closeModal()
         return;
       }
-
+      const separacion = datosarch.nombres.trim().split(' ').filter(Boolean);
+      const separacion2 = datosarch.apellidos.trim().split(' ').filter(Boolean);
       const nombre = `${datosarch.nombres.split(' ')[0]}`
       const apellido = `${datosarch.apellidos.split(' ')[0]}`
-      const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}.${datosarch.extension}`
 
-      if (fileName.toUpperCase() != CodigoSave.toUpperCase()) {
+      const segnombre = separacion.length > 1 ? separacion[1] : separacion[0];
+      const segapellido = separacion2.length > 1 ? separacion2[1] : separacion2[0];
+
+      const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}`
+      const CodigoSavealt = `${datosarch.nomenclatura}-${datosarch.orden}-${segnombre}-${segapellido}`
+
+      if (fileNameWithoutExtension.toUpperCase() != CodigoSave.toUpperCase() && fileNameWithoutExtension.toUpperCase() != CodigoSavealt.toUpperCase()) {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
           text: 'El Nombre del Archivo deben ser iguales',
         });
+        closeCAMUModal()
         return;
       }
 

@@ -48,15 +48,23 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
 
   }, []);
 
+
   useEffect(() => {
       if (data && data.length > 0) {
-        GetArchivosSubidos(data[0].historiaClinica, iduser, token)
-          .then(response => {
-            setRead(response);
-          })
-          .catch(error => {
-            throw new Error('Network response was not ok.', error);
-          });
+
+        const fetchArchivos = async () => {
+          const archivosPorHistoria = {};
+          for (let item of data) {
+            try {
+              const response = await GetArchivosSubidos(item.historiaClinica, iduser, token);
+              archivosPorHistoria[item.historiaClinica] = response;
+            } catch (error) {
+              console.error('Error fetching archivos for historiaClinica', item.historiaClinica, error);
+            }
+          }
+          setRead(archivosPorHistoria);
+        };
+        fetchArchivos();
       }
   }, [data, reload])
 
@@ -172,15 +180,6 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
     return legend;
   };
   
-useEffect(() => {
-  if (data && data.length > 0) {
-    const pdfFiles = read.filter(item => item.extension === 'pdf');
-    if (pdfFiles.length > 0) {
-      GetBase64(data[0].historiaClinica, pdfFiles[0].id_tipo_archivo);
-    }
-  }
-}, [data, read]);
-
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
@@ -248,7 +247,7 @@ useEffect(() => {
                       <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
                       {Acces.Download && (
                         <td className="border border-gray-300 px-2 py-1">
-                          {read.map((readItem, readIndex) => (
+                          {(read[dataItem.historiaClinica] || []).map((readItem, readIndex) => (
                             <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id); } } : {})} disabled={openview} title={readItem.nombreArchivo} onClick={() => { GetBase64(dataItem.historiaClinica, readItem.id_tipo_archivo) }}>
                               {filterArchivos(readItem)}
                             </a>
