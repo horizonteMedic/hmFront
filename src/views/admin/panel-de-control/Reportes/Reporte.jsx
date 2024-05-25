@@ -236,6 +236,31 @@ const HistorialPaciente = () => {
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
   const currentData = data.slice(startIdx, endIdx);
+
+
+  // Jeambito calculador user
+  useEffect(() => {
+    if (!sede) return;
+
+    setLoading(true);
+    GetListREport(userlogued.sub, startDate, endDate, sede, token)
+      .then(response => {
+        setData(response);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      });
+  }, [sede, startDate, endDate, token, userlogued.sub]);
+
+  const totalSedes = ListSedes.length;
+  const indexSede = ListSedes.findIndex(s => s.cod_sede === sede);
+  const porcentajePorSede = 100 / totalSedes;
+  const porcentajeActual = porcentajePorSede * (indexSede + 1);
+  const mensajePorcentaje = `Datos cargados: ${porcentajeActual.toFixed(2)}%`;
+  
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -341,9 +366,12 @@ const HistorialPaciente = () => {
             />
         </div>
       
-
-
+      </div>
+      <div className='flex items-center justify-center h-full'>
+        <div className='bg-green-200 rounded-lg p-2 max-w-[300px] w-full fw-bold'>
+          <p className="text-black text-center">{mensajePorcentaje}</p>
         </div>
+      </div>
         <div className="overflow-x-auto p-3">
         {loading ? (
             <p className="text-center">Cargando...</p>

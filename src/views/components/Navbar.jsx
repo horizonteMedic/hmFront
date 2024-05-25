@@ -49,15 +49,16 @@ const Navbar = () => {
   
   const Logoutbutton = () => {
     return (
-      <button onClick={() => { setToken(null); setuserlogued(null); }} className="group ml-4 min-w-8 flex items-center justify-start w-8 h-8  rounded-full cursor-pointer relative overflow-hidden transition-all duration-700 shadow-md bg-[#fc6b03] hover:w-28    hover:rounded-xl">
-        <div className="w-full flex items-center justify-center transition text-white duration-300 group-hover:pl-0 group-hover:w-[40%]">
-          <FontAwesomeIcon icon={faSignOutAlt} />
-        </div>
-
-        <div className="absolute right-0 w-0 opacity-0 text-white font-semibold text-lg transition duration-300 group-hover:!w-[70%] group-hover:!opacity-100 group-hover:pr-2 group-hover:duration-300">
-          Salir
-        </div>
-      </button>
+      <button
+      onClick={() => { setToken(null); setuserlogued(null); }}
+      className="ml-4 flex items-center justify-start w-20 h-8 rounded-full cursor-pointer relative overflow-hidden naranja-btn text-white"
+    >
+      <div className="w-full flex items-center justify-center">
+        <FontAwesomeIcon icon={faSignOutAlt} />
+        <span className="ml-1 fw-bold">Salir</span>
+      </div>
+    </button>
+    
     )
   }
 
@@ -100,20 +101,23 @@ const Navbar = () => {
         </button>
       </div>
       {showMenu && (
-        <div className="md:hidden absolute right-0 top-16 bg-gray-800 w-[50%]  py-2" style={{ zIndex: 999 }}>
-          {filteredNavLinks.map((navLink, index) => (
-          <CustomNavLink
-            key={index}
-            to={navLink.to}
-            id={navLink.id}
-            label={navLink.label}
-            icon={navLink.icon}
-            activeLink={activeLink} 
-            onClick={handleNavLinkClick}
-          />
-        ))}
-          <Logoutbutton />
-        </div>
+       <div className="md:hidden absolute right-0 top-[80px] bg-gray-800 w-[50%] py-9" style={{ zIndex: 999, borderBottomLeftRadius: '10px', overflow: 'hidden' }}>
+       {filteredNavLinks.map((navLink, index) => (
+         <CustomNavLink
+           key={index}
+           to={navLink.to}
+           id={navLink.id}
+           label={navLink.label}
+           icon={navLink.icon}
+           activeLink={activeLink} 
+           onClick={handleNavLinkClick}
+         />
+       ))}
+       <div className='ml-3 mt-3'>
+         <Logoutbutton />
+       </div>
+     </div>
+     
       )}
     </nav>
   );
