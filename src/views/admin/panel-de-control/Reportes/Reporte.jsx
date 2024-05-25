@@ -93,8 +93,6 @@ const HistorialPaciente = () => {
 
             results = data.filter(item =>  (typeof item.apellidos === 'string' && item.apellidos.toLowerCase().includes(searchTerm.toLowerCase())) ||
             (typeof item.nombres === 'string' && item.nombres.toLowerCase().includes(searchTerm.toLowerCase())))
-            console.log('aqui busque')
-            console.log(results)
             setFilteredData(results)
             return
           }
@@ -126,7 +124,6 @@ const HistorialPaciente = () => {
           if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
             setData([])
           } else {
-            console.log('traigo la data primero jajajajjajajaj', response)
             setData(response);
             setTotalPages(Math.ceil(response.length / recordsPerPage)); 
           }
@@ -152,14 +149,12 @@ const HistorialPaciente = () => {
 
     if (startDate && endDate && sede) {
       
-      console.log('se jeceasccsa')
         const otrasSedes = ListSedes.filter(s => s.cod_sede !== sede);
         const fetchPromises = otrasSedes.map(s => GetListREport(userlogued.sub, startDate, endDate, s.cod_sede, empresa, contrata, token, {signal}));
         try{
           const otrasSedesData = await Promise.all(fetchPromises);
           const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
           const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
-          console.log('traigo data',allData)
           setData(prevData => [...prevData, ...allData]);
         }catch (error){
           if (error.name !== 'AbortError') {
