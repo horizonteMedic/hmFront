@@ -71,10 +71,13 @@ const HistorialPaciente = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [name, setName] = useState('')
   const [apell, setApell] = useState('')
+  //para el loading
+  const [porsentaje, setPorsentaje] = useState('')
   //NUEVA API FECHA DE EXAMEN
   const [fecha_examen, Setfecha_examnen] = useState('')
   const [cod_suc, SetCod_suc] = useState('')
 
+  const totalSedes = ListSedes.length;
   useEffect(() => {
     
     let results = []
@@ -116,7 +119,7 @@ const HistorialPaciente = () => {
 
     abortController.current = new AbortController(); // Crea un nuevo controlador de abortos
     const { signal } = abortController.current;
-
+    setPorsentaje(`0%`)
     setLoading(true);
     if (startDate && endDate && sede) {
       GetListREport(userlogued.sub, startDate, endDate, sede, empresa, contrata, token, { signal })
@@ -124,12 +127,14 @@ const HistorialPaciente = () => {
           if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
             setData([])
           } else {
+            const porcentajePorSede = 100 / totalSedes;
+            setPorsentaje(`${porcentajePorSede}%`)
             setData(response);
             setTotalPages(Math.ceil(response.length / recordsPerPage)); 
           }
         })
         .catch(error => {
-          console.error('Calma, se va a estabilizar',);
+          
         })
         .finally(() => {
           if (abortController.current.signal.aborted) return;
@@ -156,9 +161,10 @@ const HistorialPaciente = () => {
           const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
           const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
           setData(prevData => [...prevData, ...allData]);
+          setPorsentaje(`100%`)
         }catch (error){
           if (error.name !== 'AbortError') {
-            console.error('Calma, se va a estabilizar',);
+            
           }
         }
       }
@@ -239,26 +245,10 @@ const HistorialPaciente = () => {
 
 
   // Jeambito calculador user
-  useEffect(() => {
-    if (!sede) return;
+  
+  
 
-    setLoading(true);
-    GetListREport(userlogued.sub, startDate, endDate, sede, token)
-      .then(response => {
-        setData(response);
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        setLoading(false);
-      });
-  }, [sede, startDate, endDate, token, userlogued.sub]);
-
-  const totalSedes = ListSedes.length;
-  const indexSede = ListSedes.findIndex(s => s.cod_sede === sede);
-  const porcentajePorSede = 100 / totalSedes;
-  const porcentajeActual = porcentajePorSede * (indexSede + 1);
-  const mensajePorcentaje = `Datos cargados: ${porcentajeActual.toFixed(2)}%`;
+  const mensajePorcentaje = `Datos cargados: ${porsentaje}`;
   
 
   return (
