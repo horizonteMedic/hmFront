@@ -184,10 +184,10 @@ const AdministrarEmpresa = () => {
                           <FontAwesomeIcon icon={faTrash} className="text-red-500 cursor-pointer" onClick={() => {deleteRol(item.rucEmpresa)}} />
                         </td>
                       <td className="border border-gray-300 px-2 py-1">{item.rucEmpresa}</td>
-                      <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.razonEmpresa)}</td>
-                      <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.direccionEmpresa)}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.razonEmpresa}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.direccionEmpresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.telefonoEmpresa}</td>
-                      <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.responsableEmpresa)}</td>
+                      <td className="border border-gray-300 px-2 py-1">{item.responsableEmpresa}</td>
                       <td className="border border-gray-300 px-2 py-1">{item.emailEmpresa}</td>
                     </tr>
                   ))}

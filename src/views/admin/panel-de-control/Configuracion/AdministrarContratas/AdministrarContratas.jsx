@@ -52,6 +52,9 @@ const AdministrarContratas = () => {
   }, [refres, recordsPerPage, token]);
 
   const toTitleCase = (str) => {
+    if (str == null || str === '') {
+      return ''; // O return null; si prefieres devolver null explícitamente
+    }
     return str.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
@@ -168,10 +171,10 @@ const AdministrarContratas = () => {
                         </td>
 
                         <td className="border border-gray-300 px-2 py-1">{item.rucContrata}</td>
-                        <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.razonContrata)}</td>
-                        <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.direccionContrata)}</td>
+                        <td className="border border-gray-300 px-2 py-1">{item.razonContrata}</td>
+                        <td className="border border-gray-300 px-2 py-1">{item.direccionContrata}</td>
                         <td className="border border-gray-300 px-2 py-1">{item.telefonoContrata}</td>
-                        <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.responsableContrata)}</td>
+                        <td className="border border-gray-300 px-2 py-1">{item.responsableContrata}</td>
                         <td className="border border-gray-300 px-2 py-1">{item.emailContrata}</td>
                       </tr>
                     ))}
