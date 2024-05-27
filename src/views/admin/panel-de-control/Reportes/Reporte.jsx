@@ -109,7 +109,6 @@ const HistorialPaciente = () => {
     
   }, [searchTerm]);
   
-
 //Esto trae todos los datos cuando se entra a la vista de reportes
   useEffect(() => {
 
@@ -144,6 +143,12 @@ const HistorialPaciente = () => {
     }
   }, [startDate, endDate, sede, empresa, contrata]);
   
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   const SecondPlane = async () => {
     
     if (secondPlaneAbortController.current) {
@@ -160,8 +165,14 @@ const HistorialPaciente = () => {
           const otrasSedesData = await Promise.all(fetchPromises);
           const nonEmptyData = otrasSedesData.filter(data => data.length > 0);
           const allData = nonEmptyData.reduce((acc, data) => acc.concat(data), []);
-          setData(prevData => [...prevData, ...allData]);
+          setData(prevData => {
+            const updatedData = [...prevData, ...allData];
+            setTotalPages(Math.ceil(updatedData.length / recordsPerPage)); // Recalcular totalPages
+            return updatedData;
+          });
           setPorsentaje(`100%`)
+
+
         }catch (error){
           if (error.name !== 'AbortError') {
             
@@ -324,7 +335,7 @@ const HistorialPaciente = () => {
             >
               <option value="">Seleccionar</option>
               {ListEmpresa?.map((option,index) => (
-                <option key={index} value={option.ruc}>{option.razonSocial}</option>
+                <option key={index} value={option.ruc}>{toTitleCase(option.razonSocial)}</option>
               ))}
             </select>
           </div>

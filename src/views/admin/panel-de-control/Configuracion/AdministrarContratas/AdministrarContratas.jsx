@@ -51,6 +51,12 @@ const AdministrarContratas = () => {
       });
   }, [refres, recordsPerPage, token]);
 
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   const Refresgpag = () => {
     setRefresh(refres + +1)
   }
@@ -162,10 +168,10 @@ const AdministrarContratas = () => {
                         </td>
 
                         <td className="border border-gray-300 px-2 py-1">{item.rucContrata}</td>
-                        <td className="border border-gray-300 px-2 py-1">{item.razonContrata}</td>
-                        <td className="border border-gray-300 px-2 py-1">{item.direccionContrata}</td>
+                        <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.razonContrata)}</td>
+                        <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.direccionContrata)}</td>
                         <td className="border border-gray-300 px-2 py-1">{item.telefonoContrata}</td>
-                        <td className="border border-gray-300 px-2 py-1">{item.responsableContrata}</td>
+                        <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.responsableContrata)}</td>
                         <td className="border border-gray-300 px-2 py-1">{item.emailContrata}</td>
                       </tr>
                     ))}

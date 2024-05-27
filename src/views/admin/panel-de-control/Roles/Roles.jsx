@@ -31,6 +31,12 @@ const Roles = () => {
  
   const [isModalRolesAsignadosOpen, setIsModalRolesAsignadosOpen] = useState(false);
 
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   const openRolesAsignadosModal = (idRol) => {
     setId(idRol)
     setIsModalRolesAsignadosOpen(true);
@@ -175,8 +181,8 @@ const Roles = () => {
                     <FontAwesomeIcon icon={faPaperclip} onClick={() => {openArchivoModal(item.idRol)}} className="color-azul mr-2 cursor-pointer" />
 
                   </td>
-                  <td className="border border-gray-300 px-2 py-1">{item.nombre}</td>
-                  <td className="border border-gray-300 px-2 py-1">{item.descripcion}</td>
+                  <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombre)}</td>
+                  <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.descripcion)}</td>
                   <td className="border border-gray-300 px-2 py-1 text-center">
                     <div style={{ borderRadius: '1rem' }} className={`py-1 px-2 ${item.estado ? 'bg-green-500' : 'bg-red-500'} text-white fw-bold`}>
                       {item.estado ? 'Activo' : 'Inactivo'}

@@ -54,6 +54,12 @@ const Accesos = () => {
     })
   },[refres])
 
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   const Refresgpag = () => {
     setRefresh(refres + +1)
   }
@@ -161,9 +167,9 @@ const Accesos = () => {
                 </td>
                 <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
                 <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.apellidos}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.nombres}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.cargo}</td>   
+                <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.apellidos)}</td>
+                <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombres)}</td>
+                <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.cargo)}</td>   
                 </tr>
               ))}
             </tbody>
