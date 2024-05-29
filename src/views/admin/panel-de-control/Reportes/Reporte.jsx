@@ -327,8 +327,10 @@ const HistorialPaciente = () => {
             <select
               className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 md:mr-4 ${ListEmpresa.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
               onChange={(e) => {
+                setData([])
                 setEmpresa(e.target.value);
                 setContrata('');
+                setSearchTerm('')
               }}
               disabled={ListEmpresa.some(option => option.ruc === '0')}
               value={empresa}
@@ -344,8 +346,10 @@ const HistorialPaciente = () => {
             <select
               className={`pointer border border-gray-300 px-3 py-2 rounded-md mb-2 md:mb-0 ${ListContrata.some(option => option.ruc === '0') ? '!opacity-60' : ''}`}
               onChange={(e) => {
+                setData([])
                 setContrata(e.target.value);
                 setEmpresa('');
+                setSearchTerm('')
               }}
               disabled={ListContrata.some(option => option.ruc === '0')}
               value={contrata}
