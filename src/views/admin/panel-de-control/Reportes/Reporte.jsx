@@ -291,7 +291,7 @@ const HistorialPaciente = () => {
           className="amarillo-btn px-4 rounded flex items-center mr-3"
         >
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
-          Carga de Datos
+          Subir Carpeta
         </button>
         
         <button onClick={reloadTable} className="focus:outline-none relative">
