@@ -55,6 +55,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
       const fileName = file.name;
       const fileExtension = fileName.split('.').pop().toLowerCase();
       const fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+      const archsub = fileNameWithoutExtension.replace(/\s+/g, '')
       if (datosarch.extension === 'pdf' && fileExtension !== 'pdf') {
         Swal.fire({
           icon: 'error',
@@ -72,18 +73,14 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
         closeModal()
         return;
       }
-      const separacion = datosarch.nombres.trim().split(' ').filter(Boolean);
-      const separacion2 = datosarch.apellidos.trim().split(' ').filter(Boolean);
-      const nombre = `${datosarch.nombres.split(' ')[0]}`
-      const apellido = `${datosarch.apellidos.split(' ')[0]}`
+      const nombre = `${datosarch.nombres.trim()}`
+      const apellido = `${datosarch.apellidos.trim()}`
+      const nombresin = nombre.replace(/\s+/g, '')
+      const apellidosin = apellido.replace(/\s+/g, '')
 
-      const segnombre = separacion.length > 1 ? separacion[1] : separacion[0];
-      const segapellido = separacion2.length > 1 ? separacion2[1] : separacion2[0];
+      const CodigoSave = `${datosarch.nomenclatura}-${apellidosin}${nombresin}-${datosarch.orden}`
 
-      const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}`
-      const CodigoSavealt = `${datosarch.nomenclatura}-${datosarch.orden}-${segnombre}-${segapellido}`
-
-      if (fileNameWithoutExtension.toUpperCase() != CodigoSave.toUpperCase() && fileNameWithoutExtension.toUpperCase() != CodigoSavealt.toUpperCase()) {
+      if (archsub.toUpperCase() != CodigoSave.toUpperCase()) {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',

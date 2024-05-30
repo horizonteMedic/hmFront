@@ -54,6 +54,10 @@ body {
   background-color: #233245;
   color: white;
 }
+.amarillo-btn{
+  background-color: #10ddb8;;
+  color: white;
+}
 .pointer{
   cursor: pointer;
 }

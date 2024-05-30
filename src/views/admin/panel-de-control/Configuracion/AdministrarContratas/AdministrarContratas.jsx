@@ -51,6 +51,15 @@ const AdministrarContratas = () => {
       });
   }, [refres, recordsPerPage, token]);
 
+  const toTitleCase = (str) => {
+    if (str == null || str === '') {
+      return ''; // O return null; si prefieres devolver null explícitamente
+    }
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   const Refresgpag = () => {
     setRefresh(refres + +1)
   }
