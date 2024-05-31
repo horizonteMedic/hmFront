@@ -471,7 +471,7 @@ const HistorialPaciente = () => {
       
       {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
       {/* Modal de carga de datos */}
-      {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} />}
+      {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
     </div>
   );
 };

@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFolder, faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons'; 
 import Swal from 'sweetalert2';
+import ArchivosMasivos from '../model/postArchivosMasivos';
 
-const DataUploadModal = ({ closeModal }) => {
+const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
+  const [uparchFile, setUparchFile] = useState([])
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedSede, setSelectedSede] = useState('');
   const [isFolderUploadEnabled, setIsFolderUploadEnabled] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
-
+  const [failedUploads, setFailedUploads] = useState([]);
+  
+  const sedes = Sedes
+  
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
     return ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'gif' || ext === 'pdf' || ext === 'xls' || ext === 'xlsx';
@@ -20,6 +25,7 @@ const DataUploadModal = ({ closeModal }) => {
     setUploadStatus({});
 
     const folders = Array.from(e.target.files);
+    setUparchFile(folders)
     const folderNames = folders.map((folder) => folder.name);
     setUploadedFiles((prevFiles) => [...prevFiles, ...folderNames]);
 
@@ -40,7 +46,41 @@ const DataUploadModal = ({ closeModal }) => {
     });
   };
 
-  const handleConfirmUpload = () => {
+  const SubidaArchivos = async () => {
+    setFailedUploads([]);
+     
+      const uploadPromises = uparchFile.map(async (folder) => {
+        try {
+          const fileBase64 = await toBase64(folder);
+          const base64WithoutHeader = fileBase64.split(',')[1];
+          const datos = {
+            nombre: folder.name,
+            sede: selectedSede,
+            base64: base64WithoutHeader
+          };
+          const response = await ArchivosMasivos(datos, user, token);
+          console.log(response);
+          if (response.id === 0) {
+            failedUploads.push(folder.name);
+          }
+        } catch (error) {
+          console.error(`Error uploading ${folder.name}:`, error);
+          failedUploads.push(folder.name);
+        }
+      });
+
+      await Promise.all(uploadPromises);
+
+      if (failedUploads.length > 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Detención!',
+          text: `Estos Archivos no se han subido: ${failedUploads.join(', ')}`,
+        });
+      }
+  }
+
+  const handleConfirmUpload = async () => {
     if (!selectedSede || uploadedFiles.length === 0) {
       Swal.fire('Error', 'Por favor selecciona una sede y sube al menos un archivo.', 'error');
       return;
@@ -56,19 +96,17 @@ const DataUploadModal = ({ closeModal }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         setIsUploading(true);
-        setTimeout(() => {
-          const successRate = Math.random(); 
-          const newStatus = uploadedFiles.reduce((acc, file) => ({
-            ...acc,
-            [file]: Math.random() < successRate ? 'success' : 'error',
-          }), {});
-          setUploadStatus((prevStatus) => ({ ...prevStatus, ...newStatus }));
-
-          setIsUploading(false);
-          closeModal();
-          Swal.fire('¡Éxito!', 'Archivos subidos correctamente', 'success');
-        }, 2000);
+        SubidaArchivos()
       }
+    });
+  };
+
+  const toBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
     });
   };
 
@@ -87,9 +125,9 @@ const DataUploadModal = ({ closeModal }) => {
                   setIsFolderUploadEnabled(true);
                 }}>
                 <option value="">Seleccionar Sede</option>
-                <option value="sede1">Sede 1</option>
-                <option value="sede2">Sede 2</option>
-                <option value="sede3">Sede 3</option>
+                {sedes?.map((option) => (
+                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+                ))}
               </select>
             </div>
             <div className="flex mb-4">

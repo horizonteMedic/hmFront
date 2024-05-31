@@ -116,7 +116,6 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
         return;
       }
       const filesave = `${Nomenclatura}-${cleanedNamePart}-${Orden}.${fileExtension}`
-      console.log(filesave)
 
       const reader = new FileReader();
       reader.onload = (e) => {
