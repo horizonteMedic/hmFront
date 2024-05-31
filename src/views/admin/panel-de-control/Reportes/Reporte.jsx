@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes, ComboboxEmpresas, ComboboxContratas } from './Modal/Combobox';
 import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
+import DataUploadModal from './DataUploadModal/DataUploadModal'; 
 
 const HistorialPaciente = () => {
+  const [showDataUploadModal, setShowDataUploadModal] = useState(false);
+
   const ListSedes = ComboboxSedes();
   const ListEmpresa = ComboboxEmpresas();
   const ListContrata = ComboboxContratas();
@@ -240,7 +243,21 @@ const HistorialPaciente = () => {
   const handlePageClick = (page) => {
     setCurrentPage(page);
   };
-  
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const toggleFullScreen = () => {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+      elem.requestFullscreen()
+        .then(() => setIsFullScreen(true))
+        .catch((err) => {
+          console.log(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+    } else {
+      document.exitFullscreen()
+        .then(() => setIsFullScreen(false));
+    }
+  };
+
   const visiblePages = () => {
     const totalVisiblePages = 5; 
     const halfVisiblePages = Math.floor(totalVisiblePages / 2);
@@ -253,27 +270,36 @@ const HistorialPaciente = () => {
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
   const currentData = data.slice(startIdx, endIdx);
-
-
-  // Jeambito calculador user
-  
-  
-
   const mensajePorcentaje = `Datos cargados: ${porsentaje}`;
   
 
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
-        
-        <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
+      <div className="px-4 py-2 azuloscurobackground flex justify-between items-center"> 
+      <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
+      
+      <div className="flex items-center">
+        <button className="naranja-btn px-4 rounded flex items-center mr-3" onClick={toggleFullScreen}>
+          <FontAwesomeIcon icon={isFullScreen ? faCompress : faExpand} className="mr-2" />
+          {isFullScreen ? 'Reducir' : 'Expandir'}
+        </button>
 
-          <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
-          <button onClick={reloadTable} className="focus:outline-none ml-3 relative">
-            {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
-            <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
-          </button>
-        </div>
+
+        <button
+          onClick={() => setShowDataUploadModal(true)}
+          className="amarillo-btn px-4 rounded flex items-center mr-3"
+        >
+          <FontAwesomeIcon icon={faUpload} className="mr-2" />
+          Subir Carpeta
+        </button>
+        
+        <button onClick={reloadTable} className="focus:outline-none relative">
+          {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+          <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+        </button> 
+      </div>
+    </div>
    
         {/* filtros */}
         <div className="p-4 flex flex-col md:flex-row justify-between items-start md:items-center md:space-x-4 flex-wrap">
@@ -444,6 +470,8 @@ const HistorialPaciente = () => {
       </div>
       
       {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
+      {/* Modal de carga de datos */}
+      {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} />}
     </div>
   );
 };
