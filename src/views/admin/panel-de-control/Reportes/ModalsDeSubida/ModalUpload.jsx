@@ -4,7 +4,7 @@ import { faTimes, faCloudUploadAlt, faCheckCircle, faTimesCircle } from '@fortaw
 import NewArchivo from '../model/NewArchivo';
 import Swal from 'sweetalert2';
 
-const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }) => {
+const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, sede }) => {
 
   const [datosarch, setDatosarch] = useState({
       id: combinedParam.archivoItem.id,
@@ -55,6 +55,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
       const fileName = file.name;
       const fileExtension = fileName.split('.').pop().toLowerCase();
       const fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+      
       if (datosarch.extension === 'pdf' && fileExtension !== 'pdf') {
         Swal.fire({
           icon: 'error',
@@ -72,7 +73,11 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
         closeModal()
         return;
       }
-      const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
+      
+
+      if (sede !== 'HMAC') {
+
+        const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
       const CodOrden = fileNameWithoutExtension.split('-') 
 
       //Nomenclatuura
@@ -85,37 +90,41 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
       //Cod Orden
       const Orden = CodOrden[CodOrden.length - 1];
 
-      if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al subir archivo',
-          text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}`,
-        });
-        closeCAMUModal()
-        return;
+        if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}`,
+          });
+          closeCAMUModal()
+          return;
+        }
+  
+  
+        if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}`,
+          });
+          closeCAMUModal()
+          return;
+        }
+  
+        if (datosarch.orden != Orden) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: `El número de Orden debe ser igual: ${datosarch.orden}`,
+          });
+          closeCAMUModal()
+          return;
+        }
+        const filesave = `${Nomenclatura}-${cleanedNamePart}-${Orden}.${fileExtension}`
+        setFileName(filesave);
+      } else {
+        setFileName(fileName)
       }
-
-
-      if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al subir archivo',
-          text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}`,
-        });
-        closeCAMUModal()
-        return;
-      }
-
-      if (datosarch.orden != Orden) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al subir archivo',
-          text: `El número de Orden debe ser igual: ${datosarch.orden}`,
-        });
-        closeCAMUModal()
-        return;
-      }
-      const filesave = `${Nomenclatura}-${cleanedNamePart}-${Orden}.${fileExtension}`
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -124,7 +133,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
         setFileUploaded(true);
       };
       reader.readAsDataURL(file);
-      setFileName(filesave);
+      
     }
   };
   

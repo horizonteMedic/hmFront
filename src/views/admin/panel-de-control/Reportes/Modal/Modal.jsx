@@ -275,7 +275,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
         )}
       </div>
       {modalArchivos && (
-        <ModalUpload closeModal={closeModalArchivos} combinedParam={datosarc} dni={dni} user={user} token={token} reloadread={reloadread} />
+        <ModalUpload closeModal={closeModalArchivos} combinedParam={datosarc} dni={dni} user={user} token={token} reloadread={reloadread} sede={sede} />
       )}
       {currentFile && (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
