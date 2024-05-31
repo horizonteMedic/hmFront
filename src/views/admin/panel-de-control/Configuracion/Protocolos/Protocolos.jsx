@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import RuterConfig from '../RuterConfig';
 import EditModal from '../Protocolos/EditModal/EditModal.jsx';
+import ModalRegistroServicios from './ModalRegistroServicios/ModalRegistroServicios.jsx'; // Importamos el nuevo componente
 
 const Protocolos = () => {
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showModalRegistroServicios, setShowModalRegistroServicios] = useState(false); // Estado para mostrar/ocultar el modal de registro de servicios
   const [currentData, setCurrentData] = useState({
     razon: '',
     direccion: '',
@@ -28,10 +30,10 @@ const Protocolos = () => {
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig /> 
-  
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold color-azul text-white">Protocolo</h1>
+          <button  className="amarillo-btn px-4 rounded flex items-center mr-3" onClick={() => setShowModalRegistroServicios(true)}>Registrar Servicios</button>
         </div>
         <div className='container p-6'>
           <div className="mb-4 flex items-center">
@@ -59,14 +61,12 @@ const Protocolos = () => {
               placeholder="Ingrese el nombre de la empresa"
             />
           </div>
-          
+
           <div className="mb-4 mt-6 flex flex-wrap">
             <div className="w-full md:w-1/2 pr-2">
               <p className="mb-2">Listado de Contratas:</p>
               <div className="mb-4">
-                <label htmlFor="contrata" className="block  font-medium text-gray-700">
-                  Contrata:
-                </label>
+
                 <select
                   id="contrata"
                   name="contrata"
@@ -130,9 +130,6 @@ const Protocolos = () => {
             <div className="w-full md:w-1/2 pl-2">
               <p className="mb-2">Listado de Servicios:</p>
               <div className="mb-4">
-                <label htmlFor="contrata" className="block  font-medium text-gray-700">
-                  Contrata:
-                </label>
                 <select
                   id="contrata"
                   name="contrata"
@@ -195,7 +192,7 @@ const Protocolos = () => {
             </div>
           </div>
         </div>
-      </div>
+    </div>
       {showEditModal && (
         <EditModal 
           setShowEditModal={setShowEditModal} 
@@ -206,6 +203,7 @@ const Protocolos = () => {
           email={currentData.email} 
         />
       )}
+      {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} />}
     </div>
   );
 };
