@@ -73,12 +73,21 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         closeModal()
         return;
       }
-      
 
-      if (sede !== 'HMAC') {
+      
 
         const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
       const CodOrden = fileNameWithoutExtension.split('-') 
+
+      if (CodOrden.length < 2) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error al subir archivo',
+          text: 'El nombre del archivo no tiene el formato esperado.',
+        });
+        closeModal();
+        return;
+      }
 
       //Nomenclatuura
       const Nomenclatura = fileNameWithoutExtension.split('-')[0]
@@ -122,9 +131,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         }
         const filesave = `${Nomenclatura}-${cleanedNamePart}-${Orden}.${fileExtension}`
         setFileName(filesave);
-      } else {
-        setFileName(fileName)
-      }
+      
 
       const reader = new FileReader();
       reader.onload = (e) => {
