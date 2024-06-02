@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFolder, faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons'; 
 import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
+import {Loading} from '../../../../components/Loading'
 
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uparchFile, setUparchFile] = useState([])
@@ -11,8 +12,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [isFolderUploadEnabled, setIsFolderUploadEnabled] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
-  const [failedUploads, setFailedUploads] = useState([]);
-  
+  const [sucred, setSucred] = useState(false)
+
   const sedes = Sedes
   
   const isImageOrPDFOrExcel = (fileName) => {
@@ -45,10 +46,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       }
     });
   };
-
+ 
   const SubidaArchivos = async () => {
-    setFailedUploads([]);
-     
+    let failedUploads = [];
+   
       const uploadPromises = uparchFile.map(async (folder) => {
         try {
           const fileBase64 = await toBase64(folder);
@@ -59,8 +60,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
             base64: base64WithoutHeader
           };
           const response = await ArchivosMasivos(datos, user, token);
-          console.log(response);
           if (response.id === 0) {
+            setUploadStatus((prevStatus) => ({
+              ...prevStatus,
+              [folder.name]: 'error',
+            }));
             failedUploads.push(folder.name);
           }
         } catch (error) {
@@ -70,7 +74,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       });
 
       await Promise.all(uploadPromises);
-
+      setSucred(true)
+      setIsUploading(false);
       if (failedUploads.length > 0) {
         Swal.fire({
           icon: 'error',
@@ -146,23 +151,26 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                     <tr>
                       <th className="px-4 py-2">Nombre del Archivo</th>
                       <th className="px-4 py-2">Estado</th>
-                      <th className="px-4 py-2">Acciones</th>
+                      {sucred && <th className="px-4 py-2">Acciones</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {uploadedFiles.map((file, index) => (
                       <tr key={index}>
                         <td className="border px-4 py-2">{file}</td>
-                        <td className="border px-4 py-2">
-                          {uploadStatus[file] === 'success' ? 'Archivo subido correctamente' : 'Error al subir archivo'}
+                        <td className={`border px-4 py-2 ${uploadStatus[file] === 'success' ? 'bg-green-200' : 'bg-red-300'}`}>
+                          {uploadStatus[file] === 'success' ? 'Archivo Listo' : 'Error al subir archivo'}
                         </td>
-                        <td className="border px-4 py-2">
+                        {sucred && <td className="border px-4 py-2">
                           {uploadStatus[file] === 'success' ? (
+                            <>
                             <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                            <p>Archivo Subido Correctamente</p>
+                            </>
                           ) : (
                             <FontAwesomeIcon icon={faTimesCircle} className="text-red-500" />
                           )}
-                        </td>
+                        </td>}
                       </tr>
                     ))}
                   </tbody>
@@ -187,7 +195,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
               <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded">Cerrar</button>
             </div>
-            {isUploading && <div className="mt-4">Subiendo archivos...</div>}
+            {isUploading && <Loading/>}
           </div>
         </div>
       </div>
