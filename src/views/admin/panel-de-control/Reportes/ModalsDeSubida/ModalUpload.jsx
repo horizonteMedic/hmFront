@@ -74,7 +74,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         return;
       }
 
-      
+      if (sede !== 'HMAC') {
 
         const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
       const CodOrden = fileNameWithoutExtension.split('-') 
@@ -131,6 +131,9 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         }
         const filesave = `${Nomenclatura}-${cleanedNamePart}-${Orden}.${fileExtension}`
         setFileName(filesave);
+      } else {
+        setFileName(fileName)
+      }
       
 
       const reader = new FileReader();
