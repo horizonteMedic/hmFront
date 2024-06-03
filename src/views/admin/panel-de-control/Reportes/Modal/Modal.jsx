@@ -137,26 +137,26 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
       })
   };
 
-  const DeleteBase64 = (id) => {
-
+  const DeleteBase64 = (id, nombreArchivo, ) => {
     Swal.fire({
-      title: "¿Estas Seguro?",
-      text: "No puedes revertir esta accion!",
+      title: "¿Estás Seguro?",
+      html: `Está por eliminar: <strong>${nombreArchivo}</strong><br>Estos cambios no pueden ser revertidos.`,
       icon: "warning",
+      iconColor: '#e7333f', // Configuración directa del color del ícono
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Si, Eliminar!"
     }).then((result) => {
       if (result.isConfirmed) {
-        DeleteArchivos64(id,token)
+        DeleteArchivos64(id, token)
           .then(() => {
             Swal.fire({
               title: "Eliminado!",
-              text: "El Archivo a sido eliminado de la base de datos.",
+              text: "El Archivo ha sido eliminado de la base de datos.",
               icon: "success"
             }).then((result) => {
-              if (result.isConfirmed) reloadread()
+              if (result.isConfirmed) reloadread();
             });
           })
           .catch(() => {
@@ -167,9 +167,10 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
             });
           });
       }
-    })
-    
+    });
   };
+  
+  
   const generateLegend = () => {
     const legend = listarchivos.map((archivo, index) => (
       <div key={index} className="flex items-center mb-4"> 
@@ -248,7 +249,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                       {Acces.Download && (
                         <td className="border border-gray-300 px-2 py-1">
                           {(read[dataItem.historiaClinica] || []).map((readItem, readIndex) => (
-                            <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id); } } : {})} disabled={openview} title={readItem.nombreArchivo} onClick={() => { GetBase64(dataItem.historiaClinica, readItem.id_tipo_archivo) }}>
+                            <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id, readItem.nombreArchivo); } } : {})} disabled={openview} title={readItem.nombreArchivo} onClick={() => { GetBase64(dataItem.historiaClinica, readItem.id_tipo_archivo) }}>
                               {filterArchivos(readItem)}
                             </a>
                           ))}

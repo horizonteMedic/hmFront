@@ -3,22 +3,22 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFolder, faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons'; 
 import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
-import {Loading} from '../../../../components/Loading'
+import { Loading } from '../../../../components/Loading';
 
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
-  const [uparchFile, setUparchFile] = useState([])
+  const [uparchFile, setUparchFile] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedSede, setSelectedSede] = useState('');
   const [isFolderUploadEnabled, setIsFolderUploadEnabled] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
-  const [sucred, setSucred] = useState(false)
+  const [sucred, setSucred] = useState(false);
 
   const sedes = Sedes
 
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
-    return ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'gif' || ext === 'pdf' || ext === 'xls' || ext === 'xlsx';
+    return ext === 'jpg' || ext === 'jpeg' || ext === 'png' ||  ext === 'pdf' ;
   };
 
   const handleFolderUpload = (e) => {
@@ -26,7 +26,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setUploadStatus({});
 
     const folders = Array.from(e.target.files);
-    setUparchFile(folders)
+    setUparchFile(folders);
     const folderNames = folders.map((folder) => folder.name);
     setUploadedFiles((prevFiles) => [...prevFiles, ...folderNames]);
 
@@ -46,7 +46,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       }
     });
   };
- 
+
   const SubidaArchivos = async () => {
     let failedUploads = [];
    
@@ -73,17 +73,17 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         }
       });
 
-      await Promise.all(uploadPromises);
-      setSucred(true)
-      setIsUploading(false);
-      if (failedUploads.length > 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Detención!',
-          text: `Estos Archivos no se han subido: ${failedUploads.join(', ')}`,
-        });
-      }
-  }
+    await Promise.all(uploadPromises);
+    setSucred(true);
+    setIsUploading(false);
+    if (failedUploads.length > 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Detención!',
+        text: `Estos Archivos no se han subido: ${failedUploads.join(', ')}`,
+      });
+    }
+  };
 
   const handleConfirmUpload = async () => {
     if (!selectedSede || uploadedFiles.length === 0) {
@@ -101,7 +101,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         setIsUploading(true);
-        SubidaArchivos()
+        SubidaArchivos();
       }
     });
   };
@@ -148,7 +148,12 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
             {uploadedFiles.length > 0 && (
               <div className="max-h-[300px] overflow-y-auto">
-                <h3 className="text-lg font-bold mb-2">Archivos Cargados:</h3>
+                <h3 className="text-lg font-bold mb-2">
+                  Archivos Cargados: {uploadedFiles.length}
+                </h3>
+                <h3 className="text-lg font-bold mb-2">
+                  Archivos con Error: {getFailedUploadsCount()}
+                </h3>
                 <table className="table-auto w-full">
                   <thead>
                     <tr>
@@ -167,8 +172,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                         {sucred && <td className="border px-4 py-2">
                           {uploadStatus[file] === 'success' ? (
                             <>
-                            <FontAwesomeIcon icon={faCheck} className="text-green-500" />
-                            <p>Archivo Subido Correctamente</p>
+                              <FontAwesomeIcon icon={faCheck} className="text-green-500" />
+                              <p>Archivo Subido Correctamente</p>
                             </>
                           ) : (
                             <FontAwesomeIcon icon={faTimesCircle} className="text-red-500" />
@@ -188,17 +193,16 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 )}
               </div>
 
-            <button
-              className={`px-4 py-2 rounded mr-2 ${Object.values(uploadStatus).some(status => status === 'error') ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white'}`}
-              onClick={handleConfirmUpload}
-              disabled={Object.values(uploadStatus).some(status => status === 'error')}
-            >
-              Subir
-            </button>
-
-              <button onClick={closeModal} className="bg-gray-300 px-4 py-2 rounded">Cerrar</button>
+              <button
+                className={`px-4 py-2 rounded mr-2 ${Object.values(uploadStatus).some(status => status === 'error') ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white'
+                  }`}
+                disabled={Object.values(uploadStatus).some(status => status === 'error')}
+                onClick={handleConfirmUpload}
+              >
+                Subir Archivos
+              </button>
+              {isUploading && <Loading />}
             </div>
-            {isUploading && <Loading/>}
           </div>
         </div>
       </div>
