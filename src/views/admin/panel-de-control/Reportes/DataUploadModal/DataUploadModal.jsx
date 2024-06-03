@@ -151,9 +151,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 <h3 className="text-lg font-bold mb-2">
                   Archivos Cargados: {uploadedFiles.length}
                 </h3>
-                <h3 className="text-lg font-bold mb-2">
-                  Archivos con Error: {getFailedUploadsCount()}
-                </h3>
+                
                 <table className="table-auto w-full">
                   <thead>
                     <tr>
