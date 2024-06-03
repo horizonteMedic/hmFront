@@ -49,6 +49,8 @@ const HistorialPaciente = () => {
   const AccessUpload= views.some(view => view.id === 102);
   const AccesDownload = views.some(view => view.id === 103);
   const AccesDelete = views.some(view => view.id === 104);
+  const AccesCargaMasiva = views.some(view => view.id === 302)
+
   const Acces = {
     Upload: AccessUpload,
     Download: AccesDownload,
@@ -79,6 +81,9 @@ const HistorialPaciente = () => {
   //NUEVA API FECHA DE EXAMEN
   const [fecha_examen, Setfecha_examnen] = useState('')
   const [cod_suc, SetCod_suc] = useState('')
+
+  //Actualiza Tabla
+  const [reload, Setreload] = useState(0)
 
   const totalSedes = ListSedes.length;
   useEffect(() => {
@@ -144,7 +149,7 @@ const HistorialPaciente = () => {
           SecondPlane()
         });
     }
-  }, [startDate, endDate, sede, empresa, contrata]);
+  }, [startDate, endDate, sede, empresa, contrata, reload]);
   
   const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => {
@@ -220,26 +225,9 @@ const HistorialPaciente = () => {
 
 
   const reloadTable = () => {
-    setIsReloading(true);
-
-    setLoading(true);
-    GetListREport(userlogued.sub, startDate, endDate, sede, token)
-      .then(response => {
-        if (response.mensaje === 'No value present' || response.mensaje === 'Cannot invoke "java.util.List.stream()" because "listadoHP" is null') {
-          setData([])
-        } else {
-          setData(response);
-          setTotalPages(Math.ceil(response.length / recordsPerPage)); 
-        }
-      })
-      .catch(error => {
-        throw new Error('Network response was not ok.', error);
-      })
-      .finally(() => {
-        setLoading(false);
-        setIsReloading(false); 
-      });
+    Setreload(reload+1)
   };
+
   const handlePageClick = (page) => {
     setCurrentPage(page);
   };
@@ -286,13 +274,13 @@ const HistorialPaciente = () => {
         </button>
 
 
-        <button
+        {AccesCargaMasiva && <button
           onClick={() => setShowDataUploadModal(true)}
           className="amarillo-btn px-4 rounded flex items-center mr-3"
         >
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
           Subir Carpeta
-        </button>
+        </button>}
         
         <button onClick={reloadTable} className="focus:outline-none relative">
           {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}

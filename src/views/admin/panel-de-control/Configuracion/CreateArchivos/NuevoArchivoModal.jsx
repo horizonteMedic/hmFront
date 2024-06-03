@@ -109,7 +109,6 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
               </label>
               <input
                 value={nomenclatura}
-                maxLength={10}
                 required
                 onChange={(e) => setNomenclatura(e.target.value.toUpperCase())}
                 type="text"
