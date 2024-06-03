@@ -15,7 +15,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [sucred, setSucred] = useState(false)
 
   const sedes = Sedes
-  
+
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
     return ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'gif' || ext === 'pdf' || ext === 'xls' || ext === 'xlsx';
@@ -56,7 +56,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           const base64WithoutHeader = fileBase64.split(',')[1];
           const datos = {
             nombre: folder.name,
-            sede: selectedSede,
+            sede: selectedSede.cod_sede,
             base64: base64WithoutHeader
           };
           const response = await ArchivosMasivos(datos, user, token);
@@ -93,7 +93,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
     Swal.fire({
       title: 'Confirmar',
-      text: `¿Estás seguro de subir los archivos a la sede ${selectedSede}?`,
+      text: `¿Estás seguro de subir ${uparchFile.length} archivos a la sede ${selectedSede.nombre_sede}?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Confirmar',
@@ -115,6 +115,12 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     });
   };
 
+  const handleSelectChange = (e) => {
+    const selectedOption = JSON.parse(e.target.value);
+    setSelectedSede(selectedOption);
+    setIsFolderUploadEnabled(true);
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[600px] relative">
@@ -125,13 +131,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         <div className='container p-4'>
           <div className="bg-white rounded-lg z-50">
             <div className="flex mb-4">
-              <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede} onChange={(e) => {
-                  setSelectedSede(e.target.value);
-                  setIsFolderUploadEnabled(true);
-                }}>
+              <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede ? JSON.stringify(selectedSede) : ''} onChange={handleSelectChange}>
                 <option value="">Seleccionar Sede</option>
                 {sedes?.map((option) => (
-                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+                  <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
                 ))}
               </select>
             </div>

@@ -73,37 +73,49 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         closeModal()
         return;
       }
+      
 
+      
       if (sede !== 'HMAC') {
 
-        const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
+      const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
       const CodOrden = fileNameWithoutExtension.split('-') 
 
-      if (CodOrden.length < 2) {
+      if (CodOrden.length < 3) {
         Swal.fire({
           icon: 'error',
           title: 'Error al subir archivo',
-          text: 'El nombre del archivo no tiene el formato esperado.',
+          text: 'El nombre del archivo no tiene el formato esperado.\n\nRecuerda que debe ser Orden-Nomenclatura-Nombres',
         });
         closeModal();
         return;
       }
 
       //Nomenclatuura
-      const Nomenclatura = fileNameWithoutExtension.split('-')[0]
+      const Orden = fileNameWithoutExtension.split('-')[0]
       //Nombre
-      const NamePart = CodOrden[1].trim().replace(/\s+/g, ' ')
+      const NamePart = CodOrden[2].trim().replace(/\s+/g, ' ')
       const cleanedNamePart = NamePart.replace(/\s+/g, ' ');
       const ApellName = Nombres.trim().replace(/\s+/g, ' ');
 
       //Cod Orden
-      const Orden = CodOrden[CodOrden.length - 1];
+      const Nomenclatura = CodOrden[1].trim()
+      
+        if (datosarch.orden != Orden) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al subir archivo',
+            text: `El número de Orden debe ser igual: ${datosarch.orden}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+          });
+          closeCAMUModal()
+          return;
+        }
 
         if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
           Swal.fire({
             icon: 'error',
             title: 'Error al subir archivo',
-            text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}`,
+            text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
           });
           closeCAMUModal()
           return;
@@ -114,22 +126,14 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
           Swal.fire({
             icon: 'error',
             title: 'Error al subir archivo',
-            text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}`,
+            text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
           });
           closeCAMUModal()
           return;
         }
   
-        if (datosarch.orden != Orden) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al subir archivo',
-            text: `El número de Orden debe ser igual: ${datosarch.orden}`,
-          });
-          closeCAMUModal()
-          return;
-        }
-        const filesave = `${Nomenclatura}-${cleanedNamePart}-${Orden}.${fileExtension}`
+        
+        const filesave = `${Orden}-${Nomenclatura}-${cleanedNamePart}.${fileExtension}`
         setFileName(filesave);
       } else {
         setFileName(fileName)
@@ -152,16 +156,33 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
   };
 
   const handleUpload = () => {
-    setUploading(true);
-    NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
-    .then(data => {
-      setUploadSuccess(true);
-      setUploading(false);
-      AleertSucces()
+    
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: `Vas a subir este archivo a la Sede ${sede}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Subir!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setUploading(true);
+        NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
+        .then(data => {
+          setUploadSuccess(true);
+          setUploading(false);
+          AleertSucces()
+        })
+        .catch(error => {
+          console.error('Error:', error)
+        }) 
+      } else {
+        closeCAMUModal()
+      }
     })
-    .catch(error => {
-      console.error('Error:', error)
-    })
+
+    
     // Simulando una solicitud de carga (aquí puedes agregar tu lógica real de carga)
   };
 
