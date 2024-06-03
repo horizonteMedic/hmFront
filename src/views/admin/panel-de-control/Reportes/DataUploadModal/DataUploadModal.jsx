@@ -18,7 +18,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
-    return ext === 'jpg' || ext === 'jpeg' || ext === 'png' ||  ext === 'pdf' || ext === 'xls' || ext === 'xlsx';
+    return ext === 'jpg' || ext === 'jpeg' || ext === 'png' ||  ext === 'pdf' ;
   };
 
   const handleFolderUpload = (e) => {
