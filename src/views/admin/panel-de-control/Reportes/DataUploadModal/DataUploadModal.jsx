@@ -14,7 +14,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uploadStatus, setUploadStatus] = useState({});
   const [sucred, setSucred] = useState(false);
 
-  const sedes = Sedes;
+  const sedes = Sedes
 
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
@@ -49,29 +49,29 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
   const SubidaArchivos = async () => {
     let failedUploads = [];
-
-    const uploadPromises = uparchFile.map(async (folder) => {
-      try {
-        const fileBase64 = await toBase64(folder);
-        const base64WithoutHeader = fileBase64.split(',')[1];
-        const datos = {
-          nombre: folder.name,
-          sede: selectedSede,
-          base64: base64WithoutHeader
-        };
-        const response = await ArchivosMasivos(datos, user, token);
-        if (response.id === 0) {
-          setUploadStatus((prevStatus) => ({
-            ...prevStatus,
-            [folder.name]: 'error',
-          }));
+   
+      const uploadPromises = uparchFile.map(async (folder) => {
+        try {
+          const fileBase64 = await toBase64(folder);
+          const base64WithoutHeader = fileBase64.split(',')[1];
+          const datos = {
+            nombre: folder.name,
+            sede: selectedSede.cod_sede,
+            base64: base64WithoutHeader
+          };
+          const response = await ArchivosMasivos(datos, user, token);
+          if (response.id === 0) {
+            setUploadStatus((prevStatus) => ({
+              ...prevStatus,
+              [folder.name]: 'error',
+            }));
+            failedUploads.push(folder.name);
+          }
+        } catch (error) {
+          console.error(`Error uploading ${folder.name}:`, error);
           failedUploads.push(folder.name);
         }
-      } catch (error) {
-        console.error(`Error uploading ${folder.name}:`, error);
-        failedUploads.push(folder.name);
-      }
-    });
+      });
 
     await Promise.all(uploadPromises);
     setSucred(true);
@@ -93,7 +93,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
     Swal.fire({
       title: 'Confirmar',
-      text: `¿Estás seguro de subir los archivos a la sede ${selectedSede}?`,
+      text: `¿Estás seguro de subir ${uparchFile.length} archivos a la sede ${selectedSede.nombre_sede}?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Confirmar',
@@ -115,12 +115,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     });
   };
 
-  const getSuccessfulUploadsCount = () => {
-    return Object.values(uploadStatus).filter(status => status === 'success').length;
-  };
-
-  const getFailedUploadsCount = () => {
-    return Object.values(uploadStatus).filter(status => status === 'error').length;
+  const handleSelectChange = (e) => {
+    const selectedOption = JSON.parse(e.target.value);
+    setSelectedSede(selectedOption);
+    setIsFolderUploadEnabled(true);
   };
 
   return (
@@ -133,13 +131,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         <div className='container p-4'>
           <div className="bg-white rounded-lg z-50">
             <div className="flex mb-4">
-              <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede} onChange={(e) => {
-                setSelectedSede(e.target.value);
-                setIsFolderUploadEnabled(true);
-              }}>
+              <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede ? JSON.stringify(selectedSede) : ''} onChange={handleSelectChange}>
                 <option value="">Seleccionar Sede</option>
                 {sedes?.map((option) => (
-                  <option key={option.cod_sede} value={option.cod_sede}>{option.nombre_sede}</option>
+                  <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
                 ))}
               </select>
             </div>
