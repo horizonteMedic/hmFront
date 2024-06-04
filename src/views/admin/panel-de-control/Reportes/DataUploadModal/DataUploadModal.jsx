@@ -206,9 +206,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               </div>
 
               <button
-                className={`px-4 py-2 rounded mr-2 ${Object.values(uploadStatus).some(status => status === 'error') ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white'
-                  }`}
-                disabled={Object.values(uploadStatus).some(status => status === 'error')}
+                className='px-4 py-2 rounded mr-2 bg-blue-500 text-white'
                 onClick={handleConfirmUpload}
               >
                 Subir Archivos
