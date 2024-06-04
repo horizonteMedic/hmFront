@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faFolder, faCheck, faTimesCircle } from '@fortawesome/free-solid-svg-icons'; 
+import { faTimes, faFolder, faCheck, faTimesCircle, faDownload } from '@fortawesome/free-solid-svg-icons'; 
 import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
+import { jsPDF } from "jspdf";
 
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uparchFile, setUparchFile] = useState([]);
@@ -121,6 +122,19 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setIsFolderUploadEnabled(true);
   };
 
+  const generateErrorTablePDF = () => {
+    const doc = new jsPDF();
+    let yPos = 20;
+    doc.text("Archivos con Error", 10, 10);
+    uploadedFiles.forEach((file) => {
+      if (uploadStatus[file] === 'error') {
+        doc.text(file, 10, yPos);
+        yPos += 10;
+      }
+    });
+    doc.save("archivos_con_error.pdf");
+  };
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[600px] relative">
@@ -200,6 +214,16 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 Subir Archivos
               </button>
               {isUploading && <Loading />}
+
+              {Object.values(uploadStatus).some(status => status === 'error') && (
+                <button
+                  className="px-4 py-2 rounded bg-red-500 text-white"
+                  onClick={generateErrorTablePDF}
+                >
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                  Descargar Errores en PDF
+                </button>
+              )}
             </div>
           </div>
         </div>
