@@ -12,7 +12,7 @@ const protectedRoutes = {
     '/agregar-campa%C3%B1a': 59,
     '/administrar-empresas': 60,
     '/administrar-contratas': 61,
-    '/protocolos': 152
+    '/protocolos': 153
   };
 
 export function ProtectedRoute(){
