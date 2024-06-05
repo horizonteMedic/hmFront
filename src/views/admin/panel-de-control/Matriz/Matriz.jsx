@@ -6,7 +6,7 @@ import { GetMatrizAdmin } from './model/MatrizPOST';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileExcel } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faMagnifyingGlass,faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
@@ -20,6 +20,9 @@ const MatrizPostulante = () => {
   });
   const [data, setData] = useState([]);
   const [head, setHeaders] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1); 
+  const [recordsPerPage, setRecordsPerPage] = useState(15);
 
   const today = new Date().toISOString().split('T')[0];
   const Contratas = ComboboxContrata();
@@ -77,6 +80,7 @@ const MatrizPostulante = () => {
         setData(response);
         const headers = Object.keys(response[0]);
         setHeaders(headers);
+        setTotalPages(Math.ceil(response.length / recordsPerPage)); 
       })
       .catch(error => {
         console.log('ocurrio un telible Error', error);
@@ -94,6 +98,30 @@ const MatrizPostulante = () => {
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
 
+  //Paginación
+  const visiblePages = () => {
+    const totalVisiblePages = 5; 
+    const halfVisiblePages = Math.floor(totalVisiblePages / 2);
+    let startPage = currentPage - halfVisiblePages;
+    startPage = Math.max(startPage, 1); 
+    const endPage = startPage + totalVisiblePages - 1;
+    return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
+  };
+
+  const handlePageClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handleChangeRecordsPerPage = (e) => {
+    setRecordsPerPage(parseInt(e.target.value));
+    setCurrentPage(1);
+    setTotalPages(Math.ceil(data.length / parseInt(e.target.value)));
+  };
+
+  const startIdx = (currentPage - 1) * recordsPerPage;
+  const endIdx = startIdx + recordsPerPage;
+  const currentData = data.slice(startIdx, endIdx);
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -103,7 +131,15 @@ const MatrizPostulante = () => {
         <div className="grid gap-4 mb-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-5 p-6 ">
           <div>
             <p className="font-semibold">R.U.C. Contrata</p>
-            <select
+            <input 
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+              type="text" 
+              value={datos.rucContrata ? JSON.stringify(datos.rucContrata.razonSocial) : ''}
+              onChange={handleChange}
+              disabled
+              name='rucContrata' />
+              
+            {/*<select
               value={datos.rucContrata ? JSON.stringify(datos.rucContrata) : ''}
               onChange={handleChange}
               name='rucContrata'
@@ -113,7 +149,7 @@ const MatrizPostulante = () => {
               {Contratas.map((option) => (
                 <option key={option.ruc} value={JSON.stringify(option)}>{option.razonSocial}</option>
               ))}
-            </select>
+            </select>*/}
           </div>
           <div>
             <p className="font-semibold">Sede</p>
@@ -162,13 +198,28 @@ const MatrizPostulante = () => {
             <p className="font-semibold">Matrices</p>
             <select
               name='sede'
-              onChange={SubmitAPI}
               className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
             >
               <option value="">Selecionar...</option>
               <option value="Matriz-1">Matriz Administrativa</option>
               <option value="">Matriz 2</option>
             </select>
+          </div>
+          <div>
+            <button onClick={SubmitAPI} className="bg-blue-900 text-white px-4 py-2 rounded-md ">
+              <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
+              Buscar Matriz
+            </button>
+          </div>
+          <div className="flex flex-col mb-4 md:mb-0 w-full md:w-auto">
+            <span className="mr-2 fw-bold">Mostrar</span>
+            <select className="border pointer border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={15}>15</option>
+                      <option value={20}>20</option>
+                      <option value={25}>25</option>
+                    </select>
           </div>
         </div>
         
@@ -183,7 +234,7 @@ const MatrizPostulante = () => {
             </tr>
           </thead>
             <tbody>
-              {data.map((item, index) => (
+              {currentData.map((item, index) => (
                 <tr key={index}>
                   {head.map((header) => (
                     <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
@@ -192,6 +243,20 @@ const MatrizPostulante = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="flex justify-center p-4">
+          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+            <FontAwesomeIcon icon={faChevronLeft} />
+          </button>
+          {/* Mostrar números de página */}
+          {visiblePages().map((page) => (
+            <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
+              {page}
+            </button>
+          ))}
+          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+            <FontAwesomeIcon icon={faChevronRight} />
+          </button>
         </div>
         
         {/* Botón de exportar a Excel */}

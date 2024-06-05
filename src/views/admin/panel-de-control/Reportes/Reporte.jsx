@@ -260,7 +260,6 @@ const HistorialPaciente = () => {
   const currentData = data.slice(startIdx, endIdx);
   const mensajePorcentaje = `Datos cargados: ${porsentaje}`;
   
-
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
