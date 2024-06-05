@@ -33,7 +33,7 @@ const Protocolos = () => {
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[60%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold color-azul text-white">Protocolo</h1>
-          <button  className="amarillo-btn px-4 rounded flex items-center mr-3" onClick={() => setShowModalRegistroServicios(true)}>Registrar Servicios</button>
+          <button  className="naranja-btn px-4 rounded flex items-center mr-3" onClick={() => setShowModalRegistroServicios(true)}>Registrar Servicios</button>
         </div>
         <div className='container p-6'>
           <div className="mb-4 flex items-center">

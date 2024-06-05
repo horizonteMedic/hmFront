@@ -275,7 +275,7 @@ const HistorialPaciente = () => {
 
         {AccesCargaMasiva && <button
           onClick={() => setShowDataUploadModal(true)}
-          className="amarillo-btn px-4 rounded flex items-center mr-3"
+          className="verde-btn px-4 rounded flex items-center mr-3"
         >
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
           Subir Carpeta
