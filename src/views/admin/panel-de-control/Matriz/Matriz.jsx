@@ -6,7 +6,7 @@ import { GetMatrizAdmin } from './model/MatrizPOST';
 import { Loading } from '../../../components/Loading';
 import { useAuthStore } from '../../../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileExcel, faMagnifyingGlass,faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
@@ -20,9 +20,10 @@ const MatrizPostulante = () => {
   });
   const [data, setData] = useState([]);
   const [head, setHeaders] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1); 
-  const [totalPages, setTotalPages] = useState(1); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
+  const [reload, setReload] = useState(0); // Estado para controlar la recarga de la tabla
 
   const today = new Date().toISOString().split('T')[0];
   const Contratas = ComboboxContrata();
@@ -80,7 +81,7 @@ const MatrizPostulante = () => {
         setData(response);
         const headers = Object.keys(response[0]);
         setHeaders(headers);
-        setTotalPages(Math.ceil(response.length / recordsPerPage)); 
+        setTotalPages(Math.ceil(response.length / recordsPerPage));
       })
       .catch(error => {
         console.log('ocurrio un telible Error', error);
@@ -90,6 +91,13 @@ const MatrizPostulante = () => {
       });
   };
 
+  useEffect(() => {
+    if (reload > 0) {
+      SubmitAPI(); // Llama a la función SubmitAPI para recargar los datos
+      setReload(0); // Reinicia el estado reload para evitar múltiples recargas
+    }
+  }, [reload]);
+
   const exportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
@@ -98,6 +106,9 @@ const MatrizPostulante = () => {
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
 
+  const reloadTable = () => {
+    setReload(reload + 1);
+  };
   //Paginación
   const visiblePages = () => {
     const totalVisiblePages = 5; 
@@ -132,18 +143,26 @@ const MatrizPostulante = () => {
             <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
             Exportar a Excel
           </button>
-          <select
-            className="border pointer border-gray-300 rounded-md px-1"
-            value={recordsPerPage}
-            onChange={handleChangeRecordsPerPage}
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={15}>15</option>
-            <option value={20}>20</option>
-            <option value={25}>25</option>
-          </select>
-         
+          <div className="flex items-center">
+          <span className="ml-2 text-white mr-1">Resultados por página</span>
+
+            <select
+              className="border pointer border-gray-300 rounded-md px-1"
+              value={recordsPerPage}
+              onChange={handleChangeRecordsPerPage}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={15}>15</option>
+              <option value={20}>20</option>
+              <option value={25}>25</option>
+            </select>
+          </div>
+
+          <button onClick={reloadTable} className="focus:outline-none relative">
+          {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+          <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+        </button> 
         </div>
       </div>
         {/* filtros */}
@@ -224,26 +243,34 @@ const MatrizPostulante = () => {
 
         
         {/* Tabla de datos */}
-        <div className="overflow-x-auto p-3">
-          <table className="w-full border border-gray-300">
-          <thead>
-            <tr>
-              {head.map((header) => (
-                <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
-              ))}
-            </tr>
-          </thead>
-            <tbody>
-              {currentData.map((item, index) => (
-                <tr key={index}>
-                  {head.map((header) => (
-                    <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+<div className="overflow-x-auto p-3 relative">
+  {loading && (
+    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+      <p className="text-xl font-semibold">Cargando...</p>
+    </div>
+  )}
+  {loading || (
+    <table className="w-full border border-gray-300">
+      <thead>
+        <tr>
+          {head.map((header) => (
+            <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {currentData.map((item, index) => (
+          <tr key={index}>
+            {head.map((header) => (
+              <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )}
+</div>
+
         <div className="flex justify-center p-4">
           <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
             <FontAwesomeIcon icon={faChevronLeft} />
@@ -261,7 +288,6 @@ const MatrizPostulante = () => {
         
        
       </div>
-      {loading && <Loading />}
     </div>
   );
 };
