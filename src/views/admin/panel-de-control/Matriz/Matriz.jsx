@@ -126,90 +126,101 @@ const MatrizPostulante = () => {
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
-          <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
+        <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
+        <div className="flex items-center gap-4">
+        <button onClick={exportToExcel} className="verde-btn px-4 py-1 rounded-md">
+            <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
+            Exportar a Excel
+          </button>
+          <select
+            className="border pointer border-gray-300 rounded-md px-1"
+            value={recordsPerPage}
+            onChange={handleChangeRecordsPerPage}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={15}>15</option>
+            <option value={20}>20</option>
+            <option value={25}>25</option>
+          </select>
+         
         </div>
+      </div>
         {/* filtros */}
-        <div className="grid gap-4 mb-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-7 p-6 ">
-  <div className="flex flex-col">
-    <p className="font-semibold">R.U.C. Contrata</p>
-    <input 
-      className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-      type="text" 
-      value={datos.rucContrata ? JSON.stringify(datos.rucContrata.razonSocial) : ''}
-      onChange={handleChange}
-      disabled
-      name='rucContrata' />
-  </div>
-  <div className="flex flex-col">
-    <p className="font-semibold">Sede</p>
-    <select
-      value={datos.sede ? JSON.stringify(datos.sede) : ''}
-      onChange={handleChange}
-      name='sede'
-      className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-    >
-      <option value="">Seleccionar Sede</option>
-      {Sedes.map((option) => (
-        <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
-      ))}
-    </select>
-  </div>
-  <div className="flex flex-col">
-    <p className="font-semibold">Fecha Inicio</p>
-    <input
-      type="date"
-      id="fechaInicio"
-      name="fechaInicio"
-      value={datos.fechaInicio}
-      onChange={(e) => setDatos({
-        ...datos,
-        fechaInicio: e.target.value,
-      })}
-      className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-    />
-  </div>
-  <div className="flex flex-col">
-    <p className="font-semibold">Fecha Fin</p>
-    <input
-      type="date"
-      id="fechaFin"
-      name="fechaFinal"
-      value={datos.fechaFinal}
-      onChange={(e) => setDatos({
-        ...datos,
-        fechaFinal: e.target.value,
-      })}
-      className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-    />
-  </div>
-  <div className="flex flex-col">
-    <p className="font-semibold">Matrices</p>
-    <select
-      name='sede'
-      className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-    >
-      <option value="">Selecionar...</option>
-      <option value="Matriz-1">Matriz Administrativa</option>
-      <option value="">Matriz 2</option>
-    </select>
-  </div>
-  <div className="flex flex-col">
-    <button onClick={SubmitAPI} className="bg-blue-900 mt-4 text-white px-4 py-2 rounded-md ">
-      <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
-      Buscar Matriz
-    </button>
-  </div>
-  <div className="flex flex-col">
-    <span className="mr-2 fw-bold">Mostrar</span>
-    <select className="border pointer border-gray-300 rounded-md px-2 py-1" value={recordsPerPage} onChange={handleChangeRecordsPerPage}>
-      <option value={5}>5</option>
-      <option value={10}>10</option>
-      <option value={15}>15</option>
-      <option value={20}>20</option>
-      <option value={25}>25</option>
-    </select>
-  </div>
-</div>
+    {/* filtros */}
+    <div className="flex flex-col flex-grow p-6">
+            <p className="font-semibold">R.U.C. Contrata</p>
+            <input
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+              type="text"
+              value={datos.rucContrata ? JSON.stringify(datos.rucContrata.razonSocial) : ''}
+              onChange={handleChange}
+              disabled
+              name='rucContrata' />
+          </div>
+    <div className="flex flex-wrap gap-4 p-6">
+       
+          <div className="flex flex-col flex-grow">
+            <p className="font-semibold">Sede</p>
+            <select
+              value={datos.sede ? JSON.stringify(datos.sede) : ''}
+              onChange={handleChange}
+              name='sede'
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+            >
+              <option value="">Seleccionar Sede</option>
+              {Sedes.map((option) => (
+                <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col flex-grow">
+            <p className="font-semibold">Fecha Inicio</p>
+            <input
+              type="date"
+              id="fechaInicio"
+              name="fechaInicio"
+              value={datos.fechaInicio}
+              onChange={(e) => setDatos({
+                ...datos,
+                fechaInicio: e.target.value,
+              })}
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+            />
+          </div>
+          <div className="flex flex-col flex-grow">
+            <p className="font-semibold">Fecha Fin</p>
+            <input
+              type="date"
+              id="fechaFin"
+              name="fechaFinal"
+              value={datos.fechaFinal}
+              onChange={(e) => setDatos({
+                ...datos,
+                fechaFinal: e.target.value,
+              })}
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+            />
+          </div>
+          <div className="flex flex-col flex-grow">
+            <p className="font-semibold">Matrices</p>
+            <select
+              name='sede'
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+            >
+              <option value="">Seleccionar...</option>
+              <option value="Matriz-1">Matriz Administrativa</option>
+              <option value="">Matriz 2</option>
+            </select>
+          </div>
+          <div className="flex flex-col flex-grow justify-end">
+            <button onClick={SubmitAPI} className="bg-blue-900 mt-4 text-white px-4 py-2 rounded-md">
+              <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
+              Buscar Matriz
+            </button>
+          </div>
+        </div>
+
 
         
         {/* Tabla de datos */}
@@ -248,13 +259,7 @@ const MatrizPostulante = () => {
           </button>
         </div>
         
-        {/* Botón de exportar a Excel */}
-        <div className="flex justify-end p-6">
-          <button onClick={exportToExcel} className="verde-btn px-4 py-2 rounded-md ">
-            <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
-            Exportar a Excel
-          </button>
-        </div>
+       
       </div>
       {loading && <Loading />}
     </div>
