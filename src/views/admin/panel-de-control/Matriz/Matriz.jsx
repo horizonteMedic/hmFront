@@ -25,11 +25,19 @@ const MatrizPostulante = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(15);
   const [reload, setReload] = useState(0); // Estado para controlar la recarga de la tabla
+  const [exportButtonEnabled, setExportButtonEnabled] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
   const Contratas = ComboboxContrata();
   const Sedes = ComboboxSedes();
-
+  useEffect(() => {
+    if (data.length > 0) {
+      setExportButtonEnabled(true);
+    } else {
+      setExportButtonEnabled(false);
+    }
+  }, [data]);
+  
   useEffect(() => {
     if (today) {
       setDatos(prevDatos => ({
@@ -162,10 +170,15 @@ const MatrizPostulante = () => {
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
           <div className="flex items-center gap-4">
-            <button onClick={exportToExcel} className="verde-btn px-4 py-1 rounded-md">
-              <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
-              Exportar a Excel
-            </button>
+          <button
+  onClick={exportToExcel}
+  className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
+  disabled={!exportButtonEnabled}
+>
+  <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
+  Exportar a Excel
+</button>
+
             <div className="flex items-center">
               <span className="ml-2 text-white mr-1">Resultados por página</span>
               <select
