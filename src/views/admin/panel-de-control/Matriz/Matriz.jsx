@@ -69,13 +69,22 @@ const MatrizPostulante = () => {
   };
 
   const handleMatrizChange = (e) => {
+    const matrizSeleccionada = e.target.value;
+    if (matrizSeleccionada === "") {
+      setData([]);
+    }
     setDatos({
       ...datos,
-      matrizSeleccionada: e.target.value,
+      matrizSeleccionada,
     });
   };
-
+  
   const SubmitAPI = () => {
+    if (!datos.matrizSeleccionada || datos.matrizSeleccionada === "") {
+      setData([]);
+      return;
+    }
+  
     setLoading(true);
     const datosapi = {
       rucContrata: datos.rucContrata.ruc,
@@ -92,12 +101,13 @@ const MatrizPostulante = () => {
         setTotalPages(Math.ceil(response.length / recordsPerPage));
       })
       .catch(error => {
-        console.log('ocurrio un telible Error', error);
+        console.log('ocurrio un terrible Error', error);
       })
       .finally(() => {
         setLoading(false);
       });
   };
+  
 
   useEffect(() => {
     if (reload > 0) {
@@ -115,9 +125,13 @@ const MatrizPostulante = () => {
   };
 
   const reloadTable = () => {
+    if (datos.matrizSeleccionada === "") {
+      setData([]);
+      return;
+    }
     setReload(reload + 1);
   };
-
+  
   // Paginación
   const visiblePages = () => {
     const totalVisiblePages = 5; 
