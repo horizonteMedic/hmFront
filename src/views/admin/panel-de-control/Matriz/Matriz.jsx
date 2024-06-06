@@ -131,7 +131,6 @@ const MatrizPostulante = () => {
     const dataFile = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
-
   const reloadTable = () => {
     if (datos.matrizSeleccionada === "") {
       setData([]);
@@ -264,7 +263,6 @@ const MatrizPostulante = () => {
   >
     <option value="">Seleccionar...</option>
     <option value="Matriz-1">Matriz Administrativa</option>
-    <option value="">Matriz 2</option>
   </select>
 </div>
 <div className="flex flex-col flex-grow justify-end">
