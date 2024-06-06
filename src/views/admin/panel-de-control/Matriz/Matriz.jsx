@@ -16,7 +16,8 @@ const MatrizPostulante = () => {
     rucEmpresa: '',
     fechaInicio: '',
     fechaFinal: '',
-    sede: ''
+    sede: '',
+    matrizSeleccionada: '', // Agrega este estado para controlar la selección de matriz
   });
   const [data, setData] = useState([]);
   const [head, setHeaders] = useState([]);
@@ -67,6 +68,13 @@ const MatrizPostulante = () => {
     });
   };
 
+  const handleMatrizChange = (e) => {
+    setDatos({
+      ...datos,
+      matrizSeleccionada: e.target.value,
+    });
+  };
+
   const SubmitAPI = () => {
     setLoading(true);
     const datosapi = {
@@ -109,7 +117,8 @@ const MatrizPostulante = () => {
   const reloadTable = () => {
     setReload(reload + 1);
   };
-  //Paginación
+
+  // Paginación
   const visiblePages = () => {
     const totalVisiblePages = 5; 
     const halfVisiblePages = Math.floor(totalVisiblePages / 2);
@@ -137,48 +146,44 @@ const MatrizPostulante = () => {
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
-        <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
-        <div className="flex items-center gap-4">
-        <button onClick={exportToExcel} className="verde-btn px-4 py-1 rounded-md">
-            <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
-            Exportar a Excel
-          </button>
-          <div className="flex items-center">
-          <span className="ml-2 text-white mr-1">Resultados por página</span>
-
-            <select
-              className="border pointer border-gray-300 rounded-md px-1"
-              value={recordsPerPage}
-              onChange={handleChangeRecordsPerPage}
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={15}>15</option>
-              <option value={20}>20</option>
-              <option value={25}>25</option>
-            </select>
+          <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
+          <div className="flex items-center gap-4">
+            <button onClick={exportToExcel} className="verde-btn px-4 py-1 rounded-md">
+              <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
+              Exportar a Excel
+            </button>
+            <div className="flex items-center">
+              <span className="ml-2 text-white mr-1">Resultados por página</span>
+              <select
+                className="border pointer border-gray-300 rounded-md px-1"
+                value={recordsPerPage}
+                onChange={handleChangeRecordsPerPage}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={15}>15</option>
+                <option value={20}>20</option>
+                <option value={25}>25</option>
+              </select>
+            </div>
+            <button onClick={reloadTable} className="focus:outline-none relative">
+              {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
+              <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
+            </button> 
           </div>
-
-          <button onClick={reloadTable} className="focus:outline-none relative">
-          {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
-          <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
-        </button> 
         </div>
-      </div>
         {/* filtros */}
-    {/* filtros */}
-    <div className="flex flex-col flex-grow p-6">
-            <p className="font-semibold">R.U.C. Contrata</p>
-            <input
-              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-              type="text"
-              value={datos.rucContrata ? JSON.stringify(datos.rucContrata.razonSocial) : ''}
-              onChange={handleChange}
-              disabled
-              name='rucContrata' />
-          </div>
-    <div className="flex flex-wrap gap-4 p-6">
-       
+        <div className="flex flex-col flex-grow p-6">
+          <p className="font-semibold">R.U.C. Contrata</p>
+          <input
+            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+            type="text"
+            value={datos.rucContrata ? JSON.stringify(datos.rucContrata.razonSocial) : ''}
+            onChange={handleChange}
+            disabled
+            name='rucContrata' />
+        </div>
+        <div className="flex flex-wrap gap-4 p-6">
           <div className="flex flex-col flex-grow">
             <p className="font-semibold">Sede</p>
             <select
@@ -209,88 +214,88 @@ const MatrizPostulante = () => {
           </div>
           <div className="flex flex-col flex-grow">
             <p className="font-semibold">Fecha Fin</p>
+           
             <input
-              type="date"
-              id="fechaFin"
-              name="fechaFinal"
-              value={datos.fechaFinal}
-              onChange={(e) => setDatos({
-                ...datos,
-                fechaFinal: e.target.value,
-              })}
-              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-            />
-          </div>
-          <div className="flex flex-col flex-grow">
-            <p className="font-semibold">Matrices</p>
-            <select
-              name='sede'
-              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-            >
-              <option value="">Seleccionar...</option>
-              <option value="Matriz-1">Matriz Administrativa</option>
-              <option value="">Matriz 2</option>
-            </select>
-          </div>
-          <div className="flex flex-col flex-grow justify-end">
-            <button onClick={SubmitAPI} className="bg-blue-900 mt-4 text-white px-4 py-2 rounded-md">
-              <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
-              Buscar Matriz
-            </button>
-          </div>
-        </div>
-
-
-        
-        {/* Tabla de datos */}
+  type="date"
+  id="fechaFin"
+  name="fechaFinal"
+  value={datos.fechaFinal}
+  onChange={(e) => setDatos({
+    ...datos,
+    fechaFinal: e.target.value,
+  })}
+  className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+/>
+</div>
+<div className="flex flex-col flex-grow">
+  <p className="font-semibold">Matrices</p>
+  <select
+    name='matrizSeleccionada'
+    value={datos.matrizSeleccionada}
+    onChange={handleMatrizChange}
+    className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+  >
+    <option value="">Seleccionar...</option>
+    <option value="Matriz-1">Matriz Administrativa</option>
+    <option value="">Matriz 2</option>
+  </select>
+</div>
+<div className="flex flex-col flex-grow justify-end">
+  <button
+    onClick={SubmitAPI}
+    className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md ${datos.matrizSeleccionada ? '' : 'opacity-50 cursor-not-allowed'}`}
+    disabled={!datos.matrizSeleccionada}
+  >
+    <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
+    Buscar Matriz
+  </button>
+</div>
+</div>
+{/* Tabla de datos */}
 <div className="overflow-x-auto p-3 relative">
-  {loading && (
-    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
-      <p className="text-xl font-semibold">Cargando...</p>
-    </div>
-  )}
-  {loading || (
-    <table className="w-full border border-gray-300">
-      <thead>
-        <tr>
+{loading && (
+  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+    <p className="text-xl font-semibold">Cargando...</p>
+  </div>
+)}
+{loading || (
+  <table className="w-full border border-gray-300">
+    <thead>
+      <tr>
+        {head.map((header) => (
+          <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {currentData.map((item, index) => (
+        <tr key={index}>
           {head.map((header) => (
-            <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
+            <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
           ))}
         </tr>
-      </thead>
-      <tbody>
-        {currentData.map((item, index) => (
-          <tr key={index}>
-            {head.map((header) => (
-              <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  )}
+      ))}
+    </tbody>
+  </table>
+)}
 </div>
-
-        <div className="flex justify-center p-4">
-          <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
-            <FontAwesomeIcon icon={faChevronLeft} />
-          </button>
-          {/* Mostrar números de página */}
-          {visiblePages().map((page) => (
-            <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
-              {page}
-            </button>
-          ))}
-          <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
-            <FontAwesomeIcon icon={faChevronRight} />
-          </button>
-        </div>
-        
-       
-      </div>
-    </div>
-  );
+<div className="flex justify-center p-4">
+  <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+    <FontAwesomeIcon icon={faChevronLeft} />
+  </button>
+  {/* Mostrar números de página */}
+  {visiblePages().map((page) => (
+    <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
+      {page}
+    </button>
+  ))}
+  <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+    <FontAwesomeIcon icon={faChevronRight} />
+  </button>
+</div>
+</div>
+</div>
+);
 };
 
 export default MatrizPostulante;
-
