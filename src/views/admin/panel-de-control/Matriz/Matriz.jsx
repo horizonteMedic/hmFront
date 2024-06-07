@@ -2,14 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
 import { ComboboxContrata, ComboboxSedes } from './model/Combobox';
-import { GetMatrizAdmin } from './model/MatrizPOST';
-import { Loading } from '../../../components/Loading';
+import { GetMatrizAdmin, GetMatrizDoctor } from './model/MatrizPOST';
+import Swal from 'sweetalert2';
 import { useAuthStore } from '../../../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
+  const listView = useAuthStore(state => state.listView)
+
+  const AccessMatrizAdmi= listView.some(listView => listView.id === 402);
+  //Matriz Salud
+  const AccesMatrizSalud = listView.some(listView => listView.id === 403);
+  
   const [loading, setLoading] = useState(false);
   const [datos, setDatos] = useState({
     rucContrata: '',
@@ -88,11 +94,12 @@ const MatrizPostulante = () => {
   };
   
   const SubmitAPI = () => {
+
     if (!datos.matrizSeleccionada || datos.matrizSeleccionada === "") {
       setData([]);
       return;
     }
-  
+
     setLoading(true);
     const datosapi = {
       rucContrata: datos.rucContrata.ruc,
@@ -101,7 +108,9 @@ const MatrizPostulante = () => {
       fechaFinal: datos.fechaFinal,
       sede: datos.sede.cod_sede
     };
-    GetMatrizAdmin(datosapi, token)
+
+    if (datos.matrizSeleccionada === 'Matriz-1') {
+      GetMatrizAdmin(datosapi, token)
       .then(response => {
         setData(response);
         const headers = Object.keys(response[0]);
@@ -109,11 +118,39 @@ const MatrizPostulante = () => {
         setTotalPages(Math.ceil(response.length / recordsPerPage));
       })
       .catch(error => {
-        console.log('ocurrio un terrible Error', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Ocurrio un error al traer la Matriz',
+          text: 'No hay datos que mostrar',
+        });
       })
       .finally(() => {
         setLoading(false);
       });
+    } else if (datos.matrizSeleccionada === 'Matriz-2') {
+      GetMatrizDoctor(datosapi, token)
+      .then(response => {
+        setData(response);
+        const headers = Object.keys(response[0]);
+        setHeaders(headers);
+        setTotalPages(Math.ceil(response.length / recordsPerPage));
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ocurrio un error al traer la Matriz',
+          text: 'No hay datos que mostrar',
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+    } else {
+      setLoading(false)
+      console.log('Elijar una matriz correcta')
+    }
+  
+    
   };
   
 
@@ -170,14 +207,13 @@ const MatrizPostulante = () => {
           <h1 className="text-start font-bold color-azul text-white">Matriz Postulante</h1>
           <div className="flex items-center gap-4">
           <button
-  onClick={exportToExcel}
-  className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
-  disabled={!exportButtonEnabled}
->
-  <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
-  Exportar a Excel
-</button>
-
+            onClick={exportToExcel}
+            className={`verde-btn px-4 py-1 rounded-md ${exportButtonEnabled ? '' : 'cursor-not-allowed opacity-50'}`}
+            disabled={!exportButtonEnabled}
+          >
+            <FontAwesomeIcon icon={faFileExcel} className="mr-2" />
+            Exportar a Excel
+          </button>
             <div className="flex items-center">
               <span className="ml-2 text-white mr-1">Resultados por página</span>
               <select
@@ -240,87 +276,88 @@ const MatrizPostulante = () => {
           </div>
           <div className="flex flex-col flex-grow">
             <p className="font-semibold">Fecha Fin</p>
-           
+          
             <input
-  type="date"
-  id="fechaFin"
-  name="fechaFinal"
-  value={datos.fechaFinal}
-  onChange={(e) => setDatos({
-    ...datos,
-    fechaFinal: e.target.value,
-  })}
-  className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-/>
-</div>
-<div className="flex flex-col flex-grow">
-  <p className="font-semibold">Matrices</p>
-  <select
-    name='matrizSeleccionada'
-    value={datos.matrizSeleccionada}
-    onChange={handleMatrizChange}
-    className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-  >
-    <option value="">Seleccionar...</option>
-    <option value="Matriz-1">Matriz Administrativa</option>
-  </select>
-</div>
-<div className="flex flex-col flex-grow justify-end">
-  <button
-    onClick={SubmitAPI}
-    className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md ${datos.matrizSeleccionada ? '' : 'opacity-50 cursor-not-allowed'}`}
-    disabled={!datos.matrizSeleccionada}
-  >
-    <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
-    Buscar Matriz
-  </button>
-</div>
-</div>
-{/* Tabla de datos */}
-<div className="overflow-x-auto p-3 relative">
-{loading && (
-  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
-    <p className="text-xl font-semibold">Cargando...</p>
-  </div>
-)}
-{loading || (
-  <table className="w-full border border-gray-300">
-    <thead>
-      <tr>
-        {head.map((header) => (
-          <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
+            type="date"
+            id="fechaFin"
+            name="fechaFinal"
+            value={datos.fechaFinal}
+            onChange={(e) => setDatos({
+              ...datos,
+              fechaFinal: e.target.value,
+            })}
+            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+          />
+          </div>
+          <div className="flex flex-col flex-grow">
+            <p className="font-semibold">Matrices</p>
+            <select
+              name='matrizSeleccionada'
+              value={datos.matrizSeleccionada}
+              onChange={handleMatrizChange}
+              className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
+            >
+              <option value="">Seleccionar...</option>
+              {AccessMatrizAdmi && <option  value="Matriz-1">Matriz Administrativa</option>}
+              {AccesMatrizSalud && <option  value="Matriz-2">Matriz de Salud</option>}
+            </select>
+          </div>
+          <div className="flex flex-col flex-grow justify-end">
+            <button
+              onClick={SubmitAPI}
+              className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md ${datos.matrizSeleccionada ? '' : 'opacity-50 cursor-not-allowed'}`}
+              disabled={!datos.matrizSeleccionada || loading}
+            >
+              <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
+              Buscar Matriz
+            </button>
+          </div>
+          </div>
+      {/* Tabla de datos */}
+      <div className="overflow-x-auto p-3 relative">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10">
+          <p className="text-xl font-semibold">Cargando...</p>
+        </div>
+      )}
+      {loading || (
+        <table className="w-full border border-gray-300">
+          <thead>
+            <tr>
+              {head.map((header) => (
+                <th key={header} className="border border-gray-300 px-4 py-2">{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {currentData.map((item, index) => (
+              <tr key={index}>
+                {head.map((header) => (
+                  <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      </div>
+      <div className="flex justify-center p-4">
+        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+          <FontAwesomeIcon icon={faChevronLeft} />
+        </button>
+        {/* Mostrar números de página */}
+        {visiblePages().map((page) => (
+          <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
+            {page}
+          </button>
         ))}
-      </tr>
-    </thead>
-    <tbody>
-      {currentData.map((item, index) => (
-        <tr key={index}>
-          {head.map((header) => (
-            <td key={header} className="border border-gray-300 px-4 py-2">{item[header]}</td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
-)}
-</div>
-<div className="flex justify-center p-4">
-  <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
-    <FontAwesomeIcon icon={faChevronLeft} />
-  </button>
-  {/* Mostrar números de página */}
-  {visiblePages().map((page) => (
-    <button key={page} onClick={() => handlePageClick(page)} className={`mx-1 px-3 py-1 rounded-md ${currentPage === page ? 'azuloscurobackground text-white' : 'bg-gray-200'}`}>
-      {page}
-    </button>
-  ))}
-  <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
-    <FontAwesomeIcon icon={faChevronRight} />
-  </button>
-</div>
-</div>
-</div>
-);
+        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages} className="mx-1 px-3 py-1 naranjabackgroud text-white rounded-md">
+          <FontAwesomeIcon icon={faChevronRight} />
+        </button>
+      </div>
+      </div>
+      </div>
+      );
 };
 
 export default MatrizPostulante;
