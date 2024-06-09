@@ -24,6 +24,7 @@ export default async function ArchivosMasivos(datos,user,token) {
        id_tipo_archivo: null,
        fileBase64: datos.base64
     }
+
     const options = {
         method: 'POST', 
         headers: {

@@ -61,7 +61,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
             base64: base64WithoutHeader
           };
           const response = await ArchivosMasivos(datos, user, token);
-          if (response.id === 0) {
+          if (response.id === 0 || !response.id) {
             setUploadStatus((prevStatus) => ({
               ...prevStatus,
               [folder.name]: 'error',

@@ -14,29 +14,28 @@ const HistorialPaciente = () => {
   const ListEmpresa = ComboboxEmpresas();
   const ListContrata = ComboboxContratas();
   const [sede, setSede] = useState('');
-  const [empresauser, setEmpresauser] = useState([])
-  const [contrataauser, setContratauser] = useState([])
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (ListSedes.length > 0) {
       setSede(ListSedes[0].cod_sede);
     }
     if (ListEmpresa.length > 0) {
       if (!(ListEmpresa[0].ruc === '0')) {
-        setEmpresauser(ListEmpresa[0].razonSocial)
         setEmpresa(ListEmpresa[0].ruc)
         return
       }
     }
     if (ListContrata.length > 0) {
       if (!(ListContrata[0].ruc === '0')) {
-        setContratauser(ListContrata[0].razonSocial)
         setContrata(ListContrata[0].ruc)
         return
       }
     }
-  }, [ListSedes,ListEmpresa]);
+  }, [ListSedes,ListEmpresa,ListContrata]);
+
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(false);
+  
   const [refres, setRefresh] = useState(1);
   const hasFetchedData = useRef(false)
   const abortController = useRef(null);
@@ -459,6 +458,7 @@ const HistorialPaciente = () => {
       {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
       {/* Modal de carga de datos */}
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
+
     </div>
   );
 };
