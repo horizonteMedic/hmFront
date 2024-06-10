@@ -147,7 +147,6 @@ const MatrizPostulante = () => {
       });
     } else {
       setLoading(false)
-      console.log('Elijar una matriz correcta')
     }
   
     

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faL } from "@fortawesome/free-solid-svg-icons";
 import { Loading } from "../../../components/Loading";
+import Errors from "../../../components/Errors";
 
 export function FormLogin() {
   const [username, setUsername] = useState("");
@@ -18,6 +19,7 @@ export function FormLogin() {
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView);
   const [loading, setloadign] = useState(false);
+  const [errormess, setErrormess] = useState('')
 
   function Loginvnigate(token) {
     if (token !== null) {
@@ -45,6 +47,7 @@ export function FormLogin() {
         if (data.id === 1) {
           decodeToken(data.mensaje)
         } else {
+          setErrormess(data)
           setInhabilitado(true)
         }
       })
@@ -116,11 +119,7 @@ export function FormLogin() {
 
       </form>
       {estado && EstadoSolicitud(estado)}
-      {inhabilitado && <div className="text-red-800 bg-pink-100 text-lg p-2 mt-3 rounded-lg transition duration-100 ease-in-out flex justify-center items-center">
-                <p>
-                Usuario inhabilitado o sin rol, contactar con un administrador!!
-                </p>
-            </div>}
+      {inhabilitado && <Errors error={errormess}/>}
       {loading && <Loading/>}
     </>
   );
