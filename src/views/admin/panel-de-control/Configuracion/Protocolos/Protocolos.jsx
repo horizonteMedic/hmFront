@@ -4,8 +4,10 @@ import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import RuterConfig from '../RuterConfig';
 import EditModal from '../Protocolos/EditModal/EditModal.jsx';
 import ModalRegistroServicios from './ModalRegistroServicios/ModalRegistroServicios.jsx'; // Importamos el nuevo componente
-
+import { useAuthStore } from '../../../../../store/auth.js';
 const Protocolos = () => {
+  const token = useAuthStore(state => state.token);
+  const UserLogued = useAuthStore(state => state.userlogued)
   const [showEditModal, setShowEditModal] = useState(false);
   const [showModalRegistroServicios, setShowModalRegistroServicios] = useState(false); // Estado para mostrar/ocultar el modal de registro de servicios
   const [currentData, setCurrentData] = useState({
@@ -203,7 +205,7 @@ const Protocolos = () => {
           email={currentData.email} 
         />
       )}
-      {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} />}
+      {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} user={UserLogued.sub} token={token}  />}
     </div>
   );
 };

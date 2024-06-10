@@ -1,33 +1,89 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
+import { Loading } from '../../../../../components/Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { getFetch } from '../../../getFetch/getFetch';
 import { faEdit, faTrashAlt, faTimes} from '@fortawesome/free-solid-svg-icons';
 import ModalEditarServicio from './ModalEditarServicio';
+import { registrarServicio, DeleteServicio } from '../../model/AdministrarServicios';
 
-const ModalRegistroServicios = ({ setShowModalRegistroServicios }) => {
+const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) => {
   const [servicios, setServicios] = useState([]);
   const [nombre, setNombre] = useState('');
-  const [precio, setPrecio] = useState('');
+  const [precio, setPrecio] = useState();
   const [activo, setActivo] = useState(true);
   const [nombreTabla, setNombreTabla] = useState('');
   const [showModalEditar, setShowModalEditar] = useState(false);
   const [servicioEditar, setServicioEditar] = useState(null);
+  const [reloading, setReloading] = useState(0)
+  const [creating, setCreating] = useState(false)
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    setCreating(true);
+    getFetch('/api/v01/ct/ocupacional/servicios', token)
+      .then(response => {
+        setData(response);
+      })
+      .catch(error => {
+        throw new Error('Network response was not ok.', error);
+      })
+      .finally(() => {
+        setCreating(false);
+      });
+  },[reloading])
+
+  const reload = () => {
+    setReloading(reloading +1)
+  }
+
+  function AleertSucces() {
+    Swal.fire({
+      title: "¡Exito!",
+      text: "Se ha creado un Nuevo Servicio",
+      icon: "success",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Aceptar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        reload()
+      }
+    });
+  }
 
   const handleAgregarServicio = () => {
-    if (!nombre.trim() || !precio.trim() || !nombreTabla.trim()) {
+    if (!nombre.trim() || !precio || !nombreTabla.trim()) {
       Swal.fire('Error', 'Por favor, complete todos los campos', 'error');
       return;
     }
 
-    const nuevoServicio = { nombre, precio, activo, nombreTabla };
-    setServicios([...servicios, nuevoServicio]);
-    setNombre('');
-    setPrecio('');
-    setActivo(true);
-    setNombreTabla('');
+    const datos = { 
+      nombreServicio: nombre.toUpperCase(),
+      precio, 
+      tablaServicio: nombreTabla.toUpperCase() 
+    };
+    setCreating(true)
+    registrarServicio(datos,user,token)
+      .then(() => {
+        AleertSucces();
+      })
+      .catch((error) => {
+        Swal.fire({
+          title: 'Error',
+          text: 'Ha ocurrido un error al crear la empresa',
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Aceptar'
+        });
+      })
+      .finally(() => {
+        setCreating(false);
+      });
   };
 
-  const handleEliminarServicio = (index) => {
+  const handleEliminarServicio = (id) => {
     Swal.fire({
       title: '¿Está seguro?',
       text: 'Esta acción no se puede deshacer',
@@ -39,9 +95,12 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios }) => {
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        const updatedServicios = servicios.filter((servicio, i) => i !== index);
-        setServicios(updatedServicios);
-        Swal.fire('Eliminado', 'El servicio ha sido eliminado', 'success');
+        DeleteServicio(id,token)
+        .then(() => {
+          reload()
+          Swal.fire('Eliminado', 'El servicio ha sido eliminado', 'success');
+        })
+        
       }
     });
   };
@@ -103,7 +162,7 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios }) => {
             name="precio"
             type="number"
             value={precio}
-            onChange={(e) => setPrecio(e.target.value)}
+            onChange={(e) => setPrecio(parseFloat(e.target.value))}
             className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500  rounded-md"
             placeholder="Ingrese el precio"
           />
@@ -138,12 +197,12 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios }) => {
               </tr>
             </thead>
             <tbody>
-              {servicios.map((servicio, index) => (
+              {data.map((servicio, index) => (
                 <tr key={index}>
-                  <td className="border border-gray-300 px-4 py-2">{servicio.nombre}</td>
-                  <td className="border border-gray-300 px-4 py-2">{servicio.nombreTabla}</td>
-                  <td className="border border-gray-300 px-4 py-2">{servicio.precio}</td>
-                  <td className="border border-gray-300 px-4 py-2">{servicio.activo ? 'Activo' : 'Inactivo'}</td>
+                  <td className="border border-gray-300 px-4 py-2">{servicio.nombreServicio}</td>
+                  <td className="border border-gray-300 px-4 py-2">{servicio.tablaServicio}</td>
+                  <td className="border border-gray-300 px-4 py-2">S/{servicio.precio}</td>
+                  <td className="border border-gray-300 px-4 py-2">{servicio.estado ? 'Activo' : 'Inactivo'}</td>
                   <td className="border border-gray-300 px-4 py-2">
                     <FontAwesomeIcon
                       icon={faEdit}
@@ -153,7 +212,7 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios }) => {
                     <FontAwesomeIcon
                       icon={faTrashAlt}
                       className="text-red-500 cursor-pointer"
-                      onClick={() => handleEliminarServicio(index)}
+                      onClick={() => handleEliminarServicio(servicio.idServicio)}
                     />
                   </td>
                 </tr>
@@ -169,6 +228,7 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios }) => {
           onSave={handleGuardarCambios}
         />
       )}
+      {creating && <Loading/>}
     </div>
   );
 };
