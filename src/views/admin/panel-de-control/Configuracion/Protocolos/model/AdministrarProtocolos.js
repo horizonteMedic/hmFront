@@ -1,18 +1,19 @@
-import {URLAzure} from '../../../../config/config'
+import {URLAzure} from '../../../../../config/config'
 
-//API 11
-export function registrarServicio (datos, user,token) {
+//API 12
+export function registrarProtocolos (datos, user,token) {
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
     const day = ('0' + currentDate.getDate()).slice(-2); 
 
-
+    console.log(datos)
   const data = {
-    nombreServicio: datos.nombreServicio,
-    tablaServicio: datos.tablaServicio,
+    nombreProtocolo: datos.nombreProtocolo,
+    rucEmpresa: datos.rucEmpresa,
     precio: datos.precio,
+    observacion: "sin observaciones",
     estado: true,
     fechaRegistro: `${year}-${month}-${day}`,
     userRegistro: user,
@@ -21,7 +22,7 @@ export function registrarServicio (datos, user,token) {
   };    
   console.log(JSON.stringify(data))
 
-  const url = `${URLAzure}/api/v01/ct/ocupacional/servicios`
+  const url = `${URLAzure}/api/v01/ct/ocupacional/protocolos`
     const options = {
         method: 'POST',
         headers: {
@@ -30,7 +31,44 @@ export function registrarServicio (datos, user,token) {
         },
         body: JSON.stringify(data)
     }
-    return fetch(url,options).then(res => res.json()).then(response => response) 
+    return fetch(url,options).then(res =>  {
+        if (!res.ok) {
+            return res
+        } return res.json()}).then(response => response) 
+};
+
+export function registrarProtocolosServicios (datos, user,token) {
+
+    const currentDate = new Date(); // Obtiene la fecha y hora actual
+    const year = currentDate.getFullYear(); // Obtiene el año actual
+    const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
+    const day = ('0' + currentDate.getDate()).slice(-2); 
+
+    console.log(datos)
+  const data = {
+    id_protocolo: datos.id_protocolo,
+    id_servicio: datos.id_servicio,
+    precio: datos.precio,
+    fechaRegistro: `${year}-${month}-${day}`,
+    userRegistro: user,
+    fechaActualizacion: null,
+    userActualizacion: null
+  };    
+  console.log(JSON.stringify(data))
+
+  const url = `${URLAzure}/api/v01/ct/ocupacional/servicioProtocolos`
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+    }
+    return fetch(url,options).then(res =>  {
+        if (!res.ok) {
+            return res
+        } return res.json()}).then(response => response) 
 };
 
 export function editServicio (datos, user, token) {

@@ -5,10 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getFetch } from '../../../getFetch/getFetch';
 import { faEdit, faTrashAlt, faTimes} from '@fortawesome/free-solid-svg-icons';
 import ModalEditarServicio from './ModalEditarServicio';
-import { registrarServicio, DeleteServicio } from '../../model/AdministrarServicios';
+import { registrarServicio, DeleteServicio, editServicio } from '../../model/AdministrarServicios';
 
 const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) => {
-  const [servicios, setServicios] = useState([]);
   const [nombre, setNombre] = useState('');
   const [precio, setPrecio] = useState();
   const [activo, setActivo] = useState(true);
@@ -36,6 +35,8 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) 
   const reload = () => {
     setReloading(reloading +1)
   }
+
+  console.log(data)
 
   function AleertSucces() {
     Swal.fire({
@@ -96,26 +97,27 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) 
     }).then((result) => {
       if (result.isConfirmed) {
         DeleteServicio(id,token)
-        .then(() => {
+        .then((data) => {
+          if (data !== 200) {
+            Swal.fire('Error', 'Ocurrio un Error al Eliminar el Servicio', 'error');
+            return
+          }
           reload()
           Swal.fire('Eliminado', 'El servicio ha sido eliminado', 'success');
+        })
+        .catch(error => {
+          Swal.fire('Error', 'Ocurrio un Error al Eliminar el Servicio', 'error');
         })
         
       }
     });
   };
 
-  const handleEditarServicio = (servicio, index) => {
-    setServicioEditar({ ...servicio, index });
+  const handleEditarServicio = (servicio) => {
+    setServicioEditar(servicio);
     setShowModalEditar(true);
   };
 
-  const handleGuardarCambios = (servicio) => {
-    const updatedServicios = [...servicios];
-    updatedServicios[servicio.index] = servicio;
-    setServicios(updatedServicios);
-    setShowModalEditar(false);
-  };
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -207,7 +209,7 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) 
                     <FontAwesomeIcon
                       icon={faEdit}
                       className="text-blue-500 cursor-pointer mr-2"
-                      onClick={() => handleEditarServicio(servicio, index)}
+                      onClick={() => handleEditarServicio(servicio)}
                     />
                     <FontAwesomeIcon
                       icon={faTrashAlt}
@@ -225,7 +227,11 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) 
         <ModalEditarServicio
           servicio={servicioEditar}
           onClose={() => setShowModalEditar(false)}
-          onSave={handleGuardarCambios}
+          token={token}
+          user={user}
+          save={editServicio}
+          Loading={Loading}
+          reload={reload}
         />
       )}
       {creating && <Loading/>}
