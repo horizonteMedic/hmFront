@@ -30,7 +30,7 @@ export function registrarServicio (datos, user,token) {
         },
         body: JSON.stringify(data)
     }
-    return fetch(url,options).then(res => res.json()).then(response => response) 
+    return fetch(url,options).then(res => res.status).then(response => response) 
 };
 
 export function editServicio (datos, user, token) {

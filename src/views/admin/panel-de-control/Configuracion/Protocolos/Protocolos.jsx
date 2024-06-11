@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Swal from 'sweetalert2';
 import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
@@ -7,18 +7,20 @@ import EditModal from '../Protocolos/EditModal/EditModal.jsx';
 import ModalRegistroServicios from './ModalRegistroServicios/ModalRegistroServicios.jsx'; // Importamos el nuevo componente
 import { useAuthStore } from '../../../../../store/auth.js';
 import { ComboboxContrata, ComboboxEmpresa, ComboboxServicios } from './model/Combobox.jsx';
-import { registrarProtocolos, registrarProtocolosServicios } from './model/AdministrarProtocolos.js';
+import { registrarProtocolos, registrarProtocolosServicios, registrarProtocolosContratas } from './model/AdministrarProtocolos.js';
 import { Loading } from '../../../../components/Loading.jsx';
+import { getFetch } from '../../getFetch/getFetch.js';
 
 const Protocolos = () => {
 
   const Contratas = ComboboxContrata()
   const Empresas = ComboboxEmpresa()
-  const Servicios = ComboboxServicios()
+  const [Servicios, SEtServicios] = useState([])
   const token = useAuthStore(state => state.token);
   const UserLogued = useAuthStore(state => state.userlogued)
   const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(false)
+  const [reload, setReload] = useState(0)
 
   const [showModalRegistroServicios, setShowModalRegistroServicios] = useState(false); // Estado para mostrar/ocultar el modal de registro de servicios
   const [datos, setDatos] = useState({
@@ -40,13 +42,29 @@ const Protocolos = () => {
     empresas: [],
     contratas: []
   });
-  const [tableDataContratas, setTableDataContratas] = useState([]);
-  const [tableDataServicios, setTableDataServicios] = useState([]);
 
-  
+  useEffect(() => {
+    getFetch('/api/v01/ct/ocupacional/servicios', token)
+      .then(response => {
+        SEtServicios(response);
+      })
+      .catch(error => {
+        throw new Error('Network response was not ok.', error);
+      })
+  },[reload])
  
+  const Reloading = () => {
+    setReload(reload + 1)
+  }
+
   const newService = (option) => {
-    setServicios([...servicios, { id: option.idServicio, Nombre: option.nombreServicio, Precio: option.precio }]);
+    const servicioExistente = servicios.some(servicio => servicio.id === option.idServicio);
+
+    if (!servicioExistente) {
+      setServicios([...servicios, { id: option.idServicio, Nombre: option.nombreServicio, Precio: option.precio }]);
+    } else {
+      Swal.fire('Advertencia', 'El servicio ya está en la lista', 'warning');
+    }
   };
 
   const handleChange = (e) => {
@@ -56,7 +74,12 @@ const Protocolos = () => {
   };
 
   const newContrata = (option) => {
-    setContratas([...contratas, { razonSocial: option.razonSocial, ruc: option.ruc }]);
+    const ContrataExistente = contratas.some(contrata => contrata.ruc === option.ruc);
+    if (!ContrataExistente) {
+      setContratas([...contratas, { razonSocial: option.razonSocial, ruc: option.ruc, precio: totalPrecio }]);
+    } else {
+      Swal.fire('Advertencia', 'La contrata ya esta en la lista', 'warning');
+    }
   };
 
   const deleteService = (index) => {
@@ -84,32 +107,63 @@ const Protocolos = () => {
     
   };
 
-  const totalPrecio = servicios.reduce((total, servicio) => total + servicio.Precio, 0);
-  console.log(servicios)
-  const handleService = (id) => {
-    servicios.forEach((servicio) => {
-      const datosServices = {
-        id_protocolo: id,
-        id_servicio: servicio.id,
-        precio: servicio.Precio,
-      };
-  
-      registrarProtocolosServicios(datosServices,UserLogued.sub, token)
-        .then((res) => {
-          console.log(`Servicio ${servicio.id} registrado:`, res);
+
+  const handleContratas = (id) => {
+      const promesasContratas = contratas.map((contrata) => {
+        const datosServices = {
+          id_protocolo: id,
+          rucContrata: parseInt(contrata.ruc, 10),
+          precio: contrata.precio,
+        };
+        return registrarProtocolosContratas(datosServices, UserLogued.sub, token);
+      });
+      return Promise.all(promesasContratas)
+        .then((results) => {
+          console.log(results)
+          const allSuccessful = results.every(result => result.idContratoProtocolo);
+          if (!allSuccessful) {
+            return Swal.fire('Error', 'Ha Ocurrido un error al registrar las Contratas', 'error');
+          }
+          Swal.fire('Registro Completo', 'Se ha completado el Registro de manera correcta', 'success');
+          setContratas([])
+          setServicios([])
+          setDatos({
+            nombre: '',
+            ruc: '',
+            razonSocialE: '',
+            rucC: '',
+            razonSocialC:'',
+            servicios: ''
+          });
         })
         .catch((error) => {
-          console.error(`Error registrando el servicio ${servicio.id}:`, error);
-          Swal.fire({
-            title: 'Error',
-            text: `Ha ocurrido un error al registrar el servicio ${servicio.id}`,
-            icon: 'error',
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Aceptar'
-          });
+          Swal.fire('Error', 'Ha Ocurrido un error al registrar', 'error');
         });
-    });
+  };
+  
+
+  const handleService = (id) => {
+
+      const promesasServicios = servicios.map((servicio) => {
+        const datosServices = {
+          id_protocolo: id,
+          id_servicio: servicio.id,
+          precio: servicio.Precio,
+        };
+        return registrarProtocolosServicios(datosServices, UserLogued.sub, token);
+      });
+      return Promise.all(promesasServicios)
+        .then((results) => {
+          console.log(results)
+          const allSuccessful = results.every(result => result.idServicioProtocolo);
+          if (!allSuccessful) {
+            return Swal.fire('Error', 'Ha Ocurrido un error al registrar los Servicios', 'error');
+          }
+          return handleContratas(id);
+        })
+        .catch((error) => {
+          Swal.fire('Error', 'Ha Ocurrido un error al registrar', 'error');
+        });
   }
 
   const handleSubmit = () => {
@@ -126,8 +180,10 @@ const Protocolos = () => {
     setLoading(true)
     registrarProtocolos(datosTransformados, UserLogued.sub, token)
       .then((res) => {
-        console.log(res)
-        handleService(res.idProtocolo)
+        if (!res.idProtocolo) {
+          return Swal.fire('Error', 'Ha Ocurrido un error al registrar', 'error');
+        }
+        return handleService(res.idProtocolo)
       })
       .catch((error) => {
         Swal.fire({
@@ -144,10 +200,33 @@ const Protocolos = () => {
       });
   }
 
+  const handlePrecioChange = (e, index) => {
+    const newPrecio = e.target.value;
+    const input = e.target.name;
+    console.log(newPrecio,input,index)
+    if (input === 'contrata') {
+      setContratas(prevContratas => {
+        const updatedContratas = [...prevContratas];
+        updatedContratas[index] = {
+          ...updatedContratas[index],
+          precio: newPrecio
+        };
+        return updatedContratas;
+      });
+    } else if (input === 'servicio') {
+      
+    }
+    
+  };
+
+  console.log(contratas)
+
+  const totalPrecio = servicios.reduce((total, servicio) => total + servicio.Precio, 0);
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig /> 
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[60%]">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[81%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold color-azul text-white">Protocolo</h1>
           <button className="naranja-btn px-4 rounded flex items-center mr-3" onClick={() => setShowModalRegistroServicios(true)}>Registrar Servicios</button>
@@ -243,7 +322,7 @@ const Protocolos = () => {
                           <FontAwesomeIcon
                             icon={faEdit}
                             className="text-blue-500 cursor-pointer mr-2"
-                            onClick={() => handleEditarServicio(servicio)}
+                            onClick={() => handleEditarServicio()}
                           />
                           <FontAwesomeIcon
                             icon={faTrashAlt}
@@ -269,6 +348,7 @@ const Protocolos = () => {
                 <input
                   id="contrata"
                   name="contrata"
+                  disabled={servicios.length === 0}
                   value={searchTerm.contrata}
                   onChange={handleSearch}
                   autoComplete='off'
@@ -299,6 +379,7 @@ const Protocolos = () => {
                   <tr>
                     <th className="border border-gray-300 px-4 py-2">Razon Social</th>
                     <th className="border border-gray-300 px-4 py-2">RUC</th>
+                    <th className="border border-gray-300 px-4 py-2">Precio</th>
                     <th className="border border-gray-300 px-4 py-2">Acciones</th>
                   </tr>
                 </thead>
@@ -307,6 +388,9 @@ const Protocolos = () => {
                       <tr key={index}>
                         <td className="border border-gray-300 px-4 py-2">{option.razonSocial}</td>
                         <td className="border border-gray-300 px-4 py-2">{option.ruc}</td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <input type="number" name='contrata' className='w-full border-1 border-green-300 rounded-lg h-full' onChange={(e) => handlePrecioChange(e, index)} value={option.precio} />  
+                          </td>
                         <td className="border border-gray-300 px-4 py-2">
                           <FontAwesomeIcon
                             icon={faEdit}
@@ -327,7 +411,7 @@ const Protocolos = () => {
                 
               </div>
               <div className='flex justify-end items-end'>
-              <button onClick={handleSubmit} disabled={!totalPrecio} className='naranja-btn p-2 rounded'>Guardar</button>
+              <button onClick={handleSubmit} disabled={!totalPrecio || contratas.length === 0} className='naranja-btn p-2 rounded'>Guardar</button>
               </div>
             </div>
           </div>
@@ -340,7 +424,7 @@ const Protocolos = () => {
 
         />
       )}
-      {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} user={UserLogued.sub} token={token}  />}
+      {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} user={UserLogued.sub} token={token} RefreshS={ Reloading } />}
     </div>
   );
 };

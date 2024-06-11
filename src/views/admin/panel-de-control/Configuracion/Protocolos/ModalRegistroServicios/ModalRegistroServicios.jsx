@@ -7,7 +7,7 @@ import { faEdit, faTrashAlt, faTimes} from '@fortawesome/free-solid-svg-icons';
 import ModalEditarServicio from './ModalEditarServicio';
 import { registrarServicio, DeleteServicio, editServicio } from '../../model/AdministrarServicios';
 
-const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) => {
+const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token, RefreshS }) => {
   const [nombre, setNombre] = useState('');
   const [precio, setPrecio] = useState();
   const [activo, setActivo] = useState(true);
@@ -48,6 +48,7 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) 
       confirmButtonText: "Aceptar"
     }).then((result) => {
       if (result.isConfirmed) {
+        RefreshS()
         reload()
       }
     });
@@ -66,7 +67,10 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token }) 
     };
     setCreating(true)
     registrarServicio(datos,user,token)
-      .then(() => {
+      .then((res) => {
+        if (res !== 201) {
+          return  Swal.fire('Error', 'Ha Ocurrido un error al registrar', 'error');
+        }
         AleertSucces();
       })
       .catch((error) => {
