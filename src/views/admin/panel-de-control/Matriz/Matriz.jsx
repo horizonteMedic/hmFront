@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { saveAs } from 'file-saver';
-import * as XLSX from 'xlsx';
 import { ComboboxContrata, ComboboxSedes } from './model/Combobox';
 import { GetMatrizAdmin, GetMatrizDoctor } from './model/MatrizPOST';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '../../../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-
+import ExcelJS from 'exceljs';
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
   const listView = useAuthStore(state => state.listView)
@@ -161,13 +160,52 @@ const MatrizPostulante = () => {
     }
   }, [reload]);
 
-  const exportToExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const dataFile = new Blob([excelBuffer], { type: 'application/octet-stream' });
+  const exportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Matriz Postulante');
+  
+    const headerStyle = {
+      font: { bold: true },
+      alignment: { vertical: 'middle', horizontal: 'center' },
+      border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    };
+  
+    const dataStyle = {
+      alignment: { vertical: 'middle', horizontal: 'left' },
+      border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    };
+  
+    const headerRow = worksheet.addRow(head);
+    headerRow.eachCell(cell => {
+      cell.style = headerStyle;
+    });
+  
+    data.forEach(row => {
+      const dataRow = worksheet.addRow(Object.values(row));
+      dataRow.eachCell(cell => {
+        cell.style = dataStyle;
+      });
+    });
+  
+    worksheet.columns.forEach(column => {
+      let maxWidth = 0;
+      column.eachCell(cell => {
+        const valueLength = cell.value ? String(cell.value).length : 0;
+        maxWidth = Math.max(maxWidth, valueLength);
+      });
+      column.width = maxWidth < 20 ? 20 : maxWidth; 
+    });
+  
+    const buffer = await workbook.xlsx.writeBuffer();
+    const dataFile = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(dataFile, 'matriz_postulante.xlsx');
   };
+  
+
+
+
+
+
   const reloadTable = () => {
     if (datos.matrizSeleccionada === "") {
       setData([]);
