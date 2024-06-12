@@ -8,14 +8,19 @@ import ModalRegistroServicios from './ModalRegistroServicios/ModalRegistroServic
 import { useAuthStore } from '../../../../../store/auth.js';
 import { ComboboxContrata, ComboboxEmpresa, ComboboxServicios } from './model/Combobox.jsx';
 import { registrarProtocolos, registrarProtocolosServicios, registrarProtocolosContratas } from './model/AdministrarProtocolos.js';
+import { BusquedaContrata, BusquedaServicio } from './model/BusquedaSoC.js'; //Busqueda de C y S por ID 
 import { Loading } from '../../../../components/Loading.jsx';
 import { getFetch } from '../../getFetch/getFetch.js';
+
+
 
 const Protocolos = () => {
 
   const Contratas = ComboboxContrata()
   const Empresas = ComboboxEmpresa()
   const [Servicios, SEtServicios] = useState([])
+  const [ListProtocolos, setListProtocolos] = useState([])
+  const [ProtocoloEdit, setProtocoloEdit] = useState([])
   const token = useAuthStore(state => state.token);
   const UserLogued = useAuthStore(state => state.userlogued)
   const [showEditModal, setShowEditModal] = useState(false);
@@ -36,17 +41,25 @@ const Protocolos = () => {
   const [contratas, setContratas] = useState([])
   const [searchTerm, setSearchTerm] = useState({
     empresa: '',
-    contrata: ''
+    contrata: '',
+    protocolo: ''
   });
   const [filteredData, setFilteredData] = useState({
     empresas: [],
-    contratas: []
+    contratas: [],
+    protocolo: []
   });
 
   useEffect(() => {
-    getFetch('/api/v01/ct/ocupacional/servicios', token)
-      .then(response => {
-        SEtServicios(response);
+    Promise.all([
+      getFetch('/api/v01/ct/ocupacional/servicios', token),
+      getFetch('/api/v01/ct/ocupacional/protocolos', token)
+    ])
+      .then(([ListServices, ListProtocolos]) => {
+        console.log(ListProtocolos,ListServices)
+        // Guarda los datos en el estado
+        SEtServicios(ListServices);
+        setListProtocolos(ListProtocolos)
       })
       .catch(error => {
         throw new Error('Network response was not ok.', error);
@@ -56,6 +69,32 @@ const Protocolos = () => {
   const Reloading = () => {
     setReload(reload + 1)
   }
+
+  const APIEditTables = (id) => {
+    setLoading(true)
+    Promise.all([
+      BusquedaServicio(id,token),
+      BusquedaContrata(id,token)
+    ])
+    .then(([ListServices, ListContratas]) => {
+      setServicios(ListServices)
+      setContratas(ListContratas)
+      console.log(ListServices,ListContratas)
+    })
+    .catch(() => {
+      Swal.fire('Advertencia', 'La contrata ya esta en la lista', 'warning');
+    })
+    .finally(() => {
+      setLoading(false)
+    })
+   
+  }
+  console.log(servicios,contratas)
+  //Cuando se elige un Protocolo existente se ejecuta esta función
+  const newProtocolos = (option) => {
+    setProtocoloEdit([...ProtocoloEdit, option])
+    APIEditTables(option.idProtocolo)
+  };
 
   const newService = (option) => {
     const servicioExistente = servicios.some(servicio => servicio.id === option.idServicio);
@@ -82,6 +121,7 @@ const Protocolos = () => {
     }
   };
 
+  console.log(searchTerm)
   const deleteService = (index) => {
     setServicios(servicios.filter((_, i) => i !== index));
   };
@@ -91,18 +131,26 @@ const Protocolos = () => {
   };
 
   const handleSearch = (e) => {
+    console.log(e.target.name)
     if (e.target.name === 'empresa') {
       setSearchTerm({...searchTerm, empresa: e.target.value});
       const filteredResults = Empresas.filter((option) =>
         option.razonSocial.toLowerCase().includes(e.target.value.toLowerCase())
       );
       setFilteredData({...filteredData, empresas: filteredResults});
-    } else {
+    } else if (e.target.name === 'contrata') {
       setSearchTerm({...searchTerm, contrata: e.target.value});
       const filteredResults = Contratas.filter((option) =>
         option.razonSocial.toLowerCase().includes(e.target.value.toLowerCase())
       );
       setFilteredData({...filteredData, contratas: filteredResults});
+    } else if (e.target.name === 'protocolo') {
+      console.log('a')
+      setSearchTerm({...searchTerm, protocolo: e.target.value});
+      const filteredResults = ListProtocolos.filter((option) =>
+        option.nombreProtocolo.toLowerCase().includes(e.target.value.toLowerCase())
+      );
+      setFilteredData({...filteredData, protocolo: filteredResults});
     }
     
   };
@@ -168,12 +216,12 @@ const Protocolos = () => {
 
   const handleSubmit = () => {
 
-    if (!datos.nombre.trim() || !datos.ruc || !totalPrecio) {
+    if (!searchTerm.protocolo.trim() || !datos.ruc || !totalPrecio) {
       Swal.fire('Error', 'Por favor, complete todos los campos', 'error');
       return;
     }
     const datosTransformados = {
-      nombreProtocolo: datos.nombre.toUpperCase().trim(),
+      nombreProtocolo: searchTerm.protocolo.toUpperCase().trim(),
       rucEmpresa: parseInt(datos.ruc.trim(), 10),
       precio: totalPrecio,
     }
@@ -201,9 +249,8 @@ const Protocolos = () => {
   }
 
   const handlePrecioChange = (e, index) => {
-    const newPrecio = e.target.value;
+    const newPrecio = parseFloat(e.target.value) ;
     const input = e.target.name;
-    console.log(newPrecio,input,index)
     if (input === 'contrata') {
       setContratas(prevContratas => {
         const updatedContratas = [...prevContratas];
@@ -214,12 +261,17 @@ const Protocolos = () => {
         return updatedContratas;
       });
     } else if (input === 'servicio') {
-      
+      setServicios(prevContratas => {
+        const updatedContratas = [...prevContratas];
+        updatedContratas[index] = {
+          ...updatedContratas[index],
+          Precio: newPrecio
+        };
+        return updatedContratas;
+      });
     }
     
   };
-
-  console.log(contratas)
 
   const totalPrecio = servicios.reduce((total, servicio) => total + servicio.Precio, 0);
 
@@ -232,20 +284,38 @@ const Protocolos = () => {
           <button className="naranja-btn px-4 rounded flex items-center mr-3" onClick={() => setShowModalRegistroServicios(true)}>Registrar Servicios</button>
         </div>
         <div className='container p-6'>
-          <div className="mb-4 flex items-center">
+          <div className="mb-4 flex flex-col items-start">
             <label htmlFor="nombre" className="block font-medium text-gray-700 mr-2">
               Nombre:
             </label>
             <input
-              id="nombre"
-              name="nombre"
-              value={datos.nombre}
-              onChange={(e) => {setDatos({...datos, nombre:e.target.value})}}
+              id="protocolo"
+              name="protocolo"
+              autoComplete='off'
+              value={searchTerm.protocolo}
+              onChange={handleSearch}
               type="text"
               className="border mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
               placeholder="Ingrese el nombre del Protocolo"
             />
-            <FontAwesomeIcon icon={faEdit} className="text-blue-500 ml-2 cursor-pointer"  />
+            {searchTerm.protocolo && (
+                  <div className="border border-gray-300 rounded-md mt-1 max-h-48 w-full overflow-y-auto">
+                  {filteredData.protocolo.map((option, index) => (
+                    <div
+                      key={index}
+                      className="cursor-pointer p-2 hover:bg-gray-200"
+                      onClick={() => {
+                        console.log(option)
+                        setSearchTerm({...searchTerm, protocolo: option.nombreProtocolo, empresa: option.rucEmpresa});
+                        setFilteredData({...filteredData, protocolo: []});
+                        newProtocolos(option)
+                      }}
+                    >
+                      {option.nombreProtocolo}
+                    </div>
+                  ))}
+                </div>
+                )}
           </div>
 
           <div className="mb-4">
@@ -317,7 +387,9 @@ const Protocolos = () => {
                     {servicios?.map((option,index) => (
                       <tr key={index}>
                         <td className="border border-gray-300 px-4 py-2">{option.Nombre}</td>
-                        <td className="border border-gray-300 px-4 py-2">{option.Precio}</td>
+                        <td className="border border-gray-300 px-4 py-2">
+                          <input type="number" name='servicio' className='w-full border-1 border-green-300 rounded-lg h-full' onChange={(e) => handlePrecioChange(e, index)} value={option.Precio} />
+                          </td>
                         <td className="border border-gray-300 px-4 py-2">
                           <FontAwesomeIcon
                             icon={faEdit}
@@ -411,7 +483,7 @@ const Protocolos = () => {
                 
               </div>
               <div className='flex justify-end items-end'>
-              <button onClick={handleSubmit} disabled={!totalPrecio || contratas.length === 0} className='naranja-btn p-2 rounded'>Guardar</button>
+              <button onClick={handleSubmit} disabled={!totalPrecio} className='naranja-btn p-2 rounded'>Guardar</button>
               </div>
             </div>
           </div>
