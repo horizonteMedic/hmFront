@@ -107,6 +107,57 @@ export function registrarProtocolosContratas (datos, user,token) {
         } return res.json()}).then(response => response) 
 };
 
+//Eliminar Protocolos
+export function DeleteProtocolo (id,token){
+
+  const url = `${URLAzure}/api/v01/ct/ocupacional/protocolos/${id}`
+    const options = {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    return fetch(url,options).then(res =>  {
+        if (!res.ok) {
+            return res
+        } return res.json()}).then(response => response) 
+}
+
+//Eliminar ContrataProtocolo
+export function DeleteContrataProtocolo (id,token){
+
+    const url = `${URLAzure}/api/v01/ct/ocupacional/contrataProtocolos/${id}`
+      const options = {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          }
+      }
+      return fetch(url,options).then(res =>  {
+          if (!res.ok) {
+              return res
+          } return res.json()}).then(response => response) 
+  }
+
+//Eliminar Servicio Protocolo
+export function DeleteServicioProtocolo (id,token){
+
+    const url = `${URLAzure}/api/v01/ct/ocupacional/servicioProtocolos/${id}`
+      const options = {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          }
+      }
+      return fetch(url,options).then(res =>  {
+          if (!res.ok) {
+              return res
+          } return res.json()}).then(response => response) 
+  }
+
 export function editServicio (datos, user, token) {
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual

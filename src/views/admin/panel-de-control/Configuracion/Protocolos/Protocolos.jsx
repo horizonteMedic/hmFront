@@ -3,11 +3,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Swal from 'sweetalert2';
 import { faEdit, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import RuterConfig from '../RuterConfig';
-import EditModal from '../Protocolos/EditModal/EditModal.jsx';
+import EditModal from '../Protocolos/EditModal/EditProtocolos.jsx';
 import ModalRegistroServicios from './ModalRegistroServicios/ModalRegistroServicios.jsx'; // Importamos el nuevo componente
 import { useAuthStore } from '../../../../../store/auth.js';
 import { ComboboxContrata, ComboboxEmpresa, ComboboxServicios } from './model/Combobox.jsx';
-import { registrarProtocolos, registrarProtocolosServicios, registrarProtocolosContratas } from './model/AdministrarProtocolos.js';
+import { registrarProtocolos, registrarProtocolosServicios, registrarProtocolosContratas, DeleteProtocolo, DeleteContrataProtocolo, DeleteServicioProtocolo } from './model/AdministrarProtocolos.js';
 import { BusquedaContrata, BusquedaServicio } from './model/BusquedaSoC.js'; //Busqueda de C y S por ID 
 import { Loading } from '../../../../components/Loading.jsx';
 import { getFetch } from '../../getFetch/getFetch.js';
@@ -20,12 +20,15 @@ const Protocolos = () => {
   const Empresas = ComboboxEmpresa()
   const [Servicios, SEtServicios] = useState([])
   const [ListProtocolos, setListProtocolos] = useState([])
-  const [ProtocoloEdit, setProtocoloEdit] = useState([])
+  const [ProtocoloEdit, setProtocoloEdit] = useState({})
+  //Lista de Protocolo encontrado
+
   const token = useAuthStore(state => state.token);
   const UserLogued = useAuthStore(state => state.userlogued)
   const [showEditModal, setShowEditModal] = useState(false);
   const [loading, setLoading] = useState(false)
   const [reload, setReload] = useState(0)
+  const [EditorDelete, setEditorDelete] = useState(false)
 
   const [showModalRegistroServicios, setShowModalRegistroServicios] = useState(false); // Estado para mostrar/ocultar el modal de registro de servicios
   const [datos, setDatos] = useState({
@@ -39,11 +42,13 @@ const Protocolos = () => {
   const [selectValue, setSelectValue] = useState('');
   const [servicios, setServicios] = useState([])
   const [contratas, setContratas] = useState([])
+  //Datos que se usan para filtrar desde el input
   const [searchTerm, setSearchTerm] = useState({
     empresa: '',
     contrata: '',
     protocolo: ''
   });
+  //Datos filtrador por busqueda
   const [filteredData, setFilteredData] = useState({
     empresas: [],
     contratas: [],
@@ -70,6 +75,10 @@ const Protocolos = () => {
     setReload(reload + 1)
   }
 
+  const HandleEditDatos = () => {
+    showEditModal ? setShowEditModal(false) : setShowEditModal(true)
+  }
+
   const APIEditTables = (id) => {
     setLoading(true)
     Promise.all([
@@ -77,31 +86,41 @@ const Protocolos = () => {
       BusquedaContrata(id,token)
     ])
     .then(([ListServices, ListContratas]) => {
-      setServicios(ListServices)
-      setContratas(ListContratas)
-      console.log(ListServices,ListContratas)
+      console.log(ListServices, ListContratas)
+      setServicios(ListServices.map(service => ({
+        id: service.idServicioProtocolo,
+        Nombre: service.nombreServicio,
+        Precio: service.precio
+      })));
+      setContratas(ListContratas.map(contrata => ({
+        id: contrata.idContratoProtocolo,
+        razonSocial: contrata.razonContrata,
+        ruc: contrata.rucContrata,
+        precio: contrata.precio
+      })))
     })
     .catch(() => {
-      Swal.fire('Advertencia', 'La contrata ya esta en la lista', 'warning');
+      Swal.fire('Advertencia', 'No se puede traer los datos', 'warning');
     })
     .finally(() => {
       setLoading(false)
     })
    
   }
-  console.log(servicios,contratas)
   //Cuando se elige un Protocolo existente se ejecuta esta función
   const newProtocolos = (option) => {
-    setProtocoloEdit([...ProtocoloEdit, option])
+    setProtocoloEdit({...ProtocoloEdit, option})
     APIEditTables(option.idProtocolo)
   };
 
   const newService = (option) => {
+    console.log('wasa')
     const servicioExistente = servicios.some(servicio => servicio.id === option.idServicio);
 
     if (!servicioExistente) {
       setServicios([...servicios, { id: option.idServicio, Nombre: option.nombreServicio, Precio: option.precio }]);
     } else {
+      console.log('wasa')
       Swal.fire('Advertencia', 'El servicio ya está en la lista', 'warning');
     }
   };
@@ -121,7 +140,6 @@ const Protocolos = () => {
     }
   };
 
-  console.log(searchTerm)
   const deleteService = (index) => {
     setServicios(servicios.filter((_, i) => i !== index));
   };
@@ -131,6 +149,7 @@ const Protocolos = () => {
   };
 
   const handleSearch = (e) => {
+    setEditorDelete(false)
     console.log(e.target.name)
     if (e.target.name === 'empresa') {
       setSearchTerm({...searchTerm, empresa: e.target.value});
@@ -248,6 +267,56 @@ const Protocolos = () => {
       });
   }
 
+  const handleDelete = async () => {  
+    console.log(ProtocoloEdit.option.idProtocolo)
+    console.log(servicios,contratas)
+    if (!ProtocoloEdit.option.idProtocolo) {
+      Swal.fire('Error', 'Tiene que escojer un Protocolo de la Lista', 'error');
+    }
+    const deleteContratas = async () => {
+        for (const contrata of contratas) {
+            console.log('a')
+            await DeleteContrataProtocolo(contrata.id,token);
+        }
+    };
+
+    const deleteServicios = async () => {
+      for (const servicio of servicios) {
+          await DeleteServicioProtocolo(servicio.id,token);
+      }
+    } 
+
+    await deleteContratas();
+    await deleteServicios();
+    
+    
+    DeleteProtocolo(ProtocoloEdit.option.idProtocolo,token)
+    .then((res) => {
+      console.log(res)
+    })
+    .catch(() => {
+      console.log('aws')
+    })
+  }
+
+  const handleLimpia = () => {
+    setSearchTerm({
+      empresa: '',
+      contrata: '',
+      protocolo: ''
+    });
+    setDatos({
+      nombre: '',
+      ruc: '',
+      razonSocialE: '',
+      rucC: '',
+      razonSocialC:'',
+      servicios: ''
+    })
+    setContratas([])
+    setServicios([])
+  }
+
   const handlePrecioChange = (e, index) => {
     const newPrecio = parseFloat(e.target.value) ;
     const input = e.target.name;
@@ -274,7 +343,8 @@ const Protocolos = () => {
   };
 
   const totalPrecio = servicios.reduce((total, servicio) => total + servicio.Precio, 0);
-
+  console.log(servicios,contratas)
+  console.log(Servicios)
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig /> 
@@ -306,8 +376,11 @@ const Protocolos = () => {
                       className="cursor-pointer p-2 hover:bg-gray-200"
                       onClick={() => {
                         console.log(option)
-                        setSearchTerm({...searchTerm, protocolo: option.nombreProtocolo, empresa: option.rucEmpresa});
+                        setEditorDelete(true)
+                        setSearchTerm({...searchTerm, protocolo: option.nombreProtocolo});
+                        setDatos({...datos, ruc: option.rucEmpresa, razonSocialE: option.razonEmpresa})
                         setFilteredData({...filteredData, protocolo: []});
+                        
                         newProtocolos(option)
                       }}
                     >
@@ -483,7 +556,10 @@ const Protocolos = () => {
                 
               </div>
               <div className='flex justify-end items-end'>
-              <button onClick={handleSubmit} disabled={!totalPrecio} className='naranja-btn p-2 rounded'>Guardar</button>
+              <button onClick={handleLimpia}  className={`bg-blue-600 m-2 text-white p-2 rounded ${!servicios || !contratas && 'hidden'}`}>Limpiar Tablas</button>
+              <button onClick={handleDelete}  className={`bg-red-600 m-2 text-white p-2 rounded ${!EditorDelete && 'hidden'}`}>Eliminar</button>
+              <button onClick={HandleEditDatos}  className={`bg-yellow-600 m-2 text-white p-2 rounded ${!EditorDelete && 'hidden'}`}>Editar</button>
+              <button onClick={handleSubmit} disabled={!totalPrecio} className={`naranja-btn p-2 rounded ${EditorDelete && 'hidden'}`}>Guardar</button>
               </div>
             </div>
           </div>
@@ -492,8 +568,14 @@ const Protocolos = () => {
       {loading && <Loading/>}
       {showEditModal && (
         <EditModal 
-          setShowEditModal={setShowEditModal} 
-
+          setShowEditModal={HandleEditDatos} 
+          servicio={servicios}
+          contrata={contratas}
+          protocolo={searchTerm.protocolo}
+          empresa={datos.razonSocialE}
+          ruc={datos.ruc}
+          ListContratas={Contratas}
+          ListServicios={Servicios}
         />
       )}
       {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} user={UserLogued.sub} token={token} RefreshS={ Reloading } />}
