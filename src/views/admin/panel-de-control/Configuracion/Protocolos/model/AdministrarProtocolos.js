@@ -8,7 +8,6 @@ export function registrarProtocolos (datos, user,token) {
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
     const day = ('0' + currentDate.getDate()).slice(-2); 
    
-    console.log(datos)
   const data = {
     nombreProtocolo: datos.nombreProtocolo,
     rucEmpresa: datos.rucEmpresa,
@@ -20,7 +19,6 @@ export function registrarProtocolos (datos, user,token) {
     fechaActualizacion: null,
     userActualizacion: null
   };    
-  console.log(JSON.stringify(data))
 
   const url = `${URLAzure}/api/v01/ct/ocupacional/protocolos`
     const options = {
@@ -45,7 +43,6 @@ export function registrarProtocolosServicios (datos, user,token) {
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
     const day = ('0' + currentDate.getDate()).slice(-2); 
 
-    console.log(datos)
   const data = {
     id_protocolo: datos.id_protocolo,
     id_servicio: datos.id_servicio,
@@ -55,7 +52,6 @@ export function registrarProtocolosServicios (datos, user,token) {
     fechaActualizacion: null,
     userActualizacion: null
   };    
-  console.log(JSON.stringify(data))
 
   const url = `${URLAzure}/api/v01/ct/ocupacional/servicioProtocolos`
     const options = {
@@ -80,7 +76,6 @@ export function registrarProtocolosContratas (datos, user,token) {
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
     const day = ('0' + currentDate.getDate()).slice(-2); 
 
-    console.log(datos)
   const data = {
     id_protocolo: datos.id_protocolo,
     rucContrata: datos.rucContrata,
@@ -90,7 +85,6 @@ export function registrarProtocolosContratas (datos, user,token) {
     fechaActualizacion: null,
     userActualizacion: null
   };    
-  console.log(JSON.stringify(data))
 
   const url = `${URLAzure}/api/v01/ct/ocupacional/contrataProtocolos`
     const options = {
@@ -153,10 +147,13 @@ export function DeleteServicioProtocolo (id,token){
           }
       }
       return fetch(url,options).then(res =>  {
+        console.log(res)
           if (!res.ok) {
               return res
           } return res.json()}).then(response => response) 
   }
+
+
 
 export function editServicio (datos, user, token) {
 
@@ -164,7 +161,6 @@ export function editServicio (datos, user, token) {
     const year = currentDate.getFullYear(); // Obtiene el año actual
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
     const day = ('0' + currentDate.getDate()).slice(-2); 
-    console.log(datos)
     const data = {
         nombreServicio: datos.nombreServicio,
         tablaServicio: datos.tablaServicio,
@@ -175,7 +171,6 @@ export function editServicio (datos, user, token) {
         fechaActualizacion: `${year}-${month}-${day}`,
         userActualizacion: user
     };
-    console.log(JSON.stringify(data))
     const url = `${URLAzure}/api/v01/ct/ocupacional/servicios/${datos.id}`
       const options = {
           method: 'PUT',

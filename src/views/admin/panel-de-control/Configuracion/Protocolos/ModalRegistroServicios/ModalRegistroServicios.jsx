@@ -36,8 +36,6 @@ const ModalRegistroServicios = ({ setShowModalRegistroServicios, user, token, Re
     setReloading(reloading +1)
   }
 
-  console.log(data)
-
   function AleertSucces() {
     Swal.fire({
       title: "¡Exito!",

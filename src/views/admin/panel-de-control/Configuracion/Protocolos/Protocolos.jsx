@@ -54,6 +54,7 @@ const Protocolos = () => {
     contratas: [],
     protocolo: []
   });
+  //
 
   useEffect(() => {
     Promise.all([
@@ -61,7 +62,6 @@ const Protocolos = () => {
       getFetch('/api/v01/ct/ocupacional/protocolos', token)
     ])
       .then(([ListServices, ListProtocolos]) => {
-        console.log(ListProtocolos,ListServices)
         // Guarda los datos en el estado
         SEtServicios(ListServices);
         setListProtocolos(ListProtocolos)
@@ -86,17 +86,21 @@ const Protocolos = () => {
       BusquedaContrata(id,token)
     ])
     .then(([ListServices, ListContratas]) => {
-      console.log(ListServices, ListContratas)
       setServicios(ListServices.map(service => ({
-        id: service.idServicioProtocolo,
+        id_servicioProtocolo: service.idServicioProtocolo,
+        id: service.id_servicio,
         Nombre: service.nombreServicio,
-        Precio: service.precio
+        Precio: service.precio,
+        Fecha: service.fechaRegistro,
+        User: service.userRegistro
       })));
       setContratas(ListContratas.map(contrata => ({
         id: contrata.idContratoProtocolo,
         razonSocial: contrata.razonContrata,
         ruc: contrata.rucContrata,
-        precio: contrata.precio
+        precio: contrata.precio,
+        fecha: contrata.fechaRegistro,
+        user: contrata.userRegistro
       })))
     })
     .catch(() => {
@@ -109,18 +113,15 @@ const Protocolos = () => {
   }
   //Cuando se elige un Protocolo existente se ejecuta esta función
   const newProtocolos = (option) => {
-    setProtocoloEdit({...ProtocoloEdit, option})
+    setProtocoloEdit({...ProtocoloEdit, ...option})
     APIEditTables(option.idProtocolo)
   };
-
   const newService = (option) => {
-    console.log('wasa')
     const servicioExistente = servicios.some(servicio => servicio.id === option.idServicio);
 
     if (!servicioExistente) {
       setServicios([...servicios, { id: option.idServicio, Nombre: option.nombreServicio, Precio: option.precio }]);
     } else {
-      console.log('wasa')
       Swal.fire('Advertencia', 'El servicio ya está en la lista', 'warning');
     }
   };
@@ -150,7 +151,6 @@ const Protocolos = () => {
 
   const handleSearch = (e) => {
     setEditorDelete(false)
-    console.log(e.target.name)
     if (e.target.name === 'empresa') {
       setSearchTerm({...searchTerm, empresa: e.target.value});
       const filteredResults = Empresas.filter((option) =>
@@ -164,7 +164,6 @@ const Protocolos = () => {
       );
       setFilteredData({...filteredData, contratas: filteredResults});
     } else if (e.target.name === 'protocolo') {
-      console.log('a')
       setSearchTerm({...searchTerm, protocolo: e.target.value});
       const filteredResults = ListProtocolos.filter((option) =>
         option.nombreProtocolo.toLowerCase().includes(e.target.value.toLowerCase())
@@ -186,7 +185,6 @@ const Protocolos = () => {
       });
       return Promise.all(promesasContratas)
         .then((results) => {
-          console.log(results)
           const allSuccessful = results.every(result => result.idContratoProtocolo);
           if (!allSuccessful) {
             return Swal.fire('Error', 'Ha Ocurrido un error al registrar las Contratas', 'error');
@@ -202,6 +200,7 @@ const Protocolos = () => {
             razonSocialC:'',
             servicios: ''
           });
+          Reloading()
         })
         .catch((error) => {
           Swal.fire('Error', 'Ha Ocurrido un error al registrar', 'error');
@@ -221,7 +220,6 @@ const Protocolos = () => {
       });
       return Promise.all(promesasServicios)
         .then((results) => {
-          console.log(results)
           const allSuccessful = results.every(result => result.idServicioProtocolo);
           if (!allSuccessful) {
             return Swal.fire('Error', 'Ha Ocurrido un error al registrar los Servicios', 'error');
@@ -268,54 +266,70 @@ const Protocolos = () => {
   }
 
   const handleDelete = async () => {  
-    console.log(ProtocoloEdit.option.idProtocolo)
-    console.log(servicios,contratas)
-    if (!ProtocoloEdit.option.idProtocolo) {
+    console.log(ProtocoloEdit)
+    if (!ProtocoloEdit.idProtocolo) {
       Swal.fire('Error', 'Tiene que escojer un Protocolo de la Lista', 'error');
     }
     const deleteContratas = async () => {
         for (const contrata of contratas) {
-            console.log('a')
             await DeleteContrataProtocolo(contrata.id,token);
         }
     };
 
     const deleteServicios = async () => {
       for (const servicio of servicios) {
-          await DeleteServicioProtocolo(servicio.id,token);
+          await DeleteServicioProtocolo(servicio.id_servicioProtocolo,token);
       }
     } 
 
-    await deleteContratas();
-    await deleteServicios();
-    
-    
-    DeleteProtocolo(ProtocoloEdit.option.idProtocolo,token)
-    .then((res) => {
-      console.log(res)
-    })
-    .catch(() => {
-      console.log('aws')
-    })
-  }
+    const result = await Swal.fire({
+      title: "¿Estas Seguro?",
+      text: "No puedes revertir esta accion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar!"
+  });
 
-  const handleLimpia = () => {
-    setSearchTerm({
-      empresa: '',
-      contrata: '',
-      protocolo: ''
-    });
-    setDatos({
-      nombre: '',
-      ruc: '',
-      razonSocialE: '',
-      rucC: '',
-      razonSocialC:'',
-      servicios: ''
-    })
-    setContratas([])
-    setServicios([])
+  if (result.isConfirmed) {
+      try {
+          await deleteContratas();
+          await deleteServicios();
+          await DeleteProtocolo(ProtocoloEdit.idProtocolo, token);
+          Reloading()
+          setContratas([])
+          setServicios([])
+          setSearchTerm({
+            empresa: '',
+            contrata: '',
+            protocolo: ''
+          })
+          setDatos({
+            nombre: '',
+            ruc: '',
+            razonSocialE: '',
+            rucC: '',
+            razonSocialC:'',
+            servicios: ''
+          })
+          Swal.fire({
+              title: "Exito!",
+              text: "Se ha Eliminado Correctamente",
+              icon: "success"
+          });
+      } catch (error) {
+          Swal.fire({
+              title: "Error!",
+              text: "La asignacion no se ha podido Eliminar!",
+              icon: "error"
+          });
+      }
   }
+    
+      
+      
+    };
 
   const handlePrecioChange = (e, index) => {
     const newPrecio = parseFloat(e.target.value) ;
@@ -343,8 +357,7 @@ const Protocolos = () => {
   };
 
   const totalPrecio = servicios.reduce((total, servicio) => total + servicio.Precio, 0);
-  console.log(servicios,contratas)
-  console.log(Servicios)
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig /> 
@@ -375,7 +388,6 @@ const Protocolos = () => {
                       key={index}
                       className="cursor-pointer p-2 hover:bg-gray-200"
                       onClick={() => {
-                        console.log(option)
                         setEditorDelete(true)
                         setSearchTerm({...searchTerm, protocolo: option.nombreProtocolo});
                         setDatos({...datos, ruc: option.rucEmpresa, razonSocialE: option.razonEmpresa})
@@ -465,11 +477,6 @@ const Protocolos = () => {
                           </td>
                         <td className="border border-gray-300 px-4 py-2">
                           <FontAwesomeIcon
-                            icon={faEdit}
-                            className="text-blue-500 cursor-pointer mr-2"
-                            onClick={() => handleEditarServicio()}
-                          />
-                          <FontAwesomeIcon
                             icon={faTrashAlt}
                             className="text-red-500 cursor-pointer"
                             onClick={() => deleteService(index)}
@@ -538,11 +545,6 @@ const Protocolos = () => {
                           </td>
                         <td className="border border-gray-300 px-4 py-2">
                           <FontAwesomeIcon
-                            icon={faEdit}
-                            className="text-blue-500 cursor-pointer mr-2"
-                            onClick={() => handleEditarServicio(servicio)}
-                          />
-                          <FontAwesomeIcon
                             icon={faTrashAlt}
                             className="text-red-500 cursor-pointer"
                             onClick={() => deleteContrata(index)}
@@ -556,7 +558,6 @@ const Protocolos = () => {
                 
               </div>
               <div className='flex justify-end items-end'>
-              <button onClick={handleLimpia}  className={`bg-blue-600 m-2 text-white p-2 rounded ${!servicios || !contratas && 'hidden'}`}>Limpiar Tablas</button>
               <button onClick={handleDelete}  className={`bg-red-600 m-2 text-white p-2 rounded ${!EditorDelete && 'hidden'}`}>Eliminar</button>
               <button onClick={HandleEditDatos}  className={`bg-yellow-600 m-2 text-white p-2 rounded ${!EditorDelete && 'hidden'}`}>Editar</button>
               <button onClick={handleSubmit} disabled={!totalPrecio} className={`naranja-btn p-2 rounded ${EditorDelete && 'hidden'}`}>Guardar</button>
@@ -571,11 +572,12 @@ const Protocolos = () => {
           setShowEditModal={HandleEditDatos} 
           servicio={servicios}
           contrata={contratas}
-          protocolo={searchTerm.protocolo}
-          empresa={datos.razonSocialE}
-          ruc={datos.ruc}
+          ListDatos={ProtocoloEdit}
           ListContratas={Contratas}
           ListServicios={Servicios}
+          ListEmpresas={Empresas}
+          user={UserLogued.sub}
+          token={token}
         />
       )}
       {showModalRegistroServicios && <ModalRegistroServicios setShowModalRegistroServicios={setShowModalRegistroServicios} user={UserLogued.sub} token={token} RefreshS={ Reloading } />}
