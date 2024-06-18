@@ -244,7 +244,7 @@ const EditProtocolos = (props) => {
                         onClick={props.setShowEditModal}
                     />
                     <div className="p-3 azuloscurobackground flex justify-between">
-                        <h1 className="text-start font-bold color-azul text-white">Servicios Creación y Lista</h1>
+                        <h1 className="text-start font-bold color-azul text-white">Editar Protocolo</h1>
                     </div>
                     <div className="container p-4">
                     <label htmlFor="Protocolos" className="block font-medium mb-2">

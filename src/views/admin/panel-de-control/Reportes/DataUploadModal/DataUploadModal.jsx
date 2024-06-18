@@ -14,6 +14,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
   const [sucred, setSucred] = useState(false);
+  const [fileOrder, setFileOrder] = useState({});
 
   const sedes = Sedes
 
@@ -25,10 +26,21 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const handleFolderUpload = (e) => {
     setUploadedFiles([]);
     setUploadStatus({});
+    setFileOrder({}); // Reset file order
 
     const folders = Array.from(e.target.files);
     setUparchFile(folders);
-    const folderNames = folders.map((folder) => folder.name);
+    const folderNames = folders.map((folder, index) => {
+      const order = index + 1;
+      setFileOrder((prevOrder) => ({
+        ...prevOrder,
+        [folder.name]: order,
+      }));
+      return {
+        name: folder.name,
+        order: order,
+      };
+    });
     setUploadedFiles((prevFiles) => [...prevFiles, ...folderNames]);
 
     folders.forEach((folder) => {
@@ -51,28 +63,28 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const SubidaArchivos = async () => {
     let failedUploads = [];
    
-      const uploadPromises = uparchFile.map(async (folder) => {
-        try {
-          const fileBase64 = await toBase64(folder);
-          const base64WithoutHeader = fileBase64.split(',')[1];
-          const datos = {
-            nombre: folder.name,
-            sede: selectedSede.cod_sede,
-            base64: base64WithoutHeader
-          };
-          const response = await ArchivosMasivos(datos, user, token);
-          if (response.id === 0 || !response.id) {
-            setUploadStatus((prevStatus) => ({
-              ...prevStatus,
-              [folder.name]: 'error',
-            }));
-            failedUploads.push(folder.name);
-          }
-        } catch (error) {
-          console.error(`Error uploading ${folder.name}:`, error);
+    const uploadPromises = uparchFile.map(async (folder) => {
+      try {
+        const fileBase64 = await toBase64(folder);
+        const base64WithoutHeader = fileBase64.split(',')[1];
+        const datos = {
+          nombre: folder.name,
+          sede: selectedSede.cod_sede,
+          base64: base64WithoutHeader
+        };
+        const response = await ArchivosMasivos(datos, user, token);
+        if (response.id === 0 || !response.id) {
+          setUploadStatus((prevStatus) => ({
+            ...prevStatus,
+            [folder.name]: 'error',
+          }));
           failedUploads.push(folder.name);
         }
-      });
+      } catch (error) {
+        console.error(`Error uploading ${folder.name}:`, error);
+        failedUploads.push(folder.name);
+      }
+    });
 
     await Promise.all(uploadPromises);
     setSucred(true);
@@ -125,16 +137,29 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const generateErrorTablePDF = () => {
     const doc = new jsPDF();
     let yPos = 20;
-    doc.text("Archivos con Error", 10, 10);
+    let pageNumber = 1;
+  
+    doc.setFontSize(12);
+    doc.text(`Archivos con Error`, 10, 10);
+  
     uploadedFiles.forEach((file) => {
-      if (uploadStatus[file] === 'error') {
-        doc.text(file, 10, yPos);
+      if (uploadStatus[file.name] === 'error') {
+        doc.text(`${file.order}. ${file.name}`, 10, yPos);
         yPos += 10;
+  
+        // Veamos si sirve xd
+        if (yPos > 280) {
+          doc.addPage();
+          pageNumber++;
+          yPos = 20;
+          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
+        }
       }
     });
+  
     doc.save("archivos_con_error.pdf");
   };
-
+  
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[600px] relative">
@@ -169,6 +194,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 <table className="table-auto w-full">
                   <thead>
                     <tr>
+                      <th className="px-4 py-2">N°</th>
                       <th className="px-4 py-2">Nombre del Archivo</th>
                       <th className="px-4 py-2">Estado</th>
                       {sucred && <th className="px-4 py-2">Acciones</th>}
@@ -177,12 +203,13 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                   <tbody>
                     {uploadedFiles.map((file, index) => (
                       <tr key={index}>
-                        <td className="border px-4 py-2">{file}</td>
-                        <td className={`border px-4 py-2 ${uploadStatus[file] === 'success' ? 'bg-green-200' : 'bg-red-300'}`}>
-                          {uploadStatus[file] === 'success' ? 'Archivo Listo' : 'Error al subir archivo'}
+                        <td className="border px-4 py-2">{fileOrder[file.name]}</td>
+                        <td className="border px-4 py-2">{file.name}</td>
+                        <td className={`border px-4 py-2 ${uploadStatus[file.name] === 'success' ? 'bg-green-200' : 'bg-red-300'}`}>
+                          {uploadStatus[file.name] === 'success' ? 'Archivo Listo' : 'Error al subir archivo'}
                         </td>
                         {sucred && <td className="border px-4 py-2">
-                          {uploadStatus[file] === 'success' ? (
+                          {uploadStatus[file.name] === 'success' ? (
                             <>
                               <FontAwesomeIcon icon={faCheck} className="text-green-500" />
                               <p>Archivo Subido Correctamente</p>

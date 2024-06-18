@@ -473,7 +473,7 @@ const Protocolos = () => {
                       <tr key={index}>
                         <td className="border border-gray-300 px-4 py-2">{option.Nombre}</td>
                         <td className="border border-gray-300 px-4 py-2">
-                          <input type="number" name='servicio' className='w-full border-1 border-green-300 rounded-lg h-full' onChange={(e) => handlePrecioChange(e, index)} value={option.Precio} />
+                          <input type="number" name='servicio' className='w-full pointer border-1 border-green-300 p-[1px] fw-bold text-center rounded-lg h-full' onChange={(e) => handlePrecioChange(e, index)} value={option.Precio} />
                           </td>
                         <td className="border border-gray-300 px-4 py-2">
                           <FontAwesomeIcon
@@ -541,7 +541,7 @@ const Protocolos = () => {
                         <td className="border border-gray-300 px-4 py-2">{option.razonSocial}</td>
                         <td className="border border-gray-300 px-4 py-2">{option.ruc}</td>
                         <td className="border border-gray-300 px-4 py-2">
-                          <input type="number" name='contrata' className='w-full border-1 border-green-300 rounded-lg h-full' onChange={(e) => handlePrecioChange(e, index)} value={option.precio} />  
+                          <input type="number" name='contrata' className='w-full pointer border-1 border-green-300 p-[1px] fw-bold text-center rounded-lg h-full' onChange={(e) => handlePrecioChange(e, index)} value={option.precio} />  
                           </td>
                         <td className="border border-gray-300 px-4 py-2">
                           <FontAwesomeIcon
@@ -557,13 +557,15 @@ const Protocolos = () => {
                 </table>
                 
               </div>
-              <div className='flex justify-end items-end'>
-              <button onClick={handleDelete}  className={`bg-red-600 m-2 text-white p-2 rounded ${!EditorDelete && 'hidden'}`}>Eliminar</button>
-              <button onClick={HandleEditDatos}  className={`bg-yellow-600 m-2 text-white p-2 rounded ${!EditorDelete && 'hidden'}`}>Editar</button>
-              <button onClick={handleSubmit} disabled={!totalPrecio} className={`naranja-btn p-2 rounded ${EditorDelete && 'hidden'}`}>Guardar</button>
-              </div>
+              
             </div>
+            
           </div>
+          <div className='flex justify-end items-end'>
+                <button onClick={handleDelete}  className={`bg-red-600 fw-bold m-2 text-white p-2 rounded-lg px-4  ${!EditorDelete && 'hidden'}`}>Eliminar</button>
+                <button onClick={HandleEditDatos}  className={`naranja-btn fw-bold m-2 text-white p-2 rounded-lg px-4 ${!EditorDelete && 'hidden'}`}>Editar</button>
+                <button onClick={handleSubmit} disabled={!totalPrecio} className={`naranja-btn p-2 rounded px-4 ${EditorDelete && 'hidden'}`}>Guardar</button>
+              </div>
         </div>
     </div>
       {loading && <Loading/>}
