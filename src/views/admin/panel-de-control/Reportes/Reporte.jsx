@@ -57,7 +57,7 @@ const HistorialPaciente = () => {
   }
   
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [recordsPerPage, setRecordsPerPage] = useState(15);
+  const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const today = new Date();
   const options = { timeZone: 'America/Lima' };
