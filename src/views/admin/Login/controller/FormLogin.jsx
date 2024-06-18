@@ -46,7 +46,10 @@ export function FormLogin() {
       .then((data) => {
         if (data.id === 1) {
           decodeToken(data.mensaje)
-        } else {
+        } else if (data.id===0){
+          setErrormess(data.mensaje)
+          setInhabilitado(true)
+        }else {
           setErrormess(data)
           setInhabilitado(true)
         }
