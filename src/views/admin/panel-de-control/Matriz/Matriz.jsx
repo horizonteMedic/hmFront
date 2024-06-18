@@ -162,44 +162,52 @@ const MatrizPostulante = () => {
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Matriz Postulante');
-  
+
     const headerStyle = {
-      font: { bold: true },
-      alignment: { vertical: 'middle', horizontal: 'center' },
-      border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        font: { bold: true, color: { argb: 'FFFFFFFF' } }, // Color de la letra blanco
+        alignment: { vertical: 'middle', horizontal: 'center' },
+        border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: '4F7DE7' } } // Color de fondo azul específico
     };
-  
+
     const dataStyle = {
-      alignment: { vertical: 'middle', horizontal: 'left' },
-      border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+        alignment: { vertical: 'middle', horizontal: 'left' },
+        border: { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
     };
+
+    // Convert header to uppercase and separate camel case
+    const formatHeader = (header) => {
+        return header.replace(/([a-z])([A-Z])/g, '$1 $2').toUpperCase();
+    };
+
+    const formattedHead = head.map(formatHeader);
   
-    const headerRow = worksheet.addRow(head);
+    const headerRow = worksheet.addRow(formattedHead);
     headerRow.eachCell(cell => {
-      cell.style = headerStyle;
+        cell.style = headerStyle;
     });
-  
+
     data.forEach(row => {
-      const dataRow = worksheet.addRow(Object.values(row));
-      dataRow.eachCell(cell => {
-        cell.style = dataStyle;
-      });
+        const dataRow = worksheet.addRow(Object.values(row));
+        dataRow.eachCell(cell => {
+            cell.style = dataStyle;
+        });
     });
-  
+
     worksheet.columns.forEach(column => {
-      let maxWidth = 0;
-      column.eachCell(cell => {
-        const valueLength = cell.value ? String(cell.value).length : 0;
-        maxWidth = Math.max(maxWidth, valueLength);
-      });
-      column.width = maxWidth < 20 ? 20 : maxWidth; 
+        let maxWidth = 0;
+        column.eachCell(cell => {
+            const valueLength = cell.value ? String(cell.value).length : 0;
+            maxWidth = Math.max(maxWidth, valueLength);
+        });
+        column.width = maxWidth < 20 ? 20 : maxWidth; 
     });
-  
+
     const buffer = await workbook.xlsx.writeBuffer();
     const dataFile = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(dataFile, 'matriz_postulante.xlsx');
-  };
-  
+};
+
 
 
 
