@@ -14,6 +14,8 @@ const MatrizPostulante = () => {
   const AccessMatrizAdmi= listView.some(listView => listView.id === 402);
   //Matriz Salud
   const AccesMatrizSalud = listView.some(listView => listView.id === 403);
+  //Matriz ARCHIVOS
+  const AccesMatrizArchivos = listView.some(listView => listView.id === 502)
   
   const [loading, setLoading] = useState(false);
   const [datos, setDatos] = useState({
@@ -345,6 +347,7 @@ const MatrizPostulante = () => {
               <option value="">Seleccionar...</option>
               {AccessMatrizAdmi && <option  value="Matriz-1">Matriz Administrativa</option>}
               {AccesMatrizSalud && <option  value="Matriz-2">Matriz de Salud</option>}
+              {AccesMatrizArchivos && <option value="Matrix-3">Matriz de Archivos</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
