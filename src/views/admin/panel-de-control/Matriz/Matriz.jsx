@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { saveAs } from 'file-saver';
 import { ComboboxContrata, ComboboxSedes } from './model/Combobox';
-import { GetMatrizAdmin, GetMatrizDoctor } from './model/MatrizPOST';
+import { GetMatrizAdmin, GetMatrizDoctor, GetMatrizArchivos } from './model/MatrizPOST';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '../../../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -146,6 +146,24 @@ const MatrizPostulante = () => {
       .finally(() => {
         setLoading(false);
       });
+    } else if (datos.matrizSeleccionada === 'Matriz-3') {
+      GetMatrizArchivos(token)
+      .then(response => {
+        setData(response);
+        const headers = Object.keys(response[0]);
+        setHeaders(headers);
+        setTotalPages(Math.ceil(response.length / recordsPerPage));
+      })
+      .catch(error => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Ocurrio un error al traer la Matriz',
+          text: 'No hay datos que mostrar',
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     } else {
       setLoading(false)
     }
@@ -209,11 +227,6 @@ const MatrizPostulante = () => {
     const dataFile = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     saveAs(dataFile, 'matriz_postulante.xlsx');
 };
-
-
-
-
-
 
   const reloadTable = () => {
     if (datos.matrizSeleccionada === "") {
@@ -347,7 +360,7 @@ const MatrizPostulante = () => {
               <option value="">Seleccionar...</option>
               {AccessMatrizAdmi && <option  value="Matriz-1">Matriz Administrativa</option>}
               {AccesMatrizSalud && <option  value="Matriz-2">Matriz de Salud</option>}
-              {AccesMatrizArchivos && <option value="Matrix-3">Matriz de Archivos</option>}
+              {AccesMatrizArchivos && <option value="Matriz-3">Matriz de Archivos</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">
