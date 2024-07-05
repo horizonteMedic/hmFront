@@ -45,3 +45,17 @@ export function GetMatrizDoctor(datos,token) {
     return fetch(`${URLAzure}/api/v01/st/registros/matrizSalud`,options)
     .then(res => res.json()).then(response => response)
 }
+
+export function GetMatrizArchivos(token) {
+
+    const options = {
+        method: 'GET', 
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+    }
+
+    return fetch(`${URLAzure}/api/v01/ct/archivos`,options)
+    .then(res => res.json()).then(response => response)
+}
