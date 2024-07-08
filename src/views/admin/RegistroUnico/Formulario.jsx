@@ -4,8 +4,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 import './Formulario.css'
 import LoginA from './model/LoginA';
 import { ComboboxNivelE, ComboboxProfesion, ComboboxDepartamento, ComboboxDistrito, ComboboxProvincia } from './model/Combobos';
-
+import { SubmitRegistrarPaciente } from './model/SubmitPaciente';
+import Swal from 'sweetalert2';
 const Formulario = () => {
+  const [stardate, setStartDate] = useState(new Date());
+
   const [datos, setDatos] = useState({
     dni:'',
     nombres: '',
@@ -36,8 +39,6 @@ const Formulario = () => {
     Distrito: []
   })
 
-
-  console.log(lists)
   useEffect(() => {
     LoginA('Pacientes','123456')
     .then((res) => {
@@ -50,6 +51,16 @@ const Formulario = () => {
   },[])
 
   function GetCombobox(token) {
+    Swal.fire({
+      title: 'Abriendo Formulario',
+      text: 'Espere por favor...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
     Promise.all([
       ComboboxNivelE(token),
       ComboboxProfesion(token),
@@ -65,7 +76,9 @@ const Formulario = () => {
     .catch(error => {
       throw new Error('Network response was not ok.', error);
     })
-    
+    .finally(() => {
+      Swal.close()
+    })
   }
 
   useEffect(() => {
@@ -73,6 +86,10 @@ const Formulario = () => {
       setTiempoRestante(prev => {
         if (prev === 0) {
           clearInterval(timer);
+          setToken('')
+          Swal.fire({title: 'Se Expiro su Sesion', text: 'Su sesión expiro, refresque la pagina nuevamente', icon: 'error', confirmButtonText: 'Refrescar'}).then((res) => {if (res.isConfirmed) {
+            location.reload();
+          }})
           return 0;
         }
         return prev - 1;
@@ -96,29 +113,77 @@ const Formulario = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [alertaMostrada]);
 
+  const filterProvincias = lists.Provincia.filter(
+    (provincia) => provincia.idDepartamento === datos.departamento.id
+  )
+  const filterDistritos = lists.Distrito.filter(
+    (distrito) => distrito.idProvincia === datos.provincia.id
+  )
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name,value)
+    if (name === 'departamento' || name === 'provincia' || name === 'distrito') {
+      const selectedOption = JSON.parse(e.target.value);
+      setDatos({...datos, [name]: selectedOption})
+      return
+    }
+    if (name === 'dni' || name === 'telefono' || name === 'celular') {
+      const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
+        if (value.length <= 8) {
+          setDatos({...datos,
+            [name]: value
+          });
+          return
+      }
+    }
     setDatos({
       ...datos,
       [name]: value
     });
   };
-
+  
   const handleDateChange = (date) => {
-    setDatos({
-      ...datos,
-      fechaNacimiento: date
-    });
+    const formattedDate = formatDate(date);
+    setStartDate(date);
+    setDatos({ ...datos, fechaNacimiento: formattedDate });
+  };
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const handleSubmit = (e) => {
+    
     e.preventDefault();
-    // Aquí puedes enviar los datos a través de una solicitud HTTP o hacer cualquier otra acción necesaria
-    console.log(datos);
+    Swal.fire({
+      title: 'Validando Datos',
+      text: 'Espere por favor...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    SubmitRegistrarPaciente(datos,token)
+    .then((res) => {
+      console.log(res)
+      if (!res.id) {
+        Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
+      } else {
+        Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
+      }
+    })
+    .catch(() => {
+      Swal.fire({title: 'Error', text: 'No se pudo Registrar', icon: 'error'})
+    })
+
   };
 
   return (
+    <>
     <div style={{ position: 'relative' }}>
       <div className="background-image" />
       <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative', zIndex: 1 }} className="min-h-screen flex justify-center items-center">
@@ -136,7 +201,7 @@ const Formulario = () => {
                     <DatePicker
                       id={key}
                       name={key}
-                      selected={value}
+                      selected={stardate}
                       onChange={handleDateChange}
                       className="form-input border rounded w-full h-10"
                       dateFormat="dd/MM/yyyy"
@@ -145,7 +210,7 @@ const Formulario = () => {
                       yearDropdownItemNumber={15} // Número de años a mostrar en el menú desplegable
                     />
                   ) : key === 'sexo' || key === 'nivelEstudio' || key === 'estadoCivil' || key === 'departamento' || key === 'provincia' || key === 'distrito' ? (
-                    <select id={key} name={key} value={value} onChange={handleChange} className="text-black form-select text-sm cursor-pointer p-1 border rounded w-full">
+                    <select id={key} name={key}  onChange={handleChange} className="text-black form-select text-sm cursor-pointer p-1 border rounded w-full">
                       <option value="">Seleccionar</option>
                       {key === 'sexo' && <><option value="M">MACULINO</option>
                         <option value="F">FEMENINO</option></>}
@@ -156,14 +221,20 @@ const Formulario = () => {
                         <option value="SEPARADO">SEPARADO</option>
                         <option value="DIVORCIADO">DIVORCIADO</option></>}
                       {key === 'nivelEstudio' && lists.NivelE.map((option, index) => (
-                        <option key={index}>{option.descripcion}</option>
+                        <option key={index} value={option.descripcion}>{option.descripcion}</option>
                       ))}
                       {key === 'departamento' && lists.Departamento.map((option, index) => (
-                        <option key={index}>{option.descripcion}</option>
+                        <option key={index} value={JSON.stringify(option)}>{option.nombre}</option>
+                      ))}
+                      {key === 'provincia' && filterProvincias.map((option, index) => (
+                        <option key={index} value={JSON.stringify(option)}>{option.nombre}</option>
+                      ))}
+                      {key === 'distrito' && filterDistritos.map((option, index) => (
+                        <option key={index} value={JSON.stringify(option)}>{option.nombre}</option>
                       ))}
                     </select>
                   ) : (
-                    <input type="text" id={key} name={key} value={value} onChange={handleChange} className="text-black form-input border rounded w-full h-10" />
+                    <input type="text" id={key} name={key} maxLength={key === 'dni' && 8} value={value} onChange={handleChange} className="text-black form-input border rounded w-full h-10" />
                   )}
                 </div>
               ))}
@@ -175,6 +246,7 @@ const Formulario = () => {
         </div>
       </div>
     </div>
+          </>
   );
 };
 
