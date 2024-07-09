@@ -87,7 +87,7 @@ const Formulario = () => {
         if (prev === 0) {
           clearInterval(timer);
           setToken('')
-          Swal.fire({title: 'Se Expiro su Sesion', text: 'Su sesión expiro, refresque la pagina nuevamente', icon: 'error', confirmButtonText: 'Refrescar'}).then((res) => {if (res.isConfirmed) {
+          Swal.fire({title: 'Se Expiro su Sesion', text: 'Su sesión expiro, refresque la pagina nuevamente', icon: 'error', allowOutsideClick: false,confirmButtonText: 'Refrescar'}).then((res) => {if (res.isConfirmed) {
             location.reload();
           }})
           return 0;
