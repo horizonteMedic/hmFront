@@ -25,6 +25,8 @@ import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateAr
 import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
 import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/Protocolos.jsx'
+//Registro de Pacientes Unico
+import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 
 const App = () => {
   return (
@@ -44,7 +46,7 @@ const AppContent = () => {
   const location = useLocation();
   const showNavbarRoutes = ['/'];
   const isLoginPage = showNavbarRoutes.includes(location.pathname);
-  const isHiddenRoute = ['/forgot-password', '/verificacion-codigo', '/actualizar-password'].includes(location.pathname);
+  const isHiddenRoute = ['/forgot-password', '/verificacion-codigo', '/actualizar-password', '/RegistroP'].includes(location.pathname);
   const showBreadcrumb = !isLoginPage && !isHiddenRoute;
 
   useEffect(() => {
@@ -84,8 +86,10 @@ const AppContent = () => {
           <Route path="/protocolos" element={<Protocolos />} />
 
         </Route>
+        <Route path='/RegistroP' element={<Formulario/>}/>
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
+      
     </>
   );
 }

@@ -58,7 +58,6 @@ const ModalEditarServicio = ({ servicio, onClose, token, user, save,Loading,relo
         fechaRegistro: edits.fechaRegistro,
         userRegistro: edits.userRegistro
       }
-      console.log(datos)
       Swal.fire({
         title: '¿Está seguro?',
         text: 'Esta acción no se puede deshacer',
