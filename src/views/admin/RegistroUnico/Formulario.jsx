@@ -65,7 +65,6 @@ const Formulario = () => {
     .catch(error => {
       throw new Error('Network response was not ok.', error);
     })
-    
   }
 
   useEffect(() => {
