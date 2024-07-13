@@ -33,7 +33,7 @@ const Formulario = () => {
     celular: ''
   });
   const [token, setToken] = useState('')
-  const [tiempoRestante, setTiempoRestante] = useState(300); 
+  const [tiempoRestante, setTiempoRestante] = useState(600); 
   const [alertaMostrada, setAlertaMostrada] = useState(false);
   const [lists, setLists] = useState({
     NivelE: [],
@@ -42,7 +42,7 @@ const Formulario = () => {
     Provincia: [],
     Distrito: []
   })
-  const [disabled, setDisabled] = useState(true)
+  const [step, setStep] = useState(1);
 
   useEffect(() => {
     LoginA('Pacientes','123456')
@@ -117,7 +117,7 @@ const Formulario = () => {
 
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [alertaMostrada]);
-  //Filtos de Provincias y Distritos
+
   const filterProvincias = lists.Provincia.filter(provincia => {
     if (datos.departamento && provincia.idDepartamento === datos.departamento.id) {
       return true;
@@ -138,9 +138,7 @@ const Formulario = () => {
     if (name === 'departamento' || name === 'provincia' || name === 'distrito') {
       const selectedOption = JSON.parse(e.target.value);      
       setDatos(prevDatos => {
-        // Primero, crea una copia del estado actual
         let newDatos = { ...prevDatos, [name]: selectedOption };
-        // Si el campo es 'departamentoPa', resetea 'provinciaPa' y 'distritoPa'
         if (name === 'departamento') {
           newDatos = {
             ...newDatos,
@@ -248,72 +246,123 @@ const Formulario = () => {
     .catch(() => {
       Swal.fire({title: 'Error', text: 'No se pudo Registrar', icon: 'error'})
     })
+  };
 
+  const nextStep = () => {
+    if (validateStep()) {
+      setStep(step + 1);
+    } else {
+      alert('Por favor, complete todos los campos obligatorios.');
+    }
+  };
+
+  const prevStep = () => {
+    setStep(step - 1);
+  };
+
+  const validateStep = () => {
+    switch (step) {
+      case 1:
+        return datos.dni && datos.nombres && datos.apellidos && datos.fechaNacimiento && datos.email;
+      case 2:
+        return datos.lugarNacimiento && datos.nivelEstudio && datos.profesion && datos.estadoCivil && datos.direccion;
+      default:
+        return true;
+    }
   };
 
    console.log(datos)
    console.log(JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) )
   return (
-    
     <div style={{ position: 'relative' }}>
       <div className="background-image" />
       <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative', zIndex: 1 }} className="min-h-screen flex justify-center items-center">
         <div className="bg-[#144579] p-8 rounded shadow-md w-full sm:w-3/4 lg:w-1/2">
-          <h2 className="text-1xl font-bold mb-4 text-white">Formulario de Registro</h2>
+          <h2 className="text-xl font-bold mb-4 text-white">Formulario de Registro</h2>
           <div className="flex justify-end text-white mb-2">
             Tiempo restante: {Math.floor(tiempoRestante / 60)}:{(tiempoRestante % 60).toString().padStart(2, '0')}
           </div>
-          <div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <InputText name='dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
-            <InputText name='nombres' value={datos.nombres} handleChange={handleChange} />
-            <InputText name='apellidos' value={datos.apellidos} handleChange={handleChange} />
-            <div className='h-full'>
-              <label htmlFor='fechaNacimiento' className="text-sm font-semibold text-white" style={{ fontSize: '15px' }}>Fecha de Nacimiento:</label>
-              <DatePicker
-                id='fechaNacimiento'
-                value={datos.fechaNacimiento}
-                name='fechaNacimiento'
-                selected={stardate}
-                onChange={handleDateChange}
-                className="form-input border rounded w-full h-10"
-                dateFormat="dd/MM/yyyy"
-                showYearDropdown
-                scrollableYearDropdown
-                yearDropdownItemNumber={15} // Número de años a mostrar en el menú desplegable
-              />
-            </div>
-            <InputSelect name='sexo' value={datos.sexo} handleChange={handleChange} />
-            <InputText name='email' value={datos.email} handleChange={handleChange} />
-            <InputText name='lugarNacimiento' value={datos.lugarNacimiento} handleChange={handleChange} />
-            <InputSelect name='nivelEstudio' value={datos.nivelEstudio} selected={lists.NivelE} handleChange={handleChange} />
-            <InputSelect name='profesion' value={datos.profesion} selected={lists.Profesion} handleChange={handleChange} />
-            <InputSelect name='estadoCivil' value={datos.estadoCivil} handleChange={handleChange} />
-            <InputText name='direccion' value={datos.direccion} handleChange={handleChange} />
-            <InputSelect name='departamento' value={typeof datos.departamento === 'string'
-              ? JSON.stringify(lists.Departamento.find(d => d.nombre === datos.departamento)) || ''
-              : JSON.stringify(datos.departamento)} selected={lists.Departamento} handleChange={handleChange} />
-            <InputSelect name='provincia' value={typeof datos.provincia === 'string'
-              ? JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) 
-              : JSON.stringify(datos.provincia)} selected={!datos.provincia ? filterProvincias : lists.Provincia} handleChange={handleChange} />
-            <InputSelect name='distrito' value={typeof datos.distrito === 'string'
-              ? JSON.stringify(lists.Distrito.find(d => d.nombre === datos.distrito)) 
-              : JSON.stringify(datos.distrito)} selected={!datos.distrito ? filterDistritos : lists.Distrito} handleChange={handleChange} />
-            <InputText name='caserio' value={datos.caserio} handleChange={handleChange} />
-            <InputText name='telefono' value={datos.telefono} handleChange={handleChange} />
-            <InputText name='celular' value={datos.celular} handleChange={handleChange} />
-
-              
-            </div>
-            <div className="text-center">
-              <button onClick={handleSubmit} disabled={!datos.dni} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-1 px-4 mt-4 rounded" style={{fontSize:'13px', borderRadius:'2em'}}>Registrar</button>
-            </div>
-
+          
+          {/* Progreso */}
+          <div className="flex justify-center mb-8">
+            {[1, 2, 3].map((num) => (
+              <div key={num} className="flex items-center">
+                <div
+                  className={`rounded-full h-8 w-8 flex items-center justify-center ml-3 mr-3 ${step >= num ? 'bg-orange-500' : 'bg-gray-300'} text-white`}
+                >
+                  {num}
+                </div>
+                {num !== 3 && (
+                  <div className={`flex-1 h-1 ${step > num ? 'bg-orange-500' : 'bg-gray-300'}`} />
+                )}
+              </div>
+            ))}
           </div>
+
+          <form onSubmit={handleSubmit}>
+            {step === 1 && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <InputText name='Dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
+                <InputText name='Nombres' value={datos.nombres} handleChange={handleChange} />
+                <InputText name='Apellidos' value={datos.apellidos} handleChange={handleChange} />
+                <div className='h-full'>
+                  <label htmlFor='fechaNacimiento' className=" font-semibold text-white  w-full "  style={{ fontSize: '15px' }}>Fecha de Nacimiento:</label>
+                  <DatePicker
+                    id='fechaNacimiento'
+                    value={datos.fechaNacimiento}
+                    name='fechaNacimiento'
+                    selected={stardate}
+                    onChange={handleDateChange}
+                    className="form-input border rounded w-full h-10 "
+                    dateFormat="dd/MM/yyyy"
+                    showYearDropdown
+                    scrollableYearDropdown
+                    yearDropdownItemNumber={15}
+                  />
+                </div>
+                <InputSelect name='sexo' value={datos.sexo} handleChange={handleChange} />
+                <InputText name='Email' value={datos.email} handleChange={handleChange} />
+              </div>
+            )}
+            {step === 2 && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <InputText name='lugarNacimiento' value={datos.lugarNacimiento} handleChange={handleChange} />
+                <InputSelect name='nivelEstudio' value={datos.nivelEstudio} selected={lists.NivelE} handleChange={handleChange} />
+                <InputSelect name='profesion' value={datos.profesion} selected={lists.Profesion} handleChange={handleChange} />
+                <InputSelect name='estadoCivil' value={datos.estadoCivil} handleChange={handleChange} />
+                <InputText name='direccion' value={datos.direccion} handleChange={handleChange} />
+              </div>
+            )}
+            {step === 3 && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <InputSelect name='departamento' value={typeof datos.departamento === 'string'
+                  ? JSON.stringify(lists.Departamento.find(d => d.nombre === datos.departamento)) || ''
+                  : JSON.stringify(datos.departamento)} selected={lists.Departamento} handleChange={handleChange} />
+                <InputSelect name='provincia' value={typeof datos.provincia === 'string'
+                  ? JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) 
+                  : JSON.stringify(datos.provincia)} selected={!datos.provincia ? filterProvincias : lists.Provincia} handleChange={handleChange} />
+                <InputSelect name='distrito' value={typeof datos.distrito === 'string'
+                  ? JSON.stringify(lists.Distrito.find(d => d.nombre === datos.distrito)) 
+                  : JSON.stringify(datos.distrito)} selected={!datos.distrito ? filterDistritos : lists.Distrito} handleChange={handleChange} />
+                <InputText name='caserio' value={datos.caserio} handleChange={handleChange} />
+                <InputText name='telefono' value={datos.telefono} handleChange={handleChange} />
+                <InputText name='celular' value={datos.celular} handleChange={handleChange} />
+              </div>
+            )}
+            <div className="text-center">
+              {step > 1 && (
+                <button type="button" onClick={prevStep} className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-1 px-4 mt-4 rounded mr-2">Anterior</button>
+              )}
+              {step < 3 ? (
+                <button type="button" onClick={nextStep} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-1 px-4 mt-4 rounded">Siguiente</button>
+              ) : (
+                <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-semibold py-1 px-4 mt-4 rounded">Enviar</button>
+              )}
+            </div>
+          </form>
         </div>
       </div>
     </div>
-          
   );
 };
 
