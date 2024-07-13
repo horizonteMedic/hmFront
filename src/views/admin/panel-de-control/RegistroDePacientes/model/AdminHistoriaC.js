@@ -53,7 +53,7 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     tipoPrueba: "N/A",
     nombreHotel: "N/A",
     protocolo: "Protocolo",
-    precioAdic: `${precioAdic ? 'S/'+precioAdic : 'S/.0'}`,
+    precioAdic: `${precioAdic ? 'S/.'+precioAdic : 'S/.0'}`,
     autoriza: data.autoriza,
     n_operacion: null,
     herraManuales: data.herraManuales, //8

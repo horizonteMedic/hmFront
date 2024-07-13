@@ -5,9 +5,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faMobileAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
 import {
-  ComboboxEstadoCivil,
-  ComboboxSexo,
-  ComboboxNivelE,
   ComboboxProfesión,
   ComboboxDepartamentos,
   ComboboxProvincias,
@@ -73,8 +70,6 @@ const RegistroClientes = (props) => {
     // Mostrar el mensaje de carga
   };
 
-  const EstadoCivil = ComboboxEstadoCivil();
-  const NivelE = ComboboxNivelE();
   const Profesiones = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();
   const Provincias = ComboboxProvincias();
@@ -184,7 +179,6 @@ const RegistroClientes = (props) => {
           Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
         } else {
           Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
-          handleSearch()
         }
         
       })
@@ -265,8 +259,8 @@ const RegistroClientes = (props) => {
         <div className="flex items-center space-x-2">
       <label htmlFor="fechaNacimiento" className="block w-36">Fecha de Nacimiento:</label>
       <DatePicker
-        selected={startDate}
-        onChange={date => setStartDate(date)}
+        selected={datos.fechaNaciminetoPa}
+        onChange={date => setDatos({...datos, fechaNaciminetoPa: date})}
         dateFormat="dd/MM/yyyy"
         showYearDropdown
         yearDropdownItemNumber={15} // Número de años a mostrar
@@ -324,16 +318,20 @@ const RegistroClientes = (props) => {
             className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           >
             <option value="">Seleccionar</option>
-            {NivelE.map((option) => (
-              <option value={option.descripcion} key={option.id}>{option.descripcion}</option>
-            ))}
+            <option value="ANALFABETO">ANALFABETO</option>
+            <option value="PRIMARIA COMPLETA">PRIMARIA COMPLETA</option>
+            <option value="PRIMARIA INCOMPLETA">PRIMARIA INCOMPLETA</option>
+            <option value="SECUNDARIA COMPLETA">SECUNDARIA COMPLETA</option>
+            <option value="SECUNDARIA INCOMPLETA">SECUNDARIA INCOMPLETA</option>
+            <option value="UNIVERSITARIO">UNIVERSITARIO</option>
+            <option value="TECNICO">TECNICO</option>
           </select>
         </div>
       <div className="flex items-center space-x-2">
           <label htmlFor="profOcupacion" className="block w-36">Prof/Ocup:</label>
           <input
             type="text"
-            value={searchTerm}
+            value={searchTerm }
             onChange={handleProfesionSearch}
             placeholder="Seleccione"
             className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -352,9 +350,10 @@ const RegistroClientes = (props) => {
             </div>
           )}
         </div>
-        {selectedProfesion && (
-          <div className="text-sm mt-1">
-            Seleccionado: <strong>{selectedProfesion}</strong>
+
+        {selectedProfesion || datos.ocupacionPa && (
+          <div className="text-sm mt-1 flex items-center justify-center">
+            Seleccionado: <strong>{selectedProfesion ? selectedProfesion : datos.ocupacionPa}</strong>
           </div>
         )}
         
@@ -368,9 +367,13 @@ const RegistroClientes = (props) => {
             className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           >
             <option value="">Seleccionar</option>
-            {EstadoCivil.map((option) => (
-              <option key={option.id} value={option.descripcion}>{option.descripcion}</option>
-            ))}
+            <option value="SOLTERO">SOLTERO</option>
+            <option value="CASADO">CASADO</option>
+            <option value="VIUDO">VIUDO</option>
+            <option value="CONVIVIENTE">CONVIVIENTE</option>
+            <option value="SEPARADO">SEPARADO</option>
+            <option value="DIVORCIADO">DIVORCIADO</option>
+
           </select>
         </div>
         <div className="flex items-center space-x-2">

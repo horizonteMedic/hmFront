@@ -285,7 +285,7 @@ const Formulario = () => {
             </div>
             <InputSelect name='sexo' value={datos.sexo} handleChange={handleChange} />
             <InputText name='email' value={datos.email} handleChange={handleChange} />
-            <InputText name='lugarNacimiento' value={datos.email} handleChange={handleChange} />
+            <InputText name='lugarNacimiento' value={datos.lugarNacimiento} handleChange={handleChange} />
             <InputSelect name='nivelEstudio' value={datos.nivelEstudio} selected={lists.NivelE} handleChange={handleChange} />
             <InputSelect name='profesion' value={datos.profesion} selected={lists.Profesion} handleChange={handleChange} />
             <InputSelect name='estadoCivil' value={datos.estadoCivil} handleChange={handleChange} />

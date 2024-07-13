@@ -10,7 +10,10 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    
+    const departamentoPa = data.departamentoPa
+  ? (data.departamentoPa.nombre ? data.departamentoPa.nombre : data.departamentoPa)
+  : null;
+    console.log(departamentoPa)
   const body = {
     codPa: data.codPa,
     nombresPa: data.nombresPa,
@@ -22,9 +25,9 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     ocupacionPa: data.ocupacionPa,
     estadoCivilPa: data.estadoCivilPa,
     direccionPa: data.direccionPa,
-    departamentoPa: data.departamentoPa.nombre,
-    provinciaPa: data.provinciaPa.nombre,
-    distritoPa: data.distritoPa.nombre,
+    departamentoPa: data.departamentoPa ? (data.departamentoPa.nombre ? data.departamentoPa.nombre : data.departamentoPa) : null,
+    provinciaPa: data.provinciaPa ? (data.provinciaPa.nombre ? data.provinciaPa.nombre : data.provinciaPa): null,
+    distritoPa: data.distritoPa? (data.distritoPa.nombre ? data.distritoPa.nombre : data.distritoPa): null,
     caserioPA: data.caserioPA,
     fotoPa: null,
     codAleatorioPa: null,
@@ -36,8 +39,6 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     horaRegistroPa: `${hours}:${minutes}:${seconds}`,
     tipoDoc: 1
   };    
-  console.log(body)
-  console.log(JSON.stringify(body))
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}`
     const options = {
