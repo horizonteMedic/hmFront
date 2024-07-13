@@ -13,7 +13,8 @@ const protectedRoutes = {
     '/administrar-empresas': 60,
     '/administrar-contratas': 61,
     '/protocolos': 153,
-    '/RegistroP': 602
+    '/RegistroP': 602,
+    '/Registro-de-pacientes': 202
   };
 
 export function ProtectedRoute(){

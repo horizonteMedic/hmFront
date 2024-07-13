@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser,  faChartBar, faList,faLock, faCog, faSignOutAlt, faFlaskVial, faUserNurse } from '@fortawesome/free-solid-svg-icons';
+import { faUser,  faChartBar, faList,faLock, faCog, faSignOutAlt, faPersonCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -43,7 +43,9 @@ const Navbar = () => {
     { to: "/accesos", id:"53", label: "Accesos", icon: faLock },
     { to: "/reporte-pacientes", id:"54", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", id:"55", label: "Matriz Postulante", icon: faList },
+    { to: "/Registro-de-pacientes", id:"202", label: "Registro de Pacientes", icon: faPersonCirclePlus },
     { to: "/configuracion", id:"56", label: "Configuración", icon: faCog }
+
 
   ].filter(navLink => allowedRoutes.includes(navLink.id));
   

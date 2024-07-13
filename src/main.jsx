@@ -27,7 +27,8 @@ import AdministrarContratas from './views/admin/panel-de-control/Configuracion/A
 import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/Protocolos.jsx'
 //Registro de Pacientes Unico
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
-
+//Registro de Pacientes Multiple
+import RegistroDePacientes from './views/admin/panel-de-control/RegistroDePacientes/Registro-de-pacientes.jsx';
 const App = () => {
   return (
     <React.StrictMode>
@@ -84,6 +85,7 @@ const AppContent = () => {
           <Route path="/administrar-empresas" element={<AdministrarEmpresas />} />
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
           <Route path="/protocolos" element={<Protocolos />} />
+          <Route path="/Registro-de-pacientes" element={<RegistroDePacientes />} />
 
         </Route>
         <Route path='/RegistroP' element={<Formulario/>}/>
