@@ -302,18 +302,18 @@ const Formulario = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputText name='Dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
-                <InputText name='Nombres' value={datos.nombres} handleChange={handleChange} />
-                <InputText name='Apellidos' value={datos.apellidos} handleChange={handleChange} />
+                <InputText name='dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
+                <InputText name='nombres' value={datos.nombres} handleChange={handleChange} />
+                <InputText name='apellidos' value={datos.apellidos} handleChange={handleChange} />
                 <div className='h-full'>
-                  <label htmlFor='fechaNacimiento' className=" font-semibold text-white  w-full "  style={{ fontSize: '15px' }}>Fecha de Nacimiento:</label>
+                  <label htmlFor='fechaNacimiento' className=" font-semibold text-white w-full" style={{ fontSize: '15px' }}>Fecha de Nacimiento:</label>
                   <DatePicker
                     id='fechaNacimiento'
                     value={datos.fechaNacimiento}
                     name='fechaNacimiento'
                     selected={stardate}
                     onChange={handleDateChange}
-                    className="form-input border rounded w-full h-10 "
+                    className="form-input border rounded w-full h-10"
                     dateFormat="dd/MM/yyyy"
                     showYearDropdown
                     scrollableYearDropdown
@@ -321,7 +321,7 @@ const Formulario = () => {
                   />
                 </div>
                 <InputSelect name='sexo' value={datos.sexo} handleChange={handleChange} />
-                <InputText name='Email' value={datos.email} handleChange={handleChange} />
+                <InputText name='email' value={datos.email} handleChange={handleChange} />
               </div>
             )}
             {step === 2 && (
