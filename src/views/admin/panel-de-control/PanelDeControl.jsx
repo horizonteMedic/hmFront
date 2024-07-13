@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime } from '@fortawesome/free-solid-svg-icons';
+import { faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faPersonCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
 
 const Card = ({ to, id, icon }) => {
@@ -22,7 +22,8 @@ const Dashboard = () => {
     { to: "/accesos", id: "53", icon: <FontAwesomeIcon icon={faUserLock} style={{ color: "#fc6b03" }} size='2xl' />, title: "Accesos", description: "" },
     { to: "/reporte-pacientes", id: "54", icon: <FontAwesomeIcon icon={faFileLines} style={{ color: "#fc6b03" }} size='2xl' />, title: "Reportes", description: "" },
     { to: "/matriz-postulante", id: "55", icon: <FontAwesomeIcon icon={faBusinessTime} style={{ color: "#fc6b03" }} size='2xl' />, title: "Matriz Postulante", description: "" },
-    { to: "/configuracion", id: "56", icon: <FontAwesomeIcon style={{ color: "#fc6b03" }} icon={faGears} size='2xl' />, title: "Configuración", description: " " }
+    { to: "/configuracion", id: "56", icon: <FontAwesomeIcon style={{ color: "#fc6b03" }} icon={faGears} size='2xl' />, title: "Configuración", description: " " },
+    { to: "/Registro-de-pacientes", id: "202", icon: <FontAwesomeIcon style={{ color: "#fc6b03" }} icon={faPersonCirclePlus} size='2xl' />, title: "Registro de Pacientes", description: " " }
   ].filter(card => allowedRoutes.includes(card.id));
 
   return (

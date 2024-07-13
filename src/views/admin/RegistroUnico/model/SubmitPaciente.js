@@ -36,7 +36,8 @@ export function SubmitRegistrarPaciente(data,token) {
     horaRegistroPa: `${hours}:${minutes}:${seconds}`,
     tipoDoc: 1
   };    
-
+  console.log(body)
+  console.log(JSON.stringify(body))
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/T-NP`
     const options = {
         method: 'POST',
