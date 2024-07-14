@@ -134,36 +134,41 @@ const Formulario = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name,value)
+
+    // Función para capitalizar la primera letra de cada palabra
+    const capitalizeFirstLetter = (str) => {
+        return str.toLowerCase().replace(/^\w|\s\w/g, (letter) => letter.toUpperCase());
+    };
+
+    // Manejar campos especiales y normalizar otros campos
     if (name === 'departamento' || name === 'provincia' || name === 'distrito') {
-      const selectedOption = JSON.parse(e.target.value);      
-      setDatos(prevDatos => {
-        let newDatos = { ...prevDatos, [name]: selectedOption };
-        if (name === 'departamento') {
-          newDatos = {
-            ...newDatos,
-            provincia: '',
-            distrito: ''
-          };
+        const selectedOption = JSON.parse(e.target.value);      
+        setDatos(prevDatos => {
+            let newDatos = { ...prevDatos, [name]: selectedOption };
+            if (name === 'departamento') {
+                newDatos = {
+                    ...newDatos,
+                    provincia: '',
+                    distrito: ''
+                };
+            }
+            return newDatos;
+        });
+    } else if (name === 'dni' || name === 'telefono' || name === 'celular') {
+        // Remover caracteres no numéricos
+        const numericValue = value.replace(/\D/g, '');
+        setDatos({...datos, [name]: numericValue});
+    } else {
+        // Capitalizar la primera letra en nombres y apellidos
+        if (name === 'nombres' || name === 'apellidos') {
+            setDatos({...datos, [name]: capitalizeFirstLetter(value)});
+        } else {
+            // Para otros campos simplemente actualizar el valor
+            setDatos({...datos, [name]: value});
         }
-        return newDatos;
-      });
-      return
     }
-    if (name === 'dni' || name === 'telefono' || name === 'celular') {
-      const value = e.target.value.replace(/\D/g, ''); // Remover caracteres no numéricos
-        if (value.length <= 8) {
-          setDatos({...datos,
-            [name]: value
-          });
-          return
-      }
-    }
-    setDatos({
-      ...datos,
-      [name]: value
-    });
-  };
+};
+
   
   const handleDateChange = (date) => {
     const formattedDate = formatDate(date);
@@ -223,7 +228,6 @@ const Formulario = () => {
   }
 
   const handleSubmit = (e) => {
-    console.log(datos)
     e.preventDefault();
     Swal.fire({
       title: 'Validando Datos',
@@ -266,13 +270,13 @@ const Formulario = () => {
         return datos.dni && datos.nombres && datos.apellidos && datos.fechaNacimiento && datos.email;
       case 2:
         return datos.lugarNacimiento && datos.nivelEstudio && datos.profesion && datos.estadoCivil && datos.direccion;
+      case 3:
+        return datos.departamento && datos.provincia && datos.distrito && datos.caserio && datos.telefono && datos.celular;
       default:
         return true;
     }
   };
 
-   console.log(datos)
-   console.log(JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) )
   return (
     <div style={{ position: 'relative' }}>
       <div className="background-image" />
@@ -302,61 +306,62 @@ const Formulario = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputText name='dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
-                <InputText name='nombres' value={datos.nombres} handleChange={handleChange} />
-                <InputText name='apellidos' value={datos.apellidos} handleChange={handleChange} />
+                <InputText  label='Dni' name='dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
+                <InputText label='Nombres' name='nombres' value={datos.nombres} handleChange={handleChange} />
+                <InputText label='Apellidos' name='apellidos' value={datos.apellidos} handleChange={handleChange} />
                 <div className='h-full'>
                   <label htmlFor='fechaNacimiento' className=" font-semibold text-white w-full" style={{ fontSize: '15px' }}>Fecha de Nacimiento:</label>
                   <DatePicker
                     id='fechaNacimiento'
-                    value={datos.fechaNacimiento}
-                    name='fechaNacimiento'
-                    selected={stardate}
+                    selected={datos.fechaNacimiento}
                     onChange={handleDateChange}
                     className="form-input border rounded w-full h-10"
                     dateFormat="dd/MM/yyyy"
                     showYearDropdown
                     scrollableYearDropdown
-                    yearDropdownItemNumber={15}
+                    yearDropdownItemNumber={200} // Ajusta según la cantidad de años necesarios
+                    minDate={new Date("1800-01-01")} // Establece la fecha mínima permitida
+                    maxDate={new Date()} // Establece la fecha máxima permitida (hoy)
                   />
                 </div>
-                <InputSelect name='sexo' value={datos.sexo} handleChange={handleChange} />
-                <InputText name='email' value={datos.email} handleChange={handleChange} />
+                <InputSelect  label='Sexo' name='sexo' value={datos.sexo} handleChange={handleChange} />
+                <InputText  label='Email' name='email' value={datos.email} handleChange={handleChange} />
               </div>
             )}
             {step === 2 && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputText name='lugarNacimiento' value={datos.lugarNacimiento} handleChange={handleChange} />
-                <InputSelect name='nivelEstudio' value={datos.nivelEstudio} selected={lists.NivelE} handleChange={handleChange} />
-                <InputSelect name='profesion' value={datos.profesion} selected={lists.Profesion} handleChange={handleChange} />
-                <InputSelect name='estadoCivil' value={datos.estadoCivil} handleChange={handleChange} />
-                <InputText name='direccion' value={datos.direccion} handleChange={handleChange} />
+                <InputText label='Lugar de Nacimiento' name='lugarNacimiento' value={datos.lugarNacimiento} handleChange={handleChange} />
+                <InputSelect label='Nivel de Estudios'  name='nivelEstudio' value={datos.nivelEstudio} selected={lists.NivelE} handleChange={handleChange} />
+                <InputSelect label='Profesión' name='profesion' value={datos.profesion} selected={lists.Profesion} handleChange={handleChange} />
+                <InputSelect label='Estado Civil' name='estadoCivil' value={datos.estadoCivil} handleChange={handleChange} />
+                <InputText label='Dirección' name='direccion' value={datos.direccion} handleChange={handleChange} />
               </div>
             )}
             {step === 3 && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputSelect name='departamento' value={typeof datos.departamento === 'string'
+                <InputSelect label='Departamento' name='departamento' value={typeof datos.departamento === 'string'
                   ? JSON.stringify(lists.Departamento.find(d => d.nombre === datos.departamento)) || ''
                   : JSON.stringify(datos.departamento)} selected={lists.Departamento} handleChange={handleChange} />
-                <InputSelect name='provincia' value={typeof datos.provincia === 'string'
+                <InputSelect label='Provincia' name='provincia' value={typeof datos.provincia === 'string'
                   ? JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) 
                   : JSON.stringify(datos.provincia)} selected={!datos.provincia ? filterProvincias : lists.Provincia} handleChange={handleChange} />
-                <InputSelect name='distrito' value={typeof datos.distrito === 'string'
+                <InputSelect label='Distrito' name='distrito' value={typeof datos.distrito === 'string'
                   ? JSON.stringify(lists.Distrito.find(d => d.nombre === datos.distrito)) 
                   : JSON.stringify(datos.distrito)} selected={!datos.distrito ? filterDistritos : lists.Distrito} handleChange={handleChange} />
-                <InputText name='caserio' value={datos.caserio} handleChange={handleChange} />
-                <InputText name='telefono' value={datos.telefono} handleChange={handleChange} />
-                <InputText name='celular' value={datos.celular} handleChange={handleChange} />
+                <InputText  label='Caserío' name='caserio' value={datos.caserio} handleChange={handleChange} />
+                <InputText  label='Teléfono' name='telefono' value={datos.telefono} handleChange={handleChange} />
+                <InputText  label='Celular' name='celular' value={datos.celular} handleChange={handleChange} />
               </div>
             )}
             <div className="text-center">
               {step > 1 && (
-                <button type="button" onClick={prevStep} className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-1 px-4 mt-4 rounded mr-2">Anterior</button>
+                <button type="button" style={{fontSize:'12px'}} onClick={prevStep} className="bg-gray-500 hover:bg-gray-700 text-white font-semibold py-3 px-4 mt-4 rounded mr-2">Anterior</button>
               )}
-              {step < 3 ? (
-                <button type="button" onClick={nextStep} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-1 px-4 mt-4 rounded">Siguiente</button>
-              ) : (
-                <button type="submit" className="bg-green-500 hover:bg-green-700 text-white font-semibold py-1 px-4 mt-4 rounded">Enviar</button>
+              {step < 3 && (
+                <button type="button"  style={{fontSize:'12px'}} onClick={nextStep} className="bg-blue-500 hover:bg-blue-700 text-white font-semibold py-3 px-4 mt-4 rounded">Siguiente</button>
+              )}
+              {step === 3 && (
+                <button type="submit"  style={{fontSize:'12px'}} className="bg-green-500 hover:bg-green-700 text-white font-semibold py-3 px-4 mt-4 rounded">Enviar</button>
               )}
             </div>
           </form>
