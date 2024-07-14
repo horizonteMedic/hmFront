@@ -17,12 +17,12 @@ export const InputText = (props) => {
                     maxLength={name === 'dni' ? 8 : undefined} 
                     value={value} 
                     onChange={handleChange} 
-                    className="text-black form-input border rounded w-full h-10 py-2 px-2" 
+                    className="text-black form-input border rounded w-full h-10  py-4 px-2" 
                 />
                 {name === 'dni' && (
                     <button 
                         onClick={handleSearch} 
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 rounded-lg azuloscurobackground text-white flex items-center space-x-2"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-[8px] rounded-lg azuloscurobackground text-white flex items-center space-x-2"
                     >
                         <FontAwesomeIcon icon={faMagnifyingGlass} />
                     </button>

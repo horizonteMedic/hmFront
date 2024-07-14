@@ -56,15 +56,15 @@ const Formulario = () => {
   },[])
 
   function GetCombobox(token) {
-    Swal.fire({
-      title: 'Abriendo Formulario',
-      text: 'Espere por favor...',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
+    // Swal.fire({
+    //   title: 'Abriendo Formulario',
+    //   text: 'Espere por favor...',
+    //   allowOutsideClick: false,
+    //   allowEscapeKey: false,
+    //   didOpen: () => {
+    //     Swal.showLoading();
+    //   }
+    // });
 
     Promise.all([
       ComboboxNivelE(token),
@@ -315,14 +315,17 @@ const Formulario = () => {
                     id='fechaNacimiento'
                     selected={datos.fechaNacimiento}
                     onChange={handleDateChange}
-                    className="form-input border rounded w-full h-10"
+                    className="form-input border rounded w-full h-10 px-2"
                     dateFormat="dd/MM/yyyy"
                     showYearDropdown
                     scrollableYearDropdown
                     yearDropdownItemNumber={200} // Ajusta según la cantidad de años necesarios
                     minDate={new Date("1800-01-01")} // Establece la fecha mínima permitida
                     maxDate={new Date()} // Establece la fecha máxima permitida (hoy)
+                    
                   />
+                    <label htmlFor='fechaNacimiento' className="text-gray-500 text-sm block mt-2">Formato: Día/Mes/Año</label>
+
                 </div>
                 <InputSelect  label='Sexo' name='sexo' value={datos.sexo} handleChange={handleChange} />
                 <InputText  label='Email' name='email' value={datos.email} handleChange={handleChange} />
