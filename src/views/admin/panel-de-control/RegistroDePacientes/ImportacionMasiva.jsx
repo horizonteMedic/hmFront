@@ -137,7 +137,7 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         if (row['FechaNacimiento']) {
           const serialNumber = row['FechaNacimiento'];
           const date = addDays(new Date(1899, 11, 30), serialNumber);
-          row['FechaNacimiento'] = format(date, 'dd/MM/yyyy');
+          row['FechaNacimiento'] = format(date, 'yyyy/MM/dd');
         }
         return row;
       });
@@ -186,9 +186,9 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const handleDownloadExcelTemplate = () => {
-    window.open('https://docs.google.com/spreadsheets/d/1vnpZtd97WybQ3zCWwaF2uH4OTa_G_5hy/edit?usp=sharing&ouid=105230702023683005367&rtpof=true&sd=true', '_blank');
+    window.open('https://docs.google.com/spreadsheets/d/1sIK2ITY4OIPqnY8T0CdBJ3Ou2gbI_gtK/edit?usp=drive_link&ouid=110131358210789779317&rtpof=true&sd=true', '_blank');
   };
-
+  
   const handleCargaMasiva = async () => {
     setLoading(true);
     let failedPatients = [];
@@ -203,7 +203,7 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
-
+          console.log(res)
           const datos = {
             dni: patient.DNI,
             celular: patient.Celular,
