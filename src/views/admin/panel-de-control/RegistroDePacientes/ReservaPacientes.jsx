@@ -4,7 +4,7 @@ import { faPlus, faSortAmountUp, faSortAmountDown } from '@fortawesome/free-soli
 import Modal from './Modal';
 import { getFetch } from './../getFetch/getFetch';
 
-const ReservaPacientes = ({ selectedSede, token }) => {
+const ReservaPacientes = ({ selectedSede, token, userlogued }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [reservations, setReservations] = useState([]);
@@ -13,10 +13,9 @@ const ReservaPacientes = ({ selectedSede, token }) => {
   const [sortDirection, setSortDirection] = useState('ascending');
 
   useEffect(() => {
-    getFetch('/api/v01/ct/ocupacional/listadoReserva/developer', token)
+    getFetch(`/api/v01/ct/ocupacional/listadoReserva/${userlogued}`, token)
       .then((res) => {
         setReservations(res);
-        console.log(res);
       })
       .catch(() => {
         console.log('No se pudo encontrar');

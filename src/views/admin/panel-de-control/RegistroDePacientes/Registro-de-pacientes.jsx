@@ -136,7 +136,7 @@ const TabComponent = () => {
             <div className="custom-border p-4">
               {activeTab === 1 && Acces.Registro && <RegistroClientes selectedSede='T-NP' Loading={Loading} token={token} />}
               {activeTab === 2 && Acces.Historia && <AperturaExamenesPreOcup selectedSede='T-NP' token={token} Loading={Loading}/>}
-              {activeTab === 3 && Acces.Citas && <ReservaPacientes selectedSede='T-NP' token={token} Loading={Loading}/>}
+              {activeTab === 3 && Acces.Citas && <ReservaPacientes selectedSede='T-NP' token={token} Loading={Loading} userlogued={userlogued.sub}/>}
             </div>
           </div>
         </div>
