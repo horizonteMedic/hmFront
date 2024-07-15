@@ -1,39 +1,78 @@
 import React, { useState, useEffect } from 'react';
 import Modal from 'react-modal';
-import { parse, format } from 'date-fns';
+import { parse, format, addDays } from 'date-fns';
 import Swal from 'sweetalert2';
 import { Loading } from '../../../components/Loading';
-import { addDays } from 'date-fns';
 import * as XLSX from 'xlsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFileExcel, faTimes, faDownload, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 import { SubmitMasivoRegistarPaciente, SubmitCitas } from './model/AdminMasivoPaciente';
 import { ComboboxContratas, ComboboxEmpresas } from './model/Combobox';
+
 Modal.setAppElement('#root');
 
 const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlogued }) => {
+  const Contratas = ComboboxContratas();
+  const Empresas = ComboboxEmpresas();
 
-  const Contratas = ComboboxContratas()
-  const Empresas = ComboboxEmpresas()
- 
   const columnTitles = [
     'DNI',
+ 
     'Celular'
-    ];
+  ];
 
   const [data, setData] = useState([]);
   const [highlightedRows, setHighlightedRows] = useState([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [empresa, setEmpresa] = useState('');
   const [contrata, setContrata] = useState('');
-  const [fechaReserva, setFechaReserva] = useState(new Date().toISOString().split('T')[0]); // Fecha de hoy como inicial
-  const [loading, setLoading] = useState(false)
-  //Estados para manejar los errores
+  const [fechaReserva, setFechaReserva] = useState(new Date().toISOString().split('T')[0]);
+  const [loading, setLoading] = useState(false);
   const [failedPatients, setFailedPatients] = useState([]);
   const [failedCitasPatients, setFailedCitasPatients] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredContratas, setFilteredContratas] = useState([]);
+  const [selectedContrata, setSelectedContrata] = useState(null);
+ 
+  const [searchTermEmpresa, setSearchTermEmpresa] = useState('');
+  const [filteredEmpresas, setFilteredEmpresas] = useState([]);
+  const [selectedEmpresa, setSelectedEmpresa] = useState(null);
+  const [empresa, setEmpresa] = useState('');
   
   useEffect(() => {
-    // Validación de datos al cargar o cambiar datos
+    if (searchTermEmpresa) {
+      setFilteredEmpresas(
+        Empresas.filter((option) =>
+          option.razonSocial.toLowerCase().includes(searchTermEmpresa.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredEmpresas([]);
+    }
+  }, [searchTermEmpresa, Empresas]);
+  
+  const handleEmpresaSearch = (e) => {
+    setSearchTermEmpresa(e.target.value);
+  };
+  
+  const handleSelectEmpresa = (option) => {
+    setSelectedEmpresa(option.razonSocial);
+    setEmpresa(option.ruc);
+    setSearchTermEmpresa('');
+    setFilteredEmpresas([]);
+  };
+  useEffect(() => {
+    if (searchTerm) {
+      setFilteredContratas(
+        Contratas.filter((option) =>
+          option.razonSocial.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredContratas([]);
+    }
+  }, [searchTerm, Contratas]);
+
+  useEffect(() => {
     const validateData = () => {
       const errors = [];
 
@@ -44,7 +83,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
             errors.push({ rowIndex, title });
           }
 
-          // Validar celdas vacías
           if (value === '' || value === undefined || value === null) {
             errors.push({ rowIndex, title, empty: true });
           }
@@ -55,24 +93,23 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
     };
 
     validateData();
-  }, [data]); // Se ejecuta cuando cambia 'data'
+  }, [data]);
 
   const handleFileUpload = (event) => {
-    setData([])
+    setData([]);
     const file = event.target.files[0];
     const reader = new FileReader();
     reader.onload = (e) => {
       const binaryStr = e.target.result;
       const workbook = XLSX.read(binaryStr, { type: 'binary' });
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
+      const sheetName = workbook.sheetNames[0];
+      const worksheet = workbook.sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
-      const processedData = jsonData.map(row => {
+      const processedData = jsonData.map((row) => {
         if (row['FechaNacimiento']) {
-            // Convierte el número de serie en una fecha legible
-            const serialNumber = row['FechaNacimiento'];
-            const date = addDays(new Date(1899, 11, 30), serialNumber);
-            row['FechaNacimiento'] = format(date, 'dd/MM/yyyy');
+          const serialNumber = row['FechaNacimiento'];
+          const date = addDays(new Date(1899, 11, 30), serialNumber);
+          row['FechaNacimiento'] = format(date, 'dd/MM/yyyy');
         }
         return row;
       });
@@ -84,31 +121,28 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const validateCell = (colTitle, value) => {
-  switch (colTitle) {
-    case 'DNI':
-      const dniRegex = /^[0-9]{8}$/;
-      return dniRegex.test(value);
-    case 'Tipo de Documento':
-      // Validar que el valor esté dentro de los permitidos
-      const tiposDocumentoPermitidos = ['DNI', 'Pasaporte', 'Carnet Extra'];
-      return tiposDocumentoPermitidos.includes(value);
-    case 'Nombres':
-    case 'Apellidos':
-    case 'Ocupación':
-      const nombreRegex = /^[a-zA-Z áéíóúÁÉÍÓÚñÑ]+$/;
-      return nombreRegex.test(value);
-    case 'Sexo':
-      const sexoRegex = /^[MF]$/;
-      return sexoRegex.test(value);
-    case 'Correo':
-      const correoRegex = /@/;
-      return correoRegex.test(value);
-    default:
-      // Para cualquier otro caso que no sea DNI, CARNET EXT. o PASAPORTE, retornar true
-      return true;
-  }
-};
-
+    switch (colTitle) {
+      case 'DNI':
+        const dniRegex = /^[0-9]{8}$/;
+        return dniRegex.test(value);
+      case 'Tipo de Documento':
+        const tiposDocumentoPermitidos = ['DNI', 'Pasaporte', 'Carnet Extra'];
+        return tiposDocumentoPermitidos.includes(value);
+      case 'Nombres':
+      case 'Apellidos':
+      case 'Ocupación':
+        const nombreRegex = /^[a-zA-Z áéíóúÁÉÍÓÚñÑ]+$/;
+        return nombreRegex.test(value);
+      case 'Sexo':
+        const sexoRegex = /^[MF]$/;
+        return sexoRegex.test(value);
+      case 'Correo':
+        const correoRegex = /@/;
+        return correoRegex.test(value);
+      default:
+        return true;
+    }
+  };
 
   const handleOverlayClick = (event) => {
     if (event.target.className === 'ReactModal__Overlay') {
@@ -127,54 +161,51 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const handleCargaMasiva = async () => {
-    setLoading(true)
+    setLoading(true);
     let failedPatients = [];
-    let failedCitasPatients = []
+    let failedCitasPatients = [];
     const patientPromises = data.map(async (patient) => {
       try {
-          // Intentamos registrar el paciente
-          const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
-          console.log(res);
+        const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
+        console.log(res);
 
-          // Si el registro fue exitoso, registramos la cita
-          if (res.id) {
-            const rucEmpresa = empresa === '' ? null : Number(empresa);
-            const rucContrata = contrata === '' ? null : Number(contrata);
+        if (res.id) {
+          const rucEmpresa = empresa === '' ? null : Number(empresa);
+          const rucContrata = contrata === '' ? null : Number(contrata);
 
-              const datos = {
-                dni: patient.DNI,
-                fechaReserva: fechaReserva,
-                nomenSede: selectedSede,
-                rucEmpresa: rucEmpresa,
-                rucContrata: rucContrata   
-              }
-              
-              const cit = await SubmitCitas(datos, userlogued.sub, token);
-              console.log(cit)
-              if (!cit.idCitaOcupacional) {
-                failedCitasPatients.push(patient.DNI)
-              }
+          const datos = {
+            dni: patient.DNI,
+            celular: patient.Celular,
+            fechaReserva: fechaReserva,
+            nomenSede: selectedSede,
+            rucEmpresa: rucEmpresa,
+            rucContrata: rucContrata,
+          };
+
+          const cit = await SubmitCitas(datos, userlogued.sub, token);
+          if (!cit.idCitaOcupacional) {
+            failedCitasPatients.push(patient.DNI);
           }
+        }
       } catch (error) {
-          console.log('Ocurrió un error al registrar el paciente:', patient.DNI, error);
-          // Añadimos el paciente a la lista de fallidos
-          failedPatients.push(patient);
+        console.log('Ocurrió un error al registrar el paciente:', patient.DNI, error);
+        failedPatients.push(patient);
       }
     });
-    
-    await Promise.all(patientPromises)
-    setLoading(false)
+
+    await Promise.all(patientPromises);
+    setLoading(false);
     setFailedPatients(failedPatients);
     setFailedCitasPatients(failedCitasPatients);
     if (failedPatients.length > 0 || failedCitasPatients.length > 0) {
       let errorMessage = '';
-    
+
       if (failedPatients.length > 0) {
         errorMessage += `No se pudo registrar a los siguientes pacientes DNI: ${failedPatients.join(', ')}`;
       }
-    
+
       if (failedCitasPatients.length > 0) {
-        if (errorMessage) errorMessage += '\n'; // Añadir un salto de línea si ya hay un mensaje de error
+        if (errorMessage) errorMessage += '\n';
         errorMessage += `No se pudo registrar citas para los siguientes pacientes: ${failedCitasPatients.join(', ')}`;
       }
       Swal.fire({
@@ -183,10 +214,21 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         text: errorMessage,
       });
     } else {
-      Swal.fire({icon: 'success', title: 'Exito', text: 'Se realizo el registro masivo correctamente'})
+      Swal.fire({ icon: 'success', title: 'Exito', text: 'Se realizo el registro masivo correctamente' });
     }
-  }
- 
+  };
+
+  const handleContrataSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSelectContrata = (option) => {
+    setSelectedContrata(option.razonSocial);
+    setContrata(option.ruc);
+    setSearchTerm('');
+    setFilteredContratas([]);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -208,28 +250,80 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
             <h1 className="text-white w-full md:w-auto">
               <strong>Sede: </strong>{selectedSede}
             </h1>
-            {/* Selector de empresa */}
-            <select
-              value={empresa}
-              onChange={(e) => {setEmpresa(e.target.value)}}
-              className="border pointer rounded-lg bg-white text-black w-full md:w-[150px] px-3 py-1"
-            >
-              <option value="">Empresa</option>
-              {Empresas?.map((option, index) => (
-                <option key={index} value={option.ruc}>{option.razonSocial}</option>
-              ))}
-            </select>
+           {/* Selector de empresa */}
+            <div className="relative">
+              <div className="flex items-center space-x-2">
+                <label htmlFor="empresa" className="block w-36 text-white">Empresa:</label>
+                <input
+                  type="text"
+                  value={searchTermEmpresa}
+                  onChange={handleEmpresaSearch}
+                  placeholder="Seleccione"
+                  className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                />
+              </div>
+              {searchTermEmpresa && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md">
+                  <div className="max-h-48 overflow-y-auto">
+                    {filteredEmpresas.map((option, index) => (
+                      <div
+                        key={index}
+                        className="cursor-pointer p-2 hover:bg-gray-200"
+                        onClick={() => handleSelectEmpresa(option)}
+                      >
+                        {option.razonSocial}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Aquí muestra la empresa seleccionada */}
+              {(selectedEmpresa || empresa) && (
+                <div className="text-sm mt-1 flex items-center justify-center">
+                  Seleccionado: <strong>{selectedEmpresa}</strong>
+                </div>
+              )}
+            </div>
             {/* Selector de Contrata */}
-            <select
-              value={contrata}
-              onChange={(e) => {setContrata(e.target.value)}}
-              className="border pointer rounded-lg bg-white text-black w-full md:w-[150px] px-3 py-1"
-            >
-              <option value="">Contrata</option>
-              {Contratas?.map((option, index) => (
-                <option key={index} value={option.ruc}>{option.razonSocial}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <div className="flex items-center space-x-2">
+                <label htmlFor="contrata" className="block w-36 text-white">Contrata:</label>
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleContrataSearch}
+                  placeholder="Seleccione"
+                  className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                />
+              </div>
+              {searchTerm && (
+                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md">
+                  <div className="max-h-48 overflow-y-auto">
+                    {filteredContratas.map((option, index) => (
+                      <div
+                        key={index}
+                        className="cursor-pointer p-2 hover:bg-gray-200"
+                        onClick={() => handleSelectContrata(option)}
+                      >
+                        {option.razonSocial}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(selectedContrata || contrata) && (
+                <div className="text-sm mt-1 flex items-center justify-center">
+                  Seleccionado: <strong>{selectedContrata}</strong>
+                </div>
+              )}
+            </div>
+
+
+
+
+
             {/* Calendario de Fecha de Reserva */}
             <label htmlFor="" className="w-full md:w-auto">
               <p className="text-white">Fecha de Reserva:</p>
