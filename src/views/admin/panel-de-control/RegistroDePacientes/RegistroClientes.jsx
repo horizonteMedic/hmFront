@@ -154,6 +154,7 @@ const RegistroClientes = (props) => {
           Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
         } else {
           setDatos(res);
+          setSelectedProfesion(res.ocupacionPa)
           Swal.close(); // Cerrar el mensaje de carga
         }
       })
@@ -162,7 +163,9 @@ const RegistroClientes = (props) => {
       });
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -179,6 +182,7 @@ const RegistroClientes = (props) => {
           Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
         } else {
           Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
+          handleLimpiar()
         }
         
       })
@@ -208,6 +212,7 @@ const RegistroClientes = (props) => {
       celPa: '',
       apellidosPa: '',
     });
+    setSelectedProfesion('')
   };
   
   return (
@@ -351,9 +356,9 @@ const RegistroClientes = (props) => {
           )}
         </div>
 
-        {selectedProfesion || datos.ocupacionPa && (
+        {selectedProfesion  && (
           <div className="text-sm mt-1 flex items-center justify-center">
-            Seleccionado: <strong>{selectedProfesion ? selectedProfesion : datos.ocupacionPa}</strong>
+            Seleccionado: <strong>{selectedProfesion}</strong>
           </div>
         )}
         

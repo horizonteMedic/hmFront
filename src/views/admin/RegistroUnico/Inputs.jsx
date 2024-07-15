@@ -76,3 +76,44 @@ export const InputSelect = (props) => {
         </div>
     );
 };
+
+export const InputSearch = (props) => {
+    const { label, name, value, handleChange, searchTerm, selected, handleSelectProfesion, selectedProfesion } = props;
+   
+    return (
+        <div className="h-full">
+            <label htmlFor={name} className="font-semibold text-white" style={{ fontSize: '15px' }}>
+                {label}:
+            </label>
+            <div className="relative">
+                <input 
+                    type="text" 
+                    id={name} 
+                    name={name} 
+                    value={value} 
+                    autoComplete='off'
+                    onChange={handleChange} 
+                    className="text-black form-input border rounded w-full h-10  py-4 px-2" 
+                />
+                {searchTerm && (
+                    <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+                    {selected.map((option, index) => (
+                        <div
+                        key={index}
+                        className="cursor-pointer p-2 hover:bg-gray-200"
+                        onClick={() => handleSelectProfesion(option)}
+                        >
+                        {option.descripcion}
+                        </div>
+                    ))}
+                    </div>
+                )}
+            </div>
+            {selectedProfesion  && (
+                <div className="text-sm mt-1 flex items-center justify-center text-white">
+                    Seleccionado: <strong>{selectedProfesion}</strong>
+                </div>
+                )}
+        </div>
+    )
+}
