@@ -96,7 +96,7 @@ export const InputSearch = (props) => {
                     className="text-black form-input border rounded w-full h-10  py-4 px-2" 
                 />
                 {searchTerm && (
-                    <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+                    <div className="border border-gray-300 bg-white rounded-md mt-1 max-h-48 overflow-y-auto">
                     {selected.map((option, index) => (
                         <div
                         key={index}
