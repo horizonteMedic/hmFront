@@ -196,7 +196,7 @@ const Formulario = () => {
     .then((res) => {
       console.log(res)
       if (!res.codPa) {
-        Swal.fire('Error', 'No se ha podido encontrar al Paciente', 'error');
+        Swal.fire('Sin Registro', 'No hay Registro. Registrese por favor', 'info');
         return
       } 
       setDatos({...datos,
