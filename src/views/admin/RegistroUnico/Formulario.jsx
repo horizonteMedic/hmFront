@@ -8,7 +8,7 @@ import { SubmitRegistrarPaciente } from './model/SubmitPaciente';
 import { SearchPacienteDNI } from './model/SearchDNI';
 import Swal from 'sweetalert2';
 
-import {InputSelect, InputText} from './Inputs'
+import {InputSelect, InputText, InputSearch} from './Inputs'
 
 const Formulario = () => {
   const [stardate, setStartDate] = useState(new Date());
@@ -43,6 +43,10 @@ const Formulario = () => {
     Distrito: []
   })
   const [step, setStep] = useState(1);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredProfesiones, setFilteredProfesiones] = useState([]);
+  const [selectedProfesion, setSelectedProfesion] = useState('');
 
   useEffect(() => {
     LoginA('Pacientes','123456')
@@ -118,6 +122,31 @@ const Formulario = () => {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [alertaMostrada]);
 
+  const handleProfesionSearch = (e) => {
+    const value = e.target.value;
+    console.log(value)
+    setSearchTerm(value);
+
+    if (value) {
+      const filteredOptions = lists.Profesion.filter(option =>
+        option.descripcion.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredProfesiones(filteredOptions);
+    } else {
+      setFilteredProfesiones([]);
+    }
+  };
+
+  const handleSelectProfesion = (profesion) => {
+    setSelectedProfesion(profesion.descripcion);
+    setDatos({
+      ...datos,
+      profesion: profesion.descripcion,
+    });
+    setSearchTerm('');
+    setFilteredProfesiones([]);
+  };
+
   const filterProvincias = lists.Provincia.filter(provincia => {
     if (datos.departamento && provincia.idDepartamento === datos.departamento.id) {
       return true;
@@ -169,19 +198,6 @@ const Formulario = () => {
     }
 };
 
-  
-  const handleDateChange = (date) => {
-    const formattedDate = formatDate(date);
-    setStartDate(date);
-    setDatos({ ...datos, fechaNacimiento: formattedDate });
-  };
-
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -220,6 +236,7 @@ const Formulario = () => {
         telefono: res.telCasaPa,
         celular: res.celPa
       })
+      setSelectedProfesion(res.ocupacionPa)
       Swal.close()
     })
     .catch(() => {
@@ -245,6 +262,8 @@ const Formulario = () => {
         Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
       } else {
         Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
+        handleLimpiar()
+        setStep(1)
       }
     })
     .catch(() => {
@@ -275,6 +294,28 @@ const Formulario = () => {
       default:
         return true;
     }
+  };
+
+  const handleLimpiar = () => {
+    setDatos({
+      dni:'',
+    nombres: '',
+    apellidos: '',
+    fechaNacimiento: '',
+    sexo: '',
+    email: '',
+    lugarNacimiento: '',
+    nivelEstudio: '',
+    profesion: '',
+    estadoCivil: '',
+    direccion: '',
+    departamento: '',
+    provincia: '',
+    distrito: '',
+    caserio: '',
+    telefono: '',
+    celular: ''
+    });
   };
 
   return (
@@ -314,7 +355,7 @@ const Formulario = () => {
                   <DatePicker
                     id='fechaNacimiento'
                     selected={datos.fechaNacimiento}
-                    onChange={handleDateChange}
+                    onChange={date => setDatos({...datos, fechaNacimiento: date})}
                     className="form-input border rounded w-full h-10 px-2"
                     dateFormat="dd/MM/yyyy"
                     showYearDropdown
@@ -335,7 +376,8 @@ const Formulario = () => {
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <InputText label='Lugar de Nacimiento' name='lugarNacimiento' value={datos.lugarNacimiento} handleChange={handleChange} />
                 <InputSelect label='Nivel de Estudios'  name='nivelEstudio' value={datos.nivelEstudio} selected={lists.NivelE} handleChange={handleChange} />
-                <InputSelect label='Profesión' name='profesion' value={datos.profesion} selected={lists.Profesion} handleChange={handleChange} />
+                <InputSearch label='Profesion' name='profesion' value={searchTerm} handleChange={handleProfesionSearch} searchTerm={searchTerm} selected={filteredProfesiones} handleSelectProfesion={handleSelectProfesion}
+                selectedProfesion={selectedProfesion}/>
                 <InputSelect label='Estado Civil' name='estadoCivil' value={datos.estadoCivil} handleChange={handleChange} />
                 <InputText label='Dirección' name='direccion' value={datos.direccion} handleChange={handleChange} />
               </div>

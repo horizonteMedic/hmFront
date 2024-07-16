@@ -154,6 +154,7 @@ const RegistroClientes = (props) => {
           Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
         } else {
           setDatos(res);
+          setSelectedProfesion(res.ocupacionPa)
           Swal.close(); // Cerrar el mensaje de carga
         }
       })
@@ -162,7 +163,9 @@ const RegistroClientes = (props) => {
       });
   };
   
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -179,6 +182,7 @@ const RegistroClientes = (props) => {
           Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
         } else {
           Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
+          handleLimpiar()
         }
         
       })
@@ -208,6 +212,7 @@ const RegistroClientes = (props) => {
       celPa: '',
       apellidosPa: '',
     });
+    setSelectedProfesion('')
   };
   
   return (
@@ -263,10 +268,13 @@ const RegistroClientes = (props) => {
         onChange={date => setDatos({...datos, fechaNaciminetoPa: date})}
         dateFormat="dd/MM/yyyy"
         showYearDropdown
-        yearDropdownItemNumber={15} // Número de años a mostrar
+        yearDropdownItemNumber={200} // Ajusta según la cantidad de años necesarios
+        minDate={new Date("1800-01-01")} // Establece la fecha mínima permitida
         scrollableYearDropdown // Hacer el dropdown scrollable
         className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
       />
+      <label htmlFor='fechaNacimiento' className="text-gray-500 text-sm block mt-2">Formato: Día/Mes/Año</label>
+
     </div>
         <div className="flex items-center space-x-2">
           <label htmlFor="sexo" name="sexo" className="block w-36">Sexo:</label>
@@ -351,9 +359,9 @@ const RegistroClientes = (props) => {
           )}
         </div>
 
-        {selectedProfesion || datos.ocupacionPa && (
+        {selectedProfesion  && (
           <div className="text-sm mt-1 flex items-center justify-center">
-            Seleccionado: <strong>{selectedProfesion ? selectedProfesion : datos.ocupacionPa}</strong>
+            Seleccionado: <strong>{selectedProfesion}</strong>
           </div>
         )}
         

@@ -36,7 +36,7 @@ export function SubmitMasivoRegistarPaciente(data,sede,token) {
     horaRegistroPa: `${hours}:${minutes}:${seconds}`,
     tipoDoc: 1
   };    
-  console.log(JSON.stringify(body))
+
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}`
     const options = {
