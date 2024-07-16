@@ -286,11 +286,11 @@ const Formulario = () => {
   const validateStep = () => {
     switch (step) {
       case 1:
-        return datos.dni && datos.nombres && datos.apellidos && datos.fechaNacimiento && datos.email;
+        return datos.dni && datos.nombres && datos.apellidos && datos.fechaNacimiento ;
       case 2:
         return datos.lugarNacimiento && datos.nivelEstudio && datos.profesion && datos.estadoCivil && datos.direccion;
       case 3:
-        return datos.departamento && datos.provincia && datos.distrito && datos.caserio && datos.telefono && datos.celular;
+        return datos.departamento && datos.provincia && datos.distrito && datos.celular;
       default:
         return true;
     }

@@ -32,7 +32,10 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
     'Distrito',
     'Caserio',
     'Telefono',
-    'Celular'
+    'Celular',
+    'Area',
+    'Cargo',
+    'TipoExamen'
   ];
 
   const [data, setData] = useState([]);
@@ -107,11 +110,16 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         columnTitles.forEach((title) => {
           const value = row[title];
           if (!validateCell(title, value)) {
+            console.log(value)
             errors.push({ rowIndex, title });
           }
 
           // Validar celdas vacías
           if (value === '' || value === undefined || value === null) {
+            if (title === 'Email' || title === 'Caserio' || title === 'Telefono') {
+              return
+            }
+            console.log(title)
             errors.push({ rowIndex, title, empty: true });
           }
         });
@@ -164,9 +172,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       case 'Sexo':
         const sexoRegex = /^[MF]$/;
         return sexoRegex.test(value);
-      case 'Correo':
-        const correoRegex = /@/;
-        return correoRegex.test(value);
       default:
         // Para cualquier otro caso que no sea DNI, CARNET EXT. o PASAPORTE, retornar true
         return true;
@@ -203,17 +208,22 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
-          console.log(res)
+          console.log(patient)
           const datos = {
             dni: patient.DNI,
             celular: patient.Celular,
             fechaReserva: fechaReserva,
             nomenSede: selectedSede,
             rucEmpresa: rucEmpresa,
-            rucContrata: rucContrata
+            rucContrata: rucContrata,
+            cargo: patient.Cargo,
+            area: patient.Area,
+            tipoExamen: patient.TipoExamen
           };
+          console.log(datos)
 
           const cit = await SubmitCitas(datos, userlogued.sub, token);
+          console.log(cit)
           if (!cit.idCitaOcupacional) {
             failedCitasPatients.push(patient.DNI);
           }

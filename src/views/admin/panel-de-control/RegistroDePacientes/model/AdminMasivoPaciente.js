@@ -71,9 +71,12 @@ export function SubmitCitas(data,user,token) {
         fechaRegistro: `${year}-${month}-${day}`,
         userRegistro: user,
         fechaActualizacion: null,
-        userActualizacion: null
+        userActualizacion: null,
+        cargo: data.cargo,
+        area: data.area,
+        tipoExamen: data.tipoExamen
     }
-
+    console.log(data)
     const url = `${URLAzure}/api/v01/ct/ocupacional/citaOcupacional`
     const options = {
         method: 'POST',
