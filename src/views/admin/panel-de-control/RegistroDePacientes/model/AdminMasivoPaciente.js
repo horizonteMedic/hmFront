@@ -76,7 +76,6 @@ export function SubmitCitas(data,user,token) {
         area: data.area,
         tipoExamen: data.tipoExamen
     }
-    console.log(data)
     const url = `${URLAzure}/api/v01/ct/ocupacional/citaOcupacional`
     const options = {
         method: 'POST',
@@ -87,7 +86,6 @@ export function SubmitCitas(data,user,token) {
         body: JSON.stringify(body)
     }
     return fetch(url,options).then(res =>  {
-        console.log(res)
         if (!res.ok) {
             return res
         } return res.json()}).then(response => response) 

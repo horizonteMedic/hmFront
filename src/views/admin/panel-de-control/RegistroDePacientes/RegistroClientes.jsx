@@ -149,7 +149,6 @@ const RegistroClientes = (props) => {
   
     SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
       .then(res => {
-        console.log(res);
         if (!res.codPa) {
           Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
         } else {

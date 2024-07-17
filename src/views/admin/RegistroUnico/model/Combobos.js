@@ -8,7 +8,6 @@ export function ComboboxNivelE(token) {
             },
             })
         .then(res => {
-            console.log(res)
             if (!res.ok) {
                 return res
         }  return res.json()
@@ -25,7 +24,6 @@ export function ComboboxProfesion(token) {
         },
         })
     .then(res => {
-        console.log(res)
         if (!res.ok) {
             return res
     }  return res.json()
@@ -42,7 +40,6 @@ export function ComboboxDepartamento(token) {
         },
         })
     .then(res => {
-        console.log(res)
         if (!res.ok) {
             return res
     }  return res.json()
@@ -59,7 +56,6 @@ export function ComboboxProvincia(token) {
         },
         })
     .then(res => {
-        console.log(res)
         if (!res.ok) {
             return res
     }  return res.json()
@@ -76,7 +72,6 @@ export function ComboboxDistrito(token) {
         },
         })
     .then(res => {
-        console.log(res)
         if (!res.ok) {
             return res
     }  return res.json()

@@ -124,7 +124,6 @@ const Formulario = () => {
 
   const handleProfesionSearch = (e) => {
     const value = e.target.value;
-    console.log(value)
     setSearchTerm(value);
 
     if (value) {
@@ -213,7 +212,6 @@ const Formulario = () => {
     });
     SearchPacienteDNI(datos.dni, token)
     .then((res) => {
-      console.log(res)
       if (!res.codPa) {
         Swal.fire('Sin Registro', 'No hay Registro. Registrese por favor', 'info');
         return
@@ -257,7 +255,6 @@ const Formulario = () => {
     });
     SubmitRegistrarPaciente(datos,token)
     .then((res) => {
-      console.log(res)
       if (!res.id) {
         Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
       } else {

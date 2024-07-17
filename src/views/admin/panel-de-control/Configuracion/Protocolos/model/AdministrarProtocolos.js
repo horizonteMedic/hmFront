@@ -147,7 +147,6 @@ export function DeleteServicioProtocolo (id,token){
           }
       }
       return fetch(url,options).then(res =>  {
-        console.log(res)
           if (!res.ok) {
               return res
           } return res.json()}).then(response => response) 

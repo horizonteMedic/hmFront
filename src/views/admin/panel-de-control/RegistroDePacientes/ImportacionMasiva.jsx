@@ -110,7 +110,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         columnTitles.forEach((title) => {
           const value = row[title];
           if (!validateCell(title, value)) {
-            console.log(value)
             errors.push({ rowIndex, title });
           }
 
@@ -119,7 +118,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
             if (title === 'Email' || title === 'Caserio' || title === 'Telefono') {
               return
             }
-            console.log(title)
             errors.push({ rowIndex, title, empty: true });
           }
         });
@@ -150,7 +148,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         return row;
       });
 
-      console.log(processedData);
       setData(processedData);
     };
     reader.readAsBinaryString(file);
@@ -191,7 +188,7 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const handleDownloadExcelTemplate = () => {
-    window.open('https://docs.google.com/spreadsheets/d/1sIK2ITY4OIPqnY8T0CdBJ3Ou2gbI_gtK/edit?usp=drive_link&ouid=110131358210789779317&rtpof=true&sd=true', '_blank');
+    window.open('https://docs.google.com/spreadsheets/d/1pNIbJ-7wDCw543u7XILFP0SKKkSNS7Vj/edit?usp=drive_link&ouid=110131358210789779317&rtpof=true&sd=true', '_blank');
   };
   
   const handleCargaMasiva = async () => {
@@ -202,13 +199,11 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       try {
         // Intentamos registrar el paciente
         const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
-        console.log(res);
 
         // Si el registro fue exitoso, registramos la cita
         if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
-          console.log(patient)
           const datos = {
             dni: patient.DNI,
             celular: patient.Celular,
@@ -220,10 +215,8 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
             area: patient.Area,
             tipoExamen: patient.TipoExamen
           };
-          console.log(datos)
 
           const cit = await SubmitCitas(datos, userlogued.sub, token);
-          console.log(cit)
           if (!cit.idCitaOcupacional) {
             failedCitasPatients.push(patient.DNI);
           }

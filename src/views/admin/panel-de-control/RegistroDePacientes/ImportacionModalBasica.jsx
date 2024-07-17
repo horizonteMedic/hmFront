@@ -127,8 +127,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         }
         return row;
       });
-
-      console.log(processedData);
       setData(processedData);
     };
     reader.readAsBinaryString(file);
@@ -183,13 +181,12 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       try {
         // Intentamos registrar el paciente
         const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
-        console.log(res);
 
         // Si el registro fue exitoso, registramos la cita
         if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
-
+          
           const datos = {
             dni: patient.DNI,
             celular: patient.Celular,
