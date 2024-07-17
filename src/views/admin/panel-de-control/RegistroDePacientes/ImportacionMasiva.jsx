@@ -188,7 +188,7 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const handleDownloadExcelTemplate = () => {
-    window.open('https://docs.google.com/spreadsheets/d/1pNIbJ-7wDCw543u7XILFP0SKKkSNS7Vj/edit?usp=drive_link&ouid=110131358210789779317&rtpof=true&sd=true', '_blank');
+    window.open('https://docs.google.com/spreadsheets/d/1ykPp7jokwtdGgm-z57kG8DvVX5qis0uk/edit?usp=drive_link&ouid=110131358210789779317&rtpof=true&sd=true', '_blank');
   };
   
   const handleCargaMasiva = async () => {
