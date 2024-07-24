@@ -200,6 +200,7 @@ const Formulario = () => {
   const handleSearchDNIAPI = (dni) => {
     SearchPacienteDNIAPIREST(dni)
     .then((res) => {
+      console.log(res)
       const fechaNacimiento = res.data.fecha_nacimiento;
       const [day, month, year] = fechaNacimiento.split('/');
       const formattedDate = `${year}-${month}-${day}`;
@@ -338,7 +339,11 @@ const Formulario = () => {
     celular: ''
     });
   };
-
+  console.log(datos)
+  console.log(typeof datos.provincia === 'string'
+    ? JSON.stringify(lists.Provincia.find(d => d.nombre.trim() == datos.provincia)) 
+    : JSON.stringify(datos.provincia))
+ 
   return (
     <div style={{ position: 'relative' }}>
       <div className="background-image" />
@@ -408,7 +413,7 @@ const Formulario = () => {
                   ? JSON.stringify(lists.Departamento.find(d => d.nombre === datos.departamento)) || ''
                   : JSON.stringify(datos.departamento)} selected={lists.Departamento} handleChange={handleChange} />
                 <InputSelect label='Provincia' name='provincia' value={typeof datos.provincia === 'string'
-                  ? JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) 
+                  ? JSON.stringify(lists.Provincia.find(d => d.nombre.trim() === datos.provincia)) 
                   : JSON.stringify(datos.provincia)} selected={!datos.provincia ? filterProvincias : lists.Provincia} handleChange={handleChange} />
                 <InputSelect label='Distrito' name='distrito' value={typeof datos.distrito === 'string'
                   ? JSON.stringify(lists.Distrito.find(d => d.nombre === datos.distrito)) 

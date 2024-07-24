@@ -34,7 +34,7 @@ export const InputText = (props) => {
 
 export const InputSelect = (props) => {
     const { label, name, value, handleChange, selected } = props;
-
+    console.log(value)
     return (
         <div className="h-full">
             <label htmlFor={name} className="font-semibold text-white" style={{ fontSize: '15px' }}>
