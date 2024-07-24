@@ -19,7 +19,7 @@ const Formulario = () => {
     apellidos: '',
     fechaNacimiento: '',
     sexo: '',
-    email: '',
+    email: null,
     lugarNacimiento: '',
     nivelEstudio: '',
     profesion: '',
@@ -28,7 +28,7 @@ const Formulario = () => {
     departamento: '',
     provincia: '',
     distrito: '',
-    caserio: '',
+    caserio: null,
     telefono: '',
     celular: ''
   });
@@ -300,7 +300,7 @@ const Formulario = () => {
     apellidos: '',
     fechaNacimiento: '',
     sexo: '',
-    email: '',
+    email: null,
     lugarNacimiento: '',
     nivelEstudio: '',
     profesion: '',
@@ -309,7 +309,7 @@ const Formulario = () => {
     departamento: '',
     provincia: '',
     distrito: '',
-    caserio: '',
+    caserio: null,
     telefono: '',
     celular: ''
     });
@@ -366,7 +366,6 @@ const Formulario = () => {
 
                 </div>
                 <InputSelect  label='Sexo' name='sexo' value={datos.sexo} handleChange={handleChange} />
-                <InputText  label='Email' name='email' value={datos.email} handleChange={handleChange} />
               </div>
             )}
             {step === 2 && (
@@ -390,7 +389,6 @@ const Formulario = () => {
                 <InputSelect label='Distrito' name='distrito' value={typeof datos.distrito === 'string'
                   ? JSON.stringify(lists.Distrito.find(d => d.nombre === datos.distrito)) 
                   : JSON.stringify(datos.distrito)} selected={!datos.distrito ? filterDistritos : lists.Distrito} handleChange={handleChange} />
-                <InputText  label='Caserío' name='caserio' value={datos.caserio} handleChange={handleChange} />
                 <InputText  label='Teléfono' name='telefono' value={datos.telefono} handleChange={handleChange} />
                 <InputText  label='Celular' name='celular' value={datos.celular} handleChange={handleChange} />
               </div>
