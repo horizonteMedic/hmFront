@@ -1,4 +1,4 @@
-import { URLAzure } from "../../../config/config"
+import { URLAzure, URLAPIREST, TokenURL } from "../../../config/config"
 //12.17
 
 export function SearchPacienteDNI(dni,token) {
@@ -12,6 +12,23 @@ export function SearchPacienteDNI(dni,token) {
           }
       }
       return fetch(url,options).then(res =>  {
+          if (!res.ok) {
+              return res
+          } return res.json()}).then(response => response) 
+  }
+
+export function SearchPacienteDNIAPIREST(dni) {
+    
+    const url = `${URLAPIREST}/dni/${dni}`
+      const options = {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${TokenURL}`
+          }
+      }
+      return fetch(url,options).then(res =>  {
+        console.log(res,1)
           if (!res.ok) {
               return res
           } return res.json()}).then(response => response) 

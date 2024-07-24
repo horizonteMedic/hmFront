@@ -5,7 +5,7 @@ import './Formulario.css'
 import LoginA from './model/LoginA';
 import { ComboboxNivelE, ComboboxProfesion, ComboboxDepartamento, ComboboxDistrito, ComboboxProvincia } from './model/Combobos';
 import { SubmitRegistrarPaciente } from './model/SubmitPaciente';
-import { SearchPacienteDNI } from './model/SearchDNI';
+import { SearchPacienteDNI, SearchPacienteDNIAPIREST } from './model/SearchDNI';
 import Swal from 'sweetalert2';
 
 import {InputSelect, InputText, InputSearch} from './Inputs'
@@ -195,8 +195,19 @@ const Formulario = () => {
             setDatos({...datos, [name]: value});
         }
     }
-};
+  };
 
+  const handleSearchDNIAPI = (dni) => {
+    SearchPacienteDNIAPIREST(dni)
+    .then(() => {
+      console.log(res)
+      Swal.close()
+    })
+    .catch((error) => {
+      console.log(error)
+      Swal.fire('Error', 'Ocurrio un error al realizar la consulta', 'error');
+    })
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -213,7 +224,7 @@ const Formulario = () => {
     SearchPacienteDNI(datos.dni, token)
     .then((res) => {
       if (!res.codPa) {
-        Swal.fire('Sin Registro', 'No hay Registro. Registrese por favor', 'info');
+        handleSearchDNIAPI(datos.dni)
         return
       } 
       setDatos({...datos,
