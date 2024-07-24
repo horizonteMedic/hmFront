@@ -199,8 +199,21 @@ const Formulario = () => {
 
   const handleSearchDNIAPI = (dni) => {
     SearchPacienteDNIAPIREST(dni)
-    .then(() => {
-      console.log(res)
+    .then((res) => {
+      const fechaNacimiento = res.data.fecha_nacimiento;
+      const [day, month, year] = fechaNacimiento.split('/');
+      const formattedDate = `${year}-${month}-${day}`;
+      setDatos({...datos,
+        nombres: res.data.nombres,
+        apellidos: `${res.data.apellido_paterno} ${res.data.apellido_materno}`,
+        fechaNacimiento: formattedDate,
+        sexo: res.data.sexo,
+        estadoCivil: res.data.estado_civil,
+        direccion: res.data.direccion,
+        departamento: res.data.departamento,
+        provincia: res.data.provincia,
+        distrito: res.data.distrito,      
+      })
       Swal.close()
     })
     .catch((error) => {

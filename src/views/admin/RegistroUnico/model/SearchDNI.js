@@ -19,12 +19,11 @@ export function SearchPacienteDNI(dni,token) {
 
 export function SearchPacienteDNIAPIREST(dni) {
     
-    const url = `${URLAPIREST}/dni/${dni}`
+    const url = `${URLAzure}/api/v01/st/registros/consumoApis/${dni}`
       const options = {
           method: 'GET',
           headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${TokenURL}`
           }
       }
       return fetch(url,options).then(res =>  {
