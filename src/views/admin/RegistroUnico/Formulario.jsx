@@ -345,9 +345,9 @@ const Formulario = () => {
     : JSON.stringify(datos.provincia))
  
   return (
-    <div style={{ position: 'relative' }}>
+    <div style={{ position: 'relative' , }}>
       <div className="background-image" />
-      <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative', zIndex: 1 }} className="min-h-screen flex justify-center items-center">
+      <div style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', position: 'relative', zIndex: 1 ,padding:'1em'}} className="min-h-screen flex justify-center items-center">
         <div className="bg-[#144579] p-8 rounded shadow-md w-full sm:w-3/4 lg:w-1/2">
           <h2 className="text-xl font-bold mb-4 text-white">Formulario de Registro</h2>
           <div className="flex justify-end text-white mb-2">

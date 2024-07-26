@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
@@ -90,30 +91,25 @@ export const InputSearch = (props) => {
                     type="text" 
                     id={name} 
                     name={name} 
-                    value={value} 
+                    value={selectedProfesion || value} 
                     autoComplete='off'
                     onChange={handleChange} 
-                    className="text-black form-input border rounded w-full h-10  py-4 px-2" 
+                    className="text-black form-input border rounded w-full h-10 py-4 px-2" 
                 />
                 {searchTerm && (
                     <div className="border border-gray-300 bg-white rounded-md mt-1 max-h-48 overflow-y-auto">
-                    {selected.map((option, index) => (
-                        <div
-                        key={index}
-                        className="cursor-pointer p-2 hover:bg-gray-200"
-                        onClick={() => handleSelectProfesion(option)}
-                        >
-                        {option.descripcion}
-                        </div>
-                    ))}
+                        {selected.map((option, index) => (
+                            <div
+                                key={index}
+                                className="cursor-pointer p-2 hover:bg-gray-200"
+                                onClick={() => handleSelectProfesion(option)}
+                            >
+                                {option.descripcion}
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
-            {selectedProfesion  && (
-                <div className="text-sm mt-1 flex items-center justify-center text-white">
-                    Seleccionado: <strong>{selectedProfesion}</strong>
-                </div>
-                )}
         </div>
     )
 }
