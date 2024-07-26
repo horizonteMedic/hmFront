@@ -5,7 +5,7 @@ html {
 }
 
 .background-image {
-    background-image: url('https://www.mediasource.mx/hubfs/blog-files/fondos-web.jpg') !important;
+    background-color: white;
     background-size: cover !important;
     background-position: center !important;
     position: absolute !important;

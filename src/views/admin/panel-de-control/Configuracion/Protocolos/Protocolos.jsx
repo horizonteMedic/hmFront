@@ -266,7 +266,6 @@ const Protocolos = () => {
   }
 
   const handleDelete = async () => {  
-    console.log(ProtocoloEdit)
     if (!ProtocoloEdit.idProtocolo) {
       Swal.fire('Error', 'Tiene que escojer un Protocolo de la Lista', 'error');
     }

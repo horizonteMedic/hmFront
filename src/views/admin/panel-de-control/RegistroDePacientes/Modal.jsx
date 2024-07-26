@@ -12,7 +12,6 @@ const Modal = (props) => {
   useEffect(() => {
     SubmitDetalleCita(props.user, props.token)
       .then((res) => {
-        console.log(res);
         setData(res);
         setFilteredData(res); // Inicialmente mostrar todos los datos
       })

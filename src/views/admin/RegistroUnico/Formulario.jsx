@@ -5,7 +5,7 @@ import './Formulario.css'
 import LoginA from './model/LoginA';
 import { ComboboxNivelE, ComboboxProfesion, ComboboxDepartamento, ComboboxDistrito, ComboboxProvincia } from './model/Combobos';
 import { SubmitRegistrarPaciente } from './model/SubmitPaciente';
-import { SearchPacienteDNI } from './model/SearchDNI';
+import { SearchPacienteDNI, SearchPacienteDNIAPIREST } from './model/SearchDNI';
 import Swal from 'sweetalert2';
 
 import {InputSelect, InputText, InputSearch} from './Inputs'
@@ -19,7 +19,7 @@ const Formulario = () => {
     apellidos: '',
     fechaNacimiento: '',
     sexo: '',
-    email: '',
+    email: null,
     lugarNacimiento: '',
     nivelEstudio: '',
     profesion: '',
@@ -28,7 +28,7 @@ const Formulario = () => {
     departamento: '',
     provincia: '',
     distrito: '',
-    caserio: '',
+    caserio: null,
     telefono: '',
     celular: ''
   });
@@ -124,7 +124,6 @@ const Formulario = () => {
 
   const handleProfesionSearch = (e) => {
     const value = e.target.value;
-    console.log(value)
     setSearchTerm(value);
 
     if (value) {
@@ -196,8 +195,33 @@ const Formulario = () => {
             setDatos({...datos, [name]: value});
         }
     }
-};
+  };
 
+  const handleSearchDNIAPI = (dni) => {
+    SearchPacienteDNIAPIREST(dni)
+    .then((res) => {
+      console.log(res)
+      const fechaNacimiento = res.data.fecha_nacimiento;
+      const [day, month, year] = fechaNacimiento.split('/');
+      const formattedDate = `${year}-${month}-${day}`;
+      setDatos({...datos,
+        nombres: res.data.nombres,
+        apellidos: `${res.data.apellido_paterno} ${res.data.apellido_materno}`,
+        fechaNacimiento: formattedDate,
+        sexo: res.data.sexo,
+        estadoCivil: res.data.estado_civil,
+        direccion: res.data.direccion,
+        departamento: res.data.departamento,
+        provincia: res.data.provincia,
+        distrito: res.data.distrito,      
+      })
+      Swal.close()
+    })
+    .catch((error) => {
+      console.log(error)
+      Swal.fire('Error', 'Ocurrio un error al realizar la consulta', 'error');
+    })
+  }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -213,9 +237,8 @@ const Formulario = () => {
     });
     SearchPacienteDNI(datos.dni, token)
     .then((res) => {
-      console.log(res)
       if (!res.codPa) {
-        Swal.fire('Sin Registro', 'No hay Registro. Registrese por favor', 'info');
+        handleSearchDNIAPI(datos.dni)
         return
       } 
       setDatos({...datos,
@@ -257,7 +280,6 @@ const Formulario = () => {
     });
     SubmitRegistrarPaciente(datos,token)
     .then((res) => {
-      console.log(res)
       if (!res.id) {
         Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
       } else {
@@ -286,11 +308,11 @@ const Formulario = () => {
   const validateStep = () => {
     switch (step) {
       case 1:
-        return datos.dni && datos.nombres && datos.apellidos && datos.fechaNacimiento && datos.email;
+        return datos.dni && datos.nombres && datos.apellidos && datos.fechaNacimiento ;
       case 2:
         return datos.lugarNacimiento && datos.nivelEstudio && datos.profesion && datos.estadoCivil && datos.direccion;
       case 3:
-        return datos.departamento && datos.provincia && datos.distrito && datos.caserio && datos.telefono && datos.celular;
+        return datos.departamento && datos.provincia && datos.distrito && datos.celular;
       default:
         return true;
     }
@@ -303,7 +325,7 @@ const Formulario = () => {
     apellidos: '',
     fechaNacimiento: '',
     sexo: '',
-    email: '',
+    email: null,
     lugarNacimiento: '',
     nivelEstudio: '',
     profesion: '',
@@ -312,12 +334,16 @@ const Formulario = () => {
     departamento: '',
     provincia: '',
     distrito: '',
-    caserio: '',
+    caserio: null,
     telefono: '',
     celular: ''
     });
   };
-
+  console.log(datos)
+  console.log(typeof datos.provincia === 'string'
+    ? JSON.stringify(lists.Provincia.find(d => d.nombre.trim() == datos.provincia)) 
+    : JSON.stringify(datos.provincia))
+ 
   return (
     <div style={{ position: 'relative' }}>
       <div className="background-image" />
@@ -369,7 +395,6 @@ const Formulario = () => {
 
                 </div>
                 <InputSelect  label='Sexo' name='sexo' value={datos.sexo} handleChange={handleChange} />
-                <InputText  label='Email' name='email' value={datos.email} handleChange={handleChange} />
               </div>
             )}
             {step === 2 && (
@@ -388,12 +413,11 @@ const Formulario = () => {
                   ? JSON.stringify(lists.Departamento.find(d => d.nombre === datos.departamento)) || ''
                   : JSON.stringify(datos.departamento)} selected={lists.Departamento} handleChange={handleChange} />
                 <InputSelect label='Provincia' name='provincia' value={typeof datos.provincia === 'string'
-                  ? JSON.stringify(lists.Provincia.find(d => d.nombre === datos.provincia)) 
+                  ? JSON.stringify(lists.Provincia.find(d => d.nombre.trim() === datos.provincia)) 
                   : JSON.stringify(datos.provincia)} selected={!datos.provincia ? filterProvincias : lists.Provincia} handleChange={handleChange} />
                 <InputSelect label='Distrito' name='distrito' value={typeof datos.distrito === 'string'
                   ? JSON.stringify(lists.Distrito.find(d => d.nombre === datos.distrito)) 
                   : JSON.stringify(datos.distrito)} selected={!datos.distrito ? filterDistritos : lists.Distrito} handleChange={handleChange} />
-                <InputText  label='Caserío' name='caserio' value={datos.caserio} handleChange={handleChange} />
                 <InputText  label='Teléfono' name='telefono' value={datos.telefono} handleChange={handleChange} />
                 <InputText  label='Celular' name='celular' value={datos.celular} handleChange={handleChange} />
               </div>

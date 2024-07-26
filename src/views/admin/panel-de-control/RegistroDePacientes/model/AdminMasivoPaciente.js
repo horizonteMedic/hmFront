@@ -36,7 +36,7 @@ export function SubmitMasivoRegistarPaciente(data,sede,token) {
     horaRegistroPa: `${hours}:${minutes}:${seconds}`,
     tipoDoc: 1
   };    
-  console.log(JSON.stringify(body))
+
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}`
     const options = {
@@ -71,9 +71,11 @@ export function SubmitCitas(data,user,token) {
         fechaRegistro: `${year}-${month}-${day}`,
         userRegistro: user,
         fechaActualizacion: null,
-        userActualizacion: null
+        userActualizacion: null,
+        cargo: data.cargo,
+        area: data.area,
+        tipoExamen: data.tipoExamen
     }
-
     const url = `${URLAzure}/api/v01/ct/ocupacional/citaOcupacional`
     const options = {
         method: 'POST',
@@ -84,7 +86,6 @@ export function SubmitCitas(data,user,token) {
         body: JSON.stringify(body)
     }
     return fetch(url,options).then(res =>  {
-        console.log(res)
         if (!res.ok) {
             return res
         } return res.json()}).then(response => response) 

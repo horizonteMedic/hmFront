@@ -13,7 +13,6 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     const departamentoPa = data.departamentoPa
   ? (data.departamentoPa.nombre ? data.departamentoPa.nombre : data.departamentoPa)
   : null;
-    console.log(departamentoPa)
   const body = {
     codPa: data.codPa,
     nombresPa: data.nombresPa,

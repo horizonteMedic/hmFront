@@ -7,7 +7,6 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     return str.replace(regex, '');
   };    
   const precioAdic = removePrefix(data.precioAdic, 'S/');
-    console.log(precioAdic)
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
@@ -63,8 +62,7 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     rxcPlomos: data.rxcPlomos,//12
     mercurioo: data.mercurioo//13
   };    
-  console.log(body)
-  console.log(JSON.stringify(body))
+
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
     const options = {

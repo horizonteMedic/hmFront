@@ -68,7 +68,6 @@ const AperturaExamenesPreOcup = (props) => {
   useEffect(() => {
     getFetch(`/api/v01/st/registros/listadoHistorialOcupacional/${props.selectedSede}`,props.token)
     .then((res) => {
-      console.log(res)
       setSearchHC(res)
     })
     .catch(() => {
@@ -101,7 +100,6 @@ const AperturaExamenesPreOcup = (props) => {
   };
 
   const newPrice = (value) => {  
-    console.log(value)
     ComboboxPrecioExamenMulti(props.selectedSede,value,props.token)
     .then((res) => {
       setDatos({...datos,
@@ -166,7 +164,6 @@ const AperturaExamenesPreOcup = (props) => {
       setCreating(true)
       SearchPacienteDNI(props.selectedSede,datos.codPa,props.token)
       .then((res) => {
-        console.log(res)
         if (!res.codPa) {
           return Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
         }
@@ -239,7 +236,6 @@ const AperturaExamenesPreOcup = (props) => {
 
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
-      console.log(res)
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido editar la Historia Clinica', 'error');
         } else {
@@ -264,7 +260,6 @@ const AperturaExamenesPreOcup = (props) => {
 
     SubmitHistoriaC(datos,props.selectedSede,props.token,1)
     .then((res) => {
-      console.log(res)
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
         } else {
@@ -279,7 +274,6 @@ const AperturaExamenesPreOcup = (props) => {
 
   const codPa = datos.codPa.toString();  // Convertir a cadena de texto
   const activarDisabled = codPa.length === 8;
-  console.log(activarDisabled)
   return (
     <div >
       <form onSubmit={handleSubmit}>

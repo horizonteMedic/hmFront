@@ -32,7 +32,10 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
     'Distrito',
     'Caserio',
     'Telefono',
-    'Celular'
+    'Celular',
+    'Area',
+    'Cargo',
+    'TipoExamen'
   ];
 
   const [data, setData] = useState([]);
@@ -112,6 +115,9 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
 
           // Validar celdas vacías
           if (value === '' || value === undefined || value === null) {
+            if (title === 'Email' || title === 'Caserio' || title === 'Telefono') {
+              return
+            }
             errors.push({ rowIndex, title, empty: true });
           }
         });
@@ -137,12 +143,11 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         if (row['FechaNacimiento']) {
           const serialNumber = row['FechaNacimiento'];
           const date = addDays(new Date(1899, 11, 30), serialNumber);
-          row['FechaNacimiento'] = format(date, 'dd/MM/yyyy');
+          row['FechaNacimiento'] = format(date, 'yyyy/MM/dd');
         }
         return row;
       });
 
-      console.log(processedData);
       setData(processedData);
     };
     reader.readAsBinaryString(file);
@@ -164,9 +169,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       case 'Sexo':
         const sexoRegex = /^[MF]$/;
         return sexoRegex.test(value);
-      case 'Correo':
-        const correoRegex = /@/;
-        return correoRegex.test(value);
       default:
         // Para cualquier otro caso que no sea DNI, CARNET EXT. o PASAPORTE, retornar true
         return true;
@@ -186,9 +188,9 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const handleDownloadExcelTemplate = () => {
-    window.open('https://docs.google.com/spreadsheets/d/1vnpZtd97WybQ3zCWwaF2uH4OTa_G_5hy/edit?usp=sharing&ouid=105230702023683005367&rtpof=true&sd=true', '_blank');
+    window.open('https://docs.google.com/spreadsheets/d/1ykPp7jokwtdGgm-z57kG8DvVX5qis0uk/edit?usp=drive_link&ouid=110131358210789779317&rtpof=true&sd=true', '_blank');
   };
-
+  
   const handleCargaMasiva = async () => {
     setLoading(true);
     let failedPatients = [];
@@ -197,20 +199,21 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       try {
         // Intentamos registrar el paciente
         const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
-        console.log(res);
 
         // Si el registro fue exitoso, registramos la cita
         if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
-
           const datos = {
             dni: patient.DNI,
             celular: patient.Celular,
             fechaReserva: fechaReserva,
             nomenSede: selectedSede,
             rucEmpresa: rucEmpresa,
-            rucContrata: rucContrata
+            rucContrata: rucContrata,
+            cargo: patient.Cargo,
+            area: patient.Area,
+            tipoExamen: patient.TipoExamen
           };
 
           const cit = await SubmitCitas(datos, userlogued.sub, token);

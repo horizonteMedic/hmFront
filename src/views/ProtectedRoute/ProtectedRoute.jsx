@@ -21,7 +21,6 @@ export function ProtectedRoute(){
     const listView = useAuthStore(state => state.listView)
     const setToken = useAuthStore(state => state.token)
     const location = useLocation();
-    console.log(listView)
     if (setToken === null) {
         return <Navigate to="/" />;
       }

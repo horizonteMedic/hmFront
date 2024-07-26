@@ -127,8 +127,6 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
         }
         return row;
       });
-
-      console.log(processedData);
       setData(processedData);
     };
     reader.readAsBinaryString(file);
@@ -172,7 +170,7 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
   };
 
   const handleDownloadExcelTemplate = () => {
-    window.open('https://docs.google.com/spreadsheets/d/1vnpZtd97WybQ3zCWwaF2uH4OTa_G_5hy/edit?usp=sharing&ouid=105230702023683005367&rtpof=true&sd=true', '_blank');
+    window.open('https://docs.google.com/spreadsheets/d/1n9B5qlCYMamOIqC6JH7o_Ymz1aQE9KFh/edit?usp=drive_link', '_blank');
   };
 
   const handleCargaMasiva = async () => {
@@ -183,13 +181,12 @@ const ImportacionModal = ({ isOpen, onRequestClose, selectedSede, token, userlog
       try {
         // Intentamos registrar el paciente
         const res = await SubmitMasivoRegistarPaciente(patient, selectedSede, token);
-        console.log(res);
 
         // Si el registro fue exitoso, registramos la cita
         if (res.id) {
           const rucEmpresa = empresa === '' ? null : Number(empresa);
           const rucContrata = contrata === '' ? null : Number(contrata);
-
+          
           const datos = {
             dni: patient.DNI,
             celular: patient.Celular,
