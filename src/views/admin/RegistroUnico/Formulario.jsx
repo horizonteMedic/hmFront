@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import './Formulario.css'
@@ -12,6 +12,13 @@ import {InputSelect, InputText, InputSearch} from './Inputs'
 
 const Formulario = () => {
   const [stardate, setStartDate] = useState(new Date());
+  const dniInputRef = useRef(null);
+  
+  useEffect(() => {
+    if (dniInputRef.current) {
+      dniInputRef.current.focus();
+    }
+  }, []);
 
   const [datos, setDatos] = useState({
     dni:'',
@@ -339,10 +346,7 @@ const Formulario = () => {
     celular: ''
     });
   };
-  console.log(datos)
-  console.log(typeof datos.provincia === 'string'
-    ? JSON.stringify(lists.Provincia.find(d => d.nombre.trim() == datos.provincia)) 
-    : JSON.stringify(datos.provincia))
+  
  
   return (
     <div style={{ position: 'relative' , }}>
@@ -373,7 +377,7 @@ const Formulario = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <InputText  label='Dni' name='dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch}/>
+                <InputText  label='Dni' name='dni' value={datos.dni} handleChange={handleChange} handleSearch={handleSearch} ref={dniInputRef}/>
                 <InputText label='Nombres' name='nombres' value={datos.nombres} handleChange={handleChange} />
                 <InputText label='Apellidos' name='apellidos' value={datos.apellidos} handleChange={handleChange} />
                 <div className='h-full'>

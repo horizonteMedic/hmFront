@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
-export const InputText = (props) => {
+export const InputText = React.forwardRef((props,ref) => {
     const { label, name, value, handleChange, handleSearch } = props;
 
     return (
@@ -17,6 +18,7 @@ export const InputText = (props) => {
                     name={name} 
                     maxLength={name === 'dni' ? 8 : undefined} 
                     value={value} 
+                    ref={ref}
                     onChange={handleChange} 
                     className="text-black form-input border rounded w-full h-10  py-4 px-2" 
                 />
@@ -31,11 +33,10 @@ export const InputText = (props) => {
             </div>
         </div>
     );
-};
+});
 
 export const InputSelect = (props) => {
     const { label, name, value, handleChange, selected } = props;
-    console.log(value)
     return (
         <div className="h-full">
             <label htmlFor={name} className="font-semibold text-white" style={{ fontSize: '15px' }}>
