@@ -52,6 +52,37 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
   };
 
   const registrarEmpresaContrata = () => {
+    if (!tipo || tipo === 'seleccione') {
+      Swal.fire({
+        title: "Error",
+        text: "Por favor, seleccione una Empresa o Contrata.",
+        icon: "error",
+        confirmButtonText: "Aceptar"
+      });
+      return;
+    }
+  
+    if (!razonSocial) {
+      Swal.fire({
+        title: "Error",
+        text: "Por favor, seleccione una razón social.",
+        icon: "error",
+        confirmButtonText: "Aceptar"
+      });
+      return;
+    }
+  
+    if (!ruc) {
+      Swal.fire({
+        title: "Error",
+        text: "No se ha encontrado un RUC asociado. Por favor, seleccione una razón social válida.",
+        icon: "error",
+        confirmButtonText: "Aceptar"
+      });
+      return;
+    }
+  
+    // Si todo está correcto, procede a registrar
     AsignarEmpresaoContrata(ruc, id, tipo, estado, user, token)
       .then(data => {
         AleertSucces();
@@ -60,7 +91,7 @@ const CrearEmpresaContrataModal = ({ closeModal, id, user, token, Refresgpag }) 
         console.error('Error', error);
       });
   };
-
+  
   function AleertSucces() {
     Swal.fire({
       title: "¡Éxito!",
