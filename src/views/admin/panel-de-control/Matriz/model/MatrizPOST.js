@@ -4,7 +4,7 @@ export function GetMatrizAdmin(datos,token) {
 
     const data = {
         rucContrata: datos.rucContrata,
-        rucEmpresa: "",
+        rucEmpresa: datos.rucEmpresa,
         fechaInicio: datos.fechaInicio,
         fechaFinal: datos.fechaFinal,
         sede: datos.sede

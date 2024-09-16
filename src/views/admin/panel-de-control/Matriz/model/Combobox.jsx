@@ -69,4 +69,19 @@ const ComboboxSedes = () => {
     return options;
   };
 
-export { ComboboxEmpresa, ComboboxContrata, ComboboxSedes }
+  //9.38
+async function RucEmpoCon(user,opcion,token) {
+    return fetch(`${URLAzure}/api/v01/ct/sistemaArchivos/busquedaEmpresaContrata/${user}/${opcion}`,{
+        method: 'GET', 
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }})
+        .then(res => {
+            if (!res.ok) {
+                return res
+        }  return res.json()
+        })
+        .then(response => response)
+}
+
+export { ComboboxEmpresa, ComboboxContrata, ComboboxSedes, RucEmpoCon }

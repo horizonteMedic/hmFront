@@ -27,7 +27,6 @@ export function SearchPacienteDNIAPIREST(dni) {
           }
       }
       return fetch(url,options).then(res =>  {
-        console.log(res,1)
           if (!res.ok) {
               return res
           } return res.json()}).then(response => response) 

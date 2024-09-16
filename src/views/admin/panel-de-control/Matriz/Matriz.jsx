@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { saveAs } from 'file-saver';
-import { ComboboxContrata, ComboboxSedes } from './model/Combobox';
+import { ComboboxContrata, ComboboxSedes, RucEmpoCon } from './model/Combobox';
 import { GetMatrizAdmin, GetMatrizDoctor, GetMatrizArchivos } from './model/MatrizPOST';
 import Swal from 'sweetalert2';
 import { useAuthStore } from '../../../../store/auth';
@@ -10,6 +10,7 @@ import ExcelJS from 'exceljs';
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
   const listView = useAuthStore(state => state.listView)
+  const userlogued = useAuthStore(state => state.userlogued);
 
   const AccessMatrizAdmi= listView.some(listView => listView.id === 402);
   //Matriz Salud
@@ -18,6 +19,9 @@ const MatrizPostulante = () => {
   const AccesMatrizArchivos = listView.some(listView => listView.id === 502)
   
   const [loading, setLoading] = useState(false);
+  const [EmpresaUser, setEmpresaUser] = useState([])
+  const [ContrataUser, setContrataUser] = useState([])
+
   const [datos, setDatos] = useState({
     rucContrata: '',
     rucEmpresa: '',
@@ -37,6 +41,31 @@ const MatrizPostulante = () => {
   const today = new Date().toISOString().split('T')[0];
   const Contratas = ComboboxContrata();
   const Sedes = ComboboxSedes();
+
+  useEffect(() => {
+    const fetchEmpresayContrata = async () => {
+      const empresa = await RucEmpoCon(userlogued.sub,'EMPRESA',token)
+      if (empresa.length > 0) {
+        const empresas = empresa[0];  // Accedemos al primer elemento del array
+        // Verificamos si el ruc no es '0'
+        if (empresas.ruc && empresas.ruc !== '0') {
+          setEmpresaUser(empresa);
+          return  // Actualizamos el estado con el ruc
+        } 
+      } 
+      const contrata = await RucEmpoCon(userlogued.sub,'CONTRATA',token)
+      if (contrata && Array.isArray(contrata) && contrata.length > 0) {
+        const contratas = contrata[0];  // Accedemos al primer elemento del array
+        // Verificamos si el ruc no es '0'
+        if (contratas.ruc && contratas.ruc !== '0') {
+          setContrataUser(contrata)// Actualizamos el estado con el ruc
+        } 
+      } 
+      
+    }
+    fetchEmpresayContrata();
+  },[])
+
   useEffect(() => {
     if (data.length > 0) {
       setExportButtonEnabled(true);
@@ -56,15 +85,7 @@ const MatrizPostulante = () => {
   }, [today]);
 
   useEffect(() => {
-    const ContrataDefiner = Contratas.find(contrata => contrata.ruc === '20602703119');
     const SedeDefiner = Sedes.find(sedes => sedes.cod_sede === 'T-NP');
-
-    if (ContrataDefiner) {
-      setDatos(prevDatos => ({
-        ...prevDatos,
-        rucContrata: ContrataDefiner,
-      }));
-    }
 
     if (SedeDefiner) {
       setDatos(prevDatos => ({
@@ -72,7 +93,7 @@ const MatrizPostulante = () => {
         sede: SedeDefiner
       }));
     }
-  }, [Contratas, Sedes]);
+  }, [Sedes]);
 
   const handleChange = (e) => {
     const { name } = e.target;
@@ -103,8 +124,8 @@ const MatrizPostulante = () => {
 
     setLoading(true);
     const datosapi = {
-      rucContrata: datos.rucContrata.ruc,
-      rucEmpresa: '',
+      rucContrata: datos.rucContrata,
+      rucEmpresa: datos.rucEmpresa,
       fechaInicio: datos.fechaInicio,
       fechaFinal: datos.fechaFinal,
       sede: datos.sede.cod_sede
@@ -171,6 +192,26 @@ const MatrizPostulante = () => {
     
   };
   
+  const handleRUCEmpresa = (e) => {
+    //una para empresa
+    const selectedOption = JSON.parse(e.target.value);
+
+    if (selectedOption.opcion === 'EMPRESA') {
+      setDatos({
+        ...datos,
+        rucContrata: null,
+        rucEmpresa: selectedOption.ruc,
+      });
+    } else if (selectedOption.opcion === 'CONTRATA') {
+      setDatos({
+        ...datos,
+        rucContrata: selectedOption.ruc,
+        rucEmpresa: null,
+      });
+    }
+    
+    //otra para contrata
+  }
 
   useEffect(() => {
     if (reload > 0) {
@@ -259,7 +300,6 @@ const MatrizPostulante = () => {
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
   const currentData = data.slice(startIdx, endIdx);
-
   return (
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
@@ -296,14 +336,19 @@ const MatrizPostulante = () => {
         </div>
         {/* filtros */}
         <div className="flex flex-col flex-grow p-6">
-          <p className="font-semibold">R.U.C. Contrata</p>
-          <input
-            className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
-            type="text"
-            value={datos.rucContrata ? JSON.stringify(datos.rucContrata.razonSocial) : ''}
-            onChange={handleChange}
-            disabled
-            name='rucContrata' />
+          <p className="font-semibold">R.U.C. Contrata/Empresa</p>
+          <select name="rucs" 
+            onChange={handleRUCEmpresa}
+            className='pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none'>
+            <option>Elija una Opcion</option>
+            {EmpresaUser.map((option) => (
+              <option index={option.ruc} value={JSON.stringify({ ...option, opcion: 'EMPRESA' })}>{option.razonSocial}</option>
+            ))}
+            {ContrataUser.map((option) => (
+              <option index={option.ruc} value={JSON.stringify({ ...option, opcion: 'CONTRATA' })}>{option.razonSocial}</option>
+            ))}
+          
+          </select>
         </div>
         <div className="flex flex-wrap gap-4 p-6">
           <div className="flex flex-col flex-grow">
@@ -366,8 +411,9 @@ const MatrizPostulante = () => {
           <div className="flex flex-col flex-grow justify-end">
             <button
               onClick={SubmitAPI}
-              className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md ${datos.matrizSeleccionada ? '' : 'opacity-50 cursor-not-allowed'}`}
-              disabled={!datos.matrizSeleccionada || loading}
+              className={`bg-blue-900 mt-4 text-white px-4 py-2 rounded-md  ${datos.matrizSeleccionada && (datos.rucContrata || datos.rucEmpresa) ? '' : 'opacity-50 cursor-not-allowed'}`}
+              disabled={!datos.matrizSeleccionada || loading ||  (!datos.rucContrata && !datos.rucEmpresa) || 
+                (datos.rucContrata === "" && datos.rucEmpresa === "")}
             >
               <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2" />
               Buscar Matriz
