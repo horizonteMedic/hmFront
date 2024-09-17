@@ -139,7 +139,7 @@ const Accesos = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto mb-4 p-3">
+        <div className="overflow-x-auto mb-4 p-3" style={{ maxHeight: '450px', overflowY: 'auto' }}>
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
               <tr className="bg-gray-200">
