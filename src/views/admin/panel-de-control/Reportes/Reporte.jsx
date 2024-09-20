@@ -60,11 +60,14 @@ const HistorialPaciente = () => {
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const today = new Date();
+  const specificDate = new Date(2023, 0, 1); // Año 2023, mes 0 (enero), día 1
   const options = { timeZone: 'America/Lima' };
-  const formattedToday = today.toLocaleDateString('en-CA', options); 
+  const formattedToday1 = today.toLocaleDateString('en-CA', options); 
+  const formattedToday2 = specificDate.toLocaleDateString('en-CA', options);
+
   today.setDate(today.getDate() - 1); 
-  const [startDate, setStartDate] = useState(formattedToday);
-  const [endDate, setEndDate] = useState(formattedToday);
+  const [startDate, setStartDate] = useState(formattedToday2);
+  const [endDate, setEndDate] = useState(formattedToday1);
   const [isReloading, setIsReloading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1); 
   const [totalPages, setTotalPages] = useState(1); 
