@@ -39,10 +39,27 @@ const MatrizPostulante = () => {
   const [exportButtonEnabled, setExportButtonEnabled] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
-  const Contratas = ComboboxContrata();
   const Sedes = ComboboxSedes();
 
   useEffect(() => {
+
+    const fetchContrata = async (validar) => {
+      const contrata = await RucEmpoCon(userlogued.sub,'CONTRATA',token)
+      if (contrata && Array.isArray(contrata) && contrata.length > 0) {
+        const contratas = contrata[0];  // Accedemos al primer elemento del array
+        // Verificamos si el ruc no es '0'
+        if (contratas.ruc && contratas.ruc !== '0') {
+          setContrataUser(contrata)// Actualizamos el estado con el ruc
+          if (validar != false) {
+            setDatos(prevDatos => ({
+              ...prevDatos,
+              rucContrata: contratas.ruc,
+              rucEmpresa: null,
+            }))
+          }
+        } 
+      } 
+    }
     const fetchEmpresayContrata = async () => {
       const empresa = await RucEmpoCon(userlogued.sub,'EMPRESA',token)
       if (empresa.length > 0) {
@@ -50,17 +67,17 @@ const MatrizPostulante = () => {
         // Verificamos si el ruc no es '0'
         if (empresas.ruc && empresas.ruc !== '0') {
           setEmpresaUser(empresa);
-          return  // Actualizamos el estado con el ruc
+          setDatos(prevDatos => ({
+            ...prevDatos,
+            rucContrata: null,
+            rucEmpresa: empresas.ruc,
+          }))
+          fetchContrata(false) // Actualizamos el estado con el ruc
+        } else {
+          fetchContrata(true)
         } 
       } 
-      const contrata = await RucEmpoCon(userlogued.sub,'CONTRATA',token)
-      if (contrata && Array.isArray(contrata) && contrata.length > 0) {
-        const contratas = contrata[0];  // Accedemos al primer elemento del array
-        // Verificamos si el ruc no es '0'
-        if (contratas.ruc && contratas.ruc !== '0') {
-          setContrataUser(contrata)// Actualizamos el estado con el ruc
-        } 
-      } 
+      
       
     }
     fetchEmpresayContrata();
@@ -194,20 +211,24 @@ const MatrizPostulante = () => {
   
   const handleRUCEmpresa = (e) => {
     //una para empresa
-    const selectedOption = JSON.parse(e.target.value);
-
-    if (selectedOption.opcion === 'EMPRESA') {
-      setDatos({
-        ...datos,
+    const selectedRuc = e.target.value;
+    const empresaSeleccionada = EmpresaUser.find(empresa => empresa.ruc === selectedRuc);
+    if (empresaSeleccionada) {
+      setDatos(prevDatos => ({
+        ...prevDatos,
         rucContrata: null,
-        rucEmpresa: selectedOption.ruc,
-      });
-    } else if (selectedOption.opcion === 'CONTRATA') {
-      setDatos({
-        ...datos,
-        rucContrata: selectedOption.ruc,
+        rucEmpresa: empresaSeleccionada.ruc,
+      }))
+      return
+    } 
+    const contrataSeleccionada = ContrataUser.find(contrata => contrata.ruc === selectedRuc);
+    
+    if (contrataSeleccionada) {
+      setDatos(prevDatos => ({
+        ...prevDatos,
+        rucContrata: contrataSeleccionada.ruc,
         rucEmpresa: null,
-      });
+      }))
     }
     
     //otra para contrata
@@ -299,8 +320,8 @@ const MatrizPostulante = () => {
 
   const startIdx = (currentPage - 1) * recordsPerPage;
   const endIdx = startIdx + recordsPerPage;
-  const currentData = data.slice(startIdx, endIdx);
-  return (
+  const currentData = data?.slice(startIdx, endIdx);
+  return (  
     <div className="container mx-auto mt-12 mb-12">
       <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
         <div className="px-4 py-2 azuloscurobackground flex justify-between">
@@ -338,14 +359,15 @@ const MatrizPostulante = () => {
         <div className="flex flex-col flex-grow p-6">
           <p className="font-semibold">R.U.C. Contrata/Empresa</p>
           <select name="rucs" 
+           value={datos.rucEmpresa || datos.rucContrata}
             onChange={handleRUCEmpresa}
             className='pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none'>
             <option>Elija una Opcion</option>
             {EmpresaUser.map((option) => (
-              <option index={option.ruc} value={JSON.stringify({ ...option, opcion: 'EMPRESA' })}>{option.razonSocial}</option>
+              <option key={option.ruc} value={option.ruc}>{option.razonSocial}</option>
             ))}
             {ContrataUser.map((option) => (
-              <option index={option.ruc} value={JSON.stringify({ ...option, opcion: 'CONTRATA' })}>{option.razonSocial}</option>
+              <option key={option.ruc} value={option.ruc}>{option.razonSocial}</option>
             ))}
           
           </select>
