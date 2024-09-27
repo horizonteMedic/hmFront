@@ -46,8 +46,27 @@ const NuevoArchivoModal = ({ CerrarModal, Refresgpag, token, userlogued }) => {
     { nombre: 'Plata', codigo: '#C0C0C0' },
     { nombre: 'Verde lima', codigo: '#00FF00' },
     { nombre: 'Azul cielo', codigo: '#87CEEB' },
-    { nombre: 'Rosado', codigo: '#FFC0CB' }
+    { nombre: 'Rosado', codigo: '#FFC0CB' },
+    { nombre: 'Violeta', codigo: '#8A2BE2' },
+    { nombre: 'Naranja', codigo: '#FFA500' },
+    { nombre: 'Salmon', codigo: '#FA8072' },
+    { nombre: 'Coral', codigo: '#FF7F50' },
+    { nombre: 'Lila', codigo: '#C8A2C8' },
+    { nombre: 'Turquesa', codigo: '#40E0D0' },
+    { nombre: 'Verde oscuro', codigo: '#006400' },
+    { nombre: 'Azul marino', codigo: '#000080' },
+    { nombre: 'Vino', codigo: '#800000' },
+    { nombre: 'Gris claro', codigo: '#D3D3D3' },
+    { nombre: 'Verde olivo', codigo: '#808000' },
+    { nombre: 'Fucsia', codigo: '#FF00FF' },
+    { nombre: 'Lavanda', codigo: '#E6E6FA' },
+    { nombre: 'Durazno', codigo: '#FFDAB9' },
+    { nombre: 'Chocolate', codigo: '#D2691E' },
+    { nombre: 'Verde esmeralda', codigo: '#50C878' },
+    { nombre: 'Azul claro', codigo: '#ADD8E6' },
+    { nombre: 'Crema', codigo: '#FFFDD0' }
   ];
+  
 
   const handleColor = (e) => {
     const selectedColor = colores.find((color) => color.nombre === e.target.value);
