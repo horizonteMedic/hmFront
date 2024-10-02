@@ -25,6 +25,7 @@ const Roles = () => {
 
   const [isModalEditOpen, setIsModalEditOpen] = useState(false);
   const [id, setId] = useState('');
+  const [nombre, setnombre] = useState('')
   const [rol, setRol] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [estado, setEstado] = useState(true);
@@ -37,8 +38,9 @@ const Roles = () => {
     });
   };
 
-  const openRolesAsignadosModal = (idRol) => {
+  const openRolesAsignadosModal = (idRol,nombre) => {
     setId(idRol)
+    setnombre(nombre)
     setIsModalRolesAsignadosOpen(true);
   };
   
@@ -49,8 +51,9 @@ const Roles = () => {
 
   // para asignar archivos por rol
   const [isModalArchivoOpen, setIsModalArchivoOpen] = useState(false);
-    const openArchivoModal = (id) => {
+    const openArchivoModal = (id,nombre) => {
       setId(id)
+      setnombre(nombre)
       setIsModalArchivoOpen(true);
     };
 
@@ -97,8 +100,9 @@ const Roles = () => {
     setIsModalEditOpen(false)
   }
 
-  const openAccessModal = (id) => {
+  const openAccessModal = (id,nombre) => {
     setId(id)
+    setnombre(nombre)
     setIsModalAccessOpen(true);
   };
 
@@ -176,9 +180,9 @@ const Roles = () => {
                   <td className="border border-gray-300 px-2 py-1 text-center">
                     <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
                     <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faLock} onClick={() => {openAccessModal(item.idRol)}} className="text-gray-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faUsers} onClick={() => {openRolesAsignadosModal(item.idRol)}} className="color-naranja mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faPaperclip} onClick={() => {openArchivoModal(item.idRol)}} className="color-azul mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faLock} onClick={() => {openAccessModal(item.idRol, item.nombre)}} className="text-gray-500 mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faUsers} onClick={() => {openRolesAsignadosModal(item.idRol, item.nombre)}} className="color-naranja mr-2 cursor-pointer" />
+                    <FontAwesomeIcon icon={faPaperclip} onClick={() => {openArchivoModal(item.idRol, item.nombre)}} className="color-azul mr-2 cursor-pointer" />
 
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombre)}</td>
@@ -220,9 +224,9 @@ const Roles = () => {
       </div>
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
       {isModalEditOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} Id={id} Rol={rol} Descripcion={descripcion} Estado={estado} token={token} userlogued={userlogued.sub} />}
-      {isModalAccessOpen && <ModalAsignarVistasPorRol closeModal={closeAccessModal} token={token} Refresgpag={Refresgpag} userlogued={userlogued.sub} ID_ROL={id} />}
-      {isModalRolesAsignadosOpen && <ModalRolesAsignados closeModal={closeRolesAsignadosModal} data={data} id={id} userlogued={userlogued.sub} token={token} />}
-      {isModalArchivoOpen && <ModalArchivo closeModal={closeArchivoModal} id_rol={id} token={token} userlogued={userlogued.sub} />}
+      {isModalAccessOpen && <ModalAsignarVistasPorRol closeModal={closeAccessModal} token={token} Refresgpag={Refresgpag} userlogued={userlogued.sub} ID_ROL={id} Nombre={nombre} />}
+      {isModalRolesAsignadosOpen && <ModalRolesAsignados closeModal={closeRolesAsignadosModal} data={data} id={id} userlogued={userlogued.sub} token={token} Nombre={nombre}/>}
+      {isModalArchivoOpen && <ModalArchivo closeModal={closeArchivoModal} id_rol={id} token={token} userlogued={userlogued.sub} Nombre={nombre} />}
 
     </div>   
   );
