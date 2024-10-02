@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faUsers, faTrash, faUserXmark } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faUsers, faSortAlphaDown, faSortAlphaUp } from '@fortawesome/free-solid-svg-icons';
 import Modal from './ModalRegistroEmpleado/Modal';
 import EditModal from './ModalEditEmpleado/EditModal';
 import RegistroUsuarioModal from './ModalRegistroUsuario/ModalRegistroUsuario'; 
@@ -12,47 +12,52 @@ import { useAuthStore } from '../../../../store/auth';
 const Accesos = () => {
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [refres, setRefresh] = useState(0)
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refres, setRefresh] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isConfigurarAccesosModalOpen, setIsConfigurarAccesosModalOpen] = useState(false);
   const [isRegistroUsuarioModalOpen, setIsRegistroUsuarioModalOpen] = useState(false); 
-  const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false)
-  const [idEmpleado, SetIdEmpleado] = useState('')
+  const [isViewUsersModalOpen, SetIsViewUsersModalOpen] = useState(false);
+  const [idEmpleado, SetIdEmpleado] = useState('');
 
-  const [tipoDocumento, setTipoDocumento] = React.useState('');
-  const [nrodoc, setNrodoc] = useState('')
-  const [nombres, setNombres] = useState('')
-  const [apellidos, setApellidos] = useState('')
-  const [email, setEmail] = useState('')
-  const [startDate, setStartDate] = React.useState(null);
-  const [cip, setCip] = useState('')
-  const [sexo, setSexo] = React.useState('');
-  const [celular, setCelular] = useState('')
-  const [departamento, setDepartamento] = React.useState('');
-  const [provincia, setProvincia] = React.useState('');
-  const [distrito, setDistrito] = React.useState('');
-  const [direccion, setDireccion] = useState('')
-  const [cargo, setCargo] = useState('')
-  const [activo, setActivo] = React.useState(false);
+  const [tipoDocumento, setTipoDocumento] = useState('');
+  const [nrodoc, setNrodoc] = useState('');
+  const [nombres, setNombres] = useState('');
+  const [apellidos, setApellidos] = useState('');
+  const [email, setEmail] = useState('');
+  const [startDate, setStartDate] = useState(null);
+  const [cip, setCip] = useState('');
+  const [sexo, setSexo] = useState('');
+  const [celular, setCelular] = useState('');
+  const [departamento, setDepartamento] = useState('');
+  const [provincia, setProvincia] = useState('');
+  const [distrito, setDistrito] = useState('');
+  const [direccion, setDireccion] = useState('');
+  const [cargo, setCargo] = useState('');
+  const [activo, setActivo] = useState(false);
   const [fechainicio, setFechainicio] = useState('');
   const [userRegistro, setUserRegistro] = useState('');
 
+  // Estado para el ordenamiento
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [sortColumn, setSortColumn] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para la búsqueda
+
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     getFetch(`/api/v01/st/empleado/listadoBusquedaUsername/${userlogued.sub}`, token)
-    .then(response => {
-      setData(response)
-    })
-    .catch(error => {
-      throw new Error('Network response was not ok.',error);
-    })
-    .finally(() => {
-      setLoading(false)
-    })
-  },[refres])
+      .then(response => {
+        setData(response);
+      })
+      .catch(error => {
+        throw new Error('Network response was not ok.', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [refres]);
 
   const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => {
@@ -61,9 +66,35 @@ const Accesos = () => {
   };
 
   const Refresgpag = () => {
-    setRefresh(refres + +1)
-  }
+    setRefresh(refres + 1);
+  };
 
+  const sortData = (column) => {
+    const sortedData = [...data];
+    const newOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+    setSortOrder(newOrder);
+    setSortColumn(column);
+
+    sortedData.sort((a, b) => {
+      const aValue = a[column].toLowerCase();
+      const bValue = b[column].toLowerCase();
+
+      if (newOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setData(sortedData);
+  };
+
+  const getSortIcon = (column) => {
+    if (sortColumn === column) {
+      return sortOrder === 'asc' ? faSortAlphaDown : faSortAlphaUp;
+    }
+    return faSortAlphaDown;
+  };
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -73,25 +104,24 @@ const Accesos = () => {
     setIsModalOpen(false);
   };
 
-  const openEditModal = (id,tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado, 
+  const openEditModal = (id, tipoDocumento, nroDocumento, nombres, apellidos, cargo, ubigeo, cip, correoElectronico, celular, direccion, estado, 
     fechaNacimiento, fechaRegistro, sexo, usuarioRegistro) => {
-    SetIdEmpleado(id)
-    setTipoDocumento(tipoDocumento)
+    SetIdEmpleado(id);
+    setTipoDocumento(tipoDocumento);
     setNrodoc(nroDocumento);
     setNombres(nombres);
     setApellidos(apellidos);
     setEmail(correoElectronico);
-    setStartDate(fechaNacimiento)
-    //Fecha seteada
+    setStartDate(fechaNacimiento);
     setSexo(sexo);
-    setCip(cip)
+    setCip(cip);
     setCelular(celular);
     setDistrito(ubigeo);
     setDireccion(direccion);
     setCargo(cargo);
     setActivo(estado);
-    setFechainicio(fechaRegistro)
-    setUserRegistro(usuarioRegistro)
+    setFechainicio(fechaRegistro);
+    setUserRegistro(usuarioRegistro);
     setIsEditModalOpen(true);
   };
 
@@ -106,7 +136,7 @@ const Accesos = () => {
   const closeConfigurarAccesosModal = () => { 
     setIsConfigurarAccesosModalOpen(false);
   };
-  
+
   const openRegistroUsuarioModal = () => {
     setIsRegistroUsuarioModalOpen(true);
   };
@@ -116,65 +146,96 @@ const Accesos = () => {
   };
 
   const OpenViewUsersModal = (id) => {
-    SetIdEmpleado(id)
-    isViewUsersModalOpen ? SetIsViewUsersModalOpen(false) : SetIsViewUsersModalOpen(true)
-  }
+    SetIdEmpleado(id);
+    SetIsViewUsersModalOpen(prevState => !prevState);
+  };
+
+  // Filtrar los datos según el término de búsqueda
+  // Filtrar los datos según el término de búsqueda
+const filteredData = data.filter((item) => {
+  const searchLower = searchTerm.toLowerCase();
+  return (
+    item.nombres.toLowerCase().includes(searchLower) ||
+    item.apellidos.toLowerCase().includes(searchLower) ||
+    String(item.numDocumento).toLowerCase().includes(searchLower) || // Convertir numDocumento a string
+    item.cargo.toLowerCase().includes(searchLower)
+  );
+});
 
 
   if (loading) {
-    return <Loading/>
+    return <Loading />;
   }
 
   return (
     <div className="container mx-auto mt-12 mb-12">
-      <div className="mx-auto bg-white  rounded-lg overflow-hidden shadow-xl  w-[90%]">
-        <div className="px-4 py-2 azuloscurobackground flex justify-between ">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-xl w-[90%]">
+        <div className="px-4 py-2 azuloscurobackground flex justify-between">
           <h1 className="text-start font-bold color-azul text-white">Usuarios con Accesos</h1>
         </div>
-        <div className="flex justify-between p-6">
-          <h2 className="text-lg font-semibold">Empleados Registrados</h2>
-          <div className="flex">
-            <button className="naranja-btn px-4 py-2 rounded-md mr-2" onClick={openModal}>+ Registrar Empleado</button>
-            <button className="azul-btn px-4 py-2 rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
-          </div>
-        </div>
+        <div className="px-6 pt-4 pb-2 flex justify-between items-center">
+        {/* Input para búsqueda */}
+        <input
+          type="text"
+          placeholder="Buscar por nombre, apellido, DNI o cargo"
+          className="p-2 border border-gray-300 rounded-md w-[300px]  mr-4"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-        <div className="overflow-x-auto mb-4 p-3" style={{ maxHeight: '450px', overflowY: 'auto' }}>
+        {/* Botones para registrar */}
+        <div className="flex space-x-2">
+          <button className="naranja-btn px-4 py-2 w-[150px]  rounded-md" onClick={openModal}>+ Registrar Empleado</button>
+          <button className="azul-btn px-4 py-2  w-[150px]   rounded-md" onClick={openRegistroUsuarioModal}>+ Registrar Usuario</button>
+        </div>
+      </div>
+
+
+        <div className="overflow-x-auto mb-1 p-3" style={{ maxHeight: '460px', overflowY: 'auto' }}>
           <table className="w-full border border-gray-300 px-3 py-2">
             <thead>
               <tr className="bg-gray-200">
-                {/* <th className="border border-gray-300 px-2 py-1">Nro.</th> */}
                 <th className="border border-gray-300 px-2 py-1">Acciones</th>
                 <th className="border border-gray-300 px-2 py-1">Tipo Doc.</th>
                 <th className="border border-gray-300 px-2 py-1">Número</th>
-                <th className="border border-gray-300 px-2 py-1">Apellidos</th>
-                <th className="border border-gray-300 px-2 py-1">Nombres</th>
+                <th className="border border-gray-300 px-2 py-1 cursor-pointer" onClick={() => sortData('apellidos')}>
+                  Apellidos
+                  <FontAwesomeIcon icon={getSortIcon('apellidos')} className="ml-2" />
+                </th>
+                <th className="border border-gray-300 px-2 py-1 cursor-pointer" onClick={() => sortData('nombres')}>
+                  Nombres
+                  <FontAwesomeIcon icon={getSortIcon('nombres')} className="ml-2" />
+                </th>
                 <th className="border border-gray-300 px-2 py-1">Cargo</th>
+
               </tr>
             </thead>
             <tbody>
-            {data?.map((item, index) => (
+              {filteredData.map((item, index) => (
                 <tr key={index}>
-                {/* <td className="border border-gray-300 px-2 py-1">{item.id_empleado}</td> */}
-                <td className="border border-gray-300 px-2 py-1  text-center">
-                  <FontAwesomeIcon icon={faEdit} className="text-blue-500 mr-2 cursor-pointer" onClick={() => {openEditModal(item.id_empleado,
-                  item.tipoDoc,item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, 
-                  item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}} 
-                  title="Editar" />
-                  <FontAwesomeIcon icon={faUsers} className="text-orange-500 mr-2 cursor-pointer" onClick={() => OpenViewUsersModal(item.id_empleado)} 
-                  title="Ver Usuarios" />
-
-                </td>
-                <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
-                <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
-                <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.apellidos)}</td>
-                <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombres)}</td>
-                <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.cargo)}</td>   
+                  <td className="border border-gray-300 px-2 py-1 text-center">
+                    <FontAwesomeIcon
+                      icon={faEdit}
+                      className="text-blue-500 mr-2 cursor-pointer"
+                      onClick={() => openEditModal(item.id_empleado, item.tipoDoc, item.numDocumento, item.nombres, item.apellidos, item.cargo, item.ubigeo, item.cip, item.correoElect, item.celular, item.direccion, item.estado, item.fechaNacimiento, item.fechaRegistro, item.sexo, item.userRegistro)}
+                      title="Editar"
+                    />
+                    <FontAwesomeIcon
+                      icon={faUsers}
+                      className="text-orange-500 mr-2 cursor-pointer"
+                      onClick={() => OpenViewUsersModal(item.id_empleado)}
+                      title="Ver Usuarios"
+                    />
+                  </td>
+                  <td className="border border-gray-300 px-2 py-1">{item.tipoDoc}</td>
+                  <td className="border border-gray-300 px-2 py-1">{item.numDocumento}</td>
+                  <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.apellidos)}</td>
+                  <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombres)}</td>
+                  <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.cargo)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          
         </div>
 
         {/* Leyenda de iconos */}
@@ -183,33 +244,40 @@ const Accesos = () => {
             <FontAwesomeIcon icon={faEdit} className="text-blue-500" />
             <p className="text-sm ml-2 md:ml-4">Editar</p>
           </div>
-          {/* <div className="flex items-center ml-6 md:ml-8">
-            <FontAwesomeIcon icon={faCog} className="text-green-500" />
-            <p className="text-sm ml-2 md:ml-4">Configurar Accesos</p>
-          </div> */}
           <div className="flex items-center ml-6 md:ml-8">
             <FontAwesomeIcon icon={faUsers} className="text-orange-500" />
             <p className="text-sm ml-2 md:ml-4">Ver Usuarios</p>
           </div>
-          {/* <div className="flex items-center ml-2 md:ml-4">
-            <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
-            <p className="text-sm ml-2 md:ml-4">Activo</p>
-          </div>
-          <div className="flex items-center ml-6 md:ml-8">
-            <FontAwesomeIcon icon={faBan} className="text-red-500" />
-            <p className="text-sm ml-2 md:ml-4">Inactivo</p>
-          </div> */}
         </div>
-
       </div>
-      {/* Asegúrate de que los modales estén configurados correctamente */}
+
+      {/* Modales */}
       {isModalOpen && <Modal closeModal={closeModal} Refresgpag={Refresgpag} />}
-      {isEditModalOpen && <EditModal closeModal={closeEditModal} Refresgpag={Refresgpag} ID={idEmpleado} TipoDoc={tipoDocumento} Nrodoc={nrodoc} Nombres={nombres}
-      Apellidos={apellidos} Email={email} Sexo={sexo} FechaNacimiento={startDate} Cip={cip} Celular={celular} Distrito={distrito} Direccion={direccion}
-      Cargo={cargo} Estado={activo} FechaInicio={startDate} UserRegistro={userRegistro} />}
+      {isEditModalOpen && (
+        <EditModal
+          closeModal={closeEditModal}
+          Refresgpag={Refresgpag}
+          ID={idEmpleado}
+          TipoDoc={tipoDocumento}
+          Nrodoc={nrodoc}
+          Nombres={nombres}
+          Apellidos={apellidos}
+          Email={email}
+          Sexo={sexo}
+          FechaNacimiento={startDate}
+          Cip={cip}
+          Celular={celular}
+          Distrito={distrito}
+          Direccion={direccion}
+          Cargo={cargo}
+          Estado={activo}
+          FechaInicio={startDate}
+          UserRegistro={userRegistro}
+        />
+      )}
       {isConfigurarAccesosModalOpen && <ConfigurarAccesosModal closeModal={closeConfigurarAccesosModal} />}
-      {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag}/>}
-      {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} userlogued={userlogued.sub} token={token}/>}
+      {isRegistroUsuarioModalOpen && <RegistroUsuarioModal closeModal={closeRegistroUsuarioModal} token={token} Refresgpag={Refresgpag} />}
+      {isViewUsersModalOpen && <UsersModal closeModal={OpenViewUsersModal} idEmpleado={idEmpleado} userlogued={userlogued.sub} token={token} />}
     </div>
   );
 };
