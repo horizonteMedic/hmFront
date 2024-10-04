@@ -22,7 +22,7 @@ const iconMapping = {
 const ArrowIcon = ({ isOpen, toggle }) => {
   return (
     <svg
-      className="w-4 h-4 ml-1 cursor-pointer"
+      className="w-6 h-6 ml-2 cursor-pointer transform transition-transform duration-300"
       onClick={toggle}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
@@ -31,6 +31,7 @@ const ArrowIcon = ({ isOpen, toggle }) => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      style={{ transition: 'transform 0.3s ease' }} // Suaviza el cambio de dirección
     >
       {isOpen ? (
         <polyline points="6 9 12 15 18 9" />
@@ -40,6 +41,7 @@ const ArrowIcon = ({ isOpen, toggle }) => {
     </svg>
   );
 };
+
 
 const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgpag }) => {
   const [isOpen, setIsOpen] = useState(false);

@@ -222,11 +222,11 @@ const Roles = () => {
                   <FontAwesomeIcon icon={getSortIcon('nombre')} className="ml-2" />
                 </th>
                 <th
-                  className="border border-gray-300 px-2 py-1 cursor-pointer"
-                  onClick={() => sortData('descripcion')}
+                  className="border border-gray-300 px-2 py-1"
+                  // onClick={() => sortData('descripcion')}
                 >
                   Descripción
-                  <FontAwesomeIcon icon={getSortIcon('descripcion')} className="ml-2" />
+                  {/* <FontAwesomeIcon icon={getSortIcon('descripcion')} className="ml-2" /> */}
                 </th>
                 <th className="border border-gray-300 px-2 py-1 text-center w-[5%]">Estado</th>
               </tr>
