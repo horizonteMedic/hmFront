@@ -166,11 +166,11 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
   );
 };
 
-const MyTreeView = ({ closeModal, token, Refresgpag, userlogued, ID_ROL }) => {
-  const [data, setData] = useState([]);
-  const [dataasignacion, setDataasignacion] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [refres, setRefresh] = useState(0);
+const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL,Nombre }) => {
+  const [data, setData] = useState([])
+  const [dataasignacion, setDataasignacion] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [refres, setRefresh] = useState(0)
 
   useEffect(() => {
     setLoading(true);
@@ -205,6 +205,7 @@ const MyTreeView = ({ closeModal, token, Refresgpag, userlogued, ID_ROL }) => {
       });
   };
 
+  
   const treeData = buildTree(data);
 
   return (
@@ -216,7 +217,7 @@ const MyTreeView = ({ closeModal, token, Refresgpag, userlogued, ID_ROL }) => {
           onClick={closeModal}
         />
         <div className="p azuloscurobackground flex justify-between p-3.5">
-          <p className="text-start font-bold color-azul text-white">Asignar vistas</p>
+          <p className="text-start font-bold color-azul text-white">Asignar vistas a: {Nombre}</p>
         </div>
         <div className="p-4">
           <div
