@@ -5,7 +5,7 @@ import { AsignedRolxRol, DeleteAsignedRolxRol } from '../model/AsingRolxRol';
 import Swal from 'sweetalert2';
 import { getFetch } from '../../getFetch/getFetch';
 
-const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
+const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token, Nombre }) => {
   
   const [listRol, setListRol] = useState(data)
   const [dataAsigned, setDataAsigned] = useState([])
@@ -130,7 +130,7 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token }) => {
           onClick={closeModal}
         />
         <div className="p azuloscurobackground flex justify-between p-3.5">
-          <h1 className="text-start font-bold color-azul text-white">Asignar Roles</h1>
+          <h1 className="text-start font-bold color-azul text-white">Asignar Roles a: {Nombre}</h1>
         </div>
         <div className='container p-4'>
           <div className="mb-4">

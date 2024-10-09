@@ -5,7 +5,7 @@ import { getFetch } from '../../getFetch/getFetch';
 import { AsignedArchivoxRol, DeleteAsignedArchivoxRol } from '../model/AsingArchivoxRol';
 import Swal from 'sweetalert2';
 
-const ModalArchivo = ({ closeModal, id_rol, token, userlogued }) => {
+const ModalArchivo = ({ closeModal, id_rol, token, userlogued, Nombre }) => {
   const [data, setData] = useState([]);
   const [archivos, setArchivos] = useState([]); // Todos los archivos disponibles
   const [archivosDisponibles, setArchivosDisponibles] = useState([]); // Archivos filtrados
@@ -179,7 +179,7 @@ const ModalArchivo = ({ closeModal, id_rol, token, userlogued }) => {
         
         {/* Encabezado */}
         <div className="bg-[#233245] text-white text-center p-3 rounded-t-lg shadow-sm">
-          <h1 className="font-bold text-lg">Asignar Archivos por Rol</h1>
+          <h1 className="font-bold text-lg">Asignar Archivos por Rol a {Nombre}</h1>
         </div>
         
         <div className="p-6 bg-gray-100">
