@@ -184,7 +184,10 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-      <div className="bg-white rounded-lg overflow-hidden shadow-xl w-full max-w-[90%] mx-4">
+     <div
+        className="bg-white rounded-lg overflow-hidden shadow-xl w-full max-w-[90%] mx-4"
+        style={{ Height: window.innerWidth < 700 ? '100vh' : '100%' }} // Aplica 80% solo en móviles
+      >
         <div className="px-4 py-2 naranjabackgroud flex justify-between">
           <h2 className="text-lg font-bold text-white">Historial Paciente</h2>
           <button onClick={closeModal} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
@@ -262,11 +265,12 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
             </div>
           )}
         </div>
-        <div className="flex justify-center bg-gray-100 p-3">
+        <div className="flex justify-center bg-gray-100 p-3 hidden md:flex">
           <div className="flex flex-wrap">
             {generateLegend()}
           </div>
         </div>
+
         {Acces.Delete && (
           <div className="flex justify-center bg-gray-100 p-3">
             <div className="flex items-center">
