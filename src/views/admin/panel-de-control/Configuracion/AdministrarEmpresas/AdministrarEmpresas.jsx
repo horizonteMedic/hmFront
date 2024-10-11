@@ -157,7 +157,7 @@ const AdministrarEmpresa = () => {
            <input
             type="text"
             placeholder="Buscar por nombre, descripción o estado"
-            className="p-2 border border-gray-300 rounded-md w-[300px]   mr-4"  // Añade margen derecho para separar el campo del botón
+            className="p-2 border border-gray-300 rounded-md w-[300px]   mr-4 mb-3" 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
