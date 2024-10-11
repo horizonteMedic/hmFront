@@ -64,11 +64,11 @@ const Dashboard = () => {
         </div>
 
         {/* Tarjeta elevada para las nuevas rutas con nuevo color y hover */}
-        <div className="bg-white shadow-xl p-6 " style={{ borderRadius: '40px', width: '60%', marginTop:'5em'}}>
+        <div className="bg-white shadow-xl p-6 w-auto " style={{ borderRadius: '40px', marginTop:'5em'}}>
           <h2 className="text-2xl font-bold text-center mb-1" style={{ color: 'black' }}>Configuraciones Avanzadas</h2>
-          <div className="flex justify-center space-x-6">
+          <div className="flex flex-wrap justify-center space-x-6">
             {additionalCards.map((card, index) => (
-              <div key={index} className="flex flex-col items-center w-[320px] mb-4">
+              <div key={index} className="flex flex-col items-center w-auto mb-4">
                 <Card
                   to={card.to}
                   id={card.id}
