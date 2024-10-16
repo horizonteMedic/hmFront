@@ -73,68 +73,71 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         closeModal()
         return;
       }
+      let Ripconciv = combinedParam.contrata.split(' ')[0];
+
+      if (sede !== 'HMAC' ) {
+        if (Ripconciv !== 'RIPCONCIV') {
+          const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
+          const CodOrden = fileNameWithoutExtension.split('-') 
+    
+          if (CodOrden.length < 3) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: 'El nombre del archivo no tiene el formato esperado.\n\nRecuerda que debe ser Orden-Nomenclatura-Nombres',
+            });
+            closeModal();
+            return;
+          }
+    
+          //Nomenclatuura
+          const Orden = fileNameWithoutExtension.split('-')[0]
+          //Nombre
+          const NamePart = CodOrden[2].trim().replace(/\s+/g, ' ')
+          const cleanedNamePart = NamePart.replace(/\s+/g, ' ');
+          const ApellName = Nombres.trim().replace(/\s+/g, ' ');
+          console.log(datosarch.orden)
+          console.log(Orden)
+          //Cod Orden
+          const Nomenclatura = CodOrden[1].trim()
+          
+            if (datosarch.orden != Orden) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: `El número de Orden debe ser igual: ${datosarch.orden}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+              });
+              closeCAMUModal()
+              return;
+            }
+    
+            if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+              });
+              closeCAMUModal()
+              return;
+            }
       
-
       
-      if (sede !== 'HMAC') {
-
-      const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
-      const CodOrden = fileNameWithoutExtension.split('-') 
-
-      if (CodOrden.length < 3) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al subir archivo',
-          text: 'El nombre del archivo no tiene el formato esperado.\n\nRecuerda que debe ser Orden-Nomenclatura-Nombres',
-        });
-        closeModal();
-        return;
-      }
-
-      //Nomenclatuura
-      const Orden = fileNameWithoutExtension.split('-')[0]
-      //Nombre
-      const NamePart = CodOrden[2].trim().replace(/\s+/g, ' ')
-      const cleanedNamePart = NamePart.replace(/\s+/g, ' ');
-      const ApellName = Nombres.trim().replace(/\s+/g, ' ');
-
-      //Cod Orden
-      const Nomenclatura = CodOrden[1].trim()
+            if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+              });
+              closeCAMUModal()
+              return;
+            }
       
-        if (datosarch.orden != Orden) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al subir archivo',
-            text: `El número de Orden debe ser igual: ${datosarch.orden}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
-          });
-          closeCAMUModal()
-          return;
+            
+            const filesave = `${Orden}-${Nomenclatura}-${cleanedNamePart}.${fileExtension}`
+            setFileName(filesave); 
+        } else {
+          setFileName(fileName)
         }
-
-        if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al subir archivo',
-            text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
-          });
-          closeCAMUModal()
-          return;
-        }
-  
-  
-        if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error al subir archivo',
-            text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
-          });
-          closeCAMUModal()
-          return;
-        }
-  
-        
-        const filesave = `${Orden}-${Nomenclatura}-${cleanedNamePart}.${fileExtension}`
-        setFileName(filesave);
       } else {
         setFileName(fileName)
       }

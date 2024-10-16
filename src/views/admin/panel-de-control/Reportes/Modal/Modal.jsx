@@ -92,13 +92,14 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
     return null;
   };
   
-  const openModalArchivos = (archivoItem,historiaClinica, orden)  => {
+  const openModalArchivos = (archivoItem,historiaClinica, orden, contrata)  => {
     const combinedParam = {
       archivoItem: archivoItem,
       historiaClinica: historiaClinica,
       orden: orden,
       nombres: name,
-      apellidos: apell
+      apellidos: apell,
+      contrata: contrata
     };  
     setDatosarc(combinedParam)
     setModalArchivos(true);
@@ -231,7 +232,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                         <td className="border border-gray-300 px-2 py-1">
                           <div className="flex flex-col">
                             {listarchivos.map((archivoItem, archivoIndex) => (
-                              <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem, dataItem.historiaClinica, dataItem.orden) }} key={archivoIndex}>
+                              <div className="flex items-center" onClick={() => { openModalArchivos(archivoItem, dataItem.historiaClinica, dataItem.orden, dataItem.contrata) }} key={archivoIndex}>
                                 <FontAwesomeIcon icon={faArrowUp} className="cursor-pointer pt-2" style={{ color: archivoItem.codigo }} />
                                 <div className="text-sm fw-semi-bold cursor-pointer ml-2 pt-2">Subir {archivoItem.nombre}</div>
                               </div>
