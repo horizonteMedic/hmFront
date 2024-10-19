@@ -38,7 +38,7 @@ const MatrizPostulante = () => {
   const [reload, setReload] = useState(0); // Estado para controlar la recarga de la tabla
   const [exportButtonEnabled, setExportButtonEnabled] = useState(false);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('en-CA');
   const Sedes = ComboboxSedes();
 
   useEffect(() => {
