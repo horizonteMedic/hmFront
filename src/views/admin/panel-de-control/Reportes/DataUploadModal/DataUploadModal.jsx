@@ -65,6 +65,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
   const SubidaArchivos = async () => {
     let failedUploads = [];
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const uploadPromises = uparchFile.map(async (folder) => {
     
@@ -77,15 +78,21 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           base64: base64WithoutHeader
         };
         const response = await ArchivosMasivos(datos, user, token);
-        if (response.id === 0 || !response.id) {
+        
+        if (response.id === 1) {
+          await sleep(2000)
+          return
+        } else {
           setUploadStatus((prevStatus) => ({...prevStatus,
           [folder.name]: 'error', }));
           failedUploads.push(folder.name);
+          await sleep(2000)
         }
         } catch (error) {
           console.error(`Error uploading ${folder.name}:`, error);
           failedUploads.push(folder.name);
-        }})
+        }
+        })
     await Promise.all(uploadPromises);
     // Esperar 3 segundos antes de la sigui
     setSucred(true);
