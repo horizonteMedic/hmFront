@@ -101,7 +101,25 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       Swal.fire({
         icon: 'error',
         title: 'Detención!',
-        text: `Estos Archivos no se han subido: ${failedUploads.join(', ')}`,
+        html: `
+          <p>Estos archivos no se han subido:</p>
+          <div style="display: flex; flex-wrap: wrap; max-height: 300px; overflow-y: auto; text-align: left; padding: 10px;">
+            <ul style="flex: 1 1 50%; padding-left: 20px; margin: 0;">
+              ${failedUploads
+                .slice(0, Math.ceil(failedUploads.length / 2))
+                .map((file) => `<li style="font-size: 0.9em;">${file}</li>`)
+                .join('')}
+            </ul>
+            <ul style="flex: 1 1 50%; padding-left: 20px; margin: 0;">
+              ${failedUploads
+                .slice(Math.ceil(failedUploads.length / 2))
+                .map((file) => `<li style="font-size: 0.9em;">${file}</li>`)
+                .join('')}
+            </ul>
+          </div>
+        `,
+        width: 600,
+        confirmButtonText: 'Aceptar',
       });
     }
   };
