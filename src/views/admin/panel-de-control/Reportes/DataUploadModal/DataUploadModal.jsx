@@ -6,6 +6,7 @@ import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
 
+
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uparchFile, setUparchFile] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
