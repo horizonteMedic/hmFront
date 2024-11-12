@@ -6,9 +6,11 @@ import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
 import DataUploadModal from './DataUploadModal/DataUploadModal'; 
+import DataUploadModal2 from './Dataupload2/DataUploadModal2'; 
 
 const HistorialPaciente = () => {
   const [showDataUploadModal, setShowDataUploadModal] = useState(false);
+  const [showDataUploadModal2, setShowDataUploadModal2] = useState(false);
 
   const ListSedes = ComboboxSedes();
   const ListEmpresa = ComboboxEmpresas();
@@ -49,6 +51,7 @@ const HistorialPaciente = () => {
   const AccesDownload = views.some(view => view.id === 103);
   const AccesDelete = views.some(view => view.id === 104);
   const AccesCargaMasiva = views.some(view => view.id === 302)
+  const AccesCargaMasivaPers = views.some(view => view.id === 902)
 
   const Acces = {
     Upload: AccessUpload,
@@ -282,6 +285,14 @@ const HistorialPaciente = () => {
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
           Subir Carpeta
         </button>}
+
+        {AccesCargaMasivaPers && <button
+          onClick={() => setShowDataUploadModal2(true)}
+          className="verde-btn px-4 rounded flex items-center mr-3"
+        >
+          <FontAwesomeIcon icon={faUpload} className="mr-2" />
+          Subir Carpeta 2
+        </button>}
         
         <button onClick={reloadTable} className="focus:outline-none relative">
           {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
@@ -461,6 +472,7 @@ const HistorialPaciente = () => {
       {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
       {/* Modal de carga de datos */}
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
+      {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
 
     </div>
   );

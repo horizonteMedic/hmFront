@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFolder, faCheck, faTimesCircle, faDownload } from '@fortawesome/free-solid-svg-icons'; 
 import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
+import { getFetch } from '../../getFetch/getFetch';
 
-
-const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
+const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
+  const [listarch, setListarch] = useState([])
+  const [selectarch, setSelectarch] = useState('')
   const [uparchFile, setUparchFile] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isFolderUploadEnabled, setIsFolderUploadEnabled] = useState(false);
@@ -21,6 +23,16 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const initialSelectedSede = defaultSede || sedes[0];
   const [selectedSede, setSelectedSede] = useState(initialSelectedSede);
 
+
+  useEffect(() => {
+    getFetch('/api/v01/ct/tipoArchivo',token)
+    .then((res) => {
+      setListarch(res)
+    })
+    .catch((error) =>{
+      throw new Error('Network response was not ok.', error);
+    })
+  }, [listarch])
 
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
@@ -79,10 +91,9 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           nombre: folder.name,
           sede: selectedSede.cod_sede,
           base64: base64WithoutHeader,
-          nomenclatura: null
+          nomenclatura: selectarch.nomenclatura
         };
         const response = await ArchivosMasivos(datos, user, token);
-        
         if (response.id === 1) {
           await sleep(2000)
           return
@@ -129,8 +140,13 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
 
   const handleConfirmUpload = async () => {
-    if (!selectedSede || uploadedFiles.length === 0) {
+    if (!selectedSede) {
       Swal.fire('Error', 'Por favor selecciona una sede y sube al menos un archivo.', 'error');
+      return;
+    }
+
+    if (!selectarch || uploadedFiles.length === 0) {
+      Swal.fire('Error', 'Por favor selecciona un tipo de archivo y sube al menos un archivo.', 'error');
       return;
     }
 
@@ -164,6 +180,12 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setIsFolderUploadEnabled(true);
   };
 
+  const handleExamenChange = (e) => {
+    const selectedOption = JSON.parse(e.target.value);
+    setSelectarch(selectedOption);
+    setIsFolderUploadEnabled(true);
+  };
+
   const generateErrorTablePDF = () => {
     const doc = new jsPDF();
     let yPos = 20;
@@ -189,29 +211,42 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   
     doc.save("archivos_con_error.pdf");
   };
-  
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[600px] relative">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[700px] relative">
         <FontAwesomeIcon icon={faTimes} className="absolute top-0 right-0 m-3 cursor-pointer text-gray-400" onClick={closeModal} />
         <div className="p azuloscurobackground flex justify-between p-3.5">
           <h1 className="text-start font-bold color-azul text-white">Subir Carga Masiva de Datos</h1>
         </div>
         <div className='container p-4'>
           <div className="bg-white rounded-lg z-50">
-            <div className="flex mb-4">
-              <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede ? JSON.stringify(selectedSede) : ''} onChange={handleSelectChange}>
-                <option value="">Seleccionar Sede</option>
-                {sedes?.map((option) => (
-                  <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+            <div className="flex mb-4 justify-start items-center">
+              <h2>Sedes: </h2>
+                <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede ? JSON.stringify(selectedSede) : ''} onChange={handleSelectChange}>
+                  <option value="">Seleccionar Sede</option>
+                  {sedes?.map((option) => (
+                    <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+                  ))}
+                </select>
+            </div>
+            <div className="flex mb-4 justify-start items-center">
+              <h2>Examenes: </h2>
+              <select id="Examenes" className="pointer border rounded-md px-2 py-1" value={selectarch ? JSON.stringify(selectarch) : ''} onChange={handleExamenChange}>
+                <option value="">Seleccionar Examenes</option>
+                {listarch?.map((option) => (
+                 <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
                 ))}
               </select>
+             
             </div>
+
+            
             <div className="flex mb-4">
               <label htmlFor="folderUpload" className={`${isFolderUploadEnabled ? 'bg-blue-500' : 'bg-gray-300'} text-white px-4 py-2 rounded cursor-pointer flex items-center`}>
                 <FontAwesomeIcon icon={faFolder} className="mr-2" />
                 Subir Carpeta
-                <input type="file" id="folderUpload" multiple directory="" webkitdirectory="" disabled={!selectedSede} onChange={handleFolderUpload} style={{ display: 'none' }} />
+                <input type="file" id="folderUpload" multiple directory="" webkitdirectory="" disabled={!selectedSede || !selectarch} onChange={handleFolderUpload} style={{ display: 'none' }} />
               </label>
             </div>
 
@@ -287,4 +322,4 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   );
 };
 
-export default DataUploadModal;
+export default DataUploadModal2;

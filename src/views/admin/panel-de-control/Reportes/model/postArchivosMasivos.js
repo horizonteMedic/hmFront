@@ -22,6 +22,7 @@ export default async function ArchivosMasivos(datos,user,token) {
        fechaActualizacion: null,
        userActualizacion: null,
        id_tipo_archivo: null,
+       nomenclatura_tipo_archivo: datos.nomenclatura,
        fileBase64: datos.base64
     }
 
