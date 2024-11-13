@@ -307,6 +307,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
               >
                 Subir Archivos
               </button>
+              <p>*Cada archivo se subira cada 4 segundos al sistema</p>
               {isUploading && <Loading />}
 
               {Object.values(uploadStatus).some(status => status === 'error') && (
