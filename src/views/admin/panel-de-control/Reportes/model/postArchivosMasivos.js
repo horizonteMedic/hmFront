@@ -2,6 +2,7 @@ import { URLAzure } from "../../../../config/config";
 
 export default async function ArchivosMasivos(datos,user,token) {
 
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
@@ -25,6 +26,7 @@ export default async function ArchivosMasivos(datos,user,token) {
        nomenclatura_tipo_archivo: datos.nomenclatura,
        fileBase64: datos.base64
     }
+    await sleep(3000)
 
     const options = {
         method: 'POST', 

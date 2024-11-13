@@ -70,34 +70,36 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     let failedUploads = [];
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    const uploadPromises = uparchFile.map(async (folder) => {
-    
+    for (const folder of uparchFile) {
       try {
-        const fileBase64 = await toBase64(folder);
-        const base64WithoutHeader = fileBase64.split(',')[1];
-        const datos = {
-          nombre: folder.name,
-          sede: selectedSede.cod_sede,
-          base64: base64WithoutHeader,
-          nomenclatura: null
-        };
-        const response = await ArchivosMasivos(datos, user, token);
-        
-        if (response.id === 1) {
-          await sleep(2000)
-          return
-        } else {
-          setUploadStatus((prevStatus) => ({...prevStatus,
-          [folder.name]: 'error', }));
-          failedUploads.push(folder.name);
-          await sleep(2000)
-        }
-        } catch (error) {
+          const fileBase64 = await toBase64(folder);
+          const base64WithoutHeader = fileBase64.split(',')[1];
+          const datos = {
+              nombre: folder.name,
+              sede: selectedSede.cod_sede,
+              base64: base64WithoutHeader,
+              nomenclatura: null
+          };
+
+          const response = await ArchivosMasivos(datos, user, token);
+
+          if (response.id === 1) {
+              console.log('Subida exitosa');
+          } else {
+              setUploadStatus((prevStatus) => ({
+                  ...prevStatus,
+                  [folder.name]: 'error',
+              }));
+              failedUploads.push(folder.name);
+          }
+      } catch (error) {
           console.error(`Error uploading ${folder.name}:`, error);
           failedUploads.push(folder.name);
-        }
-        })
-    await Promise.all(uploadPromises);
+      }
+
+      // Espera 5 segundos antes de la siguiente iteración
+      await sleep(4000);
+    }
     // Esperar 3 segundos antes de la sigui
     setSucred(true);
     setIsUploading(false);
