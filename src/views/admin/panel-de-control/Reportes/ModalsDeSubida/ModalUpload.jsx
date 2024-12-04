@@ -98,6 +98,8 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
           const ApellName = Nombres.trim().replace(/\s+/g, ' ');
           console.log(datosarch.orden)
           console.log(Orden)
+          console.log(cleanedNamePart)
+          console.log(ApellName)
           //Cod Orden
           const Nomenclatura = CodOrden[1].trim()
           
@@ -173,9 +175,13 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
         setUploading(true);
         NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
         .then(data => {
-          setUploadSuccess(true);
-          setUploading(false);
-          AleertSucces()
+          if (data.id) {
+            setUploadSuccess(true);
+            setUploading(false);
+            AleertSucces()
+          } else {
+            Swal.fire({title: 'Error', text: 'Ocurrio un error al subir el archivo', icon: 'error'})
+          }          
         })
         .catch(error => {
           console.error('Error:', error)

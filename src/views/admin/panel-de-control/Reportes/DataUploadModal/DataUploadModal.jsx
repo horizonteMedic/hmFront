@@ -184,6 +184,33 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           doc.addPage();
           pageNumber++;
           yPos = 20;
+          doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10);
+          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
+        }
+      }
+    });
+    // Agrega una nueva página si es necesario
+    if (yPos > 270) {
+      doc.addPage();
+      pageNumber++;
+      yPos = 20;
+    } else {
+        yPos += 10; // Espacio entre secciones
+    }
+    doc.text('Archivos Subidos Correctamente',10,yPos)
+    yPos += 10;
+
+    uploadedFiles.forEach((file) => {
+      if (uploadStatus[file.name] === 'success') {
+        doc.text(`${file.order}. ${file.name}`, 10, yPos);
+        yPos += 10;
+  
+        // Veamos si sirve xd
+        if (yPos > 280) {
+          doc.addPage();
+          pageNumber++;
+          yPos = 20;
+          doc.text(`Archivos Subidos Correctamente (Página ${pageNumber})`, 10, 10);
           // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
         }
       }
@@ -210,7 +237,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               </select>
             </div>
             <div className="flex mb-4">
-              <label htmlFor="folderUpload" className={`${isFolderUploadEnabled ? 'bg-blue-500' : 'bg-gray-300'} text-white px-4 py-2 rounded cursor-pointer flex items-center`}>
+              <label htmlFor="folderUpload" className={`bg-blue-500 text-white px-4 py-2 rounded cursor-pointer flex items-center`}>
                 <FontAwesomeIcon icon={faFolder} className="mr-2" />
                 Subir Carpeta
                 <input type="file" id="folderUpload" multiple directory="" webkitdirectory="" disabled={!selectedSede} onChange={handleFolderUpload} style={{ display: 'none' }} />

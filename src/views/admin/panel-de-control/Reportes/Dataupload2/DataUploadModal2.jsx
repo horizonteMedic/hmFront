@@ -98,6 +98,8 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
           if (response.id === 1) {
               console.log('Subida exitosa');
           } else {
+              console.log('falle we')
+              console.log(response.id)
               setUploadStatus((prevStatus) => ({
                   ...prevStatus,
                   [folder.name]: 'error',
@@ -208,6 +210,33 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
           doc.addPage();
           pageNumber++;
           yPos = 20;
+          doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10);
+          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
+        }
+      }
+    });
+    // Agrega una nueva página si es necesario
+    if (yPos > 270) {
+      doc.addPage();
+      pageNumber++;
+      yPos = 20;
+    } else {
+        yPos += 10; // Espacio entre secciones
+    }
+    doc.text('Archivos Subidos Correctamente',10,yPos)
+    yPos += 10;
+
+    uploadedFiles.forEach((file) => {
+      if (uploadStatus[file.name] === 'success') {
+        doc.text(`${file.order}. ${file.name}`, 10, yPos);
+        yPos += 10;
+  
+        // Veamos si sirve xd
+        if (yPos > 280) {
+          doc.addPage();
+          pageNumber++;
+          yPos = 20;
+          doc.text(`Archivos Subidos Correctamente (Página ${pageNumber})`, 10, 10);
           // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
         }
       }
