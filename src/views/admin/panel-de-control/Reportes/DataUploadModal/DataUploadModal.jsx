@@ -180,8 +180,20 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
       let yPos = 20;
       let pageNumber = 1;
+      // Datos generales
+      const fechaActual = new Date();
+      const fecha = fechaActual.toLocaleDateString();
+      const hora = fechaActual.toLocaleTimeString();
 
       doc.setFontSize(12);
+      doc.text(`Índice: ${indice}`, 10, yPos);
+      yPos += 10;
+      doc.text(`Usuario: ${user}`, 10, yPos); // Asume que tienes la variable `user`
+      yPos += 10;
+      doc.text(`Fecha: ${fecha}    Hora: ${hora}`, 10, yPos);
+      yPos += 10;
+      doc.text(`Cantidad Archivos: ${res.length}`, 10, yPos)
+      yPos += 20;
 
       // Sección: Errores
       doc.text('Errores:', 10, yPos);
