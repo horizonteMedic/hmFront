@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
+import NewIndex from '../model/newIndex';
+import { GetlistPDF } from '../model/getPDFlist';
 
 
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
@@ -15,7 +17,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uploadStatus, setUploadStatus] = useState({});
   const [sucred, setSucred] = useState(false);
   const [fileOrder, setFileOrder] = useState({});
-
+  const [indice, setIndice] = useState(0)
   const sedes = Sedes
   const defaultSede = sedes.find(sede => sede.cod_sede === 'T-NP');
   const initialSelectedSede = defaultSede || sedes[0];
@@ -65,11 +67,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
 
   
-
   const SubidaArchivos = async () => {
+    setIndice(0)
     let failedUploads = [];
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
+    const index = await NewIndex(user,uploadedFiles.length,token)
     for (const folder of uparchFile) {
       try {
           const fileBase64 = await toBase64(folder);
@@ -78,7 +80,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               nombre: folder.name,
               sede: selectedSede.cod_sede,
               base64: base64WithoutHeader,
-              nomenclatura: null
+              nomenclatura: null,
+              indice: index.id
           };
 
           const response = await ArchivosMasivos(datos, user, token);
@@ -100,6 +103,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       // Espera 5 segundos antes de la siguiente iteración
       await sleep(4000);
     }
+    setIndice(index.id)
     // Esperar 3 segundos antes de la sigui
     setSucred(true);
     setIsUploading(false);
@@ -168,55 +172,67 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
   const generateErrorTablePDF = () => {
     const doc = new jsPDF();
-    let yPos = 20;
-    let pageNumber = 1;
-  
-    doc.setFontSize(12);
-    doc.text(`Archivos con Error`, 10, 10);
-  
-    uploadedFiles.forEach((file) => {
-      if (uploadStatus[file.name] === 'error') {
-        doc.text(`${file.order}. ${file.name}`, 10, yPos);
-        yPos += 10;
-  
-        // Veamos si sirve xd
-        if (yPos > 280) {
-          doc.addPage();
-          pageNumber++;
-          yPos = 20;
-          doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10);
-          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
-        }
-      }
-    });
-    // Agrega una nueva página si es necesario
-    if (yPos > 270) {
-      doc.addPage();
-      pageNumber++;
-      yPos = 20;
-    } else {
-        yPos += 10; // Espacio entre secciones
-    }
-    doc.text('Archivos Subidos Correctamente',10,yPos)
-    yPos += 10;
+    GetlistPDF(token,indice)
+    .then((res) => {
+      console.log(res)
+      const errores = res.filter((item) => item.id === 0);
+      const subidos = res.filter((item) => item.id === 1);
 
-    uploadedFiles.forEach((file) => {
-      if (uploadStatus[file.name] === 'success') {
-        doc.text(`${file.order}. ${file.name}`, 10, yPos);
-        yPos += 10;
-  
-        // Veamos si sirve xd
-        if (yPos > 280) {
+      let yPos = 20;
+      let pageNumber = 1;
+
+      doc.setFontSize(12);
+
+      // Sección: Errores
+      doc.text('Errores:', 10, yPos);
+      yPos += 10;
+      errores.forEach((file) => {
+          doc.text(`- ${file.mensaje}`, 10, yPos);
+          yPos += 10;
+
+          if (yPos > 280) {
+              doc.addPage();
+              pageNumber++;
+              yPos = 20;
+          }
+      });
+
+      // Agregar espacio entre secciones o una nueva página si es necesario
+      if (yPos > 270) {
           doc.addPage();
           pageNumber++;
           yPos = 20;
-          doc.text(`Archivos Subidos Correctamente (Página ${pageNumber})`, 10, 10);
-          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
-        }
+      } else {
+          yPos += 10;
       }
-    });
-  
-    doc.save("archivos_con_error.pdf");
+
+      // Sección: Subidos Correctamente
+      doc.text('Subidos Correctamente:', 10, yPos);
+      yPos += 10;
+      subidos.forEach((file) => {
+          doc.text(`- ${file.mensaje}`, 10, yPos);
+          yPos += 10;
+
+          if (yPos > 280) {
+              doc.addPage();
+              pageNumber++;
+              yPos = 20;
+          }
+      });
+
+      // Guardar el PDF
+      doc.save('reporte_archivos.pdf');
+    })
+    .catch(() => {
+      console.error('Error al hacer la consulta:', error);
+      Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo generar el reporte. Por favor, inténtalo nuevamente.',
+      });
+    })
+
+    
   };
   
   return (
