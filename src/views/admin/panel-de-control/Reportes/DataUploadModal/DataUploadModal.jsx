@@ -196,7 +196,6 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         .concat(erroresNombres) // Combina las listas
         .filter(Boolean); // Limpia valores undefined nuevamente en la lista combinada
 
-      console.log(listaFinal);
       let yPos = 20;
       let pageNumber = 1;
       // Datos generales
@@ -211,7 +210,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       yPos += 10;
       doc.text(`Fecha: ${fecha}    Hora: ${hora}`, 10, yPos);
       yPos += 10;
-      doc.text(`Cantidad Archivos: ${res.length}`, 10, yPos)
+      doc.text(`Cantidad Archivos: ${uparchFile.length}`, 10, yPos)
       yPos += 20;
 
       // Sección: Errores
