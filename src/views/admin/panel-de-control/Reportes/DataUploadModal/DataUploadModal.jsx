@@ -85,9 +85,16 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           };
 
           const response = await ArchivosMasivos(datos, user, token);
-
-          if (response.id === 1) {
+          if (response.id) {
+            if (response.id === 1) {
               console.log('Subida exitosa');
+            } else {
+                setUploadStatus((prevStatus) => ({
+                    ...prevStatus,
+                    [folder.name]: 'error',
+                }));
+                failedUploads.push(folder.name);
+            }
           } else {
               setUploadStatus((prevStatus) => ({
                   ...prevStatus,
@@ -95,6 +102,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               }));
               failedUploads.push(folder.name);
           }
+          
       } catch (error) {
           console.error(`Error uploading ${folder.name}:`, error);
           failedUploads.push(folder.name);
@@ -172,12 +180,23 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
 
   const generateErrorTablePDF = () => {
     const doc = new jsPDF();
+
     GetlistPDF(token,indice)
     .then((res) => {
-      console.log(res)
+
       const errores = res.filter((item) => item.id === 0);
       const subidos = res.filter((item) => item.id === 1);
+      const erroresNombres = errores.map((item) => item.nombre);
 
+      const listaFinal = Object.entries(uploadStatus)
+        .filter(([nombre, estado]) => estado === 'error') // Filtra errores en uploadStatus
+        .map(([nombre]) => nombre) // Mapea nombres
+        .filter(Boolean) // Elimina valores undefined
+        .filter((nombre) => !erroresNombres.includes(nombre)) // Excluye duplicados
+        .concat(erroresNombres) // Combina las listas
+        .filter(Boolean); // Limpia valores undefined nuevamente en la lista combinada
+
+      console.log(listaFinal);
       let yPos = 20;
       let pageNumber = 1;
 
@@ -186,16 +205,17 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       // Sección: Errores
       doc.text('Errores:', 10, yPos);
       yPos += 10;
-      errores.forEach((file) => {
-          doc.text(`- ${file.mensaje}`, 10, yPos);
-          yPos += 10;
-
-          if (yPos > 280) {
-              doc.addPage();
-              pageNumber++;
-              yPos = 20;
-          }
-      });
+      listaFinal.forEach((file) => {
+        doc.text(`- ${file}`, 10, yPos); // Muestra cada archivo de la lista final
+        yPos += 10;
+    
+        // Manejar salto de página si se supera el espacio
+        if (yPos > 280) {
+            doc.addPage();
+            pageNumber++;
+            yPos = 20;
+        }
+    });
 
       // Agregar espacio entre secciones o una nueva página si es necesario
       if (yPos > 270) {
