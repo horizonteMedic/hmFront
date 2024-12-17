@@ -362,21 +362,22 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               >
                 Subir Archivos
               </button>
+              <p style={{padding:'10px'}}>*Cada archivo se subira cada 4 segundos al sistema</p>
+              {isUploading && <Loading />}
 
-              <p style={{marginTop:'10px'}}>*Cada archivo se subira cada 4 segundos al sistema</p>
-              
-              <div className="flex justify-center mt-4">
                 {isPDFAvailable && (
-                  <button
-                    className="px-4 py-2 rounded bg-red-500 text-white"
-                    onClick={generateErrorTablePDF}
-                  >
-                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                    Descargar Errores en PDF
-                  </button>
-                )}
-              </div>
+                  <div className="flex justify-center mt-4">
 
+                    <button
+                      className="px-4 py-2 rounded bg-red-500 text-white"
+                      onClick={generateErrorTablePDF}
+                    >
+                      <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                      Descargar Errores en PDF
+                    </button>
+                  </div>
+
+                )}
             </div>
           </div>
         </div>
