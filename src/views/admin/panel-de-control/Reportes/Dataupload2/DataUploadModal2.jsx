@@ -1,16 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faFolder, faCheck, faTimesCircle, faDownload } from '@fortawesome/free-solid-svg-icons'; 
 import Swal from 'sweetalert2';
 import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
-import NewIndex from '../model/newIndex';
+import { getFetch } from '../../getFetch/getFetch';
 import { GetlistPDF } from '../model/getPDFlist';
-import autoTable from "jspdf-autotable";
-
-
-const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
+const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
+  const [listarch, setListarch] = useState([])
+  const [selectarch, setSelectarch] = useState('')
   const [uparchFile, setUparchFile] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isFolderUploadEnabled, setIsFolderUploadEnabled] = useState(false);
@@ -19,12 +18,22 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [sucred, setSucred] = useState(false);
   const [fileOrder, setFileOrder] = useState({});
   const [indice, setIndice] = useState(0)
+
   const sedes = Sedes
   const defaultSede = sedes.find(sede => sede.cod_sede === 'T-NP');
   const initialSelectedSede = defaultSede || sedes[0];
   const [selectedSede, setSelectedSede] = useState(initialSelectedSede);
-  const [isPDFAvailable, setIsPDFAvailable] = useState(false);
 
+
+  useEffect(() => {
+    getFetch('/api/v01/ct/tipoArchivo',token)
+    .then((res) => {
+      setListarch(res)
+    })
+    .catch((error) =>{
+      throw new Error('Network response was not ok.', error);
+    })
+  }, [listarch])
 
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
@@ -69,11 +78,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
 
   
+
   const SubidaArchivos = async () => {
-    setIndice(0)
     let failedUploads = [];
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    const index = await NewIndex(user,uploadedFiles.length,token)
+
     for (const folder of uparchFile) {
       try {
           const fileBase64 = await toBase64(folder);
@@ -82,11 +91,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               nombre: folder.name,
               sede: selectedSede.cod_sede,
               base64: base64WithoutHeader,
-              nomenclatura: null,
-              indice: index.id
+              nomenclatura: selectarch.nomenclatura
           };
 
           const response = await ArchivosMasivos(datos, user, token);
+
           if (response.id) {
             if (response.id === 1) {
               console.log('Subida exitosa');
@@ -104,7 +113,6 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               }));
               failedUploads.push(folder.name);
           }
-          
       } catch (error) {
           console.error(`Error uploading ${folder.name}:`, error);
           failedUploads.push(folder.name);
@@ -113,12 +121,10 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       // Espera 5 segundos antes de la siguiente iteración
       await sleep(4000);
     }
-    setIndice(index.id)
+   
     // Esperar 3 segundos antes de la sigui
     setSucred(true);
     setIsUploading(false);
-    setIsPDFAvailable(true); // Activa el botón de descarga PDF
-    
     if (failedUploads.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -147,8 +153,13 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
 
   const handleConfirmUpload = async () => {
-    if (!selectedSede || uploadedFiles.length === 0) {
+    if (!selectedSede) {
       Swal.fire('Error', 'Por favor selecciona una sede y sube al menos un archivo.', 'error');
+      return;
+    }
+
+    if (!selectarch || uploadedFiles.length === 0) {
+      Swal.fire('Error', 'Por favor selecciona un tipo de archivo y sube al menos un archivo.', 'error');
       return;
     }
 
@@ -182,130 +193,135 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setIsFolderUploadEnabled(true);
   };
 
-  
+  const handleExamenChange = (e) => {
+    const selectedOption = JSON.parse(e.target.value);
+    setSelectarch(selectedOption);
+    setIsFolderUploadEnabled(true);
+  };
+
   const generateErrorTablePDF = () => {
     const doc = new jsPDF();
-  
-    GetlistPDF(token, indice)
-      .then((res) => {
-        const errores = res.filter((item) => item.id === 0); // Archivos con error
-        const subidos = res.filter((item) => item.id === 1); // Archivos correctos
-  
-        const erroresNombres = errores.map((item) => item.nombre);
-  
-        // Filtrar nombres inválidos como 'desktop.ini' o vacíos
-        const listaFinal = Object.entries(uploadStatus)
-          .filter(
-            ([nombre, estado]) =>
-              estado === "error" &&
-              nombre !== "desktop.ini" && // Excluir desktop.ini
-              nombre.trim() !== ""        // Excluir nombres vacíos
-          )
-          .map(([nombre]) => nombre)
-          .concat(erroresNombres)
-          .filter((nombre) => nombre && nombre.trim() !== ""); // Validar nuevamente nombres vacíos
-  
-        // Configuración inicial del PDF
-        let yPos = 20;
-        const fechaActual = new Date();
-        const fecha = fechaActual.toLocaleDateString();
-        const hora = fechaActual.toLocaleTimeString();
-  
-        doc.setFontSize(12);
-        doc.text(`Índice: ${indice}`, 10, yPos);
+
+    GetlistPDF(token,indice)
+    .then((res) => {
+
+      const errores = res.filter((item) => item.id === 0);
+      const subidos = res.filter((item) => item.id === 1);
+      const erroresNombres = errores.map((item) => item.nombre);
+
+      const listaFinal = Object.entries(uploadStatus)
+        .filter(([nombre, estado]) => estado === 'error') // Filtra errores en uploadStatus
+        .map(([nombre]) => nombre) // Mapea nombres
+        .filter(Boolean) // Elimina valores undefined
+        .filter((nombre) => !erroresNombres.includes(nombre)) // Excluye duplicados
+        .concat(erroresNombres) // Combina las listas
+        .filter(Boolean); // Limpia valores undefined nuevamente en la lista combinada
+
+      let yPos = 20;
+      let pageNumber = 1;
+      // Datos generales
+      const fechaActual = new Date();
+      const fecha = fechaActual.toLocaleDateString();
+      const hora = fechaActual.toLocaleTimeString();
+
+      doc.setFontSize(12);
+      doc.text(`Índice: ${indice}`, 10, yPos);
+      yPos += 10;
+      doc.text(`Usuario: ${user}`, 10, yPos); // Asume que tienes la variable `user`
+      yPos += 10;
+      doc.text(`Fecha: ${fecha}    Hora: ${hora}`, 10, yPos);
+      yPos += 10;
+      doc.text(`Cantidad Archivos: ${uparchFile.length}`, 10, yPos)
+      yPos += 20;
+
+      // Sección: Errores
+      doc.text('Errores:', 10, yPos);
+      yPos += 10;
+      listaFinal.forEach((file) => {
+        doc.text(`- ${file}`, 10, yPos); // Muestra cada archivo de la lista final
         yPos += 10;
-        doc.text(`Usuario: ${user}`, 10, yPos);
-        yPos += 10;
-        doc.text(`Fecha: ${fecha}    Hora: ${hora}`, 10, yPos);
-        yPos += 10;
-        doc.text(`Cantidad Total de Archivos: ${uparchFile.length}`, 10, yPos);
-        yPos += 10;
-  
-        // Tabla de Errores Filtrada
-        doc.setFontSize(14);
-        doc.text("Errores de Subida:", 10, yPos);
-        yPos += 5;
-  
-        const errorTable = listaFinal.map((file, index) => [
-          index + 1,
-          file,
-          "Error",
-        ]);
-  
-        autoTable(doc, {
-          startY: yPos + 5,
-          head: [["#", "Nombre del Archivo", "Estado"]],
-          body: errorTable,
-          theme: "grid",
-          styles: { fontSize: 10, cellPadding: 2 },
-          headStyles: { fillColor: [255, 99, 132], textColor: 255 },
-        });
-  
-        yPos = doc.lastAutoTable.finalY + 10;
-  
-        // Tabla de Archivos Subidos Correctamente
-        doc.text("Archivos Subidos Correctamente:", 10, yPos);
-        yPos += 5;
-  
-        const successTable = subidos.map((file, index) => [
-          index + 1,
-          file.mensaje || "Nombre no disponible", // Usa file.mensaje como indicas
-          "Subido Correctamente",
-        ]);
-  
-        autoTable(doc, {
-          startY: yPos + 5,
-          head: [["#", "Nombre del Archivo", "Estado"]],
-          body: successTable,
-          theme: "grid",
-          styles: { fontSize: 10, cellPadding: 2 },
-          headStyles: { fillColor: [75, 192, 192], textColor: 255 },
-        });
-  
-        // Numeración de páginas
-        const totalPages = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= totalPages; i++) {
-          doc.setPage(i);
-          doc.text(`Página ${i} de ${totalPages}`, 105, 290, { align: "center" });
+    
+        // Manejar salto de página si se supera el espacio
+        if (yPos > 280) {
+            doc.addPage();
+            pageNumber++;
+            yPos = 20;
         }
-  
-        // Guardar el PDF
-        doc.save("reporte_archivos.pdf");
-      })
-      .catch((error) => {
-        console.error("Error al generar el PDF:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "No se pudo generar el reporte. Por favor, inténtalo nuevamente.",
-        });
+    });
+
+      // Agregar espacio entre secciones o una nueva página si es necesario
+      if (yPos > 270) {
+          doc.addPage();
+          pageNumber++;
+          yPos = 20;
+      } else {
+          yPos += 10;
+      }
+
+      // Sección: Subidos Correctamente
+      doc.text('Subidos Correctamente:', 10, yPos);
+      yPos += 10;
+      subidos.forEach((file) => {
+          doc.text(`- ${file.mensaje}`, 10, yPos);
+          yPos += 10;
+
+          if (yPos > 280) {
+              doc.addPage();
+              pageNumber++;
+              yPos = 20;
+          }
       });
+
+      // Guardar el PDF
+      doc.save('reporte_archivos.pdf');
+    })
+    .catch(() => {
+      console.error('Error al hacer la consulta:', error);
+      Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo generar el reporte. Por favor, inténtalo nuevamente.',
+      });
+    })
+
+    
   };
-  
-  
-  
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[600px] relative">
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[700px] relative">
         <FontAwesomeIcon icon={faTimes} className="absolute top-0 right-0 m-3 cursor-pointer text-gray-400" onClick={closeModal} />
         <div className="p azuloscurobackground flex justify-between p-3.5">
           <h1 className="text-start font-bold color-azul text-white">Subir Carga Masiva de Datos</h1>
         </div>
         <div className='container p-4'>
           <div className="bg-white rounded-lg z-50">
-            <div className="flex mb-4">
-              <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede ? JSON.stringify(selectedSede) : ''} onChange={handleSelectChange}>
-                <option value="">Seleccionar Sede</option>
-                {sedes?.map((option) => (
-                  <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+            <div className="flex mb-4 justify-start items-center">
+              <h2>Sedes: </h2>
+                <select id="sedes" className="pointer border rounded-md px-2 py-1" value={selectedSede ? JSON.stringify(selectedSede) : ''} onChange={handleSelectChange}>
+                  <option value="">Seleccionar Sede</option>
+                  {sedes?.map((option) => (
+                    <option key={option.cod_sede} value={JSON.stringify(option)}>{option.nombre_sede}</option>
+                  ))}
+                </select>
+            </div>
+            <div className="flex mb-4 justify-start items-center">
+              <h2>Examenes: </h2>
+              <select id="Examenes" className="pointer border rounded-md px-2 py-1" value={selectarch ? JSON.stringify(selectarch) : ''} onChange={handleExamenChange}>
+                <option value="">Seleccionar Examenes</option>
+                {listarch?.map((option) => (
+                 <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
                 ))}
               </select>
+             
             </div>
+
+            
             <div className="flex mb-4">
-              <label htmlFor="folderUpload" className={`bg-blue-500 text-white px-4 py-2 rounded cursor-pointer flex items-center`}>
+              <label htmlFor="folderUpload" className={`${isFolderUploadEnabled ? 'bg-blue-500' : 'bg-gray-300'} text-white px-4 py-2 rounded cursor-pointer flex items-center`}>
                 <FontAwesomeIcon icon={faFolder} className="mr-2" />
                 Subir Carpeta
-                <input type="file" id="folderUpload" multiple directory="" webkitdirectory="" disabled={!selectedSede} onChange={handleFolderUpload} style={{ display: 'none' }} />
+                <input type="file" id="folderUpload" multiple directory="" webkitdirectory="" disabled={!selectedSede || !selectarch} onChange={handleFolderUpload} style={{ display: 'none' }} />
               </label>
             </div>
 
@@ -362,21 +378,18 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               >
                 Subir Archivos
               </button>
+              <p>*Cada archivo se subira cada 4 segundos al sistema</p>
+              {isUploading && <Loading />}
 
-              <p style={{marginTop:'10px'}}>*Cada archivo se subira cada 4 segundos al sistema</p>
-              
-              <div className="flex justify-center mt-4">
-                {isPDFAvailable && (
-                  <button
-                    className="px-4 py-2 rounded bg-red-500 text-white"
-                    onClick={generateErrorTablePDF}
-                  >
-                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                    Descargar Errores en PDF
-                  </button>
-                )}
-              </div>
-
+              {Object.values(uploadStatus).some(status => status === 'error') && (
+                <button
+                  className="px-4 py-2 rounded bg-red-500 text-white"
+                  onClick={generateErrorTablePDF}
+                >
+                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                  Descargar Errores en PDF
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -385,4 +398,4 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   );
 };
 
-export default DataUploadModal;
+export default DataUploadModal2;
