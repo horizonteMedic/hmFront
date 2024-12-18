@@ -272,7 +272,7 @@ const HistorialPaciente = () => {
       <h1 className="text-start font-bold color-azul text-white">Reporte de Pacientes</h1>
       
       <div className="flex items-center">
-        <button className="naranja-btn px-4 rounded flex items-center mr-3" onClick={toggleFullScreen}>
+        <button className="naranja-btn  px-4 py-1 rounded flex items-center mr-3" onClick={toggleFullScreen}>
           <FontAwesomeIcon icon={isFullScreen ? faCompress : faExpand} className="mr-2" />
           {isFullScreen ? 'Reducir' : 'Expandir'}
         </button>
@@ -280,7 +280,7 @@ const HistorialPaciente = () => {
 
         {AccesCargaMasiva && <button
           onClick={() => setShowDataUploadModal(true)}
-          className="verde-btn px-4 rounded flex items-center mr-3"
+          className="verde-btn px-4 py-1 rounded flex items-center mr-3"
         >
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
           Subir Carpeta
@@ -288,7 +288,7 @@ const HistorialPaciente = () => {
 
         {AccesCargaMasivaPers && <button
           onClick={() => setShowDataUploadModal2(true)}
-          className="verde-btn px-4 rounded flex items-center mr-3"
+          className="verde-btn px-4 py-1 rounded flex items-center mr-3"
         >
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
           Subir Carpeta 2
