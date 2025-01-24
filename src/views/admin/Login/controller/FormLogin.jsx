@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faL } from "@fortawesome/free-solid-svg-icons";
 import { Loading } from "../../../components/Loading";
 import Errors from "../../../components/Errors";
-
+import Swal from "sweetalert2";
 export function FormLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -21,9 +21,41 @@ export function FormLogin() {
   const [loading, setloadign] = useState(false);
   const [errormess, setErrormess] = useState('')
 
+  const Toast = Swal.mixin({
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      showCloseButton: true,
+      timer: 10000,
+      width: '400px',
+      timerProgressBar: true,
+      customClass: {
+        popup: 'text-xl'
+      },
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      }
+    });
+  
+  
   function Loginvnigate(token) {
     if (token !== null) {
       navigate("/panel-de-control");
+      Toast.fire({
+
+        title: `COMUNICADO MATRIZ / MALLA OCOPACIONAL
+
+        Estimados usuarios: 
+        
+        Se les comunica que, a partir del 23 de enero del 2025, la matriz/malla ocupacional esta disponible para visualización y descargar en el partado de matriz. También indicarles que el manual de usuario está disponible para su descarga.
+        
+        Estamos trabajando para brinda un mejor servicio.
+        Atentamente
+        
+        Horizonte Medic`,
+        imageUrl: '/img/logo-color.png'
+      }); 
     }
   }
 
