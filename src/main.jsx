@@ -3,7 +3,7 @@ import { isTokenExpired, useAuthStore } from './store/auth.js';
 import { createRoot } from 'react-dom/client'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.js';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import './index.css';
 import Footer from './views/components/Footer.jsx';
 import Navbar from './views/components/Navbar.jsx';
@@ -89,6 +89,7 @@ const AppContent = () => {
 
         </Route>
         <Route path='/RegistroP' element={<Formulario/>}/>
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
       
