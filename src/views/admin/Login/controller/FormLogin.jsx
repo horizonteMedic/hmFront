@@ -23,14 +23,14 @@ export function FormLogin() {
 
   const Toast = Swal.mixin({
       toast: true,
-      position: "top-end",
-      showConfirmButton: false,
+      showConfirmButton: true,
+      confirmButtonText: "De Acuerdo!",
+      confirmButtonColor: "#233245",
       showCloseButton: true,
-      timer: 10000,
-      width: '400px',
+      width: '600px',
       timerProgressBar: true,
       customClass: {
-        popup: 'text-xl'
+        popup: 'text-3xl'
       },
       didOpen: (toast) => {
         toast.onmouseenter = Swal.stopTimer;
