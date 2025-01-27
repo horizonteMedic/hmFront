@@ -6,7 +6,7 @@ import ArchivosMasivos from '../model/postArchivosMasivos';
 import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
 import { getFetch } from '../../getFetch/getFetch';
-
+import { GetlistPDF } from '../model/getPDFlist';
 const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
   const [listarch, setListarch] = useState([])
   const [selectarch, setSelectarch] = useState('')
@@ -17,6 +17,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
   const [uploadStatus, setUploadStatus] = useState({});
   const [sucred, setSucred] = useState(false);
   const [fileOrder, setFileOrder] = useState({});
+  const [indice, setIndice] = useState(0)
 
   const sedes = Sedes
   const defaultSede = sedes.find(sede => sede.cod_sede === 'T-NP');
@@ -95,11 +96,17 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
 
           const response = await ArchivosMasivos(datos, user, token);
 
-          if (response.id === 1) {
+          if (response.id) {
+            if (response.id === 1) {
               console.log('Subida exitosa');
+            } else {
+                setUploadStatus((prevStatus) => ({
+                    ...prevStatus,
+                    [folder.name]: 'error',
+                }));
+                failedUploads.push(folder.name);
+            }
           } else {
-              console.log('falle we')
-              console.log(response.id)
               setUploadStatus((prevStatus) => ({
                   ...prevStatus,
                   [folder.name]: 'error',
@@ -194,55 +201,90 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
 
   const generateErrorTablePDF = () => {
     const doc = new jsPDF();
-    let yPos = 20;
-    let pageNumber = 1;
-  
-    doc.setFontSize(12);
-    doc.text(`Archivos con Error`, 10, 10);
-  
-    uploadedFiles.forEach((file) => {
-      if (uploadStatus[file.name] === 'error') {
-        doc.text(`${file.order}. ${file.name}`, 10, yPos);
-        yPos += 10;
-  
-        // Veamos si sirve xd
-        if (yPos > 280) {
-          doc.addPage();
-          pageNumber++;
-          yPos = 20;
-          doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10);
-          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
-        }
-      }
-    });
-    // Agrega una nueva página si es necesario
-    if (yPos > 270) {
-      doc.addPage();
-      pageNumber++;
-      yPos = 20;
-    } else {
-        yPos += 10; // Espacio entre secciones
-    }
-    doc.text('Archivos Subidos Correctamente',10,yPos)
-    yPos += 10;
 
-    uploadedFiles.forEach((file) => {
-      if (uploadStatus[file.name] === 'success') {
-        doc.text(`${file.order}. ${file.name}`, 10, yPos);
+    GetlistPDF(token,indice)
+    .then((res) => {
+
+      const errores = res.filter((item) => item.id === 0);
+      const subidos = res.filter((item) => item.id === 1);
+      const erroresNombres = errores.map((item) => item.nombre);
+
+      const listaFinal = Object.entries(uploadStatus)
+        .filter(([nombre, estado]) => estado === 'error') // Filtra errores en uploadStatus
+        .map(([nombre]) => nombre) // Mapea nombres
+        .filter(Boolean) // Elimina valores undefined
+        .filter((nombre) => !erroresNombres.includes(nombre)) // Excluye duplicados
+        .concat(erroresNombres) // Combina las listas
+        .filter(Boolean); // Limpia valores undefined nuevamente en la lista combinada
+
+      let yPos = 20;
+      let pageNumber = 1;
+      // Datos generales
+      const fechaActual = new Date();
+      const fecha = fechaActual.toLocaleDateString();
+      const hora = fechaActual.toLocaleTimeString();
+
+      doc.setFontSize(12);
+      doc.text(`Índice: ${indice}`, 10, yPos);
+      yPos += 10;
+      doc.text(`Usuario: ${user}`, 10, yPos); // Asume que tienes la variable `user`
+      yPos += 10;
+      doc.text(`Fecha: ${fecha}    Hora: ${hora}`, 10, yPos);
+      yPos += 10;
+      doc.text(`Cantidad Archivos: ${uparchFile.length}`, 10, yPos)
+      yPos += 20;
+
+      // Sección: Errores
+      doc.text('Errores:', 10, yPos);
+      yPos += 10;
+      listaFinal.forEach((file) => {
+        doc.text(`- ${file}`, 10, yPos); // Muestra cada archivo de la lista final
         yPos += 10;
-  
-        // Veamos si sirve xd
+    
+        // Manejar salto de página si se supera el espacio
         if (yPos > 280) {
+            doc.addPage();
+            pageNumber++;
+            yPos = 20;
+        }
+    });
+
+      // Agregar espacio entre secciones o una nueva página si es necesario
+      if (yPos > 270) {
           doc.addPage();
           pageNumber++;
           yPos = 20;
-          doc.text(`Archivos Subidos Correctamente (Página ${pageNumber})`, 10, 10);
-          // doc.text(`Archivos con Error (Página ${pageNumber})`, 10, 10); ( logica para mostrar por paginas y daa)
-        }
+      } else {
+          yPos += 10;
       }
-    });
-  
-    doc.save("archivos_con_error.pdf");
+
+      // Sección: Subidos Correctamente
+      doc.text('Subidos Correctamente:', 10, yPos);
+      yPos += 10;
+      subidos.forEach((file) => {
+          doc.text(`- ${file.mensaje}`, 10, yPos);
+          yPos += 10;
+
+          if (yPos > 280) {
+              doc.addPage();
+              pageNumber++;
+              yPos = 20;
+          }
+      });
+
+      // Guardar el PDF
+      doc.save('reporte_archivos.pdf');
+    })
+    .catch(() => {
+      console.error('Error al hacer la consulta:', error);
+      Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo generar el reporte. Por favor, inténtalo nuevamente.',
+      });
+    })
+
+    
   };
 
   return (

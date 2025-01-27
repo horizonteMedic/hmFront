@@ -7,7 +7,7 @@ import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
 import NewIndex from '../model/newIndex';
 import { GetlistPDF } from '../model/getPDFlist';
-
+import autoTable from "jspdf-autotable";
 
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uparchFile, setUparchFile] = useState([]);
@@ -17,13 +17,18 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uploadStatus, setUploadStatus] = useState({});
   const [sucred, setSucred] = useState(false);
   const [fileOrder, setFileOrder] = useState({});
-  const [indice, setIndice] = useState(0)
-  const sedes = Sedes
+  const [indice, setIndice] = useState(0);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  
+  const sedes = Sedes;
   const defaultSede = sedes.find(sede => sede.cod_sede === 'T-NP');
   const initialSelectedSede = defaultSede || sedes[0];
   const [selectedSede, setSelectedSede] = useState(initialSelectedSede);
+  const [isPDFAvailable, setIsPDFAvailable] = useState(false);
 
-
+  // Estados para la simulación de descarga del PDF
+  const [isDownloadingPDF, setIsDownloadingPDF] = useState(false);
+  const [downloadProgressPDF, setDownloadProgressPDF] = useState(0);
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();
     return ext === 'jpg' || ext === 'jpeg' || ext === 'png' ||  ext === 'pdf' ;
@@ -32,9 +37,11 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const handleFolderUpload = (e) => {
     setUploadedFiles([]);
     setUploadStatus({});
-    setFileOrder({}); // Reset file order
-
-    const folders = Array.from(e.target.files);
+    setFileOrder({});
+  
+    // Filtrar el archivo desktop.ini
+    let folders = Array.from(e.target.files).filter(file => file.name.toLowerCase() !== "desktop.ini");
+    
     setUparchFile(folders);
     const folderNames = folders.map((folder, index) => {
       const order = index + 1;
@@ -48,7 +55,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       };
     });
     setUploadedFiles((prevFiles) => [...prevFiles, ...folderNames]);
-
+  
     folders.forEach((folder) => {
       if (!isImageOrPDFOrExcel(folder.name)) {
         setUploadStatus((prevStatus) => ({
@@ -65,13 +72,16 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       }
     });
   };
-
   
+
+
   const SubidaArchivos = async () => {
-    setIndice(0)
+    setIndice(0);
     let failedUploads = [];
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-    const index = await NewIndex(user,uploadedFiles.length,token)
+    const index = await NewIndex(user, uploadedFiles.length, token);
+    let uploadedCount = 0; // Contador de archivos procesados
+
     for (const folder of uparchFile) {
       try {
           const fileBase64 = await toBase64(folder);
@@ -89,18 +99,18 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
             if (response.id === 1) {
               console.log('Subida exitosa');
             } else {
-                setUploadStatus((prevStatus) => ({
-                    ...prevStatus,
-                    [folder.name]: 'error',
-                }));
-                failedUploads.push(folder.name);
-            }
-          } else {
               setUploadStatus((prevStatus) => ({
-                  ...prevStatus,
-                  [folder.name]: 'error',
+                ...prevStatus,
+                [folder.name]: 'error',
               }));
               failedUploads.push(folder.name);
+            }
+          } else {
+            setUploadStatus((prevStatus) => ({
+              ...prevStatus,
+              [folder.name]: 'error',
+            }));
+            failedUploads.push(folder.name);
           }
           
       } catch (error) {
@@ -108,13 +118,19 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           failedUploads.push(folder.name);
       }
 
-      // Espera 5 segundos antes de la siguiente iteración
+      // Actualizar el progreso
+      uploadedCount++;
+      const progress = Math.round((uploadedCount / uparchFile.length) * 100);
+      setUploadProgress(progress);
+
+      // Espera 4 segundos antes de la siguiente iteración
       await sleep(4000);
     }
-    setIndice(index.id)
-    // Esperar 3 segundos antes de la sigui
+    setIndice(index.id);
     setSucred(true);
     setIsUploading(false);
+    setIsPDFAvailable(true); // Activa el botón de descarga PDF
+    
     if (failedUploads.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -158,6 +174,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         setIsUploading(true);
+        setUploadProgress(0); // Reiniciar el progreso
         SubidaArchivos();
       }
     });
@@ -178,98 +195,215 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setIsFolderUploadEnabled(true);
   };
 
+
   const generateErrorTablePDF = () => {
-    const doc = new jsPDF();
-
-    GetlistPDF(token,indice)
-    .then((res) => {
-
-      const errores = res.filter((item) => item.id === 0);
-      const subidos = res.filter((item) => item.id === 1);
-      const erroresNombres = errores.map((item) => item.nombre);
-
-      const listaFinal = Object.entries(uploadStatus)
-        .filter(([nombre, estado]) => estado === 'error') // Filtra errores en uploadStatus
-        .map(([nombre]) => nombre) // Mapea nombres
-        .filter(Boolean) // Elimina valores undefined
-        .filter((nombre) => !erroresNombres.includes(nombre)) // Excluye duplicados
-        .concat(erroresNombres) // Combina las listas
-        .filter(Boolean); // Limpia valores undefined nuevamente en la lista combinada
-
-      let yPos = 20;
-      let pageNumber = 1;
-      // Datos generales
-      const fechaActual = new Date();
-      const fecha = fechaActual.toLocaleDateString();
-      const hora = fechaActual.toLocaleTimeString();
-
-      doc.setFontSize(12);
-      doc.text(`Índice: ${indice}`, 10, yPos);
-      yPos += 10;
-      doc.text(`Usuario: ${user}`, 10, yPos); // Asume que tienes la variable `user`
-      yPos += 10;
-      doc.text(`Fecha: ${fecha}    Hora: ${hora}`, 10, yPos);
-      yPos += 10;
-      doc.text(`Cantidad Archivos: ${uparchFile.length}`, 10, yPos)
-      yPos += 20;
-
-      // Sección: Errores
-      doc.text('Errores:', 10, yPos);
-      yPos += 10;
-      listaFinal.forEach((file) => {
-        doc.text(`- ${file}`, 10, yPos); // Muestra cada archivo de la lista final
-        yPos += 10;
-    
-        // Manejar salto de página si se supera el espacio
-        if (yPos > 280) {
-            doc.addPage();
-            pageNumber++;
-            yPos = 20;
+    // Iniciar simulación de descarga
+    setIsDownloadingPDF(true);
+    setDownloadProgressPDF(0);
+  
+    // Simular descarga con un intervalo
+    const interval = setInterval(() => {
+      setDownloadProgressPDF((prev) => {
+        const nextVal = prev + 10;
+        if (nextVal >= 100) {
+          clearInterval(interval);
+          // Una vez alcanzado el 100%, generar el PDF
+          descargarPDF();
+          return 100;
         }
-    });
-
-      // Agregar espacio entre secciones o una nueva página si es necesario
-      if (yPos > 270) {
-          doc.addPage();
-          pageNumber++;
-          yPos = 20;
-      } else {
-          yPos += 10;
-      }
-
-      // Sección: Subidos Correctamente
-      doc.text('Subidos Correctamente:', 10, yPos);
-      yPos += 10;
-      subidos.forEach((file) => {
-          doc.text(`- ${file.mensaje}`, 10, yPos);
-          yPos += 10;
-
-          if (yPos > 280) {
-              doc.addPage();
-              pageNumber++;
-              yPos = 20;
-          }
+        return nextVal;
       });
-
-      // Guardar el PDF
-      doc.save('reporte_archivos.pdf');
-    })
-    .catch(() => {
-      console.error('Error al hacer la consulta:', error);
-      Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'No se pudo generar el reporte. Por favor, inténtalo nuevamente.',
-      });
-    })
-
-    
+    }, 200); // cada 200ms aumenta un 10%
   };
   
+  const descargarPDF = () => {
+    const doc = new jsPDF();
+    const imgUrl = "/img/logo-color.png";
+  
+    const loadImageAsBase64 = (url) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.src = url;
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          const dataURL = canvas.toDataURL("image/png");
+          resolve(dataURL);
+        };
+        img.onerror = (error) => reject(error);
+      });
+    };
+  
+    loadImageAsBase64(imgUrl)
+      .then((logoData) => {
+        GetlistPDF(token, indice)
+          .then((res) => {
+            const errores = res.filter((item) => item.id === 0); // Archivos con error
+            const subidos = res.filter((item) => item.id === 1); // Archivos correctos
+  
+            const erroresNombres = errores.map((item) => item.nombre);
+  
+            const listaFinal = Object.entries(uploadStatus)
+              .filter(
+                ([nombre, estado]) =>
+                  estado === "error" &&
+                  nombre.toLowerCase() !== "desktop.ini" &&
+                  nombre.trim() !== ""
+              )
+              .map(([nombre]) => nombre)
+              .concat(erroresNombres)
+              .filter((nombre) => nombre && nombre.trim() !== "");
+  
+            doc.addImage(logoData, "PNG", 10, 10, 50, 15);
+  
+            let yPos = 30;
+            const fechaActual = new Date();
+            const fecha = fechaActual.toLocaleDateString();
+            const hora = fechaActual.toLocaleTimeString();
+  
+            // Título en negrita
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text("Reporte de Datos Cargados", 10, yPos);
+            yPos += 10;
+  
+            doc.setFontSize(10);
+            const leftColX = 10;
+            const rightColX = 100;
+  
+            // ÍNDICE en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Índice:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${indice}`, leftColX + 20, yPos);
+  
+            // FECHA en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Fecha:", rightColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${fecha}`, rightColX + 15, yPos);
+            yPos += 10;
+  
+            // USUARIO en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Usuario:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${user}`, leftColX + 25, yPos);
+  
+            // HORA en negrita
+            doc.setFont("helvetica", "bold");
+            doc.text("Hora:", rightColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.text(`${hora}`, rightColX + 12, yPos);
+            yPos += 10;
+  
+            // Cantidad Total de Archivos en negrita y color rojo
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(255,0,0);
+            doc.text(`Cantidad Total de Archivos: ${uparchFile.length}`, leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            doc.setTextColor(0,0,0);
+            yPos += 10;
+  
+            // Título de la tabla de errores en negrita
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Archivos subidos con error:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            yPos += 5;
+  
+            const errorTable = listaFinal.map((file, index) => [
+              index + 1,
+              file,
+              "Error",
+            ]);
+  
+            autoTable(doc, {
+              startY: yPos + 5,
+              head: [["#", "Nombre del Archivo", "Estado"]],
+              body: errorTable,
+              theme: "grid",
+              styles: { fontSize: 10, cellPadding: 2 },
+              headStyles: { fillColor: [255, 99, 132], textColor: 255 },
+            });
+  
+            yPos = doc.lastAutoTable.finalY + 10;
+  
+            // Texto debajo de tabla de errores
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(
+              `* Verificar nomenclatura de archivos y que los archivos no excedan los 5 MB de preferencia, cualquier observación 
+              contactar con el área de Sistemas.`,
+              leftColX,
+              yPos
+            );
+  
+            yPos += 15;
+  
+            // Título de la tabla de archivos correctos en negrita
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+            doc.setFont("helvetica", "bold");
+            doc.text("Archivos Subidos Correctamente:", leftColX, yPos);
+            doc.setFont("helvetica", "normal");
+            yPos += 5;
+  
+            const successTable = subidos.map((file, index) => [
+              index + 1,
+              file.mensaje || "Nombre no disponible",
+              "Subido Correctamente",
+            ]);
+  
+            autoTable(doc, {
+              startY: yPos + 5,
+              head: [["#", "Nombre del Archivo", "Estado"]],
+              body: successTable,
+              theme: "grid",
+              styles: { fontSize: 10, cellPadding: 2 },
+              headStyles: { fillColor: [75, 192, 192], textColor: 255 },
+            });
+  
+            // Numeración de páginas
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+              doc.setPage(i);
+              doc.text(`Página ${i} de ${totalPages}`, 105, 290, { align: "center" });
+            }
+  
+            doc.save("reporte_archivos.pdf");
+            setIsDownloadingPDF(false); // Finalizar la simulación
+          })
+          .catch((error) => {
+            console.error("Error al generar el PDF:", error);
+            setIsDownloadingPDF(false);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "No se pudo generar el reporte. Por favor, inténtalo nuevamente.",
+            });
+          });
+      })
+      .catch((err) => {
+        console.error("Error al cargar la imagen:", err);
+        setIsDownloadingPDF(false);
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "No se pudo cargar la imagen para el reporte.",
+        });
+      });
+  };
+  
+
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[600px] relative">
-        <FontAwesomeIcon icon={faTimes} className="absolute top-0 right-0 m-3 cursor-pointer text-gray-400" onClick={closeModal} />
+      <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[800px] relative">
+        <FontAwesomeIcon icon={faTimes} className="absolute top-0 right-0 m-2.5  cursor-pointer text-white"  style={{fontSize:'14px'}} onClick={closeModal} />
         <div className="p azuloscurobackground flex justify-between p-3.5">
           <h1 className="text-start font-bold color-azul text-white">Subir Carga Masiva de Datos</h1>
         </div>
@@ -317,11 +451,14 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                         {sucred && <td className="border px-4 py-2">
                           {uploadStatus[file.name] === 'success' ? (
                             <>
-                              <FontAwesomeIcon icon={faCheck} className="text-green-500" />
-                              <p>Archivo Subido Correctamente</p>
+                              <FontAwesomeIcon icon={faCheck} className="text-green-500 mr-4" />
+                              <span>Archivo Subido Correctamente</span>
                             </>
                           ) : (
-                            <FontAwesomeIcon icon={faTimesCircle} className="text-red-500" />
+                            <>
+                            <FontAwesomeIcon icon={faTimesCircle} className="text-red-500 mr-4" />
+                            <span>Archivo con error</span>
+                          </>
                           )}
                         </td>}
                       </tr>
@@ -344,18 +481,62 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               >
                 Subir Archivos
               </button>
-              <p>*Cada archivo se subira cada 4 segundos al sistema</p>
-              {isUploading && <Loading />}
-
-              {Object.values(uploadStatus).some(status => status === 'error') && (
-                <button
-                  className="px-4 py-2 rounded bg-red-500 text-white"
-                  onClick={generateErrorTablePDF}
-                >
-                  <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                  Descargar Errores en PDF
-                </button>
+              <p style={{padding:'10px'}}>*Cada archivo se subira cada 4 segundos al sistema</p>
+              
+              {isUploading && (
+                <div className="flex items-center">
+                  <Loading />
+                  {uploadProgress < 100 ? (
+                    <span className="ml-2 font-bold">
+                      Cargando archivos: {uploadProgress}%
+                    </span>
+                  ) : (
+                    <span className="ml-2 font-bold text-green-600">
+                      Carga completa
+                    </span>
+                  )}
+                </div>
               )}
+
+              {/* Mostrar el GIF si la carga está completa */}
+              {!isUploading && uploadProgress === 100 && (
+  <div className="flex flex-col items-center mt-4">
+    <img src="/gifs/party-popper-confetti.gif" alt="Carga Completa" style={{width: '100px', height: '100px'}}/>
+    <span className="mt-2 font-bold text-green-600">
+      ¡Archivos subidos, ya puedes descargar!
+    </span>
+  </div>
+)}
+
+
+
+              {isPDFAvailable && (
+                <div className="flex flex-col items-center mt-4">
+                  <button
+                    className="px-4 py-2 rounded bg-red-500 text-white"
+                    onClick={generateErrorTablePDF}
+                    disabled={isDownloadingPDF}
+                  >
+                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                    Descargar PDF
+                  </button>
+                  {isDownloadingPDF && (
+                    <div className="flex items-center mt-2">
+                      <Loading />
+                      {downloadProgressPDF < 100 ? (
+                        <span className="ml-2 font-bold">
+                          Descargando archivo: {downloadProgressPDF}%
+                        </span>
+                      ) : (
+                        <span className="ml-2 font-bold text-green-600">
+                          Descarga completa
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
           </div>
         </div>

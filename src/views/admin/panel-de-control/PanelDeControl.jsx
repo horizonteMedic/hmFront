@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faPersonCirclePlus, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
+import { faDownload,faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faPersonCirclePlus, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
+import Swal from 'sweetalert2';
 
 const Card = ({ to, id, icon, color, hoverColor, iconColor, hoverIconColor }) => {
   return (
@@ -20,6 +21,8 @@ const Dashboard = () => {
   const userLogued = useAuthStore(state => state.userlogued);
   const listView = useAuthStore(state => state.listView);
   const allowedRoutes = listView.map(item => `${item.id}`);
+
+  
 
   // Cards principales (sin cambios)
   const filteredCards = [
@@ -42,8 +45,26 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard-container">
-         <div className="main-content flex flex-col items-center justify-center p-5" style={{ marginTop: '5em' }}>
-          <h1 className="text-4xl font-extrabold mb-12 text-center">Bienvenido, <span style={{color:'#fc6b03'}}>{userLogued.sub}!</span></h1>
+        
+        <div className="main-content flex flex-col items-center justify-center p-5" style={{ marginTop: '5em' }}>
+          <div className="relative w-full mb-12">
+            <h1 className="text-4xl font-extrabold text-center">
+              Bienvenido, <span style={{ color: '#fc6b03' }}>{userLogued.sub}!</span>
+            </h1>
+            <a
+              href='/Manual-de-usuario.pdf'
+              download="Manual-de-usuario.pdf"
+              className="absolute top-0 right-0 bg-[#233245] rounded-lg p-3 text-white text-xl flex items-center"
+            >
+              <FontAwesomeIcon
+                icon={faDownload}
+                style={{ color: '#fc6b03' }}
+                size="2xl"
+                className="transition duration-500"
+              />
+              <span className="ml-2">Descargar Manual de Usuario</span>
+            </a>
+          </div>
 
         {/* Cards principales (sin cambios) */}
         <div className="flex flex-wrap justify-center space-x-6 mb-8">
