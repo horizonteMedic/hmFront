@@ -105,3 +105,26 @@ export function GetMatrizSALUDOHLA(datos,token) {
     return fetch(`${URLAzure}/api/v01/st/registros/matrizSaludOhla`,options)
     .then(res => res.json()).then(response => response)
 }
+
+export function GetMatrizGeneral(datos,token) {
+
+   
+    const data = {
+        rucContrata: datos.rucContrata,
+        rucEmpresa: datos.rucEmpresa,
+        fechaInicio: datos.fechaInicio,
+        fechaFinal: datos.fechaFinal,
+        sede: datos.sede
+    }
+    const options = {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+    }
+
+    return fetch(`${URLAzure}/api/v01/st/registros/matrizGeneral`,options)
+    .then(res => res.json()).then(response => response)
+}
