@@ -91,9 +91,7 @@ export function FormLogin() {
             <p style="text-align: ${toastStyles.textStart.textAlign}; margin-bottom: ${toastStyles.textStart.marginBottom};">
               Área de Sistemas Horizonte Medic
             </p>
-            <div style="display: flex; justify-content: center; align-items: center; margin-top: 20px;">
-              <img src="gifs/fuegogif.gif" alt="Alerta" style="width: 200px; height: auto;" />
-            </div>
+
           </div>
         `,
       });
