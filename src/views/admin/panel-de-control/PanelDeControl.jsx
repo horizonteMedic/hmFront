@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload,faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faPersonCirclePlus, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
 import Swal from 'sweetalert2';
+import "./Dashboard.css";
 
 const Card = ({ to, id, icon, color, hoverColor, iconColor, hoverIconColor }) => {
   return (
@@ -52,18 +53,17 @@ const Dashboard = () => {
               Bienvenido, <span style={{ color: '#fc6b03' }}>{userLogued.sub}!</span>
             </h1>
             <a
-              href='/Manual-de-usuario.pdf'
+              href="/Manual-de-usuario.pdf"
               download="Manual-de-usuario.pdf"
-              className="absolute top-0 right-0 bg-[#233245] rounded-lg p-3 text-white text-xl flex items-center"
+              className="download-button"
             >
               <FontAwesomeIcon
                 icon={faDownload}
-                style={{ color: '#fc6b03' }}
-                size="2xl"
-                className="transition duration-500"
+                className="download-button-icon"
               />
-              <span className="ml-2">Descargar Manual de Usuario</span>
+              <span className="download-button-text">Descargar Manual de Usuario</span>
             </a>
+
           </div>
 
         {/* Cards principales (sin cambios) */}
