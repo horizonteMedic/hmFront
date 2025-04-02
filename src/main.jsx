@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { isTokenExpired, useAuthStore } from './store/auth.js';
 import { createRoot } from 'react-dom/client'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
