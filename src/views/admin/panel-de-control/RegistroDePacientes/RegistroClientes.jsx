@@ -11,7 +11,8 @@ import {
   ComboboxDistritos
 } from './model/Combobox';
 import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPaciente';
-
+import NewHuella from './huella/NewHuella';
+import NewPad from './pad/Newpad';
 const RegistroClientes = (props) => {
   const [startDate, setStartDate] = useState(new Date());
   const [datos, setDatos] = useState({
@@ -39,8 +40,9 @@ const RegistroClientes = (props) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProfesiones, setFilteredProfesiones] = useState([]);
   const [selectedProfesion, setSelectedProfesion] = useState('');
+  const [modalhuella, setModalhuella] = useState(false)
+  const [modalpad, setModalpad] = useState(false)
 
-  
   const handleProfesionSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -217,7 +219,7 @@ const RegistroClientes = (props) => {
   return (
     <>
     <div className="p-4">
-  <form onSubmit={handleSearch}>
+  <form >
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-1">
       {/* Columna 1 */}
       
@@ -494,8 +496,20 @@ const RegistroClientes = (props) => {
     {/* Botones al final */}
     <div className="col-span-3 flex justify-end">
       <button
+        onClick={(e) => {e.preventDefault(),setModalpad(true)}}
+        className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
+      >
+        Tomar Firma
+      </button>
+      <button
+        onClick={(e) => {e.preventDefault(),setModalhuella(true)}}
+        className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
+      >
+        Tomar Huella
+      </button>
+      <button
         onClick={handleSubmit}
-        className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800 focus:outline-none"
+        className="azul-btn px-6 py-2 ml-3 rounded-md hover:bg-blue-800 focus:outline-none"
       >
         Registrar
       </button>
@@ -507,7 +521,9 @@ const RegistroClientes = (props) => {
         Limpiar
       </button>
     </div>
-  </form>
+    {modalhuella && <NewHuella close={()=> {setModalhuella(false)}}/>}
+    {modalpad && <NewPad close={()=> {setModalpad(false)}} />}
+  </form> 
 </div>
 
     </>
