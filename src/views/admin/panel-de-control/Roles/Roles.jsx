@@ -31,6 +31,8 @@ const Roles = () => {
 
   const [isModalRolesAsignadosOpen, setIsModalRolesAsignadosOpen] = useState(false);
 
+<<<<<<< HEAD
+=======
   // Estado para la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -38,13 +40,19 @@ const Roles = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortColumn, setSortColumn] = useState('');
 
+>>>>>>> main
   const toTitleCase = (str) => {
     return str.replace(/\w\S*/g, (txt) => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
   };
 
+<<<<<<< HEAD
+
+  const openRolesAsignadosModal = (idRol) => {
+=======
   const openRolesAsignadosModal = (idRol,nombre) => {
+>>>>>>> main
     setId(idRol)
     setnombre(nombre)
     setIsModalRolesAsignadosOpen(true);
