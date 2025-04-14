@@ -18,6 +18,7 @@ const AdministrarContratas = () => {
   const [recordsPerPage, setRecordsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const [ruc, setRuc] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
@@ -50,6 +51,15 @@ const AdministrarContratas = () => {
         setLoading(false);
       });
   }, [refres, recordsPerPage, token]);
+
+  const toTitleCase = (str) => {
+    if (str == null || str === '') {
+      return ''; // O return null; si prefieres devolver null explícitamente
+    }
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
 
   const Refresgpag = () => {
     setRefresh(refres + +1)
@@ -107,6 +117,15 @@ const AdministrarContratas = () => {
     });
   }
 
+  const filteredData = data.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.rucContrata.toLowerCase().includes(searchLower) ||
+      item.razonContrata.toLowerCase().includes(searchLower) ||
+      (item.estado ? 'activo' : 'inactivo').toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig />
@@ -136,6 +155,14 @@ const AdministrarContratas = () => {
                   Agregar Contrata
                 </button>
               </div>
+              {/* Input de búsqueda */}
+              <input
+                type="text"
+                placeholder="Buscar por nombre, descripción o estado"
+                className="p-2 border border-gray-300 rounded-md w-[300px]   mr-4"  // Añade margen derecho para separar el campo del botón
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
               <div className="overflow-y-auto">
                 <table className="table-auto min-w-full divide-y divide-gray-200 mb-4">
                   <thead className="bg-gray-50">
@@ -151,7 +178,7 @@ const AdministrarContratas = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {data.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => (
+                    {filteredData.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => (
                       <tr key={index}>
                         <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
                         <td className="border border-gray-300 px-2 py-1 text-center">

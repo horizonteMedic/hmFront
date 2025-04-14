@@ -16,7 +16,7 @@ export default async function NewArchivo(nombre,dni,historiaClinica,orden,id_tip
         historiaClinica:historiaClinica,
         orden: orden,
         servidor: "azure",
-        estado: false,
+        estado: true,
         fechaRegistro: `${year}-${month}-${day}`,
         userRegistro: user,
        fechaActualizacion: null,

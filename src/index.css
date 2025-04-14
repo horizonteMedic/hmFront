@@ -9,7 +9,6 @@
   font-size: 10px !important;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color:white;
   min-height: 100%;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -54,6 +53,10 @@ body {
   background-color: #233245;
   color: white;
 }
+.verde-btn{
+  background-color: #257a4e;
+  color: white;
+}
 .pointer{
   cursor: pointer;
 }
@@ -66,6 +69,9 @@ body {
 }
 .tamañouno{
   font-size: 13px;
+}
+.verdebackground{
+  background-color: #2ba265;
 }
 
 /* MINERA */

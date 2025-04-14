@@ -19,7 +19,8 @@ const AdministrarEmpresa = () => {
   const [currentPage, setCurrentPage] = useState(1); // Estado para la página actual
   const [totalPages, setTotalPages] = useState(1); // Estado para el número total de páginas
   const [showEditModal, setShowEditModal] = useState(false); // Estado para el modal de edición
-
+ // Estado para la búsqueda
+ const [searchTerm, setSearchTerm] = useState('');
   //Edit
   const [ruc, setRuc] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
@@ -52,6 +53,12 @@ const AdministrarEmpresa = () => {
         setLoading(false);
       });
   }, [refres, recordsPerPage]); // Actualiza la carga de datos cuando cambia refres o recordsPerPage
+
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
 
   const Refresgpag = () => {
     setRefresh(refres + +1)
@@ -108,6 +115,16 @@ const AdministrarEmpresa = () => {
     setCurrentPage(page); // Actualiza la página actual al hacer clic en un número de página
   };
 
+  // Filtrar los datos según el término de búsqueda
+  const filteredData = data.filter((item) => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      item.rucEmpresa.toLowerCase().includes(searchLower) ||
+      item.razonEmpresa.toLowerCase().includes(searchLower) ||
+      (item.estado ? 'activo' : 'inactivo').toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="container mx-auto mt-12 mb-12">
       <RuterConfig />
@@ -115,6 +132,7 @@ const AdministrarEmpresa = () => {
         <div className="px-4 py-2 azuloscurobackground flex justify-between items-center">
           <h1 className="text-start font-bold color-azul text-white">Administrar Empresas</h1>
         </div>
+        
         <div className="container p-6">
           <div className="flex justify-between mb-4">
             <div className="flex items-center">
@@ -129,11 +147,20 @@ const AdministrarEmpresa = () => {
               </select>
 
               <span className="mx-2">registros</span>
+              
             </div>
             <button onClick={() => setShowModal(true)} className="azul-btn text-white font-bold py-2 px-4 rounded">
               Agregar Empresa
             </button>
           </div>
+           {/* Input de búsqueda */}
+           <input
+            type="text"
+            placeholder="Buscar por nombre, descripción o estado"
+            className="p-2 border border-gray-300 rounded-md w-[300px]   mr-4 mb-3" 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           {loading ? (
             <p className="text-center">Cargando...</p>
           ) : (
@@ -168,7 +195,7 @@ const AdministrarEmpresa = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {data.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => ( // Solo mapea los primeros registros hasta el número seleccionado por página
+                  {filteredData?.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage).map((item, index) => ( // Solo mapea los primeros registros hasta el número seleccionado por página
                     <tr key={index}>
                       <td className="border border-gray-300 px-2 py-1">{(currentPage - 1) * recordsPerPage + index + 1}</td>
                       <td className="border border-gray-300 px-2 py-1 text-center">

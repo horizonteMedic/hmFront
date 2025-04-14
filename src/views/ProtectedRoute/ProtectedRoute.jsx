@@ -12,14 +12,15 @@ const protectedRoutes = {
     '/agregar-campa%C3%B1a': 59,
     '/administrar-empresas': 60,
     '/administrar-contratas': 61,
-    '/protocolos': 152
+    '/protocolos': 153,
+    '/RegistroP': 602,
+    '/Registro-de-pacientes': 202
   };
 
 export function ProtectedRoute(){
     const listView = useAuthStore(state => state.listView)
     const setToken = useAuthStore(state => state.token)
     const location = useLocation();
-    
     if (setToken === null) {
         return <Navigate to="/" />;
       }
@@ -43,6 +44,12 @@ export function ProtectedLogin() {
     const setToken = useAuthStore(state => state.token)
     
     return setToken !== null ? <Navigate to="/panel-de-control"/> : <Outlet/>
+
+}
+
+export function ProtectedRegister() {
+    const listView = useAuthStore(state => state.listView)
+
 
 }
 

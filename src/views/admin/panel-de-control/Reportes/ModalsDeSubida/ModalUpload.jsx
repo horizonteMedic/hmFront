@@ -4,7 +4,7 @@ import { faTimes, faCloudUploadAlt, faCheckCircle, faTimesCircle } from '@fortaw
 import NewArchivo from '../model/NewArchivo';
 import Swal from 'sweetalert2';
 
-const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }) => {
+const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, sede }) => {
 
   const [datosarch, setDatosarch] = useState({
       id: combinedParam.archivoItem.id,
@@ -54,6 +54,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
     if (file) {
       const fileName = file.name;
       const fileExtension = fileName.split('.').pop().toLowerCase();
+      const fileNameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
       
       if (datosarch.extension === 'pdf' && fileExtension !== 'pdf') {
         Swal.fire({
@@ -61,6 +62,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
           title: 'Error al subir archivo',
           text: 'El archivo debe ser un PDF',
         });
+        closeModal()
         return;
       } else if (datosarch.extension !== 'pdf' && !['jpg', 'jpeg', 'png'].includes(fileExtension)) {
         Swal.fire({
@@ -68,21 +70,80 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
           title: 'Error al subir archivo',
           text: 'El archivo debe ser una imagen (jpg, jpeg, png)',
         });
+        closeModal()
         return;
       }
+      let Ripconciv = combinedParam.contrata.split(' ')[0];
 
-      const nombre = `${datosarch.nombres.split(' ')[0]}`
-      const apellido = `${datosarch.apellidos.split(' ')[0]}`
-      const CodigoSave = `${datosarch.nomenclatura}-${datosarch.orden}-${nombre}-${apellido}.${datosarch.extension}`
-
-      if (fileName.toUpperCase() != CodigoSave.toUpperCase()) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error al subir archivo',
-          text: 'El Nombre del Archivo deben ser iguales',
-        });
-        return;
+      if (sede !== 'HMAC' ) {
+        if (Ripconciv !== 'RIPCONCIV') {
+          const Nombres = `${datosarch.apellidos} ${datosarch.nombres}`
+          const CodOrden = fileNameWithoutExtension.split('-') 
+    
+          if (CodOrden.length < 3) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error al subir archivo',
+              text: 'El nombre del archivo no tiene el formato esperado.\n\nRecuerda que debe ser Orden-Nomenclatura-Nombres',
+            });
+            closeModal();
+            return;
+          }
+    
+          //Nomenclatuura
+          const Orden = fileNameWithoutExtension.split('-')[0]
+          //Nombre
+          const NamePart = CodOrden[2].trim().replace(/\s+/g, ' ')
+          const cleanedNamePart = NamePart.replace(/\s+/g, ' ');
+          const ApellName = Nombres.trim().replace(/\s+/g, ' ');
+          console.log(datosarch.orden)
+          console.log(Orden)
+          console.log(cleanedNamePart)
+          console.log(ApellName)
+          //Cod Orden
+          const Nomenclatura = CodOrden[1].trim()
+          
+            if (datosarch.orden != Orden) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: `El número de Orden debe ser igual: ${datosarch.orden}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+              });
+              closeCAMUModal()
+              return;
+            }
+    
+            if (datosarch.nomenclatura.toUpperCase() != Nomenclatura.toUpperCase()) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: `La Nomenlatura debe ser igual: ${datosarch.nomenclatura}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+              });
+              closeCAMUModal()
+              return;
+            }
+      
+      
+            if (ApellName.toUpperCase() != cleanedNamePart.toUpperCase()) {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al subir archivo',
+                text: `Los Apellidos y Nombres son Incorrectos: ${ApellName}. \n\nRecuerda que debe ser Orden-Nomenclatura-Nombres`,
+              });
+              closeCAMUModal()
+              return;
+            }
+      
+            
+            const filesave = `${Orden}-${Nomenclatura}-${cleanedNamePart}.${fileExtension}`
+            setFileName(filesave); 
+        } else {
+          setFileName(fileName)
+        }
+      } else {
+        setFileName(fileName)
       }
+      
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -91,7 +152,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
         setFileUploaded(true);
       };
       reader.readAsDataURL(file);
-      setFileName(fileName);
+      
     }
   };
   
@@ -100,16 +161,37 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread }
   };
 
   const handleUpload = () => {
-    setUploading(true);
-    NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
-    .then(data => {
-      setUploadSuccess(true);
-      setUploading(false);
-      AleertSucces()
+    
+    Swal.fire({
+      title: "¿Estas Seguro?",
+      text: `Vas a subir este archivo a la Sede ${sede}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Subir!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setUploading(true);
+        NewArchivo(fileName,dni,datosarch.historiaClinica,datosarch.orden,datosarch.id,user,token,filePreview)
+        .then(data => {
+          if (data.id) {
+            setUploadSuccess(true);
+            setUploading(false);
+            AleertSucces()
+          } else {
+            Swal.fire({title: 'Error', text: 'Ocurrio un error al subir el archivo', icon: 'error'})
+          }          
+        })
+        .catch(error => {
+          console.error('Error:', error)
+        }) 
+      } else {
+        closeCAMUModal()
+      }
     })
-    .catch(error => {
-      console.error('Error:', error)
-    })
+
+    
     // Simulando una solicitud de carga (aquí puedes agregar tu lógica real de carga)
   };
 
