@@ -34,6 +34,12 @@ const AdministrarSedes = () => {
     return Array.from({ length: totalVisiblePages }, (_, i) => startPage + i).filter(page => page <= totalPages);
   };
  
+  const toTitleCase = (str) => {
+    return str.replace(/\w\S*/g, (txt) => {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  };
+
   useEffect(() => {
     setLoading(true);
     getFetch('/api/v01/ct/sede', token)

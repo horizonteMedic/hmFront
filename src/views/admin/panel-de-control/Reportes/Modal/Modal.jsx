@@ -19,6 +19,8 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
   const [modalArchivos, setModalArchivos] = useState(false);
   const [datosarc, setDatosarc] = useState(null)
   const [currentFile, setCurrentFile] = useState(null);
+
+  
   useEffect(() => {
     setLoading(true);
     GetHistoryUser(user, start, end, sede, dni, empresa, contrata, token)
@@ -285,16 +287,16 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
       )}
       {currentFile && (
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl w-[700px] h-[auto] max-h-[90%]">
+          <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
             <div className="px-4 py-2 naranjabackgroud flex justify-between">
               <h2 className="text-lg font-bold color-blanco">{currentFile.name}</h2>
               <button onClick={() => setCurrentFile(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
             </div>
-            <div className="px-6 py-4 overflow-y-auto flex justify-center items-center">
+            <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
               {currentFile.type === 'application/pdf' ? (
                 <embed src={currentFile.uri} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
               ) : (
-                <img src={currentFile.uri} alt={currentFile.name} className="h-auto w-auto max-w-full" />
+                <img src={currentFile.uri} alt={currentFile.name} className="h-auto  w-auto max-w-full" />
               )}
             </div>
             <div className="flex justify-center">
