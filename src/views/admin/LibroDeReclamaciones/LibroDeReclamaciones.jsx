@@ -1,479 +1,262 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './LibroDeReclamaciones.css';
 
 const LibroDeReclamaciones = () => {
-  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    // Part 1 - User Identification
-    nombre: '',
-    apellido: '',
-    tipoDocumento: '',
-    numeroDocumento: '',
-    menorEdad: false,
-    direccion: '',
-    departamento: '',
-    provincia: '',
-    distrito: '',
-    telefono: '',
+    // Section 1
+    docType: '',
+    numDoc: '',
+    nombreRazonSocial: '',
     email: '',
-    // Part 2 - Service Identification
-    tipoServicio: '',
-    fechaIncidente: '',
-    canalCompra: '',
-    descripcion: '',
-    montoPagado: '',
-    // Part 3 - Complaint Details
-    tipoReclamo: '',
-    detalleReclamo: '',
-    pedidoSolicitud: '',
-    aceptaTerminos: false
+    domicilio: '',
+    telefono: '',
+    // Section 2
+    docTypeReclamante: '',
+    numDocReclamante: '',
+    nombreRazonSocialReclamante: '',
+    emailReclamante: '',
+    domicilioReclamante: '',
+    telefonoReclamante: '',
+    // Section 3
+    area: '',
+    servicio: '',
+    descripcionHechos: '',
+    // Section 4
+    autorizaEmail: ''
   });
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: value
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
     console.log(formData);
+    // Handle form submission
   };
 
-  const validateStep1 = () => {
-    return formData.nombre && 
-           formData.apellido && 
-           formData.tipoDocumento && 
-           formData.numeroDocumento && 
-           formData.direccion && 
-           formData.departamento && 
-           formData.provincia && 
-           formData.distrito && 
-           formData.email;
-  };
+  const [currentTime, setCurrentTime] = useState(new Date());
 
-  const validateStep2 = () => {
-    return formData.tipoServicio && 
-           formData.descripcion;
-  };
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
 
-  const nextStep = () => {
-    if (step === 1 && !validateStep1()) {
-      alert('Por favor, complete todos los campos obligatorios');
-      return;
-    }
-    if (step === 2 && !validateStep2()) {
-      alert('Por favor, complete todos los campos obligatorios');
-      return;
-    }
-    setStep(step + 1);
-  };
-
-  const prevStep = () => {
-    setStep(step - 1);
-  };
-
-  const renderStep1 = () => (
-    <div className="card-body">
-      <h3 className="text-primary mb-4">Identificación del cliente</h3>
-      
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label className="form-label">Nombre*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-md-6">
-          <label className="form-label">Apellido*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="apellido"
-            value={formData.apellido}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </div>
-
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label className="form-label">Tipo de Documento*</label>
-          <select
-            className="form-select"
-            name="tipoDocumento"
-            value={formData.tipoDocumento}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Elegir tipo de documento</option>
-            <option value="dni">DNI</option>
-            <option value="pasaporte">Pasaporte</option>
-            <option value="ce">Carnet de Extranjería</option>
-          </select>
-        </div>
-        <div className="col-md-6">
-          <label className="form-label">N° Documento*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="numeroDocumento"
-            value={formData.numeroDocumento}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </div>
-
-      <div className="mb-4">
-        <label className="form-label">¿Eres menor de Edad?*</label>
-        <div>
-          <div className="form-check form-check-inline">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="menorEdad"
-              value="no"
-              checked={!formData.menorEdad}
-              onChange={() => setFormData(prev => ({...prev, menorEdad: false}))}
-              required
-            />
-            <label className="form-check-label">No</label>
-          </div>
-          <div className="form-check form-check-inline">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="menorEdad"
-              value="si"
-              checked={formData.menorEdad}
-              onChange={() => setFormData(prev => ({...prev, menorEdad: true}))}
-            />
-            <label className="form-check-label">Si</label>
-          </div>
-        </div>
-      </div>
-
-      <h3 className="text-primary mb-4">Datos de ubicación del cliente</h3>
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <label className="form-label">Dirección*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="direccion"
-            value={formData.direccion}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-md-6">
-          <label className="form-label">Departamento*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="departamento"
-            value={formData.departamento}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </div>
-
-      <div className="row mb-4">
-        <div className="col-md-6">
-          <label className="form-label">Provincia*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="provincia"
-            value={formData.provincia}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div className="col-md-6">
-          <label className="form-label">Distrito*</label>
-          <input
-            type="text"
-            className="form-control"
-            name="distrito"
-            value={formData.distrito}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </div>
-
-      <h3 className="text-primary mb-4">Datos de contacto del cliente</h3>
-      <p className="text-muted small mb-4">
-        *En caso Usted no coloque una dirección de correo electrónico válida, nuestra empresa no podrá, de conformidad con el artículo 4 B del reglamento del
-        Libro de Reclamaciones, enviarle por dicha vía, el acceso a la presente hoja de reclamación virtual; sin embargo, la no colocación de una dirección de
-        correo electrónico válida, no impedirá que Usted pueda concluir satisfactoriamente el proceso de ingreso de su reclamo o queja, siempre que Usted
-        consigne los datos mínimos exigidos por la legislación vigente.
-      </p>
-
-      <div className="mb-3">
-        <label className="form-label">Teléfono (opcional)</label>
-        <input
-          type="tel"
-          className="form-control"
-          name="telefono"
-          value={formData.telefono}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="form-label">Email*</label>
-        <input
-          type="email"
-          className="form-control"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          required
-        />
-      </div>
-
-      <div className="text-end">
-        <button type="button" className="btn btn-primary btn-lg" onClick={nextStep}>
-          Siguiente
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderStep2 = () => (
-    <div className="card-body">
-      <h3 className="text-primary mb-4">Identificación del bien contratado</h3>
-      
-      <div className="mb-4">
-        <label className="form-label">Producto o Servicio*</label>
-        <div>
-          <div className="form-check form-check-inline">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="tipoServicio"
-              value="producto"
-              checked={formData.tipoServicio === 'producto'}
-              onChange={handleChange}
-              required
-            />
-            <label className="form-check-label">Producto</label>
-          </div>
-          <div className="form-check form-check-inline">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="tipoServicio"
-              value="servicio"
-              checked={formData.tipoServicio === 'servicio'}
-              onChange={handleChange}
-            />
-            <label className="form-check-label">Servicio</label>
-          </div>
-        </div>
-      </div>
-
-      
-      <div className="mb-4">
-        <label className="form-label">Fecha del Incidente (Opcional)</label>
-        <input
-          type="date"
-          className="form-control"
-          name="fechaIncidente"
-          value={formData.fechaIncidente}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="form-label">Indica el canal de compra (Opcional)</label>
-        <div className="canal-compra-options">
-          {['Virtual', 'Presencial', 'Telefónico', 'No Compré / No Contraté', 'Otro'].map(canal => (
-            <div className="form-check" key={canal}>
-              <input
-                type="radio"
-                className="form-check-input"
-                name="canalCompra"
-                value={canal}
-                checked={formData.canalCompra === canal}
-                onChange={handleChange}
-              />
-              <label className="form-check-label">{canal}</label>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <h3 className="text-primary mb-4">Detalles del Bien o Servicio</h3>
-      
-      <div className="mb-4">
-        <label className="form-label">Descripción*</label>
-        <textarea
-          className="form-control"
-          name="descripcion"
-          value={formData.descripcion}
-          onChange={handleChange}
-          rows="4"
-          placeholder="Describe el bien"
-          required
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="form-label">Monto Pagado (opcional)</label>
-        <div className="input-group">
-          <span className="input-group-text">S/</span>
-          <input
-            type="number"
-            className="form-control"
-            name="montoPagado"
-            value={formData.montoPagado}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      <div className="d-flex justify-content-between">
-        <button type="button" className="btn btn-secondary btn-lg" onClick={prevStep}>
-          Anterior
-        </button>
-        <button type="button" className="btn btn-primary btn-lg" onClick={nextStep}>
-          Siguiente
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className="card-body">
-      <h3 className="text-primary mb-4">Detalle de la reclamación</h3>
-      
-      <div className="reclamo-info mb-4">
-        <p className="mb-2">*RECLAMO: Disconformidad relacionada a los productos o servicios.</p>
-        <p>*QUEJA: Disconformidad NO relacionada a los productos o servicios; si no al descontento respecto a la atención al público.</p>
-      </div>
-
-      <div className="mb-4">
-        <label className="form-label">Reclamo o Queja*</label>
-        <div>
-          <div className="form-check form-check-inline">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="tipoReclamo"
-              value="reclamo"
-              checked={formData.tipoReclamo === 'reclamo'}
-              onChange={handleChange}
-              required
-            />
-            <label className="form-check-label">Reclamo</label>
-          </div>
-          <div className="form-check form-check-inline">
-            <input
-              type="radio"
-              className="form-check-input"
-              name="tipoReclamo"
-              value="queja"
-              checked={formData.tipoReclamo === 'queja'}
-              onChange={handleChange}
-            />
-            <label className="form-check-label">Queja</label>
-          </div>
-        </div>
-      </div>
-
-      <h3 className="text-primary mb-4">Pedido del Consumidor</h3>
-      
-      <div className="mb-4">
-        <label className="form-label">Detalle del Reclamo o Queja*</label>
-        <textarea
-          className="form-control"
-          name="detalleReclamo"
-          value={formData.detalleReclamo}
-          onChange={handleChange}
-          rows="4"
-          placeholder="Cuéntanos lo que motiva tu reclamo o queja."
-          required
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="form-label">Indicanos lo que Solicitas*</label>
-        <textarea
-          className="form-control"
-          name="pedidoSolicitud"
-          value={formData.pedidoSolicitud}
-          onChange={handleChange}
-          rows="4"
-          placeholder="¿Qué solicitas por parte del reclamado? Ej: Devolución del monto pagado / cambio de producto / aplicación de garantía"
-          required
-        />
-      </div>
-
-      <div className="terminos-container mb-4">
-        <div className="form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            name="aceptaTerminos"
-            checked={formData.aceptaTerminos}
-            onChange={handleChange}
-            required
-          />
-          <label className="form-check-label">
-            He leído y doy conformidad de mis datos y garantizo la veracidad de mi reclamo o queja
-          </label>
-        </div>
-        <p className="terminos-text mt-3">
-          Estimado Cliente, muchas gracias por registrar su incidencia en nuestro Libro de Reclamaciones Virtual, su opinión es muy importante para nosotros. «La confirmación de envío de la presente hoja de reclamación, expresa únicamente la recepción de la misma, más no la aceptación de su contenido. La presente reclamación será tramitada dentro del plazo de ley.» «Nuestra área de servicio al cliente le informará (i) La formulación del reclamo no impide acudir a otras vías de solución de controversias ni es requisito previo para interponer una denuncia ante el INDECOPI, (ii) El proveedor deberá dar respuesta al reclamo en un plazo no mayor a quince (15) días hábiles. Este plazo es improrrogable.»
-        </p>
-        <p className="privacy-notice">
-          * Los datos personales de los reclamantes no serán utilizados para otras finalidades ajenas o incompatibles con este libro de reclamaciones.
-        </p>
-        <p className="privacy-notice">
-          * Los datos personales de los reclamantes serán tratados de acuerdo a las políticas de privacidad de: MINNA SAC - RUC: 20608510592
-        </p>
-      </div>
-
-      <div className="d-flex justify-content-between">
-        <button type="button" className="btn btn-secondary btn-lg" onClick={prevStep}>
-          Anterior
-        </button>
-        <button type="submit" className="btn btn-primary btn-lg">
-          Enviar
-        </button>
-      </div>
-    </div>
-  );
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="container mt-4">
-      <div className="steps-indicator mb-4">
-        <div className="d-flex justify-content-between">
-          <div className={`step ${step === 1 ? 'active' : ''}`}>1. Identificación del Usuario</div>
-          <div className={`step ${step === 2 ? 'active' : ''}`}>2. Identificación del Bien Contratado</div>
-          <div className={`step ${step === 3 ? 'active' : ''}`}>3. Detalle de la Reclamación</div>
+    <div className="container mx-auto p-4">
+      {/* Header */}
+      <div className="header mb-6 p-4">
+        <div className="flex items-center justify-between">
+          <img 
+            src="/img/logo-color.png" 
+            alt="Horizonte Médic Logo" 
+            className="h-20" // increased from h-16
+          />
+          <div className="text-right">
+            <h2 className="text-xl font-bold text-gray-800">LIBRO DE RECLAMACIONES</h2>
+            <p className="text-sm text-gray-600">Hoja de Reclamación</p>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="card mb-4">
-          {step === 1 && renderStep1()}
-          {step === 2 && renderStep2()}
-          {step === 3 && renderStep3()}
+      {/* Date and Time */}
+      <div className="bg-white p-4 mb-6">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Fecha:</label>
+            <input 
+              type="text" 
+              value={currentTime.toLocaleDateString('es-PE')} 
+              className="w-full border-b border-gray-300 outline-none" 
+              readOnly 
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">Hora:</label>
+            <input 
+              type="text" 
+              value={currentTime.toLocaleTimeString('es-PE')} 
+              className="w-full border-b border-gray-300 outline-none" 
+              readOnly 
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Form continues... */}
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+        {/* Section 1 */}
+        <div className="bg-gray-100 p-4 mb-6">
+          <h3 className="text-lg font-semibold mb-4">1. IDENTIFICACIÓN DEL USUARIO O TERCERO LEGITIMADO</h3>
+          <div className="bg-white p-4 rounded">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">DOCUMENTO DE IDENTIDAD*</label>
+                <div className="flex gap-4">
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docType" value="DNI" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">DNI</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docType" value="CE" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">CE</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docType" value="PASAPORTE" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">PASAPORTE</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docType" value="RUC" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">RUC</span>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">N° DOCUMENTO*</label>
+                <input type="text" name="numDoc" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-gray-700 mb-2">NOMBRE O RAZÓN SOCIAL*</label>
+                <input type="text" name="nombreRazonSocial" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">E-MAIL</label>
+                <input type="email" name="email" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-gray-700 mb-2">DOMICILIO*</label>
+                <input type="text" name="domicilio" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">TELÉFONO*</label>
+                <input type="tel" name="telefono" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2 */}
+        <div className="bg-blue-100 p-4 mb-6">
+          <h3 className="text-lg font-semibold mb-4">
+            2. IDENTIFICACIÓN DE QUIEN PRESENTA EL RECLAMO
+            <span className="text-sm font-normal text-gray-600 ml-2">
+              (En caso del ser el usuario afectado no es necesario su llenado)
+            </span>
+          </h3>
+          <div className="bg-white p-4 rounded">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">DOCUMENTO DE IDENTIDAD*</label>
+                <div className="flex gap-4">
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docTypeReclamante" value="DNI" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">DNI</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docTypeReclamante" value="CE" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">CE</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docTypeReclamante" value="PASAPORTE" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">PASAPORTE</span>
+                  </label>
+                  <label className="inline-flex items-center">
+                    <input type="radio" name="docTypeReclamante" value="RUC" onChange={handleChange} className="form-radio" />
+                    <span className="ml-2">RUC</span>
+                  </label>
+                </div>
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">N° DOCUMENTO*</label>
+                <input type="text" name="numDocReclamante" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-gray-700 mb-2">NOMBRE O RAZÓN SOCIAL*</label>
+                <input type="text" name="nombreRazonSocialReclamante" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">E-MAIL</label>
+                <input type="email" name="emailReclamante" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block text-gray-700 mb-2">DOMICILIO*</label>
+                <input type="text" name="domicilioReclamante" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">TELÉFONO*</label>
+                <input type="tel" name="telefonoReclamante" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 3 */}
+        <div className="bg-gray-100 p-4 mb-6">
+          <h3 className="text-lg font-semibold mb-4">3. DETALLE DEL RECLAMO</h3>
+          <div className="bg-white p-4 rounded">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 mb-2">ÁREA*</label>
+                <select name="area" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none">
+                  <option value="">SELECCIONE</option>
+                  {/* Add your area options */}
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-700 mb-2">SERVICIO*</label>
+                <select name="servicio" onChange={handleChange} className="w-full border-b border-gray-300 focus:border-blue-500 outline-none">
+                  <option value="">SELECCIONE</option>
+                  {/* Add your service options */}
+                </select>
+              </div>
+            </div>
+            <div className="mt-4">
+              <label className="block text-gray-700 mb-2">DESCRIPCIÓN DE LOS HECHOS* (Máximo 900 caracteres)</label>
+              <textarea 
+                name="descripcionHechos"
+                onChange={handleChange}
+                className="w-full border rounded p-2 focus:border-blue-500 outline-none"
+                rows="6"
+                maxLength="900"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 4 */}
+        <div className="bg-gray-100 p-4">
+          <h3 className="text-lg font-semibold mb-4">4. AUTORIZO NOTIFICACIÓN DEL RESULTADO DEL RECLAMO AL E-MAIL CONSIGNADO (MARCAR)</h3>
+          <div className="bg-white p-4 rounded flex gap-4">
+            <label className="inline-flex items-center">
+              <input type="radio" name="autorizaEmail" value="SI" onChange={handleChange} className="form-radio" />
+              <span className="ml-2">SI</span>
+            </label>
+            <label className="inline-flex items-center">
+              <input type="radio" name="autorizaEmail" value="NO" onChange={handleChange} className="form-radio" />
+              <span className="ml-2">NO</span>
+            </label>
+          </div>
+        </div>
+
+        <div className="flex justify-end mt-6">
+          <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
+            Enviar Reclamo
+          </button>
         </div>
       </form>
     </div>
