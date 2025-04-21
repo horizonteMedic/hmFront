@@ -10,7 +10,7 @@ export function LoginPage() {
                     <div className="flex justify-center mb-6">
                         <img src="img/logo-color.png" alt="Logo" className="w-[70%]" />
                     </div>
-                        <p className=" text-center mb-6 color-azul"><strong>Iniciar Sesión</strong></p>
+                        <p className=" text-center mb-6 color-azul"><strong>Iniciar Sesión - Pruebas</strong></p>
                     <FormLogin />
                 </div>
             </div>

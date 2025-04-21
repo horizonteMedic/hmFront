@@ -13,6 +13,8 @@ import {
 import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPaciente';
 import NewHuella from './huella/NewHuella';
 import NewPad from './pad/Newpad';
+import NewHuellaFut from './huella/HuellaFut';
+
 const RegistroClientes = (props) => {
   const [startDate, setStartDate] = useState(new Date());
   const [datos, setDatos] = useState({
@@ -41,6 +43,7 @@ const RegistroClientes = (props) => {
   const [filteredProfesiones, setFilteredProfesiones] = useState([]);
   const [selectedProfesion, setSelectedProfesion] = useState('');
   const [modalhuella, setModalhuella] = useState(false)
+  const [modalhuellaF, setModalhuellaF] = useState(false)
   const [modalpad, setModalpad] = useState(false)
 
   const handleProfesionSearch = (e) => {
@@ -494,7 +497,7 @@ const RegistroClientes = (props) => {
     </div>
 
     {/* Botones al final */}
-    <div className="col-span-3 flex justify-end">
+    <div className="col-span-3 flex justify-end gap-2">
       <button
         onClick={(e) => {e.preventDefault(),setModalpad(true)}}
         className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
@@ -505,23 +508,30 @@ const RegistroClientes = (props) => {
         onClick={(e) => {e.preventDefault(),setModalhuella(true)}}
         className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
       >
-        Tomar Huella
+        Tomar Huella HUD
+      </button>
+      <button
+        onClick={(e) => {e.preventDefault(),setModalhuellaF(true)}}
+        className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
+      >
+        Tomar Huella Futronic
       </button>
       <button
         onClick={handleSubmit}
-        className="azul-btn px-6 py-2 ml-3 rounded-md hover:bg-blue-800 focus:outline-none"
+        className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800 focus:outline-none"
       >
         Registrar
       </button>
       <button
         type="button"
         onClick={handleLimpiar}
-        className="bg-red-500 px-6 ml-3 py-2 rounded-md text-white focus:outline-none"
+        className="bg-red-500 px-6 py-2 rounded-md text-white focus:outline-none"
       >
         Limpiar
       </button>
     </div>
     {modalhuella && <NewHuella close={()=> {setModalhuella(false)}}/>}
+    {modalhuellaF && <NewHuellaFut close={()=> {setModalhuellaF(false)}}/>}
     {modalpad && <NewPad close={()=> {setModalpad(false)}} />}
   </form> 
 </div>
