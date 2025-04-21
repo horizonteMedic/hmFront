@@ -18,9 +18,9 @@ const TabComponent = () => {
   const userlogued = useAuthStore(state => state.userlogued);
   const views = useAuthStore(state => state.listView);
 
-  const AccessRegistroC= views.some(view => view.id === 653);
-  const AccessHistoriaC = views.some(view => view.id === 654);
-  const AccessCitas = views.some(view => view.id === 655);
+  const AccessRegistroC= views.some(view => view.id === 4);
+  const AccessHistoriaC = views.some(view => view.id === 5);
+  const AccessCitas = views.some(view => view.id === 6);
   const AccesExcelBasico = views.some(view => view.id === 656)
   const AccesExcelCompleto = views.some(view => view.id === 657)
 

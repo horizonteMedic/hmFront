@@ -2,7 +2,7 @@ import {useAuthStore} from '../../store/auth'
 import { useLocation,Outlet, Navigate} from "react-router-dom"
 
 const protectedRoutes = {
-    '/roles': 52,
+    '/roles': 2,
     '/accesos': 53,
     '/reporte-pacientes': 54,
     '/matriz-postulante': 55,
@@ -14,7 +14,7 @@ const protectedRoutes = {
     '/administrar-contratas': 61,
     '/protocolos': 153,
     '/RegistroP': 602,
-    '/Registro-de-pacientes': 202
+    '/Registro-de-pacientes': 3
   };
 
 export function ProtectedRoute(){
