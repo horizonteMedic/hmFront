@@ -17,7 +17,7 @@ const HistorialPaciente = () => {
   const ListContrata = ComboboxContratas();
   const [sede, setSede] = useState('');
   const [loading, setLoading] = useState(false);
-
+  console.log(ListSedes)
   useEffect(() => {
     if (ListSedes.length > 0) {
       setSede(ListSedes[0].cod_sede);

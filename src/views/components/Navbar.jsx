@@ -38,11 +38,11 @@ const Navbar = () => {
   };
 
   const filteredNavLinks = [
-    { to: "/roles", id: "52", label: "Roles", icon: faUser },
-    { to: "/accesos", id: "53", label: "Accesos", icon: faLock },
+    { to: "/roles", id: "2", label: "Roles", icon: faUser },
+    { to: "/accesos", id: "52", label: "Accesos", icon: faLock },
     { to: "/reporte-pacientes", id: "54", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", id: "55", label: "Matriz Postulante", icon: faList },
-    { to: "/Registro-de-pacientes", id: "202", label: "Registro de Pacientes", icon: faPersonCirclePlus },
+    { to: "/Registro-de-pacientes", id: "3", label: "Registro de Pacientes", icon: faPersonCirclePlus },
   ].filter(navLink => allowedRoutes.includes(navLink.id));
 
   const Logoutbutton = () => {

@@ -140,7 +140,7 @@ const RegistroClientes = (props) => {
 
   const handleSearch = e => {
     e.preventDefault();
-    
+    if (!datos.codPa) return Swal.fire('Error','Coloque el DNI','error') 
     // Mostrar el mensaje de carga
     Swal.fire({
       title: 'Buscando datos',
@@ -169,7 +169,7 @@ const RegistroClientes = (props) => {
   
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    if (!datos.codPa) return Swal.fire('Error','Complete los campos vacios','error') 
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -182,6 +182,7 @@ const RegistroClientes = (props) => {
 
     SubmitRegistrarPaciente(datos, props.selectedSede, props.token)
       .then(res => {
+        console.log('respiesta',res)
         if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
         } else {
@@ -222,7 +223,7 @@ const RegistroClientes = (props) => {
   return (
     <>
     <div className="p-4">
-  <form >
+  
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-1">
       {/* Columna 1 */}
       
@@ -237,7 +238,7 @@ const RegistroClientes = (props) => {
             onChange={handleDNI}
             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           />
-          <button type="submit" className="px-4 py-2 rounded-lg azuloscurobackground text-white flex items-center space-x-2">
+          <button onClick={handleSearch} className="px-4 py-2 rounded-lg azuloscurobackground text-white flex items-center space-x-2">
             <span>Buscar</span>
             <FontAwesomeIcon icon={faSearch} className="ml-2" /> {/* Icono de lupa de FontAwesome */}
           </button>
@@ -506,7 +507,7 @@ const RegistroClientes = (props) => {
       </button>
       <button
         onClick={(e) => {e.preventDefault(),setModalhuella(true)}}
-        className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
+        className="verde-btn px-6 hidden py-2 rounded-md hover:bg-green-800 focus:outline-none"
       >
         Tomar Huella HUD
       </button>
@@ -533,7 +534,7 @@ const RegistroClientes = (props) => {
     {modalhuella && <NewHuella close={()=> {setModalhuella(false)}}/>}
     {modalhuellaF && <NewHuellaFut close={()=> {setModalhuellaF(false)}}/>}
     {modalpad && <NewPad close={()=> {setModalpad(false)}} />}
-  </form> 
+ 
 </div>
 
     </>
