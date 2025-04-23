@@ -17,6 +17,7 @@ import {
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
 import { Loading } from '../../../components/Loading';
+import Consentimiento from './Consentimiento';
 
 const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(1);
@@ -136,6 +137,7 @@ const TabComponent = () => {
               >
                 <FontAwesomeIcon icon={faTicket} className="mr-2" />
                 Reserva de Pacientes
+<<<<<<< HEAD
               </div>
             )}
             {/* Nuevo Tab para Consentimiento de Digitalización */}
@@ -145,9 +147,20 @@ const TabComponent = () => {
             >
               <FontAwesomeIcon icon={faFileSignature} className="mr-2" />
               Consentimiento de Digitalización
+=======
+              </div>}
+              <div
+                className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 4 ? 'bg-[#215086] text-white font-bold' : ' bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg  mb-2 sm:mb-0 sm:mr-2`}
+                onClick={() => changeTab(4)}
+              >
+                <FontAwesomeIcon icon={faTicket} className="mr-2" />
+                Consentimiento
+              </div>
+>>>>>>> 1c855312d4896a19f402df5aee89bdb652ca15b7
             </div>
           </div>
 
+<<<<<<< HEAD
           <div className="custom-border p-4">
             {activeTab === 1 && Acces.Registro && (
               <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} />
@@ -167,6 +180,15 @@ const TabComponent = () => {
             {activeTab === 4 && (
               <ConsentimientoDigitalizacion />
             )}
+=======
+            <div className="custom-border p-4">
+              {activeTab === 1 && Acces.Registro && <RegistroClientes selectedSede='T-NP' Loading={Loading} token={token} />}
+              {activeTab === 2 && Acces.Historia && <AperturaExamenesPreOcup selectedSede='T-NP' token={token} Loading={Loading}/>}
+              {activeTab === 3 && Acces.Citas && <ReservaPacientes selectedSede='T-NP' token={token} Loading={Loading} userlogued={userlogued.sub}/>}
+              {activeTab === 4  && <Consentimiento />}
+
+            </div>
+>>>>>>> 1c855312d4896a19f402df5aee89bdb652ca15b7
           </div>
         </div>
       </div>

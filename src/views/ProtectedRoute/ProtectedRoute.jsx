@@ -6,13 +6,13 @@ const protectedRoutes = {
     '/accesos': 53,
     '/reporte-pacientes': 54,
     '/matriz-postulante': 55,
-    '/configuracion': 56,
+    '/configuracion': 53,
     '/lista-archivos': 57,
     '/agregar-sede': 58,
     '/agregar-campa%C3%B1a': 59,
     '/administrar-empresas': 60,
     '/administrar-contratas': 61,
-    '/protocolos': 153,
+    '/protocolos': 61,
     '/RegistroP': 602,
     '/Registro-de-pacientes': 3
   };
