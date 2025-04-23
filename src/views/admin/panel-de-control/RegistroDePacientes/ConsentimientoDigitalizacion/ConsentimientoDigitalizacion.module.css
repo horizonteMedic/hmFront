@@ -1,0 +1,72 @@
+/* src/views/admin/panel-de-control/RegistroDePacientes/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.module.css */
+
+.container {
+    padding: 1rem;
+    font-family: sans-serif;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .title {
+    text-align: center;
+    margin: 1rem 0;
+    font-weight: bold;
+  }
+  
+  .formRow {
+    margin-bottom: 1rem;
+  }
+  
+  .input {
+    border: 1px solid #ccc;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+  
+  .radioLabel {
+    display: block;
+    line-height: 1.5;
+  }
+  
+  .footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .primaryButton {
+    background-color: #0069d9;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .secondaryButton {
+    background-color: #e0e0e0;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .iconButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .printSection {
+    margin-left: auto;
+  }
+  
