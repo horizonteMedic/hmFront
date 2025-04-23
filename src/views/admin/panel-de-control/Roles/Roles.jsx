@@ -31,7 +31,6 @@ const Roles = () => {
 
   const [isModalRolesAsignadosOpen, setIsModalRolesAsignadosOpen] = useState(false);
 
-
   // Estado para la búsqueda
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -44,7 +43,6 @@ const Roles = () => {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
   };
-
 
   const openRolesAsignadosModal = (idRol,nombre) => {
     setId(idRol)

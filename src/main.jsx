@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 import { isTokenExpired, useAuthStore } from './store/auth.js';
 import { createRoot } from 'react-dom/client'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -25,6 +27,7 @@ import CreateArchivo from './views/admin/panel-de-control/Configuracion/CreateAr
 import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/AdministrarEmpresas/AdministrarEmpresas.jsx'
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
 import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/Protocolos.jsx'
+import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeReclamaciones.jsx'
 //Registro de Pacientes Unico
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 //Registro de Pacientes Multiple
@@ -47,7 +50,7 @@ const AppContent = () => {
   const location = useLocation();
   const showNavbarRoutes = ['/'];
   const isLoginPage = showNavbarRoutes.includes(location.pathname);
-  const isHiddenRoute = ['/forgot-password', '/verificacion-codigo', '/actualizar-password', '/RegistroP'].includes(location.pathname);
+  const isHiddenRoute = ['/forgot-password', '/verificacion-codigo', '/actualizar-password', '/RegistroP', '/libro-de-reclamaciones'].includes(location.pathname);
   const showBreadcrumb = !isLoginPage && !isHiddenRoute;
 
   useEffect(() => {
@@ -89,6 +92,7 @@ const AppContent = () => {
 
         </Route>
         <Route path='/RegistroP' element={<Formulario/>}/>
+        <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}

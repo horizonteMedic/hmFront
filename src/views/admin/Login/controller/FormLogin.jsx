@@ -139,13 +139,12 @@ export function FormLogin() {
       <form onSubmit={handleSubmit} autoComplete="off">
         <div className="mb-3 mt-6">
           <label className="form-label">
-            <strong>Usuario</strong>
           </label>
           <input
             required
             type="text"
             className="form-control"
-            placeholder="Tu Usuario"
+            placeholder="Usuario"
             autoComplete="off"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -158,14 +157,13 @@ export function FormLogin() {
         </div>
         <div className="mb-2">
           <label className="form-label d-flex justify-content-between align-items-center">
-            <strong>Password</strong>
           </label>
           <div className="input-group left-0 input-group-flat">
             <input
               required
               type={showPassword ? "text" : "password"}
               className="form-control"
-              placeholder="Tu password"
+              placeholder="Constraseña"
               autoComplete="off"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
