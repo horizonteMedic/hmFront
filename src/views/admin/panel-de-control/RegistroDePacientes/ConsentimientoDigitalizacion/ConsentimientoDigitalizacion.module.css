@@ -41,12 +41,10 @@
   }
   
   .primaryButton {
-    background-color: #0069d9;
     color: #fff;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 4px;
-    cursor: pointer;
   }
   
   .secondaryButton {

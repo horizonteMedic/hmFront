@@ -7,22 +7,46 @@ import { generatePdf } from './PdfGenerado';
 import styles from './ConsentimientoDigitalizacion.module.css';
 import { VerifyHoF } from '../model/Submit';
 import Swal from 'sweetalert2';
+import { GetNoConsentimiento, SubmitConsentimiento } from '../model/Consentimiento';
 
-const ConsentimientoDigitalizacion = () => {
+const ConsentimientoDigitalizacion = ({token, userlogued}) => {
   const [orderNumber, setOrderNumber] = useState('');
   const [date, setDate] = useState('');
   const [name, setName] = useState('');
   const [edad, setEdad] = useState('');
   const [dni, setDni] = useState('');
-  const [authorized, setAuthorized] = useState(false);
-  const [FirmaP, setFirmaP] = useState({
-    id: 0,
-    url: ""
-  })
-  const [HuellaP, setHuellaP] = useState({
-    id: 0,
-    url: ""
-  })
+  const [authorized, setAuthorized] = useState(true);
+  const [saveButton, setSaveButton] = useState(false)
+
+  const Swalwait = (title, body) => {
+    Swal.fire({
+      title: title,
+      text: body,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+  }
+
+  const handeSearchNo = () => {
+    Swalwait('Buscando Datos','Espere por favor...')
+    GetNoConsentimiento(orderNumber,token)
+    .then((res) => {
+      if (res.dni) {
+        setDni(res.dni)
+        setName(res.nombresApellidos)
+        setDate(res.fechaExamen)
+        setSaveButton(true)
+      } else {
+        Swal.fire('Error', 'Ha ocurrido un error','error')
+      }
+    })
+    .finally(() => {
+        Swal.close()
+    });
+  } 
 
   const handleReset = () => {
     setOrderNumber('');
@@ -34,8 +58,19 @@ const ConsentimientoDigitalizacion = () => {
   };
 
   const handleSave = () => {
-    // TODO: Integrar llamada a tu API para guardar/actualizar
-    console.log({ orderNumber, date, name, edad, dni, authorized });
+    Swalwait('Enviando Datos','Espere por favor...')
+    const data = {
+      user: userlogued,
+      norden: orderNumber
+    }
+    SubmitConsentimiento(data,token)
+    .then((res) => {
+      if (res.norden) {
+        Swal.fire('Exito', 'Consentimiento guardado exitosamente','success')
+      } else {
+        Swal.fire('Error', 'Ha ocurrido un error','error')
+      }
+    })
   };
 
   const handlePrint = () => {
@@ -80,6 +115,11 @@ const ConsentimientoDigitalizacion = () => {
             type="text"
             value={orderNumber}
             onChange={e => setOrderNumber(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                handeSearchNo(); // 👉 aquí llamas a la función que quieras
+              }
+            }}
             className={styles.input}
           />
         </label>
@@ -135,14 +175,14 @@ const ConsentimientoDigitalizacion = () => {
           <input
             type="radio"
             checked={authorized}
-            onChange={() => setAuthorized(true)}
+            onChange={() => setAuthorized(!authorized)}
           />
           &nbsp;Autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión de informes médicos. Esta firma tendrá validez para los documentos necesarios implicados en este proceso. Asimismo, doy fe de que la información proporcionada es verídica, al igual que la información que brindaré durante los exámenes realizados en el centro médico Horizonte Medic. También, autorizo el envío de información médica a los correos electrónicos y/o números de celular de la empresa contratista.
         </label>
       </div>
 
       <div className={styles.footer}>
-        <button className={styles.primaryButton} onClick={handleSave}>
+        <button className={`${styles.primaryButton} ease-in-out ${!saveButton ? 'bg-zinc-500 cursor-default ea' : 'bg-[#0069d9] cursor-pointer'}`} disabled={!saveButton} onClick={handleSave}>
           Grabar/actualizar
         </button>
         <button className={styles.secondaryButton} onClick={handleReset}>

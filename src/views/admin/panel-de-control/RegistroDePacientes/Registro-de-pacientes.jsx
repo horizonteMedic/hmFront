@@ -168,7 +168,7 @@ const TabComponent = () => {
             )}
             {/* Mostrar el componente de Consentimiento de Digitalización */}
             {activeTab === 4 && (
-              <ConsentimientoDigitalizacion />
+              <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} />
             )}
             
           </div>
