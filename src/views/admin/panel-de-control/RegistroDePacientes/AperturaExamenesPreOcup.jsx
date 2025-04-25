@@ -28,7 +28,7 @@ const AperturaExamenesPreOcup = (props) => {
   const ListAuth = ComboboxListAuth(props.selectedSede)
   
   const [datos, setDatos] = useState({
-    codPa: "",
+    codPa: props.DNIG,
     razonEmpresa:"N/A",
     razonContrata: "N/A",
     n_medico: "",

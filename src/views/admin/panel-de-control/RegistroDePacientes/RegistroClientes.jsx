@@ -201,6 +201,11 @@ const RegistroClientes = (props) => {
         Swal.close()
     });
   }
+
+  const Viewchange = () => {
+    props.tabHC()
+    props.ChangeDNI(datos.codPa)
+  }
   
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -223,6 +228,7 @@ const RegistroClientes = (props) => {
         } else {
           Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
           handleLimpiar()
+          Viewchange()
         }
         
       })

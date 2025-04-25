@@ -23,6 +23,7 @@ const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [DNIG, setDNIG] = useState("")
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
   const views = useAuthStore(state => state.listView);
@@ -152,10 +153,10 @@ const TabComponent = () => {
 
           <div className="custom-border p-4">
             {activeTab === 1 && Acces.Registro && (
-              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} />
+              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} />
             )}
             {activeTab === 2 && Acces.Historia && (
-              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} />
+              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} />
             )}
             {activeTab === 3 && Acces.Citas && (
               <ReservaPacientes

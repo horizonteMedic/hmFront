@@ -5,6 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint, faEdit, faEraser } from '@fortawesome/free-solid-svg-icons';
 import { generatePdf } from './PdfGenerado';
 import styles from './ConsentimientoDigitalizacion.module.css';
+import { VerifyHoF } from '../model/Submit';
+import Swal from 'sweetalert2';
 
 const ConsentimientoDigitalizacion = () => {
   const [orderNumber, setOrderNumber] = useState('');
@@ -13,6 +15,14 @@ const ConsentimientoDigitalizacion = () => {
   const [edad, setEdad] = useState('');
   const [dni, setDni] = useState('');
   const [authorized, setAuthorized] = useState(false);
+  const [FirmaP, setFirmaP] = useState({
+    id: 0,
+    url: ""
+  })
+  const [HuellaP, setHuellaP] = useState({
+    id: 0,
+    url: ""
+  })
 
   const handleReset = () => {
     setOrderNumber('');
@@ -29,7 +39,36 @@ const ConsentimientoDigitalizacion = () => {
   };
 
   const handlePrint = () => {
-    generatePdf({ nombre: name, edad, dni, orderNumber });
+      if (!dni) return Swal.fire('Error','Coloque el DNI','error') 
+        // Mostrar el mensaje de carga
+      Swal.fire({
+        title: 'Generando Consentimiento',
+        text: 'Espere por favor...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
+    Promise.all([
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/HUELLA`),
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/FIRMAP`)
+    ])
+    .then(([Huella, Firma]) => {
+      const huellaData = Huella.id === 1 ? { id: 1, url: Huella.mensaje } : { id: 0, url: '' };
+      const firmaData  = Firma.id === 1 ? { id: 1, url: Firma.mensaje } : { id: 0, url: '' };
+      console.log('huella',huellaData)
+      console.log('firma',firmaData)
+      generatePdf({ nombre: name, edad, dni, orderNumber, FirmaP: firmaData, HuellaP: huellaData });
+    })
+    .catch(error => {
+      Swal.fire('Error', 'No se pudo generar el consentimiento', 'error');
+      console.error(error);
+    })
+    .finally(() => {
+        Swal.close()
+    });
   };
 
   return (
