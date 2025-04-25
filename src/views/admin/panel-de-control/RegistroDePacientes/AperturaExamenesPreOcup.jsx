@@ -68,7 +68,11 @@ const AperturaExamenesPreOcup = (props) => {
   useEffect(() => {
     getFetch(`/api/v01/st/registros/listadoHistorialOcupacional/${props.selectedSede}`,props.token)
     .then((res) => {
-      setSearchHC(res)
+      if (res) {
+        setSearchHC(res)
+      } else {
+        setSearchHC([])
+      }
     })
     .catch(() => {
       console.log('ocurrio un telibre error')
