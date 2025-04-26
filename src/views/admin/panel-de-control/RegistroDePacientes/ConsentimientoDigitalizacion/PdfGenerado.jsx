@@ -7,7 +7,7 @@ import { jsPDF } from 'jspdf';
  *
  * @param {{ nombre: string, edad: string|number, dni: string, orderNumber: string }} datos
  */
-export function generatePdf({ nombre, edad, dni, orderNumber }) {
+export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP }) {
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -17,7 +17,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber }) {
   const paraSpacing = 24;
   const lineHeightFactor = 1.2;
   let y = margin;
-
+  console.log(FirmaP.url,HuellaP.url)
   // Helper para cargar logo
   const loadImg = src =>
     new Promise((res, rej) => {
@@ -30,8 +30,12 @@ export function generatePdf({ nombre, edad, dni, orderNumber }) {
 
   const logoUrl = '/img/logo-color.png';
 
-  loadImg(logoUrl)
-    .then(logoImg => {
+  Promise.all([
+    loadImg(logoUrl),
+    HuellaP.id === 1 ? loadImg(HuellaP.url) : Promise.resolve(null),
+    FirmaP.id === 1 ? loadImg(FirmaP.url) : Promise.resolve(null)
+  ])
+    .then(([logoImg, huellaImg, firmaImg]) => {
       // ----------- CABECERA -----------
       const logoW = 200;
       const logoH = (logoImg.height / logoImg.width) * logoW;
@@ -122,7 +126,19 @@ export function generatePdf({ nombre, edad, dni, orderNumber }) {
       const labelSig2 = 'Firma Electrónica del Paciente';
       const wSig2     = doc.getTextWidth(labelSig2);
       doc.text(labelSig2, center2 - wSig2 / 2, sectionY + textOffset);
-
+      if (firmaImg) {
+        const firmaW = boxSize * 0.9; // Ajusta el ancho (90% del box)
+        const firmaH = (firmaImg.height / firmaImg.width) * firmaW;
+        const firmaX = col2X + (boxSize - firmaW) / 2;
+        const firmaY = sectionY - firmaH - 1; // un poquito encima de la línea
+        const canvas = document.createElement('canvas');
+        canvas.width = firmaImg.width;
+        canvas.height = firmaImg.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(firmaImg, 0, 0);
+        const firmaBase64 = canvas.toDataURL('image/png');
+        doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
+      }
       // DNI y Fecha bajo Firma Electrónica
       const wDni2  = doc.getTextWidth(dniLine);
       const wDate2 = doc.getTextWidth(dateLine);
@@ -140,6 +156,15 @@ export function generatePdf({ nombre, edad, dni, orderNumber }) {
 
       // Huella Electrónica
       doc.rect(col2X, sectionY, boxSize, boxSize);
+      if (huellaImg) {
+        const canvas = document.createElement('canvas');
+        canvas.width = huellaImg.width;
+        canvas.height = huellaImg.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(huellaImg, 0, 0);
+        const huellaBase64 = canvas.toDataURL('image/png');
+        doc.addImage(huellaBase64, 'PNG', col2X, sectionY, boxSize, boxSize);
+      }
       const labelHue2 = 'Huella Electrónica del Paciente';
       const wHue2     = doc.getTextWidth(labelHue2);
       doc.text(labelHue2, center2 - wHue2 / 2, sectionY + boxSize + textOffset);
@@ -170,7 +195,8 @@ export function generatePdf({ nombre, edad, dni, orderNumber }) {
       });
 
       // ----------- GUARDAR PDF -----------
-      doc.save('Declaracion_Jurada_Firma_Electronica.pdf');
+      const pdfUrl = doc.output('bloburl');
+      window.open(pdfUrl, '_blank');
     })
     .catch(err => {
       console.error(err);

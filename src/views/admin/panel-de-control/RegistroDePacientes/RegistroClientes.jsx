@@ -14,6 +14,7 @@ import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPacient
 import NewHuella from './huella/NewHuella';
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
+import { VerifyHoF } from './model/Submit';
 
 const RegistroClientes = (props) => {
   const [startDate, setStartDate] = useState(new Date());
@@ -37,7 +38,14 @@ const RegistroClientes = (props) => {
     apellidosPa: '',
   });
 
-
+  const [FirmaP, setFirmaP] = useState({
+    id: 0,
+    url: ""
+  })
+  const [HuellaP, setHuellaP] = useState({
+    id: 0,
+    url: ""
+  })
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProfesiones, setFilteredProfesiones] = useState([]);
@@ -140,8 +148,8 @@ const RegistroClientes = (props) => {
 
   const handleSearch = e => {
     e.preventDefault();
-    if (!datos.codPa) return Swal.fire('Error','Coloque el DNI','error') 
-    // Mostrar el mensaje de carga
+    if (!datos.codPa) return Swal.fire('Error','Coloque el DNI','error');
+  
     Swal.fire({
       title: 'Buscando datos',
       text: 'Espere por favor...',
@@ -155,17 +163,73 @@ const RegistroClientes = (props) => {
     SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
       .then(res => {
         if (!res.codPa) {
-          Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
+          Swal.close();
+          Swal.fire({
+            title: 'Paciente no encontrado',
+            text: '¿Deseas registrar un nuevo paciente?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, registrar',
+            cancelButtonText: 'No'
+          }).then(result => {
+            if (result.isConfirmed) {
+              Swal.fire('Listo', 'Puedes completar el formulario', 'info');
+              document.getElementById('nombresPa')?.focus();
+            } else {
+              setDatos({ ...datos, codPa: '' });
+            }
+          });
+          return;
         } else {
           setDatos(res);
-          setSelectedProfesion(res.ocupacionPa)
-          Swal.close(); // Cerrar el mensaje de carga
+          setSelectedProfesion(res.ocupacionPa);
+          handleveifyHoF();
         }
       })
       .catch(() => {
         Swal.fire('Error', 'Ha ocurrido un Error', 'error');
       });
   };
+  
+  const focusNext = (e, nextId) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const next = document.getElementById(nextId);
+      if (next) next.focus();
+    }
+  };
+  
+  const handleveifyHoF = () => {
+    Promise.all([
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${datos.codPa}/HUELLA`),
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${datos.codPa}/FIRMAP`)
+    ])
+    .then(([Huella, Firma]) => {
+        // Guarda los datos en el estado
+        if (Huella.id === 1) {
+          setHuellaP({id: Huella.id,url: Huella.mensaje})
+        } else {
+          setHuellaP({id: 0,url: ''})
+        }
+        if (Firma.id === 1) {
+          setFirmaP({id: Firma.id, url: Firma.mensaje})
+        } else {
+          setFirmaP({id: 0, url: ''})
+        }
+        
+    })
+    .catch(error => {
+        throw new Error('Network response was not ok.', error);
+    })
+    .finally(() => {
+        Swal.close()
+    });
+  }
+
+  const Viewchange = () => {
+    props.tabHC()
+    props.ChangeDNI(datos.codPa)
+  }
   
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -188,6 +252,7 @@ const RegistroClientes = (props) => {
         } else {
           Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
           handleLimpiar()
+          Viewchange()
         }
         
       })
@@ -219,7 +284,12 @@ const RegistroClientes = (props) => {
     });
     setSelectedProfesion('')
   };
-  
+
+  const openHuella = () => {
+    if (!datos.codPa) return Swal.fire('Error','Ingresa el DNI del cliente','error')
+    setModalhuellaF(true)
+  }
+
   return (
     <>
     <div className="p-4">
@@ -251,6 +321,7 @@ const RegistroClientes = (props) => {
             id="nombresPa"
             value={datos.nombresPa}
             onChange={handleChange}
+            onKeyDown={(e) => focusNext(e, 'apellidosPa')}
             name="nombresPa"
             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           />
@@ -262,6 +333,9 @@ const RegistroClientes = (props) => {
             id="apellidosPa"
             value={datos.apellidosPa}
             onChange={handleChange}
+            onKeyDown={(e) => focusNext(e, 'emailPa')}
+
+
             name="apellidosPa"
             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           />
@@ -512,7 +586,7 @@ const RegistroClientes = (props) => {
         Tomar Huella HUD
       </button>
       <button
-        onClick={(e) => {e.preventDefault(),setModalhuellaF(true)}}
+        onClick={(e) => {e.preventDefault(),openHuella()}}
         className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
       >
         Tomar Huella Futronic
@@ -531,9 +605,9 @@ const RegistroClientes = (props) => {
         Limpiar
       </button>
     </div>
-    {modalhuella && <NewHuella close={()=> {setModalhuella(false)}}/>}
-    {modalhuellaF && <NewHuellaFut close={()=> {setModalhuellaF(false)}}/>}
-    {modalpad && <NewPad close={()=> {setModalpad(false)}} />}
+    {/*modalhuella && <NewHuella close={()=> {setModalhuella(false)}}/>*/}
+    {modalhuellaF && <NewHuellaFut close={()=> {setModalhuellaF(false)}} DNI={datos.codPa} Huella={HuellaP}/>}
+    {modalpad && <NewPad close={()=> {setModalpad(false)} } DNI={datos.codPa} Firma={FirmaP} />}
  
 </div>
 

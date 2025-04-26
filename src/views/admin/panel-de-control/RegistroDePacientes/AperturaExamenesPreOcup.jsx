@@ -28,7 +28,7 @@ const AperturaExamenesPreOcup = (props) => {
   const ListAuth = ComboboxListAuth(props.selectedSede)
   
   const [datos, setDatos] = useState({
-    codPa: "",
+    codPa: props.DNIG,
     razonEmpresa:"N/A",
     razonContrata: "N/A",
     n_medico: "",
@@ -68,7 +68,11 @@ const AperturaExamenesPreOcup = (props) => {
   useEffect(() => {
     getFetch(`/api/v01/st/registros/listadoHistorialOcupacional/${props.selectedSede}`,props.token)
     .then((res) => {
-      setSearchHC(res)
+      if (res) {
+        setSearchHC(res)
+      } else {
+        setSearchHC([])
+      }
     })
     .catch(() => {
       console.log('ocurrio un telibre error')

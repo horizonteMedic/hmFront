@@ -17,12 +17,12 @@ import {
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
 import { Loading } from '../../../components/Loading';
-import Consentimiento from './Consentimiento';
 
 const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
+  const [DNIG, setDNIG] = useState("")
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
   const views = useAuthStore(state => state.listView);
@@ -94,7 +94,7 @@ const TabComponent = () => {
         </div>
       </div>
 
-      <div className="container mx-auto mt-12 mb-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white rounded-lg overflow-hidden shadow-md relative mt-6 p-4">
         <ImportacionModal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
@@ -146,15 +146,16 @@ const TabComponent = () => {
             >
               <FontAwesomeIcon icon={faFileSignature} className="mr-2" />
               Consentimiento de Digitalización
+              </div>
             </div>
           </div>
 
           <div className="custom-border p-4">
             {activeTab === 1 && Acces.Registro && (
-              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} />
+              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} />
             )}
             {activeTab === 2 && Acces.Historia && (
-              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} />
+              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} />
             )}
             {activeTab === 3 && Acces.Citas && (
               <ReservaPacientes
@@ -168,10 +169,10 @@ const TabComponent = () => {
             {activeTab === 4 && (
               <ConsentimientoDigitalizacion />
             )}
+            
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
