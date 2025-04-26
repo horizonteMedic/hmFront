@@ -148,8 +148,8 @@ const RegistroClientes = (props) => {
 
   const handleSearch = e => {
     e.preventDefault();
-    if (!datos.codPa) return Swal.fire('Error','Coloque el DNI','error') 
-    // Mostrar el mensaje de carga
+    if (!datos.codPa) return Swal.fire('Error','Coloque el DNI','error');
+  
     Swal.fire({
       title: 'Buscando datos',
       text: 'Espere por favor...',
@@ -163,18 +163,42 @@ const RegistroClientes = (props) => {
     SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
       .then(res => {
         if (!res.codPa) {
-          Swal.fire('Error', 'No se ha encontrado al Paciente', 'error');
+          Swal.close();
+          Swal.fire({
+            title: 'Paciente no encontrado',
+            text: '¿Deseas registrar un nuevo paciente?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, registrar',
+            cancelButtonText: 'No'
+          }).then(result => {
+            if (result.isConfirmed) {
+              Swal.fire('Listo', 'Puedes completar el formulario', 'info');
+              document.getElementById('nombresPa')?.focus();
+            } else {
+              setDatos({ ...datos, codPa: '' });
+            }
+          });
+          return;
         } else {
           setDatos(res);
-          setSelectedProfesion(res.ocupacionPa)
-          handleveifyHoF(); // Cerrar el mensaje de carga
+          setSelectedProfesion(res.ocupacionPa);
+          handleveifyHoF();
         }
       })
       .catch(() => {
         Swal.fire('Error', 'Ha ocurrido un Error', 'error');
       });
   };
-
+  
+  const focusNext = (e, nextId) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const next = document.getElementById(nextId);
+      if (next) next.focus();
+    }
+  };
+  
   const handleveifyHoF = () => {
     Promise.all([
       VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${datos.codPa}/HUELLA`),
@@ -297,6 +321,7 @@ const RegistroClientes = (props) => {
             id="nombresPa"
             value={datos.nombresPa}
             onChange={handleChange}
+            onKeyDown={(e) => focusNext(e, 'apellidosPa')}
             name="nombresPa"
             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           />
@@ -308,6 +333,9 @@ const RegistroClientes = (props) => {
             id="apellidosPa"
             value={datos.apellidosPa}
             onChange={handleChange}
+            onKeyDown={(e) => focusNext(e, 'emailPa')}
+
+
             name="apellidosPa"
             className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
           />

@@ -17,7 +17,6 @@ import {
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
 import { Loading } from '../../../components/Loading';
-import Consentimiento from './Consentimiento';
 
 const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(1);
@@ -95,7 +94,7 @@ const TabComponent = () => {
         </div>
       </div>
 
-      <div className="container mx-auto mt-12 mb-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white rounded-lg overflow-hidden shadow-md relative mt-6 p-4">
         <ImportacionModal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
