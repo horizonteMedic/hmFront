@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Swal from 'sweetalert2';
 import { Loading } from '../../../components/Loading';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import 'react-datepicker/dist/react-datepicker.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPhone, faMobileAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
 import {
   ComboboxProfesión,
@@ -15,12 +16,17 @@ import NewHuella from './huella/NewHuella';
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
 import { VerifyHoF } from './model/Submit';
+import InputMask from 'react-input-mask';
 
 const RegistroClientes = (props) => {
+  // ref para mantener el cursor fijo en "Nombres"
+  const nombreRef = useRef(null);
+
   const [startDate, setStartDate] = useState(new Date());
   const [datos, setDatos] = useState({
     codPa: '',
     nombresPa: '',
+    apellidosPa: '',
     fechaNaciminetoPa: '',
     sexoPa: '',
     emailPa: '',
@@ -35,237 +41,183 @@ const RegistroClientes = (props) => {
     caserioPA: '',
     telCasaPa: '',
     celPa: '',
-    apellidosPa: '',
   });
 
-  const [FirmaP, setFirmaP] = useState({
-    id: 0,
-    url: ""
-  })
-  const [HuellaP, setHuellaP] = useState({
-    id: 0,
-    url: ""
-  })
-  
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProfesiones, setFilteredProfesiones] = useState([]);
   const [selectedProfesion, setSelectedProfesion] = useState('');
-  const [modalhuella, setModalhuella] = useState(false)
-  const [modalhuellaF, setModalhuellaF] = useState(false)
-  const [modalpad, setModalpad] = useState(false)
+  const [modalhuellaF, setModalhuellaF] = useState(false);
+  const [modalpad, setModalpad] = useState(false);
+  const [FirmaP, setFirmaP] = useState({ id: 0, url: '' });
+  const [HuellaP, setHuellaP] = useState({ id: 0, url: '' });
 
-  const handleProfesionSearch = (e) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-
-    if (value) {
-      const filteredOptions = Profesiones.filter(option =>
-        option.descripcion.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredProfesiones(filteredOptions);
-    } else {
-      setFilteredProfesiones([]);
-    }
-  };
-
-  const handleSelectProfesion = (profesion) => {
-    setSelectedProfesion(profesion.descripcion);
-    setDatos({
-      ...datos,
-      ocupacionPa: profesion.descripcion,
-    });
-    setSearchTerm('');
-    setFilteredProfesiones([]);
-  };
-
-  const handleFormSearch = e => {
-    e.preventDefault();
-    // Mostrar el mensaje de carga
-  };
-
-  const Profesiones = ComboboxProfesión();
+  const Profesiones   = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();
-  const Provincias = ComboboxProvincias();
-  const Distritos = ComboboxDistritos();
-
-  // Filtrar Provincias y Distritos
-  const filterProvincias = Provincias.filter(provincia => {
-    if (datos.departamentoPa && provincia.idDepartamento === datos.departamentoPa.id) {
-      return true;
-    }
-    return false;
-  });
+  const Provincias    = ComboboxProvincias();
+  const Distritos     = ComboboxDistritos();
+  const sexoOptions = ['MASCULINO', 'FEMENINO'];
+  const nivelOptions = [
+    'ANALFABETO',
+    'PRIMARIA COMPLETA',
+    'PRIMARIA INCOMPLETA',
+    'SECUNDARIA COMPLETA',
+    'SECUNDARIA INCOMPLETA',
+    'UNIVERSITARIO',
+    'TECNICO'
+  ];
+  const handleDateInput = e => {
+    // si quisieras validar o parsear, aquí lo haces
+    setDatos(d => ({ ...d, fechaNaciminetoPa: e.target.value }));
+  };
   
-  const filterDistritos = Distritos.filter(distrito => {
-    if (datos.provinciaPa && distrito.idProvincia === datos.provinciaPa.id) {
-      return true;
-    }
-    return false;
-  });
-
-  const handleNumber = e => {
+  // --- Handlers genéricos ---
+  const handleChange = e => {
     const { name, value } = e.target;
-    setDatos({
-      ...datos,
-      [name]: value.replace(/\D/g, '') || '0',
-    });
+    setDatos(d => ({ ...d, [name]: value.toUpperCase() }));
   };
 
   const handleDNI = e => {
     const { name, value } = e.target;
-    setDatos({
-      ...datos,
-      [name]: value ? parseInt(value.replace(/\D/g, ''), 10) : 0,
-    });
+    setDatos(d => ({
+      ...d,
+      [name]: value ? parseInt(value.replace(/\D/g, ''), 10) : 0
+    }));
   };
 
-  const handleChange = e => {
+  const handleNumber = e => {
     const { name, value } = e.target;
-    setDatos({
-      ...datos,
-      [name]: value.toUpperCase(),
-    });
+    setDatos(d => ({ ...d, [name]: value.replace(/\D/g, '') || '0' }));
   };
 
   const handleDPD = e => {
-    const { name } = e.target;
-    const selectedOption = JSON.parse(e.target.value);
-   
-    setDatos(prevDatos => {
-      // Primero, crea una copia del estado actual
-      let newDatos = { ...prevDatos, [name]: selectedOption };
-      // Si el campo es 'departamentoPa', resetea 'provinciaPa' y 'distritoPa'
+    const { name, value } = e.target;
+    const sel = value ? JSON.parse(value) : '';
+    setDatos(d => {
+      let newD = { ...d, [name]: sel };
       if (name === 'departamentoPa') {
-        newDatos = {
-          ...newDatos,
-          provinciaPa: '',
-          distritoPa: ''
-        };
+        newD.provinciaPa = '';
+        newD.distritoPa = '';
       }
-      return newDatos;
+      return newD;
     });
   };
 
-  const handleSearch = e => {
-    e.preventDefault();
-    if (!datos.codPa) return Swal.fire('Error','Coloque el DNI','error');
-  
-    Swal.fire({
-      title: 'Buscando datos',
-      text: 'Espere por favor...',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-  
-    SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
-      .then(res => {
-        if (!res.codPa) {
-          Swal.close();
-          Swal.fire({
-            title: 'Paciente no encontrado',
-            text: '¿Deseas registrar un nuevo paciente?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, registrar',
-            cancelButtonText: 'No'
-          }).then(result => {
-            if (result.isConfirmed) {
-              Swal.fire('Listo', 'Puedes completar el formulario', 'info');
-              document.getElementById('nombresPa')?.focus();
-            } else {
-              setDatos({ ...datos, codPa: '' });
-            }
-          });
-          return;
-        } else {
-          setDatos(res);
-          setSelectedProfesion(res.ocupacionPa);
-          handleveifyHoF();
-        }
-      })
-      .catch(() => {
-        Swal.fire('Error', 'Ha ocurrido un Error', 'error');
-      });
-  };
-  
   const focusNext = (e, nextId) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const next = document.getElementById(nextId);
-      if (next) next.focus();
+      document.getElementById(nextId)?.focus();
     }
   };
-  
-  const handleveifyHoF = () => {
-    Promise.all([
-      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${datos.codPa}/HUELLA`),
-      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${datos.codPa}/FIRMAP`)
-    ])
-    .then(([Huella, Firma]) => {
-        // Guarda los datos en el estado
-        if (Huella.id === 1) {
-          setHuellaP({id: Huella.id,url: Huella.mensaje})
-        } else {
-          setHuellaP({id: 0,url: ''})
-        }
-        if (Firma.id === 1) {
-          setFirmaP({id: Firma.id, url: Firma.mensaje})
-        } else {
-          setFirmaP({id: 0, url: ''})
-        }
-        
-    })
-    .catch(error => {
-        throw new Error('Network response was not ok.', error);
-    })
-    .finally(() => {
-        Swal.close()
-    });
-  }
 
-  const Viewchange = () => {
-    props.tabHC()
-    props.ChangeDNI(datos.codPa)
-  }
-  
-  const handleSubmit = (e) => {
+  // Autocomplete de profesión
+  const handleProfesionSearch = e => {
+    const v = e.target.value;
+    setSearchTerm(v);
+    setFilteredProfesiones(
+      v
+        ? Profesiones.filter(o =>
+            o.descripcion.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectProfesion = prof => {
+    setSelectedProfesion(prof.descripcion);
+    setDatos(d => ({ ...d, ocupacionPa: prof.descripcion }));
+    setSearchTerm('');
+    setFilteredProfesiones([]);
+  };
+
+  const provinciasFiltradas = Provincias.filter(
+    p => datos.departamentoPa && p.idDepartamento === datos.departamentoPa.id
+  );
+  const distritosFiltrados = Distritos.filter(
+    d => datos.provinciaPa && d.idProvincia === datos.provinciaPa.id
+  );
+
+  // --- Búsqueda de paciente con toast + refocus ---
+  const handleSearch = e => {
     e.preventDefault();
-    if (!datos.codPa) return Swal.fire('Error','Complete los campos vacios','error') 
+    if (!datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
+
+    Swal.fire({
+      title: 'Buscando datos',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading()
+    });
+
+    SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
+      .then(res => {
+        Swal.close();
+        if (!res.codPa) {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'error',
+            title: 'Paciente no encontrado',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true
+          }).then(() => {
+            nombreRef.current?.focus();
+          });
+          return;
+        }
+        setDatos(res);
+        setSelectedProfesion(res.ocupacionPa);
+        Promise.all([
+          VerifyHoF(
+            `/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/HUELLA`
+          ),
+          VerifyHoF(
+            `/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/FIRMAP`
+          )
+        ]).then(([H, F]) => {
+          setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
+          setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
+        });
+      })
+      .catch(() => {
+        Swal.close();
+        Swal.fire('Error', 'Ha ocurrido un error', 'error');
+      });
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    if (!datos.codPa)
+      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+
     Swal.fire({
       title: 'Validando Datos',
-      text: 'Espere por favor...',
       allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
+      didOpen: () => Swal.showLoading()
     });
 
     SubmitRegistrarPaciente(datos, props.selectedSede, props.token)
-      .then(res => {
-        console.log('respiesta',res)
-        if (!res.id) {
-          Swal.fire('Error', 'No se ha podido registrar al Paciente', 'error');
+      .then(r => {
+        Swal.close();
+        if (!r.id) {
+          Swal.fire('Error', 'No se pudo registrar', 'error');
         } else {
-          Swal.fire('Registrado', 'Paciente Registrado Correctamente', 'success');
-          handleLimpiar()
-          Viewchange()
+          Swal.fire('Registrado', 'Paciente registrado', 'success');
+          handleLimpiar();
+          props.tabHC();
+          props.ChangeDNI(datos.codPa);
         }
-        
       })
       .catch(() => {
-        console.log('Ocurrió un problema al registrar al paciente');
-      })
-
+        Swal.close();
+        Swal.fire('Error', 'Problema al registrar', 'error');
+      });
   };
 
   const handleLimpiar = () => {
     setDatos({
       codPa: '',
       nombresPa: '',
+      apellidosPa: '',
       fechaNaciminetoPa: '',
       sexoPa: '',
       emailPa: '',
@@ -279,339 +231,637 @@ const RegistroClientes = (props) => {
       distritoPa: '',
       caserioPA: '',
       telCasaPa: '',
-      celPa: '',
-      apellidosPa: '',
+      celPa: ''
     });
-    setSelectedProfesion('')
+    setSelectedProfesion('');
   };
 
   const openHuella = () => {
-    if (!datos.codPa) return Swal.fire('Error','Ingresa el DNI del cliente','error')
-    setModalhuellaF(true)
-  }
+    if (!datos.codPa)
+      return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
+    setModalhuellaF(true);
+  };
+// 1. Definir opciones (al principio del componente)
+const civilOptions = [
+  'SOLTERO',
+  'CASADO',
+  'VIUDO',
+  'CONVIVIENTE',
+  'SEPARADO',
+  'DIVORCIADO'
+];
+
+
+// 2. Estados para la búsqueda
+const [searchSexo, setSearchSexo] = useState('');
+const [filteredSexo, setFilteredSexo] = useState([]);
+const [searchNivel, setSearchNivel] = useState('');
+const [filteredNivel, setFilteredNivel] = useState([]);
+
+// 3. Handlers de filtrado y selección
+const handleSexoSearch = e => {
+  const v = e.target.value.toUpperCase();
+  setSearchSexo(v);
+  setFilteredSexo(
+    v ? sexoOptions.filter(s => s.includes(v)) : []
+  );
+};
+const handleSelectSexo = val => {
+  setSearchSexo(val);
+  setDatos(d => ({ ...d, sexoPa: val.charAt(0) })); 
+  setFilteredSexo([]);
+};
+
+const handleNivelSearch = e => {
+  const v = e.target.value.toUpperCase();
+  setSearchNivel(v);
+  setFilteredNivel(
+    v ? nivelOptions.filter(n => n.includes(v)) : []
+  );
+};
+const handleSelectNivel = val => {
+  setSearchNivel(val);
+  setDatos(d => ({ ...d, nivelEstPa: val }));
+  setFilteredNivel([]);
+};
+
+// 2. Añadir a tus useState:
+const [searchCivil, setSearchCivil] = useState('');
+const [filteredCivil, setFilteredCivil] = useState([]);
+
+// 3. Manejadores:
+const handleCivilSearch = e => {
+  const v = e.target.value.toUpperCase();
+  setSearchCivil(v);
+  setFilteredCivil(
+    v
+      ? civilOptions.filter(c => c.includes(v))
+      : []
+  );
+};
+
+const handleSelectCivil = val => {
+  setSearchCivil(val);
+  setDatos(d => ({ ...d, estadoCivilPa: val }));
+  setFilteredCivil([]);
+};
+
+// Opciones base ya vienen de tu ComboboxDepartamentos(), ComboboxProvincias(), ComboboxDistritos()
+// Estados para Departamento
+const [searchDept, setSearchDept] = useState('');
+const [filteredDept, setFilteredDept] = useState([]);
+
+// Estados para Provincia
+const [searchProv, setSearchProv] = useState('');
+const [filteredProv, setFilteredProv] = useState([]);
+
+// Estados para Distrito
+const [searchDist, setSearchDist] = useState('');
+const [filteredDist, setFilteredDist] = useState([]);
+
+// Handler Departamento
+const handleDeptSearch = e => {
+  const v = e.target.value;
+  setSearchDept(v);
+  setFilteredDept(
+    v
+      ? Departamentos.filter(d =>
+          d.nombre.toLowerCase().includes(v.toLowerCase())
+        )
+      : []
+  );
+};
+const handleSelectDept = dept => {
+  setSearchDept(dept.nombre);
+  setDatos(d => ({ ...d, departamentoPa: dept }));
+  setFilteredDept([]);
+  // limpia provincias/distritos cuando cambias de depto
+  setSearchProv('');
+  setFilteredProv([]);
+  setSearchDist('');
+  setFilteredDist([]);
+};
+
+// Handler Provincia (usa Provincias filtradas por depto seleccionado)
+const handleProvSearch = e => {
+  const v = e.target.value;
+  setSearchProv(v);
+  const opciones = datos.departamentoPa
+    ? Provincias.filter(p =>
+        p.idDepartamento === datos.departamentoPa.id &&
+        p.nombre.toLowerCase().includes(v.toLowerCase())
+      )
+    : [];
+  setFilteredProv(v ? opciones : []);
+};
+const handleSelectProv = prov => {
+  setSearchProv(prov.nombre);
+  setDatos(d => ({ ...d, provinciaPa: prov }));
+  setFilteredProv([]);
+  // limpia distrito al cambiar provincia
+  setSearchDist('');
+  setFilteredDist([]);
+};
+
+// Handler Distrito (usa Distritos filtrados por provincia seleccionada)
+const handleDistSearch = e => {
+  const v = e.target.value;
+  setSearchDist(v);
+  const opciones = datos.provinciaPa
+    ? Distritos.filter(d =>
+        d.idProvincia === datos.provinciaPa.id &&
+        d.nombre.toLowerCase().includes(v.toLowerCase())
+      )
+    : [];
+  setFilteredDist(v ? opciones : []);
+};
+const handleSelectDist = dist => {
+  setSearchDist(dist.nombre);
+  setDatos(d => ({ ...d, distritoPa: dist }));
+  setFilteredDist([]);
+};
 
   return (
-    <>
     <div className="p-4">
-  
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-1">
-      {/* Columna 1 */}
-      
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center space-x-2">
-          <label htmlFor="dni" className="block w-[11.5em]">DNI/LM:</label>
-          <input
-            type="text"
-            value={datos.codPa}
-            id="codPa"
-            name="codPa"
-            onChange={handleDNI}
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-          <button onClick={handleSearch} className="px-4 py-2 rounded-lg azuloscurobackground text-white flex items-center space-x-2">
-            <span>Buscar</span>
-            <FontAwesomeIcon icon={faSearch} className="ml-2" /> {/* Icono de lupa de FontAwesome */}
-          </button>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <label htmlFor="nombres" className="block w-36">Nombres:</label>
-          <input
-            type="text"
-            id="nombresPa"
-            value={datos.nombresPa}
-            onChange={handleChange}
-            onKeyDown={(e) => focusNext(e, 'apellidosPa')}
-            name="nombresPa"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="apellidos" className="block w-36">Apellidos:</label>
-          <input
-            type="text"
-            id="apellidosPa"
-            value={datos.apellidosPa}
-            onChange={handleChange}
-            onKeyDown={(e) => focusNext(e, 'emailPa')}
-
-
-            name="apellidosPa"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-      <label htmlFor="fechaNacimiento" className="block w-36">Fecha de Nacimiento:</label>
-      <DatePicker
-        selected={datos.fechaNaciminetoPa}
-        onChange={date => setDatos({...datos, fechaNaciminetoPa: date})}
-        dateFormat="dd/MM/yyyy"
-        showYearDropdown
-        yearDropdownItemNumber={200} // Ajusta según la cantidad de años necesarios
-        minDate={new Date("1800-01-01")} // Establece la fecha mínima permitida
-        scrollableYearDropdown // Hacer el dropdown scrollable
-        className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-      />
-      <label htmlFor='fechaNacimiento' className="text-gray-500 text-sm block mt-2">Formato: Día/Mes/Año</label>
-
-    </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="sexo" name="sexo" className="block w-36">Sexo:</label>
-          <select
-            id="sexoPa"
-            value={datos.sexoPa}
-            onChange={handleChange}
-            name="sexoPa"
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          >
-            <option value="">Seleccionar</option>
-            <option value="M">MACULINO</option>
-            <option value="F">FEMENINO</option>
-          </select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="email" className="block w-36">Email:</label>
-          <input
-            type="email"
-            id="emailPa"
-            value={datos.emailPa}
-            onChange={handleChange}
-            name="emailPa"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-      </div>
-
-      {/* Columna 2 */}
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center space-x-2">
-          <label htmlFor="lugarNacimiento" className="block w-36">Lugar de Nacimiento:</label>
-          <input
-            type="text"
-            value={datos.lugarNacPa}
-            onChange={handleChange}
-            id="lugarNacPa"
-            name="lugarNacPa"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="nivelEstudio" name="nivelE" className="block w-36">Nivel de Estudio:</label>
-          <select
-            id="nivelEstPa"
-            value={datos.nivelEstPa}
-            onChange={handleChange}
-            name="nivelEstPa"
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          >
-            <option value="">Seleccionar</option>
-            <option value="ANALFABETO">ANALFABETO</option>
-            <option value="PRIMARIA COMPLETA">PRIMARIA COMPLETA</option>
-            <option value="PRIMARIA INCOMPLETA">PRIMARIA INCOMPLETA</option>
-            <option value="SECUNDARIA COMPLETA">SECUNDARIA COMPLETA</option>
-            <option value="SECUNDARIA INCOMPLETA">SECUNDARIA INCOMPLETA</option>
-            <option value="UNIVERSITARIO">UNIVERSITARIO</option>
-            <option value="TECNICO">TECNICO</option>
-          </select>
-        </div>
-      <div className="flex items-center space-x-2">
-          <label htmlFor="profOcupacion" className="block w-36">Prof/Ocup:</label>
-          <input
-            type="text"
-            value={searchTerm }
-            onChange={handleProfesionSearch}
-            placeholder="Seleccione"
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-          {searchTerm && (
-            <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
-              {filteredProfesiones.map((option, index) => (
-                <div
-                  key={index}
-                  className="cursor-pointer p-2 hover:bg-gray-200"
-                  onClick={() => handleSelectProfesion(option)}
-                >
-                  {option.descripcion}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {selectedProfesion  && (
-          <div className="text-sm mt-1 flex items-center justify-center">
-            Seleccionado: <strong>{selectedProfesion}</strong>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
+        {/* Columna 1 */}
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center space-x-2">
+            <label htmlFor="codPa" className="block w-[11.5em]">
+              DNI/LM:
+            </label>
+            <input
+              type="text"
+              id="codPa"
+              name="codPa"
+              value={datos.codPa}
+              onChange={handleDNI}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 rounded-lg azuloscurobackground text-white flex items-center space-x-2"
+            >
+              <span>Buscar</span>
+              <FontAwesomeIcon icon={faSearch} />
+            </button>
           </div>
-        )}
-        
-        <div className="flex items-center space-x-2">
-          <label htmlFor="estadoCivil" className="block w-36">Estado Civil:</label>
-          <select
-            id="estadoCivilPa"
-            name="estadoCivilPa"
-            value={datos.estadoCivilPa}
-            onChange={handleChange}
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          >
-            <option value="">Seleccionar</option>
-            <option value="SOLTERO">SOLTERO</option>
-            <option value="CASADO">CASADO</option>
-            <option value="VIUDO">VIUDO</option>
-            <option value="CONVIVIENTE">CONVIVIENTE</option>
-            <option value="SEPARADO">SEPARADO</option>
-            <option value="DIVORCIADO">DIVORCIADO</option>
 
-          </select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="direccionHabitual" className="block w-36">Dirección Habitual:</label>
-          <input
-            type="text"
-            value={datos.direccionPa}
-            onChange={handleChange}
-            id="direccionPa"
-            name="direccionPa"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-      </div>
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Nombres:</label>
+            <input
+              ref={nombreRef}
+              type="text"
+              id="nombresPa"
+              name="nombresPa"
+              value={datos.nombresPa}
+              onChange={handleChange}
+              onKeyDown={(e) => focusNext(e, 'apellidosPa')}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
 
-      {/* Columna 3 */}
-      <div className="flex flex-col space-y-2">
-        <div className="flex items-center space-x-2">
-          <label htmlFor="departamento" name="departamento" className="block w-36">Departamento:</label>
-          <select
-            id="departamentoPa"
-            name="departamentoPa"
-            value={typeof datos.departamentoPa === 'string'
-              ? JSON.stringify(Departamentos.find(d => d.nombre === datos.departamentoPa)) || ''
-              : JSON.stringify(datos.departamentoPa)}
-            onChange={handleDPD}
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          >
-            <option value="">Seleccionar</option>
-            {Departamentos.map((option) => (
-              <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
-            ))}
-          </select>
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Apellidos:</label>
+            <input
+              type="text"
+              id="apellidosPa"
+              name="apellidosPa"
+              value={datos.apellidosPa}
+              onChange={handleChange}
+              onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Fecha Nac.:</label>
+            <InputMask
+              type="text"
+              id="apellidosPa"
+              name="apellidosPa"
+              onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
+              mask="99/99/9999"
+              maskChar={null}
+              value={datos.fechaNaciminetoPa}
+              onChange={handleDateInput}
+            >
+              {() => (
+                <input
+                  id="fechaNaciminetoPa"
+                  name="fechaNaciminetoPa"
+                  onKeyDown={e => focusNext(e, 'sexoPa')}
+                  placeholder="dd/MM/yyyy"
+                  className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                />
+              )}
+            </InputMask>
+          </div>
+
+         {/* Sexo */}
+<div className="flex flex-col">
+  <div className="flex items-center space-x-2">
+    <label className="block w-36">Sexo:</label>
+    <input
+      id="sexoPa"
+      type="text"
+      value={searchSexo}
+      onChange={handleSexoSearch}
+      placeholder="Escribe para buscar..."
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      onKeyDown={e => {
+        if (e.key === 'Enter' && filteredSexo.length > 0) {
+          e.preventDefault();
+          handleSelectSexo(filteredSexo[0]);
+          document.getElementById('emailPa')?.focus();
+        }
+      }}
+    />
+  </div>
+  {searchSexo && filteredSexo.length > 0 && (
+    <div className="border border-gray-300 rounded-md mt-1 max-h-32 overflow-y-auto">
+      {filteredSexo.map((opt,i) => (
+        <div
+          key={i}
+          className="cursor-pointer p-2 hover:bg-gray-200"
+          onClick={() => {
+            handleSelectSexo(opt);
+            document.getElementById('emailPa')?.focus();
+          }}
+        >
+          {opt}
         </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="provincia" className="block w-36">Provincia:</label>
-          <select
-            id="provinciaPa"
-            name="provinciaPa"
-            value={typeof datos.provinciaPa === 'string'
-              ? JSON.stringify(Provincias.find(d => d.nombre === datos.provinciaPa)) || ''
-              : JSON.stringify(datos.provinciaPa)}
-            onChange={handleDPD}
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          >
-            <option value="">Seleccionar</option>
-            {!datos.provinciaPa ? filterProvincias.map((option) => (
-              <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
-            )) : Provincias.map((option) => (
-              <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="distrito" className="block w-36">Distrito:</label>
-          <select
-            id="distritoPa"
-            name="distritoPa"
-            onChange={handleDPD}
-            value={typeof datos.distritoPa === 'string'
-              ? JSON.stringify(Distritos.find(d => d.nombre === datos.distritoPa)) || ''
-              : JSON.stringify(datos.distritoPa)}
-            className="border pointer border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          >
-            <option value="">Seleccionar</option>
-            {!datos.distritoPa ? filterDistritos.map((option) => (
-              <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
-            )) : Distritos.map((option) => (
-              <option key={option.id} value={JSON.stringify(option)}>{option.nombre}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <label htmlFor="caserio" className="block w-36">Caserío:</label>
-          <input
-            type="text"
-            value={datos.caserioPA}
-            id="caserioPA"
-            onChange={handleChange}
-            name="caserioPA"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          {/* <FontAwesomeIcon icon={faPhone} className="" /> */}
-          <label htmlFor="telefono" className="block w-36">Teléfono:</label>
-          <input
-            type="text"
-            value={datos.telCasaPa}
-            id="telCasaPa"
-            onChange={handleNumber}
-            name="telCasaPa"
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          {/* <FontAwesomeIcon icon={faMobileAlt} className="" /> */}
-          <label htmlFor="celular" className="block w-36">Celular:</label>
-          <input
-            type="text"
-            value={datos.celPa}
-            id="celPa"
-            name="celPa"
-            onChange={handleNumber}
-            className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-          />
-        </div>
-      </div>
+      ))}
     </div>
-
-    {/* Botones al final */}
-    <div className="col-span-3 flex justify-end gap-2">
-      <button
-        onClick={(e) => {e.preventDefault(),setModalpad(true)}}
-        className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
-      >
-        Tomar Firma
-      </button>
-      <button
-        onClick={(e) => {e.preventDefault(),setModalhuella(true)}}
-        className="verde-btn px-6 hidden py-2 rounded-md hover:bg-green-800 focus:outline-none"
-      >
-        Tomar Huella HUD
-      </button>
-      <button
-        onClick={(e) => {e.preventDefault(),openHuella()}}
-        className="verde-btn px-6 py-2 rounded-md hover:bg-green-800 focus:outline-none"
-      >
-        Tomar Huella Futronic
-      </button>
-      <button
-        onClick={handleSubmit}
-        className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800 focus:outline-none"
-      >
-        Registrar
-      </button>
-      <button
-        type="button"
-        onClick={handleLimpiar}
-        className="bg-red-500 px-6 py-2 rounded-md text-white focus:outline-none"
-      >
-        Limpiar
-      </button>
-    </div>
-    {/*modalhuella && <NewHuella close={()=> {setModalhuella(false)}}/>*/}
-    {modalhuellaF && <NewHuellaFut close={()=> {setModalhuellaF(false)}} DNI={datos.codPa} Huella={HuellaP}/>}
-    {modalpad && <NewPad close={()=> {setModalpad(false)} } DNI={datos.codPa} Firma={FirmaP} />}
- 
+  )}
 </div>
 
-    </>
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Email:</label>
+            <input
+              id="emailPa"
+              onKeyDown={(e) => focusNext(e, 'lugarNacPa')}
+              type="email"
+              name="emailPa"
+              value={datos.emailPa}
+              onChange={handleChange}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Lugar Nac.:</label>
+            <input
+              id="lugarNacPa"
+              type="text"
+              name="lugarNacPa"
+              value={datos.lugarNacPa}
+              onKeyDown={(e) => focusNext(e, 'nivelEstPa')}
+              onChange={handleChange}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+        </div>
+
+        {/* Columna 2 */}
+        <div className="flex flex-col space-y-2">
+      
+{/* Nivel Estudio */}
+<div className="flex flex-col">
+  <div className="flex items-center space-x-2">
+    <label className="block w-36">Nivel Estudio:</label>
+    <input
+      id="nivelEstPa"
+      type="text"
+      value={searchNivel}
+      onChange={handleNivelSearch}
+      placeholder="Escribe para buscar..."
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      onKeyDown={e => {
+        if (e.key === 'Enter' && filteredNivel.length > 0) {
+          e.preventDefault();
+          handleSelectNivel(filteredNivel[0]);
+          document.getElementById('ocupacionPa')?.focus();
+        }
+      }}
+    />
+  </div>
+  {searchNivel && filteredNivel.length > 0 && (
+    <div className="border border-gray-300 rounded-md mt-1 max-h-32 overflow-y-auto">
+      {filteredNivel.map((opt,i) => (
+        <div
+          key={i}
+          className="cursor-pointer p-2 hover:bg-gray-200"
+          onClick={() => {
+            handleSelectNivel(opt);
+            document.getElementById('ocupacionPa')?.focus();
+          }}
+        >
+          {opt}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+          {/* Prof/Ocup */}
+          <div className="flex flex-col">
+            <div className="flex items-center space-x-2">
+              <label className="block w-36">Prof/Ocup:</label>
+              <input
+                id="ocupacionPa"
+                name="ocupacionPa"
+                type="text"
+                value={searchTerm}
+                onChange={handleProfesionSearch}
+                placeholder="Seleccione"
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (filteredProfesiones.length > 0) {
+                      // selecciona siempre la primera opción
+                      handleSelectProfesion(filteredProfesiones[0]);
+                      // mueve el foco al Estado Civil
+                      document.getElementById('estadoCivilPa')?.focus();
+                    }
+                  }
+                }}
+              />
+            </div>
+
+            {searchTerm && filteredProfesiones.length > 0 && (
+              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+                {filteredProfesiones.map((opt, i) => (
+                  <div
+                    key={i}
+                    className="cursor-pointer p-2 hover:bg-gray-200"
+                    onClick={() => handleSelectProfesion(opt)}
+                  >
+                    {opt.descripcion}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {selectedProfesion && (
+              <p className="text-sm mt-1">
+                Seleccionado: <strong>{selectedProfesion}</strong>
+              </p>
+            )}
+          </div>
+
+          
+          <div className="flex flex-col">
+            <div className="flex items-center space-x-2">
+              <label className="block w-36">Estado Civil:</label>
+              <input
+                id="estadoCivilPa"
+                name="estadoCivilPa"
+                type="text"
+                value={searchCivil}
+                onChange={handleCivilSearch}
+                placeholder="Escribe para buscar..."
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (filteredCivil.length > 0) {
+                      handleSelectCivil(filteredCivil[0]);
+                      // luego enfoca Dirección (por ejemplo)
+                      document.getElementById('direccionPa')?.focus();
+                    }
+                  }
+                }}
+              />
+            </div>
+
+            {searchCivil && filteredCivil.length > 0 && (
+              <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+                {filteredCivil.map((opt, i) => (
+                  <div
+                    key={i}
+                    className="cursor-pointer p-2 hover:bg-gray-200"
+                    onClick={() => {
+                      handleSelectCivil(opt);
+                      document.getElementById('direccionPa')?.focus();
+                    }}
+                  >
+                    {opt}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Dirección:</label>
+            <input
+            id='direccionPa'
+              type="text"
+              name="direccionPa"
+              value={datos.direccionPa}
+              onKeyDown={(e) => focusNext(e, 'departamentoPa')}
+              onChange={handleChange}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+
+          {/* Departamento */}
+<div className="flex flex-col">
+  <div className="flex items-center space-x-2">
+    <label className="block w-36">Departamento:</label>
+    <input
+      id="departamentoPa"
+      type="text"
+      value={searchDept}
+      onChange={handleDeptSearch}
+      placeholder="Escribe para buscar..."
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      onKeyDown={e => {
+        if (e.key === 'Enter' && filteredDept.length > 0) {
+          e.preventDefault();
+          handleSelectDept(filteredDept[0]);
+          document.getElementById('provinciaPa')?.focus();
+        }
+      }}
+    />
+  </div>
+  {searchDept && filteredDept.length > 0 && (
+    <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+      {filteredDept.map((opt, i) => (
+        <div
+          key={i}
+          className="cursor-pointer p-2 hover:bg-gray-200"
+          onClick={() => {
+            handleSelectDept(opt);
+            document.getElementById('provinciaPa')?.focus();
+          }}
+        >
+          {opt.nombre}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* Provincia */}
+<div className="flex flex-col">
+  <div className="flex items-center space-x-2">
+    <label className="block w-36">Provincia:</label>
+    <input
+      id="provinciaPa"
+      type="text"
+      value={searchProv}
+      onChange={handleProvSearch}
+      placeholder="Escribe para buscar..."
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      onKeyDown={e => {
+        if (e.key === 'Enter' && filteredProv.length > 0) {
+          e.preventDefault();
+          handleSelectProv(filteredProv[0]);
+          document.getElementById('distritoPa')?.focus();
+        }
+      }}
+    />
+  </div>
+  {searchProv && filteredProv.length > 0 && (
+    <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+      {filteredProv.map((opt, i) => (
+        <div
+          key={i}
+          className="cursor-pointer p-2 hover:bg-gray-200"
+          onClick={() => {
+            handleSelectProv(opt);
+            document.getElementById('distritoPa')?.focus();
+          }}
+        >
+          {opt.nombre}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+{/* Distrito */}
+<div className="flex flex-col">
+  <div className="flex items-center space-x-2">
+    <label className="block w-36">Distrito:</label>
+    <input
+      id="distritoPa"
+      type="text"
+      value={searchDist}
+      onChange={handleDistSearch}
+      placeholder="Escribe para buscar..."
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      onKeyDown={e => {
+        if (e.key === 'Enter' && filteredDist.length > 0) {
+          e.preventDefault();
+          handleSelectDist(filteredDist[0]);
+          document.getElementById('caserioPA')?.focus();
+        }
+      }}
+    />
+  </div>
+  {searchDist && filteredDist.length > 0 && (
+    <div className="border border-gray-300 rounded-md mt-1 max-h-48 overflow-y-auto">
+      {filteredDist.map((opt, i) => (
+        <div
+          key={i}
+          className="cursor-pointer p-2 hover:bg-gray-200"
+          onClick={() => {
+            handleSelectDist(opt);
+            document.getElementById('caserioPA')?.focus();
+          }}
+        >
+          {opt.nombre}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Caserío:</label>
+            <input
+              type="text"
+              id="caserioPA"
+              name="caserioPA"
+              value={datos.caserioPA}
+              onChange={handleChange}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Teléfono:</label>
+            <input
+              type="text"
+              id="telCasaPa"
+              name="telCasaPa"
+              value={datos.telCasaPa}
+              onChange={handleNumber}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Celular:</label>
+            <input
+              type="text"
+              id="celPa"
+              name="celPa"
+              value={datos.celPa}
+              onChange={handleNumber}
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Botones finales */}
+      <div className="flex justify-end gap-2 mt-4">
+        <button
+          onClick={() => setModalpad(true)}
+          className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
+        >
+          Tomar Firma
+        </button>
+        <button
+          onClick={openHuella}
+          className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
+        >
+          Tomar Huella Futronic
+        </button>
+        <button
+          onClick={handleSubmit}
+          className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800"
+        >
+          Registrar
+        </button>
+        <button
+          onClick={handleLimpiar}
+          className="bg-red-500 px-6 py-2 rounded-md text-white"
+        >
+          Limpiar
+        </button>
+      </div>
+
+      {modalhuellaF && (
+        <NewHuellaFut
+          close={() => setModalhuellaF(false)}
+          DNI={datos.codPa}
+          Huella={HuellaP}
+        />
+      )}
+      {modalpad && (
+        <NewPad
+          close={() => setModalpad(false)}
+          DNI={datos.codPa}
+          Firma={FirmaP}
+        />
+      )}
+    </div>
   );
 };
 
