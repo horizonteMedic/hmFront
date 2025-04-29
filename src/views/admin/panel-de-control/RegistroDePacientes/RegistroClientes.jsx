@@ -140,80 +140,101 @@ const RegistroClientes = (props) => {
   Swal.fire({ title: 'Buscando datos', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
   SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
-    .then(async res => {
-      Swal.close();
-      if (!res.codPa) {
-        // ⬇︎ dentro de handleSearch – justo donde hoy haces toast: true, icon: 'info'
-        await Swal.fire({
-          toast: true,                 // seguimos usando toast (pequeño flotante)
-          position: 'top-end',
-          icon: 'info',             // ó 'info'  (warning = triángulo, info = “i”)
-          title: '<span style="font-size:1rem">Paciente no encontrado</span>',
-          width: 360,                  // un poco más ancho que el default (300 px)
-          padding: '1.25rem',
-          showConfirmButton: false,
-          timer: 1000,
-          customClass: {
-            icon: 'swal2-icon-scale'   // veremos cómo agrandar el icono abajo
-          }
-        });
-        nombreRef.current?.focus();
-        return;
-      }
+  .then(async res => {
+    Swal.close();
 
-      /* --------------------------------------------------
-         1. Guardas los datos crudos que llegan del backend
-      -------------------------------------------------- */
-      setDatos(res);
+    // Si no existe el paciente
+    if (!res.codPa) {
+      await Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'info',
+        title: '<span style="font-size:1rem">Paciente no encontrado</span>',
+        width: 360,
+        padding: '1.25rem',
+        showConfirmButton: false,
+        timer: 1200,
+        customClass: { icon: 'swal2-icon-scale' }
+      });
 
-      /* --------------------------------------------------
-         2. Convierte los NOMBRES (strings) en OBJETOS
-            para que sigan funcionando los filtros id-based
-      -------------------------------------------------- */
-      const deptObj = Departamentos.find(d => d.nombre === res.departamentoPa);
-      const provObj = Provincias.find(
-        p => deptObj && p.idDepartamento === deptObj.id && p.nombre === res.provinciaPa
-      );
-      const distObj = Distritos.find(
-        d => provObj && d.idProvincia === provObj.id && d.nombre === res.distritoPa
-      );
+      handleLimpiar(true);
+      setTimeout(() => nombreRef.current?.focus(), 0);
+      return;
+    }
 
-      setDatos(d => ({
-        ...d,
-        departamentoPa: deptObj || '',
-        provinciaPa:    provObj || '',
-        distritoPa:     distObj || ''
-      }));
+    // 1️⃣ Sanear null/undefined → convertirlos en cadena vacía
+    const sanitized = Object.fromEntries(
+      Object.entries(res).map(([key, value]) => [key, value ?? ''])
+    );
 
-      /* --------------------------------------------------
-         3. Sincroniza los inputs de texto (search*)
-      -------------------------------------------------- */
-      setSearchSexo(res.sexoPa === 'M' ? 'MASCULINO' : 'FEMENINO');
-      setSearchNivel(res.nivelEstPa     || '');
-      setSearchCivil(res.estadoCivilPa  || '');
+    // 2️⃣ Sobrescribir todo el objeto datos con valores saneados
+    setDatos(sanitized);
 
-      setSearchTerm(res.ocupacionPa     || '');
-      setSelectedProfesion(res.ocupacionPa || '');
+    // 3️⃣ Mapear departamento/provincia/distrito SOLO si vienen valores válidos
+    let deptObj = '',
+        provObj = '',
+        distObj = '';
 
-      setSearchDept(res.departamentoPa  || '');
-      setSearchProv(res.provinciaPa     || '');
-      setSearchDist(res.distritoPa      || '');
+    if (sanitized.departamentoPa) {
+      deptObj = Departamentos.find(d => d.nombre === sanitized.departamentoPa) || '';
+      provObj = deptObj
+        ? Provincias.find(p =>
+            p.idDepartamento === deptObj.id &&
+            p.nombre === sanitized.provinciaPa
+          ) || ''
+        : '';
+      distObj = provObj
+        ? Distritos.find(d =>
+            d.idProvincia === provObj.id &&
+            d.nombre === sanitized.distritoPa
+          ) || ''
+        : '';
+    }
 
-      /* --------------------------------------------------
-         4. Cargar huella / firma
-      -------------------------------------------------- */
-      const [H, F] = await Promise.all([
-        VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/HUELLA`),
-        VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/FIRMAP`)
-      ]);
-      setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
-      setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
-    })
-    .catch(() => {
-      Swal.close();
-      Swal.fire('Error', 'Ha ocurrido un error', 'error');
-    });
-};
+    setDatos(d => ({
+      ...d,
+      departamentoPa: deptObj,
+      provinciaPa:    provObj,
+      distritoPa:     distObj
+    }));
+
+    // 4️⃣ Sincronizar los campos de búsqueda/autocomplete
+    if (sanitized.sexoPa === 'M')      setSearchSexo('MASCULINO');
+    else if (sanitized.sexoPa === 'F') setSearchSexo('FEMENINO');
+    else                                setSearchSexo('');
+
+    setSearchNivel(sanitized.nivelEstPa);
+    setSearchCivil(sanitized.estadoCivilPa);
+
+    setSearchTerm(sanitized.ocupacionPa);
+    setSelectedProfesion(sanitized.ocupacionPa);
+
+    setSearchDept(sanitized.departamentoPa);
+    setSearchProv(sanitized.provinciaPa);
+    setSearchDist(sanitized.distritoPa);
+
+    // 5️⃣ Limpiar todas las listas de sugerencias
+    setFilteredSexo([]);
+    setFilteredNivel([]);
+    setFilteredProfesiones([]);
+    setFilteredCivil([]);
+    setFilteredDept([]);
+    setFilteredProv([]);
+    setFilteredDist([]);
+
+    // 6️⃣ Cargar huella y firma
+    const [H, F] = await Promise.all([
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/HUELLA`),
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${sanitized.codPa}/FIRMAP`)
+    ]);
+    setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
+    setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
+  })
+  .catch(() => {
+    Swal.close();
+    Swal.fire('Error', 'Ha ocurrido un error', 'error');
+  });
+ }
 
 const handleSubmit = e => {
     e.preventDefault();
@@ -265,39 +286,29 @@ const initialDatos = {
   celPa: ''
 };
 
-// 2️⃣  Nuevo handleLimpiar
-const handleLimpiar = () => {
-  setDatos(initialDatos);          // limpia datos principales
-  setStartDate(new Date());        // si usas DatePicker más adelante
-  setSearchTerm('');               // input Profesión
-  setFilteredProfesiones([]);      // lista Profesión
-  setSelectedProfesion('');        // texto “Seleccionado”
+const handleLimpiar = (keepDNI = false) => {
+  const dniActual = keepDNI ? datos.codPa : '';   // guarda o descarta el DNI
 
-  setSearchSexo('');
-  setFilteredSexo([]);
+  // 🔄 reinicia el estado principal
+  setDatos({ ...initialDatos, codPa: dniActual });
+  setStartDate(new Date());          // (por si usas DatePicker)
 
-  setSearchNivel('');
-  setFilteredNivel([]);
+  // 🔄 limpia todos los autocompletados / filtros
+  setSearchTerm('');           setFilteredProfesiones([]);   setSelectedProfesion('');
+  setSearchSexo('');           setFilteredSexo([]);
+  setSearchNivel('');          setFilteredNivel([]);
+  setSearchCivil('');          setFilteredCivil([]);
+  setSearchDept('');           setFilteredDept([]);
+  setSearchProv('');           setFilteredProv([]);
+  setSearchDist('');           setFilteredDist([]);
 
-  setSearchCivil('');
-  setFilteredCivil([]);
+  // 🔄 limpia huella y firma previas
+  setHuellaP({ id: 0, url: '' });
+  setFirmaP({ id: 0, url: '' });
 
-  setSearchDept('');
-  setFilteredDept([]);
-
-  setSearchProv('');
-  setFilteredProv([]);
-
-  setSearchDist('');
-  setFilteredDist([]);
-
-  setHuellaP({ id: 0, url: '' });  // huella previa
-  setFirmaP({ id: 0, url: '' });   // firma previa
-
-  // Si tenías algún mensaje/ref adicional
-  dniRef.current?.focus();     // ⬅️  vuelve al campo DNI
+  // ⌨️ devuelve el foco al DNI para seguir escribiendo
+  dniRef.current?.focus();
 };
-
 
   const openHuella = () => {
     if (!datos.codPa)
