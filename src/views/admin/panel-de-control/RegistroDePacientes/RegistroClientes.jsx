@@ -16,11 +16,12 @@ import NewHuella from './huella/NewHuella';
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
 import { VerifyHoF } from './model/Submit';
-import InputMask from 'react-input-mask';
+import InputMask from 'react-input-mask-next';
 
 const RegistroClientes = (props) => {
   // ref para mantener el cursor fijo en "Nombres"
   const nombreRef = useRef(null);
+  const dniRef = useRef(null);   // ⬅️  nuevo
 
   const [startDate, setStartDate] = useState(new Date());
   const [datos, setDatos] = useState({
@@ -78,17 +79,19 @@ const RegistroClientes = (props) => {
 
   const handleDNI = e => {
     const { name, value } = e.target;
-    setDatos(d => ({
+    const onlyDigits = value.replace(/\D/g, '');      // quita todo lo que no sea dígito
+    setDatos(d => ({                                  // guarda como string
       ...d,
-      [name]: value ? parseInt(value.replace(/\D/g, ''), 10) : 0
+      [name]: onlyDigits              // '' si el input está vacío
     }));
   };
 
   const handleNumber = e => {
     const { name, value } = e.target;
-    setDatos(d => ({ ...d, [name]: value.replace(/\D/g, '') || '0' }));
+    const onlyDigits = value.replace(/\D/g, '');
+    setDatos(d => ({ ...d, [name]: onlyDigits }));    // '' si está vacío
   };
-
+  
   const handleDPD = e => {
     const { name, value } = e.target;
     const sel = value ? JSON.parse(value) : '';
@@ -129,62 +132,90 @@ const RegistroClientes = (props) => {
     setFilteredProfesiones([]);
   };
 
-  const provinciasFiltradas = Provincias.filter(
-    p => datos.departamentoPa && p.idDepartamento === datos.departamentoPa.id
-  );
-  const distritosFiltrados = Distritos.filter(
-    d => datos.provinciaPa && d.idProvincia === datos.provinciaPa.id
-  );
+ // --- Búsqueda de paciente -------------------------
+ const handleSearch = e => {
+  e.preventDefault();
+  if (!datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
 
-  // --- Búsqueda de paciente con toast + refocus ---
-  const handleSearch = e => {
-    e.preventDefault();
-    if (!datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
+  Swal.fire({ title: 'Buscando datos', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-    Swal.fire({
-      title: 'Buscando datos',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
-
-    SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
-      .then(res => {
-        Swal.close();
-        if (!res.codPa) {
-          Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'error',
-            title: 'Paciente no encontrado',
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true
-          }).then(() => {
-            nombreRef.current?.focus();
-          });
-          return;
-        }
-        setDatos(res);
-        setSelectedProfesion(res.ocupacionPa);
-        Promise.all([
-          VerifyHoF(
-            `/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/HUELLA`
-          ),
-          VerifyHoF(
-            `/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/FIRMAP`
-          )
-        ]).then(([H, F]) => {
-          setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
-          setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
+  SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
+    .then(async res => {
+      Swal.close();
+      if (!res.codPa) {
+        // ⬇︎ dentro de handleSearch – justo donde hoy haces toast: true, icon: 'info'
+        await Swal.fire({
+          toast: true,                 // seguimos usando toast (pequeño flotante)
+          position: 'top-end',
+          icon: 'info',             // ó 'info'  (warning = triángulo, info = “i”)
+          title: '<span style="font-size:1rem">Paciente no encontrado</span>',
+          width: 360,                  // un poco más ancho que el default (300 px)
+          padding: '1.25rem',
+          showConfirmButton: false,
+          timer: 1000,
+          customClass: {
+            icon: 'swal2-icon-scale'   // veremos cómo agrandar el icono abajo
+          }
         });
-      })
-      .catch(() => {
-        Swal.close();
-        Swal.fire('Error', 'Ha ocurrido un error', 'error');
-      });
-  };
+        nombreRef.current?.focus();
+        return;
+      }
 
-  const handleSubmit = e => {
+      /* --------------------------------------------------
+         1. Guardas los datos crudos que llegan del backend
+      -------------------------------------------------- */
+      setDatos(res);
+
+      /* --------------------------------------------------
+         2. Convierte los NOMBRES (strings) en OBJETOS
+            para que sigan funcionando los filtros id-based
+      -------------------------------------------------- */
+      const deptObj = Departamentos.find(d => d.nombre === res.departamentoPa);
+      const provObj = Provincias.find(
+        p => deptObj && p.idDepartamento === deptObj.id && p.nombre === res.provinciaPa
+      );
+      const distObj = Distritos.find(
+        d => provObj && d.idProvincia === provObj.id && d.nombre === res.distritoPa
+      );
+
+      setDatos(d => ({
+        ...d,
+        departamentoPa: deptObj || '',
+        provinciaPa:    provObj || '',
+        distritoPa:     distObj || ''
+      }));
+
+      /* --------------------------------------------------
+         3. Sincroniza los inputs de texto (search*)
+      -------------------------------------------------- */
+      setSearchSexo(res.sexoPa === 'M' ? 'MASCULINO' : 'FEMENINO');
+      setSearchNivel(res.nivelEstPa     || '');
+      setSearchCivil(res.estadoCivilPa  || '');
+
+      setSearchTerm(res.ocupacionPa     || '');
+      setSelectedProfesion(res.ocupacionPa || '');
+
+      setSearchDept(res.departamentoPa  || '');
+      setSearchProv(res.provinciaPa     || '');
+      setSearchDist(res.distritoPa      || '');
+
+      /* --------------------------------------------------
+         4. Cargar huella / firma
+      -------------------------------------------------- */
+      const [H, F] = await Promise.all([
+        VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/HUELLA`),
+        VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${res.codPa}/FIRMAP`)
+      ]);
+      setHuellaP(H.id === 1 ? { id: 1, url: H.mensaje } : { id: 0, url: '' });
+      setFirmaP(F.id === 1 ? { id: 1, url: F.mensaje } : { id: 0, url: '' });
+    })
+    .catch(() => {
+      Swal.close();
+      Swal.fire('Error', 'Ha ocurrido un error', 'error');
+    });
+};
+
+const handleSubmit = e => {
     e.preventDefault();
     if (!datos.codPa)
       return Swal.fire('Error', 'Complete los campos vacíos', 'error');
@@ -213,28 +244,60 @@ const RegistroClientes = (props) => {
       });
   };
 
-  const handleLimpiar = () => {
-    setDatos({
-      codPa: '',
-      nombresPa: '',
-      apellidosPa: '',
-      fechaNaciminetoPa: '',
-      sexoPa: '',
-      emailPa: '',
-      lugarNacPa: '',
-      nivelEstPa: '',
-      ocupacionPa: '',
-      estadoCivilPa: '',
-      direccionPa: '',
-      departamentoPa: '',
-      provinciaPa: '',
-      distritoPa: '',
-      caserioPA: '',
-      telCasaPa: '',
-      celPa: ''
-    });
-    setSelectedProfesion('');
-  };
+ // 1️⃣  Valor inicial de datos (puedes extraerlo a una constante para no repetir)
+const initialDatos = {
+  codPa: '',
+  nombresPa: '',
+  apellidosPa: '',
+  fechaNaciminetoPa: '',
+  sexoPa: '',
+  emailPa: '',
+  lugarNacPa: '',
+  nivelEstPa: '',
+  ocupacionPa: '',
+  estadoCivilPa: '',
+  direccionPa: '',
+  departamentoPa: '',
+  provinciaPa: '',
+  distritoPa: '',
+  caserioPA: '',
+  telCasaPa: '',
+  celPa: ''
+};
+
+// 2️⃣  Nuevo handleLimpiar
+const handleLimpiar = () => {
+  setDatos(initialDatos);          // limpia datos principales
+  setStartDate(new Date());        // si usas DatePicker más adelante
+  setSearchTerm('');               // input Profesión
+  setFilteredProfesiones([]);      // lista Profesión
+  setSelectedProfesion('');        // texto “Seleccionado”
+
+  setSearchSexo('');
+  setFilteredSexo([]);
+
+  setSearchNivel('');
+  setFilteredNivel([]);
+
+  setSearchCivil('');
+  setFilteredCivil([]);
+
+  setSearchDept('');
+  setFilteredDept([]);
+
+  setSearchProv('');
+  setFilteredProv([]);
+
+  setSearchDist('');
+  setFilteredDist([]);
+
+  setHuellaP({ id: 0, url: '' });  // huella previa
+  setFirmaP({ id: 0, url: '' });   // firma previa
+
+  // Si tenías algún mensaje/ref adicional
+  dniRef.current?.focus();     // ⬅️  vuelve al campo DNI
+};
+
 
   const openHuella = () => {
     if (!datos.codPa)
@@ -380,7 +443,13 @@ const handleSelectDist = dist => {
   setDatos(d => ({ ...d, distritoPa: dist }));
   setFilteredDist([]);
 };
-
+const handleFecha = e => {
+  const raw = e.target.value.replace(/\D/g, '').slice(0, 8);   // máx. 8 dígitos
+  const formatted = raw
+    .replace(/(\d{4})(\d)/, '$1-$2')          // 1995 → 1995-
+    .replace(/(\d{4}-\d{2})(\d)/, '$1-$2');   // 1995-07 → 1995-07-
+  setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
+};
   return (
     <div className="p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
@@ -391,11 +460,17 @@ const handleSelectDist = dist => {
               DNI/LM:
             </label>
             <input
+              ref={dniRef}                 // ⬅️  aquí
               type="text"
               id="codPa"
               name="codPa"
               value={datos.codPa}
               onChange={handleDNI}
+              onKeyDown={e => {            // ⬅️  disparar búsqueda con Enter
+                if (e.key === 'Enter') {
+                  handleSearch(e);
+                }
+              }}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
             />
             <button
@@ -434,29 +509,29 @@ const handleSelectDist = dist => {
             />
           </div>
 
-          <div className="flex items-center space-x-2">
-            <label className="block w-36">Fecha Nac.:</label>
-            <InputMask
-              type="text"
-              id="apellidosPa"
-              name="apellidosPa"
-              onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
-              mask="99/99/9999"
-              maskChar={null}
-              value={datos.fechaNaciminetoPa}
-              onChange={handleDateInput}
-            >
-              {() => (
-                <input
-                  id="fechaNaciminetoPa"
-                  name="fechaNaciminetoPa"
-                  onKeyDown={e => focusNext(e, 'sexoPa')}
-                  placeholder="dd/MM/yyyy"
-                  className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-                />
-              )}
-            </InputMask>
-          </div>
+         {/* Fecha de Nacimiento */}
+<div className="flex items-start space-x-2">     {/* fila igual que los demás */}
+  {/* label – ancho fijo */}
+  <label className="block w-36 mt-2">Fecha Nac.:</label>
+
+  {/* zona del input + nota */}
+  <div className="flex flex-col w-full">
+    <input
+      type="text"
+      id="fechaNaciminetoPa"
+      name="fechaNaciminetoPa"
+      value={datos.fechaNaciminetoPa}
+      onChange={handleFecha}
+      placeholder="yyyy-MM-dd"
+      onKeyDown={e => focusNext(e, 'sexoPa')}
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+    />
+
+    <p className="text-xs text-gray-500 mt-1">
+      Formato: <strong>Año-Mes-Día</strong> (AAAA-MM-DD)
+    </p>
+  </div>
+</div>
 
          {/* Sexo */}
 <div className="flex flex-col">
@@ -573,7 +648,7 @@ const handleSelectDist = dist => {
                 type="text"
                 value={searchTerm}
                 onChange={handleProfesionSearch}
-                placeholder="Seleccione"
+                placeholder="Escribe para buscar..."
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
@@ -671,12 +746,22 @@ const handleSelectDist = dist => {
   <div className="flex items-center space-x-2">
     <label className="block w-36">Departamento:</label>
     <input
-      id="departamentoPa"
-      type="text"
-      value={searchDept}
-      onChange={handleDeptSearch}
-      placeholder="Escribe para buscar..."
-      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+  id="departamentoPa"
+  type="text"
+  value={searchDept}
+  onChange={handleDeptSearch}
+  onFocus={() => {
+    // si no hay nada filtrado, muestra todo el catálogo
+    if (filteredDept.length === 0) {
+      setFilteredDept(
+        Departamentos.filter(d =>
+          d.nombre.toLowerCase().includes(searchDept.toLowerCase())
+        )
+      );
+    }
+  }}
+  placeholder="Escribe para buscar..."
+  className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredDept.length > 0) {
           e.preventDefault();
@@ -714,6 +799,15 @@ const handleSelectDist = dist => {
       value={searchProv}
       onChange={handleProvSearch}
       placeholder="Escribe para buscar..."
+      onFocus={() => {
+        if (filteredProv.length === 0) {
+          const opciones = datos.departamentoPa
+            ? Provincias.filter(p => p.idDepartamento === datos.departamentoPa.id)
+            : [];
+          setFilteredProv(opciones);
+        }
+      }}
+      
       className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredProv.length > 0) {
@@ -750,6 +844,15 @@ const handleSelectDist = dist => {
       id="distritoPa"
       type="text"
       value={searchDist}
+      onFocus={() => {
+        if (filteredDist.length === 0) {
+          const opciones = datos.provinciaPa
+            ? Distritos.filter(d => d.idProvincia === datos.provinciaPa.id)
+            : [];
+          setFilteredDist(opciones);
+        }
+      }}
+      
       onChange={handleDistSearch}
       placeholder="Escribe para buscar..."
       className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -789,6 +892,7 @@ const handleSelectDist = dist => {
               name="caserioPA"
               value={datos.caserioPA}
               onChange={handleChange}
+              onKeyDown={(e) => focusNext(e, 'telCasaPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
             />
           </div>
@@ -800,6 +904,7 @@ const handleSelectDist = dist => {
               id="telCasaPa"
               name="telCasaPa"
               value={datos.telCasaPa}
+              onKeyDown={(e) => focusNext(e, 'celPa')}
               onChange={handleNumber}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
             />
