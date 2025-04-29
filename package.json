@@ -37,6 +37,8 @@
     "react-datepicker": "^6.8.0",
     "react-dom": "^18.3.1",
     "react-input-color": "^4.0.1",
+    "react-input-mask": "^2.0.4",
+    "react-input-mask-next": "^3.0.0-alpha.12",
     "react-joyride": "^2.8.2",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.23.0",
