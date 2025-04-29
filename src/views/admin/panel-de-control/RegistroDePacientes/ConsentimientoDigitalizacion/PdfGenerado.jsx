@@ -7,17 +7,20 @@ import { jsPDF } from 'jspdf';
  *
  * @param {{ nombre: string, edad: string|number, dni: string, orderNumber: string }} datos
  */
-export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP }) {
+export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, jasper }) {
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-
+  console.log('asd',jasper)
   const margin = 50;
   const lineHeight = 18;
   const paraSpacing = 24;
   const lineHeightFactor = 1.2;
   let y = margin;
-  console.log(FirmaP.url,HuellaP.url)
+
+  //DATOS JASPER
+  
+
   // Helper para cargar logo
   const loadImg = src =>
     new Promise((res, rej) => {
@@ -59,7 +62,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP })
       // ----------- PÁRRAFO 1 -----------
       doc.setFont('helvetica', 'normal').setFontSize(11);
       const nombreText = nombre || '.................................................................';
-      const edadText   = edad   != null ? `${edad}` : '......';
+      const edadText   = jasper.edad   != null ? `${jasper.edad}` : '......';
       const dniText    = dni    || '..........................';
       const p1 =
         `Yo, ${nombreText}, de ${edadText} años de edad, identificado(a) con DNI N.° ${dniText}, ` +
@@ -179,9 +182,10 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP })
 
       doc.setFont('helvetica', 'normal').setFontSize(7);
       const footerLines = [
-        'Sede Trujillo: Av. Nicolás de Piérola N°1106 Urb. San Fernando Cel. 964385075  Telf. 044-666120  Cl. Guillermo Prescott N°127 Urb. Sto. Dominguito  Telf. 044-767608',
-        'Sede Huamachuco: Jr. Leoncio Prado N°786  Cel. 990094744-969603777  admision@horizontemedic.com  Telf. 044-348070',
-        'Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo  admision.huancayo@horizontemedic.com  Telf. 064-659554'
+        `${jasper.dir_tru_pierola}, Cel. ${jasper.cel_trujillo_pie} Telf. ${jasper.telf_tru_pierola} ${jasper.email_tru_pierola}.`,
+        `${jasper.dir_trujillo}  Telf. ${jasper.telf_trujillo}`,
+        `${jasper.dir_huamachuco}  Cel. ${jasper.cel_huamachuco}  ${jasper.email_huamachuco}  Telf. ${jasper.telf_huamachuco}`,
+        `${jasper.dir_huancayo}  ${jasper.email_huancayo}  Telf. ${jasper.telf_huancayo}`
       ];
       let ty = footerY + 12;
       footerLines.forEach(line => {

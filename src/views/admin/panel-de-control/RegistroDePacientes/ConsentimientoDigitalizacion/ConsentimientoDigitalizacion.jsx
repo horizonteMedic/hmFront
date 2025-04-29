@@ -7,6 +7,7 @@ import styles from './ConsentimientoDigitalizacion.module.css'; // Ya no importa
 import { VerifyHoF } from '../model/Submit';
 import Swal from 'sweetalert2';
 import { GetNoConsentimiento, SubmitConsentimiento } from '../model/Consentimiento';
+import { getFetch } from '../../getFetch/getFetch';
 
 const ConsentimientoDigitalizacion = ({token, userlogued}) => {
   const [orderNumber, setOrderNumber] = useState('');
@@ -85,12 +86,13 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
 
     Promise.all([
       VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/HUELLA`),
-      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/FIRMAP`)
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/FIRMAP`),
+      getFetch(`/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado/${orderNumber}`, token)
     ])
-    .then(([Huella, Firma]) => {
+    .then(([Huella, Firma, jasper]) => {
       const huellaData = Huella.id === 1 ? { id: 1, url: Huella.mensaje } : { id: 0, url: '' };
       const firmaData = Firma.id === 1 ? { id: 1, url: Firma.mensaje } : { id: 0, url: '' };
-      generatePdf({ nombre: name, dni, orderNumber, FirmaP: firmaData, HuellaP: huellaData });
+      generatePdf({ nombre: name, dni, orderNumber, FirmaP: firmaData, HuellaP: huellaData, token: token, jasper });
     })
     .catch(error => {
       Swal.fire('Error', 'No se pudo generar el consentimiento', 'error');
