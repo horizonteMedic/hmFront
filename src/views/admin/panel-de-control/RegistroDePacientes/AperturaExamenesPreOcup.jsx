@@ -27,10 +27,14 @@ const AperturaExamenesPreOcup = (props) => {
   const FormaPago = ComboboxFormaPago(props.selectedSede)
   const ListAuth = ComboboxListAuth(props.selectedSede)
 
+  
+
+
+
   const [datos, setDatos] = useState({
     codPa: props.DNIG,
-    razonEmpresa:"N/A",
-    razonContrata: "N/A",
+    razonEmpresa:"",
+    razonContrata: "",
     n_medico: "",
     tipoPrueba: "",
     cargoDe: "",
@@ -69,6 +73,252 @@ const AperturaExamenesPreOcup = (props) => {
     code: "",
     nombre: ""
   })
+
+
+  // Autocompletado Empresa
+  const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
+  const [filteredEmpresas, setFilteredEmpresas] = useState([]);
+
+  const handleEmpresaSearch = e => {
+    const v = e.target.value;
+    setSearchEmpresa(v);
+    setFilteredEmpresas(
+      v
+        ? EmpresasMulti.filter(emp =>
+            emp.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectEmpresa = emp => {
+    setSearchEmpresa(emp.mensaje);
+    setDatos(d => ({ ...d, razonEmpresa: emp.mensaje }));
+    setFilteredEmpresas([]);
+    // mueve el foco al siguiente campo Contrata
+    document.getElementById('razonContrata')?.focus();
+  };
+
+  // — Autocomplete Contrata —
+  const [searchContrata, setSearchContrata]       = useState(datos.razonContrata);
+  const [filteredContratas, setFilteredContratas] = useState([]);
+
+  const handleContrataSearch = e => {
+    const v = e.target.value;
+    setSearchContrata(v);
+    setFilteredContratas(
+      v
+        ? ContrataMulti.filter(c =>
+            c.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectContrata = c => {
+    setSearchContrata(c.mensaje);
+    setDatos(d => ({ ...d, razonContrata: c.mensaje }));
+    setFilteredContratas([]);
+    document.getElementById('n_medico')?.focus();
+  };
+
+  // — Autocomplete Médico Ocupacional —
+  const [searchMedico, setSearchMedico]       = useState(datos.n_medico);
+  const [filteredMedicos, setFilteredMedicos] = useState([]);
+
+  const handleMedicoSearch = e => {
+    const v = e.target.value;
+    setSearchMedico(v);
+    setFilteredMedicos(
+      v
+        ? MedicosMulti.filter(m =>
+            m.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectMedico = m => {
+    setSearchMedico(m.mensaje);
+    setDatos(d => ({ ...d, n_medico: m.mensaje }));
+    setFilteredMedicos([]);
+    document.getElementById('tipoPrueba')?.focus();
+  };
+
+  // — Autocomplete Tipo de Prueba —
+  const [searchPrueba, setSearchPrueba]       = useState(datos.tipoPrueba);
+  const [filteredPruebas, setFilteredPruebas] = useState([]);
+
+  const handlePruebaSearch = e => {
+    const v = e.target.value;
+    setSearchPrueba(v);
+    setFilteredPruebas(
+      v
+        ? PruebaMulti.filter(p =>
+            p.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectPrueba = p => {
+    setSearchPrueba(p.mensaje);
+    setDatos(d => ({ ...d, tipoPrueba: p.mensaje }));
+    setFilteredPruebas([]);
+    document.getElementById('cargoDe')?.focus();
+  };
+// — Estados y handlers para los demás autocompletes —
+  // Cargo
+  const [searchCargo, setSearchCargo] = useState(datos.cargoDe);
+  const [filteredCargos, setFilteredCargos] = useState([]);
+  const handleCargoSearch = e => {
+    const v = e.target.value;
+    setSearchCargo(v);
+    setFilteredCargos(
+      v
+        ? CargosMulti.filter(c =>
+            c.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectCargo = c => {
+    setSearchCargo(c.mensaje);
+    setDatos(d => ({ ...d, cargoDe: c.mensaje }));
+    setFilteredCargos([]);
+    document.getElementById('areaO')?.focus();
+  };
+
+  // Área
+  const [searchArea, setSearchArea] = useState(datos.areaO);
+  const [filteredAreas, setFilteredAreas] = useState([]);
+  const handleAreaSearch = e => {
+    const v = e.target.value;
+    setSearchArea(v);
+    setFilteredAreas(
+      v
+        ? AreaMulti.filter(a =>
+            a.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectArea = a => {
+    setSearchArea(a.mensaje);
+    setDatos(d => ({ ...d, areaO: a.mensaje }));
+    setFilteredAreas([]);
+    document.getElementById('nomExamen')?.focus();
+  };
+
+  // Examen Médico
+  const [searchExamenMedico, setSearchExamenMedico] = useState(datos.nomExamen);
+  const [filteredExamMed, setFilteredExamMed]     = useState([]);
+  const handleExamenMedSearch = e => {
+    const v = e.target.value;
+    setSearchExamenMedico(v);
+    setFilteredExamMed(
+      v
+        ? ExamenMulti.filter(x =>
+            x.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectExamenMed = x => {
+    setSearchExamenMedico(x.mensaje);
+    setDatos(d => ({ ...d, nomExamen: x.mensaje }));
+    setFilteredExamMed([]);
+    document.getElementById('nomEx')?.focus();
+  };
+
+  // Explotación en
+  const [searchExplotacion, setSearchExplotacion] = useState(datos.nomEx);
+  const [filteredExplot, setFilteredExplot]     = useState([]);
+  const handleExplotSearch = e => {
+    const v = e.target.value;
+    setSearchExplotacion(v);
+    setFilteredExplot(
+      v
+        ? ExplotacionMulti.filter(x =>
+            x.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectExplot = x => {
+    setSearchExplotacion(x.mensaje);
+    setDatos(d => ({ ...d, nomEx: x.mensaje }));
+    setFilteredExplot([]);
+    document.getElementById('mineralPo')?.focus();
+  };
+
+  // Mineral Exp
+  const [searchMineral, setSearchMineral] = useState(datos.mineralPo);
+  const [filteredMinerals, setFilteredMinerals] = useState([]);
+  const handleMineralSearch = e => {
+    const v = e.target.value;
+    setSearchMineral(v);
+    setFilteredMinerals(
+      v
+        ? MineralMulti.filter(m =>
+            m.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectMineral = m => {
+    setSearchMineral(m.mensaje);
+    setDatos(d => ({ ...d, mineralPo: m.mensaje }));
+    setFilteredMinerals([]);
+    document.getElementById('alturaPo')?.focus();
+  };
+
+  // Altura
+  const [searchAltura, setSearchAltura] = useState(datos.alturaPo);
+  const [filteredAlturas, setFilteredAlturas] = useState([]);
+  const handleAlturaSearch = e => {
+    const v = e.target.value;
+    setSearchAltura(v);
+    setFilteredAlturas(
+      v
+        ? AlturaMulti.filter(a =>
+            a.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectAltura = a => {
+    setSearchAltura(a.mensaje);
+    setDatos(d => ({ ...d, alturaPo: a.mensaje }));
+    setFilteredAlturas([]);
+    document.getElementById('protocolo')?.focus();
+  };
+
+  // Protocolo (reemplaza estos valores por los tuyos)
+  const protocoloOptions = [
+    { id: 1, mensaje: 'Protocolo A' },
+    { id: 2, mensaje: 'Protocolo B' },
+    // …
+  ];
+  const [searchProtocolo, setSearchProtocolo] = useState(datos.protocolo || '');
+  const [filteredProtocolos, setFilteredProtocolos] = useState([]);
+  const handleProtocoloSearch = e => {
+    const v = e.target.value;
+    setSearchProtocolo(v);
+    setFilteredProtocolos(
+      v
+        ? protocoloOptions.filter(p =>
+            p.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+  const handleSelectProtocolo = p => {
+    setSearchProtocolo(p.mensaje);
+    setDatos(d => ({ ...d, protocolo: p.mensaje }));
+    setFilteredProtocolos([]);
+  };
+
 
 
   useEffect(() => {
@@ -242,8 +492,8 @@ const AperturaExamenesPreOcup = (props) => {
 
     setDatos({
       codPa: "",
-      razonEmpresa:"N/A",
-      razonContrata: "N/A",
+      razonEmpresa:"",
+      razonContrata: "",
       n_medico: "",
       tipoPrueba: "",
       cargoDe: "",
@@ -424,8 +674,8 @@ const AperturaExamenesPreOcup = (props) => {
   return (
     <div >
       <form onSubmit={handleSubmit}>
-        <div className="grid md:grid-cols-2 sm:flex-col gap-4 mb-1">
-          <div className="w-full sm:w-full md:w-auto mb-4 pr-4  ">
+        <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
+          <div className="w-full sm:w-full md:w-auto   ">
             <div className="mb-1 pb-2">
               <h2 className="text-lg font-bold">Datos</h2>
             </div>
@@ -478,20 +728,285 @@ const AperturaExamenesPreOcup = (props) => {
                 className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
               />
             </div>
-            <div className="flex items-center space-x-2 mb-1">
-              <InputsSelect2 nombre="razonEmpresa" disabled={habilitar} value={datos.razonEmpresa} title="Empresa" Selects={EmpresasMulti} handleChange={handleChange}/>
-              <InputsSelect2 nombre="razonContrata" disabled={habilitar} value={datos.razonContrata} title="Contrata" Selects={ContrataMulti} handleChange={handleChange}/>
-            </div>
-            <div className="flex items-center space-x-2 mb-1">
-              <InputsSelect2 nombre="n_medico" disabled={habilitar} value={datos.n_medico} title="Médico Ocupacional" Selects={MedicosMulti} handleChange={handleChange}/>
-              <InputsSelect2 nombre="tipoPrueba" disabled={habilitar} value={datos.tipoPrueba} title="Tipo de Prueba" Selects={PruebaMulti} handleChange={handleChange}/>
-            </div>
+              {/* — Autocomplete Empresa — */}
+              <div className="flex items-center space-x-2 mb-1">
+                <label htmlFor="razonEmpresa" className="block w-32">
+                  Empresa:
+                </label>
+                <div className="relative flex-grow">
+                  <input
+                    id="razonEmpresa"
+                    name="razonEmpresa"
+                    type="text"
+                    value={datos.razonEmpresa}
+                    placeholder="Escribe para buscar empresa..."
+                    disabled={habilitar}
+                    onChange={handleEmpresaSearch}
+                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && filteredEmpresas.length > 0) {
+                        e.preventDefault();
+                        handleSelectEmpresa(filteredEmpresas[0]);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchEmpresa) {
+                        setFilteredEmpresas(
+                          EmpresasMulti.filter(emp =>
+                            emp.mensaje.toLowerCase().includes(searchEmpresa.toLowerCase())
+                          )
+                        );
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setFilteredEmpresas([]), 100)}
+                  />
+                  {searchEmpresa && filteredEmpresas.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredEmpresas.map(emp => (
+                        <li
+                          key={emp.id}
+                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={() => handleSelectEmpresa(emp)}
+                        >
+                          {emp.mensaje}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* — Autocomplete Contrata — */}
+              <div className="flex items-center space-x-2 mb-1">
+                <label htmlFor="razonContrata" className="block w-32">Contrata:</label>
+                <div className="relative flex-grow">
+                  <input
+                    id="razonContrata"
+                    name="razonContrata"
+                    type="text"
+                    value={searchContrata}
+                    placeholder="Escribe para buscar contrata..."
+                    disabled={habilitar}
+                    onChange={handleContrataSearch}
+                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && filteredContratas.length > 0) {
+                        e.preventDefault();
+                        handleSelectContrata(filteredContratas[0]);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchContrata) {
+                        setFilteredContratas(
+                          ContrataMulti.filter(c =>
+                            c.mensaje.toLowerCase().includes(searchContrata.toLowerCase())
+                          )
+                        );
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setFilteredContratas([]), 100)}
+                  />
+                  {searchContrata && filteredContratas.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredContratas.map(c => (
+                        <li
+                          key={c.id}
+                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={() => handleSelectContrata(c)}
+                        >
+                          {c.mensaje}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* — Autocomplete Médico Ocupacional — */}
+              <div className="flex items-center space-x-2 mb-1">
+                <label htmlFor="n_medico" className="block w-32">Médico Ocup.:</label>
+                <div className="relative flex-grow">
+                  <input
+                    id="n_medico"
+                    name="n_medico"
+                    type="text"
+                    value={searchMedico}
+                    placeholder="Escribe para buscar médico..."
+                    disabled={habilitar}
+                    onChange={handleMedicoSearch}
+                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && filteredMedicos.length > 0) {
+                        e.preventDefault();
+                        handleSelectMedico(filteredMedicos[0]);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchMedico) {
+                        setFilteredMedicos(
+                          MedicosMulti.filter(m =>
+                            m.mensaje.toLowerCase().includes(searchMedico.toLowerCase())
+                          )
+                        );
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
+                  />
+                  {searchMedico && filteredMedicos.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredMedicos.map(m => (
+                        <li
+                          key={m.id}
+                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={() => handleSelectMedico(m)}
+                        >
+                          {m.mensaje}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* — Autocomplete Tipo de Prueba — */}
+              <div className="flex items-center space-x-2 mb-1">
+                <label htmlFor="tipoPrueba" className="block w-32">Tipo Prueba:</label>
+                <div className="relative flex-grow">
+                  <input
+                    id="tipoPrueba"
+                    name="tipoPrueba"
+                    type="text"
+                    value={searchPrueba}
+                    placeholder="Escribe para buscar prueba..."
+                    disabled={habilitar}
+                    onChange={handlePruebaSearch}
+                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && filteredPruebas.length > 0) {
+                        e.preventDefault();
+                        handleSelectPrueba(filteredPruebas[0]);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchPrueba) {
+                        setFilteredPruebas(
+                          PruebaMulti.filter(p =>
+                            p.mensaje.toLowerCase().includes(searchPrueba.toLowerCase())
+                          )
+                        );
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setFilteredPruebas([]), 100)}
+                  />
+                  {searchPrueba && filteredPruebas.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredPruebas.map(p => (
+                        <li
+                          key={p.id}
+                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={() => handleSelectPrueba(p)}
+                        >
+                          {p.mensaje}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
             <div className="mb-1 mt-5">
               <h2 className="text-lg font-bold">Área Pre-Ocupacional</h2>
             </div>
-            <InputsSelect nombre="cargoDe" disabled={habilitar} value={datos.cargoDe} title="Cargo" Selects={CargosMulti} handleChange={handleChange}/>
-            <InputsSelect nombre="areaO" disabled={habilitar} value={datos.areaO} title="Área" Selects={AreaMulti} handleChange={handleChange}/>
-            <InputsSelect nombre="nomExamen" disabled={habilitar} value={datos.nomExamen} title="Examen Médico" Selects={ExamenMulti} handleChange={handleChange}/>
+          {/* — Autocomplete Cargo — */}
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="cargoDe" className="block w-32">Cargo:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="cargoDe"
+                  name="cargoDe"
+                  type="text"
+                  value={searchCargo}
+                  placeholder="Escribe para buscar cargo..."
+                  disabled={habilitar}
+                  onChange={handleCargoSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e => {
+                    if (e.key==='Enter' && filteredCargos.length>0) {
+                      e.preventDefault(); handleSelectCargo(filteredCargos[0]);
+                    }
+                  }}
+                  onFocus={()=> setFilteredCargos(
+                    CargosMulti.filter(c=>c.mensaje.toLowerCase().includes(searchCargo.toLowerCase()))
+                  )}
+                  onBlur={()=>setTimeout(()=>setFilteredCargos([]),100)}
+                />
+                {searchCargo && filteredCargos.length>0 && (
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredCargos.map(c=>(
+                      <li
+                        key={c.id}
+                        className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                        onMouseDown={()=>handleSelectCargo(c)}
+                      >{c.mensaje}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* — Autocomplete Área — */}
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="areaO" className="block w-32">Área:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="areaO" name="areaO" type="text"
+                  value={searchArea} placeholder="Escribe para buscar área..."
+                  disabled={habilitar} onChange={handleAreaSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredAreas.length>0){e.preventDefault();handleSelectArea(filteredAreas[0]);} }}
+                  onFocus={()=>setFilteredAreas(AreaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchArea.toLowerCase())))}
+                  onBlur={()=>setTimeout(()=>setFilteredAreas([]),100)}
+                />
+                {searchArea&&filteredAreas.length>0&&(
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredAreas.map(a=>(
+                      <li key={a.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={()=>handleSelectArea(a)}>
+                        {a.mensaje}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* — Autocomplete Examen Médico — */}
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="nomExamen" className="block w-32">Examen Médico:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="nomExamen" name="nomExamen"
+                  type="text" value={searchExamenMedico}
+                  placeholder="Escribe para buscar examen..."
+                  disabled={habilitar} onChange={handleExamenMedSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredExamMed.length>0){e.preventDefault();handleSelectExamenMed(filteredExamMed[0]);} }}
+                  onFocus={()=>setFilteredExamMed(ExamenMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExamenMedico.toLowerCase())))}
+                  onBlur={()=>setTimeout(()=>setFilteredExamMed([]),100)}
+                />
+                {searchExamenMedico&&filteredExamMed.length>0&&(
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredExamMed.map(x=>(
+                      <li key={x.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={()=>handleSelectExamenMed(x)}>
+                        {x.mensaje}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="examenAdicional" className="block w-[15em] ">Examen Adicional:</label>
               <div className="flex flex-wrap pt-2 pb-2">
@@ -546,11 +1061,88 @@ const AperturaExamenesPreOcup = (props) => {
                 </div>
               </div>
             </div>
-            <InputsSelect nombre="nomEx" disabled={habilitar} value={datos.nomEx} title="Explotación en" Selects={ExplotacionMulti} handleChange={handleChange}/>
-            <InputsSelect nombre="mineralPo" disabled={habilitar} value={datos.mineralPo} title="Mineral Exp" Selects={MineralMulti} handleChange={handleChange}/>
-            <InputsSelect nombre="alturaPo" disabled={habilitar} value={datos.alturaPo} title="Altura" Selects={AlturaMulti} handleChange={handleChange}/>
+         
+            {/* — Autocomplete Explotación en — */}
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="nomEx" className="block w-32">Explotación en:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="nomEx" name="nomEx"
+                  type="text" value={searchExplotacion}
+                  placeholder="Escribe para buscar explotación..."
+                  disabled={habilitar} onChange={handleExplotSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredExplot.length>0){e.preventDefault();handleSelectExplot(filteredExplot[0]);} }}
+                  onFocus={()=>setFilteredExplot(ExplotacionMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExplotacion.toLowerCase())))}
+                  onBlur={()=>setTimeout(()=>setFilteredExplot([]),100)}
+                />
+                {searchExplotacion&&filteredExplot.length>0&&(
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredExplot.map(x=>(
+                      <li key={x.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={()=>handleSelectExplot(x)}>
+                        {x.mensaje}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
 
-          
+            {/* — Autocomplete Mineral Exp — */}
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="mineralPo" className="block w-32">Mineral Exp:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="mineralPo" name="mineralPo"
+                  type="text" value={searchMineral}
+                  placeholder="Escribe para buscar mineral..."
+                  disabled={habilitar} onChange={handleMineralSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredMinerals.length>0){e.preventDefault();handleSelectMineral(filteredMinerals[0]);} }}
+                  onFocus={()=>setFilteredMinerals(MineralMulti.filter(m=>m.mensaje.toLowerCase().includes(searchMineral.toLowerCase())))}
+                  onBlur={()=>setTimeout(()=>setFilteredMinerals([]),100)}
+                />
+                {searchMineral&&filteredMinerals.length>0&&(
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredMinerals.map(m=>(
+                      <li key={m.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={()=>handleSelectMineral(m)}>
+                        {m.mensaje}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            {/* — Autocomplete Altura — */}
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="alturaPo" className="block w-32">Altura:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="alturaPo" name="alturaPo"
+                  type="text" value={searchAltura}
+                  placeholder="Escribe para buscar altura..."
+                  disabled={habilitar} onChange={handleAlturaSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredAlturas.length>0){e.preventDefault();handleSelectAltura(filteredAlturas[0]);} }}
+                  onFocus={()=>setFilteredAlturas(AlturaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchAltura.toLowerCase())))}
+                  onBlur={()=>setTimeout(()=>setFilteredAlturas([]),100)}
+                />
+                {searchAltura&&filteredAlturas.length>0&&(
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredAlturas.map(a=>(
+                      <li key={a.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={()=>handleSelectAltura(a)}>
+                        {a.mensaje}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+                      
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="Precio" className="block w-1/2">Precio del Examen</label>
               <input type="text"
@@ -592,10 +1184,7 @@ const AperturaExamenesPreOcup = (props) => {
                    Limpiar
                 </button>
               </div>}
-          </div>
-          {/* Nueva columna con estructura solicitada */}
-          <div className="w-full sm:w-full mb-4 pl-4">
-            <div className="mb-4">
+              <div className="mb-4">
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="fechaApertura" className="block w-1/7">Fecha de Apertura:</label>
               <DatePicker
@@ -641,17 +1230,38 @@ const AperturaExamenesPreOcup = (props) => {
                 className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
               />
             </div>
+            
+            {/* — Autocomplete Protocolo — */}
             <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="protocolo" className="block w-36">Protocolo:</label>
-              <select
-                id="protocolo"
-                name="protocolo"
-                className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
-              >
-                <option value="">Seleccionar</option>
-              </select>
+              <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
+              <div className="relative flex-grow">
+                <input
+                  id="protocolo" name="protocolo"
+                  type="text" value={searchProtocolo}
+                  placeholder="Escribe para buscar protocolo..."
+                  disabled={habilitar} onChange={handleProtocoloSearch}
+                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredProtocolos.length>0){e.preventDefault();handleSelectProtocolo(filteredProtocolos[0]);} }}
+                  onFocus={()=>setFilteredProtocolos(protocoloOptions.filter(p=>p.mensaje.toLowerCase().includes(searchProtocolo.toLowerCase())))}
+                  onBlur={()=>setTimeout(()=>setFilteredProtocolos([]),100)}
+                />
+                {searchProtocolo&&filteredProtocolos.length>0&&(
+                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredProtocolos.map(p=>(
+                      <li key={p.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={()=>handleSelectProtocolo(p)}>
+                        {p.mensaje}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
-              <div className="flex items-center space-x-2 mb-2">
+            </div>
+          </div>
+          {/* Nueva columna con estructura solicitada */}
+          <div className="w-full sm:w-full mb-4 pl-4">
+          <div className="flex items-center space-x-2 mb-2">
                 <label htmlFor="soloMiSede" className="block w-1/6">Solo mi Sede</label>
                 <input type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />
 
@@ -709,10 +1319,9 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
                 />
               </div>
-            </div>
             <div className="mb-4 ">
               <h3 className="text-lg font-bold mb-2">Últimos Agregados & Hojas de Ruta</h3>
-              <div className="overflow-y-auto" style={{ maxHeight: 'calc(7 * 4rem)' }}>
+              <div className="overflow-y-auto" style={{ maxHeight: 'calc(12 * 4rem)' }}>
               <table  className="w-full text-center border border-gray-300 mb-4 ">
                 <thead>
                   <tr>
