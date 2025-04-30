@@ -24,7 +24,7 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     nomEx: data.nomEx,
     alturaPo: data.alturaPo,
     mineralPo: data.mineralPo,
-    fechaAperturaPo: data.fechaAperturaPo,
+    fechaAperturaPo: new Date(data.fechaAperturaPo).toISOString().split('T')[0],
     precioPo: data.precioPo,
     estadoEx: "EN PROCESO",
     nomExamen: data.nomExamen,
@@ -62,7 +62,8 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     rxcPlomos: data.rxcPlomos,//12
     mercurioo: data.mercurioo//13
   };    
-
+  console.log('body',body)
+  console.log('bodyJSON',JSON.stringify(body))
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
     const options = {
@@ -78,4 +79,28 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
             return res
         } return res.json()}).then(response => response) 
 
+}
+
+export function GetHistoriaC(data,sede,token) {
+
+    const body = {
+      opcion_id_p: data.opcion_id_p,
+      norden_p: data.norden,
+      nombres_apellidos_p: data.nombres_apellidos_p,
+      cod_sede_p: sede
+    };    
+    console.log(JSON.stringify(body))
+    const url = `${URLAzure}/api/v01/ct/registroPacientes/listadoHistoriasOcupacionalesConFiltros`
+      const options = {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+      }
+      return fetch(url,options).then(res =>  {
+          if (!res.ok) {
+              return res
+          } return res.json()}).then(response => response) 
 }

@@ -307,7 +307,7 @@ const ComboboxEmpresasMulti = (sede) => {
           .catch((error) => {
               console.error('Error obteniendo opciones de tipo de documento:', error);
           });
-      }, [options]);
+      }, []);
   
     return options;
 }

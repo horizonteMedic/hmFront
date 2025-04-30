@@ -3,9 +3,8 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
-const TestAltura = () => {
 
-    const generatePDF = () => {
+export default function TestAltura  (datos)  {
         const fecha = "02/45/5154"
         const doc = new jsPDF();
         //componente header
@@ -27,11 +26,11 @@ const TestAltura = () => {
         drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
 
         drawC(doc,"LABORATORIO\n(HTO-HB)", leftspace, headspace+35, 25, 10, datos.laboratorio ? true : false);
-        drawC(doc,"A. VISUAL", leftspace+28, headspace+35, 30, 10, 4, datos.oftalmologia ? true : false);
-        drawC(doc,"EKG ( > 40 años )", leftspace+61, headspace+35, 25, 10, 4, datos.electrocardiograma ? true : false);
-        drawC(doc,"PSICOLOGIA", leftspace+90, headspace+35, 20, 10, 4, datos.psicologia ? true : false);
-        drawC(doc,"PSICOSENSOMETRICO\nPARA ALTURA", leftspace+120, headspace+35, 35, 10, 4, datos.psicosen ? true : false);
-        drawC(doc,"AUDIOMETRIA", leftspace+160, headspace+35, 25, 10, 4, datos.audiologia ? true : false);
+        drawC(doc,"A. VISUAL", leftspace+28, headspace+35, 30, 10, !datos.oftalmologia ? false : true);
+        drawC(doc,"EKG ( > 40 años )", leftspace+61, headspace+35, 25, 10, !datos.electrocardiograma ? false : true);
+        drawC(doc,"PSICOLOGIA", leftspace+90, headspace+35, 20, 10, !datos.psicologia ? false : true);
+        drawC(doc,"PSICOSENSOMETRICO\nPARA ALTURA", leftspace+120, headspace+35, 35, 10, datos.psicosen ? false : true);
+        drawC(doc,"AUDIOMETRIA", leftspace+160, headspace+35, 25, 10, !datos.audiologia ? false : true);
 
         drawLine(leftspace+25, headspace+40, leftspace+28, headspace+40); 
         drawLine(leftspace+58, headspace+40, leftspace+61, headspace+40); 
@@ -53,18 +52,18 @@ const TestAltura = () => {
         drawC(doc,"EVALUACIÓN MEDICA", leftspace+60, headspace+55, 33, 10, datos.anexo7c ? true : false);
         drawLine(leftspace+70, headspace+50, leftspace+70, headspace+55);
 
-
-
         const pdfBlob = doc.output("blob");
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            window.open(pdfUrl, "_blank");
-    };
-    return (
-        <div>
-            <button onClick={generatePDF}>Generar PDF</button>
-        </div>
-    );
+        const pdfUrl = URL.createObjectURL(pdfBlob);
 
+        // Crear un iframe invisible para imprimir directamente
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = pdfUrl;
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        };
 }
 
-export default TestAltura

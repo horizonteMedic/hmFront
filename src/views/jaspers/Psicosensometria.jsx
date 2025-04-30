@@ -3,10 +3,13 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
+import footer from "./components/footer";
 
-const Psicosensometria = () => {
+export default function Psicosensometria (datos) {
+    console.log(datos)
 
-    const generatePDF = () => {
+
+
         const fecha = "02/45/5154"
         const doc = new jsPDF();
         //componente header
@@ -45,17 +48,20 @@ const Psicosensometria = () => {
         drawLine(130, 80, 130, 85);
         drawLine(180, 80, 180, 85);
         drawLine(90, 95, 90, 100);
-
+        footer(doc);
         const pdfBlob = doc.output("blob");
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-          window.open(pdfUrl, "_blank");
-    };
-    return (
-        <div>
-            <button onClick={generatePDF}>Generar PDF</button>
-        </div>
-    );
+        const pdfUrl = URL.createObjectURL(pdfBlob);
 
+        // Crear un iframe invisible para imprimir directamente
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = pdfUrl;
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    }
+        
 }
 
-export default Psicosensometria

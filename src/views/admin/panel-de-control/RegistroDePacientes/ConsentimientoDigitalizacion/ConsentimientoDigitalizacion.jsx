@@ -64,7 +64,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
     SubmitConsentimiento(data,token)
     .then((res) => {
       if (res.norden) {
-        Swal.fire('Exito', 'Consentimiento guardado exitosamente','success')
+        Swal.fire({title: 'Exito', text:'Consentimiento guardado exitosamente\n¿Desea Imprimir?',icon:'success',cancelButtonText: "No"}).then((res) => {if(res.isConfirmed) handlePrint()})
       } else {
         Swal.fire('Error', 'Ha ocurrido un error','error')
       }

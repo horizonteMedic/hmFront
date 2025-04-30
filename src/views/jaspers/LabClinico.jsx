@@ -4,9 +4,8 @@ import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 
-const LabClinico = () => {
+export function LabClinico () {
 
-    const generatePDF = () => {
         const fecha = "02/45/5154"
         const doc = new jsPDF();
         //componente header
@@ -30,20 +29,18 @@ const LabClinico = () => {
         drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
 
         drawBox(doc,"PSICOLOGIA", 90, headspace+35, 30, 10, 4, datos.psicologia ? true : false);
-        
-
-
-
         const pdfBlob = doc.output("blob");
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            window.open(pdfUrl, "_blank");
-    };
-    return (
-        <div>
-            <button onClick={generatePDF}>Generar PDF</button>
-        </div>
-    );
+        const pdfUrl = URL.createObjectURL(pdfBlob);
 
+        // Crear un iframe invisible para imprimir directamente
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = pdfUrl;
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    }
 }
 
-export default LabClinico

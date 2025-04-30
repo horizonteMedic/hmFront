@@ -4,9 +4,8 @@ import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 
-const ReporteExamen1 = () => {
+export default function ReporteExamen1 (datos){
 
-    const generatePDF = () => {
         const fecha = "02/45/5154"
         const doc = new jsPDF();
         //componente header
@@ -29,12 +28,12 @@ const ReporteExamen1 = () => {
         drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
 
         drawC(doc,"AUDIOMETRIA", leftspace, headspace+35, 25, 10, datos.audiologia ? true : false);
-        drawC(doc,"EKG ( > 40 años)", leftspace+28, headspace+35, 30, 10, 4, datos.electrocardiograma ? true : false);
-        drawC(doc,"ESPIROMETRIA", leftspace+61, headspace+35, 25, 10, 4, datos.espirometria ? true : false);
-        drawC(doc,"A. VISUAL", leftspace+90, headspace+35, 17, 10, 4, datos.oftalmologia ? true : false);
-        drawC(doc,"ODONTOLOGIA", leftspace+112, headspace+35, 25, 10, 4, datos.odontologia ? true : false);
-        drawC(doc,"RAYOS X", leftspace+142, headspace+35, 25, 10, 4, datos.rayosx ? true : false);
-        drawC(doc,"PSICOLOGIA", leftspace+170, headspace+35, 25, 10, 4, datos.psicologia ? true : false);
+        drawC(doc,"EKG ( > 40 años)", leftspace+28, headspace+35, 30, 10, datos.electrocardiograma ? true : false);
+        drawC(doc,"ESPIROMETRIA", leftspace+61, headspace+35, 25, 10, datos.espirometria ? true : false);
+        drawC(doc,"A. VISUAL", leftspace+90, headspace+35, 17, 10, datos.oftalmologia ? true : false);
+        drawC(doc,"ODONTOLOGIA", leftspace+112, headspace+35, 25, 10, datos.odontologia ? true : false);
+        drawC(doc,"RAYOS X", leftspace+142, headspace+35, 25, 10, datos.rayosx ? true : false);
+        drawC(doc,"PSICOLOGIA", leftspace+170, headspace+35, 25, 10, datos.psicologia ? true : false);
 
         drawLine(leftspace+25, headspace+40, leftspace+28, headspace+40); 
         drawLine(leftspace+58, headspace+40, leftspace+61, headspace+40); 
@@ -64,7 +63,7 @@ const ReporteExamen1 = () => {
         drawC(doc,"TRABAJOS CALIENTES", leftspace+15, headspace+55, 33, 10, !datos.altatc ? true : datos.trabcalientes ? true : false);
         drawC(doc,"FIST TEST", leftspace+54, headspace+55, 25, 10, !datos.altaft ? true : datos.fisttest ? true : false);
         drawC(doc,"TEST ALTURA", leftspace+84, headspace+55, 25, 10, !datos.testaltura ? true : !datos.cerificadoaltura && !datos.b_certialtura ? false : true);
-        drawC(doc,"PSICOSENSOMETRIA", leftspace+115, headspace+55, 35, 10, datos.altaps ? true : datos.psicosen ? true : false);
+        drawC(doc,"PSICOSENSOMETRIA", leftspace+115, headspace+55, 35, 10, !datos.altaps ? true : datos.psicosen ? true : false);
         drawC(doc,"VISUAL COMPLEMENT", leftspace+155, headspace+55, 35, 10, !datos.altaviscom ? true : datos.visulcompl ? true : false);
 
         drawLine(leftspace+95, headspace+65, leftspace+95, headspace+70);
@@ -106,15 +105,16 @@ const ReporteExamen1 = () => {
         });
 
         const pdfBlob = doc.output("blob");
-            const pdfUrl = URL.createObjectURL(pdfBlob);
-            window.open(pdfUrl, "_blank");
-    };
-    return (
-        <div>
-            <button onClick={generatePDF}>Generar PDF</button>
-        </div>
-    );
+        const pdfUrl = URL.createObjectURL(pdfBlob);
 
+        // Crear un iframe invisible para imprimir directamente
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = pdfUrl;
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+    }
 }
-
-export default ReporteExamen1

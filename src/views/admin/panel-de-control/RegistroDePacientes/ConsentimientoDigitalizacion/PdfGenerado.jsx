@@ -94,7 +94,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
         day: 'numeric', month: 'long', year: 'numeric'
       }).format(new Date());
 
-      const boxSize       = 60;
+      const boxSize       = 80;
       const colGap        = 120;
       const textOffset    = lineHeight;
       const extraLines    = 3;       // firma + DNI + fecha
@@ -102,7 +102,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       const blockWidth    = boxSize * 2 + colGap;
       const startX        = (pageW - blockWidth) / 2;
       const col2X         = startX + boxSize + colGap;
-      let sectionY        = y;
+      let sectionY        = y+35;
 
       // Centros de columna
       const center1 = startX + boxSize / 2;
@@ -111,7 +111,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       // Líneas de firma
       doc.setLineWidth(1);
       // Firma Manuscrita
-      doc.line(startX, sectionY, startX + boxSize, sectionY);
+      doc.line(startX -20 , sectionY, startX+ 20 + boxSize, sectionY);
       const labelSig1 = 'Firma Manuscrita del Paciente';
       const wSig1     = doc.getTextWidth(labelSig1);
       doc.text(labelSig1, center1 - wSig1 / 2, sectionY + textOffset);
@@ -125,15 +125,16 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       doc.text(dateLine, center1 - wDate1 / 2, sectionY + textOffset * 3);
 
       // Firma Electrónica
-      doc.line(col2X, sectionY, col2X + boxSize, sectionY);
+      doc.line(col2X-20, sectionY, col2X+ 20 + boxSize, sectionY);
       const labelSig2 = 'Firma Electrónica del Paciente';
       const wSig2     = doc.getTextWidth(labelSig2);
       doc.text(labelSig2, center2 - wSig2 / 2, sectionY + textOffset);
       if (firmaImg) {
-        const firmaW = boxSize * 0.9; // Ajusta el ancho (90% del box)
+        const firmaW = boxSize + 40;
         const firmaH = (firmaImg.height / firmaImg.width) * firmaW;
-        const firmaX = col2X + (boxSize - firmaW) / 2;
-        const firmaY = sectionY - firmaH - 1; // un poquito encima de la línea
+        const firmaX = col2X - 20;
+        const firmaY = sectionY - firmaH - 1;
+      
         const canvas = document.createElement('canvas');
         canvas.width = firmaImg.width;
         canvas.height = firmaImg.height;
@@ -152,13 +153,13 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       sectionY += textOffset * extraLines + vertGapSigHue;
 
       // Huella Manuscrita
-      doc.rect(startX, sectionY, boxSize, boxSize);
+      doc.rect(startX, sectionY, boxSize-18, boxSize-18);
       const labelHue1 = 'Huella Manuscrita del Paciente';
       const wHue1     = doc.getTextWidth(labelHue1);
-      doc.text(labelHue1, center1 - wHue1 / 2, sectionY + boxSize + textOffset);
+      doc.text(labelHue1, center1 - wHue1 / 2, sectionY + boxSize-18 + textOffset);
 
       // Huella Electrónica
-      doc.rect(col2X, sectionY, boxSize, boxSize);
+      doc.rect(col2X, sectionY, boxSize-18, boxSize-18);
       if (huellaImg) {
         const canvas = document.createElement('canvas');
         canvas.width = huellaImg.width;
@@ -166,11 +167,11 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
         const ctx = canvas.getContext('2d');
         ctx.drawImage(huellaImg, 0, 0);
         const huellaBase64 = canvas.toDataURL('image/png');
-        doc.addImage(huellaBase64, 'PNG', col2X, sectionY, boxSize, boxSize);
+        doc.addImage(huellaBase64, 'PNG', col2X, sectionY, boxSize-18, boxSize-18);
       }
       const labelHue2 = 'Huella Electrónica del Paciente';
       const wHue2     = doc.getTextWidth(labelHue2);
-      doc.text(labelHue2, center2 - wHue2 / 2, sectionY + boxSize + textOffset);
+      doc.text(labelHue2, center2 - wHue2 / 2, sectionY + boxSize-18 + textOffset);
 
       // Actualiza Y para el footer
       y = sectionY + boxSize + paraSpacing;
@@ -199,8 +200,19 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       });
 
       // ----------- GUARDAR PDF -----------
-      const pdfUrl = doc.output('bloburl');
-      window.open(pdfUrl, '_blank');
+      const pdfBlob = doc.output("blob");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+
+        // Crear un iframe invisible para imprimir directamente
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = pdfUrl;
+        document.body.appendChild(iframe);
+
+        iframe.onload = function () {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        };
     })
     .catch(err => {
       console.error(err);

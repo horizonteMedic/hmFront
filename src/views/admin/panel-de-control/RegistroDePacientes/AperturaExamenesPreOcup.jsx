@@ -6,12 +6,12 @@ import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, Co
   ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth
  } from './model/Combobox';
 import { SearchPacienteDNI } from './model/AdminPaciente';
-import { SubmitHistoriaC } from './model/AdminHistoriaC';
+import { GetHistoriaC, SubmitHistoriaC } from './model/AdminHistoriaC';
 import {InputsSelect, InputsSelect2} from './InputsSelect';
 import {getFetch} from './../getFetch/getFetch'
-
 const AperturaExamenesPreOcup = (props) => {
   const [stardate, setStartDate] = useState(new Date());
+  const jasperModules = import.meta.glob('../../../jaspers/*.jsx'); // ajusta si usas .jsx
 
 
   const EmpresasMulti = ComboboxEmpresasMulti(props.selectedSede)
@@ -26,7 +26,7 @@ const AperturaExamenesPreOcup = (props) => {
   const AlturaMulti = ComboboxAlturaMulti(props.selectedSede)
   const FormaPago = ComboboxFormaPago(props.selectedSede)
   const ListAuth = ComboboxListAuth(props.selectedSede)
-  
+
   const [datos, setDatos] = useState({
     codPa: props.DNIG,
     razonEmpresa:"N/A",
@@ -43,7 +43,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: '',
+    fechaAperturaPo: new Date(),
     n_operacion: null,
     textObserv1: "",
     textObserv2: "",
@@ -64,9 +64,20 @@ const AperturaExamenesPreOcup = (props) => {
   const [showEdit, setShowEdit] = useState(false)
   const [habilitar, setHabilitar] = useState(false)
   const [register, setRegister] = useState(true)
+  //TABLAHC
+  const [SearchP, setSearchP] = useState({
+    code: "",
+    nombre: ""
+  })
+
 
   useEffect(() => {
-    getFetch(`/api/v01/st/registros/listadoHistorialOcupacional/${props.selectedSede}`,props.token)
+    const data = {
+      opcion_id_p: 1,
+      norden_: 0,
+      nombres_apellidos_p: ""
+    }
+    GetHistoriaC(data,props.selectedSede,props.token)
     .then((res) => {
       if (res) {
         setSearchHC(res)
@@ -79,15 +90,6 @@ const AperturaExamenesPreOcup = (props) => {
     })
   },[])
   
-  useEffect(() => {
-    if (searchHC.some(hc => hc.codPa === datos.codPa)) {
-      setRegister(false);
-      setShowEdit(true)
-    } else {
-      setShowEdit(false)
-    }
-  }, [datos.codPa, searchHC]);
-
   const [creating, setCreating] = useState(false)
 
   const handleDateChange = (date) => {
@@ -147,10 +149,58 @@ const AperturaExamenesPreOcup = (props) => {
   };
 
   const handleEdit = (value) => {
-    setDatos(value)
+    getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`,props.token)
+    .then((res) => {
+      console.log(res)
+      setDatos(res)
+    })
+    
     setRegister(false)
     setHabilitar(true)
     setShowEdit(true)
+  }
+
+  const SearchHC = (event,type) => {
+    if (event.key === 'Enter') {
+      if (type==='code') {
+        setSearchP(prev => ({
+          ...prev,
+          nombre: ""
+        }));
+        const data = {
+          opcion_id_p: 2,
+          norden: Number(SearchP.code),
+          nombres_apellidos_p: ""
+        }
+        GetHistoriaC(data,props.selectedSede,props.token)
+        .then((res) => {
+          console.log(res)
+          if (res) {
+            setSearchHC(res)
+          } else {
+            setSearchHC([])
+          }
+        })
+      } else {
+        setSearchP(prev => ({
+          ...prev,
+          code: 0
+        }));
+        const data = {
+          opcion_id_p: 3,
+          norden: "",
+          nombres_apellidos_p: SearchP.nombre
+        }
+        GetHistoriaC(data,props.selectedSede,props.token)
+        .then((res) => {
+          if (res) {
+            setSearchHC(res)
+          } else {
+            setSearchHC([])
+          }
+        })
+      }
+    }
   }
 
   const handleSearch = (event) => {
@@ -225,6 +275,97 @@ const AperturaExamenesPreOcup = (props) => {
 
     })
     setShowEdit(false)
+    setHabilitar(false)
+    setRegister(true)
+  }
+
+  const  GetDatoHR = (HC) => {
+    return new Promise((resolve, reject) => {
+      getFetch(`/api/v01/ct/consentDigit/infoFormatoHojaRuta/${HC}`, props.token)
+        .then(res => {
+          resolve(res); // 🔥 devolvemos el resultado exitosamente
+        })
+        .catch(error => {
+          reject(error); // ⚡ devolvemos el error si falla
+        });
+    });
+  }
+
+  const InfoHR = (HC) => {
+    getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${datos.nomExamen}&empresa=${datos.razonEmpresa}&altaPsicosen=${datos.n_psicosen}&testAltura=${datos.n_testaltura}`,props.token)
+    .then(async(res) => {
+      if (res.id === 1) {
+        const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
+        const filePath = `../../../jaspers/${jasperName}.jsx`;
+
+        if (jasperModules[filePath]) {
+          const module = await jasperModules[filePath](); // carga el módulo
+          if (typeof module.default === 'function') {
+            const datos = await GetDatoHR(HC)
+            Swal.fire({
+              title: "Hoja de Ruta",
+              text: "¿Desea Imprimir?.",
+              icon: "success",
+              cancelButtonText: "Cancelar"
+            }).then((result) => {
+              if (result.isConfirmed) module.default(datos);
+            });
+          } else {
+            console.warn('El módulo no exporta una función por defecto');
+          }
+        } else {
+          Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
+        }
+      }
+    })
+  }
+
+  const InfoHR2 = (HC,nomExamen,razonEmpresa,n_psicosen,n_testaltura) => {
+    getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`,props.token)
+    .then(async(res) => {
+      if (res.id === 1) {
+        const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
+        const filePath = `../../../jaspers/${jasperName}.jsx`;
+        
+        if (jasperModules[filePath]) {
+          const module = await jasperModules[filePath](); // carga el módulo
+          if (typeof module.default === 'function') {
+            
+            const datos = await GetDatoHR(HC)
+            Swal.fire({
+              title: "Hoja de Ruta",
+              text: "¿Desea Imprimir?.",
+              icon: "success",
+              cancelButtonText: "Cancelar"
+            }).then((result) => {
+              if (result.isConfirmed) module.default(datos);
+            });
+          } else {
+            console.warn('El módulo no exporta una función por defecto');
+          }
+        } else {
+          Swal.fire('Advertencia', `No se encontró el componente jasper: ${jasperName}`, 'warning');
+        }
+      }
+    })
+  }
+
+  //doble click
+  const SearchClickRight = (n_orden) => {
+    Swal.fire({
+      title: 'Cargando Hoja de Ruta',
+      text: 'Espere por favor...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`,props.token)
+    .then((res) => {
+      InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura)
+    })
+    
   }
 
   const handleSubmitEdit = e => {
@@ -240,6 +381,7 @@ const AperturaExamenesPreOcup = (props) => {
 
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
+      console.log(res)
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido editar la Historia Clinica', 'error');
         } else {
@@ -264,10 +406,11 @@ const AperturaExamenesPreOcup = (props) => {
 
     SubmitHistoriaC(datos,props.selectedSede,props.token,1)
     .then((res) => {
+      console.log(res)
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
         } else {
-          Swal.fire('Registrado', 'Historia Clinica Registrada', 'success');
+          InfoHR(res.id)
         }
     })
     .catch(() => {
@@ -457,10 +600,10 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="fechaApertura" className="block w-1/7">Fecha de Apertura:</label>
               <DatePicker
                 selected={stardate}
-                value={datos.fechaAperturaPo}
+                value={datos.fechaAperturaPo || stardate}
                 disabled={habilitar}
                 onChange={handleDateChange}
-                dateFormat="dd/MM/yyyy"
+                dateFormat="yyyy/MM/dd"
                 className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
               />
               <label htmlFor="numOperacion" className="block ml-4">N° Operación:</label>
@@ -515,7 +658,7 @@ const AperturaExamenesPreOcup = (props) => {
                 <label htmlFor="fecha" className="block w-14">Fecha:</label>
                 <DatePicker
                   selected={stardate}
-                  dateFormat="dd/MM/yyyy"
+                  dateFormat="yyyy/MM/dd"
                   className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white w-32"
                 />
                 <label htmlFor="hora" className="block w-14">Hora:</label>
@@ -538,13 +681,29 @@ const AperturaExamenesPreOcup = (props) => {
                 <label htmlFor="nombre" className="block w-36">Nombre:</label>
                 <input
                   type="text"
+                  value={SearchP.nombre}
+                  onChange={(e) => {setSearchP(prev => ({...prev, nombre: e.target.value}))}}
                   id="nombre"
+                  onKeyDown={(event) => {SearchHC(event,'nombre')}}
                   name="nombre"
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
                 />
                 <label htmlFor="codigo" className="block w-36">Código:</label>
                 <input
                   type="text"
+                  inputMode="numeric"        // muestra teclado numérico en móviles
+                  pattern="\d*"              // solo acepta números
+                  value={SearchP.code || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d{0,7}$/.test(value)) { // máximo 7 dígitos numéricos
+                      setSearchP(prev => ({
+                        ...prev,
+                        code: value
+                      }));
+                    }
+                  }}
+                  onKeyDown={(event) => {SearchHC(event,'code')}}
                   id="codigo"
                   name="codigo"
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
@@ -568,13 +727,16 @@ const AperturaExamenesPreOcup = (props) => {
                 <tbody>
                   {searchHC.length == 0  && <div className='flex justify-center items-center'><p>Cargando...</p></div>}
                   {searchHC.map((option, index) => (
-                    <tr key={index} className=' cursor-pointer' onClick={() => {handleEdit(option)}}>
+                    <tr key={index} className=' cursor-pointer' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
+                      e.preventDefault(); // 🔒 evita el menú del navegador
+                      SearchClickRight(option); // ✅ tu función personalizada
+                    }}>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.n_orden}</td>
-                      <td className="border border-gray-300 px-2 py-1  mb-1">Fulanito Panfilo</td>
-                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.fechaAperturaPo}</td>
-                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.razonEmpresa}</td>
-                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.razonContrata}</td>
-                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.nomExamen}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.nombres}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.fecha_apertura_po}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_empresa}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_contrata}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.nom_examen}</td>
                     </tr>
                   ))}
                 </tbody>

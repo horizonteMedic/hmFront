@@ -1,5 +1,4 @@
 const drawC = (doc,text, x, y, w, h, drawX = false) => {
-  
     doc.rect(x, y, w, h, "S"); // Dibuja el rectángulo
     doc.text(text, x + w / 2, y + h / 2 + 0.5, { align: "center", baseline: "middle" }); // Ajusta la posición del texto
     if (drawX) {
