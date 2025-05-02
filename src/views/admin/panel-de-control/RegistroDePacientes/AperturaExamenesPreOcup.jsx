@@ -402,6 +402,7 @@ const AperturaExamenesPreOcup = (props) => {
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`,props.token)
     .then((res) => {
       console.log(res)
+      
       setDatos(res)
     })
     
