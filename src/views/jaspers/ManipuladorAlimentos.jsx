@@ -3,8 +3,8 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
-
-export function ManAlimentos  () {
+import footer from "./components/footer";
+export default function ManAlimentos  (datos) {
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
@@ -30,7 +30,7 @@ export function ManAlimentos  () {
         drawBox(doc,"LABORATORIO", 90, headspace+35, 30, 10, 4, datos.laboratorio ? true : false);
         drawLine(105, 105, 105, 110); // Línea desde "TRIAJE" hacia abajo
         drawBox(doc,"EVALUACION MEDICA", 90, headspace+50, 50, 10, 4, datos.anexo7c ? true : false);
-
+        footer(doc,datos)
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

@@ -66,7 +66,7 @@ export default function Admision7d (datos) {
 
 
     // 7) Footer (si tienes un footer personalizado)
-    footer(doc);
+    footer(doc,datos);
 
     const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);

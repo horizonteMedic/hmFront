@@ -13,19 +13,8 @@ const AperturaExamenesPreOcup = (props) => {
   const [stardate, setStartDate] = useState(new Date());
   const jasperModules = import.meta.glob('../../../jaspers/*.jsx'); // ajusta si usas .jsx
 
-
-  const EmpresasMulti = ComboboxEmpresasMulti(props.selectedSede)
-  const ContrataMulti = ComboboxContratasMulti(props.selectedSede)
-  const MedicosMulti = ComboboxMedicosMulti(props.selectedSede)
-  const PruebaMulti = ComboboxPruebaMulti(props.selectedSede)
-  const CargosMulti = ComboboxCargoMulti(props.selectedSede)
-  const AreaMulti = ComboboxAreaMulti(props.selectedSede)
-  const ExamenMulti = ComboboxExamenMMulti(props.selectedSede)
-  const ExplotacionMulti = ComboboxExplotacionMulti(props.selectedSede)
-  const MineralMulti = ComboboxMineralMulti(props.selectedSede)
-  const AlturaMulti = ComboboxAlturaMulti(props.selectedSede)
-  const FormaPago = ComboboxFormaPago(props.selectedSede)
-  const ListAuth = ComboboxListAuth(props.selectedSede)
+  const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
+    ExamenMulti, ExplotacionMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
 
   
 
@@ -401,9 +390,17 @@ const AperturaExamenesPreOcup = (props) => {
   const handleEdit = (value) => {
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`,props.token)
     .then((res) => {
-      console.log(res)
-      
       setDatos(res)
+      setSearchEmpresa(res.razonEmpresa || "");
+      setSearchContrata(res.razonContrata || "")
+      setSearchMedico(res.n_medico || "");
+      setSearchPrueba(res.tipoPrueba || "")
+      setSearchCargo(res.cargoDe || "")
+      setSearchArea(res.areaO || "")
+      setSearchExamenMedico(res.nomExamen || "")
+      setSearchExplotacion(res.nomEx || "")
+      setSearchMineral(res.mineralPo || "")
+      setSearchAltura(res.alturaPo || "")
     })
     
     setRegister(false)
@@ -632,11 +629,11 @@ const AperturaExamenesPreOcup = (props) => {
 
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
-      console.log(res)
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido editar la Historia Clinica', 'error');
         } else {
           Swal.fire('Editado', 'Historia Clinica Editado', 'success');
+          handleLimpiar()
         }
     })
     .catch(() => {
@@ -691,7 +688,7 @@ const AperturaExamenesPreOcup = (props) => {
                 onKeyDown={handleSearch}
                 onChange={handleDNI}
                 name="codPa"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-white"}`}
               />
                 <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
               <input
@@ -699,14 +696,14 @@ const AperturaExamenesPreOcup = (props) => {
                 disabled={habilitar}
                 id="apellidos"
                 name="apellidos"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-36"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-36 ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
                <input
                 type="text"
                 disabled={habilitar}
                 id="apellidos"
                 name="apellidos"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-36"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-36 ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
@@ -717,7 +714,7 @@ const AperturaExamenesPreOcup = (props) => {
                 id="nombre"
                 value={datos.nombresPa}
                 name="nombre"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
               <label htmlFor="apellidos" className="block w-[14em]">Apellidos:</label>
               <input
@@ -726,7 +723,7 @@ const AperturaExamenesPreOcup = (props) => {
                 id="apellidos"
                 value={datos.apellidosPa}
                 name="apellidos"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
             </div>
               {/* — Autocomplete Empresa — */}
@@ -739,11 +736,11 @@ const AperturaExamenesPreOcup = (props) => {
                     id="razonEmpresa"
                     name="razonEmpresa"
                     type="text"
-                    value={datos.razonEmpresa}
+                    value={searchEmpresa}
                     placeholder="Escribe para buscar empresa..."
                     disabled={habilitar}
                     onChange={handleEmpresaSearch}
-                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredEmpresas.length > 0) {
                         e.preventDefault();
@@ -789,7 +786,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar contrata..."
                     disabled={habilitar}
                     onChange={handleContrataSearch}
-                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredContratas.length > 0) {
                         e.preventDefault();
@@ -835,7 +832,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar médico..."
                     disabled={habilitar}
                     onChange={handleMedicoSearch}
-                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredMedicos.length > 0) {
                         e.preventDefault();
@@ -881,7 +878,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar prueba..."
                     disabled={habilitar}
                     onChange={handlePruebaSearch}
-                    className="border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white w-full"
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredPruebas.length > 0) {
                         e.preventDefault();
@@ -930,7 +927,7 @@ const AperturaExamenesPreOcup = (props) => {
                   placeholder="Escribe para buscar cargo..."
                   disabled={habilitar}
                   onChange={handleCargoSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  className={`border border-gray-300 px-3 py-1 rounded-md  w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                   onKeyDown={e => {
                     if (e.key==='Enter' && filteredCargos.length>0) {
                       e.preventDefault(); handleSelectCargo(filteredCargos[0]);
@@ -963,7 +960,7 @@ const AperturaExamenesPreOcup = (props) => {
                   id="areaO" name="areaO" type="text"
                   value={searchArea} placeholder="Escribe para buscar área..."
                   disabled={habilitar} onChange={handleAreaSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredAreas.length>0){e.preventDefault();handleSelectArea(filteredAreas[0]);} }}
                   onFocus={()=>setFilteredAreas(AreaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchArea.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredAreas([]),100)}
@@ -990,7 +987,7 @@ const AperturaExamenesPreOcup = (props) => {
                   type="text" value={searchExamenMedico}
                   placeholder="Escribe para buscar examen..."
                   disabled={habilitar} onChange={handleExamenMedSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredExamMed.length>0){e.preventDefault();handleSelectExamenMed(filteredExamMed[0]);} }}
                   onFocus={()=>setFilteredExamMed(ExamenMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExamenMedico.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredExamMed([]),100)}
@@ -1072,7 +1069,7 @@ const AperturaExamenesPreOcup = (props) => {
                   type="text" value={searchExplotacion}
                   placeholder="Escribe para buscar explotación..."
                   disabled={habilitar} onChange={handleExplotSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredExplot.length>0){e.preventDefault();handleSelectExplot(filteredExplot[0]);} }}
                   onFocus={()=>setFilteredExplot(ExplotacionMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExplotacion.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredExplot([]),100)}
@@ -1099,7 +1096,7 @@ const AperturaExamenesPreOcup = (props) => {
                   type="text" value={searchMineral}
                   placeholder="Escribe para buscar mineral..."
                   disabled={habilitar} onChange={handleMineralSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredMinerals.length>0){e.preventDefault();handleSelectMineral(filteredMinerals[0]);} }}
                   onFocus={()=>setFilteredMinerals(MineralMulti.filter(m=>m.mensaje.toLowerCase().includes(searchMineral.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredMinerals([]),100)}
@@ -1126,7 +1123,7 @@ const AperturaExamenesPreOcup = (props) => {
                   type="text" value={searchAltura}
                   placeholder="Escribe para buscar altura..."
                   disabled={habilitar} onChange={handleAlturaSearch}
-                  className="border border-gray-300 px-3 py-1 rounded-md bg-white w-full"
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredAlturas.length>0){e.preventDefault();handleSelectAltura(filteredAlturas[0]);} }}
                   onFocus={()=>setFilteredAlturas(AlturaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchAltura.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredAlturas([]),100)}
@@ -1170,7 +1167,7 @@ const AperturaExamenesPreOcup = (props) => {
                 }}
                 id="precioAdic"
                 name="precioAdic"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
               <InputsSelect2 nombre="autoriza" disabled={habilitar} value={datos.autoriza} title="Autorizado Por" Selects={ListAuth} handleChange={handleChange}/>
             </div>
@@ -1216,7 +1213,7 @@ const AperturaExamenesPreOcup = (props) => {
                 onChange={handleChange}
                 id="observacion1"
                 name="textObserv1"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
@@ -1228,7 +1225,7 @@ const AperturaExamenesPreOcup = (props) => {
                 value={datos.textObserv2}
                 onChange={handleChange}
                 name="textObserv2"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
             </div>
             

@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
-
+import footer from "./components/footer";
 export default function ReporteExamen1 (datos){
 
         const fecha = "02/45/5154"
@@ -103,7 +103,7 @@ export default function ReporteExamen1 (datos){
             styles: { fontSize: 8, textColor: [0, 0, 0] },
             headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
         });
-
+        footer(doc,datos)
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

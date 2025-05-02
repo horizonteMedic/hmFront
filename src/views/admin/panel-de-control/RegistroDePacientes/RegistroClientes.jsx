@@ -52,10 +52,8 @@ const RegistroClientes = (props) => {
   const [FirmaP, setFirmaP] = useState({ id: 0, url: '' });
   const [HuellaP, setHuellaP] = useState({ id: 0, url: '' });
 
-  const Profesiones   = ComboboxProfesión();
-  const Departamentos = ComboboxDepartamentos();
-  const Provincias    = ComboboxProvincias();
-  const Distritos     = ComboboxDistritos();
+  const {Profesiones,Departamentos,Provincias,Distritos} = props.listas
+    
   const sexoOptions = ['MASCULINO', 'FEMENINO'];
   const nivelOptions = [
     'ANALFABETO',

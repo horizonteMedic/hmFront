@@ -6,10 +6,6 @@ import drawC from "./components/drawC";
 import footer from "./components/footer";
 
 export default function Psicosensometria (datos) {
-    console.log(datos)
-
-
-
         const fecha = "02/45/5154"
         const doc = new jsPDF();
         //componente header
@@ -48,7 +44,7 @@ export default function Psicosensometria (datos) {
         drawLine(130, 80, 130, 85);
         drawLine(180, 80, 180, 85);
         drawLine(90, 95, 90, 100);
-        footer(doc);
+        footer(doc,datos);
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

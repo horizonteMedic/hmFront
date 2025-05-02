@@ -4,8 +4,8 @@ import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 import { getFetch } from "../admin/panel-de-control/getFetch/getFetch";
-
-export function Sucamec () {
+import footer from "./components/footer";
+export default function Sucamec (datos) {
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
@@ -35,7 +35,7 @@ export function Sucamec () {
         drawC(doc,"PSICOLOGIA",112,85,22,10, datos.psicologia ? true : false)
         drawLine(105, 80, 105, 105); // Línea desde "TRIAJE" hacia abajo
         drawC(doc,"EVALUACION MEDICA",86,105,35,10, datos.anexo7c ? true : false)
-
+        footer(doc,datos)
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 
