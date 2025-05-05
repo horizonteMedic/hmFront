@@ -3,8 +3,8 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
-
-export function ReporteExamenR () {
+import footer from "./components/footer";
+export default function ReporteExamenR (datos) {
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
@@ -64,7 +64,7 @@ export function ReporteExamenR () {
         drawLine(leftspace+85, headspace+65, leftspace+85, headspace+70);
         drawC(doc,"EVALUACION MEDICA", leftspace+70, headspace+70, 35, 10, datos.anexo7c ? true : false);
 
-
+        footer(doc,datos)
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

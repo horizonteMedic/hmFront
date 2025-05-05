@@ -5,6 +5,12 @@ import ImportacionModal from './ImportacionMasiva';
 import ImportacionModalBasica from './ImportacionModalBasica';
 import ReservaPacientes from './ReservaPacientes';
 import ConsentimientoDigitalizacion from './ConsentimientoDigitalizacion/ConsentimientoDigitalizacion';
+import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
+  ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth, ComboboxProfesión,
+  ComboboxDepartamentos,
+  ComboboxProvincias,
+  ComboboxDistritos
+ } from './model/Combobox';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faUsers,
@@ -33,6 +39,55 @@ const TabComponent = () => {
   const AccessCitas = views.some(view => view.id === 6);
   const AccesExcelBasico = views.some(view => view.id === 656);
   const AccesExcelCompleto = views.some(view => view.id === 657);
+
+  //COMBOBOX REGISTRO
+  const Profesiones   = ComboboxProfesión();
+  const Departamentos = ComboboxDepartamentos();
+  const Provincias    = ComboboxProvincias();
+  const Distritos     = ComboboxDistritos();
+  const listasCombosR = {
+    Profesiones,Departamentos,Provincias,Distritos
+  }
+  //COMBOBOX HC
+  
+  const EmpresasMulti = ComboboxEmpresasMulti("T-NP")
+  const ContrataMulti = ComboboxContratasMulti("T-NP")
+  const MedicosMulti = ComboboxMedicosMulti("T-NP")
+  const PruebaMulti = ComboboxPruebaMulti("T-NP")
+  const CargosMulti = ComboboxCargoMulti("T-NP")
+  const AreaMulti = ComboboxAreaMulti("T-NP")
+  const ExamenMulti = ComboboxExamenMMulti("T-NP")
+  const ExplotacionMulti = ComboboxExplotacionMulti("T-NP")
+  const MineralMulti = ComboboxMineralMulti("T-NP")
+  const AlturaMulti = ComboboxAlturaMulti("T-NP")
+  const FormaPago = ComboboxFormaPago("T-NP")
+  const ListAuth = ComboboxListAuth("T-NP")
+
+  const [datos, setDatos] = useState({
+    codPa: '',
+    nombresPa: '',
+    apellidosPa: '',
+    fechaNaciminetoPa: '',
+    sexoPa: '',
+    emailPa: '',
+    lugarNacPa: '',
+    nivelEstPa: '',
+    ocupacionPa: '',
+    estadoCivilPa: '',
+    direccionPa: '',
+    departamentoPa: '',
+    provinciaPa: '',
+    distritoPa: '',
+    caserioPA: '',
+    telCasaPa: '',
+    celPa: '',
+  });
+
+  const listasCombos = {
+    EmpresasMulti,ContrataMulti,MedicosMulti,PruebaMulti,CargosMulti,AreaMulti,ExamenMulti,ExplotacionMulti,MineralMulti,AlturaMulti,
+    FormaPago,
+    ListAuth
+  };
 
   const Acces = {
     Registro: AccessRegistroC,
@@ -152,10 +207,10 @@ const TabComponent = () => {
 
           <div className="custom-border p-4">
             {activeTab === 1 && Acces.Registro && (
-              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} />
+              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} listas={listasCombosR} datos={datos} setDatos={setDatos}/>
             )}
             {activeTab === 2 && Acces.Historia && (
-              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} />
+              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} listas={listasCombos} />
             )}
             {activeTab === 3 && Acces.Citas && (
               <ReservaPacientes

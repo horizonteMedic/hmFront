@@ -3,8 +3,8 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
-
-export function RayosX () {
+import footer from "./components/footer";
+export default function RayosX (datos) {
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
@@ -28,7 +28,7 @@ export function RayosX () {
         drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
 
         drawBox(doc,"Rayos X", 90, headspace+35, 30, 10, 4, datos.rayosx ? true : false);
-        
+        footer(doc,datos)
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

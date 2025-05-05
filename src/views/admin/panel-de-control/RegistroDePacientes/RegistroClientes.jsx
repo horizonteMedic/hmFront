@@ -24,25 +24,7 @@ const RegistroClientes = (props) => {
   const dniRef = useRef(null);   // ⬅️  nuevo
 
   const [startDate, setStartDate] = useState(new Date());
-  const [datos, setDatos] = useState({
-    codPa: '',
-    nombresPa: '',
-    apellidosPa: '',
-    fechaNaciminetoPa: '',
-    sexoPa: '',
-    emailPa: '',
-    lugarNacPa: '',
-    nivelEstPa: '',
-    ocupacionPa: '',
-    estadoCivilPa: '',
-    direccionPa: '',
-    departamentoPa: '',
-    provinciaPa: '',
-    distritoPa: '',
-    caserioPA: '',
-    telCasaPa: '',
-    celPa: '',
-  });
+  
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredProfesiones, setFilteredProfesiones] = useState([]);
@@ -52,10 +34,8 @@ const RegistroClientes = (props) => {
   const [FirmaP, setFirmaP] = useState({ id: 0, url: '' });
   const [HuellaP, setHuellaP] = useState({ id: 0, url: '' });
 
-  const Profesiones   = ComboboxProfesión();
-  const Departamentos = ComboboxDepartamentos();
-  const Provincias    = ComboboxProvincias();
-  const Distritos     = ComboboxDistritos();
+  const {Profesiones,Departamentos,Provincias,Distritos} = props.listas
+    
   const sexoOptions = ['MASCULINO', 'FEMENINO'];
   const nivelOptions = [
     'ANALFABETO',
@@ -74,13 +54,13 @@ const RegistroClientes = (props) => {
   // --- Handlers genéricos ---
   const handleChange = e => {
     const { name, value } = e.target;
-    setDatos(d => ({ ...d, [name]: value.toUpperCase() }));
+    props.setDatos(d => ({ ...d, [name]: value.toUpperCase() }));
   };
 
   const handleDNI = e => {
     const { name, value } = e.target;
     const onlyDigits = value.replace(/\D/g, '');      // quita todo lo que no sea dígito
-    setDatos(d => ({                                  // guarda como string
+    props.setDatos(d => ({                                  // guarda como string
       ...d,
       [name]: onlyDigits              // '' si el input está vacío
     }));
@@ -89,7 +69,7 @@ const RegistroClientes = (props) => {
   const handleNumber = e => {
     const { name, value } = e.target;
     const onlyDigits = value.replace(/\D/g, '');
-    setDatos(d => ({ ...d, [name]: onlyDigits }));    // '' si está vacío
+    props.setDatos(d => ({ ...d, [name]: onlyDigits }));    // '' si está vacío
   };
   
   const handleDPD = e => {
@@ -127,7 +107,7 @@ const RegistroClientes = (props) => {
 
   const handleSelectProfesion = prof => {
     setSelectedProfesion(prof.descripcion);
-    setDatos(d => ({ ...d, ocupacionPa: prof.descripcion }));
+    props.setDatos(d => ({ ...d, ocupacionPa: prof.descripcion }));
     setSearchTerm('');
     setFilteredProfesiones([]);
   };
@@ -135,11 +115,11 @@ const RegistroClientes = (props) => {
  // --- Búsqueda de paciente -------------------------
  const handleSearch = e => {
   e.preventDefault();
-  if (!datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
+  if (!props.datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
 
   Swal.fire({ title: 'Buscando datos', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-  SearchPacienteDNI(props.selectedSede, datos.codPa, props.token)
+  SearchPacienteDNI(props.selectedSede, props.datos.codPa, props.token)
   .then(async res => {
     Swal.close();
 
@@ -168,7 +148,7 @@ const RegistroClientes = (props) => {
     );
 
     // 2️⃣ Sobrescribir todo el objeto datos con valores saneados
-    setDatos(sanitized);
+    props.setDatos(sanitized);
 
     // 3️⃣ Mapear departamento/provincia/distrito SOLO si vienen valores válidos
     let deptObj = '',
@@ -191,7 +171,7 @@ const RegistroClientes = (props) => {
         : '';
     }
 
-    setDatos(d => ({
+    props.setDatos(d => ({
       ...d,
       departamentoPa: deptObj,
       provinciaPa:    provObj,
@@ -238,7 +218,7 @@ const RegistroClientes = (props) => {
 
 const handleSubmit = e => {
     e.preventDefault();
-    if (!datos.codPa)
+    if (!props.datos.codPa)
       return Swal.fire('Error', 'Complete los campos vacíos', 'error');
 
     Swal.fire({
@@ -256,7 +236,7 @@ const handleSubmit = e => {
           Swal.fire('Registrado', 'Paciente registrado', 'success');
           handleLimpiar();
           props.tabHC();
-          props.ChangeDNI(datos.codPa);
+          props.ChangeDNI(props.datos.codPa);
         }
       })
       .catch(() => {
@@ -287,10 +267,10 @@ const initialDatos = {
 };
 
 const handleLimpiar = (keepDNI = false) => {
-  const dniActual = keepDNI ? datos.codPa : '';   // guarda o descarta el DNI
+  const dniActual = keepDNI ? props.datos.codPa : '';   // guarda o descarta el DNI
 
   // 🔄 reinicia el estado principal
-  setDatos({ ...initialDatos, codPa: dniActual });
+  props.setDatos({ ...initialDatos, codPa: dniActual });
   setStartDate(new Date());          // (por si usas DatePicker)
 
   // 🔄 limpia todos los autocompletados / filtros
@@ -311,7 +291,7 @@ const handleLimpiar = (keepDNI = false) => {
 };
 
   const openHuella = () => {
-    if (!datos.codPa)
+    if (!props.datos.codPa)
       return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
     setModalhuellaF(true);
   };
@@ -342,7 +322,7 @@ const handleSexoSearch = e => {
 };
 const handleSelectSexo = val => {
   setSearchSexo(val);
-  setDatos(d => ({ ...d, sexoPa: val.charAt(0) })); 
+  props.setDatos(d => ({ ...d, sexoPa: val.charAt(0) })); 
   setFilteredSexo([]);
 };
 
@@ -355,7 +335,7 @@ const handleNivelSearch = e => {
 };
 const handleSelectNivel = val => {
   setSearchNivel(val);
-  setDatos(d => ({ ...d, nivelEstPa: val }));
+  props.setDatos(d => ({ ...d, nivelEstPa: val }));
   setFilteredNivel([]);
 };
 
@@ -376,7 +356,7 @@ const handleCivilSearch = e => {
 
 const handleSelectCivil = val => {
   setSearchCivil(val);
-  setDatos(d => ({ ...d, estadoCivilPa: val }));
+  props.setDatos(d => ({ ...d, estadoCivilPa: val }));
   setFilteredCivil([]);
 };
 
@@ -407,7 +387,7 @@ const handleDeptSearch = e => {
 };
 const handleSelectDept = dept => {
   setSearchDept(dept.nombre);
-  setDatos(d => ({ ...d, departamentoPa: dept }));
+  props.setDatos(d => ({ ...d, departamentoPa: dept }));
   setFilteredDept([]);
   // limpia provincias/distritos cuando cambias de depto
   setSearchProv('');
@@ -420,9 +400,9 @@ const handleSelectDept = dept => {
 const handleProvSearch = e => {
   const v = e.target.value;
   setSearchProv(v);
-  const opciones = datos.departamentoPa
+  const opciones = props.datos.departamentoPa
     ? Provincias.filter(p =>
-        p.idDepartamento === datos.departamentoPa.id &&
+        p.idDepartamento === props.datos.departamentoPa.id &&
         p.nombre.toLowerCase().includes(v.toLowerCase())
       )
     : [];
@@ -430,7 +410,7 @@ const handleProvSearch = e => {
 };
 const handleSelectProv = prov => {
   setSearchProv(prov.nombre);
-  setDatos(d => ({ ...d, provinciaPa: prov }));
+  props.setDatos(d => ({ ...d, provinciaPa: prov }));
   setFilteredProv([]);
   // limpia distrito al cambiar provincia
   setSearchDist('');
@@ -441,9 +421,9 @@ const handleSelectProv = prov => {
 const handleDistSearch = e => {
   const v = e.target.value;
   setSearchDist(v);
-  const opciones = datos.provinciaPa
+  const opciones = props.datos.provinciaPa
     ? Distritos.filter(d =>
-        d.idProvincia === datos.provinciaPa.id &&
+        d.idProvincia === props.datos.provinciaPa.id &&
         d.nombre.toLowerCase().includes(v.toLowerCase())
       )
     : [];
@@ -451,7 +431,7 @@ const handleDistSearch = e => {
 };
 const handleSelectDist = dist => {
   setSearchDist(dist.nombre);
-  setDatos(d => ({ ...d, distritoPa: dist }));
+  props.setDatos(d => ({ ...d, distritoPa: dist }));
   setFilteredDist([]);
 };
 const handleFecha = e => {
@@ -459,7 +439,7 @@ const handleFecha = e => {
   const formatted = raw
     .replace(/(\d{4})(\d)/, '$1-$2')          // 1995 → 1995-
     .replace(/(\d{4}-\d{2})(\d)/, '$1-$2');   // 1995-07 → 1995-07-
-  setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
+  props.setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
 };
   return (
     <div className="p-4">
@@ -475,7 +455,7 @@ const handleFecha = e => {
               type="text"
               id="codPa"
               name="codPa"
-              value={datos.codPa}
+              value={props.datos.codPa}
               onChange={handleDNI}
               onKeyDown={e => {            // ⬅️  disparar búsqueda con Enter
                 if (e.key === 'Enter') {
@@ -500,7 +480,7 @@ const handleFecha = e => {
               type="text"
               id="nombresPa"
               name="nombresPa"
-              value={datos.nombresPa}
+              value={props.datos.nombresPa}
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'apellidosPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -513,7 +493,7 @@ const handleFecha = e => {
               type="text"
               id="apellidosPa"
               name="apellidosPa"
-              value={datos.apellidosPa}
+              value={props.datos.apellidosPa}
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -531,7 +511,7 @@ const handleFecha = e => {
       type="text"
       id="fechaNaciminetoPa"
       name="fechaNaciminetoPa"
-      value={datos.fechaNaciminetoPa}
+      value={props.datos.fechaNaciminetoPa}
       onChange={handleFecha}
       placeholder="yyyy-MM-dd"
       onKeyDown={e => focusNext(e, 'sexoPa')}
@@ -589,7 +569,7 @@ const handleFecha = e => {
               onKeyDown={(e) => focusNext(e, 'lugarNacPa')}
               type="email"
               name="emailPa"
-              value={datos.emailPa}
+              value={props.datos.emailPa}
               onChange={handleChange}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
             />
@@ -601,7 +581,7 @@ const handleFecha = e => {
               id="lugarNacPa"
               type="text"
               name="lugarNacPa"
-              value={datos.lugarNacPa}
+              value={props.datos.lugarNacPa}
               onKeyDown={(e) => focusNext(e, 'nivelEstPa')}
               onChange={handleChange}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -745,7 +725,7 @@ const handleFecha = e => {
             id='direccionPa'
               type="text"
               name="direccionPa"
-              value={datos.direccionPa}
+              value={props.datos.direccionPa}
               onKeyDown={(e) => focusNext(e, 'departamentoPa')}
               onChange={handleChange}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -812,8 +792,8 @@ const handleFecha = e => {
       placeholder="Escribe para buscar..."
       onFocus={() => {
         if (filteredProv.length === 0) {
-          const opciones = datos.departamentoPa
-            ? Provincias.filter(p => p.idDepartamento === datos.departamentoPa.id)
+          const opciones = props.datos.departamentoPa
+            ? Provincias.filter(p => p.idDepartamento === props.datos.departamentoPa.id)
             : [];
           setFilteredProv(opciones);
         }
@@ -857,8 +837,8 @@ const handleFecha = e => {
       value={searchDist}
       onFocus={() => {
         if (filteredDist.length === 0) {
-          const opciones = datos.provinciaPa
-            ? Distritos.filter(d => d.idProvincia === datos.provinciaPa.id)
+          const opciones = props.datos.provinciaPa
+            ? Distritos.filter(d => d.idProvincia === props.datos.provinciaPa.id)
             : [];
           setFilteredDist(opciones);
         }
@@ -901,7 +881,7 @@ const handleFecha = e => {
               type="text"
               id="caserioPA"
               name="caserioPA"
-              value={datos.caserioPA}
+              value={props.datos.caserioPA}
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'telCasaPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -914,7 +894,7 @@ const handleFecha = e => {
               type="text"
               id="telCasaPa"
               name="telCasaPa"
-              value={datos.telCasaPa}
+              value={props.datos.telCasaPa}
               onKeyDown={(e) => focusNext(e, 'celPa')}
               onChange={handleNumber}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -927,7 +907,7 @@ const handleFecha = e => {
               type="text"
               id="celPa"
               name="celPa"
-              value={datos.celPa}
+              value={props.datos.celPa}
               onChange={handleNumber}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
             />
@@ -966,14 +946,14 @@ const handleFecha = e => {
       {modalhuellaF && (
         <NewHuellaFut
           close={() => setModalhuellaF(false)}
-          DNI={datos.codPa}
+          DNI={props.datos.codPa}
           Huella={HuellaP}
         />
       )}
       {modalpad && (
         <NewPad
           close={() => setModalpad(false)}
-          DNI={datos.codPa}
+          DNI={props.datos.codPa}
           Firma={FirmaP}
         />
       )}

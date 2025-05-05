@@ -79,7 +79,7 @@ export default function TestAltura(datos) {
      .setTextColor(200, 0, 0)
      .text("INDICACIONES:", indX + 2, indY + 7)
      .setFont("helvetica", "normal")
-     .setFontSize(7)
+     .setFontSize(8)
      .setTextColor(0, 0, 0);
 
   let cursorY = indY + 11;

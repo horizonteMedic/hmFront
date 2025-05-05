@@ -3,8 +3,8 @@ import autoTable from "jspdf-autotable";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
-
-export function LabClinico () {
+import footer from "./components/footer";
+export default function LabClinico (datos) {
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
@@ -29,6 +29,7 @@ export function LabClinico () {
         drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
 
         drawBox(doc,"PSICOLOGIA", 90, headspace+35, 30, 10, 4, datos.psicologia ? true : false);
+        footer(doc,datos)
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

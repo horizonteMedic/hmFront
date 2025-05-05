@@ -52,7 +52,6 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
     setDate('');
     setName('');
     setDni('');
-    setAuthorized(false);
   };
 
   const handleSave = () => {
@@ -120,9 +119,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
             className={styles.input}
           />
         </label>
-        <button className="flex items-center gap-1 bg-white border border-gray-300 rounded py-1 px-2 text-sm hover:bg-gray-100" onClick={handleSave}>
-          <FontAwesomeIcon icon={faEdit} /> Editar
-        </button>
+
         <label className="block">
           Fecha:&nbsp;
           <input

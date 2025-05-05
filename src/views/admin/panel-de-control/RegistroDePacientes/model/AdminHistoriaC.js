@@ -89,7 +89,7 @@ export function GetHistoriaC(data,sede,token) {
       nombres_apellidos_p: data.nombres_apellidos_p,
       cod_sede_p: sede
     };    
-    console.log(JSON.stringify(body))
+
     const url = `${URLAzure}/api/v01/ct/registroPacientes/listadoHistoriasOcupacionalesConFiltros`
       const options = {
           method: 'POST',
