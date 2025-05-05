@@ -36,7 +36,6 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
     const checkConnection = () => {
         fetch(SERVER_URL)
           .then((res) => {
-            console.log(res)
             if (res.ok) {
               setStatus("Presione el botón para capturar huella", "blue");
             } else {
@@ -164,25 +163,32 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
         .then((res) => res.arrayBuffer())
         .then((buffer) => {
           const byteArray = new Uint8Array(buffer);
-          // Creamos el canvas dinámicamente
+    
+          // Eliminar canvas anterior si existe
+          const existingCanvas = document.getElementById("fingerprintCanvas");
+          if (existingCanvas) {
+            existingCanvas.remove();
+          }
+    
+          // Crear nuevo canvas
           const canvas = document.createElement("canvas");
+          canvas.id = "fingerprintCanvas"; // ID único
           canvas.width = width;
           canvas.height = height;
-
+    
           const ctx = canvas.getContext("2d");
           const imgData = ctx.createImageData(width, height);
-
+    
           for (let i = 0; i < byteArray.length; i++) {
             const val = byteArray[i];
-            imgData.data[4 * i + 0] = val; // R
-            imgData.data[4 * i + 1] = val; // G
-            imgData.data[4 * i + 2] = val; // B
-            imgData.data[4 * i + 3] = 255; // A
+            imgData.data[4 * i + 0] = val;
+            imgData.data[4 * i + 1] = val;
+            imgData.data[4 * i + 2] = val;
+            imgData.data[4 * i + 3] = 255;
           }
     
           ctx.putImageData(imgData, 0, 0);
     
-          // Aplicamos transparencia a los píxeles oscuros
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           const data = imageData.data;
     
@@ -191,21 +197,18 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
             const g = data[i + 1];
             const b = data[i + 2];
     
-            // Si el píxel es negro o casi negro, lo hacemos transparente
             if (r < 30 && g < 30 && b < 30) {
-              data[i + 3] = 0; // alpha = 0
+              data[i + 3] = 0;
             }
           }
     
           ctx.putImageData(imageData, 0, 0);
-
-          // Insertamos el canvas dentro del div
+    
           const imageDiv = document.getElementById("imagendiv");
-          imageDiv.innerHTML = ""; // Limpiamos cualquier contenido previo
           imageDiv.appendChild(canvas);
+    
           const base64Image = convertCanvasToBase64(canvas);
-          setBase64(base64Image)
-          console.log(base64Image)
+          setBase64(base64Image);
         });
     };
 
@@ -214,6 +217,17 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
     };
 
     const SubmitHuella = () => {
+      
+      if (!base64) return Swal.fire('Error','Coloca una Huella','error')
+        Swal.fire({
+          title: 'Validando Datos',
+          text: 'Espere por favor...',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
       const base64WithoutHeader = base64.substring(base64.indexOf(',') + 1);
       const datos = {
         dni: DNI,
@@ -223,7 +237,12 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
       }
       Submit(datos)
       .then((res) => {
-        console.log(res)
+        if (res.id) {
+          Swal.fire('Exito',`${res.mensaje}`,'success') 
+          close()
+        } else {
+          Swal.fire('Error','Ocurrio un error al registrar la heulla','error')
+        }
       })
     }
 
@@ -287,7 +306,7 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
                     </div>
                     <div className='flex items-start justify-center w-full pt-6'>
                         <div className='flex justify-around w-full'>
-                            <button onClick={(e) => {download(e)}} className='azul-btn px-5 py-2 rounded-lg'>Descargar</button>
+                            <button onClick={(e) => {download(e)}} className='azul-btn px-5 py-2 rounded-lg hidden'>Descargar</button>
                             <button onClick={(e) => {e.preventDefault(),startCapturing()}} className={`azul-btn px-5 py-2 rounded-lg ${acquisitionStarted && 'opacity-65'}`}>Iniciar</button>
                             <button onClick={(e) => {e.preventDefault(),StopCapturing()}} className={`azul-btn px-5 py-2 rounded-lg `}>Detener</button>
                         </div>

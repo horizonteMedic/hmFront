@@ -210,7 +210,7 @@ const TabComponent = () => {
               <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} listas={listasCombosR} datos={datos} setDatos={setDatos}/>
             )}
             {activeTab === 2 && Acces.Historia && (
-              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} listas={listasCombos} />
+              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} listas={listasCombos} PrecioC={ComboboxPrecioExamenMulti} />
             )}
             {activeTab === 3 && Acces.Citas && (
               <ReservaPacientes

@@ -1,24 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import DatePicker from 'react-datepicker';
 import Swal from 'sweetalert2';
 import 'react-datepicker/dist/react-datepicker.css';
-import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
-  ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth
- } from './model/Combobox';
 import { SearchPacienteDNI } from './model/AdminPaciente';
 import { GetHistoriaC, SubmitHistoriaC } from './model/AdminHistoriaC';
 import {InputsSelect, InputsSelect2} from './InputsSelect';
 import {getFetch} from './../getFetch/getFetch'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faAsterisk } from '@fortawesome/free-solid-svg-icons';
+import { ImportData } from './controller/HC';
+
 const AperturaExamenesPreOcup = (props) => {
   const [stardate, setStartDate] = useState(new Date());
   const jasperModules = import.meta.glob('../../../jaspers/*.jsx'); // ajusta si usas .jsx
-
+  const dniRef = useRef(null);
   const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
     ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
 
 
   const [datos, setDatos] = useState({
     codPa: props.DNIG,
+    nombres: "",
+    apellidos: "",
     razonEmpresa:"",
     razonContrata: "",
     n_medico: "",
@@ -34,7 +37,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: new Date(),
+    fechaAperturaPo: stardate,
     n_operacion: null,
     textObserv1: "",
     textObserv2: "",
@@ -56,6 +59,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [showEdit, setShowEdit] = useState(false)
   const [habilitar, setHabilitar] = useState(false)
   const [register, setRegister] = useState(true)
+  const [editPri, setEditPri] = useState(false)
   //TABLAHC
   const [SearchP, setSearchP] = useState({
     code: "",
@@ -66,6 +70,12 @@ const AperturaExamenesPreOcup = (props) => {
   // Autocompletado Empresa
   const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
   const [filteredEmpresas, setFilteredEmpresas] = useState([]);
+
+  useEffect(() => {
+    if (props.DNIG) {
+      dniRef.current?.focus(); // Aplica focus al montar o cuando cambien props
+    }
+  },[props.DNIG])
 
   const handleEmpresaSearch = e => {
     const v = e.target.value;
@@ -217,6 +227,15 @@ const AperturaExamenesPreOcup = (props) => {
     setDatos(d => ({ ...d, nomExamen: x.mensaje }));
     setFilteredExamMed([]);
     document.getElementById('nomEx')?.focus();
+    getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`,props.token)
+    .then((res) => {
+      setDatos({...datos,
+        precioPo: res.mensaje
+      })
+    })
+    .catch(() => {
+      console.log('Telible Error')
+    })
   };
 
   // Explotación en
@@ -346,10 +365,9 @@ const AperturaExamenesPreOcup = (props) => {
   };
 
   const newPrice = (value) => {  
-    ComboboxPrecioExamenMulti(props.selectedSede,value,props.token)
+    props.PrecioC(props.selectedSede,value,props.token)
     .then((res) => {
       setDatos({...datos,
-        nomExamen: value,
         precioPo: res.mensaje
       })
     })
@@ -391,6 +409,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleEdit = (value) => {
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`,props.token)
     .then((res) => {
+      console.log(res)
       setDatos({
         ...res,
         nombresPa: res.nombres,
@@ -412,9 +431,21 @@ const AperturaExamenesPreOcup = (props) => {
     setHabilitar(true)
     setShowEdit(true)
   }
+
+  const RendeSet = (res) => {
+    setSearchEmpresa(res.razonEmpresa || "");
+      setSearchContrata(res.razonContrata || "")
+      setSearchMedico(res.n_medico || "");
+      setSearchPrueba(res.tipoPrueba || "")
+      setSearchCargo(res.cargoDe || "")
+      setSearchArea(res.areaO || "")
+      setSearchExamenMedico(res.nomExamen || "")
+      setSearchExplotacion(res.nomEx || "")
+      setSearchMineral(res.mineralPo || "")
+      setSearchAltura(res.alturaPo || "")
+  }
   
   const SearchHC = (event,type) => {
-    console.log(SearchP.nombre)
     if (SearchP.code === "" && SearchP.nombre === "") {
       console.log('a');
       return;
@@ -549,9 +580,11 @@ const AperturaExamenesPreOcup = (props) => {
       rxcDorsoLumbar: false, //9
       rxcKLumbar: false, //10
       rxcPlomos: false,//12
-      mercurioo: false//13
-
+      mercurioo: false,//13
+      nombres:"",
+      apellidos:"",
     })
+    RendeSet("")
     setShowEdit(false)
     setHabilitar(false)
     setRegister(true)
@@ -684,10 +717,11 @@ const AperturaExamenesPreOcup = (props) => {
 
     SubmitHistoriaC(datos,props.selectedSede,props.token,1)
     .then((res) => {
-      console.log(res)
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
         } else {
+          setSearchP({code: ""})
+          handleLimpiar()
           InfoHR(res.id)
         }
     })
@@ -697,11 +731,10 @@ const AperturaExamenesPreOcup = (props) => {
     
   };
 
-  const codPa = datos?.codPa.toString();  // Convertir a cadena de texto
+  const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
   const activarDisabled = codPa.length === 8;
   return (
     <div >
-      <form onSubmit={handleSubmit}>
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
           <div className="w-full sm:w-full md:w-auto   ">
             <div className="mb-1 pb-2">
@@ -712,28 +745,29 @@ const AperturaExamenesPreOcup = (props) => {
               <input
                 type="text"
                 id="codPa"
+                ref={dniRef}
                 disabled={creating || habilitar}
-                value={datos.codPa}
+                defaultValue={datos.codPa}
                 maxLength={8}
                 onKeyDown={handleSearch}
                 onChange={handleDNI}
                 name="codPa"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-white"}`}
               />
+              <label htmlFor="Importar">IMPORTAR</label>
+              <button onClick={() => {ImportData(datos.codPa,Swal,getFetch,props.token, setDatos,RendeSet)}} className='mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
+                <FontAwesomeIcon icon={faAsterisk}/>
+              </button>
                 <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
               <input
                 type="text"
                 disabled={habilitar}
-                id="apellidos"
-                name="apellidos"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-36 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
                <input
                 type="text"
                 disabled={habilitar}
-                id="apellidos"
-                name="apellidos"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-36 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
@@ -741,9 +775,10 @@ const AperturaExamenesPreOcup = (props) => {
               <input
                 type="text"
                 disabled={habilitar}
-                id="nombre"
-                value={datos.nombresPa}
-                name="nombre"
+                id="nombres"
+                onChange={handleChange}
+                value={datos.nombres}
+                name="nombres"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
               <label htmlFor="apellidos" className="block w-[14em]">Apellidos:</label>
@@ -751,7 +786,8 @@ const AperturaExamenesPreOcup = (props) => {
                 type="text"
                 disabled={habilitar}
                 id="apellidos"
-                value={datos.apellidosPa}
+                onChange={handleChange}
+                value={datos.apellidos}
                 name="apellidos"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
@@ -1174,11 +1210,21 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="Precio" className="block w-1/2">Precio del Examen</label>
               <input type="text"
-                id="precioExamenAdicional"
-                name="precioExamenAdicional"
-                className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full" 
+                id="precioPo"
+                name="precioPo"
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${!editPri ? "bg-slate-300" : "bg-white"}`} 
                 value={datos.precioPo}
-                disabled />
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "" || /^[\d.,\sS/]*$/.test(value)) {
+                    setDatos({
+                      ...datos,
+                      precioPo: value,
+                    });
+                  }
+                }}
+                disabled={!editPri} />
+              <input type="checkbox" onChange={() => {setEditPri(!editPri)}}/>
               <InputsSelect2 nombre="tipoPago" disabled={habilitar} value={datos.tipoPago} title="Forma de Pago" Selects={FormaPago} handleChange={handleChange}/>
             </div>
             <div className="flex items-center space-x-2 mb-1">
@@ -1206,10 +1252,10 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="fechaApertura" className="block w-1/7">Fecha de Apertura:</label>
               <DatePicker
                 selected={stardate}
-                value={datos.fechaAperturaPo || stardate}
+                value={datos.fechaAperturaPo}
                 disabled={habilitar}
                 onChange={handleDateChange}
-                dateFormat="yyyy/MM/dd"
+                dateFormat="yyyy-MM-dd"
                 className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
               />
               <label htmlFor="numOperacion" className="block ml-4">N° Operación:</label>
@@ -1228,7 +1274,7 @@ const AperturaExamenesPreOcup = (props) => {
               <input
                 type="text"
                 disabled={habilitar}
-                value={datos.textObserv1}
+                defaultValue={datos.textObserv1}
                 onChange={handleChange}
                 id="observacion1"
                 name="textObserv1"
@@ -1241,7 +1287,7 @@ const AperturaExamenesPreOcup = (props) => {
                 type="text"
                 id="observacion2"
                 disabled={habilitar}
-                value={datos.textObserv2}
+                defaultValue={datos.textObserv2}
                 onChange={handleChange}
                 name="textObserv2"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
@@ -1392,7 +1438,6 @@ const AperturaExamenesPreOcup = (props) => {
               </div>
           </div>
         </div>
-      </form>
     </div>
   );
 };

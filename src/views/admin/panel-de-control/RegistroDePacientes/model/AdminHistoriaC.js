@@ -3,10 +3,11 @@ import { URLAzure } from "../../../../config/config";
 export function SubmitHistoriaC(data,sede,token,operacion) {
 
   const removePrefix = (str, prefix) => {
+    if (typeof str !== "string") return ""; // o puedes lanzar un error si prefieres
     const regex = new RegExp('^' + prefix);
     return str.replace(regex, '');
   };    
-  const precioAdic = removePrefix(data.precioAdic, 'S/');
+  const precioAdic = removePrefix(data.precioAdic, 'S/.');
     const currentDate = new Date(); // Obtiene la fecha y hora actual
     const year = currentDate.getFullYear(); // Obtiene el año actual
     const month = ('0' + (currentDate.getMonth() + 1)).slice(-2); // Obtiene el mes actual y le agrega un 0 al principio si es menor a 10
@@ -14,7 +15,7 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    
+    console.log(data.precioPo)
   const body = {
     tipoOperacion: operacion,
     n_orden:  data.n_orden ? data.n_orden : null,
