@@ -63,6 +63,26 @@ const TabComponent = () => {
   const FormaPago = ComboboxFormaPago("T-NP")
   const ListAuth = ComboboxListAuth("T-NP")
 
+  const [datos, setDatos] = useState({
+    codPa: '',
+    nombresPa: '',
+    apellidosPa: '',
+    fechaNaciminetoPa: '',
+    sexoPa: '',
+    emailPa: '',
+    lugarNacPa: '',
+    nivelEstPa: '',
+    ocupacionPa: '',
+    estadoCivilPa: '',
+    direccionPa: '',
+    departamentoPa: '',
+    provinciaPa: '',
+    distritoPa: '',
+    caserioPA: '',
+    telCasaPa: '',
+    celPa: '',
+  });
+
   const listasCombos = {
     EmpresasMulti,ContrataMulti,MedicosMulti,PruebaMulti,CargosMulti,AreaMulti,ExamenMulti,ExplotacionMulti,MineralMulti,AlturaMulti,
     FormaPago,
@@ -187,7 +207,7 @@ const TabComponent = () => {
 
           <div className="custom-border p-4">
             {activeTab === 1 && Acces.Registro && (
-              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} listas={listasCombosR} />
+              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} listas={listasCombosR} datos={datos} setDatos={setDatos}/>
             )}
             {activeTab === 2 && Acces.Historia && (
               <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} listas={listasCombos} />

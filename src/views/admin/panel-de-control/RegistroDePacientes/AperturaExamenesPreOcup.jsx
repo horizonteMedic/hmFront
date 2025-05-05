@@ -14,10 +14,7 @@ const AperturaExamenesPreOcup = (props) => {
   const jasperModules = import.meta.glob('../../../jaspers/*.jsx'); // ajusta si usas .jsx
 
   const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
-    ExamenMulti, ExplotacionMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
-
-  
-
+    ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
 
 
   const [datos, setDatos] = useState({
@@ -25,6 +22,7 @@ const AperturaExamenesPreOcup = (props) => {
     razonEmpresa:"",
     razonContrata: "",
     n_medico: "",
+    n_hora: "",
     tipoPrueba: "",
     cargoDe: "",
     areaO: "",
@@ -51,7 +49,8 @@ const AperturaExamenesPreOcup = (props) => {
     rxcDorsoLumbar: false, //9
     rxcKLumbar: false, //10
     rxcPlomos: false,//12
-    mercurioo: false//13
+    mercurioo: false,//13,
+    
   })
   const [searchHC, setSearchHC] = useState([])
   const [showEdit, setShowEdit] = useState(false)
@@ -309,25 +308,27 @@ const AperturaExamenesPreOcup = (props) => {
   };
 
 
-
   useEffect(() => {
-    const data = {
-      opcion_id_p: 1,
-      norden_: 0,
-      nombres_apellidos_p: ""
+    if (SearchP.code === "" || SearchP.nombre === "") {
+      const data = {
+        opcion_id_p: 1,
+        norden_: 0,
+        nombres_apellidos_p: ""
+      };
+  
+      GetHistoriaC(data, props.selectedSede, props.token)
+        .then((res) => {
+          if (res) {
+            setSearchHC(res);
+          } else {
+            setSearchHC([]);
+          }
+        })
+        .catch(() => {
+          console.log("ocurrió un error");
+        });
     }
-    GetHistoriaC(data,props.selectedSede,props.token)
-    .then((res) => {
-      if (res) {
-        setSearchHC(res)
-      } else {
-        setSearchHC([])
-      }
-    })
-    .catch(() => {
-      console.log('ocurrio un telibre error')
-    })
-  },[])
+  }, [SearchP.code, SearchP.nombre]);
   
   const [creating, setCreating] = useState(false)
 
@@ -390,7 +391,11 @@ const AperturaExamenesPreOcup = (props) => {
   const handleEdit = (value) => {
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`,props.token)
     .then((res) => {
-      setDatos(res)
+      setDatos({
+        ...res,
+        nombresPa: res.nombres,
+        apellidosPa: res.apellidos
+      });
       setSearchEmpresa(res.razonEmpresa || "");
       setSearchContrata(res.razonContrata || "")
       setSearchMedico(res.n_medico || "");
@@ -407,9 +412,23 @@ const AperturaExamenesPreOcup = (props) => {
     setHabilitar(true)
     setShowEdit(true)
   }
-
+  
   const SearchHC = (event,type) => {
+    console.log(SearchP.nombre)
+    if (SearchP.code === "" && SearchP.nombre === "") {
+      console.log('a');
+      return;
+    }
     if (event.key === 'Enter') {
+      Swal.fire({
+        title: 'Validando Datos',
+        text: 'Espere por favor...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
       if (type==='code') {
         setSearchP(prev => ({
           ...prev,
@@ -424,8 +443,13 @@ const AperturaExamenesPreOcup = (props) => {
         .then((res) => {
           console.log(res)
           if (res) {
-            setSearchHC(res)
+            if (res.length) {
+              setSearchHC(res); // Solo si tiene elementos
+            } else {
+              Swal.fire('Sin Resultado','No se encontraron registros','warning')
+            }
           } else {
+            
             setSearchHC([])
           }
         })
@@ -441,13 +465,19 @@ const AperturaExamenesPreOcup = (props) => {
         }
         GetHistoriaC(data,props.selectedSede,props.token)
         .then((res) => {
+          console.log(res)
           if (res) {
-            setSearchHC(res)
+            if (res.length) {
+              setSearchHC(res); // Solo si tiene elementos
+            } else {
+              Swal.fire('Sin Resultado','No se encontraron registros','warning')
+            }
           } else {
             setSearchHC([])
           }
         })
       }
+      Swal.close();
     }
   }
 
@@ -667,7 +697,7 @@ const AperturaExamenesPreOcup = (props) => {
     
   };
 
-  const codPa = datos.codPa.toString();  // Convertir a cadena de texto
+  const codPa = datos?.codPa.toString();  // Convertir a cadena de texto
   const activarDisabled = codPa.length === 8;
   return (
     <div >
@@ -1171,17 +1201,6 @@ const AperturaExamenesPreOcup = (props) => {
               />
               <InputsSelect2 nombre="autoriza" disabled={habilitar} value={datos.autoriza} title="Autorizado Por" Selects={ListAuth} handleChange={handleChange}/>
             </div>
-            {showEdit && <div className=" pt-4 flex justify-end items-end ">
-                <button type="button" onClick={() => {setHabilitar(false)}}  className=" mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
-                   Habilitar
-                </button>
-                <button type="button" onClick={handleSubmitEdit}  className=" mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
-                   Editar
-                </button>
-                <button type="button" onClick={handleLimpiar} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
-                   Limpiar
-                </button>
-              </div>}
               <div className="mb-4">
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="fechaApertura" className="block w-1/7">Fecha de Apertura:</label>
@@ -1256,7 +1275,19 @@ const AperturaExamenesPreOcup = (props) => {
               </div>
             </div>
             </div>
+            {showEdit && <div className=" pt-4 flex justify-end items-end ">
+                <button type="button" onClick={() => {setHabilitar(false)}}  className=" mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                   Habilitar
+                </button>
+                <button type="button" onClick={handleSubmitEdit}  className=" mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                   Editar
+                </button>
+                <button type="button" onClick={handleLimpiar} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                   Limpiar
+                </button>
+              </div>}
           </div>
+          
           {/* Nueva columna con estructura solicitada */}
           <div className="w-full sm:w-full mb-4 pl-4">
           <div className="flex items-center space-x-2 mb-2">
@@ -1272,14 +1303,16 @@ const AperturaExamenesPreOcup = (props) => {
                 <label htmlFor="hora" className="block w-14">Hora:</label>
                 <input
                   type="text"
+                  defaultValue={datos.n_hora}
                   id="hora"
                   name="hora"
-                  className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white w-24"
+                  className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white w-25"
                 />
                 <label htmlFor="sedeClinica" className="block w-36">Sede Clínica:</label>
                 <input
                   type="text"
                   id="sedeClinica"
+                  defaultValue={datos.codSede}
                   name="sedeClinica"
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-1/2"
                 />
@@ -1290,7 +1323,7 @@ const AperturaExamenesPreOcup = (props) => {
                 <input
                   type="text"
                   value={SearchP.nombre}
-                  onChange={(e) => {setSearchP(prev => ({...prev, nombre: e.target.value}))}}
+                  onChange={(e) => {setSearchP(prev => ({...prev, nombre: e.target.value.toUpperCase(), code: ""}))}}
                   id="nombre"
                   onKeyDown={(event) => {SearchHC(event,'nombre')}}
                   name="nombre"
@@ -1307,7 +1340,8 @@ const AperturaExamenesPreOcup = (props) => {
                     if (/^\d{0,7}$/.test(value)) { // máximo 7 dígitos numéricos
                       setSearchP(prev => ({
                         ...prev,
-                        code: value
+                        code: value,
+                        nombre: ""
                       }));
                     }
                   }}
@@ -1332,7 +1366,7 @@ const AperturaExamenesPreOcup = (props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchHC.length == 0  && <div className='flex justify-center items-center'><p>Cargando...</p></div>}
+                  {searchHC.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
                   {searchHC.map((option, index) => (
                     <tr key={index} className=' cursor-pointer' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
                       e.preventDefault(); // 🔒 evita el menú del navegador
