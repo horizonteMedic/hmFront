@@ -32,7 +32,7 @@ import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeRecl
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 //Registro de Pacientes Multiple
 import RegistroDePacientes from './views/admin/panel-de-control/RegistroDePacientes/Registro-de-pacientes.jsx';
-import Sucamec from './views/jaspers/Admision7D.jsx';
+import Sucamec from './views/jaspers/LabClinico.jsx';
 const App = () => {
   return (
     <React.StrictMode>

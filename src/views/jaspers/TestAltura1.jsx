@@ -54,7 +54,7 @@ export default function TestAltura(datos) {
   const maxW = 180;             // ancho máximo para el texto
   doc.setFont("helvetica", "bold").setFontSize(8).setTextColor(200, 0, 0)
      .text("INDICACIONES:", indX, indY);
-  doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(0, 0, 0);
   let cursor = indY + 4;
   [
     "• Si ud. es conductor y/o operador dejar copia a color de DNI y licencia de conducir.",
