@@ -181,7 +181,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       doc.setDrawColor(128, 0, 128).setLineWidth(1);
       doc.line(margin, footerY, pageW - margin, footerY);
 
-      doc.setFont('helvetica', 'normal').setFontSize(7);
+      doc.setFont('helvetica', 'normal').setFontSize(8);
       const footerLines = [
         `${jasper.dir_tru_pierola}, Cel. ${jasper.cel_trujillo_pie} Telf. ${jasper.telf_tru_pierola} ${jasper.email_tru_pierola}.`,
         `${jasper.dir_trujillo}  Telf. ${jasper.telf_trujillo}`,
