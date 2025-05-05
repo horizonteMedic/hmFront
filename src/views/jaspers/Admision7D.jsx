@@ -1,86 +1,114 @@
+// views/jaspers/Admision7D.jsx
+
 import React from "react";
 import jsPDF from "jspdf";
-import footer from "./components/footer";    // Ajusta la ruta según tu proyecto
+import footer from "./components/footer";
 import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 
-export default function Admision7d (datos) {
+export default function Admision7d(datos) {
+  // 1) Inicializar PDF (A4 en mm)
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
 
-    const doc = new jsPDF();
+  // 2) Encabezado (logo, campos, título)
+  headerHR(doc, datos);
 
-    // Encabezado (logo, datos de empresa, etc.)
-    headerHR(doc,datos);
+  // 3) Texto base
+  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(0, 0, 0);
 
-    // Fuente base
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(0, 0, 0);
+  // 4) Constantes de diseño
+  const pageW        = doc.internal.pageSize.getWidth();
+  const margin       = 15;
+  const diagramShift = -15;        // mueve el diagrama a la izq
+  const headerGap    = 75;         // baja el diagrama para dar más espacio
+  const centerX      = pageW / 2 + diagramShift;
+  const startY       = headerGap;
+  const ovalW=35, ovalH=12, boxR=6;
+  const rectW=40, rectH=12;
+  const vertStep=20;
 
-    const pageWidth = doc.internal.pageSize.getWidth();
-    let startY = 20; // Ajusta según necesites
+  const line = (x1,y1,x2,y2) => doc.line(x1,y1,x2,y2);
 
+  // 5) Óvalos ADMISION → TRIAJE
+  drawBox(doc, "ADMISION", centerX-ovalW/2, startY, ovalW, ovalH, boxR, datos.orden);
+  drawBox(doc, "TRIAJE",   centerX-ovalW/2, startY+vertStep, ovalW, ovalH, boxR, datos.triaje);
 
-    
+  // Una sola línea continua entre ellos
+  line(centerX, startY+ovalH, centerX, startY+vertStep);
 
-    // 4) Diagrama de flujo
-    //    a) ADMISION y TRIAJE (óvalos)
-    const centerX = pageWidth / 2;
-    const ovalWidth = 30;
-    const ovalHeight = 8;
-    const cornerRadius = 4;
-    const drawLine = (x1, y1, x2, y2) => {
-      doc.line(x1, y1, x2, y2);
-    };
-    const leftspace = 10
-    const headspace = 60
-    // ADMISION
-      drawBox(doc,"ADMISION", 90, 65, 30, 10, 4, datos.orden ? true : false);
-      drawLine(105, 75, 105, 80); // Línea desde "TRIAJE" hacia abajo
-      drawBox(doc,"TRIAJE", 90, 80, 30, 10, 4, datos.triaje ? true : false);
-      drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
+  // 6) Fila de recuadros
+  const row2Y = startY + 2*vertStep;
+  const cols = [
+    centerX - rectW*1.5 - 5,
+    centerX - rectW*0.5 - 2.5,
+    centerX + rectW*0.5 + 0,
+    centerX + rectW*1.5 + 5
+  ];
+  drawC(doc, "LABORATORIO\n(HTO-HB)", cols[0], row2Y, rectW, rectH, datos.laboratorio);
+  drawC(doc, "EKG (> 40 años)",     cols[1], row2Y, rectW, rectH, datos.electrocardiograma);
+  drawC(doc, "PSICOLOGIA",          cols[2], row2Y, rectW, rectH, datos.psicologia);
+  drawC(doc, "A. VISUAL",           cols[3], row2Y, rectW, rectH, datos.oftalmologia);
 
-      drawC(doc,"LABORATORIO\n(HTO-HB)", leftspace+28, headspace+35, 30, 10, datos.laboratorio ? true : false);
-      drawC(doc,"EKG ( > 40 años )", leftspace+61, headspace+35, 25, 10, !datos.electrocardiograma ? false : true);
-      drawC(doc,"PSICOLOGIA", leftspace+90, headspace+35, 20, 10, !datos.psicologia ? false : true);
-      drawC(doc,"A. VISUAL", leftspace+120, headspace+35, 35, 10, !datos.oftalmologia ? false : true);
+  // Conexiones horizontales entre TODOS los recuadros
+  for (let i = 0; i < cols.length - 1; i++) {
+    line(cols[i] + rectW, row2Y + rectH/2, cols[i+1], row2Y + rectH/2);
+  }
 
-      drawLine(leftspace+58, headspace+40, leftspace+61, headspace+40); 
-      drawLine(leftspace+86, headspace+40, leftspace+90, headspace+40); 
-      drawLine(leftspace+110, headspace+40, leftspace+120, headspace+40); 
+  // 7) Unión TRIAJE → EKG
+  const yTriajeBottom = startY + vertStep + ovalH;
+  const yEkgTop       = row2Y;
+  const xEkgCenter    = cols[1] + rectW/2;
+  line(xEkgCenter, yTriajeBottom, xEkgCenter, yEkgTop);
 
-      // 🟡 Evaluación Médica y Audiometría
-      
-      drawLine(leftspace+40, headspace+45, leftspace+40, headspace+50);
-      drawLine(leftspace+70, headspace+45, leftspace+70, headspace+50);
-      drawLine(leftspace+100, headspace+45, leftspace+100, headspace+50);
-      drawLine(leftspace+130, headspace+45, leftspace+130, headspace+50);
+  // 8) Uniones a EVALUACIÓN MÉDICA (solo LAB, EKG, PSICOLOGÍA)
+  const yTop    = row2Y + rectH;
+  const yBottom = yTop + 7;
+  [cols[0], cols[1], cols[2]].forEach(x =>
+    line(x + rectW/2, yTop, x + rectW/2, yBottom)
+  );
+  const labX = cols[0] + rectW/2;
+  const psiX = cols[2] + rectW/2;
+  line(labX, yBottom, psiX, yBottom);
 
+  // Conector vertical central hacia Evaluación Médica
+  const trunkX = cols[1] + rectW/2;
+  const evalY  = yBottom + 5;
+  line(trunkX, yBottom, trunkX, evalY);
 
-      drawLine(leftspace+40, headspace+50, leftspace+130, headspace+50); // Conectar "GRUPO SANGUINEO"
-      
+  // Recuadro EVALUACIÓN MÉDICA
+  drawC(doc, "EVALUACIÓN MÉDICA", trunkX - 16, evalY, 33, 10, datos.anexo7c);
 
-      drawC(doc,"EVALUACIÓN MEDICA", leftspace+60, headspace+55, 33, 10, datos.anexo7c ? true : false);
-      drawLine(leftspace+70, headspace+50, leftspace+70, headspace+55);
+  // 9) Bloque “Indicaciones” al lado de ADMISION
+  const indX = margin + (pageW - 2*margin)*0.65;
+  const indY = startY - 2;
+  const indW = pageW - margin - indX;
+  const indH = 35;
 
+  doc.setFillColor(245,245,245)
+     .roundedRect(indX, indY, indW, indH, 2, 2, "F")
+     .setFont("helvetica","bold").setFontSize(8).setTextColor(200,0,0)
+     .text("INDICACIONES:", indX+2, indY+7)
+     .setFont("helvetica","normal").setFontSize(7).setTextColor(0,0,0);
 
+  let cursorY = indY + 11;
+  [
+    "Si ud. es conductor y/o operador dejar copia a color de DNI y licencia de conducir.",
+    "Si ud. no es conductor dejar copia a color de su DNI.",
+    "Si ud. va a examen psicosensométrico para conducir dejar copia a color de su DNI."
+  ].forEach(txt => {
+    const lines = doc.splitTextToSize("• " + txt, indW - 4);
+    doc.text(lines, indX+3, cursorY);
+    cursorY += lines.length * 3.5;
+  });
 
-    // 7) Footer (si tienes un footer personalizado)
-    footer(doc);
-
-    const pdfBlob = doc.output("blob");
-        const pdfUrl = URL.createObjectURL(pdfBlob);
-
-        // Crear un iframe invisible para imprimir directamente
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = pdfUrl;
-        document.body.appendChild(iframe);
-
-        iframe.onload = function () {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-    }
-
-};
-
+  // 10) Footer e impresión
+  footer(doc);
+  const blob = doc.output("blob");
+  const url  = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}
