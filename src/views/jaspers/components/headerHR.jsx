@@ -6,6 +6,18 @@ const headerHR = (doc, datos) => {
   const yOffset = 10;       // separación extra arriba y abajo
   const lineHeight = 4;     // altura entre líneas en mm
 
+  // Draw top and bottom lines
+  doc.setLineWidth(0.5);
+  doc.line(margin, yOffset, pageW - margin, yOffset);
+  
+  // Draw box with "$sf" text on the right
+  const boxSize = 15;
+  const boxX = pageW - margin - boxSize;
+  const boxY = yOffset + 2;
+  doc.rect(boxX, boxY, boxSize, boxSize);
+  doc.setFontSize(10);
+  doc.text("$sf", boxX + boxSize/2, boxY + boxSize/2, { align: "center" });
+
   // === 1) Título principal en negrita y centrado ===
   doc
     .setFont("helvetica", "bold")
@@ -13,17 +25,17 @@ const headerHR = (doc, datos) => {
     .text(
       "CORPORACION PERUANA DE CENTROS MEDICOS S.A.C.",
       pageW / 2,
-      8 + yOffset,
+      8 + yOffset + 10,  // Added offset to push content down
       { align: "center" }
     );
 
-  // === 2) Subtítulo HOJA DE RUTA en negrita ===
+  // Rest of the content with adjusted Y positions (+10 to push everything down)
   doc
     .setFontSize(12)
     .text(
       `HOJA DE RUTA${datos.examen ? " " + datos.examen : ""}`,
       pageW / 2,
-      15 + yOffset,
+      15 + yOffset + 10,
       { align: "center" }
     );
 
@@ -58,6 +70,10 @@ const headerHR = (doc, datos) => {
   doc.text(`CARGO: ${datos.cargo || "___"}`, margin, y4);
   doc.text(`DNI: ${datos.dni || "___"}`, margin + 95, y4);
   doc.text(`G. SANGUINEO: ${datos.gruposan || "___"}`, margin + 140, y4);
+
+  // Draw bottom line
+  const finalY = y4 + lineHeight;  // Get the Y position after all content
+  doc.line(margin, finalY + 5, pageW - margin, finalY + 5);
 };
 
 export default headerHR;
