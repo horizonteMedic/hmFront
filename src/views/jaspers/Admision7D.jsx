@@ -103,7 +103,7 @@ export default function Admision7d(datos) {
   });
 
   // 10) Footer e impresión
-  footer(doc);
+  footer(doc,datos);
   const blob = doc.output("blob");
   const url  = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");

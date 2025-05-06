@@ -94,7 +94,7 @@ export default function TestAltura(datos) {
   });
 
   // 9) Footer e impresión
-  footer(doc);
+  footer(doc,datos);
 
   const blob   = doc.output("blob");
   const url    = URL.createObjectURL(blob);

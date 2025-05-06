@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { Loading } from '../../../components/Loading';
 import DatePicker from 'react-datepicker';
@@ -33,9 +33,17 @@ const RegistroClientes = (props) => {
   const [modalpad, setModalpad] = useState(false);
   const [FirmaP, setFirmaP] = useState({ id: 0, url: '' });
   const [HuellaP, setHuellaP] = useState({ id: 0, url: '' });
-
+  const [notCharge, setNotcharge] = useState(false)
   const {Profesiones,Departamentos,Provincias,Distritos} = props.listas
-    
+  
+  useEffect(() => {
+    if (Profesiones && Profesiones.length > 0) {
+      setNotcharge(true); // habilita input
+    } else {
+      setNotcharge(false); // deshabilita input
+    }
+  }, [Profesiones]);
+
   const sexoOptions = ['MASCULINO', 'FEMENINO'];
   const nivelOptions = [
     'ANALFABETO',
@@ -91,7 +99,7 @@ const RegistroClientes = (props) => {
       document.getElementById(nextId)?.focus();
     }
   };
-
+  
   // Autocomplete de profesión
   const handleProfesionSearch = e => {
     const v = e.target.value;
@@ -106,9 +114,9 @@ const RegistroClientes = (props) => {
   };
 
   const handleSelectProfesion = prof => {
+    setSearchTerm(prof.descripcion)
     setSelectedProfesion(prof.descripcion);
     props.setDatos(d => ({ ...d, ocupacionPa: prof.descripcion }));
-    setSearchTerm('');
     setFilteredProfesiones([]);
   };
 
@@ -227,7 +235,7 @@ const handleSubmit = e => {
       didOpen: () => Swal.showLoading()
     });
 
-    SubmitRegistrarPaciente(datos, props.selectedSede, props.token)
+    SubmitRegistrarPaciente(props.datos, props.selectedSede, props.token)
       .then(r => {
         Swal.close();
         if (!r.id) {
@@ -290,11 +298,16 @@ const handleLimpiar = (keepDNI = false) => {
   dniRef.current?.focus();
 };
 
-  const openHuella = () => {
-    if (!props.datos.codPa)
-      return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
-    setModalhuellaF(true);
-  };
+const openHuella = () => {
+  if (!props.datos.codPa)
+    return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
+  setModalhuellaF(true);
+};
+const openPad = () => {
+  if (!props.datos.codPa)
+    return Swal.fire('Error', 'Ingresa el DNI del cliente', 'error');
+  setModalpad(true);
+};
 // 1. Definir opciones (al principio del componente)
 const civilOptions = [
   'SOLTERO',
@@ -592,43 +605,43 @@ const handleFecha = e => {
         {/* Columna 2 */}
         <div className="flex flex-col space-y-2">
       
-{/* Nivel Estudio */}
-<div className="flex flex-col">
-  <div className="flex items-center space-x-2">
-    <label className="block w-36">Nivel Estudio:</label>
-    <input
-      id="nivelEstPa"
-      type="text"
-      value={searchNivel}
-      onChange={handleNivelSearch}
-      placeholder="Escribe para buscar..."
-      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-      onKeyDown={e => {
-        if (e.key === 'Enter' && filteredNivel.length > 0) {
-          e.preventDefault();
-          handleSelectNivel(filteredNivel[0]);
-          document.getElementById('ocupacionPa')?.focus();
-        }
-      }}
-    />
-  </div>
-  {searchNivel && filteredNivel.length > 0 && (
-    <div className="border border-gray-300 rounded-md mt-1 max-h-32 overflow-y-auto">
-      {filteredNivel.map((opt,i) => (
-        <div
-          key={i}
-          className="cursor-pointer p-2 hover:bg-gray-200"
-          onClick={() => {
-            handleSelectNivel(opt);
-            document.getElementById('ocupacionPa')?.focus();
-          }}
-        >
-          {opt}
+        {/* Nivel Estudio */}
+        <div className="flex flex-col">
+          <div className="flex items-center space-x-2">
+            <label className="block w-36">Nivel Estudio:</label>
+            <input
+              id="nivelEstPa"
+              type="text"
+              value={searchNivel}
+              onChange={handleNivelSearch}
+              placeholder="Escribe para buscar..."
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              onKeyDown={e => {
+                if (e.key === 'Enter' && filteredNivel.length > 0) {
+                  e.preventDefault();
+                  handleSelectNivel(filteredNivel[0]);
+                  document.getElementById('ocupacionPa')?.focus();
+                }
+              }}
+            />
+          </div>
+          {searchNivel && filteredNivel.length > 0 && (
+            <div className="border border-gray-300 rounded-md mt-1 max-h-32 overflow-y-auto">
+              {filteredNivel.map((opt,i) => (
+                <div
+                  key={i}
+                  className="cursor-pointer p-2 hover:bg-gray-200"
+                  onClick={() => {
+                    handleSelectNivel(opt);
+                    document.getElementById('ocupacionPa')?.focus();
+                  }}
+                >
+                  {opt}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      ))}
-    </div>
-  )}
-</div>
           {/* Prof/Ocup */}
           <div className="flex flex-col">
             <div className="flex items-center space-x-2">
@@ -637,7 +650,7 @@ const handleFecha = e => {
                 id="ocupacionPa"
                 name="ocupacionPa"
                 type="text"
-                value={searchTerm}
+                value={searchTerm}                
                 onChange={handleProfesionSearch}
                 placeholder="Escribe para buscar..."
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
@@ -667,12 +680,6 @@ const handleFecha = e => {
                   </div>
                 ))}
               </div>
-            )}
-
-            {selectedProfesion && (
-              <p className="text-sm mt-1">
-                Seleccionado: <strong>{selectedProfesion}</strong>
-              </p>
             )}
           </div>
 
@@ -918,7 +925,7 @@ const handleFecha = e => {
       {/* Botones finales */}
       <div className="flex justify-end gap-2 mt-4">
         <button
-          onClick={() => setModalpad(true)}
+          onClick={openPad}
           className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
         >
           Tomar Firma

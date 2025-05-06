@@ -116,8 +116,18 @@ const NewPad = ({close, DNI, Firma}) => {
       };
 
     const SubmitFirma = async () => {
+        
         try {
             const base64 = await Convertbase64(); // Esperamos el resultado
+            Swal.fire({
+              title: 'Validando Datos',
+              text: 'Espere por favor...',
+              allowOutsideClick: false,
+              allowEscapeKey: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
             const base64WithoutHeader = base64.substring(base64.indexOf(',') + 1);
         
             const datos = {
@@ -129,13 +139,18 @@ const NewPad = ({close, DNI, Firma}) => {
         
             Submit(datos)
               .then((res) => {
-                console.log("Respuesta del backend:", res);
+                if (res.id) {
+                  Swal.fire('Exito',`${res.mensaje}`,'success')
+                  close()
+                } else {
+                  Swal.fire('Error',`Error al registrar la firma`,'error')
+                }
               });
           } catch (error) {
             console.error("Error al convertir imagen:", error);
           }
     }
-
+   
     return(
         <>
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -169,9 +184,9 @@ const NewPad = ({close, DNI, Firma}) => {
 
                     <div className='flex items-start justify-center w-full pt-6'>
                         <div className='flex justify-around w-full'>
-                            <button onClick={(e) => {e.preventDefault(),window.aboutBox()}}  className='azul-btn px-5 py-2 rounded-lg'>Licencia</button>
+                            <button onClick={(e) => {e.preventDefault(),window.aboutBox()}}  className='hidden azul-btn px-5 py-2 rounded-lg'>Licencia</button>
                             <button onClick={(e) => {e.preventDefault(), window.clearSignature()}}  className='azul-btn px-5 py-2 rounded-lg'>Limpiar</button>
-                            <button onClick={(e) => {download(e)}} className='azul-btn px-5 py-2 rounded-lg'>Guardar</button>
+                            <button onClick={(e) => {download(e)}} className='azul-btn px-5 py-2 rounded-lg hidden'>Guardar</button>
                             <button onClick={(e) => {e.preventDefault(),window.capture("jhon", "Cabrera", imageBox.current, txtSignature.current, chkSigText.current, chkB64.current), setFirmaView({id:0,url:''})}}  className={`azul-btn px-5 py-2 rounded-lg `}>Iniciar</button>
                         </div>
                     </div>
