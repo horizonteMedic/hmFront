@@ -14,9 +14,35 @@ const headerHR = (doc, datos) => {
   const boxSize = 15;
   const boxX = pageW - margin - boxSize;
   const boxY = yOffset + 2;
-  doc.rect(boxX, boxY, boxSize, boxSize);
-  doc.setFontSize(10);
-  doc.text("$sf", boxX + boxSize/2, boxY + boxSize/2, { align: "center" });
+  
+  const color = datos.color || "#008f39";  
+  // Draw vertical line with color
+  doc.setDrawColor(color);
+  doc.setLineWidth(2);
+  doc.setLineCap('round');
+  doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+  doc.setLineCap('butt');
+  
+  // Draw box outline in black
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+  
+  // Set colored text
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(color);
+  
+  const boxText = (datos.texto || "$SF").toUpperCase();
+  doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+    align: "center",
+    baseline: "middle",
+    maxWidth: boxSize - 1
+  });
+  
+
+  // Reset text color to default black
+  doc.setTextColor(0);
 
   // === 1) Título principal en negrita y centrado ===
   doc
@@ -25,17 +51,17 @@ const headerHR = (doc, datos) => {
     .text(
       "CORPORACION PERUANA DE CENTROS MEDICOS S.A.C.",
       pageW / 2,
-      8 + yOffset + 10,  // Added offset to push content down
+      8 + yOffset + 5,  // Adjusted position
       { align: "center" }
     );
 
-  // Rest of the content with adjusted Y positions (+10 to push everything down)
+  // Rest of the content with adjusted Y positions
   doc
     .setFontSize(12)
     .text(
       `HOJA DE RUTA${datos.examen ? " " + datos.examen : ""}`,
       pageW / 2,
-      15 + yOffset + 10,
+      20 + yOffset,  // Increased spacing after title
       { align: "center" }
     );
 
@@ -43,7 +69,7 @@ const headerHR = (doc, datos) => {
   doc.setFontSize(8).setFont("helvetica", "bold");
 
   // Fila 1: TIPO EX / Fecha / Hora / N° Orden
-  const y1 = 24 + yOffset;
+  const y1 = 35 + yOffset;  // Increased initial position for data
   doc.text(`TIPO EX: ${datos.examen || "___"}`, margin, y1);
   doc.text(`Fecha: ${datos.fecha || "___"}`, margin + 60, y1);
   doc.text(`HORA: ${datos.hora || "___"}`, margin + 110, y1);
@@ -62,7 +88,7 @@ const headerHR = (doc, datos) => {
   // Fila 3: Empresa / Edad / Sede
   const y3 = y2b + lineHeight;
   doc.text(`EMPRESA: ${datos.empresa || "___"}`, margin, y3);
-  doc.text(`EDAD: ${datos.edad + "AÑOS"|| "___"}`, margin + 95, y3);
+  doc.text(`EDAD: ${datos.edad || "___"}`, margin + 95, y3);
   doc.text(`SEDE: ${datos.nombreSede || "___"}`, margin + 140, y3);
 
   // Fila 4: Cargo / DNI / G. Sanguíneo
@@ -71,9 +97,8 @@ const headerHR = (doc, datos) => {
   doc.text(`DNI: ${datos.dni || "___"}`, margin + 95, y4);
   doc.text(`G. SANGUINEO: ${datos.gruposan || "___"}`, margin + 140, y4);
 
-  // Draw bottom line
-  const finalY = y4 + lineHeight;  // Get the Y position after all content
-  doc.line(margin, finalY + 5, pageW - margin, finalY + 5);
+  // Add extra spacing after the data section (30mm margin)
+  return y4 + 30;  // Return the final Y position for content that follows
 };
 
 export default headerHR;

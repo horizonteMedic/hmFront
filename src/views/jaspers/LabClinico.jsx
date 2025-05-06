@@ -7,31 +7,35 @@ import footer from "./components/footer";
 
 export default function LabClinico(datos) {
   const doc = new jsPDF();
+  
   // componente header
-  headerHR(doc, datos);
+  const finalY = headerHR(doc, datos);
 
   // Encabezado
   doc.setFontSize(8);
   const leftspace = 10;
-  const headspace = 60;
+  const headspace = finalY + 2;
+
+  // Define the drawLine function
   const drawLine = (x1, y1, x2, y2) => {
+    doc.setLineWidth(0.5);
     doc.line(x1, y1, x2, y2);
   };
 
   // 🟡 Dibujar cuadros del organigrama
-  drawBox(doc, "ADMISION", 90, 65, 30, 10, 4, datos.orden);
-  drawLine(105, 75, 105, 80);
-  drawBox(doc, "TRIAJE", 90, 80, 30, 10, 4, datos.triaje);
-  drawLine(105, 90, 105, 95);
+  drawBox(doc, "ADMISION", 90, headspace + 5, 30, 10, 4, datos.orden);
+  drawLine(105, headspace + 15, 105, headspace + 20);
+  drawBox(doc, "TRIAJE", 90, headspace + 20, 30, 10, 4, datos.triaje);
+  drawLine(105, headspace + 30, 105, headspace + 35);
   drawBox(doc, "PSICOLOGIA", 90, headspace + 35, 30, 10, 4, datos.psicologia);
 
   // 🟡 BLOQUE DE INDICACIONES al costado derecho
-  const indX = 130;                  // a la derecha de los cuadros
-  const indY = 65;                   // alineado con ADMISION
+  const indX = 130;
+  const indY = headspace + 5;  // Align with first box
   const indW = doc.internal.pageSize.getWidth() - indX - 10;
-  doc.setFont("helvetica","bold").setFontSize(8).setTextColor(200, 0, 0);
+  doc.setFont("helvetica","bold").setFontSize(9).setTextColor(200, 0, 0);
   doc.text("INDICACIONES:", indX, indY);
-  doc.setFont("helvetica","normal").setFontSize(8).setTextColor(0, 0, 0);
+  doc.setFont("helvetica","normal").setFontSize(9).setTextColor(0, 0, 0);
   let cursor = indY + 4;
   [
     "• Si ud. es conductor y/o operador dejar copia a color de DNI y licencia de conducir.",
