@@ -78,7 +78,7 @@ export default function Ecografia (datos) {
      finalY += 10;
  
     // Llamamos al footer (si tienes un pie de página personalizado)
-    footer(doc);
+    footer(doc,datos);
 
       const pdfBlob = doc.output("blob");
       const pdfUrl = URL.createObjectURL(pdfBlob);

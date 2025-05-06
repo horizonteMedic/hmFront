@@ -67,7 +67,7 @@ export default function FactoresRiesgo (datos) {
     finalY += 10;
 
     // Footer (paginación, datos de contacto, etc.)
-    footer(doc);
+    footer(doc,datos);
 
     // Abre el PDF en una nueva pestaña
     const pdfBlob = doc.output("blob");

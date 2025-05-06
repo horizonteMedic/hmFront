@@ -50,7 +50,7 @@ const headerHR = (doc, datos) => {
   // Fila 3: Empresa / Edad / Sede
   const y3 = y2b + lineHeight;
   doc.text(`EMPRESA: ${datos.empresa || "___"}`, margin, y3);
-  doc.text(`EDAD: ${datos.edad || "___"}`, margin + 95, y3);
+  doc.text(`EDAD: ${datos.edad + "AÑOS"|| "___"}`, margin + 95, y3);
   doc.text(`SEDE: ${datos.nombreSede || "___"}`, margin + 140, y3);
 
   // Fila 4: Cargo / DNI / G. Sanguíneo

@@ -75,7 +75,7 @@ export default function Psicosensometria(datos) {
   drawBox(doc, "AUDIOMETRIA",      leftspace + 150, evalY,   30, boxH, 4, datos.audiologia);
 
   // 7) Footer e impresión
-  footer(doc);
+  footer(doc,datos);
   const blob   = doc.output("blob");
   const url    = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
