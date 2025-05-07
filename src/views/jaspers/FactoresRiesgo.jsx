@@ -13,7 +13,7 @@ export default function FactoresRiesgo (datos) {
 
     // Ajusta fuente y color por defecto
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(9);
     doc.setTextColor(0, 0, 0);
 
     let startY = 50;
@@ -25,26 +25,36 @@ export default function FactoresRiesgo (datos) {
       doc.line(x1, y1, x2, y2);
     };
     // Dibuja el diagrama de flujo
-    drawBox(doc,"ADMISION", 90, 65, 30, 10, 4, datos.orden ? true : false);
-    drawLine(105, 75, 105, 80); // Línea desde "TRIAJE" hacia abajo
-    drawBox(doc,"TRIAJE", 90, 80, 30, 10, 4, datos.triaje ? true : false);
-    drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
-    drawBox(doc,"LABORATORIO", 90, 95, 30, 10, 4, datos.laboratorio ? true : false);
-    drawLine(105, 105, 105, 110); // Línea desde "TRIAJE" hacia abajo
-    drawBox(doc,"EVALUACION MEDICA", 80, 110, 50, 10, 4, datos.anexo7c ? true : false);
+    drawBox(doc,"ADMISION", 90, 75, 30, 10, 4, datos.orden ? true : false);
+    drawLine(105, 85, 105, 90);
+    drawBox(doc,"TRIAJE", 90, 90, 30, 10, 4, datos.triaje ? true : false);
+    drawLine(105, 100, 105, 105);
+    drawBox(doc,"LABORATORIO", 90, 105, 30, 10, 4, datos.laboratorio ? true : false);
+    drawLine(105, 115, 105, 120);
+    drawBox(doc,"EVALUACION MEDICA", 80, 120, 50, 10, 4, datos.anexo7c ? true : false);
 
-    let finalY = startY + 80;
+    let finalY = startY + 90;
 
-    // INDICACIONES en rojo y negrita, tamaño 10
+    // Add background box for Indicaciones
+    const indX = 15;
+    const indY = finalY - 5;
+    const indW = 180;
+    const indH = 35;
+    
+    // Draw background box
+    doc.setFillColor(245, 245, 245);
+    doc.roundedRect(indX, indY, indW, indH, 2, 2, "F");
+
+    // INDICACIONES title
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
-    doc.setTextColor(255, 0, 0);
-    doc.text("INDICACIONES:", 15, finalY);
+    doc.setTextColor(200, 0, 0);
+    doc.text("INDICACIONES:", indX + 2, finalY);
     finalY += 5;
 
-    // Vuelve a normal, tamaño 8, color negro para el listado
+    // Reset style for list items
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
+    doc.setFontSize(9);
     doc.setTextColor(0, 0, 0);
 
     doc.text(

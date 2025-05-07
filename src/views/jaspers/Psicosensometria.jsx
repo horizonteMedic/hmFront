@@ -12,7 +12,7 @@ export default function Psicosensometria(datos) {
   // Fuente y estilos
   doc.setFont("helvetica", "normal").setFontSize(9);
   const leftspace = 10;
-  const headspace = 60;            // posición del bloque de indicaciones
+  const headspace = 60;            // Position for the map
   const mapOffset = 30;            // desplazamiento extra para bajar el mapa
   const drawLine = (x1, y1, x2, y2) => doc.line(x1, y1, x2, y2);
 
@@ -20,14 +20,14 @@ export default function Psicosensometria(datos) {
   const pageW  = doc.internal.pageSize.getWidth();
   const margin = 10;
   const indX    = margin + (pageW - 2 * margin) * 0.6;
-  const indY    = headspace;
+  const indY    = headspace + 15;  // Separate position for Indicaciones box
   const indW    = pageW - margin - indX;
   const indH    = 35;
   doc.setFillColor(245, 245, 245)
      .roundedRect(indX, indY, indW, indH, 2, 2, "F")
-     .setFont("helvetica","bold").setFontSize(8).setTextColor(200,0,0)
+     .setFont("helvetica","bold").setFontSize(9).setTextColor(200,0,0)
      .text("INDICACIONES:", indX + 2, indY + 7)
-     .setFont("helvetica","normal").setFontSize(8).setTextColor(0,0,0);
+     .setFont("helvetica","normal").setFontSize(9).setTextColor(0,0,0);
   let cursorY = indY + 11;
   [
     "Si ud. es conductor y/o operador dejar copia a color de DNI y licencia de conducir.",

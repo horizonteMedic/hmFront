@@ -96,8 +96,7 @@ export default function ReporteExamen1 (datos){
         autoTable(doc, {
             startY: headspace+140,
             body: [
-              [{ content: "HALLAZGOS:", colSpan: 1, rowSpan: 1, styles: { minCellHeight: 60,valign: "top" } }],
-              
+              [{ content: `HALLAZGOS: ${datos.hallazgos || ''}`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
             ],
             theme: "grid",
             styles: { fontSize: 8, textColor: [0, 0, 0] },
