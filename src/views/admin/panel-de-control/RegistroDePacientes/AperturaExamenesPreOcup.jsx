@@ -26,7 +26,7 @@ const AperturaExamenesPreOcup = (props) => {
     razonContrata: "",
     n_medico: "",
     n_hora: "",
-    tipoPrueba: "",
+    tipoPrueba: "N/A",
     cargoDe: "",
     areaO: "",
     nomExamen: "",
@@ -707,6 +707,13 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
+    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'cargoDe',
+      'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'precioPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+    }
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',

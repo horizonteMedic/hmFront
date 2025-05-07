@@ -6,7 +6,7 @@ import { Submit } from '../model/Submit';
 import { getFetch } from '../../getFetch/getFetch';
 
 
-const NewHuellaFut = ({close,DNI, Huella}) => {
+const NewHuellaFut = ({close,DNI, Huella,setHuella}) => {
     const SERVER_URL = "http://127.0.0.1:15270/fpoperation";
     const [statusMsg, setStatusMsg] = useState("");
     const [statusColor, setStatusColor] = useState("blue");
@@ -239,6 +239,7 @@ const NewHuellaFut = ({close,DNI, Huella}) => {
       .then((res) => {
         if (res.id) {
           Swal.fire('Exito',`${res.mensaje}`,'success') 
+          setHuella()
           close()
         } else {
           Swal.fire('Error','Ocurrio un error al registrar la heulla','error')
