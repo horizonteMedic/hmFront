@@ -4,19 +4,12 @@ import { Loading } from '../../../components/Loading';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPhone, faMobileAlt, faSearch } from '@fortawesome/free-solid-svg-icons';
-import {
-  ComboboxProfesión,
-  ComboboxDepartamentos,
-  ComboboxProvincias,
-  ComboboxDistritos
-} from './model/Combobox';
+import {  faCheck, faSearch, faX } from '@fortawesome/free-solid-svg-icons';
+
 import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPaciente';
-import NewHuella from './huella/NewHuella';
 import NewPad from './pad/Newpad';
 import NewHuellaFut from './huella/HuellaFut';
 import { VerifyHoF } from './model/Submit';
-import InputMask from 'react-input-mask-next';
 
 const RegistroClientes = (props) => {
   // ref para mantener el cursor fijo en "Nombres"
@@ -150,6 +143,11 @@ const RegistroClientes = (props) => {
       return;
     }
 
+    if (res.fechaNaciminetoPa) {
+      const [yyyy, mm, dd] = res.fechaNaciminetoPa.split('-');
+      res.fechaNaciminetoPa = `${dd}-${mm}-${yyyy}`;
+    }
+
     // 1️⃣ Sanear null/undefined → convertirlos en cadena vacía
     const sanitized = Object.fromEntries(
       Object.entries(res).map(([key, value]) => [key, value ?? ''])
@@ -226,8 +224,15 @@ const RegistroClientes = (props) => {
 
 const handleSubmit = e => {
     e.preventDefault();
-    if (!props.datos.codPa)
+    const camposRequeridos = ['codPa', 'nombresPa', 'fechaNaciminetoPa', 'sexoPa', 'lugarNacPa', 'nivelEstPa', 'ocupacionPa',
+       'estadoCivilPa', 'direccionPa', 'departamentoPa', 'provinciaPa', 'distritoPa', 'celPa']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !props.datos[campo]);
+    if (camposVacios.length > 0) {
       return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+    } 
+
+    if (HuellaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene huella registrada', 'error');
+    if (FirmaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene firma registrada', 'error');
 
     Swal.fire({
       title: 'Validando Datos',
@@ -449,12 +454,18 @@ const handleSelectDist = dist => {
 };
 const handleFecha = e => {
   const raw = e.target.value.replace(/\D/g, '').slice(0, 8);   // máx. 8 dígitos
-  const formatted = raw
-    .replace(/(\d{4})(\d)/, '$1-$2')          // 1995 → 1995-
-    .replace(/(\d{4}-\d{2})(\d)/, '$1-$2');   // 1995-07 → 1995-07-
+  let formatted = raw;
+
+  if (raw.length >= 5) {
+    formatted = raw.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1-$2-$3'); // ddMMaaaa → dd-MM-aaaa
+  } else if (raw.length >= 3) {
+    formatted = raw.replace(/(\d{2})(\d{0,2})/, '$1-$2'); // ddM → dd-M
+  }
+
   props.setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
 };
-  return (
+
+return (
     <div className="p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
         {/* Columna 1 */}
@@ -514,28 +525,28 @@ const handleFecha = e => {
           </div>
 
          {/* Fecha de Nacimiento */}
-<div className="flex items-start space-x-2">     {/* fila igual que los demás */}
-  {/* label – ancho fijo */}
-  <label className="block w-36 mt-2">Fecha Nac.:</label>
+          <div className="flex items-start space-x-2">     {/* fila igual que los demás */}
+            {/* label – ancho fijo */}
+            <label className="block w-36 mt-2">Fecha Nac.:</label>
 
-  {/* zona del input + nota */}
-  <div className="flex flex-col w-full">
-    <input
-      type="text"
-      id="fechaNaciminetoPa"
-      name="fechaNaciminetoPa"
-      value={props.datos.fechaNaciminetoPa}
-      onChange={handleFecha}
-      placeholder="yyyy-MM-dd"
-      onKeyDown={e => focusNext(e, 'sexoPa')}
-      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
-    />
+            {/* zona del input + nota */}
+            <div className="flex flex-col w-full">
+              <input
+                type="text"
+                id="fechaNaciminetoPa"
+                name="fechaNaciminetoPa"
+                value={props.datos.fechaNaciminetoPa}
+                onChange={handleFecha}
+                placeholder="dd-MM-yyyy"
+                onKeyDown={e => focusNext(e, 'sexoPa')}
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              />
 
-    <p className="text-xs text-gray-500 mt-1">
-      Formato: <strong>Año-Mes-Día</strong> (AAAA-MM-DD)
-    </p>
-  </div>
-</div>
+              <p className="text-xs text-gray-500 mt-1">
+                Formato: <strong>Día-Mes-Año</strong> (DD-MM-AAAA)
+              </p>
+            </div>
+          </div>
 
          {/* Sexo */}
 <div className="flex flex-col">
@@ -924,30 +935,41 @@ const handleFecha = e => {
 
       {/* Botones finales */}
       <div className="flex justify-end gap-2 mt-4">
-        <button
-          onClick={openPad}
-          className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
-        >
-          Tomar Firma
-        </button>
-        <button
+        <div className='flex flex-col flex-wrap justify-center items-center'>
+          <label htmlFor="">{FirmaP.id === 1 ? <FontAwesomeIcon color='green' icon={faCheck} size='xl'/> : <FontAwesomeIcon color='red' size='xl' icon={faX}/>}</label>
+          <button
+            onClick={openPad}
+            className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
+          >
+            Tomar Firma
+          </button>
+        </div>
+        <div className='flex flex-col flex-wrap justify-center items-center'>
+          <label htmlFor="">{HuellaP.id === 1 ? <FontAwesomeIcon color='green' size='xl' icon={faCheck}/> : <FontAwesomeIcon color='red' size='xl' icon={faX}/>}</label>
+          <button
           onClick={openHuella}
           className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
-        >
-          Tomar Huella Futronic
-        </button>
-        <button
-          onClick={handleSubmit}
-          className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800"
-        >
-          Registrar
-        </button>
-        <button
-          onClick={handleLimpiar}
-          className="bg-red-500 px-6 py-2 rounded-md text-white"
-        >
-          Limpiar
-        </button>
+          >
+            Tomar Huella Futronic
+          </button>
+        </div>
+        <div className='flex flex-col flex-wrap justify-end items-center'>
+          <button
+            onClick={handleSubmit}
+            className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800"
+          >
+            Registrar
+          </button>
+        </div>
+        <div className='flex flex-col flex-wrap justify-end items-center'>
+          <button
+            onClick={handleLimpiar}
+            className="bg-red-500 px-6 py-2 rounded-md text-white"
+          >
+            Limpiar
+          </button>
+        </div>
+        
       </div>
 
       {modalhuellaF && (
@@ -955,6 +977,7 @@ const handleFecha = e => {
           close={() => setModalhuellaF(false)}
           DNI={props.datos.codPa}
           Huella={HuellaP}
+          setHuella={() => {setHuellaP({id: 1})}}
         />
       )}
       {modalpad && (
@@ -962,6 +985,7 @@ const handleFecha = e => {
           close={() => setModalpad(false)}
           DNI={props.datos.codPa}
           Firma={FirmaP}
+          setFirma={() => {setFirmaP({id: 1})}}
         />
       )}
     </div>

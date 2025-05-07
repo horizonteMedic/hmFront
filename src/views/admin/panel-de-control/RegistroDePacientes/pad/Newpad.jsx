@@ -141,6 +141,7 @@ const NewPad = ({close, DNI, Firma}) => {
               .then((res) => {
                 if (res.id) {
                   Swal.fire('Exito',`${res.mensaje}`,'success')
+                  setFirma()
                   close()
                 } else {
                   Swal.fire('Error',`Error al registrar la firma`,'error')

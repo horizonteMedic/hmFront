@@ -79,32 +79,73 @@ const headerHR = (doc, datos) => {
 
   // Fila 1: TIPO EX / Fecha / Hora / N° Orden
   const y1 = 35 + yOffset;
-  doc.text(`TIPO EX: ${datos.examen || ""}`, margin, y1);
-  doc.text(`FECHA: ${datos.fecha || ""}`, margin + 60, y1);
-  doc.text(`HORA: ${datos.hora || ""}`, margin + 110, y1);
-  doc.text(`N° DE ORDEN: ${datos.orden || ""}`, margin + 155, y1);
+  doc.setFont("helvetica", "bold");
+  doc.text("TIPO EX:", margin, y1);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.examen || ""}`, margin + 20, y1);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("FECHA:", margin + 60, y1);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.fecha || ""}`, margin + 75, y1);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("HORA:", margin + 100, y1);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.hora || ""}`, margin + 115, y1);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("N° DE ORDEN:", margin + 145, y1);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.orden || ""}`, margin + 170, y1);
 
   // Fila 2: Nombres y Apellidos y Edad
   let y2 = y1 + lineHeight;
-  const nameText = `NOMBRES Y APELLIDOS: ${datos.nombres || ""}`;
-  const nameLines = doc.splitTextToSize(nameText, 80);
-  doc.text(nameLines, margin, y2);
-  doc.text(`EDAD: ${datos.edad || ""}`, margin + 95, y2);
+  doc.setFont("helvetica", "bold");
+  doc.text("NOMBRES Y APELLIDOS:", margin, y2);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.nombres || ""}`, margin + 45, y2);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("EDAD:", margin + 145, y2);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.edad || ""}`, margin + 160, y2);
 
   // Fila 3: Cargo / DNI / G. Sanguíneo
-  const y3 = y2 + (nameLines.length - 1) * lineHeight + lineHeight;
-  doc.text(`CARGO: ${datos.cargo || ""}`, margin, y3);
-  doc.text(`DNI: ${datos.dni || ""}`, margin + 95, y3);
-  doc.text(`G. SANGUINEO: ${datos.gruposan || ""}`, margin + 140, y3);
+  const y3 = y2 + lineHeight;
+  doc.setFont("helvetica", "bold");
+  doc.text("CARGO:", margin, y3);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.cargo || ""}`, margin + 20, y3);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI:", margin + 95, y3);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.dni || ""}`, margin + 108, y3);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("G. SANGUINEO:", margin + 140, y3);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.gruposan || ""}`, margin + 165, y3);
 
   // Fila 4: Empresa / Sede
   const y4 = y3 + lineHeight;
-  doc.text(`EMPRESA: ${datos.empresa || ""}`, margin, y4);
-  doc.text(`SEDE: ${datos.nombreSede || ""}`, margin + 95, y4);
+  doc.setFont("helvetica", "bold");
+  doc.text("EMPRESA:", margin, y4);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.empresa || ""}`, margin + 25, y4);
+  
+  doc.setFont("helvetica", "bold");
+  doc.text("SEDE:", margin + 110, y4);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.nombreSede || ""}`, margin + 125, y4);
 
   // Fila 5: Empresa Contratista
   const y5 = y4 + lineHeight;
-  doc.text(`EMP. CONTRATISTA: ${datos.contrata || ""}`, margin, y5);
+  doc.setFont("helvetica", "bold");
+  doc.text("EMP. CONTRATISTA:", margin, y5);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.contrata || ""}`, margin + 40, y5);
 
   // Add extra spacing after the data section (30mm margin)
   return y5 + 30;  // Updated return value to use y5

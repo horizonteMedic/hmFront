@@ -10,13 +10,13 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    const departamentoPa = data.departamentoPa
-  ? (data.departamentoPa.nombre ? data.departamentoPa.nombre : data.departamentoPa)
-  : null;
+
+  const [dd, mm, yyyy] = data.fechaNaciminetoPa.split('-');
+  const fechaFormateada = `${yyyy}-${mm}-${dd}`;
   const body = {
     codPa: data.codPa,
     nombresPa: data.nombresPa,
-    fechaNaciminetoPa: data.fechaNaciminetoPa,
+    fechaNaciminetoPa: fechaFormateada,
     sexoPa: data.sexoPa,
     emailPa: data.emailPa,
     lugarNacPa: data.lugarNacPa,

@@ -8,27 +8,28 @@ export default function ReporteExamenR (datos) {
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
+        
+        // Move drawLine function to the top
+        const drawLine = (x1, y1, x2, y2) => {
+            doc.line(x1, y1, x2, y2);
+        };
+
         //componente header
         headerHR(doc,datos)
         // Encabezado
         doc.setFontSize(9)
         const leftspace = 10
-        const headspace = 60
-        // 🟡 Función para dibujar cuadros y centrar texto
-
-        // 🟡 Función para dibujar líneas
-        const drawLine = (x1, y1, x2, y2) => {
-            doc.line(x1, y1, x2, y2);
-        };
+        const headspace = 80  // Increased from 75 to 80
 
         // 🟡 Dibujar cuadros del organigrama
-        drawBox(doc,"ADMISION", 90, 50, 30, 10,  4, datos.orden ? true : false);
-        drawLine(105, 60, 105, 65);
-        drawBox(doc,"TRIAJE", 90, 65, 30, 10, 4, datos.triaje ? true : false);
-        drawLine(105, 75, 105, 80); // Línea desde "TRIAJE" hacia abajo
-        drawBox(doc,"LABORATORIO", 90, 80, 30, 10, 4, datos.laboratorio ? true : false);
-        drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
+        drawBox(doc,"ADMISION", 90, 70, 30, 10,  4, datos.orden ? true : false); // Adjusted Y position
+        drawLine(105, 80, 105, 85);
+        drawBox(doc,"TRIAJE", 90, 85, 30, 10, 4, datos.triaje ? true : false);
+        drawLine(105, 95, 105, 100);
+        drawBox(doc,"LABORATORIO", 90, 100, 30, 10, 4, datos.laboratorio ? true : false);
+        drawLine(105, 110, 105, 115);
 
+        // Rest of the code will adjust automatically with new headspace value
         drawC(doc,"AUDIOMETRIA", leftspace, headspace+35, 25, 10, datos.audiologia ? true : false);
         drawC(doc,"EKG ( > 40 años)", leftspace+28, headspace+35, 30, 10, datos.electrocardiograma ? true : false);
         drawC(doc,"ESPIROMETRIA", leftspace+61, headspace+35, 25, 10, datos.espirometria ? true : false);

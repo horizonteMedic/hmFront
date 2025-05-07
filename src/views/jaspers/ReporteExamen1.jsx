@@ -8,25 +8,51 @@ export default function ReporteExamen1 (datos){
 
         const fecha = "02/45/5154"
         const doc = new jsPDF();
+        
+        // Move drawLine function definition to the top
+        const drawLine = (x1, y1, x2, y2) => {
+            doc.line(x1, y1, x2, y2);
+        };
+
         //componente header
         headerHR(doc,datos)
         // Encabezado
         doc.setFontSize(8)
         const leftspace = 10
-        const headspace = 60
-        // 🟡 Función para dibujar líneas
-        const drawLine = (x1, y1, x2, y2) => {
-            doc.line(x1, y1, x2, y2);
-        };
-
+        const headspace = 78  // Single definition of headspace
+        
         // 🟡 Dibujar cuadros del organigrama
-        drawBox(doc,"ADMISION", 90, 50, 30, 10,  4, datos.orden ? true : false);
-        drawLine(105, 60, 105, 65);
-        drawBox(doc,"TRIAJE", 90, 65, 30, 10, 4, datos.triaje ? true : false);
-        drawLine(105, 75, 105, 80); // Línea desde "TRIAJE" hacia abajo
-        drawBox(doc,"LABORATORIO", 90, 80, 30, 10, 4, datos.laboratorio ? true : false);
-        drawLine(105, 90, 105, 95); // Línea desde "TRIAJE" hacia abajo
+        drawBox(doc,"ADMISION", 90, 68, 30, 10,  4, datos.orden ? true : false);
+        drawLine(105, 78, 105, 83);
+        drawBox(doc,"TRIAJE", 90, 83, 30, 10, 4, datos.triaje ? true : false);
+        drawLine(105, 93, 105, 98);
+        drawBox(doc,"LABORATORIO", 90, 98, 30, 10, 4, datos.laboratorio ? true : false);
+        drawLine(105, 108, 105, 113);
 
+        // Add instructions box
+        doc.setFillColor(240, 240, 240);
+        doc.rect(125, 68, 75, 25, 'F'); // Slightly wider rectangle
+        
+        doc.setTextColor(255, 0, 0);
+        doc.setFontSize(8);
+        doc.text("INDICACIONES:", 128, 73);
+        
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(7);
+        const instructions = [
+            "- DEJAR UNA COPIA A COLOR DE SU DNI VIGENTE",
+            "- DEJAR COPIA A COLOR DE SU LICENCIA DE CONDUCIR",
+            "  VIGENTE, SI VA A CONDUCIR VEHICULO Y/O SE",
+            "  REALIZARÁ EXAMEN PSICOSENSOMETRICO"
+        ];
+        
+        let yPos = 77;
+        instructions.forEach(line => {
+            doc.text(line, 128, yPos);
+            yPos += 3;
+        });
+
+        // Remove the second headspace definition and continue with the rest
         drawC(doc,"AUDIOMETRIA", leftspace, headspace+35, 25, 10, datos.audiologia ? true : false);
         drawC(doc,"EKG ( > 40 años)", leftspace+28, headspace+35, 30, 10, datos.electrocardiograma ? true : false);
         drawC(doc,"ESPIROMETRIA", leftspace+61, headspace+35, 25, 10, datos.espirometria ? true : false);
@@ -94,7 +120,7 @@ export default function ReporteExamen1 (datos){
         drawC(doc,"MERCURIO EN ORINA", leftspace+160, headspace+118, 35, 10, !datos.amercurio ? true : datos.mercurioo ? true : false);
 
         autoTable(doc, {
-            startY: headspace+140,
+            startY: headspace+150, // Increased from 140 to 150 to maintain spacing
             body: [
               [{ content: `HALLAZGOS: ${datos.hallazgos || ''}`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
             ],
