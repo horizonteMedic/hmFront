@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RegistroClientes from './RegistroClientes';
-import AperturaExamenesPreOcup from './AperturaExamenesPreOcup';
+import AperturaExamenesPreOcup from './AperturaExamenes/AperturaExamenesPreOcup';
 import ImportacionModal from './ImportacionMasiva';
 import ImportacionModalBasica from './ImportacionModalBasica';
 import ReservaPacientes from './ReservaPacientes';

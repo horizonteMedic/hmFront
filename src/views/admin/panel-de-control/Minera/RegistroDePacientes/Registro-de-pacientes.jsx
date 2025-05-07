@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import RegistroClientes from './RegistroClientes';
-import AperturaExamenesPreOcup from './AperturaExamenesPreOcup';
+import AperturaExamenesPreOcup from './AperturaExamenes/AperturaExamenesPreOcup';
 
 
 const TabComponent = () => {
