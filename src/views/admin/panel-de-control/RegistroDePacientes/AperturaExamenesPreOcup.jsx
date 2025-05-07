@@ -224,12 +224,12 @@ const AperturaExamenesPreOcup = (props) => {
   };
   const handleSelectExamenMed = x => {
     setSearchExamenMedico(x.mensaje);
-    setDatos(d => ({ ...d, nomExamen: x.mensaje }));
     setFilteredExamMed([]);
     document.getElementById('nomEx')?.focus();
     getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`,props.token)
     .then((res) => {
       setDatos({...datos,
+        nomExamen: x.mensaje,
         precioPo: res.mensaje
       })
     })
@@ -532,6 +532,8 @@ const AperturaExamenesPreOcup = (props) => {
         }
         setDatos({
           ...datos,
+          nombres: res.nombresPa,
+          apellidos: res.apellidosPa,
           nombresPa: res.nombresPa,
           apellidosPa: res.apellidosPa
         });
@@ -689,7 +691,7 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-
+    console.log(datos)
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
       if (!res.id) {

@@ -1,46 +1,54 @@
 // views/jaspers/components/headerHR.js
 
 const headerHR = (doc, datos) => {
+  console.log(datos)
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   const yOffset = 10;       // separación extra arriba y abajo
   const lineHeight = 4;     // altura entre líneas en mm
+
+  let color = null;
+  let boxText = null;
+
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  if (colorValido) {
+    color = datos.codigoColor || "#008f39";
+    boxText = (datos.textoColor || "F").toUpperCase();
+  
+    const boxSize = 15;
+    const boxX = pageW - margin - boxSize;
+    const boxY = yOffset + 2;
+    
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+
+    // Solo renderiza si color es válido
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1
+    });
+  }
 
   // Draw top and bottom lines
   doc.setLineWidth(0.5);
   doc.line(margin, yOffset, pageW - margin, yOffset);
   
   // Draw box with "$sf" text on the right
-  const boxSize = 15;
-  const boxX = pageW - margin - boxSize;
-  const boxY = yOffset + 2;
   
-  const color = datos.color || "#008f39";  
-  // Draw vertical line with color
-  doc.setDrawColor(color);
-  doc.setLineWidth(2);
-  doc.setLineCap('round');
-  doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-  doc.setLineCap('butt');
-  
-  // Draw box outline in black
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
   
   // Set colored text
   doc.setFontSize(18);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(color);
   
-  const boxText = (datos.texto || "$SF").toUpperCase();
-  doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
-    align: "center",
-    baseline: "middle",
-    maxWidth: boxSize - 1
-  });
-  
-
   // Reset text color to default black
   doc.setTextColor(0);
 
