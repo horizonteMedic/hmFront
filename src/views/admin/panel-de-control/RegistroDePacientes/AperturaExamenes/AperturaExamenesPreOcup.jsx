@@ -976,10 +976,14 @@ const AperturaExamenesPreOcup = (props) => {
                     disabled={habilitar}
                     onChange={handlePruebaSearch}
                     className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' && filteredPruebas.length > 0) {
+                    onKeyDown={e => { 
+                      if (e.key === 'Enter') {
                         e.preventDefault();
-                        handleSelectPrueba(filteredPruebas[0]);
+                        if (filteredPruebas.length > 0) {
+                          handleSelectPrueba(filteredPruebas[0]);
+                        }
+                        // Focus on cargo input after selection
+                        document.getElementById('cargoDe').focus();
                       }
                     }}
                     onFocus={() => {
