@@ -1,7 +1,7 @@
 // views/jaspers/components/headerHR.js
 
 const headerHR = (doc, datos) => {
-  console.log(datos)
+ 
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   const yOffset = 10;       // separación extra arriba y abajo
@@ -109,7 +109,7 @@ const headerHR = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("EDAD:", margin + 145, y2);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.edad || ""}`, margin + 160, y2);
+  doc.text(`${datos.edad + " AÑOS" || ""}`, margin + 160, y2);
 
   // Fila 3: Cargo / DNI / G. Sanguíneo
   const y3 = y2 + lineHeight;
