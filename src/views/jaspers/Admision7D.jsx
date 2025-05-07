@@ -15,7 +15,7 @@ export default function Admision7d(datos) {
   headerHR(doc, datos);
 
   // 3) Texto base
-  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal").setFontSize(9).setTextColor(0, 0, 0);
 
   // 4) Constantes de diseño
   const pageW        = doc.internal.pageSize.getWidth();
@@ -87,7 +87,7 @@ export default function Admision7d(datos) {
 
   doc.setFillColor(245,245,245)
      .roundedRect(indX, indY, indW, indH, 2, 2, "F")
-     .setFont("helvetica","bold").setFontSize(8).setTextColor(200,0,0)
+     .setFont("helvetica","bold").setFontSize(9).setTextColor(200,0,0)
      .text("INDICACIONES:", indX+2, indY+7)
      .setFont("helvetica","normal").setFontSize(8).setTextColor(0,0,0);
 

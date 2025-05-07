@@ -69,36 +69,36 @@ const headerHR = (doc, datos) => {
   doc.setFontSize(8).setFont("helvetica", "bold");
 
   // Fila 1: TIPO EX / Fecha / Hora / N° Orden
-  const y1 = 35 + yOffset;  // Increased initial position for data
-  doc.text(`TIPO EX: ${datos.examen || "___"}`, margin, y1);
-  doc.text(`Fecha: ${datos.fecha || "___"}`, margin + 60, y1);
-  doc.text(`HORA: ${datos.hora || "___"}`, margin + 110, y1);
-  doc.text(`N° DE ORDEN: ${datos.orden || "___"}`, margin + 155, y1);
+  const y1 = 35 + yOffset;
+  doc.text(`TIPO EX: ${datos.examen || ""}`, margin, y1);
+  doc.text(`FECHA: ${datos.fecha || ""}`, margin + 60, y1);
+  doc.text(`HORA: ${datos.hora || ""}`, margin + 110, y1);
+  doc.text(`N° DE ORDEN: ${datos.orden || ""}`, margin + 155, y1);
 
-  // Fila 2: Nombres y Apellidos (dinámico) y Emp. Contratista
+  // Fila 2: Nombres y Apellidos y Edad
   let y2 = y1 + lineHeight;
-  const nameText = `NOMBRES Y APELLIDOS: ${datos.nombres || "___"}`;
+  const nameText = `NOMBRES Y APELLIDOS: ${datos.nombres || ""}`;
   const nameLines = doc.splitTextToSize(nameText, 80);
   doc.text(nameLines, margin, y2);
+  doc.text(`EDAD: ${datos.edad || ""}`, margin + 95, y2);
 
-  // Ajustar Y de contratista si el nombre ocupa más de una línea
-  const y2b = y2 + (nameLines.length - 1) * lineHeight;
-  doc.text(`EMP. CONTRATISTA: ${datos.contrata || "___"}`, margin + 95, y2b);
+  // Fila 3: Cargo / DNI / G. Sanguíneo
+  const y3 = y2 + (nameLines.length - 1) * lineHeight + lineHeight;
+  doc.text(`CARGO: ${datos.cargo || ""}`, margin, y3);
+  doc.text(`DNI: ${datos.dni || ""}`, margin + 95, y3);
+  doc.text(`G. SANGUINEO: ${datos.gruposan || ""}`, margin + 140, y3);
 
-  // Fila 3: Empresa / Edad / Sede
-  const y3 = y2b + lineHeight;
-  doc.text(`EMPRESA: ${datos.empresa || "___"}`, margin, y3);
-  doc.text(`EDAD: ${datos.edad || "___"}`, margin + 95, y3);
-  doc.text(`SEDE: ${datos.nombreSede || "___"}`, margin + 140, y3);
-
-  // Fila 4: Cargo / DNI / G. Sanguíneo
+  // Fila 4: Empresa / Sede
   const y4 = y3 + lineHeight;
-  doc.text(`CARGO: ${datos.cargo || "___"}`, margin, y4);
-  doc.text(`DNI: ${datos.dni || "___"}`, margin + 95, y4);
-  doc.text(`G. SANGUINEO: ${datos.gruposan || "___"}`, margin + 140, y4);
+  doc.text(`EMPRESA: ${datos.empresa || ""}`, margin, y4);
+  doc.text(`SEDE: ${datos.nombreSede || ""}`, margin + 95, y4);
+
+  // Fila 5: Empresa Contratista
+  const y5 = y4 + lineHeight;
+  doc.text(`EMP. CONTRATISTA: ${datos.contrata || ""}`, margin, y5);
 
   // Add extra spacing after the data section (30mm margin)
-  return y4 + 30;  // Return the final Y position for content that follows
+  return y5 + 30;  // Updated return value to use y5
 };
 
 export default headerHR;
