@@ -556,7 +556,7 @@ const AperturaExamenesPreOcup = (props) => {
       razonEmpresa:"",
       razonContrata: "",
       n_medico: "",
-      tipoPrueba: "",
+      tipoPrueba: "N/A",
       cargoDe: "",
       areaO: "",
       nomExamen: "",
@@ -749,7 +749,7 @@ const AperturaExamenesPreOcup = (props) => {
                 id="codPa"
                 ref={dniRef}
                 disabled={creating || habilitar}
-                defaultValue={datos.codPa}
+                value={datos.codPa}
                 maxLength={8}
                 onKeyDown={handleSearch}
                 onChange={handleDNI}
@@ -1078,52 +1078,52 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex flex-wrap pt-2 pb-2">
               
                 <div className="flex items-center mr-8 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
-                  <label htmlFor="examenAdicional4">FIST-TEST</label>
+                  <input type="checkbox"  title="FIST-TEST" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
+                  <label htmlFor="examenAdicional4" title="FIST-TEST">FIST-TEST</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.n_psicosen} onChange={handleCheack} id="examenAdicional5" name="n_psicosen" className="mr-2" />
-                  <label htmlFor="examenAdicional5">PSICOSEN</label>
+                  <input type="checkbox" title='PSICOSENSOMETRIA' disabled={habilitar} checked={datos.n_psicosen} onChange={handleCheack} id="examenAdicional5" name="n_psicosen" className="mr-2" />
+                  <label htmlFor="examenAdicional5" title='PSICOSENSOMETRIA'>PSICOSEN</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.n_testaltura} onChange={handleCheack} id="examenAdicional6" name="n_testaltura" className="mr-2" />
-                  <label htmlFor="examenAdicional6">T.ALTURA</label>
+                  <input type="checkbox" title="TEST DE ALTURA" disabled={habilitar} checked={datos.n_testaltura} onChange={handleCheack} id="examenAdicional6" name="n_testaltura" className="mr-2" />
+                  <label htmlFor="examenAdicional6" title="TEST DE ALTURA">T.ALTURA</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.trabCalientes} onChange={handleCheack} id="examenAdicional7" name="trabCalientes" className="mr-2" />
-                  <label htmlFor="examenAdicional7">T.CAL</label>
+                  <input type="checkbox" title='TRABAJOS EN CALIENTE' disabled={habilitar} checked={datos.trabCalientes} onChange={handleCheack} id="examenAdicional7" name="trabCalientes" className="mr-2" />
+                  <label htmlFor="examenAdicional7" title='TRABAJOS EN CALIENTE'>T.CAL</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcLumbosacra} onChange={handleCheack} id="examenAdicional8" name="rxcLumbosacra" className="mr-2" />
-                  <label htmlFor="examenAdicional8">RX.C.LUMBO</label>
+                  <input type="checkbox" title='RX COLUMNA LUMBOSACRA FyL' disabled={habilitar} checked={datos.rxcLumbosacra} onChange={handleCheack} id="examenAdicional8" name="rxcLumbosacra" className="mr-2" />
+                  <label htmlFor="examenAdicional8" title='RX COLUMNA LUMBOSACRA FyL' >RX.C.LUMBO</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.visualCompl} onChange={handleCheack} id="examenAdicional9" name="visualCompl" className="mr-2" />
-                  <label htmlFor="examenAdicional9">VIS.COMPL</label>
+                  <input type="checkbox" title='VISUAL COMPLEMENTARIO' disabled={habilitar} checked={datos.visualCompl} onChange={handleCheack} id="examenAdicional9" name="visualCompl" className="mr-2" />
+                  <label htmlFor="examenAdicional9" title='VISUAL COMPLEMENTARIO' >VIS.COMPL</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.manipAlimentos} onChange={handleCheack} id="examenAdicional10" name="manipAlimentos" className="mr-2" />
-                  <label htmlFor="examenAdicional10">M.ALIM.</label>
+                  <input type="checkbox" title='MANIPULADOR DE ALIMENTOS' disabled={habilitar} checked={datos.manipAlimentos} onChange={handleCheack} id="examenAdicional10" name="manipAlimentos" className="mr-2" />
+                  <label htmlFor="examenAdicional10" title='MANIPULADOR DE ALIMENTOS' >M.ALIM.</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.herraManuales} onChange={handleCheack} id="examenAdicional11" name="herraManuales" className="mr-2" />
-                  <label htmlFor="examenAdicional11">H.MAN</label>
+                  <input type="checkbox" title='HERRAMIENTAS MANUALES' disabled={habilitar} checked={datos.herraManuales} onChange={handleCheack} id="examenAdicional11" name="herraManuales" className="mr-2" />
+                  <label htmlFor="examenAdicional11" title='HERRAMIENTAS MANUALES'>H.MAN</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcDorsoLumbar} onChange={handleCheack} id="examenAdicional12" name="rxcDorsoLumbar" className="mr-2" />
-                  <label htmlFor="examenAdicional12">RX.C.DORSE</label>
+                  <input type="checkbox" title='RX COLUMNA DORSOLUMBAR FyL' disabled={habilitar} checked={datos.rxcDorsoLumbar} onChange={handleCheack} id="examenAdicional12" name="rxcDorsoLumbar" className="mr-2" />
+                  <label htmlFor="examenAdicional12" title='RX COLUMNA DORSOLUMBAR FyL'>RX.C.DORSE</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcKLumbar} onChange={handleCheack} id="examenAdicional13" name="rxcKLumbar" className="mr-2" />
-                  <label htmlFor="examenAdicional13">RX.LUMBA</label>
+                  <input type="checkbox" title='RX COLUMNA LUMBA FyL' disabled={habilitar} checked={datos.rxcKLumbar} onChange={handleCheack} id="examenAdicional13" name="rxcKLumbar" className="mr-2" />
+                  <label htmlFor="examenAdicional13" title='RX COLUMNA LUMBA FyL'>RX.LUMBA</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcPlomos} onChange={handleCheack} id="examenAdicional14" name="rxcPlomos" className="mr-2" />
-                  <label htmlFor="examenAdicional14">PLOMO S.</label>
+                  <input type="checkbox" title='PLOMO EN SaNGRA' disabled={habilitar} checked={datos.rxcPlomos} onChange={handleCheack} id="examenAdicional14" name="rxcPlomos" className="mr-2" />
+                  <label htmlFor="examenAdicional14" title='PLOMO EN SaNGRA'>PLOMO S.</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.mercurioo} onChange={handleCheack} id="examenAdicional15" name="mercurioo" className="mr-2" />
-                  <label htmlFor="examenAdicional15">MER.O</label>
+                  <input type="checkbox" title='MERCURIO EN ORINA' disabled={habilitar} checked={datos.mercurioo} onChange={handleCheack} id="examenAdicional15" name="mercurioo" className="mr-2" />
+                  <label htmlFor="examenAdicional15" title='MERCURIO EN ORINA'>MER.O</label>
                 </div>
               </div>
             </div>
