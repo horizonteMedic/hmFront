@@ -35,13 +35,13 @@ export default function TestAltura(datos) {
   const triBottomY = admY + 15 + ovalH;
   const rowY       = headspace + 35;
   line(centerX, triBottomY, centerX, rowY);
-
+  console.log(datos)
   // 6) Fila de recuadros
   drawC(doc, "LABORATORIO\n(HTO-HB)",     leftspace,      rowY, 25, 10, datos.laboratorio);
   drawC(doc, "A. VISUAL",                 leftspace + 28, rowY, 30, 10, datos.oftalmologia);
   drawC(doc, "EKG (> 40 años)",           leftspace + 61, rowY, 25, 10, datos.electrocardiograma);
   drawC(doc, "PSICOLOGIA",                leftspace + 90, rowY, 20, 10, datos.psicologia);
-  drawC(doc, "PSICOSENSOMETRICO\nPARA ALTURA", leftspace + 120, rowY, 35, 10, datos.psicosen);
+  drawC(doc, "PSICOSENSOMETRICO\nPARA ALTURA", leftspace + 120, rowY, 35, 10, !datos.psicosen);
   drawC(doc, "AUDIOMETRIA",               leftspace + 160, rowY, 25, 10, datos.audiologia);
 
   // Conexiones horizontales entre recuadros
