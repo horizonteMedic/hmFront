@@ -15,7 +15,7 @@ import ModalContrata from './modals/modalContrata/ModalContrata';
 
 const AperturaExamenesPreOcup = (props) => {
   const [stardate, setStartDate] = useState(new Date());
-  const jasperModules = import.meta.glob('../../../jaspers/*.jsx'); // ajusta si usas .jsx
+  const jasperModules = import.meta.glob('../../../../jaspers/*.jsx'); // ajusta si usas .jsx
   const dniRef = useRef(null);
   const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
     ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
@@ -44,7 +44,7 @@ const AperturaExamenesPreOcup = (props) => {
     razonContrata: "",
     n_medico: "",
     n_hora: "",
-    tipoPrueba: "",
+    tipoPrueba: "N/A",
     cargoDe: "",
     areaO: "",
     nomExamen: "",
@@ -574,7 +574,7 @@ const AperturaExamenesPreOcup = (props) => {
       razonEmpresa:"",
       razonContrata: "",
       n_medico: "",
-      tipoPrueba: "",
+      tipoPrueba: "N/A",
       cargoDe: "",
       areaO: "",
       nomExamen: "",
@@ -627,8 +627,7 @@ const AperturaExamenesPreOcup = (props) => {
     .then(async(res) => {
       if (res.id === 1) {
         const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-        const filePath = `../../../jaspers/${jasperName}.jsx`;
-
+        const filePath = `../../../../jaspers/${jasperName}.jsx`;
         if (jasperModules[filePath]) {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
@@ -656,8 +655,7 @@ const AperturaExamenesPreOcup = (props) => {
     .then(async(res) => {
       if (res.id === 1) {
         const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-        const filePath = `../../../jaspers/${jasperName}.jsx`;
-        
+        const filePath = `../../../../jaspers/${jasperName}.jsx`;
         if (jasperModules[filePath]) {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
@@ -1387,7 +1385,8 @@ const AperturaExamenesPreOcup = (props) => {
                   defaultValue={datos.n_hora}
                   id="hora"
                   name="hora"
-                  className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white w-25"
+                  disabled
+                  className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-slate-300 w-25"
                 />
                 <label htmlFor="sedeClinica" className="block w-36">Sede Clínica:</label>
                 <input
@@ -1395,7 +1394,8 @@ const AperturaExamenesPreOcup = (props) => {
                   id="sedeClinica"
                   defaultValue={datos.codSede}
                   name="sedeClinica"
-                  className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-1/2"
+                  disabled
+                  className="bg-slate-300 border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-1/2"
                 />
               </div>
 
