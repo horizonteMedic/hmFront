@@ -5,6 +5,7 @@ import ImportacionModal from './ImportacionMasiva';
 import ImportacionModalBasica from './ImportacionModalBasica';
 import ReservaPacientes from './ReservaPacientes';
 import ConsentimientoDigitalizacion from './ConsentimientoDigitalizacion/ConsentimientoDigitalizacion';
+import Triaje from './Triaje/Triaje';
 import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
   ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth, ComboboxProfesión,
   ComboboxDepartamentos,
@@ -18,7 +19,8 @@ import {
   faFileExcel,
   faExpand,
   faTicket,
-  faFileSignature
+  faFileSignature,
+  faStethoscope
 } from '@fortawesome/free-solid-svg-icons';
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
@@ -194,14 +196,19 @@ const TabComponent = () => {
                 Reserva de Pacientes
               </div>
             )}
-            {/* Nuevo Tab para Consentimiento de Digitalización */}
             <div
               className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 4 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
               onClick={() => changeTab(4)}
             >
               <FontAwesomeIcon icon={faFileSignature} className="mr-2" />
               Consentimiento de Digitalización
-              </div>
+            </div>
+            <div
+              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 5 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              onClick={() => changeTab(5)}
+            >
+              <FontAwesomeIcon icon={faStethoscope} className="mr-2" />
+              Triaje
             </div>
           </div>
 
@@ -220,14 +227,16 @@ const TabComponent = () => {
                 userlogued={userlogued.sub}
               />
             )}
-            {/* Mostrar el componente de Consentimiento de Digitalización */}
             {activeTab === 4 && (
               <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} />
             )}
-            
+            {activeTab === 5 && (
+              <Triaje />
+            )}
           </div>
         </div>
       </div>
+    </div>
   );
 };
 
