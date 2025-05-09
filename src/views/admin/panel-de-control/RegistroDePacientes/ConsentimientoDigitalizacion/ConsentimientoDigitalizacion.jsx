@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPrint, faEdit, faEraser } from '@fortawesome/free-solid-svg-icons';
 import { generatePdf } from './PdfGenerado';
-import styles from './ConsentimientoDigitalizacion.module.css'; // Ya no importamos el CSS Module
 import { VerifyHoF } from '../model/Submit';
 import Swal from 'sweetalert2';
 import { GetNoConsentimiento, SubmitConsentimiento } from '../model/Consentimiento';
@@ -29,22 +28,37 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
     });
   }
 
-  const handeSearchNo = () => {
-    Swalwait('Buscando Datos','Espere por favor...')
-    GetNoConsentimiento(orderNumber,token)
-    .then((res) => {
+  const handeSearchNo = async () => {
+    try {
+      Swalwait('Buscando Datos','Espere por favor...')
+      const res = await GetNoConsentimiento(orderNumber,token)
+      
       if (res.dni) {
-        setDni(res.dni)
-        setName(res.nombresApellidos)
-        setDate(res.fechaExamen)
-        setSaveButton(true)
+        await Promise.all([
+          new Promise(resolve => {
+            setDni(res.dni)
+            resolve()
+          }),
+          new Promise(resolve => {
+            setName(res.nombresApellidos)
+            resolve()
+          }),
+          new Promise(resolve => {
+            setDate(res.fechaExamen)
+            resolve()
+          }),
+          new Promise(resolve => {
+            setSaveButton(true)
+            resolve()
+          })
+        ])
+        Swal.close()
       } else {
         Swal.fire('Error', 'Ha ocurrido un error','error')
       }
-    })
-    .finally(() => {
-        Swal.close()
-    });
+    } catch (error) {
+      Swal.fire('Error', 'Ha ocurrido un error','error')
+    }
   } 
 
   const handleReset = () => {
@@ -70,8 +84,24 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
     })
   };
 
+  // Nuevo: función para validar si se puede guardar
+  const canSave =
+    String(orderNumber).trim() &&
+    String(date).trim() &&
+    String(name).trim() &&
+    String(dni).trim() &&
+    authorized;
+
   const handlePrint = () => {
-    if (!dni) return Swal.fire('Error', 'Coloque el DNI', 'error');
+    if (!String(dni).trim() && !String(orderNumber).trim()) {
+      return Swal.fire('Error', 'Ingrese DNI y Nro orden', 'error');
+    }
+    if (!String(dni).trim()) {
+      return Swal.fire('Error', 'Ingrese DNI', 'error');
+    }
+    if (!String(orderNumber).trim()) {
+      return Swal.fire('Error', 'Ingrese Nro orden', 'error');
+    }
 
     Swal.fire({
       title: 'Generando Consentimiento',
@@ -103,84 +133,92 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
   };
 
   return (
-    <div className="p-4 font-sans">
-      <div className="flex items-center gap-4 mb-4">
-        <label className="block">
-          Nro: Orden&nbsp;
+    <div className="max-w mx-auto bg-white rounded-xl shadow-lg p-8 font-sans">
+      <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
+        <label className="flex-1">
+          <span className="block text-black font-semibold mb-1">Nro: Orden</span>
           <input
             type="text"
             value={orderNumber}
             onChange={e => setOrderNumber(e.target.value)}
             onKeyDown={e => {
               if (e.key === 'Enter') {
-                handeSearchNo(); // 👉 aquí llamas a la función que quieras
+                handeSearchNo();
               }
             }}
-            className={styles.input}
+            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-gray-400"
+            placeholder="Ingrese número de orden"
           />
         </label>
-
-        <label className="block">
-          Fecha:&nbsp;
+        <label className="flex-1">
+          <span className="block text-black font-semibold mb-1">Fecha</span>
           <input
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            className="border border-gray-300 rounded py-1 px-2 w-32"
+            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
           />
         </label>
       </div>
 
-      <h2 className="text-center text-xl font-bold my-4">
+      <h2 className="text-center text-2xl font-bold text-black mb-8 tracking-wide">
         DECLARACIÓN JURADA PARA EL USO DE LA FIRMA ELECTRÓNICA
       </h2>
 
-      <div className="flex items-center gap-2 mb-4">
-        <label className="block">
-          Yo,&nbsp;
-        </label>
+      <div className="flex flex-col md:flex-row items-center gap-3 mb-6">
+        <span className="text-black font-medium">Yo,</span>
         <input
           type="text"
           placeholder="Nombre completo"
           value={name}
           onChange={e => setName(e.target.value)}
-          className="border border-gray-300 rounded py-1 px-2 flex-grow"
+          className="flex-1 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-gray-400"
         />
-        <label className="block whitespace-nowrap">
-          &nbsp;identificado(a) con DNI N.º&nbsp;
-        </label>
+        <span className="text-black font-medium whitespace-nowrap">identificado(a) con DNI N.º</span>
         <input
           type="text"
           placeholder="DNI"
           value={dni}
           onChange={e => setDni(e.target.value)}
+          className="w-40 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-gray-400"
         />
       </div>
 
-      <div className="mb-4">
-        <label className="block">
-          <input
-            type="checkbox"
-            checked={authorized}
-            onChange={() => setAuthorized(!authorized)}
-          />
+      <div className="flex items-start gap-3 mb-8">
+        <input
+          type="checkbox"
+          checked={authorized}
+          onChange={() => setAuthorized(!authorized)}
+          className="mt-1 w-5 h-5 accent-blue-600 border-2 border-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+        />
+        <span className="text-black text-base leading-relaxed">
           Autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión de informes médicos. Esta firma tendrá validez para los documentos necesarios implicados en este proceso. Asimismo, doy fe de que la información proporcionada es verídica, al igual que la información que brindaré durante los exámenes realizados en el centro médico Horizonte Medic. También, autorizo el envío de información médica a los correos electrónicos y/o números de celular de la empresa contratista.
-        </label>
+        </span>
       </div>
 
-      <div className={styles.footer}>
-        <button className={`${styles.primaryButton} ease-in-out ${!saveButton ? 'bg-zinc-500 cursor-default ea' : 'bg-[#0069d9] cursor-pointer'}`} disabled={!saveButton} onClick={handleSave}>
+      <div className="flex flex-col md:flex-row items-center gap-4 border-t pt-6 mt-6">
+        <button
+          className={`flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white shadow transition-colors duration-200 ${canSave ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 cursor-not-allowed'}`}
+          disabled={!canSave}
+          onClick={handleSave}
+        >
+          <FontAwesomeIcon icon={faEdit} />
           Grabar/actualizar
         </button>
-        <button className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded flex items-center gap-1" onClick={handleReset}>
-          <FontAwesomeIcon icon={faEraser} /> Limpiar
+        <button
+          className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-white bg-green-600 hover:bg-green-700 shadow transition-colors duration-200"
+          onClick={handlePrint}
+        >
+          <FontAwesomeIcon icon={faPrint} />
+          Imprimir
         </button>
-
-        <div className="ml-auto">
-          <button className="flex items-center gap-1 bg-white border border-gray-300 rounded py-1 px-2 text-sm hover:bg-gray-100" onClick={handlePrint}>
-            <FontAwesomeIcon icon={faPrint} /> Imprimir
-          </button>
-        </div>
+        <button
+          className="flex items-center gap-2 px-6 py-2 rounded-md font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 shadow border border-gray-400 transition-colors duration-200"
+          onClick={handleReset}
+        >
+          <FontAwesomeIcon icon={faEraser} />
+          Limpiar
+        </button>
       </div>
     </div>
   );
