@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faMouse, faPlus, faEdit, faBroom, faFileExport } from '@fortawesome/free-solid-svg-icons';
 import { SubmitNewContrata } from './CRUD';
 
 const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) => {
@@ -13,13 +13,16 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
     email: '',
   });
   const [List, setList] = useState([])
+  const [filteredList, setFilteredList] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
   
   useEffect(() => {
-      Get(`/api/v01/ct/Contr/listadoContratas`,token)
-      .then((res) => {
-        setList(res)
-      })
-    },[])
+    Get(`/api/v01/ct/Contr/listadoContratas`,token)
+    .then((res) => {
+      setList(res)
+      setFilteredList(res)
+    })
+  },[])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,41 +32,103 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
     }));
   };
 
+  const handleSearchChange = (e) => {
+    const value = e.target.value.toUpperCase();
+    setSearchTerm(value);
+    const filtered = List.filter(item => 
+      item.razonContrata.toUpperCase().includes(value)
+    );
+    setFilteredList(filtered);
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter' && filteredList.length > 0) {
+      const selectedItem = filteredList[0];
+      setFormData({
+        ruc: selectedItem.rucContrata || '',
+        razonSocial: selectedItem.razonContrata || '',
+        direccion: selectedItem.direccionContrata || '',
+        telefonos: selectedItem.telefonoContrata || '',
+        responsable: selectedItem.responsableContrata || '',
+        email: selectedItem.emailContrata || '',
+      });
+    }
+  };
+
   const handleSubmit = (e,text) => {
-      e.preventDefault();
-      const camposRequeridos = ['ruc', 'razonSocial']; // agrega los campos que quieras
-      const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
-      if (camposVacios.length > 0) {
-        return Swal.fire('Error', 'Complete los campos vacíos', 'error');
-      } 
-      
-      const datos = {
-        rucContrata: formData.ruc,
-        razonContrata: formData.razonSocial,
-        direccionContrata: formData.direccion,
-        telefonoContrata: formData.telefonos,
-        responsableContrata: formData.responsable,
-        emailContrata: formData.email,
-        apiToken: null
-      }
-      SubmitNewContrata(datos, token)
-      .then((res) => {
-        if (res.rucContrata) {
-          Swal.fire('Exito!', `Se ${text} con exito`, 'success')
+    e.preventDefault();
+    const camposRequeridos = ['ruc', 'razonSocial']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
+    if (camposVacios.length > 0) {
+      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+    } 
+    const datos = {
+      rucContrata: formData.ruc,
+      razonContrata: formData.razonSocial,
+      direccionContrata: formData.direccion,
+      telefonoContrata: formData.telefonos,
+      responsableContrata: formData.responsable,
+      emailContrata: formData.email,
+      apiToken: null
+    }
+
+    if (text === 'Actualizo') {
+      Swal.fire({
+        title: 'Guardando cambios',
+        text: 'Por favor espere...',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        didOpen: () => {
+          Swal.showLoading();
         }
-      })
-    };
+      });
+    }
+    
+    SubmitNewContrata(datos, token)
+    .then((res) => {
+      if (res.rucContrata) {
+        Swal.fire('Exito!', `Se ${text} con exito`, 'success')
+      }
+    })
+  };
   
   const ReturnRS = (e) => {
     GetRazonS(e)
-    onClose()
+    handleClose()
+  }
+
+  const handleClose = () => {
+    setFormData({
+      ruc: '',
+      razonSocial: '',
+      direccion: '',
+      telefonos: '',
+      responsable: '',
+      email: '',
+    });
+    setSearchTerm('');
+    setFilteredList(List);
+    onClose();
+  }
+
+  const handleClear = () => {
+    setFormData({
+      ruc: '',
+      razonSocial: '',
+      direccion: '',
+      telefonos: '',
+      responsable: '',
+      email: '',
+    });
+    setSearchTerm('');
+    setFilteredList(List);
   }
 
   // Add ESC key handler
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
     window.addEventListener('keydown', handleEsc);
@@ -76,85 +141,85 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg w-[800px] relative">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-blue-600">Agregar Contrata</h2>
+          <h2 className="text-blue-600 text-xl font-semibold">Agregar Contrata</h2>
           <div className="text-sm text-gray-500">Agregue su Contrata y ESC para Cerrar</div>
         </div>
 
-          <div className="grid grid-cols-[100px,1fr,200px] gap-2 items-center">
-            <label className="text-right">RUC:</label>
-            <input
-              type="text"
-              name="ruc"
-              value={formData.ruc}
-              onChange={handleChange}
-              className="border rounded px-2 py-1"
-              maxLength={11}
-              required
-            />
-            <div className="flex gap-2 justify-end">
-              <button type="submit" onClick={(e) => {handleSubmit(e,'Registro')}} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
-                Agregar
-              </button>
-            </div>
-
-            <label className="text-right">Razón Social:</label>
-            <input
-              type="text"
-              name="razonSocial"
-              value={formData.razonSocial}
-              onChange={handleChange}
-              className="border rounded px-2 py-1"
-              required
-            />
-            <button type="button" onClick={(e) => {handleSubmit(e,'Actualizo')}} className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
-              Actualizar
+        <div className="grid grid-cols-[100px,1fr,200px] gap-2 items-center">
+          <label className="text-right">RUC:</label>
+          <input
+            type="text"
+            name="ruc"
+            value={formData.ruc}
+            onChange={handleChange}
+            className="border rounded px-2 py-1"
+            maxLength={11}
+            required
+          />
+          <div className="flex gap-2 justify-end">
+            <button onClick={(e) => {handleSubmit(e,'Registro')}} className="px-3 py-1 bg-blue-600 text-white rounded  flex items-center gap-2">
+              <FontAwesomeIcon icon={faPlus} /> Agregar
             </button>
-
-            <label className="text-right">Dirección:</label>
-            <input
-              type="text"
-              name="direccion"
-              value={formData.direccion}
-              onChange={handleChange}
-              className="border rounded px-2 py-1"
-            />
-            <button type="button" className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600">
-              Limpiar
-            </button>
-
-            <label className="text-right">Teléfonos:</label>
-            <input
-              type="text"
-              name="telefonos"
-              value={formData.telefonos}
-              onChange={handleChange}
-              className="border rounded px-2 py-1"
-            />
-            <button type="button" className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
-              Exportar
-            </button>
-
-            <label className="text-right">Responsable:</label>
-            <input
-              type="text"
-              name="responsable"
-              value={formData.responsable}
-              onChange={handleChange}
-              className="border rounded px-2 py-1"
-            />
-            <button type="button" onClick={onClose} className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">
-              Cerrar
-            </button>
-
-            <label className="text-right">Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="border rounded px-2 py-1"
-            />
           </div>
+
+          <label className="text-right">Razón Social:</label>
+          <input
+            type="text"
+            name="razonSocial"
+            value={formData.razonSocial}
+            onChange={handleChange}
+            className="border rounded px-2 py-1"
+            required
+          />
+          <button type="button" onClick={(e) => {handleSubmit(e,'Actualizo')}} className="px-3 py-1 bg-gray-300 text-gray-700 rounded flex items-center gap-2">
+            <FontAwesomeIcon icon={faEdit} /> Actualizar
+          </button>
+
+          <label className="text-right">Dirección:</label>
+          <input
+            type="text"
+            name="direccion"
+            value={formData.direccion}
+            onChange={handleChange}
+            className="border rounded px-2 py-1"
+          />
+          <button type="button" onClick={handleClear} className="px-3 py-1 bg-yellow-500 text-white rounded  flex items-center gap-2">
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+
+          <label className="text-right">Teléfonos:</label>
+          <input
+            type="text"
+            name="telefonos"
+            value={formData.telefonos}
+            onChange={handleChange}
+            className="border rounded px-2 py-1"
+          />
+          <button type="button" className="px-3 py-1 bg-green-600 text-white rounded flex items-center gap-2">
+            <FontAwesomeIcon icon={faFileExport} /> Exportar
+          </button>
+
+          <label className="text-right">Responsable:</label>
+          <input
+            type="text"
+            name="responsable"
+            value={formData.responsable}
+            onChange={handleChange}
+            className="border rounded px-2 py-1"
+          />
+          <button type="button" onClick={handleClose} className="px-3 py-1 bg-red-500 text-white rounded  flex items-center gap-2">
+            <FontAwesomeIcon icon={faTimes} /> Cerrar
+          </button>
+
+          <label className="text-right">Email:</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="border rounded px-2 py-1"
+          />
+        </div>
 
         {/* Search Razón Social input */}
         <div className="mt-4 mb-2">
@@ -165,35 +230,61 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
                 type="text"
                 className="w-full border rounded px-2 py-1"
                 placeholder="Buscar razón social..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchKeyDown}
               />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-red-500">
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
+              {searchTerm && (
+                <button 
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-red-500"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setFilteredList(List);
+                  }}
+                >
+                  <FontAwesomeIcon icon={faTimes} />
+                </button>
+              )}
             </div>
           </div>
+        </div>
+
+        {/* Instructions */}
+        <div className="mb-2 text-md text-red-600 flex items-center gap-2" style={{fontWeight: '500'}}>
+          <FontAwesomeIcon icon={faMouse} className="text-blue-600" />
+          <span>Click izquierdo: Llena los datos | Click derecho: Envía al registro</span>
         </div>
 
         {/* Table section */}
         <div className="mt-2">
           <div className="border rounded">
-            <table className="w-full">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="px-4 py-2 text-left">RUC</th>
-                  <th className="px-4 py-2 text-left">Raz. Social</th>
-                  <th className="px-4 py-2 text-left">Dirección</th>
-                </tr>
-              </thead>
-              <tbody>
-                {List.map((item,index) => (
-                  <tr key={index} onClick={() => {setFormData(item)}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonContrata)}} className=' cursor-pointer'>
-                    <td className="px-4 py-2">{item.rucContrata}</td>
-                    <td className="px-4 py-2">{item.razonContrata}</td>
-                    <td className="px-4 py-2">{item.direccionContrata}</td>
+            <div className="max-h-[300px] overflow-y-auto">
+              <table className="w-full">
+                <thead className="bg-gray-100 sticky top-0">
+                  <tr>
+                    <th className="px-4 py-2 text-left">RUC</th>
+                    <th className="px-4 py-2 text-left">Raz. Social</th>
+                    <th className="px-4 py-2 text-left">Dirección</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredList.map((item,index) => (
+                    <tr key={index} onClick={() => {setFormData({
+                      ruc: item.rucContrata || '',
+                      razonSocial: item.razonContrata || '',
+                      direccion: item.direccionContrata || '',
+                      telefonos: item.telefonoContrata || '',
+                      responsable: item.responsableContrata || '',
+                      email: item.emailContrata || '',
+                    })}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonContrata)}} className='cursor-pointer hover:bg-gray-50'>
+                      <td className="px-4 py-2">{item.rucContrata}</td>
+                      <td className="px-4 py-2">{item.razonContrata}</td>
+                      <td className="px-4 py-2">{item.direccionContrata}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

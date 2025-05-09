@@ -4,7 +4,7 @@ import { Loading } from '../../../components/Loading';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {  faCheck, faSearch, faX } from '@fortawesome/free-solid-svg-icons';
+import {  faCheck, faSearch, faX, faSignature, faFingerprint, faBroom } from '@fortawesome/free-solid-svg-icons';
 
 import { SearchPacienteDNI, SubmitRegistrarPaciente } from './model/AdminPaciente';
 import NewPad from './pad/Newpad';
@@ -111,6 +111,7 @@ const RegistroClientes = (props) => {
     setSelectedProfesion(prof.descripcion);
     props.setDatos(d => ({ ...d, ocupacionPa: prof.descripcion }));
     setFilteredProfesiones([]);
+    document.getElementById('estadoCivilPa')?.focus();
   };
 
  // --- Búsqueda de paciente -------------------------
@@ -342,6 +343,7 @@ const handleSelectSexo = val => {
   setSearchSexo(val);
   props.setDatos(d => ({ ...d, sexoPa: val.charAt(0) })); 
   setFilteredSexo([]);
+  document.getElementById('emailPa')?.focus();
 };
 
 const handleNivelSearch = e => {
@@ -355,6 +357,7 @@ const handleSelectNivel = val => {
   setSearchNivel(val);
   props.setDatos(d => ({ ...d, nivelEstPa: val }));
   setFilteredNivel([]);
+  document.getElementById('ocupacionPa')?.focus();
 };
 
 // 2. Añadir a tus useState:
@@ -376,6 +379,7 @@ const handleSelectCivil = val => {
   setSearchCivil(val);
   props.setDatos(d => ({ ...d, estadoCivilPa: val }));
   setFilteredCivil([]);
+  document.getElementById('direccionPa')?.focus();
 };
 
 // Opciones base ya vienen de tu ComboboxDepartamentos(), ComboboxProvincias(), ComboboxDistritos()
@@ -561,10 +565,15 @@ return (
       placeholder="Escribe para buscar..."
       className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
       onKeyDown={e => {
-        if (e.key === 'Enter' && filteredSexo.length > 0) {
+        if (e.key === 'Enter') {
           e.preventDefault();
-          handleSelectSexo(filteredSexo[0]);
-          document.getElementById('emailPa')?.focus();
+          if (filteredSexo.length > 0) {
+            handleSelectSexo(filteredSexo[0]);
+          } else if (searchSexo && (searchSexo === 'MASCULINO' || searchSexo === 'FEMENINO')) {
+            handleSelectSexo(searchSexo);
+          } else {
+            document.getElementById('emailPa')?.focus();
+          }
         }
       }}
     />
@@ -575,10 +584,7 @@ return (
         <div
           key={i}
           className="cursor-pointer p-2 hover:bg-gray-200"
-          onClick={() => {
-            handleSelectSexo(opt);
-            document.getElementById('emailPa')?.focus();
-          }}
+          onClick={() => handleSelectSexo(opt)}
         >
           {opt}
         </div>
@@ -629,10 +635,13 @@ return (
               placeholder="Escribe para buscar..."
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
               onKeyDown={e => {
-                if (e.key === 'Enter' && filteredNivel.length > 0) {
+                if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleSelectNivel(filteredNivel[0]);
-                  document.getElementById('ocupacionPa')?.focus();
+                  if (filteredNivel.length > 0) {
+                    handleSelectNivel(filteredNivel[0]);
+                  } else {
+                    document.getElementById('ocupacionPa')?.focus();
+                  }
                 }
               }}
             />
@@ -643,10 +652,7 @@ return (
                 <div
                   key={i}
                   className="cursor-pointer p-2 hover:bg-gray-200"
-                  onClick={() => {
-                    handleSelectNivel(opt);
-                    document.getElementById('ocupacionPa')?.focus();
-                  }}
+                  onClick={() => handleSelectNivel(opt)}
                 >
                   {opt}
                 </div>
@@ -670,9 +676,8 @@ return (
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     if (filteredProfesiones.length > 0) {
-                      // selecciona siempre la primera opción
                       handleSelectProfesion(filteredProfesiones[0]);
-                      // mueve el foco al Estado Civil
+                    } else {
                       document.getElementById('estadoCivilPa')?.focus();
                     }
                   }
@@ -712,7 +717,7 @@ return (
                     e.preventDefault();
                     if (filteredCivil.length > 0) {
                       handleSelectCivil(filteredCivil[0]);
-                      // luego enfoca Dirección (por ejemplo)
+                    } else {
                       document.getElementById('direccionPa')?.focus();
                     }
                   }
@@ -726,10 +731,7 @@ return (
                   <div
                     key={i}
                     className="cursor-pointer p-2 hover:bg-gray-200"
-                    onClick={() => {
-                      handleSelectCivil(opt);
-                      document.getElementById('direccionPa')?.focus();
-                    }}
+                    onClick={() => handleSelectCivil(opt)}
                   >
                     {opt}
                   </div>
@@ -935,42 +937,61 @@ return (
       </div>
 
       {/* Botones finales */}
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-end gap-4 mt-4">
         <div className='flex flex-col flex-wrap justify-center items-center'>
           <label htmlFor="">{FirmaP.id === 1 ? <FontAwesomeIcon color='green' icon={faCheck} size='xl'/> : <FontAwesomeIcon color='red' size='xl' icon={faX}/>}</label>
           <button
             onClick={openPad}
-            className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
+            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-purple-600 text-white flex items-center gap-2 justify-center hover:bg-purple-700"
           >
-            Tomar Firma
+            <FontAwesomeIcon icon={faSignature} /> Tomar Firma
           </button>
         </div>
         <div className='flex flex-col flex-wrap justify-center items-center'>
           <label htmlFor="">{HuellaP.id === 1 ? <FontAwesomeIcon color='green' size='xl' icon={faCheck}/> : <FontAwesomeIcon color='red' size='xl' icon={faX}/>}</label>
           <button
           onClick={openHuella}
-          className="verde-btn px-6 py-2 rounded-md hover:bg-green-800"
+          className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-teal-600 text-white flex items-center gap-2 justify-center hover:bg-teal-700"
           >
-            Tomar Huella Futronic
+            <FontAwesomeIcon icon={faFingerprint} /> Tomar Huella Futronic
           </button>
         </div>
         <div className='flex flex-col flex-wrap justify-end items-center'>
           <button
             onClick={handleSubmit}
-            className="azul-btn px-6 py-2 rounded-md hover:bg-blue-800"
+            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-blue-600 text-white flex items-center gap-2 justify-center hover:bg-blue-700"
           >
-            Registrar
+            <FontAwesomeIcon icon={faCheck} /> Registrar
           </button>
         </div>
         <div className='flex flex-col flex-wrap justify-end items-center'>
           <button
             onClick={handleLimpiar}
-            className="bg-red-500 px-6 py-2 rounded-md text-white"
+            className="w-64 px-6 py-2 text-base font-semibold rounded-xl bg-red-500 text-white flex items-center gap-2 justify-center hover:bg-red-600"
           >
-            Limpiar
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
-        
+      </div>
+
+      {/* Leyenda de botones horizontal */}
+      <div className="mt-6 p-3 rounded-lg bg-gray-50 border border-gray-200 w-full flex flex-row items-center justify-center gap-8">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-purple-600 text-white"><FontAwesomeIcon icon={faSignature} /></span>
+          <span className="text-gray-700 text-sm">Tomar Firma: Captura la firma digital del paciente</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-teal-600 text-white"><FontAwesomeIcon icon={faFingerprint} /></span>
+          <span className="text-gray-700 text-sm">Tomar Huella Futronic: Escanea la huella dactilar del paciente</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-blue-600 text-white"><FontAwesomeIcon icon={faCheck} /></span>
+          <span className="text-gray-700 text-sm">Registrar: Guarda los datos del paciente</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center justify-center w-7 h-7 rounded bg-red-500 text-white"><FontAwesomeIcon icon={faBroom} /></span>
+          <span className="text-gray-700 text-sm">Limpiar: Limpia todos los campos del formulario</span>
+        </div>
       </div>
 
       {modalhuellaF && (

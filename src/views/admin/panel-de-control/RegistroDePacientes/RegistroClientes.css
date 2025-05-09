@@ -12,3 +12,17 @@
     }
   }
   
+/* Botones finales compactos y responsivos */
+.final-btn {
+  min-width: 120px;
+  margin-bottom: 0.5rem;
+}
+@media (max-width: 600px) {
+  .final-btn {
+    min-width: 100px;
+    font-size: 0.85rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+  
