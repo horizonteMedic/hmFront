@@ -585,7 +585,6 @@ const AperturaExamenesPreOcup = (props) => {
       tipoPago: "",
       precioAdic: "",
       autoriza: "",
-      fechaAperturaPo: '',
       n_operacion: null,
       textObserv1: "",
       textObserv2: "",
@@ -698,6 +697,12 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmitEdit = e => {
+    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'cargoDe',
+      'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'precioPo', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+    }
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -707,7 +712,6 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-    console.log(datos)
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
       if (!res.id) {
@@ -723,6 +727,12 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
+    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'cargoDe',
+      'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'precioPo', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+    }
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -748,7 +758,8 @@ const AperturaExamenesPreOcup = (props) => {
     })
     
   };
-
+  
+ 
   const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
   const activarDisabled = codPa.length === 8;
   return (
@@ -765,7 +776,7 @@ const AperturaExamenesPreOcup = (props) => {
                 id="codPa"
                 ref={dniRef}
                 disabled={creating || habilitar}
-                defaultValue={datos.codPa}
+                value={datos.codPa}
                 maxLength={8}
                 onKeyDown={handleSearch}
                 onChange={handleDNI}
@@ -1107,54 +1118,53 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="examenAdicional" className="block w-[15em] ">Examen Adicional:</label>
               <div className="flex flex-wrap pt-2 pb-2">
-              
                 <div className="flex items-center mr-8 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
-                  <label htmlFor="examenAdicional4">FIST-TEST</label>
+                  <input type="checkbox"  title="FIST-TEST" disabled={habilitar} checked={datos.n_fisttest} onChange={handleCheack}  id="examenAdicional4" name="n_fisttest" className="mr-2" />
+                  <label htmlFor="examenAdicional4" title="FIST-TEST">FIST-TEST</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.n_psicosen} onChange={handleCheack} id="examenAdicional5" name="n_psicosen" className="mr-2" />
-                  <label htmlFor="examenAdicional5">PSICOSEN</label>
+                  <input type="checkbox" title='PSICOSENSOMETRIA' disabled={habilitar} checked={datos.n_psicosen} onChange={handleCheack} id="examenAdicional5" name="n_psicosen" className="mr-2" />
+                  <label htmlFor="examenAdicional5" title='PSICOSENSOMETRIA'>PSICOSEN</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.n_testaltura} onChange={handleCheack} id="examenAdicional6" name="n_testaltura" className="mr-2" />
-                  <label htmlFor="examenAdicional6">T.ALTURA</label>
+                  <input type="checkbox" title="TEST DE ALTURA" disabled={habilitar} checked={datos.n_testaltura} onChange={handleCheack} id="examenAdicional6" name="n_testaltura" className="mr-2" />
+                  <label htmlFor="examenAdicional6" title="TEST DE ALTURA">T.ALTURA</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.trabCalientes} onChange={handleCheack} id="examenAdicional7" name="trabCalientes" className="mr-2" />
-                  <label htmlFor="examenAdicional7">T.CAL</label>
+                  <input type="checkbox" title='TRABAJOS EN CALIENTE' disabled={habilitar} checked={datos.trabCalientes} onChange={handleCheack} id="examenAdicional7" name="trabCalientes" className="mr-2" />
+                  <label htmlFor="examenAdicional7" title='TRABAJOS EN CALIENTE'>T.CAL</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcLumbosacra} onChange={handleCheack} id="examenAdicional8" name="rxcLumbosacra" className="mr-2" />
-                  <label htmlFor="examenAdicional8">RX.C.LUMBO</label>
+                  <input type="checkbox" title='RX COLUMNA LUMBOSACRA FyL' disabled={habilitar} checked={datos.rxcLumbosacra} onChange={handleCheack} id="examenAdicional8" name="rxcLumbosacra" className="mr-2" />
+                  <label htmlFor="examenAdicional8" title='RX COLUMNA LUMBOSACRA FyL' >RX.C.LUMBO</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.visualCompl} onChange={handleCheack} id="examenAdicional9" name="visualCompl" className="mr-2" />
-                  <label htmlFor="examenAdicional9">VIS.COMPL</label>
+                  <input type="checkbox" title='VISUAL COMPLEMENTARIO' disabled={habilitar} checked={datos.visualCompl} onChange={handleCheack} id="examenAdicional9" name="visualCompl" className="mr-2" />
+                  <label htmlFor="examenAdicional9" title='VISUAL COMPLEMENTARIO' >VIS.COMPL</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.manipAlimentos} onChange={handleCheack} id="examenAdicional10" name="manipAlimentos" className="mr-2" />
-                  <label htmlFor="examenAdicional10">M.ALIM.</label>
+                  <input type="checkbox" title='MANIPULADOR DE ALIMENTOS' disabled={habilitar} checked={datos.manipAlimentos} onChange={handleCheack} id="examenAdicional10" name="manipAlimentos" className="mr-2" />
+                  <label htmlFor="examenAdicional10" title='MANIPULADOR DE ALIMENTOS' >M.ALIM.</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.herraManuales} onChange={handleCheack} id="examenAdicional11" name="herraManuales" className="mr-2" />
-                  <label htmlFor="examenAdicional11">H.MAN</label>
+                  <input type="checkbox" title='HERRAMIENTAS MANUALES' disabled={habilitar} checked={datos.herraManuales} onChange={handleCheack} id="examenAdicional11" name="herraManuales" className="mr-2" />
+                  <label htmlFor="examenAdicional11" title='HERRAMIENTAS MANUALES'>H.MAN</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcDorsoLumbar} onChange={handleCheack} id="examenAdicional12" name="rxcDorsoLumbar" className="mr-2" />
-                  <label htmlFor="examenAdicional12">RX.C.DORSE</label>
+                  <input type="checkbox" title='RX COLUMNA DORSOLUMBAR FyL' disabled={habilitar} checked={datos.rxcDorsoLumbar} onChange={handleCheack} id="examenAdicional12" name="rxcDorsoLumbar" className="mr-2" />
+                  <label htmlFor="examenAdicional12" title='RX COLUMNA DORSOLUMBAR FyL'>RX.C.DORSE</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcKLumbar} onChange={handleCheack} id="examenAdicional13" name="rxcKLumbar" className="mr-2" />
-                  <label htmlFor="examenAdicional13">RX.LUMBA</label>
+                  <input type="checkbox" title='RX COLUMNA LUMBA FyL' disabled={habilitar} checked={datos.rxcKLumbar} onChange={handleCheack} id="examenAdicional13" name="rxcKLumbar" className="mr-2" />
+                  <label htmlFor="examenAdicional13" title='RX COLUMNA LUMBA FyL'>RX.LUMBA</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.rxcPlomos} onChange={handleCheack} id="examenAdicional14" name="rxcPlomos" className="mr-2" />
-                  <label htmlFor="examenAdicional14">PLOMO S.</label>
+                  <input type="checkbox" title='PLOMO EN SaNGRA' disabled={habilitar} checked={datos.rxcPlomos} onChange={handleCheack} id="examenAdicional14" name="rxcPlomos" className="mr-2" />
+                  <label htmlFor="examenAdicional14" title='PLOMO EN SaNGRA'>PLOMO S.</label>
                 </div>
                 <div className="flex items-center mr-4 mb-2">
-                  <input type="checkbox" disabled={habilitar} checked={datos.mercurioo} onChange={handleCheack} id="examenAdicional15" name="mercurioo" className="mr-2" />
-                  <label htmlFor="examenAdicional15">MER.O</label>
+                  <input type="checkbox" title='MERCURIO EN ORINA' disabled={habilitar} checked={datos.mercurioo} onChange={handleCheack} id="examenAdicional15" name="mercurioo" className="mr-2" />
+                  <label htmlFor="examenAdicional15" title='MERCURIO EN ORINA'>MER.O</label>
                 </div>
               </div>
             </div>
@@ -1163,26 +1173,14 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="nomEx" className="block w-32">Explotación en:</label>
               <div className="relative flex-grow">
-                <input
-                  id="nomEx" name="nomEx"
-                  type="text" value={searchExplotacion}
-                  placeholder="Escribe para buscar explotación..."
-                  disabled={habilitar} onChange={handleExplotSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
-                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredExplot.length>0){e.preventDefault();handleSelectExplot(filteredExplot[0]);} }}
-                  onFocus={()=>setFilteredExplot(ExplotacionMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExplotacion.toLowerCase())))}
-                  onBlur={()=>setTimeout(()=>setFilteredExplot([]),100)}
-                />
-                {searchExplotacion&&filteredExplot.length>0&&(
-                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredExplot.map(x=>(
-                      <li key={x.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={()=>handleSelectExplot(x)}>
-                        {x.mensaje}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <select name="nomEx" id="nomEx" value={datos.nomEx} onChange={(e) => {setDatos({...datos,nomEx: e.target.value})}}
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                  <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
+                  {ExplotacionMulti.map((item,index) => (
+                    <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
+                  ))}
+                </select>
+                
               </div>
             </div>
 
@@ -1190,26 +1188,13 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="mineralPo" className="block w-32">Mineral Exp:</label>
               <div className="relative flex-grow">
-                <input
-                  id="mineralPo" name="mineralPo"
-                  type="text" value={searchMineral}
-                  placeholder="Escribe para buscar mineral..."
-                  disabled={habilitar} onChange={handleMineralSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
-                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredMinerals.length>0){e.preventDefault();handleSelectMineral(filteredMinerals[0]);} }}
-                  onFocus={()=>setFilteredMinerals(MineralMulti.filter(m=>m.mensaje.toLowerCase().includes(searchMineral.toLowerCase())))}
-                  onBlur={()=>setTimeout(()=>setFilteredMinerals([]),100)}
-                />
-                {searchMineral&&filteredMinerals.length>0&&(
-                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredMinerals.map(m=>(
-                      <li key={m.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={()=>handleSelectMineral(m)}>
-                        {m.mensaje}
-                      </li>
+                <select name="mineralPo" id="mineralPo" value={datos.mineralPo} onChange={(e) => {setDatos({...datos,mineralPo: e.target.value})}}
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                    <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
+                    {MineralMulti.map((item,index) => (
+                      <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
                     ))}
-                  </ul>
-                )}
+                </select>
               </div>
             </div>
 
@@ -1217,26 +1202,13 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="alturaPo" className="block w-32">Altura:</label>
               <div className="relative flex-grow">
-                <input
-                  id="alturaPo" name="alturaPo"
-                  type="text" value={searchAltura}
-                  placeholder="Escribe para buscar altura..."
-                  disabled={habilitar} onChange={handleAlturaSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
-                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredAlturas.length>0){e.preventDefault();handleSelectAltura(filteredAlturas[0]);} }}
-                  onFocus={()=>setFilteredAlturas(AlturaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchAltura.toLowerCase())))}
-                  onBlur={()=>setTimeout(()=>setFilteredAlturas([]),100)}
-                />
-                {searchAltura&&filteredAlturas.length>0&&(
-                  <ul className="absolute inset-x-0 top-full bg-white border rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredAlturas.map(a=>(
-                      <li key={a.id} className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={()=>handleSelectAltura(a)}>
-                        {a.mensaje}
-                      </li>
+                <select name="alturaPo" id="alturaPo" value={datos.alturaPo} onChange={(e) => {setDatos({...datos,alturaPo: e.target.value})}}
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                    <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
+                    {AlturaMulti.map((item,index) => (
+                      <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
                     ))}
-                  </ul>
-                )}
+                </select>
               </div>
             </div>
                       
@@ -1359,7 +1331,7 @@ const AperturaExamenesPreOcup = (props) => {
                    Habilitar
                 </button>
                 <button type="button" onClick={handleSubmitEdit}  className=" mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
-                   Editar
+                   Actualizar
                 </button>
                 <button type="button" onClick={handleLimpiar} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
                    Limpiar
@@ -1477,11 +1449,25 @@ const AperturaExamenesPreOcup = (props) => {
       isOpen={isEmpresaModalOpen}
       onClose={() => setIsEmpresaModalOpen(false)}
       onSave={handleSaveEmpresa}
+      Swal={Swal}
+      Get={getFetch}
+      token={props.token}
+      GetRazonS={(e) => {setDatos({...datos,
+        razonEmpresa: e
+      });
+      setSearchEmpresa(e)}}
     />
     <ModalContrata 
       isOpen={isContrataModalOpen}
       onClose={() => setIsContrataModalOpen(false)}
       onSave={handleSaveContrata}
+      Swal={Swal}
+      Get={getFetch}
+      token={props.token}
+      GetRazonS={(e) => {setDatos({...datos,
+        razonContrata: e
+      });
+      setSearchContrata(e)}}
     />
     </div>
   );
