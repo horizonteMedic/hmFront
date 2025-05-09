@@ -33,6 +33,19 @@ const NewPad = ({close, DNI, Firma}) => {
         window.bodyOnLoad(document.getElementById("txtDisplay"), document.getElementById("chkShowSigText"), document.getElementById("Restore"));
     }, []);
 
+    // Agregar efecto para manejar la tecla ESC
+    useEffect(() => {
+        const handleEsc = (event) => {
+            if (event.key === 'Escape') {
+                close();
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => {
+            window.removeEventListener('keydown', handleEsc);
+        };
+    }, [close]);
+
     const download = (e) => {
         e.preventDefault();
         const imageElement = document.querySelector("#imageBox img");
@@ -156,58 +169,78 @@ const NewPad = ({close, DNI, Firma}) => {
         <>
         <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
             <div className="mx-auto bg-white rounded-lg shadow-lg w-[900px] relative">
-                {/* Botón para cerrar */}
-                <FontAwesomeIcon
-                icon={faTimes}
-                className="absolute top-0 right-3 m-3 cursor-pointer text-white"
-                onClick={close}
-                style={{fontSize:'15px'}}
-                />
+                {/* Botón para cerrar y leyenda */}
+                <div className="absolute top-0 right-0 p-3 flex items-center gap-2">
+                    <span className="text-white text-sm">Presione ESC o X para cerrar</span>
+                    <FontAwesomeIcon
+                        icon={faTimes}
+                        className="cursor-pointer text-white hover:text-gray-300 transition-colors"
+                        onClick={close}
+                        style={{fontSize:'15px'}}
+                    />
+                </div>
                 
                 {/* Encabezado */}
-                <div className="bg-[#233245] text-white text-center p-3 rounded-t-lg shadow-sm">
-                    <h1 className="font-bold text-lg">Tomar Firma</h1>
+                <div className="bg-[#233245] text-white text-center p-4 rounded-t-lg shadow-sm">
+                    <h1 className="font-bold text-xl">Tomar Firma</h1>
                 </div>
                 
                 <div className="p-6 bg-gray-100">
-                {/* Contenedor de dos columnas */}
-                    <div className='flex items-center justify-center w-auto h-auto mt-3 '>
+                    {/* Contenedor de la firma */}
+                    <div className='flex items-center justify-center w-auto h-auto mt-3'>
                         {FirmaView?.id === 1 && FirmaView?.url && (
                             <img
-                            src={FirmaView.url}
-                            alt="Huella digital"
-                            className="w-[500px] h-[400px] object-contain border-2 border-indigo-900"
+                                src={FirmaView.url}
+                                alt="Firma digital"
+                                className="w-[500px] h-[400px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
                             />
                         )}
-                        <div id='imageBox' ref={imageBox} className={`p-0 m-0 w-[500px] h-[400px] border-2 border-indigo-900 ${FirmaView?.id === 1 ? 'hidden' : ''}`}></div>
+                        <div 
+                            id='imageBox' 
+                            ref={imageBox} 
+                            className={`p-0 m-0 w-[500px] h-[400px] border-2 border-indigo-900 rounded-lg shadow-md ${FirmaView?.id === 1 ? 'hidden' : ''}`}
+                        ></div>
                     </div>
-                    
 
+                    {/* Botones de control */}
                     <div className='flex items-start justify-center w-full pt-6'>
-                        <div className='flex justify-around w-full'>
-                            <button onClick={(e) => {e.preventDefault(),window.aboutBox()}}  className='hidden azul-btn px-5 py-2 rounded-lg'>Licencia</button>
-                            <button onClick={(e) => {e.preventDefault(), window.clearSignature()}}  className='azul-btn px-5 py-2 rounded-lg'>Limpiar</button>
-                            <button onClick={(e) => {download(e)}} className='azul-btn px-5 py-2 rounded-lg hidden'>Guardar</button>
-                            <button onClick={(e) => {e.preventDefault(),window.capture("jhon", "Cabrera", imageBox.current, txtSignature.current, chkSigText.current, chkB64.current), setFirmaView({id:0,url:''})}}  className={`azul-btn px-5 py-2 rounded-lg `}>Iniciar</button>
+                        <div className='flex justify-around w-full max-w-md'>
+                            <button 
+                                onClick={(e) => {e.preventDefault(), window.clearSignature()}}  
+                                className='azul-btn px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+                            >
+                                Limpiar
+                            </button>
+                            <button 
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    window.capture("jhon", "Cabrera", imageBox.current, txtSignature.current, chkSigText.current, chkB64.current);
+                                    setFirmaView({id:0,url:''});
+                                }}  
+                                className='azul-btn px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+                            >
+                                Iniciar
+                            </button>
                         </div>
                     </div>
                 
                     {/* Botón de guardar */}
-                    <div className="flex justify-end mt-4">
-                        <button onClick={SubmitFirma}  className="bg-[#fc6b03] text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                        Guardar datos
+                    <div className="flex justify-end mt-6">
+                        <button 
+                            onClick={SubmitFirma}  
+                            className="bg-[#fc6b03] text-white font-bold py-2 px-6 rounded-lg transition duration-300 hover:bg-[#e05e00]"
+                        >
+                            Guardar Firma
                         </button>
                     </div>
                 </div>
             </div>
-            {/*Cossas necesarioas pero no debo mostrar */}
+
+            {/* Elementos ocultos necesarios */}
             <textarea className='hidden' cols="125" rows="15" id="txtDisplay" ref={txtDisplay}></textarea>
             <input className='hidden' type="checkbox" id="chkShowSigText" onChange={() => setRestoreButtonState(chkValue)} ref={chkSigText} />
-            <input className='hidden' type="checkbox" id="chkShowSigText" onChange={() => setRestoreButtonState(chkValue)} ref={chkSigText} />
-            <input className='hidden' type="checkbox" id="chkUseB64Image" ref={chkB64}/>Use base-64 signature image
-
+            <input className='hidden' type="checkbox" id="chkUseB64Image" ref={chkB64}/>
         </div>
-        
         </>
     )
 }
