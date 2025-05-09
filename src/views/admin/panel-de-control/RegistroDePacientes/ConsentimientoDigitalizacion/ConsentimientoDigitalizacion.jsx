@@ -133,10 +133,10 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
   };
 
   return (
-    <div className="max-w mx-auto bg-white rounded-xl shadow-lg p-8 font-sans">
+    <div className="max-w mx-auto bg-white rounded-xl shadow-lg p-8">
       <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
         <label className="flex-1">
-          <span className="block text-black font-semibold mb-1">Nro: Orden</span>
+          <span className="block mb-1" style={{color: '#000',fontWeight:'bold'}}>Nro: Orden</span>
           <input
             type="text"
             value={orderNumber}
@@ -146,41 +146,41 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
                 handeSearchNo();
               }
             }}
-            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-gray-400"
+            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
             placeholder="Ingrese número de orden"
           />
         </label>
         <label className="flex-1">
-          <span className="block text-black font-semibold mb-1">Fecha</span>
+          <span className="block mb-1" style={{color: '#000',fontWeight:'bold'}}>Fecha</span>
           <input
             type="date"
             value={date}
             onChange={e => setDate(e.target.value)}
-            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+            className="w-full border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
       </div>
 
-      <h2 className="text-center text-2xl font-bold text-black mb-8 tracking-wide">
+      <h2 className="text-center text-2xl mb-8 tracking-wide" style={{color: '#000',fontWeight:'bold'}}>
         DECLARACIÓN JURADA PARA EL USO DE LA FIRMA ELECTRÓNICA
       </h2>
 
       <div className="flex flex-col md:flex-row items-center gap-3 mb-6">
-        <span className="text-black font-medium">Yo,</span>
+        <span className="font-medium" style={{color: '#000',fontWeight:'bold'}}>Yo,</span>
         <input
           type="text"
           placeholder="Nombre completo"
           value={name}
           onChange={e => setName(e.target.value)}
-          className="flex-1 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-gray-400"
+          className="flex-1 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
         />
-        <span className="text-black font-medium whitespace-nowrap">identificado(a) con DNI N.º</span>
+        <span className="font-medium whitespace-nowrap" style={{color: '#000',fontWeight:'bold'}}>identificado(a) con DNI N.º</span>
         <input
           type="text"
           placeholder="DNI"
           value={dni}
           onChange={e => setDni(e.target.value)}
-          className="w-40 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black placeholder-gray-400"
+          className="w-40 border border-gray-400 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
         />
       </div>
 
@@ -191,7 +191,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
           onChange={() => setAuthorized(!authorized)}
           className="mt-1 w-5 h-5 accent-blue-600 border-2 border-blue-600 rounded focus:ring-2 focus:ring-blue-500"
         />
-        <span className="text-black text-base leading-relaxed">
+        <span className="text-base leading-relaxed">
           Autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión de informes médicos. Esta firma tendrá validez para los documentos necesarios implicados en este proceso. Asimismo, doy fe de que la información proporcionada es verídica, al igual que la información que brindaré durante los exámenes realizados en el centro médico Horizonte Medic. También, autorizo el envío de información médica a los correos electrónicos y/o números de celular de la empresa contratista.
         </span>
       </div>
