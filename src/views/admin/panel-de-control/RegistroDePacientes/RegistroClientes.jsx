@@ -158,26 +158,31 @@ const RegistroClientes = (props) => {
     props.setDatos(sanitized);
 
     // 3️⃣ Mapear departamento/provincia/distrito SOLO si vienen valores válidos
-    let deptObj = '',
-        provObj = '',
-        distObj = '';
+    let deptObj = sanitized.departamentoPa || '';
+    let provObj = sanitized.provinciaPa || '';
+    let distObj = sanitized.distritoPa || '';
 
     if (sanitized.departamentoPa) {
-      deptObj = Departamentos.find(d => d.nombre === sanitized.departamentoPa) || '';
-      provObj = deptObj
-        ? Provincias.find(p =>
-            p.idDepartamento === deptObj.id &&
-            p.nombre === sanitized.provinciaPa
-          ) || ''
-        : '';
-      distObj = provObj
-        ? Distritos.find(d =>
-            d.idProvincia === provObj.id &&
-            d.nombre === sanitized.distritoPa
-          ) || ''
-        : '';
-    }
+      const foundDept = Departamentos.find(d => d.nombre === sanitized.departamentoPa);
+      deptObj = foundDept || sanitized.departamentoPa;
 
+      const foundProv = foundDept
+        ? Provincias.find(p =>
+            p.idDepartamento === foundDept.id &&
+            p.nombre === sanitized.provinciaPa
+          )
+        : null;
+      provObj = foundProv || sanitized.provinciaPa;
+
+      const foundDist = foundProv
+        ? Distritos.find(d =>
+            d.idProvincia === foundProv.id &&
+            d.nombre === sanitized.distritoPa
+          )
+        : null;
+      distObj = foundDist || sanitized.distritoPa;
+    }
+    //Eliminar validacion
     props.setDatos(d => ({
       ...d,
       departamentoPa: deptObj,
@@ -223,13 +228,14 @@ const RegistroClientes = (props) => {
   });
  }
 
-const handleSubmit = e => {
+ const handleSubmit = e => {
     e.preventDefault();
     const camposRequeridos = ['codPa', 'nombresPa', 'fechaNaciminetoPa', 'sexoPa', 'lugarNacPa', 'nivelEstPa', 'ocupacionPa',
        'estadoCivilPa', 'direccionPa', 'departamentoPa', 'provinciaPa', 'distritoPa', 'celPa']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !props.datos[campo]);
     if (camposVacios.length > 0) {
-      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+      const lista = camposVacios.join(', ');
+  return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     } 
 
     if (HuellaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene huella registrada', 'error');
@@ -398,6 +404,7 @@ const [filteredDist, setFilteredDist] = useState([]);
 // Handler Departamento
 const handleDeptSearch = e => {
   const v = e.target.value;
+    props.setDatos(d => ({...d, departamentoPa: v}))
   setSearchDept(v);
   setFilteredDept(
     v
@@ -421,6 +428,7 @@ const handleSelectDept = dept => {
 // Handler Provincia (usa Provincias filtradas por depto seleccionado)
 const handleProvSearch = e => {
   const v = e.target.value;
+    props.setDatos(d => ({...d, provinciaPa: v}))
   setSearchProv(v);
   const opciones = props.datos.departamentoPa
     ? Provincias.filter(p =>
@@ -442,6 +450,7 @@ const handleSelectProv = prov => {
 // Handler Distrito (usa Distritos filtrados por provincia seleccionada)
 const handleDistSearch = e => {
   const v = e.target.value;
+  props.setDatos(d => ({...d, distritoPa: v}))
   setSearchDist(v);
   const opciones = props.datos.provinciaPa
     ? Distritos.filter(d =>
