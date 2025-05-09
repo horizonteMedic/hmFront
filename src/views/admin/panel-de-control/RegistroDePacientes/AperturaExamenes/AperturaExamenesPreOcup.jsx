@@ -97,6 +97,9 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleEmpresaSearch = e => {
     const v = e.target.value;
+    if (v === "") {
+      setDatos(d => ({ ...d, razonEmpresa: "" }));
+    }
     setSearchEmpresa(v);
     setFilteredEmpresas(
       v
@@ -121,6 +124,9 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleContrataSearch = e => {
     const v = e.target.value;
+    if (v === "") {
+      setDatos(d => ({ ...d, razonContrata: "" }));
+    }
     setSearchContrata(v);
     setFilteredContratas(
       v
@@ -759,7 +765,6 @@ const AperturaExamenesPreOcup = (props) => {
     
   };
   
- 
   const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
   const activarDisabled = codPa.length === 8;
   return (
