@@ -45,7 +45,6 @@ const NewHuellaFut = ({close,DNI, Huella,setHuella}) => {
     const checkConnection = () => {
         fetch(SERVER_URL)
           .then((res) => {
-            console.log(res)
             if (res.ok) {
               setStatus("Presione el botón para capturar huella", "blue");
             } else {
@@ -85,8 +84,8 @@ const NewHuellaFut = ({close,DNI, Huella,setHuella}) => {
         if (!loopCapturingRef.current) return;
         const data = {
           operation: "capture",
-          lfd: lfdRef.current.checked ? "yes" : "no",
-          invert: invertRef.current.checked ? "yes" : "no",
+          lfd: lfdRef.current?.checked ? "yes" : "no",
+          invert: invertRef.current?.checked ? "yes" : "no",
         };
     
         setLoading(true);
