@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { SubmitNewContrata } from './CRUD';
 
-const ModalContrata = ({ isOpen, onClose, onSave }) => {
+const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) => {
   const [formData, setFormData] = useState({
     ruc: '',
     razonSocial: '',
@@ -11,6 +12,14 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
     responsable: '',
     email: '',
   });
+  const [List, setList] = useState([])
+  
+  useEffect(() => {
+      Get(`/api/v01/ct/Contr/listadoContratas`,token)
+      .then((res) => {
+        setList(res)
+      })
+    },[])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,11 +29,35 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
-    onClose();
-  };
+  const handleSubmit = (e,text) => {
+      e.preventDefault();
+      const camposRequeridos = ['ruc', 'razonSocial']; // agrega los campos que quieras
+      const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
+      if (camposVacios.length > 0) {
+        return Swal.fire('Error', 'Complete los campos vacíos', 'error');
+      } 
+      
+      const datos = {
+        rucContrata: formData.ruc,
+        razonContrata: formData.razonSocial,
+        direccionContrata: formData.direccion,
+        telefonoContrata: formData.telefonos,
+        responsableContrata: formData.responsable,
+        emailContrata: formData.email,
+        apiToken: null
+      }
+      SubmitNewContrata(datos, token)
+      .then((res) => {
+        if (res.rucContrata) {
+          Swal.fire('Exito!', `Se ${text} con exito`, 'success')
+        }
+      })
+    };
+  
+  const ReturnRS = (e) => {
+    GetRazonS(e)
+    onClose()
+  }
 
   // Add ESC key handler
   useEffect(() => {
@@ -47,7 +80,6 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
           <div className="text-sm text-gray-500">Agregue su Contrata y ESC para Cerrar</div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-gray-100 p-4 rounded">
           <div className="grid grid-cols-[100px,1fr,200px] gap-2 items-center">
             <label className="text-right">RUC:</label>
             <input
@@ -60,7 +92,7 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
               required
             />
             <div className="flex gap-2 justify-end">
-              <button type="submit" className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
+              <button type="submit" onClick={(e) => {handleSubmit(e,'Registro')}} className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700">
                 Agregar
               </button>
             </div>
@@ -74,7 +106,7 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
               className="border rounded px-2 py-1"
               required
             />
-            <button type="button" className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+            <button type="button" onClick={(e) => {handleSubmit(e,'Actualizo')}} className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
               Actualizar
             </button>
 
@@ -123,7 +155,6 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
               className="border rounded px-2 py-1"
             />
           </div>
-        </form>
 
         {/* Search Razón Social input */}
         <div className="mt-4 mb-2">
@@ -154,11 +185,13 @@ const ModalContrata = ({ isOpen, onClose, onSave }) => {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="px-4 py-2">--</td>
-                  <td className="px-4 py-2">--</td>
-                  <td className="px-4 py-2">--</td>
-                </tr>
+                {List.map((item,index) => (
+                  <tr key={index} onClick={() => {setFormData(item)}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonContrata)}} className=' cursor-pointer'>
+                    <td className="px-4 py-2">{item.rucContrata}</td>
+                    <td className="px-4 py-2">{item.razonContrata}</td>
+                    <td className="px-4 py-2">{item.direccionContrata}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
