@@ -31,28 +31,23 @@ const headerHR = (doc, datos) => {
     doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
     doc.setLineCap('butt');
     doc.setFontSize(18);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(color);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
     doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
       align: "center",
       baseline: "middle",
       maxWidth: boxSize - 1
     });
+    
+    // Reset color settings after drawing the colored elements
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
   }
 
   // Draw top and bottom lines
   doc.setLineWidth(0.5);
   doc.line(margin, yOffset, pageW - margin, yOffset);
   
-  // Draw box with "$sf" text on the right
-  
-  
-  // Set colored text
-  
-  
-  // Reset text color to default black
-  doc.setTextColor(0);
-
   // === 1) Título principal en negrita y centrado ===
   doc
     .setFont("helvetica", "bold")
