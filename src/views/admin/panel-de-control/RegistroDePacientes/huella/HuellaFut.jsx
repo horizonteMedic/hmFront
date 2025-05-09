@@ -45,6 +45,7 @@ const NewHuellaFut = ({close,DNI, Huella,setHuella}) => {
     const checkConnection = () => {
         fetch(SERVER_URL)
           .then((res) => {
+            console.log(res)
             if (res.ok) {
               setStatus("Presione el botón para capturar huella", "blue");
             } else {
