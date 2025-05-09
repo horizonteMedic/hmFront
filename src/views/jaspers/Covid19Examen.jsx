@@ -6,8 +6,8 @@ import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 
-const Covid19Examen = () => {
-  const generatePDF = () => {
+export default function Covid19Examen ()  {
+
     const doc = new jsPDF();
     const datos = {}
     // Llamamos al header (si tienes un encabezado personalizado)
@@ -221,16 +221,13 @@ const Covid19Examen = () => {
     footer(doc);
 
     // Abre el PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl, "_blank");
-  };
-
-  return (
-    <div>
-      <button onClick={generatePDF}>Generar Hoja de Ruta COVID-19 (Refinado)</button>
-    </div>
-  );
+    const blob   = doc.output("blob");
+    const url    = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
+  
 };
 
-export default Covid19Examen;

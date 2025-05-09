@@ -12,7 +12,7 @@ const signer =
   lastName:  "Smith"
 };
 
-const NewPad = ({close, DNI, Firma}) => {
+const NewPad = ({close, DNI, Firma, setFirma}) => {
    const [device, setDevice] = useState(null);
    const signatory = useContext(SignerContext);
 

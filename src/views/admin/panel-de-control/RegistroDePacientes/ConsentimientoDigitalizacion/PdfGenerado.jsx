@@ -11,7 +11,6 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
   const doc = new jsPDF({ unit: 'pt', format: 'letter' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  console.log('asd',jasper)
   const margin = 50;
   const lineHeight = 18;
   const paraSpacing = 24;
