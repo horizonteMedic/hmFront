@@ -150,16 +150,17 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       doc.text(dateLine, center2 - wDate2 / 2, sectionY + textOffset * 3);
 
       // Avanzar a huellas
-      sectionY += textOffset * extraLines + vertGapSigHue;
+      sectionY += textOffset * extraLines + 30; // Menos espacio vertical
 
-      // Huella Manuscrita
-      doc.rect(startX, sectionY, boxSize-18, boxSize-18);
+      // Cuadro rectangular para huellas
+      const hueW = boxSize + 10;
+      const hueH = boxSize + 40;
+      doc.rect(startX, sectionY, hueW, hueH);
       const labelHue1 = 'Huella Manuscrita del Paciente';
       const wHue1     = doc.getTextWidth(labelHue1);
-      doc.text(labelHue1, center1 - wHue1 / 2, sectionY + boxSize-18 + textOffset);
+      doc.text(labelHue1, center1 - wHue1 / 2, sectionY + hueH + textOffset);
 
-      // Huella Electrónica
-      doc.rect(col2X, sectionY, boxSize-18, boxSize-18);
+      doc.rect(col2X, sectionY, hueW, hueH);
       if (huellaImg) {
         const canvas = document.createElement('canvas');
         canvas.width = huellaImg.width;
@@ -167,11 +168,12 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
         const ctx = canvas.getContext('2d');
         ctx.drawImage(huellaImg, 0, 0);
         const huellaBase64 = canvas.toDataURL('image/png');
-        doc.addImage(huellaBase64, 'PNG', col2X, sectionY, boxSize-18, boxSize-18);
+        // Imagen rectangular, ocupa casi todo el cuadro
+        doc.addImage(huellaBase64, 'PNG', col2X + 5, sectionY + 5, hueW - 10, hueH - 10);
       }
       const labelHue2 = 'Huella Electrónica del Paciente';
       const wHue2     = doc.getTextWidth(labelHue2);
-      doc.text(labelHue2, center2 - wHue2 / 2, sectionY + boxSize-18 + textOffset);
+      doc.text(labelHue2, center2 - wHue2 / 2, sectionY + hueH + textOffset);
 
       // Actualiza Y para el footer
       y = sectionY + boxSize + paraSpacing;
