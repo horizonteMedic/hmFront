@@ -1,12 +1,11 @@
-import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt, faPlay, faStop, faSave, faFingerprint } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState, useRef } from 'react';
 import Swal from 'sweetalert2';
 import { Submit } from '../model/Submit';
 import { getFetch } from '../../getFetch/getFetch';
 
-
-const NewHuellaFut = ({close,DNI, Huella,setHuella}) => {
+const NewHuellaFut = ({close, DNI, Huella, setHuella}) => {
     const SERVER_URL = "http://127.0.0.1:15270/fpoperation";
     const [statusMsg, setStatusMsg] = useState("");
     const [statusColor, setStatusColor] = useState("blue");
@@ -257,83 +256,106 @@ const NewHuellaFut = ({close,DNI, Huella,setHuella}) => {
     }
 
     return(
-        <>
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-            <div className="mx-auto bg-white rounded-lg shadow-lg w-[900px] relative">
-                {/* Botón para cerrar y leyenda */}
-                <div className="absolute top-0 right-0 p-3 flex items-center gap-2">
-                    <span className="text-white text-sm">Presione ESC o X para cerrar</span>
-                    <FontAwesomeIcon
-                        icon={faTimes}
-                        className="cursor-pointer text-white hover:text-gray-300 transition-colors"
-                        onClick={close}
-                        style={{fontSize:'15px'}}
-                    />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl w-[600px] max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="bg-[#233245] text-white p-4 rounded-t-lg flex justify-between items-center">
+                    <h2 className="text-xl font-semibold">Captura de Huella Digital</h2>
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm">Presione ESC para cerrar</span>
+                        <button 
+                            onClick={close}
+                            className="text-white hover:text-gray-300 transition-colors text-xl"
+                        >
+                            <FontAwesomeIcon icon={faTimes} size="lg" />
+                        </button>
+                    </div>
                 </div>
-                
-                {/* Encabezado */}
-                <div className="bg-[#233245] text-white text-center p-4 rounded-t-lg shadow-sm">
-                    <h1 className="font-bold text-xl">Tomar Huella Futronic</h1>
-                </div>
-                
-                <div className="p-6 bg-gray-100">
-                    {/* Contenedor de estado */}
-                    <div className='flex items-center justify-center mb-4'>
-                        <div className='flex flex-row border-2 p-4 items-center border-black justify-center text-center bg-white rounded-lg shadow-sm'>
-                            <h1 style={{ color: statusColor }} className="text-lg font-medium">{statusMsg}</h1>
+
+                {/* Content */}
+                <div className="p-6">
+                    {/* Status Message */}
+                    <div className="mb-4">
+                        <div className={`p-3 rounded-lg text-center ${statusColor === 'red' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                            <p className="font-medium">{statusMsg}</p>
                         </div>
                     </div>
 
-                    {acquisitionStarted && (
-                        <div className='flex items-center justify-center my-3'>
-                            <h1 className='text-red-600 text-xl font-semibold'>Listo para Escanear</h1>
-                        </div>
-                    )}
-
-                    {/* Contenedor de la huella */}
-                    <div className='flex items-center justify-center w-auto h-auto mt-3'>
-                        {Huellaview?.id === 1 && Huellaview?.url && (
+                    {/* Fingerprint Display */}
+                    <div className="flex justify-center mb-6">
+                        {Huellaview?.id === 1 && Huellaview?.url ? (
                             <img
                                 src={Huellaview.url}
                                 alt="Huella digital"
-                                className="w-[320px] h-[480px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
+                                className="w-[240px] h-[280px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
                             />
+                        ) : (
+                            <div 
+                                id='imagendiv' 
+                                className="w-[240px] h-[280px] border-2 border-indigo-900 rounded-lg shadow-md bg-gray-50 flex items-center justify-center"
+                            >
+                                <p className="text-gray-400">Área de captura</p>
+                            </div>
                         )}
-                        <div id='imagendiv' className={`p-0 m-0 w-[320px] h-[480px] border-2 border-indigo-900 rounded-lg shadow-md ${Huellaview?.id === 1 ? 'hidden' : ''}`}></div>
                     </div>
 
-                    {/* Botones de control */}
-                    <div className='flex items-start justify-center w-full pt-6'>
-                        <div className='flex justify-around w-full max-w-md'>
-                            <button 
-                                onClick={(e) => {e.preventDefault(),startCapturing()}} 
-                                className={`azul-btn px-6 py-2 rounded-lg ${acquisitionStarted ? 'opacity-65' : ''} hover:bg-blue-700 transition-colors`}
-                            >
-                                Iniciar
-                            </button>
-                            <button 
-                                onClick={(e) => {e.preventDefault(),StopCapturing()}} 
-                                className='azul-btn px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
-                            >
-                                Detener
-                            </button>
-                        </div>
-                    </div>
-                
-                    {/* Botón de guardar */}
-                    <div className="flex justify-end mt-6">
+                    {/* Control Buttons */}
+                    <div className="flex justify-center gap-4 mb-6">
                         <button 
-                            onClick={SubmitHuella} 
-                            className="bg-[#fc6b03] text-white font-bold py-2 px-6 rounded-lg transition duration-300 hover:bg-[#e05e00]"
+                            onClick={(e) => {e.preventDefault(); startCapturing()}} 
+                            className={`px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={loading}
                         >
-                            Guardar Huella
+                            <FontAwesomeIcon icon={faPlay} />
+                            <span>Iniciar Captura</span>
                         </button>
+                        <button 
+                            onClick={(e) => {e.preventDefault(); StopCapturing()}} 
+                            className="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faStop} />
+                            <span>Detener</span>
+                        </button>
+                    </div>
+
+                    {/* Save Button */}
+                    <div className="flex justify-end">
+                        <button 
+                            onClick={SubmitHuella}
+                            className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faSave} />
+                            <span>Guardar Huella</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Button Legend */}
+                <div className="mt-4 p-3 bg-gray-50 border-t border-gray-200">
+                    <div className="flex justify-center gap-8 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-blue-600 text-white">
+                                <FontAwesomeIcon icon={faPlay} />
+                            </span>
+                            <span>Iniciar: Comienza la captura de huella</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-red-600 text-white">
+                                <FontAwesomeIcon icon={faStop} />
+                            </span>
+                            <span>Detener: Finaliza la captura actual</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-green-600 text-white">
+                                <FontAwesomeIcon icon={faSave} />
+                            </span>
+                            <span>Guardar: Almacena la huella capturada</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        </>
-    )
-}
+    );
+};
 
-export default NewHuellaFut
+export default NewHuellaFut;

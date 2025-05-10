@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faTrashAlt, faPlay, faEraser, faSave, faSignature } from '@fortawesome/free-solid-svg-icons';
 import React, { useEffect, useState, useRef, createContext, useContext } from 'react';
 import Swal from 'sweetalert2';
 import { Submit } from '../model/Submit';
@@ -166,83 +166,108 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
     }
    
     return(
-        <>
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
-            <div className="mx-auto bg-white rounded-lg shadow-lg w-[900px] relative">
-                {/* Botón para cerrar y leyenda */}
-                <div className="absolute top-0 right-0 p-3 flex items-center gap-2">
-                    <span className="text-white text-sm">Presione ESC o X para cerrar</span>
-                    <FontAwesomeIcon
-                        icon={faTimes}
-                        className="cursor-pointer text-white hover:text-gray-300 transition-colors"
-                        onClick={close}
-                        style={{fontSize:'15px'}}
-                    />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-xl w-[600px] max-h-[90vh] overflow-y-auto">
+                {/* Header */}
+                <div className="bg-[#233245] text-white p-4 rounded-t-lg flex justify-between items-center">
+                    <h2 className="text-xl font-semibold">Captura de Firma Digital</h2>
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm">Presione ESC para cerrar</span>
+                        <button 
+                            onClick={close}
+                            className="text-white hover:text-gray-300 transition-colors text-xl"
+                        >
+                            <FontAwesomeIcon icon={faTimes} size="lg" />
+                        </button>
+                    </div>
                 </div>
-                
-                {/* Encabezado */}
-                <div className="bg-[#233245] text-white text-center p-4 rounded-t-lg shadow-sm">
-                    <h1 className="font-bold text-xl">Tomar Firma</h1>
-                </div>
-                
-                <div className="p-6 bg-gray-100">
-                    {/* Contenedor de la firma */}
-                    <div className='flex items-center justify-center w-auto h-auto mt-3'>
-                        {FirmaView?.id === 1 && FirmaView?.url && (
+
+                {/* Content */}
+                <div className="p-6">
+                    {/* Signature Display */}
+                    <div className="flex justify-center mb-6">
+                        {FirmaView?.id === 1 && FirmaView?.url ? (
                             <img
                                 src={FirmaView.url}
                                 alt="Firma digital"
-                                className="w-[500px] h-[400px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
+                                className="w-[400px] h-[300px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
                             />
+                        ) : (
+                            <div 
+                                id='imageBox' 
+                                ref={imageBox} 
+                                className="w-[400px] h-[300px] border-2 border-indigo-900 rounded-lg shadow-md bg-gray-50 flex items-center justify-center"
+                            >
+                                <p className="text-gray-400">Área de firma</p>
+                            </div>
                         )}
-                        <div 
-                            id='imageBox' 
-                            ref={imageBox} 
-                            className={`p-0 m-0 w-[500px] h-[400px] border-2 border-indigo-900 rounded-lg shadow-md ${FirmaView?.id === 1 ? 'hidden' : ''}`}
-                        ></div>
                     </div>
 
-                    {/* Botones de control */}
-                    <div className='flex items-start justify-center w-full pt-6'>
-                        <div className='flex justify-around w-full max-w-md'>
-                            <button 
-                                onClick={(e) => {e.preventDefault(), window.clearSignature()}}  
-                                className='azul-btn px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
-                            >
-                                Limpiar
-                            </button>
-                            <button 
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    window.capture("jhon", "Cabrera", imageBox.current, txtSignature.current, chkSigText.current, chkB64.current);
-                                    setFirmaView({id:0,url:''});
-                                }}  
-                                className='azul-btn px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
-                            >
-                                Iniciar
-                            </button>
-                        </div>
+                    {/* Control Buttons */}
+                    <div className="flex justify-center gap-4 mb-6">
+                        <button 
+                            onClick={(e) => {e.preventDefault(); window.clearSignature()}}  
+                            className="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faEraser} />
+                            <span>Limpiar</span>
+                        </button>
+                        <button 
+                            onClick={(e) => {
+                                e.preventDefault();
+                                window.capture("jhon", "Cabrera", imageBox.current, txtSignature.current, chkSigText.current, chkB64.current);
+                                setFirmaView({id:0,url:''});
+                            }}  
+                            className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faPlay} />
+                            <span>Iniciar</span>
+                        </button>
                     </div>
-                
-                    {/* Botón de guardar */}
-                    <div className="flex justify-end mt-6">
+
+                    {/* Save Button */}
+                    <div className="flex justify-end">
                         <button 
                             onClick={SubmitFirma}  
-                            className="bg-[#fc6b03] text-white font-bold py-2 px-6 rounded-lg transition duration-300 hover:bg-[#e05e00]"
+                            className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors flex items-center gap-2"
                         >
-                            Guardar Firma
+                            <FontAwesomeIcon icon={faSave} />
+                            <span>Guardar Firma</span>
                         </button>
+                    </div>
+                </div>
+
+                {/* Button Legend */}
+                <div className="mt-4 p-3 bg-gray-50 border-t border-gray-200">
+                    <div className="flex justify-center gap-8 text-sm text-gray-600">
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-red-600 text-white">
+                                <FontAwesomeIcon icon={faEraser} />
+                            </span>
+                            <span>Limpiar: Borra la firma actual</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-blue-600 text-white">
+                                <FontAwesomeIcon icon={faPlay} />
+                            </span>
+                            <span>Iniciar: Comienza la captura de firma</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center w-6 h-6 rounded bg-green-600 text-white">
+                                <FontAwesomeIcon icon={faSave} />
+                            </span>
+                            <span>Guardar: Almacena la firma capturada</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Elementos ocultos necesarios */}
+            {/* Hidden Elements */}
             <textarea className='hidden' cols="125" rows="15" id="txtDisplay" ref={txtDisplay}></textarea>
             <input className='hidden' type="checkbox" id="chkShowSigText" onChange={() => setRestoreButtonState(chkValue)} ref={chkSigText} />
             <input className='hidden' type="checkbox" id="chkUseB64Image" ref={chkB64}/>
         </div>
-        </>
-    )
-}
+    );
+};
 
-export default NewPad
+export default NewPad;
