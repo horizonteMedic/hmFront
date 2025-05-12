@@ -28,10 +28,7 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
     const [base64, setBase64] = useState("")
     const [FirmaView, setFirmaView] = useState(Firma)
 
-    useEffect(() => {
-        // When the form is first drawn call the bodyOnLoad() function to initialise the SigCaptX session
-        window.bodyOnLoad(document.getElementById("txtDisplay"), document.getElementById("chkShowSigText"), document.getElementById("Restore"));
-    }, []);
+
 
     // Agregar efecto para manejar la tecla ESC
     useEffect(() => {

@@ -287,14 +287,13 @@ const NewHuellaFut = ({close, DNI, Huella, setHuella}) => {
                             <img
                                 src={Huellaview.url}
                                 alt="Huella digital"
-                                className="w-[240px] h-[280px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
+                                className="w-[320px] h-[480px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
                             />
                         ) : (
                             <div 
                                 id='imagendiv' 
-                                className="w-[240px] h-[280px] border-2 border-indigo-900 rounded-lg shadow-md bg-gray-50 flex items-center justify-center"
+                                className="w-[320px] h-[480px] border-2 border-indigo-900 rounded-lg shadow-md bg-gray-50 flex items-center justify-center"
                             >
-                                <p className="text-gray-400">Área de captura</p>
                             </div>
                         )}
                     </div>
