@@ -15,6 +15,8 @@ export const ImportData = (dni,Swal,getFetch,token,set,RendeSet) => {
         if (!res) {
            return Swal.fire('Sin Resultado','No se encontro al paciente', 'error')
         } else {
+          const [yyyy, mm, dd] = res.fechaAperturaPo.split('-');
+          res.fechaAperturaPo = `${dd}/${mm}/${yyyy}`;
             set({
                 ...res,
                 nombresPa: res.nombres,

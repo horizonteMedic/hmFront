@@ -57,7 +57,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: "",
+    fechaAperturaPo: format(today, 'dd/MM/yyyy'),
     n_operacion: null,
     textObserv1: "",
     textObserv2: "",
@@ -404,9 +404,6 @@ const AperturaExamenesPreOcup = (props) => {
       setSearchCargo(res.cargoDe || "")
       setSearchArea(res.areaO || "")
       setSearchExamenMedico(res.nomExamen || "")
-      setSearchExplotacion(res.nomEx || "")
-      setSearchMineral(res.mineralPo || "")
-      setSearchAltura(res.alturaPo || "")
   }
   
   const SearchHC = (event,type) => {
@@ -696,13 +693,6 @@ const AperturaExamenesPreOcup = (props) => {
     
   };
 
-  useEffect(() => {
-    setDatos(d => ({
-      ...d,
-      fechaAperturaPo: format(today, 'dd/MM/yyyy')
-    }));
-  }, []);
-
   // Formateo en DD-MM-AAAA mientras escribes
  // Formateo en DD/MM/AAAA mientras escribes
  const handleFechaAperturaInput = e => {
@@ -766,7 +756,7 @@ const AperturaExamenesPreOcup = (props) => {
 
     return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   };
-  
+
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
