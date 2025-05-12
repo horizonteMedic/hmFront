@@ -12,6 +12,7 @@ import { ImportData } from '../controller/HC';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
 import ModalContrata from './modals/modalContrata/ModalContrata';
+import { format } from 'date-fns';
 
 const AperturaExamenesPreOcup = (props) => {
   const [stardate, setStartDate] = useState(new Date());
@@ -703,12 +704,6 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmitEdit = e => {
-    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'cargoDe',
-      'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'precioPo', 'fechaAperturaPo']; // agrega los campos que quieras
-    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
-    if (camposVacios.length > 0) {
-      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
-    }
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -733,12 +728,6 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
-    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'cargoDe',
-      'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'precioPo', 'fechaAperturaPo']; // agrega los campos que quieras
-    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
-    if (camposVacios.length > 0) {
-      return Swal.fire('Error', 'Complete los campos vacíos', 'error');
-    }
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -764,9 +753,54 @@ const AperturaExamenesPreOcup = (props) => {
     })
     
   };
-  
+  // Formateo en DD-MM-AAAA mientras escribes
+const handleFechaAperturaInput = e => {
+  const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
+  let formatted = raw;
+  if (raw.length >= 5) {
+    formatted = raw.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1-$2-$3');
+  } else if (raw.length >= 3) {
+    formatted = raw.replace(/(\d{2})(\d{0,2})/, '$1-$2');
+  }
+  setDatos(d => ({ ...d, fechaAperturaPo: formatted }));
+};
+
   const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
   const activarDisabled = codPa.length === 8;
+
+  // Debounce para evitar demasiadas llamadas
+  const debounceTimeout = useRef(null);
+
+  // Reemplaza el onChange del input de nombre por una función con debounce
+  const handleNombreChange = (e) => {
+    const value = e.target.value.toUpperCase();
+    setSearchP(prev => ({ ...prev, nombre: value, code: "" }));
+
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+
+    debounceTimeout.current = setTimeout(() => {
+      if (value.trim() !== "") {
+        const data = {
+          opcion_id_p: 3,
+          norden: "",
+          nombres_apellidos_p: value
+        };
+        GetHistoriaC(data, props.selectedSede, props.token)
+          .then((res) => {
+            if (res && res.length) {
+              setSearchHC(res);
+            } else {
+              setSearchHC([]);
+            }
+          })
+          .catch(() => setSearchHC([]));
+      } else {
+        // Si el campo está vacío, puedes decidir si mostrar todos o limpiar la tabla
+        setSearchHC([]);
+      }
+    }, 400); // 400ms de espera
+  };
+
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
@@ -1259,14 +1293,23 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
               <div className="mb-4">
             <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="fechaApertura" className="block w-1/7">Fecha de Apertura:</label>
-              <DatePicker
-                selected={stardate}
+              <label htmlFor="fechaApertura" className="block w-1/3">Fecha de Apertura:</label>
+                            
+              <input
+                type="text"
+                id="fechaAperturaPo"
+                name="fechaAperturaPo"
+                placeholder="DD-MM-AAAA"
                 value={datos.fechaAperturaPo}
+                onChange={handleFechaAperturaInput}
                 disabled={habilitar}
-                onChange={handleDateChange}
-                dateFormat="yyyy-MM-dd"
-                className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                className="border border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    // por ejemplo, pasar al siguiente campo
+                    document.getElementById('numOperacion')?.focus();
+                  }
+                }}
               />
               <label htmlFor="numOperacion" className="block ml-4">N° Operación:</label>
               <input
@@ -1342,6 +1385,11 @@ const AperturaExamenesPreOcup = (props) => {
                    Limpiar
                 </button>
               </div>}
+            {register && <div className="pt-4 flex justify-end items-end">
+                <button type="button" onClick={handleSubmit} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                   Agregar
+                </button>
+            </div>}
           </div>
           
           {/* Nueva columna con estructura solicitada */}
@@ -1381,9 +1429,8 @@ const AperturaExamenesPreOcup = (props) => {
                 <input
                   type="text"
                   value={SearchP.nombre}
-                  onChange={(e) => {setSearchP(prev => ({...prev, nombre: e.target.value.toUpperCase(), code: ""}))}}
+                  onChange={handleNombreChange}
                   id="nombre"
-                  onKeyDown={(event) => {SearchHC(event,'nombre')}}
                   name="nombre"
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
                 />
@@ -1442,12 +1489,6 @@ const AperturaExamenesPreOcup = (props) => {
               </table>
               </div>
             </div>
-              <div className=" pt-4 flex justify-end items-end">
-                {register && <button type="button" onClick={handleSubmit} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
-                   Agregar
-                </button>}
-                
-              </div>
           </div>
         </div>
         <ModalEmpresa 
