@@ -28,7 +28,10 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
     const [base64, setBase64] = useState("")
     const [FirmaView, setFirmaView] = useState(Firma)
 
-
+    useEffect(() => {
+        // When the form is first drawn call the bodyOnLoad() function to initialise the SigCaptX session
+        window.bodyOnLoad(document.getElementById("txtDisplay"), document.getElementById("chkShowSigText"), document.getElementById("Restore"));
+    }, []);
 
     // Agregar efecto para manejar la tecla ESC
     useEffect(() => {
@@ -183,21 +186,18 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
                 <div className="p-6">
                     {/* Signature Display */}
                     <div className="flex justify-center mb-6">
-                        {FirmaView?.id === 1 && FirmaView?.url ? (
+                        {FirmaView?.id === 1 && FirmaView?.url && (
                             <img
                                 src={FirmaView.url}
                                 alt="Firma digital"
-                                className="w-[400px] h-[300px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
+                                className="w-[500px] h-[400px] object-contain border-2 border-indigo-900 rounded-lg shadow-md"
                             />
-                        ) : (
-                            <div 
-                                id='imageBox' 
-                                ref={imageBox} 
-                                className="w-[400px] h-[300px] border-2 border-indigo-900 rounded-lg shadow-md bg-gray-50 flex items-center justify-center"
-                            >
-                                <p className="text-gray-400">Área de firma</p>
-                            </div>
                         )}
+                         <div 
+                            id='imageBox' 
+                            ref={imageBox} 
+                            className={`p-0 m-0 w-[500px] h-[400px] border-2 border-indigo-900 rounded-lg shadow-md ${FirmaView?.id === 1 ? 'hidden' : ''}`}
+                        ></div>
                     </div>
 
                     {/* Control Buttons */}
