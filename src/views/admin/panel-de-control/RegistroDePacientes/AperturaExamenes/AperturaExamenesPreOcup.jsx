@@ -15,6 +15,7 @@ import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
 
 const AperturaExamenesPreOcup = (props) => {
+  const today = new Date();
   const [stardate, setStartDate] = useState(new Date());
   const jasperModules = import.meta.glob('../../../../jaspers/*.jsx'); // ajusta si usas .jsx
   const dniRef = useRef(null);
@@ -763,8 +764,16 @@ const AperturaExamenesPreOcup = (props) => {
     })
     
   };
+  useEffect(() => {
+    setDatos(d => ({
+      ...d,
+      fechaAperturaPo: format(today, 'dd/MM/yyyy')
+    }));
+  }, []);
+
   // Formateo en DD-MM-AAAA mientras escribes
-const handleFechaAperturaInput = e => {
+ // Formateo en DD/MM/AAAA mientras escribes
+ const handleFechaAperturaInput = e => {
   const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
   let formatted = raw;
   if (raw.length >= 5) {
