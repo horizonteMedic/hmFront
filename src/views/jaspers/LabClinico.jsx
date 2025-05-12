@@ -27,7 +27,7 @@ export default function LabClinico(datos) {
   drawLine(105, headspace + 15, 105, headspace + 20);
   drawBox(doc, "TRIAJE", 90, headspace + 20, 30, 10, 4, datos.triaje);
   drawLine(105, headspace + 30, 105, headspace + 35);
-  drawBox(doc, "PSICOLOGIA", 90, headspace + 35, 30, 10, 4, datos.psicologia);
+  drawBox(doc, "LABORATORIO", 90, headspace + 35, 30, 10, 4, !datos.laboratorio ? false : true);
 
   // 🟡 BLOQUE DE INDICACIONES al costado derecho
   const indX = 130;

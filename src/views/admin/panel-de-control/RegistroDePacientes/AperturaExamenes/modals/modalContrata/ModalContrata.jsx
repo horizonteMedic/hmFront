@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faMouse, faPlus, faEdit, faBroom, faFileExport } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faMouse, faPlus, faEdit, faBroom, faFileExport, faUnlock } from '@fortawesome/free-solid-svg-icons';
 import { SubmitNewContrata } from './CRUD';
 
 const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) => {
@@ -15,6 +15,8 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
   const [List, setList] = useState([])
   const [filteredList, setFilteredList] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [habilitar, setHabilitar] = useState(false)
+  const [refresh, setRefresh] = useState(0)
   
   useEffect(() => {
     Get(`/api/v01/ct/Contr/listadoContratas`,token)
@@ -22,7 +24,7 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
       setList(res)
       setFilteredList(res)
     })
-  },[])
+  },[refresh])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,22 +74,21 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
       apiToken: null
     }
 
-    if (text === 'Actualizo') {
-      Swal.fire({
-        title: 'Guardando cambios',
-        text: 'Por favor espere...',
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-        didOpen: () => {
-          Swal.showLoading();
-        }
-      });
-    }
+    Swal.fire({
+      title: 'Guardando cambios',
+      text: 'Por favor espere...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
     
     SubmitNewContrata(datos, token)
     .then((res) => {
       if (res.rucContrata) {
-        Swal.fire('Exito!', `Se ${text} con exito`, 'success')
+        Swal.fire('Exito!', `Se Registro/Actualizo con exito`, 'success')
+        setRefresh(refresh+1)
       }
     })
   };
@@ -152,7 +153,8 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
             name="ruc"
             value={formData.ruc}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+            disabled={habilitar}
             maxLength={11}
             required
           />
@@ -168,7 +170,8 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
             name="razonSocial"
             value={formData.razonSocial}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+            disabled={habilitar}
             required
           />
           <button type="button" onClick={(e) => {handleSubmit(e,'Actualizo')}} className="px-3 py-1 bg-gray-300 text-gray-700 rounded flex items-center gap-2">
@@ -181,7 +184,8 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
             name="direccion"
             value={formData.direccion}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+            disabled={habilitar}
           />
           <button type="button" onClick={handleClear} className="px-3 py-1 bg-yellow-500 text-white rounded  flex items-center gap-2">
             <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -193,7 +197,8 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
             name="telefonos"
             value={formData.telefonos}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+            disabled={habilitar}
           />
           <button type="button" className="px-3 py-1 bg-green-600 text-white rounded flex items-center gap-2">
             <FontAwesomeIcon icon={faFileExport} /> Exportar
@@ -205,7 +210,8 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
             name="responsable"
             value={formData.responsable}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+            disabled={habilitar}
           />
           <button type="button" onClick={handleClose} className="px-3 py-1 bg-red-500 text-white rounded  flex items-center gap-2">
             <FontAwesomeIcon icon={faTimes} /> Cerrar
@@ -217,8 +223,12 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+            disabled={habilitar}
           />
+          <button type="button" onClick={() => {setHabilitar(!habilitar)}} className="px-3 py-1 bg-green-500 text-white rounded  flex items-center gap-2">
+            <FontAwesomeIcon icon={faUnlock} /> Habilitar
+          </button>
         </div>
 
         {/* Search Razón Social input */}
@@ -276,7 +286,7 @@ const ModalContrata = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS })
                       telefonos: item.telefonoContrata || '',
                       responsable: item.responsableContrata || '',
                       email: item.emailContrata || '',
-                    })}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonContrata)}} className='cursor-pointer hover:bg-gray-50'>
+                    }), setHabilitar(true)}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonContrata)}} className='cursor-pointer hover:bg-gray-50'>
                       <td className="px-4 py-2">{item.rucContrata}</td>
                       <td className="px-4 py-2">{item.razonContrata}</td>
                       <td className="px-4 py-2">{item.direccionContrata}</td>

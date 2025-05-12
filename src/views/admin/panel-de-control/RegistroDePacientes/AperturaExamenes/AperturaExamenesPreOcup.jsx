@@ -1451,29 +1451,29 @@ const AperturaExamenesPreOcup = (props) => {
           </div>
         </div>
         <ModalEmpresa 
-      isOpen={isEmpresaModalOpen}
-      onClose={() => setIsEmpresaModalOpen(false)}
-      onSave={handleSaveEmpresa}
-      Swal={Swal}
-      Get={getFetch}
-      token={props.token}
-      GetRazonS={(e) => {setDatos({...datos,
-        razonEmpresa: e
-      });
-      setSearchEmpresa(e)}}
-    />
-    <ModalContrata 
-      isOpen={isContrataModalOpen}
-      onClose={() => setIsContrataModalOpen(false)}
-      onSave={handleSaveContrata}
-      Swal={Swal}
-      Get={getFetch}
-      token={props.token}
-      GetRazonS={(e) => {setDatos({...datos,
-        razonContrata: e
-      });
-      setSearchContrata(e)}}
-    />
+          isOpen={isEmpresaModalOpen}
+          onClose={() => setIsEmpresaModalOpen(false)}
+          onSave={handleSaveEmpresa}
+          Swal={Swal}
+          Get={getFetch}
+          token={props.token}
+          GetRazonS={(e) => {setDatos({...datos,
+            razonEmpresa: e
+          });
+          setSearchEmpresa(e)}}
+        />
+        <ModalContrata 
+          isOpen={isContrataModalOpen}
+          onClose={() => setIsContrataModalOpen(false)}
+          onSave={handleSaveContrata}
+          Swal={Swal}
+          Get={getFetch}
+          token={props.token}
+          GetRazonS={(e) => {setDatos({...datos,
+            razonContrata: e
+          });
+          setSearchContrata(e)}}
+        />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes, faMouse, faPlus, faEdit, faBroom, faFileExport } from '@fortawesome/free-solid-svg-icons';
+import { faTimes, faMouse, faPlus, faEdit, faBroom, faFileExport, faUnlock } from '@fortawesome/free-solid-svg-icons';
 import { SubmitNewEmpresa } from './CRUD';
 
 const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) => {
@@ -15,6 +15,8 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
   const [List, setList] = useState([])
   const [filteredList, setFilteredList] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [habilitar, setHabilitar] = useState(false)
+  const [refresh, setRefresh] = useState(0)
 
   useEffect(() => {
     Get(`/api/v01/ct/infoAdmisionEmpresa/listadoEmpresas`,token)
@@ -22,7 +24,7 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
       setList(res)
       setFilteredList(res)
     })
-  },[])
+  },[refresh])
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -55,7 +57,7 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
     }
   };
 
-  const handleSubmit = (e,text) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const camposRequeridos = ['ruc', 'razonSocial']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !formData[campo]);
@@ -72,7 +74,6 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
       apiToken: null
     }
     
-    if (text === 'Actualizo') {
       Swal.fire({
         title: 'Guardando cambios',
         text: 'Por favor espere...',
@@ -82,12 +83,12 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
           Swal.showLoading();
         }
       });
-    }
-
+    
     SubmitNewEmpresa(datos, token)
     .then((res) => {
       if (res.rucEmpresa) {
-        Swal.fire('Exito!', `Se ${text} con exito`, 'success')
+        Swal.fire('Exito!', `Se Registro/Actualizo con exito`, 'success')
+        setRefresh(refresh+1)
       }
     })
   };
@@ -151,12 +152,13 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
             name="ruc"
             value={formData.ruc}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
             maxLength={11}
+            disabled={habilitar}
             required
           />
           <div className="flex gap-2 justify-end">
-            <button onClick={(e) => {handleSubmit(e,'Registro')}} className="px-3 py-1 bg-blue-600 text-white rounded  flex items-center gap-2">
+            <button onClick={(e) => {handleSubmit(e)}} className="px-3 py-1 bg-blue-600 text-white rounded  flex items-center gap-2">
               <FontAwesomeIcon icon={faPlus} /> Agregar
             </button>
           </div>
@@ -167,10 +169,11 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
             name="razonSocial"
             value={formData.razonSocial}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            disabled={habilitar}
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
             required
           />
-          <button type="button" onClick={(e) => {handleSubmit(e,'Actualizo')}} className="px-3 py-1 bg-gray-300 text-gray-700 rounded  flex items-center gap-2">
+          <button type="button" onClick={(e) => {handleSubmit(e)}} className="px-3 py-1 bg-gray-300 text-gray-700 rounded  flex items-center gap-2">
             <FontAwesomeIcon icon={faEdit} /> Actualizar
           </button>
 
@@ -178,9 +181,10 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
           <input
             type="text"
             name="direccion"
+            disabled={habilitar}
             value={formData.direccion}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
           />
           <button type="button" onClick={handleClear} className="px-3 py-1 bg-yellow-500 text-white rounded  flex items-center gap-2">
             <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -189,10 +193,11 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
           <label className="text-right">Teléfonos:</label>
           <input
             type="text"
+            disabled={habilitar}
             name="telefonos"
             value={formData.telefonos}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
           />
           <button type="button" className="px-3 py-1 bg-green-600 text-white rounded  flex items-center gap-2">
             <FontAwesomeIcon icon={faFileExport} /> Exportar
@@ -201,10 +206,11 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
           <label className="text-right">Responsable:</label>
           <input
             type="text"
+            disabled={habilitar}
             name="responsable"
             value={formData.responsable}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
           />
           <button type="button" onClick={handleClose} className="px-3 py-1 bg-red-500 text-white rounded  flex items-center gap-2">
             <FontAwesomeIcon icon={faTimes} /> Cerrar
@@ -213,11 +219,15 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
           <label className="text-right">Email:</label>
           <input
             type="email"
+            disabled={habilitar}
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="border rounded px-2 py-1"
+            className={`border rounded px-2 py-1 ${habilitar ? "bg-slate-300" : "bg-white"}`}
           />
+          <button type="button" onClick={() => {setHabilitar(!habilitar)}} className="px-3 py-1 bg-green-500 text-white rounded  flex items-center gap-2">
+            <FontAwesomeIcon icon={faUnlock} /> Habilitar
+          </button>
         </div>
 
         {/* Search Razón Social input */}
@@ -275,7 +285,7 @@ const ModalEmpresa = ({ isOpen, onClose, onSave, Swal, Get, token, GetRazonS }) 
                       telefonos: item.telefonoEmpresa || '',
                       responsable: item.responsableEmpresa || '',
                       email: item.emailEmpresa || '',
-                    })}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonEmpresa)}} className='cursor-pointer hover:bg-gray-50'>
+                    }),setHabilitar(true)}} onContextMenu={(e) => {e.preventDefault(), ReturnRS(item.razonEmpresa)}} className='cursor-pointer hover:bg-gray-50'>
                       <td className="px-4 py-2">{item.rucEmpresa}</td>
                       <td className="px-4 py-2">{item.razonEmpresa}</td>
                       <td className="px-4 py-2">{item.direccionEmpresa}</td>
