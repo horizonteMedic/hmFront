@@ -15,7 +15,9 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     const hours = String(currentDate.getHours()).padStart(2, '0');
     const minutes = String(currentDate.getMinutes()).padStart(2, '0');
     const seconds = String(currentDate.getSeconds()).padStart(2, '0');
-    
+
+    const [dd, mm, yyyy] = data.fechaAperturaPo.split('/');
+    const fechaFormateada = `${yyyy}/${mm}/${dd}`;
   const body = {
     tipoOperacion: operacion,
     n_orden:  data.n_orden ? data.n_orden : null,
@@ -25,7 +27,7 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     nomEx: data.nomEx,
     alturaPo: data.alturaPo,
     mineralPo: data.mineralPo,
-    fechaAperturaPo: new Date(data.fechaAperturaPo).toISOString().split('T')[0],
+    fechaAperturaPo: fechaFormateada,
     precioPo: data.precioPo,
     estadoEx: "EN PROCESO",
     nomExamen: data.nomExamen,
@@ -63,7 +65,7 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     rxcPlomos: data.rxcPlomos,//12
     mercurioo: data.mercurioo//13
   };    
-  console.log(data)
+   console.log(JSON.stringify(body))
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
     const options = {

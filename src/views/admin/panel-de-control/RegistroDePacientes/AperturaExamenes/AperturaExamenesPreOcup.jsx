@@ -15,6 +15,7 @@ import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
 
 const AperturaExamenesPreOcup = (props) => {
+  const today = new Date();
   const [stardate, setStartDate] = useState(new Date());
   const jasperModules = import.meta.glob('../../../../jaspers/*.jsx'); // ajusta si usas .jsx
   const dniRef = useRef(null);
@@ -84,7 +85,7 @@ const AperturaExamenesPreOcup = (props) => {
     code: "",
     nombre: ""
   })
-
+  const [refresh, setRefresh] = useState(0)
 
   // Autocompletado Empresa
   const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
@@ -101,6 +102,7 @@ const AperturaExamenesPreOcup = (props) => {
     if (v === "") {
       setDatos(d => ({ ...d, razonEmpresa: "" }));
     }
+    setDatos(d => ({...d, razonEmpresa: v}))
     setSearchEmpresa(v);
     setFilteredEmpresas(
       v
@@ -128,6 +130,7 @@ const AperturaExamenesPreOcup = (props) => {
     if (v === "") {
       setDatos(d => ({ ...d, razonContrata: "" }));
     }
+    setDatos(d => ({...d, razonContrata: v}))
     setSearchContrata(v);
     setFilteredContratas(
       v
@@ -152,6 +155,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleMedicoSearch = e => {
     const v = e.target.value;
     setSearchMedico(v);
+    setDatos(d => ({...d, n_medico: v}))
     setFilteredMedicos(
       v
         ? MedicosMulti.filter(m =>
@@ -174,6 +178,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handlePruebaSearch = e => {
     const v = e.target.value;
+    setDatos(d => ({...d, tipoPrueba: v}))
     setSearchPrueba(v);
     setFilteredPruebas(
       v
@@ -196,6 +201,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredCargos, setFilteredCargos] = useState([]);
   const handleCargoSearch = e => {
     const v = e.target.value;
+    setDatos(d => ({...d, cargoDe: v}))
     setSearchCargo(v);
     setFilteredCargos(
       v
@@ -217,6 +223,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredAreas, setFilteredAreas] = useState([]);
   const handleAreaSearch = e => {
     const v = e.target.value;
+    setDatos(d => ({...d, areaO: v}))
     setSearchArea(v);
     setFilteredAreas(
       v
@@ -238,6 +245,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredExamMed, setFilteredExamMed]     = useState([]);
   const handleExamenMedSearch = e => {
     const v = e.target.value;
+    setDatos(d => ({...d, nomExamen: v}))
     setSearchExamenMedico(v);
     setFilteredExamMed(
       v
@@ -263,68 +271,7 @@ const AperturaExamenesPreOcup = (props) => {
     })
   };
 
-  // Explotación en
-  const [searchExplotacion, setSearchExplotacion] = useState(datos.nomEx);
-  const [filteredExplot, setFilteredExplot]     = useState([]);
-  const handleExplotSearch = e => {
-    const v = e.target.value;
-    setSearchExplotacion(v);
-    setFilteredExplot(
-      v
-        ? ExplotacionMulti.filter(x =>
-            x.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
-        : []
-    );
-  };
-  const handleSelectExplot = x => {
-    setSearchExplotacion(x.mensaje);
-    setDatos(d => ({ ...d, nomEx: x.mensaje }));
-    setFilteredExplot([]);
-    document.getElementById('mineralPo')?.focus();
-  };
-
-  // Mineral Exp
-  const [searchMineral, setSearchMineral] = useState(datos.mineralPo);
-  const [filteredMinerals, setFilteredMinerals] = useState([]);
-  const handleMineralSearch = e => {
-    const v = e.target.value;
-    setSearchMineral(v);
-    setFilteredMinerals(
-      v
-        ? MineralMulti.filter(m =>
-            m.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
-        : []
-    );
-  };
-  const handleSelectMineral = m => {
-    setSearchMineral(m.mensaje);
-    setDatos(d => ({ ...d, mineralPo: m.mensaje }));
-    setFilteredMinerals([]);
-    document.getElementById('alturaPo')?.focus();
-  };
-
-  // Altura
-  const [searchAltura, setSearchAltura] = useState(datos.alturaPo);
-  const [filteredAlturas, setFilteredAlturas] = useState([]);
-  const handleAlturaSearch = e => {
-    const v = e.target.value;
-    setSearchAltura(v);
-    setFilteredAlturas(
-      v
-        ? AlturaMulti.filter(a =>
-            a.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
-        : []
-    );
-  };
-  const handleSelectAltura = a => {
-    setSearchAltura(a.mensaje);
-    setDatos(d => ({ ...d, alturaPo: a.mensaje }));
-    setFilteredAlturas([]);
-    document.getElementById('protocolo')?.focus();
-  };
+  // Explotación
 
   // Protocolo (reemplaza estos valores por los tuyos)
   const protocoloOptions = [
@@ -372,7 +319,7 @@ const AperturaExamenesPreOcup = (props) => {
           console.log("ocurrió un error");
         });
     }
-  }, [SearchP.code, SearchP.nombre]);
+  }, [SearchP.code, SearchP.nombre, refresh]);
   
   const [creating, setCreating] = useState(false)
 
@@ -382,21 +329,7 @@ const AperturaExamenesPreOcup = (props) => {
     setDatos({ ...datos, fechaAperturaPo: formattedDate });
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    // Si contiene GMT o "hora estándar", lo consideramos inválido
-    if (typeof dateString === 'string' && (dateString.includes('GMT') || dateString.includes('hora estándar'))) {
-      return '';
-    }
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return '';
-    
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    
-    return `${day}/${month}/${year}`;
-  };
+
 
   const newPrice = (value) => {  
     props.PrecioC(props.selectedSede,value,props.token)
@@ -443,7 +376,6 @@ const AperturaExamenesPreOcup = (props) => {
   const handleEdit = (value) => {
     getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${value.n_orden}`,props.token)
     .then((res) => {
-      console.log(res)
       setDatos({
         ...res,
         nombresPa: res.nombres,
@@ -457,9 +389,6 @@ const AperturaExamenesPreOcup = (props) => {
       setSearchCargo(res.cargoDe || "")
       setSearchArea(res.areaO || "")
       setSearchExamenMedico(res.nomExamen || "")
-      setSearchExplotacion(res.nomEx || "")
-      setSearchMineral(res.mineralPo || "")
-      setSearchAltura(res.alturaPo || "")
     })
     
     setRegister(false)
@@ -723,6 +652,7 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
+    console.log(datos)
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
       if (!res.id) {
@@ -730,6 +660,7 @@ const AperturaExamenesPreOcup = (props) => {
         } else {
           Swal.fire('Editado', 'Historia Clinica Editado', 'success');
           handleLimpiar()
+          setRefresh(refresh+1)
         }
     })
     .catch(() => {
@@ -756,6 +687,7 @@ const AperturaExamenesPreOcup = (props) => {
           setSearchP({code: ""})
           handleLimpiar()
           InfoHR(res.id)
+          setRefresh(refresh+1)
         }
     })
     .catch(() => {
@@ -763,8 +695,17 @@ const AperturaExamenesPreOcup = (props) => {
     })
     
   };
+
+  useEffect(() => {
+    setDatos(d => ({
+      ...d,
+      fechaAperturaPo: format(today, 'dd/MM/yyyy')
+    }));
+  }, []);
+
   // Formateo en DD-MM-AAAA mientras escribes
-const handleFechaAperturaInput = e => {
+ // Formateo en DD/MM/AAAA mientras escribes
+ const handleFechaAperturaInput = e => {
   const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
   let formatted = raw;
   if (raw.length >= 5) {
@@ -811,6 +752,21 @@ const handleFechaAperturaInput = e => {
     }, 400); // 400ms de espera
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    if (typeof dateString === 'string' && (dateString.includes('GMT') || dateString.includes('hora estándar'))) {
+      return '';
+    }
+
+    const parts = dateString.split(/[/-]/); // acepta "2015/02/16" o "2015-02-16"
+    if (parts.length !== 3) return '';
+
+    const [year, month, day] = parts.map(Number);
+    if (!year || !month || !day) return '';
+
+    return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+  };
+  
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
@@ -1222,7 +1178,7 @@ const handleFechaAperturaInput = e => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="nomEx" className="block w-32">Explotación en:</label>
               <div className="relative flex-grow">
-                <select name="nomEx" id="nomEx" value={datos.nomEx} onChange={(e) => {setDatos({...datos,nomEx: e.target.value})}}
+                <select name="nomEx" id="nomEx" value={datos.nomEx} onChange={(e) => {setDatos({...datos,nomEx: e.target.value}), document.getElementById('mineralPo')?.focus();}}
                   className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
                   <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                   {ExplotacionMulti.map((item,index) => (
@@ -1237,7 +1193,7 @@ const handleFechaAperturaInput = e => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="mineralPo" className="block w-32">Mineral Exp:</label>
               <div className="relative flex-grow">
-                <select name="mineralPo" id="mineralPo" value={datos.mineralPo} onChange={(e) => {setDatos({...datos,mineralPo: e.target.value})}}
+                <select name="mineralPo" id="mineralPo" value={datos.mineralPo} onChange={(e) => {setDatos({...datos,mineralPo: e.target.value}), document.getElementById('alturaPo')?.focus();}}
                     className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                     {MineralMulti.map((item,index) => (
@@ -1251,7 +1207,7 @@ const handleFechaAperturaInput = e => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="alturaPo" className="block w-32">Altura:</label>
               <div className="relative flex-grow">
-                <select name="alturaPo" id="alturaPo" value={datos.alturaPo} onChange={(e) => {setDatos({...datos,alturaPo: e.target.value})}}
+                <select name="alturaPo" id="alturaPo" value={datos.alturaPo} onChange={(e) => {setDatos({...datos,alturaPo: e.target.value}), document.getElementById('tipoPago')?.focus();}}
                     className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                     {AlturaMulti.map((item,index) => (
@@ -1490,7 +1446,7 @@ const handleFechaAperturaInput = e => {
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.n_orden}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.nombres}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">
-                        {formatDate(option.fecha_apertura_po)}
+                        {option.fecha_apertura_po}
                       </td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_empresa}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_contrata}</td>

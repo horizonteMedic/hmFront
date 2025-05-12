@@ -1,6 +1,7 @@
 import { URLAzure } from "../../../../config/config";
 
 //12.16
+
 export function SubmitRegistrarPaciente(data,sede,token) {
  
     const currentDate = new Date(); // Obtiene la fecha y hora actual
@@ -38,7 +39,7 @@ export function SubmitRegistrarPaciente(data,sede,token) {
     horaRegistroPa: `${hours}:${minutes}:${seconds}`,
     tipoDoc: 1
   };    
-
+ 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/datosPaciente/${sede}`
     const options = {
         method: 'POST',
