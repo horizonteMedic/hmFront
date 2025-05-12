@@ -461,7 +461,7 @@ const AperturaExamenesPreOcup = (props) => {
     setSearchEmpresa(res.razonEmpresa || "");
       setSearchContrata(res.razonContrata || "")
       setSearchMedico(res.n_medico || "");
-      setSearchPrueba(res.tipoPrueba || "")
+      setSearchPrueba(res.tipoPrueba || "N/A")
       setSearchCargo(res.cargoDe || "")
       setSearchArea(res.areaO || "")
       setSearchExamenMedico(res.nomExamen || "")
