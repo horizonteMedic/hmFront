@@ -56,7 +56,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: stardate,
+    fechaAperturaPo: "",
     n_operacion: null,
     textObserv1: "",
     textObserv2: "",
@@ -382,11 +382,20 @@ const AperturaExamenesPreOcup = (props) => {
     setDatos({ ...datos, fechaAperturaPo: formattedDate });
   };
 
-  const formatDate = (date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    // Si contiene GMT o "hora estándar", lo consideramos inválido
+    if (typeof dateString === 'string' && (dateString.includes('GMT') || dateString.includes('hora estándar'))) {
+      return '';
+    }
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    
+    return `${day}/${month}/${year}`;
   };
 
   const newPrice = (value) => {  
@@ -438,7 +447,8 @@ const AperturaExamenesPreOcup = (props) => {
       setDatos({
         ...res,
         nombresPa: res.nombres,
-        apellidosPa: res.apellidos
+        apellidosPa: res.apellidos,
+        fechaAperturaPo: formatDate(res.fechaAperturaPo)
       });
       setSearchEmpresa(res.razonEmpresa || "");
       setSearchContrata(res.razonContrata || "")
@@ -758,9 +768,9 @@ const handleFechaAperturaInput = e => {
   const raw = e.target.value.replace(/\D/g, '').slice(0, 8);
   let formatted = raw;
   if (raw.length >= 5) {
-    formatted = raw.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1-$2-$3');
+    formatted = raw.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
   } else if (raw.length >= 3) {
-    formatted = raw.replace(/(\d{2})(\d{0,2})/, '$1-$2');
+    formatted = raw.replace(/(\d{2})(\d{0,2})/, '$1/$2');
   }
   setDatos(d => ({ ...d, fechaAperturaPo: formatted }));
 };
@@ -1299,7 +1309,7 @@ const handleFechaAperturaInput = e => {
                 type="text"
                 id="fechaAperturaPo"
                 name="fechaAperturaPo"
-                placeholder="DD-MM-AAAA"
+                placeholder="DD/MM/AAAA"
                 value={datos.fechaAperturaPo}
                 onChange={handleFechaAperturaInput}
                 disabled={habilitar}
@@ -1474,12 +1484,14 @@ const handleFechaAperturaInput = e => {
                   {searchHC.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
                   {searchHC.map((option, index) => (
                     <tr key={index} className=' cursor-pointer' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
-                      e.preventDefault(); // 🔒 evita el menú del navegador
-                      SearchClickRight(option); // ✅ tu función personalizada
+                      e.preventDefault();
+                      SearchClickRight(option);
                     }}>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.n_orden}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.nombres}</td>
-                      <td className="border border-gray-300 px-2 py-1  mb-1">{option.fecha_apertura_po}</td>
+                      <td className="border border-gray-300 px-2 py-1  mb-1">
+                        {formatDate(option.fecha_apertura_po)}
+                      </td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_empresa}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.razon_contrata}</td>
                       <td className="border border-gray-300 px-2 py-1  mb-1">{option.nom_examen}</td>
