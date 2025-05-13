@@ -2,14 +2,17 @@ import React from "react";
  
  function footer(doc,datos) {
    const pageHeight = doc.internal.pageSize.getHeight();
-   const marginBottom = 17;
+   // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
+   const marginBottom = 25;
+   // Posición base para el footer
    const baseY = pageHeight - marginBottom;
    const col1X = 15;
    const col2X = 70;
    const col3X = 120;
    const col4X = 175;
  
-   doc.setFontSize(6);
+   // Ajustamos la fuente a 8 y color a negro
+   doc.setFontSize(7);
    doc.setTextColor(0, 0, 0);
  
    //       COLUMNA 1

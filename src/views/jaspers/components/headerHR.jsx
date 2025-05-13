@@ -59,21 +59,32 @@ const headerHR = (doc, datos) => {
       { align: "center" }
     );
 
-  // Rest of the content with adjusted Y positions
+  // Sede al costado izquierdo de "HOJA DE RUTA"
+  doc
+    .setFont("helvetica", "bold")
+    .setFontSize(10)
+    .text(
+      `SEDE: ${datos.nombreSede || ""}`,
+      margin,
+      20 + yOffset,
+      { align: "left" }
+    );
+
+  // "HOJA DE RUTA..." centrado
   doc
     .setFontSize(12)
     .text(
       `HOJA DE RUTA${datos.examen ? " " + datos.examen : ""}`,
       pageW / 2,
-      20 + yOffset,  // Increased spacing after title
+      20 + yOffset,
       { align: "center" }
     );
 
   // === 3) Campos en negrita ===
-  doc.setFontSize(8).setFont("helvetica", "bold");
+  doc.setFontSize(9).setFont("helvetica", "bold");
 
   // Fila 1: TIPO EX / Fecha / Hora / N° Orden
-  const y1 = 35 + yOffset;
+  const y1 = 30 + yOffset;
   doc.setFont("helvetica", "bold");
   doc.text("TIPO EX:", margin, y1);
   doc.setFont("helvetica", "normal");
@@ -92,7 +103,9 @@ const headerHR = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("N° DE ORDEN:", margin + 145, y1);
   doc.setFont("helvetica", "normal");
+  doc.setFontSize(15);
   doc.text(`${datos.orden || ""}`, margin + 170, y1);
+  doc.setFontSize(9);
 
   // Fila 2: Nombres y Apellidos y Edad
   let y2 = y1 + lineHeight;
@@ -114,26 +127,21 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.cargo || ""}`, margin + 20, y3);
   
   doc.setFont("helvetica", "bold");
-  doc.text("DNI:", margin + 95, y3);
+  doc.text("DNI:", margin + 100, y3);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.dni || ""}`, margin + 108, y3);
   
   doc.setFont("helvetica", "bold");
-  doc.text("G. SANGUINEO:", margin + 140, y3);
+  doc.text("G. SANGUINEO:", margin + 145, y3);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.gruposan || ""}`, margin + 165, y3);
+  doc.text(`${datos.gruposan || ""}`, margin + 175, y3);
 
-  // Fila 4: Empresa / Sede
+  // Fila 4: Empresa (SEDE eliminada)
   const y4 = y3 + lineHeight;
   doc.setFont("helvetica", "bold");
   doc.text("EMPRESA:", margin, y4);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.empresa || ""}`, margin + 25, y4);
-  
-  doc.setFont("helvetica", "bold");
-  doc.text("SEDE:", margin + 110, y4);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${datos.nombreSede || ""}`, margin + 125, y4);
 
   // Fila 5: Empresa Contratista
   const y5 = y4 + lineHeight;

@@ -544,6 +544,7 @@ const AperturaExamenesPreOcup = (props) => {
       apellidos:"",
     })
     RendeSet("")
+    props.ChangeDNI("")
     setShowEdit(false)
     setHabilitar(false)
     setRegister(true)
