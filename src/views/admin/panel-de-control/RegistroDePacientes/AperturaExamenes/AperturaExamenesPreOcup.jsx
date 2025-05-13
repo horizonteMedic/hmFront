@@ -245,7 +245,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredExamMed, setFilteredExamMed]     = useState([]);
   const handleExamenMedSearch = e => {
     const v = e.target.value;
-    setDatos(d => ({...d, nomExamen: v}))
+
     setSearchExamenMedico(v);
     setFilteredExamMed(
       v
@@ -300,7 +300,7 @@ const AperturaExamenesPreOcup = (props) => {
 
 
   useEffect(() => {
-    if (SearchP.code === "" || SearchP.nombre === "") {
+    if (SearchP.code === "" && SearchP.nombre === "") {
       const data = {
         opcion_id_p: 1,
         norden_: 0,
