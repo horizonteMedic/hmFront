@@ -120,11 +120,16 @@ export default function ReporteExamen1 (datos){
         drawC(doc,"MERCURIO EN ORINA", leftspace+160, headspace+118, 35, 10, !datos.amercurio ? true : datos.mercurioo ? true : false);
 
         autoTable(doc, {
-            startY: headspace+150, // Increased from 140 to 150 to maintain spacing
+            startY: headspace+136, // Increased from 140 to 150 to maintain spacing
             body: [
               [{ content: `HALLAZGOS: ${datos.hallazgos || ''}`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
+              [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
+              [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
+              [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
+              [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
+              [{ content: `___________________________________________________________________________________________________________________`, colSpan: 1, rowSpan: 1, styles: { valign: "top" } }],
             ],
-            theme: "grid",
+            theme: "plain",
             styles: { fontSize: 8, textColor: [0, 0, 0] },
             headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
         });

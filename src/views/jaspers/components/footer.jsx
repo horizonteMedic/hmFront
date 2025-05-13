@@ -4,7 +4,7 @@ import React from "react";
    // Altura total de la página
    const pageHeight = doc.internal.pageSize.getHeight();
    // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
-   const marginBottom = 30;
+   const marginBottom = 17;
    // Posición base para el footer
    const baseY = pageHeight - marginBottom;
  
@@ -16,7 +16,7 @@ import React from "react";
    const col4X = 175;
  
    // Ajustamos la fuente a 8 y color a negro
-   doc.setFontSize(8);
+   doc.setFontSize(6);
    doc.setTextColor(0, 0, 0);
  
    // --------------------------------------
