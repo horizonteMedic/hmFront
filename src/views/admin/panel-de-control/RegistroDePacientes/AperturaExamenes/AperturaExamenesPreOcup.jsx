@@ -408,7 +408,6 @@ const AperturaExamenesPreOcup = (props) => {
   
   const SearchHC = (event,type) => {
     if (SearchP.code === "" && SearchP.nombre === "") {
-      console.log('a');
       return;
     }
     if (event.key === 'Enter') {
@@ -433,7 +432,6 @@ const AperturaExamenesPreOcup = (props) => {
         }
         GetHistoriaC(data,props.selectedSede,props.token)
         .then((res) => {
-          console.log(res)
           if (res) {
             if (res.length) {
               setSearchHC(res); // Solo si tiene elementos
@@ -457,7 +455,6 @@ const AperturaExamenesPreOcup = (props) => {
         }
         GetHistoriaC(data,props.selectedSede,props.token)
         .then((res) => {
-          console.log(res)
           if (res) {
             if (res.length) {
               setSearchHC(res); // Solo si tiene elementos
@@ -649,7 +646,6 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-    console.log(datos)
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
       if (!res.id) {

@@ -35,7 +35,6 @@ export default function TestAltura(datos) {
   const triBottomY = admY + 15 + ovalH;
   const rowY       = headspace + 35;
   line(centerX, triBottomY, centerX, rowY);
-  console.log(datos)
   // 6) Fila de recuadros
   drawC(doc, "LABORATORIO\n(HTO-HB)",     leftspace,      rowY, 25, 10, datos.laboratorio);
   drawC(doc, "A. VISUAL",                 leftspace + 28, rowY, 30, 10, datos.oftalmologia);

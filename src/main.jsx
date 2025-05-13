@@ -32,7 +32,6 @@ import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeRecl
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 //Registro de Pacientes Multiple
 import RegistroDePacientes from './views/admin/panel-de-control/RegistroDePacientes/Registro-de-pacientes.jsx';
-import Sucamec from './views/jaspers/ReporteTriaje.jsx';
 const App = () => {
   return (
     <React.StrictMode>
@@ -95,7 +94,6 @@ const AppContent = () => {
         <Route path='/RegistroP' element={<Formulario/>}/>
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/fichapi" element={<Sucamec />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
       
@@ -104,4 +102,3 @@ const AppContent = () => {
 }
 
 createRoot(document.getElementById('root')).render(<App />);
-

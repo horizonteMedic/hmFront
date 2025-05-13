@@ -65,7 +65,6 @@ export function SubmitHistoriaC(data,sede,token,operacion) {
     rxcPlomos: data.rxcPlomos,//12
     mercurioo: data.mercurioo//13
   };    
-   console.log(JSON.stringify(body))
 
   const url = `${URLAzure}/api/v01/ct/registroPacientes/historiaClinicaOcupacional`
     const options = {
