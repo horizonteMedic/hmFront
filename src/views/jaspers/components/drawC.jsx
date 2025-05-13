@@ -5,8 +5,10 @@ const drawC = (doc,text, x, y, w, h, drawX = false) => {
         const centerX = x + w / 2;
         const centerY = y + h / 2;
         const size = 5; // tamaño de la X
+        doc.setDrawColor(255, 0, 0); // 🔴 Color rojo
         doc.line(centerX - size, centerY - size, centerX + size, centerY + size);
         doc.line(centerX + size, centerY - size, centerX - size, centerY + size);
+         doc.setDrawColor(0); // 🔁 Restaurar color predeterminado (negro)
       }
 }
 
