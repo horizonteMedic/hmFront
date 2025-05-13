@@ -489,18 +489,19 @@ return (
               DNI/LM:
             </label>
             <input
-              ref={dniRef}                 // ⬅️  aquí
+              ref={dniRef}
               type="text"
               id="codPa"
               name="codPa"
               value={props.datos.codPa}
               onChange={handleDNI}
-              onKeyDown={e => {            // ⬅️  disparar búsqueda con Enter
+              onKeyDown={e => {
                 if (e.key === 'Enter') {
                   handleSearch(e);
                 }
               }}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
             <button
               onClick={handleSearch}
@@ -522,6 +523,7 @@ return (
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'apellidosPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
           </div>
 
@@ -535,6 +537,7 @@ return (
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
           </div>
 
@@ -554,6 +557,7 @@ return (
                 placeholder="dd-MM-yyyy"
                 onKeyDown={e => focusNext(e, 'sexoPa')}
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                style={{ textTransform: 'uppercase' }}
               />
 
               <p className="text-xs text-gray-500 mt-1">
@@ -573,6 +577,7 @@ return (
       onChange={handleSexoSearch}
       placeholder="Escribe para buscar..."
       className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -612,6 +617,7 @@ return (
               value={props.datos.emailPa}
               onChange={handleChange}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
           </div>
 
@@ -625,6 +631,7 @@ return (
               onKeyDown={(e) => focusNext(e, 'nivelEstPa')}
               onChange={handleChange}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
           </div>
         </div>
@@ -643,6 +650,7 @@ return (
               onChange={handleNivelSearch}
               placeholder="Escribe para buscar..."
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
               onKeyDown={e => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
@@ -681,6 +689,7 @@ return (
                 onChange={handleProfesionSearch}
                 placeholder="Escribe para buscar..."
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                style={{ textTransform: 'uppercase' }}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -721,6 +730,7 @@ return (
                 onChange={handleCivilSearch}
                 placeholder="Escribe para buscar..."
                 className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                style={{ textTransform: 'uppercase' }}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -759,6 +769,7 @@ return (
               onKeyDown={(e) => focusNext(e, 'departamentoPa')}
               onChange={handleChange}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
           </div>
 
@@ -783,6 +794,7 @@ return (
   }}
   placeholder="Escribe para buscar..."
   className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredDept.length > 0) {
           e.preventDefault();
@@ -830,6 +842,7 @@ return (
       }}
       
       className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredProv.length > 0) {
           e.preventDefault();
@@ -877,6 +890,7 @@ return (
       onChange={handleDistSearch}
       placeholder="Escribe para buscar..."
       className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredDist.length > 0) {
           e.preventDefault();
@@ -915,6 +929,7 @@ return (
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'telCasaPa')}
               className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              style={{ textTransform: 'uppercase' }}
             />
           </div>
 
