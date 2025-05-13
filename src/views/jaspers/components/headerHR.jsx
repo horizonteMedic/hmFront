@@ -101,26 +101,44 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.hora || ""}`, margin + 115, y1);
   
   doc.setFont("helvetica", "bold");
-  doc.text("N° DE ORDEN:", margin + 145, y1);
+  doc.text("N° DE ORDEN:", margin + 145, y1-6);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(15);
-  doc.text(`${datos.orden || ""}`, margin + 170, y1);
+  doc.text(`${datos.orden || ""}`, margin + 170, y1-6);
   doc.setFontSize(9);
 
   // Fila 2: Nombres y Apellidos y Edad
-  let y2 = y1 + lineHeight;
+  let y2 = y1 + lineHeight+ 2;
   doc.setFont("helvetica", "bold");
   doc.text("NOMBRES Y APELLIDOS:", margin, y2);
+  const value = datos.nombres || "";
+  const x = margin + 45;
+  const y = y2;
+
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.nombres || ""}`, margin + 45, y2);
+
+  // fondo amarillo solo para el texto del valor
+  doc.setFillColor(255, 255, 0);
+  doc.rect(x, y - 4.2, doc.getTextWidth(value), 6, "F");
+
+  // texto en negro encima del fondo
+  doc.setTextColor(0, 0, 0);
+  doc.text(value, x, y);
   
   doc.setFont("helvetica", "bold");
   doc.text("EDAD:", margin + 145, y2);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.edad + " AÑOS" || ""}`, margin + 160, y2);
+  const edadText = datos.edad ? `${datos.edad} AÑOS` : "";
+  const xedad = margin + 160;
+  const yedad = y2;
+
+  doc.setFillColor(255, 255, 0);
+  doc.rect(xedad, yedad - 4.2, doc.getTextWidth(edadText), 6, "F");
+  doc.setTextColor(0, 0, 0);
+  doc.text(edadText, xedad, yedad);
 
   // Fila 3: Cargo / DNI / G. Sanguíneo
-  const y3 = y2 + lineHeight;
+  const y3 = y2 + lineHeight+ 2;
   doc.setFont("helvetica", "bold");
   doc.text("CARGO:", margin, y3);
   doc.setFont("helvetica", "normal");
@@ -128,23 +146,29 @@ const headerHR = (doc, datos) => {
   
   doc.setFont("helvetica", "bold");
   doc.text("DNI:", margin + 100, y3);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${datos.dni || ""}`, margin + 108, y3);
+  const dni = `${datos.dni || ""}`;
+  const xdni = margin + 108;
+  const ydni = y3;
+
+  doc.setFillColor(255, 255, 0);
+  doc.rect(xdni, ydni - 4.2, doc.getTextWidth(dni), 6, "F");
+  doc.setTextColor(0, 0, 0);
+  doc.text(dni, xdni, ydni);
   
   doc.setFont("helvetica", "bold");
   doc.text("G. SANGUINEO:", margin + 145, y3);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.gruposan || ""}`, margin + 175, y3);
+  doc.text(`${datos.gruposan || "-"}`, margin + 175, y3);
 
   // Fila 4: Empresa (SEDE eliminada)
-  const y4 = y3 + lineHeight;
+  const y4 = y3 + lineHeight +2;
   doc.setFont("helvetica", "bold");
   doc.text("EMPRESA:", margin, y4);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.empresa || ""}`, margin + 25, y4);
 
   // Fila 5: Empresa Contratista
-  const y5 = y4 + lineHeight;
+  const y5 = y4 + lineHeight +1;
   doc.setFont("helvetica", "bold");
   doc.text("EMP. CONTRATISTA:", margin, y5);
   doc.setFont("helvetica", "normal");
