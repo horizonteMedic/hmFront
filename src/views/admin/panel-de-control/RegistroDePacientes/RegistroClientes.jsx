@@ -488,7 +488,7 @@ return (
             <label htmlFor="codPa" className="block w-[11.5em]">
               DNI/LM:
             </label>
-            <input
+            <input autoComplete="off" 
               ref={dniRef}
               type="text"
               id="codPa"
@@ -514,7 +514,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Nombres:</label>
-            <input
+            <input autoComplete="off"
               ref={nombreRef}
               type="text"
               id="nombresPa"
@@ -529,7 +529,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Apellidos:</label>
-            <input
+            <input autoComplete="off"
               type="text"
               id="apellidosPa"
               name="apellidosPa"
@@ -548,7 +548,7 @@ return (
 
             {/* zona del input + nota */}
             <div className="flex flex-col w-full">
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="fechaNaciminetoPa"
                 name="fechaNaciminetoPa"
@@ -570,7 +570,7 @@ return (
 <div className="flex flex-col">
   <div className="flex items-center space-x-2">
     <label className="block w-36">Sexo:</label>
-    <input
+    <input autoComplete="off"
       id="sexoPa"
       type="text"
       value={searchSexo}
@@ -609,7 +609,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Email:</label>
-            <input
+            <input autoComplete="off"
               id="emailPa"
               onKeyDown={(e) => focusNext(e, 'lugarNacPa')}
               type="email"
@@ -623,7 +623,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Lugar Nac.:</label>
-            <input
+            <input autoComplete="off"
               id="lugarNacPa"
               type="text"
               name="lugarNacPa"
@@ -643,7 +643,7 @@ return (
         <div className="flex flex-col">
           <div className="flex items-center space-x-2">
             <label className="block w-36">Nivel Estudio:</label>
-            <input
+            <input autoComplete="off"
               id="nivelEstPa"
               type="text"
               value={searchNivel}
@@ -681,7 +681,7 @@ return (
           <div className="flex flex-col">
             <div className="flex items-center space-x-2">
               <label className="block w-36">Prof/Ocup:</label>
-              <input
+              <input autoComplete="off"
                 id="ocupacionPa"
                 name="ocupacionPa"
                 type="text"
@@ -722,7 +722,7 @@ return (
           <div className="flex flex-col">
             <div className="flex items-center space-x-2">
               <label className="block w-36">Estado Civil:</label>
-              <input
+              <input autoComplete="off"
                 id="estadoCivilPa"
                 name="estadoCivilPa"
                 type="text"
@@ -761,7 +761,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Dirección:</label>
-            <input
+            <input autoComplete="off"
             id='direccionPa'
               type="text"
               name="direccionPa"
@@ -777,7 +777,7 @@ return (
 <div className="flex flex-col">
   <div className="flex items-center space-x-2">
     <label className="block w-36">Departamento:</label>
-    <input
+    <input autoComplete="off"
   id="departamentoPa"
   type="text"
   value={searchDept}
@@ -826,7 +826,7 @@ return (
 <div className="flex flex-col">
   <div className="flex items-center space-x-2">
     <label className="block w-36">Provincia:</label>
-    <input
+    <input autoComplete="off"
       id="provinciaPa"
       type="text"
       value={searchProv}
@@ -874,7 +874,7 @@ return (
 <div className="flex flex-col">
   <div className="flex items-center space-x-2">
     <label className="block w-36">Distrito:</label>
-    <input
+    <input autoComplete="off"
       id="distritoPa"
       type="text"
       value={searchDist}
@@ -921,7 +921,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Caserío:</label>
-            <input
+            <input autoComplete="off"
               type="text"
               id="caserioPA"
               name="caserioPA"
@@ -935,7 +935,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Teléfono:</label>
-            <input
+            <input autoComplete="off"
               type="text"
               id="telCasaPa"
               name="telCasaPa"
@@ -948,7 +948,7 @@ return (
 
           <div className="flex items-center space-x-2">
             <label className="block w-36">Celular:</label>
-            <input
+            <input autoComplete="off"
               type="text"
               id="celPa"
               name="celPa"
