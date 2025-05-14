@@ -116,6 +116,23 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
       
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
+
+            // 🔁 Obtener los datos de la imagen
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            // 🔄 Recorremos todos los píxeles para eliminar fondo blanco
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // Si el píxel es casi blanco, lo hacemos transparente
+                if (r > 200 && g > 200 && b > 200) {
+                data[i + 3] = 0; // alpha = 0
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
       
             const base64Image = canvas.toDataURL("image/png");
             resolve(base64Image); // <-- devolvemos el base64
