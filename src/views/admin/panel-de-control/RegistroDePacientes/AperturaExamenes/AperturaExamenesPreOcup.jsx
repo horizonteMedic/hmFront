@@ -257,18 +257,23 @@ const AperturaExamenesPreOcup = (props) => {
   };
   const handleSelectExamenMed = x => {
     setSearchExamenMedico(x.mensaje);
+    setDatos(d => ({
+      ...d,
+      nomExamen: x.mensaje
+    }));
+
     setFilteredExamMed([]);
-    document.getElementById('nomEx')?.focus();
     getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`,props.token)
     .then((res) => {
-      setDatos({...datos,
-        nomExamen: x.mensaje,
+      setDatos(d => ({
+        ...d,
         precioPo: res.mensaje
-      })
+      }));
     })
     .catch(() => {
       console.log('Telible Error')
     })
+    document.getElementById('nomEx')?.focus();
   };
 
   // Explotación
@@ -300,6 +305,7 @@ const AperturaExamenesPreOcup = (props) => {
 
 
   useEffect(() => {
+
     if (SearchP.code === "" && SearchP.nombre === "") {
       const data = {
         opcion_id_p: 1,
@@ -525,6 +531,7 @@ const AperturaExamenesPreOcup = (props) => {
       tipoPago: "",
       precioAdic: "",
       autoriza: "",
+      fechaAperturaPo: format(today, 'dd/MM/yyyy'),
       n_operacion: null,
       textObserv1: "",
       textObserv2: "",
@@ -638,6 +645,14 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmitEdit = e => {
+    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
+       'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      const lista = camposVacios.join(', ');
+      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -663,6 +678,14 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
+     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
+       'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      const lista = camposVacios.join(', ');
+      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -672,13 +695,12 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-
     SubmitHistoriaC(datos,props.selectedSede,props.token,1)
     .then((res) => {
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
         } else {
-          setSearchP({code: ""})
+          setSearchP(prev => ({ ...prev, code: "" , nombre: ""}));
           handleLimpiar()
           InfoHR(res.id)
           setRefresh(refresh+1)
@@ -687,7 +709,6 @@ const AperturaExamenesPreOcup = (props) => {
     .catch(() => {
       console.log('telible error')
     })
-    
   };
 
   // Formateo en DD-MM-AAAA mientras escribes
@@ -753,7 +774,6 @@ const AperturaExamenesPreOcup = (props) => {
 
     return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   };
-
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
@@ -1086,6 +1106,7 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="relative flex-grow">
                 <input
                   id="nomExamen" name="nomExamen"
+                  autoComplete='off'
                   type="text" value={searchExamenMedico}
                   placeholder="Escribe para buscar examen..."
                   disabled={habilitar} onChange={handleExamenMedSearch}
@@ -1276,13 +1297,13 @@ const AperturaExamenesPreOcup = (props) => {
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="observacion1" className="block w-36">Observación 1:</label>
+              <label htmlFor="textObserv1" className="block w-36">Observación 1:</label>
               <input
                 type="text"
                 disabled={habilitar}
-                defaultValue={datos.textObserv1}
+                value={datos.textObserv1}
                 onChange={handleChange}
-                id="observacion1"
+                id="textObserv1"
                 name="textObserv1"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
@@ -1293,7 +1314,7 @@ const AperturaExamenesPreOcup = (props) => {
                 type="text"
                 id="observacion2"
                 disabled={habilitar}
-                defaultValue={datos.textObserv2}
+                value={datos.textObserv2}
                 onChange={handleChange}
                 name="textObserv2"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
