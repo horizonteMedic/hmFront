@@ -102,9 +102,18 @@ const headerHR = (doc, datos) => {
   
   doc.setFont("helvetica", "bold");
   doc.text("N° DE ORDEN:", margin + 145, y1-6);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(15);
-  doc.text(`${datos.orden || ""}`, margin + 170, y1-6);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  const orderText = `${datos.orden || ""}`;
+  const orderX = margin + 170;
+  const orderY = y1-6;
+  
+  // Draw underline
+  const orderWidth = doc.getTextWidth(orderText);
+  doc.setLineWidth(0.5);
+  doc.line(orderX, orderY + 1, orderX + orderWidth, orderY + 1);
+  
+  doc.text(orderText, orderX, orderY);
   doc.setFontSize(9);
 
   // Fila 2: Nombres y Apellidos y Edad
