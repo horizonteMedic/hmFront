@@ -33,7 +33,7 @@ import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 //Registro de Pacientes Multiple
 import RegistroDePacientes from './views/admin/panel-de-control/RegistroDePacientes/Registro-de-pacientes.jsx';
 //jaspers
-import Sucamec from './views/jaspers/ReporteExamen1.jsx';
+import Sucamec from './views/jaspers/AnalisisBioquimicos.jsx';
 
 const App = () => {
   return (
