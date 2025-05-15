@@ -257,18 +257,23 @@ const AperturaExamenesPreOcup = (props) => {
   };
   const handleSelectExamenMed = x => {
     setSearchExamenMedico(x.mensaje);
+    setDatos(d => ({
+      ...d,
+      nomExamen: x.mensaje
+    }));
+
     setFilteredExamMed([]);
-    document.getElementById('nomEx')?.focus();
     getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`,props.token)
     .then((res) => {
-      setDatos({...datos,
-        nomExamen: x.mensaje,
+      setDatos(d => ({
+        ...d,
         precioPo: res.mensaje
-      })
+      }));
     })
     .catch(() => {
       console.log('Telible Error')
     })
+    document.getElementById('nomEx')?.focus();
   };
 
   // Explotación
@@ -300,6 +305,7 @@ const AperturaExamenesPreOcup = (props) => {
 
 
   useEffect(() => {
+
     if (SearchP.code === "" && SearchP.nombre === "") {
       const data = {
         opcion_id_p: 1,
@@ -525,6 +531,7 @@ const AperturaExamenesPreOcup = (props) => {
       tipoPago: "",
       precioAdic: "",
       autoriza: "",
+      fechaAperturaPo: format(today, 'dd/MM/yyyy'),
       n_operacion: null,
       textObserv1: "",
       textObserv2: "",
@@ -638,6 +645,14 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmitEdit = e => {
+    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
+       'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      const lista = camposVacios.join(', ');
+      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -663,6 +678,14 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
+     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
+       'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      const lista = camposVacios.join(', ');
+      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -672,13 +695,12 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-
     SubmitHistoriaC(datos,props.selectedSede,props.token,1)
     .then((res) => {
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
         } else {
-          setSearchP({code: ""})
+          setSearchP(prev => ({ ...prev, code: "" , nombre: ""}));
           handleLimpiar()
           InfoHR(res.id)
           setRefresh(refresh+1)
@@ -687,7 +709,6 @@ const AperturaExamenesPreOcup = (props) => {
     .catch(() => {
       console.log('telible error')
     })
-    
   };
 
   // Formateo en DD-MM-AAAA mientras escribes
@@ -753,7 +774,6 @@ const AperturaExamenesPreOcup = (props) => {
 
     return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   };
-
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
@@ -763,7 +783,7 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="dni" className="block w-40">DNI:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="codPa"
                 ref={dniRef}
@@ -780,12 +800,12 @@ const AperturaExamenesPreOcup = (props) => {
                 <FontAwesomeIcon icon={faAsterisk}/>
               </button>
                 <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
-               <input
+               <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
@@ -793,7 +813,7 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="nombre" className="block w-[14em]">Nombre:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 id="nombres"
@@ -803,7 +823,7 @@ const AperturaExamenesPreOcup = (props) => {
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
               <label htmlFor="apellidos" className="block w-[14em]">Apellidos:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 id="apellidos"
@@ -819,7 +839,7 @@ const AperturaExamenesPreOcup = (props) => {
                   Empresa:
                 </label>
                 <div className="relative flex-grow flex items-center">
-                  <input
+                  <input autoComplete="off"
                     id="razonEmpresa"
                     name="razonEmpresa"
                     type="text"
@@ -871,7 +891,7 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center space-x-2 mb-1">
                   <label htmlFor="razonContrata" className="block w-32">Contrata:</label>
                   <div className="relative flex-grow flex items-center">
-                    <input
+                    <input autoComplete="off"
                       id="razonContrata"
                       name="razonContrata"
                       type="text"
@@ -922,7 +942,7 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center space-x-2 mb-1">
                 <label htmlFor="n_medico" className="block w-32">Médico Ocup.:</label>
                 <div className="relative flex-grow">
-                  <input
+                  <input autoComplete="off"
                     id="n_medico"
                     name="n_medico"
                     type="text"
@@ -968,7 +988,7 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center space-x-2 mb-1">
                 <label htmlFor="tipoPrueba" className="block w-32">Tipo Prueba:</label>
                 <div className="relative flex-grow">
-                  <input
+                  <input autoComplete="off"
                     id="tipoPrueba"
                     name="tipoPrueba"
                     type="text"
@@ -1021,7 +1041,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="cargoDe" className="block w-32">Cargo:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="cargoDe"
                   name="cargoDe"
                   type="text"
@@ -1058,7 +1078,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="areaO" className="block w-32">Área:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="areaO" name="areaO" type="text"
                   value={searchArea} placeholder="Escribe para buscar área..."
                   disabled={habilitar} onChange={handleAreaSearch}
@@ -1084,7 +1104,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="nomExamen" className="block w-32">Examen Médico:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="nomExamen" name="nomExamen"
                   type="text" value={searchExamenMedico}
                   placeholder="Escribe para buscar examen..."
@@ -1226,7 +1246,7 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="precioExamenAdicional" className="block w-1/2">Precio Examen Adicional:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 value={datos.precioAdic}
@@ -1248,7 +1268,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="fechaApertura" className="block w-1/3">Fecha de Apertura:</label>
                             
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="fechaAperturaPo"
                 name="fechaAperturaPo"
@@ -1265,7 +1285,7 @@ const AperturaExamenesPreOcup = (props) => {
                 }}
               />
               <label htmlFor="numOperacion" className="block ml-4">N° Operación:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 value={datos.n_operacion}
@@ -1276,24 +1296,24 @@ const AperturaExamenesPreOcup = (props) => {
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="observacion1" className="block w-36">Observación 1:</label>
-              <input
+              <label htmlFor="textObserv1" className="block w-36">Observación 1:</label>
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
-                defaultValue={datos.textObserv1}
+                value={datos.textObserv1}
                 onChange={handleChange}
-                id="observacion1"
+                id="textObserv1"
                 name="textObserv1"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="observacion2" className="block w-36">Observación 2:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="observacion2"
                 disabled={habilitar}
-                defaultValue={datos.textObserv2}
+                value={datos.textObserv2}
                 onChange={handleChange}
                 name="textObserv2"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
@@ -1304,7 +1324,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="protocolo" name="protocolo"
                   type="text" value={searchProtocolo}
                   placeholder="Escribe para buscar protocolo..."
@@ -1349,7 +1369,7 @@ const AperturaExamenesPreOcup = (props) => {
           <div className="w-full sm:w-full mb-4 pl-4">
           <div className="flex items-center space-x-2 mb-2">
                 <label htmlFor="soloMiSede" className="block w-1/6">Solo mi Sede</label>
-                <input type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />
+                <input autoComplete="off" type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />
 
                 <label htmlFor="fecha" className="block w-14">Fecha:</label>
                 <DatePicker
@@ -1358,7 +1378,7 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white w-32"
                 />
                 <label htmlFor="hora" className="block w-14">Hora:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   defaultValue={datos.n_hora}
                   id="hora"
@@ -1367,7 +1387,7 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-slate-300 w-25"
                 />
                 <label htmlFor="sedeClinica" className="block w-36">Sede Clínica:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   id="sedeClinica"
                   defaultValue={datos.codSede}
@@ -1379,7 +1399,7 @@ const AperturaExamenesPreOcup = (props) => {
 
               <div className="flex items-center space-x-2 mb-2">
                 <label htmlFor="nombre" className="block w-36">Nombre:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   value={SearchP.nombre}
                   onChange={handleNombreChange}
@@ -1388,7 +1408,7 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
                 />
                 <label htmlFor="codigo" className="block w-36">Código:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   inputMode="numeric"        // muestra teclado numérico en móviles
                   pattern="\d*"              // solo acepta números
