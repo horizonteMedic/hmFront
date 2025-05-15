@@ -7,7 +7,7 @@ import { GetHistoriaC, SubmitHistoriaC } from '../model/AdminHistoriaC';
 import {InputsSelect, InputsSelect2} from '../InputsSelect';
 import {getFetch} from '../../getFetch/getFetch'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAsterisk } from '@fortawesome/free-solid-svg-icons';
+import { faAsterisk, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import { ImportData } from '../controller/HC';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
@@ -795,9 +795,20 @@ const AperturaExamenesPreOcup = (props) => {
                 name="codPa"
                 className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-white"}`}
               />
-              <label htmlFor="Importar">IMPORTAR</label>
-              <button onClick={() => {ImportData(datos.codPa,Swal,getFetch,props.token, setDatos,RendeSet)}} className='mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
-                <FontAwesomeIcon icon={faAsterisk}/>
+              <button
+                onClick={() => {
+                  const wrappedSetDatos = (importedData) => {
+                    setDatos(prev => ({
+                      ...prev,
+                      ...importedData,
+                      fechaAperturaPo: format(new Date(), 'dd/MM/yyyy') // Ensure this is always today
+                    }));
+                  };
+                  ImportData(datos.codPa, Swal, getFetch, props.token, wrappedSetDatos, RendeSet);
+                }}
+                className='mr-2 flex items-center justify-center border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
+                <FontAwesomeIcon icon={faFileImport} className="mr-2"/>
+                IMPORTAR
               </button>
                 <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
               <input autoComplete="off"
@@ -1110,7 +1121,24 @@ const AperturaExamenesPreOcup = (props) => {
                   placeholder="Escribe para buscar examen..."
                   disabled={habilitar} onChange={handleExamenMedSearch}
                   className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
-                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredExamMed.length>0){e.preventDefault();handleSelectExamenMed(filteredExamMed[0]);} }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      // Si hay una sola opción, seleccionarla
+                      if (filteredExamMed.length === 1) {
+                        handleSelectExamenMed(filteredExamMed[0]);
+                        return;
+                      }
+                      // Si hay coincidencia exacta, seleccionarla
+                      const exact = filteredExamMed.find(x => x.mensaje.trim().toUpperCase() === searchExamenMedico.trim().toUpperCase());
+                      if (exact) {
+                        handleSelectExamenMed(exact);
+                        return;
+                      }
+                      // Si no hay coincidencia, limpiar el campo real
+                      setDatos(d => ({ ...d, nomExamen: '' }));
+                    }
+                  }}
                   onFocus={()=>setFilteredExamMed(ExamenMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExamenMedico.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredExamMed([]),100)}
                 />

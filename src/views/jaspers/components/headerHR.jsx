@@ -151,7 +151,14 @@ const headerHR = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("CARGO:", margin, y3);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.cargo || ""}`, margin + 20, y3);
+  const cargoText = datos.cargo || "";
+  const xCargo = margin + 20;
+  const yCargo = y3;
+
+  doc.setFillColor(255, 255, 0); // Yellow background
+  doc.rect(xCargo, yCargo - 4.2, doc.getTextWidth(cargoText), 6, "F");
+  doc.setTextColor(0, 0, 0); // Black text
+  doc.text(cargoText, xCargo, yCargo);
   
   doc.setFont("helvetica", "bold");
   doc.text("DNI:", margin + 100, y3);
