@@ -21,36 +21,41 @@ export default function ReporteExamen1 (datos){
         const leftspace = 10
         const headspace = 78  // Single definition of headspace
         
-        // 🟡 Dibujar cuadros del organigrama
-        drawBox(doc,"ADMISION", 90, 68, 30, 10,  4, datos.orden ? true : false);
-        drawLine(105, 78, 105, 83);
-        drawBox(doc,"TRIAJE", 90, 83, 30, 10, 4, datos.triaje ? true : false);
-        drawLine(105, 93, 105, 98);
-        drawBox(doc,"LABORATORIO", 90, 98, 30, 10, 4, datos.laboratorio ? true : false);
-        drawLine(105, 108, 105, 113);
+        // Define new positions for layout
+        const indicacionesX = leftspace;
+        const indicacionesTextX = indicacionesX + 3;
+        const indicacionesWidth = 75; 
+        const organigramX = indicacionesX + indicacionesWidth + 10; // organigram to the right of indications
+        const organigramLineX = organigramX + 15; // Center of organigram boxes (width 30)
 
-        // Add instructions box
+        // Add instructions box (now on the left)
         doc.setFillColor(240, 240, 240);
-        doc.rect(125, 68, 75, 25, 'F'); // Slightly wider rectangle
+        doc.rect(indicacionesX, 68, indicacionesWidth, 25, 'F'); 
         
         doc.setTextColor(255, 0, 0);
         doc.setFontSize(8);
-        doc.text("INDICACIONES:", 128, 73);
+        doc.text("INDICACIONES:", indicacionesTextX, 73);
         
         doc.setTextColor(0, 0, 0);
-        doc.setFontSize(7);
-        const instructions = [
-            "- DEJAR UNA COPIA A COLOR DE SU DNI VIGENTE",
-            "- DEJAR COPIA A COLOR DE SU LICENCIA DE CONDUCIR",
-            "  VIGENTE, SI VA A CONDUCIR VEHICULO Y/O SE",
-            "  REALIZARÁ EXAMEN PSICOSENSOMETRICO"
-        ];
-        
-        let yPos = 77;
-        instructions.forEach(line => {
-            doc.text(line, 128, yPos);
-            yPos += 3;
+        doc.setFontSize(8);
+        // Texto dinámico y ajustado al ancho del recuadro
+        const indicacionesTexto =
+            "- DEJAR UNA COPIA A COLOR DE SU DNI VIGENTE\n" +
+            "- DEJAR COPIA A COLOR DE SU LICENCIA DE CONDUCIR VIGENTE, SI VA A CONDUCIR VEHICULO Y/O SE REALIZARÁ EXAMEN PSICOSENSOMETRICO";
+        const splittedIndicaciones = doc.splitTextToSize(indicacionesTexto, indicacionesWidth - 6);
+        let yPosInd = 77;
+        splittedIndicaciones.forEach(line => {
+            doc.text(line, indicacionesTextX, yPosInd);
+            yPosInd += 3.5;
         });
+
+        // 🟡 Dibujar cuadros del organigrama (now on the right)
+        drawBox(doc,"ADMISION", organigramX, 68, 30, 10,  4, datos.orden ? true : false);
+        drawLine(organigramLineX, 78, organigramLineX, 83);
+        drawBox(doc,"TRIAJE", organigramX, 83, 30, 10, 4, datos.triaje ? true : false);
+        drawLine(organigramLineX, 93, organigramLineX, 98);
+        drawBox(doc,"LABORATORIO", organigramX, 98, 30, 10, 4, datos.laboratorio ? true : false);
+        drawLine(organigramLineX, 108, organigramLineX, 113);
 
         // Remove the second headspace definition and continue with the rest
         drawC(doc,"AUDIOMETRIA", leftspace, headspace+35, 25, 10, datos.audiologia ? true : false);
