@@ -877,10 +877,10 @@ const AperturaExamenesPreOcup = (props) => {
                     onBlur={() => setTimeout(() => setFilteredEmpresas([]), 100)}
                   />
                 <button 
-                    className="ml-2 flex items-center justify-center w-8 h-8 rounded-md bg-blue-800 hover:bg-blue-600 text-white"
+                    className="ml-2 flex items-center justify-center px-2 h-8 rounded-md bg-blue-800 hover:bg-blue-600 text-white"
                     onClick={() => setIsEmpresaModalOpen(true)}
                   >
-                    <FontAwesomeIcon icon={faPlus} />
+                    Agregar <FontAwesomeIcon icon={faPlus} className="ml-2" />
                   </button>
                   {searchEmpresa && filteredEmpresas.length > 0 && (
                     <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
@@ -929,10 +929,10 @@ const AperturaExamenesPreOcup = (props) => {
                       onBlur={() => setTimeout(() => setFilteredContratas([]), 100)}
                     />
                   <button 
-                    className="ml-2 flex items-center justify-center w-8 h-8 rounded-md bg-blue-800 hover:bg-blue-600 text-white"
+                    className="ml-2 flex items-center justify-center px-2 h-8 rounded-md bg-green-600 hover:bg-blue-600 text-white"
                     onClick={() => setIsContrataModalOpen(true)}
                   >
-                    <FontAwesomeIcon icon={faPlus} />
+                    Agregar <FontAwesomeIcon icon={faPlus} className="ml-2" />
                   </button>
                     {searchContrata && filteredContratas.length > 0 && (
                       <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
