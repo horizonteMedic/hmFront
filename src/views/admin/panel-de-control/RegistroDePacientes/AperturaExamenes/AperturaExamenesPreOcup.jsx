@@ -39,7 +39,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   
   const [datos, setDatos] = useState({
-    codPa: props.DNIG,
+    codPa: props.DNIG ? String(props.DNIG) : "",
     nombres: "",
     apellidos: "",
     razonEmpresa:"",
@@ -372,11 +372,13 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleDNI = (e) => {
     const { name, value } = e.target;
+    // Solo permitir números y hasta 8 caracteres
+    const cleanValue = value.replace(/\D/g, '').slice(0, 8);
     setDatos({
-        ...datos,
-        [name]: value ? parseInt(value.replace(/\D/g, ''), 10) : 0
+      ...datos,
+      [name]: cleanValue
     });
-    setRegister(true)
+    setRegister(true);
   };
 
   const handleEdit = (value) => {
@@ -597,7 +599,38 @@ const AperturaExamenesPreOcup = (props) => {
     })
   }
 
-  const InfoHR2 = (HC,nomExamen,razonEmpresa,n_psicosen,n_testaltura) => {
+  const SearchClickRight = (n_orden) => {
+    Swal.fire({
+      title: `<span style="font-size:1.3em;font-weight:bold;">Cargando Hoja de Ruta</span>`,
+      html: `<div style="font-size:1.1em;">N° <b style='color:#2563eb;'>${n_orden.n_orden}</b> - <span style='color:#0d9488;font-weight:bold;'>${n_orden.nombres}</span></div><div class='mt-2'>Espere por favor...</div>`,
+      icon: 'info',
+      background: '#f0f6ff',
+      color: '#22223b',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      customClass: {
+        popup: 'swal2-border-radius',
+        title: 'swal2-title-custom',
+        htmlContainer: 'swal2-html-custom',
+      },
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      },
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`,props.token)
+    .then((res) => {
+      InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura, res.nombres);
+    })
+  }
+
+  const InfoHR2 = (HC,nomExamen,razonEmpresa,n_psicosen,n_testaltura,nombres) => {
     getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`,props.token)
     .then(async(res) => {
       if (res.id === 1) {
@@ -606,13 +639,29 @@ const AperturaExamenesPreOcup = (props) => {
         if (jasperModules[filePath]) {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
-            
             const datos = await GetDatoHR(HC)
             Swal.fire({
-              title: "Hoja de Ruta",
-              text: "¿Desea Imprimir?.",
-              icon: "success",
-              cancelButtonText: "Cancelar"
+              title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>` ,
+              html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>` ,
+              icon: 'question',
+              background: '#f0f6ff',
+              color: '#22223b',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, Imprimir',
+              cancelButtonText: 'Cancelar',
+              customClass: {
+                popup: 'swal2-border-radius',
+                title: 'swal2-title-custom',
+                htmlContainer: 'swal2-html-custom',
+                confirmButton: 'swal2-confirm-custom',
+                cancelButton: 'swal2-cancel-custom',
+              },
+              showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+              },
+              hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+              }
             }).then((result) => {
               if (result.isConfirmed) module.default(datos);
             });
@@ -624,24 +673,6 @@ const AperturaExamenesPreOcup = (props) => {
         }
       }
     })
-  }
-
-  //doble click
-  const SearchClickRight = (n_orden) => {
-    Swal.fire({
-      title: 'Cargando Hoja de Ruta',
-      text: 'Espere por favor...',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-    getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`,props.token)
-    .then((res) => {
-      InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura)
-    })
-    
   }
 
   const handleSubmitEdit = e => {
@@ -806,7 +837,8 @@ const AperturaExamenesPreOcup = (props) => {
                   };
                   ImportData(datos.codPa, Swal, getFetch, props.token, wrappedSetDatos, RendeSet);
                 }}
-                className='mr-2 flex items-center justify-center border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
+                className='mr-2 flex items-center justify-center border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'
+              >
                 <FontAwesomeIcon icon={faFileImport} className="mr-2"/>
                 IMPORTAR
               </button>
@@ -998,7 +1030,7 @@ const AperturaExamenesPreOcup = (props) => {
               {/* — Autocomplete Tipo de Prueba — */}
               <div className="flex items-center space-x-2 mb-1">
                 <label htmlFor="tipoPrueba" className="block w-32">Tipo Prueba:</label>
-                <div className="relative flex-grow">
+                <div className="relative flex-grow flex items-center">
                   <input autoComplete="off"
                     id="tipoPrueba"
                     name="tipoPrueba"
@@ -1007,7 +1039,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar prueba..."
                     disabled={habilitar}
                     onChange={handlePruebaSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-1/2 ${habilitar ? "bg-slate-300" : "bg-white"}`}
                     onKeyDown={e => { 
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -1029,19 +1061,16 @@ const AperturaExamenesPreOcup = (props) => {
                     }}
                     onBlur={() => setTimeout(() => setFilteredPruebas([]), 100)}
                   />
-                  {searchPrueba && filteredPruebas.length > 0 && (
-                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                      {filteredPruebas.map(p => (
-                        <li
-                          key={p.id}
-                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={() => handleSelectPrueba(p)}
-                        >
-                          {p.mensaje}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <div className="flex items-center w-1/2 ml-2">
+                    <label className="whitespace-nowrap mr-2 font-medium">Historia clínica:</label>
+                    <input
+                      type="text"
+                      value={datos.n_orden || ""}
+                      disabled
+                      className="border border-gray-300 px-3 py-4 mb-1 rounded-md focus:outline-none w-full font-bold bg-slate-100 h-14 text-3xl"
+                      placeholder="N° Orden"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1459,7 +1488,32 @@ const AperturaExamenesPreOcup = (props) => {
               </div>
             <div className="mb-4 ">
               <h3 className="text-lg font-bold mb-2">Últimos Agregados & Hojas de Ruta</h3>
+             
+              <div className="flex items-center justify-between mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50">
+                <div className="flex items-center">
+                  <label htmlFor="filtroFechaTabla" className="mr-2 font-semibold">Fecha:</label>
+                  <DatePicker
+                    id="filtroFechaTabla"
+                    selected={stardate}
+                    onChange={date => setStartDate(date)}
+                    dateFormat="yyyy/MM/dd"
+                    className="border border-gray-300 px-3 py-1 rounded-md focus:outline-none bg-white w-32"
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0">
+                  <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">0</span></span>
+                  <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-yellow-600">0</span></span>
+                  <span className="font-medium text-blue-900">Pacientes observados: <span className="font-bold text-red-600">0</span></span>
+                </div>
+              </div>
+              <div className="flex items-center mb-2 bg-gray-50">
+                <span className="mr-2 text-xl">🖱️</span>
+                <span className="text-sm text-gray-700">
+                  <span className="font-semibold">Click izquierdo</span> para importar datos &nbsp;|&nbsp; <span className="font-semibold">Click derecho</span> para imprimir
+                </span>
+              </div>
               <div className="overflow-y-auto" style={{ maxHeight: 'calc(12 * 4rem)' }}>
+                
               <table  className="w-full text-center border border-gray-300 mb-4 ">
                 <thead>
                   <tr>
@@ -1474,7 +1528,7 @@ const AperturaExamenesPreOcup = (props) => {
                 <tbody>
                   {searchHC.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
                   {searchHC.map((option, index) => (
-                    <tr key={index} className=' cursor-pointer' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
+                    <tr key={index} className='cursor-pointer hover:bg-blue-100 transition-colors' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
                       e.preventDefault();
                       SearchClickRight(option);
                     }}>
