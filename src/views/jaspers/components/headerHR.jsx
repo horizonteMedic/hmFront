@@ -1,7 +1,6 @@
 // views/jaspers/components/headerHR.js
 
 const headerHR = (doc, datos) => {
- 
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   const yOffset = 10;       // separación extra arriba y abajo
@@ -189,6 +188,17 @@ const headerHR = (doc, datos) => {
   doc.text("EMP. CONTRATISTA:", margin, y5);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.contrata || ""}`, margin + 40, y5);
+
+  if (Array.isArray(datos.subReporte) && datos.subReporte.length > 0) {
+  doc.setFontSize(10)
+  doc.setFont("helvetica", "bold");
+  datos.subReporte.forEach((item, index) => {
+    doc.text(`${item.orden}        ${item.fecha}            ${item.grupo}`, margin + 124, y5 + 6 + (index * 6));
+  });
+  }
+  doc.setFontSize(9)
+  doc.setFont("helvetica", "normal");
+
 
   // Add extra spacing after the data section (30mm margin)
   return y5 + 30;  // Updated return value to use y5
