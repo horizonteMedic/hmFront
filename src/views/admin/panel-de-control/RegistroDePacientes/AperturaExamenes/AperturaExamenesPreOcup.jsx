@@ -706,9 +706,6 @@ const AperturaExamenesPreOcup = (props) => {
   setDatos(d => ({ ...d, fechaAperturaPo: formatted }));
 };
 
-  const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
-  const activarDisabled = codPa.length === 8;
-
   // Debounce para evitar demasiadas llamadas
   const debounceTimeout = useRef(null);
 
@@ -1342,7 +1339,7 @@ const AperturaExamenesPreOcup = (props) => {
                 </button>
               </div>}
             {register && <div className="pt-4 flex justify-end items-end">
-                <button type="button" onClick={handleSubmit} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                <button type="button" onClick={handleSubmit} disabled={!datos.codPa} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
                    Agregar
                 </button>
             </div>}
