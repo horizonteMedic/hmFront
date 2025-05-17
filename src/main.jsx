@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { getFetch } from './views/admin/panel-de-control/getFetch/getFetch.js';
 import { isTokenExpired, useAuthStore } from './store/auth.js';
 import { createRoot } from 'react-dom/client'; 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -47,9 +47,12 @@ const App = () => {
 
 const AppContent = () => {
   const token = useAuthStore(state => state.token);
+  const userLogued = useAuthStore(state => state.userlogued);
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView)
+  //VISTA DE API
+  const [TotalView, setTotalView] = useState([]) 
   const location = useLocation();
   const showNavbarRoutes = ['/'];
   const isLoginPage = showNavbarRoutes.includes(location.pathname);
@@ -63,6 +66,22 @@ const AppContent = () => {
       setlistView([])
     }
   },[token])
+
+  useEffect(() => {
+    // Supongamos que getFetch es una función para obtener datos de la API
+    if (userLogued) {
+      getFetch(`/api/v01/ct/opcionesInterfaz`, token)
+      .then((res) => {
+        setTotalView(res)
+      })
+      .catch(() => {
+        console.log('Ocurrió un Error al traer los datos');
+      });
+      return
+    }
+   
+  }, [userLogued]);
+
   return (
     <>
       {!isHiddenRoute && !isLoginPage && <Navbar />}
@@ -79,7 +98,7 @@ const AppContent = () => {
           <Route path="/panel-de-control" element={<DashboardAdmin />}/> 
         </Route>
 
-        <Route element={<ProtectedRoute/>}>
+        <Route element={<ProtectedRoute TotalView={TotalView}/>}>
           <Route path="/accesos" element={ <Accesos />}  /> 
           <Route path="/roles" element={<Roles />}/> 
           <Route path="/reporte-pacientes" element={<Reporte />}/> 
