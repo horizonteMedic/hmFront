@@ -21,8 +21,8 @@ export function ProtectedRoute({TotalView}){
     const listView = useAuthStore(state => state.listView)
     const setToken = useAuthStore(state => state.token)
     const location = useLocation();
-    console.log(TotalView)
-    
+    //console.log(TotalView)
+    //console.log(listView)
     
     
     if (setToken === null) {
@@ -31,7 +31,7 @@ export function ProtectedRoute({TotalView}){
 
     const currentView = TotalView?.find(view => view.rutaVista === location.pathname);
     const isAccessAllowed = currentView && listView.some(view => view.id === currentView.id);
-    console.log(isAccessAllowed)
+    //console.log(isAccessAllowed)
     return isAccessAllowed ? <Outlet /> : <Navigate to="/panel-de-control" />;
 }
 
