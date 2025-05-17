@@ -1489,7 +1489,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="mb-4 ">
               <h3 className="text-lg font-bold mb-2">Últimos Agregados & Hojas de Ruta</h3>
              
-              <div className="flex items-center justify-between mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50">
+              <div className="flex items-center justify-between mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50 hidden">
                 <div className="flex items-center">
                   <label htmlFor="filtroFechaTabla" className="mr-2 font-semibold">Fecha:</label>
                   <DatePicker
@@ -1528,7 +1528,8 @@ const AperturaExamenesPreOcup = (props) => {
                 <tbody>
                   {searchHC.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
                   {searchHC.map((option, index) => (
-                    <tr key={index} className='cursor-pointer hover:bg-blue-100 transition-colors' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
+                    <tr key={index} className={`cursor-pointer hover:opacity-80 transition-colors ${option.color === 'AMARILLO' ? 'bg-[#ffff00]' 
+                      : option.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
                       e.preventDefault();
                       SearchClickRight(option);
                     }}>
