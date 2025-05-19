@@ -709,6 +709,7 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
+    console.log('Click en Agregar: handleSubmit ejecutado');
      const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
        'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
@@ -717,6 +718,7 @@ const AperturaExamenesPreOcup = (props) => {
       return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     } 
 
+    console.log('Datos a enviar:', datos);
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -1416,7 +1418,7 @@ const AperturaExamenesPreOcup = (props) => {
                 </button>
               </div>}
             {register && <div className="pt-4 flex justify-end items-end">
-                <button type="button" onClick={handleSubmit} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                <button type="button" onClick={e => { console.log('Click directo en el botón Agregar'); handleSubmit(e); }} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
                    Agregar
                 </button>
             </div>}
