@@ -17,20 +17,21 @@ const protectedRoutes = {
     '/Registro-de-pacientes': 202
   };
 
-export function ProtectedRoute(){
+export function ProtectedRoute({TotalView}){
     const listView = useAuthStore(state => state.listView)
     const setToken = useAuthStore(state => state.token)
     const location = useLocation();
+    //console.log(TotalView)
+    //console.log(listView)
+    
+    
     if (setToken === null) {
         return <Navigate to="/" />;
       }
-    
-    const isRouteAllowed = (route) => {
-        const routeId = protectedRoutes[route];
-        return listView.some(view => view.id === routeId);
-    };
-    
-    const isAccessAllowed = isRouteAllowed(location.pathname);
+
+    const currentView = TotalView?.find(view => view.rutaVista === location.pathname);
+    const isAccessAllowed = currentView && listView.some(view => view.id === currentView.id);
+    //console.log(isAccessAllowed)
     return isAccessAllowed ? <Outlet /> : <Navigate to="/panel-de-control" />;
 }
 

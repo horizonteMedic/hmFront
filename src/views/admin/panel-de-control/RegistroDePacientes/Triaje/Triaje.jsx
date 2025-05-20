@@ -85,45 +85,37 @@ const Triaje = () => {
               <label className="font-medium ml-2"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({...f, recibo: true, nOrden: false}))}/> Recibo</label>
               <label className="font-medium ml-2"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({...f, nOrden: true, recibo: false}))}/> N° Orden</label>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Ex.Médico :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="exMedico" value={form.exMedico} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Ex.Médico :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="exMedico" value={form.exMedico} onChange={handleFormChange} readOnly/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Empresa :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Empresa :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange} readOnly/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Contrata :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Contrata :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange} readOnly/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">N° Historial :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">N° Historial :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} readOnly/>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="font-medium block mb-1">Nombres :</label>
-                <input className="border rounded px-1 w-full text-md" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange}/>
-              </div>
-              <div className="w-28">
-                <label className="font-medium block mb-1">Edad:</label>
-                <input className="border rounded px-1 w-full text-md" placeholder="" name="edad" value={form.edad} onChange={handleFormChange}/>
-              </div>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Nombres :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange} readOnly/>
+              <label className="font-medium ml-2">Edad:</label>
+              <input className="border rounded px-1 w-24 text-md" placeholder="" name="edad" value={form.edad} onChange={handleFormChange} readOnly/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Apellidos :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Apellidos :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange} readOnly/>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="font-medium block mb-1">Fecha Nac:</label>
-                <input className="border rounded px-1 w-full text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange}/>
-              </div>
-              <div className="flex-1">
-                <label className="font-medium block mb-1">Fecha Triaje:</label>
-                <input className="border rounded px-1 w-full text-md" type="date" name="fechaTriaje" value={form.fechaTriaje} onChange={handleFormChange}/>
-              </div>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Fecha Nac:</label>
+              <input className="border rounded px-1 text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} readOnly/>
+              <label className="font-medium ml-2">Fecha Triaje:</label>
+              <input className="border rounded px-1 text-md" type="date" name="fechaTriaje" value={form.fechaTriaje} onChange={handleFormChange} readOnly/>
             </div>
             {/* Tabs internos para Triaje/Espirometría */}
             <fieldset className="border rounded p-2 mt-2">

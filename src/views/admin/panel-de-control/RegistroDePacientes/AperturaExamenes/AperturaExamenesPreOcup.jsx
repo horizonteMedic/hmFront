@@ -98,7 +98,7 @@ const AperturaExamenesPreOcup = (props) => {
   },[props.DNIG])
 
   const handleEmpresaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     if (v === "") {
       setDatos(d => ({ ...d, razonEmpresa: "" }));
     }
@@ -126,7 +126,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredContratas, setFilteredContratas] = useState([]);
 
   const handleContrataSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     if (v === "") {
       setDatos(d => ({ ...d, razonContrata: "" }));
     }
@@ -153,7 +153,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredMedicos, setFilteredMedicos] = useState([]);
 
   const handleMedicoSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setSearchMedico(v);
     setDatos(d => ({...d, n_medico: v}))
     setFilteredMedicos(
@@ -177,7 +177,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredPruebas, setFilteredPruebas] = useState([]);
 
   const handlePruebaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, tipoPrueba: v}))
     setSearchPrueba(v);
     setFilteredPruebas(
@@ -200,7 +200,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchCargo, setSearchCargo] = useState(datos.cargoDe);
   const [filteredCargos, setFilteredCargos] = useState([]);
   const handleCargoSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, cargoDe: v}))
     setSearchCargo(v);
     setFilteredCargos(
@@ -222,7 +222,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchArea, setSearchArea] = useState(datos.areaO);
   const [filteredAreas, setFilteredAreas] = useState([]);
   const handleAreaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, areaO: v}))
     setSearchArea(v);
     setFilteredAreas(
@@ -244,8 +244,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchExamenMedico, setSearchExamenMedico] = useState(datos.nomExamen);
   const [filteredExamMed, setFilteredExamMed]     = useState([]);
   const handleExamenMedSearch = e => {
-    const v = e.target.value;
-
+    const v = e.target.value.toUpperCase();
     setSearchExamenMedico(v);
     setFilteredExamMed(
       v
@@ -287,7 +286,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchProtocolo, setSearchProtocolo] = useState(datos.protocolo || '');
   const [filteredProtocolos, setFilteredProtocolos] = useState([]);
   const handleProtocoloSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setSearchProtocolo(v);
     setFilteredProtocolos(
       v
@@ -361,7 +360,7 @@ const AperturaExamenesPreOcup = (props) => {
     const { name, value } = e.target;
     
     if (name === 'nomExamen') {
-      newPrice(value)
+      newPrice(value.toUpperCase())
       return
     }
     setDatos({
@@ -709,7 +708,6 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
-    console.log('Click en Agregar: handleSubmit ejecutado');
      const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
        'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
@@ -718,7 +716,6 @@ const AperturaExamenesPreOcup = (props) => {
       return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     } 
 
-    console.log('Datos a enviar:', datos);
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -757,9 +754,6 @@ const AperturaExamenesPreOcup = (props) => {
   setDatos(d => ({ ...d, fechaAperturaPo: formatted }));
 };
 
-  const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
-  const activarDisabled = codPa.length === 8;
-
   // Debounce para evitar demasiadas llamadas
   const debounceTimeout = useRef(null);
 
@@ -787,10 +781,9 @@ const AperturaExamenesPreOcup = (props) => {
           })
           .catch(() => setSearchHC([]));
       } else {
-        // Si el campo está vacío, puedes decidir si mostrar todos o limpiar la tabla
         setSearchHC([]);
       }
-    }, 400); // 400ms de espera
+    }, 400);
   };
 
   const formatDate = (dateString) => {
@@ -1418,7 +1411,7 @@ const AperturaExamenesPreOcup = (props) => {
                 </button>
               </div>}
             {register && <div className="pt-4 flex justify-end items-end">
-                <button type="button" onClick={e => { console.log('Click directo en el botón Agregar'); handleSubmit(e); }} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                <button type="button" onClick={handleSubmit} disabled={!datos.codPa} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
                    Agregar
                 </button>
             </div>}
