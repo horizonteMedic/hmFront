@@ -86,6 +86,16 @@ const AperturaExamenesPreOcup = (props) => {
     nombre: ""
   })
   const [refresh, setRefresh] = useState(0)
+  const [CanP, setCanP] = useState({Completos: 0, Faltantes: 0})
+  const [FechaCanP, setFechaCanP] = useState(format(today, 'dd/MM/yyyy'))
+
+  useEffect(() => {
+    getFetch(`/api/v01/ct/consentDigit/resumenAdmPacientesConFiltros?nomSede=${props.selectedSede}&fecha=${FechaCanP}`,props.token)
+    .then((res) => {
+      setCanP(d => ({...d, Completos: res.completos, Faltantes: res.faltantes}))
+    })
+  },[FechaCanP])
+
 
   // Autocompletado Empresa
   const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
@@ -800,10 +810,11 @@ const AperturaExamenesPreOcup = (props) => {
 
     return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   };
+
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
-          <div className="w-full sm:w-full md:w-auto   ">
+          <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
             <div className="mb-1 pb-2">
               <h2 className="text-lg font-bold">Datos</h2>
             </div>
@@ -1484,21 +1495,20 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="mb-4 ">
               <h3 className="text-lg font-bold mb-2">Últimos Agregados & Hojas de Ruta</h3>
              
-              <div className="flex items-center justify-between mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50 hidden">
-                <div className="flex items-center">
+              <div className="flex items-center justify-between mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50 ">
+                <div className="flex items-center text-lg">
                   <label htmlFor="filtroFechaTabla" className="mr-2 font-semibold">Fecha:</label>
                   <DatePicker
                     id="filtroFechaTabla"
-                    selected={stardate}
-                    onChange={date => setStartDate(date)}
+                    value={FechaCanP}
+                    onChange={(date) => {setFechaCanP(format(date, "dd/MM/yyyy"))}}
                     dateFormat="yyyy/MM/dd"
                     className="border border-gray-300 px-3 py-1 rounded-md focus:outline-none bg-white w-32"
                   />
                 </div>
-                <div className="flex flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0">
-                  <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">0</span></span>
-                  <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-yellow-600">0</span></span>
-                  <span className="font-medium text-blue-900">Pacientes observados: <span className="font-bold text-red-600">0</span></span>
+                <div className="flex text-lg flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0">
+                  <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">{CanP.Completos}</span></span>
+                  <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-red-600">{CanP.Faltantes}</span></span>
                 </div>
               </div>
               <div className="flex items-center mb-2 bg-gray-50">
