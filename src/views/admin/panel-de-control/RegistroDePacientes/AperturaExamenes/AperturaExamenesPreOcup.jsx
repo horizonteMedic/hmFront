@@ -113,7 +113,7 @@ const AperturaExamenesPreOcup = (props) => {
       setDatos(d => ({ ...d, razonEmpresa: "" }));
     }
     setDatos(d => ({...d, razonEmpresa: v}))
-    setSearchEmpresa(v);
+    setSearchEmpresa(v.toUpperCase());
     setFilteredEmpresas(
       v
         ? EmpresasMulti.filter(emp =>
@@ -141,7 +141,7 @@ const AperturaExamenesPreOcup = (props) => {
       setDatos(d => ({ ...d, razonContrata: "" }));
     }
     setDatos(d => ({...d, razonContrata: v}))
-    setSearchContrata(v);
+    setSearchContrata(v.toUpperCase());
     setFilteredContratas(
       v
         ? ContrataMulti.filter(c =>
@@ -164,7 +164,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleMedicoSearch = e => {
     const v = e.target.value;
-    setSearchMedico(v);
+    setSearchMedico(v.toUpperCase());
     setDatos(d => ({...d, n_medico: v}))
     setFilteredMedicos(
       v
@@ -212,7 +212,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleCargoSearch = e => {
     const v = e.target.value;
     setDatos(d => ({...d, cargoDe: v}))
-    setSearchCargo(v);
+    setSearchCargo(v.toUpperCase());
     setFilteredCargos(
       v
         ? CargosMulti.filter(c =>
@@ -234,7 +234,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleAreaSearch = e => {
     const v = e.target.value;
     setDatos(d => ({...d, areaO: v}))
-    setSearchArea(v);
+    setSearchArea(v.toUpperCase());
     setFilteredAreas(
       v
         ? AreaMulti.filter(a =>
@@ -256,7 +256,7 @@ const AperturaExamenesPreOcup = (props) => {
   const handleExamenMedSearch = e => {
     const v = e.target.value;
 
-    setSearchExamenMedico(v);
+    setSearchExamenMedico(v.toUpperCase());
     setFilteredExamMed(
       v
         ? ExamenMulti.filter(x =>
@@ -832,7 +832,7 @@ const AperturaExamenesPreOcup = (props) => {
                 onKeyDown={handleSearch}
                 onChange={handleDNI}
                 name="codPa"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-slate-100"}`}
               />
               <button
                 onClick={() => {
@@ -854,12 +854,12 @@ const AperturaExamenesPreOcup = (props) => {
               <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
                <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
@@ -871,7 +871,7 @@ const AperturaExamenesPreOcup = (props) => {
                 onChange={handleChange}
                 value={datos.nombres}
                 name="nombres"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
               <label htmlFor="apellidos" className="block w-[14em]">Apellidos:</label>
               <input autoComplete="off"
@@ -881,7 +881,7 @@ const AperturaExamenesPreOcup = (props) => {
                 onChange={handleChange}
                 value={datos.apellidos}
                 name="apellidos"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
               {/* — Autocomplete Empresa — */}
@@ -898,7 +898,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar empresa..."
                     disabled={habilitar}
                     onChange={handleEmpresaSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredEmpresas.length > 0) {
                         e.preventDefault();
@@ -950,7 +950,7 @@ const AperturaExamenesPreOcup = (props) => {
                       placeholder="Escribe para buscar contrata..."
                       disabled={habilitar}
                       onChange={handleContrataSearch}
-                      className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                      className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                       onKeyDown={e => {
                         if (e.key === 'Enter' && filteredContratas.length > 0) {
                           e.preventDefault();
@@ -1001,7 +1001,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar médico..."
                     disabled={habilitar}
                     onChange={handleMedicoSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredMedicos.length > 0) {
                         e.preventDefault();
@@ -1047,7 +1047,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar prueba..."
                     disabled={habilitar}
                     onChange={handlePruebaSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-1/2 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-1/2 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                     onKeyDown={e => { 
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -1097,7 +1097,7 @@ const AperturaExamenesPreOcup = (props) => {
                   placeholder="Escribe para buscar cargo..."
                   disabled={habilitar}
                   onChange={handleCargoSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md  w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                  className={`border border-gray-300 px-3 py-1 rounded-md  w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                   onKeyDown={e => {
                     if (e.key==='Enter' && filteredCargos.length>0) {
                       e.preventDefault(); handleSelectCargo(filteredCargos[0]);
@@ -1130,7 +1130,7 @@ const AperturaExamenesPreOcup = (props) => {
                   id="areaO" name="areaO" type="text"
                   value={searchArea} placeholder="Escribe para buscar área..."
                   disabled={habilitar} onChange={handleAreaSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredAreas.length>0){e.preventDefault();handleSelectArea(filteredAreas[0]);} }}
                   onFocus={()=>setFilteredAreas(AreaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchArea.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredAreas([]),100)}
@@ -1157,7 +1157,7 @@ const AperturaExamenesPreOcup = (props) => {
                   type="text" value={searchExamenMedico}
                   placeholder="Escribe para buscar examen..."
                   disabled={habilitar} onChange={handleExamenMedSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                   onKeyDown={e => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -1251,7 +1251,7 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="nomEx" className="block w-32">Explotación en:</label>
               <div className="relative flex-grow">
                 <select name="nomEx" id="nomEx" value={datos.nomEx} onChange={(e) => {setDatos({...datos,nomEx: e.target.value}), document.getElementById('mineralPo')?.focus();}}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}>
                   <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                   {ExplotacionMulti.map((item,index) => (
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
@@ -1266,7 +1266,7 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="mineralPo" className="block w-32">Mineral Exp:</label>
               <div className="relative flex-grow">
                 <select name="mineralPo" id="mineralPo" value={datos.mineralPo} onChange={(e) => {setDatos({...datos,mineralPo: e.target.value}), document.getElementById('alturaPo')?.focus();}}
-                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}>
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                     {MineralMulti.map((item,index) => (
                       <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
@@ -1280,7 +1280,7 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="alturaPo" className="block w-32">Altura:</label>
               <div className="relative flex-grow">
                 <select name="alturaPo" id="alturaPo" value={datos.alturaPo} onChange={(e) => {setDatos({...datos,alturaPo: e.target.value}), document.getElementById('tipoPago')?.focus();}}
-                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}>
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                     {AlturaMulti.map((item,index) => (
                       <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
@@ -1294,7 +1294,7 @@ const AperturaExamenesPreOcup = (props) => {
               <input type="text"
                 id="precioPo"
                 name="precioPo"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${!editPri ? "bg-slate-300" : "bg-white"}`} 
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${!editPri ? "bg-slate-300" : "bg-slate-100"}`} 
                 value={datos.precioPo}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -1325,7 +1325,7 @@ const AperturaExamenesPreOcup = (props) => {
                 }}
                 id="precioAdic"
                 name="precioAdic"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
               <InputsSelect2 nombre="autoriza" disabled={habilitar} value={datos.autoriza} title="Autorizado Por" Selects={ListAuth} handleChange={handleChange}/>
             </div>
@@ -1369,7 +1369,7 @@ const AperturaExamenesPreOcup = (props) => {
                 onChange={handleChange}
                 id="textObserv1"
                 name="textObserv1"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
@@ -1381,7 +1381,7 @@ const AperturaExamenesPreOcup = (props) => {
                 value={datos.textObserv2}
                 onChange={handleChange}
                 name="textObserv2"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
             
