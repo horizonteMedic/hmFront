@@ -95,7 +95,7 @@ const AppContent = () => {
         <Route path="/actualizar-password" element={<ActualizarPassword />} />
 
         <Route element={<ProtectedPanel/>}>
-          <Route path="/panel-de-control" element={<DashboardAdmin />}/> 
+          <Route path="/panel-de-control" element={<DashboardAdmin TotalView={TotalView}/>}/> 
         </Route>
 
         <Route element={<ProtectedRoute TotalView={TotalView}/>}>

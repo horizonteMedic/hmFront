@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload,faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faPersonCirclePlus, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
@@ -18,12 +18,79 @@ const Card = ({ to, id, icon, color, hoverColor, iconColor, hoverIconColor }) =>
   );
 };
 
-const Dashboard = () => {
+const iconMap = {
+    faList,
+    faFileLines,
+    faGears,
+    faUserLock,
+    faCodeBranch,
+    faBusinessTime,
+    faPersonCirclePlus,
+    faTentArrowDownToLine,
+    faBuilding,
+    faHandshake,
+    faNetworkWired
+  };
+
+
+const mapBackendToCard = (view) => ({
+  id: String(view.id),               // siempre string
+  to: view.rutaVista,                // rutaVista → to
+  title: view.nombre,                // nombre    → title
+  icon: iconMap[view.descripcion] || faFileLines, // default si no existe
+});
+
+const allowedRoutesStatic = [
+  "/roles",
+  "/accesos",
+  "/reporte-pacientes",
+  "/matriz-postulante",
+  "/configuracion",
+  "/Registro-de-pacientes",
+];
+
+const Dashboard = ({TotalView}) => {
   const userLogued = useAuthStore(state => state.userlogued);
   const listView = useAuthStore(state => state.listView);
   const allowedRoutes = listView.map(item => `${item.id}`);
+  //DINAMISMO DETENDIO
+  /*const allowedIds = useMemo(() => new Set(listView.map(v => String(v.id))), [listView]);
+  const allCards = useMemo(() => {
+  // ① Filtrar por ruta
+    const viewsWanted = TotalView.filter((view) =>
+      allowedRoutesStatic.includes(view.rutaVista)
+    );
 
-  
+    // ② Mapear cada vista permitida al formato de tarjeta
+    return viewsWanted.map(mapBackendToCard);
+  }, [TotalView]); // o [] si TotalView es import estático
+  console.log(TotalView)
+
+  const filteredCards = useMemo(
+    () => allCards.filter((card) => allowedIds.has(card.id)),
+    [allowedIds, allCards]
+  );
+
+  if (filteredCards.length === 0) {
+    return (
+      <p className="text-center text-gray-600">
+        Sin accesos disponibles para tu usuario
+      </p>
+    );
+  }
+  {filteredCards.map((card, index) => (
+    <div key={index} className="flex flex-col items-center w-[120px] mb-4">
+      <Link
+        key={card.id}
+        to={card.to}
+        className="`flex justify-center items-center w-[60px] h-[60px]  flex-shrink-0 m-4 p-6 bg-[#1c4d77] rounded-xl transition duration-500 transform hover:shadow-lg hover:bg-[#fc6b03] hover:scale-110`"
+      >
+        <FontAwesomeIcon icon={card.icon} style={{ color: 'white' }} size="2xl" className={`transition duration-500 hover:text-white`} />
+      </Link>
+      <h2 className="text-lg font-bold my-2 text-center">{card.title}</h2>
+    </div>
+  ))}*/
+
 
   // Cards principales (sin cambios)
   const filteredCards = [

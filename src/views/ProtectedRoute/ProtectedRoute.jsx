@@ -1,7 +1,7 @@
 import {useAuthStore} from '../../store/auth'
 import { useLocation,Outlet, Navigate} from "react-router-dom"
 
-const protectedRoutes = {
+/*const protectedRoutes = {
     '/roles': 52,
     '/accesos': 53,
     '/reporte-pacientes': 54,
@@ -15,7 +15,7 @@ const protectedRoutes = {
     '/protocolos': 61,
     '/RegistroP': 602,
     '/Registro-de-pacientes': 202
-  };
+  };*/
 
 export function ProtectedRoute({TotalView}){
     const listView = useAuthStore(state => state.listView)
