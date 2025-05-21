@@ -231,7 +231,7 @@ const TabComponent = () => {
               <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} />
             )}
             {activeTab === 5 && (
-              <Triaje />
+              <Triaje token={token} selectedSede="T-NP"/>
             )}
           </div>
         </div>

@@ -108,12 +108,12 @@ const AperturaExamenesPreOcup = (props) => {
   },[props.DNIG])
 
   const handleEmpresaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     if (v === "") {
       setDatos(d => ({ ...d, razonEmpresa: "" }));
     }
     setDatos(d => ({...d, razonEmpresa: v}))
-    setSearchEmpresa(v.toUpperCase());
+    setSearchEmpresa(v);
     setFilteredEmpresas(
       v
         ? EmpresasMulti.filter(emp =>
@@ -136,12 +136,12 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredContratas, setFilteredContratas] = useState([]);
 
   const handleContrataSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     if (v === "") {
       setDatos(d => ({ ...d, razonContrata: "" }));
     }
     setDatos(d => ({...d, razonContrata: v}))
-    setSearchContrata(v.toUpperCase());
+    setSearchContrata(v);
     setFilteredContratas(
       v
         ? ContrataMulti.filter(c =>
@@ -163,8 +163,8 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredMedicos, setFilteredMedicos] = useState([]);
 
   const handleMedicoSearch = e => {
-    const v = e.target.value;
-    setSearchMedico(v.toUpperCase());
+    const v = e.target.value.toUpperCase();
+    setSearchMedico(v);
     setDatos(d => ({...d, n_medico: v}))
     setFilteredMedicos(
       v
@@ -187,7 +187,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredPruebas, setFilteredPruebas] = useState([]);
 
   const handlePruebaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, tipoPrueba: v}))
     setSearchPrueba(v);
     setFilteredPruebas(
@@ -210,9 +210,9 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchCargo, setSearchCargo] = useState(datos.cargoDe);
   const [filteredCargos, setFilteredCargos] = useState([]);
   const handleCargoSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, cargoDe: v}))
-    setSearchCargo(v.toUpperCase());
+    setSearchCargo(v);
     setFilteredCargos(
       v
         ? CargosMulti.filter(c =>
@@ -232,9 +232,9 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchArea, setSearchArea] = useState(datos.areaO);
   const [filteredAreas, setFilteredAreas] = useState([]);
   const handleAreaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, areaO: v}))
-    setSearchArea(v.toUpperCase());
+    setSearchArea(v);
     setFilteredAreas(
       v
         ? AreaMulti.filter(a =>
@@ -254,9 +254,8 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchExamenMedico, setSearchExamenMedico] = useState(datos.nomExamen);
   const [filteredExamMed, setFilteredExamMed]     = useState([]);
   const handleExamenMedSearch = e => {
-    const v = e.target.value;
-
-    setSearchExamenMedico(v.toUpperCase());
+    const v = e.target.value.toUpperCase();
+    setSearchExamenMedico(v);
     setFilteredExamMed(
       v
         ? ExamenMulti.filter(x =>
@@ -297,7 +296,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchProtocolo, setSearchProtocolo] = useState(datos.protocolo || '');
   const [filteredProtocolos, setFilteredProtocolos] = useState([]);
   const handleProtocoloSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setSearchProtocolo(v);
     setFilteredProtocolos(
       v
@@ -371,7 +370,7 @@ const AperturaExamenesPreOcup = (props) => {
     const { name, value } = e.target;
     
     if (name === 'nomExamen') {
-      newPrice(value)
+      newPrice(value.toUpperCase())
       return
     }
     setDatos({
@@ -792,10 +791,9 @@ const AperturaExamenesPreOcup = (props) => {
           })
           .catch(() => setSearchHC([]));
       } else {
-        // Si el campo está vacío, puedes decidir si mostrar todos o limpiar la tabla
         setSearchHC([]);
       }
-    }, 400); // 400ms de espera
+    }, 400);
   };
 
   const formatDate = (dateString) => {

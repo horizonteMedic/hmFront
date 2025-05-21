@@ -4,6 +4,7 @@ import { faUser, faCogs, faFileAlt, faBuilding, faLock, faList, faTentArrowDownT
 import { getFetch } from '../../getFetch/getFetch';
 import { ListViewxRol, NewVistaxRol, DeleteVistaxRol } from '../model/ListViewxRol';
 import Swal from 'sweetalert2';
+import ModalAsignacionesSub from './modalasiganacionessub';
 
 const iconMapping = {
   'Sistema': faCogs,
@@ -31,7 +32,7 @@ const ArrowIcon = ({ isOpen, toggle }) => {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ transition: 'transform 0.3s ease' }} // Suaviza el cambio de dirección
+      style={{ transition: 'transform 0.3s ease' }}
     >
       {isOpen ? (
         <polyline points="6 9 12 15 18 9" />
@@ -42,11 +43,12 @@ const ArrowIcon = ({ isOpen, toggle }) => {
   );
 };
 
-
 const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgpag }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [idAsignation, setIdAsignation] = useState('');
+  const [showSubModal, setShowSubModal] = useState(false);
+  const [accionesSeleccionadas, setAccionesSeleccionadas] = useState([]);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -58,95 +60,134 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
     setIdAsignation(assignedNode ? assignedNode.id : '');
   }, [node.id, asigned]);
 
-  function AleertSuccesCreate() {
-    Swal.fire({
-      title: '¿Estas Seguro?',
-      text: 'Deseas asignar esta vista a este Rol?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Si, Asignar!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Asignado!',
-          text: 'Se ha asignado correctamente.',
-          icon: 'success'
-        }).then((result) => {
-          if (result.isConfirmed) Refresgpag();
-        });
-      }
-    });
-  }
-
-  function AleertSuccesDelete() {
-    Swal.fire({
-      title: '¿Estas Seguro?',
-      text: 'Deseas quitar esta vista al Rol?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Si, Eliminar!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: 'Eliminado!',
-          text: 'Se ha quitado la asignacion.',
-          icon: 'success'
-        }).then((result) => {
-          if (result.isConfirmed) Refresgpag();
-        });
-      }
-    });
-  }
-
   const handleCheckboxChange = () => {
     if (isChecked) {
-      DeleteVistaxRol(idAsignation, token)
-        .then(() => {
-          AleertSuccesDelete();
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¿Deseas quitar esta vista al Rol?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        customClass: {
+          popup: 'swal2-popup-custom',
+          confirmButton: 'swal2-confirm-custom',
+          cancelButton: 'swal2-cancel-custom'
+        },
+        backdrop: `rgba(44,62,80,0.7)`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          DeleteVistaxRol(idAsignation, token)
+            .then(() => {
+              Swal.fire({
+                title: '¡Eliminado!',
+                text: 'Se ha quitado la asignación.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#f8f9fa',
+                color: '#233245'
+              });
+              setIsChecked(false);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+        }
+      });
     } else {
-      const datos = {
-        descripcion: `Acceso a ${node.label}`,
-        id_rol: ID_ROL,
-        id_opcion_interfaz: node.id
-      };
-      NewVistaxRol(datos, userlogued, token)
-        .then(() => {
-          AleertSuccesCreate();
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: '¿Deseas asignar esta vista a este Rol?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#233245',
+        cancelButtonColor: '#fc6b03',
+        confirmButtonText: 'Sí, asignar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true,
+        customClass: {
+          popup: 'swal2-popup-custom',
+          confirmButton: 'swal2-confirm-custom',
+          cancelButton: 'swal2-cancel-custom'
+        },
+        backdrop: `rgba(44,62,80,0.7)`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          const datos = {
+            descripcion: `Acceso a ${node.label}`,
+            id_rol: ID_ROL,
+            id_opcion_interfaz: node.id
+          };
+          NewVistaxRol(datos, userlogued, token)
+            .then(() => {
+              Swal.fire({
+                title: '¡Asignado!',
+                text: 'Se ha asignado correctamente.',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#f8f9fa',
+                color: '#233245'
+              });
+              setIsChecked(true);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+        }
+      });
     }
-    setIsChecked(!isChecked); // Actualiza el estado del checkbox
+  };
+
+  const handleSubModalOpen = (e) => {
+    e.stopPropagation();
+    setShowSubModal(true);
+  };
+
+  const handleSubModalClose = () => {
+    setShowSubModal(false);
+  };
+
+  const accionesEjemplo = ['Actualizar', 'Eliminar', 'Mostrar'];
+
+  const handleSeleccionAccion = (accion) => {
+    setAccionesSeleccionadas((prev) =>
+      prev.includes(accion)
+        ? prev.filter((a) => a !== accion)
+        : [...prev, accion]
+    );
   };
 
   return (
     <div className={`mt-2 mb-2 ${isParent ? '' : ''}`}>
       <div className="flex items-center">
-        <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
+        {node.children && node.children.length > 0 && (
+          <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
+        )}
+        {isParent ? null : <span className="mr-1">-</span>}
         <button
           className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
           style={{ backgroundColor: isParent ? '#233245 ' : '#fc6b03' }}
+          onClick={isParent ? undefined : handleSubModalOpen}
+          type="button"
         >
-          <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
+          {iconMapping[node.label] && (
+            <FontAwesomeIcon icon={iconMapping[node.label]} className="mr-1" />
+          )}
           {node.label}
         </button>
         <input
           type="checkbox"
           className="ml-auto pointer"
           checked={isChecked}
-          onChange={handleCheckboxChange} // El checkbox controla la selección
+          onChange={handleCheckboxChange}
         />
       </div>
-      {isOpen && (
+      {isOpen && node.children && node.children.length > 0 && (
         <div style={{ marginLeft: 20 }}>
           {node.children.map((child) => (
             <TreeNode
@@ -162,25 +203,34 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
           ))}
         </div>
       )}
+      {/* Modal para asignar acciones a sub vista */}
+      {!isParent && (
+        <ModalAsignacionesSub
+          open={showSubModal}
+          onClose={handleSubModalClose}
+          nombre={node.label}
+          acciones={accionesEjemplo}
+          seleccionadas={accionesSeleccionadas}
+          onChangeSeleccion={handleSeleccionAccion}
+        />
+      )}
     </div>
   );
 };
 
-const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL,Nombre }) => {
-  const [data, setData] = useState([])
-  const [dataasignacion, setDataasignacion] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [refres, setRefresh] = useState(0)
+const MyTreeView = ({ closeModal, token, Refresgpag, userlogued, ID_ROL, Nombre }) => {
+  const [data, setData] = useState([]);
+  const [dataasignacion, setDataasignacion] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [refres, setRefresh] = useState(0);
 
   useEffect(() => {
     setLoading(true);
-    // Realizar las dos solicitudes a la API en paralelo usando Promise.all
     Promise.all([
       getFetch('/api/v01/ct/opcionesInterfaz', token),
       ListViewxRol(ID_ROL, token)
     ])
       .then(([opcionesInterfazResponse, listViewxRolResponse]) => {
-        // Establecer los datos para cada solicitud
         setData(opcionesInterfazResponse);
         setDataasignacion(listViewxRolResponse);
       })
@@ -193,7 +243,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL,Nombre }) =>
   }, []);
 
   const buildTree = (data, parentId = null) => {
-    return data
+    const items = data
       .filter((item) => item.idPadre === parentId)
       .map((item) => {
         return {
@@ -203,9 +253,17 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL,Nombre }) =>
           descripcion: item.descripcion
         };
       });
+
+    // Sort items: items with children first, then items without children
+    return items.sort((a, b) => {
+      const aHasChildren = a.children && a.children.length > 0;
+      const bHasChildren = b.children && b.children.length > 0;
+      if (aHasChildren && !bHasChildren) return -1;
+      if (!aHasChildren && bHasChildren) return 1;
+      return 0;
+    });
   };
 
-  
   const treeData = buildTree(data);
 
   return (
@@ -222,7 +280,7 @@ const MyTreeView = ({ closeModal,token,Refresgpag,userlogued,ID_ROL,Nombre }) =>
         <div className="p-4">
           <div
             className="modal-body relative"
-            style={{ maxHeight: '400px', overflowY: 'auto' }} // Ajuste para agregar scroll
+            style={{ maxHeight: '400px', overflowY: 'auto' }}
           >
             <div className="tree smart-form">
               <ul role="tree">
