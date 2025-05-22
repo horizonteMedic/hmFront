@@ -500,7 +500,7 @@ return (
                   handleSearch(e);
                 }
               }}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
             <button
@@ -522,7 +522,7 @@ return (
               value={props.datos.nombresPa}
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'apellidosPa')}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
           </div>
@@ -536,7 +536,7 @@ return (
               value={props.datos.apellidosPa}
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'fechaNaciminetoPa')}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
           </div>
@@ -556,7 +556,7 @@ return (
                 onChange={handleFecha}
                 placeholder="dd-MM-yyyy"
                 onKeyDown={e => focusNext(e, 'sexoPa')}
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
                 style={{ textTransform: 'uppercase' }}
               />
 
@@ -576,7 +576,7 @@ return (
       value={searchSexo}
       onChange={handleSexoSearch}
       placeholder="Escribe para buscar..."
-      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
       style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter') {
@@ -616,7 +616,7 @@ return (
               name="emailPa"
               value={props.datos.emailPa}
               onChange={handleChange}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
           </div>
@@ -630,7 +630,7 @@ return (
               value={props.datos.lugarNacPa}
               onKeyDown={(e) => focusNext(e, 'nivelEstPa')}
               onChange={handleChange}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
           </div>
@@ -649,7 +649,7 @@ return (
               value={searchNivel}
               onChange={handleNivelSearch}
               placeholder="Escribe para buscar..."
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
               onKeyDown={e => {
                 if (e.key === 'Enter') {
@@ -688,7 +688,7 @@ return (
                 value={searchTerm}                
                 onChange={handleProfesionSearch}
                 placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
                 style={{ textTransform: 'uppercase' }}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
@@ -729,7 +729,7 @@ return (
                 value={searchCivil}
                 onChange={handleCivilSearch}
                 placeholder="Escribe para buscar..."
-                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+                className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
                 style={{ textTransform: 'uppercase' }}
                 onKeyDown={e => {
                   if (e.key === 'Enter') {
@@ -768,7 +768,7 @@ return (
               value={props.datos.direccionPa}
               onKeyDown={(e) => focusNext(e, 'departamentoPa')}
               onChange={handleChange}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
           </div>
@@ -793,7 +793,7 @@ return (
     }
   }}
   placeholder="Escribe para buscar..."
-  className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+  className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
       style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredDept.length > 0) {
@@ -841,7 +841,7 @@ return (
         }
       }}
       
-      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
       style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredProv.length > 0) {
@@ -889,7 +889,7 @@ return (
       
       onChange={handleDistSearch}
       placeholder="Escribe para buscar..."
-      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+      className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
       style={{ textTransform: 'uppercase' }}
       onKeyDown={e => {
         if (e.key === 'Enter' && filteredDist.length > 0) {
@@ -928,7 +928,7 @@ return (
               value={props.datos.caserioPA}
               onChange={handleChange}
               onKeyDown={(e) => focusNext(e, 'telCasaPa')}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
               style={{ textTransform: 'uppercase' }}
             />
           </div>
@@ -942,7 +942,7 @@ return (
               value={props.datos.telCasaPa}
               onKeyDown={(e) => focusNext(e, 'celPa')}
               onChange={handleNumber}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
             />
           </div>
 
@@ -954,7 +954,7 @@ return (
               name="celPa"
               value={props.datos.celPa}
               onChange={handleNumber}
-              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-white w-full"
+              className="border border-gray-300 px-3 py-2 rounded-md focus:outline-none bg-slate-100 w-full"
             />
           </div>
         </div>
