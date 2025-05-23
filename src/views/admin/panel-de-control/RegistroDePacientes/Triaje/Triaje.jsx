@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetICC, GetIMC, GetPA } from './Conversiones';
-import { Clean, GetInfoPac, GetTable, VerifyTR } from './Controller';
+import { Clean, GetInfoPac, GetTable, handleNombreChange, SearchHC, VerifyTR } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
 import { useEffect } from 'react';
 
 const Triaje = ({token,selectedSede}) => {
+  //Para la busqueda
+  const debounceTimeout = useRef(null);
   // Estado para tab principal
   const [activeTab, setActiveTab] = useState('datos');
   // Estado para tab interno de triaje/espiro
@@ -244,9 +246,19 @@ const Triaje = ({token,selectedSede}) => {
           <div className="flex gap-3 items-center mb-2 text-md">
             <label className="font-medium"><input type="checkbox" name="tipoPaciente" checked={busqueda.tipoPaciente} onChange={handleBusquedaChange}/> Pacientes</label>
             <label className="font-medium"><input type="checkbox" name="tipoOcupacional" checked={busqueda.tipoOcupacional} onChange={handleBusquedaChange}/> Ocupacional</label>
-            <label className="ml-2 font-medium">Código: <input className="border rounded px-1 w-24 text-md" name="codigo" value={busqueda.codigo} onChange={handleBusquedaChange}/></label>
+            <label className="ml-2 font-medium">Código: <input autoComplete='off' className="border rounded px-1 w-24 text-md" name="codigo" value={busqueda.codigo} onKeyUp={(event) => {SearchHC(event,busqueda,setTablehc,selectedSede,token)}}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d{0,7}$/.test(value)) { // máximo 7 dígitos numéricos
+                setBusqueda(prev => ({
+                  ...prev,
+                  codigo: value,
+                  nombres: ""
+                }));
+              }
+            }}/></label>
           </div>
-          <input className="border rounded px-1 w-full mb-2 text-md" placeholder="Nombres" name="nombres" value={busqueda.nombres} onChange={handleBusquedaChange}/>
+          <input className="border rounded px-1 w-full mb-2 text-md" placeholder="Nombres" name="nombres" value={busqueda.nombres} onChange={(e) => {handleNombreChange(e,setBusqueda,setTablehc,selectedSede,token,debounceTimeout)}}/>
         </div>
         <div className="border rounded">
           <div className="bg-gray-100 px-2 py-1 text-md font-bold">Revisar si registro paciente correctamente</div>
