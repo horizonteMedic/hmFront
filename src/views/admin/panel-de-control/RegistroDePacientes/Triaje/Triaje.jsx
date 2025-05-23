@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetICC, GetIMC, GetPA } from './Conversiones';
-import { GetInfoPac } from './Controller';
+import { Clean, GetInfoPac, GetTable, VerifyTR } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
+import { useEffect } from 'react';
 
 const Triaje = ({token,selectedSede}) => {
   // Estado para tab principal
@@ -43,11 +44,16 @@ const Triaje = ({token,selectedSede}) => {
     codigo: '',
     nombres: '',
   });
+  const [refresh, setRefresh] = useState(0)
 
   // Ejemplo de datos de tabla
-  const tablaEjemplo = [
-    { nro: '148731', nombre: 'BIDEL...', fecha: '25/04/2025', empresa: 'CENTR...', contrata: 'CENTR...', tExamen: 'ANUAL', cargo: 'ADMIN...', fAptitud: 'FALTA', estado: '', hEntrada: '12:04:27', hSalida: '' }
-  ];
+  const [tablehc, setTablehc] = useState([])
+
+  useEffect(() => {
+    if (busqueda.codigo === "" && busqueda.nombres === "") {
+      GetTable(busqueda.codigo,busqueda.nombres,selectedSede,token,setTablehc)
+    }
+  },[busqueda.codigo,busqueda.nombres,refresh])
 
   // Handlers
   const handleFormChange = e => {
@@ -88,7 +94,7 @@ const Triaje = ({token,selectedSede}) => {
             </div>
             <div className="flex gap-2 items-center">
               <label className="font-medium">Nro.: <input className="border rounded px-1 text-md w-24" autoComplete='off' name="nro" value={form.nro} onChange={handleFormChange} 
-              onKeyDown={(event) => {if(event.key === 'Enter')GetInfoPac(form,setForm,getFetch,token,selectedSede)}}/></label>
+              onKeyDown={(event) => {if(event.key === 'Enter')VerifyTR(form.nro,getFetch,token)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/}}/></label>
               <button type="button" onClick={() => {GetInfoPac(form,setForm,getFetch,token,selectedSede)}} className="bg-yellow-200 border rounded px-2 text-md flex items-center"><span role="img" aria-label="buscar" className="mr-1">🔍</span>buscar</button>
               <label className="font-medium ml-2"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({...f, recibo: true, nOrden: false}))}/> Recibo</label>
               <label className="font-medium ml-2"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({...f, nOrden: true, recibo: false}))}/> N° Orden</label>
@@ -221,7 +227,7 @@ const Triaje = ({token,selectedSede}) => {
                   <div className="flex gap-3 mt-2">
                     <button type="button"  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
                     <button type="button" id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
-                    <button type="button" className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
+                    <button type="button" onClick={() => {Clean(setForm,setTriaje)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
                   </div>
                 </div>
               )}
@@ -246,14 +252,21 @@ const Triaje = ({token,selectedSede}) => {
           <div className="bg-gray-100 px-2 py-1 text-md font-bold">Revisar si registro paciente correctamente</div>
           <table className="w-full text-md">
             <thead>
-              <tr className="bg-gray-200">
-                <th>N°</th><th>Nombre</th><th>Fecha</th><th>Empresa</th><th>Contrata</th><th>T.Examen</th><th>Cargo</th><th>F.Aptitud</th><th>Estado</th><th>H.Entrada</th><th>H.Salida</th>
+              <tr className="bg-gray-200 text-center">
+                <th>N°</th><th>Nombre</th><th>Fecha</th><th>Empresa</th><th>Contrata</th><th>T.Examen</th><th>Estado</th>
               </tr>
             </thead>
             <tbody>
-              {tablaEjemplo.map((row, i) => (
-                <tr key={i} className="text-center" style={{background: i === 0 ? '#ff0000' : undefined, color: i === 0 ? 'white' : undefined}}>
-                  <td>{row.nro}</td><td>{row.nombre}</td><td>{row.fecha}</td><td>{row.empresa}</td><td>{row.contrata}</td><td>{row.tExamen}</td><td>{row.cargo}</td><td>{row.fAptitud}</td><td>{row.estado}</td><td>{row.hEntrada}</td><td>{row.hSalida}</td>
+              {tablehc.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
+              {tablehc.map((row, i) => (
+                <tr key={i} className={`text-center ${row.color === 'AMARILLO' ? 'bg-[#ffff00]' : row.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} >
+                  <td>{row.n_orden}</td>
+                  <td>{row.nombres}</td>
+                  <td>{row.fecha_apertura_po}</td>
+                  <td>{row.razon_empresa}</td>
+                  <td>{row.razon_contrata}</td>
+                  <td>{row.nom_examen}</td>
+                  <td>{row.estado}</td>
                 </tr>
               ))}
             </tbody>
