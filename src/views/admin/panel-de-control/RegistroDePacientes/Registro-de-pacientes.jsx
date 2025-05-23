@@ -7,6 +7,8 @@ import ReservaPacientes from './ReservaPacientes';
 import ConsentimientoDigitalizacion from './ConsentimientoDigitalizacion/ConsentimientoDigitalizacion';
 import Triaje from './Triaje/Triaje';
 import Consentimientos from './Consentimientos/Consentimientos';
+import Resultados from './Resultados/Resultados';
+import ExamenesLaboratorio from './ExamenesLaboratorio/ExamenesLaboratorio';
 import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
   ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth, ComboboxProfesión,
   ComboboxDepartamentos,
@@ -22,7 +24,9 @@ import {
   faTicket,
   faFileSignature,
   faStethoscope,
-  faFileContract
+  faFileContract,
+  faChartLine,
+  faVial
 } from '@fortawesome/free-solid-svg-icons';
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
@@ -219,6 +223,20 @@ const TabComponent = () => {
               <FontAwesomeIcon icon={faFileContract} className="mr-2" />
               Consentimientos
             </div>
+            <div
+              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 7 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              onClick={() => changeTab(7)}
+            >
+              <FontAwesomeIcon icon={faChartLine} className="mr-2" />
+              Resultados
+            </div>
+            <div
+              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 8 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              onClick={() => changeTab(8)}
+            >
+              <FontAwesomeIcon icon={faVial} className="mr-2" />
+              Examenes de Laboratorio
+            </div>
           </div>
 
           <div className="custom-border p-4">
@@ -244,6 +262,12 @@ const TabComponent = () => {
             )}
             {activeTab === 6 && (
               <Consentimientos token={token} selectedSede="T-NP"/>
+            )}
+            {activeTab === 7 && (
+              <Resultados token={token} selectedSede="T-NP"/>
+            )}
+            {activeTab === 8 && (
+              <ExamenesLaboratorio token={token} selectedSede="T-NP"/>
             )}
           </div>
         </div>
