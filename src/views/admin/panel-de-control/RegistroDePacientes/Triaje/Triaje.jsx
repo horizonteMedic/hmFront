@@ -217,7 +217,7 @@ const Triaje = ({token,selectedSede}) => {
                       onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('registrarTR')?.focus()}}/>
                     </div>
                   </div>
-                  <textarea className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje({diagnostico: e.target.value.toUpperCase()})}}/>
+                  <textarea className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje({diagnostico: e.target.value.toUpperCase()})}} rows="1" onInput={(e) => {e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';}}/>
                   <div className="flex gap-3 mt-2">
                     <button type="button"  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
                     <button type="button" id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>

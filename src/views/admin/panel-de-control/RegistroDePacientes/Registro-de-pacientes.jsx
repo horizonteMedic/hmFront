@@ -6,6 +6,7 @@ import ImportacionModalBasica from './ImportacionModalBasica';
 import ReservaPacientes from './ReservaPacientes';
 import ConsentimientoDigitalizacion from './ConsentimientoDigitalizacion/ConsentimientoDigitalizacion';
 import Triaje from './Triaje/Triaje';
+import Consentimientos from './Consentimientos/Consentimientos';
 import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
   ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth, ComboboxProfesión,
   ComboboxDepartamentos,
@@ -20,7 +21,8 @@ import {
   faExpand,
   faTicket,
   faFileSignature,
-  faStethoscope
+  faStethoscope,
+  faFileContract
 } from '@fortawesome/free-solid-svg-icons';
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
@@ -210,6 +212,13 @@ const TabComponent = () => {
               <FontAwesomeIcon icon={faStethoscope} className="mr-2" />
               Triaje
             </div>
+            <div
+              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 6 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              onClick={() => changeTab(6)}
+            >
+              <FontAwesomeIcon icon={faFileContract} className="mr-2" />
+              Consentimientos
+            </div>
           </div>
 
           <div className="custom-border p-4">
@@ -232,6 +241,9 @@ const TabComponent = () => {
             )}
             {activeTab === 5 && (
               <Triaje token={token} selectedSede="T-NP"/>
+            )}
+            {activeTab === 6 && (
+              <Consentimientos token={token} selectedSede="T-NP"/>
             )}
           </div>
         </div>
