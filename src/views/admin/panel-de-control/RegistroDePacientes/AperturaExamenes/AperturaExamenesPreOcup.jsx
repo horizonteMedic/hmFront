@@ -57,7 +57,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: format(today, 'dd/MM/yyyy'),
+    fechaAperturaPo: format(today, 'dd-MM-yyyy'),
     n_operacion: null,
     textObserv1: "",
     textObserv2: "",
