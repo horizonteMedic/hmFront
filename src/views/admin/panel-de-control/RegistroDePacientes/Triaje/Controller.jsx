@@ -1,3 +1,4 @@
+import { useRef } from "react"
 import { GetHistoriaC } from "../model/AdminHistoriaC"
 
 export const VerifyTR = (nro,get,token) => {
@@ -43,12 +44,54 @@ export const Clean = (setF,setT) => {
 export const GetTable = (nro,nombre,sede,token,set) => {
     const data = {
         opcion_id_p: 1,
-        norden_: nro,
+        norden: nro,
         nombres_apellidos_p: nombre
     }
     GetHistoriaC(data, sede, token)
     .then((res) => {
         set(res)
     })
-    
 }
+
+export const SearchHC = (event,nro,set,sede,token) => {
+    if (event.key === 'Enter') {
+        const data = {
+        opcion_id_p: 2,
+        norden: Number(nro.codigo),
+        nombres_apellidos_p: ""
+        }
+        GetHistoriaC(data, sede, token)
+        .then((res) => {
+            set(res)
+        })
+    }
+}
+
+
+export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) => {
+    const value = e.target.value.toUpperCase();
+    set(prev => ({ ...prev, nombres: value, codigo: "" }));
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      if (value.trim() !== "") {
+        const data = {
+          opcion_id_p: 3,
+          norden: "",
+          nombres_apellidos_p: value
+        };
+        GetHistoriaC(data, sede, token)
+          .then((res) => {
+            if (res && res.length) {
+                console.log(res)
+              setTable(res);
+            } else {
+              setTable([]);
+            }
+          })
+          .catch(() => setTable([]));
+      } else {
+        setTable([]);
+      }
+    }, 400);
+
+  };
