@@ -124,7 +124,7 @@ export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) =>
 
   };
 
-export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshtable) => {
+export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshtable,get,setH) => {
     const camposRequeridos = ['talla', 'peso', 'cintura', 'cadera', 'temperatura', 'fCardiaca', 'sat02',
         'perimetroCuello', 'sistolica', 'diastolica', 'fRespiratoria']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
@@ -144,13 +144,30 @@ export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshta
     SubmitTriaje(datos,edad,nro,fecha,token)
     .then((res) => {
         if (res.id === 1) {
-          Swal.fire('Exito',`${res.mensaje}`,'success')
           refreshtable()
           Clean(setF,setT)
+          setH(true)
+          Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              GetListTriajeMult(nro,setF,setT,get,token,true)
+            }
+          })
+          
         } else if (res.id === 0){
-          Swal.fire('Exito',`${res.mensaje}`,'success')
           refreshtable()
           Clean(setF,setT)
+          setH(true)
+          Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              GetListTriajeMult(nro,setF,setT,get,token,true)
+            }
+          })
         }
     })
     .catch(() => {

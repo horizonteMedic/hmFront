@@ -85,7 +85,7 @@ const Triaje = ({token,selectedSede}) => {
   const refreshtable = () => {
     setRefresh(refresh + 1)
   }
-  
+  console.log(triaje)
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
       {/* Columna 1 */}
@@ -237,10 +237,10 @@ const Triaje = ({token,selectedSede}) => {
                       onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('registrarTR')?.focus()}}/>
                     </div>
                   </div>
-                  <textarea disabled={habilitarTR} className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje({diagnostico: e.target.value.toUpperCase()})}} rows="1" onInput={(e) => {e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';}}/>
+                  <textarea disabled={habilitarTR} className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje(d => ({...d,diagnostico: e.target.value.toUpperCase()}))}} rows="1" onInput={(e) => {e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';}}/>
                   <div className="flex gap-3 mt-2">
                     <button type="button" onClick={() => {setHabilitar(false),setHabilitarTR(false)}}  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
-                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nro, form.fechaExamen, Swal, token,setForm,setTriaje,refreshtable)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
+                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nro, form.fechaExamen, Swal, token,setForm,setTriaje,refreshtable,getFetch,setHabilitar)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
                     <button type="button" onClick={() => {Clean(setForm,setTriaje),setHabilitar(true)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
                   </div>
                 </div>
