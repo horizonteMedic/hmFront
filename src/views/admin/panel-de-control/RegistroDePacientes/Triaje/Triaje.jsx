@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetICC, GetIMC, GetPA } from './Conversiones';
-import { Clean, GetInfoPac, GetTable, handleNombreChange, handleSubmit, SearchHC, VerifyTR } from './Controller';
+import { Clean, GetInfoPac, GetListTriajeMult, GetListTriajeMulttable, GetTable, handleNombreChange, handleSubmit, SearchHC, VerifyTR } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
 import { useEffect } from 'react';
@@ -50,7 +50,7 @@ const Triaje = ({token,selectedSede}) => {
     nombres: '',
   });
   const [refresh, setRefresh] = useState(0)
-
+  const [habilitar, setHabilitar] = useState(true )
   // Ejemplo de datos de tabla
   const [tablehc, setTablehc] = useState([])
 
@@ -75,6 +75,12 @@ const Triaje = ({token,selectedSede}) => {
     const { name, value, type, checked } = e.target;
     setBusqueda(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
+  const handleTR = () => {
+    setTriaje({talla: '', peso: '', imc: '', cintura: '', icc: '',
+    cadera: '', temperatura: '', fCardiaca: '', sat02: '', perimetroCuello: '',
+    sistolica: '', diastolica: '', fRespiratoria: '',
+    diagnostico: ''})
+  }
 
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
@@ -98,40 +104,40 @@ const Triaje = ({token,selectedSede}) => {
             </div>
             <div className="flex gap-2 items-center">
               <label className="font-medium">Nro.: <input className="border rounded px-1 text-md w-24" autoComplete='off' name="nro" value={form.nro} onChange={handleFormChange} 
-              onKeyDown={(event) => {if(event.key === 'Enter')VerifyTR(form.nro,getFetch,token)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/}}/></label>
-              <button type="button" onClick={() => {GetInfoPac(form,setForm,getFetch,token,selectedSede)}} className="bg-yellow-200 border rounded px-2 text-md flex items-center"><span role="img" aria-label="buscar" className="mr-1">🔍</span>buscar</button>
+              onKeyUp={(event) => {if(event.key === 'Enter')handleTR(),VerifyTR(form,getFetch,token,setForm,setTriaje,selectedSede)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/}}/></label>
+              <button type="button" onClick={() => {handleTR(),VerifyTR(form,getFetch,token,setForm,setTriaje,selectedSede)}} className="bg-yellow-200 border rounded px-2 text-md flex items-center"><span role="img" aria-label="buscar" className="mr-1">🔍</span>buscar</button>
               <label className="font-medium ml-2"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({...f, recibo: true, nOrden: false}))}/> Recibo</label>
               <label className="font-medium ml-2"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({...f, nOrden: true, recibo: false}))}/> N° Orden</label>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">Ex.Médico :</label>
-              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled={habilitar}/>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">Empresa :</label>
-              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange} disabled={habilitar}/>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">Contrata :</label>
-              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange} disabled={habilitar}/>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">N° Historial :</label>
-              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled={habilitar}/>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">Nombres :</label>
-              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange} disabled={habilitar}/>
               <label className="font-medium ml-2">Edad:</label>
-              <input className="border rounded px-1 w-24 text-md" placeholder="" name="edad" value={form.edad} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 w-24 text-md" placeholder="" name="edad" value={form.edad} onChange={handleFormChange} disabled={habilitar}/>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">Apellidos :</label>
-              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled={habilitar}/>
             </div>
             <div className="flex items-center gap-x-2 mb-2">
               <label className="font-medium">Fecha Nac:</label>
-              <input className="border rounded px-1 text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled/>
+              <input className="border rounded px-1 text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled={habilitar}/>
               <label className="font-medium ml-2">Fecha Triaje:</label>
               <DatePicker id="fechaExamen" value={form.fechaExamen} onChange={(date) => {setForm(d => ({...d, fechaExamen: (format(date, "yyyy-MM-dd"))}))}} dateFormat="yyyy/MM/dd" className="border rounded px-1 text-md"/>
             </div>
@@ -229,8 +235,8 @@ const Triaje = ({token,selectedSede}) => {
                   </div>
                   <textarea className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje({diagnostico: e.target.value.toUpperCase()})}} rows="1" onInput={(e) => {e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';}}/>
                   <div className="flex gap-3 mt-2">
-                    <button type="button"  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
-                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nOrden, form.fechaExamen, Swal, token)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
+                    <button type="button" onClick={() => {setHabilitar(false)}}  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
+                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nro, form.fechaExamen, Swal, token)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
                     <button type="button" onClick={() => {Clean(setForm,setTriaje)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
                   </div>
                 </div>
@@ -273,7 +279,8 @@ const Triaje = ({token,selectedSede}) => {
             <tbody>
               {tablehc.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
               {tablehc.map((row, i) => (
-                <tr key={i} className={`text-center ${row.color === 'AMARILLO' ? 'bg-[#ffff00]' : row.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} >
+                <tr key={i} className={`text-center cursor-pointer ${row.color === 'AMARILLO' ? 'bg-[#ffff00]' : row.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} 
+                onClick={() => {GetListTriajeMulttable(row.n_orden,setForm,setTriaje,getFetch,token)}}>
                   <td>{row.n_orden}</td>
                   <td>{row.nombres}</td>
                   <td>{row.fecha_apertura_po}</td>

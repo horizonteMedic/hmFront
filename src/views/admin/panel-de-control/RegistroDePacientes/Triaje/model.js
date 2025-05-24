@@ -1,7 +1,8 @@
 import { URLAzure } from "../../../../config/config"
 
 export function SubmitTriaje(data,edad,nOrden,fecha,token) {
-    
+        console.log(nOrden)
+
     const body = {
         codTriaje: 0,
         numTicket: 0,
@@ -27,6 +28,7 @@ export function SubmitTriaje(data,edad,nOrden,fecha,token) {
         fCardiaca: data.fCardiaca,
         fRespiratoria: data.fRespiratoria
     }
+    console.log(JSON.stringify(body))
 
     const url = `${URLAzure}/api/v01/ct/triaje/registrarActualizar`
         const options = {
