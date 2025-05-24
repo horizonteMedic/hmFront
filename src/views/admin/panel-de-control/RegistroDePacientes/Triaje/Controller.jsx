@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import { GetHistoriaC } from "../model/AdminHistoriaC"
+import { SubmitTriaje } from './model';
 
 export const VerifyTR = (nro,get,token) => {
     console.log(nro,get,token)
@@ -95,3 +96,26 @@ export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) =>
     }, 400);
 
   };
+
+export const handleSubmit = (datos,edad,nro,fecha,Swal,token) => {
+    const camposRequeridos = ['talla', 'peso', 'cintura', 'cadera', 'temperatura', 'fCardiaca', 'sat02',
+        'perimetroCuello', 'sistolica', 'diastolica', 'fRespiratoria']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+        const lista = camposVacios.join(', ');
+        return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+    Swal.fire({
+      title: 'Validando Datos',
+      text: 'Espere por favor...',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    SubmitTriaje(datos,edad,nro,fecha,token)
+    .then((res) => {
+        console.log(res)
+    })
+}

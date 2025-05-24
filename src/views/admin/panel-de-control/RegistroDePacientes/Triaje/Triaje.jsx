@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetICC, GetIMC, GetPA } from './Conversiones';
-import { Clean, GetInfoPac, GetTable, handleNombreChange, SearchHC, VerifyTR } from './Controller';
+import { Clean, GetInfoPac, GetTable, handleNombreChange, handleSubmit, SearchHC, VerifyTR } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
 import { useEffect } from 'react';
+import { format } from 'date-fns';
+import DatePicker from 'react-datepicker';
 
 const Triaje = ({token,selectedSede}) => {
   //Para la busqueda
+  const today = new Date();
   const debounceTimeout = useRef(null);
   // Estado para tab principal
   const [activeTab, setActiveTab] = useState('datos');
@@ -26,7 +29,7 @@ const Triaje = ({token,selectedSede}) => {
     apellidos: '',
     edad: '',
     fechaNac: '',
-    fechaExamen: '',
+    fechaExamen: format(today, 'yyyy-MM-dd'),
     recibo: false,
     nOrden: true,
   });
@@ -72,7 +75,6 @@ const Triaje = ({token,selectedSede}) => {
     const { name, value, type, checked } = e.target;
     setBusqueda(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
-  
 
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
@@ -131,7 +133,7 @@ const Triaje = ({token,selectedSede}) => {
               <label className="font-medium">Fecha Nac:</label>
               <input className="border rounded px-1 text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled/>
               <label className="font-medium ml-2">Fecha Triaje:</label>
-              <input className="border rounded px-1 text-md" type="date" name="fechaExamen" value={form.fechaExamen} onChange={handleFormChange} disabled/>
+              <DatePicker id="fechaExamen" value={form.fechaExamen} onChange={(date) => {setForm(d => ({...d, fechaExamen: (format(date, "yyyy-MM-dd"))}))}} dateFormat="yyyy/MM/dd" className="border rounded px-1 text-md"/>
             </div>
             {/* Tabs internos para Triaje/Espirometría */}
             <fieldset className="border rounded p-2 mt-2">
@@ -228,7 +230,7 @@ const Triaje = ({token,selectedSede}) => {
                   <textarea className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje({diagnostico: e.target.value.toUpperCase()})}} rows="1" onInput={(e) => {e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';}}/>
                   <div className="flex gap-3 mt-2">
                     <button type="button"  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
-                    <button type="button" id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
+                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nOrden, form.fechaExamen, Swal, token)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
                     <button type="button" onClick={() => {Clean(setForm,setTriaje)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
                   </div>
                 </div>
