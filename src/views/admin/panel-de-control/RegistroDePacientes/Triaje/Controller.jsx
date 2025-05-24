@@ -1,6 +1,6 @@
 import { useRef } from "react"
 import { GetHistoriaC } from "../model/AdminHistoriaC"
-import { SubmitTriaje } from './model';
+import { GetHistoriaCTriaje, SubmitTriaje } from './model';
 import Swal from "sweetalert2";
 
 const Loading = () => {
@@ -74,7 +74,7 @@ export const GetTable = (nro,nombre,sede,token,set) => {
         norden: nro,
         nombres_apellidos_p: nombre
     }
-    GetHistoriaC(data, sede, token)
+    GetHistoriaCTriaje(data, sede, token)
     .then((res) => {
         set(res)
     })

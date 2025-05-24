@@ -44,3 +44,26 @@ export function SubmitTriaje(data,edad,nOrden,fecha,token) {
                 return res
             } return res.json()}).then(response => response) 
 }
+
+export function GetHistoriaCTriaje(data,sede,token) {
+
+    const body = {
+      opcion_id_p: data.opcion_id_p,
+      norden_p: data.norden,
+      nombres_apellidos_p: data.nombres_apellidos_p,
+      cod_sede_p: sede
+    };    
+    const url = `${URLAzure}/api/v01/ct/registroPacientes/listadoHistoriasOcupacionalesTriajeConFiltros`
+      const options = {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+      }
+      return fetch(url,options).then(res =>  {
+          if (!res.ok) {
+              return res
+          } return res.json()}).then(response => response) 
+}
