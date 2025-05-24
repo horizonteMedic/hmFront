@@ -3,9 +3,9 @@ import { GetHistoriaC } from "../model/AdminHistoriaC"
 import { GetHistoriaCTriaje, SubmitTriaje } from './model';
 import Swal from "sweetalert2";
 import ReporteTriaje from "../../../../jaspers/ReporteTriaje";
-const Loading = () => {
+const Loading = (text) => {
   Swal.fire({
-        title: 'Validando Datos',
+        title: text,
         text: 'Espere por favor...',
         allowOutsideClick: false,
         allowEscapeKey: false,
@@ -15,12 +15,13 @@ const Loading = () => {
       });
 }
 
-export const VerifyTR = async (form,get,token,set,setTR,sede) => {
+export const VerifyTR = async (form,get,token,set,setTR,sede,setHTR,setH) => {
     if (!form.nro) { 
       await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
       return
     }
-    Loading()
+    setH(true)
+    Loading('Validando datos')
     get(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${form.nro}&nomService=${'triaje'}`,token)
     .then((res) => {
         if (res.id === 0) {
@@ -28,7 +29,7 @@ export const VerifyTR = async (form,get,token,set,setTR,sede) => {
           GetInfoPac(form,set,get,token,sede)
         } else {
           console.log('registrado')
-          GetListTriajeMult(form.nro,set,setTR,get,token)
+          GetListTriajeMult(form.nro,set,setTR,get,token,false,setHTR)
         }
     })
 }
@@ -87,7 +88,7 @@ export const SearchHC = (event,nro,set,sede,token) => {
         norden: Number(nro.codigo),
         nombres_apellidos_p: ""
         }
-        GetHistoriaC(data, sede, token)
+        GetHistoriaCTriaje(data, sede, token)
         .then((res) => {
             set(res)
         })
@@ -123,7 +124,7 @@ export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) =>
 
   };
 
-export const handleSubmit = (datos,edad,nro,fecha,Swal,token) => {
+export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshtable) => {
     const camposRequeridos = ['talla', 'peso', 'cintura', 'cadera', 'temperatura', 'fCardiaca', 'sat02',
         'perimetroCuello', 'sistolica', 'diastolica', 'fRespiratoria']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
@@ -140,24 +141,32 @@ export const handleSubmit = (datos,edad,nro,fecha,Swal,token) => {
         Swal.showLoading();
       }
     });
-    console.log(nro)
     SubmitTriaje(datos,edad,nro,fecha,token)
     .then((res) => {
-      console.log(res)
         if (res.id === 1) {
           Swal.fire('Exito',`${res.mensaje}`,'success')
+          refreshtable()
+          Clean(setF,setT)
         } else if (res.id === 0){
           Swal.fire('Exito',`${res.mensaje}`,'success')
+          refreshtable()
+          Clean(setF,setT)
         }
+    })
+    .catch(() => {
+      Swal.fire('Error', 'Ocurrio un error al registrar/actualizar','error')
     })
 }
 
 //FUNCION MULTIPLE DE LOBO
-export const GetListTriajeMult = async (nro,set,setTR,get,token,jasper) => {
+export const GetListTriajeMult = async (nro,set,setTR,get,token,jasper,setHTR) => {
   if (!nro){
     await  Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
     return
   }  
+  if (jasper) {
+    Loading('Cargando Formato a Imprimir')
+  }
   get(`/api/v01/ct/triaje/listarFormatoTriaje/${nro}`,token)
   .then(async(res) => {
     if (res.n_orden) {
@@ -165,6 +174,7 @@ export const GetListTriajeMult = async (nro,set,setTR,get,token,jasper) => {
         await GetJasper(res,token)
         return
       }
+      setHTR(true)
       set({
         nro: res.n_orden,
         nomExam: res.nom_examen,
@@ -193,7 +203,7 @@ export const GetListTriajeMult = async (nro,set,setTR,get,token,jasper) => {
   })
 }
 
-export const GetListTriajeMulttable = async (nro,set,setTR,get,token) => {
+export const GetListTriajeMulttable = async (nro,set,setTR,get,token,setHTR,setH) => {
   if (!nro){
     await  Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
     return
@@ -201,6 +211,9 @@ export const GetListTriajeMulttable = async (nro,set,setTR,get,token) => {
   get(`/api/v01/ct/triaje/listarFormatoTriaje/${nro}`,token)
   .then((res) => {
     if (res.n_orden) {
+      setH(true)
+      setHTR(true)
+      console.log(res)
       set({
         nro: res.n_orden,
         nomExam: res.nom_examen,
@@ -209,6 +222,7 @@ export const GetListTriajeMulttable = async (nro,set,setTR,get,token) => {
         fechaNac: res.fecha_nac,
         nombres: res.nombres,
         apellidos: res.apellidos,
+        edad: res.edad,
         fechaExamen: res.fecha_triaje
       })
       setTR({

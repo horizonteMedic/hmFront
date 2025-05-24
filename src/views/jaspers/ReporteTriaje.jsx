@@ -16,6 +16,8 @@ export default function ReporteTriaje(datos) {
     const cuadroX = 55;
     const cuadroY = 25 + offsetY;
     doc.setFontSize(14);
+
+    doc.setFontSize(14);
     doc.setFont(undefined, 'normal');
     doc.rect(cuadroX, cuadroY, cuadroW, cuadroH, 'S');
     let y = cuadroY + 16;
@@ -43,6 +45,7 @@ export default function ReporteTriaje(datos) {
     drawRow("Frec. Respiratoria :", `${datos.f_respiratoria || ''} x'`);
 
     // --- Diagnóstico ---
+    doc.setFontSize(11);
     doc.setFontSize(11);
     doc.setFont(undefined, 'bold');
     doc.text("Diagnóstico:", 20, cuadroY + cuadroH + 15);

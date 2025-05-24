@@ -185,3 +185,17 @@ export const GetPA = async (event,triaje,set) => {
         document.getElementById('fRespiratoria')?.focus();
     }
 }
+
+export const GetSat = async (event,triaje,set) => {
+    if (!triaje.sat02) {
+        return
+    }
+    if (event.key === 'Enter') {
+        if (triaje.sat02 < 92 || triaje.sat02 > 100) {
+            set(d => ({ ...d, sat02: '' }))
+            await Swal.fire('Error','No se permite este dato','error')
+            return
+        }
+        document.getElementById('perimetroCuello')?.focus();
+    }
+}

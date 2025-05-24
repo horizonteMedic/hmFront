@@ -116,7 +116,7 @@ const headerTriaje = (doc, datos) => {
   let y2 = y1 + lineHeight + 2;
   doc.setFont("helvetica", "bold");
   doc.text("NOMBRES Y APELLIDOS:", margin, y2);
-  const value = datos.nombres +' '+ datos.apellidos || "";
+  const value = datos.nombres + ' '+ datos.apellidos || "";
   const x = margin + 45;
   const y = y2;
 
