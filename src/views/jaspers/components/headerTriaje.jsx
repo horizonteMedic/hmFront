@@ -2,7 +2,12 @@ const headerTriaje = (doc, datos) => {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   const yOffset = 10;       // separación extra arriba y abajo
+  const textYOffset = 12;   // sube un poco el texto principal
   const lineHeight = 4;     // altura entre líneas en mm
+
+  // Agregar logo
+  const img = "./img/logo-color.png";
+  doc.addImage(img, "PNG", margin, yOffset, 70, 22);
 
   let color = null;
   let boxText = null;
@@ -41,47 +46,41 @@ const headerTriaje = (doc, datos) => {
     doc.setTextColor(0);
   }
 
-  // Draw top and bottom lines
-  doc.setLineWidth(0.5);
-  doc.line(margin, yOffset, pageW - margin, yOffset);
-  
   // === 1) Título principal en negrita y centrado ===
-  doc
-    .setFont("helvetica", "bold")
-    .setFontSize(13)
-    .text(
-      "CORPORACION PERUANA DE CENTROS MEDICOS S.A.C.",
-      pageW / 2,
-      8 + yOffset + 5,
-      { align: "center" }
-    );
+  // doc
+  //   .setFont("helvetica", "bold")
+  //   .setFontSize(13)
+  //   .text(
+  //     "CORPORACION PERUANA DE CENTROS MEDICOS S.A.C.",
+  //     pageW / 2,
+  //     8 + yOffset + 5 + textYOffset,
+  //     { align: "center" }
+  //   );
 
-  // Sede al costado izquierdo
-  doc
-    .setFont("helvetica", "bold")
-    .setFontSize(10)
-    .text(
-      `SEDE: ${datos.nombreSede || ""}`,
-      margin,
-      20 + yOffset,
-      { align: "left" }
-    );
+  // Sede, fecha y hora a la derecha, alineadas con el logo
+  const sedeY = yOffset + 8;
+  const sedeX = pageW - margin;
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text(`SEDE: ${datos.nombreSede || ""}`, sedeX, sedeY, { align: "right" });
+  doc.text(`FECHA: ${datos.fecha || ""}`, sedeX, sedeY + 7, { align: "right" });
+  doc.text(`HORA: ${datos.hora || ""}`, sedeX, sedeY + 14, { align: "right" });
 
-  // "HOJA DE RUTA" centrado
+  // "INFORME TRIAJE" centrado
   doc
-    .setFontSize(12)
+    .setFontSize(14)
+    .setFont("helvetica", "bold")
     .text(
       "INFORME TRIAJE",
       pageW / 2,
-      20 + yOffset,
+      20 + yOffset + textYOffset,
       { align: "center" }
     );
 
   // === 2) Campos en negrita ===
   doc.setFontSize(9).setFont("helvetica", "bold");
 
-  // Fila 1: N° Orden / Fecha / Hora
-  const y1 = 30 + yOffset;
+  // Fila 1: N° Orden / Hora
+  const y1 = 30 + yOffset + textYOffset;
   // N° DE ORDEN a la derecha
   doc.setFont("helvetica", "bold");
   const orderLabel = "N° DE ORDEN:";
@@ -102,15 +101,6 @@ const headerTriaje = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text(orderText, orderBoxX + orderBoxW/2, orderBoxY + orderBoxH/2 + 1, { align: "center", baseline: "middle" });
   doc.setFontSize(9);
-  // Fecha y hora como antes
-  doc.setFont("helvetica", "bold");
-  doc.text("FECHA:", margin, y1);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${datos.fecha || ""}`, margin + 15, y1);
-  doc.setFont("helvetica", "bold");
-  doc.text("HORA:", margin + 60, y1);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${datos.hora || ""}`, margin + 75, y1);
 
   // Fila 2: Nombres y Apellidos
   let y2 = y1 + lineHeight + 2;
