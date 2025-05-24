@@ -1,12 +1,18 @@
 const drawC = (doc,text, x, y, w, h, drawX = false) => {
     doc.rect(x, y, w, h, "S"); // Dibuja el rectángulo
-    doc.text(text, x + w / 2, y + h / 2 + 0.5, { align: "center", baseline: "middle" }); // Ajusta la posición del texto
+    doc.text(text, x + w / 2, y + h / 2, { align: "center", baseline: "middle" }); // Ajusta la posición del texto
     if (drawX) {
         const centerX = x + w / 2;
         const centerY = y + h / 2;
         const size = 5; // tamaño de la X
+        if (text === 'ADMISION') {
+            doc.setDrawColor(0, 102, 255); // 🔵 Azul
+        } else {
+            doc.setDrawColor(255, 0, 0); // 🔴 Rojo
+        }
         doc.line(centerX - size, centerY - size, centerX + size, centerY + size);
         doc.line(centerX + size, centerY - size, centerX - size, centerY + size);
+        doc.setDrawColor(0); // 🔁 Restaurar color predeterminado (negro)
       }
 }
 

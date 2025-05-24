@@ -11,7 +11,6 @@ export function SubmitNewContrata(data,token) {
         emailContrata: data.emailContrata,
         apiToken: data.apiToken
     };    
-    console.log(JSON.stringify(body))
   
     const url = `${URLAzure}/api/v01/ct/Contr`
       const options = {

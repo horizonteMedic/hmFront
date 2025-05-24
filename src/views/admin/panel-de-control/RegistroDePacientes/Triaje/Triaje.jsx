@@ -1,6 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetICC, GetIMC, GetPA } from './Conversiones';
+import { Clean, GetInfoPac, GetTable, handleNombreChange, handleSubmit, SearchHC, VerifyTR } from './Controller';
+import { getFetch } from '../../getFetch/getFetch';
+import Swal from 'sweetalert2';
+import { useEffect } from 'react';
+import { format } from 'date-fns';
+import DatePicker from 'react-datepicker';
 
-const Triaje = () => {
+const Triaje = ({token,selectedSede}) => {
+  //Para la busqueda
+  const today = new Date();
+  const debounceTimeout = useRef(null);
   // Estado para tab principal
   const [activeTab, setActiveTab] = useState('datos');
   // Estado para tab interno de triaje/espiro
@@ -8,10 +18,10 @@ const Triaje = () => {
 
   // Estado para formulario de datos
   const [form, setForm] = useState({
-    ocupacional: false,
+    ocupacional: true,
     asistencial: false,
     nro: '',
-    exMedico: '',
+    nomExam: '',
     empresa: '',
     contrata: '',
     nroHistorial: '',
@@ -19,9 +29,9 @@ const Triaje = () => {
     apellidos: '',
     edad: '',
     fechaNac: '',
-    fechaTriaje: '',
+    fechaExamen: format(today, 'yyyy-MM-dd'),
     recibo: false,
-    nOrden: false,
+    nOrden: true,
   });
 
   // Estado para información de triaje
@@ -39,11 +49,16 @@ const Triaje = () => {
     codigo: '',
     nombres: '',
   });
+  const [refresh, setRefresh] = useState(0)
 
   // Ejemplo de datos de tabla
-  const tablaEjemplo = [
-    { nro: '148731', nombre: 'BIDEL...', fecha: '25/04/2025', empresa: 'CENTR...', contrata: 'CENTR...', tExamen: 'ANUAL', cargo: 'ADMIN...', fAptitud: 'FALTA', estado: '', hEntrada: '12:04:27', hSalida: '' }
-  ];
+  const [tablehc, setTablehc] = useState([])
+
+  useEffect(() => {
+    if (busqueda.codigo === "" && busqueda.nombres === "") {
+      GetTable(busqueda.codigo,busqueda.nombres,selectedSede,token,setTablehc)
+    }
+  },[busqueda.codigo,busqueda.nombres,refresh])
 
   // Handlers
   const handleFormChange = e => {
@@ -52,7 +67,9 @@ const Triaje = () => {
   };
   const handleTriajeChange = e => {
     const { name, value } = e.target;
-    setTriaje(prev => ({ ...prev, [name]: value }));
+    if (/^\d{0,15}$/.test(value)) {
+      setTriaje(prev => ({ ...prev, [name]: value }));
+    }
   };
   const handleBusquedaChange = e => {
     const { name, value, type, checked } = e.target;
@@ -80,50 +97,43 @@ const Triaje = () => {
               <label className="font-medium"><input type="checkbox" name="asistencial" checked={form.asistencial} onChange={handleFormChange}/> Asistencial</label>
             </div>
             <div className="flex gap-2 items-center">
-              <label className="font-medium">Nro.: <input className="border rounded px-1 text-md w-24" name="nro" value={form.nro} onChange={handleFormChange} /></label>
-              <button type="button" className="bg-yellow-200 border rounded px-2 text-md flex items-center"><span role="img" aria-label="buscar" className="mr-1">🔍</span>buscar</button>
+              <label className="font-medium">Nro.: <input className="border rounded px-1 text-md w-24" autoComplete='off' name="nro" value={form.nro} onChange={handleFormChange} 
+              onKeyDown={(event) => {if(event.key === 'Enter')VerifyTR(form.nro,getFetch,token)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/}}/></label>
+              <button type="button" onClick={() => {GetInfoPac(form,setForm,getFetch,token,selectedSede)}} className="bg-yellow-200 border rounded px-2 text-md flex items-center"><span role="img" aria-label="buscar" className="mr-1">🔍</span>buscar</button>
               <label className="font-medium ml-2"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({...f, recibo: true, nOrden: false}))}/> Recibo</label>
               <label className="font-medium ml-2"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({...f, nOrden: true, recibo: false}))}/> N° Orden</label>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Ex.Médico :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="exMedico" value={form.exMedico} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Ex.Médico :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Empresa :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Empresa :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange} disabled/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Contrata :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Contrata :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange} disabled/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">N° Historial :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">N° Historial :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled/>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="font-medium block mb-1">Nombres :</label>
-                <input className="border rounded px-1 w-full text-md" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange}/>
-              </div>
-              <div className="w-28">
-                <label className="font-medium block mb-1">Edad:</label>
-                <input className="border rounded px-1 w-full text-md" placeholder="" name="edad" value={form.edad} onChange={handleFormChange}/>
-              </div>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Nombres :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange} disabled/>
+              <label className="font-medium ml-2">Edad:</label>
+              <input className="border rounded px-1 w-24 text-md" placeholder="" name="edad" value={form.edad} onChange={handleFormChange} disabled/>
             </div>
-            <div>
-              <label className="font-medium block mb-1">Apellidos :</label>
-              <input className="border rounded px-1 w-full text-md" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange}/>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Apellidos :</label>
+              <input className="border rounded px-1 flex-1 text-md" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled/>
             </div>
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="font-medium block mb-1">Fecha Nac:</label>
-                <input className="border rounded px-1 w-full text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange}/>
-              </div>
-              <div className="flex-1">
-                <label className="font-medium block mb-1">Fecha Triaje:</label>
-                <input className="border rounded px-1 w-full text-md" type="date" name="fechaTriaje" value={form.fechaTriaje} onChange={handleFormChange}/>
-              </div>
+            <div className="flex items-center gap-x-2 mb-2">
+              <label className="font-medium">Fecha Nac:</label>
+              <input className="border rounded px-1 text-md" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled/>
+              <label className="font-medium ml-2">Fecha Triaje:</label>
+              <DatePicker id="fechaExamen" value={form.fechaExamen} onChange={(date) => {setForm(d => ({...d, fechaExamen: (format(date, "yyyy-MM-dd"))}))}} dateFormat="yyyy/MM/dd" className="border rounded px-1 text-md"/>
             </div>
             {/* Tabs internos para Triaje/Espirometría */}
             <fieldset className="border rounded p-2 mt-2">
@@ -149,45 +159,53 @@ const Triaje = () => {
                     <div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">Talla:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" placeholder="m." name="talla" value={triaje.talla} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" autoComplete='off' id="talla" placeholder="m." name="talla" value={triaje.talla} onChange={handleTriajeChange}
+                        onKeyUp={(event) => {Convert(event,triaje,setTriaje,Swal)}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">Peso:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" placeholder="Kg." name="peso" value={triaje.peso} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" id="peso" autoComplete='off' placeholder="Kg." name="peso" value={triaje.peso} onChange={handleTriajeChange}
+                        onKeyUp={(event) => {GetIMC(event,triaje,setTriaje,Swal)}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">IMC:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" name="imc" value={triaje.imc} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" disabled autoComplete='off' name="imc" value={triaje.imc} onChange={handleTriajeChange}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">Cintura:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" name="cintura" value={triaje.cintura} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" id="cintura" autoComplete='off' name="cintura" value={triaje.cintura} onChange={handleTriajeChange}
+                        onKeyUp={(event) => {GetCintura(event,triaje,setTriaje,Swal)}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">ICC:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" name="icc" value={triaje.icc} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" disabled autoComplete='off' name="icc" value={triaje.icc} onChange={handleTriajeChange}/>
                       </div>
                     </div>
                     <div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">Cadera:</label>
-                        <input className="border rounded px-1 w-24 text-md ml-1" name="cadera" value={triaje.cadera} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-24 text-md ml-1" id="cadera" name="cadera" autoComplete='off' value={triaje.cadera} onChange={handleTriajeChange}
+                         onKeyUp={(event) => {GetICC(event,triaje,setTriaje,Swal)}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">Temperatura:</label>
-                        <input className="border rounded px-1 w-24 text-md ml-1" name="temperatura" value={triaje.temperatura} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-24 text-md ml-1" id="temperatura" name="temperatura" autoComplete='off' value={triaje.temperatura} onChange={handleTriajeChange}
+                        onKeyUp={(event) => {GetCC(event,triaje,setTriaje,Swal)}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">F. Cardiaca:</label>
-                        <input className="border rounded px-1 w-24 text-md ml-1" name="fCardiaca" value={triaje.fCardiaca} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-24 text-md ml-1" id="fCardiaca" name="fCardiaca" autoComplete='off' value={triaje.fCardiaca} onChange={handleTriajeChange}
+                        onKeyUp={(event) => {GetFC(event,triaje,setTriaje,Swal)}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">SAT. 02:</label>
-                        <input className="border rounded px-1 w-24 text-md ml-1" name="sat02" value={triaje.sat02} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-24 text-md ml-1" id="sat02" name="sat02" autoComplete='off' value={triaje.sat02} onChange={handleTriajeChange}
+                        onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('perimetroCuello')?.focus()}}/>
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">Perímetro Cuello:</label>
-                        <input className="border rounded px-1 w-24 text-md ml-1" name="perimetroCuello" value={triaje.perimetroCuello} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-24 text-md ml-1" id="perimetroCuello" name="perimetroCuello" autoComplete='off' value={triaje.perimetroCuello} onChange={handleTriajeChange}
+                        onKeyDown={(event) => {GetCuello(event,triaje,setTriaje,Swal)}}/>
                       </div>
                     </div>
                   </div>
@@ -196,21 +214,24 @@ const Triaje = () => {
                       <legend className="text-md text-blue-700 font-semibold">Presión Sistémica</legend>
                       <div className="flex gap-2 items-center mb-1">
                         <label className="font-medium w-20">Sistólica:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" name="sistolica" value={triaje.sistolica} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" id="sistolica" name="sistolica" value={triaje.sistolica} onChange={handleTriajeChange}
+                        onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('diastolica')?.focus()}}/>
                         <label className="font-medium w-20 ml-4">Diastólica:</label>
-                        <input className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" name="diastolica" value={triaje.diastolica} onChange={handleTriajeChange}/>
+                        <input className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" id="diastolica" name="diastolica" value={triaje.diastolica} onChange={handleTriajeChange}
+                        onKeyDown={(event) => {GetPA(event,triaje,setTriaje,Swal)}}/>
                       </div>
                     </fieldset>
                     <div className="flex-1 flex items-center ml-4">
                       <label className="font-medium w-32">F. Respiratoria:</label>
-                      <input className="border rounded px-1 w-32 text-md ml-1" name="fRespiratoria" value={triaje.fRespiratoria} onChange={handleTriajeChange}/>
+                      <input className="border rounded px-1 w-32 text-md ml-1 " id="fRespiratoria" name="fRespiratoria" value={triaje.fRespiratoria} onChange={handleTriajeChange}
+                      onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('registrarTR')?.focus()}}/>
                     </div>
                   </div>
-                  <textarea className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={handleTriajeChange}/>
+                  <textarea className="border rounded px-1 w-full mt-2 text-md" placeholder="Diagnóstico" name="diagnostico" value={triaje.diagnostico} onChange={(e) => {setTriaje({diagnostico: e.target.value.toUpperCase()})}} rows="1" onInput={(e) => {e.target.style.height = 'auto'; e.target.style.height = e.target.scrollHeight + 'px';}}/>
                   <div className="flex gap-3 mt-2">
-                    <button type="button" className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
-                    <button type="button" className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
-                    <button type="button" className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
+                    <button type="button"  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
+                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nOrden, form.fechaExamen, Swal, token)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
+                    <button type="button" onClick={() => {Clean(setForm,setTriaje)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
                   </div>
                 </div>
               )}
@@ -227,22 +248,39 @@ const Triaje = () => {
           <div className="flex gap-3 items-center mb-2 text-md">
             <label className="font-medium"><input type="checkbox" name="tipoPaciente" checked={busqueda.tipoPaciente} onChange={handleBusquedaChange}/> Pacientes</label>
             <label className="font-medium"><input type="checkbox" name="tipoOcupacional" checked={busqueda.tipoOcupacional} onChange={handleBusquedaChange}/> Ocupacional</label>
-            <label className="ml-2 font-medium">Código: <input className="border rounded px-1 w-24 text-md" name="codigo" value={busqueda.codigo} onChange={handleBusquedaChange}/></label>
+            <label className="ml-2 font-medium">Código: <input autoComplete='off' className="border rounded px-1 w-24 text-md" name="codigo" value={busqueda.codigo} onKeyUp={(event) => {SearchHC(event,busqueda,setTablehc,selectedSede,token)}}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (/^\d{0,7}$/.test(value)) { // máximo 7 dígitos numéricos
+                setBusqueda(prev => ({
+                  ...prev,
+                  codigo: value,
+                  nombres: ""
+                }));
+              }
+            }}/></label>
           </div>
-          <input className="border rounded px-1 w-full mb-2 text-md" placeholder="Nombres" name="nombres" value={busqueda.nombres} onChange={handleBusquedaChange}/>
+          <input className="border rounded px-1 w-full mb-2 text-md" placeholder="Nombres" name="nombres" value={busqueda.nombres} onChange={(e) => {handleNombreChange(e,setBusqueda,setTablehc,selectedSede,token,debounceTimeout)}}/>
         </div>
         <div className="border rounded">
           <div className="bg-gray-100 px-2 py-1 text-md font-bold">Revisar si registro paciente correctamente</div>
           <table className="w-full text-md">
             <thead>
-              <tr className="bg-gray-200">
-                <th>N°</th><th>Nombre</th><th>Fecha</th><th>Empresa</th><th>Contrata</th><th>T.Examen</th><th>Cargo</th><th>F.Aptitud</th><th>Estado</th><th>H.Entrada</th><th>H.Salida</th>
+              <tr className="bg-gray-200 text-center">
+                <th>N°</th><th>Nombre</th><th>Fecha</th><th>Empresa</th><th>Contrata</th><th>T.Examen</th><th>Estado</th>
               </tr>
             </thead>
             <tbody>
-              {tablaEjemplo.map((row, i) => (
-                <tr key={i} className="text-center" style={{background: i === 0 ? '#ff0000' : undefined, color: i === 0 ? 'white' : undefined}}>
-                  <td>{row.nro}</td><td>{row.nombre}</td><td>{row.fecha}</td><td>{row.empresa}</td><td>{row.contrata}</td><td>{row.tExamen}</td><td>{row.cargo}</td><td>{row.fAptitud}</td><td>{row.estado}</td><td>{row.hEntrada}</td><td>{row.hSalida}</td>
+              {tablehc.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
+              {tablehc.map((row, i) => (
+                <tr key={i} className={`text-center ${row.color === 'AMARILLO' ? 'bg-[#ffff00]' : row.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} >
+                  <td>{row.n_orden}</td>
+                  <td>{row.nombres}</td>
+                  <td>{row.fecha_apertura_po}</td>
+                  <td>{row.razon_empresa}</td>
+                  <td>{row.razon_contrata}</td>
+                  <td>{row.nom_examen}</td>
+                  <td>{row.estado}</td>
                 </tr>
               ))}
             </tbody>

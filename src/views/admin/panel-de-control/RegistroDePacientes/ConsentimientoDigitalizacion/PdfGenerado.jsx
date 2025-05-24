@@ -13,9 +13,9 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
   const pageH = doc.internal.pageSize.getHeight();
   const margin = 50;
   const lineHeight = 18;
-  const paraSpacing = 24;
+  const paraSpacing = 8;
   const lineHeightFactor = 1.2;
-  let y = margin;
+  let y = margin - 20;
 
   //DATOS JASPER
   
@@ -43,26 +43,38 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       const logoH = (logoImg.height / logoImg.width) * logoW;
       doc.addImage(logoImg, 'PNG', margin, y, logoW, logoH);
 
-      doc.setFont('helvetica', 'normal').setFontSize(10);
-      const ordText = `Nro Orden: ${orderNumber || ''}`;
-      const ordX = pageW - margin - doc.getTextWidth(ordText);
+      // Solo "Nro Orden:" normal, el número grande, negrita y subrayado
+      const ordLabel = 'Nro Orden:';
+      const ordValue = orderNumber || '';
+      doc.setFont('helvetica', 'bold').setFontSize(12);
+      const labelWidth = doc.getTextWidth(ordLabel + ' ');
+      const ordX = pageW - margin - doc.getTextWidth(ordLabel + ' ' + ordValue);
       const ordY = y + logoH / 2 + 4;
-      doc.text(ordText, ordX, ordY);
+      doc.text(ordLabel, ordX, ordY);
+      // Número grande y subrayado
+      doc.setFontSize(22);
+      const valueX = ordX + labelWidth;
+      doc.text(ordValue, valueX, ordY);
+      // Subrayar solo el número
+      const valueWidth = doc.getTextWidth(ordValue);
+      doc.setLineWidth(0.7);
+      doc.line(valueX, ordY + 2, valueX + valueWidth, ordY + 2);
+      doc.setFontSize(11); // restaurar tamaño para el resto
 
-      y += Math.max(logoH, 80) + 30;
+      y += Math.max(logoH, 80) + 10 + 40; // Espacio extra para bajar título y párrafos
 
       // ----------- TÍTULO CENTRADO -----------
       doc.setFont('helvetica', 'bold').setFontSize(14);
       const title = 'DECLARACIÓN JURADA PARA EL USO DE FIRMA ELECTRÓNICA';
       const titleWidth = doc.getTextWidth(title);
       doc.text(title, (pageW - titleWidth) / 2, y);
-      y += paraSpacing;
+      y += paraSpacing + 25;
 
       // ----------- PÁRRAFO 1 -----------
       doc.setFont('helvetica', 'normal').setFontSize(11);
-      const nombreText = nombre || '.................................................................';
+      const nombreText = String(nombre || '.................................................................');
       const edadText   = jasper.edad   != null ? `${jasper.edad}` : '......';
-      const dniText    = dni    || '..........................';
+      const dniText    = String(dni || '...........................');
       const p1 =
         `Yo, ${nombreText}, de ${edadText} años de edad, identificado(a) con DNI N.° ${dniText}, ` +
         `autorizo el uso de mi firma electrónica y huella, exclusivamente para la impresión ` +
@@ -101,7 +113,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
       const blockWidth    = boxSize * 2 + colGap;
       const startX        = (pageW - blockWidth) / 2;
       const col2X         = startX + boxSize + colGap;
-      let sectionY        = y+35;
+      let sectionY        = y+75;
 
       // Centros de columna
       const center1 = startX + boxSize / 2;

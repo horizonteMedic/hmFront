@@ -67,7 +67,6 @@ const NewHuellaFut = ({close, DNI, Huella, setHuella}) => {
         // Convertimos el canvas en blob y lo descargamos
         canvas.toBlob((blob) => {
           const url = URL.createObjectURL(blob);
-          console.log(url)
           const a = document.createElement("a");
           a.href = url;
           a.download = "huella.png";

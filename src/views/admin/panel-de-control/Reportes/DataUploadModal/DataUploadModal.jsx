@@ -97,7 +97,6 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
           const response = await ArchivosMasivos(datos, user, token);
           if (response.id) {
             if (response.id === 1) {
-              console.log('Subida exitosa');
             } else {
               setUploadStatus((prevStatus) => ({
                 ...prevStatus,

@@ -239,12 +239,33 @@ const Roles = () => {
               {filteredData?.map((item, index) => (
                 <tr key={index}>
                   <td className="border border-gray-300 px-2 py-1 text-center">
-                    <FontAwesomeIcon icon={faEdit} onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}} className="text-blue-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faTrash} onClick={() => {deleteRol(item.idRol)}} className="text-red-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faLock} onClick={() => {openAccessModal(item.idRol, item.nombre)}} className="text-gray-500 mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faUsers} onClick={() => {openRolesAsignadosModal(item.idRol, item.nombre)}} className="color-naranja mr-2 cursor-pointer" />
-                    <FontAwesomeIcon icon={faPaperclip} onClick={() => {openArchivoModal(item.idRol, item.nombre)}} className="color-azul mr-2 cursor-pointer" />
-
+                    <div className="flex justify-center space-x-4">
+                      <FontAwesomeIcon 
+                        icon={faEdit} 
+                        onClick={() => {openEditModal(item.idRol, item.nombre, item.descripcion, item.estado)}}
+                        className="text-blue-600 text-lg  cursor: pointer" 
+                      />
+                      <FontAwesomeIcon 
+                        icon={faTrash} 
+                        onClick={() => {deleteRol(item.idRol)}}
+                        className="text-red-600 text-lg  cursor: pointer" 
+                      />
+                      <FontAwesomeIcon 
+                        icon={faLock} 
+                        onClick={() => {openAccessModal(item.idRol, item.nombre)}}
+                        className="text-gray-600 text-lg  cursor: pointer" 
+                      />
+                      <FontAwesomeIcon 
+                        icon={faUsers} 
+                        onClick={() => {openRolesAsignadosModal(item.idRol, item.nombre)}}
+                        className="text-orange-500 text-lg  cursor: pointer" 
+                      />
+                      <FontAwesomeIcon 
+                        icon={faPaperclip} 
+                        onClick={() => {openArchivoModal(item.idRol, item.nombre)}}
+                        className="text-blue-500 text-lg  cursor: pointer" 
+                      />
+                    </div>
                   </td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombre)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.descripcion)}</td>

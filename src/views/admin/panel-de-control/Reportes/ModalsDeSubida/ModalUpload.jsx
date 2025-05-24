@@ -96,10 +96,7 @@ const ModalUpload = ({ closeModal, combinedParam, dni, user, token, reloadread, 
           const NamePart = CodOrden[2].trim().replace(/\s+/g, ' ')
           const cleanedNamePart = NamePart.replace(/\s+/g, ' ');
           const ApellName = Nombres.trim().replace(/\s+/g, ' ');
-          console.log(datosarch.orden)
-          console.log(Orden)
-          console.log(cleanedNamePart)
-          console.log(ApellName)
+
           //Cod Orden
           const Nomenclatura = CodOrden[1].trim()
           
