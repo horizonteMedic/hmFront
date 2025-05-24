@@ -1,54 +1,27 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import header from "./components/header";
+import headerTriaje from "./components/headerTriaje";
 import footer from "./components/footer";
 
 export default function ReporteTriaje(datos) {
     const doc = new jsPDF();
-    header(doc);
-
+    headerTriaje(doc, datos);
+    console.log(datos)
     // --- Offset para bajar el contenido ---
-    const offsetY = 25;
-
-    // --- Título grande y en mayúsculas ---
-    doc.setFontSize(16);
-    doc.setFont(undefined, 'bold');
-    doc.text("INFORME TRIAJE", 105, 38 + offsetY, { align: "center" });
-
-    // --- Labels de ficha y fecha en negrita ---
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.text(`N° Ficha :`, 155, 32 + offsetY);
-    doc.text(`Fecha Triaje :`, 155, 38 + offsetY);
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(13);
-    doc.text(`${datos.nroFicha || ''}`, 180, 32 + offsetY, { align: "right" });
-    doc.setFontSize(9);
-    doc.text(`${datos.fechaTriaje || ''}`, 180, 38 + offsetY, { align: "right" });
-
-    // --- Datos principales en negrita ---
-    doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
-    doc.text(`Nombres :`, 20, 48 + offsetY);
-    doc.text(`Sexo :`, 90, 48 + offsetY);
-    doc.text(`Nacimiento:`, 140, 48 + offsetY);
-    doc.setFont(undefined, 'normal');
-    doc.text(`${datos.nombres || ''}`, 45, 48 + offsetY);
-    doc.text(`${datos.sexo || ''}`, 110, 48 + offsetY);
-    doc.text(`${datos.nacimiento || ''}`, 170, 48 + offsetY);
+    const offsetY = 45;
 
     // --- Cuadro de signos vitales mejor alineado y más angosto ---
-    const cuadroW = 80;
-    const cuadroH = 88;
-    const cuadroX = 65;
-    const cuadroY = 55 + offsetY;
-    doc.setFontSize(10);
+    const cuadroW = 100;
+    const cuadroH = 130;
+    const cuadroX = 55;
+    const cuadroY = 25 + offsetY;
+    doc.setFontSize(14);
     doc.setFont(undefined, 'normal');
     doc.rect(cuadroX, cuadroY, cuadroW, cuadroH, 'S');
-    let y = cuadroY + 8;
-    const salto = 7;
-    const labelX = cuadroX + 4;
-    const valueX = cuadroX + cuadroW - 4;
+    let y = cuadroY + 16;
+    const salto = 10;
+    const labelX = cuadroX + 10;
+    const valueX = cuadroX + cuadroW - 10;
     const drawRow = (label, value) => {
         doc.setFont(undefined, 'normal');
         doc.text(label, labelX, y);
@@ -59,27 +32,41 @@ export default function ReporteTriaje(datos) {
     drawRow("Talla :", `${datos.talla || ''} cm`);
     drawRow("Peso :", `${datos.peso || ''} kg`);
     drawRow("IMC :", `${datos.imc || ''} %`);
-    drawRow("Perímetro Cuello :", `${datos.perimetroCuello || ''} cm`);
+    drawRow("Perímetro Cuello :", `${datos.perimetro_cuello || ''} cm`);
     drawRow("Cintura :", `${datos.cintura || ''} cm`);
     drawRow("Cadera :", `${datos.cadera || ''} cm`);
     drawRow("Temperatura :", `${datos.temperatura || ''} °C`);
-    drawRow("Frecuencia cardiaca :", `${datos.fc || ''} x'`);
-    drawRow("SatO2 :", `${datos.sat02 || ''} %`);
+    drawRow("Frecuencia cardiaca :", `${datos.f_cardiaca || ''} x'`);
+    drawRow("SatO2 :", `${datos.sat_02 || ''} %`);
     drawRow("Sistólica :", `${datos.sistolica || ''}`);
     drawRow("Diastólica :", `${datos.diastolica || ''}`);
-    drawRow("Frec. Respiratoria :", `${datos.fr || ''} x'`);
+    drawRow("Frec. Respiratoria :", `${datos.f_respiratoria || ''} x'`);
 
     // --- Diagnóstico ---
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     doc.setFont(undefined, 'bold');
     doc.text("Diagnóstico:", 20, cuadroY + cuadroH + 15);
-    doc.setFontSize(9);
     doc.setFont(undefined, 'normal');
-    let diagY = cuadroY + cuadroH + 21;
-    const diagnosticos = (datos.diagnostico || "").split("\n");
-    diagnosticos.forEach(linea => {
-        doc.text(`- ${linea}`, 25, diagY);
-        diagY += 6;
+
+    // Líneas de diagnóstico que cubren todo el ancho útil
+    const diagStartY = cuadroY + cuadroH + 21;
+    const leftMargin = 20;
+    const rightMargin = 195;
+    const lineHeight = 7;
+    let currentY = diagStartY;
+    for (let i = 0; i < 3; i++) {
+        doc.line(leftMargin, currentY, rightMargin, currentY);
+        currentY += lineHeight;
+    }
+    autoTable(doc, {
+        startY: diagStartY,
+        body: [
+            [{ content: `Observaciones: \n\n${datos.conclusion}`, colSpan: 1, rowSpan: 1, styles: { minCellHeight: 22,valign: "top" } }],
+            
+        ],
+        theme: "grid",
+        styles: { fontSize: 12, textColor: [0, 0, 0] },
+        headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
     });
 
     // --- Footer ---

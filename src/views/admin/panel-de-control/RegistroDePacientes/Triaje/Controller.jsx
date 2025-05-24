@@ -2,7 +2,7 @@ import { useRef } from "react"
 import { GetHistoriaC } from "../model/AdminHistoriaC"
 import { GetHistoriaCTriaje, SubmitTriaje } from './model';
 import Swal from "sweetalert2";
-
+import ReporteTriaje from "../../../../jaspers/ReporteTriaje";
 const Loading = () => {
   Swal.fire({
         title: 'Validando Datos',
@@ -153,14 +153,18 @@ export const handleSubmit = (datos,edad,nro,fecha,Swal,token) => {
 }
 
 //FUNCION MULTIPLE DE LOBO
-export const GetListTriajeMult = async (nro,set,setTR,get,token) => {
+export const GetListTriajeMult = async (nro,set,setTR,get,token,jasper) => {
   if (!nro){
     await  Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
     return
   }  
   get(`/api/v01/ct/triaje/listarFormatoTriaje/${nro}`,token)
-  .then((res) => {
+  .then(async(res) => {
     if (res.n_orden) {
+      if (jasper) {
+        await GetJasper(res,token)
+        return
+      }
       set({
         nro: res.n_orden,
         nomExam: res.nom_examen,
@@ -220,4 +224,8 @@ export const GetListTriajeMulttable = async (nro,set,setTR,get,token) => {
   .catch(() => {
       Swal.fire('Error','No se Encontro un Registro de Triaje para esta Historia Clinica','error')
   })
+}
+
+export const GetJasper = async (nro,token) => {
+  ReporteTriaje(nro)
 }

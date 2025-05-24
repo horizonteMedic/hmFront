@@ -280,7 +280,7 @@ const Triaje = ({token,selectedSede}) => {
               {tablehc.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
               {tablehc.map((row, i) => (
                 <tr key={i} className={`text-center cursor-pointer ${row.color === 'AMARILLO' ? 'bg-[#ffff00]' : row.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} 
-                onClick={() => {GetListTriajeMulttable(row.n_orden,setForm,setTriaje,getFetch,token)}}>
+                onClick={() => {GetListTriajeMulttable(row.n_orden,setForm,setTriaje,getFetch,token)}} onContextMenu={(e) => {e.preventDefault(),GetListTriajeMult(row.n_orden,setForm,setTriaje,getFetch,token,true)}}>
                   <td>{row.n_orden}</td>
                   <td>{row.nombres}</td>
                   <td>{row.fecha_apertura_po}</td>
