@@ -98,28 +98,44 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
 
     const Convertbase64 = () => {
         return new Promise((resolve, reject) => {
-          const imageElement = document.querySelector(`#imageBox img`);
-      
-          if (!imageElement) {
+          const imageElement = document.querySelector("#imageBox img");
+
+            if (!imageElement) {
             Swal.fire("Error", "No se encontró la imagen", "error");
             return reject("No se encontró la imagen");
-          }
-      
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.src = imageElement.src;
-      
-          img.onload = () => {
+            }
+
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = imageElement.src;
+
+            img.onload = () => {
             const canvas = document.createElement("canvas");
             canvas.width = img.width;
             canvas.height = img.height;
-      
+
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
-      
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+
+                // Si es casi blanco, lo hacemos transparente
+                if (r > 240 && g > 240 && b > 240) {
+                data[i + 3] = 0; // Alpha = 0 (transparente)
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+
             const base64Image = canvas.toDataURL("image/png");
-            resolve(base64Image); // <-- devolvemos el base64
-          };
+            resolve(base64Image);
+            };
       
           img.onerror = () => {
             Swal.fire("Error", "No se pudo cargar la imagen para convertirla", "error");

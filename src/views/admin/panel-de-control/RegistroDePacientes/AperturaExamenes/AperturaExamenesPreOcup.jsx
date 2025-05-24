@@ -7,7 +7,7 @@ import { GetHistoriaC, SubmitHistoriaC } from '../model/AdminHistoriaC';
 import {InputsSelect, InputsSelect2} from '../InputsSelect';
 import {getFetch} from '../../getFetch/getFetch'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAsterisk } from '@fortawesome/free-solid-svg-icons';
+import { faAsterisk, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import { ImportData } from '../controller/HC';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
@@ -39,7 +39,7 @@ const AperturaExamenesPreOcup = (props) => {
 
   
   const [datos, setDatos] = useState({
-    codPa: props.DNIG,
+    codPa: props.DNIG ? String(props.DNIG) : "",
     nombres: "",
     apellidos: "",
     razonEmpresa:"",
@@ -57,7 +57,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: format(today, 'dd/MM/yyyy'),
+    fechaAperturaPo: format(today, 'dd-MM-yyyy'),
     n_operacion: null,
     textObserv1: "",
     textObserv2: "",
@@ -86,6 +86,16 @@ const AperturaExamenesPreOcup = (props) => {
     nombre: ""
   })
   const [refresh, setRefresh] = useState(0)
+  const [CanP, setCanP] = useState({Completos: 0, Faltantes: 0})
+  const [FechaCanP, setFechaCanP] = useState(format(today, 'dd/MM/yyyy'))
+
+  useEffect(() => {
+    getFetch(`/api/v01/ct/consentDigit/resumenAdmPacientesConFiltros?nomSede=${props.selectedSede}&fecha=${FechaCanP}`,props.token)
+    .then((res) => {
+      setCanP(d => ({...d, Completos: res.completos, Faltantes: res.faltantes}))
+    })
+  },[FechaCanP])
+
 
   // Autocompletado Empresa
   const [searchEmpresa, setSearchEmpresa] = useState(datos.razonEmpresa);
@@ -98,7 +108,7 @@ const AperturaExamenesPreOcup = (props) => {
   },[props.DNIG])
 
   const handleEmpresaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     if (v === "") {
       setDatos(d => ({ ...d, razonEmpresa: "" }));
     }
@@ -126,7 +136,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredContratas, setFilteredContratas] = useState([]);
 
   const handleContrataSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     if (v === "") {
       setDatos(d => ({ ...d, razonContrata: "" }));
     }
@@ -153,7 +163,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredMedicos, setFilteredMedicos] = useState([]);
 
   const handleMedicoSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setSearchMedico(v);
     setDatos(d => ({...d, n_medico: v}))
     setFilteredMedicos(
@@ -177,7 +187,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [filteredPruebas, setFilteredPruebas] = useState([]);
 
   const handlePruebaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, tipoPrueba: v}))
     setSearchPrueba(v);
     setFilteredPruebas(
@@ -200,7 +210,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchCargo, setSearchCargo] = useState(datos.cargoDe);
   const [filteredCargos, setFilteredCargos] = useState([]);
   const handleCargoSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, cargoDe: v}))
     setSearchCargo(v);
     setFilteredCargos(
@@ -222,7 +232,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchArea, setSearchArea] = useState(datos.areaO);
   const [filteredAreas, setFilteredAreas] = useState([]);
   const handleAreaSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setDatos(d => ({...d, areaO: v}))
     setSearchArea(v);
     setFilteredAreas(
@@ -244,8 +254,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchExamenMedico, setSearchExamenMedico] = useState(datos.nomExamen);
   const [filteredExamMed, setFilteredExamMed]     = useState([]);
   const handleExamenMedSearch = e => {
-    const v = e.target.value;
-
+    const v = e.target.value.toUpperCase();
     setSearchExamenMedico(v);
     setFilteredExamMed(
       v
@@ -257,18 +266,23 @@ const AperturaExamenesPreOcup = (props) => {
   };
   const handleSelectExamenMed = x => {
     setSearchExamenMedico(x.mensaje);
+    setDatos(d => ({
+      ...d,
+      nomExamen: x.mensaje
+    }));
+
     setFilteredExamMed([]);
-    document.getElementById('nomEx')?.focus();
     getFetch(`/api/v01/ct/ocupacional/PrecioExamenMutisucursal/${props.selectedSede}/${x.mensaje}`,props.token)
     .then((res) => {
-      setDatos({...datos,
-        nomExamen: x.mensaje,
+      setDatos(d => ({
+        ...d,
         precioPo: res.mensaje
-      })
+      }));
     })
     .catch(() => {
       console.log('Telible Error')
     })
+    document.getElementById('nomEx')?.focus();
   };
 
   // Explotación
@@ -282,7 +296,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [searchProtocolo, setSearchProtocolo] = useState(datos.protocolo || '');
   const [filteredProtocolos, setFilteredProtocolos] = useState([]);
   const handleProtocoloSearch = e => {
-    const v = e.target.value;
+    const v = e.target.value.toUpperCase();
     setSearchProtocolo(v);
     setFilteredProtocolos(
       v
@@ -300,6 +314,7 @@ const AperturaExamenesPreOcup = (props) => {
 
 
   useEffect(() => {
+
     if (SearchP.code === "" && SearchP.nombre === "") {
       const data = {
         opcion_id_p: 1,
@@ -355,7 +370,7 @@ const AperturaExamenesPreOcup = (props) => {
     const { name, value } = e.target;
     
     if (name === 'nomExamen') {
-      newPrice(value)
+      newPrice(value.toUpperCase())
       return
     }
     setDatos({
@@ -366,11 +381,13 @@ const AperturaExamenesPreOcup = (props) => {
 
   const handleDNI = (e) => {
     const { name, value } = e.target;
+    // Solo permitir números y hasta 8 caracteres
+    const cleanValue = value.replace(/\D/g, '').slice(0, 8);
     setDatos({
-        ...datos,
-        [name]: value ? parseInt(value.replace(/\D/g, ''), 10) : 0
+      ...datos,
+      [name]: cleanValue
     });
-    setRegister(true)
+    setRegister(true);
   };
 
   const handleEdit = (value) => {
@@ -408,7 +425,6 @@ const AperturaExamenesPreOcup = (props) => {
   
   const SearchHC = (event,type) => {
     if (SearchP.code === "" && SearchP.nombre === "") {
-      console.log('a');
       return;
     }
     if (event.key === 'Enter') {
@@ -433,7 +449,6 @@ const AperturaExamenesPreOcup = (props) => {
         }
         GetHistoriaC(data,props.selectedSede,props.token)
         .then((res) => {
-          console.log(res)
           if (res) {
             if (res.length) {
               setSearchHC(res); // Solo si tiene elementos
@@ -457,7 +472,6 @@ const AperturaExamenesPreOcup = (props) => {
         }
         GetHistoriaC(data,props.selectedSede,props.token)
         .then((res) => {
-          console.log(res)
           if (res) {
             if (res.length) {
               setSearchHC(res); // Solo si tiene elementos
@@ -528,6 +542,7 @@ const AperturaExamenesPreOcup = (props) => {
       tipoPago: "",
       precioAdic: "",
       autoriza: "",
+      fechaAperturaPo: format(today, 'dd/MM/yyyy'),
       n_operacion: null,
       textObserv1: "",
       textObserv2: "",
@@ -547,6 +562,7 @@ const AperturaExamenesPreOcup = (props) => {
       apellidos:"",
     })
     RendeSet("")
+    props.ChangeDNI("")
     setShowEdit(false)
     setHabilitar(false)
     setRegister(true)
@@ -592,7 +608,38 @@ const AperturaExamenesPreOcup = (props) => {
     })
   }
 
-  const InfoHR2 = (HC,nomExamen,razonEmpresa,n_psicosen,n_testaltura) => {
+  const SearchClickRight = (n_orden) => {
+    Swal.fire({
+      title: `<span style="font-size:1.3em;font-weight:bold;">Cargando Hoja de Ruta</span>`,
+      html: `<div style="font-size:1.1em;">N° <b style='color:#2563eb;'>${n_orden.n_orden}</b> - <span style='color:#0d9488;font-weight:bold;'>${n_orden.nombres}</span></div><div class='mt-2'>Espere por favor...</div>`,
+      icon: 'info',
+      background: '#f0f6ff',
+      color: '#22223b',
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      customClass: {
+        popup: 'swal2-border-radius',
+        title: 'swal2-title-custom',
+        htmlContainer: 'swal2-html-custom',
+      },
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown'
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp'
+      },
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+    getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`,props.token)
+    .then((res) => {
+      InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura, res.nombres);
+    })
+  }
+
+  const InfoHR2 = (HC,nomExamen,razonEmpresa,n_psicosen,n_testaltura,nombres) => {
     getFetch(`/api/v01/ct/consentDigit/nombreHojaRuta?nameExamen=${nomExamen}&empresa=${razonEmpresa}&altaPsicosen=${n_psicosen}&testAltura=${n_testaltura}`,props.token)
     .then(async(res) => {
       if (res.id === 1) {
@@ -601,13 +648,29 @@ const AperturaExamenesPreOcup = (props) => {
         if (jasperModules[filePath]) {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
-            
             const datos = await GetDatoHR(HC)
             Swal.fire({
-              title: "Hoja de Ruta",
-              text: "¿Desea Imprimir?.",
-              icon: "success",
-              cancelButtonText: "Cancelar"
+              title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>` ,
+              html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>` ,
+              icon: 'question',
+              background: '#f0f6ff',
+              color: '#22223b',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, Imprimir',
+              cancelButtonText: 'Cancelar',
+              customClass: {
+                popup: 'swal2-border-radius',
+                title: 'swal2-title-custom',
+                htmlContainer: 'swal2-html-custom',
+                confirmButton: 'swal2-confirm-custom',
+                cancelButton: 'swal2-cancel-custom',
+              },
+              showClass: {
+                popup: 'animate__animated animate__fadeInDown'
+              },
+              hideClass: {
+                popup: 'animate__animated animate__fadeOutUp'
+              }
             }).then((result) => {
               if (result.isConfirmed) module.default(datos);
             });
@@ -621,25 +684,15 @@ const AperturaExamenesPreOcup = (props) => {
     })
   }
 
-  //doble click
-  const SearchClickRight = (n_orden) => {
-    Swal.fire({
-      title: 'Cargando Hoja de Ruta',
-      text: 'Espere por favor...',
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-    getFetch(`/api/v01/ct/consentDigit/busquedaHistoriaOcupNOrden/${n_orden.n_orden}`,props.token)
-    .then((res) => {
-      InfoHR2(res.n_orden, res.nomExamen, res.razonEmpresa, res.n_psicosen, res.n_testaltura)
-    })
-    
-  }
-
   const handleSubmitEdit = e => {
+    const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
+       'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      const lista = camposVacios.join(', ');
+      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -649,7 +702,6 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-    console.log(datos)
     SubmitHistoriaC(datos,props.selectedSede,props.token,2)
     .then((res) => {
       if (!res.id) {
@@ -666,6 +718,14 @@ const AperturaExamenesPreOcup = (props) => {
   }
 
   const handleSubmit = (e) => {
+     const camposRequeridos = ['codPa', 'nombres', 'apellidos', 'razonEmpresa', 'razonContrata', 'n_medico', 'tipoPrueba',
+       'cargoDe', 'areaO', 'nomExamen', 'nomEx', 'mineralPo', 'alturaPo', 'tipoPago', 'fechaAperturaPo']; // agrega los campos que quieras
+    const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
+    if (camposVacios.length > 0) {
+      const lista = camposVacios.join(', ');
+      return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
+    } 
+
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',
@@ -675,13 +735,12 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-
     SubmitHistoriaC(datos,props.selectedSede,props.token,1)
     .then((res) => {
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
         } else {
-          setSearchP({code: ""})
+          setSearchP(prev => ({ ...prev, code: "" , nombre: ""}));
           handleLimpiar()
           InfoHR(res.id)
           setRefresh(refresh+1)
@@ -690,7 +749,6 @@ const AperturaExamenesPreOcup = (props) => {
     .catch(() => {
       console.log('telible error')
     })
-    
   };
 
   // Formateo en DD-MM-AAAA mientras escribes
@@ -705,9 +763,6 @@ const AperturaExamenesPreOcup = (props) => {
   }
   setDatos(d => ({ ...d, fechaAperturaPo: formatted }));
 };
-
-  const codPa = datos.codPa ? datos.codPa.toString() : "";  // Convertir a cadena de texto
-  const activarDisabled = codPa.length === 8;
 
   // Debounce para evitar demasiadas llamadas
   const debounceTimeout = useRef(null);
@@ -736,10 +791,9 @@ const AperturaExamenesPreOcup = (props) => {
           })
           .catch(() => setSearchHC([]));
       } else {
-        // Si el campo está vacío, puedes decidir si mostrar todos o limpiar la tabla
         setSearchHC([]);
       }
-    }, 400); // 400ms de espera
+    }, 400);
   };
 
   const formatDate = (dateString) => {
@@ -760,13 +814,13 @@ const AperturaExamenesPreOcup = (props) => {
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
-          <div className="w-full sm:w-full md:w-auto   ">
+          <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
             <div className="mb-1 pb-2">
               <h2 className="text-lg font-bold">Datos</h2>
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="dni" className="block w-40">DNI:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="codPa"
                 ref={dniRef}
@@ -776,44 +830,56 @@ const AperturaExamenesPreOcup = (props) => {
                 onKeyDown={handleSearch}
                 onChange={handleDNI}
                 name="codPa"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-full ${habilitar ? "bg-slate-400" : "bg-slate-100"}`}
               />
-              <label htmlFor="Importar">IMPORTAR</label>
-              <button onClick={() => {ImportData(datos.codPa,Swal,getFetch,props.token, setDatos,RendeSet)}} className='mr-2 flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800  mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'>
-                <FontAwesomeIcon icon={faAsterisk}/>
+              <button
+                onClick={() => {
+                  const wrappedSetDatos = (importedData) => {
+                    setDatos(prev => ({
+                      ...prev,
+                      ...importedData,
+                      fechaAperturaPo: format(new Date(), 'dd/MM/yyyy') // Ensure this is always today
+                    }));
+                  };
+                  ImportData(datos.codPa, Swal, getFetch, props.token, wrappedSetDatos, RendeSet);
+                }}
+                className='mr-2 flex items-center justify-center border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none'
+              >
+                <FontAwesomeIcon icon={faFileImport} className="mr-2"/>
+                IMPORTAR
               </button>
                 <label htmlFor="apellidos" className="block w-36">G.Sang.:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
-               <input
+               <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none  flex-grow w-12 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="nombre" className="block w-[14em]">Nombre:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 id="nombres"
                 onChange={handleChange}
                 value={datos.nombres}
                 name="nombres"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
               <label htmlFor="apellidos" className="block w-[14em]">Apellidos:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 id="apellidos"
                 onChange={handleChange}
                 value={datos.apellidos}
                 name="apellidos"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
               {/* — Autocomplete Empresa — */}
@@ -822,7 +888,7 @@ const AperturaExamenesPreOcup = (props) => {
                   Empresa:
                 </label>
                 <div className="relative flex-grow flex items-center">
-                  <input
+                  <input autoComplete="off"
                     id="razonEmpresa"
                     name="razonEmpresa"
                     type="text"
@@ -830,7 +896,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar empresa..."
                     disabled={habilitar}
                     onChange={handleEmpresaSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredEmpresas.length > 0) {
                         e.preventDefault();
@@ -849,10 +915,10 @@ const AperturaExamenesPreOcup = (props) => {
                     onBlur={() => setTimeout(() => setFilteredEmpresas([]), 100)}
                   />
                 <button 
-                    className="ml-2 flex items-center justify-center w-8 h-8 rounded-md bg-blue-800 hover:bg-blue-600 text-white"
+                    className="ml-2 flex items-center justify-center px-2 h-8 rounded-md bg-blue-800 hover:bg-blue-600 text-white"
                     onClick={() => setIsEmpresaModalOpen(true)}
                   >
-                    <FontAwesomeIcon icon={faPlus} />
+                    Agregar <FontAwesomeIcon icon={faPlus} className="ml-2" />
                   </button>
                   {searchEmpresa && filteredEmpresas.length > 0 && (
                     <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
@@ -874,7 +940,7 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center space-x-2 mb-1">
                   <label htmlFor="razonContrata" className="block w-32">Contrata:</label>
                   <div className="relative flex-grow flex items-center">
-                    <input
+                    <input autoComplete="off"
                       id="razonContrata"
                       name="razonContrata"
                       type="text"
@@ -882,7 +948,7 @@ const AperturaExamenesPreOcup = (props) => {
                       placeholder="Escribe para buscar contrata..."
                       disabled={habilitar}
                       onChange={handleContrataSearch}
-                      className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                      className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                       onKeyDown={e => {
                         if (e.key === 'Enter' && filteredContratas.length > 0) {
                           e.preventDefault();
@@ -901,10 +967,10 @@ const AperturaExamenesPreOcup = (props) => {
                       onBlur={() => setTimeout(() => setFilteredContratas([]), 100)}
                     />
                   <button 
-                    className="ml-2 flex items-center justify-center w-8 h-8 rounded-md bg-blue-800 hover:bg-blue-600 text-white"
+                    className="ml-2 flex items-center justify-center px-2 h-8 rounded-md bg-green-600 hover:bg-blue-600 text-white"
                     onClick={() => setIsContrataModalOpen(true)}
                   >
-                    <FontAwesomeIcon icon={faPlus} />
+                    Agregar <FontAwesomeIcon icon={faPlus} className="ml-2" />
                   </button>
                     {searchContrata && filteredContratas.length > 0 && (
                       <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
@@ -925,7 +991,7 @@ const AperturaExamenesPreOcup = (props) => {
               <div className="flex items-center space-x-2 mb-1">
                 <label htmlFor="n_medico" className="block w-32">Médico Ocup.:</label>
                 <div className="relative flex-grow">
-                  <input
+                  <input autoComplete="off"
                     id="n_medico"
                     name="n_medico"
                     type="text"
@@ -933,7 +999,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar médico..."
                     disabled={habilitar}
                     onChange={handleMedicoSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                     onKeyDown={e => {
                       if (e.key === 'Enter' && filteredMedicos.length > 0) {
                         e.preventDefault();
@@ -970,8 +1036,8 @@ const AperturaExamenesPreOcup = (props) => {
               {/* — Autocomplete Tipo de Prueba — */}
               <div className="flex items-center space-x-2 mb-1">
                 <label htmlFor="tipoPrueba" className="block w-32">Tipo Prueba:</label>
-                <div className="relative flex-grow">
-                  <input
+                <div className="relative flex-grow flex items-center">
+                  <input autoComplete="off"
                     id="tipoPrueba"
                     name="tipoPrueba"
                     type="text"
@@ -979,7 +1045,7 @@ const AperturaExamenesPreOcup = (props) => {
                     placeholder="Escribe para buscar prueba..."
                     disabled={habilitar}
                     onChange={handlePruebaSearch}
-                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-1/2 ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                     onKeyDown={e => { 
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -1001,19 +1067,16 @@ const AperturaExamenesPreOcup = (props) => {
                     }}
                     onBlur={() => setTimeout(() => setFilteredPruebas([]), 100)}
                   />
-                  {searchPrueba && filteredPruebas.length > 0 && (
-                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                      {filteredPruebas.map(p => (
-                        <li
-                          key={p.id}
-                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={() => handleSelectPrueba(p)}
-                        >
-                          {p.mensaje}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  <div className="flex items-center w-1/2 ml-2">
+                    <label className="whitespace-nowrap mr-2 font-medium">Historia clínica:</label>
+                    <input
+                      type="text"
+                      value={datos.n_orden || ""}
+                      disabled
+                      className="border border-gray-300 px-3 py-4 mb-1 rounded-md focus:outline-none w-full font-bold bg-slate-100 h-14 text-3xl"
+                      placeholder="N° Orden"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1024,7 +1087,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="cargoDe" className="block w-32">Cargo:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="cargoDe"
                   name="cargoDe"
                   type="text"
@@ -1032,7 +1095,7 @@ const AperturaExamenesPreOcup = (props) => {
                   placeholder="Escribe para buscar cargo..."
                   disabled={habilitar}
                   onChange={handleCargoSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md  w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                  className={`border border-gray-300 px-3 py-1 rounded-md  w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                   onKeyDown={e => {
                     if (e.key==='Enter' && filteredCargos.length>0) {
                       e.preventDefault(); handleSelectCargo(filteredCargos[0]);
@@ -1061,11 +1124,11 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="areaO" className="block w-32">Área:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="areaO" name="areaO" type="text"
                   value={searchArea} placeholder="Escribe para buscar área..."
                   disabled={habilitar} onChange={handleAreaSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
                   onKeyDown={e=>{ if(e.key==='Enter'&&filteredAreas.length>0){e.preventDefault();handleSelectArea(filteredAreas[0]);} }}
                   onFocus={()=>setFilteredAreas(AreaMulti.filter(a=>a.mensaje.toLowerCase().includes(searchArea.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredAreas([]),100)}
@@ -1087,13 +1150,30 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="nomExamen" className="block w-32">Examen Médico:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="nomExamen" name="nomExamen"
                   type="text" value={searchExamenMedico}
                   placeholder="Escribe para buscar examen..."
                   disabled={habilitar} onChange={handleExamenMedSearch}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
-                  onKeyDown={e=>{ if(e.key==='Enter'&&filteredExamMed.length>0){e.preventDefault();handleSelectExamenMed(filteredExamMed[0]);} }}
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      // Si hay una sola opción, seleccionarla
+                      if (filteredExamMed.length === 1) {
+                        handleSelectExamenMed(filteredExamMed[0]);
+                        return;
+                      }
+                      // Si hay coincidencia exacta, seleccionarla
+                      const exact = filteredExamMed.find(x => x.mensaje.trim().toUpperCase() === searchExamenMedico.trim().toUpperCase());
+                      if (exact) {
+                        handleSelectExamenMed(exact);
+                        return;
+                      }
+                      // Si no hay coincidencia, limpiar el campo real
+                      setDatos(d => ({ ...d, nomExamen: '' }));
+                    }
+                  }}
                   onFocus={()=>setFilteredExamMed(ExamenMulti.filter(x=>x.mensaje.toLowerCase().includes(searchExamenMedico.toLowerCase())))}
                   onBlur={()=>setTimeout(()=>setFilteredExamMed([]),100)}
                 />
@@ -1169,7 +1249,7 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="nomEx" className="block w-32">Explotación en:</label>
               <div className="relative flex-grow">
                 <select name="nomEx" id="nomEx" value={datos.nomEx} onChange={(e) => {setDatos({...datos,nomEx: e.target.value}), document.getElementById('mineralPo')?.focus();}}
-                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                  className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}>
                   <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                   {ExplotacionMulti.map((item,index) => (
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
@@ -1184,7 +1264,7 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="mineralPo" className="block w-32">Mineral Exp:</label>
               <div className="relative flex-grow">
                 <select name="mineralPo" id="mineralPo" value={datos.mineralPo} onChange={(e) => {setDatos({...datos,mineralPo: e.target.value}), document.getElementById('alturaPo')?.focus();}}
-                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}>
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                     {MineralMulti.map((item,index) => (
                       <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
@@ -1198,7 +1278,7 @@ const AperturaExamenesPreOcup = (props) => {
               <label htmlFor="alturaPo" className="block w-32">Altura:</label>
               <div className="relative flex-grow">
                 <select name="alturaPo" id="alturaPo" value={datos.alturaPo} onChange={(e) => {setDatos({...datos,alturaPo: e.target.value}), document.getElementById('tipoPago')?.focus();}}
-                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}>
+                    className={`border border-gray-300 px-3 py-1 rounded-md w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}>
                     <option className="cursor-pointer px-3 py-2 hover:bg-gray-100">Seleccione una opcion...</option>
                     {AlturaMulti.map((item,index) => (
                       <option className="cursor-pointer px-3 py-2 hover:bg-gray-100" key={index} value={item.mensaje}>{item.mensaje} </option>
@@ -1212,7 +1292,7 @@ const AperturaExamenesPreOcup = (props) => {
               <input type="text"
                 id="precioPo"
                 name="precioPo"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${!editPri ? "bg-slate-300" : "bg-white"}`} 
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${!editPri ? "bg-slate-300" : "bg-slate-100"}`} 
                 value={datos.precioPo}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -1229,7 +1309,7 @@ const AperturaExamenesPreOcup = (props) => {
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="precioExamenAdicional" className="block w-1/2">Precio Examen Adicional:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 value={datos.precioAdic}
@@ -1243,7 +1323,7 @@ const AperturaExamenesPreOcup = (props) => {
                 }}
                 id="precioAdic"
                 name="precioAdic"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
               <InputsSelect2 nombre="autoriza" disabled={habilitar} value={datos.autoriza} title="Autorizado Por" Selects={ListAuth} handleChange={handleChange}/>
             </div>
@@ -1251,7 +1331,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="fechaApertura" className="block w-1/3">Fecha de Apertura:</label>
                             
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="fechaAperturaPo"
                 name="fechaAperturaPo"
@@ -1268,7 +1348,7 @@ const AperturaExamenesPreOcup = (props) => {
                 }}
               />
               <label htmlFor="numOperacion" className="block ml-4">N° Operación:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
                 value={datos.n_operacion}
@@ -1279,27 +1359,27 @@ const AperturaExamenesPreOcup = (props) => {
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
-              <label htmlFor="observacion1" className="block w-36">Observación 1:</label>
-              <input
+              <label htmlFor="textObserv1" className="block w-36">Observación 1:</label>
+              <input autoComplete="off"
                 type="text"
                 disabled={habilitar}
-                defaultValue={datos.textObserv1}
+                value={datos.textObserv1}
                 onChange={handleChange}
-                id="observacion1"
+                id="textObserv1"
                 name="textObserv1"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="observacion2" className="block w-36">Observación 2:</label>
-              <input
+              <input autoComplete="off"
                 type="text"
                 id="observacion2"
                 disabled={habilitar}
-                defaultValue={datos.textObserv2}
+                value={datos.textObserv2}
                 onChange={handleChange}
                 name="textObserv2"
-                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-white"}`}
+                className={`border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full ${habilitar ? "bg-slate-300" : "bg-slate-100"}`}
               />
             </div>
             
@@ -1307,7 +1387,7 @@ const AperturaExamenesPreOcup = (props) => {
             <div className="flex items-center space-x-2 mb-1">
               <label htmlFor="protocolo" className="block w-32">Protocolo:</label>
               <div className="relative flex-grow">
-                <input
+                <input autoComplete="off"
                   id="protocolo" name="protocolo"
                   type="text" value={searchProtocolo}
                   placeholder="Escribe para buscar protocolo..."
@@ -1342,7 +1422,7 @@ const AperturaExamenesPreOcup = (props) => {
                 </button>
               </div>}
             {register && <div className="pt-4 flex justify-end items-end">
-                <button type="button" onClick={handleSubmit} disabled={!activarDisabled} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
+                <button type="button" onClick={handleSubmit} disabled={!datos.codPa} className="flex items-end border-1 border-blue-500 text-white px-3 py-1 bg-blue-800 mb-1 rounded-md hover:bg-blue-500 hover:text-white focus:outline-none">
                    Agregar
                 </button>
             </div>}
@@ -1352,7 +1432,7 @@ const AperturaExamenesPreOcup = (props) => {
           <div className="w-full sm:w-full mb-4 pl-4">
           <div className="flex items-center space-x-2 mb-2">
                 <label htmlFor="soloMiSede" className="block w-1/6">Solo mi Sede</label>
-                <input type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />
+                <input autoComplete="off" type="checkbox" id="soloMiSede" name="soloMiSede" className="mr-2 pointer" />
 
                 <label htmlFor="fecha" className="block w-14">Fecha:</label>
                 <DatePicker
@@ -1361,7 +1441,7 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border pointer border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white w-32"
                 />
                 <label htmlFor="hora" className="block w-14">Hora:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   defaultValue={datos.n_hora}
                   id="hora"
@@ -1370,7 +1450,7 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-slate-300 w-25"
                 />
                 <label htmlFor="sedeClinica" className="block w-36">Sede Clínica:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   id="sedeClinica"
                   defaultValue={datos.codSede}
@@ -1382,7 +1462,7 @@ const AperturaExamenesPreOcup = (props) => {
 
               <div className="flex items-center space-x-2 mb-2">
                 <label htmlFor="nombre" className="block w-36">Nombre:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   value={SearchP.nombre}
                   onChange={handleNombreChange}
@@ -1391,7 +1471,7 @@ const AperturaExamenesPreOcup = (props) => {
                   className="border border-gray-300 px-3 py-1  mb-1 rounded-md focus:outline-none bg-white flex-grow w-full"
                 />
                 <label htmlFor="codigo" className="block w-36">Código:</label>
-                <input
+                <input autoComplete="off"
                   type="text"
                   inputMode="numeric"        // muestra teclado numérico en móviles
                   pattern="\d*"              // solo acepta números
@@ -1414,7 +1494,31 @@ const AperturaExamenesPreOcup = (props) => {
               </div>
             <div className="mb-4 ">
               <h3 className="text-lg font-bold mb-2">Últimos Agregados & Hojas de Ruta</h3>
+             
+              <div className="flex items-center justify-between mb-4 p-4 rounded-lg border border-blue-200 bg-blue-50 ">
+                <div className="flex items-center text-lg">
+                  <label htmlFor="filtroFechaTabla" className="mr-2 font-semibold">Fecha:</label>
+                  <DatePicker
+                    id="filtroFechaTabla"
+                    value={FechaCanP}
+                    onChange={(date) => {setFechaCanP(format(date, "dd/MM/yyyy"))}}
+                    dateFormat="yyyy/MM/dd"
+                    className="border border-gray-300 px-3 py-1 rounded-md focus:outline-none bg-white w-32"
+                  />
+                </div>
+                <div className="flex text-lg flex-col sm:flex-row sm:space-x-6 mt-2 sm:mt-0">
+                  <span className="font-medium text-blue-900">Pacientes completados: <span className="font-bold text-green-600">{CanP.Completos}</span></span>
+                  <span className="font-medium text-blue-900">Pacientes faltantes: <span className="font-bold text-red-600">{CanP.Faltantes}</span></span>
+                </div>
+              </div>
+              <div className="flex items-center mb-2 bg-gray-50">
+                <span className="mr-2 text-xl">🖱️</span>
+                <span className="text-sm text-gray-700">
+                  <span className="font-semibold">Click izquierdo</span> para importar datos &nbsp;|&nbsp; <span className="font-semibold">Click derecho</span> para imprimir
+                </span>
+              </div>
               <div className="overflow-y-auto" style={{ maxHeight: 'calc(12 * 4rem)' }}>
+                
               <table  className="w-full text-center border border-gray-300 mb-4 ">
                 <thead>
                   <tr>
@@ -1429,7 +1533,8 @@ const AperturaExamenesPreOcup = (props) => {
                 <tbody>
                   {searchHC.length == 0  && <tr><td className="border border-gray-300 px-2 py-1  mb-1">Cargando...</td></tr>}
                   {searchHC.map((option, index) => (
-                    <tr key={index} className=' cursor-pointer' onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
+                    <tr key={index} className={`cursor-pointer hover:opacity-80 transition-colors ${option.color === 'AMARILLO' ? 'bg-[#ffff00]' 
+                      : option.color === 'VERDE' ? 'bg-[#00ff00]' : 'bg-[#ff6767]'}`} onClick={() => {handleEdit(option)}} onContextMenu={(e) => {
                       e.preventDefault();
                       SearchClickRight(option);
                     }}>

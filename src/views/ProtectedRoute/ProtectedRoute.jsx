@@ -1,7 +1,23 @@
 import {useAuthStore} from '../../store/auth'
 import { useLocation,Outlet, Navigate} from "react-router-dom"
 
-const protectedRoutes = {
+/*MAINconst protectedRoutes = {
+    '/roles': 52,
+    '/accesos': 53,
+    '/reporte-pacientes': 54,
+    '/matriz-postulante': 55,
+    '/configuracion': 56,
+    '/lista-archivos': 57,
+    '/agregar-sede': 58,
+    '/agregar-campa%C3%B1a': 59,
+    '/administrar-empresas': 60,
+    '/administrar-contratas': 61,
+    '/protocolos': 61,
+    '/RegistroP': 602,
+    '/Registro-de-pacientes': 202
+  };*/
+
+  const protectedRoutes = {
     '/roles': 2,
     '/accesos': 53,
     '/reporte-pacientes': 54,
@@ -15,10 +31,10 @@ const protectedRoutes = {
     '/protocolos': 61,
     '/RegistroP': 602,
     '/Registro-de-pacientes': 3
-  };
+  }; 
 
-export function ProtectedRoute(){
-    const listView = useAuthStore(state => state.listView)
+export function ProtectedRoute({TotalView}){
+      const listView = useAuthStore(state => state.listView)
     const setToken = useAuthStore(state => state.token)
     const location = useLocation();
     if (setToken === null) {

@@ -38,18 +38,18 @@ const Navbar = () => {
   };
 
   const filteredNavLinks = [
-    { to: "/roles", id: "2", label: "Roles", icon: faUser },
-    { to: "/accesos", id: "52", label: "Accesos", icon: faLock },
+    { to: "/roles", id: "52", label: "Roles", icon: faUser },
+    { to: "/accesos", id: "53", label: "Accesos", icon: faLock },
     { to: "/reporte-pacientes", id: "54", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", id: "55", label: "Matriz Postulante", icon: faList },
-    { to: "/Registro-de-pacientes", id: "3", label: "Registro de Pacientes", icon: faPersonCirclePlus },
+    { to: "/Registro-de-pacientes", id: "202", label: "Registro de Pacientes", icon: faPersonCirclePlus },
   ].filter(navLink => allowedRoutes.includes(navLink.id));
 
   const Logoutbutton = () => {
     return (
       <button
         onClick={() => { setToken(null); setuserlogued(null); }}
-        className="flex items-center justify-center px-4 py-2 bg-red-600 rounded-lg text-white font-semibold hover:bg-red-700 transition-all duration-300 ease-in-out shadow-md hover:shadow-lg"
+        className="ml-4 flex items-center justify-center w-24 h-10 bg-red-600 rounded-full text-white font-bold hover:bg-red-700 transition duration-300 ease-in-out"
       >
         <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
         Salir
@@ -58,14 +58,14 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-[#233245] px-6 py-4 flex justify-between items-center text-white shadow-lg">
+    <nav className="bg-[#233245] px-4 py-3 flex justify-between items-center text-white shadow-md">
       <div className="flex items-center">
-        <Link to="/panel-de-control" onClick={handleLogoClick} className="hover:opacity-90 transition-opacity">
-          <img src="img/logo-blanco.png" alt="Logo" className="h-[40px] mr-4" />
+        <Link to="/panel-de-control" onClick={handleLogoClick}>
+        <img src="img/logo-blanco.png" alt="Logo" className="w-full h-[40px]  mr-4" />
         </Link>
       </div>
 
-      <div className="hidden md:flex items-center space-x-2">
+      <div className="hidden md:flex items-center">
         <CustomNavLink
           to="/panel-de-control"
           label="Inicio"
@@ -88,10 +88,7 @@ const Navbar = () => {
       </div>
 
       <div className="md:hidden">
-        <button 
-          onClick={toggleMenu} 
-          className="text-white p-2 rounded-lg hover:bg-[#fc6b03] transition-colors duration-300"
-        >
+        <button onClick={toggleMenu} className="text-white focus:outline-none">
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             {showMenu ? (
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -103,29 +100,27 @@ const Navbar = () => {
       </div>
 
       {showMenu && (
-        <div className="md:hidden absolute right-0 top-[72px] bg-[#233245] w-[280px] py-4 shadow-xl rounded-bl-lg border-l border-b border-[#fc6b03]">
-          <div className="flex flex-col space-y-2 px-3">
+        <div className="md:hidden absolute right-0 top-[80px] bg-gray-800 w-[60%] py-9 shadow-lg" style={{ zIndex: 999, borderBottomLeftRadius: '10px', overflow: 'hidden' }}>
+          <CustomNavLink
+            to="/panel-de-control"
+            label="Inicio"
+            icon={faHome}
+            activeLink={activeLink}
+            onClick={handleNavLinkClick}
+          />
+          {filteredNavLinks.map((navLink, index) => (
             <CustomNavLink
-              to="/panel-de-control"
-              label="Inicio"
-              icon={faHome}
+              key={index}
+              to={navLink.to}
+              id={navLink.id}
+              label={navLink.label}
+              icon={navLink.icon}
               activeLink={activeLink}
               onClick={handleNavLinkClick}
             />
-            {filteredNavLinks.map((navLink, index) => (
-              <CustomNavLink
-                key={index}
-                to={navLink.to}
-                id={navLink.id}
-                label={navLink.label}
-                icon={navLink.icon}
-                activeLink={activeLink}
-                onClick={handleNavLinkClick}
-              />
-            ))}
-            <div className="pt-2">
-              <Logoutbutton />
-            </div>
+          ))}
+          <div className='ml-3 mt-3'>
+            <Logoutbutton />
           </div>
         </div>
       )}
@@ -139,13 +134,7 @@ const CustomNavLink = ({ to, id, label, icon, activeLink, onClick }) => {
       to={to}
       id={id}
       onClick={() => onClick(to)}
-      className={({ isActive }) => `
-        flex items-center px-4 py-2 rounded-lg font-semibold transition-all duration-300
-        ${isActive || activeLink === to 
-          ? 'bg-[#fc6b03] text-white shadow-md' 
-          : 'text-white hover:bg-[#fc6b03] hover:shadow-md'
-        }
-      `}
+      className={`hvr-sweep-to-top before:bg-[#fc6b03] text-white px-4 py-2 ml-2 rounded block md:inline-block relative font-bold ${activeLink === to ? 'bg-[#fc6b03] text-white' : 'hover:bg-[#fc6b03]'}`}
     >
       <FontAwesomeIcon icon={icon} className="mr-2" />
       {label}

@@ -17,7 +17,8 @@ const HistorialPaciente = () => {
   const ListContrata = ComboboxContratas();
   const [sede, setSede] = useState('');
   const [loading, setLoading] = useState(false);
-  console.log(ListSedes)
+  const [disabled, setDisabled] = useState(false)
+
   useEffect(() => {
     if (ListSedes.length > 0) {
       setSede(ListSedes[0].cod_sede);
@@ -124,7 +125,7 @@ const HistorialPaciente = () => {
   
 //Esto trae todos los datos cuando se entra a la vista de reportes
   useEffect(() => {
-
+    setDisabled(true)
     if (abortController.current) {
       abortController.current.abort(); // Cancela la solicitud anterior si existe
     }
@@ -183,6 +184,7 @@ const HistorialPaciente = () => {
             setTotalPages(Math.ceil(updatedData.length / recordsPerPage)); // Recalcular totalPages
             return updatedData;
           });
+          setDisabled(false)
           setPorsentaje(`100%`)
 
 
@@ -390,8 +392,9 @@ const HistorialPaciente = () => {
           <span className="mr-2"><strong>Buscar:</strong></span>
             <input
               type="text"
-              className="border rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4"
+              className={`border rounded-md px-2 py-1 mb-2 md:mb-0 md:mr-4 ${disabled ? "bg-slate-300" : "bg-white"}`}
               placeholder="Buscar por DNI o nombre"
+              disabled={disabled}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
