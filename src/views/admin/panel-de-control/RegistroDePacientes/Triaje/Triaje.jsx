@@ -88,7 +88,6 @@ const Triaje = ({token,selectedSede}) => {
   const refreshtable = () => {
     setRefresh(refresh + 1)
   }
-  console.log(triaje)
 
   // Calcular resumen de pacientes para la fecha seleccionada
   const pacientesDelDia = tablehc.filter(row => row.fecha_apertura_po && row.fecha_apertura_po.startsWith(resumenFecha));
@@ -106,38 +105,6 @@ const Triaje = ({token,selectedSede}) => {
   // Click derecho: primero muestra alerta de carga, luego la de impresión según la conexión
   const handleRowContextMenu = async (e, row) => {
     e.preventDefault();
-    Swal.fire({
-      title: '<span style="font-size:1.3em;font-weight:bold;">Cargando Hoja de Ruta</span>',
-      html: `<div style=\"font-size:1.1em;\">N° <b style='color:#2563eb;'>${row.n_orden}</b> - <span style='color:#0d9488;font-weight:bold;'>${row.nombres}</span></div><div class='mt-2'>Espere por favor...</div>` ,
-      icon: 'info',
-      background: '#f0f6ff',
-      color: '#22223b',
-      showConfirmButton: false,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      customClass: {
-        popup: 'swal2-border-radius',
-        title: 'swal2-title-custom',
-        htmlContainer: 'swal2-html-custom',
-      },
-      showClass: {
-        popup: 'animate__animated animate__fadeInDown'
-      },
-      hideClass: {
-        popup: 'animate__animated animate__fadeOutUp'
-      },
-      didOpen: () => {
-        Swal.showLoading();
-      }
-    });
-    try {
-      await getFetch(`/api/v01/ct/triaje/listarFormatoTriaje/${row.n_orden}`, token);
-    } catch (error) {
-      Swal.close();
-      Swal.fire('Error', 'No se pudo cargar la hoja de ruta', 'error');
-      return;
-    }
-    Swal.close();
     Swal.fire({
       title: '<span style="font-size:1.3em;font-weight:bold;">¿Desea Imprimir Hoja de Ruta?</span>',
       html: `<div style=\"font-size:1.1em;\">N° <b style='color:#2563eb;'>${row.n_orden}</b> - <span style='color:#0d9488;font-weight:bold;'>${row.nombres.split(' ').slice(0,2).join(' ')}</span></div>` ,
@@ -162,7 +129,7 @@ const Triaje = ({token,selectedSede}) => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        import('./Controller').then(mod => mod.GetJasper(row.n_orden, token));
+        GetListTriajeMult(row.n_orden,setForm,setTriaje,getFetch,token,true)
       }
     });
   };

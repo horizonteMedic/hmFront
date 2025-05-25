@@ -61,8 +61,8 @@ const headerTriaje = (doc, datos) => {
   const sedeY = yOffset + 8;
   const sedeX = pageW - margin;
   doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`SEDE: ${datos.nombreSede || ""}`, sedeX, sedeY, { align: "right" });
-  doc.text(`FECHA: ${datos.fecha || ""}`, sedeX, sedeY + 7, { align: "right" });
+  doc.text(`SEDE: ${datos.sede }`, sedeX, sedeY, { align: "right" });
+  doc.text(`FECHA: ${datos.fecha_triaje || ""}`, sedeX, sedeY + 7, { align: "right" });
   doc.text(`HORA: ${datos.hora || ""}`, sedeX, sedeY + 14, { align: "right" });
 
   // "INFORME TRIAJE" centrado
@@ -84,7 +84,7 @@ const headerTriaje = (doc, datos) => {
   // N° DE ORDEN a la derecha
   doc.setFont("helvetica", "bold");
   const orderLabel = "N° DE ORDEN:";
-  const orderText = `${datos.orden || ""}`;
+  const orderText = `${datos.n_orden || ""}`;
   doc.setFontSize(9);
   const orderBoxW = 28;
   const orderBoxH = 10;
@@ -106,7 +106,7 @@ const headerTriaje = (doc, datos) => {
   let y2 = y1 + lineHeight + 2;
   doc.setFont("helvetica", "bold");
   doc.text("NOMBRES Y APELLIDOS:", margin, y2);
-  const value = datos.nombres || "";
+  const value = datos.nombres + ' ' + datos.apellidos || "";
   const x = margin + 45;
   const y = y2;
 
@@ -125,7 +125,7 @@ const headerTriaje = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("SEXO:", margin, y3);
   doc.setFont("helvetica", "normal");
-  const sexoText = datos.sexo || "";
+  const sexoText = datos.sexo_pa === "M" ? "MASCULINO" : "FEMENINO" || "";
   const xSexo = margin + 20;
   const ySexo = y3;
 
@@ -137,7 +137,7 @@ const headerTriaje = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("F. NACIMIENTO:", margin + 100, y3);
   doc.setFont("helvetica", "normal");
-  const nacimientoText = datos.nacimiento || "";
+  const nacimientoText = datos.fecha_nac || "";
   const xNacimiento = margin + 125;
   const yNacimiento = y3;
 

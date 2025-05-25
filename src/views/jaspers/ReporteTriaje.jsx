@@ -53,14 +53,7 @@ export default function ReporteTriaje(datos) {
 
     // Líneas de diagnóstico que cubren todo el ancho útil
     const diagStartY = cuadroY + cuadroH + 21;
-    const leftMargin = 20;
-    const rightMargin = 195;
-    const lineHeight = 7;
-    let currentY = diagStartY;
-    for (let i = 0; i < 3; i++) {
-        doc.line(leftMargin, currentY, rightMargin, currentY);
-        currentY += lineHeight;
-    }
+    
     autoTable(doc, {
         startY: diagStartY,
         body: [
