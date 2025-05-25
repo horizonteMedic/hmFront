@@ -56,6 +56,7 @@ const Triaje = ({token,selectedSede}) => {
   const [tablehc, setTablehc] = useState([])
   const [loadingInputs, setLoadingInputs] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const [resumenFecha, setResumenFecha] = useState(format(new Date(), 'yyyy-MM-dd'));
 
   useEffect(() => {
     if (busqueda.codigo === "" && busqueda.nombres === "") {
@@ -88,6 +89,11 @@ const Triaje = ({token,selectedSede}) => {
     setRefresh(refresh + 1)
   }
   console.log(triaje)
+
+  // Calcular resumen de pacientes para la fecha seleccionada
+  const pacientesDelDia = tablehc.filter(row => row.fecha_apertura_po && row.fecha_apertura_po.startsWith(resumenFecha));
+  const completados = pacientesDelDia.filter(row => (row.estado || '').toLowerCase().includes('complet')).length;
+  const faltantes = pacientesDelDia.filter(row => (row.estado || '').toLowerCase().includes('falta')).length;
 
   // Modifica la función para cargar datos al hacer click izquierdo y mostrar loading
   const handleRowClick = async (row) => {
@@ -182,12 +188,19 @@ const Triaje = ({token,selectedSede}) => {
               <label className="font-medium"><input type="checkbox" name="asistencial" checked={form.asistencial} onChange={handleFormChange}/> Asistencial</label>
             </div>
             <div className="flex gap-2 items-center">
-              <label className="font-medium">Nro.: <input className="border rounded px-1 text-md w-24" autoComplete='off' name="nro" value={form.nro} onChange={handleFormChange} 
+              <label className="font-medium">Nro.: <input style={{fontSize: '2rem', fontWeight: 800}} className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-2 text-xl font-bold text-black focus:outline-none focus:ring-2 focus:ring-blue-200 w-56 text-center shadow-sm" autoComplete='off' name="nro" value={form.nro} onChange={handleFormChange} 
               onKeyUp={(event) => {if(event.key === 'Enter')handleTR(),VerifyTR(form,getFetch,token,setForm,setTriaje,selectedSede,setHabilitarTR,setHabilitar)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/}}/></label>
-              <button type="button" onClick={() => {handleTR(),VerifyTR(form,getFetch,token,setForm,setTriaje,selectedSede,setHabilitarTR,setHabilitar)}} className="bg-yellow-200 border rounded px-2 text-md flex items-center"><span role="img" aria-label="buscar" className="mr-1">🔍</span>buscar</button>
+              <button type="button" onClick={() => {handleTR(),VerifyTR(form,getFetch,token,setForm,setTriaje,selectedSede,setHabilitarTR,setHabilitar)}} className="bg-blue-600 hover:bg-blue-700 border border-blue-700 rounded px-3 py-2 text-md flex items-center text-white font-semibold transition-colors duration-150">
+                <i className="fa fa-search mr-2"></i>Buscar
+              </button>
               <label className="font-medium ml-2"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({...f, recibo: true, nOrden: false}))}/> Recibo</label>
               <label className="font-medium ml-2"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({...f, nOrden: true, recibo: false}))}/> N° Orden</label>
             </div>
+            {form.nroHistorial && (
+              <div className="bg-blue-50 text-gray-500 rounded px-4 py-2 mb-2 w-fit mx-auto border border-blue-100 shadow-sm flex items-center justify-center">
+                <span style={{fontSize: '2.5rem', fontWeight: 800, color: '#222'}}> {form.nroHistorial} </span>
+              </div>
+            )}
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Ex.Médico :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
@@ -332,7 +345,8 @@ const Triaje = ({token,selectedSede}) => {
                   </div>
                   <textarea
                     disabled={habilitarTR}
-                    className="border rounded px-1 w-full mt-2 text-md resize-none overflow-hidden"
+                    className="border rounded px-1 w-full mt-2 text-md resize-none overflow-hidden "
+                    style={{padding: '10px'}}
                     placeholder="Diagnóstico"
                     name="diagnostico"
                     value={triaje.diagnostico}
@@ -354,9 +368,15 @@ const Triaje = ({token,selectedSede}) => {
                     }}
                   />
                   <div className="flex gap-3 mt-2">
-                    <button type="button" onClick={() => {setHabilitar(false),setHabilitarTR(false)}}  className="bg-blue-500 text-white px-3 py-1 rounded text-md">Editar</button>
-                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nro, form.fechaExamen, Swal, token,setForm,setTriaje,refreshtable,getFetch,setHabilitar)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">Registrar/Actualizar</button>
-                    <button type="button" onClick={() => {Clean(setForm,setTriaje),setHabilitar(true)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">Limpiar/Cancelar</button>
+                    <button type="button" onClick={() => {setHabilitar(false),setHabilitarTR(false)}}  className="bg-blue-500 text-white px-3 py-1 rounded text-md">
+                      <i className="fa fa-pencil mr-2"></i>Editar
+                    </button>
+                    <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nro, form.fechaExamen, Swal, token,setForm,setTriaje,refreshtable,getFetch,setHabilitar)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">
+                      <i className="fa fa-save mr-2"></i>Registrar/Actualizar
+                    </button>
+                    <button type="button" onClick={() => {Clean(setForm,setTriaje),setHabilitar(true)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">
+                      <i className="fa fa-eraser mr-2"></i>Limpiar/Cancelar
+                    </button>
                   </div>
                 </div>
               )}
@@ -369,6 +389,7 @@ const Triaje = ({token,selectedSede}) => {
       </div>
       {/* Columna 2 */}
       <div className="bg-white rounded shadow p-4 min-w-[400px]  w-full md:w-[55%]">
+        {/* Filtro de pacientes/código/nombres */}
         <div className="border rounded p-2 mb-2">
           <div className="flex gap-3 items-center mb-2 text-md">
             <label className="font-medium"><input type="checkbox" name="tipoPaciente" checked={busqueda.tipoPaciente} onChange={handleBusquedaChange}/> Pacientes</label>
@@ -387,6 +408,32 @@ const Triaje = ({token,selectedSede}) => {
           </div>
           <input className="border rounded px-1 w-full mb-2 text-md" placeholder="Nombres" name="nombres" value={busqueda.nombres} onChange={(e) => {handleNombreChange(e,setBusqueda,setTablehc,selectedSede,token,debounceTimeout)}}/>
         </div>
+        {/* Resumen de pacientes y fecha */}
+        <div className="mb-2">
+          <div className="font-bold mb-1">Últimos Agregados & Hojas de Ruta</div>
+          <div className="flex flex-col md:flex-row items-center justify-between bg-blue-50 rounded-lg px-4 py-3 border border-blue-100">
+            <div className="flex items-center gap-2 mb-2 md:mb-0">
+              <span className="font-semibold">Fecha:</span>
+              <input
+                type="date"
+                className="border rounded px-2 py-1 text-md"
+                value={resumenFecha}
+                onChange={e => setResumenFecha(e.target.value)}
+                style={{minWidth: '120px'}}
+              />
+            </div>
+            <div className="flex gap-6 text-lg font-semibold">
+              <span className="text-gray-700">Pacientes completados: <span className="text-green-600">{completados}</span></span>
+              <span className="text-gray-700">Pacientes faltantes: <span className="text-red-600">{faltantes}</span></span>
+            </div>
+          </div>
+        </div>
+        {/* Número de historia clínica destacado */}
+        {form.nroHistorial && (
+          <div className="bg-blue-50 text-gray-500 text-2xl font-extrabold rounded px-4 py-2 mb-2 w-fit mx-auto border border-blue-100 shadow-sm flex items-center justify-center">
+            <span style={{fontSize: '2.5rem', fontWeight: 800, color: '#222'}}> {form.nroHistorial} </span>
+          </div>
+        )}
         <div className="border rounded">
           {/* Texto informativo arriba de la tabla */}
           <div className="bg-blue-50 text-blue-700 px-2 py-1 text-sm font-medium border-b border-blue-200 mb-1">(Click izquierdo para importar datos  |  Click derecho para imprimir)</div>
