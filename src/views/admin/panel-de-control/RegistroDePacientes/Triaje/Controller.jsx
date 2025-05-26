@@ -124,7 +124,7 @@ export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) =>
           norden: "",
           nombres_apellidos_p: value
         };
-        GetHistoriaC(data, sede, token)
+        GetHistoriaCTriaje(data, sede, token)
           .then((res) => {
             if (res && res.length) {
                 console.log(res)

@@ -71,7 +71,7 @@ const Triaje = ({token,selectedSede}) => {
   };
   const handleTriajeChange = e => {
     const { name, value } = e.target;
-    if (/^\d{0,15}$/.test(value)) {
+    if (/^[\d.,]{0,15}$/.test(value)) {
       setTriaje(prev => ({ ...prev, [name]: value }));
     }
   };
@@ -252,7 +252,7 @@ const Triaje = ({token,selectedSede}) => {
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">Cintura:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-20 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" id="cintura" autoComplete='off' name="cintura" value={triaje.cintura} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} maxLength={180} className="border rounded px-1 w-20 text-md ml-1" id="cintura" autoComplete='off' name="cintura" value={triaje.cintura} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetCintura(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
