@@ -1,3 +1,4 @@
+import Swal from "sweetalert2"
 
 export const Convert = async (event,triaje,set,s) => {
     if (!triaje.talla) {
@@ -23,7 +24,7 @@ export const GetIMC = async (event,triaje,set,s) => {
     if (event.key === 'Enter') {
         if (triaje.peso < 40 || triaje.peso > 150) {
             set(d => ({ ...d, peso: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const IMC = triaje.peso / (triaje.talla * triaje.talla);
@@ -39,7 +40,7 @@ export const GetCintura = async (event,triaje,set,s) => {
     if (event.key === 'Enter') {
         if (triaje.cintura < 45 || triaje.cintura > 180) {
             set(d => ({ ...d, cintura: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const imc = triaje.imc
@@ -67,7 +68,7 @@ export const GetICC = async (event,triaje,set) => {
     if (event.key === 'Enter') {
         if (triaje.cadera < 70 || triaje.cadera > 180) {
             set(d => ({ ...d, cadera: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const icc = triaje.cintura / triaje.cadera
@@ -83,7 +84,7 @@ export const GetCC = async (event,triaje,set) => {
     if (event.key === 'Enter') {
         if (triaje.temperatura < 35 || triaje.temperatura > 38) {
             set(d => ({ ...d, temperatura: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const icc = triaje.icc
@@ -115,7 +116,7 @@ export const GetFC = async (event,triaje,set) => {
     if (event.key === 'Enter') {
         if (triaje.fCardiaca < 60 || triaje.fCardiaca > 100) {
             set(d => ({ ...d, fCardiaca: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const frecuencia = triaje.fCardiaca
@@ -137,7 +138,7 @@ export const GetCuello = async (event,triaje,set) => {
     if (event.key === 'Enter') {
         if (triaje.perimetroCuello < 30 || triaje.perimetroCuello > 55) {
             set(d => ({ ...d, perimetroCuello: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const sexo = "M"
@@ -160,14 +161,14 @@ export const GetCuello = async (event,triaje,set) => {
     }
 }
 
-export const GetPA = async (event,triaje,set,s) => {
+export const GetPA = async (event,triaje,set) => {
     if (!triaje.sistolica || !triaje.diastolica) {
         return
     }
     if (event.key === 'Enter') {
         if (triaje.diastolica < 60) {
             set(d => ({ ...d, diastolica: '' }))
-            await s.fire('Error','No se permite este dato','error')
+            await Swal.fire('Error','No se permite este dato','error')
             return
         }
         const sistolica = triaje.sistolica
@@ -182,5 +183,19 @@ export const GetPA = async (event,triaje,set,s) => {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HTA-2.'+"\n" }))
         }
         document.getElementById('fRespiratoria')?.focus();
+    }
+}
+
+export const GetSat = async (event,triaje,set) => {
+    if (!triaje.sat02) {
+        return
+    }
+    if (event.key === 'Enter') {
+        if (triaje.sat02 < 92 || triaje.sat02 > 100) {
+            set(d => ({ ...d, sat02: '' }))
+            await Swal.fire('Error','No se permite este dato','error')
+            return
+        }
+        document.getElementById('perimetroCuello')?.focus();
     }
 }
