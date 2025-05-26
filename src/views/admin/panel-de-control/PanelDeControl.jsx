@@ -196,3 +196,23 @@ export default Dashboard;
     { to: "/administrar-contratas", id: "57", icon: faHandshake, title: "Administrar Contratas" },
     { to: "/protocolos", id: "61", icon: faNetworkWired, title: "Protocolos" }
   ].filter(card => allowedRoutes.includes(card.id)); */
+
+  /*CARD MAIN
+  // Cards principales (sin cambios)
+  const filteredCards = [
+    { to: "/roles", id: "52", icon: faCodeBranch, title: "Roles" },
+    { to: "/accesos", id: "53", icon: faUserLock, title: "Accesos" },
+    { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
+    { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
+    { to: "/configuracion", id: "56", icon: faGears, title: "Configuración" },
+    { to: "/Registro-de-pacientes", id: "202", icon: faPersonCirclePlus, title: "Registro de Pacientes" }
+  ].filter(card => allowedRoutes.includes(card.id));
+
+  // Cards adicionales en la tarjeta elevada con nuevo estilo
+  const additionalCards = [
+    { to: "/lista-archivos", id: "57", icon: faList, title: "Administrar Archivos" },
+    { to: "/agregar-sede", id: "58", icon: faTentArrowDownToLine, title: "Administrar Sedes" },
+    { to: "/administrar-empresas", id: "60", icon: faBuilding, title: "Administrar Empresas" },
+    { to: "/administrar-contratas", id: "61", icon: faHandshake, title: "Administrar Contratas" },
+    { to: "/protocolos", id: "153", icon: faNetworkWired, title: "Protocolos" }
+  ].filter(card => allowedRoutes.includes(card.id)); */
