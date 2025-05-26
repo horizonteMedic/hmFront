@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faChartBar, faList, faLock, faSignOutAlt, faPersonCirclePlus, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome } from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -42,7 +42,7 @@ const Navbar = () => {
     { to: "/accesos", id: "53", label: "Accesos", icon: faLock },
     { to: "/reporte-pacientes", id: "54", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", id: "55", label: "Matriz Postulante", icon: faList },
-    { to: "/Registro-de-pacientes", id: "202", label: "Registro de Pacientes", icon: faPersonCirclePlus },
+    { to: "/Registro-de-pacientes", id: "202", label: "Ocupacional", icon: faNotesMedical },
   ].filter(navLink => allowedRoutes.includes(navLink.id));
 
   const Logoutbutton = () => {

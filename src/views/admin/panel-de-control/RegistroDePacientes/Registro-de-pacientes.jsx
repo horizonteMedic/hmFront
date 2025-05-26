@@ -26,20 +26,39 @@ import {
   faStethoscope,
   faFileContract,
   faChartLine,
-  faVial
+  faVial,
+  faUserCheck,
+  faUserMd,
+  faXRay,
+  faHeartbeat,
+  faLungs,
+  faDeaf,
+  faTooth,
+  faEye,
+  faBars,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import './TabComponent.css';
 import { useAuthStore } from '../../../../store/auth';
 import { Loading } from '../../../components/Loading';
+import styles from './Drawer/DrawerOverlay.module.css';
+import DrawerQuickAccess from './Drawer/DrawerQuickAccess';
 
 const TabComponent = () => {
-  const [activeTab, setActiveTab] = useState(1);
+  const [activeTab, setActiveTab] = useState(null); // null: dashboard, 0: Admisión, 1: Triaje, 2: Laboratorio
+  const [subTab, setSubTab] = useState(0); // Para tabs internos de Admisión
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [DNIG, setDNIG] = useState("")
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
   const views = useAuthStore(state => state.listView);
+  const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
+  const [tabLab, setTabLab] = useState(0);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeTabAdmi, setActiveTabAdmi] = useState(0);
+  const [showTabsAdmi, setShowTabsAdmi] = useState(false);
+  const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
 
   // permisos
  const AccessRegistroC= views.some(view => view.id === 653);
@@ -106,12 +125,26 @@ const TabComponent = () => {
     Triaje: AccesTriaje
   };
 
+  const accesos = [
+    { icon: faUserCheck, label: 'Admisión' },
+    { icon: faStethoscope, label: 'Triaje' },
+    { icon: faVial, label: 'Laboratorio' },
+    { icon: faUserMd, label: 'Psicología' },
+    { icon: faUserMd, label: 'Medicina General' },
+    { icon: faXRay, label: 'Rayos X' },
+    { icon: faHeartbeat, label: 'EKG' },
+    { icon: faLungs, label: 'Espirometría' },
+    { icon: faDeaf, label: 'Audiometría' },
+    { icon: faTooth, label: 'Odontología' },
+    { icon: faEye, label: 'Oftalmología' },
+  ];
+
   useEffect(() => {
     // inicializa la primera pestaña a la que el usuario tiene acceso
     const keys = Object.keys(Acces);
     for (let i = 0; i < keys.length; i++) {
       if (Acces[keys[i]]) {
-        setActiveTab(i + 1);
+        setActiveTab(i);
         break;
       }
     }
@@ -132,10 +165,10 @@ const TabComponent = () => {
   };
 
   return (
-    <div className="mx-auto bg-white rounded-lg overflow-hidden shadow-md w-[90%] relative mt-6">
-      <div className="p azuloscurobackground flex justify-between p-3.5">
-        <h1 className="text-start font-bold color-azul text-white">Registro de Pacientes</h1>
-        <div className="flex items-center">
+    <div className="mx-auto  overflow-hidden w-[100%] relative ">
+   
+        
+        {/* <div className="flex items-center">
           {Acces.ExcelB && (
             <button className="verde-btn px-4 rounded flex items-center mr-4 sm:mr-2" onClick={openCompleteModal}>
               <FontAwesomeIcon icon={faFileExcel} className="mr-2 px-1 py-2" />
@@ -155,10 +188,100 @@ const TabComponent = () => {
             <FontAwesomeIcon icon={faExpand} className="mr-2 px-1 py-2" />
             Expandir
           </button>
-        </div>
-      </div>
+        </div> */}
 
-      <div className="bg-white rounded-lg overflow-hidden shadow-md relative mt-6 p-4">
+      <div className="bg-white rounded-lg overflow-hidden shadow-md relative p-8">
+           {/* Select de Sedes y accesos tipo dashboard */}
+      {activeTab === null && (
+        <>
+          <div className="mb-4 w-full flex justify-center">
+            <select className="border border-gray-300 rounded px-6 py-3 text-lg font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 min-w-[220px] text-center">
+              <option value="">Sedes</option>
+              <option value="sede1">Sede 1</option>
+              <option value="sede2">Sede 2</option>
+              <option value="sede3">Sede 3</option>
+            </select>
+          </div>
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-6 mt-10">
+            <div
+              className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
+              onClick={() => setActiveTab(0)}
+            >
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faUserCheck} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Admisión</span>
+            </div>
+            <div
+              className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
+              onClick={() => setActiveTab(1)}
+            >
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faStethoscope} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Triaje</span>
+            </div>
+            <div
+              className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
+              onClick={() => setActiveTab(2)}
+            >
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faVial} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Laboratorio</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faUserMd} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Psicología</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faUserMd} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Medicina General</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faXRay} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Rayos X</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faHeartbeat} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">EKG</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faLungs} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Espirometría</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faDeaf} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Audiometría</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faTooth} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Odontología</span>
+            </div>
+            <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faEye} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Oftalmología</span>
+            </div>
+          </div>
+        </>
+      )}
+
         <ImportacionModal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
@@ -175,106 +298,156 @@ const TabComponent = () => {
         />
 
         <div className="bg-white rounded-lg overflow-hidden w-full mx-auto">
-          <div className="flex flex-col sm:flex-row">
-            {Acces.Registro && (
-              <div
-                className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 1 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-                onClick={() => changeTab(1)}
-              >
-                <FontAwesomeIcon icon={faUsers} className="mr-2" />
-                Registro de Clientes en General
-              </div>
-            )}
-            {Acces.Historia && (
-              <div
-                className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 2 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-                onClick={() => changeTab(2)}
-              >
-                <FontAwesomeIcon icon={faClipboardList} className="mr-2" />
-                Apertura de Exámenes Pre-Ocupacionales
-              </div>
-            )}
-            {Acces.Citas && (
-              <div
-                className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 3 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-                onClick={() => changeTab(3)}
-              >
-                <FontAwesomeIcon icon={faTicket} className="mr-2" />
-                Reserva de Pacientes
-              </div>
-            )}
-            <div
-              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 4 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-              onClick={() => changeTab(4)}
-            >
-              <FontAwesomeIcon icon={faFileSignature} className="mr-2" />
-              Consentimiento de Digitalización
-            </div>
-            {Acces.Triaje && (
-              <div
-              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 5 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-              onClick={() => changeTab(5)}
-            >
-              <FontAwesomeIcon icon={faStethoscope} className="mr-2" />
-              Triaje
-            </div>
-          )}  
-            <div
-              className={`hidden cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 6 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-              onClick={() => changeTab(6)}
-            >
-              <FontAwesomeIcon icon={faFileContract} className="mr-2" />
-              Consentimientos
-            </div>
-            <div
-              className={`hidden cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 7 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-              onClick={() => changeTab(7)}
-            >
-              <FontAwesomeIcon icon={faChartLine} className="mr-2" />
-              Resultados
-            </div>
-            <div
-              className={`hidden cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 8 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
-              onClick={() => changeTab(8)}
-            >
-              <FontAwesomeIcon icon={faVial} className="mr-2" />
-              Examenes de Laboratorio
-            </div>
-          </div>
+          {vista === 'default' && (
+            <>
+              {/* No renderices el bloque de tabs cuando vista sea 'default' */}
+            </>
+          )}
 
-          <div className="custom-border p-4">
-            {activeTab === 1 && Acces.Registro && (
-              <RegistroClientes selectedSede="T-NP" Loading={Loading} token={token} tabHC={() => {changeTab(2)}} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}} listas={listasCombosR} datos={datos} setDatos={setDatos}/>
-            )}
-            {activeTab === 2 && Acces.Historia && (
-              <AperturaExamenesPreOcup selectedSede="T-NP" token={token} Loading={Loading} DNIG={DNIG} listas={listasCombos} PrecioC={ComboboxPrecioExamenMulti} ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}}/>
-            )}
-            {activeTab === 3 && Acces.Citas && (
-              <ReservaPacientes
-                selectedSede="T-NP"
-                token={token}
-                Loading={Loading}
-                userlogued={userlogued.sub}
-              />
-            )}
-            {activeTab === 4 && (
-              <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} />
-            )}
-            {activeTab === 5 && (
-              <Triaje token={token} selectedSede="T-NP"/>
-            )}
-            {activeTab === 6 && (
-              <Consentimientos token={token} selectedSede="T-NP"/>
-            )}
-            {activeTab === 7 && (
-              <Resultados token={token} selectedSede="T-NP"/>
-            )}
-            {activeTab === 8 && (
-              <ExamenesLaboratorio token={token} selectedSede="T-NP"/>
-            )}
-          </div>
+          {/* Tabs dinámicos */}
+          {activeTab === 0 && (
+            <div className="mt-10 bg-white rounded-lg shadow-md p-6">
+              <div className="flex border-b mb-6">
+                <button
+                  className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 border-b-4 border-[#1a2536] text-[#1a2536]`}
+                >
+                  Admisión
+                </button>
+                <button
+                  className="ml-auto text-gray-400 hover:text-red-500 px-2"
+                  onClick={() => setActiveTab(null)}
+                  title="Cerrar"
+                >
+                  ×
+                </button>
+              </div>
+              <div>
+                <div className="flex border-b mb-6">
+                  <button
+                    className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 border-b-4 border-[#1a2536] text-[#1a2536]`}
+                    onClick={() => setSubTab(0)}
+                  >
+                    Registro de Pacientes
+                  </button>
+                  <button
+                    className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 1 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
+                    onClick={() => setSubTab(1)}
+                  >
+                    Consentimiento Digitalización
+                  </button>
+                  <button
+                    className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 2 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
+                    onClick={() => setSubTab(2)}
+                  >
+                    Apertura Exámenes PreOcup
+                  </button>
+                </div>
+                <div>
+                  {subTab === 0 && (
+                    <RegistroClientes
+                      listas={listasCombosR}
+                      datos={datos}
+                      setDatos={setDatos}
+                      selectedSede={"T-NP"}
+                      token={token}
+                      tabHC={() => {}}
+                      ChangeDNI={() => {}}
+                    />
+                  )}
+                  {subTab === 1 && (
+                    <ConsentimientoDigitalizacion token={token} userlogued={userlogued} />
+                  )}
+                  {subTab === 2 && (
+                    <AperturaExamenesPreOcup
+                      listas={listasCombos}
+                      DNIG={DNIG}
+                      selectedSede={"T-NP"}
+                      token={token}
+                      PrecioC={() => {}}
+                      ChangeDNI={() => {}}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 1 && (
+            <div className="mt-10 bg-white rounded-lg shadow-md p-6">
+              <div className="flex border-b mb-6">
+                <button
+                  className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 border-b-4 border-[#1a2536] text-[#1a2536]`}
+                >
+                  Triaje
+                </button>
+                <button
+                  className="ml-auto text-gray-400 hover:text-red-500 px-2"
+                  onClick={() => setActiveTab(null)}
+                  title="Cerrar"
+                >
+                  ×
+                </button>
+              </div>
+              <Triaje token={token} selectedSede={"T-NP"} />
+            </div>
+          )}
+          {activeTab === 2 && (
+            <div className="mt-10 bg-white rounded-lg shadow-md p-6">
+              <div className="flex border-b mb-6">
+                <button
+                  className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${labTab === 0 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
+                  onClick={() => setLabTab(0)}
+                >
+                  Exámenes
+                </button>
+                <button
+                  className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${labTab === 1 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
+                  onClick={() => setLabTab(1)}
+                >
+                  Consentimientos
+                </button>
+                <button
+                  className="ml-auto text-gray-400 hover:text-red-500 px-2"
+                  onClick={() => setActiveTab(null)}
+                  title="Cerrar"
+                >
+                  ×
+                </button>
+              </div>
+              <div>
+                {labTab === 0 && <ExamenesLaboratorio />}
+                {labTab === 1 && <Consentimientos />}
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* FAB flotante */}
+      <button
+        className="fixed bottom-8 right-8 z-50 bg-[#1a2536] hover:bg-[#273656] text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg transition-all duration-200"
+        onClick={() => setDrawerOpen(true)}
+        aria-label="Abrir menú rápido"
+      >
+        <FontAwesomeIcon icon={faBars} className="text-3xl" />
+      </button>
+
+      <DrawerQuickAccess
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onNavigate={idx => {
+          setDrawerOpen(false);
+          if (idx === 7) {
+            setActiveTab(null); // Ir a inicio/dashboard
+          } else if (idx === 0) {
+            setActiveTab(0);
+          } else if (idx === 1) {
+            setActiveTab(1);
+          } else if (idx === 2) {
+            setActiveTab(2);
+          }
+        }}
+        activeIndex={activeTab}
+      />
     </div>
   );
 };

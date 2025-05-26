@@ -54,16 +54,16 @@ const Inmunologia = () => {
   };
 
   return (
-    <form className="w-full max-w-3xl mx-auto bg-white p-8 rounded shadow">
-      <div className="flex flex-wrap items-center gap-6 mb-6">
-        <div className="flex items-center gap-2">
+    <form className="w-full max-w-4xl mx-auto bg-white p-8 rounded shadow">
+      <div className="flex flex-col md:flex-row flex-wrap items-center gap-6 mb-6">
+        <div className="flex items-center gap-2 flex-1 min-w-[220px]">
           <label className="font-semibold text-base">Nro Ficha:</label>
           <input name="nroFicha" value={form.nroFicha} onChange={handleInputChange} className="border rounded px-3 py-2 w-32 text-base" />
         </div>
         <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
           <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-[220px]">
           <label className="font-semibold text-base">Fecha:</label>
           <input
             name="fecha"
@@ -75,11 +75,11 @@ const Inmunologia = () => {
             onFocus={handleFechaFocus}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-[220px]">
           <label className="font-semibold text-base">Nombres:</label>
           <input name="nombres" value={form.nombres} onChange={handleInputChange} className="border rounded px-3 py-2 w-56 text-base" />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1 min-w-[120px]">
           <label className="font-semibold text-base">Edad:</label>
           <input name="edad" value={form.edad} onChange={handleInputChange} className="border rounded px-3 py-2 w-20 text-base" />
         </div>
@@ -118,20 +118,18 @@ const Inmunologia = () => {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 mb-4 justify-end">
-        <div className="flex items-center gap-2 mr-8">
-          <span className="font-semibold text-blue-900 text-base italic">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-28 text-base" />
-          <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-base">
-            <FontAwesomeIcon icon={faPrint} />
-          </button>
+      <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
+        <div className="flex gap-3">
+          <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold"><FontAwesomeIcon icon={faSave} /> Guardar/Actualizar</button>
+          <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
         </div>
-        <button type="button" className="bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 text-base hover:bg-green-700">
-          <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-        </button>
-        <button type="button" className="bg-yellow-400 text-white px-6 py-2 rounded flex items-center gap-2 text-base hover:bg-yellow-500" onClick={handleLimpiar}>
-          <FontAwesomeIcon icon={faBroom} /> Limpiar
-        </button>
+        <div className="flex flex-col items-center">
+          <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+          <div className="flex gap-1 mt-1">
+            <input className="border rounded px-3 py-2 w-24 text-base" />
+            <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300"><FontAwesomeIcon icon={faPrint} /></button>
+          </div>
+        </div>
       </div>
     </form>
   );

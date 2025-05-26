@@ -50,8 +50,9 @@ const Triaje = ({token,selectedSede}) => {
     nombres: '',
   });
   const [refresh, setRefresh] = useState(0)
-  const [habilitar, setHabilitar] = useState(true )
-  const [habilitarTR, setHabilitarTR] = useState(false )
+  const [habilitar, setHabilitar] = useState(true)
+  const [habilitarTR, setHabilitarTR] = useState(false)
+  const [habilitarEdicion, setHabilitarEdicion] = useState(false)
   // Ejemplo de datos de tabla
   const [tablehc, setTablehc] = useState([])
   const [loadingInputs, setLoadingInputs] = useState(false);
@@ -171,43 +172,43 @@ const Triaje = ({token,selectedSede}) => {
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Ex.Médico :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
-              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled={true}/>}
             </div>
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Empresa :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
-              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="empresa" value={form.empresa} onChange={handleFormChange} disabled={true}/>}
             </div>
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Contrata :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
-              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="contrata" value={form.contrata} onChange={handleFormChange} disabled={true}/>}
             </div>
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">N° Historial :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
-              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled={true}/>}
             </div>
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Nombres :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
-              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="nombres" value={form.nombres} onChange={handleFormChange} disabled={true}/>}
               <label className="font-medium ml-2 min-w-[50px]">Edad:</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 w-24" /> :
-              <input className="border rounded px-1 w-24 text-md h-8" placeholder="" name="edad" value={form.edad} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 w-24 text-md h-8" placeholder="" name="edad" value={form.edad} onChange={handleFormChange} disabled={true}/>}
             </div>
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Apellidos :</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 flex-1" /> :
-              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 flex-1 text-md h-8" placeholder="" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled={true}/>}
             </div>
             <div className="flex items-center gap-x-1 mb-2">
               <label className="font-medium min-w-[90px]">Fecha Nac:</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 w-40" /> :
-              <input className="border rounded px-1 text-md h-8 w-40" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled={habilitar}/>}
+              <input className="border rounded px-1 text-md h-8 w-40" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled={true}/>}
               <label className="font-medium ml-2 min-w-[90px]">Fecha Triaje:</label>
               {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded h-8 w-40" /> :
-              <DatePicker id="fechaExamen" value={form.fechaExamen} onChange={(date) => {setForm(d => ({...d, fechaExamen: (format(date, "yyyy-MM-dd"))}))}} dateFormat="yyyy/MM/dd" className="border rounded px-1 text-md h-8 w-40"/>}
+              <DatePicker id="fechaExamen" value={form.fechaExamen} onChange={(date) => {setForm(d => ({...d, fechaExamen: (format(date, "yyyy-MM-dd"))}))}} dateFormat="yyyy/MM/dd" className="border rounded px-1 text-md h-8 w-40" disabled={!habilitarEdicion}/>}
             </div>
             {/* Tabs internos para Triaje/Espirometría */}
             <fieldset className="border rounded p-2 mt-2">
@@ -335,13 +336,13 @@ const Triaje = ({token,selectedSede}) => {
                     }}
                   />
                   <div className="flex gap-3 mt-2">
-                    <button type="button" onClick={() => {setHabilitar(false),setHabilitarTR(false)}}  className="bg-blue-500 text-white px-3 py-1 rounded text-md">
+                    <button type="button" onClick={() => {setHabilitarEdicion(true),setHabilitarTR(false)}}  className="bg-blue-500 text-white px-3 py-1 rounded text-md">
                       <i className="fa fa-pencil mr-2"></i>Editar
                     </button>
                     <button type="button" onClick={() => {handleSubmit(triaje,form.edad,form.nro, form.fechaExamen, Swal, token,setForm,setTriaje,refreshtable,getFetch,setHabilitar)}} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">
                       <i className="fa fa-save mr-2"></i>Registrar/Actualizar
                     </button>
-                    <button type="button" onClick={() => {Clean(setForm,setTriaje),setHabilitar(true)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">
+                    <button type="button" onClick={() => {Clean(setForm,setTriaje),setHabilitarEdicion(false)}} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">
                       <i className="fa fa-eraser mr-2"></i>Limpiar/Cancelar
                     </button>
                   </div>

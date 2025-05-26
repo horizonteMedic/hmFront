@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './LibroDeReclamaciones.css';
+// import './LibroDeReclamaciones.css';
+import axios from 'axios';
 
 const LibroDeReclamaciones = () => {
   const [formData, setFormData] = useState({
@@ -33,9 +34,48 @@ const LibroDeReclamaciones = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission
+    
+    try {
+      // Preparar los datos del correo
+      const emailData = {
+        to: ['agarcia@horizontemedic.com', 'caguirre@horizontemedic.com'],
+        subject: 'Nueva Reclamación Registrada',
+        formData: formData,
+        fecha: currentTime.toLocaleDateString('es-PE'),
+        hora: currentTime.toLocaleTimeString('es-PE')
+      };
+
+      // Enviar la solicitud al backend
+      const response = await axios.post('/api/reclamaciones/enviar-correo', emailData);
+      
+      if (response.data.success) {
+        alert('Reclamación enviada exitosamente');
+        // Limpiar el formulario
+        setFormData({
+          docType: '',
+          numDoc: '',
+          nombreRazonSocial: '',
+          email: '',
+          domicilio: '',
+          telefono: '',
+          docTypeReclamante: '',
+          numDocReclamante: '',
+          nombreRazonSocialReclamante: '',
+          emailReclamante: '',
+          domicilioReclamante: '',
+          telefonoReclamante: '',
+          area: '',
+          servicio: '',
+          descripcionHechos: '',
+          autorizaEmail: ''
+        });
+      }
+    } catch (error) {
+      console.error('Error al enviar la reclamación:', error);
+      alert('Hubo un error al enviar la reclamación. Por favor, intente nuevamente.');
+    }
   };
 
   const [currentTime, setCurrentTime] = useState(new Date());

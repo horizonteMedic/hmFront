@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDownload,faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faPersonCirclePlus, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
+import { faDownload,faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faNotesMedical, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
 import Swal from 'sweetalert2';
 import "./Dashboard.css";
@@ -25,7 +25,7 @@ const iconMap = {
     faUserLock,
     faCodeBranch,
     faBusinessTime,
-    faPersonCirclePlus,
+    faNotesMedical,
     faTentArrowDownToLine,
     faBuilding,
     faHandshake,
@@ -99,7 +99,7 @@ const Dashboard = ({TotalView}) => {
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "56", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "202", icon: faPersonCirclePlus, title: "Registro de Pacientes" }
+    { to: "/Registro-de-pacientes", id: "202", icon: faNotesMedical, title: "Ocupacional" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
@@ -116,7 +116,7 @@ const Dashboard = ({TotalView}) => {
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "56", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "202", icon: faPersonCirclePlus, title: "Registro de Pacientes" }
+    { to: "/Registro-de-pacientes", id: "202", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
@@ -202,7 +202,7 @@ export default Dashboard;
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "53", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "3", icon: faPersonCirclePlus, title: "Registro de Pacientes" }
+    { to: "/Registro-de-pacientes", id: "3", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
@@ -222,7 +222,7 @@ export default Dashboard;
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "56", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "202", icon: faPersonCirclePlus, title: "Registro de Pacientes" }
+    { to: "/Registro-de-pacientes", id: "202", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
