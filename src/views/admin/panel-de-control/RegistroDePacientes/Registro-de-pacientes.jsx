@@ -47,7 +47,7 @@ const TabComponent = () => {
   const AccessCitas = views.some(view => view.id === 655);
   const AccesExcelBasico = views.some(view => view.id === 656);
   const AccesExcelCompleto = views.some(view => view.id === 657);
-
+  const AccesTriaje = views.some(view => view.id === 252);
   //COMBOBOX REGISTRO
   const Profesiones   = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();
@@ -102,7 +102,8 @@ const TabComponent = () => {
     Historia: AccessHistoriaC,
     Citas: AccessCitas,
     ExcelB: AccesExcelBasico,
-    ExcelC: AccesExcelCompleto
+    ExcelC: AccesExcelCompleto,
+    Triaje: AccesTriaje
   };
 
   useEffect(() => {
@@ -209,29 +210,31 @@ const TabComponent = () => {
               <FontAwesomeIcon icon={faFileSignature} className="mr-2" />
               Consentimiento de Digitalización
             </div>
-            <div
+            {Acces.Triaje && (
+              <div
               className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 5 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
               onClick={() => changeTab(5)}
             >
               <FontAwesomeIcon icon={faStethoscope} className="mr-2" />
               Triaje
             </div>
+          )}  
             <div
-              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 6 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              className={`hidden cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 6 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
               onClick={() => changeTab(6)}
             >
               <FontAwesomeIcon icon={faFileContract} className="mr-2" />
               Consentimientos
             </div>
             <div
-              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 7 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              className={`hidden cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 7 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
               onClick={() => changeTab(7)}
             >
               <FontAwesomeIcon icon={faChartLine} className="mr-2" />
               Resultados
             </div>
             <div
-              className={`cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 8 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
+              className={`hidden cursor-pointer flex items-center py-2 px-4 sm:px-6 ${activeTab === 8 ? 'bg-[#215086] text-white font-bold' : 'bg-[#edf0f7] text-gray-800'} rounded-tl-lg rounded-tr-lg mb-2 sm:mb-0 sm:mr-2`}
               onClick={() => changeTab(8)}
             >
               <FontAwesomeIcon icon={faVial} className="mr-2" />
