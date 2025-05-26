@@ -42,7 +42,7 @@ const AperturaExamenesPreOcup = (props) => {
     codPa: props.DNIG ? String(props.DNIG) : "",
     nombres: "",
     apellidos: "",
-    razonEmpresa:"",
+    razonEmpresa: "",
     razonContrata: "",
     n_medico: "",
     n_hora: "",
@@ -57,22 +57,22 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: format(today, 'dd-MM-yyyy'),
-    n_operacion: null,
+    fechaAperturaPo: format(today, 'yyyy-MM-dd'),
+    n_operacion: "",
     textObserv1: "",
     textObserv2: "",
-    n_fisttest: false, //1
-    n_psicosen: false, //2
-    n_testaltura: false, //3
-    trabCalientes: false, //4
-    rxcLumbosacra: false, //5
-    visualCompl: false,//6
-    manipAlimentos: false, //7
-    herraManuales: false, //8
-    rxcDorsoLumbar: false, //9
-    rxcKLumbar: false, //10
-    rxcPlomos: false,//12
-    mercurioo: false,//13,
+    n_fisttest: false,
+    n_psicosen: false,
+    n_testaltura: false,
+    trabCalientes: false,
+    rxcLumbosacra: false,
+    visualCompl: false,
+    manipAlimentos: false,
+    herraManuales: false,
+    rxcDorsoLumbar: false,
+    rxcKLumbar: false,
+    rxcPlomos: false,
+    mercurioo: false,
     
   })
   const [searchHC, setSearchHC] = useState([])
@@ -339,7 +339,7 @@ const AperturaExamenesPreOcup = (props) => {
   const [creating, setCreating] = useState(false)
 
   const handleDateChange = (date) => {
-    const formattedDate = formatDate(date);
+    const formattedDate = format(date, 'yyyy-MM-dd');
     setStartDate(date);
     setDatos({ ...datos, fechaAperturaPo: formattedDate });
   };
@@ -542,8 +542,8 @@ const AperturaExamenesPreOcup = (props) => {
       tipoPago: "",
       precioAdic: "",
       autoriza: "",
-      fechaAperturaPo: format(today, 'dd/MM/yyyy'),
-      n_operacion: null,
+      fechaAperturaPo: format(today, 'yyyy-MM-dd'),
+      n_operacion: "",
       textObserv1: "",
       textObserv2: "",
       n_fisttest: false, //1
