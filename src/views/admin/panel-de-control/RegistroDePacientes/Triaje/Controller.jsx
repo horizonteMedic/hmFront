@@ -154,12 +154,16 @@ export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshta
       text: 'Espere por favor...',
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       didOpen: () => {
         Swal.showLoading();
       }
     });
     SubmitTriaje(datos,edad,nro,fecha,token)
     .then((res) => {
+      console.log(res)
         if (res.id === 1) {
           refreshtable()
           Clean(setF,setT)
@@ -187,8 +191,13 @@ export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshta
           })
         }
     })
-    .catch(() => {
+    .catch((error) => {
+      if (error.name === 'AbortError') {
+        Swal.fire('Error', 'El tiempo de espera termino.\nIntente otra vez','error')
+      } else {
       Swal.fire('Error', 'Ocurrio un error al registrar/actualizar','error')
+
+      }
     })
 }
 

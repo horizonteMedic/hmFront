@@ -57,7 +57,7 @@ const AperturaExamenesPreOcup = (props) => {
     tipoPago: "",
     precioAdic: "",
     autoriza: "",
-    fechaAperturaPo: format(today, 'yyyy-MM-dd'),
+    fechaAperturaPo: format(today, 'dd/MM/yyyy'),
     n_operacion: "",
     textObserv1: "",
     textObserv2: "",
@@ -730,7 +730,7 @@ const AperturaExamenesPreOcup = (props) => {
       title: 'Validando Datos',
       text: 'Espere por favor...',
       allowOutsideClick: false,
-      allowEscapeKey: false,
+      allowEscapeKey: true,
       didOpen: () => {
         Swal.showLoading();
       }

@@ -61,13 +61,8 @@ const headerTriaje = (doc, datos) => {
   const sedeY = yOffset + 8;
   const sedeX = pageW - margin;
   doc.setFont("helvetica", "bold").setFontSize(10);
-<<<<<<< HEAD
-  doc.text(`SEDE: ${datos.nombreSede || ""}`, sedeX, sedeY, { align: "right" });
-  doc.text(`FECHA: ${datos.fecha || ""}`, sedeX, sedeY + 7, { align: "right" });
-=======
   doc.text(`SEDE: ${datos.sede }`, sedeX, sedeY, { align: "right" });
   doc.text(`FECHA: ${datos.fecha_triaje || ""}`, sedeX, sedeY + 7, { align: "right" });
->>>>>>> 2acdd93aae35f0b2a0122a8c6b78b93102548427
   doc.text(`HORA: ${datos.hora || ""}`, sedeX, sedeY + 14, { align: "right" });
 
   // "INFORME TRIAJE" centrado
