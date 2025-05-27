@@ -37,9 +37,10 @@ export function SubmitTriaje(data,edad,nOrden,fecha,token) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
+            signal: controller.signal
         }
-        return fetch(url,{signal: controller.signal},options)
+        return fetch(url,options)
         .then(res =>  {
             clearTimeout(timeout)
             if (!res.ok) {
