@@ -2,7 +2,7 @@ import { URLAzure } from "../../../../config/config"
 
 export function SubmitTriaje(data,edad,nOrden,fecha,token) {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 100)
+    const timeout = setTimeout(() => controller.abort(), 8000)
     const body = {
         codTriaje: 0,
         numTicket: 0,
