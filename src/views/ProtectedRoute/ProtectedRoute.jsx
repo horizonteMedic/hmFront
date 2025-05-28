@@ -35,11 +35,11 @@ import { useLocation,Outlet, Navigate} from "react-router-dom"
   }; */
 
   const protectedRoutes = {
-    '/roles': 52,
+    '/roles': 2,
     '/accesos': 53,
     '/reporte-pacientes': 54,
     '/matriz-postulante': 55,
-    '/configuracion': 56,
+    '/configuracion': 53,
     '/lista-archivos': 57,
     '/agregar-sede': 58,
     '/agregar-campa%C3%B1a': 59,
@@ -47,7 +47,7 @@ import { useLocation,Outlet, Navigate} from "react-router-dom"
     '/administrar-contratas': 61,
     '/protocolos': 61,
     '/RegistroP': 602,
-    '/Registro-de-pacientes': 202
+    '/Registro-de-pacientes': 3
   };
 
 export function ProtectedRoute({TotalView}){
