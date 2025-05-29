@@ -1,0 +1,137 @@
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import headerConsentimiento from "./components/headerConsentimiento";
+import footer from "./components/footer";
+
+export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
+  const doc = new jsPDF();
+  headerConsentimiento(doc);
+
+  let y = 44; // Más espacio bajo el logo
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 15;
+
+  // Título principal
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text(
+    "CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 5D",
+    pageW / 2,
+    y,
+    { align: "center" }
+  );
+  y += 6;
+  doc.setFontSize(11);
+  doc.text(
+    "(COCAINA, MARIHUANA, ANFETAMINA, METHANFETAMINA Y BENZODIAZEPINA)",
+    pageW / 2,
+    y,
+    { align: "center" }
+  );
+  y += 11;
+
+  // Línea de YO, nombre, edad, dni
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  doc.text("YO", margin, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${datos.nombre || ''}`, margin + 11, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text("de", margin + 70, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${datos.edad || ''}`, margin + 80, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text("años de edad, identificado con DNI N°", margin + 95, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`${datos.dni || ''}`, margin + 170, y);
+  y += 6;
+
+  // Texto de consentimiento
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(11);
+  const texto =
+    "habiendo recibido consejería, e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales, AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, asi mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.";
+  const lines = doc.splitTextToSize(texto, pageW - 2 * margin);
+  doc.text(lines, margin, y);
+  y += lines.length * 4 + 2;
+
+  // Sede y fecha
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.text(`${datos.sede || ''} - ${datos.fecha || ''}`, pageW - margin - 60, y);
+  y += 11;
+
+  // Firma y huella - centrado
+  const firmasY = y;
+  const blockWidth = 170;
+  const blockX = (pageW - blockWidth) / 2;
+
+  // Cuadro de huella digital a la izquierda
+  doc.setDrawColor(0);
+  doc.rect(blockX, firmasY, 40, 40);
+  doc.setFontSize(11);
+  doc.text("Huella Digital", blockX, firmasY + 45);
+
+  // Firmas centradas
+  const firma1X = blockX + 60;
+  const firma2X = blockX + 111;
+  const firmaLineWidth = 40;
+  const firmaY = firmasY + 25;
+  // Línea de firma del paciente
+  doc.line(firma1X, firmaY, firma1X + firmaLineWidth, firmaY);
+  doc.text("Firma del Paciente", firma1X + firmaLineWidth / 2, firmaY + 7, { align: "center" });
+  // Línea de firma y sello del consejero
+  doc.line(firma2X, firmaY, firma2X + firmaLineWidth, firmaY);
+  doc.text("Firma y sello del Consejero", firma2X + firmaLineWidth / 2, firmaY + 7, { align: "center" });
+
+  y = firmasY + 55;
+
+  // ANTECEDENTES
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.text("ANTECEDENTES :", margin, y);
+  y += 6;
+
+  // Tabla de antecedentes
+  const antecedentes = [
+    "CONSUMO DE MARIHUANA",
+    "CONSUMO DE COCAÍNA",
+    "CONSUMO DE HOJA DE COCA EN LOS 14 DÍAS PREVIOS",
+    "CONSUMO DE ANFETAMINAS",
+    "CONSUMO DE METHANFETAMINAS",
+    "CONSUMO DE BENZODIACEPINAS"
+  ];
+  const body = antecedentes.map((label, idx) => [
+    label,
+    `SI (${datos[`ant${idx}_si`] ? 'X' : ' '})`,
+    `NO (${datos[`ant${idx}_no`] ? 'X' : ' '})`
+  ]);
+  autoTable(doc, {
+    startY: y,
+    body,
+    theme: 'plain',
+    styles: { fontSize: 9, textColor: [0, 0, 0], cellPadding: 2 },
+    columnStyles: {
+      0: { cellWidth: 110 },
+      1: { cellWidth: 25 },
+      2: { cellWidth: 25 }
+    },
+    margin: { left: margin, right: margin }
+  });
+  y = doc.lastAutoTable.finalY + 5;
+
+  // Footer
+  footer(doc, datos);
+
+  // Mostrar PDF
+  const pdfBlob = doc.output("blob");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.src = pdfUrl;
+  document.body.appendChild(iframe);
+  iframe.onload = function () {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  };
+} 

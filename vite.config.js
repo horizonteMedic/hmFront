@@ -6,5 +6,15 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'build' 
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://testbackendhm.azurewebsites.net',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   }
 })

@@ -3,44 +3,40 @@ import autoTable from "jspdf-autotable";
 import header from "./components/header";
 import footer from "./components/footer";
 
-export default function microbiologia(datos) {
+export default function AnalisisClinicosB_Digitalizado(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 
   // Offset para bajar el contenido después del header
   let y = 60;
 
-  // Título MICROBIOLOGÍA
+  // Título BIOQUIMICA
   doc.setFontSize(14);
   doc.setFont(undefined, 'bold');
-  doc.text("MICROBIOLOGÍA", 105, y, { align: "center" });
+  doc.text("BIOQUIMICA", 105, y, { align: "center" });
   y += 15;
 
   // Sección MUESTRA
   doc.setFontSize(11);
   doc.setFont(undefined, 'bold');
-  doc.text("MUESTRA:", 20, y);
+  doc.text("MUESTRA", 20, y);
   doc.setFont(undefined, 'normal');
-  doc.text("ESPUTO", 50, y);
-  y += 10;
+  doc.text(`${datos.txtmuestra || ''}`, 50, y);
+  y += 12;
 
-  // Tabla de pruebas y resultados
+  // Tabla de resultados
   autoTable(doc, {
     startY: y,
-    tableWidth: 160,
-    margin: { left: (doc.internal.pageSize.getWidth() - 160) / 2 },
     head: [[
       { content: "PRUEBA", styles: { halign: "center", fontStyle: "bold" } },
-      { content: "RESULTADO", styles: { halign: "center", fontStyle: "bold" } }
+      { content: "RESULTADO", styles: { halign: "center", fontStyle: "bold" } },
+      { content: "VALORES NORMALES", styles: { halign: "center", fontStyle: "bold" } }
     ]],
     body: [
       [
-        { content: "Examen de BK - BACILOSCOPIA 1° Muestra", styles: { fontStyle: "bold" } },
-        `${datos.txtmuestra1 || ''}`
-      ],
-      [
-        { content: "Examen de BK - BACILOSCOPIA 2° Muestra", styles: { fontStyle: "bold" } },
-        `${datos.txtmuestra2 || ''}`
+        `${datos.txtprueba || ''}`,
+        `${datos.txtresultado || ''}`,
+        `${datos.txtvaloresn || ''}`
       ]
     ],
     theme: 'grid',
@@ -48,13 +44,19 @@ export default function microbiologia(datos) {
     headStyles: { fillColor: [220, 220, 220], textColor: [0, 0, 0], fontSize: 12, fontStyle: 'bold' },
     bodyStyles: { textColor: [60, 60, 60] },
     columnStyles: {
-      0: { cellWidth: 100 },
-      1: { cellWidth: 60 }
+      0: { cellWidth: 60 },
+      1: { cellWidth: 50 },
+      2: { cellWidth: 60 }
     }
   });
 
-  // Footer
-  footer(doc, datos);
+  // Pie de página con sede y fecha
+  doc.setFontSize(11);
+  doc.setFont(undefined, 'normal');
+  doc.text(`${datos.sede || ''} - ${datos.fecha || ''}`, 105, 270, { align: "center" });
+
+  // Footer (si se requiere)
+  // footer(doc, datos);
 
   // Mostrar PDF
   const pdfBlob = doc.output("blob");

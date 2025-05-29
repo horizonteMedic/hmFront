@@ -5,49 +5,26 @@ import footer from "./components/footer";
 
 export default function inmunologialab(datos) {
   const doc = new jsPDF();
-  header(doc);
+  header(doc, datos);
 
-  // Offset para bajar el contenido
-  const offsetY = 20;
-
-  // Nro Orden
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.text("Nro Orden :", 160, 25 + offsetY);
-  doc.setFont(undefined, 'normal');
-  doc.text(`${datos.n_orden || ''}`, 200, 25 + offsetY, { align: "right" });
-
-  // Datos principales
-  doc.setFontSize(11);
-  doc.setFont(undefined, 'bold');
-  doc.text("Apellidos y Nombres :", 15, 35 + offsetY);
-  doc.setFont(undefined, 'normal');
-  doc.text(`${datos.nombre || ''}`, 65, 35 + offsetY);
-
-  doc.setFont(undefined, 'bold');
-  doc.text("Edad :", 15, 43 + offsetY);
-  doc.setFont(undefined, 'normal');
-  doc.text(`${datos.fec_nac || ''} AÑOS`, 40, 43 + offsetY);
-
-  doc.setFont(undefined, 'bold');
-  doc.text("Fecha :", 15, 51 + offsetY);
-  doc.setFont(undefined, 'normal');
-  doc.text(`${datos.fecha || ''}`, 40, 51 + offsetY);
+  // Offset para bajar el contenido después del header
+  let y = 60;
 
   // Título INMUNOLOGÍA
   doc.setFontSize(14);
   doc.setFont(undefined, 'bold');
-  doc.text("INMUNOLOGÍA", 105, 65 + offsetY, { align: "center" });
+  doc.text("INMUNOLOGÍA", 105, y, { align: "center" });
+  y += 15;
 
   // Sección MUESTRA y MÉTODO
   doc.setFontSize(11);
   doc.setFont(undefined, 'bold');
-  doc.text("MUESTRA : SUERO", 20, 80 + offsetY);
-  doc.text("MÉTODO: AGLUTINACIÓN EN LÁMINA PORTAOBJETO", 20, 88 + offsetY);
+  doc.text("MUESTRA : SUERO", 20, y);
+  doc.text("MÉTODO: AGLUTINACIÓN EN LÁMINA PORTAOBJETO", 20, y + 8);
 
   // Tabla de pruebas y resultados
   autoTable(doc, {
-    startY: 98 + offsetY,
+    startY: y + 18,
     tableWidth: 160,
     margin: { left: (doc.internal.pageSize.getWidth() - 160) / 2 },
     head: [[

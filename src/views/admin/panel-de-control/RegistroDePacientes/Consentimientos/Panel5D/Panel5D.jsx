@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import Consentimiento_Panel5D_ohla_Digitalizado from '../../../../../jaspers/Consentimiento_Panel5D_ohla_Digitalizado';
+import Swal from 'sweetalert2';
 
 const antecedentesList = [
   { label: 'CONSUME MARIHUANA' },
@@ -46,6 +48,47 @@ const Panel5D = () => {
 
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
+  };
+
+  const handlePrint = () => {
+    // Mapear los datos del formulario a los campos esperados por el Jasper
+    const datos = {
+      nombre: form.nombre,
+      edad: form.edad,
+      dni: form.dni,
+      sede: '', // Puedes completar si tienes este dato
+      fecha: form.fecha,
+      // Antecedentes: marcar SI/NO según el estado
+      ant0_si: form.antecedentes[0] === 'SI',
+      ant0_no: form.antecedentes[0] === 'NO',
+      ant1_si: form.antecedentes[1] === 'SI',
+      ant1_no: form.antecedentes[1] === 'NO',
+      ant2_si: form.antecedentes[2] === 'SI',
+      ant2_no: form.antecedentes[2] === 'NO',
+      ant3_si: form.antecedentes[3] === 'SI',
+      ant3_no: form.antecedentes[3] === 'NO',
+      ant4_si: form.antecedentes[4] === 'SI',
+      ant4_no: form.antecedentes[4] === 'NO',
+      ant5_si: form.antecedentes[5] === 'SI',
+      ant5_no: form.antecedentes[5] === 'NO',
+    };
+    Swal.fire({
+      title: '¿Desea Imprimir Consentimiento Panel 5D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>${form.nombre}</b> - DNI <b>${form.dni}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Consentimiento_Panel5D_ohla_Digitalizado(datos);
+      }
+    });
   };
 
   return (
@@ -120,19 +163,23 @@ const Panel5D = () => {
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
-          <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-        </button>
-        <button type="button" className="bg-yellow-400 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-yellow-500" onClick={handleLimpiar}>
-          <FontAwesomeIcon icon={faBroom} /> Limpiar
-        </button>
-        <div className="ml-auto flex items-center gap-2">
-          <span className="font-semibold text-blue-900 text-lg">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-32 text-base" />
-          <button type="button" className="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 text-lg">
-            <FontAwesomeIcon icon={faPrint} />
+      <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
+        <div className="flex gap-3">
+          <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold">
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
+          <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}>
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+          <div className="flex gap-1 mt-1">
+            <input className="border rounded px-2 py-1 w-24" />
+            <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300" onClick={handlePrint}>
+              <FontAwesomeIcon icon={faPrint} />
+            </button>
+          </div>
         </div>
       </div>
     </form>

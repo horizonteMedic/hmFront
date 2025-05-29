@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import Consentimiento_Boro_Digitalizado from '../../../../../jaspers/Consentimiento_Boro_Digitalizado';
+import Swal from 'sweetalert2';
 
 const antecedentesList = [
   { label: 'CONSUME COCAINA' },
@@ -64,6 +66,45 @@ const Boro = () => {
 
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
+  };
+
+  const handlePrint = () => {
+    const datos = {
+      nombre: form.nombre,
+      edad: form.edad,
+      dni: form.dni,
+      fecha: form.fecha,
+      hora: form.hora || '',
+      ciudad: form.ciudad || '',
+      empresa: form.empresa || '',
+      enfermedad_si: form.enfermedad.si,
+      enfermedad_cual: form.enfermedad.cual,
+      medicamento_si: form.medicamento.si,
+      medicamento_cual: form.medicamento.cual,
+      coca_si: form.coca.si,
+      coca_fecha: form.coca.fecha,
+      tratamiento_si: form.tratamiento.si,
+      tratamiento_cual: form.tratamiento.cual,
+      tratamiento_cuando: form.tratamiento.cuando,
+      tratamiento_donde: form.tratamiento.donde,
+    };
+    Swal.fire({
+      title: '¿Desea Imprimir Consentimiento Boro?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>${form.nombre}</b> - DNI <b>${form.dni}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Consentimiento_Boro_Digitalizado(datos);
+      }
+    });
   };
 
   return (
@@ -293,7 +334,7 @@ const Boro = () => {
         <div className="ml-auto flex items-center gap-2">
           <span className="font-semibold text-blue-900 text-lg">IMPRIMIR</span>
           <input className="border rounded px-3 py-2 w-32 text-base" />
-          <button type="button" className="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 text-lg">
+          <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300" onClick={handlePrint}>
             <FontAwesomeIcon icon={faPrint} />
           </button>
         </div>

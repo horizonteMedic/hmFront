@@ -1,8 +1,76 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
+import AnalisisClinicosB_Digitalizado from '../../../../../jaspers/AnalisisClinicosB_Digitalizado';
+import Swal from 'sweetalert2';
 
 const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
+  const [form, setForm] = useState({
+    nroFicha: '',
+    fecha: '',
+    nombres: '',
+    edad: '',
+    prueba: 'ÁCIDO ÚRICO SÉRICO',
+    muestra: 'SUERO',
+    resultado: '',
+    valoresn: 'Mujeres : 2.5 - 6.8 mg/dl\nHombres : 3.6 - 7.7 mg/dl',
+    sede: selectedSede || '',
+  });
+
+  const fechaRef = useRef(null);
+
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleLimpiar = () => {
+    setForm({
+      nroFicha: '',
+      fecha: '',
+      nombres: '',
+      edad: '',
+      prueba: 'ÁCIDO ÚRICO SÉRICO',
+      muestra: 'SUERO',
+      resultado: '',
+      valoresn: 'Mujeres : 2.5 - 6.8 mg/dl\nHombres : 3.6 - 7.7 mg/dl',
+      sede: selectedSede || '',
+    });
+  };
+
+  const handleFechaFocus = (e) => {
+    e.target.showPicker && e.target.showPicker();
+  };
+
+  const handleImprimir = () => {
+    Swal.fire({
+      title: '¿Desea Imprimir Hoja de Bioquímica?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.nroFicha}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        AnalisisClinicosB_Digitalizado({
+          n_orden: form.nroFicha,
+          nombre: form.nombres,
+          edad: form.edad,
+          fecha: form.fecha,
+          txtprueba: form.prueba,
+          txtmuestra: form.muestra,
+          txtresultado: form.resultado,
+          txtvaloresn: form.valoresn,
+          sede: form.sede
+        });
+      }
+    });
+  };
+
   return (
     <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
       <h2 className="text-2xl font-bold mb-6 text-center">Bioquímica - Ácido Úrico</h2>
@@ -10,50 +78,50 @@ const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input className="border rounded px-2 py-1 flex-1" />
+            <input name="nroFicha" value={form.nroFicha} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1" />
             <button type="button" className="ml-2 bg-gray-200 px-3 py-1 rounded border border-gray-300 flex items-center gap-1"><FontAwesomeIcon icon={faEdit} /> Editar</button>
           </div>
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold">Fecha:</label>
-            <input type="date" className="border rounded px-2 py-1 flex-1" />
+            <input name="fecha" type="date" value={form.fecha} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1" ref={fechaRef} onFocus={handleFechaFocus} />
           </div>
         </div>
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input className="border rounded px-2 py-1 flex-1" />
+            <input name="nombres" value={form.nombres} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1" disabled />
           </div>
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold">Edad:</label>
-            <input className="border rounded px-2 py-1 w-24" />
+            <input name="edad" value={form.edad} onChange={handleInputChange} className="border rounded px-2 py-1 w-24" disabled />
           </div>
         </div>
         <div className="flex gap-2 items-center">
           <label className="font-semibold min-w-[120px]">PRUEBA:</label>
-          <input className="border rounded px-2 py-1 flex-1 bg-gray-100" value="ÁCIDO ÚRICO SÉRICO" readOnly />
+          <input name="prueba" className="border rounded px-2 py-1 flex-1 bg-gray-100" value={form.prueba} readOnly />
         </div>
         <div className="flex gap-2 items-center">
           <label className="font-semibold min-w-[120px]">MUESTRA:</label>
-          <input className="border rounded px-2 py-1 flex-1 bg-gray-100" value="SUERO" readOnly />
+          <input name="muestra" className="border rounded px-2 py-1 flex-1 bg-gray-100" value={form.muestra} readOnly />
         </div>
         <div className="flex gap-2 items-center">
           <label className="font-semibold min-w-[120px]">RESULTADO:</label>
-          <input className="border rounded px-2 py-1 flex-1" />
+          <input name="resultado" className="border rounded px-2 py-1 flex-1" value={form.resultado} onChange={handleInputChange} />
         </div>
         <div className="flex gap-2 items-start">
           <label className="font-semibold min-w-[140px]">VALORES NORMALES:</label>
-          <textarea className="border rounded px-2 py-1 flex-1 bg-gray-100" rows={2} readOnly value={"Mujeres : 2.5 - 6.8 mg/dl\nHombres : 3.6 - 7.7 mg/dl"} />
+          <textarea name="valoresn" className="border rounded px-2 py-1 flex-1 bg-gray-100" rows={2} readOnly value={form.valoresn} />
         </div>
         <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
           <div className="flex gap-3">
             <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold"><FontAwesomeIcon icon={faSave} /> Guardar/Actualizar</button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold"><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
+            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
           </div>
           <div className="flex flex-col items-center">
             <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
             <div className="flex gap-1 mt-1">
               <input className="border rounded px-2 py-1 w-24" />
-              <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300"><FontAwesomeIcon icon={faPrint} /></button>
+              <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300" onClick={handleImprimir}><FontAwesomeIcon icon={faPrint} /></button>
             </div>
           </div>
         </div>

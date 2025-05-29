@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
+import parasitologia from '../../../../../jaspers/parasitologia';
+import Swal from 'sweetalert2';
 
 const Parasitologia = () => {
   const [form, setForm] = useState({
@@ -45,86 +47,138 @@ const Parasitologia = () => {
     e.target.showPicker && e.target.showPicker();
   };
 
-  return (
-    <form className="w-full max-w-4xl mx-auto bg-white p-8 rounded shadow">
-      <div className="flex flex-wrap items-center gap-6 mb-6">
-        <div className="flex items-center gap-2">
-          <label className="font-semibold text-base">Nro Ficha:</label>
-          <input name="nroFicha" value={form.nroFicha} onChange={handleInputChange} className="border rounded px-3 py-2 w-32 text-base" />
-        </div>
-        <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
-          <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
-        </button>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold text-base">Fecha:</label>
-          <input
-            name="fecha"
-            type="date"
-            value={form.fecha}
-            onChange={handleInputChange}
-            className="border rounded px-3 py-2 w-40 text-base"
-            ref={fechaRef}
-            onFocus={handleFechaFocus}
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold text-base">Nombres:</label>
-          <input name="nombres" value={form.nombres} onChange={handleInputChange} className="border rounded px-3 py-2 w-56 text-base" />
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="font-semibold text-base">Edad:</label>
-          <input name="edad" value={form.edad} onChange={handleInputChange} className="border rounded px-3 py-2 w-20 text-base" />
-        </div>
-      </div>
+  const handleImprimir = () => {
+    Swal.fire({
+      title: '¿Desea Imprimir Hoja de Parasitología?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.nroFicha}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        parasitologia({
+          n_orden: form.nroFicha,
+          nombre: form.nombres,
+          edad: form.edad,
+          fecha: form.fecha,
+          muestras: form.muestras
+        });
+      }
+    });
+  };
 
-      <div className="flex flex-wrap gap-8 mb-8 justify-center">
-        {[0, 1, 2].map(idx => (
-          <div key={idx} className="bg-gray-50 border rounded p-4 min-w-[220px] flex-1">
-            <div className="font-bold text-base mb-2 text-center">MUESTRA {idx + 1}</div>
-            <div className="mb-2">
-              <label className="block text-base">COLOR</label>
-              <input
-                className="border rounded px-3 py-2 w-full text-base"
-                value={form.muestras[idx].color}
-                onChange={e => handleMuestraChange(idx, 'color', e.target.value)}
-              />
+  return (
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
+      <h2 className="text-2xl font-bold mb-6 text-center">Parasitología</h2>
+      <form className="space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex-1 flex gap-2 items-center">
+            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
+            <input 
+              name="nroFicha" 
+              value={form.nroFicha} 
+              onChange={handleInputChange} 
+              className="border rounded px-2 py-1 flex-1" 
+            />
+            <button type="button" className="ml-2 bg-gray-200 px-3 py-1 rounded border border-gray-300 flex items-center gap-1">
+              <FontAwesomeIcon icon={faEdit} /> Editar
+            </button>
+          </div>
+          <div className="flex-1 flex gap-2 items-center">
+            <label className="font-semibold">Fecha:</label>
+            <input
+              name="fecha"
+              type="date"
+              value={form.fecha}
+              onChange={handleInputChange}
+              className="border rounded px-2 py-1 flex-1"
+              ref={fechaRef}
+              onFocus={handleFechaFocus}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex-1 flex gap-2 items-center">
+            <label className="font-semibold min-w-[90px]">Nombres:</label>
+            <input 
+              name="nombres" 
+              value={form.nombres} 
+              onChange={handleInputChange} 
+              className="border rounded px-2 py-1 flex-1" 
+              disabled
+            />
+          </div>
+          <div className="flex-1 flex gap-2 items-center">
+            <label className="font-semibold">Edad:</label>
+            <input 
+              name="edad" 
+              value={form.edad} 
+              onChange={handleInputChange} 
+              className="border rounded px-2 py-1 w-24" 
+              disabled
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-8 mb-8 justify-center">
+          {[0, 1, 2].map(idx => (
+            <div key={idx} className="bg-gray-50 border rounded p-4 min-w-[220px] flex-1">
+              <div className="font-bold text-base mb-2 text-center">MUESTRA {idx + 1}</div>
+              <div className="mb-2">
+                <label className="block text-base">COLOR</label>
+                <input
+                  className="border rounded px-2 py-1 w-full text-base"
+                  value={form.muestras[idx].color}
+                  onChange={e => handleMuestraChange(idx, 'color', e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="block text-base">ASPECTO</label>
+                <input
+                  className="border rounded px-2 py-1 w-full text-base"
+                  value={form.muestras[idx].aspecto}
+                  onChange={e => handleMuestraChange(idx, 'aspecto', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-base">LUGOL</label>
+                <input
+                  className="border rounded px-2 py-1 w-full text-base"
+                  value={form.muestras[idx].lugol}
+                  onChange={e => handleMuestraChange(idx, 'lugol', e.target.value)}
+                />
+              </div>
             </div>
-            <div className="mb-2">
-              <label className="block text-base">ASPECTO</label>
-              <input
-                className="border rounded px-3 py-2 w-full text-base"
-                value={form.muestras[idx].aspecto}
-                onChange={e => handleMuestraChange(idx, 'aspecto', e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-base">LUGOL</label>
-              <input
-                className="border rounded px-3 py-2 w-full text-base"
-                value={form.muestras[idx].lugol}
-                onChange={e => handleMuestraChange(idx, 'lugol', e.target.value)}
-              />
+          ))}
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
+          <div className="flex gap-3">
+            <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold">
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}>
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+          <div className="flex flex-col items-center">
+            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+            <div className="flex gap-1 mt-1">
+              <input className="border rounded px-2 py-1 w-24" />
+              <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300 hover:bg-gray-300" onClick={handleImprimir}>
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
             </div>
           </div>
-        ))}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-4 mb-4 justify-end">
-        <div className="flex items-center gap-2 mr-8">
-          <span className="font-semibold text-blue-900 text-base italic">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-28 text-base" />
-          <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-base">
-            <FontAwesomeIcon icon={faPrint} />
-          </button>
         </div>
-        <button type="button" className="bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 text-base hover:bg-green-700">
-          <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-        </button>
-        <button type="button" className="bg-yellow-400 text-white px-6 py-2 rounded flex items-center gap-2 text-base hover:bg-yellow-500" onClick={handleLimpiar}>
-          <FontAwesomeIcon icon={faBroom} /> Limpiar
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   );
 };
 

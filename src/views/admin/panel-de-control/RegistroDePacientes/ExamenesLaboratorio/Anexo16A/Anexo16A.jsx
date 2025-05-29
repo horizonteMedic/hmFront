@@ -5,9 +5,7 @@ import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-ic
 const Anexo16A = ({ token, selectedSede }) => {
   return (
     <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <div className="flex items-center mb-4">
-        <span className="bg-blue-100 text-blue-900 font-bold px-3 py-1 rounded-t">ANEXO 16 A</span>
-      </div>
+      <h2 className="text-2xl font-bold mb-6 text-center">Anexo 16A</h2>
       <form className="space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
@@ -23,37 +21,32 @@ const Anexo16A = ({ token, selectedSede }) => {
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input className="border rounded px-2 py-1 flex-1" />
+            <input className="border rounded px-2 py-1 flex-1" disabled />
           </div>
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold">Edad:</label>
-            <input className="border rounded px-2 py-1 w-24" />
+            <input className="border rounded px-2 py-1 w-24" disabled />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <fieldset className="border rounded p-3">
-            <legend className="font-bold text-blue-900 text-sm px-2">PRUEBAS</legend>
-            <div className="mb-4 flex items-center gap-4">
-              <label className="font-semibold">Grupo Sanguíneo:</label>
-              <label className="flex items-center gap-1"><input type="checkbox" /> O</label>
-              <label className="flex items-center gap-1"><input type="checkbox" /> A</label>
-              <label className="flex items-center gap-1"><input type="checkbox" /> B</label>
-              <label className="flex items-center gap-1"><input type="checkbox" /> AB</label>
-            </div>
-            <div className="mb-4 flex items-center gap-4">
-              <label className="font-semibold">Factor Rh:</label>
-              <label className="flex items-center gap-1"><input type="checkbox" /> Rh(-)</label>
-              <label className="flex items-center gap-1"><input type="checkbox" /> Rh(+)</label>
-            </div>
-            <div className="mb-4 flex items-center gap-4">
-              <label className="font-semibold">Hemoglobina:</label>
-              <input className="border rounded px-2 py-1 w-32" />
-            </div>
-            <div className="mb-4 flex items-center gap-4">
-              <label className="font-semibold">Hematocrito:</label>
-              <input className="border rounded px-2 py-1 w-32" />
-            </div>
-          </fieldset>
+        <div className="flex gap-2 items-center">
+          <label className="font-semibold min-w-[120px]">PRUEBA:</label>
+          <input className="border rounded px-2 py-1 flex-1 bg-gray-100" value="Grupo Sanguíneo / Factor Rh / Hemoglobina / Hematocrito" readOnly />
+        </div>
+        <div className="flex gap-2 items-center">
+          <label className="font-semibold min-w-[120px]">GRUPO SANGUÍNEO:</label>
+          <input className="border rounded px-2 py-1 flex-1" />
+        </div>
+        <div className="flex gap-2 items-center">
+          <label className="font-semibold min-w-[120px]">FACTOR RH:</label>
+          <input className="border rounded px-2 py-1 flex-1" />
+        </div>
+        <div className="flex gap-2 items-center">
+          <label className="font-semibold min-w-[120px]">HEMOGLOBINA:</label>
+          <input className="border rounded px-2 py-1 flex-1" />
+        </div>
+        <div className="flex gap-2 items-center">
+          <label className="font-semibold min-w-[120px]">HEMATOCRITO:</label>
+          <input className="border rounded px-2 py-1 flex-1" />
         </div>
         <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
           <div className="flex gap-3">
