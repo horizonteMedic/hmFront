@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // import './LibroDeReclamaciones.css';
 import axios from 'axios';
-import { URLAzure } from '../../../config/config';
+import { URLAzure } from '../../config/config';
 
 const API_URL = `${URLAzure}/api/v01/st/email/libroReclamacionesEnviarCorreo`;
 
