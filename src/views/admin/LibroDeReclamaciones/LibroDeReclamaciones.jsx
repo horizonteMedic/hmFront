@@ -40,8 +40,16 @@ const LibroDeReclamaciones = () => {
     if (!formData.docType) {
       newErrors.docType = 'Debe seleccionar un tipo de documento';
     }
-    if (!/^[0-9]{8}$/.test(formData.numDoc)) {
-      newErrors.numDoc = 'El DNI debe tener exactamente 8 dígitos numéricos';
+    if (formData.docType === 'DNI') {
+      if (!/^\d{8}$/.test(formData.numDoc)) {
+        newErrors.numDoc = 'El DNI debe tener exactamente 8 dígitos numéricos';
+      }
+    } else {
+      if (!formData.numDoc) {
+        newErrors.numDoc = 'El número de documento es requerido';
+      } else if (formData.numDoc.length > 15) {
+        newErrors.numDoc = 'El documento no debe exceder 15 caracteres';
+      }
     }
     if (!formData.nombreRazonSocial) {
       newErrors.nombreRazonSocial = 'El nombre es requerido';
@@ -74,24 +82,38 @@ const LibroDeReclamaciones = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    // Solo permitir números en DNI y celular
+    let newValue = value;
+    // Si cambia el tipo de documento, limpiar numDoc
+    if (name === 'docType') {
+      setFormData(prevState => ({
+        ...prevState,
+        docType: value,
+        numDoc: ''
+      }));
+      if (errors['numDoc']) setErrors(prev => ({ ...prev, numDoc: '' }));
+      return;
+    }
     if (name === 'numDoc') {
-      if (!/^\d*$/.test(value)) return;
+      if (formData.docType === 'DNI') {
+        if (!/^\d{0,8}$/.test(value)) return;
+      } else {
+        if (value.length > 15) return;
+      }
     }
     if (name === 'telefono') {
       if (!/^\d*$/.test(value)) return;
     }
+    if (name === 'nombreRazonSocial') {
+      newValue = toTitleCase(value);
+    }
+    if (name === 'descripcionHechos') {
+      newValue = toSentenceCase(value);
+    }
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: newValue
     }));
-    // Limpiar el error cuando el usuario comienza a escribir
-    if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ''
-      }));
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const handleSubmit = async (e) => {
@@ -228,6 +250,14 @@ const LibroDeReclamaciones = () => {
     );
   };
 
+  // Función para Title Case
+  const toTitleCase = (str) =>
+    str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
+  // Función para oración (primera letra mayúscula, resto minúscula)
+  const toSentenceCase = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -291,6 +321,7 @@ const LibroDeReclamaciones = () => {
                           name="docType" 
                           value={type} 
                           onChange={handleChange} 
+                          checked={formData.docType === type}
                           className="form-radio h-4 w-4 text-blue-600"
                           required
                         />
@@ -306,6 +337,11 @@ const LibroDeReclamaciones = () => {
                     type="text" 
                     name="numDoc" 
                     onChange={handleChange} 
+                    inputMode={formData.docType === 'DNI' ? 'numeric' : 'text'}
+                    pattern={formData.docType === 'DNI' ? '[0-9]*' : undefined}
+                    onInput={formData.docType === 'DNI' ? (e => e.target.value = e.target.value.replace(/[^0-9]/g, '')) : undefined}
+                    maxLength={formData.docType === 'DNI' ? 8 : 15}
+                    value={formData.numDoc}
                     className={`w-full p-2 border ${errors.numDoc ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     required
                   />
@@ -319,10 +355,14 @@ const LibroDeReclamaciones = () => {
                     type="text" 
                     name="nombreRazonSocial" 
                     onChange={handleChange} 
+                    value={formData.nombreRazonSocial}
                     className={`w-full p-2 border ${errors.nombreRazonSocial ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     required
                   />
                   {errors.nombreRazonSocial && <p className="text-red-500 text-sm mt-1">{errors.nombreRazonSocial}</p>}
+                  {/* {formData.nombreRazonSocial && (
+                    <div className="text-xs text-gray-500 mt-1">Ejemplo: <span className="font-semibold">{toTitleCase(formData.nombreRazonSocial)}</span></div>
+                  )} */}
                 </div>
                 <div>
                   <label className="block text-gray-700 font-semibold mb-2">E-MAIL*</label>
@@ -342,6 +382,9 @@ const LibroDeReclamaciones = () => {
                   type="tel" 
                   name="telefono" 
                   onChange={handleChange} 
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  onInput={e => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
                   className={`w-full p-2 border ${errors.telefono ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                   required
                 />
@@ -385,6 +428,7 @@ const LibroDeReclamaciones = () => {
                 <textarea 
                   name="descripcionHechos"
                   onChange={handleChange}
+                  value={formData.descripcionHechos}
                   className={`w-full p-2 border ${errors.descripcionHechos ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                   rows="6"
                   maxLength="900"
@@ -392,6 +436,9 @@ const LibroDeReclamaciones = () => {
                   required
                 ></textarea>
                 {errors.descripcionHechos && <p className="text-red-500 text-sm mt-1">{errors.descripcionHechos}</p>}
+                {/* {formData.descripcionHechos && (
+                  <div className="text-xs text-gray-500 mt-1">Ejemplo: <span className="font-semibold">{toSentenceCase(formData.descripcionHechos)}</span></div>
+                )} */}
               </div>
             </div>
           </div>
@@ -436,7 +483,10 @@ const LibroDeReclamaciones = () => {
             <button 
               type="submit" 
               disabled={loading || !isFormValid()}
-              className="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-md"
+              className={`px-8 py-3 rounded-md font-semibold shadow-md transition-colors duration-200
+                ${loading || !isFormValid() 
+                  ? 'bg-gray-300 text-gray-400 cursor-not-allowed opacity-120' 
+                  : 'bg-blue-600 text-white hover:bg-blue-700'}`}
             >
               {loading ? 'Cargando...' : 'Enviar Reclamo'}
             </button>
