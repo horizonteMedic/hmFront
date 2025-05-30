@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 // import './LibroDeReclamaciones.css';
 import axios from 'axios';
 import { URLAzure } from '../../config/config';
+import Swal from 'sweetalert2';
 
 const API_URL = `${URLAzure}/api/v01/st/email/libroReclamacionesEnviarCorreo`;
 
@@ -22,6 +23,7 @@ const LibroDeReclamaciones = () => {
 
   const [errors, setErrors] = useState({});
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,8 +40,8 @@ const LibroDeReclamaciones = () => {
     if (!formData.docType) {
       newErrors.docType = 'Debe seleccionar un tipo de documento';
     }
-    if (!formData.numDoc) {
-      newErrors.numDoc = 'El número de documento es requerido';
+    if (!/^[0-9]{8}$/.test(formData.numDoc)) {
+      newErrors.numDoc = 'El DNI debe tener exactamente 8 dígitos numéricos';
     }
     if (!formData.nombreRazonSocial) {
       newErrors.nombreRazonSocial = 'El nombre es requerido';
@@ -49,8 +51,8 @@ const LibroDeReclamaciones = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'El email no es válido';
     }
-    if (!formData.telefono) {
-      newErrors.telefono = 'El teléfono es requerido';
+    if (!/^[0-9]{9}$/.test(formData.telefono)) {
+      newErrors.telefono = 'El celular debe tener exactamente 9 dígitos numéricos';
     }
 
     // Validación de detalle del reclamo
@@ -72,6 +74,13 @@ const LibroDeReclamaciones = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Solo permitir números en DNI y celular
+    if (name === 'numDoc') {
+      if (!/^\d*$/.test(value)) return;
+    }
+    if (name === 'telefono') {
+      if (!/^\d*$/.test(value)) return;
+    }
     setFormData(prevState => ({
       ...prevState,
       [name]: value
@@ -89,11 +98,28 @@ const LibroDeReclamaciones = () => {
     e.preventDefault();
     
     if (!validateForm()) {
-      alert('Por favor, complete todos los campos requeridos correctamente');
+      Swal.fire({ icon: 'error', title: 'Campos inválidos', text: 'Por favor, complete todos los campos correctamente.' });
       return;
     }
     
+    setLoading(true);
+    Swal.fire({
+      title: 'Enviando reclamo...',
+      allowOutsideClick: false,
+      didOpen: () => { Swal.showLoading(); }
+    });
+    
     try {
+      // Transformar a mayúsculas los campos de texto
+      const upperForm = {
+        ...formData,
+        nombreRazonSocial: formData.nombreRazonSocial.toUpperCase(),
+        email: formData.email.toUpperCase(),
+        descripcionHechos: formData.descripcionHechos.toUpperCase(),
+        area: formData.area.toUpperCase(),
+        docType: formData.docType.toUpperCase(),
+        autorizaEmail: formData.autorizaEmail.toUpperCase()
+      };
       const destinatarios = [
         'agarcia@horizontemedic.com',
         'caguirre@horizontemedic.com',
@@ -101,23 +127,56 @@ const LibroDeReclamaciones = () => {
       ];
       const asunto = 'LIBRO DE RECLAMACIONES';
       const cuerpoHtml = `
-        <h2>Nueva Reclamación Registrada</h2>
-        <p><strong>Fecha:</strong> ${currentTime.toLocaleDateString('es-PE')}</p>
-        <p><strong>Hora:</strong> ${currentTime.toLocaleTimeString('es-PE')}</p>
-        
-        <h3>1. IDENTIFICACIÓN DEL USUARIO</h3>
-        <p><strong>Tipo de Documento:</strong> ${formData.docType}</p>
-        <p><strong>N° Documento:</strong> ${formData.numDoc}</p>
-        <p><strong>Nombre:</strong> ${formData.nombreRazonSocial}</p>
-        <p><strong>Email:</strong> ${formData.email}</p>
-        <p><strong>Teléfono:</strong> ${formData.telefono}</p>
-
-        <h3>2. DETALLE DEL RECLAMO</h3>
-        <p><strong>Área:</strong> ${formData.area}</p>
-        <p><strong>Descripción:</strong> ${formData.descripcionHechos}</p>
-
-        <h3>3. AUTORIZACIÓN DE NOTIFICACIÓN</h3>
-        <p><strong>Autoriza notificación por email:</strong> ${formData.autorizaEmail}</p>
+        <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#f9f9f9;padding:24px;border-radius:10px;box-shadow:0 2px 8px #0001;">
+          <h2 style="color:#0f4e8c;text-align:center;margin-bottom:24px;">NUEVA RECLAMACIÓN REGISTRADA</h2>
+          <table style="width:100%;background:#fff;border-radius:8px;overflow:hidden;">
+            <tr>
+              <td style="padding:8px 0 4px 0;text-align:center;" colspan="2">
+                <span style="color:#888;font-size:14px;">${currentTime.toLocaleDateString('es-PE')} - ${currentTime.toLocaleTimeString('es-PE')}</span>
+              </td>
+            </tr>
+            <tr><td colspan="2"><hr style="border:none;border-top:1px solid #eee;margin:12px 0;"></td></tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;padding:8px 0;">TIPO DE DOCUMENTO:</td>
+              <td style="padding:8px 0;">${upperForm.docType}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">N° DOCUMENTO:</td>
+              <td>${upperForm.numDoc}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">NOMBRE:</td>
+              <td>${upperForm.nombreRazonSocial}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">EMAIL:</td>
+              <td>${upperForm.email}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">TELÉFONO:</td>
+              <td>${upperForm.telefono}</td>
+            </tr>
+            <tr><td colspan="2"><hr style="border:none;border-top:1px solid #eee;margin:12px 0;"></td></tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">ÁREA:</td>
+              <td>${upperForm.area}</td>
+            </tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">DESCRIPCIÓN:</td>
+              <td>${upperForm.descripcionHechos}</td>
+            </tr>
+            <tr><td colspan="2"><hr style="border:none;border-top:1px solid #eee;margin:12px 0;"></td></tr>
+            <tr>
+              <td style="font-weight:bold;color:#0f4e8c;">AUTORIZA NOTIFICACIÓN POR EMAIL:</td>
+              <td>${upperForm.autorizaEmail}</td>
+            </tr>
+          </table>
+          <div style="text-align:center;margin-top:24px;">
+            <img src="https://sistema.horizontemedic.com/img/logo-color.png" alt="Logo Horizonte Médic" style="height:48px;margin-bottom:8px;" />
+            <div style="color:#0f4e8c;font-size:13px;">Horizonte Médic</div>
+            <!-- Aquí el pie de página -->
+          </div>
+        </div>
       `;
 
       await axios.post(API_URL, {
@@ -126,7 +185,13 @@ const LibroDeReclamaciones = () => {
         cuerpoHtml
       });
 
-      alert('Reclamación enviada exitosamente');
+      setLoading(false);
+      Swal.fire({
+        icon: 'success',
+        title: '¡Reclamación enviada!',
+        text: 'Su reclamo fue enviado correctamente.',
+        showConfirmButton: true
+      });
       setFormData({
         docType: '',
         numDoc: '',
@@ -137,10 +202,30 @@ const LibroDeReclamaciones = () => {
         descripcionHechos: '',
         autorizaEmail: ''
       });
+      setErrors({});
     } catch (error) {
+      setLoading(false);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al enviar',
+        text: 'Hubo un error al enviar la reclamación. Por favor, intente nuevamente.'
+      });
       console.error('Error al enviar la reclamación:', error);
-      alert('Hubo un error al enviar la reclamación. Por favor, intente nuevamente.');
     }
+  };
+
+  // Función para saber si el formulario está listo para enviar
+  const isFormValid = () => {
+    return (
+      formData.docType &&
+      /^[0-9]{8}$/.test(formData.numDoc) &&
+      formData.nombreRazonSocial &&
+      formData.email && /\S+@\S+\.\S+/.test(formData.email) &&
+      /^[0-9]{9}$/.test(formData.telefono) &&
+      formData.area &&
+      formData.descripcionHechos &&
+      formData.autorizaEmail
+    );
   };
 
   return (
@@ -347,12 +432,13 @@ const LibroDeReclamaciones = () => {
             </div>
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-center">
             <button 
               type="submit" 
+              disabled={loading || !isFormValid()}
               className="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors duration-200 font-semibold shadow-md"
             >
-              Enviar Reclamo
+              {loading ? 'Cargando...' : 'Enviar Reclamo'}
             </button>
           </div>
         </form>
