@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 // import './LibroDeReclamaciones.css';
 import axios from 'axios';
+import { URLAzure } from '../../../config/config';
 
-const API_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://devclientes.horizontemedic.com/api'
-  : 'http://localhost:3001/api';
+const API_URL = `${URLAzure}/api/v01/st/email/libroReclamacionesEnviarCorreo`;
 
 const LibroDeReclamaciones = () => {
   const [formData, setFormData] = useState({
@@ -95,53 +94,52 @@ const LibroDeReclamaciones = () => {
     }
     
     try {
-      const emailData = {
-        from: 'sistemas.developer.hm@gmail.com',
-        to: ['agarcia@horizontemedic.com', 'caguirre@horizontemedic.com','jeansimon176@gmail.com'],
-        subject: 'Nueva Reclamación Registrada',
-        html: `
-          <h2>Nueva Reclamación Registrada</h2>
-          <p><strong>Fecha:</strong> ${currentTime.toLocaleDateString('es-PE')}</p>
-          <p><strong>Hora:</strong> ${currentTime.toLocaleTimeString('es-PE')}</p>
-          
-          <h3>1. IDENTIFICACIÓN DEL USUARIO</h3>
-          <p><strong>Tipo de Documento:</strong> ${formData.docType}</p>
-          <p><strong>N° Documento:</strong> ${formData.numDoc}</p>
-          <p><strong>Nombre:</strong> ${formData.nombreRazonSocial}</p>
-          <p><strong>Email:</strong> ${formData.email}</p>
-          <p><strong>Teléfono:</strong> ${formData.telefono}</p>
+      const destinatarios = [
+        'agarcia@horizontemedic.com',
+        'caguirre@horizontemedic.com',
+        'jeansimon176@gmail.com'
+      ];
+      const asunto = 'LIBRO DE RECLAMACIONES';
+      const cuerpoHtml = `
+        <h2>Nueva Reclamación Registrada</h2>
+        <p><strong>Fecha:</strong> ${currentTime.toLocaleDateString('es-PE')}</p>
+        <p><strong>Hora:</strong> ${currentTime.toLocaleTimeString('es-PE')}</p>
+        
+        <h3>1. IDENTIFICACIÓN DEL USUARIO</h3>
+        <p><strong>Tipo de Documento:</strong> ${formData.docType}</p>
+        <p><strong>N° Documento:</strong> ${formData.numDoc}</p>
+        <p><strong>Nombre:</strong> ${formData.nombreRazonSocial}</p>
+        <p><strong>Email:</strong> ${formData.email}</p>
+        <p><strong>Teléfono:</strong> ${formData.telefono}</p>
 
-          <h3>2. DETALLE DEL RECLAMO</h3>
-          <p><strong>Área:</strong> ${formData.area}</p>
-          <p><strong>Descripción:</strong> ${formData.descripcionHechos}</p>
+        <h3>2. DETALLE DEL RECLAMO</h3>
+        <p><strong>Área:</strong> ${formData.area}</p>
+        <p><strong>Descripción:</strong> ${formData.descripcionHechos}</p>
 
-          <h3>3. AUTORIZACIÓN DE NOTIFICACIÓN</h3>
-          <p><strong>Autoriza notificación por email:</strong> ${formData.autorizaEmail}</p>
-        `
-      };
+        <h3>3. AUTORIZACIÓN DE NOTIFICACIÓN</h3>
+        <p><strong>Autoriza notificación por email:</strong> ${formData.autorizaEmail}</p>
+      `;
 
-      const response = await axios.post(`${API_URL}/send-email`, emailData);
+      await axios.post(API_URL, {
+        destinatarios,
+        asunto,
+        cuerpoHtml
+      });
 
-      if (response.data.success) {
-        alert(`Reclamación enviada exitosamente\nID del mensaje: ${response.data.messageId}\nPuedes verificar el envío en tu bandeja de entrada.`);
-        setFormData({
-          docType: '',
-          numDoc: '',
-          nombreRazonSocial: '',
-          email: '',
-          telefono: '',
-          area: '',
-          descripcionHechos: '',
-          autorizaEmail: ''
-        });
-      }
+      alert('Reclamación enviada exitosamente');
+      setFormData({
+        docType: '',
+        numDoc: '',
+        nombreRazonSocial: '',
+        email: '',
+        telefono: '',
+        area: '',
+        descripcionHechos: '',
+        autorizaEmail: ''
+      });
     } catch (error) {
       console.error('Error al enviar la reclamación:', error);
-      if (error.response) {
-        alert(`Error al enviar la reclamación: ${error.response.data.error || error.response.data.message}`);
-      } else {
-        alert('Hubo un error al enviar la reclamación. Por favor, intente nuevamente.');
-      }
+      alert('Hubo un error al enviar la reclamación. Por favor, intente nuevamente.');
     }
   };
 
