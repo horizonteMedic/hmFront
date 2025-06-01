@@ -52,7 +52,7 @@ const TabComponent = () => {
   const [DNIG, setDNIG] = useState("")
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-  const views = useAuthStore(state => state.listView);
+  const Acceso = useAuthStore(state => state.listView);
   const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
   const [tabLab, setTabLab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,12 +61,12 @@ const TabComponent = () => {
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
 
   // permisos
- const AccessRegistroC= views.some(view => view.id === 653);
-  const AccessHistoriaC = views.some(view => view.id === 654);
-  const AccessCitas = views.some(view => view.id === 655);
-  const AccesExcelBasico = views.some(view => view.id === 656);
-  const AccesExcelCompleto = views.some(view => view.id === 657);
-  const AccesTriaje = views.some(view => view.id === 252);
+  const AccessRegistroC= Acceso.some(view => view.id === 653);
+  const AccessHistoriaC = Acceso.some(view => view.id === 654);
+  const AccessCitas = Acceso.some(view => view.id === 655);
+  const AccesExcelBasico = Acceso.some(view => view.id === 656);
+  const AccesExcelCompleto = Acceso.some(view => view.id === 657);
+  const AccesTriaje = Acceso.some(view => view.id === 252);
   //COMBOBOX REGISTRO
   const Profesiones   = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();

@@ -40,30 +40,32 @@ import { useLocation,Outlet, Navigate} from "react-router-dom"
     '/reporte-pacientes': 54,
     '/matriz-postulante': 55,
     '/configuracion': 53,
-    '/lista-archivos': 57,
-    '/agregar-sede': 58,
+    '/lista-archivos': "Administrar Archivos",
+    '/agregar-sede': "Administrar Sedes",
     '/agregar-campa%C3%B1a': 59,
     '/administrar-empresas': 60,
     '/administrar-contratas': 61,
     '/protocolos': 61,
     '/RegistroP': 602,
-    '/Registro-de-pacientes': 3
+    '/Registro-de-pacientes': "Registro de Pacientes"
   };
 
-export function ProtectedRoute({TotalView}){
-      const listView = useAuthStore(state => state.listView)
-    const setToken = useAuthStore(state => state.token)
+export function ProtectedRoute() {
+    const listView = useAuthStore(state => state.listView);
+    const token = useAuthStore(state => state.token);
     const location = useLocation();
-    if (setToken === null) {
-        return <Navigate to="/" />;
-      }
-    
+
+    if (token === null) {
+      return <Navigate to="/" />;
+    }
+
     const isRouteAllowed = (route) => {
-        const routeId = protectedRoutes[route];
-        return listView.some(view => view.id === routeId);
+      const routeName = protectedRoutes[route];
+      return listView.includes(routeName);
     };
     
     const isAccessAllowed = isRouteAllowed(location.pathname);
+    console.log(isAccessAllowed)
     return isAccessAllowed ? <Outlet /> : <Navigate to="/panel-de-control" />;
 }
 

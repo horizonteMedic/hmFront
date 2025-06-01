@@ -8,6 +8,7 @@ import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { Loading } from "../../../components/Loading";
 import Errors from "../../../components/Errors";
 import Swal from "sweetalert2";
+import { getFetch } from "../../panel-de-control/getFetch/getFetch";
 
 export function FormLogin() {
   const [username, setUsername] = useState("");
@@ -19,6 +20,7 @@ export function FormLogin() {
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView);
+  const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
   const [loading, setloadign] = useState(false);
   const [errormess, setErrormess] = useState("");
 
@@ -100,12 +102,17 @@ export function FormLogin() {
   
   
 
-  const decodeToken = (token) => {
+  const decodeToken = async (token) => {
     const payloadBase64 = token.split(".")[1];
     const decodedPayload = atob(payloadBase64);
     const UserLogued = JSON.parse(decodedPayload);
-    const listadoVistas = UserLogued["listado vistas"];
-    setlistView(listadoVistas);
+    const TokenResponse = UserLogued["listado vistas"];
+    const IDROL = TokenResponse[0].idRol;
+    const ListaVista = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${IDROL}`,token)
+    const todosLosPermisos = ListaVista.flatMap(item => item.listaPermisos);
+    const todasLasVistas = ListaVista.flatMap(item => item.nombre);
+    setlistView(todasLasVistas);
+    setlistAccesos(todosLosPermisos)
     setuserlogued(UserLogued);
     setToken(token);
     Loginvnigate(token);

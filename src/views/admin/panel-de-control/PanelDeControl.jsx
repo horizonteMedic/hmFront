@@ -52,64 +52,25 @@ const allowedRoutesStatic = [
 const Dashboard = ({TotalView}) => {
   const userLogued = useAuthStore(state => state.userlogued);
   const listView = useAuthStore(state => state.listView);
-  const allowedRoutes = listView.map(item => `${item.id}`);
-  //DINAMISMO DETENDIO
-  /*const allowedIds = useMemo(() => new Set(listView.map(v => String(v.id))), [listView]);
-  const allCards = useMemo(() => {
-  // ① Filtrar por ruta
-    const viewsWanted = TotalView.filter((view) =>
-      allowedRoutesStatic.includes(view.rutaVista)
-    );
-
-    // ② Mapear cada vista permitida al formato de tarjeta
-    return viewsWanted.map(mapBackendToCard);
-  }, [TotalView]); // o [] si TotalView es import estático
-  console.log(TotalView)
-
-  const filteredCards = useMemo(
-    () => allCards.filter((card) => allowedIds.has(card.id)),
-    [allowedIds, allCards]
-  );
-
-  if (filteredCards.length === 0) {
-    return (
-      <p className="text-center text-gray-600">
-        Sin accesos disponibles para tu usuario
-      </p>
-    );
-  }
-  {filteredCards.map((card, index) => (
-    <div key={index} className="flex flex-col items-center w-[120px] mb-4">
-      <Link
-        key={card.id}
-        to={card.to}
-        className="`flex justify-center items-center w-[60px] h-[60px]  flex-shrink-0 m-4 p-6 bg-[#1c4d77] rounded-xl transition duration-500 transform hover:shadow-lg hover:bg-[#fc6b03] hover:scale-110`"
-      >
-        <FontAwesomeIcon icon={card.icon} style={{ color: 'white' }} size="2xl" className={`transition duration-500 hover:text-white`} />
-      </Link>
-      <h2 className="text-lg font-bold my-2 text-center">{card.title}</h2>
-    </div>
-  ))}*/
-
 
   // Cards principales (sin cambios)
  const filteredCards = [
-    { to: "/roles", id: "2", icon: faCodeBranch, title: "Roles" },
-    { to: "/accesos", id: "52", icon: faUserLock, title: "Accesos" },
-    { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
-    { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
-    { to: "/configuracion", id: "53", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "3", icon: faNotesMedical, title: "Registro de Pacientes" }
-  ].filter(card => allowedRoutes.includes(card.id));
+    { to: "/roles", name: "", icon: faCodeBranch, title: "Roles" },
+    { to: "/accesos", name: "52", icon: faUserLock, title: "Accesos" },
+    { to: "/reporte-pacientes", name: "2", icon: faFileLines, title: "Reportes" },
+    { to: "/matriz-postulante", name: "55", icon: faBusinessTime, title: "Matriz Postulante" },
+    { to: "/configuracion", name: "53", icon: faGears, title: "Configuración" },
+    { to: "/Registro-de-pacientes", name: "Registro de Pacientes", icon: faNotesMedical, title: "Registro de Pacientes" }
+  ].filter(card => listView.includes(card.name));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
   const additionalCards = [
-    { to: "/lista-archivos", id: "59", icon: faList, title: "Administrar Archivos" },
-    { to: "/agregar-sede", id: "58", icon: faTentArrowDownToLine, title: "Administrar Sedes" },
+    { to: "/lista-archivos", id: "Administrar Archivos", icon: faList, title: "Administrar Archivos" },
+    { to: "/agregar-sede", id: "Administrar Sedes", icon: faTentArrowDownToLine, title: "Administrar Sedes" },
     { to: "/administrar-empresas", id: "56", icon: faBuilding, title: "Administrar Empresas" },
     { to: "/administrar-contratas", id: "57", icon: faHandshake, title: "Administrar Contratas" },
     { to: "/protocolos", id: "61", icon: faNetworkWired, title: "Protocolos" }
-  ].filter(card => allowedRoutes.includes(card.id));
+  ].filter(card => listView.includes(card.id));
  /* MAIN const filteredCards = [
     { to: "/roles", id: "52", icon: faCodeBranch, title: "Roles" },
     { to: "/accesos", id: "53", icon: faUserLock, title: "Accesos" },
