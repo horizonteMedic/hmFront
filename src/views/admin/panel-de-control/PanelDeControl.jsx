@@ -17,37 +17,6 @@ const Card = ({ to, id, icon, color, hoverColor, iconColor, hoverIconColor }) =>
     </Link>
   );
 };
-/* DINAMISMO xd
-const iconMap = {
-    faList,
-    faFileLines,
-    faGears,
-    faUserLock,
-    faCodeBranch,
-    faBusinessTime,
-    faNotesMedical,
-    faTentArrowDownToLine,
-    faBuilding,
-    faHandshake,
-    faNetworkWired
-  };
-
-
-const mapBackendToCard = (view) => ({
-  id: String(view.id),               // siempre string
-  to: view.rutaVista,                // rutaVista → to
-  title: view.nombre,                // nombre    → title
-  icon: iconMap[view.descripcion] || faFileLines, // default si no existe
-});
-
-const allowedRoutesStatic = [
-  "/roles",
-  "/accesos",
-  "/reporte-pacientes",
-  "/matriz-postulante",
-  "/configuracion",
-  "/Registro-de-pacientes",
-];*/
 
 const Dashboard = ({TotalView}) => {
   const userLogued = useAuthStore(state => state.userlogued);
@@ -55,11 +24,11 @@ const Dashboard = ({TotalView}) => {
 
   // Cards principales (sin cambios)
  const filteredCards = [
-    { to: "/roles", name: "", icon: faCodeBranch, title: "Roles" },
-    { to: "/accesos", name: "52", icon: faUserLock, title: "Accesos" },
-    { to: "/reporte-pacientes", name: "2", icon: faFileLines, title: "Reportes" },
-    { to: "/matriz-postulante", name: "55", icon: faBusinessTime, title: "Matriz Postulante" },
-    { to: "/configuracion", name: "53", icon: faGears, title: "Configuración" },
+    { to: "/roles", name: "Menú de Roles", icon: faCodeBranch, title: "Roles" },
+    { to: "/accesos", name: "Menú de Accesos", icon: faUserLock, title: "Accesos" },
+    { to: "/reporte-pacientes", name: "Reportes", icon: faFileLines, title: "Reportes" },
+    { to: "/matriz-postulante", name: "Matriz Postulante", icon: faBusinessTime, title: "Matriz Postulante" },
+    { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
     { to: "/Registro-de-pacientes", name: "Registro de Pacientes", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => listView.includes(card.name));
 
@@ -67,9 +36,9 @@ const Dashboard = ({TotalView}) => {
   const additionalCards = [
     { to: "/lista-archivos", id: "Administrar Archivos", icon: faList, title: "Administrar Archivos" },
     { to: "/agregar-sede", id: "Administrar Sedes", icon: faTentArrowDownToLine, title: "Administrar Sedes" },
-    { to: "/administrar-empresas", id: "56", icon: faBuilding, title: "Administrar Empresas" },
-    { to: "/administrar-contratas", id: "57", icon: faHandshake, title: "Administrar Contratas" },
-    { to: "/protocolos", id: "61", icon: faNetworkWired, title: "Protocolos" }
+    { to: "/administrar-empresas", id: "Administrar Empresas", icon: faBuilding, title: "Administrar Empresas" },
+    { to: "/administrar-contratas", id: "Administrar Contratas", icon: faHandshake, title: "Administrar Contratas" },
+    { to: "/protocolos", id: "Servicios", icon: faNetworkWired, title: "Protocolos" }
   ].filter(card => listView.includes(card.id));
  /* MAIN const filteredCards = [
     { to: "/roles", id: "52", icon: faCodeBranch, title: "Roles" },

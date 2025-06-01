@@ -106,7 +106,7 @@ export function FormLogin() {
     const payloadBase64 = token.split(".")[1];
     const decodedPayload = atob(payloadBase64);
     const UserLogued = JSON.parse(decodedPayload);
-    const TokenResponse = UserLogued["listado vistas"];
+    const TokenResponse = UserLogued["id_rolUser"];
     const IDROL = TokenResponse[0].idRol;
     const ListaVista = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${IDROL}`,token)
     const todosLosPermisos = ListaVista.flatMap(item => item.listaPermisos);

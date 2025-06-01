@@ -52,7 +52,7 @@ const TabComponent = () => {
   const [DNIG, setDNIG] = useState("")
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-  const Acceso = useAuthStore(state => state.listView);
+  const Acceso = useAuthStore(state => state.listAccesos);
   const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
   const [tabLab, setTabLab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -61,12 +61,12 @@ const TabComponent = () => {
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
 
   // permisos
-  const AccessRegistroC= Acceso.some(view => view.id === 653);
-  const AccessHistoriaC = Acceso.some(view => view.id === 654);
-  const AccessCitas = Acceso.some(view => view.id === 655);
-  const AccesExcelBasico = Acceso.some(view => view.id === 656);
-  const AccesExcelCompleto = Acceso.some(view => view.id === 657);
-  const AccesTriaje = Acceso.some(view => view.id === 252);
+  const AccessRegistroC = Acceso.includes("AccesoRP");
+  const AccessHistoriaC = Acceso.includes("AccesoHC");
+  const AccessCitas = Acceso.includes("AccesoReservaP");
+  const AccesExcelBasico = Acceso.includes(656);
+  const AccesExcelCompleto = Acceso.includes(657);
+  const AccesTriaje = Acceso.includes("AccesoTriaje");
   //COMBOBOX REGISTRO
   const Profesiones   = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();
@@ -139,7 +139,7 @@ const TabComponent = () => {
     { icon: faEye, label: 'Oftalmología' },
   ];
 
-  useEffect(() => {
+  /*useEffect(() => {
     // inicializa la primera pestaña a la que el usuario tiene acceso
     const keys = Object.keys(Acces);
     for (let i = 0; i < keys.length; i++) {
@@ -148,7 +148,7 @@ const TabComponent = () => {
         break;
       }
     }
-  }, []);
+  }, []);*/
 
   const changeTab = (tabIndex) => setActiveTab(tabIndex);
   const openModal = () => setIsModalOpen(true);
@@ -212,6 +212,7 @@ const TabComponent = () => {
               </span>
               <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Admisión</span>
             </div>
+            {Acces.Triaje && ( 
             <div
               className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
               onClick={() => setActiveTab(1)}
@@ -221,6 +222,7 @@ const TabComponent = () => {
               </span>
               <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Triaje</span>
             </div>
+            )}
             <div
               className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
               onClick={() => setActiveTab(2)}
@@ -323,24 +325,28 @@ const TabComponent = () => {
               </div>
               <div>
                 <div className="flex border-b mb-6">
-                  <button
+                  {Acces.Registro && ( 
+                    <button
                     className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 border-b-4 border-[#1a2536] text-[#1a2536]`}
                     onClick={() => setSubTab(0)}
                   >
                     Registro de Pacientes
                   </button>
+                  )}
                   <button
                     className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 1 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
                     onClick={() => setSubTab(1)}
                   >
                     Consentimiento Digitalización
                   </button>
+                  {Acces.Historia && ( 
                   <button
                     className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 2 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
                     onClick={() => setSubTab(2)}
                   >
                     Apertura Exámenes PreOcup
                   </button>
+                  )}
                 </div>
                 <div>
                   {subTab === 0 && (

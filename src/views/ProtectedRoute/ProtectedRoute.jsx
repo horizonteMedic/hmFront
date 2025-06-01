@@ -35,17 +35,17 @@ import { useLocation,Outlet, Navigate} from "react-router-dom"
   }; */
 
   const protectedRoutes = {
-    '/roles': 2,
-    '/accesos': 53,
-    '/reporte-pacientes': 54,
-    '/matriz-postulante': 55,
-    '/configuracion': 53,
+    '/roles': "Menú de Roles",
+    '/accesos': "Menú de Accesos",
+    '/reporte-pacientes': "Reportes",
+    '/matriz-postulante': "Matriz Postulante",
+    '/configuracion': "Configuracion",
     '/lista-archivos': "Administrar Archivos",
     '/agregar-sede': "Administrar Sedes",
     '/agregar-campa%C3%B1a': 59,
-    '/administrar-empresas': 60,
-    '/administrar-contratas': 61,
-    '/protocolos': 61,
+    '/administrar-empresas': "Administrar Empresas",
+    '/administrar-contratas': "Administrar Contratas",
+    '/protocolos': "Servicios",
     '/RegistroP': 602,
     '/Registro-de-pacientes': "Registro de Pacientes"
   };

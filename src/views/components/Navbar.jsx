@@ -10,7 +10,6 @@ const Navbar = () => {
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const listView = useAuthStore(state => state.listView);
-  const allowedRoutes = listView.map(item => `${item.id}`);
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -38,12 +37,12 @@ const Navbar = () => {
   };
 
   const filteredNavLinks = [
-    { to: "/roles", id: "52", label: "Roles", icon: faUser },
-    { to: "/accesos", id: "53", label: "Accesos", icon: faLock },
-    { to: "/reporte-pacientes", id: "54", label: "Reportes", icon: faChartBar },
-    { to: "/matriz-postulante", id: "55", label: "Matriz Postulante", icon: faList },
-    { to: "/Registro-de-pacientes", id: "202", label: "Ocupacional", icon: faNotesMedical },
-  ].filter(navLink => allowedRoutes.includes(navLink.id));
+    { to: "/roles", name: "Menú de Roles", label: "Roles", icon: faUser },
+    { to: "/accesos", name: "Menú de Accesos", label: "Accesos", icon: faLock },
+    { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
+    { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
+    { to: "/Registro-de-pacientes", name: "Registro de Pacientes", label: "Ocupacional", icon: faNotesMedical },
+  ].filter(navLink => listView.includes(navLink.name));
 
   const Logoutbutton = () => {
     return (
