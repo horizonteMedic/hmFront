@@ -1,13 +1,16 @@
 import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
-import AnalisisClinicosB_Digitalizado from '../../../../../jaspers/AnalisisClinicosB_Digitalizado';
+import AnalisisClinicosB_Digitalizado from '../../../../../../jaspers/AnalisisClinicosB_Digitalizado';
 import Swal from 'sweetalert2';
+import { VerifyTR } from '../ControllerE/ControllerE';
 
 const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [form, setForm] = useState({
-    nroFicha: '',
-    fecha: '',
+    norden: '',
+    fecha: today,
     nombres: '',
     edad: '',
     prueba: 'ÁCIDO ÚRICO SÉRICO',
@@ -25,8 +28,8 @@ const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
 
   const handleLimpiar = () => {
     setForm({
-      nroFicha: '',
-      fecha: '',
+      norden: '',
+      fecha: today,
       nombres: '',
       edad: '',
       prueba: 'ÁCIDO ÚRICO SÉRICO',
@@ -44,7 +47,7 @@ const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
   const handleImprimir = () => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Bioquímica?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.nroFicha}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.norden}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir',
@@ -57,7 +60,7 @@ const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
     }).then((result) => {
       if (result.isConfirmed) {
         AnalisisClinicosB_Digitalizado({
-          n_orden: form.nroFicha,
+          norden: form.norden,
           nombre: form.nombres,
           edad: form.edad,
           fecha: form.fecha,
@@ -78,7 +81,8 @@ const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input name="nroFicha" value={form.nroFicha} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1" />
+            <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1"
+            onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'ac_bioquimica2022',token,setForm,selectedSede)}} />
             <button type="button" className="ml-2 bg-gray-200 px-3 py-1 rounded border border-gray-300 flex items-center gap-1"><FontAwesomeIcon icon={faEdit} /> Editar</button>
           </div>
           <div className="flex-1 flex gap-2 items-center">

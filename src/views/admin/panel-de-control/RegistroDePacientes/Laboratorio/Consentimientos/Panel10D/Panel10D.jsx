@@ -1,19 +1,28 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
-  { label: 'CONSUME MARIHUANA' },
-  { label: 'CONSUMO HOJA DE COCA EN LOS 7 DIAS PREVIOS' },
-  { label: 'CONSUME COCAINA' },
-  { label: 'CONSUME EXTASIS' },
+  { label: 'CONSUME MARIHUANA (THC)' },
+  { label: 'CONSUME COCAINA (COC)' },
+  { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' },
+  { label: 'CONSUME ANFETAMINAS (AMP)' },
+  { label: 'CONSUME METHANFETAMINAS (MET)' },
+  { label: 'CONSUME BENZODIAZEPINAS (BZO)' },
+  { label: 'CONSUME OPIÁCEOS (OPI)' },
+  { label: 'CONSUME BARBITÚRICOS (BAR)' },
+  { label: 'CONSUME METADONA (MTD)' },
+  { label: 'CONSUME FENCICLIDINA (PCP)' },
+  { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)' },
 ];
 
-const Panel3D = () => {
+const Panel10D = ({token,selectedSede}) => {
+  const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({
-    nroOrden: '',
-    fecha: '',
-    nombre: '',
+    norden: '',
+    fecha: today,
+    nombres: '',
     edad: '',
     dni: '',
     antecedentes: Array(antecedentesList.length).fill('NO'),
@@ -33,15 +42,16 @@ const Panel3D = () => {
 
   const handleLimpiar = () => {
     setForm({
-      nroOrden: '',
-      fecha: '',
-      nombre: '',
+      norden: '',
+      fecha: today,
+      nombres: '',
       edad: '',
       dni: '',
-      antecedentes: Array(antecedentesList.length).fill('NO'),
+      antecedentes: Array(antecedentesList?.length).fill('NO'),
     });
   };
 
+  // Forzar apertura del calendario al hacer focus
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
   };
@@ -51,7 +61,8 @@ const Panel3D = () => {
       <div className="flex flex-wrap items-center gap-6 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
-          <input name="nroOrden" value={form.nroOrden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base" />
+          <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
+          onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'con_panel10D',token,setForm,selectedSede)}} />
         </div>
         <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
           <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
@@ -71,28 +82,29 @@ const Panel3D = () => {
       </div>
 
       <div className="text-center font-bold text-xl mb-4">
-        CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA, COCAINA Y EXTASIS.
+        CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS<br />
+        PANEL 10 D (AMP-BAR-BZO-COC-MET-MTP-PCP-THC-OPI-TCA)
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-4 justify-center text-base">
-        <span>YO,</span>
-        <input name="nombre" value={form.nombre} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
-        <span>de,</span>
+      <div className="flex flex-wrap items-center gap-2 mb-4 justify-start text-base">
+        <span>Yo</span>
+        <input name="nombres" value={form.nombres} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
+        <span>, de</span>
         <input name="edad" value={form.edad} readOnly className="border-b border-gray-400 px-3 py-2 w-20 text-base bg-gray-100 cursor-not-allowed" />
-        <span>años de edad, identificado con DNI nº</span>
+        <span>años de edad, identificado con DNI N°</span>
         <input name="dni" value={form.dni} readOnly className="border-b border-gray-400 px-3 py-2 w-40 text-base bg-gray-100 cursor-not-allowed" />
       </div>
 
       <div className="text-justify text-base mb-4">
-        ; habiendo recibido consejería e información acerca de la prueba para Marihuana, cocaína y extasis en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post – Test y mis resultados.
+        , habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post -Test y mis resultados.
       </div>
 
-      <div className="font-semibold mb-2 text-lg">ANTECEDENTES :</div>
-      <div className="flex flex-wrap gap-8 mb-8">
+      <div className="font-semibold mb-2 text-lg">ANTECEDENTES</div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-8">
         {antecedentesList.map((item, idx) => (
-          <div key={item.label} className="flex items-center gap-4">
-            <label className="text-base font-medium">{item.label}</label>
-            <div className="flex items-center gap-3 ml-2">
+          <div key={item.label} className="flex items-center gap-6">
+            <label className="text-base font-medium flex-1 whitespace-nowrap">{item.label}</label>
+            <div className="flex items-center gap-4 ml-2">
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
@@ -135,4 +147,4 @@ const Panel3D = () => {
   );
 };
 
-export default Panel3D; 
+export default Panel10D; 

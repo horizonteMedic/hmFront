@@ -1,16 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
   { label: 'CONSUME MARIHUANA' },
+  { label: 'CONSUMO HOJA DE COCA EN LOS 7 DIAS PREVIOS' },
+  { label: 'CONSUME COCAINA' },
+  { label: 'CONSUME EXTASIS' },
 ];
 
-const ConsMarihuana = () => {
+const Panel3D = ({token, selectedSede}) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [form, setForm] = useState({
-    nroOrden: '',
-    fecha: '',
-    nombre: '',
+    norden: '',
+    fecha: today,
+    nombres: '',
     edad: '',
     dni: '',
     antecedentes: Array(antecedentesList.length).fill('NO'),
@@ -30,9 +36,9 @@ const ConsMarihuana = () => {
 
   const handleLimpiar = () => {
     setForm({
-      nroOrden: '',
-      fecha: '',
-      nombre: '',
+      norden: '',
+      fecha: today,
+      nombres: '',
       edad: '',
       dni: '',
       antecedentes: Array(antecedentesList.length).fill('NO'),
@@ -48,7 +54,8 @@ const ConsMarihuana = () => {
       <div className="flex flex-wrap items-center gap-6 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
-          <input name="nroOrden" value={form.nroOrden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base" />
+          <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
+          onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'con_panel3D',token,setForm,selectedSede)}} />
         </div>
         <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
           <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
@@ -68,12 +75,12 @@ const ConsMarihuana = () => {
       </div>
 
       <div className="text-center font-bold text-xl mb-4">
-        CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA
+        CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA, COCAINA Y EXTASIS.
       </div>
 
       <div className="flex flex-wrap items-center gap-2 mb-4 justify-center text-base">
         <span>YO,</span>
-        <input name="nombre" value={form.nombre} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
+        <input name="nombres" value={form.nombres} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
         <span>de,</span>
         <input name="edad" value={form.edad} readOnly className="border-b border-gray-400 px-3 py-2 w-20 text-base bg-gray-100 cursor-not-allowed" />
         <span>años de edad, identificado con DNI nº</span>
@@ -81,7 +88,7 @@ const ConsMarihuana = () => {
       </div>
 
       <div className="text-justify text-base mb-4">
-        ; habiendo recibido consejería e información acerca de la prueba para Marihuana en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post – Test y mis resultados.
+        ; habiendo recibido consejería e información acerca de la prueba para Marihuana, cocaína y extasis en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post – Test y mis resultados.
       </div>
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES :</div>
@@ -132,4 +139,4 @@ const ConsMarihuana = () => {
   );
 };
 
-export default ConsMarihuana; 
+export default Panel3D; 

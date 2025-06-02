@@ -1,45 +1,56 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
-import parasitologia from '../../../../../jaspers/parasitologia';
+import inmunologia1 from '../../../../../../jaspers/inmunologia1';
 import Swal from 'sweetalert2';
+import { VerifyTR } from '../ControllerE/ControllerE';
 
-const Parasitologia = () => {
+const pruebasList = [
+  { label: 'TIFICO O' },
+  { label: 'TIFICO H' },
+  { label: 'PARATIFICO A' },
+  { label: 'PARATIFICO B' },
+  { label: 'Brucella abortus' },
+];
+
+const Inmunologia = ({token,selectedSede}) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [form, setForm] = useState({
-    nroFicha: '',
-    fecha: '',
+    norden: '',
+    fecha: today,
     nombres: '',
     edad: '',
-    muestras: [
-      { color: '', aspecto: '', lugol: '' },
-      { color: '', aspecto: '', lugol: '' },
-      { color: '', aspecto: '', lugol: '' },
-    ],
+    resultados: Array(pruebasList.length).fill('1/40'),
+    hepatitis: false,
+    hepatitisA: '',
   });
 
   const fechaRef = useRef(null);
 
   const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setForm({
+      ...form,
+      [name]: type === 'checkbox' ? checked : value,
+    });
   };
 
-  const handleMuestraChange = (idx, field, value) => {
-    const updated = [...form.muestras];
-    updated[idx][field] = value;
-    setForm({ ...form, muestras: updated });
+  const handleResultadoChange = (idx, value) => {
+    const updated = [...form.resultados];
+    updated[idx] = value;
+    setForm({ ...form, resultados: updated });
   };
 
   const handleLimpiar = () => {
     setForm({
-      nroFicha: '',
-      fecha: '',
+      norden: '',
+      fecha: today,
       nombres: '',
       edad: '',
-      muestras: [
-        { color: '', aspecto: '', lugol: '' },
-        { color: '', aspecto: '', lugol: '' },
-        { color: '', aspecto: '', lugol: '' },
-      ],
+      resultados: Array(pruebasList.length).fill('1/40'),
+      hepatitis: false,
+      hepatitisA: '',
     });
   };
 
@@ -49,8 +60,8 @@ const Parasitologia = () => {
 
   const handleImprimir = () => {
     Swal.fire({
-      title: '¿Desea Imprimir Hoja de Parasitología?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.nroFicha}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      title: '¿Desea Imprimir Hoja de Inmunología?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.norden}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir',
@@ -62,12 +73,15 @@ const Parasitologia = () => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        parasitologia({
-          n_orden: form.nroFicha,
+        inmunologia1({
+          n_orden: form.norden,
           nombre: form.nombres,
           edad: form.edad,
           fecha: form.fecha,
-          muestras: form.muestras
+          cbomarca: 'COVID-19',
+          chkinvalido: 'NEGATIVO',
+          txtvrigm: 'NEGATIVO',
+          txtvrigg: 'NEGATIVO'
         });
       }
     });
@@ -75,16 +89,17 @@ const Parasitologia = () => {
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">Parasitología</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Inmunología</h2>
       <form className="space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
             <input 
-              name="nroFicha" 
-              value={form.nroFicha} 
+              name="norden" 
+              value={form.norden} 
               onChange={handleInputChange} 
-              className="border rounded px-2 py-1 flex-1" 
+              className="border rounded px-2 py-1 flex-1"
+              onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'inmunologia',token,setForm,selectedSede)}} 
             />
             <button type="button" className="ml-2 bg-gray-200 px-3 py-1 rounded border border-gray-300 flex items-center gap-1">
               <FontAwesomeIcon icon={faEdit} /> Editar
@@ -126,36 +141,42 @@ const Parasitologia = () => {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-8 mb-8 justify-center">
-          {[0, 1, 2].map(idx => (
-            <div key={idx} className="bg-gray-50 border rounded p-4 min-w-[220px] flex-1">
-              <div className="font-bold text-base mb-2 text-center">MUESTRA {idx + 1}</div>
-              <div className="mb-2">
-                <label className="block text-base">COLOR</label>
-                <input
-                  className="border rounded px-2 py-1 w-full text-base"
-                  value={form.muestras[idx].color}
-                  onChange={e => handleMuestraChange(idx, 'color', e.target.value)}
-                />
-              </div>
-              <div className="mb-2">
-                <label className="block text-base">ASPECTO</label>
-                <input
-                  className="border rounded px-2 py-1 w-full text-base"
-                  value={form.muestras[idx].aspecto}
-                  onChange={e => handleMuestraChange(idx, 'aspecto', e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-base">LUGOL</label>
-                <input
-                  className="border rounded px-2 py-1 w-full text-base"
-                  value={form.muestras[idx].lugol}
-                  onChange={e => handleMuestraChange(idx, 'lugol', e.target.value)}
-                />
-              </div>
-            </div>
+        <div className="font-bold text-base text-center mb-2">MÉTODO EN LÁMINA PORTAOBJETO</div>
+
+        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-4">
+          <div className="font-bold text-base">PRUEBAS</div>
+          <div className="font-bold text-base">RESULTADOS</div>
+          {pruebasList.map((item, idx) => (
+            <React.Fragment key={item.label}>
+              <div className="flex items-center text-base">{item.label}</div>
+              <input
+                className="border rounded px-2 py-1 w-40 text-base"
+                value={form.resultados[idx]}
+                onChange={e => handleResultadoChange(idx, e.target.value)}
+              />
+            </React.Fragment>
           ))}
+        </div>
+
+        <div className="flex items-center gap-2 mb-4">
+          <input 
+            type="checkbox" 
+            name="hepatitis" 
+            checked={form.hepatitis} 
+            onChange={handleInputChange} 
+          />
+          <label className="text-base font-semibold">PRUEBA HEPATITIS</label>
+          {form.hepatitis && (
+            <>
+              <span className="ml-4 text-base">Prueba Rápida HEPATITIS A</span>
+              <input
+                className="border rounded px-2 py-1 w-56 text-base ml-2"
+                name="hepatitisA"
+                value={form.hepatitisA}
+                onChange={handleInputChange}
+              />
+            </>
+          )}
         </div>
 
         <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
@@ -171,7 +192,11 @@ const Parasitologia = () => {
             <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
             <div className="flex gap-1 mt-1">
               <input className="border rounded px-2 py-1 w-24" />
-              <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300 hover:bg-gray-300" onClick={handleImprimir}>
+              <button 
+                type="button" 
+                className="bg-gray-200 px-2 py-1 rounded border border-gray-300 hover:bg-gray-300"
+                onClick={handleImprimir}
+              >
                 <FontAwesomeIcon icon={faPrint} />
               </button>
             </div>
@@ -182,4 +207,4 @@ const Parasitologia = () => {
   );
 };
 
-export default Parasitologia; 
+export default Inmunologia; 

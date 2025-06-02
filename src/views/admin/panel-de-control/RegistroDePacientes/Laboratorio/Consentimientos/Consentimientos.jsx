@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loading } from '../../../../components/Loading';
+import { Loading } from '../../../../../components/Loading';
 import Panel10D from './Panel10D/Panel10D';
 import Panel5D from './Panel5D/Panel5D';
 import Panel3D from './Panel3D/Panel3D';
@@ -8,19 +8,20 @@ import MuestraDeSangre from './MuestraDeSangre/MuestraDeSangre';
 import ConsMarihuana from './ConsMarihuana/ConsMarihuana';
 import Boro from './Boro/Boro';
 
-const tabs = [
-  { label: 'Panel 10D', component: <Panel10D /> },
-  { label: 'Panel 5D', component: <Panel5D /> },
-  { label: 'Panel 3D', component: <Panel3D /> },
-  { label: 'Panel 2D', component: <Panel2D /> },
-  { label: 'MUESTRA DE SANGRE', component: <MuestraDeSangre /> },
-  { label: 'CONS. MARIHUANA', component: <ConsMarihuana /> },
-  { label: 'BORO', component: <Boro /> },
-];
 
 const Consentimientos = ({ token, selectedSede }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
+
+  const tabs = [
+    { label: 'Panel 10D', component: <Panel10D token={token} selectedSede={selectedSede} /> },
+    { label: 'Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} /> },
+    { label: 'Panel 3D', component: <Panel3D token={token} selectedSede={selectedSede} /> },
+    { label: 'Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} /> },
+    { label: 'MUESTRA DE SANGRE', component: <MuestraDeSangre token={token} selectedSede={selectedSede} /> },
+    { label: 'CONS. MARIHUANA', component: <ConsMarihuana token={token} selectedSede={selectedSede} /> },
+    { label: 'BORO', component: <Boro token={token} selectedSede={selectedSede} /> },
+  ];
 
   return (
     <div className="w-full">

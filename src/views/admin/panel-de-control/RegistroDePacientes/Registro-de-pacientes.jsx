@@ -6,9 +6,9 @@ import ImportacionModalBasica from './ImportacionModalBasica';
 import ReservaPacientes from './ReservaPacientes';
 import ConsentimientoDigitalizacion from './ConsentimientoDigitalizacion/ConsentimientoDigitalizacion';
 import Triaje from './Triaje/Triaje';
-import Consentimientos from './Consentimientos/Consentimientos';
+import Consentimientos from './Laboratorio/Consentimientos/Consentimientos';
 import Resultados from './Resultados/Resultados';
-import ExamenesLaboratorio from './ExamenesLaboratorio/ExamenesLaboratorio';
+import ExamenesLaboratorio from './Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio';
 import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
   ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth, ComboboxProfesión,
   ComboboxDepartamentos,
@@ -420,8 +420,8 @@ const TabComponent = () => {
                 </button>
               </div>
               <div>
-                {labTab === 0 && <ExamenesLaboratorio />}
-                {labTab === 1 && <Consentimientos />}
+                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={"T-NP"} />}
+                {labTab === 1 && <Consentimientos token={token} selectedSede={"T-NP"} />}
               </div>
             </div>
           )}

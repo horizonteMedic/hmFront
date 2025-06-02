@@ -131,7 +131,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
       Swal.close();
     });
   };
-
+  console.log(date)
   return (
     <div className="max-w mx-auto bg-white rounded-xl shadow-lg p-8">
       <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">

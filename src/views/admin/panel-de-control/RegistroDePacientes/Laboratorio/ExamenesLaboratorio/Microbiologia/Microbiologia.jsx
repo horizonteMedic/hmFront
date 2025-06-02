@@ -1,13 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
-import microbiologia from '../../../../../jaspers/microbiologia';
+import microbiologia from '../../../../../../jaspers/microbiologia';
 import Swal from 'sweetalert2';
+import { VerifyTR } from '../ControllerE/ControllerE';
 
-const Microbiologia = () => {
+const Microbiologia = ({token,selectedSede}) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [form, setForm] = useState({
-    nroFicha: '',
-    fecha: '',
+    norden: '',
+    fecha: today,
     nombres: '',
     edad: '',
     examenDirecto: false,
@@ -35,8 +38,8 @@ const Microbiologia = () => {
 
   const handleLimpiar = () => {
     setForm({
-      nroFicha: '',
-      fecha: '',
+      norden: '',
+      fecha: today,
       nombres: '',
       edad: '',
       examenDirecto: false,
@@ -88,10 +91,11 @@ const Microbiologia = () => {
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
             <input 
-              name="nroFicha" 
-              value={form.nroFicha} 
+              name="norden" 
+              value={form.norden} 
               onChange={handleInputChange} 
               className="border rounded px-2 py-1 flex-1" 
+              onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'microbiologia',token,setForm,selectedSede)}}
             />
             <button type="button" className="ml-2 bg-gray-200 px-3 py-1 rounded border border-gray-300 flex items-center gap-1">
               <FontAwesomeIcon icon={faEdit} /> Editar

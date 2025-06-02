@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import Consentimiento_Boro_Digitalizado from '../../../../../jaspers/Consentimiento_Boro_Digitalizado';
+import Consentimiento_Boro_Digitalizado from '../../../../../../jaspers/Consentimiento_Boro_Digitalizado';
 import Swal from 'sweetalert2';
+import { VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
   { label: 'CONSUME COCAINA' },
@@ -18,11 +19,13 @@ const preguntasAdicionales = [
   { label: '', field: 'tratamiento_donde', tipo: 'text', especifica: 'Especifique dónde:' },
 ];
 
-const Boro = () => {
+const Boro = ({token,selectedSede}) => {
+  const today = new Date().toISOString().split("T")[0];
+
   const [form, setForm] = useState({
-    nroOrden: '',
-    fecha: '',
-    nombre: '',
+    norden: '',
+    fecha: today,
+    nombres: '',
     edad: '',
     dni: '',
     antecedentes: Array(antecedentesList.length).fill('NO'),
@@ -51,9 +54,9 @@ const Boro = () => {
 
   const handleLimpiar = () => {
     setForm({
-      nroOrden: '',
-      fecha: '',
-      nombre: '',
+      norden: '',
+      fecha: today,
+      nombres: '',
       edad: '',
       dni: '',
       antecedentes: Array(antecedentesList.length).fill('NO'),
@@ -70,7 +73,7 @@ const Boro = () => {
 
   const handlePrint = () => {
     const datos = {
-      nombre: form.nombre,
+      nombres: form.nombres,
       edad: form.edad,
       dni: form.dni,
       fecha: form.fecha,
@@ -90,7 +93,7 @@ const Boro = () => {
     };
     Swal.fire({
       title: '¿Desea Imprimir Consentimiento Boro?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>${form.nombre}</b> - DNI <b>${form.dni}</b></div>`,
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>${form.nombres}</b> - DNI <b>${form.dni}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir',
@@ -112,7 +115,8 @@ const Boro = () => {
       <div className="flex flex-wrap items-center gap-6 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
-          <input name="nroOrden" value={form.nroOrden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base" />
+          <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
+          onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'consent_Boro',token,setForm,selectedSede)}} />
         </div>
         <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
           <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
@@ -137,7 +141,7 @@ const Boro = () => {
 
       <div className="flex flex-wrap items-center gap-2 mb-4 justify-center text-base">
         <span>Yo</span>
-        <input name="nombre" value={form.nombre} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
+        <input name="nombres" value={form.nombres} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
         <span>de</span>
         <input name="edad" value={form.edad} readOnly className="border-b border-gray-400 px-3 py-2 w-20 text-base bg-gray-100 cursor-not-allowed" />
         <span>años de edad, con documento de identidad N°</span>
