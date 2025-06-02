@@ -130,7 +130,7 @@ const ModalRolesAsignados = ({ closeModal, data, id,userlogued,token, Nombre }) 
           onClick={closeModal}
         />
         <div className="p azuloscurobackground flex justify-between p-3.5">
-          <h1 className="text-start font-bold color-azul text-white">Asignar Roles a: {Nombre}</h1>
+          <h1 className="text-start font-bold color-azul text-white">Asignar Roles: {Nombre}</h1>
         </div>
         <div className='container p-4'>
           <div className="mb-4">
