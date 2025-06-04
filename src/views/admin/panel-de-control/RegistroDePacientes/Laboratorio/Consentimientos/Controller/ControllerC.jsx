@@ -1,5 +1,21 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch";
+import { GetInfoLaboratioEx } from "./model";
+
+const backendToLabelMap = {
+  antConsumeMarih: "CONSUME MARIHUANA (THC)",
+  antConsumeCocacina: "CONSUME COCAINA (COC)",
+  antConsumeHojaCoca: "CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS",
+  antConsumeAnfetamina: "CONSUME ANFETAMINAS (AMP)",
+  antConsumeMethanfetamina: "CONSUME METHANFETAMINAS (MET)",
+  antConsumeBenzodiacepinas: "CONSUME BENZODIAZEPINAS (BZO)",
+  antConsumeOpiacesos: "CONSUME OPIÁCEOS (OPI)",
+  antConsumeBarbituricos: "CONSUME BARBITÚRICOS (BAR)",
+  antConsumeMetadona: "CONSUME METADONA (MTD)",
+  antConsumeFenciclidina: "CONSUME FENCICLIDINA (PCP)",
+  antConsumeAntidepreTricicli: "CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)"
+};
+
 const Loading = (text) => {
     Swal.fire({
       title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -41,7 +57,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            console.log('aun no xd')
+            GetInfoPacLaboratorioFil(nro,tabla,set,token)
         }
     })
 }
@@ -49,8 +65,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
 export const GetInfoPac = (nro,set,token,sede) => {
     getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,token)
     .then((res) => {
-                console.log('pros',res)
-
+        console.log('pros',res)
         set(prev => ({
         ...prev,
         ...res,
@@ -60,4 +75,34 @@ export const GetInfoPac = (nro,set,token,sede) => {
     .finally(() => {
       Swal.close()
     })
+}
+
+export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
+    getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`,token)
+    .then((res) => {
+      const antecedentesConvertidos = {};
+
+      for (const [key, label] of Object.entries(backendToLabelMap)) {
+        antecedentesConvertidos[label] = res.hasOwnProperty(key) ? res[key] : false;
+      }
+
+      set(prev => ({
+        ...prev,
+        ...res,
+        norden: res.nOrden,
+        fecha: res.fechaex,
+        antecedentes: antecedentesConvertidos
+      }));
+      })
+    .finally(() => {
+      Swal.close()
+    })
+}
+
+export const SubmitConsentimientoLab = (form, tabla, token, user) => {
+  console.log('as')
+  GetInfoLaboratioEx(form,tabla,token,user)
+  .then((res) => {
+    console.log(res)
+  })
 }

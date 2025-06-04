@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from '../Controller/ControllerC';
+import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
   { label: 'CONSUME MARIHUANA (THC)' },
@@ -17,15 +17,24 @@ const antecedentesList = [
   { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)' },
 ];
 
-const Panel10D = ({token,selectedSede}) => {
+const Panel10D = ({token,selectedSede,userlogued}) => {
   const today = new Date().toISOString().split("T")[0];
+
+  const createAntecedentesObject = () => {
+    const obj = {};
+    antecedentesList.forEach(({ label }) => {
+      obj[label] = false;
+    });
+    return obj;
+  };
+
   const [form, setForm] = useState({
     norden: '',
     fecha: today,
     nombres: '',
     edad: '',
     dni: '',
-    antecedentes: Array(antecedentesList.length).fill('NO'),
+    antecedentes: createAntecedentesObject(),
   });
 
   const fechaRef = useRef(null);
@@ -34,10 +43,14 @@ const Panel10D = ({token,selectedSede}) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAntecedenteChange = (idx, value) => {
-    const updated = [...form.antecedentes];
-    updated[idx] = value;
-    setForm({ ...form, antecedentes: updated });
+  const handleAntecedenteChange = (label, value) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: {
+        ...prev.antecedentes,
+        [label]: value,
+      }
+    }));
   };
 
   const handleLimpiar = () => {
@@ -55,7 +68,7 @@ const Panel10D = ({token,selectedSede}) => {
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
   };
-
+  console.log(form.fecha)
   return (
     <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
       <div className="flex flex-wrap items-center gap-6 mb-6">
@@ -64,9 +77,6 @@ const Panel10D = ({token,selectedSede}) => {
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
           onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'con_panel10D',token,setForm,selectedSede)}} />
         </div>
-        <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
-          <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
-        </button>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Fecha :</label>
           <input
@@ -101,25 +111,25 @@ const Panel10D = ({token,selectedSede}) => {
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-8">
-        {antecedentesList.map((item, idx) => (
-          <div key={item.label} className="flex items-center gap-6">
-            <label className="text-base font-medium flex-1 whitespace-nowrap">{item.label}</label>
+        {antecedentesList.map(({ label }) => (
+          <div key={label} className="flex items-center gap-6">
+            <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
             <div className="flex items-center gap-4 ml-2">
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
-                  name={`antecedente_${idx}`}
-                  checked={form.antecedentes[idx] === 'NO'}
-                  onChange={() => handleAntecedenteChange(idx, 'NO')}
+                  name={`antecedente_${label}`}
+                  checked={form.antecedentes[label] === false}
+                  onChange={() => handleAntecedenteChange(label, false)}
                 />
                 NO
               </label>
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
-                  name={`antecedente_${idx}`}
-                  checked={form.antecedentes[idx] === 'SI'}
-                  onChange={() => handleAntecedenteChange(idx, 'SI')}
+                  name={`antecedente_${label}`}
+                  checked={form.antecedentes[label] === true}
+                  onChange={() => handleAntecedenteChange(label, true)}
                 />
                 SI
               </label>
@@ -129,7 +139,7 @@ const Panel10D = ({token,selectedSede}) => {
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
+        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel10D",token, userlogued)})} className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
           <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
         </button>
         <button type="button" className="bg-yellow-400 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-yellow-500" onClick={handleLimpiar}>

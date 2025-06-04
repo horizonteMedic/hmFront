@@ -71,7 +71,7 @@ const TabComponent = () => {
   const AccesExcelBasico = Acceso.includes(656);
   const AccesExcelCompleto = Acceso.includes(657);
   const AccesTriaje = Acceso.includes("AccesoTriaje");
-  console.log('asas',Acceso.includes("AccesoRP"))
+  
   //COMBOBOX REGISTRO
   const Profesiones   = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();
@@ -407,8 +407,8 @@ const TabComponent = () => {
                 </button>
               </div>
               <div>
-                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={"T-NP"} />}
-                {labTab === 1 && <Consentimientos token={token} selectedSede={"T-NP"} />}
+                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={"T-NP"} userlogued={userlogued.sub} />}
+                {labTab === 1 && <Consentimientos token={token} selectedSede={"T-NP"} userlogued={userlogued.sub} />}
               </div>
             </div>
           )}
