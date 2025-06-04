@@ -5,7 +5,7 @@ import { getFetch } from '../../getFetch/getFetch';
 import { ListViewxRol, NewVistaxRol, DeleteVistaxRol } from '../model/ListViewxRol';
 import Swal from 'sweetalert2';
 import ModalAsignacionesSub from './modalasiganacionessub';
-
+import { useAuthStore } from '../../../../../store/auth';
 const iconMapping = {
   'Sistema': faCogs,
   'Menú de Roles': faUser,
@@ -48,8 +48,9 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
   const [isChecked, setIsChecked] = useState(false);
   const [idAsignation, setIdAsignation] = useState('');
   const [showSubModal, setShowSubModal] = useState(false);
-  const [accionesSeleccionadas, setAccionesSeleccionadas] = useState([]);
-
+  const [ListPermis, setListPermis] = useState([])
+  const AccesUser =  useAuthStore((state) => state.listAccesos);
+  const [AccesUserCheck, SetAccesUserCheck] = useState({})
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
@@ -143,24 +144,20 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
     }
   };
 
-  const handleSubModalOpen = (e) => {
+  const handleSubModalOpen = async (e,id,nombre) => {
     e.stopPropagation();
+    console.log(nombre)
+    const Accesoscheck = AccesUser.find(item => item.nombre === nombre);
+    SetAccesUserCheck(Accesoscheck)
+    const res = await getFetch(`/api/v01/ct/posiblesPermisosSistema/listadoPermisosPorVista/${id}`,token)
+    setListPermis(res)
     setShowSubModal(true);
   };
 
   const handleSubModalClose = () => {
     setShowSubModal(false);
   };
-
-  const accionesEjemplo = ['Actualizar', 'Eliminar', 'Mostrar'];
-
-  const handleSeleccionAccion = (accion) => {
-    setAccionesSeleccionadas((prev) =>
-      prev.includes(accion)
-        ? prev.filter((a) => a !== accion)
-        : [...prev, accion]
-    );
-  };
+  
 
   return (
     <div className={`mt-2 mb-2 ${isParent ? '' : ''}`}>
@@ -172,7 +169,7 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
         <button
           className={`ml-1 ${isParent ? 'btn-azul text-white' : 'btn-naranja text-white'} hover:bg-blue-600 px-2 py-1 rounded`}
           style={{ backgroundColor: isParent ? '#233245 ' : '#fc6b03' }}
-          onClick={isParent ? undefined : handleSubModalOpen}
+          onClick={isParent ? undefined : ((e) => {handleSubModalOpen(e,node.id,node.label)})}
           type="button"
         >
           {iconMapping[node.label] && (
@@ -209,9 +206,12 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
           open={showSubModal}
           onClose={handleSubModalClose}
           nombre={node.label}
-          acciones={accionesEjemplo}
-          seleccionadas={accionesSeleccionadas}
-          onChangeSeleccion={handleSeleccionAccion}
+          get={getFetch}
+          IDView={node.id}
+          token={token}
+          ListPerm={ListPermis}
+          ListPermCheck={AccesUserCheck}
+          ID_ROL={ID_ROL}
         />
       )}
     </div>

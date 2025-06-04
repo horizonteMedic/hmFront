@@ -51,6 +51,7 @@ const AppContent = () => {
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView)
+  const setListAccesos = useAuthStore((state) => state.setlistAccesos)
   //VISTA DE API
   const [TotalView, setTotalView] = useState([]) 
   const location = useLocation();
@@ -64,6 +65,7 @@ const AppContent = () => {
       setToken(null);
       setuserlogued(null);
       setlistView([])
+      setListAccesos([])
     }
   },[token])
 

@@ -108,9 +108,13 @@ export function FormLogin() {
     const UserLogued = JSON.parse(decodedPayload);
     const TokenResponse = UserLogued["id_rolUser"];
     const IDROL = TokenResponse[0].idRol;
-    const ListaVista = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${IDROL}`,token)
-    const todosLosPermisos = ListaVista.flatMap(item => item.listaPermisos);
-    const todasLasVistas = ListaVista.flatMap(item => item.nombre);
+    const ListaVistaAccesos = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${IDROL}`,token)
+    const ListVistasxROL = await getFetch(`/api/v01/ct/opcionesInterfaz/vistasPorIdRol/${IDROL}`,token)
+    const todosLosPermisos = ListaVistaAccesos.map(item => ({
+      nombre: item.nombre,
+      listaPermisos: item.listaPermisos
+    }));
+    const todasLasVistas = ListVistasxROL.flatMap(item => item.nombre);
     setlistView(todasLasVistas);
     setlistAccesos(todosLosPermisos)
     setuserlogued(UserLogued);
