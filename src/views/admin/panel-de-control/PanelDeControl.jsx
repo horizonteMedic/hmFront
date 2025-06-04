@@ -29,7 +29,7 @@ const Dashboard = ({TotalView}) => {
     { to: "/reporte-pacientes", name: "Reportes", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", name: "Matriz Postulante", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", name: "Registro de Pacientes", icon: faNotesMedical, title: "Registro de Pacientes" }
+    { to: "/Registro-de-pacientes", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => listView.includes(card.name));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo

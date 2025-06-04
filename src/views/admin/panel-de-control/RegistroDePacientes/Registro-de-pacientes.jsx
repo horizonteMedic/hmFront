@@ -53,6 +53,7 @@ const TabComponent = () => {
   const [DNIG, setDNIG] = useState("")
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
+  const Vista = useAuthStore(state => state.listView)
   const Acceso = useAuthStore(state => state.listAccesos);
   const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
   const [tabLab, setTabLab] = useState(0);
@@ -62,12 +63,16 @@ const TabComponent = () => {
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
 
   // permisos
+  const ViewAdminision = Vista.includes("Admision")
+  const ViewTriaje = Vista.includes("Triaje")
+  const ViewLaboratorio = Vista.includes("Laboratorio")
   const AccessRegistroC = Acceso.includes("AccesoRP");
   const AccessHistoriaC = Acceso.includes("AccesoHC");
   const AccessCitas = Acceso.includes("AccesoReservaP");
   const AccesExcelBasico = Acceso.includes(656);
   const AccesExcelCompleto = Acceso.includes(657);
   const AccesTriaje = Acceso.includes("AccesoTriaje");
+  
   //COMBOBOX REGISTRO
   const Profesiones   = ComboboxProfesión();
   const Departamentos = ComboboxDepartamentos();
@@ -117,28 +122,25 @@ const TabComponent = () => {
     ListAuth
   };
 
-  const Acces = {
+  const AccesViews = {
+    ViewAdminision: ViewAdminision,
+    ViewTriaje: ViewTriaje,
+    ViewLaboratorio: ViewLaboratorio,
+    ATriaje: AccesTriaje
+  }
+  
+  const AccesAdmision = {
     Registro: AccessRegistroC,
     Historia: AccessHistoriaC,
     Citas: AccessCitas,
     ExcelB: AccesExcelBasico,
     ExcelC: AccesExcelCompleto,
-    Triaje: AccesTriaje
   };
 
-  const accesos = [
-    { icon: faUserCheck, label: 'Admisión' },
-    { icon: faStethoscope, label: 'Triaje' },
-    { icon: faVial, label: 'Laboratorio' },
-    { icon: faUserMd, label: 'Psicología' },
-    { icon: faUserMd, label: 'Medicina General' },
-    { icon: faXRay, label: 'Rayos X' },
-    { icon: faHeartbeat, label: 'EKG' },
-    { icon: faLungs, label: 'Espirometría' },
-    { icon: faDeaf, label: 'Audiometría' },
-    { icon: faTooth, label: 'Odontología' },
-    { icon: faEye, label: 'Oftalmología' },
-  ];
+  const tienePermisoEnVista = (nombreVista, permiso) => {
+    const vista = Acceso.find(item => item.nombre === nombreVista);
+    return vista?.listaPermisos.includes(permiso) ?? false;
+  };
 
   /*useEffect(() => {
     // inicializa la primera pestaña a la que el usuario tiene acceso
@@ -168,29 +170,6 @@ const TabComponent = () => {
   return (
     <div className="mx-auto  overflow-hidden w-[100%] relative ">
    
-        
-        {/* <div className="flex items-center">
-          {Acces.ExcelB && (
-            <button className="verde-btn px-4 rounded flex items-center mr-4 sm:mr-2" onClick={openCompleteModal}>
-              <FontAwesomeIcon icon={faFileExcel} className="mr-2 px-1 py-2" />
-              Excel Básico
-            </button>
-          )}
-          {Acces.ExcelC && (
-            <button className="verde-btn px-4 rounded flex items-center mr-4 sm:mr-2" onClick={openModal}>
-              <FontAwesomeIcon icon={faFileExcel} className="mr-2 px-1 py-2" />
-              Excel Completo
-            </button>
-          )}
-          <button
-            className="naranja-btn px-4 rounded flex items-center hidden sm:flex"
-            onClick={toggleFullScreen}
-          >
-            <FontAwesomeIcon icon={faExpand} className="mr-2 px-1 py-2" />
-            Expandir
-          </button>
-        </div> */}
-
       <div className="bg-white rounded-lg overflow-hidden shadow-md relative p-8">
            {/* Select de Sedes y accesos tipo dashboard */}
       {activeTab === null && (
@@ -203,7 +182,9 @@ const TabComponent = () => {
               <option value="sede3">Sede 3</option>
             </select>
           </div>
+          {/*Acces VIEWS */}
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-6 mt-10">
+            {AccesViews.ViewAdminision && (
             <div
               className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
               onClick={() => setActiveTab(0)}
@@ -213,7 +194,8 @@ const TabComponent = () => {
               </span>
               <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Admisión</span>
             </div>
-            {Acces.Triaje && ( 
+            )}
+            {AccesViews.ViewTriaje && ( 
             <div
               className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
               onClick={() => setActiveTab(1)}
@@ -224,6 +206,7 @@ const TabComponent = () => {
               <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Triaje</span>
             </div>
             )}
+            {AccesViews.ViewLaboratorio && (
             <div
               className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
               onClick={() => setActiveTab(2)}
@@ -233,6 +216,7 @@ const TabComponent = () => {
               </span>
               <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Laboratorio</span>
             </div>
+             )}
             <div className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group">
               <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
                 <FontAwesomeIcon icon={faUserMd} />
@@ -335,7 +319,7 @@ const TabComponent = () => {
               </div>
               <div>
                 <div className="flex border-b mb-6">
-                  {Acces.Registro && ( 
+                  {tienePermisoEnVista("Admision","AccesoRP") && ( 
                     <button
                     className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 border-b-4 border-[#1a2536] text-[#1a2536]`}
                     onClick={() => setSubTab(0)}
@@ -343,18 +327,21 @@ const TabComponent = () => {
                     Registro de Pacientes
                   </button>
                   )}
-                  <button
-                    className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 1 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
-                    onClick={() => setSubTab(1)}
-                  >
-                    Consentimiento Digitalización
-                  </button>
-                  {Acces.Historia && ( 
+                  
+                  {tienePermisoEnVista("Admision","AccesoHC") && ( 
                   <button
                     className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 2 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
                     onClick={() => setSubTab(2)}
                   >
                     Apertura Exámenes PreOcup
+                  </button>
+                  )}
+                  {tienePermisoEnVista("Admision","AccesoReservaP") && (
+                  <button
+                    className={`ml-4 px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 ${subTab === 1 ? 'border-b-4 border-[#1a2536] text-[#1a2536]' : 'text-gray-500'}`}
+                    onClick={() => setSubTab(1)}
+                  >
+                    Consentimiento Digitalización
                   </button>
                   )}
                 </div>
@@ -430,8 +417,8 @@ const TabComponent = () => {
                 </button>
               </div>
               <div>
-                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={"T-NP"} />}
-                {labTab === 1 && <Consentimientos token={token} selectedSede={"T-NP"} />}
+                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={"T-NP"} userlogued={userlogued.sub} />}
+                {labTab === 1 && <Consentimientos token={token} selectedSede={"T-NP"} userlogued={userlogued.sub} />}
               </div>
             </div>
           )}

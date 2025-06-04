@@ -47,7 +47,7 @@ import { useLocation,Outlet, Navigate} from "react-router-dom"
     '/administrar-contratas': "Administrar Contratas",
     '/protocolos': "Servicios",
     '/RegistroP': 602,
-    '/Registro-de-pacientes': "Registro de Pacientes"
+    '/Registro-de-pacientes': "Modulo Ocupacional"
   };
 
 export function ProtectedRoute() {

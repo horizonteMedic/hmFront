@@ -9,18 +9,18 @@ import ConsMarihuana from './ConsMarihuana/ConsMarihuana';
 import Boro from './Boro/Boro';
 
 
-const Consentimientos = ({ token, selectedSede }) => {
+const Consentimientos = ({ token, selectedSede, userlogued }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { label: 'Panel 10D', component: <Panel10D token={token} selectedSede={selectedSede} /> },
-    { label: 'Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} /> },
-    { label: 'Panel 3D', component: <Panel3D token={token} selectedSede={selectedSede} /> },
-    { label: 'Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} /> },
-    { label: 'MUESTRA DE SANGRE', component: <MuestraDeSangre token={token} selectedSede={selectedSede} /> },
-    { label: 'CONS. MARIHUANA', component: <ConsMarihuana token={token} selectedSede={selectedSede} /> },
-    { label: 'BORO', component: <Boro token={token} selectedSede={selectedSede} /> },
+    { label: 'Panel 10D', component: <Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 3D', component: <Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'MUESTRA DE SANGRE', component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'CONS. MARIHUANA', component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'BORO', component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
   ];
 
   return (
