@@ -141,7 +141,7 @@ export const handleNombreChange = (e,set,setTable,sede,token,debounceTimeout) =>
 
   };
 
-export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshtable,get,setH) => {
+export const handleSubmit = async (datos,edad,nro,fecha,Swal,token,setF,setT,refreshtable,get,setH) => {
     const camposRequeridos = ['talla', 'peso', 'cintura', 'cadera', 'temperatura', 'fCardiaca', 'sat02',
         'perimetroCuello', 'sistolica', 'diastolica', 'fRespiratoria']; // agrega los campos que quieras
     const camposVacios = camposRequeridos.filter(campo => !datos[campo]);
@@ -149,6 +149,40 @@ export const handleSubmit = (datos,edad,nro,fecha,Swal,token,setF,setT,refreshta
         const lista = camposVacios.join(', ');
         return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     } 
+    if (datos.talla < 1.30 || datos.talla > 2.80){ 
+      await Swal.fire('Error','No se permite este dato en Talla','error') 
+      return}
+    if (datos.peso < 40 || datos.peso > 150){ 
+      await Swal.fire('Error','No se permite este dato en Peso','error') 
+      return}
+    if (datos.cintura < 45 || datos.cintura > 180){ 
+      await Swal.fire('Error','No se permite este dato en Cintura','error') 
+      return}
+    if (datos.cadera < 70 || datos.cadera > 180){ 
+      await Swal.fire('Error','No se permite este dato en Cadera','error') 
+      return}
+    if (datos.temperatura < 35 || datos.temperatura > 38){ 
+      await Swal.fire('Error','No se permite este dato en Termperatura','error') 
+      return}
+    if (datos.fCardiaca < 60 || datos.fCardiaca > 100){ 
+      await Swal.fire('Error','No se permite este dato en Frecuencia Cardiaca','error') 
+      return}
+    if (datos.sat02 < 92 || datos.sat02 > 100){ 
+      await Swal.fire('Error','No se permite este dato en Sat02','error') 
+      return}
+    if (datos.perimetroCuello < 30 || datos.perimetroCuello > 55){ 
+      await Swal.fire('Error','No se permite este dato en Perimetro Cuello','error') 
+      return}
+    if (datos.sistolica < 90){ 
+      await Swal.fire('Error','No se permite este dato en Sistolica','error') 
+      return}
+    if (datos.diastolica < 60){ 
+      await Swal.fire('Error','No se permite este dato en Diastolica','error') 
+      return}
+    if (datos.fRespiratoria < 12 || datos.fRespiratoria > 20){ 
+      await Swal.fire('Error','No se permite este dato en Frecuencia Respiratoria','error') 
+      return}
+    
     Swal.fire({
       title: 'Validando Datos',
       text: 'Espere por favor...',

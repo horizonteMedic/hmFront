@@ -161,6 +161,17 @@ export const GetCuello = async (event,triaje,set) => {
     }
 }
 
+export const GetSistolica = async (event,triaje,set) => {
+    if (event.key === 'Enter') {
+        if (triaje.sistolica < 90) {
+            set(d => ({ ...d, sistolica: '' }))
+            await Swal.fire('Error','No se permite este dato','error')
+            return
+        }
+        document.getElementById('diastolica')?.focus();
+    }
+}
+
 export const GetPA = async (event,triaje,set) => {
     if (!triaje.sistolica || !triaje.diastolica) {
         return
@@ -197,5 +208,16 @@ export const GetSat = async (event,triaje,set) => {
             return
         }
         document.getElementById('perimetroCuello')?.focus();
+    }
+}
+
+export const GetFRespira = async (event,triaje,set) => {
+    if (event.key === 'Enter') {
+        if (triaje.fRespiratoria < 12 || triaje.fRespiratoria > 20) {
+            set(d => ({ ...d, fRespiratoria: '' }))
+            await Swal.fire('Error','No se permite este dato','error')
+            return
+        }
+        document.getElementById('registrarTR')?.focus();
     }
 }
