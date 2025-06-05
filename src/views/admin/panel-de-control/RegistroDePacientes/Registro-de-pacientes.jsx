@@ -9,6 +9,7 @@ import Triaje from './Triaje/Triaje';
 import Consentimientos from './Laboratorio/Consentimientos/Consentimientos';
 import Resultados from './Resultados/Resultados';
 import ExamenesLaboratorio from './Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio';
+import ParasitologiaCoprologico from './Parasitologia/ParasitologiaCoprologico';
 import { ComboboxEmpresasMulti, ComboboxContratasMulti, ComboboxMedicosMulti, ComboboxPruebaMulti, ComboboxCargoMulti, ComboboxAreaMulti,
   ComboboxExamenMMulti, ComboboxExplotacionMulti, ComboboxMineralMulti, ComboboxAlturaMulti, ComboboxPrecioExamenMulti, ComboboxFormaPago, ComboboxListAuth, ComboboxProfesión,
   ComboboxDepartamentos,
@@ -264,6 +265,15 @@ const TabComponent = () => {
               </span>
               <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Oftalmología</span>
             </div>
+            <div
+              className="flex items-center bg-gray-100 hover:bg-[#1a2536] shadow-md rounded-xl px-4 py-7 min-w-[180px] transition-all duration-200 cursor-pointer group"
+              onClick={() => setActiveTab(3)}
+            >
+              <span className="text-orange-500 text-3xl mr-4 group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={faClipboardList} />
+              </span>
+              <span className="font-bold text-xl text-gray-900 group-hover:text-white transition-all duration-200">Coproparasitológico</span>
+            </div>
           </div>
         </>
       )}
@@ -412,6 +422,25 @@ const TabComponent = () => {
               </div>
             </div>
           )}
+          {activeTab === 3 && (
+            <div className="mt-10 bg-white rounded-lg shadow-md p-6">
+              <div className="flex border-b mb-6">
+                <button
+                  className={`px-6 py-2 font-bold text-lg focus:outline-none transition-colors duration-200 border-b-4 border-[#1a2536] text-[#1a2536]`}
+                >
+                  Coproparasitológico
+                </button>
+                <button
+                  className="ml-auto text-gray-400 hover:text-red-500 px-2"
+                  onClick={() => setActiveTab(null)}
+                  title="Cerrar"
+                >
+                  ×
+                </button>
+              </div>
+              <ParasitologiaCoprologico />
+            </div>
+          )}
         </div>
       </div>
 
@@ -437,6 +466,8 @@ const TabComponent = () => {
             setActiveTab(1);
           } else if (idx === 2) {
             setActiveTab(2);
+          } else if (idx === 3) {
+            setActiveTab(3);
           }
         }}
         activeIndex={activeTab}
