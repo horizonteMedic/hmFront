@@ -19,7 +19,7 @@ export default function ConsentimientoDosajeMarihuana(datos) {
 
   // Cuerpo del consentimiento
   y += 10;
-  let texto = `Yo......................................................................................., de ....... años de\nedad, identificado con DNI nº ......................... ............................; habiendo recibido consejería e información\nacerca de la prueba para Marihuana en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
+  let texto = `Yo......................................................................................., de ....... años de\nedad, identificado con DNI nº ...${datos.dni}.; habiendo recibido consejería e información\nacerca de la prueba para Marihuana en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
 
   texto = texto
     .replace('.......................................................................................', datos.nombres || '_________________________')
@@ -46,9 +46,9 @@ export default function ConsentimientoDosajeMarihuana(datos) {
   doc.setFont(undefined, 'normal');
   doc.text('CONSUME MARIHUANA', 15, antY);
   doc.text(': NO (', 70, antY);
-  doc.text(`${datos.ant_marihuana_no || ''}`, 85, antY);
+  doc.text(`${!datos.antConsumeMarih ? "X" : "  " }`, 85, antY);
   doc.text(')   SI (', 95, antY);
-  doc.text(`${datos.ant_marihuana_si || ''}`, 110, antY);
+  doc.text(`${datos.antConsumeMarih ? "X" : "  "}`, 110, antY);
   doc.text(')', 120, antY);
 
   // Recuadros de firmas y huella

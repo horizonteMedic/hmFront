@@ -35,7 +35,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
   doc.setFontSize(11);
   doc.text("YO", margin, y);
   doc.setFont('helvetica', 'bold');
-  doc.text(`${datos.nombre || ''}`, margin + 11, y);
+  doc.text(`${datos.nombres || ''}`, margin + 11, y);
   doc.setFont('helvetica', 'normal');
   doc.text("de", margin + 70, y);
   doc.setFont('helvetica', 'bold');
@@ -108,7 +108,14 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
   ]);
   autoTable(doc, {
     startY: y,
-    body,
+    body: [
+      ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "" || ''})`, `SI (${datos.antConsumeMarih ? "X" : " " })`],
+      ['CONSUME COCAINA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "" || ''})`, `SI (${datos.antConsumeCocacina ? "X" : " " })`],
+      ['CONSUME HOJA DE COCA EN LOS 14 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "" || ''})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })`],
+      ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "" || ''})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
+      ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetamina ? "X" : "" || ''})`, `SI (${datos.antConsumeMethanfetamina ? "X" : " " })`],
+      ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "" || ''})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : " " })`],
+    ],
     theme: 'plain',
     styles: { fontSize: 9, textColor: [0, 0, 0], cellPadding: 2 },
     columnStyles: {

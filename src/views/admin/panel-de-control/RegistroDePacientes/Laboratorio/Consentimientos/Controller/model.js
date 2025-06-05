@@ -7,7 +7,7 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
         antConsumeMarih: data.antecedentes.hasOwnProperty("CONSUME MARIHUANA (THC)") ? data.antecedentes["CONSUME MARIHUANA (THC)"]: false,
         antConsumeCocacina: data.antecedentes.hasOwnProperty("CONSUME COCAINA (COC)") ? data.antecedentes["CONSUME COCAINA (COC)"]: false,
         antConsumeHojaCoca: data.antecedentes.hasOwnProperty("CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS") ? data.antecedentes["CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS"]: false,
-        antConsumeAnfetamina: data.antecedentes.hasOwnProperty("CONSUME ANFETAMINAS (AMP)") ? data.antecedentes["CONSUME ANFETAMINAS (AMP)"]: false,
+        antConsumeAnfetamina: data.antecedentes.hasOwnProperty("CONSUME ANFETAMINAS (AMP)")  ? data.antecedentes["CONSUME ANFETAMINAS (AMP)"]  : false,
         antConsumeMethanfetamina: data.antecedentes.hasOwnProperty("CONSUME METHANFETAMINAS (MET)") ? data.antecedentes["CONSUME METHANFETAMINAS (MET)"]: false,
         antConsumeBenzodiacepinas: data.antecedentes.hasOwnProperty("CONSUME BENZODIAZEPINAS (BZO)") ? data.antecedentes["CONSUME BENZODIAZEPINAS (BZO)"]: false,
         antConsumeOpiacesos: data.antecedentes.hasOwnProperty("CONSUME OPIÁCEOS (OPI)") ? data.antecedentes["CONSUME OPIÁCEOS (OPI)"]: false,

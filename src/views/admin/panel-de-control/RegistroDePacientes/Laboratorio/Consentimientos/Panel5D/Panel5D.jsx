@@ -3,19 +3,27 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import Consentimiento_Panel5D_ohla_Digitalizado from '../../../../../../jaspers/Consentimiento_Panel5D_ohla_Digitalizado';
 import Swal from 'sweetalert2';
-import { VerifyTR } from '../Controller/ControllerC';
+import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
-  { label: 'CONSUME MARIHUANA' },
-  { label: 'CONSUME COCAINA' },
+  { label: 'CONSUME MARIHUANA (THC)' },
+  { label: 'CONSUME COCAINA (COC)' },
   { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' },
-  { label: 'CONSUME ANFETAMINAS' },
-  { label: 'CONSUME METHANFETAMINAS' },
-  { label: 'CONSUME BENZODIAZEPINAS' },
+  { label: 'CONSUME ANFETAMINAS (AMP)' },
+  { label: 'CONSUME METHANFETAMINAS (MET)' },
+  { label: 'CONSUME BENZODIAZEPINAS (BZO)' },
 ];
 
-const Panel5D = ({token, selectedSede}) => {
+const Panel5D = ({token, selectedSede, userlogued}) => {
   const today = new Date().toISOString().split("T")[0];
+
+  const createAntecedentesObject = () => {
+    const obj = {};
+    antecedentesList.forEach(({ label }) => {
+      obj[label] = false;
+    });
+    return obj;
+  };
 
   const [form, setForm] = useState({
     norden: '',
@@ -23,7 +31,7 @@ const Panel5D = ({token, selectedSede}) => {
     nombres: '',
     edad: '',
     dni: '',
-    antecedentes: Array(antecedentesList.length).fill('NO'),
+    antecedentes: createAntecedentesObject(),
   });
 
   const fechaRef = useRef(null);
@@ -32,10 +40,14 @@ const Panel5D = ({token, selectedSede}) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAntecedenteChange = (idx, value) => {
-    const updated = [...form.antecedentes];
-    updated[idx] = value;
-    setForm({ ...form, antecedentes: updated });
+  const handleAntecedenteChange = (label, value) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: {
+        ...prev.antecedentes,
+        [label]: value,
+      }
+    }));
   };
 
   const handleLimpiar = () => {
@@ -93,7 +105,7 @@ const Panel5D = ({token, selectedSede}) => {
       }
     });
   };
-
+  console.log(form)
   return (
     <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
       <div className="flex flex-wrap items-center gap-6 mb-6">
@@ -140,25 +152,25 @@ const Panel5D = ({token, selectedSede}) => {
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES</div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-8">
-        {antecedentesList.map((item, idx) => (
-          <div key={item.label} className="flex items-center gap-6">
-            <label className="text-base font-medium flex-1 whitespace-nowrap">{item.label}</label>
+        {antecedentesList.map(({ label }) => (
+          <div key={label} className="flex items-center gap-6">
+            <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
             <div className="flex items-center gap-4 ml-2">
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
-                  name={`antecedente_${idx}`}
-                  checked={form.antecedentes[idx] === 'NO'}
-                  onChange={() => handleAntecedenteChange(idx, 'NO')}
+                  name={`antecedente_${label}`}
+                  checked={form.antecedentes[label] === false}
+                  onChange={() => handleAntecedenteChange(label, false)}
                 />
                 NO
               </label>
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
-                  name={`antecedente_${idx}`}
-                  checked={form.antecedentes[idx] === 'SI'}
-                  onChange={() => handleAntecedenteChange(idx, 'SI')}
+                  name={`antecedente_${label}`}
+                  checked={form.antecedentes[label] === true}
+                  onChange={() => handleAntecedenteChange(label, true)}
                 />
                 SI
               </label>
@@ -169,7 +181,7 @@ const Panel5D = ({token, selectedSede}) => {
 
       <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
         <div className="flex gap-3">
-          <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold">
+          <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel5D",token, userlogued)})} className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}>

@@ -31,14 +31,14 @@ const header = (doc, datos = {}) => {
   // 2. Nro Orden
   doc.text("Nro Orden :", pageW - margin - 60, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.n_orden || ''}`, pageW - margin - 10, y, { align: "right" });
+  doc.text(`${datos.n_orden || datos.norden || ''}`, pageW - margin - 10, y, { align: "right" });
   y += 8;
 
   // 3. Apellidos y Nombres
   doc.setFont("helvetica", "bold");
   doc.text("Apellidos y Nombres :", margin, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.nombre || ''}`, margin + 55, y);
+  doc.text(`${datos.nombre || datos.nombres || ''}`, margin + 55, y);
   y += 8;
 
   // 4. Edad

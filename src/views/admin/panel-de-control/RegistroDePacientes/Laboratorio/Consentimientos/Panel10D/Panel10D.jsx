@@ -60,7 +60,7 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
-      antecedentes: Array(antecedentesList?.length).fill('NO'),
+      antecedentes: createAntecedentesObject(),
     });
   };
 
@@ -68,7 +68,7 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
   };
-  console.log(form.fecha)
+  console.log(form)
   return (
     <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
       <div className="flex flex-wrap items-center gap-6 mb-6">

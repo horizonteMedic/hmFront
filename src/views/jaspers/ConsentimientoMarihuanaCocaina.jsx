@@ -19,7 +19,7 @@ export default function ConsentimientoMarihuanaCocaina(datos) {
 
   // Cuerpo del consentimiento
   y += 10;
-  let texto = `Yo......................................................................................., de ....... años de\nedad, identificado con DNI nº ......................... ............................; habiendo recibido consejería e información\nacerca de la prueba para Marihuana y cocaína en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
+  let texto = `Yo......................................................................................., de ....... años de\nedad, identificado con DNI nº ..${datos.dni}...; habiendo recibido consejería e información\nacerca de la prueba para Marihuana y cocaína en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
 
   texto = texto
     .replace('.......................................................................................', datos.nombres || '_________________________')
@@ -46,9 +46,9 @@ export default function ConsentimientoMarihuanaCocaina(datos) {
   autoTable(doc, {
     startY: antY + 2,
     body: [
-      ['CONSUME MARIHUANA', `NO (${datos.ant_marihuana_no || ''})`, `SI (${datos.ant_marihuana_si || ''})`],
-      ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO (${datos.ant_coca_no || ''})`, `SI (${datos.ant_coca_si || ''})`],
-      ['CONSUME COCAINA', `NO (${datos.ant_cocaina_no || ''})`, `SI (${datos.ant_cocaina_si || ''})`],
+      ['CONSUME MARIHUANA', `NO (${!datos.antConsumeMarih ? "X" : "" || ''})`, `SI (${datos.antConsumeMarih ? "X" : " " })`],
+      ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "" || ''})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })`],
+      ['CONSUME COCAINA', `NO (${!datos.antConsumeCocacina ? "X" : "" || ''})`, `SI (${datos.antConsumeCocacina ? "X" : " " })`],
     ],
     theme: 'plain',
     styles: { fontSize: 9, cellPadding: 1 },

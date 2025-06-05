@@ -1,16 +1,24 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from '../Controller/ControllerC';
+import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
-  { label: 'CONSUME MARIHUANA' },
-  { label: 'CONSUMO HOJA DE COCA EN LOS 7 DIAS PREVIOS' },
-  { label: 'CONSUME COCAINA' },
+  { label: 'CONSUME MARIHUANA (THC)' },
+  { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' },
+  { label: 'CONSUME COCAINA (COC)' },
 ];
 
-const Panel2D = ({token,selectedSede}) => {
+const Panel2D = ({token,selectedSede, userlogued}) => {
   const today = new Date().toISOString().split("T")[0];
+
+  const createAntecedentesObject = () => {
+    const obj = {};
+    antecedentesList.forEach(({ label }) => {
+      obj[label] = false;
+    });
+    return obj;
+  };
 
   const [form, setForm] = useState({
     norden: '',
@@ -18,7 +26,7 @@ const Panel2D = ({token,selectedSede}) => {
     nombres: '',
     edad: '',
     dni: '',
-    antecedentes: Array(antecedentesList.length).fill('NO'),
+    antecedentes: createAntecedentesObject()
   });
 
   const fechaRef = useRef(null);
@@ -27,10 +35,14 @@ const Panel2D = ({token,selectedSede}) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAntecedenteChange = (idx, value) => {
-    const updated = [...form.antecedentes];
-    updated[idx] = value;
-    setForm({ ...form, antecedentes: updated });
+  const handleAntecedenteChange = (label, value) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: {
+        ...prev.antecedentes,
+        [label]: value,
+      }
+    }));
   };
 
   const handleLimpiar = () => {
@@ -40,7 +52,7 @@ const Panel2D = ({token,selectedSede}) => {
       nombres: '',
       edad: '',
       dni: '',
-      antecedentes: Array(antecedentesList.length).fill('NO'),
+      antecedentes: createAntecedentesObject()
     });
   };
 
@@ -92,25 +104,25 @@ const Panel2D = ({token,selectedSede}) => {
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES :</div>
       <div className="flex flex-wrap gap-8 mb-8">
-        {antecedentesList.map((item, idx) => (
-          <div key={item.label} className="flex items-center gap-4">
-            <label className="text-base font-medium">{item.label}</label>
-            <div className="flex items-center gap-3 ml-2">
+        {antecedentesList.map(({ label }) => (
+          <div key={label} className="flex items-center gap-6">
+            <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
+            <div className="flex items-center gap-4 ml-2">
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
-                  name={`antecedente_${idx}`}
-                  checked={form.antecedentes[idx] === 'NO'}
-                  onChange={() => handleAntecedenteChange(idx, 'NO')}
+                  name={`antecedente_${label}`}
+                  checked={form.antecedentes[label] === false}
+                  onChange={() => handleAntecedenteChange(label, false)}
                 />
                 NO
               </label>
               <label className="flex items-center gap-1 text-base">
                 <input
                   type="radio"
-                  name={`antecedente_${idx}`}
-                  checked={form.antecedentes[idx] === 'SI'}
-                  onChange={() => handleAntecedenteChange(idx, 'SI')}
+                  name={`antecedente_${label}`}
+                  checked={form.antecedentes[label] === true}
+                  onChange={() => handleAntecedenteChange(label, true)}
                 />
                 SI
               </label>
@@ -120,7 +132,7 @@ const Panel2D = ({token,selectedSede}) => {
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
+        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel2D",token, userlogued)})} className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
           <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
         </button>
         <button type="button" className="bg-yellow-400 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-yellow-500" onClick={handleLimpiar}>
