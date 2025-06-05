@@ -1,8 +1,8 @@
 import { URLAzure } from "../../../../config/config"
 
 export function SubmitTriaje(data,edad,nOrden,fecha,token) {
-        console.log(nOrden)
-
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 8000)
     const body = {
         codTriaje: 0,
         numTicket: 0,
@@ -37,12 +37,17 @@ export function SubmitTriaje(data,edad,nOrden,fecha,token) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(body)
+            body: JSON.stringify(body),
+            signal: controller.signal
         }
-        return fetch(url,options).then(res =>  {
+        return fetch(url,options)
+        .then(res =>  {
+            clearTimeout(timeout)
             if (!res.ok) {
                 return res
-            } return res.json()}).then(response => response) 
+            } return res.json()})
+        .then(response => response) 
+        
 }
 
 export function GetHistoriaCTriaje(data,sede,token) {

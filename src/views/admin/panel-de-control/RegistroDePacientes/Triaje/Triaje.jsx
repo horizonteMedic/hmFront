@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetICC, GetIMC, GetPA, GetSat } from './Conversiones';
+import { Convert, GetCC, GetCintura, GetCuello, GetFC, GetFRespira, GetICC, GetIMC, GetPA, GetSat, GetSistolica } from './Conversiones';
 import { Clean, GetInfoPac, GetListTriajeMult, GetListTriajeMulttable, GetTable, handleNombreChange, handleSubmit, SearchHC, VerifyTR } from './Controller';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
@@ -134,7 +134,7 @@ const Triaje = ({token,selectedSede}) => {
       }
     });
   };
-
+  console.log(triaje)
   return (
     <div className="flex flex-col md:flex-row gap-4 w-full">
       {/* Columna 1 */}
@@ -301,13 +301,13 @@ const Triaje = ({token,selectedSede}) => {
                       <div className="flex flex-wrap gap-2 items-center mb-1">
                         <label className="font-medium w-20">Sistólica:</label>
                         <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" id="sistolica" name="sistolica" value={triaje.sistolica} onChange={handleTriajeChange}
-                        onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('diastolica')?.focus()}}/>
+                        onKeyUp={(event) => {GetSistolica(event,triaje,setTriaje,Swal)}}/>
                         <label className="font-medium w-20 ml-4">Diastólica:</label>
                         <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" id="diastolica" name="diastolica" value={triaje.diastolica} onChange={handleTriajeChange}
-                        onKeyDown={(event) => {GetPA(event,triaje,setTriaje,Swal)}}/>
+                        onKeyUp={(event) => {GetPA(event,triaje,setTriaje,Swal)}}/>
                         <label className="font-medium w-32 ml-4">F. Respiratoria:</label>
                         <input disabled={habilitarTR} className="border rounded px-1 w-32 text-md ml-1 " id="fRespiratoria" name="fRespiratoria" value={triaje.fRespiratoria} onChange={handleTriajeChange}
-                        onKeyDown={(event) => {if(event.key === 'Enter')document.getElementById('registrarTR')?.focus()}}/>
+                        onKeyUp={(event) => {GetFRespira(event,triaje,setTriaje,Swal)}}/>
                       </div>
                     </fieldset>
                   </div>
