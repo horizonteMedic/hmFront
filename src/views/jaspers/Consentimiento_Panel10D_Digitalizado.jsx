@@ -3,7 +3,7 @@ import autoTable from "jspdf-autotable";
 import headerConsentimiento from "./components/headerConsentimiento";
 import footer from "./components/footer";
 
-export default function ConsentimientoPanel10D(datos) {
+export default function Consentimiento_Panel10D_Digitalizado(datos) {
   const doc = new jsPDF();
   headerConsentimiento(doc, datos);
 
