@@ -110,14 +110,19 @@ export function FormLogin() {
     const IDROL = TokenResponse[0].idRol;
     const ListaVistaAccesos = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${IDROL}`,token)
     const ListVistasxROL = await getFetch(`/api/v01/ct/opcionesInterfaz/vistasPorIdRol/${IDROL}`,token)
+    const ListSedesxUser = await getFetch(`/api/v01/ct/sistemaArchivos/sedePorUsuario/${UserLogued.sub}`,token)
     const todosLosPermisos = ListaVistaAccesos.map(item => ({
       nombre: item.nombre,
       listaPermisos: item.listaPermisos
     }));
     const todasLasVistas = ListVistasxROL.flatMap(item => item.nombre);
+    const userConSedes = {
+      ...UserLogued,
+      sedes: ListSedesxUser  // o usa el nombre que desees
+    };
     setlistView(todasLasVistas);
     setlistAccesos(todosLosPermisos)
-    setuserlogued(UserLogued);
+    setuserlogued(userConSedes);
     setToken(token);
     Loginvnigate(token);
   };

@@ -56,12 +56,18 @@ const TabComponent = () => {
   const Vista = useAuthStore(state => state.listView)
   const Acceso = useAuthStore(state => state.listAccesos);
   const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
-  const [tabLab, setTabLab] = useState(0);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [activeTabAdmi, setActiveTabAdmi] = useState(0);
-  const [showTabsAdmi, setShowTabsAdmi] = useState(false);
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
 
+  //Sede
+  const [selectSede, setSelectSede] = useState("")
+
+  useEffect(() => {
+    if (userlogued?.sedes?.length > 0) {
+      const sedeTNP = userlogued.sedes.find(sede => sede.cod_sede === "T-NP");
+      setSelectSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);
+    }
+  }, [userlogued.sedes]);
   // permisos
   const ViewAdminision = Vista.includes("Admision")
   const ViewTriaje = Vista.includes("Triaje")
@@ -166,7 +172,7 @@ const TabComponent = () => {
       document.exitFullscreen();
     }
   };
-
+  console.log(selectSede)
   return (
     <div className="mx-auto  overflow-hidden w-[100%] relative ">
    
@@ -175,11 +181,12 @@ const TabComponent = () => {
       {activeTab === null && (
         <>
           <div className="mb-4 w-full flex justify-center">
-            <select className="border border-gray-300 rounded px-6 py-3 text-lg font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 min-w-[220px] text-center">
-              <option value="">Sedes</option>
-              <option value="sede1">Sede 1</option>
-              <option value="sede2">Sede 2</option>
-              <option value="sede3">Sede 3</option>
+            <select className="border border-gray-300 rounded px-6 py-3 text-lg font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-200 min-w-[220px] text-center"
+            onChange={(e) => setSelectSede(e.target.value)}
+            value={selectSede}>
+              {userlogued.sedes.map((option, index) => (
+                  <option key={index} value={option.cod_sede}>{option.nombre_sede}</option>
+              ))}
             </select>
           </div>
           {/*Acces VIEWS */}
@@ -281,14 +288,14 @@ const TabComponent = () => {
         <ImportacionModal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
-          selectedSede="T-NP"
+          selectedSede={selectSede}
           token={token}
           userlogued={userlogued}
         />
         <ImportacionModalBasica
           isOpen={isCompleteModalOpen}
           onRequestClose={closeCompleteModal}
-          selectedSede="T-NP"
+          selectedSede={selectSede}
           token={token}
           userlogued={userlogued}
         />
@@ -351,7 +358,7 @@ const TabComponent = () => {
                       listas={listasCombosR}
                       datos={datos}
                       setDatos={setDatos}
-                      selectedSede={"T-NP"}
+                      selectedSede={selectSede}
                       token={token}
                       tabHC={() => {}}
                       ChangeDNI={() => {}}
@@ -364,7 +371,7 @@ const TabComponent = () => {
                     <AperturaExamenesPreOcup
                       listas={listasCombos}
                       DNIG={DNIG}
-                      selectedSede={"T-NP"}
+                      selectedSede={selectSede}
                       token={token}
                       PrecioC={() => {}}
                       ChangeDNI={() => {}}
@@ -390,7 +397,7 @@ const TabComponent = () => {
                   ×
                 </button>
               </div>
-              <Triaje token={token} selectedSede={"T-NP"} />
+              <Triaje token={token} selectedSede={selectSede} />
             </div>
           )}
           {activeTab === 2 && (
@@ -417,8 +424,8 @@ const TabComponent = () => {
                 </button>
               </div>
               <div>
-                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={"T-NP"} userlogued={userlogued.sub} />}
-                {labTab === 1 && <Consentimientos token={token} selectedSede={"T-NP"} userlogued={userlogued.sub} />}
+                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                {labTab === 1 && <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
               </div>
             </div>
           )}

@@ -250,6 +250,7 @@ const ComboboxFormaPago = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/detalleParametros/detalleParametrizable/Formas de pago`,{
           method: 'GET', 
           headers: {
@@ -272,6 +273,7 @@ const ComboboxListAuth = () => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/detalleParametros/detalleParametrizable/Autorizacion`,{
           method: 'GET', 
           headers: {
@@ -294,6 +296,7 @@ const ComboboxEmpresasMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoEmpresasMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -316,6 +319,7 @@ const ComboboxContratasMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoContratasMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -338,6 +342,7 @@ const ComboboxMedicosMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoNombreMedicosMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -360,6 +365,7 @@ const ComboboxPruebaMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoTipoPruebaMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -382,6 +388,7 @@ const ComboboxCargoMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoCargoMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -404,6 +411,7 @@ const ComboboxAreaMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoAreaMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -426,6 +434,7 @@ const ComboboxExamenMMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoTipoExamenMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -448,6 +457,7 @@ const ComboboxExplotacionMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoExplotacionMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -470,6 +480,7 @@ const ComboboxMineralMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoMineralMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {
@@ -492,6 +503,7 @@ const ComboboxAlturaMulti = (sede) => {
     const [options, setOptions] = useState([]);
     const token = useAuthStore((state) => state.token);
     useEffect(() => { 
+        
           fetch(`${URLAzure}/api/v01/ct/ocupacional/listadoAlturaMutisucursal/${sede}`,{
           method: 'GET', 
           headers: {

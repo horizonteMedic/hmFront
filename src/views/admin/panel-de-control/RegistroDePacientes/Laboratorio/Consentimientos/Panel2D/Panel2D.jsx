@@ -56,6 +56,17 @@ const Panel2D = ({token,selectedSede, userlogued}) => {
     });
   };
 
+  const handleset = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      dni: '',
+      antecedentes: createAntecedentesObject(),
+    }));
+  }
+
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
   };
@@ -66,7 +77,7 @@ const Panel2D = ({token,selectedSede, userlogued}) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
-          onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'con_panel2D',token,setForm,selectedSede)}} />
+          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'con_panel2D',token,setForm,selectedSede)}} />
         </div>
         <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
           <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar

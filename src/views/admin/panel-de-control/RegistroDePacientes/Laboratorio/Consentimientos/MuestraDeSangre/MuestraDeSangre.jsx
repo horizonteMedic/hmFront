@@ -1,10 +1,33 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from '../Controller/ControllerC';
+import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
-const MuestraDeSangre = ({token,selectedSede}) => {
+const antecedentesList = [
+  { label: 'CONSUME MARIHUANA (THC)' },
+  { label: 'CONSUME COCAINA (COC)' },
+  { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' },
+  { label: 'CONSUME ANFETAMINAS (AMP)' },
+  { label: 'CONSUME METHANFETAMINAS (MET)' },
+  { label: 'CONSUME BENZODIAZEPINAS (BZO)' },
+  { label: 'CONSUME OPIÁCEOS (OPI)' },
+  { label: 'CONSUME BARBITÚRICOS (BAR)' },
+  { label: 'CONSUME METADONA (MTD)' },
+  { label: 'CONSUME FENCICLIDINA (PCP)' },
+  { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)' },
+];
+
+const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
   const today = new Date().toISOString().split("T")[0];
+
+  const createAntecedentesObject = () => {
+    const obj = {};
+    antecedentesList.forEach(({ label }) => {
+      obj[label] = false;
+    });
+    return obj;
+  };
+
 
   const [form, setForm] = useState({
     norden: '',
@@ -12,7 +35,7 @@ const MuestraDeSangre = ({token,selectedSede}) => {
     nombres: '',
     edad: '',
     dni: '',
-    protocolo: '',
+    empresa: '',
   });
 
   const fechaRef = useRef(null);
@@ -28,8 +51,30 @@ const MuestraDeSangre = ({token,selectedSede}) => {
       nombres: '',
       edad: '',
       dni: '',
-      protocolo: '',
+      empresa: '',
     });
+  };
+
+  const handleset = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      dni: '',
+      empresa: '',
+      antecedentes: createAntecedentesObject(),
+    }));
+  }
+
+  const handleAntecedenteChange = (label, value) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: {
+        ...prev.antecedentes,
+        [label]: value,
+      }
+    }));
   };
 
   const handleFechaFocus = (e) => {
@@ -42,7 +87,7 @@ const MuestraDeSangre = ({token,selectedSede}) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
-          onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'consent_Muestra_Sangre',token,setForm,selectedSede)}} />
+          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'consent_Muestra_Sangre',token,setForm,selectedSede)}} />
         </div>
         <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
           <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
@@ -78,14 +123,14 @@ const MuestraDeSangre = ({token,selectedSede}) => {
         ; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va ha realizar según solicitud del protocolo médico de la empresa
       </div>
       <div className="mb-2 flex justify-center">
-        <input name="protocolo" value={form.protocolo} onChange={handleInputChange} className="border-b border-gray-400 px-3 py-2 w-96 text-base" placeholder="Protocolo médico de la empresa" />
+        <input name="protocolo" value={form.empresa} readOnly onChange={handleInputChange} className="border-b border-gray-400 px-3 py-2 w-96 text-base bg-gray-100 cursor-not-allowed" placeholder="Protocolo médico de la empresa" />
       </div>
       <div className="text-justify text-base mb-4">
         ; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
+        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"consent_Muestra_Sangre",token, userlogued)})} className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
           <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
         </button>
         <button type="button" className="bg-yellow-400 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-yellow-500" onClick={handleLimpiar}>
