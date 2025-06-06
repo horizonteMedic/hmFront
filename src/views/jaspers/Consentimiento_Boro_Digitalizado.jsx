@@ -5,172 +5,122 @@ import footer from "./components/footer";
 
 export default function Consentimiento_Boro_Digitalizado(datos) {
   const doc = new jsPDF();
-  headerConsentimiento(doc);
+  headerConsentimiento(doc, datos);
 
   let y = 44;
-  const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
 
   // Título principal
+  doc.setFont(undefined, 'bold');
   doc.setFontSize(13);
-  doc.setFont('helvetica', 'bold');
-  doc.text("AUTORIZACION DE EXAMEN DE DROGAS", pageW / 2, y, { align: "center" });
+  doc.text('AUTORIZACIÓN DE EXAMEN DE DROGAS', 105, y, { align: 'center' });
+  doc.setFontSize(11);
+
+  // Encabezado de datos principales
   y += 8;
+  doc.setFont(undefined, 'normal');
+  doc.text(`Fecha:`, 18, y);
+  doc.text(`${datos.fecha || ''}`, 35, y);
+  doc.text(`Hora:`, 65, y);
+  doc.text(`${datos.hora || ''}`, 80, y);
+  doc.text(`Ciudad:`, 110, y);
+  doc.text(`${datos.ciudad || ''}`, 130, y);
+  doc.setFont(undefined, 'bold');
+  doc.text(`Nro Orden :`, 170, y);
+  doc.text(`${datos.nro_orden || ''}`, 195, y, { align: 'right' });
 
-  // Tabla de datos personales (Fecha, Hora, Ciudad)
-  autoTable(doc, {
-    startY: y,
-    body: [
-      [
-        { content: "Fecha:", styles: { fontStyle: 'bold', halign: 'right' } },
-        datos.fecha || '',
-        { content: "Hora:", styles: { fontStyle: 'bold', halign: 'right' } },
-        datos.hora || '',
-        { content: "Ciudad:", styles: { fontStyle: 'bold', halign: 'right' } },
-        datos.ciudad || ''
-      ]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 10, cellPadding: 2 },
-    columnStyles: {
-      0: { cellWidth: 18 },
-      1: { cellWidth: 32 },
-      2: { cellWidth: 15 },
-      3: { cellWidth: 25 },
-      4: { cellWidth: 18 },
-      5: { cellWidth: 40 }
-    },
-    margin: { left: margin, right: margin }
-  });
-  y = doc.lastAutoTable.finalY + 2;
-
-  // Tabla de datos personales (Nombre, Edad, DNI, Empresa)
-  autoTable(doc, {
-    startY: y,
-    body: [
-      [
-        { content: "Nombre:", styles: { fontStyle: 'bold', halign: 'right' } },
-        datos.nombre || '',
-        { content: "Edad:", styles: { fontStyle: 'bold', halign: 'right' } },
-        datos.edad || '',
-        { content: "DNI:", styles: { fontStyle: 'bold', halign: 'right' } },
-        datos.dni || ''
-      ],
-      [
-        { content: "Empresa:", styles: { fontStyle: 'bold', halign: 'right' } },
-        { content: datos.empresa || '', colSpan: 5 }
-      ]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 10, cellPadding: 2 },
-    columnStyles: {
-      0: { cellWidth: 18 },
-      1: { cellWidth: 60 },
-      2: { cellWidth: 15 },
-      3: { cellWidth: 18 },
-      4: { cellWidth: 15 },
-      5: { cellWidth: 32 }
-    },
-    margin: { left: margin, right: margin }
-  });
-  y = doc.lastAutoTable.finalY + 2;
-
-  // Texto de autorización
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  const texto =
-    "Autorizo al POLICLINICO HORIZONTE MEDIC, para que se me realice el examen toxicológico de drogas en orina y/o saliva, según los protocolos establecidos y que los resultados se entreguen directamente a la empresa.";
-  const lines = doc.splitTextToSize(texto, pageW - 2 * margin);
-  doc.text(lines, margin, y);
-  y += lines.length * 4 + 2;
-
-  // Declaración
-  doc.setFont('helvetica', 'bold');
-  doc.text("Además, declaro que la información que brindaré a continuación es verdadera:", margin, y);
+  // Nombre y datos personales
+  y += 8;
+  doc.setFont(undefined, 'bold');
+  doc.text(`Yo`, 18, y);
+  doc.setFont(undefined, 'bold');
+  doc.text(`${datos.nombres || '_________________________'}`, 28, y);
+  doc.setFont(undefined, 'normal');
+  doc.text(`de`, 110, y);
+  doc.text(`${datos.edad || '___'}`, 118, y);
+  doc.text(`años de edad,`, 130, y);
   y += 6;
+  doc.text(`con documento de identidad N°`, 18, y);
+  doc.setFont(undefined, 'bold');
+  doc.text(`${datos.dni || '__________'}`, 80, y);
+  doc.setFont(undefined, 'normal');
+  doc.text(`trabajador ( ${datos.trabajador ? 'X' : ' '} ) o postulante ( ${datos.postulante ? 'X' : ' '} ), de la empresa`, 100, y);
+  y += 6;
+  doc.setFont(undefined, 'bold');
+  doc.text(`${datos.empresa || '_________________________'}`, 18, y);
+  doc.setFont(undefined, 'normal');
+  const intro = ", autorizo al POLICLINICO HORIZONTE MEDIC, para que se me realice el examen toxicológico de drogas en orina y/o saliva, según los protocolos establecidos y que los resultados se entreguen directamente a la empresa.";
+  const introLines = doc.splitTextToSize(intro, 176);
+  doc.text(introLines, 18, y + 6, { maxWidth: 176 });
+  y += introLines.length * 6 + 6;
 
-  // Preguntas tipo formulario
-  autoTable(doc, {
-    startY: y,
-    body: [
-      [
-        { content: "¿Sufre alguna enfermedad?", styles: { fontStyle: 'bold' } },
-        `SI (${datos.enfermedad_si === 'SI' ? 'X' : ' '})`,
-        `NO (${datos.enfermedad_si === 'NO' ? 'X' : ' '})`,
-        { content: datos.enfermedad_cual ? `¿Cuál?: ${datos.enfermedad_cual}` : '', colSpan: 2 }
-      ],
-      [
-        { content: "¿Consume regularmente algún medicamento?", styles: { fontStyle: 'bold' } },
-        `SI (${datos.medicamento_si === 'SI' ? 'X' : ' '})`,
-        `NO (${datos.medicamento_si === 'NO' ? 'X' : ' '})`,
-        { content: datos.medicamento_cual ? `¿Cuál?: ${datos.medicamento_cual}` : '', colSpan: 2 }
-      ],
-      [
-        { content: "¿Chaccha o mastica hoja de coca?", styles: { fontStyle: 'bold' } },
-        `SI (${datos.coca_si === 'SI' ? 'X' : ' '})`,
-        `NO (${datos.coca_si === 'NO' ? 'X' : ' '})`,
-        { content: datos.coca_fecha ? `Fecha: ${datos.coca_fecha}` : '', colSpan: 2 }
-      ],
-      [
-        { content: "¿En las últimas 48 horas, se realizó algún tratamiento quirúrgico o dental?", styles: { fontStyle: 'bold' } },
-        `SI (${datos.tratamiento_si === 'SI' ? 'X' : ' '})`,
-        `NO (${datos.tratamiento_si === 'NO' ? 'X' : ' '})`,
-        { content: datos.tratamiento_cual ? `¿Cuál?: ${datos.tratamiento_cual}` : '', colSpan: 2 }
-      ],
-      [
-        { content: '', colSpan: 1 }, '', '',
-        { content: datos.tratamiento_cuando ? `¿Cuándo?: ${datos.tratamiento_cuando}` : '', colSpan: 2 }
-      ],
-      [
-        { content: '', colSpan: 1 }, '', '',
-        { content: datos.tratamiento_donde ? `¿Dónde?: ${datos.tratamiento_donde}` : '', colSpan: 2 }
-      ]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 10, cellPadding: 2 },
-    columnStyles: {
-      0: { cellWidth: 90 },
-      1: { cellWidth: 18 },
-      2: { cellWidth: 18 },
-      3: { cellWidth: 40 },
-      4: { cellWidth: 40 }
-    },
-    margin: { left: margin, right: margin }
-  });
-  y = doc.lastAutoTable.finalY + 6;
-
-  // Notas
-  doc.setFont('helvetica', 'bold');
-  doc.text('Notas:', margin, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(datos.notas || '', margin + 20, y);
+  // Preguntas
+  doc.setFont(undefined, 'normal');
+  doc.text('Además, declaro que la información que brindaré a continuación es verdadera:', 18, y);
+  y += 8;
+  // Enfermedad
+  doc.text('¿Sufre alguna enfermedad?', 18, y);
+  doc.text(`SI ( ${datos.enfermedad_si ? 'X' : ' '} )  NO ( ${datos.enfermedad_no ? 'X' : ' '} )`, 110, y);
+  doc.text('¿Cuál (es):', 150, y);
+  doc.text(`${datos.enfermedad_cual || ''}`, 140, y);
+  y += 8;
+  // Medicamento
+  doc.text('¿Consume regularmente algún medicamento?', 18, y);
+  doc.text(`SI ( ${datos.medicamento_si ? 'X' : ' '} )  NO ( ${datos.medicamento_no ? 'X' : ' '} )`, 110, y);
+  doc.text('¿Cuál (es):', 150, y);
+  doc.text(`${datos.medicamento_cual || ''}`, 140, y);
+  y += 8;
+  // Mate de coca
+  doc.text('¿Consume regularmente mate de coca?', 18, y);
+  doc.text(`SI ( ${datos.mate_si ? 'X' : ' '} )  NO ( ${datos.mate_no ? 'X' : ' '} )`, 110, y);
+  y += 8;
+  doc.text('Si la respuesta es SI: ¿Cuándo consumió por última vez?', 18, y);
+  y += 6;
+  doc.text('Fecha:', 25, y);
+  doc.text(`${datos.mate_fecha || ''}`, 40, y);
   y += 10;
+  // Hoja de coca
+  doc.text('¿Consume o mastica hoja de coca?', 18, y);
+  doc.text(`SI ( ${datos.hoja_si ? 'X' : ' '} )  NO ( ${datos.hoja_no ? 'X' : ' '} )`, 110, y);
+  y += 8;
+  const hojaMsg = 'Si la respuesta es SI, se procederá a reprogramar la toma de la muestra en 5 días, caso contrario se tomará la muestra bajo responsabilidad del paciente.';
+  const hojaLines = doc.splitTextToSize(hojaMsg, 176);
+  doc.text(hojaLines, 18, y, { maxWidth: 176 });
+  y += hojaLines.length * 6 + 2;
+  // Tratamiento quirúrgico/dental
+  doc.text('¿Se realizó algún tratamiento quirúrgico o dental en las últimas 48 horas?', 18, y);
+  doc.text(`SI ( ${datos.tratamiento_si ? 'X' : ' '} )  NO ( ${datos.tratamiento_no ? 'X' : ' '} )`, 160, y);
+  y += 8;
+  const tratMsg = 'Si la respuesta es SI, indicar qué tratamiento se realizó, cual es nombre del cirujano, donde y cuando se realizó dicho procedimiento o tratamiento';
+  const tratLines = doc.splitTextToSize(tratMsg, 176);
+  doc.text(tratLines, 18, y, { maxWidth: 176 });
+  y += tratLines.length * 6 + 2;
+  doc.text('Cual:', 18, y);
+  doc.text(`${datos.tratamiento_cual || ''}`, 32, y);
+  doc.text('Cuando:', 80, y);
+  doc.text(`${datos.tratamiento_cuando || ''}`, 100, y);
+  doc.text('Donde:', 120, y);
+  doc.text(`${datos.tratamiento_donde || ''}`, 135, y);
 
-  // Bloque de firmas y huella
-  const firmasY = y;
-  const blockWidth = 170;
-  const blockX = (pageW - blockWidth) / 2;
-  // Firma del paciente
-  doc.line(blockX, firmasY + 20, blockX + 50, firmasY + 20);
-  doc.text('Firma del Paciente', blockX + 25, firmasY + 25, { align: 'center' });
-  // Cuadro de huella
-  doc.setDrawColor(0);
-  doc.rect(blockX + 60, firmasY, 40, 40);
-  doc.text('Huella', blockX + 80, firmasY + 45, { align: 'center' });
-  // Firma responsable/testigo (solo línea arriba, no cuadro)
-  const testigoX = blockX + 110;
-  const testigoY = firmasY;
-  const testigoWidth = 60;
-  // Línea para firma
-  doc.line(testigoX, testigoY + 8, testigoX + testigoWidth, testigoY + 8);
-  // Texto debajo de la línea
-  doc.setFont('helvetica', 'bold');
-  doc.text('Firma del testigo o responsable de la toma de muestra', testigoX + testigoWidth / 2, testigoY + 14, { align: 'center', maxWidth: testigoWidth - 4 });
-  doc.setFont('helvetica', 'normal');
-  doc.text('Nombre Completo:', testigoX + 2, testigoY + 21);
-  doc.text('DNI:', testigoX + 2, testigoY + 28);
+  // Más espacio antes de la firma y huella
+  y += 34;
+  // Línea horizontal antes del texto de firma (solo hasta el final del texto)
+  const firmaText = 'Firma y Huella del trabajador / paciente evaluado';
+  const firmaTextWidth = doc.getTextWidth(firmaText);
+  doc.setDrawColor(100);
+  doc.line(18, y - 4, 18 + firmaTextWidth, y - 4);
+  doc.setFont(undefined, 'bold');
+  doc.text(firmaText, 18, y);
 
-  y = firmasY + 50;
+  // Notas como cuadro
+  y += 10;
+  doc.setFont(undefined, 'normal');
+  doc.text('Notas:', 18, y);
+  const notas = datos.notas || '';
+  const notasLines = doc.splitTextToSize(notas, 170);
+  doc.setDrawColor(100);
+  doc.rect(35, y - 5, 160, notasLines.length * 7 + 10);
+  doc.text(notasLines, 40, y + 5, { maxWidth: 150 });
+
   footer(doc, datos);
 
   // Mostrar PDF
