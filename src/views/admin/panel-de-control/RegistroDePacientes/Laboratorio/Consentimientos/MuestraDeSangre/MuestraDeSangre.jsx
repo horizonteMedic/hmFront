@@ -110,13 +110,13 @@ const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
         CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 mb-4 justify-center text-base">
+      <div className="flex flex-wrap items-center gap-2 mb-4 justify-start text-base">
         <span>YO,</span>
-        <input name="nombres" value={form.nombres} readOnly className="border-b border-gray-400 px-3 py-2 w-64 text-base bg-gray-100 cursor-not-allowed" />
+        <input name="nombres" value={form.nombres} readOnly className="border-b border-gray-400 px-3 py-2 min-w-[120px] max-w-[400px] text-base bg-gray-100 cursor-not-allowed" style={{width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px`}} />
         <span>de,</span>
-        <input name="edad" value={form.edad} readOnly className="border-b border-gray-400 px-3 py-2 w-20 text-base bg-gray-100 cursor-not-allowed" />
+        <input name="edad" value={form.edad} readOnly className="border-b border-gray-400 px-3 py-2 min-w-[30px] max-w-[50px] text-base bg-gray-100 cursor-not-allowed" style={{width: `${Math.min(50, Math.max(30, (String(form.edad)?.length || 0) * 14))}px`}} />
         <span>años de edad, identificado con DNI nº</span>
-        <input name="dni" value={form.dni} readOnly className="border-b border-gray-400 px-3 py-2 w-40 text-base bg-gray-100 cursor-not-allowed" />
+        <input name="dni" value={form.dni} readOnly className="border-b border-gray-400 px-3 py-2 min-w-[80px] max-w-[120px] text-base bg-gray-100 cursor-not-allowed" style={{width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px`}} />
       </div>
 
       <div className="text-justify text-base mb-2">
@@ -142,6 +142,15 @@ const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
           <button type="button" className="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 text-lg">
             <FontAwesomeIcon icon={faPrint} />
           </button>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+          <div className="flex gap-1 mt-1">
+            <input className="border rounded px-2 py-1 w-24" />
+            <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300">
+              <FontAwesomeIcon icon={faPrint} />
+            </button>
+          </div>
         </div>
       </div>
     </form>

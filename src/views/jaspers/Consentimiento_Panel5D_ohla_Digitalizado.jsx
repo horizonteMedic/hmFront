@@ -51,9 +51,11 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
   doc.setFontSize(11);
   const texto =
     "habiendo recibido consejería, e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales, AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, asi mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.";
-  const lines = doc.splitTextToSize(texto, pageW - 2 * margin);
-  doc.text(lines, margin, y);
-  y += lines.length * 4 + 2;
+  const lines = doc.splitTextToSize(texto, pageW - 2 * margin - 4);
+  const altoLinea = 5.5;
+  const altoCaja = lines.length * altoLinea + 6;
+  doc.text(lines, margin + 3, y, { maxWidth: pageW - 2 * margin - 6 });
+  y += altoCaja + 2;
 
   // Sede y fecha
   doc.setFont('helvetica', 'normal');

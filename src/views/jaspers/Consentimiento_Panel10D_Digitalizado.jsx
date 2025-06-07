@@ -1,47 +1,43 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import header from "./components/header";
+import headerConsentimiento from "./components/headerConsentimiento";
 import footer from "./components/footer";
 
-export default function ConsentimientoPanel10D(datos) {
+export default function Consentimiento_Panel10D_Digitalizado(datos) {
   const doc = new jsPDF();
-  header(doc, datos);
+  headerConsentimiento(doc, datos);
 
   let y = 58;
 
-  // Título subrayado y negrita
+  // Título principal en dos líneas, sin línea horizontal
   doc.setFont(undefined, 'bold');
+  doc.setFontSize(12);
+  doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10 D', 105, y, { align: 'center' });
+  y += 6;
   doc.setFontSize(11);
-  doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10 D (AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', 105, y, { align: 'center' });
-  doc.setLineWidth(0.5);
-  doc.line(15, y + 2, 195, y + 2);
+  doc.text('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', 105, y, { align: 'center' });
   doc.setFontSize(10);
 
-  // Cuerpo del consentimiento
+  // Fecha en la parte superior derecha
+  doc.setFont(undefined, 'normal');
+  doc.setFontSize(10);
+  doc.text(`${datos.fecha || ''}`, 195, y, { align: 'right' });
+
+  // Bloque de datos personales y consentimiento con interlineado y justificado
   y += 10;
-  let texto = `Yo......................................................................................., de ....... años de\nedad, identificado con DNI nº ...${datos.dni}..; habiendo recibido consejería e información\nacerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
-
-  texto = texto
-    .replace('.......................................................................................', datos.nombres || '_________________________')
-    .replace('.......', datos.edad || '___')
-    .replace('.......................... ............................', datos.cod_pa || '__________');
-
-  // Caja del consentimiento
   doc.setFont(undefined, 'normal');
-  doc.setDrawColor(180);
-  doc.rect(15, y, 180, 22);
-  doc.text(texto, 18, y + 6, { maxWidth: 176 });
+  const bloque =
+    `Yo ${datos.nombres || '_________________________'} , de ${datos.edad || '___'} años de edad, identificado con DNI nº ${datos.dni || '__________'}; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
+  const lines = doc.splitTextToSize(bloque, 176);
+  const altoLinea = 7;
+  const altoCaja = lines.length * altoLinea + 6;
+  doc.text(lines, 18, y + 6, { maxWidth: 176, lineHeightFactor: 1.5, align: 'left' });
+  y += altoCaja + 4;
 
-  // Fecha apertura
+  // Antecedentes (tabla) centrados
+  let antY = y;
   doc.setFont(undefined, 'bold');
-  doc.text('Fecha:', 140, y + 30);
-  doc.setFont(undefined, 'normal');
-  doc.text(`${datos.fecha || ''}`, 155, y + 30);
-
-  // Antecedentes (tabla)
-  let antY = y + 38;
-  doc.setFont(undefined, 'bold');
-  doc.text('ANTECEDENTES:', 15, antY);
+  doc.text('ANTECEDENTES:', 105, antY, { align: 'center' });
   antY += 2;
   autoTable(doc, {
     startY: antY + 2,
@@ -61,7 +57,7 @@ export default function ConsentimientoPanel10D(datos) {
     theme: 'plain',
     styles: { fontSize: 9, cellPadding: 1 },
     columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 } },
-    margin: { left: 15 },
+    margin: { left: 40 },
     didDrawPage: () => {}
   });
 

@@ -2,18 +2,18 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch";
 import { GetInfoLaboratioEx } from "./model";
 
-const backendToLabelMap = {
-  antConsumeMarih: "CONSUME MARIHUANA (THC)",
-  antConsumeCocacina: "CONSUME COCAINA (COC)",
-  antConsumeHojaCoca: "CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS",
-  antConsumeAnfetaminaOExtasis: "CONSUME ANFETAMINAS (AMP)",
-  antConsumeMethanfetamina: "CONSUME METHANFETAMINAS (MET)",
-  antConsumeBenzodiacepinas: "CONSUME BENZODIAZEPINAS (BZO)",
-  antConsumeOpiacesos: "CONSUME OPIÁCEOS (OPI)",
-  antConsumeBarbituricos: "CONSUME BARBITÚRICOS (BAR)",
-  antConsumeMetadona: "CONSUME METADONA (MTD)",
-  antConsumeFenciclidina: "CONSUME FENCICLIDINA (PCP)",
-  antConsumeAntidepreTricicli: "CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)",
+const backendToKeyMap = {
+  antConsumeMarih: 'MARIHUANA',
+  antConsumeCocacina: 'COCAINA',
+  antConsumeHojaCoca: 'COCA',
+  antConsumeAnfetaminaOExtasis: 'ANFETAMINAS',
+  antConsumeMethanfetaminaOOpiaceos: 'METAN',
+  antConsumeBenzodiacepinas: 'BENZO',
+  antConsumeOpiacesos: 'OPIA',
+  antConsumeBarbituricos: 'BARBI',
+  antConsumeMetadona: 'METADONA',
+  antConsumeFenciclidina: 'FENCI',
+  antConsumeAntidepreTricicli: 'ANTI',
 };
 
 const Loading = (text) => {
@@ -84,8 +84,8 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
         console.log('registrao datos',res)
         const antecedentesConvertidos = {};
 
-        for (const [key, label] of Object.entries(backendToLabelMap)) {
-          antecedentesConvertidos[label] = res.hasOwnProperty(key) ? res[key] : false;
+        for (const [backendKey, localKey] of Object.entries(backendToKeyMap)) {
+          antecedentesConvertidos[localKey] = res.hasOwnProperty(backendKey) ? res[backendKey] : false;
         }
         set(prev => ({
           ...prev,
