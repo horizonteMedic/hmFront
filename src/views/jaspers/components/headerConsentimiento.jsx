@@ -11,7 +11,7 @@ const headerConsentimiento = (doc, datos = {}) => {
   doc.setFontSize(11);
   doc.text("Nro Orden :", pageW - 70, y + 6);
   doc.setFontSize(13);
-  doc.text(`${datos.nro_orden || ''}`, pageW - 35, y + 6);
+  doc.text(`${datos.norden || ''}`, pageW - 35, y + 6);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.text("Sede :", pageW - 70, y + 14);
