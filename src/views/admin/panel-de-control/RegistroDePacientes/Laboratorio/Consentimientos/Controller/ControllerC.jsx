@@ -109,8 +109,6 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user) => {
   Loading('Registrando Datos')
   GetInfoLaboratioEx(form,tabla,token,user)
   .then((res) => {
-    console.log('registro',res)
-    console.log(form)
     if (res.id === 1 || res.id === 0) {
       Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -129,6 +127,7 @@ export const PrintHojaR = async (datos,tabla,token) => {
    // Ej: 'ConsentimientoPanel10D'
   getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${datos.norden}&nameConset=${tabla}`,token)
   .then(async (res) => {
+    console.log(res)
     if (res.norden) {
       const nombre = res.nameJasper;
       console.log(nombre)
