@@ -118,9 +118,6 @@ const Boro = ({token,selectedSede}) => {
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
           onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'consent_Boro',token,setForm,selectedSede)}} />
         </div>
-        <button type="button" className="text-blue-700 hover:text-blue-900 flex items-center px-3 text-base">
-          <FontAwesomeIcon icon={faEdit} className="mr-1" /> Editar
-        </button>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Fecha :</label>
           <input
@@ -330,10 +327,10 @@ const Boro = ({token,selectedSede}) => {
 
       <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
         <div className="flex gap-3">
-          <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold">
+          <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
-          <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}>
+          <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}>
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
@@ -341,7 +338,7 @@ const Boro = ({token,selectedSede}) => {
           <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
           <div className="flex gap-1 mt-1">
             <input className="border rounded px-2 py-1 w-24" />
-            <button type="button" className="bg-gray-200 px-2 py-1 rounded border border-gray-300" onClick={handlePrint}>
+            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>
               <FontAwesomeIcon icon={faPrint} />
             </button>
           </div>

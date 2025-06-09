@@ -121,7 +121,7 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
       </div>
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES</div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-8">
+      <div className="flex flex-col gap-y-4 mb-8">
         {antecedentesList.map(({ label, key }) => (
           <div key={key} className="flex items-center gap-6">
             <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
@@ -144,22 +144,30 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
                 />
                 SI
               </label>
+              {label === 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' && form.antecedentes[key] === true && (
+                <input
+                  type="date"
+                  className="border rounded px-2 py-1 ml-4"
+                  value={form.fechaCoca || ''}
+                  onChange={e => setForm(prev => ({ ...prev, fechaCoca: e.target.value }))}
+                />
+              )}
             </div>
           </div>
         ))}
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel10D",token, userlogued)})} className="bg-green-600 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-green-700">
+        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel10D",token, userlogued)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors">
           <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
         </button>
-        <button type="button" className="bg-yellow-400 text-white px-6 py-3 rounded flex items-center gap-2 text-lg hover:bg-yellow-500" onClick={handleLimpiar}>
+        <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors" onClick={handleLimpiar}>
           <FontAwesomeIcon icon={faBroom} /> Limpiar
         </button>
         <div className="ml-auto flex items-center gap-2">
           <span className="font-semibold text-blue-900 text-lg">IMPRIMIR</span>
           <input className="border rounded px-3 py-2 w-32 text-base" />
-          <button type="button" className="bg-blue-600 text-white px-4 py-3 rounded hover:bg-blue-700 text-lg">
+          <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded border border-blue-700 flex items-center shadow-md transition-colors">
             <FontAwesomeIcon icon={faPrint} />
           </button>
         </div>

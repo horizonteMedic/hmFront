@@ -101,9 +101,6 @@ const Inmunologia = ({token,selectedSede}) => {
               className="border rounded px-2 py-1 flex-1"
               onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'inmunologia',token,setForm,selectedSede)}} 
             />
-            <button type="button" className="ml-2 bg-gray-200 px-3 py-1 rounded border border-gray-300 flex items-center gap-1">
-              <FontAwesomeIcon icon={faEdit} /> Editar
-            </button>
           </div>
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold">Fecha:</label>
@@ -125,7 +122,8 @@ const Inmunologia = ({token,selectedSede}) => {
               name="nombres" 
               value={form.nombres} 
               onChange={handleInputChange} 
-              className="border rounded px-2 py-1 flex-1" 
+              className="border rounded px-2 py-1 bg-gray-100"
+              style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
               disabled
             />
           </div>
@@ -135,7 +133,7 @@ const Inmunologia = ({token,selectedSede}) => {
               name="edad" 
               value={form.edad} 
               onChange={handleInputChange} 
-              className="border rounded px-2 py-1 w-24" 
+              className="border rounded px-2 py-1 w-24 bg-gray-100" 
               disabled
             />
           </div>
@@ -181,10 +179,10 @@ const Inmunologia = ({token,selectedSede}) => {
 
         <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
           <div className="flex gap-3">
-            <button type="button" className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold">
+            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
               <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
             </button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold" onClick={handleLimpiar}>
+            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}>
               <FontAwesomeIcon icon={faBroom} /> Limpiar
             </button>
           </div>
@@ -194,7 +192,7 @@ const Inmunologia = ({token,selectedSede}) => {
               <input className="border rounded px-2 py-1 w-24" />
               <button 
                 type="button" 
-                className="bg-gray-200 px-2 py-1 rounded border border-gray-300 hover:bg-gray-300"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"
                 onClick={handleImprimir}
               >
                 <FontAwesomeIcon icon={faPrint} />
