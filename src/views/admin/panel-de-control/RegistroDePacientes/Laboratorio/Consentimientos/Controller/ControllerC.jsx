@@ -90,7 +90,8 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
         set(prev => ({
           ...prev,
           ...res,
-          antecedentes: antecedentesConvertidos
+          antecedentes: antecedentesConvertidos,
+          fechaCoca: res.fechaConsumoHojaCoca
         }));
       } else {
         Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
@@ -101,13 +102,14 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
     })
 }
 
-export const SubmitConsentimientoLab = async (form, tabla, token, user) => {
+export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null) => {
   if (!form.norden) {
     await Swal.fire('Error', 'Datos Incompletos','error')
     return
   }
   Loading('Registrando Datos')
-  GetInfoLaboratioEx(form,tabla,token,user)
+  console.log('wts',fechaCoca)
+  GetInfoLaboratioEx(form,tabla,token,user, fechaCoca)
   .then((res) => {
     if (res.id === 1 || res.id === 0) {
       Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,

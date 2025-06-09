@@ -31,6 +31,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
     nombres: '',
     edad: '',
     dni: '',
+    fechaCoca: today,
     antecedentes: createAntecedentesObject(),
   });
 
@@ -57,6 +58,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
+      fechaCoca: today,
       antecedentes: Array(antecedentesList.length).fill('NO'),
     });
   };
@@ -68,6 +70,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
+      fechaCoca: today,
       antecedentes: createAntecedentesObject(),
     }));
   }
@@ -197,7 +200,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
 
       <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
         <div className="flex gap-3">
-          <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel5D",token, userlogued)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
+          <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"con_panel5D",token, userlogued, form.antecedentes.COCA ? form.fechaCoca : null)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}>

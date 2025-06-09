@@ -48,7 +48,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     doc.setFont(undefined, 'bold');
     doc.text('Fecha:', 140, y);
     doc.setFont(undefined, 'normal');
-    doc.text(`${datos.fecha_apertura_po || ''}`, 155, y);
+    doc.text(`${datos.fecha || ''}`, 155, y);
 
     // Espacio extra antes de las firmas y huella
     const baseY = y + 30;

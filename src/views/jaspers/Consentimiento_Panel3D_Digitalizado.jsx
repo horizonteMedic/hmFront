@@ -66,7 +66,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
         startY: antY,
         body: [
           ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : ""})`, `SI (${datos.antConsumeMarih ? "X" : " " })`],
-          ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : ""})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })`],
+          ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : ""})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Fecha:  ${datos.fechaConsumoHojaCoca}` : ""}`],
           ['CONSUME COCAINA', `NO (${!datos.antConsumeCocacina ? "X" : ""})`, `SI (${datos.antConsumeCocacina ? "X" : " " })`],
           ['CONSUME EXTASIS', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : ""})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
         ],
