@@ -6,9 +6,9 @@ import footer from "./components/footer";
 export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
   const doc = new jsPDF();
   headerConsentimiento(doc,datos);
-  const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const huella = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
+  const firma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
+  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
 
   const loadImg = src =>
     new Promise((res, rej) => {
@@ -48,32 +48,73 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     );
     y += 11;
 
-    // Línea de YO, nombre, edad, dni
-    doc.setFont('helvetica', 'normal');
+    // Línea de YO, nombre, edad, dni y consentimiento en un solo párrafo justificado y con campos clave en negrita
     doc.setFontSize(11);
-    doc.text("YO", margin, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${datos.nombres || ''}`, margin + 11, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text("de", margin + 70, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${datos.edad || ''}`, margin + 80, y);
-    doc.setFont('helvetica', 'normal');
-    doc.text("años de edad, identificado con DNI N°", margin + 95, y);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${datos.dni || ''}`, margin + 170, y);
-    y += 6;
-
-    // Texto de consentimiento
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    const texto =
-      "habiendo recibido consejería, e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales, AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, asi mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.";
-    const lines = doc.splitTextToSize(texto, pageW - 2 * margin - 4);
-    const altoLinea = 5.5;
-    const altoCaja = lines.length * altoLinea + 6;
-    doc.text(lines, margin + 3, y, { maxWidth: pageW - 2 * margin - 6 });
-    y += altoCaja + 2;
+    const bloqueNormal1 = 'YO ';
+    const bloqueNegrita1 = String(datos.nombres || '');
+    const bloqueNormal2 = ' de ';
+    const bloqueNegrita2 = String(datos.edad || '');
+    const bloqueNormal3 = ' años de edad, identificado con DNI N° ';
+    const bloqueNegrita3 = String(datos.dni || '');
+    const bloqueNormal4 = ', habiendo recibido consejería, e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales, AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.';
+    const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
+    const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
+    let yBloque = y;
+    lines.forEach(line => {
+      let x = margin;
+      // Detectar y renderizar los campos en negrita en cada línea
+      let idx = 0;
+      while (idx < line.length) {
+        if (line.startsWith(bloqueNormal1, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal1);
+          idx += bloqueNormal1.length;
+        } else if (line.startsWith(bloqueNegrita1, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita1);
+          idx += bloqueNegrita1.length;
+        } else if (line.startsWith(bloqueNormal2, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal2);
+          idx += bloqueNormal2.length;
+        } else if (line.startsWith(bloqueNegrita2, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita2);
+          idx += bloqueNegrita2.length;
+        } else if (line.startsWith(bloqueNormal3, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal3);
+          idx += bloqueNormal3.length;
+        } else if (line.startsWith(bloqueNegrita3, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita3);
+          idx += bloqueNegrita3.length;
+        } else if (line.startsWith(bloqueNormal4, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
+          break;
+        } else {
+          // Si hay texto que no coincide, lo renderizamos normal
+          let nextIdx = idx + 1;
+          while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4].some(b => line.startsWith(b, nextIdx))) {
+            nextIdx++;
+          }
+          const fragment = line.substring(idx, nextIdx);
+          doc.setFont('helvetica', 'normal');
+          doc.text(fragment, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(fragment);
+          idx = nextIdx;
+        }
+      }
+      yBloque += 7;
+    });
+    y += lines.length * 7 + 2;
 
     // Sede y fecha
     doc.setFont('helvetica', 'normal');
