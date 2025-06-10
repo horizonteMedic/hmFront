@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
+import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
+import Swal from 'sweetalert2';
 
 const antecedentesList = [
   { label: 'CONSUME MARIHUANA', key: 'MARIHUANA' },
@@ -72,6 +73,27 @@ const Panel2D = ({token,selectedSede, userlogued}) => {
 
   const handleFechaFocus = (e) => {
     e.target.showPicker && e.target.showPicker();
+  };
+
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Consentimiento Panel 5D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form,'con_panel2D',token);
+      }
+    });
   };
 
   return (
@@ -162,8 +184,8 @@ const Panel2D = ({token,selectedSede, userlogued}) => {
         <div className="flex flex-col items-center">
           <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
           <div className="flex gap-1 mt-1">
-            <input className="border rounded px-2 py-1 w-24" />
-            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors">
+            <input className="border rounded px-2 py-1 w-24" value={form.norden} name="norden" onChange={handleInputChange}/>
+            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>
               <FontAwesomeIcon icon={faPrint} />
             </button>
           </div>

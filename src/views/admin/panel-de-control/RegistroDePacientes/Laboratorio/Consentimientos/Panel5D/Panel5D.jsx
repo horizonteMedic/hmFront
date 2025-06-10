@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import Consentimiento_Panel5D_ohla_Digitalizado from '../../../../../../jaspers/Consentimiento_Panel5D_ohla_Digitalizado';
 import Swal from 'sweetalert2';
-import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
+import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
   { label: 'CONSUME MARIHUANA', key: 'MARIHUANA' },
@@ -80,30 +80,10 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
   };
 
   const handlePrint = () => {
-    // Mapear los datos del formulario a los campos esperados por el Jasper
-    const datos = {
-      nombres: form.nombres,
-      edad: form.edad,
-      dni: form.dni,
-      sede: '', // Puedes completar si tienes este dato
-      fecha: form.fecha,
-      // Antecedentes: marcar SI/NO según el estado
-      ant0_si: form.antecedentes[0] === 'SI',
-      ant0_no: form.antecedentes[0] === 'NO',
-      ant1_si: form.antecedentes[1] === 'SI',
-      ant1_no: form.antecedentes[1] === 'NO',
-      ant2_si: form.antecedentes[2] === 'SI',
-      ant2_no: form.antecedentes[2] === 'NO',
-      ant3_si: form.antecedentes[3] === 'SI',
-      ant3_no: form.antecedentes[3] === 'NO',
-      ant4_si: form.antecedentes[4] === 'SI',
-      ant4_no: form.antecedentes[4] === 'NO',
-      ant5_si: form.antecedentes[5] === 'SI',
-      ant5_no: form.antecedentes[5] === 'NO',
-    };
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
       title: '¿Desea Imprimir Consentimiento Panel 5D?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>${form.nombres}</b> - DNI <b>${form.dni}</b></div>`,
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir',
@@ -115,7 +95,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        Consentimiento_Panel5D_ohla_Digitalizado(datos);
+        PrintHojaR(form,'con_panel5D',token);
       }
     });
   };
@@ -210,7 +190,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
         <div className="flex flex-col items-center">
           <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
           <div className="flex gap-1 mt-1">
-            <input className="border rounded px-2 py-1 w-24" />
+            <input className="border rounded px-2 py-1 w-24" value={form.norden} name="norden" onChange={handleInputChange}  />
             <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>
               <FontAwesomeIcon icon={faPrint} />
             </button>
