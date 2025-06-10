@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
+import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
+import Swal from 'sweetalert2';
 
 const antecedentesList = [
   { label: 'CONSUME MARIHUANA (THC)', key: 'MARIHUANA' },
@@ -83,6 +84,27 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
     e.target.showPicker && e.target.showPicker();
   };
   
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Consentimiento Panel 5D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form,'con_panel10D',token);
+      }
+    });
+  };
+
   return (
     <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
       <div className="flex flex-wrap items-center gap-6 mb-6">
@@ -169,8 +191,8 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
         </button>
         <div className="ml-auto flex items-center gap-2">
           <span className="font-semibold text-blue-900 text-lg">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-32 text-base" />
-          <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded border border-blue-700 flex items-center shadow-md transition-colors">
+          <input className="border rounded px-3 py-2 w-32 text-base" value={form.norden} name="norden" onChange={handleInputChange} />
+          <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>
             <FontAwesomeIcon icon={faPrint} />
           </button>
         </div>
