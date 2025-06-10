@@ -106,7 +106,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
             nextIdx++;
           }
           const fragment = line.substring(idx, nextIdx);
-          doc.setFont('helvetica', 'normal');
+    doc.setFont('helvetica', 'normal');
           doc.text(fragment, x, yBloque, { baseline: 'top' });
           x += doc.getTextWidth(fragment);
           idx = nextIdx;

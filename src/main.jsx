@@ -28,10 +28,8 @@ import AdministrarEmpresas from './views/admin/panel-de-control/Configuracion/Ad
 import AdministrarContratas from './views/admin/panel-de-control/Configuracion/AdministrarContratas/AdministrarContratas.jsx'
 import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/Protocolos.jsx'
 import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeReclamaciones.jsx'
-//Registro de Pacientes Unico
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
-//Registro de Pacientes Multiple
-import RegistroDePacientes from './views/admin/panel-de-control/RegistroDePacientes/Registro-de-pacientes.jsx';
+import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 //jaspers
 import Sucamec from './views/jaspers/Consentimiento_Panel5D_Digitalizado.jsx';
 
@@ -112,7 +110,7 @@ const AppContent = () => {
           <Route path="/administrar-empresas" element={<AdministrarEmpresas />} />
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
           <Route path="/protocolos" element={<Protocolos />} />
-          <Route path="/Registro-de-pacientes" element={<RegistroDePacientes />} />
+          <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
 
         </Route>
         <Route path='/RegistroP' element={<Formulario/>}/>

@@ -29,7 +29,7 @@ const Dashboard = ({TotalView}) => {
     { to: "/reporte-pacientes", name: "Reportes", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", name: "Matriz Postulante", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Registro de Pacientes" }
+    { to: "/SistemaOcupacional", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Sistema Ocupacional" }
   ].filter(card => listView.includes(card.name));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
@@ -46,7 +46,7 @@ const Dashboard = ({TotalView}) => {
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "56", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "202", icon: faNotesMedical, title: "Registro de Pacientes" }
+    { to: "/SistemaOcupacional", id: "202", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
@@ -132,7 +132,7 @@ export default Dashboard;
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "53", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "3", icon: faNotesMedical, title: "Registro de Pacientes" }
+    { to: "/SistemaOcupacional", id: "3", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
@@ -152,7 +152,7 @@ export default Dashboard;
     { to: "/reporte-pacientes", id: "54", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", id: "55", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", id: "56", icon: faGears, title: "Configuración" },
-    { to: "/Registro-de-pacientes", id: "202", icon: faNotesMedical, title: "Registro de Pacientes" }
+    { to: "/SistemaOcupacional", id: "202", icon: faNotesMedical, title: "Registro de Pacientes" }
   ].filter(card => allowedRoutes.includes(card.id));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo
