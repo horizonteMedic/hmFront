@@ -196,29 +196,47 @@ const Boro = ({ token, selectedSede }) => {
         {/* Línea de datos personales */}
         <div className="flex flex-wrap items-center gap-3 mb-3 text-lg">
           <span>Yo</span>
-          <input
-            name="nombres"
-            value={form.nombres}
-            readOnly
-            className="border-b border-gray-400 px-2 py-1 min-w-[120px] max-w-[400px] text-lg bg-gray-100 cursor-not-allowed"
-            style={{ width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
-          />
+          <div className="relative">
+            <input
+              name="nombres"
+              value={form.nombres}
+              readOnly
+              className="border-b border-gray-400 px-2 py-1 bg-gray-100 cursor-not-allowed text-lg"
+              style={{ 
+                width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px`,
+                minWidth: '120px',
+                maxWidth: '400px'
+              }}
+            />
+          </div>
           <span>de</span>
-          <input
-            name="edad"
-            value={form.edad}
-            readOnly
-            className="border-b border-gray-400 px-2 py-1 min-w-[30px] max-w-[50px] bg-gray-100 cursor-not-allowed text-lg"
-            style={{ width: `${Math.min(50, Math.max(30, (String(form.edad)?.length || 0) * 14))}px` }}
-          />
+          <div className="relative">
+            <input
+              name="edad"
+              value={form.edad}
+              readOnly
+              className="border-b border-gray-400 px-2 py-1 bg-gray-100 cursor-not-allowed text-lg"
+              style={{ 
+                width: `${Math.min(50, Math.max(30, (String(form.edad)?.length || 0) * 14))}px`,
+                minWidth: '30px',
+                maxWidth: '50px'
+              }}
+            />
+          </div>
           <span>años de edad, con documento de identidad N°</span>
-          <input
-            name="dni"
-            value={form.dni}
-            readOnly
-            className="border-b border-gray-400 px-2 py-1 min-w-[80px] max-w-[120px] bg-gray-100 cursor-not-allowed text-lg"
-            style={{ width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px` }}
-          />
+          <div className="relative">
+            <input
+              name="dni"
+              value={form.dni}
+              readOnly
+              className="border-b border-gray-400 px-2 py-1 bg-gray-100 cursor-not-allowed text-lg"
+              style={{ 
+                width: `${Math.min(120, Math.max(80, (String(form.dni)?.length || 0) * 10))}px`,
+                minWidth: '80px',
+                maxWidth: '120px'
+              }}
+            />
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-3 mb-3 text-lg">
           <span>trabajador (</span>

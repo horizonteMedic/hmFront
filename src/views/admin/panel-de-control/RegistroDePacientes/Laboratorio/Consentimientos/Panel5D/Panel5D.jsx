@@ -100,6 +100,7 @@ const Panel5D = ({token, selectedSede, userlogued}) => {
       ant4_no: form.antecedentes[4] === 'NO',
       ant5_si: form.antecedentes[5] === 'SI',
       ant5_no: form.antecedentes[5] === 'NO',
+      digitalizacion: [] // Agregamos la propiedad digitalizacion como un array vacío
     };
     Swal.fire({
       title: '¿Desea Imprimir Consentimiento Panel 5D?',

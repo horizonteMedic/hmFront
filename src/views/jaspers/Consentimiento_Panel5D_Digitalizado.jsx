@@ -7,9 +7,9 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
   const doc = new jsPDF();
   headerConsentimiento(doc, datos);
 
-  const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const huella = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
+  const firma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
+  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
 
   const loadImg = src =>
     new Promise((res, rej) => {
@@ -48,22 +48,73 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
     );
     y += 11;
 
-    // Bloque de datos personales y consentimiento en un solo string
-    doc.setFont('helvetica', 'normal');
+    // Bloque de datos personales y consentimiento en un solo párrafo justificado y con campos clave en negrita
     doc.setFontSize(11);
-    const bloque =
-      `Yo ${datos.nombres || '_________________________'} , de ${datos.edad || '___'} años de edad, identificado con DNI nº ${datos.dni || '__________'}; habiendo recibido consejería e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.`;
-    const lines = doc.splitTextToSize(bloque, pageW - 2 * margin - 4);
-    const altoLinea = 7;
-    const altoCaja = lines.length * altoLinea + 6;
-    doc.text(lines, margin + 3, y, { maxWidth: pageW - 2 * margin - 6, lineHeightFactor: 1.5 });
-    y += altoCaja + 2;
-
-    // Declaración adicional
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(11);
-    doc.text("Además, declaro que la información que brindaré a continuación es verdadera:", margin, y);
-    y += 8;
+    const bloqueNormal1 = 'YO ';
+    const bloqueNegrita1 = String(datos.nombres || '_________________________');
+    const bloqueNormal2 = ' de ';
+    const bloqueNegrita2 = String(datos.edad || '___');
+    const bloqueNormal3 = ' años de edad, identificado con DNI N° ';
+    const bloqueNegrita3 = String(datos.dni || '__________');
+    const bloqueNormal4 = ', habiendo recibido consejería, e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales, AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.';
+    const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
+    const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
+    let yBloque = y;
+    lines.forEach(line => {
+      let x = margin;
+      // Detectar y renderizar los campos en negrita en cada línea
+      let idx = 0;
+      while (idx < line.length) {
+        if (line.startsWith(bloqueNormal1, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal1);
+          idx += bloqueNormal1.length;
+        } else if (line.startsWith(bloqueNegrita1, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita1);
+          idx += bloqueNegrita1.length;
+        } else if (line.startsWith(bloqueNormal2, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal2);
+          idx += bloqueNormal2.length;
+        } else if (line.startsWith(bloqueNegrita2, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita2);
+          idx += bloqueNegrita2.length;
+        } else if (line.startsWith(bloqueNormal3, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal3);
+          idx += bloqueNormal3.length;
+        } else if (line.startsWith(bloqueNegrita3, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita3);
+          idx += bloqueNegrita3.length;
+        } else if (line.startsWith(bloqueNormal4, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
+          break;
+        } else {
+          // Si hay texto que no coincide, lo renderizamos normal
+          let nextIdx = idx + 1;
+          while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4].some(b => line.startsWith(b, nextIdx))) {
+            nextIdx++;
+          }
+          const fragment = line.substring(idx, nextIdx);
+          doc.setFont('helvetica', 'normal');
+          doc.text(fragment, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(fragment);
+          idx = nextIdx;
+        }
+      }
+      yBloque += 7;
+    });
+    y += lines.length * 7 + 2;
 
     // Tabla de antecedentes (según la segunda imagen)
     autoTable(doc, {
@@ -153,7 +204,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       const selloW = 35;
       const selloH = (sellop.height / sellop.width) * selloW;
       const selloX = firma2X + (firmaLineWidth - selloW) / 2;
-      const selloY = lineaY - selloH - 1;
+      const selloY = firmaY - selloH - 1;
 
       const canvas = document.createElement('canvas');
       canvas.width = sellop.width;
