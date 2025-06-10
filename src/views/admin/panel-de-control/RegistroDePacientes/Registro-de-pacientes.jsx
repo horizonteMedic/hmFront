@@ -172,7 +172,7 @@ const TabComponent = () => {
       document.exitFullscreen();
     }
   };
-  console.log(selectSede)
+
   return (
     <div className="mx-auto  overflow-hidden w-[100%] relative ">
    

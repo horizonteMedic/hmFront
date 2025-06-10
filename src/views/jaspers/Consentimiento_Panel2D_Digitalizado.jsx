@@ -48,7 +48,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
     doc.setFont(undefined, 'bold');
     doc.text('Fecha:', 140, y);
     doc.setFont(undefined, 'normal');
-    doc.text(`${datos.fecha_apertura_po || ''}`, 155, y);
+    doc.text(`${datos.fecha || ''}`, 155, y);
 
     // Antecedentes
     let antY = y + 18;
@@ -60,7 +60,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
       startY: antY,
       body: [
         ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "})`, `SI ( ${datos.antConsumeMarih ? "X" : " " })`],
-        ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "})`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " " })`],
+        ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "})`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " " })    ${datos.antConsumeHojaCoca ? `Fecha:  ${datos.fechaConsumoHojaCoca}` : ""}`],
         ['CONSUME COCAINA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "})`, `SI ( ${datos.antConsumeCocacina ? "X" : " " })`],
       ],
       theme: 'plain',

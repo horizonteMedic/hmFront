@@ -1,7 +1,7 @@
 import { URLAzure } from "../../../../../../config/config";
 
-export function GetInfoLaboratioEx(data, tabla, token, user) {
-    
+export function GetInfoLaboratioEx(data, tabla, token, user, fechaCoca) {
+    console.log(data)
     const body = {
         nameConset: tabla,
         antConsumeMarih: data.antecedentes.MARIHUANA ?? false,
@@ -18,9 +18,10 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
         userRegistro: user,
         userMedicoOcup: "",
         fechaex: data.fecha,
+        fechaConsumoHojaCoca: fechaCoca,
         nOrden: data.norden
     };    
-    
+    console.log(JSON.stringify(body))
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
         const options = {
             method: 'POST',
