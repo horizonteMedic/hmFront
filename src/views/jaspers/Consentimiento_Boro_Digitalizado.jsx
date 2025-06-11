@@ -93,7 +93,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     y += 8;
     doc.text('Si la respuesta es SI: ¿Cuándo consumió por última vez?', 18, y);
     y += 6;
-    doc.text('Fecha:', 25, y);
+    doc.text(`${datos.antBoroConsumenMateCoca ? 'Fecha:' : ''}`, 25, y);
     doc.text(`${datos.antBoroConsumenMateCoca ? datos.critFechaConsumoMateCoca : ''}`, 40, y);
     y += 10;
     // Hoja de coca

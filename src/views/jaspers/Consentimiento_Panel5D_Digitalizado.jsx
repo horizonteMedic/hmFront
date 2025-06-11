@@ -141,7 +141,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
     // Fecha
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
+    doc.text(`Fecha: ${datos.fecha}`, pageW / 2, y, { align: "center" });
     y += 12;
 
     // Firma y huella - centrado

@@ -119,7 +119,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     // Sede y fecha
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
-    doc.text(`${datos.sede || ''} - ${datos.fecha || ''}`, pageW - margin - 60, y);
+    doc.text(`Fecha: ${datos.fecha || ''}`, pageW - margin - 60, y);
     y += 11;
 
     // Firma y huella - centrado

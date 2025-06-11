@@ -6,12 +6,12 @@ import ImportacionModalBasica from './Admision/ImportacionModalBasica.jsx';
 import ReservaPacientes from './Admision/ReservaPacientes.jsx';
 import ConsentimientoDigitalizacion from './Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx';
 import Triaje from './Triaje/Triaje';
-import Consentimientos from './Consentimientos/Consentimientos.jsx';
+import Consentimientos from './Laboratorio/Consentimientos/Consentimientos.jsx';
 import Resultados from './Resultados/Resultados';
 import ExamenesLaboratorio from './Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio';
 import ParasitologiaCoprologico from './Parasitologia/ParasitologiaCoprologico';
-import LaboratorioClinico from './LaboratorioClinico/LaboratorioClinico';
-import LaboratorioAnalisisBioquimicos from './laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos';
+import LaboratorioClinico from './Laboratorio/LaboratorioClinico/LaboratorioClinico.jsx';
+import LaboratorioAnalisisBioquimicos from './Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos.jsx';
 import {
   ComboboxEmpresasMulti,
   ComboboxContratasMulti,
@@ -178,33 +178,7 @@ const TabComponent = () => {
     return vista?.listaPermisos.includes(permiso) ?? false;
   };
 
-  useEffect(() => {
-    const handleClick = (e) => {
-      if (contextMenu.visible && contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
-        setContextMenu({ ...contextMenu, visible: false });
-      }
-    };
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') setContextMenu({ ...contextMenu, visible: false });
-    };
-    document.addEventListener('mousedown', handleClick);
-    document.addEventListener('keydown', handleEsc);
-    return () => {
-      document.removeEventListener('mousedown', handleClick);
-      document.removeEventListener('keydown', handleEsc);
-    };
-  }, [contextMenu]);
-
-  useEffect(() => {
-    const handleContextMenu = (e) => {
-      e.preventDefault();
-      setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
-    };
-    document.addEventListener('contextmenu', handleContextMenu);
-    return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-    };
-  }, []);
+ 
 
   const changeTab = (tabIndex) => setActiveTab(tabIndex);
   const openModal = () => setIsModalOpen(true);

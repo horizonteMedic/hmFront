@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loading } from '../../../../components/Loading';
+import { Loading } from '../../../../../components/Loading';
 import Panel10D from './Panel10D/Panel10D';
 import Panel5D from './Panel5D/Panel5D';
 import Panel3D from './Panel3D/Panel3D';

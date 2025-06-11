@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import Consentimiento_Panel5D_ohla_Digitalizado from '../../../../../jaspers/Consentimiento_Panel5D_ohla_Digitalizado';
 import Swal from 'sweetalert2';
 import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 

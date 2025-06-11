@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
-import { getFetch } from '../../../getFetch/getFetch.js';
-import { GetInfoLaboratioEx, SubmitInfoLaboratioExBoro } from "./model";
+import { getFetch } from '../../../../getFetch/getFetch.js';
+import { GetInfoLaboratioEx, SubmitInfoLaboratioExBoro } from "./model.js";
 
 const backendToKeyMap = {
   antConsumeMarih: 'MARIHUANA',
@@ -169,8 +169,8 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
       if (res.norden) {
         const nombre = res.nameJasper;
         console.log(nombre)
-        const jasperModules = import.meta.glob('../../../../../jaspers/*.jsx');
-        const modulo = await jasperModules[`../../../../../jaspers/${nombre}.jsx`]();
+        const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
+        const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
@@ -188,8 +188,8 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
       if (res.norden) {
         const nombre = res.nameJasper;
         console.log(nombre)
-        const jasperModules = import.meta.glob('../../../../../jaspers/*.jsx');
-        const modulo = await jasperModules[`../../../../../jaspers/${nombre}.jsx`]();
+        const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
+        const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
