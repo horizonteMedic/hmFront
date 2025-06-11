@@ -271,31 +271,13 @@ const TabComponent = () => {
                 </div>
               )}
               <div
-                className={`${styles.gridItem} ${activeTab === 4 ? styles.active : ''}`}
-                onClick={() => setActiveTab(4)}
+                className={`${styles.gridItem} ${activeTab === 3 ? styles.active : ''}`}
+                onClick={() => setActiveTab(3)}
               >
                 <span className={styles.icon}>
-                  <FontAwesomeIcon icon={faVial} />
+                  <FontAwesomeIcon icon={faClipboardList} />
                 </span>
-                <span className={styles.title}>Laboratorio Clínico</span>
-              </div>
-              <div
-                className={`${styles.gridItem} ${activeTab === 5 ? styles.active : ''}`}
-                onClick={() => setActiveTab(5)}
-              >
-                <span className={styles.icon}>
-                  <FontAwesomeIcon icon={faVial} />
-                </span>
-                <span className={styles.title}>Análisis Bioquímicos</span>
-              </div>
-              <div
-                className={`${styles.gridItem} ${activeTab === 6 ? styles.active : ''}`}
-                onClick={() => setActiveTab(6)}
-              >
-                <span className={styles.icon}>
-                  <FontAwesomeIcon icon={faFileContract} />
-                </span>
-                <span className={styles.title}>Consentimientos</span>
+                <span className={styles.title}>Coproparasitológico</span>
               </div>
               <div className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ''}`}>
                 <span className={styles.icon}>
@@ -344,15 +326,6 @@ const TabComponent = () => {
                   <FontAwesomeIcon icon={faEye} />
                 </span>
                 <span className={styles.title}>Oftalmología</span>
-              </div>
-              <div
-                className={`${styles.gridItem} ${activeTab === 3 ? styles.active : ''}`}
-                onClick={() => setActiveTab(3)}
-              >
-                <span className={styles.icon}>
-                  <FontAwesomeIcon icon={faClipboardList} />
-                </span>
-                <span className={styles.title}>Coproparasitológico</span>
               </div>
             </div>
           </>
@@ -470,10 +443,48 @@ const TabComponent = () => {
                 </button>
               </div>
               <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Examenes</h2>
+                <h2 className="text-2xl font-bold text-[#233245]">Laboratorio</h2>
               </div>
-              <div>
-                <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} activeTabExamenes={activeTabExamenes} setActiveTabExamenes={setActiveTabExamenes} />
+              <div className={styles.gridContainer} style={{width: '100%', gap: '2.5rem', marginTop: '2.5rem'}}>
+                <div
+                  className={styles.gridItem}
+                  onClick={() => setActiveTab(4)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faVial} />
+                  </span>
+                  <span className={styles.title}>Laboratorio Clínico</span>
+                </div>
+                <div
+                  className={styles.gridItem}
+                  onClick={() => setActiveTab(5)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faVial} />
+                  </span>
+                  <span className={styles.title}>Análisis Bioquímicos</span>
+                </div>
+                <div
+                  className={styles.gridItem}
+                  onClick={() => setActiveTab(6)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faFileContract} />
+                  </span>
+                  <span className={styles.title}>Consentimientos</span>
+                </div>
+                <div
+                  className={styles.gridItem}
+                  onClick={() => {
+                    setActiveTab(7);
+                    setActiveTabExamenes(1);
+                  }}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faClipboardList} />
+                  </span>
+                  <span className={styles.title}>Exámenes</span>
+                </div>
               </div>
             </div>
           )}
@@ -498,7 +509,7 @@ const TabComponent = () => {
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
+                  onClick={() => setActiveTab(2)}
                 >
                   ← Atrás
                 </button>
@@ -514,7 +525,7 @@ const TabComponent = () => {
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
+                  onClick={() => setActiveTab(2)}
                 >
                   ← Atrás
                 </button>
@@ -530,7 +541,7 @@ const TabComponent = () => {
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
+                  onClick={() => setActiveTab(2)}
                 >
                   ← Atrás
                 </button>
@@ -539,6 +550,22 @@ const TabComponent = () => {
                 <h2 className="text-2xl font-bold text-[#233245]">Consentimientos</h2>
               </div>
               <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>
+            </div>
+          )}
+          {activeTab === 7 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(2)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Exámenes</h2>
+              </div>
+              <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} activeTabExamenes={activeTabExamenes} setActiveTabExamenes={setActiveTabExamenes} />
             </div>
           )}
         </div>
