@@ -108,6 +108,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
     return
   }
   Loading('Registrando Datos')
+  console.log('wts',fechaCoca)
   GetInfoLaboratioEx(form,tabla,token,user, fechaCoca)
   .then((res) => {
     if (res.id === 1 || res.id === 0) {

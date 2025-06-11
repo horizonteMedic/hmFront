@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import HematologiaBioquimicaSIEO from './Hematologia-bioquimicaSI-EO/Hematologia-bioquimicaSI-EO';
 import ExamenOrina from './ExamenOrina/ExamenOrina';
 import ExamenInmonulogico from './ExamenInmonulogico/ExamenInmonulogico';
 
 const LaboratorioClinico = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const navigate = useNavigate();
 
   const tabs = [
     { label: 'Hematología - Bioquímica SI-EO', component: <HematologiaBioquimicaSIEO /> },
@@ -12,8 +14,20 @@ const LaboratorioClinico = () => {
     { label: 'Examen Inmunológico', component: <ExamenInmonulogico /> },
   ];
 
+  const handleBack = () => {
+    window.location.assign('/SistemaOcupacional');
+  };
+
   return (
     <div className="w-full">
+      <div className="flex items-center justify-end gap-4 mb-2">
+        <button
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+          onClick={handleBack}
+        >
+          ← Atrás
+        </button>
+      </div>
       <h2 className="text-2xl font-bold text-[#233245] mb-4">Laboratorio Clínico</h2>
       <div className="flex space-x-1">
         {tabs.map((tab, idx) => (
