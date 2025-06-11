@@ -138,7 +138,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
           cancelButtonColor: "#d33",
         }).then((result) => {
           if (result.isConfirmed) {
-            Swal.fire('ÑO','LOBO AUN NO HACE ESta API XDD', 'error')
+            PrintHojaR(res,tabla,token,true)
           }
         })
       }
@@ -161,26 +161,47 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
  
 }
 
-export const PrintHojaR = async (datos,tabla,token) => {
+export const PrintHojaR = async (datos,tabla,token, boro = false) => {
   Loading('Cargando Formato a Imprimir')
    // Ej: 'ConsentimientoPanel10D'
-  getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${datos.norden}&nameConset=${tabla}`,token)
-  .then(async (res) => {
-    console.log(res)
-    if (res.norden) {
-      const nombre = res.nameJasper;
-      console.log(nombre)
-      const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === 'function') {
-        modulo.default(res);
-      } else {
-        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+  if (boro === true) {
+    getFetch(`/api/v01/ct/laboratorio/consentimientoLaboratorioBoro?nOrden=${datos.norden}&nameConset=${tabla}`,token)
+    .then(async (res) => {
+      if (res.norden) {
+        const nombre = res.nameJasper;
+        console.log(nombre)
+        const jasperModules = import.meta.glob('../../../../../jaspers/*.jsx');
+        const modulo = await jasperModules[`../../../../../jaspers/${nombre}.jsx`]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === 'function') {
+          modulo.default(res);
+        } else {
+          console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+        }
       }
-    }
-  })
-  .finally(() => {
-    Swal.close()
-  })
+    })
+    .finally(() => {
+      Swal.close()
+    })
+  } else{
+    getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${datos.norden}&nameConset=${tabla}`,token)
+    .then(async (res) => {
+      if (res.norden) {
+        const nombre = res.nameJasper;
+        console.log(nombre)
+        const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
+        const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === 'function') {
+          modulo.default(res);
+        } else {
+          console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+        }
+      }
+    })
+    .finally(() => {
+      Swal.close()
+    })
+  }
+  
 }

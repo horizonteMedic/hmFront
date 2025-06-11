@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import Consentimiento_Boro_Digitalizado from '../../../../../jaspers/Consentimiento_Boro_Digitalizado';
 import Swal from 'sweetalert2';
-import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
+import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
   { label: 'CONSUME COCAINA' },
@@ -89,25 +89,10 @@ const Boro = ({ token, selectedSede, userlogued }) => {
   };
 
   const handlePrint = () => {
-    const datos = {
-      ...form,
-      enfermedad_si: form.enfermedad.si,
-      enfermedad_cual: form.enfermedad.cual,
-      medicamento_si: form.medicamento.si,
-      medicamento_cual: form.medicamento.cual,
-      matecoca_si: form.matecoca.si,
-      matecoca_fecha: form.matecoca.fecha,
-      chaccha_si: form.chaccha.si,
-      tratamiento_si: form.tratamiento.si,
-      tratamiento_cual: form.tratamiento.cual,
-      tratamiento_cuando: form.tratamiento.cuando,
-      tratamiento_donde: form.tratamiento.donde,
-      notas: form.notas,
-      medico: form.medico,
-    };
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
-      title: '¿Desea Imprimir Consentimiento Boro?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>${form.nombres}</b> - DNI <b>${form.dni}</b></div>`,
+      title: '¿Desea Imprimir Consentimiento Panel 5D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir',
@@ -115,11 +100,11 @@ const Boro = ({ token, selectedSede, userlogued }) => {
       customClass: {
         title: 'swal2-title',
         confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel',
-      },
+        cancelButton: 'swal2-cancel'
+      }
     }).then((result) => {
       if (result.isConfirmed) {
-        Consentimiento_Boro_Digitalizado(datos);
+        PrintHojaR(form,'consent_Boro',token,true);
       }
     });
   };
@@ -136,8 +121,10 @@ const Boro = ({ token, selectedSede, userlogued }) => {
             onChange={handleInputChange}
             className="border rounded px-3 py-2 w-40 text-lg"
             onKeyUp={(event) => {
-              if (event.key === 'Enter')
+              if (event.key === 'Enter'){
+                handleLimpiar()
                 VerifyTR(form.norden, 'consent_Boro', token, setForm, selectedSede, true);
+              }
             }}
           />
           <label className="font-semibold text-lg ml-4">Fecha :</label>
@@ -365,30 +352,18 @@ const Boro = ({ token, selectedSede, userlogued }) => {
               className="border rounded px-2 py-1 w-80 h-20 resize-none text-lg"
             />
           </div>
-          <div className="flex flex-col justify-end">
-            <label className="font-semibold text-lg">MEDICO:</label>
-            <select
-              name="medico"
-              value={form.medico}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-64 text-lg"
-            >
-              {medicosList.map((med) => (
-                <option key={med.value} value={med.value}>{med.label}</option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Botones */}
         <div className="flex flex-wrap gap-4 items-center mt-6">
-          <button type="button" onClick={() => {SubmitConsentimientoLab(form,"",token,userlogued,null,true)}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg">
+          <button type="button" onClick={() => {SubmitConsentimientoLab(form,"consent_Boro",token,userlogued,null,true)}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg" onClick={handleLimpiar}>
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
           <span className="font-bold text-blue-900 text-lg italic ml-6">IMPRIMIR</span>
+          <input className="border rounded px-3 py-2 w-32 text-base" value={form.norden} name="norden" onChange={handleInputChange} />
           <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded border border-blue-700 flex items-center shadow-md transition-colors ml-2 text-lg" onClick={handlePrint}>
             <FontAwesomeIcon icon={faPrint} />
           </button>
