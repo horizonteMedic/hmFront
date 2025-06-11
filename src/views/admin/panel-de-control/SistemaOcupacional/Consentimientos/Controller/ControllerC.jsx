@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../getFetch/getFetch.js';
-import { GetInfoLaboratioEx } from "./model";
+import { GetInfoLaboratioEx, SubmitInfoLaboratioExBoro } from "./model";
 
 const backendToKeyMap = {
   antConsumeMarih: 'MARIHUANA',
@@ -45,7 +45,7 @@ const Loading = (text) => {
 
 }
 
-export const VerifyTR = async (nro,tabla,token,set,sede) => {
+export const VerifyTR = async (nro,tabla,token,set,sede, boro = false) => {
     if (!nro) { 
       await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
       return
@@ -57,7 +57,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoPacLaboratorioFil(nro,tabla,set,token)
+            GetInfoPacLaboratorioFil(nro,tabla,set,token, boro)
         }
     })
 }
@@ -77,7 +77,27 @@ export const GetInfoPac = (nro,set,token,sede) => {
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
+export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro) => {
+  console.log(boro)
+  if (boro === true) {
+    getFetch(`/api/v01/ct/laboratorio/consentimientoLaboratorioBoro?nOrden=${nro}&nameConset=${tabla}`,token)
+    .then((res) => {
+      console.log(res)
+      set(prev => ({
+        ...prev,
+        ...res,
+        enfermedad: { key: res.antBoroAlgunaEnfermedad, cual: res.critCualAlgunaEnfermedad ? res.critCualAlgunaEnfermedad : '' },
+        medicamento: { key: res.antBoroAlgunMedicamento, cual: res.critCualAlgunMedicamento ? res.critCualAlgunMedicamento : '' },
+        matecoca: { key: res.antBoroConsumenMateCoca, fecha: res.critFechaConsumoMateCoca },
+        chaccha: { key: res.masticaHojaCoca, fecha: res.fechaConsumoHojaCoca},
+        tratamiento: { key: res.antBoroTratQuirugODental, cual: res.critCualTratQuirugODental ? res.critCualTratQuirugODental : '', 
+          cuando: res.critCuandoTratQuirugODental ? res.critCuandoTratQuirugODental : '', donde: res.critDondeTratQuirugODental ? res.critDondeTratQuirugODental : '' },
+      }))
+    })
+    .finally(() => {
+      Swal.close()
+    })
+  } else {
     getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`,token)
     .then((res) => {
       if (res.norden) {
@@ -100,28 +120,44 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
     .finally(() => {
       Swal.close()
     })
+  }
 }
 
-export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null) => {
+export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null, boro = false) => {
   if (!form.norden) {
     await Swal.fire('Error', 'Datos Incompletos','error')
     return
   }
   Loading('Registrando Datos')
-  console.log('wts',fechaCoca)
-  GetInfoLaboratioEx(form,tabla,token,user, fechaCoca)
-  .then((res) => {
-    if (res.id === 1 || res.id === 0) {
-      Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          PrintHojaR(form,tabla,token)
-        }
-      })
-    }
-  })
+  if (boro === true) {
+    SubmitInfoLaboratioExBoro(form,token,user)
+    .then((res) => {
+      if (res.norden) {
+        Swal.fire({title: 'Exito', text:`Se completo el Registro Correctamente,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Swal.fire('ÑO','LOBO AUN NO HACE ESta API XDD', 'error')
+          }
+        })
+      }
+    })
+  } else {
+     GetInfoLaboratioEx(form,tabla,token,user, fechaCoca)
+    .then((res) => {
+      if (res.id === 1 || res.id === 0) {
+        Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            PrintHojaR(form,tabla,token)
+          }
+        })
+      }
+    })
+  }
 }
 
 export const PrintHojaR = async (datos,tabla,token) => {
