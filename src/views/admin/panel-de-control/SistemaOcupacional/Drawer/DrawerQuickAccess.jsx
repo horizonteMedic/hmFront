@@ -30,7 +30,7 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex }) => (
           <FontAwesomeIcon icon={faTimes} className="text-2xl text-gray-500 hover:text-[#1a2536]" />
         </button>
       </div>
-      <div className="flex flex-col gap-2 px-4 py-6">
+      <div className="flex flex-col gap-2 px-4 py-6 overflow-y-auto max-h-[calc(100vh-80px)]">
         <button
           className="flex items-center gap-4 bg-gray-100 hover:bg-[#1a2536] rounded-xl px-4 py-4 transition-all duration-200 group text-left mb-2"
           onClick={() => onNavigate(7)}

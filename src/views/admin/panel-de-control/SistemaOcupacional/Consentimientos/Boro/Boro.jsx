@@ -51,7 +51,7 @@ const Boro = ({ token, selectedSede, userlogued }) => {
   const chacchaFechaRef = useRef(null);
 
   const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   };
 
   const handleAntecedenteChange = (idx, value) => {
@@ -82,6 +82,26 @@ const Boro = ({ token, selectedSede, userlogued }) => {
       notas: '',
       medico: '',
     });
+  };
+
+  const handleset = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      dni: '',
+      trabajador: true,
+      postulante: false,
+      empresa: '',
+      enfermedad: { key: false, cual: '' },
+      medicamento: { key: false, cual: '' },
+      matecoca: { key: false, fecha: '' },
+      chaccha: { key: false, fecha: today },
+      tratamiento: { key: false, cual: '', cuando: '', donde: '' },
+      notas: '',
+      medico: '',
+    }));
   };
 
   const handleFechaFocus = (e) => {
@@ -122,7 +142,7 @@ const Boro = ({ token, selectedSede, userlogued }) => {
             className="border rounded px-3 py-2 w-40 text-lg"
             onKeyUp={(event) => {
               if (event.key === 'Enter'){
-                handleLimpiar()
+                handleset()
                 VerifyTR(form.norden, 'consent_Boro', token, setForm, selectedSede, true);
               }
             }}
@@ -208,8 +228,9 @@ const Boro = ({ token, selectedSede, userlogued }) => {
           <input
             name="empresa"
             value={form.empresa}
+            disabled
             onChange={handleInputChange}
-            className="border-b border-gray-400 px-2 py-1 min-w-[120px] max-w-[200px] bg-white text-lg"
+            className="border-b border-gray-400 px-2 py-1 min-w-[120px] max-w-[200px] bg-gray-100 text-lg"
             style={{ width: `${Math.min(200, Math.max(120, (form.empresa?.length || 0) * 10))}px` }}
           />
         </div>

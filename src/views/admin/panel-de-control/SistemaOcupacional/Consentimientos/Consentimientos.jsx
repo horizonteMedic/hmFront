@@ -8,7 +8,6 @@ import MuestraDeSangre from './MuestraDeSangre/MuestraDeSangre';
 import ConsMarihuana from './ConsMarihuana/ConsMarihuana';
 import Boro from './Boro/Boro';
 
-
 const Consentimientos = ({ token, selectedSede, userlogued }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -23,17 +22,29 @@ const Consentimientos = ({ token, selectedSede, userlogued }) => {
     { label: 'BORO', component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
   ];
 
+  const handleBack = () => {
+    window.location.assign('/SistemaOcupacional');
+  };
+
   return (
     <div className="w-full">
+      <div className="flex items-center justify-end gap-4 mb-2">
+        <button
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+          onClick={handleBack}
+        >
+          ← Atrás
+        </button>
+      </div>
       {loading ? (
         <Loading />
       ) : (
-        <div >
+        <div>
           <div className="flex space-x-2">
             {tabs.map((tab, idx) => (
               <button
                 key={tab.label}
-                className={`px-6 py-2 border rounded-t-lg transition-all duration-150 text-base font-semibold focus:outline-none ${activeTab === idx ? 'bg-[#215086] text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                className={`px-6 py-2 border rounded-t-lg transition-all duration-150 text-base font-semibold focus:outline-none ${activeTab === idx ? 'bg-[#233245] text-white font-bold' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
                 onClick={() => setActiveTab(idx)}
               >
                 {tab.label}

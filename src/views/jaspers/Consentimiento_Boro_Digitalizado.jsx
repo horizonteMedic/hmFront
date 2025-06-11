@@ -172,10 +172,37 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const notas = datos.notas || '';
     const notasLines = doc.splitTextToSize(notas, 170);
     doc.setDrawColor(100);
-    doc.rect(35, y - 5, 160, notasLines.length * 7 + 10);
+    doc.rect(35, y - 5, 160, notasLines.length * 6 + 5);
     doc.text(notasLines, 40, y + 5, { maxWidth: 150 });
 
-    footer(doc, datos);
+    //sello
+    y += 31
+    const SelloText = 'Firma del testigo o responsable de la toma de muestra';
+    const SelloTextWidth = doc.getTextWidth(SelloText);
+    const SellolineaBaseY = y - 4; // Línea donde se posicionan firma y huella
+    doc.setDrawColor(100);
+    doc.line(100, SellolineaBaseY, 100 + SelloTextWidth, SellolineaBaseY);
+    doc.setFont(undefined, 'bold');
+    doc.text(SelloText, 100, y); // texto a y (encima de la línea)
+    if (sellop) {
+      const selloW = 50; // Ajusta este valor para achicar o agrandar
+      const selloH = (sellop.height / sellop.width) * selloW;
+
+      // Centrado horizontal respecto a la línea de texto
+      const selloX = 100 + (SelloTextWidth - selloW) / 2;
+
+      // Un poco arriba de la línea horizontal
+      const selloY = SellolineaBaseY - selloH - 2;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = sellop.width;
+      canvas.height = sellop.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(sellop, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
+    }
+
 
     // Mostrar PDF
     const pdfBlob = doc.output("blob");

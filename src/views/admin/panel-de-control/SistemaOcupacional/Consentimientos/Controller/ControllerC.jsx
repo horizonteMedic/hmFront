@@ -158,7 +158,6 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
       }
     })
   }
- 
 }
 
 export const PrintHojaR = async (datos,tabla,token, boro = false) => {

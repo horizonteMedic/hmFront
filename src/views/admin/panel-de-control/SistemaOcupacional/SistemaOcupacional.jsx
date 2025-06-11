@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import RegistroClientes from './Admision/RegistroClientes.jsx';
 import AperturaExamenesPreOcup from './Admision/AperturaExamenes/AperturaExamenesPreOcup.jsx';
 import ImportacionModal from './Admision/ImportacionMasiva.jsx';
@@ -6,7 +6,7 @@ import ImportacionModalBasica from './Admision/ImportacionModalBasica.jsx';
 import ReservaPacientes from './Admision/ReservaPacientes.jsx';
 import ConsentimientoDigitalizacion from './Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx';
 import Triaje from './Triaje/Triaje';
-import Consentimientos from './Consentimientos/Consentimientos';
+import Consentimientos from './Consentimientos/Consentimientos.jsx';
 import Resultados from './Resultados/Resultados';
 import ExamenesLaboratorio from './Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio';
 import ParasitologiaCoprologico from './Parasitologia/ParasitologiaCoprologico';
@@ -59,6 +59,19 @@ import { useAuthStore } from '../../../../store/auth';
 import { Loading } from '../../../components/Loading';
 import DrawerQuickAccess from './Drawer/DrawerQuickAccess';
 
+const hiddenExamTabs = [
+  { key: 6, label: 'Anexo 16 A' },
+  { key: 7, label: 'Test Altura' },
+  { key: 8, label: 'Bioquímica' },
+  { key: 9, label: 'Gonadotropina' },
+  { key: 10, label: 'Perfil Hepático' },
+  { key: 11, label: 'Hepatitis' },
+  { key: 12, label: 'ANEXO 16A - TEST DE ALTURA - PSICOSENSOMETRICO' },
+  { key: 13, label: 'Hemograma Automatizado' },
+  { key: 14, label: 'Psicosensometría' },
+  { key: 15, label: 'Coproparasitología' },
+];
+
 const TabComponent = () => {
   const [activeTab, setActiveTab] = useState(null); // null: dashboard, 0: Admisión, 1: Triaje, 2: Laboratorio
   const [subTab, setSubTab] = useState(0); // Para tabs internos de Admisión
@@ -72,6 +85,9 @@ const TabComponent = () => {
   const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
+  const [activeTabExamenes, setActiveTabExamenes] = useState(1); // Para ExamenesLaboratorio
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0 });
+  const contextMenuRef = useRef(null);
 
   //Sede
   const [selectSede, setSelectSede] = useState("")
@@ -162,16 +178,33 @@ const TabComponent = () => {
     return vista?.listaPermisos.includes(permiso) ?? false;
   };
 
-  /*useEffect(() => {
-    // inicializa la primera pestaña a la que el usuario tiene acceso
-    const keys = Object.keys(Acces);
-    for (let i = 0; i < keys.length; i++) {
-      if (Acces[keys[i]]) {
-        setActiveTab(i);
-        break;
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (contextMenu.visible && contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
+        setContextMenu({ ...contextMenu, visible: false });
       }
-    }
-  }, []);*/
+    };
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') setContextMenu({ ...contextMenu, visible: false });
+    };
+    document.addEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleEsc);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleEsc);
+    };
+  }, [contextMenu]);
+
+  useEffect(() => {
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      setContextMenu({ visible: true, x: e.clientX, y: e.clientY });
+    };
+    document.addEventListener('contextmenu', handleContextMenu);
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+    };
+  }, []);
 
   const changeTab = (tabIndex) => setActiveTab(tabIndex);
   const openModal = () => setIsModalOpen(true);
@@ -255,6 +288,15 @@ const TabComponent = () => {
                 </span>
                 <span className={styles.title}>Análisis Bioquímicos</span>
               </div>
+              <div
+                className={`${styles.gridItem} ${activeTab === 6 ? styles.active : ''}`}
+                onClick={() => setActiveTab(6)}
+              >
+                <span className={styles.icon}>
+                  <FontAwesomeIcon icon={faFileContract} />
+                </span>
+                <span className={styles.title}>Consentimientos</span>
+              </div>
               <div className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faUserMd} />
@@ -334,17 +376,16 @@ const TabComponent = () => {
         <div className={styles.tabContainer}>
           {activeTab === 0 && (
             <div>
-              <div className={styles.tabHeader}>
-                <button className={`${styles.tabButton} ${styles.active}`}>
-                  Admisión
-                </button>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
-                  className={styles.closeButton}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
                   onClick={() => setActiveTab(null)}
-                  title="Cerrar"
                 >
-                  ×
+                  ← Atrás
                 </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Admisión</h2>
               </div>
               <div>
                 <div className={styles.tabHeader}>
@@ -404,72 +445,101 @@ const TabComponent = () => {
           )}
           {activeTab === 1 && (
             <div>
-              <div className={styles.tabHeader}>
-                <button className={`${styles.tabButton} ${styles.active}`}>
-                  Triaje
-                </button>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
-                  className={styles.closeButton}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
                   onClick={() => setActiveTab(null)}
-                  title="Cerrar"
                 >
-                  ×
+                  ← Atrás
                 </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Triaje</h2>
               </div>
               <Triaje token={token} selectedSede={selectSede} />
             </div>
           )}
           {activeTab === 2 && (
             <div>
-              <div className={styles.tabHeader}>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
-                  className={`${styles.tabButton} ${labTab === 0 ? styles.active : ''}`}
-                  onClick={() => setLabTab(0)}
-                >
-                  Exámenes
-                </button>
-                <button
-                  className={`${styles.tabButton} ${labTab === 1 ? styles.active : ''}`}
-                  onClick={() => setLabTab(1)}
-                >
-                  Consentimientos
-                </button>
-                <button
-                  className={styles.closeButton}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
                   onClick={() => setActiveTab(null)}
-                  title="Cerrar"
                 >
-                  ×
+                  ← Atrás
                 </button>
               </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Examenes</h2>
+              </div>
               <div>
-                {labTab === 0 && <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
-                {labTab === 1 && <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} activeTabExamenes={activeTabExamenes} setActiveTabExamenes={setActiveTabExamenes} />
               </div>
             </div>
           )}
           {activeTab === 3 && (
             <div>
-              <div className={styles.tabHeader}>
-                <button className={`${styles.tabButton} ${styles.active}`}>
-                  Coproparasitológico
-                </button>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
-                  className={styles.closeButton}
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
                   onClick={() => setActiveTab(null)}
-                  title="Cerrar"
                 >
-                  ×
+                  ← Atrás
                 </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Coproparasitológico</h2>
               </div>
               <ParasitologiaCoprologico />
             </div>
           )}
           {activeTab === 4 && (
-            <LaboratorioClinico />
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Laboratorio Clínico</h2>
+              </div>
+              <LaboratorioClinico />
+            </div>
           )}
           {activeTab === 5 && (
-            <LaboratorioAnalisisBioquimicos />
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Análisis Bioquímicos</h2>
+              </div>
+              <LaboratorioAnalisisBioquimicos />
+            </div>
+          )}
+          {activeTab === 6 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Consentimientos</h2>
+              </div>
+              <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>
+            </div>
           )}
         </div>
       </div>
@@ -501,10 +571,34 @@ const TabComponent = () => {
             setActiveTab(4);
           } else if (idx === 5) {
             setActiveTab(5);
+          } else if (idx === 6) {
+            setActiveTab(6);
           }
         }}
         activeIndex={activeTab}
       />
+
+      {/* Context Menu for hidden exam tabs */}
+      {contextMenu.visible && (
+        <ul
+          ref={contextMenuRef}
+          style={{ position: 'fixed', top: contextMenu.y, left: contextMenu.x, zIndex: 9999, background: 'white', border: '1px solid #ccc', borderRadius: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.15)', padding: 0, margin: 0, minWidth: 220 }}
+        >
+          {hiddenExamTabs.map(tab => (
+            <li
+              key={tab.key}
+              style={{ listStyle: 'none', padding: '10px 18px', cursor: 'pointer', fontSize: 15, color: '#233245', borderBottom: '1px solid #eee' }}
+              onClick={() => {
+                setActiveTab(2);
+                setActiveTabExamenes(tab.key);
+                setContextMenu({ ...contextMenu, visible: false });
+              }}
+            >
+              {tab.label}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
