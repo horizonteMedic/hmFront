@@ -17,7 +17,7 @@ import { format } from 'date-fns';
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
   const [stardate, setStartDate] = useState(new Date());
-  const jasperModules = import.meta.glob('../../../../jaspers/*.jsx'); // ajusta si usas .jsx
+  const jasperModules = import.meta.glob('../../../../../jaspers/*.jsx'); // ajusta si usas .jsx
   const dniRef = useRef(null);
   const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
     ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
@@ -585,7 +585,7 @@ const AperturaExamenesPreOcup = (props) => {
     .then(async(res) => {
       if (res.id === 1) {
         const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-        const filePath = `../../../../jaspers/${jasperName}.jsx`;
+        const filePath = `../../../../../jaspers/${jasperName}.jsx`;
         if (jasperModules[filePath]) {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
@@ -644,7 +644,7 @@ const AperturaExamenesPreOcup = (props) => {
     .then(async(res) => {
       if (res.id === 1) {
         const jasperName = res.mensaje; // por ejemplo: 'TestAltura1'
-        const filePath = `../../../../jaspers/${jasperName}.jsx`;
+        const filePath = `../../../../../jaspers/${jasperName}.jsx`;
         if (jasperModules[filePath]) {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
@@ -810,7 +810,7 @@ const AperturaExamenesPreOcup = (props) => {
 
     return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
   };
-  console.log(datos)
+  
   return (
     <div >
         <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">

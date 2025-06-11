@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import Consentimiento_Boro_Digitalizado from '../../../../../jaspers/Consentimiento_Boro_Digitalizado';
 import Swal from 'sweetalert2';
-import { VerifyTR } from '../Controller/ControllerC';
+import { SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 
 const antecedentesList = [
   { label: 'CONSUME COCAINA' },
@@ -25,7 +25,7 @@ const medicosList = [
   { value: 'dr2', label: 'Dra. María López' },
 ];
 
-const Boro = ({ token, selectedSede }) => {
+const Boro = ({ token, selectedSede, userlogued }) => {
   const today = new Date().toISOString().split('T')[0];
 
   const [form, setForm] = useState({
@@ -34,14 +34,14 @@ const Boro = ({ token, selectedSede }) => {
     nombres: '',
     edad: '',
     dni: '',
-    trabajador: '',
-    postulante: '',
+    trabajador: true,
+    postulante: false,
     empresa: '',
-    enfermedad: { si: 'NO', cual: '' },
-    medicamento: { si: 'NO', cual: '' },
-    matecoca: { si: 'NO', fecha: '' },
-    chaccha: { si: 'NO' },
-    tratamiento: { si: 'NO', cual: '', cuando: '', donde: '' },
+    enfermedad: { key: false, cual: '' },
+    medicamento: { key: false, cual: '' },
+    matecoca: { key: false, fecha: today },
+    chaccha: { key: false, fecha: today },
+    tratamiento: { key: false, cual: '', cuando: '', donde: '' },
     notas: '',
     medico: '',
   });
@@ -71,14 +71,14 @@ const Boro = ({ token, selectedSede }) => {
       nombres: '',
       edad: '',
       dni: '',
-      trabajador: '',
-      postulante: '',
+      trabajador: true,
+      postulante: false,
       empresa: '',
-      enfermedad: { si: 'NO', cual: '' },
-      medicamento: { si: 'NO', cual: '' },
-      matecoca: { si: 'NO', fecha: '' },
-      chaccha: { si: 'NO' },
-      tratamiento: { si: 'NO', cual: '', cuando: '', donde: '' },
+      enfermedad: { key: false, cual: '' },
+      medicamento: { key: false, cual: '' },
+      matecoca: { key: false, fecha: '' },
+      chaccha: { key: false, fecha: today },
+      tratamiento: { key: false, cual: '', cuando: '', donde: '' },
       notas: '',
       medico: '',
     });
@@ -124,42 +124,6 @@ const Boro = ({ token, selectedSede }) => {
     });
   };
 
-  const handleMateCocaRadio = (value) => {
-    if (form.matecoca.si === value) {
-      handlePreguntaChange('matecoca', 'si', 'NO');
-      handlePreguntaChange('matecoca', 'fecha', '');
-      return;
-    }
-    handlePreguntaChange('matecoca', 'si', value);
-    if (value === 'SI') {
-      setTimeout(() => {
-        if (mateCocaFechaRef.current) {
-          mateCocaFechaRef.current.showPicker && mateCocaFechaRef.current.showPicker();
-        }
-      }, 100);
-    } else {
-      handlePreguntaChange('matecoca', 'fecha', '');
-    }
-  };
-
-  const handleChacchaRadio = (value) => {
-    if (form.chaccha.si === value) {
-      handlePreguntaChange('chaccha', 'si', 'NO');
-      handlePreguntaChange('chaccha', 'fecha', '');
-      return;
-    }
-    handlePreguntaChange('chaccha', 'si', value);
-    if (value === 'SI') {
-      setTimeout(() => {
-        if (chacchaFechaRef.current) {
-          chacchaFechaRef.current.showPicker && chacchaFechaRef.current.showPicker();
-        }
-      }, 100);
-    } else {
-      handlePreguntaChange('chaccha', 'fecha', '');
-    }
-  };
-
   return (
     <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f6fa' }}>
       <form className="w-full bg-white p-10 rounded shadow text-base" style={{ width: '60%' }}>
@@ -173,7 +137,7 @@ const Boro = ({ token, selectedSede }) => {
             className="border rounded px-3 py-2 w-40 text-lg"
             onKeyUp={(event) => {
               if (event.key === 'Enter')
-                VerifyTR(form.norden, 'consent_Boro', token, setForm, selectedSede);
+                VerifyTR(form.norden, 'consent_Boro', token, setForm, selectedSede, true);
             }}
           />
           <label className="font-semibold text-lg ml-4">Fecha :</label>
@@ -243,15 +207,15 @@ const Boro = ({ token, selectedSede }) => {
           <input
             type="radio"
             name="trabajador"
-            checked={form.trabajador === 'SI'}
-            onChange={() => setForm({ ...form, trabajador: 'SI', postulante: '' })}
+            checked={form.trabajador}
+            onChange={() => setForm({ ...form, trabajador: true, postulante: false })}
           />
           <span>) o postulante (</span>
           <input
             type="radio"
             name="postulante"
-            checked={form.postulante === 'SI'}
-            onChange={() => setForm({ ...form, trabajador: '', postulante: 'SI' })}
+            checked={form.postulante}
+            onChange={() => setForm({ ...form, trabajador: false, postulante: true })}
           />
           <span>), de la empresa</span>
           <input
@@ -274,15 +238,16 @@ const Boro = ({ token, selectedSede }) => {
           {/* Enfermedad */}
           <div className="flex items-center gap-3">
             <input
-              type="radio"
+              type="checkbox"
               name="enfermedad_si"
-              checked={form.enfermedad.si === 'SI'}
-              onChange={() => handlePreguntaChange('enfermedad', 'si', 'SI')}
+              checked={form.enfermedad.key}
+              onChange={() => handlePreguntaChange('enfermedad', 'key', !form.enfermedad.key)}
             />
             <span>¿Sufre alguna enfermedad?</span>
             <span className="ml-2">¿Cuál?</span>
             <input
               type="text"
+              disabled={!form.enfermedad.key}
               value={form.enfermedad.cual}
               onChange={e => handlePreguntaChange('enfermedad', 'cual', e.target.value)}
               className="border px-2 py-1 w-56 ml-1 text-lg"
@@ -291,15 +256,16 @@ const Boro = ({ token, selectedSede }) => {
           {/* Medicamento */}
           <div className="flex items-center gap-3">
             <input
-              type="radio"
+              type="checkbox"
               name="medicamento_si"
-              checked={form.medicamento.si === 'SI'}
-              onChange={() => handlePreguntaChange('medicamento', 'si', 'SI')}
+              checked={form.medicamento.key}
+              onChange={() => handlePreguntaChange('medicamento', 'key', !form.medicamento.key)}
             />
             <span>¿Consume regularmente algún medicamento?</span>
             <span className="ml-2">¿Cuál?</span>
             <input
               type="text"
+              disabled={!form.medicamento.key}
               value={form.medicamento.cual}
               onChange={e => handlePreguntaChange('medicamento', 'cual', e.target.value)}
               className="border px-2 py-1 w-56 ml-1 text-lg"
@@ -308,13 +274,13 @@ const Boro = ({ token, selectedSede }) => {
           {/* Mate de coca */}
           <div className="flex items-center gap-3">
             <input
-              type="radio"
+              type="checkbox"
               name="matecoca_si"
-              checked={form.matecoca.si === 'SI'}
-              onChange={() => handleMateCocaRadio('SI')}
+              checked={form.matecoca.key}
+              onChange={() => handlePreguntaChange('matecoca', 'key', !form.matecoca.key)}
             />
             <span>¿Consume regularmente mate de coca?</span>
-            {form.matecoca.si === 'SI' && (
+            {form.matecoca.key === true && (
               <>
                 <span className="ml-2">Especifique la fecha:</span>
                 <input
@@ -331,18 +297,18 @@ const Boro = ({ token, selectedSede }) => {
           {/* Chaccha o mastica hoja de coca */}
           <div className="flex items-center gap-3">
             <input
-              type="radio"
+              type="checkbox"
               name="chaccha_si"
-              checked={form.chaccha.si === 'SI'}
-              onChange={() => handleChacchaRadio('SI')}
+              checked={form.chaccha.key}
+              onChange={() => handlePreguntaChange('chaccha', 'key', !form.chaccha.key)}
             />
             <span>¿Chaccha o mastica hoja de coca?</span>
-            {form.chaccha.si === 'SI' && (
+            {form.chaccha.key === true && (
               <>
                 <span className="ml-2">Especifique la fecha:</span>
                 <input
                   type="date"
-                  value={form.chaccha.fecha || ''}
+                  value={form.chaccha.fecha}
                   onChange={e => handlePreguntaChange('chaccha', 'fecha', e.target.value)}
                   className="border px-2 py-1 w-48 ml-1 text-lg"
                   ref={chacchaFechaRef}
@@ -354,14 +320,15 @@ const Boro = ({ token, selectedSede }) => {
           {/* Tratamiento quirúrgico o dental */}
           <div className="flex items-center gap-3">
             <input
-              type="radio"
+              type="checkbox"
               name="tratamiento_si"
-              checked={form.tratamiento.si === 'SI'}
-              onChange={() => handlePreguntaChange('tratamiento', 'si', 'SI')}
+              checked={form.tratamiento.key}
+              onChange={() => handlePreguntaChange('tratamiento', 'key', !form.tratamiento.key)}
             />
             <span>¿En las últimas 48 horas, se realizó algún tratamiento quirúrgico o dental? Especifique cuál:</span>
             <input
               type="text"
+              disabled={!form.tratamiento.key}
               value={form.tratamiento.cual}
               onChange={e => handlePreguntaChange('tratamiento', 'cual', e.target.value)}
               className="border px-2 py-1 w-56 ml-1 text-lg"
@@ -371,6 +338,7 @@ const Boro = ({ token, selectedSede }) => {
             <span>Especifique cuándo:</span>
             <input
               type="text"
+              disabled={!form.tratamiento.key}
               value={form.tratamiento.cuando}
               onChange={e => handlePreguntaChange('tratamiento', 'cuando', e.target.value)}
               className="border px-2 py-1 w-40 ml-1 text-lg"
@@ -378,6 +346,7 @@ const Boro = ({ token, selectedSede }) => {
             <span>Especifique dónde:</span>
             <input
               type="text"
+              disabled={!form.tratamiento.key}
               value={form.tratamiento.donde}
               onChange={e => handlePreguntaChange('tratamiento', 'donde', e.target.value)}
               className="border px-2 py-1 w-40 ml-1 text-lg"
@@ -413,7 +382,7 @@ const Boro = ({ token, selectedSede }) => {
 
         {/* Botones */}
         <div className="flex flex-wrap gap-4 items-center mt-6">
-          <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg">
+          <button type="button" onClick={() => {SubmitConsentimientoLab(form,"",token,userlogued,null,true)}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg" onClick={handleLimpiar}>
