@@ -188,8 +188,8 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
       if (res.norden) {
         const nombre = res.nameJasper;
         console.log(nombre)
-        const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
-        const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
+        const jasperModules = import.meta.glob('../../../../../jaspers/*.jsx');
+        const modulo = await jasperModules[`../../../../../jaspers/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
