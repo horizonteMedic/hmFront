@@ -10,6 +10,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
   const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
   const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const isValidUrl = url => url && url !== "Sin registro";
 
   const loadImg = src =>
     new Promise((res, rej) => {
@@ -20,9 +21,9 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
   Promise.all([
-    huella && huella.url ? loadImg(huella.url) : Promise.resolve(null),
-    firma && firma.url ? loadImg(firma.url) : Promise.resolve(null),
-    sello && sello.url ? loadImg(sello.url) : Promise.resolve(null)
+    isValidUrl(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
+    isValidUrl(firma?.url) ? loadImg(firma.url) : Promise.resolve(null),
+    isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
   ])
    .then(([huellap, firmap, sellop]) => {
     let y = 44;
