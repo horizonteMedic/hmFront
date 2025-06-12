@@ -7,11 +7,14 @@ import ReservaPacientes from './Admision/ReservaPacientes.jsx';
 import ConsentimientoDigitalizacion from './Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx';
 import Triaje from './Triaje/Triaje';
 import Consentimientos from './Laboratorio/Consentimientos/Consentimientos.jsx';
-import Resultados from './Resultados/Resultados';
 import ExamenesLaboratorio from './Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio';
 import ParasitologiaCoprologico from './Parasitologia/ParasitologiaCoprologico';
-import LaboratorioClinico from './Laboratorio/LaboratorioClinico/LaboratorioClinico.jsx';
-import LaboratorioAnalisisBioquimicos from './Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos.jsx';
+import LaboratorioClinico from './Laboratorio/LaboratorioClinico/LaboratorioClinico';
+import LaboratorioAnalisisBioquimicos from './Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos';
+import InmunologiaTab from './Laboratorio/Inmunologia/Inmunologia_tab.jsx';
+import Toxicologia from './Laboratorio/Toxicologia/Toxicologia';
+import Manipuladores from './Laboratorio/Manipuladores/Manipuladores';
+import PruebasCovid from './Laboratorio/PruebasCovid/PruebasCovid';
 import {
   ComboboxEmpresasMulti,
   ComboboxContratasMulti,
@@ -52,7 +55,15 @@ import {
   faTooth,
   faEye,
   faBars,
-  faTimes
+  faTimes,
+  faFlask,
+  faFilter,
+  faVirus,
+  faSyringe,
+  faFileAlt,
+  faMicroscope,
+  faVialVirus,
+  faNotesMedical
 } from '@fortawesome/free-solid-svg-icons';
 import styles from './SistemaOcupacional.module.css';
 import { useAuthStore } from '../../../../store/auth';
@@ -406,8 +417,9 @@ const TabComponent = () => {
               <Triaje token={token} selectedSede={selectSede} />
             </div>
           )}
-          {activeTab === 2 && (
+         {activeTab === 2 && (
             <div>
+              {/* ——— Header con botón "Atrás" y título ——— */}
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
@@ -419,49 +431,91 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Laboratorio</h2>
               </div>
-              <div className={styles.gridContainer} style={{width: '100%', gap: '2.5rem', marginTop: '2.5rem'}}>
-                <div
-                  className={styles.gridItem}
-                  onClick={() => setActiveTab(4)}
+
+              {/* ——— Sub-menú fijo ——— */}
+              <nav className={styles.labNav}>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 0 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(0)}
                 >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faVial} />
-                  </span>
-                  <span className={styles.title}>Laboratorio Clínico</span>
-                </div>
-                <div
-                  className={styles.gridItem}
-                  onClick={() => setActiveTab(5)}
+                  <FontAwesomeIcon icon={faFlask} className="mr-2" />
+                  LABORATORIO CLÍNICO
+                </button>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 1 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(1)}
                 >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faVial} />
-                  </span>
-                  <span className={styles.title}>Análisis Bioquímicos</span>
-                </div>
-                <div
-                  className={styles.gridItem}
-                  onClick={() => setActiveTab(6)}
+                  <FontAwesomeIcon icon={faFilter} className="mr-2" />
+                  ANÁLISIS BIOQUÍMICOS
+                </button>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 2 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(2)}
                 >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faFileContract} />
-                  </span>
-                  <span className={styles.title}>Consentimientos</span>
-                </div>
-                <div
-                  className={styles.gridItem}
-                  onClick={() => {
-                    setActiveTab(7);
-                    setActiveTabExamenes(1);
-                  }}
+                  <FontAwesomeIcon icon={faVirus} className="mr-2" />
+                  INMUNOLOGÍA
+                </button>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 3 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(3)}
                 >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faClipboardList} />
-                  </span>
-                  <span className={styles.title}>Exámenes</span>
-                </div>
+                  <FontAwesomeIcon icon={faSyringe} className="mr-2" />
+                  TOXICOLOGÍA
+                </button>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 4 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(4)}
+                >
+                  <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
+                  CONSENTIMIENTOS
+                </button>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 5 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(5)}
+                >
+                  <FontAwesomeIcon icon={faMicroscope} className="mr-2" />
+                  MANIPULADORES
+                </button>
+                <button
+                  className={`${styles.labNavButton} ${labTab === 6 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(6)}
+                >
+                  <FontAwesomeIcon icon={faVialVirus} className="mr-2" />
+                  PRUEBAS COVID
+                </button>
+                {/* <button
+                  className={`${styles.labNavButton} ${labTab === 7 ? styles.labNavButtonActive : ''}`}
+                  onClick={() => setLabTab(7)}
+                >
+                  <FontAwesomeIcon icon={faNotesMedical} className="mr-2" />
+                  EXÁMENES
+                </button> */}
+              </nav>
+
+              {/* ——— Contenido según pestaña ——— */}
+              <div className={styles.labContent}>
+                {labTab === 0 && <LaboratorioClinico />}
+                {labTab === 1 && <LaboratorioAnalisisBioquimicos />}
+                {labTab === 2 && <InmunologiaTab token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                {labTab === 3 && <Toxicologia token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                {labTab === 4 && (
+                  <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub} />
+                )}
+                {labTab === 5 && <Manipuladores token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                {labTab === 6 && <PruebasCovid token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                {/* {labTab === 7 && (
+                  <ExamenesLaboratorio
+                    token={token}
+                    selectedSede={selectSede}
+                    userlogued={userlogued.sub}
+                    activeTabExamenes={activeTabExamenes}
+                    setActiveTabExamenes={setActiveTabExamenes}
+                  />
+                )} */}
               </div>
             </div>
           )}
+
           {activeTab === 3 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -526,7 +580,7 @@ const TabComponent = () => {
               <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>
             </div>
           )}
-          {activeTab === 7 && (
+          {/* {activeTab === 7 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
@@ -541,7 +595,7 @@ const TabComponent = () => {
               </div>
               <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} activeTabExamenes={activeTabExamenes} setActiveTabExamenes={setActiveTabExamenes} />
             </div>
-          )}
+          )} */}
         </div>
       </div>
 

@@ -4,6 +4,48 @@
   width: 100%;
   position: relative;
 }
+/* Contenedor sticky para el sub-menú */
+.labNav {
+  display: flex;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Botones del sub-menú */
+.labNavButton {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  font-size: 1rem;
+  color: #4a5568; /* gris oscuro */
+}
+
+.labNavButton:hover {
+  background-color: #f7fafc;
+}
+
+/* Estado activo */
+.labNavButtonActive {
+  border-bottom-color: #233245;
+  color: #233245;
+  font-weight: 600;
+}
+
+/* Contenido debajo del sub-menú */
+.labContent {
+  padding: 1.5rem;
+  background: #f9fafb;
+}
 
 .mainContent {
   background-color: white;
@@ -11,7 +53,7 @@
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
-  padding: 2rem;
+  padding: 2rem 0 2rem 0;
 }
 
 .sedeSelector {
