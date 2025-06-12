@@ -130,8 +130,7 @@ const Boro = ({ token, selectedSede, userlogued }) => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#f5f6fa' }}>
-      <form className="w-full bg-white p-10 rounded shadow text-base" style={{ width: '60%' }}>
+    <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
         {/* Encabezado */}
         <div className="flex flex-wrap items-center gap-4 mb-4">
           <label className="font-semibold text-lg">Nro Orden :</label>
@@ -390,7 +389,6 @@ const Boro = ({ token, selectedSede, userlogued }) => {
           </button>
         </div>
       </form>
-    </div>
   );
 };
 

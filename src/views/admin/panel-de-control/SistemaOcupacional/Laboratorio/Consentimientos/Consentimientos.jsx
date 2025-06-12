@@ -17,9 +17,9 @@ const Consentimientos = ({ token, selectedSede, userlogued }) => {
     { label: 'Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Panel 3D', component: <Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'MUESTRA DE SANGRE', component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'CONS. MARIHUANA', component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'BORO', component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Muestra de sangre', component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Cons. Marihuana', component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Boro', component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
   ];
 
   const handleBack = () => {
