@@ -8,13 +8,15 @@ import {
   faSearch
 } from '@fortawesome/free-solid-svg-icons'
 import microscopioImg from '../microscopio.webp'
+import { VerifyTR } from '../controller/ControllerABio'
 
 export default function AnalisisBioquimicos({ token, selectedSede }) {
+  const tabla = 'analisis_bioquimicos'
   const [form, setForm] = useState({
     examType: 'ficha',
-    ficha: '',
+    norden: '',
     medico: '',
-    paciente: '',
+    nombres: '',
     fecha: '',
     creatinina: '',
     colesterolTotal: '',
@@ -43,13 +45,13 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
     setSearchParams(p => ({ ...p, [name]: value }))
   }
 
-  const handleEdit = () => console.log('Editar', form.ficha)
+  const handleEdit = () => console.log('Editar', form.norden)
   const handleSave = () => console.log('Guardar', form)
   const handleClear = () => setForm({
-    examType: 'ficha', ficha: '', medico: '', paciente: '', fecha: '',
+    examType: 'ficha', norden: '', medico: '', nombres: '', fecha: '',
     creatinina: '', colesterolTotal: '', ldl: '', hdl: '', vldl: '', trigliceridos: ''
   })
-  const handlePrint = () => console.log('Imprimir', form.ficha)
+  const handlePrint = () => console.log('Imprimir', form.norden)
 
   return (
     <div className="w-full">
@@ -95,9 +97,11 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
             <label className="flex items-center gap-1 font-medium">
               N° Ficha:
               <input
-                name="ficha"
-                value={form.ficha}
+                name="norden"
+                value={form.norden}
+                autoComplete='off'
                 onChange={handleFormChange}
+                onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,tabla,token,setForm,selectedSede)}}
                 className="border rounded px-2 py-1 w-20 ml-1"
               />
             </label>
@@ -118,8 +122,8 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
             <label className="flex-1 flex items-center gap-1 font-medium">
               Paciente:
               <input
-                name="paciente"
-                value={form.paciente}
+                name="nombres"
+                value={form.nombres}
                 onChange={handleFormChange}
                 className="border rounded px-2 py-1 flex-1 ml-1"
               />

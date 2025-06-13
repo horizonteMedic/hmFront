@@ -1,7 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import microscopioImg from './microscopio.webp';
 
 const HematologiaBioquimicaSIEO = () => {
+
+  const [form, setForm] = useState({
+    norden: '',
+    nombres: ''
+  })
+
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Barra superior sola y alineada */}
@@ -10,7 +20,7 @@ const HematologiaBioquimicaSIEO = () => {
           <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Consultas</label>
           <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Particular</label>
           <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1" defaultChecked/> Ficha Médica Ocupacional</label>
-          <label className="font-medium flex items-center whitespace-nowrap">N° Orden:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
+          <label className="font-medium flex items-center whitespace-nowrap">N° Orden:<input className="border rounded px-2 py-1 w-28 text-md ml-1" name='norden' value={form.norden} onChange={handleInputChange} /></label>
           <label className="font-medium flex items-center whitespace-nowrap">N° Recibo:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
           <label className="font-medium flex items-center whitespace-nowrap">DNI:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
           <label className="font-medium flex items-center whitespace-nowrap">Fecha:<input type="date" className="border rounded px-2 py-1 w-36 text-md ml-1" /></label>

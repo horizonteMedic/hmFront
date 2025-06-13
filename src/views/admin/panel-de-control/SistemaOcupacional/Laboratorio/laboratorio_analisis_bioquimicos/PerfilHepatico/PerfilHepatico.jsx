@@ -10,7 +10,7 @@ const PerfilHepatico = ({ token, selectedSede }) => {
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input className="border rounded px-2 py-1 flex-1" disabled />
+            <input className="border rounded px-2 py-1 flex-1"  />
           </div>
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold">Fecha:</label>
