@@ -376,7 +376,7 @@ const Boro = ({ token, selectedSede, userlogued }) => {
 
         {/* Botones */}
         <div className="flex flex-wrap gap-4 items-center mt-6">
-          <button type="button" onClick={() => {SubmitConsentimientoLab(form,"consent_Boro",token,userlogued,null,true)}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg">
+          <button type="button" onClick={() => {SubmitConsentimientoLab(form,"consent_Boro",token,userlogued,null,true, handleLimpiar)}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-8 py-3 rounded flex items-center gap-3 font-semibold shadow-md transition-colors text-lg" onClick={handleLimpiar}>

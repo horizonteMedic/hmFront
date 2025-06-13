@@ -123,7 +123,7 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro) => {
   }
 }
 
-export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null, boro = false) => {
+export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null, boro = false, limpiar = null) => {
   if (!form.norden) {
     await Swal.fire('Error', 'Datos Incompletos','error')
     return
@@ -137,6 +137,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
         }).then((result) => {
+          limpiar()
           if (result.isConfirmed) {
             PrintHojaR(res,tabla,token,true)
           }
@@ -151,6 +152,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
         }).then((result) => {
+          limpiar()
           if (result.isConfirmed) {
             PrintHojaR(form,tabla,token)
           }

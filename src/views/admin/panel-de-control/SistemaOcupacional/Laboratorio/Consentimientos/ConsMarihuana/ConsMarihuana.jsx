@@ -161,7 +161,7 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
 
       <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
         <div className="flex gap-3">
-          <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"consent_marihuana",token, userlogued)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
+          <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"consent_marihuana",token, userlogued, null, false, handleLimpiar)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}>
