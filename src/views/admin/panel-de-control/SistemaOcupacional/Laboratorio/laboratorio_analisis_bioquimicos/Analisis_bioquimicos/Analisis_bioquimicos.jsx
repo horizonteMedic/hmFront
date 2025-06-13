@@ -3,35 +3,21 @@ import React, { useReducer, useState, useEffect, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint, faSearch } from '@fortawesome/free-solid-svg-icons'
 import microscopioImg from '../microscopio.webp'
-import Swal from 'sweetalert2'
 
-const initialForm = {
-  examType: 'ficha',
-  ficha: '',
-  medico: '',
-  paciente: '',
-  fecha: new Date().toISOString().split('T')[0],
-  creatinina: '',
-  colesterolTotal: '',
-  ldl: '',
-  hdl: '',
-  vldl: '',
-  trigliceridos: ''
-}
-
-function formReducer(state, action) {
-  switch (action.type) {
-    case 'SET_FIELD':
-      return { ...state, [action.field]: action.value }
-    case 'RESET':
-      return initialForm
-    default:
-      return state
-  }
-}
-
-export default function AnalisisBioquimicos({ apiBase, token, selectedSede }) {
-  const [form, dispatch] = useReducer(formReducer, initialForm)
+export default function AnalisisBioquimicos({ token, selectedSede }) {
+  const [form, setForm] = useState({
+    examType: 'ficha',
+    ficha: '',
+    medico: '',
+    paciente: '',
+    fecha: '',
+    creatinina: '',
+    colesterolTotal: '',
+    ldl: '',
+    hdl: '',
+    vldl: '',
+    trigliceridos: ''
+  })
   const [searchParams, setSearchParams] = useState({ buscar: '', codigo: '' })
   const [exams, setExams] = useState([])
 
@@ -52,41 +38,18 @@ export default function AnalisisBioquimicos({ apiBase, token, selectedSede }) {
     dispatch({ type: 'SET_FIELD', field, value })
   }, [])
 
-  const handleSearchChange = useCallback(e => {
+  const handleSearchChange = e => {
     const { name, value } = e.target
     setSearchParams(p => ({ ...p, [name]: value }))
-  }, [])
+  }
 
-  const handleEdit = useCallback(() => {
-    Swal.fire('Buscar', `Ficha: ${form.ficha}`, 'info')
-    // then fetch single exam by ficha...
-  }, [form.ficha])
-
-  const handleSave = useCallback(async () => {
-    try {
-      const payload = { ...form, sede: selectedSede }
-      // await fetch(`${apiBase}/bio`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      //   body: JSON.stringify(payload)
-      // })
-      Swal.fire('Guardado', 'Datos guardados correctamente', 'success')
-    } catch (err) {
-      Swal.fire('Error', err.message, 'error')
-    }
-  }, [form, apiBase, token, selectedSede])
-
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'RESET' })
-    setSearchParams({ buscar: '', codigo: '' })
-    setExams([])
-    Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
-  }, [])
-
-  const handlePrint = useCallback(() => {
-    window.open(`${apiBase}/bio/print?ficha=${form.ficha}`, '_blank')
-    Swal.fire('Imprimiendo', 'Se abrió la ventana de impresión', 'success')
-  }, [apiBase, form.ficha])
+  const handleEdit = () => console.log('Editar', form.ficha)
+  const handleSave = () => console.log('Guardar', form)
+  const handleClear = () => setForm({
+    examType: 'ficha', ficha: '', medico: '', paciente: '', fecha: '',
+    creatinina: '', colesterolTotal: '', ldl: '', hdl: '', vldl: '', trigliceridos: ''
+  })
+  const handlePrint = () => console.log('Imprimir', form.ficha)
 
   return (
     <div className="w-full p-4 space-y-6">
@@ -119,18 +82,49 @@ export default function AnalisisBioquimicos({ apiBase, token, selectedSede }) {
           </Section>
 
           {/* Datos Generales */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-            <Field label="N° Ficha" name="ficha" value={form.ficha} onChange={e => setField('ficha', e.target.value)} />
-            <Field label="Médico / Técnico" name="medico" value={form.medico} onChange={e => setField('medico', e.target.value)} />
-            <div className="flex justify-end">
-              <img src={microscopioImg} alt="Microscopio" className="w-32" />
-            </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <label className="flex items-center gap-1 font-medium">
+              N° Ficha:
+              <input
+                name="ficha"
+                value={form.ficha}
+                onChange={handleFormChange}
+                className="border rounded px-2 py-1 w-20 ml-1"
+              />
+            </label>
+            <label className="flex-1 flex items-center gap-1 font-medium">
+              Médico / Técnico:
+              <input
+                name="medico"
+                value={form.medico}
+                onChange={handleFormChange}
+                className="border rounded px-2 py-1 flex-1 ml-1"
+              />
+            </label>
+            <img src={microscopioImg} alt="Microscopio" className="w-32" />
           </div>
 
           {/* Paciente y Fecha */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Paciente" name="paciente" value={form.paciente} onChange={e => setField('paciente', e.target.value)} />
-            <Field label="Fecha" type="date" name="fecha" value={form.fecha} onChange={e => setField('fecha', e.target.value)} />
+          <div className="flex items-center gap-4">
+            <label className="flex-1 flex items-center gap-1 font-medium">
+              Paciente:
+              <input
+                name="paciente"
+                value={form.paciente}
+                onChange={handleFormChange}
+                className="border rounded px-2 py-1 flex-1 ml-1"
+              />
+            </label>
+            <label className="flex items-center gap-1 font-medium">
+              Fecha:
+              <input
+                name="fecha"
+                type="date"
+                value={form.fecha}
+                onChange={handleFormChange}
+                className="border rounded px-2 py-1 w-36 ml-1"
+              />
+            </label>
           </div>
 
           {/* Parámetros Bioquímicos */}

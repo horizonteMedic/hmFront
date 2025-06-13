@@ -66,7 +66,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
       ],
       theme: 'plain',
       styles: { fontSize: 9, cellPadding: 1 },
-      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30 }, 2: { cellWidth: 30 } },
+      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30 }, 2: { cellWidth: 60 } },
       margin: { left: 15 },
       didDrawPage: () => {}
     });

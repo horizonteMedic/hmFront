@@ -7,14 +7,14 @@ import Microbiologia from './Microbiologia/Microbiologia';
 import Inmunologia from './Inmunologia/Inmunologia';
 import Hepatitis from './Hepatitis/Hepatitis';
 
-const InmunologiaTab = () => {
+const InmunologiaTab = ({token, selectedSede, userlogued}) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { label: 'L. Gonadotropina', icon: faMars, component: <Gonadotropina /> },
-    { label: 'Microbiología', icon: faMicroscope, component: <Microbiologia /> },
-    { label: 'Inmunología', icon: faVirus, component: <Inmunologia /> },
-    { label: 'L. Hepatitis', icon: faSyringe, component: <Hepatitis /> }
+    { label: 'L. Gonadotropina', icon: faMars, component: <Gonadotropina token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Microbiología', icon: faMicroscope, component: <Microbiologia token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Inmunología', icon: faVirus, component: <Inmunologia  token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'L. Hepatitis', icon: faSyringe, component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
   ];
 
   return (

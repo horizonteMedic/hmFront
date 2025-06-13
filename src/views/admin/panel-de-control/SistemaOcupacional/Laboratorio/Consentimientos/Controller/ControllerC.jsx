@@ -123,7 +123,7 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro) => {
   }
 }
 
-export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null, boro = false) => {
+export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoca = null, boro = false, limpiar = null) => {
   if (!form.norden) {
     await Swal.fire('Error', 'Datos Incompletos','error')
     return
@@ -137,6 +137,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
         }).then((result) => {
+          limpiar()
           if (result.isConfirmed) {
             PrintHojaR(res,tabla,token,true)
           }
@@ -151,6 +152,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
           confirmButtonColor: "#3085d6",
           cancelButtonColor: "#d33",
         }).then((result) => {
+          limpiar()
           if (result.isConfirmed) {
             PrintHojaR(form,tabla,token)
           }
@@ -203,4 +205,54 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
     })
   }
   
+}
+
+
+export const PrintHojaRMasivo = async (norden,token) => {
+  if (!norden){
+    await Swal.fire('Error', 'Datos Incompletos','error')
+    return 
+  } 
+  const tablas = [
+    'con_panel10D',
+    'con_panel5D',
+    'con_panel3D',
+    'con_panel2D',
+    'consent_Muestra_Sangre',
+    'consent_marihuana',
+    'consent_Boro'
+  ]
+  await Loading('Cargando Formato a Imprimir')
+  const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
+  for (const tabla of tablas) {
+    try {
+      const url =
+      tabla === 'consent_Boro'
+        ? `/api/v01/ct/laboratorio/consentimientoLaboratorioBoro?nOrden=${norden}&nameConset=${tabla}`
+        : `/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${norden}&nameConset=${tabla}`;
+      const res = await getFetch(url, token);
+      
+      if (res && res.norden && res.nameJasper) {
+        const nombre = res.nameJasper;
+        const path = `../../../../../../jaspers/${nombre}.jsx`;
+
+        if (jasperModules[path]) {
+          const modulo = await jasperModules[path]();
+          
+          if (typeof modulo.default === 'function') {
+            await modulo.default(res);
+          } else {
+            console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+          }
+        } else {
+          console.error(`No se encontró el módulo Jasper: ${path}`);
+        }
+      }
+    } catch (error) {
+      console.error(`Error al procesar la tabla ${tabla}:`, error);
+    }
+  }
+  Swal.close();
+
+
 }

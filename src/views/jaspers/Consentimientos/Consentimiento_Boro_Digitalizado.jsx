@@ -40,9 +40,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`Fecha:`, 18, y);
     doc.text(`${datos.fecha || ''}`, 35, y);
     doc.text(`Hora:`, 65, y);
-    doc.text(`${datos.hora || ''}`, 80, y);
+    doc.text(`${datos.horaExamen || ''}`, 80, y);
     doc.text(`Ciudad:`, 110, y);
-    doc.text(`${datos.ciudad || ''}`, 130, y);
+    doc.text(`${datos.sede || ''}`, 130, y);
     doc.setFont(undefined, 'bold');
     doc.text(`Nro Orden :`, 160, y);
     doc.text(`${datos.norden || ''}`, 195, y, { align: 'right' });
@@ -79,14 +79,14 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     // Enfermedad
     doc.text('¿Sufre alguna enfermedad?', 18, y);
     doc.text(`SI ( ${datos.antBoroAlgunaEnfermedad ? 'X' : ' '} )  NO ( ${!datos.antBoroAlgunaEnfermedad ? 'X' : ' '} )`, 110, y);
-    doc.text('¿Cuál (es):', 150, y);
-    doc.text(`${datos.critCualAlgunaEnfermedad || ''}`, 170, y);
+    doc.text('¿Cuál (es):', 143, y);
+    doc.text(`${datos.antBoroAlgunaEnfermedad ? datos.critCualAlgunaEnfermedad : ''}`, 166, y);
     y += 8;
     // Medicamento
     doc.text('¿Consume regularmente algún medicamento?', 18, y);
     doc.text(`SI ( ${datos.antBoroAlgunMedicamento ? 'X' : ' '} )  NO ( ${!datos.antBoroAlgunMedicamento ? 'X' : ' '} )`, 110, y);
-    doc.text('¿Cuál (es):', 150, y);
-    doc.text(`${datos.critCualAlgunMedicamento || ''}`, 170, y);
+    doc.text('¿Cuál (es):', 143, y);
+    doc.text(`${datos.antBoroAlgunMedicamento ? datos.critCualAlgunMedicamento : ''}`, 166, y);
     y += 8;
     // Mate de coca
     doc.text('¿Consume regularmente mate de coca?', 18, y);
@@ -94,12 +94,13 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     y += 8;
     doc.text('Si la respuesta es SI: ¿Cuándo consumió por última vez?', 18, y);
     y += 6;
-    doc.text(`${datos.antBoroConsumenMateCoca ? 'Fecha:' : ''}`, 25, y);
+    doc.text(`${datos.antBoroConsumenMateCoca ? 'Cuando:' : ''}`, 25, y);
     doc.text(`${datos.antBoroConsumenMateCoca ? datos.critFechaConsumoMateCoca : ''}`, 40, y);
     y += 10;
     // Hoja de coca
     doc.text('¿Consume o mastica hoja de coca?', 18, y);
     doc.text(`SI ( ${datos.masticaHojaCoca ? 'X' : ' '} )  NO ( ${!datos.masticaHojaCoca ? 'X' : ' '} )`, 110, y);
+    doc.text(`${datos.masticaHojaCoca ? `Cuando: ${datos.fechaConsumoHojaCoca}` :  ''}`, 140, y);
     y += 8;
     const hojaMsg = 'Si la respuesta es SI, se procederá a reprogramar la toma de la muestra en 5 días, caso contrario se tomará la muestra bajo responsabilidad del paciente.';
     const hojaLines = doc.splitTextToSize(hojaMsg, 176);
@@ -114,11 +115,11 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(tratLines, 18, y, { maxWidth: 176 });
     y += tratLines.length * 6 + 2;
     doc.text('Cual:', 18, y);
-    doc.text(`${datos.critCualTratQuirugODental || ''}`, 32, y);
+    doc.text(`${datos.antBoroTratQuirugODental ? datos.critCualTratQuirugODental : ''}`, 32, y);
     doc.text('Cuando:', 80, y);
-    doc.text(`${datos.critCuandoTratQuirugODental || ''}`, 100, y);
+    doc.text(`${datos.antBoroTratQuirugODental ? datos.critCuandoTratQuirugODental : ''}`, 100, y);
     doc.text('Donde:', 120, y);
-    doc.text(`${datos.critDondeTratQuirugODental || ''}`, 135, y);
+    doc.text(`${datos.antBoroTratQuirugODental ? datos.critDondeTratQuirugODental : ''}`, 135, y);
 
     // Más espacio antes de la firma y huella
     y += 34;

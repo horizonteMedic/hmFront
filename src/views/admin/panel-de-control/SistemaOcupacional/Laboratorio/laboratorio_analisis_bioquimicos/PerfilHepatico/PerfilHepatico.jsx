@@ -76,56 +76,20 @@ export default function PerfilHepatico({ apiBase, token, selectedSede }) {
   }, [form.ficha, form.printCount, apiBase])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-center">PERFIL HEPÁTICO</h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha"   name="ficha"   value={form.ficha}   onChange={e=>setField('ficha',e.target.value)} />
-        <Field label="Fecha"        name="fecha"   type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} />
-        <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} />
-      </div>
-
-      <Section title="Bioquímica Hepática">
-        {[
-          ['tgo','TGO','U/L'],
-          ['tgp','TGP','U/L'],
-          ['ggt','GGT','U/L'],
-          ['fosfAlc','FOSFATASA ALCALINA','U/L'],
-          ['biliTotal','BILIRRUBINA TOTAL','mg/dL'],
-          ['biliInd','BILIRRUBINA INDIRECTA','mg/dL'],
-          ['biliDir','BILIRRUBINA DIRECTA','mg/dL'],
-          ['protTot','PROTEÍNAS TOTALES','g/dL'],
-          ['albumina','ALBÚMINA','g/dL'],
-          ['globSer','GLOBULINA SÉRICA','g/dL'],
-        ].map(([key,label,unit]) => (
-          <Field
-            key={key}
-            label={label}
-            name={key}
-            unit={unit}
-            value={form[key]}
-            onChange={e=>setField(key,e.target.value)}
-          />
-        ))}
-      </Section>
-
-      <div className="flex justify-between">
-        <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
-        <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
-        <div className="flex items-center gap-2">
-          <input
-            name="printCount"
-            value={form.printCount}
-            onChange={e=>setField('printCount',e.target.value)}
-            className="border rounded px-2 py-1 w-24"
-          />
-          <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
+      <h2 className="text-2xl font-bold mb-6 text-center">PERFIL HEPÁTICO</h2>
+      <form className="space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex-1 flex gap-2 items-center">
+            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
+            <input className="border rounded px-2 py-1 flex-1" disabled />
+          </div>
+          <div className="flex-1 flex gap-2 items-center">
+            <label className="font-semibold">Fecha:</label>
+            <input type="date" className="border rounded px-2 py-1 flex-1" disabled />
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   )
 }

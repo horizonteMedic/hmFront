@@ -1,114 +1,19 @@
-import React, { useReducer, useEffect, useCallback } from 'react'
-import Swal from 'sweetalert2'
-import microscopioImg from './microscopio.webp'
+import React from 'react';
+import microscopioImg from './microscopio.webp';
 
-const today = new Date().toISOString().split('T')[0]
-
-const initialState = {
-  consultas: false,
-  particular: false,
-  ficha: true,
-  norden: '',
-  nrecibo: '',
-  dni: '',
-  fecha: today,
-  responsable: '',
-  paciente: '',
-  empContratista: '',
-  empresa: '',
-  empresaNA: false,
-  grupo: '',
-  rh: '+',
-  hemoglobina: '',
-  hematocrito: '',
-  vsg: '',
-  leucocitos: '',
-  hematies: '',
-  plaquetas: '',
-  linfocitos: '',
-  neutrofilos: '',
-  abastonados: '',
-  segmentados: '',
-  monocitos: '',
-  eosinofilos: '',
-  basofilos: '',
-  glucosa: '',
-  glucosaNA: true,
-  creatinina: '',
-  creatininaNA: true,
-  rpr: '',
-  rprNA: true,
-  rprPos: false,
-  vih: '',
-  vihNA: true,
-  vihPos: false,
-}
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET':
-      return { ...state, [action.field]: action.value }
-    case 'RESET':
-      return initialState
-    case 'LOAD':
-      return { ...state, ...action.payload }
-    default:
-      return state
-  }
-}
-
-export default function HematologiaBioquimicaSIEO({ apiBase, token }) {
-  const [form, dispatch] = useReducer(reducer, initialState)
-  const [status, setStatus] = React.useState('')
-
-  useEffect(() => {
-    if (!form.norden) return
-    async function load() {
-      // const res = await fetch(`${apiBase}/hc/${form.norden}`, { headers:{Authorization:`Bearer ${token}`} })
-      // const data = await res.json()
-      // dispatch({ type:'LOAD', payload:data })
-    }
-    load()
-  }, [form.norden, apiBase, token])
-
-  const setField = useCallback((field, value) => {
-    dispatch({ type:'SET', field, value })
-  }, [])
-
-  const handleSave = useCallback(async () => {
-    try {
-      const payload = { ...form }
-      // await fetch(`${apiBase}/hc`, { method:'POST', headers:{ 'Content-Type':'application/json', Authorization:`Bearer ${token}` }, body:JSON.stringify(payload) })
-      Swal.fire({ icon: 'success', title: 'Guardado exitoso', timer: 2000, showConfirmButton: false })
-      setStatus('')
-    } catch {
-      Swal.fire({ icon: 'error', title: 'Error al guardar', text: 'Por favor, inténtalo de nuevo.' })
-    }
-  }, [form, apiBase, token])
-
-  const handleClear = useCallback(() => {
-    dispatch({ type:'RESET' })
-    Swal.fire({ icon: 'info', title: 'Formulario limpiado', timer: 1500, showConfirmButton: false })
-    setStatus('')
-  }, [])
-
-  const handlePrint = useCallback(() => {
-    window.open(`${apiBase}/hc/print?norden=${form.norden}`, '_blank')
-    Swal.fire({ icon: 'success', title: 'Imprimiendo', timer: 1500, showConfirmButton: false })
-  }, [apiBase, form.norden])
-
+const HematologiaBioquimicaSIEO = () => {
   return (
-    <div className="w-full max-w-[100vw] mx-auto p-4 space-y-6">
-      {/* barra superior */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-3 items-center flex-1 min-w-0">
-          <Checkbox label="Consultas"     checked={form.consultas}  onChange={v=>setField('consultas',v)} />
-          <Checkbox label="Particular"    checked={form.particular} onChange={v=>setField('particular',v)} />
-          <Checkbox label="Ficha Médica Ocupacional" checked={form.ficha} onChange={v=>setField('ficha',v)} />
-          <Field label="N° Orden" name="norden" value={form.norden} onChange={e=>setField('norden',e.target.value)} />
-          <Field label="N° Recibo" name="nrecibo" value={form.nrecibo} onChange={e=>setField('nrecibo',e.target.value)} />
-          <Field label="DNI"       name="dni"       value={form.dni}    onChange={e=>setField('dni',e.target.value)} />
-          <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
+    <div className="flex flex-col gap-2 w-full">
+      {/* Barra superior sola y alineada */}
+      <div className="flex flex-wrap items-center w-full gap-3 p-2 justify-between">
+        <div className="flex flex-wrap items-center gap-3 flex-1 min-w-0">
+          <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Consultas</label>
+          <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Particular</label>
+          <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1" defaultChecked/> Ficha Médica Ocupacional</label>
+          <label className="font-medium flex items-center whitespace-nowrap">N° Orden:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
+          <label className="font-medium flex items-center whitespace-nowrap">N° Recibo:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
+          <label className="font-medium flex items-center whitespace-nowrap">DNI:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
+          <label className="font-medium flex items-center whitespace-nowrap">Fecha:<input type="date" className="border rounded px-2 py-1 w-36 text-md ml-1" /></label>
         </div>
         <div className="flex items-center gap-4">
           <button

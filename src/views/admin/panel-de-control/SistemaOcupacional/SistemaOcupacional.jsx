@@ -494,8 +494,8 @@ const TabComponent = () => {
 
               {/* ——— Contenido según pestaña ——— */}
               <div className={styles.labContent}>
-                {labTab === 0 && <LaboratorioClinico />}
-                {labTab === 1 && <LaboratorioAnalisisBioquimicos />}
+                {labTab === 0 && <LaboratorioClinico token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>}
+                {labTab === 1 && <LaboratorioAnalisisBioquimicos token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>}
                 {labTab === 2 && <InmunologiaTab token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
                 {labTab === 3 && <Toxicologia token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
                 {labTab === 4 && (

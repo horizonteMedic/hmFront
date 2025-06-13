@@ -85,7 +85,7 @@ const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
   const handlePrint = () => {
     if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
-      title: '¿Desea Imprimir Consentimiento Panel 5D?',
+      title: '¿Desea Imprimir Consentimiento Muestra de Sangre?',
       html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
@@ -149,7 +149,7 @@ const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
       </div>
 
       <div className="flex flex-wrap items-center gap-4 mb-4">
-        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"consent_Muestra_Sangre",token, userlogued)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors">
+        <button type="button" onClick={(() => {SubmitConsentimientoLab(form,"consent_Muestra_Sangre",token, userlogued,null,false,handleLimpiar)})} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors">
           <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
         </button>
         <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-3 rounded flex items-center gap-2 text-lg shadow-md transition-colors" onClick={handleLimpiar}>

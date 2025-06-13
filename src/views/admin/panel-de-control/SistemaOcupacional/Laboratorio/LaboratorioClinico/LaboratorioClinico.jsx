@@ -7,7 +7,7 @@ import HematologiaBioquimicaSIEO from './Hematologia-bioquimicaSI-EO/Hematologia
 import ExamenOrina from './ExamenOrina/ExamenOrina';
 import Hematologia from './Hematologia/Hematologia';
 
-const LaboratorioClinico = () => {
+const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
 
@@ -15,17 +15,17 @@ const LaboratorioClinico = () => {
     {
       label: 'Hematología - Bioquímica SI-EO',
       icon: faMicroscope,
-      component: <HematologiaBioquimicaSIEO />
+      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued}/>
     },
     {
       label: 'Examen de Orina',
       icon: faTint,
-      component: <ExamenOrina />
+      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued}/>
     },
     {
       label: 'Hematología',
       icon: faHeartbeat,
-      component: <Hematologia />
+      component: <Hematologia token={token} selectedSede={selectedSede} userlogued={userlogued}/>
     }
   ];
 
