@@ -96,6 +96,7 @@ const RegistroClientes = (props) => {
   // Autocomplete de profesión
   const handleProfesionSearch = e => {
     const v = e.target.value;
+    props.setDatos(d => ({...d, ocupacionPa: v.toUpperCase()}))
     setSearchTerm(v);
     setFilteredProfesiones(
       v
@@ -354,6 +355,7 @@ const handleSelectSexo = val => {
 
 const handleNivelSearch = e => {
   const v = e.target.value.toUpperCase();
+  props.setDatos(d => ({...d, nivelEstPa: v.toUpperCase()}))
   setSearchNivel(v);
   setFilteredNivel(
     v ? nivelOptions.filter(n => n.includes(v)) : []
@@ -404,7 +406,7 @@ const [filteredDist, setFilteredDist] = useState([]);
 // Handler Departamento
 const handleDeptSearch = e => {
   const v = e.target.value;
-    props.setDatos(d => ({...d, departamentoPa: v}))
+    props.setDatos(d => ({...d, departamentoPa: v.toUpperCase()}))
   setSearchDept(v);
   setFilteredDept(
     v
@@ -428,7 +430,7 @@ const handleSelectDept = dept => {
 // Handler Provincia (usa Provincias filtradas por depto seleccionado)
 const handleProvSearch = e => {
   const v = e.target.value;
-    props.setDatos(d => ({...d, provinciaPa: v}))
+    props.setDatos(d => ({...d, provinciaPa: v.toUpperCase()}))
   setSearchProv(v);
   const opciones = props.datos.departamentoPa
     ? Provincias.filter(p =>
@@ -450,7 +452,7 @@ const handleSelectProv = prov => {
 // Handler Distrito (usa Distritos filtrados por provincia seleccionada)
 const handleDistSearch = e => {
   const v = e.target.value;
-  props.setDatos(d => ({...d, distritoPa: v}))
+  props.setDatos(d => ({...d, distritoPa: v.toUpperCase()}))
   setSearchDist(v);
   const opciones = props.datos.provinciaPa
     ? Distritos.filter(d =>
@@ -478,7 +480,7 @@ const handleFecha = e => {
   props.setDatos(d => ({ ...d, fechaNaciminetoPa: formatted }));
 };
 
-
+console.log(props.datos)
 return (
     <div className="p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-1">
