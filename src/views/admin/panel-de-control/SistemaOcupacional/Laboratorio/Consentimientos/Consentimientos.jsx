@@ -1,7 +1,7 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Toxicologia/Consentimientos.jsx
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTint, faSquare, faCube, faLayerGroup, faThLarge, faLeaf, faFlask } from '@fortawesome/free-solid-svg-icons';
+import { faTint, faSquare, faCube, faLayerGroup, faThLarge, faLeaf, faFlask, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { Loading } from '../../../../../components/Loading';
 import Panel10D from './Panel10D/Panel10D';
 import Panel5D from './Panel5D/Panel5D';
@@ -10,11 +10,12 @@ import Panel2D from './Panel2D/Panel2D';
 import MuestraDeSangre from './MuestraDeSangre/MuestraDeSangre';
 import ConsMarihuana from './ConsMarihuana/ConsMarihuana';
 import Boro from './Boro/Boro';
+import { PrintHojaRMasivo } from './Controller/ControllerC';
 
 const Consentimientos = ({ token, selectedSede, userlogued }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
-
+  const [norden, setNorden] = useState('')
   const tabs = [
     { label: 'Muestra Sangre', icon: faTint,   component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Panel 2D',       icon: faSquare, component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
@@ -29,21 +30,40 @@ const Consentimientos = ({ token, selectedSede, userlogued }) => {
 
   return (
     <div className="w-full">
-      <div className="flex space-x-2 overflow-x-auto">
-        {tabs.map((tab, idx) => (
-          <button
-            key={idx}
-            onClick={() => setActiveTab(idx)}
-            className={`px-6 py-2 border rounded-t-lg transition-all duration-150 text-base font-semibold focus:outline-none ${
-              activeTab === idx
-                ? 'bg-[#233245] text-white font-bold'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-            {tab.label}
-          </button>
-        ))}
+      <div className="flex justify-between items-center overflow-x-auto">
+        {/* Sección izquierda: tabs */}
+        <div className="flex space-x-2">
+          {tabs.map((tab, idx) => (
+            <button
+              key={idx}
+              onClick={() => setActiveTab(idx)}
+              className={`px-6 py-2 border rounded-t-lg transition-all duration-150 text-base font-semibold focus:outline-none ${
+                activeTab === idx
+                  ? 'bg-[#233245] text-white font-bold'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+              {tab.label}
+            </button>
+          ))}
+        </div>
+       <div className="flex items-center space-x-2 pr-2">
+        <span className="font-semibold text-blue-900 text-lg">IMPRIMIR MASIVO</span>
+        <input
+          className="border rounded px-3 py-2 w-32 text-base"
+          value={norden}
+          onChange={(e) => {setNorden(e.target.value)}}
+          name="norden"
+        />
+        <button
+          type="button"
+          onClick={() => {PrintHojaRMasivo(norden,token)}}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded border border-green-700 flex items-center shadow-md transition-colors"
+        >
+          <FontAwesomeIcon icon={faPrint} />
+        </button>
+      </div>
       </div>
       <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg">
         {tabs[activeTab].component}

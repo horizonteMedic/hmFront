@@ -73,7 +73,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
         ],
         theme: 'plain',
         styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: { 0: { cellWidth: 90 }, 1: { cellWidth: 40 }, 2: { cellWidth: 40 } },
+        columnStyles: { 0: { cellWidth: 90 }, 1: { cellWidth: 40 }, 2: { cellWidth: 60 } },
         margin: { left: 15 },
         didDrawPage: () => {}
       });

@@ -40,9 +40,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`Fecha:`, 18, y);
     doc.text(`${datos.fecha || ''}`, 35, y);
     doc.text(`Hora:`, 65, y);
-    doc.text(`${datos.hora || ''}`, 80, y);
+    doc.text(`${datos.horaExamen || ''}`, 80, y);
     doc.text(`Ciudad:`, 110, y);
-    doc.text(`${datos.ciudad || ''}`, 130, y);
+    doc.text(`${datos.sede || ''}`, 130, y);
     doc.setFont(undefined, 'bold');
     doc.text(`Nro Orden :`, 160, y);
     doc.text(`${datos.norden || ''}`, 195, y, { align: 'right' });

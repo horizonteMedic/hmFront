@@ -96,7 +96,7 @@ const Boro = ({ token, selectedSede, userlogued }) => {
       empresa: '',
       enfermedad: { key: false, cual: '' },
       medicamento: { key: false, cual: '' },
-      matecoca: { key: false, fecha: '' },
+      matecoca: { key: false, fecha: today },
       chaccha: { key: false, fecha: today },
       tratamiento: { key: false, cual: '', cuando: '', donde: '' },
       notas: '',

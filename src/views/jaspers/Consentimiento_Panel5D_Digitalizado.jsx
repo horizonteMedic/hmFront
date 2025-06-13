@@ -123,7 +123,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       body: [
         ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "})`, `SI ( ${datos.antConsumeMarih ? "X" : " " })`],
         ['CONSUME COCAINA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "})`, `SI ( ${datos.antConsumeCocacina ? "X" : " " })`],
-        ['CONSUME HOJA DE COCA EN LOS 14 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "})`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Fecha:  ${datos.fechaConsumoHojaCoca}` : ""}`],
+        ['CONSUME HOJA DE COCA EN LOS 14 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "})`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Cuando:  ${datos.fechaConsumoHojaCoca}` : ""}`],
         ['CONSUME DE ÉXTASIS', `NO ( ${!datos.antConsumeAnfetaminaOExtasis ? "X" : " "})`, `SI ( ${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
         ['CONSUME DE OPIÁCEOS', `NO ( ${!datos.antConsumeOpiaceos ? "X" : " "})`, `SI ( ${datos.antConsumeOpiaceos ? "X" : " " })`],
         ['CONSUME DE BENZODIACEPINAS', `NO ( ${!datos.antConsumeBenzodiacepinas ? "X" : " "})`, `SI ( ${datos.antConsumeBenzodiacepinas ? "X" : " " })`],
@@ -133,7 +133,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       columnStyles: {
         0: { cellWidth: 110 },
         1: { cellWidth: 25 },
-        2: { cellWidth: 25 }
+        2: { cellWidth: 45 }
       },
       margin: { left: margin, right: margin }
     });
