@@ -31,7 +31,7 @@ import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeRecl
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 //jaspers
-import Sucamec from './views/jaspers/Consentimiento_Panel5D_Digitalizado.jsx';
+import Sucamec from './views/jaspers/AnalisisBioquimicos/PerfilHepatico_Digitalizado.jsx';
 
 const App = () => {
   return (

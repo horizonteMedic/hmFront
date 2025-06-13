@@ -1,13 +1,13 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import headerConsentimiento from "./components/headerConsentimiento";
-import footer from "./components/footer";
+import headerConsentimiento from "../components/headerConsentimiento";
+import footer from "../components/footer";
 
-export default function Consentimiento_Marihuana_Digitalizado(datos) {
+export default function Consentimiento_Panel2D_Digitalizado(datos) {
   const doc = new jsPDF();
   headerConsentimiento(doc, datos);
 
-   const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
+  const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
   const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
   const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const isValidUrl = url => url && url !== "Sin registro";
@@ -28,7 +28,7 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
    .then(([huellap, firmap, sellop]) => {
     let y = 44;
 
-    // Título subrayado y negrita con salto de línea
+    // Título subrayado y negrita
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
     doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE', 105, y, { align: 'center' });
@@ -51,7 +51,7 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
     doc.setFont(undefined, 'normal');
     doc.text(`${datos.fecha || ''}`, 155, y);
 
-    // Antecedentes (tabla)
+    // Antecedentes
     let antY = y + 18;
     doc.setFont(undefined, 'bold');
     doc.text('ANTECEDENTES:', 15, antY);
@@ -61,6 +61,8 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
       startY: antY,
       body: [
         ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "})`, `SI ( ${datos.antConsumeMarih ? "X" : " " })`],
+        ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "})`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " " })    ${datos.antConsumeHojaCoca ? `Cuando:  ${datos.fechaConsumoHojaCoca}` : ""}`],
+        ['CONSUME COCAINA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "})`, `SI ( ${datos.antConsumeCocacina ? "X" : " " })`],
       ],
       theme: 'plain',
       styles: { fontSize: 9, cellPadding: 1 },
@@ -145,7 +147,6 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-
    })
   
 } 

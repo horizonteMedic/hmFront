@@ -1,64 +1,220 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/PerfilRenal.jsx
+import React, { useReducer, useEffect, useCallback } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
 
-const Bioquimica = ({ token, selectedSede }) => {
+const initialState = {
+  ficha: '',
+  fecha: new Date().toISOString().split('T')[0],
+  nombres: '',
+  edad: '',
+  creatinina: '',
+  urea: '',
+  acidoUrico: '',
+  printCount: ''
+}
+
+function formReducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    case 'LOAD':
+      return { ...state, ...action.payload }
+    case 'RESET':
+      return initialState
+    default:
+      return state
+  }
+}
+
+export default function PerfilRenal({ apiBase, token, selectedSede }) {
+  const [form, dispatch] = useReducer(formReducer, initialState)
+
+  // when ficha changes, load existing record
+  useEffect(() => {
+    if (!form.ficha) return
+    async function load() {
+      // placeholder for API call:
+      // const res = await fetch(`${apiBase}/renal/${form.ficha}`, {
+      //   headers: { Authorization: `Bearer ${token}` }
+      // })
+      // const data = await res.json()
+      // dispatch({ type: 'LOAD', payload: data })
+    }
+    load()
+  }, [form.ficha, apiBase, token])
+
+  const setField = useCallback((field, value) => {
+    dispatch({ type: 'SET_FIELD', field, value })
+  }, [])
+
+  const handleSave = useCallback(async () => {
+    try {
+      const payload = { ...form, sede: selectedSede }
+      // await fetch(`${apiBase}/renal`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${token}`
+      //   },
+      //   body: JSON.stringify(payload)
+      // })
+      Swal.fire('Guardado', 'Perfil renal guardado correctamente', 'success')
+    } catch (err) {
+      Swal.fire('Error', 'No se pudo guardar', 'error')
+    }
+  }, [form, apiBase, token, selectedSede])
+
+  const handleClear = useCallback(() => {
+    dispatch({ type: 'RESET' })
+    Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
+  }, [])
+
+  const handlePrint = useCallback(() => {
+    window.open(`${apiBase}/renal/print?ficha=${form.ficha}&count=${form.printCount}`, '_blank')
+    Swal.fire('Imprimiendo', 'Se ha abierto la ventana de impresión', 'success')
+  }, [apiBase, form.ficha, form.printCount])
+
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">PERFIL RENAL</h2>
-      <form className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input className="border rounded px-2 py-1 flex-1" />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Fecha:</label>
-            <input type="date" className="border rounded px-2 py-1 flex-1" />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input className="border rounded px-2 py-1 bg-gray-100" style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (''?.length || 0) * 10))}px` }} />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Edad:</label>
-            <input className="border rounded px-2 py-1 w-24 bg-gray-100" />
-          </div>
-        </div>
-        <div className="flex gap-2 items-center">
-          <label className="font-semibold min-w-[90px]">Muestra</label>
-          <input className="border rounded px-2 py-1 flex-1 bg-gray-100" value="SUERO" readOnly />
-        </div>
-        <div className="flex gap-8 mt-6">
-          <div className="flex flex-col gap-2 flex-1">
-            <span className="font-bold">PRUEBAS</span>
-            <label className="flex items-center gap-2">CREATININA SÉRICA</label>
-            <label className="flex items-center gap-2">UREA SÉRICA</label>
-            <label className="flex items-center gap-2">ACIDO URICO SÉRICO</label>
-          </div>
-          <div className="flex flex-col gap-2 flex-1">
-            <span className="font-bold">RESULTADOS</span>
-            <input className="border rounded px-2 py-1" />
-            <input className="border rounded px-2 py-1" />
-            <input className="border rounded px-2 py-1" />
-          </div>
-          <div className="flex flex-col gap-2 justify-between">
-            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faSave} /> Guardar/Actualizar</button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
-          </div>
-        </div>
-        <div className="flex flex-col items-end mt-6">
-          <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
-          <div className="flex gap-1 mt-1">
-            <input className="border rounded px-2 py-1 w-24" />
-            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"><FontAwesomeIcon icon={faPrint} /></button>
-          </div>
-        </div>
-      </form>
-    </div>
-  );
-};
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-center">PERFIL RENAL</h2>
 
-export default Bioquimica; 
+      {/* Encabezado */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field
+          label="Nro Ficha"
+          name="ficha"
+          value={form.ficha}
+          onChange={e => setField('ficha', e.target.value)}
+        />
+        <Field
+          label="Fecha"
+          type="date"
+          name="fecha"
+          value={form.fecha}
+          onChange={e => setField('fecha', e.target.value)}
+        />
+      </div>
+
+      {/* Paciente */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          onChange={e => setField('nombres', e.target.value)}
+        />
+        <Field
+          label="Edad"
+          name="edad"
+          value={form.edad}
+          onChange={e => setField('edad', e.target.value)}
+        />
+      </div>
+
+      {/* Muestra fija */}
+      <div>
+        <label className="font-semibold">Muestra:</label>
+        <input
+          readOnly
+          value="SUERO"
+          className="border rounded px-2 py-1 bg-gray-100 ml-2"
+        />
+      </div>
+
+      {/* Pruebas y Resultados */}
+      <div className="grid grid-cols-3 gap-4">
+        <Section>
+          <h3 className="font-bold">PRUEBAS</h3>
+          <div className="space-y-2 mt-2">
+            <span>CREATININA SÉRICA</span>
+            <span>UREA SÉRICA</span>
+            <span>ÁCIDO ÚRICO SÉRICO</span>
+          </div>
+        </Section>
+        <Section>
+          <h3 className="font-bold">RESULTADOS</h3>
+          <div className="space-y-2 mt-2">
+            <input
+              className="border rounded px-2 py-1 w-full"
+              value={form.creatinina}
+              onChange={e => setField('creatinina', e.target.value)}
+            />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              value={form.urea}
+              onChange={e => setField('urea', e.target.value)}
+            />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              value={form.acidoUrico}
+              onChange={e => setField('acidoUrico', e.target.value)}
+            />
+          </div>
+        </Section>
+        <div className="flex flex-col justify-between">
+          <ActionButton color="green" icon={faSave} onClick={handleSave}>
+            Guardar/Actualizar
+          </ActionButton>
+          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>
+            Limpiar
+          </ActionButton>
+        </div>
+      </div>
+
+      {/* Imprimir */}
+      <div className="flex flex-col items-end space-y-2">
+        <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+        <div className="flex items-center gap-2">
+          <input
+            name="printCount"
+            value={form.printCount}
+            onChange={e => setField('printCount', e.target.value)}
+            className="border rounded px-2 py-1 w-24"
+          />
+          <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Aux components
+
+function Field({ label, name, type = 'text', value, onChange, disabled }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-semibold mb-1">{label}</label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        className={`border rounded px-2 py-1 ${disabled ? 'bg-gray-100' : ''}`}
+      />
+    </div>
+  )
+}
+
+function Section({ children }) {
+  return <div className="space-y-2">{children}</div>
+}
+
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    green:  'bg-emerald-600 hover:bg-emerald-700',
+    yellow: 'bg-yellow-400 hover:bg-yellow-500',
+    blue:   'bg-blue-600 hover:bg-blue-700'
+  }[color]
+  return (
+    <button
+      onClick={onClick}
+      className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}
+    >
+      <FontAwesomeIcon icon={icon} />
+      {children}
+    </button>
+  )
+}

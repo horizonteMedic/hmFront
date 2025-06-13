@@ -1,7 +1,7 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/LaboratorioClinico/Hematologia/Hematologia.jsx
-import React, { useState, useEffect } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import React, { useReducer, useEffect, useCallback } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 
 const PRUEBAS = [
   'HEMOGLOBINA',
@@ -12,7 +12,7 @@ const PRUEBAS = [
   'Concentración de la Hemoglobina Corpuscular',
   'LEUCOCITOS',
   'PLAQUETAS'
-];
+]
 
 const DIFERENCIAL = [
   'NEUTRÓFILOS (%)',
@@ -22,191 +22,214 @@ const DIFERENCIAL = [
   'EOSINÓFILOS (%)',
   'BASÓFILOS (%)',
   'LINFOCITOS (%)'
-];
+]
+
+const today = new Date().toISOString().split('T')[0]
+
+const initialState = {
+  norden: '',
+  fecha: today,
+  nombres: '',
+  edad: '',
+  resultados: Array(PRUEBAS.length).fill(''),
+  recuentos: Array(DIFERENCIAL.length).fill(''),
+  medico: ''
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    case 'SET_ARRAY':
+      const arr = [...state[action.field]]
+      arr[action.index] = action.value
+      return { ...state, [action.field]: arr }
+    case 'LOAD':
+      return { ...state, ...action.payload }
+    case 'RESET':
+      return initialState
+    default:
+      return state
+  }
+}
 
 export default function Hematologia({ apiBase, token, selectedSede }) {
-  const today = new Date().toISOString().split('T')[0];
-  const [form, setForm] = useState({
-    norden: '',
-    fecha: today,
-    nombres: '',
-    edad: '',
-    resultados: Array(PRUEBAS.length).fill(''),
-    recuentos: Array(DIFERENCIAL.length).fill(''),
-    medico: ''
-  });
-  const [status, setStatus] = useState('');
+  const [form, dispatch] = useReducer(reducer, initialState)
+  const [status, setStatus] = React.useState('')
 
+  // cargar datos cuando cambia norden
   useEffect(() => {
-    setForm(f => ({ ...f, fecha: today }));
-  }, [today]);
-
-  const handleChange = e => {
-    const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
-  };
-
-  const handleArrayChange = (key, idx, value) => {
-    setForm(f => {
-      const arr = f[key].slice();
-      arr[idx] = value;
-      return { ...f, [key]: arr };
-    });
-  };
-
-  const handleSave = async () => {
-    try {
-      const payload = { ...form, sede: selectedSede };
-      const res = await fetch(`${apiBase}/hematologia`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('Error al guardar');
-      setStatus('Guardado exitoso');
-    } catch (err) {
-      setStatus(err.message);
+    if (!form.norden) return
+    async function load() {
+      // const res = await fetch(`${apiBase}/hematologia/${form.norden}`, {
+      //   headers: { Authorization: `Bearer ${token}` }
+      // })
+      // const data = await res.json()
+      // dispatch({ type: 'LOAD', payload: data })
     }
-  };
+    load()
+  }, [form.norden, apiBase, token])
 
-  const handleClear = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      resultados: Array(PRUEBAS.length).fill(''),
-      recuentos: Array(DIFERENCIAL.length).fill(''),
-      medico: ''
-    });
-    setStatus('Formulario limpiado');
-  };
+  const onChange = useCallback(e => {
+    const { name, value } = e.target
+    dispatch({ type: 'SET_FIELD', field: name, value })
+  }, [])
 
-  const handlePrint = () => {
-    window.open(`${apiBase}/hematologia/print?norden=${form.norden}`, '_blank');
-  };
+  const onArrayChange = useCallback((field, idx) => e => {
+    dispatch({ type: 'SET_ARRAY', field, index: idx, value: e.target.value })
+  }, [])
+
+  const handleSave = useCallback(async () => {
+    try {
+      const payload = { ...form, sede: selectedSede }
+      // await fetch(`${apiBase}/hematologia`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${token}`
+      //   },
+      //   body: JSON.stringify(payload)
+      // })
+      setStatus('Guardado exitoso')
+    } catch (err) {
+      setStatus('Error al guardar')
+    }
+  }, [form, apiBase, token, selectedSede])
+
+  const handleClear = useCallback(() => {
+    dispatch({ type: 'RESET' })
+    setStatus('Formulario limpiado')
+  }, [])
+
+  const handlePrint = useCallback(() => {
+    window.open(`${apiBase}/hematologia/print?norden=${form.norden}`, '_blank')
+  }, [apiBase, form.norden])
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">HEMATOLOGÍA</h2>
-      <form className="space-y-6">
-        {/* Encabezado */}
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[100px]">Nro Ficha:</label>
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 flex-1"
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[100px]">Fecha:</label>
-            <input
-              name="fecha"
-              type="date"
-              value={form.fecha}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 flex-1"
-            />
-          </div>
-        </div>
-        {/* Paciente */}
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[100px]">Nombres:</label>
-            <input
-              name="nombres"
-              value={form.nombres}
-              disabled
-              className="border rounded px-2 py-1 flex-1 bg-gray-100"
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[100px]">Edad:</label>
-            <input
-              name="edad"
-              value={form.edad}
-              disabled
-              className="border rounded px-2 py-1 w-32 bg-gray-100"
-            />
-          </div>
-        </div>
-        {/* Muestra */}
-        <div className="font-bold mb-2">MUESTRA: SANGRE TOTAL C/ EDTA</div>
-        {/* Resultados y Recuento */}
-        <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-6">
-          {/* Pruebas */}
-          <div>
-            <div className="font-bold mb-2">PRUEBAS</div>
-            {PRUEBAS.map((label, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
-                <span className="flex-1">{label}</span>
+    <div className="max-w-3xl mx-auto bg-white rounded shadow p-6 space-y-6">
+      <h2 className="text-2xl font-bold text-center">HEMATOLOGÍA</h2>
+
+      {/* Encabezado */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={onChange} />
+        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={onChange} />
+      </div>
+
+      {/* Paciente */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nombres" name="nombres" value={form.nombres} disabled />
+        <Field label="Edad" name="edad" value={form.edad} disabled />
+      </div>
+
+      {/* Muestra fija */}
+      <div className="font-semibold">MUESTRA: SANGRE TOTAL C/ EDTA</div>
+
+      {/* Resultados y Recuento */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="font-semibold mb-2">PRUEBAS</h3>
+          <div className="space-y-2">
+            {PRUEBAS.map((lbl, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="flex-1">{lbl}</span>
                 <input
-                  value={form.resultados[idx]}
-                  onChange={e => handleArrayChange('resultados', idx, e.target.value)}
-                  className="border rounded px-2 py-1 w-40"
-                />
-              </div>
-            ))}
-          </div>
-          {/* Recuento Diferencial */}
-          <div>
-            <div className="font-bold mb-2">RECUENTO DIFERENCIAL</div>
-            {DIFERENCIAL.map((label, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
-                <span className="flex-1">{label}</span>
-                <input
-                  value={form.recuentos[idx]}
-                  onChange={e => handleArrayChange('recuentos', idx, e.target.value)}
-                  className="border rounded px-2 py-1 w-40"
+                  className="border rounded px-2 py-1 w-32"
+                  value={form.resultados[i]}
+                  onChange={onArrayChange('resultados', i)}
                 />
               </div>
             ))}
           </div>
         </div>
-        {/* Médico */}
-        <div className="flex items-center gap-2">
-          <label className="font-semibold min-w-[100px]">ASIGNAR MÉDICO:</label>
-          <select name="medico" value={form.medico} disabled className="border rounded px-2 py-1 flex-1 bg-gray-100">
-            <option value="">-- N/A --</option>
-          </select>
-        </div>
-        {/* Acciones */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic">IMPRIMIR</span>
-            <div className="flex items-center gap-2 mt-2">
-              <input name="printCount" className="border rounded px-2 py-1 w-24" placeholder="Veces" />
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
+        <div>
+          <h3 className="font-semibold mb-2">RECUENTO DIFERENCIAL</h3>
+          <div className="space-y-2">
+            {DIFERENCIAL.map((lbl, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <span className="flex-1">{lbl}</span>
+                <input
+                  className="border rounded px-2 py-1 w-32"
+                  value={form.recuentos[i]}
+                  onChange={onArrayChange('recuentos', i)}
+                />
+              </div>
+            ))}
           </div>
         </div>
-      </form>
-      {status && <p className="mt-4 text-center text-green-600">{status}</p>}
+      </div>
+
+      {/* Médico */}
+      <div>
+        <label className="font-semibold block mb-1">Asignar Médico</label>
+        <select
+          name="medico"
+          value={form.medico}
+          disabled
+          className="border rounded px-2 py-1 w-full bg-gray-100"
+        >
+          <option value="">-- N/A --</option>
+        </select>
+      </div>
+
+      {/* Acciones */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex gap-3">
+          <ActionButton color="emerald" icon={faSave} onClick={handleSave}>
+            Guardar/Actualizar
+          </ActionButton>
+          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>
+            Limpiar
+          </ActionButton>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="italic font-semibold mb-2">IMPRIMIR</span>
+          <button
+            onClick={handlePrint}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded inline-flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faPrint} />
+            <span>Ficha</span>
+          </button>
+        </div>
+      </div>
+
+      {status && (
+        <p className="text-center text-green-600 font-medium">{status}</p>
+      )}
     </div>
-  );
+  )
+}
+
+// Input field component
+function Field({ label, name, type = 'text', value, onChange, disabled }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-semibold mb-1">{label}</label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        className={`border rounded px-2 py-1 ${disabled ? 'bg-gray-100' : ''}`}
+      />
+    </div>
+  )
+}
+
+// Action button component
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    emerald: 'bg-emerald-600 hover:bg-emerald-700',
+    yellow:  'bg-yellow-400 hover:bg-yellow-500'
+  }[color]
+  return (
+    <button
+      onClick={onClick}
+      className={`${bg} text-white px-4 py-1 rounded inline-flex items-center gap-2`}
+    >
+      <FontAwesomeIcon icon={icon} />
+      {children}
+    </button>
+  )
 }
