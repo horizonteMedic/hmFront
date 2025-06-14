@@ -3,11 +3,14 @@ import React, { useReducer, useState, useEffect, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint, faSearch } from '@fortawesome/free-solid-svg-icons'
 import microscopioImg from '../microscopio.webp'
+import { VerifyTR } from '../controller/ControllerABio'
 
 export default function AnalisisBioquimicos({ token, selectedSede }) {
+  const tabla = 'analisis_bioquimicos'
+
   const [form, setForm] = useState({
     examType: 'ficha',
-    ficha: '',
+    norden: '',
     medico: '',
     paciente: '',
     fecha: '',
@@ -22,17 +25,10 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
   const [exams, setExams] = useState([])
 
   // placeholder: fetch exams when searchParams change
-  useEffect(() => {
-    async function fetchExams() {
-      // const res = await fetch(`${apiBase}/bio?buscar=${searchParams.buscar}&codigo=${searchParams.codigo}`, {
-      //   headers: { Authorization: `Bearer ${token}` }
-      // })
-      // const data = await res.json()
-      // setExams(data)
-      console.log('Fetch exams with', searchParams)
-    }
-    fetchExams()
-  }, [searchParams, apiBase, token])
+  const handleFormChange = e => {
+    const { name, value } = e.target
+    setForm(f => ({ ...f, [name]: value }))
+  }
 
   const setField = useCallback((field, value) => {
     dispatch({ type: 'SET_FIELD', field, value })
@@ -43,14 +39,14 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
     setSearchParams(p => ({ ...p, [name]: value }))
   }
 
-  const handleEdit = () => console.log('Editar', form.ficha)
+  const handleEdit = () => console.log('Editar', form.norden)
   const handleSave = () => console.log('Guardar', form)
   const handleClear = () => setForm({
-    examType: 'ficha', ficha: '', medico: '', paciente: '', fecha: '',
+    examType: 'ficha', norden: '', medico: '', paciente: '', fecha: '',
     creatinina: '', colesterolTotal: '', ldl: '', hdl: '', vldl: '', trigliceridos: ''
   })
-  const handlePrint = () => console.log('Imprimir', form.ficha)
-
+  const handlePrint = () => console.log('Imprimir', form.norden)
+  
   return (
     <div className="w-full p-4 space-y-6">
       <h2 className="text-3xl font-bold text-center">Análisis Bioquímicos</h2>
@@ -86,8 +82,10 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
             <label className="flex items-center gap-1 font-medium">
               N° Ficha:
               <input
-                name="ficha"
-                value={form.ficha}
+                name="norden"
+                value={form.norden}
+                autoComplete='off'
+                onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,tabla,token,setForm,selectedSede)}}
                 onChange={handleFormChange}
                 className="border rounded px-2 py-1 w-20 ml-1"
               />

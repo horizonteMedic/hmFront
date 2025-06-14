@@ -238,9 +238,7 @@ const RegistroClientes = (props) => {
   return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     } 
 
-    if (HuellaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene huella registrada', 'error');
-    if (FirmaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene firma registrada', 'error');
-
+    
     Swal.fire({
       title: 'Validando Datos',
       allowOutsideClick: false,
@@ -250,6 +248,7 @@ const RegistroClientes = (props) => {
     SubmitRegistrarPaciente(props.datos, props.selectedSede, props.token)
       .then(r => {
         Swal.close();
+        console.log(r)
         if (!r.id) {
           Swal.fire('Error', 'No se pudo registrar', 'error');
         } else {

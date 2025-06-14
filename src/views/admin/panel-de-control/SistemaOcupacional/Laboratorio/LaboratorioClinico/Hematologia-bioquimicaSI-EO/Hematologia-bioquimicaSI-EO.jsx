@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import microscopioImg from './microscopio.webp';
 
-const HematologiaBioquimicaSIEO = () => {
+export const HematologiaBioquimicaSIEO = () => {
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Barra superior sola y alineada */}
@@ -208,3 +208,4 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
+export default HematologiaBioquimicaSIEO

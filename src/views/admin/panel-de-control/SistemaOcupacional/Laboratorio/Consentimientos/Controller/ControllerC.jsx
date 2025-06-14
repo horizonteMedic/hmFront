@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
 import { GetInfoLaboratioEx, SubmitInfoLaboratioExBoro } from "./model.js";
-
 const backendToKeyMap = {
   antConsumeMarih: 'MARIHUANA',
   antConsumeCocacina: 'COCAINA',
@@ -171,8 +170,8 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
       if (res.norden) {
         const nombre = res.nameJasper;
         console.log(nombre)
-        const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
-        const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
+        const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
+        const modulo = await jasperModules[`../../../../../../jaspers/Consentimientos/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
@@ -190,8 +189,8 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
       if (res.norden) {
         const nombre = res.nameJasper;
         console.log(nombre)
-        const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
-        const modulo = await jasperModules[`../../../../../../jaspers/${nombre}.jsx`]();
+        const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
+        const modulo = await jasperModules[`../../../../../../jaspers/Consentimientos/${nombre}.jsx`]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === 'function') {
           modulo.default(res);
@@ -223,7 +222,7 @@ export const PrintHojaRMasivo = async (norden,token) => {
     'consent_Boro'
   ]
   await Loading('Cargando Formato a Imprimir')
-  const jasperModules = import.meta.glob('../../../../../../jaspers/*.jsx');
+  const jasperModules = import.meta.glob('../../../../../../jaspers/Consentimientos/*.jsx');
   for (const tabla of tablas) {
     try {
       const url =
@@ -234,7 +233,7 @@ export const PrintHojaRMasivo = async (norden,token) => {
       
       if (res && res.norden && res.nameJasper) {
         const nombre = res.nameJasper;
-        const path = `../../../../../../jaspers/${nombre}.jsx`;
+        const path = `../../../../../../jaspers/Consentimientos/${nombre}.jsx`;
 
         if (jasperModules[path]) {
           const modulo = await jasperModules[path]();
