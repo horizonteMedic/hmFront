@@ -6,11 +6,12 @@ import { useAuthStore } from '../../../../../store/auth';
 
 const ModalAsignacionesSub = ({ open, onClose, nombre, get, IDView, token, ListPerm, ListPermCheck, ID_ROL }) => {
   if (!open) return null;
+  console.log(ListPermCheck)
   const [permisos, setPermisos] = useState(ListPerm)
-  const [checkedPermisos, setCheckedPermisos] = useState(ListPermCheck?.listaPermisos || []);
+  const [checkedPermisos, setCheckedPermisos] = useState(ListPermCheck);
   const listAccesos = useAuthStore((state) => state.listAccesos);
   const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
-
+  
   //GLOBAL
   const eliminarPermisoGlobal = (vistaNombre, accion) => {
     const nuevaLista = listAccesos.map((item) => {
@@ -86,7 +87,6 @@ const ModalAsignacionesSub = ({ open, onClose, nombre, get, IDView, token, ListP
             color: '#233245'
           });
           setCheckedPermisos([...checkedPermisos, accion]);
-          agregarPermisoGlobal(nombre, accion);
         })
       }
     })}
@@ -125,7 +125,6 @@ const ModalAsignacionesSub = ({ open, onClose, nombre, get, IDView, token, ListP
           });
           const nuevosPermisos = checkedPermisos.filter((perm) => perm !== accion);
           setCheckedPermisos(nuevosPermisos);
-          eliminarPermisoGlobal(nombre, accion); // Global
         })
       }
     })
