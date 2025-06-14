@@ -380,8 +380,8 @@ const TabComponent = () => {
                       setDatos={setDatos}
                       selectedSede={selectSede}
                       token={token}
-                      tabHC={() => {}}
-                      ChangeDNI={() => {}}
+                      tabHC={() => {setSubTab(2)}}
+                      ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}}
                     />
                   )}
                   {subTab === 1 && (
