@@ -109,16 +109,12 @@ const TabComponent = () => {
       setSelectSede(sedeTNP?.cod_sede || userlogued.sedes[0].cod_sede);
     }
   }, [userlogued.sedes]);
-  // permisos
+  
+  //AVVESO A LAS TARJETAS VIEWS
   const ViewAdminision = Vista.includes("Admision")
   const ViewTriaje = Vista.includes("Triaje")
-  const ViewLaboratorio = Vista.includes("Laboratorio")
-  const AccessRegistroC = Acceso.includes("AccesoRP");
-  const AccessHistoriaC = Acceso.includes("AccesoHC");
-  const AccessCitas = Acceso.includes("AccesoReservaP");
-  const AccesExcelBasico = Acceso.includes(656);
-  const AccesExcelCompleto = Acceso.includes(657);
-  const AccesTriaje = Acceso.includes("AccesoTriaje");
+  const ViewLaboratorio = Vista.includes("Laboratorio Clinico")
+ 
   
   //COMBOBOX REGISTRO
   const Profesiones   = ComboboxProfesión();
@@ -173,16 +169,8 @@ const TabComponent = () => {
     ViewAdminision: ViewAdminision,
     ViewTriaje: ViewTriaje,
     ViewLaboratorio: ViewLaboratorio,
-    ATriaje: AccesTriaje
   }
   
-  const AccesAdmision = {
-    Registro: AccessRegistroC,
-    Historia: AccessHistoriaC,
-    Citas: AccessCitas,
-    ExcelB: AccesExcelBasico,
-    ExcelC: AccesExcelCompleto,
-  };
 
   const tienePermisoEnVista = (nombreVista, permiso) => {
     const vista = Acceso.find(item => item.nombre === nombreVista);
@@ -347,15 +335,15 @@ const TabComponent = () => {
               </div>
               <div>
                 <div className={styles.tabHeader}>
-                  {tienePermisoEnVista("Admision","AccesoRP") && (
+                    {/*Esto se va a mostrar por defecto */}
                     <button
                       className={`${styles.tabButton} ${subTab === 0 ? styles.active : ''}`}
                       onClick={() => setSubTab(0)}
                     >
                       Registro de Pacientes
                     </button>
-                  )}
-                  {tienePermisoEnVista("Admision","AccesoHC") && (
+
+                  {tienePermisoEnVista("Admision","Acceso a Examenes Pre") && (
                     <button
                       className={`${styles.tabButton} ${subTab === 2 ? styles.active : ''}`}
                       onClick={() => setSubTab(2)}
@@ -363,10 +351,18 @@ const TabComponent = () => {
                       Apertura Exámenes PreOcup
                     </button>
                   )}
-                  {tienePermisoEnVista("Admision","AccesoReservaP") && (
+                  {tienePermisoEnVista("Admision","Acceso Consentimiento de Digitalizacion") && (
                     <button
                       className={`${styles.tabButton} ${subTab === 1 ? styles.active : ''}`}
                       onClick={() => setSubTab(1)}
+                    >
+                      Consentimiento Digitalización
+                    </button>
+                  )}
+                  {tienePermisoEnVista("Admision","Acceso Reserva de Pacientes") && (
+                    <button
+                      className={`${styles.tabButton} ${subTab === 3 ? styles.active : ''}`}
+                      onClick={() => setSubTab(3)}
                     >
                       Consentimiento Digitalización
                     </button>
@@ -385,7 +381,7 @@ const TabComponent = () => {
                     />
                   )}
                   {subTab === 1 && (
-                    <ConsentimientoDigitalizacion token={token} userlogued={userlogued} />
+                    <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} />
                   )}
                   {subTab === 2 && (
                     <AperturaExamenesPreOcup
@@ -393,8 +389,16 @@ const TabComponent = () => {
                       DNIG={DNIG}
                       selectedSede={selectSede}
                       token={token}
-                      PrecioC={() => {}}
-                      ChangeDNI={() => {}}
+                      PrecioC={ComboboxPrecioExamenMulti}
+                      ChangeDNI={(nuevoDNI) => {setDNIG(nuevoDNI)}}
+                    />
+                  )}
+                  {subTab === 3 && (
+                    <ReservaPacientes
+                      selectedSede="T-NP"
+                      token={token}
+                      Loading={Loading}
+                      userlogued={userlogued.sub}
                     />
                   )}
                 </div>
