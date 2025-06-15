@@ -25,12 +25,12 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
 
   // ==== TABLA ====
   const tests = [
-    { label: "CREATININA", key: "creatinina", range: "(V.N. 0.8 - 1.4 mg/dl)" },
-    { label: "COLESTEROL TOTAL", key: "colesterol_total", range: "(V.N. < 200 mg/dl)" },
-    { label: "L.D.L. COLESTEROL", key: "ldl", range: "(V.N. < 129 mg/dl)" },
-    { label: "H.D.L. COLESTEROL", key: "hdl", range: "(V.N. 40 - 60 mg/dl)" },
-    { label: "V.L.D.L. COLESTEROL", key: "vldl", range: "(V.N. < 30 mg/dl)" },
-    { label: "TRIGLICÉRIDOS", key: "trigliceridos", range: "(V.N. < 150 mg/dl)" },
+    { label: "CREATININA", key: "txtCreatinina", range: "(V.N. 0.8 - 1.4 mg/dl)" },
+    { label: "COLESTEROL TOTAL", key: "txtColesterol", range: "(V.N. < 200 mg/dl)" },
+    { label: "L.D.L. COLESTEROL", key: "txtLdlColesterol", range: "(V.N. < 129 mg/dl)" },
+    { label: "H.D.L. COLESTEROL", key: "txtHdlColesterol", range: "(V.N. 40 - 60 mg/dl)" },
+    { label: "V.L.D.L. COLESTEROL", key: "txtVldlColesterol", range: "(V.N. < 30 mg/dl)" },
+    { label: "TRIGLICÉRIDOS", key: "txtTrigliseridos", range: "(V.N. < 150 mg/dl)" },
   ];
   const tableW = pageW - margin * 4;
   const tableX = (pageW - tableW) / 2;
@@ -53,7 +53,7 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
   // Paciente
   doc.setFont("helvetica", "bold").text("PACIENTE", tableX + 2, textY);
   doc.text(":", tableX + 40, textY);
-  doc.setFont("helvetica", "normal").text(datos.nombre || "", tableX + 44, textY);
+  doc.setFont("helvetica", "normal").text(datos.nombres || "", tableX + 44, textY);
   // Fecha
   textY += rowH;
   doc.setFont("helvetica", "bold").text("FECHA", tableX + 2, textY);

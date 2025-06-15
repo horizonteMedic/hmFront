@@ -7,14 +7,14 @@ import Bioquimica from './Bioquimica/Bioquimica';
 import BioquimicaAcidoUrico from './BioquimicaAcidoUrico/BioquimicaAcidoUrico';
 import PerfilHepatico from './PerfilHepatico/PerfilHepatico';
 
-const LaboratorioAnalisisBioquimicos = ({ token, selectedSede }) => {
+const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     {
       label: 'Análisis Bioquímicos',
       icon: faFlask,
-      component: <AnalisisBioquimicos token={token} selectedSede={selectedSede} />
+      component: <AnalisisBioquimicos token={token} selectedSede={selectedSede} userlogued={userlogued} />
     },
     {
       label: 'Perfil Renal',
