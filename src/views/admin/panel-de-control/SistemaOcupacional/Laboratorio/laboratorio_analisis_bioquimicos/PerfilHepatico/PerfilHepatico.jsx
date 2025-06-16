@@ -1,8 +1,80 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/PerfilHepatico.jsx
+import React, { useReducer, useEffect, useCallback } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
 
-const PerfilHepatico = ({ token, selectedSede }) => {
+const today = new Date().toISOString().split('T')[0]
+
+const initialState = {
+  ficha: '',
+  fecha: today,
+  nombres: '',
+  edad: '',
+  tgo: '',
+  tgp: '',
+  ggt: '',
+  fosfAlc: '',
+  biliTotal: '',
+  biliInd: '',
+  biliDir: '',
+  protTot: '',
+  albumina: '',
+  globSer: '',
+  printCount: ''
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    case 'LOAD':
+      return { ...state, ...action.payload }
+    case 'RESET':
+      return initialState
+    default:
+      return state
+  }
+}
+
+export default function PerfilHepatico({ apiBase, token, selectedSede }) {
+  const [form, dispatch] = useReducer(reducer, { ...initialState })
+  
+  useEffect(() => {
+    if (!form.ficha) return
+    async function load() {
+      // placeholder GET
+      // const res = await fetch(`${apiBase}/hepatico/${form.ficha}`, { headers:{Authorization:`Bearer ${token}`} })
+      // const data = await res.json()
+      // dispatch({ type:'LOAD', payload:data })
+    }
+    load()
+  }, [form.ficha, apiBase, token])
+
+  const setField = useCallback((field, value) => {
+    dispatch({ type:'SET_FIELD', field, value })
+  }, [])
+
+  const handleSave = useCallback(async () => {
+    try {
+      // POST placeholder
+      // await fetch(`${apiBase}/hepatico`, {...})
+      Swal.fire('Guardado', 'Perfil hepático guardado', 'success')
+    } catch {
+      Swal.fire('Error', 'No se pudo guardar', 'error')
+    }
+  }, [form])
+
+  const handleClear = useCallback(() => {
+    dispatch({ type:'RESET' })
+    Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
+  }, [])
+
+  const handlePrint = useCallback(() => {
+    window.open(`${apiBase}/hepatico/print?ficha=${form.ficha}&count=${form.printCount}`, '_blank')
+    Swal.fire('Imprimiendo', '', 'success')
+  }, [form.ficha, form.printCount, apiBase])
+
   return (
     <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
       <h2 className="text-2xl font-bold mb-6 text-center">PERFIL HEPÁTICO</h2>
@@ -10,65 +82,59 @@ const PerfilHepatico = ({ token, selectedSede }) => {
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input className="border rounded px-2 py-1 flex-1"  />
+            <input className="border rounded px-2 py-1 flex-1" disabled />
           </div>
           <div className="flex-1 flex gap-2 items-center">
             <label className="font-semibold">Fecha:</label>
             <input type="date" className="border rounded px-2 py-1 flex-1" disabled />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input className="border rounded px-2 py-1 bg-gray-100" style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (''?.length || 0) * 10))}px` }} disabled />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Edad:</label>
-            <input className="border rounded px-2 py-1 w-24 bg-gray-100" disabled />
-          </div>
-        </div>
-        <div className="w-full mt-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 items-center">
-            <span className="font-bold col-span-1">PRUEBAS</span>
-            <span className="font-bold col-span-1">RESULTADOS</span>
-            <label className="flex items-center">TGO</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">TGP</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">GGT</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">FOSFATASA ALCALINA</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">BILIRRUBINA TOTAL</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">BILIRRUBINA INDIRECTA</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">BILIRRUBINA DIRECTA</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">PROTEINAS TOTALES</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">ALBUMINA</label>
-            <input className="border rounded px-2 py-1" />
-            <label className="flex items-center">GLOBULINA SERICA</label>
-            <input className="border rounded px-2 py-1" />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 mt-8 items-center justify-between w-full">
-          <div className="flex gap-3 w-full md:w-auto justify-center md:justify-start">
-            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faSave} /> Guardar/Actualizar</button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
-          </div>
-          <div className="flex flex-col items-end w-full md:w-auto">
-            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
-            <div className="flex gap-1 mt-1">
-              <input className="border rounded px-2 py-1 w-24" />
-              <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"><FontAwesomeIcon icon={faPrint} /></button>
-            </div>
-          </div>
-        </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default PerfilHepatico; 
+// --- Aux components ---
+function Field({ label, name, type='text', unit='', value, onChange, disabled }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-semibold mb-1">
+        {label}{unit && <span className="ml-1 text-sm">({unit})</span>}
+      </label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+      />
+    </div>
+  )
+}
+
+function Section({ title, children }) {
+  return (
+    <div className="space-y-2">
+      <h3 className="font-semibold text-blue-700">{title}</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{children}</div>
+    </div>
+  )
+}
+
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    green:  'bg-emerald-600 hover:bg-emerald-700',
+    yellow: 'bg-yellow-400 hover:bg-yellow-500',
+    blue:   'bg-blue-600 hover:bg-blue-700'
+  }[color]
+  return (
+    <button
+      onClick={onClick}
+      className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}
+    >
+      <FontAwesomeIcon icon={icon} />
+      {children}
+    </button>
+  )
+}

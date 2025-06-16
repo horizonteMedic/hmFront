@@ -96,6 +96,7 @@ const RegistroClientes = (props) => {
   // Autocomplete de profesión
   const handleProfesionSearch = e => {
     const v = e.target.value;
+    props.setDatos(d => ({...d, ocupacionPa: v.toUpperCase()}))
     setSearchTerm(v);
     setFilteredProfesiones(
       v
@@ -238,9 +239,7 @@ const RegistroClientes = (props) => {
   return Swal.fire('Error', `Faltan completar: ${lista}`, 'error');
     } 
 
-    if (HuellaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene huella registrada', 'error');
-    if (FirmaP.id === 0 ) return Swal.fire('Error', 'El Paciente no tiene firma registrada', 'error');
-
+    
     Swal.fire({
       title: 'Validando Datos',
       allowOutsideClick: false,
@@ -250,6 +249,7 @@ const RegistroClientes = (props) => {
     SubmitRegistrarPaciente(props.datos, props.selectedSede, props.token)
       .then(r => {
         Swal.close();
+        console.log(r)
         if (!r.id) {
           Swal.fire('Error', 'No se pudo registrar', 'error');
         } else {
@@ -354,6 +354,7 @@ const handleSelectSexo = val => {
 
 const handleNivelSearch = e => {
   const v = e.target.value.toUpperCase();
+  props.setDatos(d => ({...d, nivelEstPa: v.toUpperCase()}))
   setSearchNivel(v);
   setFilteredNivel(
     v ? nivelOptions.filter(n => n.includes(v)) : []
@@ -404,7 +405,7 @@ const [filteredDist, setFilteredDist] = useState([]);
 // Handler Departamento
 const handleDeptSearch = e => {
   const v = e.target.value;
-    props.setDatos(d => ({...d, departamentoPa: v}))
+    props.setDatos(d => ({...d, departamentoPa: v.toUpperCase()}))
   setSearchDept(v);
   setFilteredDept(
     v
@@ -428,7 +429,7 @@ const handleSelectDept = dept => {
 // Handler Provincia (usa Provincias filtradas por depto seleccionado)
 const handleProvSearch = e => {
   const v = e.target.value;
-    props.setDatos(d => ({...d, provinciaPa: v}))
+    props.setDatos(d => ({...d, provinciaPa: v.toUpperCase()}))
   setSearchProv(v);
   const opciones = props.datos.departamentoPa
     ? Provincias.filter(p =>
@@ -450,7 +451,7 @@ const handleSelectProv = prov => {
 // Handler Distrito (usa Distritos filtrados por provincia seleccionada)
 const handleDistSearch = e => {
   const v = e.target.value;
-  props.setDatos(d => ({...d, distritoPa: v}))
+  props.setDatos(d => ({...d, distritoPa: v.toUpperCase()}))
   setSearchDist(v);
   const opciones = props.datos.provinciaPa
     ? Distritos.filter(d =>

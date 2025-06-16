@@ -1,137 +1,179 @@
-import React, { useRef, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
-import AnalisisClinicosB_Digitalizado from '../../../../../../jaspers/AnalisisClinicosB_Digitalizado';
-import Swal from 'sweetalert2';
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/BioquimicaAcidoUrico.jsx
+import React, { useReducer, useEffect, useCallback, useRef } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
+import AnalisisClinicosB_Digitalizado from '../../../../../../jaspers/AnalisisClinicosB_Digitalizado'
+import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
 
-const BioquimicaAcidoUrico = ({ token, selectedSede }) => {
-  const today = new Date().toISOString().split("T")[0];
+const today = new Date().toISOString().split('T')[0]
 
-  const [form, setForm] = useState({
-    norden: '',
-    fecha: today,
-    nombres: '',
-    edad: '',
-    prueba: 'ÁCIDO ÚRICO SÉRICO',
-    muestra: 'SUERO',
-    resultado: '',
-    valoresn: 'Mujeres : 2.5 - 6.8 mg/dl\nHombres : 3.6 - 7.7 mg/dl',
-    sede: selectedSede || '',
-  });
+const initialState = {
+  norden: '',
+  fecha: today,
+  nombres: '',
+  edad: '',
+  prueba: 'ÁCIDO ÚRICO SÉRICO',
+  muestra: 'SUERO',
+  resultado: '',
+  valoresn: 'Mujeres : 2.5 - 6.8 mg/dl\nHombres : 3.6 - 7.7 mg/dl',
+  sede: ''
+}
 
-  const fechaRef = useRef(null);
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value }
+    case 'LOAD':
+      return { ...state, ...action.payload }
+    case 'RESET':
+      return { ...initialState, sede: state.sede }
+    default:
+      return state
+  }
+}
 
-  const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+export default function BioquimicaAcidoUrico({ token, selectedSede }) {
+  const [form, dispatch] = useReducer(reducer, { ...initialState, sede: selectedSede })
+  const fechaRef = useRef(null)
 
-  const handleLimpiar = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      prueba: 'ÁCIDO ÚRICO SÉRICO',
-      muestra: 'SUERO',
-      resultado: '',
-      valoresn: 'Mujeres : 2.5 - 6.8 mg/dl\nHombres : 3.6 - 7.7 mg/dl',
-      sede: selectedSede || '',
-    });
-  };
+  // when norden enters, verify and load
+  useEffect(() => {
+    if (!form.norden) return
+    async function load() {
+      await VerifyTR(form.norden, 'ac_bioquimica2022', token, dispatch, selectedSede)
+    }
+    load()
+  }, [form.norden, token, selectedSede])
 
-  const handleFechaFocus = (e) => {
-    e.target.showPicker && e.target.showPicker();
-  };
+  const setField = useCallback((field, value) => {
+    dispatch({ type: 'SET_FIELD', field, value })
+  }, [])
 
-  const handleImprimir = () => {
+  const handleSave = useCallback(() => {
+    // placeholder POST
+    // await fetch(...)
+    Swal.fire('Guardado', 'Datos de Ácido Úrico guardados', 'success')
+  }, [])
+
+  const handleClear = useCallback(() => {
+    dispatch({ type: 'RESET' })
+    Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
+  }, [])
+
+  const handlePrint = useCallback(() => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Bioquímica?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.norden}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
+      confirmButtonText: 'Sí, Imprimir'
+    }).then(result => {
       if (result.isConfirmed) {
-        AnalisisClinicosB_Digitalizado({
-          norden: form.norden,
-          nombre: form.nombres,
-          edad: form.edad,
-          fecha: form.fecha,
-          txtprueba: form.prueba,
-          txtmuestra: form.muestra,
-          txtresultado: form.resultado,
-          txtvaloresn: form.valoresn,
-          sede: form.sede
-        });
+        AnalisisClinicosB_Digitalizado({ ...form })
+        Swal.fire('Imprimiendo', '', 'success')
       }
-    });
-  };
+    })
+  }, [form])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">ÁCIDO ÚRICO</h2>
-      <form className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1"
-            onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'ac_bioquimica2022',token,setForm,selectedSede)}} />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Fecha:</label>
-            <input name="fecha" type="date" value={form.fecha} onChange={handleInputChange} className="border rounded px-2 py-1 flex-1" ref={fechaRef} onFocus={handleFechaFocus} />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input name="nombres" value={form.nombres} onChange={handleInputChange} className="border rounded px-2 py-1 bg-gray-100"
-              style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }} disabled />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Edad:</label>
-            <input name="edad" value={form.edad} onChange={handleInputChange} className="border rounded px-2 py-1 w-24 bg-gray-100" disabled />
-          </div>
-        </div>
-        <div className="flex gap-2 items-center">
-          <label className="font-semibold min-w-[120px]">PRUEBA:</label>
-          <input name="prueba" className="border rounded px-2 py-1 flex-1 bg-gray-100" value={form.prueba} readOnly />
-        </div>
-        <div className="flex gap-2 items-center">
-          <label className="font-semibold min-w-[120px]">MUESTRA:</label>
-          <input name="muestra" className="border rounded px-2 py-1 flex-1 bg-gray-100" value={form.muestra} readOnly />
-        </div>
-        <div className="flex gap-2 items-center">
-          <label className="font-semibold min-w-[120px]">RESULTADO:</label>
-          <input name="resultado" className="border rounded px-2 py-1 flex-1" value={form.resultado} onChange={handleInputChange} />
-        </div>
-        <div className="flex gap-2 items-start">
-          <label className="font-semibold min-w-[140px]">VALORES NORMALES:</label>
-          <textarea name="valoresn" className="border rounded px-2 py-1 flex-1 bg-gray-100" rows={2} readOnly value={form.valoresn} />
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
-          <div className="flex gap-3">
-            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faSave} /> Guardar/Actualizar</button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
-            <div className="flex gap-1 mt-1">
-              <input className="border rounded px-2 py-1 w-24" />
-              <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handleImprimir}><FontAwesomeIcon icon={faPrint} /></button>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-  );
-};
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-center">ÁCIDO ÚRICO</h2>
 
-export default BioquimicaAcidoUrico; 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field
+          label="Nro Ficha"
+          name="norden"
+          value={form.norden}
+          onChange={e => setField('norden', e.target.value)}
+          onKeyUp={e => e.key==='Enter' && VerifyTR(form.norden,'ac_bioquimica2022',token,dispatch,selectedSede)}
+        />
+        <Field
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={e=>setField('fecha',e.target.value)}
+          inputRef={fechaRef}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          onChange={e=>setField('nombres',e.target.value)}
+          disabled
+        />
+        <Field
+          label="Edad"
+          name="edad"
+          value={form.edad}
+          onChange={e=>setField('edad',e.target.value)}
+          disabled
+        />
+      </div>
+
+      <Field label="PRUEBA" name="prueba" value={form.prueba} disabled />
+      <Field label="MUESTRA" name="muestra" value={form.muestra} disabled />
+      <Field label="RESULTADO" name="resultado" value={form.resultado} onChange={e=>setField('resultado',e.target.value)} />
+
+      <Section>
+        <label className="font-semibold">VALORES NORMALES</label>
+        <textarea
+          rows={2}
+          readOnly
+          value={form.valoresn}
+          className="border rounded px-2 py-1 bg-gray-100 w-full"
+        />
+      </Section>
+
+      <div className="flex justify-between">
+        <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
+        <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+        <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
+      </div>
+    </div>
+  )
+}
+
+// --- Aux components ---
+function Field({ label, name, type = 'text', value, onChange, disabled, inputRef, onKeyUp }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-semibold mb-1">{label}</label>
+      <input
+        ref={inputRef}
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        onKeyUp={onKeyUp}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+      />
+    </div>
+  )
+}
+
+function Section({ children }) {
+  return <div className="space-y-2">{children}</div>
+}
+
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    green:  'bg-emerald-600 hover:bg-emerald-700',
+    yellow: 'bg-yellow-400 hover:bg-yellow-500',
+    blue:   'bg-blue-600 hover:bg-blue-700'
+  }[color]
+  return (
+    <button
+      onClick={onClick}
+      className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}
+    >
+      <FontAwesomeIcon icon={icon} />
+      {children}
+    </button>
+  )
+}

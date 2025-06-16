@@ -1,72 +1,141 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Hepatitis.jsx
+import React, { useReducer, useEffect, useCallback } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
 
-const Hepatitis = ({ token, selectedSede }) => {
+const today = new Date().toISOString().split('T')[0]
+
+const initialState = {
+  ficha: '',
+  fecha: today,
+  nombres: '',
+  edad: '',
+  hav: false,
+  hbsag: false,
+  printCount: ''
+}
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET':      return { ...state, [action.field]: action.value }
+    case 'RESET':    return initialState
+    case 'LOAD':     return { ...state, ...action.payload }
+    default:         return state
+  }
+}
+
+export default function Hepatitis({ apiBase, token, selectedSede }) {
+  const [form, dispatch] = useReducer(reducer, initialState)
+
+  useEffect(() => {
+    if (!form.ficha) return
+    async function load() {
+      // GET placeholder
+      // const res = await fetch(`${apiBase}/hepatitis/${form.ficha}`,{headers:{Authorization:`Bearer ${token}`}})
+      // const data = await res.json()
+      // dispatch({ type:'LOAD', payload:data })
+    }
+    load()
+  }, [form.ficha, apiBase, token])
+
+  const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
+
+  const handleSave = useCallback(async () => {
+    try {
+      // POST placeholder
+      // await fetch(`${apiBase}/hepatitis`,{...})
+      Swal.fire('Guardado','Datos guardados','success')
+    } catch {
+      Swal.fire('Error','No se pudo guardar','error')
+    }
+  }, [form])
+
+  const handleClear = useCallback(() => {
+    dispatch({ type:'RESET' })
+    Swal.fire('Limpiado','Formulario reiniciado','success')
+  }, [])
+
+  const handlePrint = useCallback(() => {
+    window.open(`${apiBase}/hepatitis/print?ficha=${form.ficha}&count=${form.printCount}`,'_blank')
+    Swal.fire('Imprimiendo','','success')
+  }, [form.ficha, form.printCount, apiBase])
+
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">HEPATITIS</h2>
-      <form className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input className="border rounded px-2 py-1 flex-1" />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Fecha:</label>
-            <input type="date" className="border rounded px-2 py-1 flex-1" />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input className="border rounded px-2 py-1 bg-gray-100" style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (''?.length || 0) * 10))}px` }} />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Edad:</label>
-            <input className="border rounded px-2 py-1 w-24 bg-gray-100" />
-          </div>
-        </div>
-        <div className="flex gap-2 items-center mt-2">
-          <input type="checkbox" className="mr-1" /> HEPATITIS A (HAV)
-          <input type="checkbox" className="ml-4 mr-1" /> HEPATITIS B (HBsAg)
-        </div>
-        <div className="flex gap-2 items-center mt-2">
-          <label className="font-semibold">MARCA :</label>
-          <input className="border rounded px-2 py-1 flex-1" value="RAPID TEST - MONTEST" readOnly />
-        </div>
-        <div className="flex gap-8 mt-6">
-          <div className="flex flex-col gap-2 flex-1">
-            <span className="font-bold">PRUEBAS</span>
-            <label className="flex items-center gap-2">HEPATITIS A (HAV) - RAPID TEST</label>
-            <label className="flex items-center gap-2">HEPATITIS B (HBsAg) - RAPID TEST</label>
-          </div>
-          <div className="flex flex-col gap-2 flex-1">
-            <span className="font-bold">RESULTADOS</span>
-            <input className="border rounded px-2 py-1" />
-            <input className="border rounded px-2 py-1" />
-            <div className="flex items-center gap-2 mt-2">
-              <input type="radio" name="hepatitis" /> POSITIVO
-              <input type="radio" name="hepatitis" /> NEGATIVO
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 mt-8 items-center justify-between w-full">
-          <div className="flex gap-3 w-full md:w-auto justify-center md:justify-start">
-            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faSave} /> Guardar/Actualizar</button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors"><FontAwesomeIcon icon={faBroom} /> Limpiar</button>
-          </div>
-          <div className="flex flex-col items-end w-full md:w-auto">
-            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
-            <div className="flex gap-1 mt-1">
-              <input className="border rounded px-2 py-1 w-24" />
-              <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"><FontAwesomeIcon icon={faPrint} /></button>
-            </div>
-          </div>
-        </div>
-      </form>
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-center">HEPATITIS</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nro Ficha" name="ficha" value={form.ficha} onChange={e=>setField('ficha',e.target.value)} />
+        <Field label="Fecha"      name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} />
+        <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} />
+      </div>
+      <Section title="Selección de prueba">
+        <Checkbox label="HEPATITIS A (HAV)"   checked={form.hav}    onChange={v=>setField('hav',v)} />
+        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={v=>setField('hbsag',v)} />
+      </Section>
+      <div className="flex items-center gap-4">
+        <input
+          name="printCount"
+          value={form.printCount}
+          onChange={e=>setField('printCount',e.target.value)}
+          className="border rounded px-2 py-1 w-24"
+          placeholder="Veces"
+        />
+        <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
+      </div>
+      <div className="flex justify-between">
+        <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
+        <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Hepatitis; 
+// Reusable
+function Field({ label, name, type='text', value, onChange, disabled }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-medium mb-1">{label}</label>
+      <input
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+      />
+    </div>
+  )
+}
+function Checkbox({ label, checked, onChange }) {
+  return (
+    <label className="flex items-center gap-2">
+      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
+      {label}
+    </label>
+  )
+}
+function Section({ title, children }) {
+  return (
+    <div className="space-y-2">
+      {title && <h3 className="font-semibold text-blue-700">{title}</h3>}
+      {children}
+    </div>
+  )
+}
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    green:  'bg-emerald-600 hover:bg-emerald-700',
+    yellow: 'bg-yellow-400 hover:bg-yellow-500',
+    blue:   'bg-blue-600 hover:bg-blue-700'
+  }[color]
+  return (
+    <button onClick={onClick} className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}>
+      <FontAwesomeIcon icon={icon} />
+      {children}
+    </button>
+  )
+}

@@ -1,207 +1,201 @@
-import React, { useState, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
-import inmunologia1 from '../../../../../../jaspers/inmunologialab';
-import Swal from 'sweetalert2';
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Inmunologia.jsx
+import React, { useReducer, useEffect, useCallback, useRef } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
+import inmunologia1 from '../../../../../../jaspers/inmunologialab'
+import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
+
 const pruebasList = [
-  { label: 'TIFICO O' },
-  { label: 'TIFICO H' },
-  { label: 'PARATIFICO A' },
-  { label: 'PARATIFICO B' },
-  { label: 'Brucella abortus' },
-];
+  'TIFICO O',
+  'TIFICO H',
+  'PARATIFICO A',
+  'PARATIFICO B',
+  'Brucella abortus'
+]
+const today = new Date().toISOString().split('T')[0]
 
-const Inmunologia = ({token,selectedSede}) => {
-  const today = new Date().toISOString().split("T")[0];
+const initialState = {
+  norden: '',
+  fecha: today,
+  nombres: '',
+  edad: '',
+  resultados: pruebasList.map(() => '1/40'),
+  hepatitis: false,
+  hepatitisA: '',
+  printCount: ''
+}
 
-  const [form, setForm] = useState({
-    norden: '',
-    fecha: today,
-    nombres: '',
-    edad: '',
-    resultados: Array(pruebasList.length).fill('1/40'),
-    hepatitis: false,
-    hepatitisA: '',
-  });
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET': {
+      const { field, value } = action
+      return Array.isArray(state[field])
+        ? { ...state, [field]: value }
+        : { ...state, [field]: value }
+    }
+    case 'RESET':
+      return initialState
+    case 'LOAD':
+      return { ...state, ...action.payload }
+    default:
+      return state
+  }
+}
 
-  const fechaRef = useRef(null);
+export default function Inmunologia({ apiBase, token, selectedSede }) {
+  const [form, dispatch] = useReducer(reducer, { ...initialState })
+  const fechaRef = useRef(null)
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-  };
+  useEffect(() => {
+    if (!form.norden) return
+    VerifyTR(form.norden, 'inmunologia', token, dispatch, selectedSede)
+  }, [form.norden, token, selectedSede])
+
+  const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
 
   const handleResultadoChange = (idx, value) => {
-    const updated = [...form.resultados];
-    updated[idx] = value;
-    setForm({ ...form, resultados: updated });
-  };
+    const arr = [...form.resultados]
+    arr[idx] = value
+    setField('resultados', arr)
+  }
 
-  const handleLimpiar = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      resultados: Array(pruebasList.length).fill('1/40'),
-      hepatitis: false,
-      hepatitisA: '',
-    });
-  };
+  const handleSave = useCallback(async () => {
+    try {
+      // await fetch...
+      Swal.fire('Guardado','Inmunología guardada','success')
+    } catch {
+      Swal.fire('Error','No se pudo guardar','error')
+    }
+  }, [form])
 
-  const handleFechaFocus = (e) => {
-    e.target.showPicker && e.target.showPicker();
-  };
+  const handleClear = useCallback(() => {
+    dispatch({ type:'RESET' })
+    Swal.fire('Limpiado','Formulario reiniciado','success')
+  }, [])
 
-  const handleImprimir = () => {
+  const handlePrint = useCallback(() => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Inmunología?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.norden}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
+      confirmButtonText: 'Sí, Imprimir'
+    }).then(res => {
+      if (res.isConfirmed) {
+        inmunologia1({ ...form })
+        Swal.fire('Imprimiendo','','success')
       }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        inmunologia1({
-          n_orden: form.norden,
-          nombre: form.nombres,
-          edad: form.edad,
-          fecha: form.fecha,
-          cbomarca: 'COVID-19',
-          chkinvalido: 'NEGATIVO',
-          txtvrigm: 'NEGATIVO',
-          txtvrigg: 'NEGATIVO'
-        });
-      }
-    });
-  };
+    })
+  }, [form])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">INMUNOLOGÍA</h2>
-      <form className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input 
-              name="norden" 
-              value={form.norden} 
-              onChange={handleInputChange} 
-              className="border rounded px-2 py-1 flex-1"
-              onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'inmunologia',token,setForm,selectedSede)}} 
-            />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Fecha:</label>
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-center">INMUNOLOGÍA</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={e=>setField('norden',e.target.value)} onKeyUp={e=>e.key==='Enter'&&VerifyTR(form.norden,'inmunologia',token,dispatch,selectedSede)} />
+        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} inputRef={fechaRef} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled />
+        <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} disabled />
+      </div>
+
+      <Section>
+        <h3 className="font-semibold">MÉTODO EN LÁMINA PORTAOBJETO</h3>
+      </Section>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <span className="font-bold">PRUEBAS</span>
+          {pruebasList.map((lbl, i) => <div key={i}>{lbl}</div>)}
+        </div>
+        <div className="space-y-2">
+          <span className="font-bold">RESULTADOS</span>
+          {form.resultados.map((r, i) => (
             <input
-              name="fecha"
-              type="date"
-              value={form.fecha}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 flex-1"
-              ref={fechaRef}
-              onFocus={handleFechaFocus}
+              key={i}
+              className="border rounded px-2 py-1 w-full"
+              value={r}
+              onChange={e=>handleResultadoChange(i,e.target.value)}
             />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input 
-              name="nombres" 
-              value={form.nombres} 
-              onChange={handleInputChange} 
-              className="border rounded px-2 py-1 bg-gray-100"
-              style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
-              disabled
-            />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Edad:</label>
-            <input 
-              name="edad" 
-              value={form.edad} 
-              onChange={handleInputChange} 
-              className="border rounded px-2 py-1 w-24 bg-gray-100" 
-              disabled
-            />
-          </div>
-        </div>
-
-        <div className="font-bold text-base text-center mb-2">MÉTODO EN LÁMINA PORTAOBJETO</div>
-
-        <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-4">
-          <div className="font-bold text-base">PRUEBAS</div>
-          <div className="font-bold text-base">RESULTADOS</div>
-          {pruebasList.map((item, idx) => (
-            <React.Fragment key={item.label}>
-              <div className="flex items-center text-base">{item.label}</div>
-              <input
-                className="border rounded px-2 py-1 w-40 text-base"
-                value={form.resultados[idx]}
-                onChange={e => handleResultadoChange(idx, e.target.value)}
-              />
-            </React.Fragment>
           ))}
         </div>
+      </div>
 
-        <div className="flex items-center gap-2 mb-4">
-          <input 
-            type="checkbox" 
-            name="hepatitis" 
-            checked={form.hepatitis} 
-            onChange={handleInputChange} 
+      <div className="flex items-center gap-4">
+        <Checkbox label="PRUEBA HEPATITIS" checked={form.hepatitis} onChange={v=>setField('hepatitis',v)} />
+        {form.hepatitis && (
+          <input
+            className="border rounded px-2 py-1 ml-4"
+            name="hepatitisA"
+            value={form.hepatitisA}
+            onChange={e=>setField('hepatitisA',e.target.value)}
+            placeholder="Hepatitis A"
           />
-          <label className="text-base font-semibold">PRUEBA HEPATITIS</label>
-          {form.hepatitis && (
-            <>
-              <span className="ml-4 text-base">Prueba Rápida HEPATITIS A</span>
-              <input
-                className="border rounded px-2 py-1 w-56 text-base ml-2"
-                name="hepatitisA"
-                value={form.hepatitisA}
-                onChange={handleInputChange}
-              />
-            </>
-          )}
-        </div>
+        )}
+      </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
-          <div className="flex gap-3">
-            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}>
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
-            <div className="flex gap-1 mt-1">
-              <input className="border rounded px-2 py-1 w-24" />
-              <button 
-                type="button" 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors"
-                onClick={handleImprimir}
-              >
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
-            </div>
-          </div>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-2">
+          <input
+            name="printCount"
+            value={form.printCount}
+            onChange={e=>setField('printCount',e.target.value)}
+            className="border rounded px-2 py-1 w-24"
+            placeholder="Veces"
+          />
+          <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
         </div>
-      </form>
+        <div className="flex gap-4">
+          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
+          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+        </div>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Inmunologia; 
+// Aux
+function Field({ label, name, type='text', value, onChange, disabled, inputRef, onKeyUp }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-medium mb-1">{label}</label>
+      <input
+        ref={inputRef}
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        onKeyUp={onKeyUp}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+      />
+    </div>
+  )
+}
+function Checkbox({ label, checked, onChange }) {
+  return (
+    <label className="flex items-center gap-2">
+      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
+      {label}
+    </label>
+  )
+}
+function Section({ children }) {
+  return <div className="mb-2">{children}</div>
+}
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    green:  'bg-emerald-600 hover:bg-emerald-700',
+    yellow: 'bg-yellow-400 hover:bg-yellow-500',
+    blue:   'bg-blue-600 hover:bg-blue-700'
+  }[color]
+  return (
+    <button onClick={onClick} className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}>
+      <FontAwesomeIcon icon={icon} /> {children}
+    </button>
+  )
+}

@@ -41,7 +41,7 @@ const Navbar = () => {
     { to: "/accesos", name: "Menú de Accesos", label: "Accesos", icon: faLock },
     { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
-    { to: "/SistemaOcupacional", name: "Sistema Ocupacional", label: "Ocupacional", icon: faNotesMedical },
+    { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
   ].filter(navLink => listView.includes(navLink.name));
 
   const Logoutbutton = () => {

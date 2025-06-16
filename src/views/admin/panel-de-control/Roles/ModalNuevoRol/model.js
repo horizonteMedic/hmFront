@@ -7,6 +7,7 @@ export function NewPermiso(IDVIEW,NAME,IDROL,token) {
         namePermiso: NAME,
         idRol: IDROL
     }
+    console.log(data)
     const options = {
         method: 'POST', 
         headers: {
@@ -21,7 +22,7 @@ export function NewPermiso(IDVIEW,NAME,IDROL,token) {
     }
 
 export function DeletePermiso(IDVIEW,NAME,IDROL,token) {
-
+    console.log(IDROL)
     const options = {
         method: 'DELETE', 
         headers: {

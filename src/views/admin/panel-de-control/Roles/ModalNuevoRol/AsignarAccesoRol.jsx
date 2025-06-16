@@ -146,10 +146,14 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
 
   const handleSubModalOpen = async (e,id,nombre) => {
     e.stopPropagation();
-    console.log(nombre)
-    const Accesoscheck = AccesUser.find(item => item.nombre === nombre);
-    SetAccesUserCheck(Accesoscheck)
+    console.log(ID_ROL)
+    const PermisosRol = await getFetch(`/api/v01/ct/permisosAsignadosPorRol/listadoVistasYOpcionesAsigPorRol/${ID_ROL}`,token)
+    const permisoEncontrado = PermisosRol.find(item => item.nombre === nombre);
+    const listaPermisos = permisoEncontrado ? permisoEncontrado.listaPermisos : [];
+    SetAccesUserCheck(listaPermisos)
     const res = await getFetch(`/api/v01/ct/posiblesPermisosSistema/listadoPermisosPorVista/${id}`,token)
+    console.log(listaPermisos)
+    console.log(res)
     setListPermis(res)
     setShowSubModal(true);
   };

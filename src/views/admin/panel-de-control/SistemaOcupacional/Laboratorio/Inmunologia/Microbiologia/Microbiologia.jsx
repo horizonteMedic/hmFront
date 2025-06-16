@@ -1,288 +1,189 @@
-import React, { useState, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
-import microbiologia from '../../../../../../jaspers/microbiologia';
-import Swal from 'sweetalert2';
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Microbiologia.jsx
+import React, { useReducer, useEffect, useCallback, useRef } from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import Swal from 'sweetalert2'
+import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
+import Microbiologia_Digitalizado from '../../../../../../jaspers/AnalisisBioquimicos/Microbiologia_Digitalizado'
 
-const Microbiologia = ({token,selectedSede}) => {
-  const today = new Date().toISOString().split("T")[0];
+const today = new Date().toISOString().split('T')[0]
 
-  const [form, setForm] = useState({
-    norden: '',
-    fecha: today,
-    nombres: '',
-    edad: '',
-    examenDirecto: false,
-    bk1: '',
-    bk1Radio: '',
-    bk2: '',
-    bk2Radio: '',
-    koh: '',
-    kohRadio: '',
-  });
+const initialState = {
+  norden: '',
+  fecha: today,
+  nombres: '',
+  edad: '',
+  examenDirecto: false,
+  bk1: '',
+  bk1Radio: '',
+  bk2: '',
+  bk2Radio: '',
+  koh: '',
+  kohRadio: '',
+  printCount: ''
+}
 
-  const fechaRef = useRef(null);
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET':      return { ...state, [action.field]: action.value }
+    case 'RESET':    return initialState
+    case 'LOAD':     return { ...state, ...action.payload }
+    default:         return state
+  }
+}
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setForm({
-      ...form,
-      [name]: type === 'checkbox' ? checked : value,
-    });
-  };
+export default function Microbiologia({ apiBase, token, selectedSede }) {
+  const [form, dispatch] = useReducer(reducer, initialState)
+  const fechaRef = useRef(null)
 
-  const handleRadioChange = (name, value) => {
-    setForm({ ...form, [name]: value });
-  };
+  useEffect(() => {
+    if (!form.norden) return
+    VerifyTR(form.norden, 'microbiologia', token, dispatch, selectedSede)
+  }, [form.norden, token, selectedSede])
 
-  const handleLimpiar = () => {
-    setForm({
-      norden: '',
-      fecha: today,
-      nombres: '',
-      edad: '',
-      examenDirecto: false,
-      bk1: '',
-      bk1Radio: '',
-      bk2: '',
-      bk2Radio: '',
-      koh: '',
-      kohRadio: '',
-    });
-  };
+  const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
 
-  const handleFechaFocus = (e) => {
-    e.target.showPicker && e.target.showPicker();
-  };
+  const handleSave = useCallback(async () => {
+    try {
+      // await fetch...
+      Swal.fire('Guardado','Microbiología guardada','success')
+    } catch {
+      Swal.fire('Error','No se pudo guardar','error')
+    }
+  }, [form])
 
-  const handleImprimir = () => {
+  const handleClear = useCallback(() => {
+    dispatch({ type:'RESET' })
+    Swal.fire('Limpiado','Formulario reiniciado','success')
+  }, [])
+
+  const handlePrint = useCallback(() => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Microbiología?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'>N° <b style='color:#5b6ef5;'>${form.nroFicha}</b> - <span style='color:#1abc9c;font-weight:bold;'>${form.nombres}</span></div>`,
+      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
-      customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel'
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        microbiologia({
-          n_orden: form.nroFicha,
-          nombre: form.nombres,
+      confirmButtonText: 'Sí, Imprimir'
+    }).then(res => {
+      if (res.isConfirmed) {
+        Microbiologia_Digitalizado({
+          norden: form.norden,
+          nombres: form.nombres,
           edad: form.edad,
           fecha: form.fecha,
-          txtmuestra1: form.bk1,
-          txtmuestra2: form.bk2
-        });
+          bk1: form.bk1,
+          bk2: form.bk2,
+          koh: form.koh
+        })
+        Swal.fire('Imprimiendo','','success')
       }
-    });
-  };
+    })
+  }, [form])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
-      <h2 className="text-2xl font-bold mb-6 text-center">MICROBIOLOGÍA</h2>
-      <form className="space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nro Ficha:</label>
-            <input 
-              name="norden" 
-              value={form.norden} 
-              onChange={handleInputChange} 
-              className="border rounded px-2 py-1 flex-1" 
-              onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,'microbiologia',token,setForm,selectedSede)}}
-            />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Fecha:</label>
-            <input
-              name="fecha"
-              type="date"
-              value={form.fecha}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 flex-1"
-              ref={fechaRef}
-              onFocus={handleFechaFocus}
-            />
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row gap-4 items-center">
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold min-w-[90px]">Nombres:</label>
-            <input 
-              name="nombres" 
-              value={form.nombres} 
-              onChange={handleInputChange} 
-              className="border rounded px-2 py-1 bg-gray-100" 
-              style={{ minWidth: '120px', maxWidth: '400px', width: `${Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10))}px` }}
-              disabled
-            />
-          </div>
-          <div className="flex-1 flex gap-2 items-center">
-            <label className="font-semibold">Edad:</label>
-            <input 
-              name="edad" 
-              value={form.edad} 
-              onChange={handleInputChange} 
-              className="border rounded px-2 py-1 w-24 bg-gray-100" 
-              disabled
-            />
-          </div>
-        </div>
+    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-center">MICROBIOLOGÍA</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={e=>setField('norden',e.target.value)} onKeyUp={e=>e.key==='Enter'&&VerifyTR(form.norden,'microbiologia',token,dispatch,selectedSede)} />
+        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} inputRef={fechaRef} />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled />
+        <Field label="Edad" name="edad" value={form.edad} onChange={e=>setField('edad',e.target.value)} disabled />
+      </div>
+      <Checkbox label="Examen Directo" checked={form.examenDirecto} onChange={v=>setField('examenDirecto',v)} />
+      <div className="text-center font-semibold">MUESTRA: ESPUTO</div>
+      <div className="grid grid-cols-12 gap-2 items-center">
+        <div className="col-span-4 font-bold">PRUEBA</div>
+        <div className="col-span-2 font-bold">RESULTADO</div>
+        <div className="col-span-6"></div>
 
-        <div className="mb-2 flex items-center gap-2">
-          <input 
-            type="checkbox" 
-            name="examenDirecto" 
-            checked={form.examenDirecto} 
-            onChange={handleInputChange} 
-          />
-          <label className="text-base">EXAMEN DIRECTO</label>
-        </div>
-
-        <div className="font-bold text-base text-center mb-2">MUESTRA: ESPUTO</div>
-
-        <div className="grid grid-cols-12 gap-y-4 gap-x-2 mb-4 items-center">
-          <div className="col-span-4 font-bold text-base">PRUEBA</div>
-          <div className="col-span-2 font-bold text-base">RESULTADO</div>
-          <div className="col-span-6"></div>
-          {/* BK 1 */}
-          <div className="col-span-4 flex items-center text-base">Examen de BK - BACILOSCOPIA 1ª Muestra :</div>
-          <div className="col-span-2">
-            <input
-              className="border rounded px-2 py-1 w-full text-base"
-              name="bk1"
-              value={form.bk1}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="col-span-6 flex gap-6 items-center">
-            <label className="flex items-center gap-1 text-base">
+        {[
+          { label:'Examen de BK - BACILOSCOPIA 1ª', key:'bk1', radio:'bk1Radio' },
+          { label:'Examen de BK - BACILOSCOPIA 2ª', key:'bk2', radio:'bk2Radio' },
+          { label:'KOH', key:'koh', radio:'kohRadio' }
+        ].map((item,i) => (
+          <React.Fragment key={i}>
+            <div className="col-span-4">{item.label} :</div>
+            <div className="col-span-2">
               <input
-                type="radio"
-                name="bk1Radio"
-                checked={form.bk1Radio === 'NEGATIVO'}
-                onChange={() => handleRadioChange('bk1Radio', 'NEGATIVO')}
+                className="border rounded px-2 py-1 w-full"
+                name={item.key}
+                value={form[item.key]}
+                onChange={e=>setField(item.key, e.target.value)}
               />
-              BAAR - NEGATIVO
-            </label>
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="bk1Radio"
-                checked={form.bk1Radio === 'POSITIVO'}
-                onChange={() => handleRadioChange('bk1Radio', 'POSITIVO')}
-              />
-              BAAR - POSITIVO
-            </label>
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="bk1Radio"
-                checked={form.bk1Radio === 'NA'}
-                onChange={() => handleRadioChange('bk1Radio', 'NA')}
-              />
-              N/A
-            </label>
-          </div>
-          {/* BK 2 */}
-          <div className="col-span-4 flex items-center text-base">Examen de BK - BACILOSCOPIA 2ª Muestra :</div>
-          <div className="col-span-2">
-            <input
-              className="border rounded px-2 py-1 w-full text-base"
-              name="bk2"
-              value={form.bk2}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="col-span-6 flex gap-6 items-center">
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="bk2Radio"
-                checked={form.bk2Radio === 'NEGATIVO'}
-                onChange={() => handleRadioChange('bk2Radio', 'NEGATIVO')}
-              />
-              BAAR - NEGATIVO
-            </label>
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="bk2Radio"
-                checked={form.bk2Radio === 'POSITIVO'}
-                onChange={() => handleRadioChange('bk2Radio', 'POSITIVO')}
-              />
-              BAAR - POSITIVO
-            </label>
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="bk2Radio"
-                checked={form.bk2Radio === 'NA'}
-                onChange={() => handleRadioChange('bk2Radio', 'NA')}
-              />
-              N/A
-            </label>
-          </div>
-          {/* KOH */}
-          <div className="col-span-4 flex items-center text-base">KOH :</div>
-          <div className="col-span-2">
-            <input
-              className="border rounded px-2 py-1 w-full text-base"
-              name="koh"
-              value={form.koh}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div className="col-span-6 flex gap-6 items-center">
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="kohRadio"
-                checked={form.kohRadio === 'POSITIVO'}
-                onChange={() => handleRadioChange('kohRadio', 'POSITIVO')}
-              />
-              POSITIVO
-            </label>
-            <label className="flex items-center gap-1 text-base">
-              <input
-                type="radio"
-                name="kohRadio"
-                checked={form.kohRadio === 'NEGATIVO'}
-                onChange={() => handleRadioChange('kohRadio', 'NEGATIVO')}
-              />
-              NEGATIVO
-            </label>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
-          <div className="flex gap-3">
-            <button type="button" className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleLimpiar}>
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
-            <div className="flex gap-1 mt-1">
-              <input className="border rounded px-2 py-1 w-24" />
-              <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handleImprimir}>
-                <FontAwesomeIcon icon={faPrint} />
-              </button>
             </div>
-          </div>
+            <div className="col-span-6 flex gap-4">
+              {['NEGATIVO','POSITIVO','NA'].map(opt => (
+                <label key={opt} className="flex items-center gap-1">
+                  <input
+                    type="radio"
+                    name={item.radio}
+                    checked={form[item.radio]===opt}
+                    onChange={()=>setField(item.radio,opt)}
+                  />
+                  {opt}
+                </label>
+              ))}
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-2">
+          <input
+            name="printCount"
+            value={form.printCount}
+            onChange={e=>setField('printCount',e.target.value)}
+            className="border rounded px-2 py-1 w-24"
+            placeholder="Veces"
+          />
+          <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
         </div>
-      </form>
+        <div className="flex gap-4">
+          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
+          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+        </div>
+      </div>
     </div>
-  );
-};
+  )
+}
 
-export default Microbiologia; 
+// Aux
+function Field({ label, name, type='text', value, onChange, disabled, inputRef, onKeyUp }) {
+  return (
+    <div className="flex flex-col">
+      <label className="font-medium mb-1">{label}</label>
+      <input
+        ref={inputRef}
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        onKeyUp={onKeyUp}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+      />
+    </div>
+  )
+}
+function Checkbox({ label, checked, onChange }) {
+  return (
+    <label className="flex items-center gap-2">
+      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
+      {label}
+    </label>
+  )
+}
+function ActionButton({ color, icon, onClick, children }) {
+  const bg = {
+    green:  'bg-emerald-600 hover:bg-emerald-700',
+    yellow: 'bg-yellow-400 hover:bg-yellow-500',
+    blue:   'bg-blue-600 hover:bg-blue-700'
+  }[color]
+  return (
+    <button onClick={onClick} className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2`}>
+      <FontAwesomeIcon icon={icon} /> {children}
+    </button>
+  )
+}

@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import headerConsentimiento from "./components/headerConsentimiento";
-import footer from "./components/footer";
+import headerConsentimiento from "../components/headerConsentimiento";
+import footer from "../components/footer";
 
 export default function Consentimiento_Boro_Digitalizado(datos) {
   const doc = new jsPDF();

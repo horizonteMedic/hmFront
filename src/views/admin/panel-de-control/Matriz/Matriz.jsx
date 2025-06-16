@@ -9,18 +9,14 @@ import { faFileExcel, faMagnifyingGlass, faChevronLeft, faChevronRight, faSyncAl
 import ExcelJS from 'exceljs';
 const MatrizPostulante = () => {
   const token = useAuthStore(state => state.token);
-  const listView = useAuthStore(state => state.listView)
   const userlogued = useAuthStore(state => state.userlogued);
 
-  const AccessMatrizAdmi= listView.some(listView => listView.id === 402);
-  //Matriz Salud
-  const AccesMatrizSalud = listView.some(listView => listView.id === 403);
-  //Matriz ARCHIVOS
-  const AccesMatrizArchivos = listView.some(listView => listView.id === 502)
-  //MATRICES DE OHLA
-  const AccesMatrizADMOHLA = listView.some(listView => listView.id === 952)
-  const AccesMatrizSALUDOHLA = listView.some(listView => listView.id === 953)
-  const AccesMatrizGeneral = listView.some(listView => listView.id === 1002)
+  //ACCESOS
+  const Acceso = useAuthStore(state => state.listAccesos);
+  const tienePermisoEnVista = (nombreVista, permiso) => {
+    const vista = Acceso.find(item => item.nombre === nombreVista);
+    return vista?.listaPermisos.includes(permiso) ?? false;
+  };
   
   const [loading, setLoading] = useState(false);
   const [EmpresaUser, setEmpresaUser] = useState([])
@@ -483,12 +479,12 @@ const MatrizPostulante = () => {
               className="pointer border border-gray-300 px-3 py-2 rounded-md w-full focus:outline-none"
             >
               <option value="">Seleccionar...</option>
-              {AccessMatrizAdmi && <option  value="Matriz-1">Matriz Administrativa</option>}
-              {AccesMatrizSalud && <option  value="Matriz-2">Matriz de Salud</option>}
-              {AccesMatrizArchivos && <option value="Matriz-3">Matriz de Archivos</option>}
-              {AccesMatrizADMOHLA && <option value="Matriz-4">Matriz Administrativa OHLA</option>}
-              {AccesMatrizSALUDOHLA && <option value="Matriz-5">Matriz de Salud OHLA</option>}
-              {AccesMatrizGeneral && <option value="Matriz-6">Matriz General</option>}
+              {tienePermisoEnVista("Matriz Postulante","Matriz Administrativa") && <option  value="Matriz-1">Matriz Administrativa</option>}
+              {tienePermisoEnVista("Matriz Postulante","Matriz Salud") && <option  value="Matriz-2">Matriz de Salud</option>}
+              {tienePermisoEnVista("Matriz Postulante","Matriz Archivos") && <option value="Matriz-3">Matriz de Archivos</option>}
+              {tienePermisoEnVista("Matriz Postulante","Matriz Administrativo OHLA") && <option value="Matriz-4">Matriz Administrativa OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante","Matriz de Salud OHLA") && <option value="Matriz-5">Matriz de Salud OHLA</option>}
+              {tienePermisoEnVista("Matriz Postulante","Matriz General") && <option value="Matriz-6">Matriz General</option>}
             </select>
           </div>
           <div className="flex flex-col flex-grow justify-end">

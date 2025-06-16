@@ -46,19 +46,7 @@ const HistorialPaciente = () => {
 
   const token = useAuthStore(state => state.token);
   const userlogued = useAuthStore(state => state.userlogued);
-  const views = useAuthStore(state => state.listView);
 
-  const AccessUpload= views.some(view => view.id === 102);
-  const AccesDownload = views.some(view => view.id === 103);
-  const AccesDelete = views.some(view => view.id === 104);
-  const AccesCargaMasiva = views.some(view => view.id === 302)
-  const AccesCargaMasivaPers = views.some(view => view.id === 902)
-
-  const Acces = {
-    Upload: AccessUpload,
-    Download: AccesDownload,
-    Delete: AccesDelete
-  }
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
@@ -92,6 +80,14 @@ const HistorialPaciente = () => {
   const [reload, Setreload] = useState(0)
 
   const totalSedes = ListSedes.length;
+
+  //ACCESOS
+  const Acceso = useAuthStore(state => state.listAccesos);
+  const tienePermisoEnVista = (nombreVista, permiso) => {
+    const vista = Acceso.find(item => item.nombre === nombreVista);
+    return vista?.listaPermisos.includes(permiso) ?? false;
+  };
+
   useEffect(() => {
     
     let results = []
@@ -280,7 +276,7 @@ const HistorialPaciente = () => {
         </button>
 
 
-        {AccesCargaMasiva && <button
+        {tienePermisoEnVista("Reportes","Carga Masiva 1") && <button
           onClick={() => setShowDataUploadModal(true)}
           className="verde-btn px-4 py-1 rounded flex items-center mr-3"
         >
@@ -288,7 +284,7 @@ const HistorialPaciente = () => {
           Subir Carpeta
         </button>}
 
-        {AccesCargaMasivaPers && <button
+        {tienePermisoEnVista("Reportes","Carga Masiva 2") && <button
           onClick={() => setShowDataUploadModal2(true)}
           className="verde-btn px-4 py-1 rounded flex items-center mr-3"
         >
@@ -472,7 +468,7 @@ const HistorialPaciente = () => {
         </div>
       </div>
       
-      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={Acces} />}
+      {isModalOpen && <Modal closeModal={closeModal} user={userlogued.sub} iduser={userlogued.id_user} start={fecha_examen} end={endDate} sede={cod_suc} dni={dnipicker} nombre={nombrespicker} empresa={empresa} contrata={contrata} token={token} name={name} apell={apell}  Acces={tienePermisoEnVista} />}
       {/* Modal de carga de datos */}
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}

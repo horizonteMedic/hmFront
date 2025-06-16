@@ -59,6 +59,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
           for (let item of data) {
             try {
               const response = await GetArchivosSubidos(item.historiaClinica, iduser, token);
+              console.log(response)
               archivosPorHistoria[item.historiaClinica] = response;
             } catch (error) {
               console.error('Error fetching archivos for historiaClinica', item.historiaClinica, error);
@@ -183,7 +184,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
     ));
     return legend;
   };
-  
+  console.log(Acces(read))
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
@@ -213,7 +214,7 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
               <table className="w-full border border-gray-300">
                 <thead>
                   <tr className="bg-gray-200">
-                    {Acces.Upload && <th className="border border-gray-300 px-2 py-1 text-center">Acción</th>}
+                    {Acces("Reportes","Subir Reportes") && <th className="border border-gray-300 px-2 py-1 text-center">Acción</th>}
                     <th className="border border-gray-300 px-2 py-1 text-center">Orden</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Empresa</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Contrata</th>
@@ -224,13 +225,13 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                     <th className="border border-gray-300 px-2 py-1 text-center">Área</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Grupo sanguíneo</th>
                     <th className="border border-gray-300 px-2 py-1 text-center">Historia Clinica</th>
-                    {Acces.Download && <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>}
+                    {Acces("Reportes","Descargar Reportes") && <th className="border border-gray-300 px-2 py-1 text-center">Archivos</th>}
                   </tr>
                 </thead>
                 <tbody>
                   {data.map((dataItem, dataIndex) => (
                     <tr key={dataIndex}>
-                      {Acces.Upload && (
+                      {Acces("Reportes","Subir Reportes") && (
                         <td className="border border-gray-300 px-2 py-1">
                           <div className="flex flex-col">
                             {listarchivos.map((archivoItem, archivoIndex) => (
@@ -252,10 +253,10 @@ const Modal = ({ closeModal, user, iduser, start, end, sede, dni, nombre, empres
                       <td className="border border-gray-300 px-2 py-1">{dataItem.area}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.grupoSanguineo}</td>
                       <td className="border border-gray-300 px-2 py-1">{dataItem.historiaClinica}</td>
-                      {Acces.Download && (
+                      {Acces("Reportes","Descargar Reportes") && (
                         <td className="border border-gray-300 px-2 py-1">
                           {(read[dataItem.historiaClinica] || []).map((readItem, readIndex) => (
-                            <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces.Delete ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id, readItem.nombreArchivo); } } : {})} disabled={openview} title={readItem.nombreArchivo} onClick={() => { GetBase64(dataItem.historiaClinica, readItem.id_tipo_archivo) }}>
+                            <a key={readIndex} className={`${openview ? 'cursor-auto' : 'cursor-pointer'}`} {...(Acces("Reportes","Eliminar Reportes") ? { onContextMenu: (e) => { e.preventDefault(); DeleteBase64(readItem.id, readItem.nombreArchivo); } } : {})} disabled={openview} title={readItem.nombreArchivo} onClick={() => { GetBase64(dataItem.historiaClinica, readItem.id_tipo_archivo) }}>
                               {filterArchivos(readItem)}
                             </a>
                           ))}
