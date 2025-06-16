@@ -12,12 +12,13 @@ import { VerifyTR } from '../controller/ControllerABio'
 
 export default function AnalisisBioquimicos({ token, selectedSede }) {
   const tabla = 'analisis_bioquimicos'
+    const today = new Date().toISOString().split("T")[0];
   const [form, setForm] = useState({
     examType: 'ficha',
     norden: '',
     medico: '',
     nombres: '',
-    fecha: '',
+    fecha: today,
     creatinina: '',
     colesterolTotal: '',
     ldl: '',
@@ -48,7 +49,7 @@ export default function AnalisisBioquimicos({ token, selectedSede }) {
   const handleEdit = () => console.log('Editar', form.norden)
   const handleSave = () => console.log('Guardar', form)
   const handleClear = () => setForm({
-    examType: 'ficha', norden: '', medico: '', nombres: '', fecha: '',
+    examType: 'ficha', norden: '', medico: '', nombres: '', fecha: today,
     creatinina: '', colesterolTotal: '', ldl: '', hdl: '', vldl: '', trigliceridos: ''
   })
   const handlePrint = () => console.log('Imprimir', form.norden)
