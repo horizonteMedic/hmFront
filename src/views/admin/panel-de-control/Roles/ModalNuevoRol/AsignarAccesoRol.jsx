@@ -43,7 +43,7 @@ const ArrowIcon = ({ isOpen, toggle }) => {
   );
 };
 
-const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgpag }) => {
+const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgpag, depth = 0 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [idAsignation, setIdAsignation] = useState('');
@@ -164,7 +164,7 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
   
 
   return (
-    <div className={`mt-2 mb-2 ${isParent ? '' : ''}`}>
+    <div className={`mt-2 mb-2 ${isParent ? '' : ''}`} style={{ marginLeft: depth * 20 }}>
       <div className="flex items-center">
         {node.children && node.children.length > 0 && (
           <ArrowIcon isOpen={isOpen} toggle={handleToggle} />
@@ -189,7 +189,7 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
         />
       </div>
       {isOpen && node.children && node.children.length > 0 && (
-        <div style={{ marginLeft: 20 }}>
+        <div >
           {node.children.map((child) => (
             <TreeNode
               key={child.id}
@@ -200,6 +200,7 @@ const TreeNode = ({ node, isParent, asigned, ID_ROL, userlogued, token, Refresgp
               userlogued={userlogued}
               token={token}
               Refresgpag={Refresgpag}
+              depth={depth + 1}
             />
           ))}
         </div>
