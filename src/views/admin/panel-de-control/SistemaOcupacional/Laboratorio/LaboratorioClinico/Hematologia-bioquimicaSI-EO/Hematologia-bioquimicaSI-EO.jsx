@@ -2,6 +2,92 @@ import React, { useState } from 'react';
 import microscopioImg from './microscopio.webp';
 
 export const HematologiaBioquimicaSIEO = () => {
+  const [form, setForm] = useState({
+    ficha: true,
+    responsable: '',
+    paciente: '',
+    empContratista: '',
+    empresa: '',
+    empresaNA: false,
+    grupo: '',
+    rh: '',
+    hemoglobina: '',
+    hematocrito: '',
+    vsg: '',
+    leucocitos: '',
+    hematies: '',
+    plaquetas: '',
+    linfocitos: '',
+    neutrofilos: '',
+    abastonados: '',
+    segmentados: '',
+    monocitos: '',
+    eosinofilos: '',
+    basofilos: '',
+    glucosa: '',
+    glucosaNA: false,
+    creatinina: '',
+    creatininaNA: false,
+    rpr: '',
+    rprNA: false,
+    rprPos: false,
+    vih: '',
+    vihNA: false,
+    vihPos: false
+  });
+
+  const setField = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = () => {
+    // TODO: Implement save functionality
+    console.log('Saving form:', form);
+  };
+
+  const handleClear = () => {
+    setForm({
+      ficha: true,
+      responsable: '',
+      paciente: '',
+      empContratista: '',
+      empresa: '',
+      empresaNA: false,
+      grupo: '',
+      rh: '',
+      hemoglobina: '',
+      hematocrito: '',
+      vsg: '',
+      leucocitos: '',
+      hematies: '',
+      plaquetas: '',
+      linfocitos: '',
+      neutrofilos: '',
+      abastonados: '',
+      segmentados: '',
+      monocitos: '',
+      eosinofilos: '',
+      basofilos: '',
+      glucosa: '',
+      glucosaNA: false,
+      creatinina: '',
+      creatininaNA: false,
+      rpr: '',
+      rprNA: false,
+      rprPos: false,
+      vih: '',
+      vihNA: false,
+      vihPos: false
+    });
+  };
+
+  const handlePrint = () => {
+    // TODO: Implement print functionality
+    console.log('Printing form:', form);
+  };
+
+  const [status, setStatus] = useState('');
+
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Barra superior sola y alineada */}

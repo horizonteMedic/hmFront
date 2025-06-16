@@ -12,11 +12,11 @@ const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
   const navigate = useNavigate();
 
   const tabs = [
-    /*{
+    {
       label: 'Hematología - Bioquímica SI-EO',
       icon: faMicroscope,
       component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued}/>
-    },*/
+    },
     {
       label: 'Examen de Orina',
       icon: faTint,
