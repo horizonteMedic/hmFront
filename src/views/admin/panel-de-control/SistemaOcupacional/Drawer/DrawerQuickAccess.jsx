@@ -4,20 +4,20 @@ import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLu
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
-  { icon: faUserCheck, label: 'Admisión' },
-  { icon: faStethoscope, label: 'Triaje' },
-  { icon: faVial, label: 'Laboratorio' },
-  { icon: faUserMd, label: 'Psicología' },
-  { icon: faUserMd, label: 'Medicina General' },
-  { icon: faXRay, label: 'Rayos X' },
-  { icon: faHeartbeat, label: 'EKG' },
-  { icon: faLungs, label: 'Espirometría' },
-  { icon: faDeaf, label: 'Audiometría' },
-  { icon: faTooth, label: 'Odontología' },
-  { icon: faEye, label: 'Oftalmología' },
+  { icon: faUserCheck, label: 'Admisión', key : "Admision" },
+  { icon: faStethoscope, label: 'Triaje',  key : "Triaje" },
+  { icon: faVial, label: 'Laboratorio',  key : "Laboratorio Clinico" },
+  { icon: faUserMd, label: 'Psicología',  key : "Psicologia" },
+  { icon: faUserMd, label: 'Medicina General', key : "Medicina General" },
+  { icon: faXRay, label: 'Rayos X', key : "Rayos X" },
+  { icon: faHeartbeat, label: 'EKG', key : "EKG" },
+  { icon: faLungs, label: 'Espirometría', key : "Espirometria" },
+  { icon: faDeaf, label: 'Audiometría', key : "Audiometria" },
+  { icon: faTooth, label: 'Odontología', key : "Odontologia" },
+  { icon: faEye, label: 'Oftalmología', key : "Oftalmologia" },
 ];
 
-const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex }) => (
+const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
   <>
     {/* Overlay leve */}
     {open && <div className={styles.overlay} onClick={onClose} />}
@@ -40,7 +40,9 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex }) => (
           </span>
           <span className="font-bold text-lg text-gray-900 group-hover:text-white transition-all duration-200">Inicio</span>
         </button>
-        {accesos.map((item, idx) => (
+        {accesos
+        .filter(item => tieneVista(item.key))
+        .map((item, idx) => (
           <button
             key={item.label}
             className={`flex items-center gap-4 bg-gray-100 hover:bg-[#1a2536] rounded-xl px-4 py-4 transition-all duration-200 group text-left ${activeIndex === idx ? 'ring-2 ring-[#1a2536]' : ''}`}

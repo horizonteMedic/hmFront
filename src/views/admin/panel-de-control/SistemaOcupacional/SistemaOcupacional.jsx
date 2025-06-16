@@ -93,7 +93,6 @@ const TabComponent = () => {
   const userlogued = useAuthStore(state => state.userlogued);
   const Vista = useAuthStore(state => state.listView)
   const Acceso = useAuthStore(state => state.listAccesos);
-  const [vista, setVista] = useState('default'); // 'default', 'admision', 'triaje', etc.
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
   const [activeTabExamenes, setActiveTabExamenes] = useState(1); // Para ExamenesLaboratorio
@@ -111,9 +110,10 @@ const TabComponent = () => {
   }, [userlogued.sedes]);
   
   //AVVESO A LAS TARJETAS VIEWS
-  const ViewAdminision = Vista.includes("Admision")
-  const ViewTriaje = Vista.includes("Triaje")
-  const ViewLaboratorio = Vista.includes("Laboratorio Clinico")
+
+  const tieneVista = (nombreVista) => {
+    return Vista.some(item => item === nombreVista);
+  };
  
   
   //COMBOBOX REGISTRO
@@ -165,13 +165,6 @@ const TabComponent = () => {
     ListAuth
   };
 
-  const AccesViews = {
-    ViewAdminision: ViewAdminision,
-    ViewTriaje: ViewTriaje,
-    ViewLaboratorio: ViewLaboratorio,
-  }
-  
-
   const tienePermisoEnVista = (nombreVista, permiso) => {
     const vista = Acceso.find(item => item.nombre === nombreVista);
     return vista?.listaPermisos.includes(permiso) ?? false;
@@ -210,7 +203,7 @@ const TabComponent = () => {
               </select>
             </div>
             <div className={styles.gridContainer}>
-              {AccesViews.ViewAdminision && (
+              {tieneVista("Admision") && (
                 <div
                   className={`${styles.gridItem} ${activeTab === 0 ? styles.active : ''}`}
                   onClick={() => setActiveTab(0)}
@@ -221,7 +214,7 @@ const TabComponent = () => {
                   <span className={styles.title}>Admisión</span>
                 </div>
               )}
-              {AccesViews.ViewTriaje && (
+              {tieneVista("Triaje") && (
                 <div
                   className={`${styles.gridItem} ${activeTab === 1 ? styles.active : ''}`}
                   onClick={() => setActiveTab(1)}
@@ -232,7 +225,7 @@ const TabComponent = () => {
                   <span className={styles.title}>Triaje</span>
                 </div>
               )}
-              {AccesViews.ViewLaboratorio && (
+              {tieneVista("Laboratorio Clinico") && (
                 <div
                   className={`${styles.gridItem} ${activeTab === 2 ? styles.active : ''}`}
                   onClick={() => setActiveTab(2)}
@@ -243,7 +236,7 @@ const TabComponent = () => {
                   <span className={styles.title}>Laboratorio</span>
                 </div>
               )}
-              <div
+              {tieneVista("Coproparasitologico") && <div
                 className={`${styles.gridItem} ${activeTab === 3 ? styles.active : ''}`}
                 onClick={() => setActiveTab(3)}
               >
@@ -251,55 +244,63 @@ const TabComponent = () => {
                   <FontAwesomeIcon icon={faClipboardList} />
                 </span>
                 <span className={styles.title}>Coproparasitológico</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ''}`}>
+              </div>}
+             {tieneVista("Psicologia") &&  <div 
+                className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faUserMd} />
                 </span>
                 <span className={styles.title}>Psicología</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 11 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("Medicina General") && <div 
+                className={`${styles.gridItem} ${activeTab === 11 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faUserMd} />
                 </span>
                 <span className={styles.title}>Medicina General</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 12 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("Rayos X") && <div 
+                className={`${styles.gridItem} ${activeTab === 12 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faXRay} />
                 </span>
                 <span className={styles.title}>Rayos X</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 13 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("EKG") && <div 
+                className={`${styles.gridItem} ${activeTab === 13 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faHeartbeat} />
                 </span>
                 <span className={styles.title}>EKG</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 14 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("Espirometria") && <div 
+                className={`${styles.gridItem} ${activeTab === 14 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faLungs} />
                 </span>
                 <span className={styles.title}>Espirometría</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 15 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("Audiometria") && <div 
+                className={`${styles.gridItem} ${activeTab === 15 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faDeaf} />
                 </span>
                 <span className={styles.title}>Audiometría</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 16 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("Odontologia") && <div 
+                className={`${styles.gridItem} ${activeTab === 16 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faTooth} />
                 </span>
                 <span className={styles.title}>Odontología</span>
-              </div>
-              <div className={`${styles.gridItem} ${activeTab === 17 ? styles.active : ''}`}>
+              </div>}
+              {tieneVista("Oftalmologia") && <div 
+                className={`${styles.gridItem} ${activeTab === 17 ? styles.active : ''}`}>
                 <span className={styles.icon}>
                   <FontAwesomeIcon icon={faEye} />
                 </span>
                 <span className={styles.title}>Oftalmología</span>
-              </div>
+              </div>}
             </div>
           </>
         )}
@@ -364,7 +365,7 @@ const TabComponent = () => {
                       className={`${styles.tabButton} ${subTab === 3 ? styles.active : ''}`}
                       onClick={() => setSubTab(3)}
                     >
-                      Consentimiento Digitalización
+                      Reserva de Pacientes
                     </button>
                   )}
                 </div>
@@ -438,55 +439,55 @@ const TabComponent = () => {
 
               {/* ——— Sub-menú fijo ——— */}
               <nav className={styles.labNav}>
-                <button
+                {tieneVista("Laboratorio Clinico Formulario") && <button
                   className={`${styles.labNavButton} ${labTab === 0 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(0)}
                 >
                   <FontAwesomeIcon icon={faFlask} className="mr-2" />
                   LABORATORIO CLÍNICO
-                </button>
-                <button
+                </button>}
+                {tieneVista("Laboratorio Clinico Formulario") && <button
                   className={`${styles.labNavButton} ${labTab === 1 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(1)}
                 >
                   <FontAwesomeIcon icon={faFilter} className="mr-2" />
                   ANÁLISIS BIOQUÍMICOS
-                </button>
-                <button
+                </button>}
+                {tieneVista("Inmunologia") && <button
                   className={`${styles.labNavButton} ${labTab === 2 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(2)}
                 >
                   <FontAwesomeIcon icon={faVirus} className="mr-2" />
                   INMUNOLOGÍA
-                </button>
-                <button
+                </button>}
+                {tieneVista("Toxicologia") && <button
                   className={`${styles.labNavButton} ${labTab === 3 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(3)}
                 >
                   <FontAwesomeIcon icon={faSyringe} className="mr-2" />
                   TOXICOLOGÍA
-                </button>
-                <button
+                </button>}
+                {tieneVista("Consentimientos") && <button
                   className={`${styles.labNavButton} ${labTab === 4 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(4)}
                 >
                   <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
                   CONSENTIMIENTOS
-                </button>
-                <button
+                </button>}
+                {tieneVista("Manipuladores") && <button
                   className={`${styles.labNavButton} ${labTab === 5 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(5)}
                 >
                   <FontAwesomeIcon icon={faMicroscope} className="mr-2" />
                   MANIPULADORES
-                </button>
-                <button
+                </button>}
+                {tieneVista("Pruebas Covid") && <button
                   className={`${styles.labNavButton} ${labTab === 6 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(6)}
                 >
                   <FontAwesomeIcon icon={faVialVirus} className="mr-2" />
                   PRUEBAS COVID
-                </button>
+                </button>}
                 {/* <button
                   className={`${styles.labNavButton} ${labTab === 7 ? styles.labNavButtonActive : ''}`}
                   onClick={() => setLabTab(7)}
@@ -635,6 +636,7 @@ const TabComponent = () => {
           }
         }}
         activeIndex={activeTab}
+        tieneVista={tieneVista}
       />
 
       {/* Context Menu for hidden exam tabs */}
