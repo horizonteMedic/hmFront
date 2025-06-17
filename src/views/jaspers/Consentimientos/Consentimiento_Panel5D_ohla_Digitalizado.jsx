@@ -29,8 +29,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     const pageW = doc.internal.pageSize.getWidth();
     const margin = 15;
 
-
-    // Título principal
+    // Título principal con línea horizontal
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text(
@@ -39,24 +38,25 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
       y,
       { align: "center" }
     );
+    doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
     y += 6;
     doc.setFontSize(11);
     doc.text(
-      "(COCAINA, MARIHUANA, ANFETAMINA, METHANFETAMINA Y BENZODIAZEPINA)",
+      "(COCAÍNA, MARIHUANA, ANFETAMINA, METHANFETAMINA Y BENZODIAZEPINA)",
       pageW / 2,
       y,
       { align: "center" }
     );
     y += 11;
 
-    // Línea de YO, nombre, edad, dni y consentimiento en un solo párrafo justificado y con campos clave en negrita
+    // Bloque de datos personales y consentimiento en un solo párrafo justificado y con campos clave en negrita
     doc.setFontSize(11);
     const bloqueNormal1 = 'YO ';
-    const bloqueNegrita1 = String(datos.nombres || '');
+    const bloqueNegrita1 = String(datos.nombres || '_________________________');
     const bloqueNormal2 = ' de ';
-    const bloqueNegrita2 = String(datos.edad || '');
+    const bloqueNegrita2 = String(datos.edad || '___');
     const bloqueNormal3 = ' años de edad, identificado con DNI N° ';
-    const bloqueNegrita3 = String(datos.dni || '');
+    const bloqueNegrita3 = String(datos.dni || '__________');
     const bloqueNormal4 = ', habiendo recibido consejería, e información acerca de la prueba para el panel de 5 drogas en orina; y en pleno uso de mis facultades mentales, AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post-Test y mis resultados.';
     const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
     const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
@@ -117,11 +117,39 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     });
     y += lines.length * 7 + 2;
 
-    // Sede y fecha
+    // ANTECEDENTES
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text("ANTECEDENTES :", margin, y);
+    y += 6;
+
+    // Tabla de antecedentes
+    autoTable(doc, {
+      startY: y,
+      body: [
+        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumoMarih || ''}` : ""}`],
+        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumoCocaina || ''}` : ""}`],
+        ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
+        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumoAnfetaminas || ''}` : ""}`],
+        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetamina ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetamina ? "X" : "    "})${datos.antConsumeMethanfetamina ? `  CUANDO: ${datos.fechaConsumoMetanfetaminas || ''}` : ""}`],
+        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumoBenzodiacepinas || ''}` : ""}`],
+      ],
+      theme: 'plain',
+      styles: { fontSize: 9, textColor: [0, 0, 0], cellPadding: 2 },
+      columnStyles: {
+        0: { cellWidth: 110 },
+        1: { cellWidth: 25 },
+        2: { cellWidth: 66 }
+      },
+      margin: { left: margin, right: margin }
+    });
+    y = doc.lastAutoTable.finalY + 5;
+
+    // Fecha del examen en la parte inferior
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text(`Fecha: ${datos.fecha || ''}`, pageW - margin - 60, y);
-    y += 11;
+    doc.setFontSize(10);
+    doc.text(`Fecha del examen: ${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
+    y += 12;
 
     // Firma y huella - centrado
     const firmasY = y;
@@ -132,7 +160,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     doc.setDrawColor(0);
     doc.rect(blockX, firmasY, 40, 40);
     doc.setFontSize(11);
-    doc.text("Huella Digital", blockX, firmasY + 45);
+    doc.text("Huella Digital", blockX + 20, firmasY + 45, { align: "center" });
     if (huellap) {
       const boxW = 40;
       const boxH = 40;
@@ -176,7 +204,6 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
       const firmaBase64 = canvas.toDataURL('image/png');
       doc.addImage(firmaBase64, 'PNG', firmaX, firmaImgY, firmaW, firmaH);
     }
-
     // Línea de firma y sello del consejero
     doc.line(firma2X, firmaY, firma2X + firmaLineWidth, firmaY);
     doc.text("Firma y sello del Consejero", firma2X + firmaLineWidth / 2, firmaY + 7, { align: "center" });
@@ -184,7 +211,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
       const selloW = 35;
       const selloH = (sellop.height / sellop.width) * selloW;
       const selloX = firma2X + (firmaLineWidth - selloW) / 2;
-      const selloY = firmaY - selloH - 1; // Corregido aquí
+      const selloY = firmaY - selloH - 1;
 
       const canvas = document.createElement('canvas');
       canvas.width = sellop.width;
@@ -194,49 +221,6 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
       const selloBase64 = canvas.toDataURL('image/png');
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
-
-    y = firmasY + 55;
-
-    // ANTECEDENTES
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
-    doc.text("ANTECEDENTES :", margin, y);
-    y += 6;
-
-    // Tabla de antecedentes
-    const antecedentes = [
-      "CONSUMO DE MARIHUANA",
-      "CONSUMO DE COCAÍNA",
-      "CONSUMO DE HOJA DE COCA EN LOS 14 DÍAS PREVIOS",
-      "CONSUMO DE ANFETAMINAS",
-      "CONSUMO DE METHANFETAMINAS",
-      "CONSUMO DE BENZODIACEPINAS"
-    ];
-    const body = antecedentes.map((label, idx) => [
-      label,
-      `SI (${datos[`ant${idx}_si`] ? 'X' : ' '})`,
-      `NO (${datos[`ant${idx}_no`] ? 'X' : ' '})`
-    ]);
-    autoTable(doc, {
-      startY: y,
-      body: [
-        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "" || ''})`, `SI (${datos.antConsumeMarih ? "X" : " " })`],
-        ['CONSUME COCAINA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "" || ''})`, `SI (${datos.antConsumeCocacina ? "X" : " " })`],
-        ['CONSUME HOJA DE COCA EN LOS 14 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "" || ''})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Cuando:  ${datos.fechaConsumoHojaCoca}` : ""}`],
-        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "" || ''})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
-        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetamina ? "X" : "" || ''})`, `SI (${datos.antConsumeMethanfetamina ? "X" : " " })`],
-        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "" || ''})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : " " })`],
-      ],
-      theme: 'plain',
-      styles: { fontSize: 9, textColor: [0, 0, 0], cellPadding: 2 },
-      columnStyles: {
-        0: { cellWidth: 110 },
-        1: { cellWidth: 25 },
-        2: { cellWidth: 45 }
-      },
-      margin: { left: margin, right: margin }
-    });
-    y = doc.lastAutoTable.finalY + 5;
 
     // Footer
     footer(doc, datos);

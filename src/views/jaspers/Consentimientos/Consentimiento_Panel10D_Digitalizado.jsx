@@ -26,30 +26,51 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
    .then(([huellap, firmap, sellop]) => {
     let y = 58;
 
-    // Título principal en dos líneas, sin línea horizontal
+    // Título principal en dos líneas, con línea horizontal
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
     doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10 D', 105, y, { align: 'center' });
+    doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
     y += 6;
     doc.setFontSize(11);
     doc.text('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', 105, y, { align: 'center' });
     doc.setFontSize(10);
 
-    // Fecha en la parte superior derecha
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    doc.text(`${datos.fecha || ''}`, 195, y, { align: 'right' });
-
     // Bloque de datos personales y consentimiento con interlineado y justificado
     y += 10;
     doc.setFont(undefined, 'normal');
     const bloque =
-      `Yo ${datos.nombres || '_________________________'} , de ${datos.edad || '___'} años de edad, identificado con DNI nº ${datos.dni || '__________'}; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
-    const lines = doc.splitTextToSize(bloque, 176);
-    const altoLinea = 7;
-    const altoCaja = lines.length * altoLinea + 6;
-    doc.text(lines, 18, y + 6, { maxWidth: 176, lineHeightFactor: 1.5, align: 'left' });
-    y += altoCaja + 4;
+      `Yo `;
+    doc.text(bloque, 18, y + 6, { maxWidth: 176, lineHeightFactor: 1.5, align: 'left' });
+    
+    // Nombres en negrita
+    doc.setFont(undefined, 'bold');
+    doc.text(`${datos.nombres || '_________________________'}`, 25, y + 6);
+    
+    // Resto del texto
+    doc.setFont(undefined, 'normal');
+    const bloque2 = `, de `;
+    doc.text(bloque2, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________'), y + 6);
+    
+    // Edad en negrita
+    doc.setFont(undefined, 'bold');
+    doc.text(`${datos.edad || '___'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________') + doc.getTextWidth(bloque2), y + 6);
+    
+    // Resto del texto
+    doc.setFont(undefined, 'normal');
+    const bloque3 = ` años de edad, identificado con DNI nº `;
+    doc.text(bloque3, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(datos.edad || '___'), y + 6);
+    
+    // DNI en negrita
+    doc.setFont(undefined, 'bold');
+    doc.text(`${datos.dni || '__________'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(datos.edad || '___') + doc.getTextWidth(bloque3), y + 6);
+    
+    // Resto del texto
+    doc.setFont(undefined, 'normal');
+    const bloque4 = `; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
+    doc.text(bloque4, 18, y + 13, { maxWidth: 176, lineHeightFactor: 1.5, align: 'justify' });
+    
+    y += 25;
 
     // Antecedentes (tabla) centrados
     let antY = y;
@@ -59,21 +80,21 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     autoTable(doc, {
       startY: antY + 2,
       body: [
-        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "" || ''})`, `SI (${datos.antConsumeMarih ? "X" : " " })`],
-        ['CONSUME COCAINA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "" || ''})`, `SI (${datos.antConsumeCocacina ? "X" : " " })`],
-        ['CONSUME HOJA DE COCA EN LOS 14 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "" || ''})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Cuando:  ${datos.fechaConsumoHojaCoca}` : ""}`],
-        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "" || ''})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
-        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "" || ''})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : " " })`],
-        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "" || ''})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : " " })`],
-        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "" || ''})`, `SI (${datos.antConsumeOpiacesos ? "X" : " " })`],
-        ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "" || ''})`, `SI (${datos.antConsumeBarbituricos ? "X" : " " })`],
-        ['CONSUME METADONA (MTD)', `NO (${!datos.antConsumeMetadona ? "X" : "" || ''})`, `SI (${datos.antConsumeMetadona ? "X" : " " })`],
-        ['CONSUME FENCICLIDINA (PCP)', `NO (${!datos.antConsumeFenciclidina ? "X" : "" || ''})`, `SI (${datos.antConsumeFenciclidina ? "X" : " " })`],
-        ['CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "" || ''})`, `SI (${datos.antConsumeAntidepreTricicli ? "X" : " " })`],
+        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumoMarih || ''}` : ""}`],
+        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumoCocaina || ''}` : ""}`],
+        ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
+        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumoAnfetaminas || ''}` : ""}`],
+        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.fechaConsumoMetanfetaminas || ''}` : ""}`],
+        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumoBenzodiacepinas || ''}` : ""}`],
+        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`, `SI (${datos.antConsumeOpiacesos ? "X" : "    "})${datos.antConsumeOpiacesos ? `  CUANDO: ${datos.fechaConsumoOpiacesos || ''}` : ""}`],
+        ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`, `SI (${datos.antConsumeBarbituricos ? "X" : "    "})${datos.antConsumeBarbituricos ? `  CUANDO: ${datos.fechaConsumoBarbituricos || ''}` : ""}`],
+        ['CONSUME METADONA (MTD)', `NO (${!datos.antConsumeMetadona ? "X" : "    "})`, `SI (${datos.antConsumeMetadona ? "X" : "    "})${datos.antConsumeMetadona ? `  CUANDO: ${datos.fechaConsumoMetadona || ''}` : ""}`],
+        ['CONSUME FENCICLIDINA (PCP)', `NO (${!datos.antConsumeFenciclidina ? "X" : "    "})`, `SI (${datos.antConsumeFenciclidina ? "X" : "    "})${datos.antConsumeFenciclidina ? `  CUANDO: ${datos.fechaConsumoFenciclidina || ''}` : ""}`],
+        ['CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "    "})`, `SI (${datos.antConsumeAntidepreTricicli ? "X" : "    "})${datos.antConsumeAntidepreTricicli ? `  CUANDO: ${datos.fechaConsumoAntidepresivos || ''}` : ""}`],
       ],
       theme: 'plain',
       styles: { fontSize: 9, cellPadding: 1 },
-      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30 }, 2: { cellWidth: 50 } },
+      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30 }, 2: { cellWidth: 66 } },
       margin: { left: 40 },
       didDrawPage: () => {}
     });
@@ -136,11 +157,17 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
       canvas.width = sellop.width;
       canvas.height = sellop.height;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(sellop, 0, 0); // cuidado con la variable correcta
+      ctx.drawImage(sellop, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
+
+    // Fecha del examen en la parte inferior
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text(`Fecha del examen: ${datos.fecha || ''}`, 105, doc.internal.pageSize.height - 20, { align: 'center' });
+
     footer(doc, datos);
 
     // Mostrar PDF

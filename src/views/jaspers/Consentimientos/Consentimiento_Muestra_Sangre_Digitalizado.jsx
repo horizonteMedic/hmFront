@@ -27,32 +27,108 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   ])
    .then(([huellap, firmap, sellop]) => {
     let y = 44;
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 15;
 
     // Título subrayado y negrita con salto de línea
     doc.setFont(undefined, 'bold');
     doc.setFontSize(12);
-    doc.text('CONSENTIMIENTO INFORMADO PARA LA TOMA DE', 105, y, { align: 'center' });
+    doc.text('CONSENTIMIENTO INFORMADO PARA LA TOMA DE', pageW / 2, y, { align: 'center' });
     y += 6;
-    doc.text('MUESTRA DE SANGRE', 105, y, { align: 'center' });
+    doc.text('MUESTRA DE SANGRE', pageW / 2, y, { align: 'center' });
+    doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
     doc.setFontSize(11);
 
-    // Cuerpo del consentimiento
+    // Cuerpo del consentimiento con campos en negrita
     y += 10;
     doc.setFont(undefined, 'normal');
-    const bloque =
-      `Yo ${datos.nombres || '_________________________'} , de ${datos.edad || '___'} años de edad, identificado con DNI nº ${datos.dni || '__________'}; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va ha realizar según solicitud del protocolo médico de la empresa ${datos.empresa || '_________________________'}; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.`;
-    const lines = doc.splitTextToSize(bloque, 176);
-    doc.text(lines, 18, y + 6, { maxWidth: 176, lineHeightFactor: 1.5 });
+    const bloqueNormal1 = 'Yo ';
+    const bloqueNegrita1 = String(datos.nombres || '_________________________');
+    const bloqueNormal2 = ' , de ';
+    const bloqueNegrita2 = String(datos.edad || '___');
+    const bloqueNormal3 = ' años de edad, identificado con DNI nº ';
+    const bloqueNegrita3 = String(datos.dni || '__________');
+    const bloqueNormal4 = '; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va ha realizar según solicitud del protocolo médico de la empresa ';
+    const bloqueNegrita4 = String(datos.empresa || '_________________________');
+    const bloqueNormal5 = '; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.';
+
+    const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4 + bloqueNegrita4 + bloqueNormal5;
+    const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
+    let yBloque = y;
+    lines.forEach(line => {
+      let x = margin;
+      // Detectar y renderizar los campos en negrita en cada línea
+      let idx = 0;
+      while (idx < line.length) {
+        if (line.startsWith(bloqueNormal1, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal1);
+          idx += bloqueNormal1.length;
+        } else if (line.startsWith(bloqueNegrita1, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita1);
+          idx += bloqueNegrita1.length;
+        } else if (line.startsWith(bloqueNormal2, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal2);
+          idx += bloqueNormal2.length;
+        } else if (line.startsWith(bloqueNegrita2, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita2);
+          idx += bloqueNegrita2.length;
+        } else if (line.startsWith(bloqueNormal3, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal3);
+          idx += bloqueNormal3.length;
+        } else if (line.startsWith(bloqueNegrita3, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita3);
+          idx += bloqueNegrita3.length;
+        } else if (line.startsWith(bloqueNormal4, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal4, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal4);
+          idx += bloqueNormal4.length;
+        } else if (line.startsWith(bloqueNegrita4, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita4, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita4);
+          idx += bloqueNegrita4.length;
+        } else if (line.startsWith(bloqueNormal5, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
+          break;
+        } else {
+          // Si hay texto que no coincide, lo renderizamos normal
+          let nextIdx = idx + 1;
+          while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4, bloqueNegrita4, bloqueNormal5].some(b => line.startsWith(b, nextIdx))) {
+            nextIdx++;
+          }
+          const fragment = line.substring(idx, nextIdx);
+          doc.setFont('helvetica', 'normal');
+          doc.text(fragment, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(fragment);
+          idx = nextIdx;
+        }
+      }
+      yBloque += 7;
+    });
     y += lines.length * 7 + 10;
 
-    // Fecha apertura
-    doc.setFont(undefined, 'bold');
-    doc.text('Fecha:', 140, y);
-    doc.setFont(undefined, 'normal');
-    doc.text(`${datos.fecha || ''}`, 155, y);
+    // Fecha del examen en la parte inferior
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Fecha del examen: ${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
+    y += 12;
 
     // Espacio extra antes de las firmas y huella
-    const baseY = y + 30;
+    const baseY = y + 10;
 
     // Huella
     doc.rect(25, baseY, 28, 32);

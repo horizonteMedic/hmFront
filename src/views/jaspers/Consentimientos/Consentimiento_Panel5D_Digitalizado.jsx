@@ -30,7 +30,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
     const pageW = doc.internal.pageSize.getWidth();
     const margin = 15;
 
-    // Título principal
+    // Título principal con línea horizontal
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.text(
@@ -39,10 +39,11 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       y,
       { align: "center" }
     );
+    doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
     y += 6;
     doc.setFontSize(11);
     doc.text(
-      "(COCAINA, MARIHUANA, ÉXTASIS, OPIÁCEOS Y BENZODIACEPINA)",
+      "(COCAÍNA, MARIHUANA, ÉXTASIS, OPIÁCEOS Y BENZODIACEPINA)",
       pageW / 2,
       y,
       { align: "center" }
@@ -107,7 +108,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
             nextIdx++;
           }
           const fragment = line.substring(idx, nextIdx);
-    doc.setFont('helvetica', 'normal');
+          doc.setFont('helvetica', 'normal');
           doc.text(fragment, x, yBloque, { baseline: 'top' });
           x += doc.getTextWidth(fragment);
           idx = nextIdx;
@@ -117,32 +118,32 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
     });
     y += lines.length * 7 + 2;
 
-    // Tabla de antecedentes (según la segunda imagen)
+    // Tabla de antecedentes
     autoTable(doc, {
       startY: y,
       body: [
-        ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "})`, `SI ( ${datos.antConsumeMarih ? "X" : " " })`],
-        ['CONSUME COCAINA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "})`, `SI ( ${datos.antConsumeCocacina ? "X" : " " })`],
-        ['CONSUME HOJA DE COCA EN LOS 14 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "})`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Cuando:  ${datos.fechaConsumoHojaCoca}` : ""}`],
-        ['CONSUME DE ÉXTASIS', `NO ( ${!datos.antConsumeAnfetaminaOExtasis ? "X" : " "})`, `SI ( ${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
-        ['CONSUME DE OPIÁCEOS', `NO ( ${!datos.antConsumeOpiaceos ? "X" : " "})`, `SI ( ${datos.antConsumeOpiaceos ? "X" : " " })`],
-        ['CONSUME DE BENZODIACEPINAS', `NO ( ${!datos.antConsumeBenzodiacepinas ? "X" : " "})`, `SI ( ${datos.antConsumeBenzodiacepinas ? "X" : " " })`],
+        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumoMarih || ''}` : ""}`],
+        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumoCocaina || ''}` : ""}`],
+        ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
+        ['CONSUME ÉXTASIS (EXT)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumoExtasis || ''}` : ""}`],
+        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeOpiaceos ? "X" : "    "})${datos.antConsumeOpiaceos ? `  CUANDO: ${datos.fechaConsumoOpiaceos || ''}` : ""}`],
+        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumoBenzodiacepinas || ''}` : ""}`],
       ],
       theme: 'plain',
       styles: { fontSize: 9, textColor: [0, 0, 0], cellPadding: 2 },
       columnStyles: {
         0: { cellWidth: 110 },
         1: { cellWidth: 25 },
-        2: { cellWidth: 45 }
+        2: { cellWidth: 66 }
       },
       margin: { left: margin, right: margin }
     });
     y = doc.lastAutoTable.finalY + 5;
 
-    // Fecha
+    // Fecha del examen en la parte inferior
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Fecha: ${datos.fecha}`, pageW / 2, y, { align: "center" });
+    doc.text(`Fecha del examen: ${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
     y += 12;
 
     // Firma y huella - centrado
@@ -215,6 +216,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       const selloBase64 = canvas.toDataURL('image/png');
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
+
     // Footer
     footer(doc, datos);
 
@@ -230,6 +232,5 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       iframe.contentWindow.print();
     };
   })
-
   
 } 

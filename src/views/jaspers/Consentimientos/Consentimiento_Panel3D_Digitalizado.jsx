@@ -26,60 +26,143 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
     isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
   ])
    .then(([huellap, firmap, sellop]) => {
-      // Margen superior reducido
       let y = 44;
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 15;
 
       // Título subrayado y negrita
       doc.setFont(undefined, 'bold');
       doc.setFontSize(12);
       doc.text(
-        'CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA, COCAINA Y EXTASIS.',
-        105,
+        'CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA, COCAÍNA Y ÉXTASIS.',
+        pageW / 2,
         y,
         { align: 'center', maxWidth: 180 }
       );
+      doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
       doc.setFontSize(10);
 
-      // Cuerpo del consentimiento
+      // Cuerpo del consentimiento con campos en negrita
       y += 12;
-      let texto =
-        `Yo ${datos.nombres || '_________________________'} de ${datos.edad || '___'} años de edad, identificado con DNI nº ${datos.dni || '__________'}; habiendo recibido consejería e información acerca de la prueba para Marihuana y cocaína en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
+      const bloqueNormal1 = 'Yo ';
+      const bloqueNegrita1 = String(datos.nombres || '_________________________');
+      const bloqueNormal2 = ' de ';
+      const bloqueNegrita2 = String(datos.edad || '___');
+      const bloqueNormal3 = ' años de edad, identificado con DNI nº ';
+      const bloqueNegrita3 = String(datos.dni || '__________');
+      const bloqueNormal4 = '; habiendo recibido consejería e información acerca de la prueba para Marihuana y cocaína en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.';
 
-      // Calcular líneas y altura dinámica para la caja
-      const textoLineas = doc.splitTextToSize(texto, 176);
-      const altoLinea = 5.5; // altura aproximada de línea en jsPDF
-      const altoCaja = textoLineas.length * altoLinea + 6; // margen superior e inferior
-
-      // Bloque de consentimiento sin cuadro, con interlineado
-      doc.setFont(undefined, 'normal');
-      doc.text(textoLineas, 18, y + 7, { maxWidth: 176, lineHeightFactor: 1.5 });
-
-      // Fecha apertura
-      doc.setFont(undefined, 'bold');
-      doc.text(`${datos.fecha_apertura_po || ''}`, 170, y + altoCaja + 4);
+      const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
+      const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
+      let yBloque = y;
+      lines.forEach(line => {
+        let x = margin;
+        // Detectar y renderizar los campos en negrita en cada línea
+        let idx = 0;
+        while (idx < line.length) {
+          if (line.startsWith(bloqueNormal1, idx)) {
+            doc.setFont('helvetica', 'normal');
+            doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(bloqueNormal1);
+            idx += bloqueNormal1.length;
+          } else if (line.startsWith(bloqueNegrita1, idx)) {
+            doc.setFont('helvetica', 'bold');
+            doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(bloqueNegrita1);
+            idx += bloqueNegrita1.length;
+          } else if (line.startsWith(bloqueNormal2, idx)) {
+            doc.setFont('helvetica', 'normal');
+            doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(bloqueNormal2);
+            idx += bloqueNormal2.length;
+          } else if (line.startsWith(bloqueNegrita2, idx)) {
+            doc.setFont('helvetica', 'bold');
+            doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(bloqueNegrita2);
+            idx += bloqueNegrita2.length;
+          } else if (line.startsWith(bloqueNormal3, idx)) {
+            doc.setFont('helvetica', 'normal');
+            doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(bloqueNormal3);
+            idx += bloqueNormal3.length;
+          } else if (line.startsWith(bloqueNegrita3, idx)) {
+            doc.setFont('helvetica', 'bold');
+            doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(bloqueNegrita3);
+            idx += bloqueNegrita3.length;
+          } else if (line.startsWith(bloqueNormal4, idx)) {
+            doc.setFont('helvetica', 'normal');
+            doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
+            break;
+          } else {
+            // Si hay texto que no coincide, lo renderizamos normal
+            let nextIdx = idx + 1;
+            while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4].some(b => line.startsWith(b, nextIdx))) {
+              nextIdx++;
+            }
+            const fragment = line.substring(idx, nextIdx);
+            doc.setFont('helvetica', 'normal');
+            doc.text(fragment, x, yBloque, { baseline: 'top' });
+            x += doc.getTextWidth(fragment);
+            idx = nextIdx;
+          }
+        }
+        yBloque += 7;
+      });
+      y += lines.length * 7 + 10;
 
       // Antecedentes (tabla)
-      let antY = y + altoCaja + 12;
+      let antY = y + 12;
       doc.setFont(undefined, 'bold');
       doc.text('ANTECEDENTES:', 15, antY);
       antY += 6;
       autoTable(doc, {
         startY: antY,
         body: [
-          ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : ""})`, `SI (${datos.antConsumeMarih ? "X" : " " })`],
-          ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : ""})`, `SI (${datos.antConsumeHojaCoca ? "X" : " " })   ${datos.antConsumeHojaCoca ? `Cuando:  ${datos.fechaConsumoHojaCoca}` : ""}`],
-          ['CONSUME COCAINA', `NO (${!datos.antConsumeCocacina ? "X" : ""})`, `SI (${datos.antConsumeCocacina ? "X" : " " })`],
-          ['CONSUME EXTASIS', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : ""})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : " " })`],
+          ['CONSUME MARIHUANA (THC)', `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`, `SI ( ${datos.antConsumeMarih ? "X" : " "} )`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumoMarihuana || ''}` : ''],
+          ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "} )`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " "} )`, datos.antConsumeHojaCoca ? `CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ''],
+          ['CONSUME COCAÍNA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`, `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`, datos.antConsumeCocacina ? `CUANDO: ${datos.fechaConsumoCocaina || ''}` : ''],
+          ['CONSUME ÉXTASIS', `NO ( ${!datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, `SI ( ${datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, datos.antConsumeAnfetaminaOExtasis ? `CUANDO: ${datos.fechaConsumoExtasis || ''}` : ''],
         ],
         theme: 'plain',
         styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: { 0: { cellWidth: 90 }, 1: { cellWidth: 40 }, 2: { cellWidth: 60 } },
+        columnStyles: { 
+          0: { cellWidth: 90 }, 
+          1: { cellWidth: 40 }, 
+          2: { cellWidth: 40 },
+          3: { cellWidth: 60 }
+        },
         margin: { left: 15 },
         didDrawPage: () => {}
       });
 
+      // Fecha del examen en la parte inferior
+      y = doc.lastAutoTable.finalY + 10;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`Fecha del examen: ${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
+      y += 12;
+
       // Recuadros de firmas y huella
-      const baseY = doc.lastAutoTable.finalY + 12;
+      const baseY = y + 10;
+
+      // Firma primero, luego huella
+      doc.line(70, baseY + 32, 120, baseY + 32);
+      doc.text('Firma del Paciente', 95, baseY + 38, { align: 'center' });
+      if (firmap) {
+        const firmaW = 40;
+        const firmaH = (firmap.height / firmap.width) * firmaW;
+        const firmaX = 70 + (50 - firmaW) / 2;
+        const firmaY = baseY + 32 - firmaH - 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = firmap.width;
+        canvas.height = firmap.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(firmap, 0, 0);
+        const firmaBase64 = canvas.toDataURL('image/png');
+        doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
+      }
+
       // Huella
       doc.rect(25, baseY, 28, 32);
       doc.setFontSize(10);
@@ -108,22 +191,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
 
         doc.addImage(huellaBase64, 'PNG', huellaX, huellaY, huellaW, huellaH);
       }
-      // Firma paciente
-      doc.line(70, baseY + 32, 120, baseY + 32);
-      doc.text('Firma del Paciente', 95, baseY + 38, { align: 'center' });
-      if (firmap) {
-        const firmaW = 40;
-        const firmaH = (firmap.height / firmap.width) * firmaW;
-        const firmaX = 70 + (50 - firmaW) / 2;
-        const firmaY = baseY + 32 - firmaH - 2;
-        const canvas = document.createElement('canvas');
-        canvas.width = firmap.width;
-        canvas.height = firmap.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(firmap, 0, 0);
-        const firmaBase64 = canvas.toDataURL('image/png');
-        doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
-      }
+
       // Firma consejero
       doc.line(135, baseY + 32, 185, baseY + 32);
       doc.text('Firma y sello del Consejero', 160, baseY + 38, { align: 'center' });
