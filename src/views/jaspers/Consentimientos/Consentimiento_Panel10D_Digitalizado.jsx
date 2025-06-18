@@ -38,45 +38,90 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
 
     // Bloque de datos personales y consentimiento con interlineado y justificado
     y += 10;
-    doc.setFont(undefined, 'normal');
-    const bloque =
-      `Yo `;
-    doc.text(bloque, 18, y + 6, { maxWidth: 176, lineHeightFactor: 1.5, align: 'left' });
-    
-    // Nombres en negrita
-    doc.setFont(undefined, 'bold');
-    doc.text(`${datos.nombres || '_________________________'}`, 25, y + 6);
-    
-    // Resto del texto
-    doc.setFont(undefined, 'normal');
-    const bloque2 = `, de `;
-    doc.text(bloque2, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________'), y + 6);
-    
-    // Edad en negrita
-    doc.setFont(undefined, 'bold');
-    doc.text(`${datos.edad || '___'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________') + doc.getTextWidth(bloque2), y + 6);
-    
-    // Resto del texto
-    doc.setFont(undefined, 'normal');
-    const bloque3 = ` años de edad, identificado con DNI nº `;
-    doc.text(bloque3, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(String(datos.edad) || '___'), y + 6);
-    
-    // DNI en negrita
-    doc.setFont(undefined, 'bold');
-    doc.text(`${datos.dni || '__________'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(String(datos.edad) || '___') + doc.getTextWidth(bloque3), y + 6);
-    
-    // Resto del texto
-    doc.setFont(undefined, 'normal');
-    const bloque4 = `; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
-    doc.text(bloque4, 18, y + 13, { maxWidth: 176, lineHeightFactor: 1.5, align: 'justify' });
-    
-    y += 32;
+    const pageW = doc.internal.pageSize.getWidth();
+    const margin = 18;
+    const bloqueNormal1 = 'Yo ';
+    const bloqueNegrita1 = String(datos.nombres || '_________________________');
+    const bloqueNormal2 = ', de ';
+    const bloqueNegrita2 = String(datos.edad || '___');
+    const bloqueNormal3 = ' años de edad, identificado con DNI nº ';
+    const bloqueNegrita3 = String(datos.dni || '__________');
+    const bloqueNormal4 = '; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.';
+    const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
+    const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
+    let yBloque = y + 6;
+    lines.forEach(line => {
+      let x = margin;
+      let idx = 0;
+      while (idx < line.length) {
+        if (line.startsWith(bloqueNormal1, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal1);
+          idx += bloqueNormal1.length;
+        } else if (line.startsWith(bloqueNegrita1, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita1);
+          idx += bloqueNegrita1.length;
+        } else if (line.startsWith(bloqueNormal2, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal2);
+          idx += bloqueNormal2.length;
+        } else if (line.startsWith(bloqueNegrita2, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita2);
+          idx += bloqueNegrita2.length;
+        } else if (line.startsWith(bloqueNormal3, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNormal3);
+          idx += bloqueNormal3.length;
+        } else if (line.startsWith(bloqueNegrita3, idx)) {
+          doc.setFont('helvetica', 'bold');
+          doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(bloqueNegrita3);
+          idx += bloqueNegrita3.length;
+        } else if (line.startsWith(bloqueNormal4, idx)) {
+          doc.setFont('helvetica', 'normal');
+          doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
+          break;
+        } else {
+          let nextIdx = idx + 1;
+          while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4].some(b => line.startsWith(b, nextIdx))) {
+            nextIdx++;
+          }
+          const fragment = line.substring(idx, nextIdx);
+          doc.setFont('helvetica', 'normal');
+          doc.text(fragment, x, yBloque, { baseline: 'top' });
+          x += doc.getTextWidth(fragment);
+          idx = nextIdx;
+        }
+      }
+      yBloque += 7;
+    });
+    y += lines.length * 7 + 10; // Deja más espacio después del bloque de datos personales
 
     // Antecedentes (tabla) centrados
-    let antY = y;
+    const antTitle = "ANTECEDENTES:";
+    const fechaText = `Fecha del examen: ${datos.fecha || ''}`;
     doc.setFont(undefined, 'bold');
-    doc.text('ANTECEDENTES:', 105, antY, { align: 'center' });
-    antY += 2;
+    const antTitleWidth = doc.getTextWidth(antTitle + "  ");
+    doc.setFont(undefined, 'normal');
+    const fechaTextWidth = doc.getTextWidth(fechaText);
+
+    const totalWidth = antTitleWidth + fechaTextWidth;
+    const startX = (pageW - totalWidth) / 2;
+    let antY = y + 2;
+
+    // Dibuja el título y la fecha juntos, centrados
+    doc.setFont(undefined, 'bold');
+    doc.text(antTitle, startX, antY);
+    doc.setFont(undefined, 'normal');
+    doc.text(fechaText, startX + antTitleWidth, antY);
+
     autoTable(doc, {
       startY: antY + 2,
       body: [
@@ -84,7 +129,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
         ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumeCocacina || ''}` : ""}`],
         ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
         ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ""}`],
-        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.antConsumeMethanfetaminaOOpiaceos || ''}` : ""}`],
+        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
         ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumeBenzodiacepinas || ''}` : ""}`],
         ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`, `SI (${datos.antConsumeOpiacesos ? "X" : "    "})${datos.antConsumeOpiacesos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
         ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`, `SI (${datos.antConsumeBarbituricos ? "X" : "    "})${datos.antConsumeBarbituricos ? `  CUANDO: ${datos.fechaConsumeBarbituricos || ''}` : ""}`],
@@ -162,11 +207,6 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
 
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
-
-    // Fecha del examen en la parte inferior
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(10);
-    doc.text(`Fecha del examen: ${datos.fecha || ''}`, 105, doc.internal.pageSize.height - 20, { align: 'center' });
 
     footer(doc, datos);
 
