@@ -24,7 +24,14 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
         nOrden: data.norden
     };
     
-    data.antecedentes.forEach(({ key, value, fecha }) => {
+    const antecedentes = Array.isArray(data.antecedentes)
+        ? data.antecedentes
+        : Object.entries(data.antecedentes).map(([key, value]) => ({
+            key,
+            value: typeof value === 'object' && value !== null ? value.value : value,
+            fecha: typeof value === 'object' && value !== null ? value.fecha : null,
+            }));
+    antecedentes.forEach(({ key, value, fecha }) => {
         const campos = camposAPI[key];
         if (campos) {
         body[campos.valor] = value ?? false;
@@ -33,7 +40,23 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
     });
 
    
-    console.log(JSON.stringify(body))
+    const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        }
+        return fetch(url,options).then(res =>  {
+            if (!res.ok) {
+                return res
+            } return res.json()}).then(response => response) 
+}
+
+export function GetInfoLaboratioEx2(data, tabla, token, user) {
+
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
         const options = {
             method: 'POST',

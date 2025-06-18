@@ -70,7 +70,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     const bloque4 = `; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
     doc.text(bloque4, 18, y + 13, { maxWidth: 176, lineHeightFactor: 1.5, align: 'justify' });
     
-    y += 30;
+    y += 32;
 
     // Antecedentes (tabla) centrados
     let antY = y;

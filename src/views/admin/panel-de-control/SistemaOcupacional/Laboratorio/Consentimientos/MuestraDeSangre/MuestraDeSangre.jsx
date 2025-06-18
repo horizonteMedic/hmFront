@@ -37,6 +37,7 @@ const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
     edad: '',
     dni: '',
     empresa: '',
+    antecedentes: []
   });
 
   const fechaRef = useRef(null);
