@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import microscopioImg from './microscopio.webp';
 import { VerifyTR } from '../ControllerLC/ControllerLC';
 
-export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => {
-  const tabla = 'lab_clinico'
+export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) => {
+  const tabla = 'lab_clinico';
   const [form, setForm] = useState({
     ficha: true,
     norden: '',
@@ -48,13 +48,13 @@ export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => 
   };
 
   const handleSave = () => {
-    // TODO: Implement save functionality
     console.log('Saving form:', form);
   };
 
   const handleClear = () => {
     setForm({
       ficha: true,
+      norden: '',
       responsable: '',
       paciente: '',
       empContratista: '',
@@ -89,7 +89,6 @@ export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => 
   };
 
   const handlePrint = () => {
-    // TODO: Implement print functionality
     console.log('Printing form:', form);
   };
 
@@ -97,45 +96,65 @@ export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => 
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      {/* Barra superior sola y alineada */}
+      {/* Barra superior */}
       <div className="flex flex-wrap items-center w-full gap-3 p-2 justify-between">
         <div className="flex flex-wrap items-center gap-3 flex-1 min-w-0">
-          <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Consultas</label>
-          <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Particular</label>
-          <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1" defaultChecked/> Ficha Médica Ocupacional</label>
           <label className="font-medium flex items-center whitespace-nowrap">
-            N° Orden:<input name='norden' value={form.norden} onChange={handleInputChange} className="border rounded px-2 py-1 w-28 text-md ml-1" 
-            onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}/>
+            <input type="checkbox" className="mr-1"/> Consultas
           </label>
-          <label className="font-medium flex items-center whitespace-nowrap">N° Recibo:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
-          <label className="font-medium flex items-center whitespace-nowrap">DNI:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
-          <label className="font-medium flex items-center whitespace-nowrap">Fecha:<input type="date" className="border rounded px-2 py-1 w-36 text-md ml-1" /></label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            <input type="checkbox" className="mr-1"/> Particular
+          </label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            <input type="checkbox" className="mr-1" defaultChecked/> Ficha Médica Ocupacional
+          </label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            N° Orden:
+            <input
+              name="norden"
+              value={form.norden}
+              onChange={handleInputChange}
+              onKeyUp={event => { if (event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede) }}
+              className="border rounded px-2 py-1 w-28 text-md ml-1"
+            />
+          </label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            N° Recibo:
+            <input className="border rounded px-2 py-1 w-28 text-md ml-1" />
+          </label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            DNI:
+            <input className="border rounded px-2 py-1 w-28 text-md ml-1" />
+          </label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            Fecha:
+            <input type="date" className="border rounded px-2 py-1 w-36 text-md ml-1" />
+          </label>
         </div>
         <div className="flex items-center gap-4">
           <button
-            onClick={() => dispatch({ type:'SET', field:'ficha', value:!form.ficha })}
+            onClick={() => setField('ficha', !form.ficha)}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded"
           >Editar</button>
           <Checkbox
             label={<span className="text-red-600 font-semibold">INCOMPLETO</span>}
             checked={!form.ficha}
-            onChange={v=>setField('ficha',!v)}
+            onChange={v => setField('ficha', !v)}
           />
         </div>
       </div>
 
-      {/* contenido principal */}
+      {/* Contenido principal */}
       <div className="flex flex-col lg:flex-row gap-4">
-        {/* formulario */}
         <div className="flex-1 bg-white p-4 rounded shadow space-y-6">
           <Section title="Datos Generales">
-            <Field label="Responsable Lab" name="responsable" value={form.responsable} onChange={e=>setField('responsable',e.target.value)} />
-            <Field label="Nombres"         name="paciente"    value={form.paciente}    onChange={e=>setField('paciente',e.target.value)} />
+            <Field label="Responsable Lab" name="responsable" value={form.responsable} onChange={e => setField('responsable', e.target.value)} />
+            <Field label="Nombres" name="paciente" value={form.paciente} onChange={e => setField('paciente', e.target.value)} />
             <div className="flex gap-4">
-              <Field label="Emp. Contratista" name="empContratista" value={form.empContratista} onChange={e=>setField('empContratista',e.target.value)} />
+              <Field label="Emp. Contratista" name="empContratista" value={form.empContratista} onChange={e => setField('empContratista', e.target.value)} />
               <div className="flex items-center gap-2">
-                <Field label="Empresa"    name="empresa" value={form.empresa} onChange={e=>setField('empresa',e.target.value)} />
-                <Checkbox label="N/A" checked={form.empresaNA} onChange={v=>setField('empresaNA',v)} />
+                <Field label="Empresa" name="empresa" value={form.empresa} onChange={e => setField('empresa', e.target.value)} />
+                <Checkbox label="N/A" checked={form.empresaNA} onChange={v => setField('empresaNA', v)} />
               </div>
             </div>
           </Section>
@@ -147,14 +166,14 @@ export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => 
                 name="grupo"
                 options={['O','A','B','AB']}
                 value={form.grupo}
-                onChange={v=>setField('grupo',v)}
+                onChange={v => setField('grupo', v)}
               />
               <RadioGroup
                 label="Factor Rh"
                 name="rh"
                 options={['+','-']}
                 value={form.rh}
-                onChange={v=>setField('rh',v)}
+                onChange={v => setField('rh', v)}
               />
             </div>
             <div className="grid grid-cols-3 gap-4 mt-4">
@@ -172,53 +191,95 @@ export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => 
                 ['monocitos','%'],
                 ['eosinofilos','%'],
                 ['basofilos','%'],
-              ].map(([key,unit])=>(
+              ].map(([key,unit]) => (
                 <Field
                   key={key}
                   label={capitalize(key)}
                   name={key}
                   unit={unit}
                   value={form[key]}
-                  onChange={e=>setField(key,e.target.value)}
+                  onChange={e => setField(key, e.target.value)}
                 />
               ))}
             </div>
           </Section>
 
           <Section title="Bioquímica">
-            <div className="flex gap-8">
-              <Field label="Glucosa"     name="glucosa"     unit="mg/dl" value={form.glucosa}     onChange={e=>setField('glucosa',e.target.value)}>
-                <Checkbox label="N/A" checked={form.glucosaNA} onChange={v=>setField('glucosaNA',v)} />
-              </Field>
-              <Field label="Creatinina"  name="creatinina"  unit="mg/dl" value={form.creatinina}  onChange={e=>setField('creatinina',e.target.value)}>
-                <Checkbox label="N/A" checked={form.creatininaNA} onChange={v=>setField('creatininaNA',v)} />
-              </Field>
+            <div className="flex flex-col gap-2 border rounded p-2">
+              <div className="flex items-center gap-2">
+                <label className="w-24">Glucosa :</label>
+                <input
+                  type="number"
+                  name="glucosa"
+                  value={form.glucosa}
+                  onChange={e => setField('glucosa', e.target.value)}
+                  className="border rounded px-2 py-1 w-28"
+                  disabled={form.glucosaNA}
+                />
+                <span>mg/dl</span>
+                <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => setField('glucosaNA', v)} />
+                <span className="ml-4 text-xs text-gray-600">Valores normales 70 - 110 mg/dl</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="w-24">Creatinina :</label>
+                <input
+                  type="number"
+                  name="creatinina"
+                  value={form.creatinina}
+                  onChange={e => setField('creatinina', e.target.value)}
+                  className="border rounded px-2 py-1 w-28"
+                  disabled={form.creatininaNA}
+                />
+                <span>mg/dl</span>
+                <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => setField('creatininaNA', v)} />
+                <span className="ml-4 text-xs text-gray-600">Valores normales 0.8 - 1.4 mg/dl</span>
+              </div>
             </div>
           </Section>
 
           <Section title="Reacciones Serológicas">
-            <div className="flex gap-8">
-              {['rpr','vih'].map(key=>(
-                <Field key={key} label={key.toUpperCase()} name={key} value={form[key]} onChange={e=>setField(key,e.target.value)}>
-                  <Checkbox label="N/A" checked={form[`${key}NA`]} onChange={v=>setField(`${key}NA`,v)} />
-                  <RadioGroup
-                    name={key+'Pos'}
-                    options={['+','-']}
-                    value={form[`${key}Pos`]? '+' : '-'}
-                    onChange={v=>setField(`${key}Pos`, v==='+' )}
-                  />
-                </Field>
-              ))}
+            <div className="flex border rounded p-2 divide-x divide-gray-300">
+              <div className="flex-1 flex items-center gap-2 pr-4">
+                <label className="w-12">RPR :</label>
+                <input
+                  type="text"
+                  name="rpr"
+                  value={form.rprNA ? 'N/A' : form.rpr}
+                  onChange={e => setField('rpr', e.target.value)}
+                  className="border rounded px-2 py-1 w-28"
+                  disabled={form.rprNA}
+                />
+                <div className="flex items-center gap-1 ml-2">
+                  <Checkbox label="+" checked={form.rprPos && !form.rprNA} onChange={v => { setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA} onChange={v => { setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', 'N/A'); }} />
+                </div>
+              </div>
+              <div className="flex-1 flex items-center gap-2 pl-4">
+                <label className="w-12">VIH :</label>
+                <input
+                  type="text"
+                  name="vih"
+                  value={form.vihNA ? 'N/A' : form.vih}
+                  onChange={e => setField('vih', e.target.value)}
+                  className="border rounded px-2 py-1 w-28"
+                  disabled={form.vihNA}
+                />
+                <div className="flex items-center gap-1 ml-2">
+                  <Checkbox label="+" checked={form.vihPos && !form.vihNA} onChange={v => { setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA} onChange={v => { setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="N/A" checked={form.vihNA} onChange={v => { setField('vihNA', v); if (v) setField('vih', 'N/A'); }} />
+                </div>
+              </div>
             </div>
           </Section>
 
           <div className="flex justify-between mt-6">
-            <button onClick={handleSave}  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Guardar</button>
+            <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Guardar</button>
             <button onClick={handleClear} className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">Limpiar</button>
           </div>
         </div>
 
-        {/* registros y microscopio */}
         <div className="bg-white p-4 rounded shadow w-full lg:w-1/3 flex flex-col justify-between">
           <Section title="Registros anteriores">
             <div className="h-32 bg-blue-50 rounded" />
@@ -237,11 +298,11 @@ export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => 
 
       {status && <p className="text-center text-green-600">{status}</p>}
     </div>
-  )
-}
+  );
+};
 
-// componentes auxiliares
-function Field({ label, name, type='text', unit='', value, onChange, children, disabled }) {
+// Componentes auxiliares
+function Field({ label, name, type = 'text', unit = '', value, onChange, children, disabled }) {
   return (
     <div className="flex flex-col">
       <label className="font-medium mb-1">{label}{unit && <span className="text-sm ml-1">{unit}</span>}</label>
@@ -252,21 +313,21 @@ function Field({ label, name, type='text', unit='', value, onChange, children, d
           value={value}
           disabled={disabled}
           onChange={onChange}
-          className={`border rounded px-2 py-1 flex-1 ${disabled?'bg-gray-100':''}`}
+          className={`border rounded px-2 py-1 flex-1 ${disabled ? 'bg-gray-100' : ''}`}
         />
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 function Checkbox({ label, checked, onChange }) {
   return (
     <label className="flex items-center gap-1">
-      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
+      <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} />
       {label}
     </label>
-  )
+  );
 }
 
 function RadioGroup({ label, name, options, value, onChange }) {
@@ -274,21 +335,21 @@ function RadioGroup({ label, name, options, value, onChange }) {
     <div className="flex flex-col">
       <span className="font-medium mb-1">{label}</span>
       <div className="flex items-center gap-2">
-        {options.map(opt=>(
+        {options.map(opt => (
           <label key={opt} className="flex items-center gap-1">
             <input
               type="radio"
               name={name}
               value={opt}
-              checked={value===opt}
-              onChange={e=>onChange(e.target.value)}
+              checked={value === opt}
+              onChange={e => onChange(e.target.value)}
             />
             {opt}
           </label>
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 function Section({ title, children }) {
@@ -297,11 +358,11 @@ function Section({ title, children }) {
       <h3 className="text-blue-700 font-semibold">{title}</h3>
       {children}
     </div>
-  )
+  );
 }
 
 function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1)
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default HematologiaBioquimicaSIEO
+export default HematologiaBioquimicaSIEO;
