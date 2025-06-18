@@ -4,23 +4,10 @@ import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-ic
 import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 import Swal from 'sweetalert2';
 
-const antecedentesList = [
-  { label: 'CONSUME MARIHUANA', key: 'MARIHUANA' },
-  { label: 'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', key: 'COCA' },
-  { label: 'CONSUME COCAINA', key: 'COCAINA' },
-  { label: 'CONSUME EXTASIS', key: 'ANFETAMINAS' },
-];
-
 const Panel3D = ({token, selectedSede, userlogued}) => {
-  const today = new Date().toISOString().split("T")[0];
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-  const createAntecedentesObject = () => {
-    const obj = {};
-    antecedentesList.forEach(({ label }) => {
-      obj[label] = false;
-    });
-    return obj;
-  };
 
   const [form, setForm] = useState({
     norden: '',
@@ -29,7 +16,12 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
     edad: '',
     dni: '',
     fechaCoca: today,
-    antecedentes: createAntecedentesObject()
+    antecedentes: [
+      { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
+      { label: 'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', key: 'COCA', fecha: today, value: false },
+      { label: 'CONSUME COCAINA', key: 'COCAINA', fecha: today, value: false },
+      { label: 'CONSUME EXTASIS', key: 'ANFETAMINAS', fecha: today, value: false },
+    ]
   });
 
   const fechaRef = useRef(null);
@@ -38,15 +30,28 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAntecedenteChange = (key, value) => {
-    setForm((prev) => ({
+  const handleAntecedenteChange = (key, newValue) => {
+    setForm(prev => ({
       ...prev,
-      antecedentes: {
-        ...prev.antecedentes,
-        [key]: value,
-      },
+      antecedentes: prev.antecedentes.map(item =>
+        item.key === key
+          ? { ...item, value: newValue }
+          : item
+      )
     }));
   };
+
+  const handleFechaChange = (key, nuevaFecha) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: prev.antecedentes.map(item =>
+        item.key === key
+          ? { ...item, fecha: nuevaFecha }
+          : item
+      )
+    }));
+  };
+
 
   const handleLimpiar = () => {
     setForm({
@@ -56,7 +61,12 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
       edad: '',
       dni: '',
       fechaCoca: today,
-      antecedentes: createAntecedentesObject(),
+      antecedentes: [
+        { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
+        { label: 'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', key: 'COCA', fecha: today, value: false },
+        { label: 'CONSUME COCAINA', key: 'COCAINA', fecha: today, value: false },
+        { label: 'CONSUME EXTASIS', key: 'ANFETAMINAS', fecha: today, value: false },
+      ]
     });
   };
 
@@ -68,7 +78,12 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
       edad: '',
       dni: '',
       fechaCoca: today,
-      antecedentes: createAntecedentesObject(),
+      antecedentes: [
+        { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
+        { label: 'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', key: 'COCA', fecha: today, value: false },
+        { label: 'CONSUME COCAINA', key: 'COCAINA', fecha: today, value: false },
+        { label: 'CONSUME EXTASIS', key: 'ANFETAMINAS', fecha: today, value: false },
+      ]
     }));
   }
 
@@ -103,7 +118,7 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
-          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'con_panel3D',token,setForm,selectedSede)}} />
+          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'con_panel3D',token,setForm,selectedSede,form)}} />
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Fecha :</label>
@@ -138,7 +153,7 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES :</div>
       <div className="flex flex-col gap-y-4 mb-8">
-        {antecedentesList.map(({ label, key }) => (
+        {form.antecedentes.map(({ label, key, fecha, value }) => (
           <div key={key} className="flex items-center gap-6">
             <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
             <div className="flex items-center gap-4 ml-2">
@@ -146,7 +161,7 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
                 <input
                   type="radio"
                   name={`antecedente_${key}`}
-                  checked={form.antecedentes[key] === false || form.antecedentes[key] === undefined}
+                  checked={value === false}
                   onChange={() => handleAntecedenteChange(key, false)}
                 />
                 NO
@@ -155,18 +170,19 @@ const Panel3D = ({token, selectedSede, userlogued}) => {
                 <input
                   type="radio"
                   name={`antecedente_${key}`}
-                  checked={form.antecedentes[key] === true}
+                  checked={value === true}
                   onChange={() => handleAntecedenteChange(key, true)}
                 />
                 SI
               </label>
-              {label === 'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS' && form.antecedentes[key] === true && (
-                <input
-                  type="date"
-                  className="border rounded px-2 py-1 ml-4"
-                  value={form.fechaCoca || ''}
-                  onChange={e => setForm(prev => ({ ...prev, fechaCoca: e.target.value }))}
-                />
+
+              {value === true && (
+                  <input
+                    type="date"
+                    className="border rounded px-2 py-1 ml-4"
+                    value={fecha}
+                    onChange={e => handleFechaChange(key, e.target.value)}
+                  />
               )}
             </div>
           </div>

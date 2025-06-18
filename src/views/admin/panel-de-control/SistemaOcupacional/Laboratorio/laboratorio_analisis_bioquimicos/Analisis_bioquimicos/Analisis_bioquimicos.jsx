@@ -10,7 +10,8 @@ import Swal from 'sweetalert2'
 
 export default function AnalisisBioquimicos({ token, selectedSede, userlogued }) {
   const tabla = 'analisis_bioquimicos'
-  const today = new Date().toISOString().split("T")[0];
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   
   const [form, setForm] = useState({
     examType: 'ficha',

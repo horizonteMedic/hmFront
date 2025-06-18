@@ -1,20 +1,12 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Gonadotropina.jsx
-import React, { useReducer, useEffect, useCallback } from 'react'
+import React, { useReducer, useEffect, useCallback, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
 
-const today = new Date().toISOString().split('T')[0]
+const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-const initialState = {
-  ficha: '',
-  fecha: today,
-  nombres: '',
-  edad: '',
-  resultado: '',
-  positivo: false,
-  printCount: ''
-}
 
 function reducer(state, action) {
   switch (action.type) {
@@ -30,7 +22,15 @@ function reducer(state, action) {
 }
 
 export default function Gonadotropina({ apiBase, token, selectedSede }) {
-  const [form, dispatch] = useReducer(reducer, initialState)
+  const [form, setForm] = useState({
+    ficha: '',
+    fecha: today,
+    nombres: '',
+    edad: '',
+    resultado: '',
+    positivo: false,
+    printCount: ''
+  })
 
   // load existing when ficha changes
   useEffect(() => {

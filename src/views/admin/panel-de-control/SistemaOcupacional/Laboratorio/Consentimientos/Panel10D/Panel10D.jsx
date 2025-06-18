@@ -4,22 +4,25 @@ import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-ic
 import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 import Swal from 'sweetalert2';
 
-const antecedentesList = [
-  { label: 'CONSUME MARIHUANA (THC)', key: 'MARIHUANA' },
-  { label: 'CONSUME COCAINA (COC)', key: 'COCAINA' },
-  { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS', key: 'COCA' },
-  { label: 'CONSUME ANFETAMINAS (AMP)', key: 'ANFETAMINAS' },
-  { label: 'CONSUME METHANFETAMINAS (MET)', key: 'METAN' },
-  { label: 'CONSUME BENZODIAZEPINAS (BZO)', key: 'BENZO' },
-  { label: 'CONSUME OPIÁCEOS (OPI)', key: 'OPIA' },
-  { label: 'CONSUME BARBITÚRICOS (BAR)', key: 'BARBI' },
-  { label: 'CONSUME METADONA (MTD)', key: 'METADONA' },
-  { label: 'CONSUME FENCICLIDINA (PCP)', key: 'FENCI' },
-  { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', key: 'ANTI' },
-];
+
 
 const Panel10D = ({token,selectedSede,userlogued}) => {
-  const today = new Date().toISOString().split("T")[0];
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+  const antecedentesList = [
+    { label: 'CONSUME MARIHUANA (THC)', key: 'MARIHUANA', fecha: today },
+    { label: 'CONSUME COCAINA (COC)', key: 'COCAINA', fecha: today  },
+    { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS', key: 'COCA', fecha: today  },
+    { label: 'CONSUME ANFETAMINAS (AMP)', key: 'ANFETAMINAS', fecha: today  },
+    { label: 'CONSUME METHANFETAMINAS (MET)', key: 'METAN', fecha: today  },
+    { label: 'CONSUME BENZODIAZEPINAS (BZO)', key: 'BENZO', fecha: today  },
+    { label: 'CONSUME OPIÁCEOS (OPI)', key: 'OPIA', fecha: today  },
+    { label: 'CONSUME BARBITÚRICOS (BAR)', key: 'BARBI', fecha: today  },
+    { label: 'CONSUME METADONA (MTD)', key: 'METADONA', fecha: today  },
+    { label: 'CONSUME FENCICLIDINA (PCP)', key: 'FENCI', fecha: today  },
+    { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', key: 'ANTI', fecha: today  },
+  ];
 
   const createAntecedentesObject = () => {
     const obj = {};
@@ -35,8 +38,19 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
     nombres: '',
     edad: '',
     dni: '',
-    fechaCoca: today,
-    antecedentes: createAntecedentesObject(),
+    antecedentes: [
+      { label: 'CONSUME MARIHUANA (THC)', key: 'MARIHUANA', fecha: today, value: false },
+      { label: 'CONSUME COCAINA (COC)', key: 'COCAINA', fecha: today, value: false  },
+      { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS', key: 'COCA', fecha: today, value: false  },
+      { label: 'CONSUME ANFETAMINAS (AMP)', key: 'ANFETAMINAS', fecha: today, value: false  },
+      { label: 'CONSUME METHANFETAMINAS (MET)', key: 'METAN', fecha: today, value: false  },
+      { label: 'CONSUME BENZODIAZEPINAS (BZO)', key: 'BENZO', fecha: today, value: false  },
+      { label: 'CONSUME OPIÁCEOS (OPI)', key: 'OPIA', fecha: today, value: false  },
+      { label: 'CONSUME BARBITÚRICOS (BAR)', key: 'BARBI', fecha: today, value: false  },
+      { label: 'CONSUME METADONA (MTD)', key: 'METADONA', fecha: today, value: false  },
+      { label: 'CONSUME FENCICLIDINA (PCP)', key: 'FENCI', fecha: today, value: false  },
+      { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', key: 'ANTI', fecha: today , value: false },
+    ],
   });
 
   const fechaRef = useRef(null);
@@ -45,13 +59,25 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAntecedenteChange = (key, value) => {
-    setForm((prev) => ({
+  const handleAntecedenteChange = (key, newValue) => {
+    setForm(prev => ({
       ...prev,
-      antecedentes: {
-        ...prev.antecedentes,
-        [key]: value,
-      },
+      antecedentes: prev.antecedentes.map(item =>
+        item.key === key
+          ? { ...item, value: newValue }
+          : item
+      )
+    }));
+  };
+
+  const handleFechaChange = (key, nuevaFecha) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: prev.antecedentes.map(item =>
+        item.key === key
+          ? { ...item, fecha: nuevaFecha }
+          : item
+      )
     }));
   };
 
@@ -62,8 +88,19 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
-      fechaCoca: today,
-      antecedentes: createAntecedentesObject(),
+      antecedentes: [
+      { label: 'CONSUME MARIHUANA (THC)', key: 'MARIHUANA', fecha: today, value: false },
+      { label: 'CONSUME COCAINA (COC)', key: 'COCAINA', fecha: today, value: false  },
+      { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS', key: 'COCA', fecha: today, value: false  },
+      { label: 'CONSUME ANFETAMINAS (AMP)', key: 'ANFETAMINAS', fecha: today, value: false  },
+      { label: 'CONSUME METHANFETAMINAS (MET)', key: 'METAN', fecha: today, value: false  },
+      { label: 'CONSUME BENZODIAZEPINAS (BZO)', key: 'BENZO', fecha: today, value: false  },
+      { label: 'CONSUME OPIÁCEOS (OPI)', key: 'OPIA', fecha: today, value: false  },
+      { label: 'CONSUME BARBITÚRICOS (BAR)', key: 'BARBI', fecha: today, value: false  },
+      { label: 'CONSUME METADONA (MTD)', key: 'METADONA', fecha: today, value: false  },
+      { label: 'CONSUME FENCICLIDINA (PCP)', key: 'FENCI', fecha: today, value: false  },
+      { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', key: 'ANTI', fecha: today , value: false },
+    ],
     });
   };
 
@@ -74,8 +111,19 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
-      fechaCoca: today,
-      antecedentes: createAntecedentesObject(),
+      antecedentes: [
+      { label: 'CONSUME MARIHUANA (THC)', key: 'MARIHUANA', fecha: today, value: false },
+      { label: 'CONSUME COCAINA (COC)', key: 'COCAINA', fecha: today, value: false  },
+      { label: 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS', key: 'COCA', fecha: today, value: false  },
+      { label: 'CONSUME ANFETAMINAS (AMP)', key: 'ANFETAMINAS', fecha: today, value: false  },
+      { label: 'CONSUME METHANFETAMINAS (MET)', key: 'METAN', fecha: today, value: false  },
+      { label: 'CONSUME BENZODIAZEPINAS (BZO)', key: 'BENZO', fecha: today, value: false  },
+      { label: 'CONSUME OPIÁCEOS (OPI)', key: 'OPIA', fecha: today, value: false  },
+      { label: 'CONSUME BARBITÚRICOS (BAR)', key: 'BARBI', fecha: today, value: false  },
+      { label: 'CONSUME METADONA (MTD)', key: 'METADONA', fecha: today, value: false  },
+      { label: 'CONSUME FENCICLIDINA (PCP)', key: 'FENCI', fecha: today, value: false  },
+      { label: 'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', key: 'ANTI', fecha: today , value: false },
+    ],
     }));
   }
 
@@ -104,14 +152,14 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
       }
     });
   };
-
+  console.log(form.antecedentes)
   return (
     <form className="w-full max-w-7xl mx-auto bg-white p-8 rounded shadow">
       <div className="flex flex-wrap items-center gap-6 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
-          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'con_panel10D',token,setForm,selectedSede)}} />
+          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'con_panel10D',token,setForm,selectedSede,form)}} />
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Fecha :</label>
@@ -147,7 +195,7 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES</div>
       <div className="flex flex-col gap-y-4 mb-8">
-        {antecedentesList.map(({ label, key }) => (
+        {form.antecedentes.map(({ label, key, fecha, value }) => (
           <div key={key} className="flex items-center gap-6">
             <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
             <div className="flex items-center gap-4 ml-2">
@@ -155,7 +203,7 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
                 <input
                   type="radio"
                   name={`antecedente_${key}`}
-                  checked={form.antecedentes[key] === false || form.antecedentes[key] === undefined}
+                  checked={value === false}
                   onChange={() => handleAntecedenteChange(key, false)}
                 />
                 NO
@@ -164,19 +212,28 @@ const Panel10D = ({token,selectedSede,userlogued}) => {
                 <input
                   type="radio"
                   name={`antecedente_${key}`}
-                  checked={form.antecedentes[key] === true}
+                  checked={value === true}
                   onChange={() => handleAntecedenteChange(key, true)}
                 />
                 SI
               </label>
-              {label === 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' && form.antecedentes[key] === true && (
+
+              {value === true && (
+                  <input
+                    type="date"
+                    className="border rounded px-2 py-1 ml-4"
+                    value={fecha}
+                    onChange={e => handleFechaChange(key, e.target.value)}
+                  />
+              )}
+              {/*label === 'CONSUMO HOJA DE COCA EN LOS 14 DIAS PREVIOS' && form.antecedentes[key] === true && (
                 <input
                   type="date"
                   className="border rounded px-2 py-1 ml-4"
                   value={form.fechaCoca || ''}
                   onChange={e => setForm(prev => ({ ...prev, fechaCoca: e.target.value }))}
                 />
-              )}
+              )*/}
             </div>
           </div>
         ))}

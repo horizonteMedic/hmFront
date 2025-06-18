@@ -117,9 +117,9 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
     autoTable(doc, {
       startY: antY,
       body: [
-        ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`, `SI ( ${datos.antConsumeMarih ? "X" : " "} )`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumoMarihuana || ''}` : ''],
+        ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`, `SI ( ${datos.antConsumeMarih ? "X" : " "} )`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumeMarih || ''}` : ''],
         ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "} )`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " "} )`, datos.antConsumeHojaCoca ? `CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ''],
-        ['CONSUME COCAÍNA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`, `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`, datos.antConsumeCocacina ? `CUANDO: ${datos.fechaConsumoCocaina || ''}` : ''],
+        ['CONSUME COCAÍNA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`, `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`, datos.antConsumeCocacina ? `CUANDO: ${datos.fechaConsumeCocacina || ''}` : ''],
       ],
       theme: 'plain',
       styles: { fontSize: 9, cellPadding: 1 },

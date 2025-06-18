@@ -1,26 +1,38 @@
 import { URLAzure } from '../../../../../../config/config';
 
-export function GetInfoLaboratioEx(data, tabla, token, user, fechaCoca) {
-   
+export function GetInfoLaboratioEx(data, tabla, token, user) {
+
+    const camposAPI = {
+        MARIHUANA: { valor: 'antConsumeMarih', fecha: 'fechaConsumeMarih' },
+        COCAINA: { valor: 'antConsumeCocacina', fecha: 'fechaConsumeCocacina' },
+        COCA: { valor: 'antConsumeHojaCoca', fecha: 'fechaConsumoHojaCoca' },
+        ANFETAMINAS: { valor: 'antConsumeAnfetamina', fecha: 'fechaConsumeAnfetamina' },
+        METAN: { valor: 'antConsumeMethanfetaminaOOpiaceos', fecha: 'fechaConsumeMethanfetamina' },
+        BENZO: { valor: 'antConsumeBenzodiacepinas', fecha: 'fechaConsumeBenzodiacepinas' },
+        OPIA: { valor: 'antConsumeOpiacesos', fecha: 'fechaConsumeOpiacesos' },
+        BARBI: { valor: 'antConsumeBarbituricos', fecha: 'fechaConsumeBarbituricos' },
+        METADONA: { valor: 'antConsumeMetadona', fecha: 'fechaConsumeMetadona' },
+        FENCI: { valor: 'antConsumeFenciclidina', fecha: 'fechaConsumeFenciclidina' },
+        ANTI: { valor: 'antConsumeAntidepreTricicli', fecha: 'fechaConsumeAntidepreTricicli' }
+        };
+
     const body = {
         nameConset: tabla,
-        antConsumeMarih: data.antecedentes.MARIHUANA ?? false,
-        antConsumeCocacina: data.antecedentes.COCAINA ?? false,
-        antConsumeHojaCoca: data.antecedentes.COCA ?? false,
-        antConsumeAnfetamina: data.antecedentes.ANFETAMINAS ?? false,
-        antConsumeMethanfetamina: data.antecedentes.METAN ?? false,
-        antConsumeBenzodiacepinas: data.antecedentes.BENZO ?? false,
-        antConsumeOpiacesos: data.antecedentes.OPIA ?? false,
-        antConsumeBarbituricos: data.antecedentes.BARBI ?? false,
-        antConsumeMetadona: data.antecedentes.METADONA ?? false,
-        antConsumeFenciclidina: data.antecedentes.FENCI ?? false,
-        antConsumeAntidepreTricicli: data.antecedentes.ANTI ?? false,
         userRegistro: user,
         userMedicoOcup: "",
         fechaex: data.fecha,
-        fechaConsumoHojaCoca: fechaCoca,
         nOrden: data.norden
-    };    
+    };
+    
+    data.antecedentes.forEach(({ key, value, fecha }) => {
+        const campos = camposAPI[key];
+        if (campos) {
+        body[campos.valor] = value ?? false;
+        body[campos.fecha] = fecha ?? null;
+        }
+    });
+
+   
     console.log(JSON.stringify(body))
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
         const options = {

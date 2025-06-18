@@ -4,20 +4,10 @@ import { faEdit, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-ic
 import { PrintHojaR, SubmitConsentimientoLab, VerifyTR } from '../Controller/ControllerC';
 import Swal from 'sweetalert2';
 
-const antecedentesList = [
-  { label: 'CONSUME MARIHUANA', key: 'MARIHUANA' },
-];
 
 const ConsMarihuana = ({token,selectedSede,userlogued}) => {
-  const today = new Date().toISOString().split("T")[0];
-
-  const createAntecedentesObject = () => {
-    const obj = {};
-    antecedentesList.forEach(({ label }) => {
-      obj[label] = false;
-    });
-    return obj;
-  };
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
   const [form, setForm] = useState({
     norden: '',
@@ -25,7 +15,9 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
     nombres: '',
     edad: '',
     dni: '',
-    antecedentes: createAntecedentesObject()
+    antecedentes: [
+      { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
+    ]
   });
 
   const fechaRef = useRef(null);
@@ -34,15 +26,28 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleAntecedenteChange = (key, value) => {
-    setForm((prev) => ({
+  const handleAntecedenteChange = (key, newValue) => {
+    setForm(prev => ({
       ...prev,
-      antecedentes: {
-        ...prev.antecedentes,
-        [key]: value,
-      },
+      antecedentes: prev.antecedentes.map(item =>
+        item.key === key
+          ? { ...item, value: newValue }
+          : item
+      )
     }));
   };
+
+  const handleFechaChange = (key, nuevaFecha) => {
+    setForm(prev => ({
+      ...prev,
+      antecedentes: prev.antecedentes.map(item =>
+        item.key === key
+          ? { ...item, fecha: nuevaFecha }
+          : item
+      )
+    }));
+  };
+
 
   const handleLimpiar = () => {
     setForm({
@@ -51,7 +56,9 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
-      antecedentes: createAntecedentesObject()
+      antecedentes: [
+        { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
+      ]
     });
   };
 
@@ -62,7 +69,9 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
       nombres: '',
       edad: '',
       dni: '',
-      antecedentes: createAntecedentesObject(),
+      antecedentes: [
+        { label: 'CONSUME MARIHUANA', key: 'MARIHUANA', fecha: today, value: false },
+      ]
     }));
   }
 
@@ -97,7 +106,7 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Nro Orden :</label>
           <input name="norden" value={form.norden} onChange={handleInputChange} className="border rounded px-3 py-2 w-48 text-base"
-          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'consent_marihuana',token,setForm,selectedSede)}} />
+          onKeyUp={(event) => {if(event.key === 'Enter')handleset(),VerifyTR(form.norden,'consent_marihuana',token,setForm,selectedSede,form)}} />
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-lg">Fecha :</label>
@@ -132,7 +141,7 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
 
       <div className="font-semibold mb-2 text-lg">ANTECEDENTES :</div>
       <div className="flex flex-wrap gap-8 mb-8">
-        {antecedentesList.map(({ label, key }) => (
+        {form.antecedentes.map(({ label, key, fecha, value }) => (
           <div key={key} className="flex items-center gap-6">
             <label className="text-base font-medium flex-1 whitespace-nowrap">{label}</label>
             <div className="flex items-center gap-4 ml-2">
@@ -140,7 +149,7 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
                 <input
                   type="radio"
                   name={`antecedente_${key}`}
-                  checked={form.antecedentes[key] === false || form.antecedentes[key] === undefined}
+                  checked={value === false}
                   onChange={() => handleAntecedenteChange(key, false)}
                 />
                 NO
@@ -149,11 +158,20 @@ const ConsMarihuana = ({token,selectedSede,userlogued}) => {
                 <input
                   type="radio"
                   name={`antecedente_${key}`}
-                  checked={form.antecedentes[key] === true}
+                  checked={value === true}
                   onChange={() => handleAntecedenteChange(key, true)}
                 />
                 SI
               </label>
+
+              {value === true && (
+                  <input
+                    type="date"
+                    className="border rounded px-2 py-1 ml-4"
+                    value={fecha}
+                    onChange={e => handleFechaChange(key, e.target.value)}
+                  />
+              )}
             </div>
           </div>
         ))}

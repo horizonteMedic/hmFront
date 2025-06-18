@@ -119,10 +119,10 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
       autoTable(doc, {
         startY: antY,
         body: [
-          ['CONSUME MARIHUANA (THC)', `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`, `SI ( ${datos.antConsumeMarih ? "X" : " "} )`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumoMarihuana || ''}` : ''],
+          ['CONSUME MARIHUANA (THC)', `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`, `SI ( ${datos.antConsumeMarih ? "X" : " "} )`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumeMarih || ''}` : ''],
           ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "} )`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " "} )`, datos.antConsumeHojaCoca ? `CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ''],
-          ['CONSUME COCAÍNA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`, `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`, datos.antConsumeCocacina ? `CUANDO: ${datos.fechaConsumoCocaina || ''}` : ''],
-          ['CONSUME ÉXTASIS', `NO ( ${!datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, `SI ( ${datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, datos.antConsumeAnfetaminaOExtasis ? `CUANDO: ${datos.fechaConsumoExtasis || ''}` : ''],
+          ['CONSUME COCAÍNA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`, `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`, datos.antConsumeCocacina ? `CUANDO: ${datos.fechaConsumeCocacina || ''}` : ''],
+          ['CONSUME ÉXTASIS', `NO ( ${!datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, `SI ( ${datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, datos.antConsumeAnfetaminaOExtasis ? `CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ''],
         ],
         theme: 'plain',
         styles: { fontSize: 9, cellPadding: 1 },

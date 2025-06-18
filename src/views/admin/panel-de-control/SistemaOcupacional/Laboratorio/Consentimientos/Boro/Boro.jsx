@@ -26,7 +26,8 @@ const medicosList = [
 ];
 
 const Boro = ({ token, selectedSede, userlogued }) => {
-  const today = new Date().toISOString().split('T')[0];
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
   const [form, setForm] = useState({
     norden: '',
@@ -142,7 +143,7 @@ const Boro = ({ token, selectedSede, userlogued }) => {
             onKeyUp={(event) => {
               if (event.key === 'Enter'){
                 handleset()
-                VerifyTR(form.norden, 'consent_Boro', token, setForm, selectedSede, true);
+                VerifyTR(form.norden, 'consent_Boro', token, setForm, selectedSede, null,true);
               }
             }}
           />

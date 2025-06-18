@@ -122,12 +122,12 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
     autoTable(doc, {
       startY: y,
       body: [
-        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumoMarih || ''}` : ""}`],
-        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumoCocaina || ''}` : ""}`],
+        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumeMarih || ''}` : ""}`],
+        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumeCocacina || ''}` : ""}`],
         ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
-        ['CONSUME ÉXTASIS (EXT)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumoExtasis || ''}` : ""}`],
-        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeOpiaceos ? "X" : "    "})${datos.antConsumeOpiaceos ? `  CUANDO: ${datos.fechaConsumoOpiaceos || ''}` : ""}`],
-        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumoBenzodiacepinas || ''}` : ""}`],
+        ['CONSUME ÉXTASIS (EXT)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ""}`],
+        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeOpiaceos ? "X" : "    "})${datos.antConsumeOpiaceos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
+        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumeBenzodiacepinas || ''}` : ""}`],
       ],
       theme: 'plain',
       styles: { fontSize: 9, textColor: [0, 0, 0], cellPadding: 2 },

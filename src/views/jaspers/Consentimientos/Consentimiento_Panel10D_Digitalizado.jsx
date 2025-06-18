@@ -50,20 +50,20 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     // Resto del texto
     doc.setFont(undefined, 'normal');
     const bloque2 = `, de `;
-    doc.text(bloque2, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________'), y + 6);
+    doc.text(bloque2, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________'), y + 6);
     
     // Edad en negrita
     doc.setFont(undefined, 'bold');
-    doc.text(`${datos.edad || '___'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________') + doc.getTextWidth(bloque2), y + 6);
+    doc.text(`${datos.edad || '___'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________') + doc.getTextWidth(bloque2), y + 6);
     
     // Resto del texto
     doc.setFont(undefined, 'normal');
     const bloque3 = ` años de edad, identificado con DNI nº `;
-    doc.text(bloque3, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(datos.edad || '___'), y + 6);
+    doc.text(bloque3, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(String(datos.edad) || '___'), y + 6);
     
     // DNI en negrita
     doc.setFont(undefined, 'bold');
-    doc.text(`${datos.dni || '__________'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(datos.nombres || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(datos.edad || '___') + doc.getTextWidth(bloque3), y + 6);
+    doc.text(`${datos.dni || '__________'}`, 18 + doc.getTextWidth(bloque) + doc.getTextWidth(String(datos.nombres) || '_________________________') + doc.getTextWidth(bloque2) + doc.getTextWidth(String(datos.edad) || '___') + doc.getTextWidth(bloque3), y + 6);
     
     // Resto del texto
     doc.setFont(undefined, 'normal');
@@ -80,17 +80,17 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     autoTable(doc, {
       startY: antY + 2,
       body: [
-        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumoMarih || ''}` : ""}`],
-        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumoCocaina || ''}` : ""}`],
+        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumeMarih || ''}` : ""}`],
+        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumeCocacina || ''}` : ""}`],
         ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
-        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumoAnfetaminas || ''}` : ""}`],
-        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.fechaConsumoMetanfetaminas || ''}` : ""}`],
-        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumoBenzodiacepinas || ''}` : ""}`],
-        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`, `SI (${datos.antConsumeOpiacesos ? "X" : "    "})${datos.antConsumeOpiacesos ? `  CUANDO: ${datos.fechaConsumoOpiacesos || ''}` : ""}`],
-        ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`, `SI (${datos.antConsumeBarbituricos ? "X" : "    "})${datos.antConsumeBarbituricos ? `  CUANDO: ${datos.fechaConsumoBarbituricos || ''}` : ""}`],
-        ['CONSUME METADONA (MTD)', `NO (${!datos.antConsumeMetadona ? "X" : "    "})`, `SI (${datos.antConsumeMetadona ? "X" : "    "})${datos.antConsumeMetadona ? `  CUANDO: ${datos.fechaConsumoMetadona || ''}` : ""}`],
-        ['CONSUME FENCICLIDINA (PCP)', `NO (${!datos.antConsumeFenciclidina ? "X" : "    "})`, `SI (${datos.antConsumeFenciclidina ? "X" : "    "})${datos.antConsumeFenciclidina ? `  CUANDO: ${datos.fechaConsumoFenciclidina || ''}` : ""}`],
-        ['CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "    "})`, `SI (${datos.antConsumeAntidepreTricicli ? "X" : "    "})${datos.antConsumeAntidepreTricicli ? `  CUANDO: ${datos.fechaConsumoAntidepresivos || ''}` : ""}`],
+        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ""}`],
+        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.fechaConsumeMethanfetamina || ''}` : ""}`],
+        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumeBenzodiacepinas || ''}` : ""}`],
+        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`, `SI (${datos.antConsumeOpiacesos ? "X" : "    "})${datos.antConsumeOpiacesos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
+        ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`, `SI (${datos.antConsumeBarbituricos ? "X" : "    "})${datos.antConsumeBarbituricos ? `  CUANDO: ${datos.fechaConsumeBarbituricos || ''}` : ""}`],
+        ['CONSUME METADONA (MTD)', `NO (${!datos.antConsumeMetadona ? "X" : "    "})`, `SI (${datos.antConsumeMetadona ? "X" : "    "})${datos.antConsumeMetadona ? `  CUANDO: ${datos.fechaConsumeMetadona || ''}` : ""}`],
+        ['CONSUME FENCICLIDINA (PCP)', `NO (${!datos.antConsumeFenciclidina ? "X" : "    "})`, `SI (${datos.antConsumeFenciclidina ? "X" : "    "})${datos.antConsumeFenciclidina ? `  CUANDO: ${datos.fechaConsumeFenciclidina || ''}` : ""}`],
+        ['CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "    "})`, `SI (${datos.antConsumeAntidepreTricicli ? "X" : "    "})${datos.antConsumeAntidepreTricicli ? `  CUANDO: ${datos.fechaConsumeAntidepreTricicli || ''}` : ""}`],
       ],
       theme: 'plain',
       styles: { fontSize: 9, cellPadding: 1 },

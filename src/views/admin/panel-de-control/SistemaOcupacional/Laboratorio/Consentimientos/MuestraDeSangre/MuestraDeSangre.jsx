@@ -19,8 +19,8 @@ const antecedentesList = [
 ];
 
 const MuestraDeSangre = ({token,selectedSede,userlogued}) => {
-  const today = new Date().toISOString().split("T")[0];
-
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const createAntecedentesObject = () => {
     const obj = {};
     antecedentesList.forEach(({ label }) => {

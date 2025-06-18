@@ -118,7 +118,7 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
     autoTable(doc, {
       startY: antY,
       body: [
-        ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "})`, `SI ( ${datos.antConsumeMarih ? "X" : " " })`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumoMarihuana || ''}` : ''],
+        ['CONSUME MARIHUANA', `NO ( ${!datos.antConsumeMarih ? "X" : " "})`, `SI ( ${datos.antConsumeMarih ? "X" : " " })`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumeMarih || ''}` : ''],
       ],
       theme: 'plain',
       styles: { fontSize: 9, cellPadding: 1 },

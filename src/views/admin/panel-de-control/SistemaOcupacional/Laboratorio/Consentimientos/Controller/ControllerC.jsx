@@ -1,19 +1,23 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
 import { GetInfoLaboratioEx, SubmitInfoLaboratioExBoro } from "./model.js";
-const backendToKeyMap = {
-  antConsumeMarih: 'MARIHUANA',
-  antConsumeCocacina: 'COCAINA',
-  antConsumeHojaCoca: 'COCA',
-  antConsumeAnfetaminaOExtasis: 'ANFETAMINAS',
-  antConsumeMethanfetaminaOOpiaceos: 'METAN',
-  antConsumeBenzodiacepinas: 'BENZO',
-  antConsumeOpiacesos: 'OPIA',
-  antConsumeBarbituricos: 'BARBI',
-  antConsumeMetadona: 'METADONA',
-  antConsumeFenciclidina: 'FENCI',
-  antConsumeAntidepreTricicli: 'ANTI',
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+const camposAPI = {
+  MARIHUANA: { valor: 'antConsumeMarih', fecha: 'fechaConsumeMarih' },
+  COCAINA: { valor: 'antConsumeCocacina', fecha: 'fechaConsumeCocacina' },
+  COCA: { valor: 'antConsumeHojaCoca', fecha: 'fechaConsumoHojaCoca' },
+  ANFETAMINAS: { valor: 'antConsumeAnfetaminaOExtasis', fecha: 'fechaConsumeAnfetamina' },
+  METAN: { valor: 'antConsumeMethanfetaminaOOpiaceos', fecha: 'fechaConsumeMethanfetamina' },
+  BENZO: { valor: 'antConsumeBenzodiacepinas', fecha: 'fechaConsumeBenzodiacepinas' },
+  OPIA: { valor: 'antConsumeOpiacesos', fecha: 'fechaConsumeOpiacesos' },
+  BARBI: { valor: 'antConsumeBarbituricos', fecha: 'fechaConsumeBarbituricos' },
+  METADONA: { valor: 'antConsumeMetadona', fecha: 'fechaConsumeMetadona' },
+  FENCI: { valor: 'antConsumeFenciclidina', fecha: 'fechaConsumeFenciclidina' },
+  ANTI: { valor: 'antConsumeAntidepreTricicli', fecha: 'fechaConsumeAntidepreTricicli' }
 };
+
 
 const Loading = (text) => {
     Swal.fire({
@@ -44,7 +48,7 @@ const Loading = (text) => {
 
 }
 
-export const VerifyTR = async (nro,tabla,token,set,sede, boro = false) => {
+export const VerifyTR = async (nro,tabla,token,set,sede, form,boro = false) => {
     if (!nro) { 
       await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
       return
@@ -56,7 +60,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede, boro = false) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoPacLaboratorioFil(nro,tabla,set,token, boro)
+            GetInfoPacLaboratorioFil(nro,tabla,set,token, boro, form)
         }
     })
 }
@@ -76,8 +80,8 @@ export const GetInfoPac = (nro,set,token,sede) => {
     })
 }
 
-export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro) => {
-  console.log(boro)
+export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro, form) => {
+  
   if (boro === true) {
     getFetch(`/api/v01/ct/laboratorio/consentimientoLaboratorioBoro?nOrden=${nro}&nameConset=${tabla}`,token)
     .then((res) => {
@@ -100,18 +104,28 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token, boro) => {
     getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${nro}&nameConset=${tabla}`,token)
     .then((res) => {
       if (res.norden) {
-        console.log('registrao datos',res)
-        const antecedentesConvertidos = {};
-
-        for (const [backendKey, localKey] of Object.entries(backendToKeyMap)) {
-          antecedentesConvertidos[localKey] = res.hasOwnProperty(backendKey) ? res[backendKey] : false;
+        if (tabla === 'consent_Muestra_Sangre') {
+          set(prev => ({
+            ...prev,
+            ...res,
+          }));
+        } else {
+          const antecedentesActualizados = form.antecedentes.map((item) => {
+            const campos = camposAPI[item.key] || {};
+            return {
+              ...item,
+              value: res[campos.valor] ?? false,
+              fecha: res[campos.fecha] ?? today
+            };
+          });
+          
+          set(prev => ({
+            ...prev,
+            ...res,
+            antecedentes: antecedentesActualizados,
+          }));
         }
-        set(prev => ({
-          ...prev,
-          ...res,
-          antecedentes: antecedentesConvertidos,
-          fechaCoca: res.fechaConsumoHojaCoca
-        }));
+
       } else {
         Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
       }

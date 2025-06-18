@@ -1,7 +1,8 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/LaboratorioClinico/Hematologia/Hematologia.jsx
-import React, { useReducer, useEffect, useCallback } from 'react'
+import React, { useReducer, useEffect, useCallback, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
+import { VerifyTR } from '../ControllerLC/ControllerLC'
 
 const PRUEBAS = [
   'HEMOGLOBINA',
@@ -24,12 +25,13 @@ const DIFERENCIAL = [
   'LINFOCITOS (%)'
 ]
 
-const today = new Date().toISOString().split('T')[0]
+const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
 const initialState = {
   norden: '',
   fecha: today,
-  nombres: '',
+  paciente: '',
   edad: '',
   resultados: Array(PRUEBAS.length).fill(''),
   recuentos: Array(DIFERENCIAL.length).fill(''),
@@ -53,31 +55,57 @@ function reducer(state, action) {
   }
 }
 
-export default function Hematologia({ apiBase, token, selectedSede }) {
-  const [form, dispatch] = useReducer(reducer, initialState)
+export default function Hematologia({ apiBase, token, selectedSede, userlogued }) {
+  const tabla = 'hemograma_autom'
+  const [form, setForm] = useState({
+     norden: '',
+    fecha: today,
+    paciente: '',
+    edad: '',
+    pruebas: [
+      { key: 'HEMOGLOBINA', value: ''},
+      { key: 'HEMATOCRITO', value: ''},
+      { key: 'HEMATÍES', value: ''},
+      { key: 'Volumen Corpuscular medio', value: ''},
+      { key: 'Hemoglobina Corpuscular media', value: ''},
+      { key: 'Concentración de la Hemoglobina Corpuscular', value: ''},
+      { key: 'LEUCOCITOS', value: ''},
+      { key: 'PLAQUETAS', value: ''},
+    ],
+    recuentos: [
+      { key: 'NEUTRÓFILOS (%)', value: ''},
+      { key: 'ABASTONADOS (%)', value: ''},
+      { key: 'SEGMENTADOS (%)', value: ''},
+      { key: 'MONOCITOS (%)', value: ''},
+      { key: 'EOSINÓFILOS (%)', value: ''},
+      { key: 'BASÓFILOS (%)', value: ''},
+      { key: 'LINFOCITOS (%)', value: ''}
+    ],
+    medico: ''
+  })
   const [status, setStatus] = React.useState('')
+  
+  console.log(form)
 
-  // cargar datos cuando cambia norden
-  useEffect(() => {
-    if (!form.norden) return
-    async function load() {
-      // const res = await fetch(`${apiBase}/hematologia/${form.norden}`, {
-      //   headers: { Authorization: `Bearer ${token}` }
-      // })
-      // const data = await res.json()
-      // dispatch({ type: 'LOAD', payload: data })
-    }
-    load()
-  }, [form.norden, apiBase, token])
-
-  const onChange = useCallback(e => {
+  const onChange = (e) => {
     const { name, value } = e.target
-    dispatch({ type: 'SET_FIELD', field: name, value })
-  }, [])
+    setForm({ ...form, [name]: value.toUpperCase() })
+  }
 
-  const onArrayChange = useCallback((field, idx) => e => {
-    dispatch({ type: 'SET_ARRAY', field, index: idx, value: e.target.value })
-  }, [])
+  const onArrayChange = (campo, index) => (e) => {
+    const nuevoValor = e.target.value;
+    setForm((prev) => {
+      const nuevoArray = [...prev[campo]];
+      nuevoArray[index] = {
+        ...nuevoArray[index],
+        value: nuevoValor
+      };
+      return {
+        ...prev,
+        [campo]: nuevoArray
+      };
+    });
+  };
 
   const handleSave = useCallback(async () => {
     try {
@@ -96,14 +124,40 @@ export default function Hematologia({ apiBase, token, selectedSede }) {
     }
   }, [form, apiBase, token, selectedSede])
 
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'RESET' })
-    setStatus('Formulario limpiado')
-  }, [])
+  const handleClear = () => {
+    setForm({
+       norden: '',
+    fecha: today,
+    paciente: '',
+    edad: '',
+    pruebas: [
+      { key: 'HEMOGLOBINA', value: ''},
+      { key: 'HEMATOCRITO', value: ''},
+      { key: 'HEMATÍES', value: ''},
+      { key: 'Volumen Corpuscular medio', value: ''},
+      { key: 'Hemoglobina Corpuscular media', value: ''},
+      { key: 'Concentración de la Hemoglobina Corpuscular', value: ''},
+      { key: 'LEUCOCITOS', value: ''},
+      { key: 'PLAQUETAS', value: ''},
+    ],
+    recuentos: [
+      { key: 'NEUTRÓFILOS (%)', value: ''},
+      { key: 'ABASTONADOS (%)', value: ''},
+      { key: 'SEGMENTADOS (%)', value: ''},
+      { key: 'MONOCITOS (%)', value: ''},
+      { key: 'EOSINÓFILOS (%)', value: ''},
+      { key: 'BASÓFILOS (%)', value: ''},
+      { key: 'LINFOCITOS (%)', value: ''}
+    ],
+    medico: ''
+    })
+  }
 
   const handlePrint = useCallback(() => {
     window.open(`${apiBase}/hematologia/print?norden=${form.norden}`, '_blank')
   }, [apiBase, form.norden])
+
+
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded shadow p-6 space-y-6">
@@ -111,13 +165,14 @@ export default function Hematologia({ apiBase, token, selectedSede }) {
 
       {/* Encabezado */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={onChange} />
+        <Field label="Nro Ficha" name="norden" value={form.norden} 
+        onKeyup={(event) => {if(event.key === 'Enter')VerifyTR(form.norden,tabla,token,setForm, selectedSede)}} onChange={onChange} />
         <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={onChange} />
       </div>
 
       {/* Paciente */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} disabled />
+        <Field label="paciente" name="paciente" value={form.paciente} disabled />
         <Field label="Edad" name="edad" value={form.edad} disabled />
       </div>
 
@@ -134,8 +189,8 @@ export default function Hematologia({ apiBase, token, selectedSede }) {
                 <span className="flex-1">{lbl}</span>
                 <input
                   className="border rounded px-2 py-1 w-32"
-                  value={form.resultados[i]}
-                  onChange={onArrayChange('resultados', i)}
+                  value={form.pruebas[i].value}
+                  onChange={onArrayChange('pruebas', i)}
                 />
               </div>
             ))}
@@ -201,7 +256,7 @@ export default function Hematologia({ apiBase, token, selectedSede }) {
 }
 
 // Input field component
-function Field({ label, name, type = 'text', value, onChange, disabled }) {
+function Field({ label, name, type = 'text', value, onKeyup, onChange, disabled }) {
   return (
     <div className="flex flex-col">
       <label className="font-semibold mb-1">{label}</label>
@@ -209,6 +264,7 @@ function Field({ label, name, type = 'text', value, onChange, disabled }) {
         type={type}
         name={name}
         value={value}
+        onKeyUp={onKeyup}
         disabled={disabled}
         onChange={onChange}
         className={`border rounded px-2 py-1 ${disabled ? 'bg-gray-100' : ''}`}

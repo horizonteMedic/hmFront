@@ -9,7 +9,8 @@ import DatePicker from 'react-datepicker';
 
 const Triaje = ({token,selectedSede}) => {
   //Para la busqueda
-  const today = new Date();
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const debounceTimeout = useRef(null);
   // Estado para tab principal
   const [activeTab, setActiveTab] = useState('datos');

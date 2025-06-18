@@ -6,7 +6,8 @@ import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 const PRUEBAS = ['MARIHUANA (THC)', 'COCAINA (COC)'];
 
 export default function Resultado_Panel2D({ apiBase, token, selectedSede }) {
-  const today = new Date().toISOString().split('T')[0];
+ const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const [form, setForm] = useState({
     norden: '',
     fecha: today,

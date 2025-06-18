@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import microscopioImg from './microscopio.webp';
+import { VerifyTR } from '../ControllerLC/ControllerLC';
 
-export const HematologiaBioquimicaSIEO = () => {
+export const HematologiaBioquimicaSIEO = ({token, selectedSede, userlogued}) => {
+  const tabla = 'lab_clinico'
   const [form, setForm] = useState({
     ficha: true,
+    norden: '',
     responsable: '',
     paciente: '',
     empContratista: '',
@@ -38,6 +41,10 @@ export const HematologiaBioquimicaSIEO = () => {
 
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
@@ -96,7 +103,10 @@ export const HematologiaBioquimicaSIEO = () => {
           <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Consultas</label>
           <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1"/> Particular</label>
           <label className="font-medium flex items-center whitespace-nowrap"><input type="checkbox" className="mr-1" defaultChecked/> Ficha Médica Ocupacional</label>
-          <label className="font-medium flex items-center whitespace-nowrap">N° Orden:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
+          <label className="font-medium flex items-center whitespace-nowrap">
+            N° Orden:<input name='norden' value={form.norden} onChange={handleInputChange} className="border rounded px-2 py-1 w-28 text-md ml-1" 
+            onKeyUp={(event) => {if(event.key === 'Enter')VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}/>
+          </label>
           <label className="font-medium flex items-center whitespace-nowrap">N° Recibo:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
           <label className="font-medium flex items-center whitespace-nowrap">DNI:<input className="border rounded px-2 py-1 w-28 text-md ml-1" /></label>
           <label className="font-medium flex items-center whitespace-nowrap">Fecha:<input type="date" className="border rounded px-2 py-1 w-36 text-md ml-1" /></label>
