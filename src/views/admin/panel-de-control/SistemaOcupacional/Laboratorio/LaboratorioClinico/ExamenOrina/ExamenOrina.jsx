@@ -1,111 +1,98 @@
 // src/views/Orina/Orina.jsx
-import React, { useReducer, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons'
 
 const physicalLabels  = ['Incoloro','Medicamentosa','Transparente','Turbio','No Aplica']
-const chemicalLabels  = ['Nitritos','Proteínas','Cetonas','Leucocitos','Ac. Ascórbico','Urobilinógeno','Bilirrubina','Glucosa','Sangre']
-const sedimentLabels  = ['Leucocitos','Hematíes','Cel. Epiteliales','Cristales','Cilindros','Bacterias','GRAM S/C','Otros']
-const drugLabels      = ['Cocaína','Marihuana']
-const posNegLabels    = ['Pos.','Neg.','N/A']
+const chemicalLabels  = ['Nitritos','Proteínas','Cetonas','LeucocitosQ','AcAscorbico','Urobilinogeno','Bilirrubina','GlucosaQ','Sangre']
+const sedimentLabels  = ['LeucocitosS','Hematies','CelEpiteliales','Cristales','Cilindros','Bacterias','GramSC','Otros']
+const drugLabels      = ['Cocaina','Marihuana']
+const posNegLabels    = ['ScreeningPos','ScreeningNeg','ScreeningNA','ConfirmPos','ConfirmNeg','ConfirmNA']
 
-const makeMap = (keys, init) =>
-  keys.reduce((o,k) => ({ ...o, [k]: typeof init==='function'? init(k) : init }), {})
-
-const initialState = {
-  physicalOptions: makeMap(physicalLabels, false),
-  physicalDetails: { Color:'', Aspecto:'N/A', Densidad:'', PH:'' },
-  chemical:       makeMap(chemicalLabels,   'NEGATIVO'),
-  sediment:       makeMap(sedimentLabels,   ''),
-  drugValues:     makeMap(drugLabels,       ''),
-  screeningFlags: makeMap(posNegLabels,     false),
-  confirmFlags:   makeMap(posNegLabels,     false),
-  observaciones:  '',
-  print:          { orden:false, recibo:false, value:'' },
+const initialForm = {
+  // Examen Físico
+  Incoloro: false,
+  Medicamentosa: false,
+  Transparente: false,
+  Turbio: false,
+  NoAplica: false,
+  Color: '',
+  Aspecto: 'N/A',
+  Densidad: '',
+  PH: '',
+  // Examen Químico
+  Nitritos: 'NEGATIVO',
+  Proteínas: 'NEGATIVO',
+  Cetonas: 'NEGATIVO',
+  LeucocitosQ: 'NEGATIVO',
+  AcAscorbico: 'NEGATIVO',
+  Urobilinogeno: 'NEGATIVO',
+  Bilirrubina: 'NEGATIVO',
+  GlucosaQ: 'NEGATIVO',
+  Sangre: 'NEGATIVO',
+  // Sedimento
+  LeucocitosS: '',
+  Hematies: '',
+  CelEpiteliales: '',
+  Cristales: '',
+  Cilindros: '',
+  Bacterias: '',
+  GramSC: '',
+  Otros: '',
+  // Drogas
+  Cocaina: '',
+  Marihuana: '',
+  ScreeningPos: false,
+  ScreeningNeg: false,
+  ScreeningNA: false,
+  ConfirmPos: false,
+  ConfirmNeg: false,
+  ConfirmNA: false,
+  // Observaciones
+  observaciones: '',
+  // Imprimir
+  printOrden: false,
+  printRecibo: false,
+  printValue: ''
 }
 
-function reducer(state, action) {
-  switch(action.type) {
-    case 'SET_FIELD':
-      return { ...state, [action.field]: action.value }
-    case 'SET_NESTED':
-      return {
-        ...state,
-        [action.section]: {
-          ...state[action.section],
-          [action.key]: action.value
-        }
-      }
-    case 'RESET':
-      return initialState
-    case 'LOAD_PAYLOAD':
-      return { ...state, ...action.payload }
-    default:
-      return state
+export default function ExamenOrina() {
+  const [form, setForm] = useState(initialForm)
+
+  const setField = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }))
   }
-}
 
-export default function Orina() {
-  const [form, dispatch] = useReducer(reducer, initialState)
-
-  useEffect(() => {
-    if (!form.print.value) return
-    async function load() {
-      // const res = await fetch(`/api/orina/${form.print.value}`)
-      // const data = await res.json()
-      // dispatch({ type:'LOAD_PAYLOAD', payload:data })
-    }
-    load()
-  }, [form.print.value])
-
-  const onNested = useCallback((section, key, val) => {
-    dispatch({ type:'SET_NESTED', section, key, value:val })
-  }, [])
-
-  const onChange = useCallback(e => {
+  const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
-    if (name.startsWith('print.')) {
-      const k = name.split('.')[1]
-      dispatch({
-        type:'SET_NESTED',
-        section:'print',
-        key:k,
-        value: type==='checkbox' ? checked : value
-      })
-    } else if (initialState.hasOwnProperty(name)) {
-      dispatch({
-        type:'SET_FIELD',
-        field:name,
-        value: type==='checkbox' ? checked : value
-      })
-    }
-  }, [])
+    setField(name, type === 'checkbox' ? checked : value)
+  }
 
-  const handleClear = useCallback(() => dispatch({ type:'RESET' }), [])
-  const handleSave  = useCallback(() => {
+  const handleClear = () => setForm(initialForm)
+  const handleSave = () => {
     // await fetch('/api/orina',{method:'POST',body:JSON.stringify(form)})
     console.log('Guardando', form)
-  }, [form])
-  const handlePrint = useCallback(() => {
+  }
+  const handlePrint = () => {
     window.open(
-      `/api/orina/print/${form.print.value}?orden=${form.print.orden}&recibo=${form.print.recibo}`,
+      `/api/orina/print/${form.printValue}?orden=${form.printOrden}&recibo=${form.printRecibo}`,
       '_blank'
     )
-  }, [form.print])
+  }
 
   return (
     <div className="p-4 grid grid-cols-5 gap-4">
       {/* == IZQUIERDA: 3/5 == */}
       <div className="col-span-3 bg-white p-3 rounded shadow space-y-4">
-
         <Section title="Examen Físico">
           <div className="grid grid-cols-3 gap-2">
             {physicalLabels.map(opt => (
               <label key={opt} className="flex items-center gap-1">
                 <input
                   type="checkbox"
-                  checked={form.physicalOptions[opt]}
-                  onChange={e=>onNested('physicalOptions',opt,e.target.checked)}
+                  name={opt}
+                  checked={form[opt]}
+                  onChange={handleInputChange}
                 />
                 {opt}
               </label>
@@ -118,15 +105,17 @@ export default function Orina() {
                 {f==='Aspecto'
                   ? <select
                       className="border rounded p-1"
-                      value={form.physicalDetails[f]}
-                      onChange={e=>onNested('physicalDetails',f,e.target.value)}
+                      name={f}
+                      value={form[f]}
+                      onChange={handleInputChange}
                     >
                       <option>N/A</option><option>Claro</option><option>Turbio</option>
                     </select>
                   : <input
                       className="border rounded p-1"
-                      value={form.physicalDetails[f]}
-                      onChange={e=>onNested('physicalDetails',f,e.target.value)}
+                      name={f}
+                      value={form[f]}
+                      onChange={handleInputChange}
                     />
                 }
               </div>
@@ -138,11 +127,12 @@ export default function Orina() {
           <div className="grid grid-cols-2 gap-2">
             {chemicalLabels.map(lbl=>(
               <div key={lbl} className="flex items-center gap-2">
-                <span className="w-28 font-medium text-sm">{lbl}:</span>
+                <span className="w-28 font-medium text-sm">{lbl.replace('Q','')}:</span>
                 <input
                   className="border rounded p-1 w-full"
-                  value={form.chemical[lbl]}
-                  onChange={e=>onNested('chemical',lbl,e.target.value)}
+                  name={lbl}
+                  value={form[lbl]}
+                  onChange={handleInputChange}
                 />
               </div>
             ))}
@@ -153,11 +143,12 @@ export default function Orina() {
           <div className="grid grid-cols-2 gap-2">
             {sedimentLabels.map(lbl=>(
               <div key={lbl} className="flex items-center gap-2">
-                <span className="w-32 font-medium text-sm">{lbl}:</span>
+                <span className="w-32 font-medium text-sm">{lbl.replace('S','')}:</span>
                 <input
                   className="border rounded p-1 w-full"
-                  value={form.sediment[lbl]}
-                  onChange={e=>onNested('sediment',lbl,e.target.value)}
+                  name={lbl}
+                  value={form[lbl]}
+                  onChange={handleInputChange}
                 />
               </div>
             ))}
@@ -165,39 +156,42 @@ export default function Orina() {
         </Section>
 
         <Section title="Drogas">
-          <div className="grid grid-cols-3 gap-2 mb-2">
-            {posNegLabels.map(lbl=>(
-              <label key={lbl} className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  checked={form.screeningFlags[lbl]}
-                  onChange={e=>onNested('screeningFlags',lbl,e.target.checked)}
-                />
-                {lbl}
-              </label>
-            ))}
-          </div>
           <div className="space-y-2">
             {drugLabels.map(drug=>(
               <div key={drug} className="flex items-center gap-2">
                 <span className="w-32 font-medium text-sm">{drug}:</span>
                 <input
                   className="border rounded p-1 w-full"
-                  value={form.drugValues[drug]}
-                  onChange={e=>onNested('drugValues',drug,e.target.value)}
+                  name={drug}
+                  value={form[drug]}
+                  onChange={handleInputChange}
                 />
               </div>
             ))}
           </div>
           <div className="grid grid-cols-3 gap-2 mt-2">
-            {posNegLabels.map(lbl=>(
+            {['ScreeningPos','ScreeningNeg','ScreeningNA'].map(lbl=>(
               <label key={lbl} className="flex items-center gap-1">
                 <input
                   type="checkbox"
-                  checked={form.confirmFlags[lbl]}
-                  onChange={e=>onNested('confirmFlags',lbl,e.target.checked)}
+                  name={lbl}
+                  checked={form[lbl]}
+                  onChange={handleInputChange}
                 />
-                {lbl}
+                {lbl.replace('Screening','')}
+              </label>
+            ))}
+          </div>
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {['ConfirmPos','ConfirmNeg','ConfirmNA'].map(lbl=>(
+              <label key={lbl} className="flex items-center gap-1">
+                <input
+                  type="checkbox"
+                  name={lbl}
+                  checked={form[lbl]}
+                  onChange={handleInputChange}
+                />
+                {lbl.replace('Confirm','')}
               </label>
             ))}
           </div>
@@ -206,8 +200,9 @@ export default function Orina() {
         <Section title="Observaciones">
           <textarea
             className="border rounded w-full h-24 p-2"
+            name="observaciones"
             value={form.observaciones}
-            onChange={e=>dispatch({ type:'SET_FIELD', field:'observaciones', value:e.target.value })}
+            onChange={handleInputChange}
           />
         </Section>
 
@@ -223,25 +218,25 @@ export default function Orina() {
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            name="print.orden"
-            checked={form.print.orden}
-            onChange={onChange}
+            name="printOrden"
+            checked={form.printOrden}
+            onChange={handleInputChange}
           />
           <label>Nro Orden</label>
         </div>
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            name="print.recibo"
-            checked={form.print.recibo}
-            onChange={onChange}
+            name="printRecibo"
+            checked={form.printRecibo}
+            onChange={handleInputChange}
           />
           <label>Nro Recibo</label>
         </div>
         <input
-          name="print.value"
-          value={form.print.value}
-          onChange={onChange}
+          name="printValue"
+          value={form.printValue}
+          onChange={handleInputChange}
           placeholder="Código..."
           className="border rounded p-1 w-full"
         />
