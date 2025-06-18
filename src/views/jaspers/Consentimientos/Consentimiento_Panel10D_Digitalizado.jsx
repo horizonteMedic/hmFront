@@ -70,7 +70,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     const bloque4 = `; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.`;
     doc.text(bloque4, 18, y + 13, { maxWidth: 176, lineHeightFactor: 1.5, align: 'justify' });
     
-    y += 25;
+    y += 30;
 
     // Antecedentes (tabla) centrados
     let antY = y;
@@ -84,7 +84,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
         ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumeCocacina || ''}` : ""}`],
         ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
         ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ""}`],
-        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.fechaConsumeMethanfetamina || ''}` : ""}`],
+        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.antConsumeMethanfetaminaOOpiaceos || ''}` : ""}`],
         ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumeBenzodiacepinas || ''}` : ""}`],
         ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`, `SI (${datos.antConsumeOpiacesos ? "X" : "    "})${datos.antConsumeOpiacesos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
         ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`, `SI (${datos.antConsumeBarbituricos ? "X" : "    "})${datos.antConsumeBarbituricos ? `  CUANDO: ${datos.fechaConsumeBarbituricos || ''}` : ""}`],
@@ -100,7 +100,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     });
 
     // Recuadros de firmas y huella
-    const baseY = doc.lastAutoTable.finalY + 10;
+    const baseY = doc.lastAutoTable.finalY + 20;
     // Huella
     doc.rect(25, baseY, 28, 32);
     doc.setFontSize(10);
