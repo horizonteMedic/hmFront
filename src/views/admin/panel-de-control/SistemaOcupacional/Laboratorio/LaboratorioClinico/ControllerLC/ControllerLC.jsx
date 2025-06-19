@@ -61,3 +61,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
       Swal.close()
     })
 }
+
+export const SubmitHematologia = () => {
+  
+}

@@ -4,9 +4,13 @@ import { VerifyTR } from '../ControllerLC/ControllerLC';
 
 export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) => {
   const tabla = 'lab_clinico';
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
   const [form, setForm] = useState({
     ficha: true,
     norden: '',
+    fecha: today,
     responsable: '',
     paciente: '',
     empContratista: '',
@@ -93,7 +97,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
   };
 
   const [status, setStatus] = useState('');
-
+  console.log(form)
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Barra superior */}
