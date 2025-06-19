@@ -7,202 +7,200 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
   const doc = new jsPDF();
   headerConsentimiento(doc, datos);
 
+  // Carga de imágenes (huella, firma, sello)
   const huella = datos.digitalizacion.find(d => d.nombreDigitalizacion === "HUELLA");
-  const firma = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const isValidUrl = url => url && url !== "Sin registro";
-
+  const firma  = datos.digitalizacion.find(d => d.nombreDigitalizacion === "FIRMAP");
+  const sello  = datos.digitalizacion.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const isValid = url => url && url !== "Sin registro";
   const loadImg = src =>
     new Promise((res, rej) => {
       const img = new Image();
-      img.src = src;
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
+      img.src = src; img.crossOrigin = 'anonymous';
+      img.onload  = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
-  Promise.all([
-    isValidUrl(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
-    isValidUrl(firma?.url) ? loadImg(firma.url) : Promise.resolve(null),
-    isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
-  ])
-   .then(([huellap, firmap, sellop]) => {
-    let y = 44;
-    const pageW = doc.internal.pageSize.getWidth();
-    const margin = 15;
 
-    // Título subrayado y negrita con salto de línea
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(12);
-    doc.text('CONSENTIMIENTO INFORMADO PARA LA TOMA DE', pageW / 2, y, { align: 'center' });
-    y += 6;
-    doc.text('MUESTRA DE SANGRE', pageW / 2, y, { align: 'center' });
-    doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
+  Promise.all([
+    isValid(huella?.url) ? loadImg(huella.url) : Promise.resolve(null),
+    isValid(firma?.url)  ? loadImg(firma.url)  : Promise.resolve(null),
+    isValid(sello?.url)  ? loadImg(sello.url)  : Promise.resolve(null)
+  ]).then(([huellap, firmap, sellop]) => {
+
+    const pageW  = doc.internal.pageSize.getWidth();
+    const margin = 15;
+    let y        = 44;
+
+    // ─── 1) TÍTULO CON SUBRAYADO ─────────────────────────
+    const titulo = 'CONSENTIMIENTO INFORMADO PARA LA TOMA DE MUESTRA DE SANGRE';
+    doc.setFont('helvetica','bold').setFontSize(14);
+    doc.text(titulo, pageW/2, y, { align:'center' });
+    // Subrayado (línea recta debajo del título)
+    const wT = doc.getTextWidth(titulo);
+    const xT = (pageW - wT) / 2;
+    doc.setLineWidth(0.7);
+    doc.line(xT, y + 2, xT + wT, y + 2);
+    doc.setLineWidth(0.2);
+
+    y += 18;
     doc.setFontSize(11);
 
-    // Cuerpo del consentimiento con campos en negrita
-    y += 10;
-    doc.setFont(undefined, 'normal');
-    const bloqueNormal1 = 'Yo ';
-    const bloqueNegrita1 = String(datos.nombres || '_________________________');
-    const bloqueNormal2 = ' , de ';
-    const bloqueNegrita2 = String(datos.edad || '___');
-    const bloqueNormal3 = ' años de edad, identificado con DNI nº ';
-    const bloqueNegrita3 = String(datos.dni || '__________');
-    const bloqueNormal4 = '; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va ha realizar según solicitud del protocolo médico de la empresa ';
-    const bloqueNegrita4 = String(datos.empresa || '_________________________');
-    const bloqueNormal5 = '; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra de sangre para cumplir con los exámenes pertinentes.';
+    // ─── 2) PREPARAR DATOS Y TEXTO ────────────────────
+    const nombre  = String(datos.nombres  || '_________________________').trim();
+    const edad    = String(datos.edad     || '___').trim();
+    const dni     = String(datos.dni      || '__________').trim();
+    const empresa = String(datos.empresa  || '_________________________').trim();
 
-    const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4 + bloqueNegrita4 + bloqueNormal5;
-    const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
-    let yBloque = y;
-    lines.forEach(line => {
-      let x = margin;
-      // Detectar y renderizar los campos en negrita en cada línea
-      let idx = 0;
-      while (idx < line.length) {
-        if (line.startsWith(bloqueNormal1, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal1);
-          idx += bloqueNormal1.length;
-        } else if (line.startsWith(bloqueNegrita1, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita1);
-          idx += bloqueNegrita1.length;
-        } else if (line.startsWith(bloqueNormal2, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal2);
-          idx += bloqueNormal2.length;
-        } else if (line.startsWith(bloqueNegrita2, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita2);
-          idx += bloqueNegrita2.length;
-        } else if (line.startsWith(bloqueNormal3, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal3);
-          idx += bloqueNormal3.length;
-        } else if (line.startsWith(bloqueNegrita3, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita3);
-          idx += bloqueNegrita3.length;
-        } else if (line.startsWith(bloqueNormal4, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal4, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal4);
-          idx += bloqueNormal4.length;
-        } else if (line.startsWith(bloqueNegrita4, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita4, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita4);
-          idx += bloqueNegrita4.length;
-        } else if (line.startsWith(bloqueNormal5, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
-          break;
-        } else {
-          // Si hay texto que no coincide, lo renderizamos normal
-          let nextIdx = idx + 1;
-          while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4, bloqueNegrita4, bloqueNormal5].some(b => line.startsWith(b, nextIdx))) {
-            nextIdx++;
+    // Construir bloques de texto (normales y negrita)
+    const bloques = [
+      { text: 'Yo ', bold: false },
+      { text: nombre, bold: true },
+      { text: ', de ', bold: false },
+      { text: edad, bold: true },
+      { text: ' años de edad, identificado con DNI nº ', bold: false },
+      { text: dni, bold: true },
+      { text: '; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va a realizar según solicitud del protocolo médico de la empresa ', bold: false },
+      { text: empresa, bold: true },
+      { text: '; y en pleno uso de mis facultades mentales ', bold: false },
+      { text: 'AUTORIZO', bold: true },
+      { text: ' se me tome la muestra de sangre para cumplir con los exámenes pertinentes.', bold: false },
+    ];
+    const maxWidth = pageW - 2 * margin;
+    const interlineado = 7;
+
+    // Algoritmo para armar líneas respetando bloques
+    function armarLineas(bloques, maxWidth) {
+      let lineas = [];
+      let lineaActual = [];
+      let anchoActual = 0;
+      let espacio = doc.getTextWidth(' ');
+      let i = 0;
+      while (i < bloques.length) {
+        let bloque = bloques[i];
+        // Si el bloque es largo, partirlo en palabras
+        if (!bloque.bold && bloque.text.includes(' ')) {
+          let palabras = bloque.text.split(/(\s+)/);
+          for (let j = 0; j < palabras.length; j++) {
+            let palabra = palabras[j];
+            if (palabra === '') continue;
+            let anchoPalabra = doc.getTextWidth(palabra);
+            if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
+              lineas.push(lineaActual);
+              lineaActual = [];
+              anchoActual = 0;
+            }
+            lineaActual.push({ text: palabra, bold: false });
+            anchoActual += anchoPalabra;
           }
-          const fragment = line.substring(idx, nextIdx);
-          doc.setFont('helvetica', 'normal');
-          doc.text(fragment, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(fragment);
-          idx = nextIdx;
+        } else {
+          // Bloque negrita o bloque sin espacios
+          let anchoBloque = doc.getTextWidth(bloque.text);
+          if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+            lineas.push(lineaActual);
+            lineaActual = [];
+            anchoActual = 0;
+          }
+          lineaActual.push(bloque);
+          anchoActual += anchoBloque;
         }
+        i++;
       }
-      yBloque += 7;
+      if (lineaActual.length > 0) lineas.push(lineaActual);
+      return lineas;
+    }
+
+    // Renderizar líneas justificadas
+    let yL = y;
+    const lineas = armarLineas(bloques, maxWidth);
+    lineas.forEach((linea, idx) => {
+      // Calcular ancho total de la línea
+      const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
+      // Contar espacios para justificar
+      const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
+      // Espacio extra para justificar (no en la última línea)
+      const extraSpace = (idx < lineas.length - 1 && espacios > 0)
+        ? (maxWidth - totalW) / espacios
+        : 0;
+      let x = margin;
+      linea.forEach(b => {
+        doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
+        doc.text(b.text, x, yL);
+        let w = doc.getTextWidth(b.text);
+        if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
+          x += w + extraSpace;
+        } else {
+          x += w;
+        }
+      });
+      yL += interlineado;
     });
-    y += lines.length * 7 + 10;
+    y = yL + 3;
 
-    // Fecha del examen en la parte inferior
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.text(`Fecha del examen: ${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
-    y += 12;
+    // ─── 4) FECHA ─────────────────────────────────────
+    doc.setFont('helvetica','normal').setFontSize(10);
+    if (datos.fecha) {
+      const f   = new Date(datos.fecha);
+      const dia = String(f.getDate()).padStart(2,'0');
+      const mes = String(f.getMonth()+1).padStart(2,'0');
+      const anio= f.getFullYear();
+      doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align:'right' });
+    }
+    y += 15;
 
-    // Espacio extra antes de las firmas y huella
-    const baseY = y + 10;
+    // ─── 5) HUELLA, FIRMAS Y SELLO ────────────────────
+    const baseY = y + 18;
 
     // Huella
-    doc.rect(25, baseY, 28, 32);
-    doc.setFontSize(10);
-    doc.text('Huella', 39, baseY + 38, { align: 'center' });
+    doc.rect(25, baseY, 28, 32)
+       .setFontSize(10)
+       .text('Huella', 39, baseY+38, { align:'center' });
     if (huellap) {
-      const maxW = 28;
-      const maxH = 32;
-      let huellaW = maxW;
-      let huellaH = (huellap.height / huellap.width) * huellaW;
-
-      // Si excede la altura máxima, reajustar proporciones
-      if (huellaH > maxH) {
-        huellaH = maxH;
-        huellaW = (huellap.width / huellap.height) * huellaH;
-      }
-
-      const huellaX = 25 + (maxW - huellaW) / 2;
-      const huellaY = baseY + (maxH - huellaH) / 2;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = huellap.width;
-      canvas.height = huellap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(huellap, 0, 0);
-      const huellaBase64 = canvas.toDataURL('image/png');
-
-      doc.addImage(huellaBase64, 'PNG', huellaX, huellaY, huellaW, huellaH);
+      const maxW=28, maxH=32;
+      let hW=maxW, hH=(huellap.height/huellap.width)*hW;
+      if (hH>maxH){hH=maxH;hW=(huellap.width/huellap.height)*hH;}
+      const xH=25+(maxW-hW)/2, yH=baseY+(maxH-hH)/2;
+      const cv= document.createElement('canvas');
+      cv.width=huellap.width;cv.height=huellap.height;
+      cv.getContext('2d').drawImage(huellap,0,0);
+      doc.addImage(cv.toDataURL('image/png'),'PNG',xH,yH,hW,hH);
     }
+
     // Firma paciente
-    doc.line(65, baseY + 32, 115, baseY + 32);
-    doc.text('Firma del Paciente', 90, baseY + 38, { align: 'center' });
+    doc.line(65, baseY+32,115,baseY+32)
+       .text('Firma del Paciente',90,baseY+38,{align:'center'});
     if (firmap) {
-      const firmaW = 40;
-      const firmaH = (firmap.height / firmap.width) * firmaW;
-      const firmaX = 70 + (50 - firmaW) / 2;
-      const firmaY = baseY + 32 - firmaH - 2;
-      const canvas = document.createElement('canvas');
-      canvas.width = firmap.width;
-      canvas.height = firmap.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(firmap, 0, 0);
-      const firmaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
+      const fW=40, fH=(firmap.height/firmap.width)*fW;
+      const xF=70+(50-fW)/2, yF=baseY+32-fH-2;
+      const cvf=document.createElement('canvas');
+      cvf.width=firmap.width;cvf.height=firmap.height;
+      cvf.getContext('2d').drawImage(firmap,0,0);
+      doc.addImage(cvf.toDataURL('image/png'),'PNG',xF,yF,fW,fH);
     }
-    // Firma consejero
-    doc.line(135, baseY + 32, 185, baseY + 32);
-    doc.text('Firma y sello del Consejero', 160, baseY + 38, { align: 'center' });
+
+    // Firma y sello consejero
+    doc.line(135, baseY+32,185,baseY+32)
+       .text('Firma y sello del Consejero',160,baseY+38,{align:'center'});
     if (sellop) {
-      const selloW = 35;
-      const selloH = (sellop.height / sellop.width) * selloW;
-      const selloX = 135 + (50 - selloW) / 2;
-      const selloY = baseY + 32 - selloH - 2;
-      const canvas = document.createElement('canvas');
-      canvas.width = sellop.width;
-      canvas.height = sellop.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(sellop, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-      doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
+      const sW=35, sH=(sellop.height/sellop.width)*sW;
+      const xS=135+(50-sW)/2, yS=baseY+32-sH-2;
+      const cvs=document.createElement('canvas');
+      cvs.width=sellop.width;cvs.height=sellop.height;
+      cvs.getContext('2d').drawImage(sellop,0,0);
+      doc.addImage(cvs.toDataURL('image/png'),'PNG',xS,yS,sW,sH);
     }
+
     footer(doc, datos);
 
-    // Mostrar PDF
-    const pdfBlob = doc.output("blob");
-    const pdfUrl = URL.createObjectURL(pdfBlob);
+    // ─── 6) IMPRIMIR ───────────────────────────────────
+    const blob = doc.output("blob");
+    const url  = URL.createObjectURL(blob);
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
-    iframe.src = pdfUrl;
+    iframe.src = url;
     document.body.appendChild(iframe);
-    iframe.onload = function () {
+    iframe.onload = () => {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-   })
-  
-} 
+
+  });
+}

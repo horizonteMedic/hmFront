@@ -11,6 +11,11 @@ import React from "react";
    const col3X = 120;
    const col4X = 175;
  
+   // Línea horizontal arriba del footer
+   doc.setLineWidth(0.3);
+   doc.line(15, baseY - 3, doc.internal.pageSize.getWidth() - 15, baseY - 3);
+   doc.setLineWidth(0.2);
+ 
    // Ajustamos la fuente a 8 y color a negro
    doc.setFontSize(7);
    doc.setTextColor(0, 0, 0);

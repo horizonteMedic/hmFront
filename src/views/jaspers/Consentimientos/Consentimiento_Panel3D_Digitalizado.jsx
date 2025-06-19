@@ -32,107 +32,148 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
 
       // Título subrayado y negrita
       doc.setFont(undefined, 'bold');
-      doc.setFontSize(12);
-      doc.text(
-        'CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE DE MARIHUANA, COCAÍNA Y ÉXTASIS.',
-        pageW / 2,
-        y,
-        { align: 'center', maxWidth: 180 }
-      );
-      doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
-      doc.setFontSize(10);
+      doc.setFontSize(13);
+      // Primera línea del título
+      doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE', pageW / 2, y, { align: 'center' });
+      let wT1 = doc.getTextWidth('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DOSAJE');
+      let xT1 = (pageW - wT1) / 2;
+      doc.setLineWidth(0.7);
+      doc.line(xT1, y + 2, xT1 + wT1, y + 2);
+      doc.setLineWidth(0.2);
+      y += 10;
+      // Segunda línea del título
+      doc.text('DE MARIHUANA, COCAÍNA Y ÉXTASIS', pageW / 2, y, { align: 'center' });
+      let wT2 = doc.getTextWidth(' DE MARIHUANA, COCAÍNA Y ÉXTASIS');
+      let xT2 = (pageW - wT2) / 2;
+      doc.setLineWidth(0.7);
+      doc.line(xT2, y + 2, xT2 + wT2, y + 2);
+      doc.setLineWidth(0.2);
+      y += 12;
+      doc.setFontSize(11);
 
       // Cuerpo del consentimiento con campos en negrita
-      y += 12;
-      const bloqueNormal1 = 'Yo ';
-      const bloqueNegrita1 = String(datos.nombres || '_________________________');
-      const bloqueNormal2 = ' de ';
-      const bloqueNegrita2 = String(datos.edad || '___');
-      const bloqueNormal3 = ' años de edad, identificado con DNI nº ';
-      const bloqueNegrita3 = String(datos.dni || '__________');
-      const bloqueNormal4 = '; habiendo recibido consejería e información acerca de la prueba para Marihuana y cocaína en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.';
-
-      const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
-      const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
-      let yBloque = y;
-      lines.forEach(line => {
-        let x = margin;
-        // Detectar y renderizar los campos en negrita en cada línea
-        let idx = 0;
-        while (idx < line.length) {
-          if (line.startsWith(bloqueNormal1, idx)) {
-            doc.setFont('helvetica', 'normal');
-            doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(bloqueNormal1);
-            idx += bloqueNormal1.length;
-          } else if (line.startsWith(bloqueNegrita1, idx)) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(bloqueNegrita1);
-            idx += bloqueNegrita1.length;
-          } else if (line.startsWith(bloqueNormal2, idx)) {
-            doc.setFont('helvetica', 'normal');
-            doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(bloqueNormal2);
-            idx += bloqueNormal2.length;
-          } else if (line.startsWith(bloqueNegrita2, idx)) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(bloqueNegrita2);
-            idx += bloqueNegrita2.length;
-          } else if (line.startsWith(bloqueNormal3, idx)) {
-            doc.setFont('helvetica', 'normal');
-            doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(bloqueNormal3);
-            idx += bloqueNormal3.length;
-          } else if (line.startsWith(bloqueNegrita3, idx)) {
-            doc.setFont('helvetica', 'bold');
-            doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(bloqueNegrita3);
-            idx += bloqueNegrita3.length;
-          } else if (line.startsWith(bloqueNormal4, idx)) {
-            doc.setFont('helvetica', 'normal');
-            doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
-            break;
-          } else {
-            // Si hay texto que no coincide, lo renderizamos normal
-            let nextIdx = idx + 1;
-            while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4].some(b => line.startsWith(b, nextIdx))) {
-              nextIdx++;
+      const nombre = String(datos.nombres || '_________________________');
+      const edad = String(datos.edad || '___');
+      const dni = String(datos.dni || '__________');
+      const bloques = [
+        { text: 'Yo ', bold: false },
+        { text: nombre, bold: true },
+        { text: ' de ', bold: false },
+        { text: edad, bold: true },
+        { text: ' años de edad, identificado con DNI nº ', bold: false },
+        { text: dni, bold: true },
+        { text: '; habiendo recibido consejería e información acerca de la prueba para Marihuana, cacoína y éxtasis en orina; y en pleno uso de mis facultades mentales ', bold: false },
+        { text: 'AUTORIZO', bold: true },
+        { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
+      ];
+      const maxWidth = pageW - 2 * margin - 4;
+      const interlineado = 7;
+      function armarLineas(bloques, maxWidth) {
+        let lineas = [];
+        let lineaActual = [];
+        let anchoActual = 0;
+        let espacio = doc.getTextWidth(' ');
+        let i = 0;
+        while (i < bloques.length) {
+          let bloque = bloques[i];
+          if (!bloque.bold && bloque.text.includes(' ')) {
+            let palabras = bloque.text.split(/(\s+)/);
+            for (let j = 0; j < palabras.length; j++) {
+              let palabra = palabras[j];
+              if (palabra === '') continue;
+              let anchoPalabra = doc.getTextWidth(palabra);
+              if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
+                lineas.push(lineaActual);
+                lineaActual = [];
+                anchoActual = 0;
+              }
+              lineaActual.push({ text: palabra, bold: false });
+              anchoActual += anchoPalabra;
             }
-            const fragment = line.substring(idx, nextIdx);
-            doc.setFont('helvetica', 'normal');
-            doc.text(fragment, x, yBloque, { baseline: 'top' });
-            x += doc.getTextWidth(fragment);
-            idx = nextIdx;
+          } else {
+            let anchoBloque = doc.getTextWidth(bloque.text);
+            if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+              lineas.push(lineaActual);
+              lineaActual = [];
+              anchoActual = 0;
+            }
+            lineaActual.push(bloque);
+            anchoActual += anchoBloque;
           }
+          i++;
         }
-        yBloque += 7;
+        if (lineaActual.length > 0) lineas.push(lineaActual);
+        return lineas;
+      }
+      let yBloque = y;
+      const lineas = armarLineas(bloques, maxWidth);
+      lineas.forEach((linea, idx) => {
+        const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
+        const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
+        const extraSpace = (idx < lineas.length - 1 && espacios > 0)
+          ? (maxWidth - totalW) / espacios
+          : 0;
+        let x = margin;
+        linea.forEach(b => {
+          doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
+          doc.text(b.text, x, yBloque);
+          let w = doc.getTextWidth(b.text);
+          if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
+            x += w + extraSpace;
+          } else {
+            x += w;
+          }
+        });
+        yBloque += interlineado;
       });
-      y += lines.length * 7 + 10;
+      y = yBloque + 10;
 
       // Antecedentes (tabla)
-      let antY = y + 12;
       doc.setFont(undefined, 'bold');
-      doc.text('ANTECEDENTES:', 15, antY);
-      antY += 6;
+      doc.setFontSize(12);
+      doc.text('ANTECEDENTES:', margin, y);
+      doc.setFont(undefined, 'normal');
+      y += 6;
       autoTable(doc, {
-        startY: antY,
+        startY: y,
         body: [
-          ['CONSUME MARIHUANA (THC)', `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`, `SI ( ${datos.antConsumeMarih ? "X" : " "} )`, datos.antConsumeMarih ? `CUANDO: ${datos.fechaConsumeMarih || ''}` : ''],
-          ['CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS', `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "} )`, `SI ( ${datos.antConsumeHojaCoca ? "X" : " "} )`, datos.antConsumeHojaCoca ? `CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ''],
-          ['CONSUME COCAÍNA', `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`, `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`, datos.antConsumeCocacina ? `CUANDO: ${datos.fechaConsumeCocacina || ''}` : ''],
-          ['CONSUME ÉXTASIS', `NO ( ${!datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, `SI ( ${datos.antConsumeAnfetaminaOExtasis ? "X" : " "} )`, datos.antConsumeAnfetaminaOExtasis ? `CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ''],
+          [
+            'CONSUME MARIHUANA ',
+            `NO (${!datos.antConsumeMarih ? "X" : "    "})`,
+            `SI (${datos.antConsumeMarih ? "X" : "    "})`,
+            datos.antConsumeMarih && datos.fechaConsumeMarih
+              ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMarih); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+              : ''
+          ],
+          [
+            'CONSUMIO HOJA DE COCA EN LOS 7 DIAS PREVIOS',
+            `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`,
+            `SI (${datos.antConsumeHojaCoca ? "X" : "    "})`,
+            datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca
+              ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumoHojaCoca); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+              : ''
+          ],
+          [
+            'CONSUME COCAÍNA',
+            `NO (${!datos.antConsumeCocacina ? "X" : "    "})`,
+            `SI (${datos.antConsumeCocacina ? "X" : "    "})`,
+            datos.antConsumeCocacina && datos.fechaConsumeCocacina
+              ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeCocacina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+              : ''
+          ],
+          [
+            'CONSUME ÉXTASIS',
+            `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`,
+            `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`,
+            datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina
+              ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeAnfetamina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+              : ''
+          ],
         ],
         theme: 'plain',
-        styles: { fontSize: 9, cellPadding: 1 },
-        columnStyles: { 
-          0: { cellWidth: 90 }, 
-          1: { cellWidth: 40 }, 
-          2: { cellWidth: 40 },
-          3: { cellWidth: 60 }
-        },
-        margin: { left: 15 },
+        styles: { fontSize: 11, cellPadding: 1 },
+        columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
+        margin: { left: 18 },
         didDrawPage: () => {}
       });
 
@@ -140,7 +181,13 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
       y = doc.lastAutoTable.finalY + 10;
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.text(`Fecha del examen: ${datos.fecha || ''}`, pageW / 2, y, { align: "center" });
+      if (datos.fecha) {
+        const f = new Date(datos.fecha);
+        const dia = String(f.getDate()).padStart(2, '0');
+        const mes = String(f.getMonth() + 1).padStart(2, '0');
+        const anio = f.getFullYear();
+        doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align: 'right' });
+      }
       y += 12;
 
       // Recuadros de firmas y huella
