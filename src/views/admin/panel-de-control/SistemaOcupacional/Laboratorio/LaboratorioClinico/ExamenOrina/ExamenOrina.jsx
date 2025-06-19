@@ -1,5 +1,5 @@
 // src/views/Orina/Orina.jsx
-import React, { useReducer, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons'
 
@@ -12,7 +12,7 @@ const posNegLabels    = ['Pos.','Neg.','N/A']
 const makeMap = (keys, init) =>
   keys.reduce((o,k) => ({ ...o, [k]: typeof init==='function'? init(k) : init }), {})
 
-const initialState = {
+const initialForm = {
   physicalOptions: makeMap(physicalLabels, false),
   physicalDetails: { Color:'', Aspecto:'N/A', Densidad:'', PH:'' },
   chemical:       makeMap(chemicalLabels,   'NEGATIVO'),
@@ -24,74 +24,50 @@ const initialState = {
   print:          { orden:false, recibo:false, value:'' },
 }
 
-function reducer(state, action) {
-  switch(action.type) {
-    case 'SET_FIELD':
-      return { ...state, [action.field]: action.value }
-    case 'SET_NESTED':
-      return {
-        ...state,
-        [action.section]: {
-          ...state[action.section],
-          [action.key]: action.value
-        }
-      }
-    case 'RESET':
-      return initialState
-    case 'LOAD_PAYLOAD':
-      return { ...state, ...action.payload }
-    default:
-      return state
+export default function ExamenOrina() {
+  const [form, setForm] = useState(initialForm)
+
+  const setField = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }))
   }
-}
 
-export default function Orina() {
-  const [form, dispatch] = useReducer(reducer, initialState)
+  const setNestedField = (section, key, value) => {
+    setForm(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [key]: value
+      }
+    }))
+  }
 
-  useEffect(() => {
-    if (!form.print.value) return
-    async function load() {
-      // const res = await fetch(`/api/orina/${form.print.value}`)
-      // const data = await res.json()
-      // dispatch({ type:'LOAD_PAYLOAD', payload:data })
-    }
-    load()
-  }, [form.print.value])
-
-  const onNested = useCallback((section, key, val) => {
-    dispatch({ type:'SET_NESTED', section, key, value:val })
-  }, [])
-
-  const onChange = useCallback(e => {
+  const handleInputChange = e => {
     const { name, value, type, checked } = e.target
     if (name.startsWith('print.')) {
       const k = name.split('.')[1]
-      dispatch({
-        type:'SET_NESTED',
-        section:'print',
-        key:k,
-        value: type==='checkbox' ? checked : value
-      })
-    } else if (initialState.hasOwnProperty(name)) {
-      dispatch({
-        type:'SET_FIELD',
-        field:name,
-        value: type==='checkbox' ? checked : value
-      })
+      setForm(prev => ({
+        ...prev,
+        print: {
+          ...prev.print,
+          [k]: type === 'checkbox' ? checked : value
+        }
+      }))
+    } else if (Object.prototype.hasOwnProperty.call(initialForm, name)) {
+      setField(name, type === 'checkbox' ? checked : value)
     }
-  }, [])
+  }
 
-  const handleClear = useCallback(() => dispatch({ type:'RESET' }), [])
-  const handleSave  = useCallback(() => {
+  const handleClear = () => setForm(initialForm)
+  const handleSave = () => {
     // await fetch('/api/orina',{method:'POST',body:JSON.stringify(form)})
     console.log('Guardando', form)
-  }, [form])
-  const handlePrint = useCallback(() => {
+  }
+  const handlePrint = () => {
     window.open(
       `/api/orina/print/${form.print.value}?orden=${form.print.orden}&recibo=${form.print.recibo}`,
       '_blank'
     )
-  }, [form.print])
+  }
 
   return (
     <div className="p-4 grid grid-cols-5 gap-4">
@@ -105,7 +81,7 @@ export default function Orina() {
                 <input
                   type="checkbox"
                   checked={form.physicalOptions[opt]}
-                  onChange={e=>onNested('physicalOptions',opt,e.target.checked)}
+                  onChange={e=>setNestedField('physicalOptions',opt,e.target.checked)}
                 />
                 {opt}
               </label>
@@ -119,14 +95,14 @@ export default function Orina() {
                   ? <select
                       className="border rounded p-1"
                       value={form.physicalDetails[f]}
-                      onChange={e=>onNested('physicalDetails',f,e.target.value)}
+                      onChange={e=>setNestedField('physicalDetails',f,e.target.value)}
                     >
                       <option>N/A</option><option>Claro</option><option>Turbio</option>
                     </select>
                   : <input
                       className="border rounded p-1"
                       value={form.physicalDetails[f]}
-                      onChange={e=>onNested('physicalDetails',f,e.target.value)}
+                      onChange={e=>setNestedField('physicalDetails',f,e.target.value)}
                     />
                 }
               </div>
@@ -142,7 +118,7 @@ export default function Orina() {
                 <input
                   className="border rounded p-1 w-full"
                   value={form.chemical[lbl]}
-                  onChange={e=>onNested('chemical',lbl,e.target.value)}
+                  onChange={e=>setNestedField('chemical',lbl,e.target.value)}
                 />
               </div>
             ))}
@@ -157,7 +133,7 @@ export default function Orina() {
                 <input
                   className="border rounded p-1 w-full"
                   value={form.sediment[lbl]}
-                  onChange={e=>onNested('sediment',lbl,e.target.value)}
+                  onChange={e=>setNestedField('sediment',lbl,e.target.value)}
                 />
               </div>
             ))}
@@ -171,7 +147,7 @@ export default function Orina() {
                 <input
                   type="checkbox"
                   checked={form.screeningFlags[lbl]}
-                  onChange={e=>onNested('screeningFlags',lbl,e.target.checked)}
+                  onChange={e=>setNestedField('screeningFlags',lbl,e.target.checked)}
                 />
                 {lbl}
               </label>
@@ -184,7 +160,7 @@ export default function Orina() {
                 <input
                   className="border rounded p-1 w-full"
                   value={form.drugValues[drug]}
-                  onChange={e=>onNested('drugValues',drug,e.target.value)}
+                  onChange={e=>setNestedField('drugValues',drug,e.target.value)}
                 />
               </div>
             ))}
@@ -195,7 +171,7 @@ export default function Orina() {
                 <input
                   type="checkbox"
                   checked={form.confirmFlags[lbl]}
-                  onChange={e=>onNested('confirmFlags',lbl,e.target.checked)}
+                  onChange={e=>setNestedField('confirmFlags',lbl,e.target.checked)}
                 />
                 {lbl}
               </label>
@@ -207,7 +183,7 @@ export default function Orina() {
           <textarea
             className="border rounded w-full h-24 p-2"
             value={form.observaciones}
-            onChange={e=>dispatch({ type:'SET_FIELD', field:'observaciones', value:e.target.value })}
+            onChange={e=>setField('observaciones', e.target.value)}
           />
         </Section>
 
@@ -225,7 +201,7 @@ export default function Orina() {
             type="checkbox"
             name="print.orden"
             checked={form.print.orden}
-            onChange={onChange}
+            onChange={handleInputChange}
           />
           <label>Nro Orden</label>
         </div>
@@ -234,14 +210,14 @@ export default function Orina() {
             type="checkbox"
             name="print.recibo"
             checked={form.print.recibo}
-            onChange={onChange}
+            onChange={handleInputChange}
           />
           <label>Nro Recibo</label>
         </div>
         <input
           name="print.value"
           value={form.print.value}
-          onChange={onChange}
+          onChange={handleInputChange}
           placeholder="Código..."
           className="border rounded p-1 w-full"
         />

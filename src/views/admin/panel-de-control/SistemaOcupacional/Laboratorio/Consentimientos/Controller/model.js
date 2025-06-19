@@ -55,23 +55,6 @@ export function GetInfoLaboratioEx(data, tabla, token, user) {
             } return res.json()}).then(response => response) 
 }
 
-export function GetInfoLaboratioEx2(data, tabla, token, user) {
-
-    const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarConsentimientos`
-        const options = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        }
-        return fetch(url,options).then(res =>  {
-            if (!res.ok) {
-                return res
-            } return res.json()}).then(response => response) 
-}
-
 export function SubmitInfoLaboratioExBoro(data, token, user) {
    
     const body = {
