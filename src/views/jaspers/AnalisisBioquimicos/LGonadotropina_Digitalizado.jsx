@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import header from "./components/header";
-import footer from "./components/footer";
+import header from "../components/header";
+import footer from "../components/footer";
 
-export default function LGonadotropina_digitalizado(datos) {
+export default function LGonadotropina_Digitalizado(datos) {
   const doc = new jsPDF();
   header(doc, datos);
 
