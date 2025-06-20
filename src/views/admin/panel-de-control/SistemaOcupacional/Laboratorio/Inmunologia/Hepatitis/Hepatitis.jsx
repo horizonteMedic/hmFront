@@ -13,7 +13,13 @@ const initialState = {
   edad: '',
   hav: false,
   hbsag: false,
-  printCount: ''
+  marca: 'RAPID TEST - MONTEST',
+  resultadoHAV: '',
+  resultadoHAVRadio: '',
+  resultadoHBsAg: '',
+  resultadoHBsAgRadio: '',
+  printCount: '',
+  medico: ''
 }
 
 function reducer(state, action) {
@@ -39,6 +45,19 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
     load()
   }, [form.ficha, apiBase, token])
 
+  useEffect(() => {
+    if (form.hav) {
+      dispatch({ type: 'SET', field: 'hbsag', value: false });
+      dispatch({ type: 'SET', field: 'resultadoHBsAg', value: '' });
+      dispatch({ type: 'SET', field: 'resultadoHBsAgRadio', value: '' });
+    }
+    if (form.hbsag) {
+      dispatch({ type: 'SET', field: 'hav', value: false });
+      dispatch({ type: 'SET', field: 'resultadoHAV', value: '' });
+      dispatch({ type: 'SET', field: 'resultadoHAVRadio', value: '' });
+    }
+  }, [form.hav, form.hbsag]);
+
   const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
 
   const handleSave = useCallback(async () => {
@@ -61,33 +80,159 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
     Swal.fire('Imprimiendo','','success')
   }, [form.ficha, form.printCount, apiBase])
 
+  // Lógica para habilitar/deshabilitar campos según el check (mejorada para cambio instantáneo y limpieza al desmarcar)
+  const handleCheck = useCallback((field) => {
+    if (field === 'hav') {
+      if (!form.hav) {
+        // Se va a activar HAV
+        dispatch({ type: 'SET', field: 'hav', value: true });
+        dispatch({ type: 'SET', field: 'hbsag', value: false });
+        dispatch({ type: 'SET', field: 'resultadoHBsAg', value: '' });
+        dispatch({ type: 'SET', field: 'resultadoHBsAgRadio', value: '' });
+      } else {
+        // Se va a desactivar HAV
+        dispatch({ type: 'SET', field: 'hav', value: false });
+        dispatch({ type: 'SET', field: 'resultadoHAV', value: '' });
+        dispatch({ type: 'SET', field: 'resultadoHAVRadio', value: '' });
+      }
+    } else if (field === 'hbsag') {
+      if (!form.hbsag) {
+        // Se va a activar HBsAg
+        dispatch({ type: 'SET', field: 'hbsag', value: true });
+        dispatch({ type: 'SET', field: 'hav', value: false });
+        dispatch({ type: 'SET', field: 'resultadoHAV', value: '' });
+        dispatch({ type: 'SET', field: 'resultadoHAVRadio', value: '' });
+      } else {
+        // Se va a desactivar HBsAg
+        dispatch({ type: 'SET', field: 'hbsag', value: false });
+        dispatch({ type: 'SET', field: 'resultadoHBsAg', value: '' });
+        dispatch({ type: 'SET', field: 'resultadoHBsAgRadio', value: '' });
+      }
+    }
+  }, [form.hav, form.hbsag]);
+
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-center">HEPATITIS</h2>
+    <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Nro Ficha" name="ficha" value={form.ficha} onChange={e=>setField('ficha',e.target.value)} />
-        <Field label="Fecha"      name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
+        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} />
-        <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} />
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled dynamicWidth />
+        <Field label="Edad" name="edad" value={form.edad} onChange={e=>setField('edad',e.target.value)} disabled />
       </div>
-      <Section title="Selección de prueba">
-        <Checkbox label="HEPATITIS A (HAV)"   checked={form.hav}    onChange={v=>setField('hav',v)} />
-        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={v=>setField('hbsag',v)} />
-      </Section>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6 mt-2">
+        <Checkbox label="HEPATITIS A (HAV)" checked={form.hav} onChange={()=>handleCheck('hav')} />
+        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={()=>handleCheck('hbsag')} />
+      </div>
+      <div className="flex items-center gap-2 mt-2">
+        <span className="font-bold">MARCA :</span>
         <input
-          name="printCount"
-          value={form.printCount}
-          onChange={e=>setField('printCount',e.target.value)}
-          className="border rounded px-2 py-1 w-24"
-          placeholder="Veces"
+          className="border rounded px-2 py-1 min-w-[220px]"
+          name="marca"
+          value={form.marca}
+          onChange={e=>setField('marca',e.target.value)}
         />
-        <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
       </div>
-      <div className="flex justify-between">
-        <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
+      <div className="grid grid-cols-12 gap-2 items-center mt-4">
+        <div className="col-span-4 font-bold flex items-center">PRUEBAS</div>
+        <div className="col-span-4 font-bold flex items-center">RESULTADOS</div>
+        <div className="col-span-4"></div>
+        {/* HAV */}
+        <div className="col-span-4 flex items-center">HEPATITIS A (HAV) - RAPID TEST</div>
+        <div className="col-span-4">
+          <input
+            className="border rounded px-2 py-1 w-full"
+            name="resultadoHAV"
+            value={form.resultadoHAV}
+            onChange={e=>setField('resultadoHAV',e.target.value)}
+            disabled={!form.hav}
+          />
+        </div>
+        <div className="col-span-4 flex gap-4">
+          {["POSITIVO","NEGATIVO"].map(opt => (
+            <label key={opt} className="flex items-center gap-1">
+              <input
+                type="radio"
+                name="resultadoHAVRadio"
+                checked={form.resultadoHAVRadio===opt}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setField('resultadoHAVRadio', opt);
+                    setField('resultadoHAV', opt);
+                  }
+                }}
+                disabled={!form.hav}
+              />
+              <span className="font-bold">{opt}</span>
+            </label>
+          ))}
+        </div>
+        {/* HBsAg */}
+        <div className="col-span-4 flex items-center">HEPATITIS B (HBsAg) - RAPID TEST</div>
+        <div className="col-span-4">
+          <input
+            className="border rounded px-2 py-1 w-full"
+            name="resultadoHBsAg"
+            value={form.resultadoHBsAg}
+            onChange={e=>setField('resultadoHBsAg',e.target.value)}
+            disabled={!form.hbsag}
+          />
+        </div>
+        <div className="col-span-4 flex gap-4">
+          {["POSITIVO","NEGATIVO"].map(opt => (
+            <label key={opt} className="flex items-center gap-1">
+              <input
+                type="radio"
+                name="resultadoHBsAgRadio"
+                checked={form.resultadoHBsAgRadio===opt}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setField('resultadoHBsAgRadio', opt);
+                    setField('resultadoHBsAg', opt);
+                  }
+                }}
+                disabled={!form.hbsag}
+              />
+              <span className="font-bold">{opt}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+      {/* Área de imprimir */}
+      <div className="flex justify-end items-end mt-2">
+        <div className="flex flex-col items-end">
+          <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
+          <div className="flex items-center gap-2">
+            <input
+              name="printCount"
+              value={form.printCount}
+              onChange={e=>setField('printCount',e.target.value)}
+              className="border rounded px-2 py-1 w-24"
+              placeholder="Veces"
+            />
+            <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
+          </div>
+        </div>
+      </div>
+      {/* Campo ASIGNAR MEDICO */}
+      <div className="flex items-center mt-6 mb-2">
+        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
+        <select
+          id="asignarMedico"
+          className="border rounded px-2 py-1 min-w-[220px]"
+          value={form.medico || ''}
+          onChange={e => setField('medico', e.target.value)}
+        >
+          <option value="">Seleccionar medico</option>
+          <option value="medico1">Dr. Juan Pérez</option>
+          <option value="medico2">Dra. Ana Torres</option>
+          <option value="medico3">Dr. Luis Gómez</option>
+        </select>
+      </div>
+      {/* Botones */}
+      <div className="flex gap-4 mt-2">
+        <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
         <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
       </div>
     </div>
@@ -95,9 +240,9 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
 }
 
 // Reusable
-function Field({ label, name, type='text', value, onChange, disabled }) {
+function Field({ label, name, type='text', value, onChange, disabled, dynamicWidth }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-w-0">
       <label className="font-medium mb-1">{label}</label>
       <input
         type={type}
@@ -105,7 +250,8 @@ function Field({ label, name, type='text', value, onChange, disabled }) {
         value={value}
         disabled={disabled}
         onChange={onChange}
-        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''} ${dynamicWidth?'min-w-0 truncate overflow-x-auto':''}`}
+        style={dynamicWidth ? { width: '100%' } : {}}
       />
     </div>
   )

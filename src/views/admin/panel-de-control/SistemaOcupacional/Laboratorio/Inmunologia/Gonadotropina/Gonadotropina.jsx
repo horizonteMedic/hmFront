@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Gonadotropina.jsx
-import React, { useReducer, useEffect, useCallback, useState } from 'react'
+import React, { useReducer, useEffect, useCallback, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -45,8 +45,8 @@ export default function Gonadotropina({ apiBase, token, selectedSede }) {
   }, [form.ficha, form.printCount, apiBase])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-center">GONADOTROPINA</h2>
+    <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
+      <h2 className="text-2xl font-bold text-center">GONADOTROPINA CORIÓNICA HUMANA</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Nro Ficha" name="norden" value={form.norden} onChange={handleFormChange} 
           onKeyUp={event => {if(event.key === 'Enter')VerifyTR(form.norden,tabla,token,setForm, selectedSede)}}/>
@@ -87,34 +87,22 @@ export default function Gonadotropina({ apiBase, token, selectedSede }) {
 // Reusable components
 function Field({ label, name, type='text', value, onChange, disabled, onKeyUp }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-w-0">
       <label className="font-medium mb-1">{label}</label>
       <input
+        ref={inputRef}
         type={type}
         name={name}
         onKeyUp={onKeyUp}
         value={value}
         disabled={disabled}
         onChange={onChange}
-        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''} ${dynamicWidth?'min-w-0 truncate overflow-x-auto':''}`}
+        style={dynamicWidth ? { width: '100%' } : {}}
       />
     </div>
   )
 }
-
-function Checkbox({ label, checked, onChange }) {
-  return (
-    <label className="flex items-center gap-2">
-      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
-      {label}
-    </label>
-  )
-}
-
-function Section({ children }) {
-  return <div className="space-y-2">{children}</div>
-}
-
 function ActionButton({ color, icon, onClick, children }) {
   const bg = {
     green:  'bg-emerald-600 hover:bg-emerald-700',
