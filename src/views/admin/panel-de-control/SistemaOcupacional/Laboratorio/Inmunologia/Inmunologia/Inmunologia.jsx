@@ -23,7 +23,8 @@ const initialState = {
   resultados: pruebasList.map(() => '1/40'),
   hepatitis: false,
   hepatitisA: '',
-  printCount: ''
+  printCount: '',
+  medico: ''
 }
 
 function reducer(state, action) {
@@ -90,7 +91,7 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
   }, [form])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+    <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <h2 className="text-2xl font-bold text-center">INMUNOLOGÍA</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -99,59 +100,86 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled />
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled dynamicWidth />
         <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} disabled />
       </div>
 
       <Section>
-        <h3 className="font-semibold">MÉTODO EN LÁMINA PORTAOBJETO</h3>
+        <h3 className="font-semibold text-center">MÉTODO EN LÁMINA PORTAOBJETO</h3>
       </Section>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <span className="font-bold">PRUEBAS</span>
-          {pruebasList.map((lbl, i) => <div key={i}>{lbl}</div>)}
+      <div className="grid grid-cols-12 gap-2 items-center">
+        <div className="col-span-2 font-bold flex items-center">PRUEBAS</div>
+        <div className="col-span-2 font-bold flex items-center">RESULTADOS</div>
+        <div className="col-span-8"></div>
+        {pruebasList.map((lbl, i) => (
+          <React.Fragment key={i}>
+            <div className="col-span-2 flex items-center">{lbl}</div>
+            <div className="col-span-2">
+              <input
+                className="border rounded px-2 py-1 w-full"
+                value={form.resultados[i]}
+                onChange={e=>handleResultadoChange(i,e.target.value)}
+              />
+            </div>
+            <div className="col-span-8"></div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-12 gap-2 items-center mt-4">
+        <div className="col-span-4 flex items-center">
+          <Checkbox label={<span className="font-bold">PRUEBA HEPATITIS</span>} checked={form.hepatitis} onChange={v=>setField('hepatitis',v)} />
         </div>
-        <div className="space-y-2">
-          <span className="font-bold">RESULTADOS</span>
-          {form.resultados.map((r, i) => (
+        <div className="col-span-4 flex items-center">
+          {form.hepatitis && (
             <input
-              key={i}
-              className="border rounded px-2 py-1 w-full"
-              value={r}
-              onChange={e=>handleResultadoChange(i,e.target.value)}
+              className="border rounded px-2 py-1 ml-4 w-full"
+              name="hepatitisA"
+              value={form.hepatitisA}
+              onChange={e=>setField('hepatitisA',e.target.value)}
+              placeholder="Prueba Rápida HEPATITIS A"
+              disabled={!form.hepatitis}
             />
-          ))}
+          )}
         </div>
+        <div className="col-span-4"></div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <Checkbox label="PRUEBA HEPATITIS" checked={form.hepatitis} onChange={v=>setField('hepatitis',v)} />
-        {form.hepatitis && (
-          <input
-            className="border rounded px-2 py-1 ml-4"
-            name="hepatitisA"
-            value={form.hepatitisA}
-            onChange={e=>setField('hepatitisA',e.target.value)}
-            placeholder="Hepatitis A"
-          />
-        )}
+      {/* Campo ASIGNAR MEDICO */}
+      <div className="flex items-center mt-6 mb-2">
+        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
+        <select
+          id="asignarMedico"
+          className="border rounded px-2 py-1 min-w-[220px]"
+          value={form.medico || ''}
+          onChange={e => setField('medico', e.target.value)}
+        >
+          <option value="">Seleccionar medico</option>
+          <option value="medico1">Dr. Juan Pérez</option>
+          <option value="medico2">Dra. Ana Torres</option>
+          <option value="medico3">Dr. Luis Gómez</option>
+        </select>
       </div>
 
-      <div className="flex justify-between">
-        <div className="flex items-center gap-2">
-          <input
-            name="printCount"
-            value={form.printCount}
-            onChange={e=>setField('printCount',e.target.value)}
-            className="border rounded px-2 py-1 w-24"
-            placeholder="Veces"
-          />
-          <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
-        </div>
+      {/* Botones y área de imprimir */}
+      <div className="flex justify-between items-end mt-6">
         <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
+          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
           <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+        </div>
+        <div className="flex flex-col items-end">
+          <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
+          <div className="flex items-center gap-2">
+            <input
+              name="printCount"
+              value={form.printCount}
+              onChange={e=>setField('printCount',e.target.value)}
+              className="border rounded px-2 py-1 w-24"
+              placeholder="Veces"
+            />
+            <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
+          </div>
         </div>
       </div>
     </div>
@@ -159,9 +187,9 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
 }
 
 // Aux
-function Field({ label, name, type='text', value, onChange, disabled, inputRef, onKeyUp }) {
+function Field({ label, name, type='text', value, onChange, disabled, inputRef, onKeyUp, dynamicWidth }) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-w-0">
       <label className="font-medium mb-1">{label}</label>
       <input
         ref={inputRef}
@@ -171,7 +199,8 @@ function Field({ label, name, type='text', value, onChange, disabled, inputRef, 
         disabled={disabled}
         onChange={onChange}
         onKeyUp={onKeyUp}
-        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''}`}
+        className={`border rounded px-2 py-1 ${disabled?'bg-gray-100':''} ${dynamicWidth?'min-w-0 truncate overflow-x-auto':''}`}
+        style={dynamicWidth ? { width: '100%' } : {}}
       />
     </div>
   )
