@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons'
+import { SubmitHematologiaLabCLinico } from '../ControllerLC/ControllerLC'
 
 const physicalLabels  = ['Incoloro','Medicamentosa','Transparente','Turbio','No Aplica']
 const chemicalLabels  = ['Nitritos','Proteínas','Cetonas','LeucocitosQ','AcAscorbico','Urobilinogeno','Bilirrubina','GlucosaQ','Sangre']
@@ -56,8 +57,8 @@ const initialForm = {
   printValue: ''
 }
 
-export default function ExamenOrina() {
-  const [form, setForm] = useState(initialForm)
+export default function ExamenOrina({token, selectedSede, userlogued, form, setForm, formH, ClearForm}) {
+
 
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -68,11 +69,10 @@ export default function ExamenOrina() {
     setField(name, type === 'checkbox' ? checked : value)
   }
 
-  const handleClear = () => setForm(initialForm)
-  const handleSave = () => {
-    // await fetch('/api/orina',{method:'POST',body:JSON.stringify(form)})
-    console.log('Guardando', form)
-  }
+  const handleClear = () => {
+    ClearForm()
+    setForm(initialForm)}
+  
   const handlePrint = () => {
     window.open(
       `/api/orina/print/${form.printValue}?orden=${form.printOrden}&recibo=${form.printRecibo}`,
@@ -208,7 +208,7 @@ export default function ExamenOrina() {
 
         <div className="flex gap-2">
           <Button onClick={handleClear}  color="yellow" icon={faBroom}>Limpiar</Button>
-          <Button onClick={handleSave}   color="green"  icon={faSave}>Grabar</Button>
+          <Button onClick={() => {SubmitHematologiaLabCLinico(formH,form,token,userlogued,handleClear)}}   color="green"  icon={faSave}>Grabar</Button>
         </div>
       </div>
 

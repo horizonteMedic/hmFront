@@ -10,17 +10,138 @@ import Hematologia from './Hematologia/Hematologia';
 const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  //ESTADO PARA HEMATOLOGIA Y EXAMEN DE ORINA
+  const [form, setForm] = useState({
+    ficha: true,
+    norden: '',
+    fecha: today,
+    responsable: '',
+    paciente: '',
+    empContratista: '',
+    empresa: '',
+    empresaNA: false,
+    grupo: '',
+    rh: '',
+    hemoglobina: '',
+    hematocrito: '',
+    vsg: '',
+    leucocitos: '',
+    hematies: '',
+    plaquetas: '',
+    linfocitos: '',
+    neutrofilos: '',
+    abastonados: '',
+    segmentados: '',
+    monocitos: '',
+    eosinofilos: '',
+    basofilos: '',
+    glucosa: '',
+    glucosaNA: false,
+    creatinina: '',
+    creatininaNA: false,
+    rpr: '',
+    rprNA: false,
+    rprPos: false,
+    vih: '',
+    vihNA: false,
+    vihPos: false
+  })
+  const [formO, setFormO] = useState({
+    // Examen Físico
+    Incoloro: false,
+    Medicamentosa: false,
+    Transparente: false,
+    Turbio: false,
+    NoAplica: false,
+    Color: '',
+    Aspecto: 'N/A',
+    Densidad: '',
+    PH: '',
+    // Examen Químico
+    Nitritos: 'NEGATIVO',
+    Proteínas: 'NEGATIVO',
+    Cetonas: 'NEGATIVO',
+    LeucocitosQ: 'NEGATIVO',
+    AcAscorbico: 'NEGATIVO',
+    Urobilinogeno: 'NEGATIVO',
+    Bilirrubina: 'NEGATIVO',
+    GlucosaQ: 'NEGATIVO',
+    Sangre: 'NEGATIVO',
+    // Sedimento
+    LeucocitosS: '',
+    Hematies: '',
+    CelEpiteliales: '',
+    Cristales: '',
+    Cilindros: '',
+    Bacterias: '',
+    GramSC: '',
+    Otros: '',
+    // Drogas
+    Cocaina: '',
+    Marihuana: '',
+    ScreeningPos: false,
+    ScreeningNeg: false,
+    ScreeningNA: false,
+    ConfirmPos: false,
+    ConfirmNeg: false,
+    ConfirmNA: false,
+    // Observaciones
+    observaciones: '',
+    // Imprimir
+    printOrden: false,
+    printRecibo: false,
+    printValue: ''
+  })
+  
+  const ClearForm = () => {
+    setForm({
+      ficha: true,
+      norden: '',
+      responsable: '',
+      paciente: '',
+      empContratista: '',
+      empresa: '',
+      empresaNA: false,
+      grupo: '',
+      rh: '',
+      hemoglobina: '',
+      hematocrito: '',
+      vsg: '',
+      leucocitos: '',
+      hematies: '',
+      plaquetas: '',
+      linfocitos: '',
+      neutrofilos: '',
+      abastonados: '',
+      segmentados: '',
+      monocitos: '',
+      eosinofilos: '',
+      basofilos: '',
+      glucosa: '',
+      glucosaNA: false,
+      creatinina: '',
+      creatininaNA: false,
+      rpr: '',
+      rprNA: false,
+      rprPos: false,
+      vih: '',
+      vihNA: false,
+      vihPos: false
+    });
+  }
 
   const tabs = [
     {
       label: 'Hematología - Bioquímica SI-EO',
       icon: faMicroscope,
-      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued}/>
+      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} setFormO={setFormO}/>
     },
     {
       label: 'Examen de Orina',
       icon: faTint,
-      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued}/>
+      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm}/>
     },
     {
       label: 'Hematología',

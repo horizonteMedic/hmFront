@@ -1,47 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import microscopioImg from './microscopio.webp';
 import { VerifyTR } from '../ControllerLC/ControllerLC';
+import { getFetch } from '../../../../getFetch/getFetch';
 
-export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) => {
+export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, form, setForm, setFormO }) => {
   const tabla = 'lab_clinico';
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-
-  const [form, setForm] = useState({
-    ficha: true,
-    norden: '',
-    fecha: today,
-    responsable: '',
-    paciente: '',
-    empContratista: '',
-    empresa: '',
-    empresaNA: false,
-    grupo: '',
-    rh: '',
-    hemoglobina: '',
-    hematocrito: '',
-    vsg: '',
-    leucocitos: '',
-    hematies: '',
-    plaquetas: '',
-    linfocitos: '',
-    neutrofilos: '',
-    abastonados: '',
-    segmentados: '',
-    monocitos: '',
-    eosinofilos: '',
-    basofilos: '',
-    glucosa: '',
-    glucosaNA: false,
-    creatinina: '',
-    creatininaNA: false,
-    rpr: '',
-    rprNA: false,
-    rprPos: false,
-    vih: '',
-    vihNA: false,
-    vihPos: false
-  });
 
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -51,9 +16,6 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    console.log('Saving form:', form);
-  };
 
   const handleClear = () => {
     setForm({
@@ -97,6 +59,42 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
   };
 
   const [status, setStatus] = useState('');
+  const [listDoc, setListDoc] = useState([])
+
+//NOMBRES DEL DOCTOR
+  useEffect(() => {
+    getFetch(`/api/v01/ct/laboratorio/listadoUsuariosPorPrioridadNameUser?nameUser=${userlogued}`,token)
+      .then((res) => {
+        setListDoc(res)
+        setForm(f => ({ ...f, responsable: res[0] }))
+        setSearchMedico(res[0])
+      })
+      .catch(() => {});
+  },[])
+
+  //AUTOCOMPLETAR DEL DOC
+  const [searchMedico, setSearchMedico]  = useState(form.responsable);
+  const [filteredMedicos, setFilteredMedicos] = useState([]);
+
+  const handleMedicoSearch = e => {
+    
+    const v = e.target.value.toUpperCase();
+    setSearchMedico(v);
+    setField('responsable', v)
+    setFilteredMedicos(
+      v
+        ? listDoc.filter(m =>
+            m.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectMedico = m => {
+    setSearchMedico(m);
+    setField('responsable', m)
+    setFilteredMedicos([]);
+  };
   console.log(form)
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -118,7 +116,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
               name="norden"
               value={form.norden}
               onChange={handleInputChange}
-              onKeyUp={event => { if (event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede) }}
+              onKeyUp={event => { if (event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede,setSearchMedico) }}
               className="border rounded px-2 py-1 w-28 text-md ml-1"
             />
           </label>
@@ -132,7 +130,11 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
           </label>
           <label className="font-medium flex items-center whitespace-nowrap">
             Fecha:
-            <input type="date" className="border rounded px-2 py-1 w-36 text-md ml-1" />
+            <input name="fecha"
+            type="date"
+            value={form.fecha}
+            onChange={handleInputChange}
+            className="border rounded px-2 py-1 w-36 text-md ml-1" />
           </label>
         </div>
         <div className="flex items-center gap-4">
@@ -152,7 +154,48 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 bg-white p-4 rounded shadow space-y-6">
           <Section title="Datos Generales">
-            <Field label="Responsable Lab" name="responsable" value={form.responsable} onChange={e => setField('responsable', e.target.value)} />
+            <div className="flex flex-col">
+              <label className="font-medium mb-1">Responsable Lab<span className="text-sm ml-1"></span></label>
+              <div className="flex items-center gap-2 relative">
+                <input
+                  type='text'
+                  autoComplete='off'
+                  name='responsable'
+                  value={searchMedico}
+                  onChange={handleMedicoSearch}
+                  className={`border rounded px-2 py-1 flex-1  bg-gray-100}`}
+                  onKeyUp={e => {
+                    if (e.key === 'Enter' && filteredMedicos.length > 0) {
+                      e.preventDefault();
+                      handleSelectMedico(filteredMedicos[0]);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (searchMedico) {
+                      setFilteredMedicos(
+                        listDoc.filter(m =>
+                          m.toLowerCase().includes(searchMedico.toLowerCase())
+                        )
+                      );
+                    }
+                  }}
+                  onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
+                />
+                {searchMedico && filteredMedicos.length > 0 && (
+                  <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                    {filteredMedicos.map(m => (
+                      <li
+                        key={m}
+                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg"
+                        onMouseDown={() => handleSelectMedico(m)}
+                      >
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
             <Field label="Nombres" name="paciente" value={form.paciente} onChange={e => setField('paciente', e.target.value)} />
             <div className="flex gap-4">
               <Field label="Emp. Contratista" name="empContratista" value={form.empContratista} onChange={e => setField('empContratista', e.target.value)} />
@@ -213,7 +256,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
               <div className="flex items-center gap-2">
                 <label className="w-24">Glucosa :</label>
                 <input
-                  type="number"
+                  type="text"
                   name="glucosa"
                   value={form.glucosa}
                   onChange={e => setField('glucosa', e.target.value)}
@@ -227,7 +270,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
               <div className="flex items-center gap-2">
                 <label className="w-24">Creatinina :</label>
                 <input
-                  type="number"
+                  type="text"
                   name="creatinina"
                   value={form.creatinina}
                   onChange={e => setField('creatinina', e.target.value)}
@@ -254,8 +297,8 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
                   disabled={form.rprNA}
                 />
                 <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.rprPos && !form.rprNA} onChange={v => { setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
-                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA} onChange={v => { setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="+" checked={form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: ''})),setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: ''})),setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
                   <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', 'N/A'); }} />
                 </div>
               </div>
@@ -270,16 +313,15 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued }) =
                   disabled={form.vihNA}
                 />
                 <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.vihPos && !form.vihNA} onChange={v => { setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
-                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA} onChange={v => { setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
-                  <Checkbox label="N/A" checked={form.vihNA} onChange={v => { setField('vihNA', v); if (v) setField('vih', 'N/A'); }} />
+                  <Checkbox label="+" checked={form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: ''})),setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: ''})),setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="N/A" checked={form.vihNA || form.vih === 'N/A'} onChange={v => { setField('vihNA', v); if (v) setField('vih', 'N/A'); }} />
                 </div>
               </div>
             </div>
           </Section>
 
           <div className="flex justify-between mt-6">
-            <button onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Guardar</button>
             <button onClick={handleClear} className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">Limpiar</button>
           </div>
         </div>

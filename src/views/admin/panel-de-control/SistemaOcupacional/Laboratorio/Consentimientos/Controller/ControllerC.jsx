@@ -29,6 +29,9 @@ const Loading = (text) => {
       showConfirmButton: false,
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       customClass: {
         popup: 'swal2-border-radius',
         title: 'swal2-title-custom',
@@ -170,6 +173,8 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
             PrintHojaR(form,tabla,token)
           }
         })
+      } else {
+        Swal.fire('Error','Ocurrio un error al Registrar','error')
       }
     })
   }

@@ -13,7 +13,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   doc.addImage(img, "PNG", margin, y, 50, 16);
 
   // --- Nro Orden con sufijo "-TP" a la derecha ---
-  const nro = datos.n_orden ? `${datos.n_orden}-TP` : "";
+  const nro = datos.norden ? `${datos.norden}-TP` : "";
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text(nro, pageW - margin, y + 2, { align: "right" });
 
@@ -22,7 +22,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   doc.text(`Sede : ${datos.sede || ""}`, pageW - margin, y + 8, { align: "right" });
 
   // --- Fecha debajo de la Sede ---
-  doc.text(`Fecha : ${datos.fecha || ""}`, pageW - margin, y + 14, { align: "right" });
+  doc.text(`Fecha : ${datos.fechaLab || ""}`, pageW - margin, y + 14, { align: "right" });
 
   // --- Título centrado ---
   doc.setFont("helvetica", "bold").setFontSize(14);
@@ -35,7 +35,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold").setFontSize(10);
   doc.text("Trabajador :", margin, y2);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.trabajador || "", margin + 30, y2);
+  doc.text(datos.nombres || "", margin + 30, y2);
 
   // --- N° Ficha a la derecha de la mitad ---
   const fichaXStart = pageW / 2 + 10;
@@ -43,7 +43,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   doc.text("N° Ficha :", fichaXStart, y2);
 
   // Caja para el número de ficha
-  const ficha = datos.n_ficha || "";
+  const ficha = String(datos.norden) || "";
   const boxW = 25;
   const boxH = 6;
   const boxX = fichaXStart + 20;
@@ -59,7 +59,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Empresa Contratista :", margin, y2);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa_contratista || "N/A", margin + 45, y2);
+  doc.text(datos.contrata || "N/A", margin + 45, y2);
 
   // --- Empresa principal a la derecha ---
   doc.setFont("helvetica", "bold");
