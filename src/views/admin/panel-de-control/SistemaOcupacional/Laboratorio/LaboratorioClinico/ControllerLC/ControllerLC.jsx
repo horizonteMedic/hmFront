@@ -65,6 +65,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
     })
 }
 
+
 export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedico) => {
   getFetch(`/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
