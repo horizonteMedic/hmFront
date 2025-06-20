@@ -306,8 +306,8 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                   disabled={form.rprNA}
                 />
                 <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: ''})),setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
-                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: ''})),setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="+" checked={form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: 'POSITIVO'})),setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: 'NEGATIVO'})),setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
                   <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', 'N/A'); }} />
                 </div>
               </div>
@@ -322,8 +322,8 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                   disabled={form.vihNA}
                 />
                 <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: ''})),setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
-                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: ''})),setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="+" checked={form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: 'POSITIVO'})),setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: 'NEGATIVO'})),setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
                   <Checkbox label="N/A" checked={form.vihNA || form.vih === 'N/A'} onChange={v => { setField('vihNA', v); if (v) setField('vih', 'N/A'); }} />
                 </div>
               </div>
