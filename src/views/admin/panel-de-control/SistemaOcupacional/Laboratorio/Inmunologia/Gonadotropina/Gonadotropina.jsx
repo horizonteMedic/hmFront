@@ -3,27 +3,15 @@ import React, { useReducer, useEffect, useCallback, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
+import { VerifyTR } from './controller';
 
 const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET':
-      return { ...state, [action.field]: action.value }
-    case 'RESET':
-      return initialState
-    case 'LOAD':
-      return { ...state, ...action.payload }
-    default:
-      return state
-  }
-}
-
 export default function Gonadotropina({ apiBase, token, selectedSede }) {
+  const tabla = 'lgonadotropina'
   const [form, setForm] = useState({
-    ficha: '',
+    norden: '',
     fecha: today,
     nombres: '',
     edad: '',
@@ -32,18 +20,10 @@ export default function Gonadotropina({ apiBase, token, selectedSede }) {
     printCount: ''
   })
 
-  // load existing when ficha changes
-  useEffect(() => {
-    if (!form.ficha) return
-    async function load() {
-      // const res = await fetch(`${apiBase}/gonadotropina/${form.ficha}`,{headers:{Authorization:`Bearer ${token}`}})
-      // const data = await res.json()
-      // dispatch({ type:'LOAD', payload:data })
-    }
-    load()
-  }, [form.ficha, apiBase, token])
-
-  const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
+  const handleFormChange = e => {
+    const { name, value } = e.target
+    setForm(f => ({ ...f, [name]: value }))
+  }
 
   const handleSave = useCallback(async () => {
     try {
@@ -68,19 +48,20 @@ export default function Gonadotropina({ apiBase, token, selectedSede }) {
     <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
       <h2 className="text-2xl font-bold text-center">GONADOTROPINA</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="ficha" value={form.ficha} onChange={e=>setField('ficha',e.target.value)} />
-        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
+        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={handleFormChange} 
+          onKeyUp={event => {if(event.key === 'Enter')VerifyTR(form.norden,tabla,token,setForm, selectedSede)}}/>
+        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={handleFormChange} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} />
-        <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} />
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={handleFormChange} disabled={true}/>
+        <Field label="Edad"    name="edad"    value={form.edad}    onChange={handleFormChange} disabled={true}/>
       </div>
       <Section>
-        <Field label="Resultado" name="resultado" value={form.resultado} onChange={e=>setField('resultado',e.target.value)} />
+        <Field label="Resultado" name="resultado" value={form.resultado} onChange={handleFormChange} />
         <Checkbox
           label="Positivo"
           checked={form.positivo}
-          onChange={v=>setField('positivo',v)}
+          onChange={handleFormChange}
         />
       </Section>
       <div className="flex items-center gap-4">
@@ -104,13 +85,14 @@ export default function Gonadotropina({ apiBase, token, selectedSede }) {
 }
 
 // Reusable components
-function Field({ label, name, type='text', value, onChange, disabled }) {
+function Field({ label, name, type='text', value, onChange, disabled, onKeyUp }) {
   return (
     <div className="flex flex-col">
       <label className="font-medium mb-1">{label}</label>
       <input
         type={type}
         name={name}
+        onKeyUp={onKeyUp}
         value={value}
         disabled={disabled}
         onChange={onChange}
