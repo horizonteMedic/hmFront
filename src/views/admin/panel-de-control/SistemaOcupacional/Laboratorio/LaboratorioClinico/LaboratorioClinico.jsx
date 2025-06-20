@@ -144,7 +144,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
       component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm}/>
     },
     {
-      label: 'Hematología',
+      label: 'Hematograma',
       icon: faHeartbeat,
       component: <Hematologia token={token} selectedSede={selectedSede} userlogued={userlogued}/>
     }

@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
-import { VerifyTR } from '../ControllerLC/ControllerLC'
+import { SubmitHematogramaLabClinic, VerifyTR } from './Controller'
 
 const PRUEBAS = [
   { key: 'hemoglobina', label: 'HEMOGLOBINA' },
@@ -53,7 +53,7 @@ const initialForm = {
   linfocitos: ''
 }
 
-export default function Hematologia({ apiBase, token, selectedSede, userlogued }) {
+export default function Hematologia({ token, selectedSede, userlogued }) {
   const tabla = 'hemograma_autom'
   const [form, setForm] = useState(initialForm)
   const [status, setStatus] = useState('')
@@ -67,29 +67,8 @@ export default function Hematologia({ apiBase, token, selectedSede, userlogued }
     setField(name, value.toUpperCase())
   }
 
-  const handleSave = () => {
-    try {
-      const payload = { ...form, sede: selectedSede }
-      // await fetch(`${apiBase}/hematologia`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${token}`
-      //   },
-      //   body: JSON.stringify(payload)
-      // })
-      setStatus('Guardado exitoso')
-    } catch (err) {
-      setStatus('Error al guardar')
-    }
-  }
-
   const handleClear = () => {
     setForm(initialForm)
-  }
-
-  const handlePrint = () => {
-    window.open(`${apiBase}/hematologia/print?norden=${form.norden}`, '_blank')
   }
 
   return (
@@ -164,13 +143,12 @@ export default function Hematologia({ apiBase, token, selectedSede, userlogued }
       {/* Acciones */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="flex gap-3">
-          <Button onClick={handleSave} color="green" icon={faSave}>Guardar/Actualizar</Button>
+          <Button onClick={() => {SubmitHematogramaLabClinic(form,token,userlogued,handleClear)}} color="green" icon={faSave}>Guardar/Actualizar</Button>
           <Button onClick={handleClear} color="yellow" icon={faBroom}>Limpiar</Button>
         </div>
         <div className="flex flex-col items-end">
           <span className="italic font-semibold mb-2">IMPRIMIR</span>
           <button
-            onClick={handlePrint}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded inline-flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faPrint} />
