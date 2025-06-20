@@ -24,125 +24,225 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     isValidUrl(sello?.url) ? loadImg(sello.url) : Promise.resolve(null)
   ])
    .then(([huellap, firmap, sellop]) => {
-    let y = 58;
-
-    // Título principal en dos líneas, con línea horizontal
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(12);
-    doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10 D', 105, y, { align: 'center' });
-    doc.line(20, y + 2, 190, y + 2); // Línea horizontal debajo del título
-    y += 6;
-    doc.setFontSize(11);
-    doc.text('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', 105, y, { align: 'center' });
-    doc.setFontSize(10);
-
-    // Bloque de datos personales y consentimiento con interlineado y justificado
-    y += 10;
+    let y = 44;
     const pageW = doc.internal.pageSize.getWidth();
     const margin = 18;
-    const bloqueNormal1 = 'Yo ';
-    const bloqueNegrita1 = String(datos.nombres || '_________________________');
-    const bloqueNormal2 = ', de ';
-    const bloqueNegrita2 = String(datos.edad || '___');
-    const bloqueNormal3 = ' años de edad, identificado con DNI nº ';
-    const bloqueNegrita3 = String(datos.dni || '__________');
-    const bloqueNormal4 = '; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales AUTORIZO se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.';
-    const fullText = bloqueNormal1 + bloqueNegrita1 + bloqueNormal2 + bloqueNegrita2 + bloqueNormal3 + bloqueNegrita3 + bloqueNormal4;
-    const lines = doc.splitTextToSize(fullText, pageW - 2 * margin - 4);
-    let yBloque = y + 6;
-    lines.forEach(line => {
-      let x = margin;
-      let idx = 0;
-      while (idx < line.length) {
-        if (line.startsWith(bloqueNormal1, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal1, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal1);
-          idx += bloqueNormal1.length;
-        } else if (line.startsWith(bloqueNegrita1, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita1, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita1);
-          idx += bloqueNegrita1.length;
-        } else if (line.startsWith(bloqueNormal2, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal2, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal2);
-          idx += bloqueNormal2.length;
-        } else if (line.startsWith(bloqueNegrita2, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita2, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita2);
-          idx += bloqueNegrita2.length;
-        } else if (line.startsWith(bloqueNormal3, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(bloqueNormal3, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNormal3);
-          idx += bloqueNormal3.length;
-        } else if (line.startsWith(bloqueNegrita3, idx)) {
-          doc.setFont('helvetica', 'bold');
-          doc.text(bloqueNegrita3, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(bloqueNegrita3);
-          idx += bloqueNegrita3.length;
-        } else if (line.startsWith(bloqueNormal4, idx)) {
-          doc.setFont('helvetica', 'normal');
-          doc.text(line.substring(idx), x, yBloque, { baseline: 'top' });
-          break;
-        } else {
-          let nextIdx = idx + 1;
-          while (nextIdx < line.length && ![bloqueNormal1, bloqueNegrita1, bloqueNormal2, bloqueNegrita2, bloqueNormal3, bloqueNegrita3, bloqueNormal4].some(b => line.startsWith(b, nextIdx))) {
-            nextIdx++;
+
+    // Título principal en dos líneas, con subrayado y tamaño 14
+    doc.setFont(undefined, 'bold');
+    doc.setFontSize(12);
+    // Primera línea del título
+    doc.text('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10D', pageW / 2, y, { align: 'center' });
+    let wT1 = doc.getTextWidth('CONSENTIMIENTO INFORMADO PARA REALIZAR LA PRUEBA DE DROGAS PANEL 10D');
+    let xT1 = (pageW - wT1) / 2;
+    doc.setLineWidth(0.7);
+    doc.line(xT1, y + 2, xT1 + wT1, y + 2);
+    doc.setLineWidth(0.2);
+    y += 10;
+    // Segunda línea del título
+    doc.text('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)', pageW / 2, y, { align: 'center' });
+    let wT2 = doc.getTextWidth('(AMP-BAR-BZO-COC-MET-MTD-PCP-THC-OPI-TCA)');
+    let xT2 = (pageW - wT2) / 2;
+    doc.setLineWidth(0.7);
+    doc.line(xT2, y + 2, xT2 + wT2, y + 2);
+    doc.setLineWidth(0.2);
+    y += 12;
+    doc.setFontSize(11);
+
+    // Bloque de datos personales y consentimiento con interlineado y justificado
+    const nombre = String(datos.nombres || '_________________________');
+    const edad = String(datos.edad || '___');
+    const dni = String(datos.dni || '__________');
+    const bloques = [
+      { text: 'Yo ', bold: false },
+      { text: nombre, bold: true },
+      { text: ', de ', bold: false },
+      { text: edad, bold: true },
+      { text: ' años de edad, identificado con DNI nº ', bold: false },
+      { text: dni, bold: true },
+      { text: '; habiendo recibido consejería e información acerca de la prueba para el panel de 10D drogas en orina; y en pleno uso de mis facultades mentales ', bold: false },
+      { text: 'AUTORIZO', bold: true },
+      { text: ' se me tome la muestra para el dosaje de dichas sustancias, así mismo me comprometo a regresar para recibir la consejería Post - Test y mis resultados.', bold: false },
+    ];
+    const maxWidth = pageW - 2 * margin - 4;
+    const interlineado = 7;
+    function armarLineas(bloques, maxWidth) {
+      let lineas = [];
+      let lineaActual = [];
+      let anchoActual = 0;
+      let espacio = doc.getTextWidth(' ');
+      let i = 0;
+      while (i < bloques.length) {
+        let bloque = bloques[i];
+        if (!bloque.bold && bloque.text.includes(' ')) {
+          let palabras = bloque.text.split(/(\s+)/);
+          for (let j = 0; j < palabras.length; j++) {
+            let palabra = palabras[j];
+            if (palabra === '') continue;
+            let anchoPalabra = doc.getTextWidth(palabra);
+            if (anchoActual + anchoPalabra > maxWidth && lineaActual.length > 0) {
+              lineas.push(lineaActual);
+              lineaActual = [];
+              anchoActual = 0;
+            }
+            lineaActual.push({ text: palabra, bold: false });
+            anchoActual += anchoPalabra;
           }
-          const fragment = line.substring(idx, nextIdx);
-          doc.setFont('helvetica', 'normal');
-          doc.text(fragment, x, yBloque, { baseline: 'top' });
-          x += doc.getTextWidth(fragment);
-          idx = nextIdx;
+        } else {
+          let anchoBloque = doc.getTextWidth(bloque.text);
+          if (anchoActual + anchoBloque > maxWidth && lineaActual.length > 0) {
+            lineas.push(lineaActual);
+            lineaActual = [];
+            anchoActual = 0;
+          }
+          lineaActual.push(bloque);
+          anchoActual += anchoBloque;
         }
+        i++;
       }
-      yBloque += 7;
+      if (lineaActual.length > 0) lineas.push(lineaActual);
+      return lineas;
+    }
+    let yBloque = y;
+    const lineas = armarLineas(bloques, maxWidth);
+    lineas.forEach((linea, idx) => {
+      const totalW = linea.reduce((sum, b) => sum + doc.getTextWidth(b.text), 0);
+      const espacios = linea.filter(b => !b.bold && /^\s+$/.test(b.text)).length;
+      const extraSpace = (idx < lineas.length - 1 && espacios > 0)
+        ? (maxWidth - totalW) / espacios
+        : 0;
+      let x = margin;
+      linea.forEach(b => {
+        doc.setFont('helvetica', b.bold ? 'bold' : 'normal');
+        doc.text(b.text, x, yBloque);
+        let w = doc.getTextWidth(b.text);
+        if (!b.bold && /^\s+$/.test(b.text) && extraSpace) {
+          x += w + extraSpace;
+        } else {
+          x += w;
+        }
+      });
+      yBloque += interlineado;
     });
-    y += lines.length * 7 + 10; // Deja más espacio después del bloque de datos personales
+    y = yBloque + 10;
 
-    // Antecedentes (tabla) centrados
-    const antTitle = "ANTECEDENTES:";
-    const fechaText = `Fecha del examen: ${datos.fecha || ''}`;
+    // Antecedentes (tabla) igual que Panel2D
     doc.setFont(undefined, 'bold');
-    const antTitleWidth = doc.getTextWidth(antTitle + "  ");
+    doc.setFontSize(12);
+    doc.text('ANTECEDENTES:', margin, y);
     doc.setFont(undefined, 'normal');
-    const fechaTextWidth = doc.getTextWidth(fechaText);
-
-    const totalWidth = antTitleWidth + fechaTextWidth;
-    const startX = (pageW - totalWidth) / 2;
-    let antY = y + 2;
-
-    // Dibuja el título y la fecha juntos, centrados
-    doc.setFont(undefined, 'bold');
-    doc.text(antTitle, startX, antY);
-    doc.setFont(undefined, 'normal');
-    doc.text(fechaText, startX + antTitleWidth, antY);
-
+    y += 6;
     autoTable(doc, {
-      startY: antY + 2,
+      startY: y,
       body: [
-        ['CONSUME MARIHUANA (THC)', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})${datos.antConsumeMarih ? `  CUANDO: ${datos.fechaConsumeMarih || ''}` : ""}`],
-        ['CONSUME COCAÍNA (COC)', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})${datos.antConsumeCocacina ? `  CUANDO: ${datos.fechaConsumeCocacina || ''}` : ""}`],
-        ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})${datos.antConsumeHojaCoca ? `  CUANDO: ${datos.fechaConsumoHojaCoca || ''}` : ""}`],
-        ['CONSUME ANFETAMINAS (AMP)', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})${datos.antConsumeAnfetaminaOExtasis ? `  CUANDO: ${datos.fechaConsumeAnfetamina || ''}` : ""}`],
-        ['CONSUME METANFETAMINAS (MET)', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})${datos.antConsumeMethanfetaminaOOpiaceos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
-        ['CONSUME BENZODIAZEPINAS (BZO)', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})${datos.antConsumeBenzodiacepinas ? `  CUANDO: ${datos.fechaConsumeBenzodiacepinas || ''}` : ""}`],
-        ['CONSUME OPIÁCEOS (OPI)', `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`, `SI (${datos.antConsumeOpiacesos ? "X" : "    "})${datos.antConsumeOpiacesos ? `  CUANDO: ${datos.fechaConsumeOpiacesos || ''}` : ""}`],
-        ['CONSUME BARBITÚRICOS (BAR)', `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`, `SI (${datos.antConsumeBarbituricos ? "X" : "    "})${datos.antConsumeBarbituricos ? `  CUANDO: ${datos.fechaConsumeBarbituricos || ''}` : ""}`],
-        ['CONSUME METADONA (MTD)', `NO (${!datos.antConsumeMetadona ? "X" : "    "})`, `SI (${datos.antConsumeMetadona ? "X" : "    "})${datos.antConsumeMetadona ? `  CUANDO: ${datos.fechaConsumeMetadona || ''}` : ""}`],
-        ['CONSUME FENCICLIDINA (PCP)', `NO (${!datos.antConsumeFenciclidina ? "X" : "    "})`, `SI (${datos.antConsumeFenciclidina ? "X" : "    "})${datos.antConsumeFenciclidina ? `  CUANDO: ${datos.fechaConsumeFenciclidina || ''}` : ""}`],
-        ['CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)', `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "    "})`, `SI (${datos.antConsumeAntidepreTricicli ? "X" : "    "})${datos.antConsumeAntidepreTricicli ? `  CUANDO: ${datos.fechaConsumeAntidepreTricicli || ''}` : ""}`],
+        [
+          'CONSUME MARIHUANA (THC)',
+          `NO (${!datos.antConsumeMarih ? "X" : "    "})`,
+          `SI (${datos.antConsumeMarih ? "X" : "    "})`,
+          datos.antConsumeMarih && datos.fechaConsumeMarih
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMarih); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME COCAÍNA (COC)',
+          `NO (${!datos.antConsumeCocacina ? "X" : "    "})`,
+          `SI (${datos.antConsumeCocacina ? "X" : "    "})`,
+          datos.antConsumeCocacina && datos.fechaConsumeCocacina
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeCocacina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS',
+          `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`,
+          `SI (${datos.antConsumeHojaCoca ? "X" : "    "})`,
+          datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumoHojaCoca); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME ANFETAMINAS (AMP)',
+          `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`,
+          `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`,
+          datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeAnfetamina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME METANFETAMINAS (MET)',
+          `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`,
+          `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`,
+          datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeOpiacesos
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeOpiacesos); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME BENZODIAZEPINAS (BZO)',
+          `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`,
+          `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})`,
+          datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeBenzodiacepinas); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME OPIÁCEOS (OPI)',
+          `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`,
+          `SI (${datos.antConsumeOpiacesos ? "X" : "    "})`,
+          datos.antConsumeOpiacesos && datos.fechaConsumeOpiacesos
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeOpiacesos); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME BARBITÚRICOS (BAR)',
+          `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`,
+          `SI (${datos.antConsumeBarbituricos ? "X" : "    "})`,
+          datos.antConsumeBarbituricos && datos.fechaConsumeBarbituricos
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeBarbituricos); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME METADONA (MTD)',
+          `NO (${!datos.antConsumeMetadona ? "X" : "    "})`,
+          `SI (${datos.antConsumeMetadona ? "X" : "    "})`,
+          datos.antConsumeMetadona && datos.fechaConsumeMetadona
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMetadona); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME FENCICLIDINA (PCP)',
+          `NO (${!datos.antConsumeFenciclidina ? "X" : "    "})`,
+          `SI (${datos.antConsumeFenciclidina ? "X" : "    "})`,
+          datos.antConsumeFenciclidina && datos.fechaConsumeFenciclidina
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeFenciclidina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
+        [
+          'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)',
+          `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "    "})`,
+          `SI (${datos.antConsumeAntidepreTricicli ? "X" : "    "})`,
+          datos.antConsumeAntidepreTricicli && datos.fechaConsumeAntidepreTricicli
+            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeAntidepreTricicli); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            : ''
+        ],
       ],
       theme: 'plain',
-      styles: { fontSize: 9, cellPadding: 1 },
-      columnStyles: { 0: { cellWidth: 80 }, 1: { cellWidth: 30 }, 2: { cellWidth: 66 } },
-      margin: { left: 40 },
+      styles: { fontSize: 11, cellPadding: 1 },
+      columnStyles: { 0: { cellWidth: 100 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
+      margin: { left: 18 },
       didDrawPage: () => {}
     });
+
+    // Fecha del examen alineada a la derecha y formato dd/mm/yyyy
+    y = doc.lastAutoTable.finalY + 10;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    if (datos.fecha) {
+      const f = new Date(datos.fecha);
+      const dia = String(f.getDate()).padStart(2, '0');
+      const mes = String(f.getMonth() + 1).padStart(2, '0');
+      const anio = f.getFullYear();
+      doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align: 'right' });
+    }
+    y += 12;
 
     // Recuadros de firmas y huella
     const baseY = doc.lastAutoTable.finalY + 20;
