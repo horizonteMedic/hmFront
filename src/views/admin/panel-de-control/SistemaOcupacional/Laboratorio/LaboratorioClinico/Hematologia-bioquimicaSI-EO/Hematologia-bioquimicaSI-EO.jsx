@@ -8,6 +8,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
+  const [tableLab, settableLab] = useState([])
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
   };
@@ -52,11 +53,19 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
       vihNA: false,
       vihPos: false
     });
+    settableLab([])
   };
 
   const handlePrint = () => {
     console.log('Printing form:', form);
   };
+
+  const GetTable = (nro) => {
+    getFetch(`/api/v01/ct/laboratorio/listadoGrupoFactorSanguineo?nOrden=${nro}`,token)
+    .then((res) => {
+      settableLab(res)
+    })
+  }
 
   const [status, setStatus] = useState('');
   const [listDoc, setListDoc] = useState([])
@@ -95,7 +104,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
     setField('responsable', m)
     setFilteredMedicos([]);
   };
-  console.log(form)
+  
   return (
     <div className="flex flex-col gap-2 w-full">
       {/* Barra superior */}
@@ -116,7 +125,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
               name="norden"
               value={form.norden}
               onChange={handleInputChange}
-              onKeyUp={event => { if (event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede,setSearchMedico) }}
+              onKeyUp={event => { if (event.key === 'Enter')handleClear(),VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede,setSearchMedico),GetTable(form.norden) }}
               className="border rounded px-2 py-1 w-28 text-md ml-1"
             />
           </label>
@@ -297,8 +306,8 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                   disabled={form.rprNA}
                 />
                 <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: ''})),setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
-                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: ''})),setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="+" checked={form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: 'POSITIVO'})),setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
+                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: 'NEGATIVO'})),setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
                   <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', 'N/A'); }} />
                 </div>
               </div>
@@ -313,8 +322,8 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                   disabled={form.vihNA}
                 />
                 <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: ''})),setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
-                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: ''})),setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="+" checked={form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: 'POSITIVO'})),setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
+                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: 'NEGATIVO'})),setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
                   <Checkbox label="N/A" checked={form.vihNA || form.vih === 'N/A'} onChange={v => { setField('vihNA', v); if (v) setField('vih', 'N/A'); }} />
                 </div>
               </div>
@@ -328,7 +337,29 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
 
         <div className="bg-white p-4 rounded shadow w-full lg:w-1/3 flex flex-col justify-between">
           <Section title="Registros anteriores">
-            <div className="h-32 bg-blue-50 rounded" />
+            <table className="w-full text-md border border-gray-300 rounded-lg overflow-hidden">
+              <thead>
+                <tr className="bg-gradient-to-r from-blue-100 to-blue-300 text-center">
+                  <th>Fecha Laboratorio</th>
+                  <th>Grupo Sanguineo</th>
+                  <th>Factor RH</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableLab.length == 0  && <tr><td className="border border-gray-300 px-2 py-1 mb-1 text-center" colSpan={7}>Sin Datos...</td></tr>}
+                {tableLab.map((row, i) => (
+                  <tr
+                    key={i}
+                    className={`text-center transition-all duration-200 relative after:content-[""] after:absolute after:inset-0 }`}
+                    style={{zIndex: 1, position: 'relative'}}
+                  >
+                    <td className="font-bold border-b border-gray-200 py-1">{row.fechaLab}</td>
+                    <td className="border-b border-gray-200 py-1">{row.grupoSanguineo}</td>
+                    <td className="border-b border-gray-200 py-1">{row.factorRh}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </Section>
           <div className="flex justify-center">
             <img src={microscopioImg} alt="Microscopio" className="w-64 h-64 object-contain" />

@@ -2,8 +2,8 @@
 import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
-import { SubmitHematogramaLabClinic, VerifyTR } from './Controller'
-
+import { PrintHojaR, SubmitHematogramaLabClinic, VerifyTR } from './Controller'
+import Swal from 'sweetalert2'
 const PRUEBAS = [
   { key: 'hemoglobina', label: 'HEMOGLOBINA' },
   { key: 'hematocrito', label: 'HEMATOCRITO' },
@@ -70,6 +70,27 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
   const handleClear = () => {
     setForm(initialForm)
   }
+
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir HEMATOGRAMA?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token);
+      }
+    });
+  };
 
   return (
     <div className="max-w-3xl mx-auto bg-white rounded shadow p-6 space-y-6">
@@ -146,13 +167,14 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
           <Button onClick={() => {SubmitHematogramaLabClinic(form,token,userlogued,handleClear)}} color="green" icon={faSave}>Guardar/Actualizar</Button>
           <Button onClick={handleClear} color="yellow" icon={faBroom}>Limpiar</Button>
         </div>
-        <div className="flex flex-col items-end">
-          <span className="italic font-semibold mb-2">IMPRIMIR</span>
+        <div className="flex flex-row items-end">
+          <input className="border rounded px-2 py-1 w-24" value={form.norden} name="norden" onChange={handleInputChange}  />
           <button
+            onClick={handlePrint}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded inline-flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faPrint} />
-            <span>Ficha</span>
+            <span>IMPRIMIR</span>
           </button>
         </div>
       </div>
