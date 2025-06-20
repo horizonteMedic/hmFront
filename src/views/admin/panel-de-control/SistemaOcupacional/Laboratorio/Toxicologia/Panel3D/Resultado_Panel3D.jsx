@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from './controller3D';
 
 const pruebas3D = [
   'COCAINA (COC)',
@@ -9,21 +10,19 @@ const pruebas3D = [
   'EXTASIS (MDMA)',
 ];
 
-const Resultado_Panel3D = ({ initialData = {}, apiBase }) => {
+const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
+  const tabla = 'panel3d'
   const [form, setForm] = useState({
     nroFicha: '',
     fecha: '',
     nombres: '',
     edad: '',
     resultados: pruebas3D.map(() => 'NEGATIVO'),
-    ...initialData
   });
   const fechaRef = useRef(null);
 
   // Si recibes initialData desde la API, ajusta aquí…
-  useEffect(() => {
-    if (initialData.nroFicha) setForm(f => ({ ...f, ...initialData }));
-  }, [initialData]);
+ 
 
   const handleChange = ({ name, value }) =>
     setForm(f => ({ ...f, [name]: value }));
@@ -49,16 +48,11 @@ const Resultado_Panel3D = ({ initialData = {}, apiBase }) => {
 
   const handleSave = async () => {
     // Ejemplo de llamada API
-    await fetch(`${apiBase}/toxicologia/3d`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+    
   };
 
   const handlePrint = () => {
     // Por ejemplo, abrir en nueva pestaña
-    window.open(`${apiBase}/toxicologia/3d/print/${form.nroFicha}`, '_blank');
   };
 
   // ancho dinámico para nombres
@@ -76,6 +70,7 @@ const Resultado_Panel3D = ({ initialData = {}, apiBase }) => {
             name="nroFicha"
             value={form.nroFicha}
             onChange={e => handleChange(e.target)}
+            onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
             className="border rounded px-3 py-2 w-32"
           />
         </div>

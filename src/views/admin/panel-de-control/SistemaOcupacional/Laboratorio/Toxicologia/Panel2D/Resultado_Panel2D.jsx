@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from './controller2D';
 
 const PRUEBAS = ['MARIHUANA (THC)', 'COCAINA (COC)'];
 
-export default function Resultado_Panel2D({ apiBase, token, selectedSede }) {
+export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
  const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const tabla = 'panel2d'
   const [form, setForm] = useState({
     norden: '',
     fecha: today,
@@ -36,18 +38,7 @@ export default function Resultado_Panel2D({ apiBase, token, selectedSede }) {
   };
 
   const handleSave = async () => {
-    try {
-      const payload = { ...form, sede: selectedSede };
-      const res = await fetch(`${apiBase}/toxicologia/panel2d`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(payload)
-      });
-      if (!res.ok) throw new Error('Error al guardar');
-      setStatus('Guardado exitoso');
-    } catch (err) {
-      setStatus(err.message);
-    }
+
   };
 
   const handleClear = () => {
@@ -63,7 +54,6 @@ export default function Resultado_Panel2D({ apiBase, token, selectedSede }) {
   };
 
   const handlePrint = () => {
-    window.open(`${apiBase}/toxicologia/panel2d/print?norden=${form.norden}`, '_blank');
   };
 
   return (
@@ -78,6 +68,7 @@ export default function Resultado_Panel2D({ apiBase, token, selectedSede }) {
               name="norden"
               value={form.norden}
               onChange={handleChange}
+              onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
               className="border rounded px-2 py-1 flex-1"
             />
           </div>

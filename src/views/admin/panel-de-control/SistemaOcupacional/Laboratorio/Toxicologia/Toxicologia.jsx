@@ -7,14 +7,14 @@ import Resultado_Panel3D from './Panel3D/Resultado_Panel3D';
 import Resultado_Panel5D from './Panel5D/Resultado_Panel5D';
 import Resultado_Panel10D from './Panel10D/Resultado_Panel10D';
 
-const Toxicologia = () => {
+const Toxicologia = ({token, selectedSede, userlogued}) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { label: 'Panel 2D', icon: faSquare, component: <Resultado_Panel2D /> },
-    { label: 'Panel 3D', icon: faCube, component: <Resultado_Panel3D /> },
-    { label: 'Panel 5D', icon: faLayerGroup, component: <Resultado_Panel5D /> },
-    { label: 'Panel 10D', icon: faThLarge, component: <Resultado_Panel10D /> }
+    { label: 'Panel 2D', icon: faSquare, component: <Resultado_Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Panel 3D', icon: faCube, component: <Resultado_Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Panel 5D', icon: faLayerGroup, component: <Resultado_Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Panel 10D', icon: faThLarge, component: <Resultado_Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
   ];
 
   return (

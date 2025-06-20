@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from './controller10D';
 
 const pruebas10D = [
   'COCAINA (COC)',
@@ -16,22 +17,18 @@ const pruebas10D = [
   'ANTIDEPRESIVOS TRICÍCLICOS (TCA)',
 ];
 
-const Rseultado_Panel10D = ({ initialData = {}, apiBase }) => {
+const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
+  const tabla = 'panel10d'
   const [form, setForm] = useState({
     nroFicha: '',
     fecha: '',
     nombres: '',
     edad: '',
     resultados: pruebas10D.map(() => 'NEGATIVO'),
-    ...initialData
   });
   const fechaRef = useRef(null);
 
-  useEffect(() => {
-    if (initialData.nroFicha) {
-      setForm(f => ({ ...f, ...initialData }));
-    }
-  }, [initialData]);
+  
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -61,16 +58,11 @@ const Rseultado_Panel10D = ({ initialData = {}, apiBase }) => {
   };
 
   const handleSave = async () => {
-    await fetch(`${apiBase}/toxicologia/10d`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+    
     // manejar respuesta, notificaciones, etc.
   };
 
   const handlePrint = () => {
-    window.open(`${apiBase}/toxicologia/10d/print/${form.nroFicha}`, '_blank');
   };
 
   // ancho dinámico para el campo nombres
@@ -87,6 +79,7 @@ const Rseultado_Panel10D = ({ initialData = {}, apiBase }) => {
           <input
             name="nroFicha"
             value={form.nroFicha}
+            onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
             onChange={handleChange}
             className="border rounded px-3 py-2 w-32"
           />

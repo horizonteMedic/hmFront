@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from './controller5D';
 
 const pruebas5D = [
   'COCAINA',
@@ -10,22 +11,18 @@ const pruebas5D = [
   'BENZODIAZEPINA',
 ];
 
-const Rseultado_Panel5D = ({ initialData = {}, apiBase }) => {
+const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
+  const tabla = 'panel5d'
   const [form, setForm] = useState({
     nroFicha: '',
     fecha: '',
     nombres: '',
     edad: '',
     resultados: pruebas5D.map(() => 'NEGATIVO'),
-    ...initialData
   });
   const fechaRef = useRef(null);
 
-  useEffect(() => {
-    if (initialData.nroFicha) {
-      setForm(f => ({ ...f, ...initialData }));
-    }
-  }, [initialData]);
+  
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -55,15 +52,10 @@ const Rseultado_Panel5D = ({ initialData = {}, apiBase }) => {
   };
 
   const handleSave = async () => {
-    await fetch(`${apiBase}/toxicologia/5d`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
+    
   };
 
   const handlePrint = () => {
-    window.open(`${apiBase}/toxicologia/5d/print/${form.nroFicha}`, '_blank');
   };
 
   const nameWidth = Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10));
@@ -78,6 +70,7 @@ const Rseultado_Panel5D = ({ initialData = {}, apiBase }) => {
           <input
             name="nroFicha"
             value={form.nroFicha}
+            onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
             onChange={handleChange}
             className="border rounded px-3 py-2 w-32"
           />
