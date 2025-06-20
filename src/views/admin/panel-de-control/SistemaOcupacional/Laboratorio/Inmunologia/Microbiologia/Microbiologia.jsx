@@ -20,7 +20,8 @@ const initialState = {
   bk2Radio: '',
   koh: '',
   kohRadio: '',
-  printCount: ''
+  printCount: '',
+  medico: ''
 }
 
 function reducer(state, action) {
@@ -37,9 +38,18 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
   const fechaRef = useRef(null)
 
   useEffect(() => {
-    if (!form.norden) return
-    VerifyTR(form.norden, 'microbiologia', token, dispatch, selectedSede)
-  }, [form.norden, token, selectedSede])
+    if (form.examenDirecto) {
+      // Limpiar BK 1ª y BK 2ª
+      dispatch({ type: 'SET', field: 'bk1', value: '' });
+      dispatch({ type: 'SET', field: 'bk1Radio', value: '' });
+      dispatch({ type: 'SET', field: 'bk2', value: '' });
+      dispatch({ type: 'SET', field: 'bk2Radio', value: '' });
+    } else {
+      // Limpiar KOH
+      dispatch({ type: 'SET', field: 'koh', value: '' });
+      dispatch({ type: 'SET', field: 'kohRadio', value: '' });
+    }
+  }, [form.examenDirecto]);
 
   const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
 
@@ -81,10 +91,16 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
   }, [form])
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded shadow p-8 space-y-6">
+    <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <h2 className="text-2xl font-bold text-center">MICROBIOLOGÍA</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={e=>setField('norden',e.target.value)} onKeyUp={e=>e.key==='Enter'&&VerifyTR(form.norden,'microbiologia',token,dispatch,selectedSede)} />
+        <Field
+          label="Nro Ficha"
+          name="norden"
+          value={form.norden}
+          onChange={e => setField('norden', e.target.value)}
+          onKeyUp={e => e.key === 'Enter' && VerifyTR(form.norden, 'microbiologia', token, dispatch, selectedSede)}
+        />
         <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} inputRef={fechaRef} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -94,55 +110,145 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
       <Checkbox label="Examen Directo" checked={form.examenDirecto} onChange={v=>setField('examenDirecto',v)} />
       <div className="text-center font-semibold">MUESTRA: ESPUTO</div>
       <div className="grid grid-cols-12 gap-2 items-center">
-        <div className="col-span-4 font-bold">PRUEBA</div>
-        <div className="col-span-2 font-bold">RESULTADO</div>
+        <div className="col-span-4 font-bold flex items-center">PRUEBA</div>
+        <div className="col-span-2 font-bold flex items-center">RESULTADO</div>
         <div className="col-span-6"></div>
 
-        {[
-          { label:'Examen de BK - BACILOSCOPIA 1ª', key:'bk1', radio:'bk1Radio' },
-          { label:'Examen de BK - BACILOSCOPIA 2ª', key:'bk2', radio:'bk2Radio' },
-          { label:'KOH', key:'koh', radio:'kohRadio' }
-        ].map((item,i) => (
-          <React.Fragment key={i}>
-            <div className="col-span-4">{item.label} :</div>
-            <div className="col-span-2">
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name={item.key}
-                value={form[item.key]}
-                onChange={e=>setField(item.key, e.target.value)}
-              />
-            </div>
-            <div className="col-span-6 flex gap-4">
-              {['NEGATIVO','POSITIVO','NA'].map(opt => (
-                <label key={opt} className="flex items-center gap-1">
-                  <input
-                    type="radio"
-                    name={item.radio}
-                    checked={form[item.radio]===opt}
-                    onChange={()=>setField(item.radio,opt)}
-                  />
-                  {opt}
-                </label>
-              ))}
-            </div>
-          </React.Fragment>
-        ))}
-      </div>
-      <div className="flex justify-between">
-        <div className="flex items-center gap-2">
+        {/* Examen de BK - BACILOSCOPIA 1ª */}
+        <div className="col-span-4 flex items-center">Examen de BK - BACILOSCOPIA 1ª<span className="ml-1">:</span></div>
+        <div className="col-span-2">
           <input
-            name="printCount"
-            value={form.printCount}
-            onChange={e=>setField('printCount',e.target.value)}
-            className="border rounded px-2 py-1 w-24"
-            placeholder="Veces"
+            className="border rounded px-2 py-1 w-full"
+            name="bk1"
+            value={form.bk1}
+            onChange={e=>setField('bk1', e.target.value)}
+            disabled={form.examenDirecto}
           />
-          <ActionButton color="blue" icon={faPrint} onClick={handlePrint}>Imprimir</ActionButton>
         </div>
+        <div className="col-span-6 flex gap-4">
+          {["BAAR - NEGATIVO","BAAR - POSITIVO","N/A"].map(opt => (
+            <label key={opt} className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                name="bk1Radio"
+                checked={form.bk1Radio===opt}
+                disabled={form.examenDirecto}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setField('bk1Radio', opt);
+                    setField('bk1', opt);
+                  } else {
+                    setField('bk1Radio', '');
+                    setField('bk1', '');
+                  }
+                }}
+              />
+              {opt}
+            </label>
+          ))}
+        </div>
+
+        {/* Examen de BK - BACILOSCOPIA 2ª */}
+        <div className="col-span-4 flex items-center">Examen de BK - BACILOSCOPIA 2ª<span className="ml-1">:</span></div>
+        <div className="col-span-2">
+          <input
+            className="border rounded px-2 py-1 w-full"
+            name="bk2"
+            value={form.bk2}
+            onChange={e=>setField('bk2', e.target.value)}
+            disabled={form.examenDirecto}
+          />
+        </div>
+        <div className="col-span-6 flex gap-4">
+          {["BAAR - NEGATIVO","BAAR - POSITIVO","N/A"].map(opt => (
+            <label key={opt} className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                name="bk2Radio"
+                checked={form.bk2Radio===opt}
+                disabled={form.examenDirecto}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setField('bk2Radio', opt);
+                    setField('bk2', opt);
+                  } else {
+                    setField('bk2Radio', '');
+                    setField('bk2', '');
+                  }
+                }}
+              />
+              {opt}
+            </label>
+          ))}
+        </div>
+
+        {/* KOH */}
+        <div className="col-span-4 flex items-center">KOH<span className="ml-1">:</span></div>
+        <div className="col-span-2">
+          <input
+            className="border rounded px-2 py-1 w-full"
+            name="koh"
+            value={form.koh}
+            onChange={e=>setField('koh', e.target.value)}
+            disabled={!form.examenDirecto}
+          />
+        </div>
+        <div className="col-span-6 flex gap-4">
+          {["BAAR - NEGATIVO","BAAR - POSITIVO","N/A"].map(opt => (
+            <label key={opt} className="flex items-center gap-1">
+              <input
+                type="checkbox"
+                name="kohRadio"
+                checked={form.kohRadio===opt}
+                disabled={!form.examenDirecto}
+                onChange={e => {
+                  if (e.target.checked) {
+                    setField('kohRadio', opt);
+                    setField('koh', opt);
+                  } else {
+                    setField('kohRadio', '');
+                    setField('koh', '');
+                  }
+                }}
+              />
+              {opt}
+            </label>
+          ))}
+        </div>
+      </div>
+      {/* Campo ASIGNAR MEDICO */}
+      <div className="flex items-center mt-6 mb-2">
+        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
+        <select
+          id="asignarMedico"
+          className="border rounded px-2 py-1 min-w-[220px]"
+          value={form.medico || ''}
+          onChange={e => setField('medico', e.target.value)}
+        >
+          <option value="">Seleccionar medico</option>
+          <option value="medico1">Dr. Juan Pérez</option>
+          <option value="medico2">Dra. Ana Torres</option>
+          <option value="medico3">Dr. Luis Gómez</option>
+        </select>
+      </div>
+      {/* Botones y área de imprimir */}
+      <div className="flex justify-between items-end mt-6">
         <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar</ActionButton>
+          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
           <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+        </div>
+        <div className="flex flex-col items-end">
+          <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
+          <div className="flex items-center gap-2">
+            <input
+              name="printCount"
+              value={form.printCount}
+              onChange={e=>setField('printCount',e.target.value)}
+              className="border rounded px-2 py-1 w-24"
+              placeholder="Veces"
+            />
+            <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
+          </div>
         </div>
       </div>
     </div>
