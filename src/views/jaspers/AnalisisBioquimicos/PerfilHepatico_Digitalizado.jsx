@@ -3,101 +3,110 @@ import jsPDF from "jspdf";
 import headerPerfilHepatico from "./Header/headerPerfilHepatico";
 import footer from "../components/footer";
 
+const config = {
+  margin: 15,
+  fontSize: {
+    title: 14,
+    subtitle: 11,
+    header: 11,
+    body: 10,
+  },
+  lineHeight: {
+    normal: 7,
+    small: 5,
+  },
+  font: 'helvetica',
+};
+
+const drawRow = (doc, y, test, datos, cols) => {
+  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
+  doc.text(test.label, cols.col1, y);
+  
+  const result = datos[test.key] != null ? String(datos[test.key]) : "0";
+  doc.text(result, cols.col2, y, { align: "center" });
+
+  if (typeof test.ref === "string") {
+    doc.text(test.ref, cols.col3, y, { align: "right" });
+    return y + config.lineHeight.normal;
+  } else if (Array.isArray(test.ref)) {
+    let tempY = y;
+    test.ref.forEach((line, index) => {
+      // Divide la línea en parte de etiqueta y parte de valor para alinearlas
+      const parts = line.split(/(Hasta .*|10 - 50 U\/L|8 - 35 U\/L)/);
+      const labelPart = parts[0] || '';
+      const valuePart = parts[1] || '';
+      const textRightAligned = labelPart.trim() + " " + valuePart.trim();
+
+      doc.text(textRightAligned, cols.col3, tempY, { align: "right" });
+      if (index < test.ref.length - 1) {
+        tempY += config.lineHeight.small;
+      }
+    });
+    // Devuelve la posición Y más baja alcanzada, más un pequeño espacio, 
+    // o la altura de línea normal, lo que sea mayor, para evitar solapamientos.
+    return Math.max(y + config.lineHeight.normal, tempY + config.lineHeight.small + 2);
+  }
+  return y + config.lineHeight.normal;
+};
+
 export default function PerfilHepatico_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
+  let y = 70; // Posición inicial después del header
 
-  // === HEADER ===
   headerPerfilHepatico(doc, datos);
 
-  // === CUERPO: más abajo y con márgenes laterales ampliados ===
-  let y = 80;                        // iniciamos más abajo
-  const xLeft = margin * 2;          // margen izquierdo 30mm
-  const xMid = pageW / 2;            // columna central
-  const tableX = margin * 2;         // inicio de tabla
-  const tableW = pageW - margin * 4; // ancho de tabla reducido
-  const xRight = tableX + tableW;    // fin de tabla
-
-  // Título
-  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
   doc.text("BIOQUÍMICA", pageW / 2, y, { align: "center" });
-  y += 10;
+  y += config.lineHeight.normal * 1.5;
 
-  // Muestra y perfil
-  doc.setFont("helvetica", "bold").setFontSize(11);
-  doc.text(`MUESTRA: ${datos.muestra || "SUERO"}`, xLeft, y);
-  y += 7;
-  doc.text("PERFIL HEPÁTICO", xLeft, y);
-  y += 10;
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
+  doc.text(`MUESTRA: ${datos.muestra || "SUERO"}`, config.margin, y);
+  y += config.lineHeight.normal;
+  doc.text("PERFIL HEPÁTICO", config.margin, y);
+  y += config.lineHeight.normal * 1.5;
 
-  // Encabezado de tabla
-  doc.setFont("helvetica", "bold");
-  doc.text("PRUEBA", tableX, y);
-  doc.text("RESULTADO", xMid, y, { align: "center" });
-  doc.text("RANGO REFERENCIAL", xRight, y, { align: "right" });
-  y += 4;
-  doc.setLineWidth(0.5);
-  doc.line(tableX, y, tableX + tableW, y);
-  y += 6;
+  const tableCols = {
+    col1: config.margin,
+    col2: pageW / 2,
+    col3: pageW - config.margin,
+  };
 
-  // Definición de pruebas
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA", tableCols.col1, y);
+  doc.text("RESULTADO", tableCols.col2, y, { align: "center" });
+  doc.text("RANGO REFERENCIAL", tableCols.col3, y, { align: "right" });
+  y += 3;
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight.normal;
+
   const tests = [
     { label: "TGO", key: "tgo", ref: "Hasta 31 U/L" },
-    {
-      label: "TGP",
-      key: "tgp",
-      ref: [
-        { text: "Hombres  Hasta 40 U/L" },
-        { text: "Mujeres  Hasta 35 U/L" },
-      ],
-    },
-    {
-      label: "GGT",
-      key: "ggt",
-      ref: [
-        { text: "Hombres  10 - 50 U/L" },
-        { text: "Mujeres  8 - 35 U/L" },
-      ],
-    },
-    { label: "FOSFATASA ALCALINA", key: "fosfatasa", ref: "Hasta 300 U/L" },
-    { label: "BILIRRUBINA TOTAL", key: "bilirrubina_total", ref: "0.2 - 1.20 mg/dL" },
-    { label: "BILIRRUBINA INDIRECTA", key: "bilirrubina_indirecta", ref: "0.1 - 1 mg/dL" },
-    { label: "BILIRRUBINA DIRECTA", key: "bilirrubina_directa", ref: "Hasta 0.25 mg/dL" },
-    { label: "PROTEÍNAS TOTALES", key: "proteinas", ref: "6.6 - 8.3 g/dL" },
+    { label: "TGP", key: "tgp", ref: ["Hombres  Hasta 40 U/L", "Mujeres  Hasta 35 U/L"] },
+    { label: "GGT", key: "ggt", ref: ["Hombres  10 - 50 U/L", "Mujeres  8 - 35 U/L"] },
+    { label: "FOSFATASA ALCALINA", key: "fosfAlc", ref: "Hasta 300 U/L" },
+    { label: "BILIRRUBINA TOTAL", key: "biliTotal", ref: "0.2 - 1.20 mg/dL" },
+    { label: "BILIRRUBINA INDIRECTA", key: "biliInd", ref: "0.1 - 1 mg/dL" },
+    { label: "BILIRRUBINA DIRECTA", key: "biliDir", ref: "Hasta 0.25 mg/dL" },
+    { label: "PROTEÍNAS TOTALES", key: "protTot", ref: "6.6 - 8.3 g/dL" },
     { label: "ALBÚMINA", key: "albumina", ref: "3.5 - 5.5 g/dL" },
-    { label: "GLOBULINA SÉRICA", key: "globulina", ref: "2.3 - 3.5 g/dL" },
+    { label: "GLOBULINA SÉRICA", key: "globSer", ref: "2.3 - 3.5 g/dL" },
   ];
 
-  doc.setFont("helvetica", "normal").setFontSize(11);
-
-  tests.forEach(t => {
-    // columna prueba y resultado
-    doc.text(t.label, tableX, y);
-    doc.text(`${datos[t.key] ?? ""}`, xMid, y, { align: "center" });
-
-    // columna rango
-    if (typeof t.ref === "string") {
-      doc.text(t.ref, xRight, y, { align: "right" });
-      y += 7;
-    } else {
-      // array de líneas
-      t.ref.forEach(r => {
-        doc.text(r.text, xRight, y, { align: "right" });
-        y += 7;
-      });
-    }
+  tests.forEach(test => {
+    y = drawRow(doc, y, test, datos, tableCols);
   });
 
-  // === FOOTER ===
   footer(doc, datos);
 
-  // === IMPRIMIR ===
   const pdfBlob = doc.output("blob");
-  const pdfUrl  = URL.createObjectURL(pdfBlob);
-  const iframe  = document.createElement("iframe");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = pdfUrl;
   document.body.appendChild(iframe);
-  iframe.onload = () => iframe.contentWindow.print();
+  iframe.onload = () => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+  };
 }

@@ -204,13 +204,13 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
-            <input
-              name="printCount"
-              value={form.printCount}
-              onChange={e=>setField('printCount',e.target.value)}
-              className="border rounded px-2 py-1 w-24"
-              placeholder="Veces"
-            />
+        <input
+          name="printCount"
+          value={form.printCount}
+          onChange={e=>setField('printCount',e.target.value)}
+          className="border rounded px-2 py-1 w-24"
+          placeholder="Veces"
+        />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>
         </div>

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
 import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
-import Microbiologia_Digitalizado from '../../../../../../jaspers/AnalisisBioquimicos/Microbiologia_Digitalizado'
+import Microbiologia_Digitalizado from '../../../../../../jaspers/Inmunologia/Microbiologia_Digitalizado'
 
 const today = new Date().toISOString().split('T')[0]
 

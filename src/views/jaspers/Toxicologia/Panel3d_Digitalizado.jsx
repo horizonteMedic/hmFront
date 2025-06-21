@@ -1,75 +1,100 @@
 // src/views/jaspers/Toxicologia/Panel3d_Digitalizado.jsx
 import jsPDF from "jspdf";
-import header from "./Header/Header_toxicologia";
+import header_Panel3d_Digitalizado from "./Header/header_Panel3d_Digitalizado";
 import footer from "../components/footer";
 
-export default function Panel3d_Digitalizado(datos) {
-  const doc = new jsPDF();
-  // Header común
-  header(doc, datos);
+// --- Configuración Centralizada ---
+const config = {
+  margin: 15,
+  col1X: 15,
+  col2X: 100,
+  col3X: 185,
+  fontSize: {
+    title: 14,
+    header: 11,
+    body: 11,
+  },
+  font: 'helvetica',
+  lineHeight: 8,
+};
 
-  // Posición inicial
+// --- Funciones de Ayuda ---
+
+const drawUnderlinedTitle = (doc, text, y) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text(text, pageW / 2, y, { align: "center" });
+};
+
+const drawResultRow = (doc, y, label, result, units) => {
+  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
+  doc.text(label, config.col1X, y);
+  doc.text(result, config.col2X, y, { align: "center" });
+  doc.text(units, config.col3X, y, { align: "center" });
+  return y + config.lineHeight;
+};
+
+// --- Componente Principal ---
+
+export default function Panel3d_Digitalizado(datos = {}) {
+  const doc = new jsPDF();
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // === HEADER ===
+  header_Panel3d_Digitalizado(doc, datos);
+
+  // === CUERPO ===
   let y = 80;
 
-  // --- TÍTULO PRINCIPAL ---
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("TOXICOLÓGICO", 105, y, { align: "center" });
-  y += 12;
+  // Título
+  drawUnderlinedTitle(doc, "TOXICOLÓGICO", y);
+  y += config.lineHeight * 1.5;
 
-  // --- MUESTRA Y MÉTODO ---
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("MUESTRA :", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.muestra || "ORINA", 50, y);
-  y += 8;
+  // Muestra y Método
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("MUESTRA :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text(datos.muestra || "ORINA", config.margin + 30, y);
+  y += config.lineHeight;
 
-  doc.setFont("helvetica", "bold");
-  doc.text("MÉTODO  :", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", 50, y);
-  y += 12;
+  doc.setFont(config.font, "bold");
+  doc.text("MÉTODO :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", config.margin + 30, y);
+  y += config.lineHeight * 2;
 
-  // --- ENCABEZADO DE COLUMNAS ---
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("PRUEBA CUALITATIVO", 20, y);
-  doc.text("RESULTADOS", 85, y);
-  doc.text("UNIDADES", 150, y);
-  y += 5;
-  doc.setLineWidth(0.5);
-  doc.line(20, y, 190, y);
+  // Encabezado de tabla
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+  doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
+  doc.text("UNIDADES", config.col3X, y, { align: 'center' });
+  y += 3;
 
-  // --- TÍTULO DEL PANEL 3D ---
-  y += 8;
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("PANEL DROGAS 3D", 20, y);
+  // Línea
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-  // --- FILAS DE ANALITOS ---
-  y += 8;
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
+  // Título del Panel
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("PANEL DROGAS 3D", config.col1X, y);
+  y += config.lineHeight;
 
-  const tests3d = [
+  // Datos
+  const tests = [
     { label: "Cocaína (COC)", key: "cocaina" },
-    { label: "Marihuana (THC)", key: "marihuana" },
+    { label: "Marihuana(THC)", key: "marihuana" },
     { label: "Éxtasis (MDMA)", key: "extasis" },
   ];
-
-  tests3d.forEach(({ label, key }) => {
-    doc.text(label, 20, y);
-    const resultado = (datos[key] || "NEGATIVO").toUpperCase();
-    doc.text(resultado, 85, y);
-    doc.text("S/U", 150, y);
-    y += 7;
+  
+  tests.forEach(({ label, key }) => {
+    const value = datos[key] != null ? datos[key] : "NEGATIVO";
+    y = drawResultRow(doc, y, label, value, "S/U");
   });
 
-  // Footer común
+  // === FOOTER ===
   footer(doc, datos);
 
-  // Generar blob y lanzar impresión
+  // === IMPRIMIR ===
   const pdfBlob = doc.output("blob");
   const pdfUrl = URL.createObjectURL(pdfBlob);
   const iframe = document.createElement("iframe");

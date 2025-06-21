@@ -1,75 +1,102 @@
 // src/views/jaspers/Toxicologia/Panel2d_Digitalizado.jsx
 import jsPDF from "jspdf";
-import header from "../components/header";
+import header_Panel2d_Digitalizado from "./Header/header_Panel2d_Digitalizado";
 import footer from "../components/footer";
 
-export default function Panel2d_Digitalizado(datos) {
-  const doc = new jsPDF();
-  // ahora usamos el header_toxicologia que creaste
-  header(doc, datos);
+// --- Configuración Centralizada ---
+const config = {
+  margin: 15,
+  col1X: 15,
+  col2X: 100,
+  col3X: 185,
+  fontSize: {
+    title: 14,
+    header: 11,
+    body: 11,
+  },
+  font: 'helvetica',
+  lineHeight: 8,
+};
 
-  // baja todo el contenido un poco más
+// --- Funciones de Ayuda ---
+
+const drawUnderlinedTitle = (doc, text, y) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text(text, pageW / 2, y, { align: "center" });
+};
+
+const drawResultRow = (doc, y, label, result, units) => {
+  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
+  doc.text(label, config.col1X, y);
+  doc.text(result, config.col2X, y, { align: "center" });
+  doc.text(units, config.col3X, y, { align: "center" });
+  return y + config.lineHeight;
+};
+
+// --- Componente Principal ---
+
+export default function Panel2d_Digitalizado(datos = {}) {
+  const doc = new jsPDF();
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // === HEADER ===
+  header_Panel2d_Digitalizado(doc, datos);
+
+  // === CUERPO ===
   let y = 80;
 
-  // --- TÍTULO ---
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text("TOXICOLÓGICO", 105, y, { align: "center" });
-  y += 12;
+  // Título
+  drawUnderlinedTitle(doc, "TOXICOLÓGICO", y);
+  y += config.lineHeight * 1.5;
 
-  // --- MUESTRA Y MÉTODO ---
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("MUESTRA :", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.muestra || "ORINA", 50, y);
-  y += 8;
+  // Muestra y Método
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("MUESTRA :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text(datos.muestra || "ORINA", config.margin + 30, y);
+  y += config.lineHeight;
 
-  doc.setFont("helvetica", "bold");
-  doc.text("MÉTODO  :", 20, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", 50, y);
-  y += 12;
+  doc.setFont(config.font, "bold");
+  doc.text("MÉTODO :", config.margin, y);
+  doc.setFont(config.font, "normal");
+  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", config.margin + 30, y);
+  y += config.lineHeight * 2;
 
-  // --- ENCABEZADO DE COLUMNAS ---
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("PRUEBA CUALITATIVO", 20, y);
-  doc.text("RESULTADOS", 85, y);
-  doc.text("UNIDADES", 150, y);
+  // Encabezado de tabla
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+  doc.text("PRUEBA CUALITATIVO", config.col1X, y);
+  doc.text("RESULTADOS", config.col2X, y, { align: 'center' });
+  doc.text("UNIDADES", config.col3X, y, { align: 'center' });
+  y += 3;
 
-  // Línea bajo encabezados
-  y += 5;
-  doc.setLineWidth(0.5);
-  doc.line(20, y, 190, y);
+  // Línea
+  doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+  y += config.lineHeight;
 
-  // --- PANEL DROGAS 2D ---
-  y += 8;
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text("PANEL DROGAS 2D", 20, y);
+  // Título del Panel
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
+  doc.text("PANEL DROGAS 2D", config.col1X, y);
+  y += config.lineHeight;
 
-  // --- DATOS ---
-  y += 8;
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
+  // Datos
+  const tests = [
+    { label: "Cocaína (COC)", key: "cocaina" },
+    { label: "Marihuana(THC)", key: "marihuana" },
+  ];
+  
+  tests.forEach(({ label, key }) => {
+    const value = datos[key] != null ? datos[key] : "NEGATIVO";
+    y = drawResultRow(doc, y, label, value, "S/U");
+  });
 
-  doc.text("Cocaína (COC)", 20, y);
-  doc.text(datos.cocaina  || "NEGATIVO", 85, y);
-  doc.text("S/U", 150, y);
-
-  y += 7;
-  doc.text("Marihuana (THC)", 20, y);
-  doc.text(datos.marihuana || "POSITIVO", 85, y);
-  doc.text("S/U", 150, y);
-
-  // --- FOOTER ---
+  // === FOOTER ===
   footer(doc, datos);
 
-  // abrir para imprimir
+  // === IMPRIMIR ===
   const pdfBlob = doc.output("blob");
-  const pdfUrl  = URL.createObjectURL(pdfBlob);
-  const iframe  = document.createElement("iframe");
+  const pdfUrl = URL.createObjectURL(pdfBlob);
+  const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = pdfUrl;
   document.body.appendChild(iframe);

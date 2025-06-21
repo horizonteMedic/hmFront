@@ -1,13 +1,10 @@
-// src/views/jaspers/AnalisisBioquimicos/Header/headerPerfilHepatico.jsx
-
 /**
- * Formatea una fecha en formato "04 noviembre 2024".
+ * Formatea una fecha en formato "13 diciembre 2024".
  * @param {string} dateString - La fecha en formato YYYY-MM-DD.
  * @returns {string} - La fecha formateada.
  */
 const formatDateToLong = (dateString) => {
   if (!dateString) return '';
-  // Aseguramos que la fecha se interprete en la zona horaria local y no en UTC.
   const date = new Date(`${dateString}T00:00:00`);
   return date.toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -16,44 +13,54 @@ const formatDateToLong = (dateString) => {
   });
 };
 
-const headerPerfilHepatico = (doc, datos = {}) => {
-  const pageW = doc.internal.pageSize.getWidth();
+/**
+ * Dibuja el encabezado para el reporte de Inmunología (Aglutinación).
+ * @param {jsPDF} doc - La instancia del documento jsPDF.
+ * @param {object} datos - Los datos a imprimir.
+ */
+const header_InmunologiaLab_Digitalizado = (doc, datos = {}) => {
   const margin = 15;
+  const pageW = doc.internal.pageSize.getWidth();
   let y = 10;
 
-  // 1. Logo (izquierda)
+  // 1. Logo a la izquierda
+  const img = "./img/logo-color.png";
   try {
-    const img = "./img/logo-color.png";
     doc.addImage(img, "PNG", margin, y, 60, 20);
   } catch (error) {
     console.error("No se pudo cargar el logo.", error);
-    doc.setFont("helvetica", "bold").text("Policlinico Horizonte Medic", margin, y + 8);
+    doc.text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2. Nro Orden (derecha)
+  // 2. Bloque de datos a la derecha
   const rightColX = pageW - margin;
-  doc.setFontSize(11).setFont("helvetica", "normal");
+  const lineHeight = 6;
+  
+  // --- Sede ---
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  doc.text(`Sede : ${datos.sede || ''}`, rightColX, y + 5, { align: 'right' });
+
+  // --- Nro Orden ---
+  y += 10;
+  doc.setFont('helvetica', 'normal');
   const nroOrdenLabel = "Nro Orden :";
   const nroOrdenValue = String(datos.norden || '');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
-  
-  doc.text(nroOrdenLabel, nroOrdenX, y + 5);
-  doc.setFont("helvetica", "bold");
-  doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y + 5);
-  doc.setLineWidth(0.5).line(
-    nroOrdenX + nroOrdenLabelWidth + 1, y + 6.5,
-    nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 6.5
+  doc.text(nroOrdenLabel, nroOrdenX, y);
+
+  doc.setFont('helvetica', 'bold');
+  doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y);
+  doc.setLineWidth(0.5);
+  doc.line(
+    nroOrdenX + nroOrdenLabelWidth + 2, y + 1.5,
+    nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 1.5
   );
+  y += lineHeight;
 
-  // Sede (debajo, alineado con el Nro Orden)
-  doc.setFontSize(9).setFont("helvetica", "normal");
-  doc.text(datos.sede || "Trujillo-Pierola", rightColX, y + 11, { align: "right" });
-
-  // 3. Bloque de datos del paciente
-  y = 40; 
-  const lineHeight = 6;
+  // --- Datos del paciente ---
+  y += 5;
   const patientDataX = margin + 80;
   
   const drawPatientDataRow = (label, value) => {
@@ -61,15 +68,14 @@ const headerPerfilHepatico = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 2, y);
     y += lineHeight;
   };
   
-  drawPatientDataRow("Apellidos y Nombres :", datos.nombres);
+  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
   drawPatientDataRow("Edad :", datos.edad ? `${datos.edad} AÑOS` : '');
-  drawPatientDataRow("DNI :", datos.dni);
   
-  // Fecha con formato especial
+  // --- Fecha (sin valor en mayúsculas) ---
   doc.setFontSize(11).setFont('helvetica', 'bold');
   const fechaLabel = "Fecha :";
   doc.text(fechaLabel, patientDataX, y);
@@ -77,8 +83,8 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
   doc.text(formatDateToLong(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
   
-  // Reseteo de estilos para el cuerpo
+  // Reseteo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
 
-export default headerPerfilHepatico;
+export default header_InmunologiaLab_Digitalizado; 

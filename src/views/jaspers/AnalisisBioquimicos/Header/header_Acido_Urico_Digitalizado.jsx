@@ -7,7 +7,6 @@
  */
 const formatDateToLong = (dateString) => {
   if (!dateString) return '';
-  // Aseguramos que la fecha se interprete en la zona horaria local y no en UTC.
   const date = new Date(`${dateString}T00:00:00`);
   return date.toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -16,7 +15,7 @@ const formatDateToLong = (dateString) => {
   });
 };
 
-const headerPerfilHepatico = (doc, datos = {}) => {
+const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   let y = 10;
@@ -30,11 +29,11 @@ const headerPerfilHepatico = (doc, datos = {}) => {
     doc.setFont("helvetica", "bold").text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2. Nro Orden (derecha)
+  // 2. Nro Orden (derecha) - SIN el sufijo "-TP"
   const rightColX = pageW - margin;
   doc.setFontSize(11).setFont("helvetica", "normal");
   const nroOrdenLabel = "Nro Orden :";
-  const nroOrdenValue = String(datos.norden || '');
+  const nroOrdenValue = String(datos.norden || ''); // <-- Sin "-TP"
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
@@ -46,11 +45,6 @@ const headerPerfilHepatico = (doc, datos = {}) => {
     nroOrdenX + nroOrdenLabelWidth + 1, y + 6.5,
     nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 6.5
   );
-
-  // Sede (debajo, alineado con el Nro Orden)
-  doc.setFontSize(9).setFont("helvetica", "normal");
-  doc.text(datos.sede || "Trujillo-Pierola", rightColX, y + 11, { align: "right" });
-
   // 3. Bloque de datos del paciente
   y = 40; 
   const lineHeight = 6;
@@ -69,7 +63,7 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   drawPatientDataRow("Edad :", datos.edad ? `${datos.edad} AÑOS` : '');
   drawPatientDataRow("DNI :", datos.dni);
   
-  // Fecha con formato especial
+  // Fecha con formato largo para coincidir con la imagen
   doc.setFontSize(11).setFont('helvetica', 'bold');
   const fechaLabel = "Fecha :";
   doc.text(fechaLabel, patientDataX, y);
@@ -81,4 +75,4 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
 
-export default headerPerfilHepatico;
+export default header_Acido_Urico_Digitalizado;

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlask, faFilter, faTint, faLungs } from '@fortawesome/free-solid-svg-icons';
 import AnalisisBioquimicos from './Analisis_bioquimicos/Analisis_bioquimicos';
-import Bioquimica from './Bioquimica/Bioquimica';
+import Bioquimica from './Bioquimica/Perfil_Renal';
 import BioquimicaAcidoUrico from './BioquimicaAcidoUrico/BioquimicaAcidoUrico';
 import PerfilHepatico from './PerfilHepatico/PerfilHepatico';
 

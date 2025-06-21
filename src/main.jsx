@@ -30,9 +30,10 @@ import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/
 import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeReclamaciones.jsx'
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
+import Test from './views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/BioquimicaAcidoUrico/BioquimicaAcidoUrico'
 //jaspers
-import Sucamec from './views/jaspers/AnalisisBioquimicos/PerfilHepatico_Digitalizado.jsx';
-
+import Ficha from './views/jaspers/AnalisisBioquimicos/Acido_Urico.jsx'
+// import Test from './views/jaspers/AnalisisBioquimicos/Hematologia_Digitalizado'
 const App = () => {
   return (
     <React.StrictMode>
@@ -116,7 +117,8 @@ const AppContent = () => {
         <Route path='/RegistroP' element={<Formulario/>}/>
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/fichapi" element={<Sucamec />} />
+        <Route path="/fichapi" element={<Ficha />} />
+        <Route path="/test" element={<Test />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
       

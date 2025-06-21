@@ -1,13 +1,13 @@
-// src/views/jaspers/Toxicologia/Panel10d_Digitalizado.jsx
+// src/views/jaspers/Toxicologia/Panel5d_Digitalizado.jsx
 import jsPDF from "jspdf";
-import header_Panel10d_Digitalizado from "./Header/header_Panel10d_Digitalizado";
+import header_Panel5d_Digitalizado from "./Header/header_Panel5d_Digitalizado";
 import footer from "../components/footer";
 
 // --- Configuración Centralizada ---
 const config = {
   margin: 15,
   col1X: 15,
-  col2X: 115,
+  col2X: 100,
   col3X: 185,
   fontSize: {
     title: 14,
@@ -36,12 +36,12 @@ const drawResultRow = (doc, y, label, result, units) => {
 
 // --- Componente Principal ---
 
-export default function Panel10d_Digitalizado(datos = {}) {
+export default function Panel5d_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
   // === HEADER ===
-  header_Panel10d_Digitalizado(doc, datos);
+  header_Panel5d_Digitalizado(doc, datos);
 
   // === CUERPO ===
   let y = 80;
@@ -76,21 +76,16 @@ export default function Panel10d_Digitalizado(datos = {}) {
 
   // Título del Panel
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);
-  doc.text("PANEL DROGAS 10D", config.col1X, y);
+  doc.text("PANEL DROGAS 5D", config.col1X, y);
   y += config.lineHeight;
 
   // Datos
   const tests = [
-    { label: "COCAÍNA (COC)", key: "cocaina" },
-    { label: "MARIHUANA (THC)", key: "marihuana" },
-    { label: "ANFETAMINA (AMP)", key: "anfetamina" },
-    { label: "METANFETAMINA (MET)", key: "metanfetamina" },
-    { label: "BENZODIACEPINA (BZO)", key: "benzodiacepina" },
-    { label: "OPIÁCEOS (OPI)", key: "opiaceos" },
-    { label: "BARBITÚRICOS", key: "barbituricos" },
-    { label: "METADONA (MTD)", key: "metadona" },
-    { label: "FENCICLIDINA (PCP)", key: "fenciclidina" },
-    { label: "ANTIDEPRESIVOS TRICÍCLICOS (TCA)", key: "antidepresivos" },
+    { label: "Cocaína", key: "cocaina" },
+    { label: "Marihuana", key: "marihuana" },
+    { label: "Anfetamina en Orina", key: "anfetamina" },
+    { label: "Metanfetamina", key: "metanfetamina" },
+    { label: "Benzodiacepina", key: "benzodiacepina" },
   ];
   
   tests.forEach(({ label, key }) => {
