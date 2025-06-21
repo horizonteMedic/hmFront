@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Gonadotropina.jsx
-import React, { useReducer, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -7,61 +7,79 @@ import { PrintHojaR, SubmitGonadotropinaLab, VerifyTR } from './controller';
 
 const today = new Date().toISOString().split('T')[0]
 
-const initialState = {
-  norden: '',
-  fecha: today,
-  nombres: '',
-  edad: '',
-  resultado: '',
-  resultadoRadio: '',
-  medico: '',
-  printCount: ''
-}
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET':      return { ...state, [action.field]: action.value }
-    case 'RESET':    return initialState
-    case 'LOAD':     return { ...state, ...action.payload }
-    default:         return state
-  }
-}
-
 export default function Gonadotropina({ token, selectedSede, userlogued }) {
   const tabla = 'lgonadotropina'
-  const [form, dispatch] = useReducer(reducer, initialState)
+  
+  // Individual useState hooks for each form field
+  const [norden, setNorden] = useState('')
+  const [fecha, setFecha] = useState(today)
+  const [nombres, setNombres] = useState('')
+  const [edad, setEdad] = useState('')
+  const [resultado, setResultado] = useState('')
+  const [resultadoRadio, setResultadoRadio] = useState('')
+  const [medico, setMedico] = useState('')
+  const [printCount, setPrintCount] = useState('')
+  
   const fechaRef = useRef(null)
 
   useEffect(() => {
-    dispatch({ type: 'SET', field: 'resultado', value: form.resultadoRadio })
-  }, [form.resultadoRadio])
+    setResultado(resultadoRadio)
+  }, [resultadoRadio])
 
-  const setField = useCallback((field, value) => dispatch({ type: 'SET', field, value }), [])
-
-  const handleSave = useCallback(() => {
-    SubmitGonadotropinaLab(form, token, userlogued, handleClear)
-  }, [form, token, userlogued])
-
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'RESET' })
+  const handleClear = () => {
+    setNorden('')
+    setFecha(today)
+    setNombres('')
+    setEdad('')
+    setResultado('')
+    setResultadoRadio('')
+    setMedico('')
+    setPrintCount('')
     Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
-  }, [])
+  }
 
-  const handlePrint = useCallback(() => {
-    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+  const handleSave = () => {
+    const formData = {
+      norden,
+      fecha,
+      nombres,
+      edad,
+      resultado,
+      resultadoRadio,
+      medico,
+      printCount
+    }
+    SubmitGonadotropinaLab(formData, token, userlogued, handleClear)
+  }
+
+  const handlePrint = () => {
+    if (!norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
       title: '¿Desea Imprimir?',
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir',
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(form.norden, token);
+        PrintHojaR(norden, token);
         Swal.fire('Imprimiendo', '', 'success')
       }
     });
-  }, [form.norden, token]);
+  }
+
+  const handleVerifyTR = (nordenValue) => {
+    VerifyTR(nordenValue, tabla, token, (payload) => {
+      setNorden(payload.norden || '')
+      setFecha(payload.fecha || today)
+      setNombres(payload.nombres || '')
+      setEdad(payload.edad || '')
+      setResultado(payload.resultado || '')
+      setResultadoRadio(payload.resultadoRadio || '')
+      setMedico(payload.medico || '')
+      setPrintCount(payload.printCount || '')
+    }, selectedSede)
+  }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
@@ -70,22 +88,22 @@ export default function Gonadotropina({ token, selectedSede, userlogued }) {
         <Field
           label="Nro Ficha"
           name="norden"
-          value={form.norden}
-          onChange={e => setField('norden', e.target.value)}
-          onKeyUp={event => { if (event.key === 'Enter') VerifyTR(form.norden, tabla, token, (payload) => dispatch({ type: 'LOAD', payload }), selectedSede) }}
+          value={norden}
+          onChange={e => setNorden(e.target.value)}
+          onKeyUp={event => { if (event.key === 'Enter') handleVerifyTR(norden) }}
         />
         <Field
           label="Fecha"
           name="fecha"
           type="date"
-          value={form.fecha}
-          onChange={e => setField('fecha', e.target.value)}
+          value={fecha}
+          onChange={e => setFecha(e.target.value)}
           inputRef={fechaRef}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} disabled={true} dynamicWidth />
-        <Field label="Edad" name="edad" value={form.edad} disabled={true} />
+        <Field label="Nombres" name="nombres" value={nombres} disabled={true} dynamicWidth />
+        <Field label="Edad" name="edad" value={edad} disabled={true} />
       </div>
 
       <div className="grid grid-cols-12 gap-2 items-center mt-4">
@@ -98,7 +116,7 @@ export default function Gonadotropina({ token, selectedSede, userlogued }) {
           <input
             className="border rounded px-2 py-1 w-full bg-gray-100"
             name="resultado"
-            value={form.resultado}
+            value={resultado}
             disabled
           />
         </div>
@@ -108,8 +126,8 @@ export default function Gonadotropina({ token, selectedSede, userlogued }) {
               <input
                 type="radio"
                 name="resultadoRadio"
-                checked={form.resultadoRadio === opt}
-                onChange={() => setField('resultadoRadio', opt)}
+                checked={resultadoRadio === opt}
+                onChange={() => setResultadoRadio(opt)}
               />
               <span className="font-bold">{opt}</span>
             </label>
@@ -122,8 +140,8 @@ export default function Gonadotropina({ token, selectedSede, userlogued }) {
         <select
           id="asignarMedico"
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={form.medico || ''}
-          onChange={e => setField('medico', e.target.value)}
+          value={medico || ''}
+          onChange={e => setMedico(e.target.value)}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -142,8 +160,8 @@ export default function Gonadotropina({ token, selectedSede, userlogued }) {
           <div className="flex items-center gap-2">
             <input
               name="printCount"
-              value={form.printCount}
-              onChange={e => setField('printCount', e.target.value)}
+              value={printCount}
+              onChange={e => setPrintCount(e.target.value)}
               className="border rounded px-2 py-1 w-24"
               placeholder="Veces"
             />

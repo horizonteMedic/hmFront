@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/PerfilRenal.jsx
-import React, { useReducer, useCallback } from 'react'
+import React, { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -8,77 +8,70 @@ import Perfil_Renal_Digitalizado from '../../../../../../jaspers/AnalisisBioquim
 
 const today = new Date().toISOString().split('T')[0]
 
-const initialState = {
-  norden: '',
-  fecha: today,
-  nombres: '',
-  edad: '',
-  muestra: 'SUERO',
-  creatinina: '',
-  urea: '',
-  acidoUrico: '',
-  printCount: '',
-  medico: ''
-}
-
 const testFields = [
   { label: 'CREATININA SÉRICA', name: 'creatinina' },
   { label: 'UREA SÉRICA', name: 'urea' },
   { label: 'ACIDO URICO SÉRICO', name: 'acidoUrico' },
 ]
 
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET': return { ...state, [action.field]: action.value }
-    case 'LOAD': return { ...state, ...action.payload }
-    case 'RESET': return initialState
-    default: return state
-  }
-}
-
 export default function PerfilRenal({ apiBase, token, selectedSede }) {
-  const [form, dispatch] = useReducer(reducer, initialState)
+  // Individual useState hooks for each form field
+  const [norden, setNorden] = useState('')
+  const [fecha, setFecha] = useState(today)
+  const [nombres, setNombres] = useState('')
+  const [edad, setEdad] = useState('')
+  const [muestra, setMuestra] = useState('SUERO')
+  const [creatinina, setCreatinina] = useState('')
+  const [urea, setUrea] = useState('')
+  const [acidoUrico, setAcidoUrico] = useState('')
+  const [printCount, setPrintCount] = useState('')
+  const [medico, setMedico] = useState('')
 
-  const setField = useCallback((field, value) => {
-    dispatch({ type: 'SET', field, value })
-  }, [])
-
-  const handleSave = useCallback(async () => {
+  const handleSave = async () => {
     try {
       // Placeholder para la lógica de guardado
       Swal.fire('Guardado', 'Perfil renal guardado correctamente', 'success')
     } catch (err) {
       Swal.fire('Error', 'No se pudo guardar', 'error')
     }
-  }, [form])
+  }
 
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'RESET' })
+  const handleClear = () => {
+    setNorden('')
+    setFecha(today)
+    setNombres('')
+    setEdad('')
+    setMuestra('SUERO')
+    setCreatinina('')
+    setUrea('')
+    setAcidoUrico('')
+    setPrintCount('')
+    setMedico('')
     Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
-  }, [])
+  }
 
-  const handlePrint = useCallback(() => {
+  const handlePrint = () => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Perfil Renal?',
-      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
+      html: `<div>N° <b>${norden}</b> - <b>${nombres}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir'
     }).then(res => {
       if (res.isConfirmed) {
         Perfil_Renal_Digitalizado({
-          n_orden: form.norden,
-          paciente: form.nombres,
-          edad: form.edad,
-          fecha: form.fecha,
-          txtcreatinina: form.creatinina,
-          txtureaserica: form.urea,
-          txtacidourico: form.acidoUrico
+          n_orden: norden,
+          paciente: nombres,
+          edad: edad,
+          fecha: fecha,
+          txtcreatinina: creatinina,
+          txtureaserica: urea,
+          txtacidourico: acidoUrico
         })
         Swal.fire('Imprimiendo','','success')
       }
     })
-  }, [form])
+  }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
@@ -88,42 +81,63 @@ export default function PerfilRenal({ apiBase, token, selectedSede }) {
         <Field
           label="Nro Ficha"
           name="norden"
-          value={form.norden}
-          onChange={e => setField('norden', e.target.value)}
-          onKeyUp={e => e.key === 'Enter' && VerifyTR(form.norden, 'perfil_renal', token, dispatch, selectedSede)}
+          value={norden}
+          onChange={e => setNorden(e.target.value)}
+          onKeyUp={e => e.key === 'Enter' && VerifyTR(norden, 'perfil_renal', token, (payload) => {
+            setNorden(payload.norden || '')
+            setFecha(payload.fecha || today)
+            setNombres(payload.nombres || '')
+            setEdad(payload.edad || '')
+            setMuestra(payload.muestra || 'SUERO')
+            setCreatinina(payload.creatinina || '')
+            setUrea(payload.urea || '')
+            setAcidoUrico(payload.acidoUrico || '')
+            setPrintCount(payload.printCount || '')
+            setMedico(payload.medico || '')
+          }, selectedSede)}
         />
-        <Field label="Fecha" type="date" name="fecha" value={form.fecha} onChange={e => setField('fecha', e.target.value)} />
+        <Field label="Fecha" type="date" name="fecha" value={fecha} onChange={e => setFecha(e.target.value)} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} disabled />
-        <Field label="Edad" name="edad" value={form.edad} disabled />
+        <Field label="Nombres" name="nombres" value={nombres} disabled />
+        <Field label="Edad" name="edad" value={edad} disabled />
       </div>
       
       <div>
         <label className="font-semibold mb-1 block">Muestra</label>
-        <input readOnly value={form.muestra} className="border rounded px-2 py-1 bg-gray-100 w-full" />
+        <input readOnly value={muestra} className="border rounded px-2 py-1 bg-gray-100 w-full" />
       </div>
 
       <div className="grid grid-cols-2 gap-x-8 gap-y-4 pt-4 border-t mt-4">
         <div className="font-bold text-center">PRUEBAS</div>
         <div className="font-bold text-center">RESULTADOS</div>
-        {testFields.map(({label, name}) => (
-          <React.Fragment key={name}>
-            <label className="font-semibold text-left">{label}</label>
-            <input
-              name={name}
-              value={form[name]}
-              onChange={e => setField(name, e.target.value)}
-              className="border rounded px-2 py-1 w-full"
-            />
-          </React.Fragment>
-        ))}
+        <label className="font-semibold text-left">CREATININA SÉRICA</label>
+        <input
+          name="creatinina"
+          value={creatinina}
+          onChange={e => setCreatinina(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        />
+        <label className="font-semibold text-left">UREA SÉRICA</label>
+        <input
+          name="urea"
+          value={urea}
+          onChange={e => setUrea(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        />
+        <label className="font-semibold text-left">ACIDO URICO SÉRICO</label>
+        <input
+          name="acidoUrico"
+          value={acidoUrico}
+          onChange={e => setAcidoUrico(e.target.value)}
+          className="border rounded px-2 py-1 w-full"
+        />
       </div>
 
       <div className="flex items-center mt-6 mb-2">
         <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
-        <select id="asignarMedico" className="border rounded px-2 py-1 min-w-[220px]" value={form.medico || ''} onChange={e => setField('medico', e.target.value)}>
+        <select id="asignarMedico" className="border rounded px-2 py-1 min-w-[220px]" value={medico || ''} onChange={e => setMedico(e.target.value)}>
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
           <option value="medico2">Dra. Ana Torres</option>
@@ -139,7 +153,7 @@ export default function PerfilRenal({ apiBase, token, selectedSede }) {
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
-            <input name="printCount" value={form.printCount} onChange={e => setField('printCount', e.target.value)} className="border rounded px-2 py-1 w-24" placeholder="Veces" />
+            <input name="printCount" value={printCount} onChange={e => setPrintCount(e.target.value)} className="border rounded px-2 py-1 w-24" placeholder="Veces" />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>
         </div>
