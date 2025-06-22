@@ -3,46 +3,37 @@ import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
-import inmunologia1 from '../../../../../../jaspers/inmunologialab'
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
+import { PrintHojaR, SubmitInmunologiaLab, VerifyTR } from './controller'
 
-const pruebasList = [
-  'TIFICO O',
-  'TIFICO H',
-  'PARATIFICO A',
-  'PARATIFICO B',
-  'Brucella abortus'
-]
-const today = new Date().toISOString().split('T')[0]
 
-export default function Inmunologia({ apiBase, token, selectedSede }) {
+const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+export default function Inmunologia({ token, selectedSede, userlogued }) {
   // Individual useState hooks for each form field
-  const [norden, setNorden] = useState('')
-  const [fecha, setFecha] = useState(today)
-  const [nombres, setNombres] = useState('')
-  const [edad, setEdad] = useState('')
-  const [resultados, setResultados] = useState(pruebasList.map(() => '1/40'))
-  const [hepatitis, setHepatitis] = useState(false)
-  const [hepatitisA, setHepatitisA] = useState('')
-  const [printCount, setPrintCount] = useState('')
-  const [medico, setMedico] = useState('')
+  const tabla = 'inmunologia'
+  const [form, setForm] = useState({
+    norden: '',
+    fecha: today,
+    nombres: '',
+    edad: '',
+    tificoO: '',
+    tificoH: '',
+    paratificoA: '',
+    paratificoB: '',
+    brucella: '',
+    hepatitis: false,
+    hepatitisA: '',
+    printCount: '',
+    medico: ''
+  });
   
   const fechaRef = useRef(null)
 
-  useEffect(() => {
-    if (!norden) return
-    VerifyTR(norden, 'inmunologia', token, (payload) => {
-      setNorden(payload.norden || '')
-      setFecha(payload.fecha || today)
-      setNombres(payload.nombres || '')
-      setEdad(payload.edad || '')
-      setResultados(payload.resultados || pruebasList.map(() => '1/40'))
-      setHepatitis(payload.hepatitis || false)
-      setHepatitisA(payload.hepatitisA || '')
-      setPrintCount(payload.printCount || '')
-      setMedico(payload.medico || '')
-    }, selectedSede)
-  }, [norden, token, selectedSede])
+  const handleFormChange = e => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleResultadoChange = (idx, value) => {
     const arr = [...resultados]
@@ -60,41 +51,60 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
   }
 
   const handleClear = () => {
-    setNorden('')
-    setFecha(today)
-    setNombres('')
-    setEdad('')
-    setResultados(pruebasList.map(() => '1/40'))
-    setHepatitis(false)
-    setHepatitisA('')
-    setPrintCount('')
-    setMedico('')
-    Swal.fire('Limpiado','Formulario reiniciado','success')
+   setForm({
+      norden: '',
+      fecha: today,
+      nombres: '',
+      edad: '',
+      tificoO: '',
+      tificoH: '',
+      paratificoA: '',
+      paratificoB: '',
+      brucella: '',
+      hepatitis: false,
+      hepatitisA: '',
+      printCount: '',
+      medico: ''
+    });
+  }
+
+  const handleSeat = () => {
+   setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      tificoO: '',
+      tificoH: '',
+      paratificoA: '',
+      paratificoB: '',
+      brucella: '',
+      hepatitis: false,
+      hepatitisA: '',
+      printCount: '',
+      medico: ''
+    }));
   }
 
   const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
-      title: '¿Desea Imprimir Hoja de Inmunología?',
-      html: `<div>N° <b>${norden}</b> - <b>${nombres}</b></div>`,
+      title: '¿Desea Imprimir Inmunologia?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir'
-    }).then(res => {
-      if (res.isConfirmed) {
-        inmunologia1({ 
-          norden, 
-          fecha, 
-          nombres, 
-          edad, 
-          resultados, 
-          hepatitis, 
-          hepatitisA, 
-          printCount, 
-          medico 
-        })
-        Swal.fire('Imprimiendo','','success')
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
       }
-    })
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
   }
 
   return (
@@ -102,23 +112,44 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
       <h2 className="text-2xl font-bold text-center">INMUNOLOGÍA</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="norden" value={norden} onChange={e=>setNorden(e.target.value)} onKeyUp={e=>e.key==='Enter'&&VerifyTR(norden,'inmunologia',token,(payload) => {
-          setNorden(payload.norden || '')
-          setFecha(payload.fecha || today)
-          setNombres(payload.nombres || '')
-          setEdad(payload.edad || '')
-          setResultados(payload.resultados || pruebasList.map(() => '1/40'))
-          setHepatitis(payload.hepatitis || false)
-          setHepatitisA(payload.hepatitisA || '')
-          setPrintCount(payload.printCount || '')
-          setMedico(payload.medico || '')
-        },selectedSede)} />
-        <Field label="Fecha" name="fecha" type="date" value={fecha} onChange={e=>setFecha(e.target.value)} inputRef={fechaRef} />
+        <Field
+          label="Nro Ficha"
+          name="norden"
+          value={form.norden}
+          onChange={handleFormChange}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              handleSeat()
+              VerifyTR(form.norden,tabla,token,setForm, selectedSede)
+            }
+          }}
+        />
+        <Field
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleFormChange}
+          inputRef={fechaRef}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={nombres} onChange={e=>setNombres(e.target.value)} disabled dynamicWidth />
-        <Field label="Edad"    name="edad"    value={edad}    onChange={e=>setEdad(e.target.value)} disabled />
+        <Field
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          onChange={handleFormChange}
+          disabled
+          dynamicWidth
+        />
+        <Field
+          label="Edad"
+          name="edad"
+          value={form.edad}
+          onChange={handleFormChange}
+          disabled
+        />
       </div>
 
       <Section>
@@ -129,14 +160,22 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
         <div className="col-span-2 font-bold flex items-center">PRUEBAS</div>
         <div className="col-span-2 font-bold flex items-center">RESULTADOS</div>
         <div className="col-span-8"></div>
-        {pruebasList.map((lbl, i) => (
-          <React.Fragment key={i}>
-            <div className="col-span-2 flex items-center">{lbl}</div>
+
+        {[
+          { name: 'tificoO', label: 'TIFICO O' },
+          { name: 'tificoH', label: 'TIFICO H' },
+          { name: 'paratificoA', label: 'PARATIFICO A' },
+          { name: 'paratificoB', label: 'PARATIFICO B' },
+          { name: 'brucella', label: 'Brucella abortus' },
+        ].map(({ name, label }) => (
+          <React.Fragment key={name}>
+            <div className="col-span-2 flex items-center">{label}</div>
             <div className="col-span-2">
               <input
+                name={name}
                 className="border rounded px-2 py-1 w-full"
-                value={resultados[i]}
-                onChange={e=>handleResultadoChange(i,e.target.value)}
+                value={form[name]}
+                onChange={handleFormChange}
               />
             </div>
             <div className="col-span-8"></div>
@@ -146,17 +185,21 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
 
       <div className="grid grid-cols-12 gap-2 items-center mt-4">
         <div className="col-span-4 flex items-center">
-          <Checkbox label={<span className="font-bold">PRUEBA HEPATITIS</span>} checked={hepatitis} onChange={v=>setHepatitis(v)} />
+          <Checkbox
+            label={<span className="font-bold">PRUEBA HEPATITIS</span>}
+            checked={form.hepatitis}
+            onChange={v => setForm(f => ({ ...f, hepatitis: v, hepatitisA: '' }))}
+          />
         </div>
         <div className="col-span-4 flex items-center">
-          {hepatitis && (
+          {form.hepatitis && (
             <input
               className="border rounded px-2 py-1 ml-4 w-full"
               name="hepatitisA"
-              value={hepatitisA}
-              onChange={e=>setHepatitisA(e.target.value)}
+              value={form.hepatitisA}
+              onChange={handleFormChange}
               placeholder="Prueba Rápida HEPATITIS A"
-              disabled={!hepatitis}
+              disabled={!form.hepatitis}
             />
           )}
         </div>
@@ -169,8 +212,9 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
         <select
           id="asignarMedico"
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={medico || ''}
-          onChange={e => setMedico(e.target.value)}
+          name="medico"
+          value={form.medico}
+          onChange={handleFormChange}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -182,18 +226,17 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
       {/* Botones y área de imprimir */}
       <div className="flex justify-between items-end mt-6">
         <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
+          <ActionButton color="green" icon={faSave} onClick={() => {SubmitInmunologiaLab(form,token,userlogued,handleClear,tabla)}}>Guardar/Actualizar</ActionButton>
           <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
         </div>
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
             <input
-              name="printCount"
-              value={printCount}
-              onChange={e=>setPrintCount(e.target.value)}
+              name="norden"
+              value={form.norden}
+              onChange={handleFormChange}
               className="border rounded px-2 py-1 w-24"
-              placeholder="Veces"
             />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>

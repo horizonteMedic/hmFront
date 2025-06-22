@@ -76,11 +76,11 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
 
   // Datos
   const testsAglu = [
-    { label: "TIFICO O", key: "tificoO" },
-    { label: "TIFICO H", key: "tificoH" },
-    { label: "PARATIFICO A", key: "paratifA" },
-    { label: "PARATIFICO B", key: "paratifB" },
-    { label: "Brucella abortus", key: "brucella" },
+    { label: "TIFICO O", key: "txtTificoO" },
+    { label: "TIFICO H", key: "txtTificoH" },
+    { label: "PARATIFICO A", key: "txtParatificoA" },
+    { label: "PARATIFICO B", key: "txtParatificoB" },
+    { label: "Brucella abortus", key: "txtBrucella" },
   ];
   
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
