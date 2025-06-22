@@ -14,11 +14,15 @@ const pruebas5D = [
 const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
   const tabla = 'panel5d'
   const [form, setForm] = useState({
-    nroFicha: '',
+    norden: '',
     fecha: '',
     nombres: '',
     edad: '',
-    resultados: pruebas5D.map(() => 'NEGATIVO'),
+    valueM: '',
+    valueC: '',
+    valueAn: '',
+    valueMet: '',
+    valueBen: '',
   });
   const fechaRef = useRef(null);
 
@@ -29,21 +33,17 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
     setForm(f => ({ ...f, [name]: value }));
   };
 
-  const handleResultadoChange = (idx, value) => {
-    setForm(f => {
-      const resultados = [...f.resultados];
-      resultados[idx] = value;
-      return { ...f, resultados };
-    });
-  };
-
   const handleLimpiar = () => {
     setForm({
-      nroFicha: '',
+      norden: '',
       fecha: '',
       nombres: '',
       edad: '',
-      resultados: pruebas5D.map(() => 'NEGATIVO'),
+      valueM: '',
+      valueC: '',
+      valueAn: '',
+      valueMet: '',
+      valueBen: '',
     });
   };
 
@@ -68,8 +68,8 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold">Nro Ficha:</label>
           <input
-            name="nroFicha"
-            value={form.nroFicha}
+            name="norden"
+            value={form.norden}
             onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
             onChange={handleChange}
             className="border rounded px-3 py-2 w-32"
@@ -113,16 +113,41 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
       <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-8">
         <div className="font-bold">PRUEBAS</div>
         <div className="font-bold">RESULTADOS</div>
-        {pruebas5D.map((label, idx) => (
-          <React.Fragment key={label}>
-            <div className="flex items-center">{label}</div>
-            <input
-              className="border rounded px-3 py-2 w-40"
-              value={form.resultados[idx]}
-              onChange={e => handleResultadoChange(idx, e.target.value)}
-            />
-          </React.Fragment>
-        ))}
+        <div className="flex items-center">COCAINA</div>
+          <input
+            name='valueC'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueC}
+            onChange={handleChange}
+          />
+        <div className="flex items-center">MARIHUANA</div>
+          <input
+            name='valueM'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueM}
+            onChange={handleChange}
+          />
+        <div className="flex items-center">ANFETAMINA EN ORINA</div>
+          <input
+            name='valueAn'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueAn}
+            onChange={handleChange}
+          />
+        <div className="flex items-center">METHANFETAMINA</div>
+          <input
+            name='valueMet'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueMet}
+            onChange={handleChange}
+          />
+        <div className="flex items-center">BENZODIAZEPINA</div>
+          <input
+            name='valueBen'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueBen}
+            onChange={handleChange}
+          />
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-4">

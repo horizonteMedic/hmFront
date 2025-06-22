@@ -44,8 +44,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            console.log('falta que lobo haga la api')
-            //GetInfoPanel2D(nro,tabla,set,token)
+            GetInfoPanel5D(nro,tabla,set,token)
         }
     })
 }
@@ -66,8 +65,8 @@ export const GetInfoPac = (nro,set,token,sede) => {
 }
 
 
-export const GetInfoPanel2D = (nro,tabla,set,token) => {
-  getFetch(`/api/v01/ct/inmunologia/obtenerReporteLgonadotropina?nOrden=${nro}&nameService=${tabla}`,token)
+export const GetInfoPanel5D = (nro,tabla,set,token) => {
+  getFetch(`/api/v01/ct/toxicologia/obtenerReportePanel5D?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
         console.log(res)
@@ -75,9 +74,7 @@ export const GetInfoPanel2D = (nro,tabla,set,token) => {
         ...prev,
         ...res,
         fecha: res.fechaExamen,
-        resultado: res.txtResultado,
-        positivo: res.resultado === 'POSITIVO' ? true : false,
-        negativo: res.resultado === 'NEGATIVO' ? true : false,
+        
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
