@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/Inmunologia.jsx
-import React, { useReducer, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -15,93 +15,110 @@ const pruebasList = [
 ]
 const today = new Date().toISOString().split('T')[0]
 
-const initialState = {
-  norden: '',
-  fecha: today,
-  nombres: '',
-  edad: '',
-  resultados: pruebasList.map(() => '1/40'),
-  hepatitis: false,
-  hepatitisA: '',
-  printCount: '',
-  medico: ''
-}
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET': {
-      const { field, value } = action
-      return Array.isArray(state[field])
-        ? { ...state, [field]: value }
-        : { ...state, [field]: value }
-    }
-    case 'RESET':
-      return initialState
-    case 'LOAD':
-      return { ...state, ...action.payload }
-    default:
-      return state
-  }
-}
-
 export default function Inmunologia({ apiBase, token, selectedSede }) {
-  const [form, dispatch] = useReducer(reducer, { ...initialState })
+  // Individual useState hooks for each form field
+  const [norden, setNorden] = useState('')
+  const [fecha, setFecha] = useState(today)
+  const [nombres, setNombres] = useState('')
+  const [edad, setEdad] = useState('')
+  const [resultados, setResultados] = useState(pruebasList.map(() => '1/40'))
+  const [hepatitis, setHepatitis] = useState(false)
+  const [hepatitisA, setHepatitisA] = useState('')
+  const [printCount, setPrintCount] = useState('')
+  const [medico, setMedico] = useState('')
+  
   const fechaRef = useRef(null)
 
   useEffect(() => {
-    if (!form.norden) return
-    VerifyTR(form.norden, 'inmunologia', token, dispatch, selectedSede)
-  }, [form.norden, token, selectedSede])
-
-  const setField = useCallback((field, value) => dispatch({ type:'SET', field, value }), [])
+    if (!norden) return
+    VerifyTR(norden, 'inmunologia', token, (payload) => {
+      setNorden(payload.norden || '')
+      setFecha(payload.fecha || today)
+      setNombres(payload.nombres || '')
+      setEdad(payload.edad || '')
+      setResultados(payload.resultados || pruebasList.map(() => '1/40'))
+      setHepatitis(payload.hepatitis || false)
+      setHepatitisA(payload.hepatitisA || '')
+      setPrintCount(payload.printCount || '')
+      setMedico(payload.medico || '')
+    }, selectedSede)
+  }, [norden, token, selectedSede])
 
   const handleResultadoChange = (idx, value) => {
-    const arr = [...form.resultados]
+    const arr = [...resultados]
     arr[idx] = value
-    setField('resultados', arr)
+    setResultados(arr)
   }
 
-  const handleSave = useCallback(async () => {
+  const handleSave = async () => {
     try {
       // await fetch...
       Swal.fire('Guardado','Inmunología guardada','success')
     } catch {
       Swal.fire('Error','No se pudo guardar','error')
     }
-  }, [form])
+  }
 
-  const handleClear = useCallback(() => {
-    dispatch({ type:'RESET' })
+  const handleClear = () => {
+    setNorden('')
+    setFecha(today)
+    setNombres('')
+    setEdad('')
+    setResultados(pruebasList.map(() => '1/40'))
+    setHepatitis(false)
+    setHepatitisA('')
+    setPrintCount('')
+    setMedico('')
     Swal.fire('Limpiado','Formulario reiniciado','success')
-  }, [])
+  }
 
-  const handlePrint = useCallback(() => {
+  const handlePrint = () => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Inmunología?',
-      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
+      html: `<div>N° <b>${norden}</b> - <b>${nombres}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir'
     }).then(res => {
       if (res.isConfirmed) {
-        inmunologia1({ ...form })
+        inmunologia1({ 
+          norden, 
+          fecha, 
+          nombres, 
+          edad, 
+          resultados, 
+          hepatitis, 
+          hepatitisA, 
+          printCount, 
+          medico 
+        })
         Swal.fire('Imprimiendo','','success')
       }
     })
-  }, [form])
+  }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <h2 className="text-2xl font-bold text-center">INMUNOLOGÍA</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={e=>setField('norden',e.target.value)} onKeyUp={e=>e.key==='Enter'&&VerifyTR(form.norden,'inmunologia',token,dispatch,selectedSede)} />
-        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} inputRef={fechaRef} />
+        <Field label="Nro Ficha" name="norden" value={norden} onChange={e=>setNorden(e.target.value)} onKeyUp={e=>e.key==='Enter'&&VerifyTR(norden,'inmunologia',token,(payload) => {
+          setNorden(payload.norden || '')
+          setFecha(payload.fecha || today)
+          setNombres(payload.nombres || '')
+          setEdad(payload.edad || '')
+          setResultados(payload.resultados || pruebasList.map(() => '1/40'))
+          setHepatitis(payload.hepatitis || false)
+          setHepatitisA(payload.hepatitisA || '')
+          setPrintCount(payload.printCount || '')
+          setMedico(payload.medico || '')
+        },selectedSede)} />
+        <Field label="Fecha" name="fecha" type="date" value={fecha} onChange={e=>setFecha(e.target.value)} inputRef={fechaRef} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled dynamicWidth />
-        <Field label="Edad"    name="edad"    value={form.edad}    onChange={e=>setField('edad',e.target.value)} disabled />
+        <Field label="Nombres" name="nombres" value={nombres} onChange={e=>setNombres(e.target.value)} disabled dynamicWidth />
+        <Field label="Edad"    name="edad"    value={edad}    onChange={e=>setEdad(e.target.value)} disabled />
       </div>
 
       <Section>
@@ -118,7 +135,7 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
             <div className="col-span-2">
               <input
                 className="border rounded px-2 py-1 w-full"
-                value={form.resultados[i]}
+                value={resultados[i]}
                 onChange={e=>handleResultadoChange(i,e.target.value)}
               />
             </div>
@@ -129,17 +146,17 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
 
       <div className="grid grid-cols-12 gap-2 items-center mt-4">
         <div className="col-span-4 flex items-center">
-          <Checkbox label={<span className="font-bold">PRUEBA HEPATITIS</span>} checked={form.hepatitis} onChange={v=>setField('hepatitis',v)} />
+          <Checkbox label={<span className="font-bold">PRUEBA HEPATITIS</span>} checked={hepatitis} onChange={v=>setHepatitis(v)} />
         </div>
         <div className="col-span-4 flex items-center">
-          {form.hepatitis && (
+          {hepatitis && (
             <input
               className="border rounded px-2 py-1 ml-4 w-full"
               name="hepatitisA"
-              value={form.hepatitisA}
-              onChange={e=>setField('hepatitisA',e.target.value)}
+              value={hepatitisA}
+              onChange={e=>setHepatitisA(e.target.value)}
               placeholder="Prueba Rápida HEPATITIS A"
-              disabled={!form.hepatitis}
+              disabled={!hepatitis}
             />
           )}
         </div>
@@ -152,8 +169,8 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
         <select
           id="asignarMedico"
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={form.medico || ''}
-          onChange={e => setField('medico', e.target.value)}
+          value={medico || ''}
+          onChange={e => setMedico(e.target.value)}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -173,8 +190,8 @@ export default function Inmunologia({ apiBase, token, selectedSede }) {
           <div className="flex items-center gap-2">
             <input
               name="printCount"
-              value={form.printCount}
-              onChange={e=>setField('printCount',e.target.value)}
+              value={printCount}
+              onChange={e=>setPrintCount(e.target.value)}
               className="border rounded px-2 py-1 w-24"
               placeholder="Veces"
             />

@@ -6,7 +6,7 @@ import { SubmitHematologiaLabCLinico } from '../ControllerLC/ControllerLC'
 
 const physicalLabels  = ['Incoloro','Medicamentosa','Transparente','Turbio','No Aplica']
 const chemicalLabels  = ['Nitritos','Proteínas','Cetonas','LeucocitosQ','AcAscorbico','Urobilinogeno','Bilirrubina','GlucosaQ','Sangre']
-const sedimentLabels  = ['LeucocitosS','Hematies','CelEpiteliales','Cristales','Cilindros','Bacterias','GramSC','Otros']
+const sedimentLabels  = ['LeucocitosS', 'Hematies', 'CelEpiteliales', 'Cristales', 'Cilindros', 'Bacterias', 'GramSC', 'Otros']
 const drugLabels      = ['Cocaina','Marihuana']
 const posNegLabels    = ['ScreeningPos','ScreeningNeg','ScreeningNA','ConfirmPos','ConfirmNeg','ConfirmNA']
 
@@ -52,8 +52,6 @@ const initialForm = {
   // Observaciones
   observaciones: '',
   // Imprimir
-  printOrden: false,
-  printRecibo: false,
   printValue: ''
 }
 
@@ -75,17 +73,18 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
   
   const handlePrint = () => {
     window.open(
-      `/api/orina/print/${form.printValue}?orden=${form.printOrden}&recibo=${form.printRecibo}`,
+      `/api/orina/print/${form.printValue}`,
       '_blank'
     )
   }
 
   return (
-    <div className="p-4 grid grid-cols-5 gap-4">
+    <div className="p-4 grid grid-cols-5 gap-4 text-md">
       {/* == IZQUIERDA: 3/5 == */}
       <div className="col-span-3 bg-white p-3 rounded shadow space-y-4">
-        <Section title="Examen Físico">
-          <div className="grid grid-cols-3 gap-2">
+        <fieldset className="border p-2 rounded">
+          <legend className="px-1 font-semibold">Examen Físico</legend>
+          <div className="grid grid-cols-5 gap-2 mb-2">
             {physicalLabels.map(opt => (
               <label key={opt} className="flex items-center gap-1">
                 <input
@@ -98,36 +97,40 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
               </label>
             ))}
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {['Color','Aspecto','Densidad','PH'].map(f=>(
-              <div key={f} className="flex flex-col">
-                <span className="font-medium text-sm">{f}</span>
-                {f==='Aspecto'
-                  ? <select
-                      className="border rounded p-1"
-                      name={f}
-                      value={form[f]}
-                      onChange={handleInputChange}
-                    >
-                      <option>N/A</option><option>Claro</option><option>Turbio</option>
-                    </select>
-                  : <input
-                      className="border rounded p-1"
-                      name={f}
-                      value={form[f]}
-                      onChange={handleInputChange}
-                    />
-                }
-              </div>
-            ))}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-2 items-center">
+              <label className="font-medium">Color :</label>
+              <select name="Color" value={form.Color} onChange={handleInputChange} className="border rounded p-1 w-full">
+                <option>N/A</option>
+                <option>Amarillo</option>
+                <option>Rojo</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-2 items-center">
+              <label className="font-medium">Aspecto :</label>
+              <select name="Aspecto" value={form.Aspecto} onChange={handleInputChange} className="border rounded p-1 w-full">
+                <option>N/A</option>
+                <option>Claro</option>
+                <option>Turbio</option>
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-2 items-center">
+              <label className="font-medium">Densidad :</label>
+              <input name="Densidad" value={form.Densidad} onChange={handleInputChange} className="border rounded p-1 w-full" />
+            </div>
+            <div className="grid grid-cols-2 gap-2 items-center">
+              <label className="font-medium">PH :</label>
+              <input name="PH" value={form.PH} onChange={handleInputChange} className="border rounded p-1 w-full" />
+            </div>
           </div>
-        </Section>
+        </fieldset>
 
-        <Section title="Examen Químico">
-          <div className="grid grid-cols-2 gap-2">
+        <fieldset className="border p-2 rounded">
+          <legend className="px-1 font-semibold">Examen Químico</legend>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {chemicalLabels.map(lbl=>(
-              <div key={lbl} className="flex items-center gap-2">
-                <span className="w-28 font-medium text-sm">{lbl.replace('Q','')}:</span>
+              <div key={lbl} className="grid grid-cols-2 items-center gap-2">
+                <label className="font-medium">{lbl.replace('Q','').replace('S','')}:</label>
                 <input
                   className="border rounded p-1 w-full"
                   name={lbl}
@@ -137,13 +140,14 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
               </div>
             ))}
           </div>
-        </Section>
+        </fieldset>
 
-        <Section title="Sedimento Unitario">
-          <div className="grid grid-cols-2 gap-2">
+        <fieldset className="border p-2 rounded">
+          <legend className="px-1 font-semibold">Sedimento Unitario</legend>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {sedimentLabels.map(lbl=>(
-              <div key={lbl} className="flex items-center gap-2">
-                <span className="w-32 font-medium text-sm">{lbl.replace('S','')}:</span>
+              <div key={lbl} className="grid grid-cols-2 items-center gap-2">
+                <label className="font-medium">{lbl.replace('Q','').replace('S','')}:</label>
                 <input
                   className="border rounded p-1 w-full"
                   name={lbl}
@@ -153,58 +157,47 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
               </div>
             ))}
           </div>
-        </Section>
-
-        <Section title="Drogas">
-          <div className="space-y-2">
-            {drugLabels.map(drug=>(
-              <div key={drug} className="flex items-center gap-2">
-                <span className="w-32 font-medium text-sm">{drug}:</span>
-                <input
-                  className="border rounded p-1 w-full"
-                  name={drug}
-                  value={form[drug]}
-                  onChange={handleInputChange}
-                />
-              </div>
-            ))}
+        </fieldset>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <fieldset className="border p-2 rounded">
+            <legend className="px-1 font-semibold">Drogas</legend>
+            <div className="space-y-2">
+              {drugLabels.map(drug => (
+                <div key={drug} className="grid grid-cols-[auto,1fr,auto] items-center gap-x-2">
+                  <label className="font-medium">{drug}:</label>
+                  <input
+                    className="border rounded p-1 w-full"
+                    name={drug}
+                    value={form[drug]}
+                    onChange={handleInputChange}
+                  />
+                  <div className="flex gap-2">
+                    <label className="flex items-center gap-1">
+                      <input type="radio" name={`${drug}_result`} value="Pos" /> Pos.
+                    </label>
+                    <label className="flex items-center gap-1">
+                      <input type="radio" name={`${drug}_result`} value="Neg" /> Neg.
+                    </label>
+                    <label className="flex items-center gap-1">
+                      <input type="radio" name={`${drug}_result`} value="NA" /> N/A
+                    </label>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+          
+          <div>
+            <h3 className="font-semibold mb-1">Observaciones</h3>
+            <textarea
+              className="border rounded w-full h-32 p-2"
+              name="observaciones"
+              value={form.observaciones}
+              onChange={handleInputChange}
+            />
           </div>
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            {['ScreeningPos','ScreeningNeg','ScreeningNA'].map(lbl=>(
-              <label key={lbl} className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  name={lbl}
-                  checked={form[lbl]}
-                  onChange={handleInputChange}
-                />
-                {lbl.replace('Screening','')}
-              </label>
-            ))}
-          </div>
-          <div className="grid grid-cols-3 gap-2 mt-2">
-            {['ConfirmPos','ConfirmNeg','ConfirmNA'].map(lbl=>(
-              <label key={lbl} className="flex items-center gap-1">
-                <input
-                  type="checkbox"
-                  name={lbl}
-                  checked={form[lbl]}
-                  onChange={handleInputChange}
-                />
-                {lbl.replace('Confirm','')}
-              </label>
-            ))}
-          </div>
-        </Section>
-
-        <Section title="Observaciones">
-          <textarea
-            className="border rounded w-full h-24 p-2"
-            name="observaciones"
-            value={form.observaciones}
-            onChange={handleInputChange}
-          />
-        </Section>
+        </div>
 
         <div className="flex gap-2">
           <Button onClick={handleClear}  color="yellow" icon={faBroom}>Limpiar</Button>
@@ -213,46 +206,24 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
       </div>
 
       {/* == DERECHA: 2/5 == */}
-      <div className="col-span-2 bg-white p-3 rounded shadow space-y-4 text-sm">
-        <h3 className="text-blue-700 font-medium">Imprimir</h3>
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="printOrden"
-            checked={form.printOrden}
-            onChange={handleInputChange}
-          />
-          <label>Nro Orden</label>
-        </div>
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="printRecibo"
-            checked={form.printRecibo}
-            onChange={handleInputChange}
-          />
-          <label>Nro Recibo</label>
-        </div>
-        <input
-          name="printValue"
-          value={form.printValue}
-          onChange={handleInputChange}
-          placeholder="Código..."
-          className="border rounded p-1 w-full"
-        />
-        <button onClick={handlePrint} className="ml-auto">
-          <FontAwesomeIcon icon={faPrint} className="text-2xl text-blue-700" />
-        </button>
+      <div className="col-span-2 bg-white p-3 rounded shadow space-y-4">
+        <fieldset className="border p-2 rounded">
+          <legend className="px-1 font-semibold">Imprimir</legend>
+          <div className="flex items-center gap-2">
+            <label className="font-medium">Nro Orden</label>
+            <input
+              name="printValue"
+              value={form.printValue}
+              onChange={handleInputChange}
+              placeholder="Código..."
+              className="border rounded p-1 w-full flex-grow"
+            />
+            <button onClick={handlePrint}>
+              <FontAwesomeIcon icon={faPrint} className="text-2xl text-blue-700" />
+            </button>
+          </div>
+        </fieldset>
       </div>
-    </div>
-  )
-}
-
-function Section({ title, children }) {
-  return (
-    <div className="space-y-1">
-      <h3 className="text-blue-700 font-semibold">{title}</h3>
-      {children}
     </div>
   )
 }
@@ -264,7 +235,7 @@ function Button({ onClick, color, icon, children }) {
   return (
     <button
       onClick={onClick}
-      className={`${bg} text-white px-3 py-1 rounded inline-flex items-center gap-2 text-sm`}
+      className={`${bg} text-white px-3 py-1 rounded inline-flex items-center gap-2 text-md`}
     >
       <FontAwesomeIcon icon={icon} />
       {children}

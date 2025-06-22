@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/BioquimicaAcidoUrico.jsx
-import React, { useReducer, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -8,58 +8,61 @@ import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
 
 const today = new Date().toISOString().split('T')[0]
 
-const initialState = {
-  norden: '',
-  fecha: today,
-  nombres: '',
-  edad: '',
-  prueba: 'ÁCIDO ÚRICO SÉRICO',
-  muestra: 'SUERO',
-  resultado: '',
-  printCount: '',
-  medico: '',
-  sede: ''
-}
-
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET': return { ...state, [action.field]: action.value }
-    case 'LOAD': return { ...state, ...action.payload }
-    case 'RESET': return { ...initialState, sede: state.sede }
-    default: return state
-  }
-}
-
 export default function BioquimicaAcidoUrico({ token, selectedSede }) {
-  const [form, dispatch] = useReducer(reducer, { ...initialState, sede: selectedSede })
+  // Individual useState hooks for each form field
+  const [norden, setNorden] = useState('')
+  const [fecha, setFecha] = useState(today)
+  const [nombres, setNombres] = useState('')
+  const [edad, setEdad] = useState('')
+  const [prueba, setPrueba] = useState('ÁCIDO ÚRICO SÉRICO')
+  const [muestra, setMuestra] = useState('SUERO')
+  const [resultado, setResultado] = useState('')
+  const [printCount, setPrintCount] = useState('')
+  const [medico, setMedico] = useState('')
+  const [sede, setSede] = useState(selectedSede)
 
-  const setField = useCallback((field, value) => {
-    dispatch({ type: 'SET', field, value })
-  }, [])
-
-  const handleSave = useCallback(() => {
+  const handleSave = () => {
     Swal.fire('Guardado', 'Datos de Ácido Úrico guardados', 'success')
-  }, [])
+  }
 
-  const handleClear = useCallback(() => {
-    dispatch({ type: 'RESET' })
+  const handleClear = () => {
+    setNorden('')
+    setFecha(today)
+    setNombres('')
+    setEdad('')
+    setPrueba('ÁCIDO ÚRICO SÉRICO')
+    setMuestra('SUERO')
+    setResultado('')
+    setPrintCount('')
+    setMedico('')
     Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
-  }, [])
+  }
 
-  const handlePrint = useCallback(() => {
+  const handlePrint = () => {
     Swal.fire({
       title: '¿Desea Imprimir Hoja de Bioquímica?',
-      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
+      html: `<div>N° <b>${norden}</b> - <b>${nombres}</b></div>`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'Sí, Imprimir'
     }).then(result => {
       if (result.isConfirmed) {
-        Acido_Urico_Digitalizado({ ...form })
+        Acido_Urico_Digitalizado({ 
+          norden, 
+          fecha, 
+          nombres, 
+          edad, 
+          prueba, 
+          muestra, 
+          resultado, 
+          printCount, 
+          medico, 
+          sede 
+        })
         Swal.fire('Imprimiendo', '', 'success')
       }
     })
-  }, [form])
+  }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
@@ -69,30 +72,41 @@ export default function BioquimicaAcidoUrico({ token, selectedSede }) {
         <Field
           label="Nro Ficha"
           name="norden"
-          value={form.norden}
-          onChange={e => setField('norden', e.target.value)}
-          onKeyUp={e => e.key === 'Enter' && VerifyTR(form.norden, 'ac_bioquimica2022', token, dispatch, selectedSede)}
+          value={norden}
+          onChange={e => setNorden(e.target.value)}
+          onKeyUp={e => e.key === 'Enter' && VerifyTR(norden, 'ac_bioquimica2022', token, (payload) => {
+            setNorden(payload.norden || '')
+            setFecha(payload.fecha || today)
+            setNombres(payload.nombres || '')
+            setEdad(payload.edad || '')
+            setPrueba(payload.prueba || 'ÁCIDO ÚRICO SÉRICO')
+            setMuestra(payload.muestra || 'SUERO')
+            setResultado(payload.resultado || '')
+            setPrintCount(payload.printCount || '')
+            setMedico(payload.medico || '')
+            setSede(payload.sede || selectedSede)
+          }, selectedSede)}
         />
-        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e => setField('fecha', e.target.value)} />
+        <Field label="Fecha" name="fecha" type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} disabled />
-        <Field label="Edad" name="edad" value={form.edad} disabled />
+        <Field label="Nombres" name="nombres" value={nombres} disabled />
+        <Field label="Edad" name="edad" value={edad} disabled />
       </div>
 
       <div className="grid grid-cols-3 gap-x-6 gap-y-4 items-center pt-4 border-t mt-4">
         <FieldRow label="PRUEBA:">
-          <input className="border rounded px-2 py-1 bg-gray-100 w-full" value={form.prueba} readOnly />
+          <input className="border rounded px-2 py-1 bg-gray-100 w-full" value={prueba} readOnly />
         </FieldRow>
         <FieldRow label="MUESTRA:">
-          <input className="border rounded px-2 py-1 bg-gray-100 w-full" value={form.muestra} readOnly />
+          <input className="border rounded px-2 py-1 bg-gray-100 w-full" value={muestra} readOnly />
         </FieldRow>
         <FieldRow label="RESULTADO:">
           <input
             className="border rounded px-2 py-1 w-full"
-            value={form.resultado}
-            onChange={e => setField('resultado', e.target.value)}
+            value={resultado}
+            onChange={e => setResultado(e.target.value)}
           />
         </FieldRow>
         <FieldRow label="VALORES NORMALES:">
@@ -108,8 +122,8 @@ export default function BioquimicaAcidoUrico({ token, selectedSede }) {
         <select
           id="asignarMedico"
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={form.medico}
-          onChange={e => setField('medico', e.target.value)}
+          value={medico}
+          onChange={e => setMedico(e.target.value)}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -128,8 +142,8 @@ export default function BioquimicaAcidoUrico({ token, selectedSede }) {
           <div className="flex items-center gap-2">
             <input
               name="printCount"
-              value={form.printCount}
-              onChange={e => setField('printCount', e.target.value)}
+              value={printCount}
+              onChange={e => setPrintCount(e.target.value)}
               className="border rounded px-2 py-1 w-24"
               placeholder="Veces"
             />

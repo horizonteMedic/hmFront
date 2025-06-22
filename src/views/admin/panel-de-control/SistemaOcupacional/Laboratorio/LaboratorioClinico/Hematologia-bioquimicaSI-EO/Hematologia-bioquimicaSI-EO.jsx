@@ -48,10 +48,9 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
       creatininaNA: false,
       rpr: '',
       rprNA: false,
-      rprPos: false,
       vih: '',
       vihNA: false,
-      vihPos: false
+      gfSangPedido: ''
     });
     settableLab([])
   };
@@ -81,6 +80,33 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
       .catch(() => {});
   },[])
 
+  useEffect(() => {
+    const grupo = form.grupo || '';
+    const rh = (form.rh || '').replace('Rh','');
+    setField('gfSangPedido', `${grupo} ${rh}`.trim());
+  }, [form.grupo, form.rh]);
+
+  useEffect(() => {
+    const isNA = form.empresaNA;
+    const value = isNA ? 'N/A' : '';
+    const fieldsToUpdate = {
+      hemoglobina: value,
+      hematocrito: value,
+      vsg: value,
+      leucocitos: value,
+      hematies: value,
+      plaquetas: value,
+      linfocitos: value,
+      neutrofilos: value,
+      abastonados: value,
+      segmentados: value,
+      monocitos: value,
+      eosinofilos: value,
+      basofilos: value
+    };
+    setForm(prev => ({...prev, ...fieldsToUpdate}));
+  }, [form.empresaNA]);
+
   //AUTOCOMPLETAR DEL DOC
   const [searchMedico, setSearchMedico]  = useState(form.responsable);
   const [filteredMedicos, setFilteredMedicos] = useState([]);
@@ -106,7 +132,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   };
   
   return (
-    <div className="flex flex-col gap-2 w-full">
+    <div className="flex flex-col gap-2 w-full text-md">
       {/* Barra superior */}
       <div className="flex flex-wrap items-center w-full gap-3 p-2 justify-between">
         <div className="flex flex-wrap items-center gap-3 flex-1 min-w-0">
@@ -149,10 +175,10 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
         <div className="flex items-center gap-4">
           <button
             onClick={() => setField('ficha', !form.ficha)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded text-md"
           >Editar</button>
           <Checkbox
-            label={<span className="text-red-600 font-semibold">INCOMPLETO</span>}
+            label={<span className="text-red-600 font-semibold text-md">INCOMPLETO</span>}
             checked={!form.ficha}
             onChange={v => setField('ficha', !v)}
           />
@@ -161,178 +187,138 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
 
       {/* Contenido principal */}
       <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex-1 bg-white p-4 rounded shadow space-y-6">
-          <Section title="Datos Generales">
-            <div className="flex flex-col">
-              <label className="font-medium mb-1">Responsable Lab<span className="text-sm ml-1"></span></label>
-              <div className="flex items-center gap-2 relative">
-                <input
-                  type='text'
-                  autoComplete='off'
-                  name='responsable'
-                  value={searchMedico}
-                  onChange={handleMedicoSearch}
-                  className={`border rounded px-2 py-1 flex-1  bg-gray-100}`}
-                  onKeyUp={e => {
-                    if (e.key === 'Enter' && filteredMedicos.length > 0) {
-                      e.preventDefault();
-                      handleSelectMedico(filteredMedicos[0]);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (searchMedico) {
-                      setFilteredMedicos(
-                        listDoc.filter(m =>
-                          m.toLowerCase().includes(searchMedico.toLowerCase())
-                        )
-                      );
-                    }
-                  }}
-                  onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
-                />
-                {searchMedico && filteredMedicos.length > 0 && (
-                  <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                    {filteredMedicos.map(m => (
-                      <li
-                        key={m}
-                        className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg"
-                        onMouseDown={() => handleSelectMedico(m)}
-                      >
-                        {m}
-                      </li>
+        <div className="flex-1 bg-white p-4 rounded shadow font-sans text-md">
+            {/* Top general section */}
+            <div className="space-y-1">
+                <div className="flex items-center gap-x-4">
+                    <div className="flex items-center flex-1">
+                        <label className="w-28 font-semibold shrink-0">Nombres :</label>
+                        <input name="paciente" value={form.paciente} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-full text-md" />
+                    </div>
+                    <div className="flex items-center">
+                        <label className="font-semibold mr-2 shrink-0">G.F. Sang. Pedido</label>
+                        <input name="gfSangPedido" value={form.gfSangPedido} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-32 bg-gray-100 text-md" disabled />
+                    </div>
+                </div>
+                 <div className="flex items-center col-span-2">
+                    <label className="w-28 font-semibold shrink-0">Emp. Contratista :</label>
+                    <input name="empContratista" value={form.empContratista} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-full text-md" />
+                </div>
+                <div className="flex items-center col-span-2">
+                    <label className="w-28 font-semibold shrink-0">Empresa :</label>
+                    <input name="empresa" value={form.empresa} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-full text-md" />
+                    <div className="ml-2">
+                        <Checkbox label="N/A" checked={form.empresaNA} onChange={v => setField('empresaNA', v)} />
+                    </div>
+                </div>
+            </div>
+
+            {/* Hematología */}
+            <fieldset className="border border-gray-400 p-2 mt-2">
+                <legend className="px-2 font-semibold text-md">Hematología</legend>
+                <div className="grid grid-cols-2 gap-x-8">
+                {/* Left Column */}
+                <div className="space-y-1">
+                    <div className="flex items-center">
+                        <label className="w-32 font-semibold">Grupo Sanguíneo :</label>
+                        <div className="flex gap-2">
+                            {['O','A','B','AB'].map(opt => (
+                            <label key={opt} className="flex items-center gap-1">
+                                <input type="radio" name="grupo" value={opt} checked={form.grupo === opt} onClick={e => setField('grupo', form.grupo === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />{opt}
+                            </label>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex items-center">
+                        <label className="w-32 font-semibold">Factor Rh :</label>
+                        <div className="flex gap-2">
+                            <label className="flex items-center gap-1">
+                                <input type="radio" name="rh" value="Rh(+)" checked={form.rh === 'Rh(+)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />Rh(+)
+                            </label>
+                            <label className="flex items-center gap-1">
+                                <input type="radio" name="rh" value="Rh(-)" checked={form.rh === 'Rh(-)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />Rh(-)
+                            </label>
+                        </div>
+                    </div>
+                    {[
+                        ['hemoglobina','g/dl'], ['hematocrito','%'], ['vsg','mm/Hora'], 
+                        ['leucocitos','mm³'], ['hematies','mm³'], ['plaquetas','mm³']
+                    ].map(([key, unit]) => (
+                    <div key={key} className="flex items-center">
+                        <label className="w-32 font-semibold">{capitalize(key)} :</label>
+                        <input name={key} value={form[key]} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-24 text-md" disabled={form.empresaNA}/>
+                        <span className="ml-2 w-16">{unit}</span>
+                    </div>
                     ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-            <Field label="Nombres" name="paciente" value={form.paciente} onChange={e => setField('paciente', e.target.value)} />
-            <div className="flex gap-4">
-              <Field label="Emp. Contratista" name="empContratista" value={form.empContratista} onChange={e => setField('empContratista', e.target.value)} />
-              <div className="flex items-center gap-2">
-                <Field label="Empresa" name="empresa" value={form.empresa} onChange={e => setField('empresa', e.target.value)} />
-                <Checkbox label="N/A" checked={form.empresaNA} onChange={v => setField('empresaNA', v)} />
-              </div>
-            </div>
-          </Section>
-
-          <Section title="Hematología">
-            <div className="flex gap-8">
-              <RadioGroup
-                label="Grupo Sanguíneo"
-                name="grupo"
-                options={['O','A','B','AB']}
-                value={form.grupo}
-                onChange={v => setField('grupo', v)}
-              />
-              <RadioGroup
-                label="Factor Rh"
-                name="rh"
-                options={['+','-']}
-                value={form.rh}
-                onChange={v => setField('rh', v)}
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-4 mt-4">
-              {[
-                ['hemoglobina','g/dl'],
-                ['hematocrito','%'],
-                ['vsg','mm/Hora'],
-                ['leucocitos','mm³'],
-                ['hematies','mm³'],
-                ['plaquetas','mm³'],
-                ['linfocitos','%'],
-                ['neutrofilos','%'],
-                ['abastonados','%'],
-                ['segmentados','%'],
-                ['monocitos','%'],
-                ['eosinofilos','%'],
-                ['basofilos','%'],
-              ].map(([key,unit]) => (
-                <Field
-                  key={key}
-                  label={capitalize(key)}
-                  name={key}
-                  unit={unit}
-                  value={form[key]}
-                  onChange={e => setField(key, e.target.value)}
-                />
-              ))}
-            </div>
-          </Section>
-
-          <Section title="Bioquímica">
-            <div className="flex flex-col gap-2 border rounded p-2">
-              <div className="flex items-center gap-2">
-                <label className="w-24">Glucosa :</label>
-                <input
-                  type="text"
-                  name="glucosa"
-                  value={form.glucosa}
-                  onChange={e => setField('glucosa', e.target.value)}
-                  className="border rounded px-2 py-1 w-28"
-                  disabled={form.glucosaNA}
-                />
-                <span>mg/dl</span>
-                <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => setField('glucosaNA', v)} />
-                <span className="ml-4 text-xs text-gray-600">Valores normales 70 - 110 mg/dl</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="w-24">Creatinina :</label>
-                <input
-                  type="text"
-                  name="creatinina"
-                  value={form.creatinina}
-                  onChange={e => setField('creatinina', e.target.value)}
-                  className="border rounded px-2 py-1 w-28"
-                  disabled={form.creatininaNA}
-                />
-                <span>mg/dl</span>
-                <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => setField('creatininaNA', v)} />
-                <span className="ml-4 text-xs text-gray-600">Valores normales 0.8 - 1.4 mg/dl</span>
-              </div>
-            </div>
-          </Section>
-
-          <Section title="Reacciones Serológicas">
-            <div className="flex border rounded p-2 divide-x divide-gray-300">
-              <div className="flex-1 flex items-center gap-2 pr-4">
-                <label className="w-12">RPR :</label>
-                <input
-                  type="text"
-                  name="rpr"
-                  value={form.rprNA ? 'N/A' : form.rpr}
-                  onChange={e => setField('rpr', e.target.value)}
-                  className="border rounded px-2 py-1 w-28"
-                  disabled={form.rprNA}
-                />
-                <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: 'POSITIVO'})),setField('rprPos', v); setField('rprNA', false); }} disabled={form.rprNA} />
-                  <Checkbox label="-" checked={!form.rprPos && !form.rprNA && form.rpr !== 'N/A'} onChange={v => { setForm(prev => ({...prev, rpr: 'NEGATIVO'})),setField('rprPos', !v); setField('rprNA', false); }} disabled={form.rprNA} />
-                  <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', 'N/A'); }} />
                 </div>
-              </div>
-              <div className="flex-1 flex items-center gap-2 pl-4">
-                <label className="w-12">VIH :</label>
-                <input
-                  type="text"
-                  name="vih"
-                  value={form.vihNA ? 'N/A' : form.vih}
-                  onChange={e => setField('vih', e.target.value)}
-                  className="border rounded px-2 py-1 w-28"
-                  disabled={form.vihNA}
-                />
-                <div className="flex items-center gap-1 ml-2">
-                  <Checkbox label="+" checked={form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: 'POSITIVO'})),setField('vihPos', v); setField('vihNA', false); }} disabled={form.vihNA} />
-                  <Checkbox label="-" checked={!form.vihPos && !form.vihNA && form.vih !== 'N/A'} onChange={v => { setForm(prev => ({...prev, vih: 'NEGATIVO'})),setField('vihPos', !v); setField('vihNA', false); }} disabled={form.vihNA} />
-                  <Checkbox label="N/A" checked={form.vihNA || form.vih === 'N/A'} onChange={v => { setField('vihNA', v); if (v) setField('vih', 'N/A'); }} />
+                {/* Right Column */}
+                <div className="space-y-1">
+                    {[
+                        ['neutrofilos','%'], ['abastonados','%'], ['segmentados','%'], 
+                        ['monocitos','%'], ['eosinofilos','%'], ['basofilos','%'], ['linfocitos','%']
+                    ].map(([key, unit]) => (
+                    <div key={key} className="flex items-center">
+                        <label className="w-32 font-semibold">{capitalize(key)} :</label>
+                        <input name={key} value={form[key]} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-24 text-md" disabled={form.empresaNA}/>
+                        <span className="ml-2">{unit}</span>
+                    </div>
+                    ))}
                 </div>
-              </div>
-            </div>
-          </Section>
+                </div>
+            </fieldset>
 
-          <div className="flex justify-between mt-6">
-            <button onClick={handleClear} className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded">Limpiar</button>
-          </div>
+            {/* Bioquímica */}
+            <fieldset className="border border-gray-400 p-2 mt-2">
+                <legend className="px-2 font-semibold text-md">Bioquímica</legend>
+                <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                    <label className="w-24 font-semibold">Glucosa :</label>
+                    <input name="glucosa" value={form.glucosa} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.glucosaNA}/>
+                    <span className="w-12">mg/dl</span>
+                    <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => setField('glucosaNA', v)} />
+                    <span className="ml-4 text-md">Valores normales 70 - 110 mg/dl</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <label className="w-24 font-semibold">Creatinina :</label>
+                    <input name="creatinina" value={form.creatinina} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.creatininaNA}/>
+                    <span className="w-12">mg/dl</span>
+                    <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => setField('creatininaNA', v)} />
+                    <span className="ml-4 text-md">Valores normales 0.8 - 1.4 mg/dl</span>
+                </div>
+                </div>
+            </fieldset>
+
+            {/* Reacciones Serológicas */}
+            <fieldset className="border border-gray-400 p-2 mt-2">
+                <legend className="px-2 font-semibold text-md">Reacciones Serológicas</legend>
+                <div className="grid grid-cols-2 divide-x divide-gray-400">
+                    <div className="pr-4 space-y-1">
+                        <div className="flex items-center gap-2">
+                        <label className="w-12 font-semibold">RPR :</label>
+                        <input name="rpr" value={form.rprNA ? 'N/A' : form.rpr} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 flex-1 text-md" disabled={form.rprNA} />
+                        </div>
+                        <div className="flex items-center gap-2 justify-center">
+                            <Checkbox label="+" checked={form.rpr === 'POSITIVO'} onChange={() => { setField('rpr', 'POSITIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
+                            <Checkbox label="-" checked={form.rpr === 'NEGATIVO'} onChange={() => { setField('rpr', 'NEGATIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
+                            <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', ''); }} />
+                        </div>
+                    </div>
+                    <div className="pl-4 space-y-1">
+                        <div className="flex items-center gap-2">
+                        <label className="w-12 font-semibold">VIH :</label>
+                        <input name="vih" value={form.vihNA ? 'N/A' : form.vih} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 flex-1 text-md" disabled={form.vihNA}/>
+                        </div>
+                        <div className="flex items-center gap-2 justify-center">
+                            <Checkbox label="+" checked={form.vih === 'POSITIVO'} onChange={() => { setField('vih', 'POSITIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
+                            <Checkbox label="-" checked={form.vih === 'NEGATIVO'} onChange={() => { setField('vih', 'NEGATIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
+                            <Checkbox label="N/A" checked={form.vihNA} onChange={v => { setField('vihNA', v); if(v) setField('vih', ''); }} />
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <div className="flex justify-between mt-6">
+              <button onClick={handleClear} className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded text-md">Limpiar</button>
+            </div>
         </div>
 
         <div className="bg-white p-4 rounded shadow w-full lg:w-1/3 flex flex-col justify-between">
@@ -361,19 +347,13 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
               </tbody>
             </table>
           </Section>
-          <div className="flex justify-center">
-            <img src={microscopioImg} alt="Microscopio" className="w-64 h-64 object-contain" />
-          </div>
+         
         </div>
       </div>
 
-      <div className="flex justify-end">
-        <button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded inline-flex items-center gap-2">
-          <i className="fa fa-print" /> Imprimir
-        </button>
-      </div>
+     
 
-      {status && <p className="text-center text-green-600">{status}</p>}
+      {status && <p className="text-center text-green-600 text-md">{status}</p>}
     </div>
   );
 };
@@ -382,7 +362,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
 function Field({ label, name, type = 'text', unit = '', value, onChange, children, disabled }) {
   return (
     <div className="flex flex-col">
-      <label className="font-medium mb-1">{label}{unit && <span className="text-sm ml-1">{unit}</span>}</label>
+      <label className="font-medium mb-1 text-md">{label}{unit && <span className="text-md ml-1">{unit}</span>}</label>
       <div className="flex items-center gap-2">
         <input
           type={type}
@@ -390,7 +370,7 @@ function Field({ label, name, type = 'text', unit = '', value, onChange, childre
           value={value}
           disabled={disabled}
           onChange={onChange}
-          className={`border rounded px-2 py-1 flex-1 ${disabled ? 'bg-gray-100' : ''}`}
+          className={`border rounded px-2 py-1 flex-1 text-md ${disabled ? 'bg-gray-100' : ''}`}
         />
         {children}
       </div>
@@ -400,7 +380,7 @@ function Field({ label, name, type = 'text', unit = '', value, onChange, childre
 
 function Checkbox({ label, checked, onChange }) {
   return (
-    <label className="flex items-center gap-1">
+    <label className="flex items-center gap-1 text-md">
       <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} />
       {label}
     </label>
@@ -410,10 +390,10 @@ function Checkbox({ label, checked, onChange }) {
 function RadioGroup({ label, name, options, value, onChange }) {
   return (
     <div className="flex flex-col">
-      <span className="font-medium mb-1">{label}</span>
+      <span className="font-medium mb-1 text-md">{label}</span>
       <div className="flex items-center gap-2">
         {options.map(opt => (
-          <label key={opt} className="flex items-center gap-1">
+          <label key={opt} className="flex items-center gap-1 text-md">
             <input
               type="radio"
               name={name}
@@ -432,7 +412,7 @@ function RadioGroup({ label, name, options, value, onChange }) {
 function Section({ title, children }) {
   return (
     <div className="space-y-2">
-      <h3 className="text-blue-700 font-semibold">{title}</h3>
+      <h3 className="text-blue-700 font-semibold text-md">{title}</h3>
       {children}
     </div>
   );
