@@ -60,7 +60,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
   doc.setFont(config.font, "bold");
   doc.text("MÉTODO :", config.margin, y);
   doc.setFont(config.font, "normal");
-  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", config.margin + 30, y);
+  doc.text(datos.txtMetodo || "", config.margin + 30, y);
   y += config.lineHeight * 2;
 
   // Encabezado de tabla
@@ -81,16 +81,16 @@ export default function Panel10d_Digitalizado(datos = {}) {
 
   // Datos
   const tests = [
-    { label: "COCAÍNA (COC)", key: "cocaina" },
-    { label: "MARIHUANA (THC)", key: "marihuana" },
-    { label: "ANFETAMINA (AMP)", key: "anfetamina" },
-    { label: "METANFETAMINA (MET)", key: "metanfetamina" },
-    { label: "BENZODIACEPINA (BZO)", key: "benzodiacepina" },
-    { label: "OPIÁCEOS (OPI)", key: "opiaceos" },
-    { label: "BARBITÚRICOS", key: "barbituricos" },
-    { label: "METADONA (MTD)", key: "metadona" },
-    { label: "FENCICLIDINA (PCP)", key: "fenciclidina" },
-    { label: "ANTIDEPRESIVOS TRICÍCLICOS (TCA)", key: "antidepresivos" },
+    { label: "COCAÍNA (COC)", key: "txtCocaina" },
+    { label: "MARIHUANA (THC)", key: "txtMarihuana" },
+    { label: "ANFETAMINA (AMP)", key: "txtAnfetamina" },
+    { label: "METANFETAMINA (MET)", key: "txtMetanfetamina" },
+    { label: "BENZODIACEPINA (BZO)", key: "txtBenzodiacepina" },
+    { label: "OPIÁCEOS (OPI)", key: "txtOpiaceos" },
+    { label: "BARBITÚRICOS", key: "txtBarbituricos" },
+    { label: "METADONA (MTD)", key: "txtMetadona" },
+    { label: "FENCICLIDINA (PCP)", key: "txtFenciclidina" },
+    { label: "ANTIDEPRESIVOS TRICÍCLICOS (TCA)", key: "txtAntidepresivos" },
   ];
   
   tests.forEach(({ label, key }) => {

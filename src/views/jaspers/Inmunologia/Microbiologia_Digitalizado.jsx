@@ -89,20 +89,20 @@ export default function Microbiologia_Digitalizado(datos = {}) {
       doc,
       y,
       "EXAMEN DIRECTO (KOH)",
-      datos.koh ?? "N/A"
+      datos.txtKoh ?? "N/A"
     );
   } else {
     y = drawResultRow(
       doc,
       y,
       "Examen de BK - BACILOSCOPIA 1° Muestra",
-      datos.bk1 ?? "N/A"
+      datos.txtMuestra1 ?? "N/A"
     );
     drawResultRow(
       doc,
       y,
       "Examen de BK - BACILOSCOPIA 2° Muestra",
-      datos.bk2 ?? "N/A"
+      datos.txtMuestra2 ?? "N/A"
     );
   }
 

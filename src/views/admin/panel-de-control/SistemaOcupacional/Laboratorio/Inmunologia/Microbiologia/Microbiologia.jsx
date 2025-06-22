@@ -3,43 +3,37 @@ import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
 import Microbiologia_Digitalizado from '../../../../../../jaspers/Inmunologia/Microbiologia_Digitalizado'
+import { PrintHojaR, SubmitMicrobiologiaLab, VerifyTR } from './controller'
 
 const today = new Date().toISOString().split('T')[0]
 
-export default function Microbiologia({ apiBase, token, selectedSede }) {
+export default function Microbiologia({ token, selectedSede, userlogued }) {
   // Individual useState hooks for each form field
-  const [norden, setNorden] = useState('')
-  const [fecha, setFecha] = useState(today)
-  const [nombres, setNombres] = useState('')
-  const [edad, setEdad] = useState('')
-  const [examenDirecto, setExamenDirecto] = useState(false)
-  const [bk1, setBk1] = useState('')
-  const [bk1Radio, setBk1Radio] = useState('')
-  const [bk2, setBk2] = useState('')
-  const [bk2Radio, setBk2Radio] = useState('')
-  const [koh, setKoh] = useState('')
-  const [kohRadio, setKohRadio] = useState('')
-  const [printCount, setPrintCount] = useState('')
-  const [medico, setMedico] = useState('')
+  const tabla = 'microbiologia'
+  const [form, setForm] = useState({
+    norden: '',
+    fecha: today,
+    nombres: '',
+    edad: '',
+    examenDirecto: false,
+    bk1: '',
+    bk1Radio: '',
+    bk2: '',
+    bk2Radio: '',
+    koh: '',
+    kohRadio: '',
+    printCount: '',
+    medico: ''
+  });
   
   const fechaRef = useRef(null)
 
-  useEffect(() => {
-    if (examenDirecto) {
-      // Limpiar BK 1ª y BK 2ª
-      setBk1('');
-      setBk1Radio('');
-      setBk2('');
-      setBk2Radio('');
-    } else {
-      // Limpiar KOH
-      setKoh('');
-      setKohRadio('');
-    }
-  }, [examenDirecto]);
-
+  const handleFormChange = e => {
+    const { name, value } = e.target
+    setForm(f => ({ ...f, [name]: value }))
+  }
+  
   const handleSave = async () => {
     try {
       // await fetch...
@@ -50,110 +44,113 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
   }
 
   const handleClear = () => {
-    setNorden('')
-    setFecha(today)
-    setNombres('')
-    setEdad('')
-    setExamenDirecto(false)
-    setBk1('')
-    setBk1Radio('')
-    setBk2('')
-    setBk2Radio('')
-    setKoh('')
-    setKohRadio('')
-    setPrintCount('')
-    setMedico('')
-    Swal.fire('Limpiado','Formulario reiniciado','success')
+    setForm({
+      norden: '',
+      fecha: today,
+      nombres: '',
+      edad: '',
+      examenDirecto: false,
+      bk1: '',
+      bk1Radio: '',
+      bk2: '',
+      bk2Radio: '',
+      koh: '',
+      kohRadio: '',
+      printCount: '',
+      medico: ''
+    })
   }
 
   const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
-      title: '¿Desea Imprimir Hoja de Microbiología?',
-      html: `<div>N° <b>${norden}</b> - <b>${nombres}</b></div>`,
+      title: '¿Desea Imprimir MICROBIOLOGIA?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir'
-    }).then(res => {
-      if (res.isConfirmed) {
-        Microbiologia_Digitalizado({
-          norden: norden,
-          nombres: nombres,
-          edad: edad,
-          fecha: fecha,
-          bk1: bk1,
-          bk2: bk2,
-          koh: koh
-        })
-        Swal.fire('Imprimiendo','','success')
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
       }
-    })
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
   }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <h2 className="text-2xl font-bold text-center">MICROBIOLOGÍA</h2>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field
           label="Nro Ficha"
           name="norden"
-          value={norden}
-          onChange={e => setNorden(e.target.value)}
-          onKeyUp={e => e.key === 'Enter' && VerifyTR(norden, 'microbiologia', token, (payload) => {
-            setNorden(payload.norden || '')
-            setFecha(payload.fecha || today)
-            setNombres(payload.nombres || '')
-            setEdad(payload.edad || '')
-            setExamenDirecto(payload.examenDirecto || false)
-            setBk1(payload.bk1 || '')
-            setBk1Radio(payload.bk1Radio || '')
-            setBk2(payload.bk2 || '')
-            setBk2Radio(payload.bk2Radio || '')
-            setKoh(payload.koh || '')
-            setKohRadio(payload.kohRadio || '')
-            setPrintCount(payload.printCount || '')
-            setMedico(payload.medico || '')
-          }, selectedSede)}
+          value={form.norden}
+          onChange={handleFormChange}
+          onKeyUp={event => {
+            if (event.key === 'Enter') {
+              VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            }
+          }}
         />
-        <Field label="Fecha" name="fecha" type="date" value={fecha} onChange={e=>setFecha(e.target.value)} inputRef={fechaRef} />
+        <Field
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleFormChange}
+          inputRef={fechaRef}
+        />
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={nombres} onChange={e=>setNombres(e.target.value)} disabled />
-        <Field label="Edad" name="edad" value={edad} onChange={e=>setEdad(e.target.value)} disabled />
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={handleFormChange} disabled />
+        <Field label="Edad" name="edad" value={form.edad} onChange={handleFormChange} disabled />
       </div>
-      <Checkbox label="Examen Directo" checked={examenDirecto} onChange={v=>setExamenDirecto(v)} />
+
+      <Checkbox
+        label="Examen Directo"
+        checked={form.examenDirecto}
+        onChange={v => setForm(f => ({ ...f, examenDirecto: v }))}
+      />
+
       <div className="text-center font-semibold">MUESTRA: ESPUTO</div>
+
       <div className="grid grid-cols-12 gap-2 items-center">
         <div className="col-span-4 font-bold flex items-center">PRUEBA</div>
         <div className="col-span-2 font-bold flex items-center">RESULTADO</div>
         <div className="col-span-6"></div>
 
-        {/* Examen de BK - BACILOSCOPIA 1ª */}
+        {/* BK 1 */}
         <div className="col-span-4 flex items-center">Examen de BK - BACILOSCOPIA 1ª<span className="ml-1">:</span></div>
         <div className="col-span-2">
           <input
             className="border rounded px-2 py-1 w-full"
             name="bk1"
-            value={bk1}
-            onChange={e=>setBk1(e.target.value)}
-            disabled={examenDirecto}
+            value={form.bk1}
+            onChange={handleFormChange}
+            disabled={form.examenDirecto}
           />
         </div>
         <div className="col-span-6 flex gap-4">
-          {["BAAR - NEGATIVO","BAAR - POSITIVO","N/A"].map(opt => (
+          {["BAAR - NEGATIVO", "BAAR - POSITIVO", "N/A"].map(opt => (
             <label key={opt} className="flex items-center gap-1">
               <input
                 type="checkbox"
                 name="bk1Radio"
-                checked={bk1Radio===opt}
-                disabled={examenDirecto}
+                checked={form.bk1Radio === opt}
+                disabled={form.examenDirecto}
                 onChange={e => {
-                  if (e.target.checked) {
-                    setBk1Radio(opt);
-                    setBk1(opt);
-                  } else {
-                    setBk1Radio('');
-                    setBk1('');
-                  }
+                  setForm(f => ({
+                    ...f,
+                    bk1Radio: e.target.checked ? opt : '',
+                    bk1: e.target.checked ? opt : ''
+                  }));
                 }}
               />
               {opt}
@@ -161,33 +158,31 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
           ))}
         </div>
 
-        {/* Examen de BK - BACILOSCOPIA 2ª */}
+        {/* BK 2 */}
         <div className="col-span-4 flex items-center">Examen de BK - BACILOSCOPIA 2ª<span className="ml-1">:</span></div>
         <div className="col-span-2">
           <input
             className="border rounded px-2 py-1 w-full"
             name="bk2"
-            value={bk2}
-            onChange={e=>setBk2(e.target.value)}
-            disabled={examenDirecto}
+            value={form.bk2}
+            onChange={handleFormChange}
+            disabled={form.examenDirecto}
           />
         </div>
         <div className="col-span-6 flex gap-4">
-          {["BAAR - NEGATIVO","BAAR - POSITIVO","N/A"].map(opt => (
+          {["BAAR - NEGATIVO", "BAAR - POSITIVO", "N/A"].map(opt => (
             <label key={opt} className="flex items-center gap-1">
               <input
                 type="checkbox"
                 name="bk2Radio"
-                checked={bk2Radio===opt}
-                disabled={examenDirecto}
+                checked={form.bk2Radio === opt}
+                disabled={form.examenDirecto}
                 onChange={e => {
-                  if (e.target.checked) {
-                    setBk2Radio(opt);
-                    setBk2(opt);
-                  } else {
-                    setBk2Radio('');
-                    setBk2('');
-                  }
+                  setForm(f => ({
+                    ...f,
+                    bk2Radio: e.target.checked ? opt : '',
+                    bk2: e.target.checked ? opt : ''
+                  }));
                 }}
               />
               {opt}
@@ -201,27 +196,25 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
           <input
             className="border rounded px-2 py-1 w-full"
             name="koh"
-            value={koh}
-            onChange={e=>setKoh(e.target.value)}
-            disabled={!examenDirecto}
+            value={form.koh}
+            onChange={handleFormChange}
+            disabled={!form.examenDirecto}
           />
         </div>
         <div className="col-span-6 flex gap-4">
-          {["BAAR - NEGATIVO","BAAR - POSITIVO","N/A"].map(opt => (
+          {["BAAR - NEGATIVO", "BAAR - POSITIVO", "N/A"].map(opt => (
             <label key={opt} className="flex items-center gap-1">
               <input
                 type="checkbox"
                 name="kohRadio"
-                checked={kohRadio===opt}
-                disabled={!examenDirecto}
+                checked={form.kohRadio === opt}
+                disabled={!form.examenDirecto}
                 onChange={e => {
-                  if (e.target.checked) {
-                    setKohRadio(opt);
-                    setKoh(opt);
-                  } else {
-                    setKohRadio('');
-                    setKoh('');
-                  }
+                  setForm(f => ({
+                    ...f,
+                    kohRadio: e.target.checked ? opt : '',
+                    koh: e.target.checked ? opt : ''
+                  }));
                 }}
               />
               {opt}
@@ -229,36 +222,39 @@ export default function Microbiologia({ apiBase, token, selectedSede }) {
           ))}
         </div>
       </div>
-      {/* Campo ASIGNAR MEDICO */}
+
+      {/* ASIGNAR MÉDICO */}
       <div className="flex items-center mt-6 mb-2">
-        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
+        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MÉDICO:</label>
         <select
           id="asignarMedico"
+          disabled
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={medico || ''}
-          onChange={e => setMedico(e.target.value)}
+          name="medico"
+          value={form.medico}
+          onChange={handleFormChange}
         >
-          <option value="">Seleccionar medico</option>
+          <option value="">Seleccionar médico</option>
           <option value="medico1">Dr. Juan Pérez</option>
           <option value="medico2">Dra. Ana Torres</option>
           <option value="medico3">Dr. Luis Gómez</option>
         </select>
       </div>
-      {/* Botones y área de imprimir */}
+
+      {/* BOTONES E IMPRESIÓN */}
       <div className="flex justify-between items-end mt-6">
         <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
+          <ActionButton color="green" icon={faSave} onClick={() => {SubmitMicrobiologiaLab(form,token,userlogued,handleClear,tabla)}}>Guardar/Actualizar</ActionButton>
           <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
         </div>
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
             <input
-              name="printCount"
-              value={printCount}
-              onChange={e=>setPrintCount(e.target.value)}
+              name="norden"
+              value={form.norden}
+              onChange={handleFormChange}
               className="border rounded px-2 py-1 w-24"
-              placeholder="Veces"
             />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>

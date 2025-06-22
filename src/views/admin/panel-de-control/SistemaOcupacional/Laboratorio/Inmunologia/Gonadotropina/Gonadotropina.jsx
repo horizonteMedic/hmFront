@@ -43,7 +43,7 @@ export default function Gonadotropina({ token, selectedSede, userlogued }) {
    const handlePrint = () => {
       if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
       Swal.fire({
-        title: '¿Desea Imprimir HEMATOGRAMA?',
+        title: '¿Desea Imprimir Gonadotropina?',
         html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
         icon: 'question',
         showCancelButton: true,

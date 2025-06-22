@@ -1,21 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from './controller5D';
-
-const pruebas5D = [
-  'COCAINA',
-  'MARIHUANA',
-  'ANFETAMINA EN ORINA',
-  'METHANFETAMINA',
-  'BENZODIAZEPINA',
-];
+import { PrintHojaR, SubmitPanel5D, VerifyTR } from './controller5D';
+import Swal from 'sweetalert2';
 
 const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
-  const tabla = 'panel5d'
+  const tabla = 'toxicologia'
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
   const [form, setForm] = useState({
     norden: '',
-    fecha: '',
+    fecha: today,
     nombres: '',
     edad: '',
     valueM: '',
@@ -30,13 +25,13 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
 
   const handleChange = e => {
     const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
+    setForm(f => ({ ...f, [name]: value.toUpperCase() }));
   };
 
   const handleLimpiar = () => {
     setForm({
       norden: '',
-      fecha: '',
+      fecha: today,
       nombres: '',
       edad: '',
       valueM: '',
@@ -51,11 +46,25 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
     e.target.showPicker?.();
   };
 
-  const handleSave = async () => {
-    
-  };
-
   const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Panel 5D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,tabla,token);
+      }
+    });
   };
 
   const nameWidth = Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10));
@@ -153,7 +162,7 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
       <div className="flex flex-wrap items-center justify-end gap-4">
         <div className="flex items-center gap-2 mr-8">
           <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-28" />
+          <input className="border rounded px-3 py-2 w-28" name='norden' value={form.norden} onChange={handleChange} />
           <button
             type="button"
             onClick={handlePrint}
@@ -164,7 +173,7 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
         </div>
         <button
           type="button"
-          onClick={handleSave}
+          onClick={() => {SubmitPanel5D(form,userlogued,token,handleLimpiar,tabla)}}
           className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
         >
           <FontAwesomeIcon icon={faSave} /> Guardar

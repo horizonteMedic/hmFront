@@ -79,7 +79,7 @@ const headerLGonadotropinaDigitalizado = (doc, datos = {}) => {
   doc.setFont('helvetica', 'bold');
   doc.text("Fecha :", labelEndX, patientDataY, { align: 'right' });
   doc.setFont('helvetica', 'normal');
-  doc.text(formatDateToNumeric(datos.fecha), valueX, patientDataY);
+  doc.text(formatDateToNumeric(datos.fechaExamen), valueX, patientDataY);
   
   // Reseteo de estilos para no afectar el resto del documento
   doc.setFont('helvetica', 'normal');

@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
+import { SubmitToxPanel5D } from "../model/model.js";
 
 export const Loading = (text) => {
     Swal.fire({
@@ -74,7 +75,11 @@ export const GetInfoPanel5D = (nro,tabla,set,token) => {
         ...prev,
         ...res,
         fecha: res.fechaExamen,
-        
+        valueM: res.txtrMarihuana,
+        valueC: res.txtrCocaina,
+        valueAn: res.txtrAnfetamina,
+        valueMet: res.txtrMethanfetamina,
+        valueBen: res.txtrBenzodiacepina,
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
@@ -85,37 +90,39 @@ export const GetInfoPanel5D = (nro,tabla,set,token) => {
   })
 }
 
-export const SubmitPanel2D = async (form,user,token,limpiar,tabla) => {
+export const SubmitPanel5D = async (form,user,token,limpiar,tabla) => {
   if (!form.norden) {
     await Swal.fire('Error', 'Datos Incompletos','error')
     return
   }
   Loading('Registrando Datos')
-  SubmitLabAnalBio(form,user, token)
+  SubmitToxPanel5D(form,user, token)
   .then((res) => {
-    if (res.codAb) {
-      Swal.fire({title: 'Exito', text:`Se ha Registrado/Actualizado con EXito,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar()
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden,tabla,token)
-        }
-      })
-    }
-  })
+      console.log(res)
+      if (res.id === 1 || res.id === 0) {
+        Swal.fire({title: 'Exito', text:`Se ha Registrado/Actualizado con Exito,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+        }).then((result) => {
+          limpiar()
+          if (result.isConfirmed) {
+            PrintHojaR(form.norden,tabla,token)
+          }
+        })
+      }
+    })
 }
 
 export const PrintHojaR = async (norden,tabla,token) => {
   Loading('Cargando Formato a Imprimir')
    // Ej: 'ConsentimientoPanel10D'
-  getFetch(`/api/v01/ct/laboratorio/reporteAnalisisBioquimico?nOrden=${norden}&nameService=${tabla}`,token)
+ getFetch(`/api/v01/ct/toxicologia/obtenerReportePanel5D?nOrden=${norden}&nameService=${tabla}`,token)
   .then(async (res) => {
     if (res.norden) {
       const nombre = res.nameJasper;
-      const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
+      console.log(nombre)
+      const jasperModules = import.meta.glob('../../../../../../jaspers/Toxicologia/*.jsx');
+      const modulo = await jasperModules[`../../../../../../jaspers/Toxicologia/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
         modulo.default(res);

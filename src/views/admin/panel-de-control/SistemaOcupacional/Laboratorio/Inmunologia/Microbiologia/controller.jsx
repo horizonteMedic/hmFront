@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import { SubmitGonadotropina } from "../model/model.js";
+import { SubmitMicrobiologia } from "../model/model.js";
 
 //CONTROLADOR DE ANALISIS BIOQUIMICOS
 export const Loading = (text) => {
@@ -46,7 +46,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoGonadotropina(nro,tabla,set,token)
+            GetInfoMicrobio(nro,tabla,set,token)
         }
     })
 }
@@ -67,8 +67,8 @@ export const GetInfoPac = (nro,set,token,sede) => {
 }
 
 
-export const GetInfoGonadotropina = (nro,tabla,set,token) => {
-  getFetch(`/api/v01/ct/inmunologia/obtenerReporteLgonadotropina?nOrden=${nro}&nameService=${tabla}`,token)
+export const GetInfoMicrobio = (nro,tabla,set,token) => {
+  getFetch(`/api/v01/ct/inmunologia/obtenerReporteMicrobiologia?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
         console.log(res)
@@ -76,9 +76,9 @@ export const GetInfoGonadotropina = (nro,tabla,set,token) => {
         ...prev,
         ...res,
         fecha: res.fechaExamen,
-        resultado: res.txtResultado,
-        positivo: res.resultado === 'POSITIVO' ? true : false,
-        negativo: res.resultado === 'NEGATIVO' ? true : false,
+        bk1: res.txtMuestra1,
+        bk2: res.txtMuestra2,
+        koh: res.txtKoh
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
@@ -89,14 +89,13 @@ export const GetInfoGonadotropina = (nro,tabla,set,token) => {
   })
 }
 
-export const SubmitGonadotropinaLab = async (form,token,user,limpiar) => {
+export const SubmitMicrobiologiaLab = async (form,token,user,limpiar,tabla) => {
     if (!form.norden) {
         await Swal.fire('Error', 'Datos Incompletos','error')
         return
     }
     Loading('Registrando Datos')
-    console.log(token)
-    SubmitGonadotropina(form,user,token)
+    SubmitMicrobiologia(form,user,token)
     .then((res) => {
         console.log(res)
         if (res.id === 1 || res.id === 0) {
@@ -106,7 +105,7 @@ export const SubmitGonadotropinaLab = async (form,token,user,limpiar) => {
         }).then((result) => {
             limpiar()
             if (result.isConfirmed) {
-                PrintHojaR(form.norden,token)
+                PrintHojaR(form.norden,token,tabla)
             }
         })
         } else {
@@ -115,9 +114,9 @@ export const SubmitGonadotropinaLab = async (form,token,user,limpiar) => {
     })
 }
 
-export const PrintHojaR = (nro,token) => {
+export const PrintHojaR = (nro,token,tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/api/v01/ct/inmunologia/obtenerReporteLgonadotropina?nOrden=${nro}&nameService=lgonadotropina`,token)
+  getFetch(`/api/v01/ct/inmunologia/obtenerReporteMicrobiologia?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
     if (res.norden) {
       console.log(res)
