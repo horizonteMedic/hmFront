@@ -3,110 +3,131 @@ import React, { useState, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
-import Acido_Urico_Digitalizado from '../../../../../../jaspers/AnalisisBioquimicos/Acido_Urico.jsx'
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
+import { PrintHojaR, SubmiteAcidoUricoLab, VerifyTR } from './controllerAcidoU.jsx'
 
-const today = new Date().toISOString().split('T')[0]
+const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-export default function BioquimicaAcidoUrico({ token, selectedSede }) {
+export default function BioquimicaAcidoUrico({ token, selectedSede, userlogued }) {
   // Individual useState hooks for each form field
-  const [norden, setNorden] = useState('')
-  const [fecha, setFecha] = useState(today)
-  const [nombres, setNombres] = useState('')
-  const [edad, setEdad] = useState('')
-  const [prueba, setPrueba] = useState('ÁCIDO ÚRICO SÉRICO')
-  const [muestra, setMuestra] = useState('SUERO')
-  const [resultado, setResultado] = useState('')
-  const [printCount, setPrintCount] = useState('')
-  const [medico, setMedico] = useState('')
-  const [sede, setSede] = useState(selectedSede)
+  const tabla = 'ac_bioquimica2022'
+  const [form, setForm] = useState({
+    norden: '',
+    fecha: today,
+    nombres: '',
+    edad: '',
+    prueba: 'ÁCIDO ÚRICO SÉRICO',
+    muestra: 'SUERO',
+    resultado: '',
+    printCount: '',
+    medico: ''
+  });
 
-  const handleSave = () => {
-    Swal.fire('Guardado', 'Datos de Ácido Úrico guardados', 'success')
-  }
+  const handleFormChange = e => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleClear = () => {
-    setNorden('')
-    setFecha(today)
-    setNombres('')
-    setEdad('')
-    setPrueba('ÁCIDO ÚRICO SÉRICO')
-    setMuestra('SUERO')
-    setResultado('')
-    setPrintCount('')
-    setMedico('')
-    Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
+    setForm({
+      norden: '',
+      fecha: today,
+      nombres: '',
+      edad: '',
+      prueba: 'ÁCIDO ÚRICO SÉRICO',
+      muestra: 'SUERO',
+      resultado: '',
+      printCount: '',
+      medico: ''
+    })
+  }
+
+  const handleSeat = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      prueba: 'ÁCIDO ÚRICO SÉRICO',
+      muestra: 'SUERO',
+      resultado: '',
+      printCount: '',
+      medico: ''
+    }))
   }
 
   const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
-      title: '¿Desea Imprimir Hoja de Bioquímica?',
-      html: `<div>N° <b>${norden}</b> - <b>${nombres}</b></div>`,
+      title: '¿Desea Imprimir Hepatitis?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir'
-    }).then(result => {
-      if (result.isConfirmed) {
-        Acido_Urico_Digitalizado({ 
-          norden, 
-          fecha, 
-          nombres, 
-          edad, 
-          prueba, 
-          muestra, 
-          resultado, 
-          printCount, 
-          medico, 
-          sede 
-        })
-        Swal.fire('Imprimiendo', '', 'success')
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
       }
-    })
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
   }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
-      <h2 className="text-2xl font-bold text-center">ÁCIDO ÚRICO</h2>
+  <h2 className="text-2xl font-bold text-center">ÁCIDO ÚRICO</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field
-          label="Nro Ficha"
-          name="norden"
-          value={norden}
-          onChange={e => setNorden(e.target.value)}
-          onKeyUp={e => e.key === 'Enter' && VerifyTR(norden, 'ac_bioquimica2022', token, (payload) => {
-            setNorden(payload.norden || '')
-            setFecha(payload.fecha || today)
-            setNombres(payload.nombres || '')
-            setEdad(payload.edad || '')
-            setPrueba(payload.prueba || 'ÁCIDO ÚRICO SÉRICO')
-            setMuestra(payload.muestra || 'SUERO')
-            setResultado(payload.resultado || '')
-            setPrintCount(payload.printCount || '')
-            setMedico(payload.medico || '')
-            setSede(payload.sede || selectedSede)
-          }, selectedSede)}
-        />
-        <Field label="Fecha" name="fecha" type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <Field
+      label="Nro Ficha"
+      name="norden"
+      value={form.norden}
+      onChange={handleFormChange}
+      onKeyUp={e => {
+      if (e.key === 'Enter') {
+        handleSeat()
+        VerifyTR(form.norden,tabla,token,setForm, selectedSede)
+      }}}
+    />
+      <Field
+        label="Fecha"
+        name="fecha"
+        type="date"
+        value={form.fecha}
+        onChange={handleFormChange}
+      />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={nombres} disabled />
-        <Field label="Edad" name="edad" value={edad} disabled />
+        <Field label="Nombres" name="nombres" value={form.nombres} disabled />
+        <Field label="Edad" name="edad" value={form.edad} disabled />
       </div>
 
       <div className="grid grid-cols-3 gap-x-6 gap-y-4 items-center pt-4 border-t mt-4">
         <FieldRow label="PRUEBA:">
-          <input className="border rounded px-2 py-1 bg-gray-100 w-full" value={prueba} readOnly />
+          <input
+            className="border rounded px-2 py-1 bg-gray-100 w-full"
+            value={form.prueba}
+            readOnly
+          />
         </FieldRow>
         <FieldRow label="MUESTRA:">
-          <input className="border rounded px-2 py-1 bg-gray-100 w-full" value={muestra} readOnly />
+          <input
+            className="border rounded px-2 py-1 bg-gray-100 w-full"
+            value={form.muestra}
+            readOnly
+          />
         </FieldRow>
         <FieldRow label="RESULTADO:">
           <input
             className="border rounded px-2 py-1 w-full"
-            value={resultado}
-            onChange={e => setResultado(e.target.value)}
+            name="resultado"
+            value={form.resultado}
+            onChange={handleFormChange}
           />
         </FieldRow>
         <FieldRow label="VALORES NORMALES:">
@@ -122,8 +143,10 @@ export default function BioquimicaAcidoUrico({ token, selectedSede }) {
         <select
           id="asignarMedico"
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={medico}
-          onChange={e => setMedico(e.target.value)}
+          name="medico"
+          disabled
+          value={form.medico}
+          onChange={handleFormChange}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -134,18 +157,17 @@ export default function BioquimicaAcidoUrico({ token, selectedSede }) {
 
       <div className="flex justify-between items-end mt-6">
         <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
+          <ActionButton color="green" icon={faSave} onClick={() => {SubmiteAcidoUricoLab(form,token, userlogued,handleClear,tabla)}}>Guardar/Actualizar</ActionButton>
           <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
         </div>
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
             <input
-              name="printCount"
-              value={printCount}
-              onChange={e => setPrintCount(e.target.value)}
+              name="norden"
+              value={form.norden}
+              onChange={handleFormChange}
               className="border rounded px-2 py-1 w-24"
-              placeholder="Veces"
             />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>

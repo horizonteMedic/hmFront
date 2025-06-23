@@ -19,17 +19,17 @@ const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued }) => 
     {
       label: 'Perfil Renal',
       icon: faFilter,
-      component: <Bioquimica token={token} selectedSede={selectedSede} />
+      component: <Bioquimica token={token} selectedSede={selectedSede} userlogued={userlogued} />
     },
     {
       label: 'Ácido Úrico',
       icon: faTint,
-      component: <BioquimicaAcidoUrico token={token} selectedSede={selectedSede} />
+      component: <BioquimicaAcidoUrico token={token} selectedSede={selectedSede} userlogued={userlogued} />
     },
     {
       label: 'Perfil Hepático',
       icon: faLungs,
-      component: <PerfilHepatico token={token} selectedSede={selectedSede} />
+      component: <PerfilHepatico token={token} selectedSede={selectedSede} userlogued={userlogued} />
     }
   ];
 

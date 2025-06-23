@@ -1,31 +1,12 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/PerfilHepatico.jsx
-import React, { useReducer, useCallback } from 'react'
+import React, { useReducer, useCallback, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
-import { VerifyTR } from '../../ExamenesLaboratorio/ControllerE/ControllerE'
-import PerfilHepatico_Digitalizado from '../../../../../../jaspers/AnalisisBioquimicos/PerfilHepatico_Digitalizado'
+import { PrintHojaR, SubmitPerfilHepaticoLab, VerifyTR } from './controllerPerfilH';
 
-const today = new Date().toISOString().split('T')[0]
-
-const initialState = {
-  norden: '',
-  fecha: today,
-  nombres: '',
-  edad: '',
-  tgo: '',
-  tgp: '',
-  ggt: '',
-  fosfAlc: '',
-  biliTotal: '',
-  biliInd: '',
-  biliDir: '',
-  protTot: '',
-  albumina: '',
-  globSer: '',
-  printCount: '',
-  medico: ''
-}
+const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
 const testFields = [
   { label: 'TGO', name: 'tgo' },
@@ -40,21 +21,32 @@ const testFields = [
   { label: 'GLOBULINA SERICA', name: 'globSer' },
 ]
 
-function reducer(state, action) {
-  switch (action.type) {
-    case 'SET': return { ...state, [action.field]: action.value }
-    case 'LOAD': return { ...state, ...action.payload }
-    case 'RESET': return initialState
-    default: return state
-  }
-}
+export default function PerfilHepatico({ token, selectedSede, userlogued }) {
+    const tabla = 'perfil_hepatico'
 
-export default function PerfilHepatico({ apiBase, token, selectedSede }) {
-  const [form, dispatch] = useReducer(reducer, initialState)
+  const [form, setForm] = useState({
+    norden: '',
+    fecha: today,
+    nombres: '',
+    edad: '',
+    tgo: '',
+    tgp: '',
+    ggt: '',
+    fosfAlc: '',
+    biliTotal: '',
+    biliInd: '',
+    biliDir: '',
+    protTot: '',
+    albumina: '',
+    globSer: '',
+    printCount: '',
+    medico: ''
+  })
   
-  const setField = useCallback((field, value) => {
-    dispatch({ type:'SET', field, value })
-  }, [])
+  const handleFormChange = e => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSave = useCallback(async () => {
     try {
@@ -66,58 +58,123 @@ export default function PerfilHepatico({ apiBase, token, selectedSede }) {
     }
   }, [form])
 
-  const handleClear = useCallback(() => {
-    dispatch({ type:'RESET' })
-    Swal.fire('Limpiado', 'Formulario reiniciado', 'success')
-  }, [])
+  const handleClear = () => {
+    setForm({
+      norden: '',
+      fecha: today,
+      nombres: '',
+      edad: '',
+      tgo: '',
+      tgp: '',
+      ggt: '',
+      fosfAlc: '',
+      biliTotal: '',
+      biliInd: '',
+      biliDir: '',
+      protTot: '',
+      albumina: '',
+      globSer: '',
+      printCount: '',
+      medico: ''
+    })
+  }
+ 
+  const handleSeat = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      tgo: '',
+      tgp: '',
+      ggt: '',
+      fosfAlc: '',
+      biliTotal: '',
+      biliInd: '',
+      biliDir: '',
+      protTot: '',
+      albumina: '',
+      globSer: '',
+      printCount: '',
+      medico: ''
+    }))
+  }
 
-  const handlePrint = useCallback(() => {
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
     Swal.fire({
-      title: '¿Desea Imprimir Hoja de Perfil Hepático?',
-      html: `<div>N° <b>${form.norden}</b> - <b>${form.nombres}</b></div>`,
+      title: '¿Desea Imprimir Hepatitis?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: 'question',
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir'
-    }).then(res => {
-      if (res.isConfirmed) {
-        PerfilHepatico_Digitalizado(form)
-        Swal.fire('Imprimiendo','','success')
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
       }
-    })
-  }, [form])
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
+  }
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <h2 className="text-2xl font-bold text-center">PERFIL HEPÁTICO</h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field
           label="Nro Ficha"
           name="norden"
           value={form.norden}
-          onChange={e => setField('norden', e.target.value)}
-          onKeyUp={e => e.key === 'Enter' && VerifyTR(form.norden, 'perfil_hepatico', token, dispatch, selectedSede)}
+          onChange={handleFormChange}
+          onKeyUp={e => {
+          if (e.key === 'Enter') {
+            handleSeat()
+            VerifyTR(form.norden,tabla,token,setForm, selectedSede)
+          }}}
         />
-        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={e=>setField('fecha',e.target.value)} />
+        <Field
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleFormChange}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={form.nombres} onChange={e=>setField('nombres',e.target.value)} disabled />
-        <Field label="Edad" name="edad" value={form.edad} onChange={e=>setField('edad',e.target.value)} disabled />
+        <Field
+          label="Nombres"
+          name="nombres"
+          value={form.nombres}
+          onChange={handleFormChange}
+          disabled
+        />
+        <Field
+          label="Edad"
+          name="edad"
+          value={form.edad}
+          onChange={handleFormChange}
+          disabled
+        />
       </div>
 
       <div className="grid grid-cols-5 gap-x-6 gap-y-3 items-center">
         <div className="col-span-2 font-bold text-center mb-2">PRUEBAS</div>
         <div className="col-span-3 font-bold text-center mb-2">RESULTADOS</div>
-        
-        {testFields.map(({label, name}) => (
+
+        {testFields.map(({ label, name }) => (
           <React.Fragment key={name}>
             <label className="col-span-2 font-semibold text-right">{label}</label>
             <div className="col-span-3">
               <input
                 name={name}
                 value={form[name]}
-                onChange={e => setField(name, e.target.value)}
+                onChange={handleFormChange}
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
@@ -126,12 +183,15 @@ export default function PerfilHepatico({ apiBase, token, selectedSede }) {
       </div>
 
       <div className="flex items-center mt-6 mb-2">
-        <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
+        <label className="font-medium mr-2" htmlFor="asignarMedico">
+          ASIGNAR MEDICO:
+        </label>
         <select
           id="asignarMedico"
+          name="medico"
           className="border rounded px-2 py-1 min-w-[220px]"
           value={form.medico || ''}
-          onChange={e => setField('medico', e.target.value)}
+          onChange={handleFormChange}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -142,18 +202,21 @@ export default function PerfilHepatico({ apiBase, token, selectedSede }) {
 
       <div className="flex justify-between items-end mt-6">
         <div className="flex gap-4">
-          <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
-          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
+          <ActionButton color="green" icon={faSave} onClick={() => {SubmitPerfilHepaticoLab(form,token,userlogued,handleClear,tabla)}}>
+            Guardar/Actualizar
+          </ActionButton>
+          <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>
+            Limpiar
+          </ActionButton>
         </div>
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
             <input
-              name="printCount"
-              value={form.printCount}
-              onChange={e=>setField('printCount',e.target.value)}
+              name="norden"
+              value={form.norden}
+              onChange={handleFormChange}
               className="border rounded px-2 py-1 w-24"
-              placeholder="Veces"
             />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>

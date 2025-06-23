@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import header_Acido_Urico_Digitalizado from "./Header/header_Acido_Urico_Digitalizado";
 import footer from "../components/footer";
-
+//ACIDO URICO
 const config = {
   margin: 15,
   fontSize: {
@@ -30,7 +30,7 @@ const formatDateForFooter = (dateString) => {
 };
 
 
-export default function Acido_Urico_Digitalizado(datos = {}) {
+export default function AnalisisClinicosB_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   let y = 70;
@@ -44,7 +44,7 @@ export default function Acido_Urico_Digitalizado(datos = {}) {
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
   doc.text(`MUESTRA :`, config.margin, y);
   doc.setFont(config.font, "normal");
-  doc.text(datos.muestra || "SUERO", config.margin + 20, y);
+  doc.text(datos.txtMuestra || "SUERO", config.margin + 20, y);
   y += config.lineHeight.normal * 1.5;
 
   const tableCols = {
@@ -62,8 +62,8 @@ export default function Acido_Urico_Digitalizado(datos = {}) {
   y += config.lineHeight.normal;
 
   doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
-  doc.text("ÁCIDO ÚRICO SÉRICO", tableCols.col1, y);
-  doc.text(String(datos.resultado || ''), tableCols.col2, y, { align: "center" });
+  doc.text(datos.txtPrueba, tableCols.col1, y);
+  doc.text(String(datos.txtResultado + ' mg/dL' || ''), tableCols.col2, y, { align: "center" });
   
   const valoresNormales = ["Mujeres : 2.5 - 6.8 mg/dl", "Hombres : 3.6 - 7.7 mg/dl"];
   let tempY = y;
@@ -76,7 +76,7 @@ export default function Acido_Urico_Digitalizado(datos = {}) {
 
   // Posiciona la fecha justo debajo de la sección "Valores Normales".
   const dateYPosition = tempY + config.lineHeight.normal * 2;
-  const footerDate = formatDateForFooter(datos.fecha);
+  const footerDate = String(datos.fecha);
   doc.setFontSize(10).setFont(config.font, 'normal');
   doc.text(footerDate, pageW - config.margin, dateYPosition, { align: 'right' });
 

@@ -1,8 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import { SubmitLabAnalBio } from "../model/model.js";
+import {SubmitAcidoUrico} from '../model/model.js'
 
-//CONTROLADOR DE ANALISIS BIOQUIMICOS
 export const Loading = (text) => {
     Swal.fire({
       title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -13,6 +12,9 @@ export const Loading = (text) => {
       showConfirmButton: false,
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       customClass: {
         popup: 'swal2-border-radius',
         title: 'swal2-title-custom',
@@ -31,7 +33,7 @@ export const Loading = (text) => {
 }
 
 
-export const VerifyTR = async (nro,tabla,token,set,sede,setMed) => {
+export const VerifyTR = async (nro,tabla,token,set,sede) => {
     if (!nro) { 
       await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
       return
@@ -39,11 +41,11 @@ export const VerifyTR = async (nro,tabla,token,set,sede,setMed) => {
     Loading('Validando datos')
     getFetch(`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,token)
     .then((res) => {
+        console.log(res)
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoPacAnalisisBio(nro,tabla,set,token,setMed)
-            //GetInfoPacLaboratorioFil(nro,tabla,set,token, boro)
+            GetInfoAcidoUricoLab(nro,tabla,set,token)
         }
     })
 }
@@ -64,23 +66,19 @@ export const GetInfoPac = (nro,set,token,sede) => {
 }
 
 
-export const GetInfoPacAnalisisBio = (nro,tabla,set,token,setMed) => {
-  getFetch(`/api/v01/ct/laboratorio/reporteAnalisisBioquimico?nOrden=${nro}&nameService=${tabla}`,token)
+export const GetInfoAcidoUricoLab = (nro,tabla,set,token) => {
+  getFetch(`/api/v01/ct/analisisBioquimico/obtenerReporteAcidoUrico?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
+        console.log(res)
       set(prev => ({
         ...prev,
         ...res,
-        paciente: res.nombres,
-        medico : res.txtReponsable,
-        creatinina: res.txtCreatinina,
-        colesterolTotal: res.txtColesterol,
-        ldl: res.txtLdlColesterol,
-        hdl: res.txtHdlColesterol,
-        vldl: res.txtVldlColesterol,
-        trigliceridos: res.txtTrigliseridos
+        fecha: res.fecha,
+        prueba: res.txtPrueba,
+        muestra: res.txtMuestra,
+        resultado: res.txtResultado,
       }));
-      setMed(res.txtReponsable)
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
     }
@@ -90,35 +88,39 @@ export const GetInfoPacAnalisisBio = (nro,tabla,set,token,setMed) => {
   })
 }
 
-export const SubmitAnalsisiBio = async (form,user,token,limpiar,tabla) => {
-  if (!form.norden) {
-    await Swal.fire('Error', 'Datos Incompletos','error')
-    return
-  }
-  Loading('Registrando Datos')
-  SubmitLabAnalBio(form,user, token)
-  .then((res) => {
-    if (res.codAb) {
-      Swal.fire({title: 'Exito', text:`Se ha Registrado/Actualizado con EXito,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar()
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden,tabla,token)
-        }
-      })
+export const SubmiteAcidoUricoLab = async (form,token,user,limpiar,tabla) => {
+    if (!form.norden) {
+        await Swal.fire('Error', 'Datos Incompletos','error')
+        return
     }
-  })
+    Loading('Registrando Datos')
+    SubmitAcidoUrico(form,user,token)
+    .then((res) => {
+        console.log(res)
+        if (res.id === 1 || res.id === 0) {
+        Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+        }).then((result) => {
+            limpiar()
+            if (result.isConfirmed) {
+                PrintHojaR(form.norden,token,tabla)
+            }
+        })
+        } else {
+            Swal.fire('Error','Ocurrio un error al Registrar','error')
+        }
+    })
 }
 
-export const PrintHojaR = async (norden,tabla,token) => {
+export const PrintHojaR = (nro,token,tabla) => {
   Loading('Cargando Formato a Imprimir')
-   // Ej: 'ConsentimientoPanel10D'
-  getFetch(`/api/v01/ct/laboratorio/reporteAnalisisBioquimico?nOrden=${norden}&nameService=${tabla}`,token)
+  getFetch(`/api/v01/ct/analisisBioquimico/obtenerReporteAcidoUrico?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
     if (res.norden) {
+      console.log(res)
       const nombre = res.nameJasper;
+      console.log(nombre)
       const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
       const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
