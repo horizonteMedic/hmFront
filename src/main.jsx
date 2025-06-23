@@ -32,7 +32,7 @@ import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 import Test from './views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/BioquimicaAcidoUrico/BioquimicaAcidoUrico'
 //jaspers
-import Ficha from './views/jaspers/AnalisisBioquimicos/AnalisisClinicosB_Digitalizado.jsx'
+import Ficha from './views/jaspers/LaboratorioClinico/Hematologia'
 // import Test from './views/jaspers/AnalisisBioquimicos/Hematologia_Digitalizado'
 const App = () => {
   return (

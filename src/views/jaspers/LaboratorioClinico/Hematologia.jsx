@@ -1,30 +1,30 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import header from "./components/header";
+import header_Hematologia from "./header/header_Hematologia";
 
 const Hematologia = () => {
 
     const generatePDF = () => {
-        const fecha = "02/45/5154"
+        // Datos de ejemplo, reemplazar por datos reales en integración
+        const datos = {
+            norden: '96639',
+            sede: 'Trujillo-Planta',
+            nombres: 'HADY KATHERINE CASTILLO PLASENCIA',
+            edad: 31,
+            dni: '72384273',
+            fecha: '2024-11-04',
+            muestra: 'SANGRE TOTAL  C/ EDTA'
+        };
         const doc = new jsPDF();
-        //componente header
-        header(doc);
-        // Encabezado
-        const headerwhite = 22
-        doc.setTextColor(0, 0, 0);
-        doc.setFontSize(8)
-        doc.text("Nro Orden: _________ ", 175,headerwhite+18)
-        doc.setFontSize(8)
-        doc.text("Apelidos y Nombres: ______________________________", 40, headerwhite + 25)
-        doc.text("Edad: ______________________________", 40, headerwhite + 32)
-        doc.text("DNI: ______________________________", 40, headerwhite + 39)
-        doc.text("FECHA: ______________________________",40, headerwhite + 46)
-        doc.text("Muestra: ______________________________", 40, headerwhite + 53)
+        // Nuevo header profesional
+        header_Hematologia(doc, datos);
+        // Título del examen
         doc.setFontSize(13);
-        doc.text("HEMOGRAMA AUTOMATIZADO", 70, headerwhite+65);
-
+        doc.setFont('helvetica', 'bold');
+        doc.text("HEMOGRAMA AUTOMATIZADO", 70, 70);
+        // Tabla de resultados
         autoTable(doc, {
-          startY: 95,
+          startY: 80,
           head: [[
             "PRUEBA", "RESULTADO", "VALORES NORMALES"
           ]],
@@ -49,10 +49,9 @@ const Hematologia = () => {
           styles: { fontSize: 8, textColor: [0, 0, 0] },
           headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
         });
-
         const pdfBlob = doc.output("blob");
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-          window.open(pdfUrl, "_blank");
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        window.open(pdfUrl, "_blank");
     };
     return (
         <div>
