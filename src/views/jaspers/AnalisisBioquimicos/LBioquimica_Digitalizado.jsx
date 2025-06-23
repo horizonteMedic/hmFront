@@ -189,8 +189,6 @@ export default function LBioquimica_Digitalizado(datos) {
       const imgY = sigY + (sigH - imgH) / 2;
 
       // Dibujar el borde si quieres
-      doc.setLineWidth(0.3);
-      doc.roundedRect(sigX, sigY, sigW, sigH, 2, 2);
 
       // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
