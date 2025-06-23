@@ -149,6 +149,9 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
     setFilteredMedicos([]);
   };
 
+  // refs para inputs de parámetros bioquímicos
+  const bioRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
+
   return (
     <div className="w-full p-4 space-y-6">
       <h2 className="text-4xl font-bold text-center">Análisis Bioquímicos</h2>
@@ -240,6 +243,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
                 value={form.paciente}
                 onChange={handleFormChange}
                 className="border rounded px-2 py-1 flex-1 ml-1 text-lg"
+                disabled
               />
             </label>
             <label className="flex items-center gap-1 font-medium text-lg">
@@ -263,7 +267,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
               { key: 'ldl',            label: 'L.D.L Colesterol',hint: '< 129 mg/dl' },
               { key: 'hdl',            label: 'H.D.L Colesterol',hint: '40 - 60 mg/dl' },
               { key: 'vldl',           label: 'V.L.D.L Colesterol',hint: '< 30 mg/dl' },
-            ].map(({ key, label, hint }) => (
+            ].map(({ key, label, hint }, idx, arr) => (
               <div key={key} className="flex items-center gap-4">
                 <span className="font-medium min-w-[150px] text-lg">{label}:</span>
                 <input
@@ -271,6 +275,15 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
                   name={key}
                   value={form[key]}
                   onChange={handleFormChange}
+                  ref={bioRefs[idx]}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (idx < arr.length - 1) {
+                        bioRefs[idx + 1].current && bioRefs[idx + 1].current.focus();
+                      }
+                    }
+                  }}
                 />
                 <span className="text-gray-500 text-lg">(V.N. {hint})</span>
               </div>
