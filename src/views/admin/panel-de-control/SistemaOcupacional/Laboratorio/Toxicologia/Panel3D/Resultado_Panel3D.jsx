@@ -2,22 +2,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from './controller3D';
-
-const pruebas3D = [
-  'COCAINA (COC)',
-  'MARIHUANA (THC)',
-  'EXTASIS (MDMA)',
-];
+import { PrintHojaR, SubmitPanel3D, VerifyTR } from './controller3D';
+import Swal from 'sweetalert2';
 
 const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
   const tabla = 'panel3d'
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
   const [form, setForm] = useState({
-    nroFicha: '',
-    fecha: '',
+    norden: '',
+    fecha: today,
     nombres: '',
     edad: '',
-    resultados: pruebas3D.map(() => 'NEGATIVO'),
+    valueM: '',
+    valueC: '',
+    valueE: '',
+    metodo: '',
+    
   });
   const fechaRef = useRef(null);
 
@@ -25,22 +27,20 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
  
 
   const handleChange = ({ name, value }) =>
-    setForm(f => ({ ...f, [name]: value }));
+    setForm(f => ({ ...f, [name]: value.toUpperCase() }));
 
-  const handleResultado = (idx, value) =>
-    setForm(f => {
-      const r = [...f.resultados];
-      r[idx] = value;
-      return { ...f, resultados: r };
-    });
+ 
 
   const handleLimpiar = () => {
     setForm({
-      nroFicha: '',
-      fecha: '',
+      norden: '',
+      fecha: today,
       nombres: '',
       edad: '',
-      resultados: pruebas3D.map(() => 'NEGATIVO'),
+      valueM: '',
+      valueC: '',
+      valueE: '',
+      metodo: '',
     });
   };
 
@@ -52,7 +52,24 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
   };
 
   const handlePrint = () => {
-    // Por ejemplo, abrir en nueva pestaña
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Panel 3D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,tabla,token);
+      }
+    });
   };
 
   // ancho dinámico para nombres
@@ -67,8 +84,8 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold">Nro Ficha:</label>
           <input
-            name="nroFicha"
-            value={form.nroFicha}
+            name="norden"
+            value={form.norden}
             onChange={e => handleChange(e.target)}
             onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
             className="border rounded px-3 py-2 w-32"
@@ -114,7 +131,8 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
         <div className="font-semibold">PRUEBA RÁPIDA CUALITATIVA</div>
         <input
           className="border rounded px-3 py-2 w-full mt-1 mb-2"
-          value="MÉTODO: INMUNOCROMATOGRÁFICO"
+          disabled
+          value={form.metodo}
           readOnly
         />
       </div>
@@ -123,29 +141,40 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-8">
         <div className="font-bold">PRUEBAS</div>
         <div className="font-bold">RESULTADOS</div>
-        {pruebas3D.map((label, i) => (
-          <React.Fragment key={label}>
-            <div className="flex items-center">{label}</div>
-            <input
-              className="border rounded px-3 py-2 w-40"
-              value={form.resultados[i]}
-              onChange={e => handleResultado(i, e.target.value)}
-            />
-          </React.Fragment>
-        ))}
+        <div className="flex items-center">COCAINA (COC)</div>
+          <input
+            name='valueC'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueC}
+            onChange={e => handleChange(e.target)}
+          />
+        <div className="flex items-center">MARIHUANA (THC)</div>
+          <input
+            name='valueM'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueM}
+            onChange={e => handleChange(e.target)}
+          />
+        <div className="flex items-center">EXTASIS (MDMA)</div>
+          <input
+            name='valueE'
+            className="border rounded px-3 py-2 w-40"
+            value={form.valueE}
+            onChange={e => handleChange(e.target)}
+          />
       </div>
 
       {/* Botones */}
       <div className="flex flex-wrap items-center justify-end gap-4">
         <div className="flex items-center gap-2 mr-8">
           <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-28" />
+          <input className="border rounded px-3 py-2 w-28" name='norden' value={form.norden} onChange={e => handleChange(e.target)} />
           <button onClick={handlePrint} type="button"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             <FontAwesomeIcon icon={faPrint}/>
           </button>
         </div>
-        <button onClick={handleSave} type="button"
+        <button onClick={() => {SubmitPanel3D(form,userlogued,token,handleLimpiar,tabla)}} type="button"
           className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700">
           <FontAwesomeIcon icon={faSave}/> Guardar
         </button>

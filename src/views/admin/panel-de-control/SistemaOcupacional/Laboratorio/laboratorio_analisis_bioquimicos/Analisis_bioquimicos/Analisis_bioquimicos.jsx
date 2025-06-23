@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint, faSearch } from '@fortawesome/free-solid-svg-icons'
 import microscopioImg from '../microscopio.webp'
 import { GetInfoPacAnalisisBio, Loading, PrintHojaR, SubmitAnalsisiBio, VerifyTR } from '../controller/ControllerABio'
-import { GetTableAnalBio } from './model'
+import { GetTableAnalBio } from '../model/model'
 import { getFetch } from '../../../../getFetch/getFetch'
 import Swal from 'sweetalert2'
 

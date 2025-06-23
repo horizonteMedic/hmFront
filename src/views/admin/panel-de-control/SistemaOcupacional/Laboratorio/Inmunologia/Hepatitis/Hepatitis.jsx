@@ -3,60 +3,35 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
+import { PrintHojaR, SubmitHepatitisLab, VerifyTR } from './controller';
 
-const today = new Date().toISOString().split('T')[0]
+const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-export default function Hepatitis({ apiBase, token, selectedSede }) {
+export default function Hepatitis({ token, selectedSede, userlogued }) {
   // Individual useState hooks for each form field
-  const [ficha, setFicha] = useState('')
-  const [fecha, setFecha] = useState(today)
-  const [nombres, setNombres] = useState('')
-  const [edad, setEdad] = useState('')
-  const [hav, setHav] = useState(false)
-  const [hbsag, setHbsag] = useState(false)
-  const [marca, setMarca] = useState('RAPID TEST - MONTEST')
-  const [resultadoHAV, setResultadoHAV] = useState('')
-  const [resultadoHAVRadio, setResultadoHAVRadio] = useState('')
-  const [resultadoHBsAg, setResultadoHBsAg] = useState('')
-  const [resultadoHBsAgRadio, setResultadoHBsAgRadio] = useState('')
-  const [printCount, setPrintCount] = useState('')
-  const [medico, setMedico] = useState('')
+    const tabla = 'inmunologia'
 
-  useEffect(() => {
-    if (!ficha) return
-    async function load() {
-      // GET placeholder
-      // const res = await fetch(`${apiBase}/hepatitis/${ficha}`,{headers:{Authorization:`Bearer ${token}`}})
-      // const data = await res.json()
-      // setFicha(data.ficha || '')
-      // setFecha(data.fecha || today)
-      // setNombres(data.nombres || '')
-      // setEdad(data.edad || '')
-      // setHav(data.hav || false)
-      // setHbsag(data.hbsag || false)
-      // setMarca(data.marca || 'RAPID TEST - MONTEST')
-      // setResultadoHAV(data.resultadoHAV || '')
-      // setResultadoHAVRadio(data.resultadoHAVRadio || '')
-      // setResultadoHBsAg(data.resultadoHBsAg || '')
-      // setResultadoHBsAgRadio(data.resultadoHBsAgRadio || '')
-      // setPrintCount(data.printCount || '')
-      // setMedico(data.medico || '')
-    }
-    load()
-  }, [ficha, apiBase, token])
+  const [form, setForm] = useState({
+    norden: '',
+    fecha: today,
+    nombres: '',
+    edad: '',
+    hav: false,
+    hbsag: false,
+    marca: 'RAPID TEST - MONTEST',
+    resultadoHAV: '',
+    resultadoHAVRadio: '',
+    resultadoHBsAg: '',
+    resultadoHBsAgRadio: '',
+    printCount: '',
+    medico: ''
+  });
 
-  useEffect(() => {
-    if (hav) {
-      setHbsag(false);
-      setResultadoHBsAg('');
-      setResultadoHBsAgRadio('');
-    }
-    if (hbsag) {
-      setHav(false);
-      setResultadoHAV('');
-      setResultadoHAVRadio('');
-    }
-  }, [hav, hbsag]);
+  const handleFormChange = e => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSave = async () => {
     try {
@@ -69,170 +44,198 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
   }
 
   const handleClear = () => {
-    setFicha('')
-    setFecha(today)
-    setNombres('')
-    setEdad('')
-    setHav(false)
-    setHbsag(false)
-    setMarca('RAPID TEST - MONTEST')
-    setResultadoHAV('')
-    setResultadoHAVRadio('')
-    setResultadoHBsAg('')
-    setResultadoHBsAgRadio('')
-    setPrintCount('')
-    setMedico('')
-    Swal.fire('Limpiado','Formulario reiniciado','success')
+    setForm({
+      norden: '',
+      fecha: today,
+      nombres: '',
+      edad: '',
+      hav: false,
+      hbsag: false,
+      marca: 'RAPID TEST - MONTEST',
+      resultadoHAV: '',
+      resultadoHAVRadio: '',
+      resultadoHBsAg: '',
+      resultadoHBsAgRadio: '',
+      printCount: '',
+      medico: ''
+    })
+  }
+
+  const handleSeat = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      hav: false,
+      hbsag: false,
+      marca: 'RAPID TEST - MONTEST',
+      resultadoHAV: '',
+      resultadoHAVRadio: '',
+      resultadoHBsAg: '',
+      resultadoHBsAgRadio: '',
+      printCount: '',
+      medico: ''
+    }))
   }
 
   const handlePrint = () => {
-    window.open(`${apiBase}/hepatitis/print?ficha=${ficha}&count=${printCount}`,'_blank')
-    Swal.fire('Imprimiendo','','success')
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Hepatitis?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
   }
 
   // Lógica para habilitar/deshabilitar campos según el check (mejorada para cambio instantáneo y limpieza al desmarcar)
-  const handleCheck = (field) => {
-    if (field === 'hav') {
-      if (!hav) {
-        // Se va a activar HAV
-        setHav(true);
-        setHbsag(false);
-        setResultadoHBsAg('');
-        setResultadoHBsAgRadio('');
-      } else {
-        // Se va a desactivar HAV
-        setHav(false);
-        setResultadoHAV('');
-        setResultadoHAVRadio('');
-      }
-    } else if (field === 'hbsag') {
-      if (!hbsag) {
-        // Se va a activar HBsAg
-        setHbsag(true);
-        setHav(false);
-        setResultadoHAV('');
-        setResultadoHAVRadio('');
-      } else {
-        // Se va a desactivar HBsAg
-        setHbsag(false);
-        setResultadoHBsAg('');
-        setResultadoHBsAgRadio('');
-      }
-    }
-  }
+
 
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nro Ficha" name="ficha" value={ficha} onChange={e=>setFicha(e.target.value)} />
-        <Field label="Fecha" name="fecha" type="date" value={fecha} onChange={e=>setFecha(e.target.value)} />
+        <Field label="Nro Ficha" name="norden" value={form.norden} onChange={handleFormChange} 
+        onKeyUp={e => {
+          if (e.key === 'Enter') {
+            handleSeat()
+            VerifyTR(form.norden,tabla,token,setForm, selectedSede)
+          }
+        }}/>
+        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={handleFormChange} />
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Nombres" name="nombres" value={nombres} onChange={e=>setNombres(e.target.value)} disabled dynamicWidth />
-        <Field label="Edad" name="edad" value={edad} onChange={e=>setEdad(e.target.value)} disabled />
+        <Field label="Nombres" name="nombres" value={form.nombres} onChange={handleFormChange} disabled dynamicWidth />
+        <Field label="Edad" name="edad" value={form.edad} onChange={handleFormChange} disabled />
       </div>
+
       <div className="flex items-center gap-6 mt-2">
-        <Checkbox label="HEPATITIS A (HAV)" checked={hav} onChange={()=>handleCheck('hav')} />
-        <Checkbox label="HEPATITIS B (HBsAg)" checked={hbsag} onChange={()=>handleCheck('hbsag')} />
+        <Checkbox label="HEPATITIS A (HAV)" checked={form.hav} onChange={v => setForm(p => ({ ...p, hav: v }))} />
+        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={v => setForm(p => ({ ...p, hbsag: v }))} />
       </div>
+
       <div className="flex items-center gap-2 mt-2">
         <span className="font-bold">MARCA :</span>
         <input
           className="border rounded px-2 py-1 min-w-[220px]"
           name="marca"
-          value={marca}
-          onChange={e=>setMarca(e.target.value)}
+          value={form.marca}
+          onChange={handleFormChange}
         />
       </div>
+
       <div className="grid grid-cols-12 gap-2 items-center mt-4">
         <div className="col-span-4 font-bold flex items-center">PRUEBAS</div>
         <div className="col-span-4 font-bold flex items-center">RESULTADOS</div>
         <div className="col-span-4"></div>
+
         {/* HAV */}
         <div className="col-span-4 flex items-center">HEPATITIS A (HAV) - RAPID TEST</div>
         <div className="col-span-4">
           <input
             className="border rounded px-2 py-1 w-full"
             name="resultadoHAV"
-            value={resultadoHAV}
-            onChange={e=>setResultadoHAV(e.target.value)}
-            disabled={!hav}
+            value={form.resultadoHAV}
+            onChange={handleFormChange}
+            disabled={!form.hav}
           />
         </div>
         <div className="col-span-4 flex gap-4">
-          {["POSITIVO","NEGATIVO"].map(opt => (
+          {["POSITIVO", "NEGATIVO"].map(opt => (
             <label key={opt} className="flex items-center gap-1">
               <input
                 type="radio"
                 name="resultadoHAVRadio"
-                checked={resultadoHAVRadio===opt}
+                checked={form.resultadoHAVRadio === opt}
                 onChange={e => {
                   if (e.target.checked) {
-                    setResultadoHAVRadio(opt);
-                    setResultadoHAV(opt);
+                    setForm(prev => ({
+                      ...prev,
+                      resultadoHAVRadio: opt,
+                      resultadoHAV: opt
+                    }));
                   }
                 }}
-                disabled={!hav}
+                disabled={!form.hav}
               />
               <span className="font-bold">{opt}</span>
             </label>
           ))}
         </div>
+
         {/* HBsAg */}
         <div className="col-span-4 flex items-center">HEPATITIS B (HBsAg) - RAPID TEST</div>
         <div className="col-span-4">
           <input
             className="border rounded px-2 py-1 w-full"
             name="resultadoHBsAg"
-            value={resultadoHBsAg}
-            onChange={e=>setResultadoHBsAg(e.target.value)}
-            disabled={!hbsag}
+            value={form.resultadoHBsAg}
+            onChange={handleFormChange}
+            disabled={!form.hbsag}
           />
         </div>
         <div className="col-span-4 flex gap-4">
-          {["POSITIVO","NEGATIVO"].map(opt => (
+          {["POSITIVO", "NEGATIVO"].map(opt => (
             <label key={opt} className="flex items-center gap-1">
               <input
                 type="radio"
                 name="resultadoHBsAgRadio"
-                checked={resultadoHBsAgRadio===opt}
+                checked={form.resultadoHBsAgRadio === opt}
                 onChange={e => {
                   if (e.target.checked) {
-                    setResultadoHBsAgRadio(opt);
-                    setResultadoHBsAg(opt);
+                    setForm(prev => ({
+                      ...prev,
+                      resultadoHBsAgRadio: opt,
+                      resultadoHBsAg: opt
+                    }));
                   }
                 }}
-                disabled={!hbsag}
+                disabled={!form.hbsag}
               />
               <span className="font-bold">{opt}</span>
             </label>
           ))}
         </div>
       </div>
+
       {/* Área de imprimir */}
       <div className="flex justify-end items-end mt-2">
         <div className="flex flex-col items-end">
           <div className="font-bold italic text-blue-800 mb-1">IMPRIMIR</div>
           <div className="flex items-center gap-2">
-        <input
-          name="printCount"
-          value={printCount}
-          onChange={e=>setPrintCount(e.target.value)}
-          className="border rounded px-2 py-1 w-24"
-          placeholder="Veces"
-        />
+            <input
+              name="norden"
+              value={form.norden}
+              onChange={handleFormChange}
+              className="border rounded px-2 py-1 w-24"
+            />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>
         </div>
       </div>
+
       {/* Campo ASIGNAR MEDICO */}
       <div className="flex items-center mt-6 mb-2">
         <label className="font-medium mr-2" htmlFor="asignarMedico">ASIGNAR MEDICO:</label>
         <select
           id="asignarMedico"
           className="border rounded px-2 py-1 min-w-[220px]"
-          value={medico || ''}
-          onChange={e => setMedico(e.target.value)}
+          name="medico"
+          value={form.medico}
+          disabled
+          onChange={handleFormChange}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -240,9 +243,10 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
           <option value="medico3">Dr. Luis Gómez</option>
         </select>
       </div>
+
       {/* Botones */}
       <div className="flex gap-4 mt-2">
-        <ActionButton color="green" icon={faSave} onClick={handleSave}>Guardar/Actualizar</ActionButton>
+        <ActionButton color="green" icon={faSave} onClick={() => {SubmitHepatitisLab(form,token,userlogued,handleClear,tabla)}}>Guardar/Actualizar</ActionButton>
         <ActionButton color="yellow" icon={faBroom} onClick={handleClear}>Limpiar</ActionButton>
       </div>
     </div>
@@ -250,13 +254,14 @@ export default function Hepatitis({ apiBase, token, selectedSede }) {
 }
 
 // Reusable
-function Field({ label, name, type='text', value, onChange, disabled, dynamicWidth }) {
+function Field({ label, name, type='text', value, onChange, disabled, dynamicWidth, onKeyUp }) {
   return (
     <div className="flex flex-col min-w-0">
       <label className="font-medium mb-1">{label}</label>
       <input
         type={type}
         name={name}
+        onKeyUp={onKeyUp}
         value={value}
         disabled={disabled}
         onChange={onChange}

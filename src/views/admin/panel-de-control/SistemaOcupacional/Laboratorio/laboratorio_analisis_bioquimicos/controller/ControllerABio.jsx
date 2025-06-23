@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import { SubmitLabAnalBio } from "../Analisis_bioquimicos/model.js";
+import { SubmitLabAnalBio } from "../model/model.js";
 
 //CONTROLADOR DE ANALISIS BIOQUIMICOS
 export const Loading = (text) => {

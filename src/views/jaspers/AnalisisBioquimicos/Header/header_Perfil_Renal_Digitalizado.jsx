@@ -51,10 +51,10 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
     doc.text(value, patientDataX + labelWidth, y)
   }
 
-  const formattedDate = formatDate(datos.fecha);
+
 
   field('Apellidos y Nombres :', datos.paciente || 'HADY KATHERINE CASTILLO PLASENCIA', patientDataY)
   field('Edad :', (datos.edad || '31') + ' AÑOS', patientDataY + 5)
-  field('DNI :', datos.dni || '72384273', patientDataY + 10)
-  field('Fecha :', formattedDate, patientDataY + 15)
+  field('DNI :', String(datos.dni) || '72384273', patientDataY + 10)
+  field('Fecha :', String(datos.fechaExamen), patientDataY + 15)
 } 

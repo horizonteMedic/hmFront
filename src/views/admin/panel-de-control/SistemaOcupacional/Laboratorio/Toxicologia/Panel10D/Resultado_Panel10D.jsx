@@ -2,29 +2,29 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from './controller10D';
-
-const pruebas10D = [
-  'COCAINA (COC)',
-  'MARIHUANA (THC)',
-  'ANFETAMINA (AMP)',
-  'METANFETAMINA (MET)',
-  'BENZODIAZEPINA (BZO)',
-  'OPIÁCEOS (OPI)',
-  'BARBITÚRICOS (BAR)',
-  'METADONA (MTD)',
-  'FENCICLIDINA (PCP)',
-  'ANTIDEPRESIVOS TRICÍCLICOS (TCA)',
-];
-
+import { PrintHojaR, SubmitPanel10D, VerifyTR } from './controller10D';
+import Swal from 'sweetalert2';
 const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
   const tabla = 'panel10d'
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
   const [form, setForm] = useState({
-    nroFicha: '',
-    fecha: '',
+    norden: '',
+    fecha: today,
     nombres: '',
     edad: '',
-    resultados: pruebas10D.map(() => 'NEGATIVO'),
+    valueM: '',
+    valueC: '',
+    valueAn: '',
+    valueMet: '',
+    valueBen: '',
+    valueOpi: '',
+    valueBar: '',
+    valueMetadona: '',
+    valueFenci: '',
+    valueAnti: '',
+    metodo: ''
   });
   const fechaRef = useRef(null);
 
@@ -32,24 +32,26 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
 
   const handleChange = e => {
     const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
-  };
-
-  const handleResultadoChange = (idx, value) => {
-    setForm(f => {
-      const resultados = [...f.resultados];
-      resultados[idx] = value;
-      return { ...f, resultados };
-    });
+    setForm(f => ({ ...f, [name]: value.toUpperCase() }));
   };
 
   const handleLimpiar = () => {
     setForm({
-      nroFicha: '',
-      fecha: '',
+      norden: '',
+      fecha: today,
       nombres: '',
       edad: '',
-      resultados: pruebas10D.map(() => 'NEGATIVO'),
+      valueM: '',
+      valueC: '',
+      valueAn: '',
+      valueMet: '',
+      valueBen: '',
+      valueOpi: '',
+      valueBar: '',
+      valueMetadona: '',
+      valueFenci: '',
+      valueAnti: '',
+      metodo: '',
     });
   };
 
@@ -57,12 +59,25 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
     e.target.showPicker?.();
   };
 
-  const handleSave = async () => {
-    
-    // manejar respuesta, notificaciones, etc.
-  };
-
   const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Panel 10D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,tabla,token);
+      }
+    });
   };
 
   // ancho dinámico para el campo nombres
@@ -77,8 +92,8 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
         <div className="flex items-center gap-2">
           <label className="font-semibold">Nro Ficha:</label>
           <input
-            name="nroFicha"
-            value={form.nroFicha}
+            name="norden"
+            value={form.norden}
             onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
             onChange={handleChange}
             className="border rounded px-3 py-2 w-32"
@@ -124,7 +139,8 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
         <div className="font-semibold">PRUEBA RÁPIDA CUALITATIVA</div>
         <input
           className="border rounded px-3 py-2 w-full mt-1 mb-2"
-          value="MÉTODO: INMUNOCROMATOGRÁFICO"
+          value={form.metodo}
+          disabled
           readOnly
         />
       </div>
@@ -133,23 +149,83 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
       <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-8">
         <div className="font-bold">PRUEBAS</div>
         <div className="font-bold">RESULTADOS</div>
-        {pruebas10D.map((label, idx) => (
-          <React.Fragment key={label}>
-            <div className="flex items-center">{label}</div>
-            <input
-              className="border rounded px-3 py-2 w-40"
-              value={form.resultados[idx]}
-              onChange={e => handleResultadoChange(idx, e.target.value)}
-            />
-          </React.Fragment>
-        ))}
+          <div className="flex items-center">COCAINA (COC)</div>
+              <input
+                name='valueC'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueC}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">MARIHUANA (THC)</div>
+              <input
+                name='valueM'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueM}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">ANFETAMINA (AMP)</div>
+              <input
+                name='valueAn'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueAn}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">METANFETAMINA (MET)</div>
+              <input
+                name='valueMet'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueMet}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">BENZODIAZEPINA (BZO)</div>
+              <input
+                name='valueBen'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueBen}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">OPIÁCEOS (OPI)</div>
+              <input
+                name='valueOpi'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueOpi}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">BARBITÚRICOS (BAR)</div>
+              <input
+                name='valueBar'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueBar}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">METADONA (MTD)</div>
+              <input
+                name='valueMetadona'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueMetadona}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">FENCICLIDINA (PCP)</div>
+              <input
+                name='valueFenci'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueFenci}
+                onChange={handleChange}
+              />
+          <div className="flex items-center">ANTIDEPRESIVOS TRICÍCLICOS (TCA)</div>
+              <input
+                name='valueAnti'
+                className="border rounded px-3 py-2 w-40"
+                value={form.valueAnti}
+                onChange={handleChange}
+              />
       </div>
 
       {/* Botones */}
       <div className="flex flex-wrap items-center justify-end gap-4">
         <div className="flex items-center gap-2 mr-8">
           <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-28" />
+          <input className="border rounded px-3 py-2 w-28" name='norden' value={form.norden} onChange={handleChange} />
           <button
             type="button"
             onClick={handlePrint}
@@ -160,7 +236,7 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
         </div>
         <button
           type="button"
-          onClick={handleSave}
+          onClick={() => {SubmitPanel10D(form,userlogued,token,handleLimpiar,tabla)}}
           className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700"
         >
           <FontAwesomeIcon icon={faSave} /> Guardar

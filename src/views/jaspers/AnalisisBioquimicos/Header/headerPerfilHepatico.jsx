@@ -67,7 +67,7 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres);
   drawPatientDataRow("Edad :", datos.edad ? `${datos.edad} AÑOS` : '');
-  drawPatientDataRow("DNI :", datos.dni);
+  drawPatientDataRow("DNI :", String(datos.dni));
   
   // Fecha con formato especial
   doc.setFontSize(11).setFont('helvetica', 'bold');
@@ -75,7 +75,7 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(String(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
   
   // Reseteo de estilos para el cuerpo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);

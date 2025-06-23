@@ -36,7 +36,7 @@ const drawResultRow = (doc, y, label, result, units) => {
 
 // --- Componente Principal ---
 
-export default function Panel5d_ohla_Digitalizado(datos = {}) {
+export default function ResultadosPanel5d_ohla_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -81,11 +81,11 @@ export default function Panel5d_ohla_Digitalizado(datos = {}) {
 
   // Datos
   const tests = [
-    { label: "Cocaína", key: "cocaina" },
-    { label: "Marihuana", key: "marihuana" },
-    { label: "Éxtasis", key: "extasis" },
-    { label: "Opiáceos", key: "opiaceos" },
-    { label: "Benzodiacepina", key: "benzodiacepina" },
+    { label: "Cocaína", key: "txtrCocaina" },
+    { label: "Marihuana", key: "txtrMarihuana" },
+    { label: "Éxtasis", key: "txtrAnfetamina" },
+    { label: "Opiáceos", key: "txtrMethanfetamina" },
+    { label: "Benzodiacepina", key: "txtrBenzodiacepina" },
   ];
   
   tests.forEach(({ label, key }) => {

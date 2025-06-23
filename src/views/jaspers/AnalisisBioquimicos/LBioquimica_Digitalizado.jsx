@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import footer from "../components/footer";
 import header_Perfil_Renal_Digitalizado from "./Header/header_Perfil_Renal_Digitalizado";
 
-export default function Perfil_Renal_Digitalizado(datos) {
+export default function LBioquimica_Digitalizado(datos) {
   const doc = new jsPDF();
   
   header_Perfil_Renal_Digitalizado(doc, datos);
@@ -81,17 +81,17 @@ export default function Perfil_Renal_Digitalizado(datos) {
   const dataRows = [
     {
       prueba: 'CREATININA SÉRICA',
-      resultado: datos.txtcreatinina || '',
+      resultado: datos.txtCreatinina + ' mg/dL' || '',
       normales: 'Adulto: 0.8 - 1.4 mg/dl\nNiño: 0.24 - 0.84 mg/dl'
     },
     {
       prueba: 'UREA SÉRICA',
-      resultado: datos.txtureaserica || '',
+      resultado: datos.txtUreaSerica + ' mg/dL' || '',
       normales: '10 - 50 mg/dl'
     },
     {
       prueba: 'ÁCIDO ÚRICO SÉRICO',
-      resultado: datos.txtacidourico || '',
+      resultado: datos.txtAcidoUrico + ' mg/dL' || '',
       normales: 'Mujeres: 2.5 - 6.8 mg/dl\nHombres 3.6 - 7.7 mg/dl'
     }
   ];

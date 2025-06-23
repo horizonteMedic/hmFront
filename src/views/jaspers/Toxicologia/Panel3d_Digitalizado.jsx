@@ -39,7 +39,7 @@ const drawResultRow = (doc, y, label, result, units) => {
 export default function Panel3d_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
-
+  console.log('hoja',datos)
   // === HEADER ===
   header_Panel3d_Digitalizado(doc, datos);
 
@@ -60,7 +60,7 @@ export default function Panel3d_Digitalizado(datos = {}) {
   doc.setFont(config.font, "bold");
   doc.text("MÉTODO :", config.margin, y);
   doc.setFont(config.font, "normal");
-  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", config.margin + 30, y);
+  doc.text(datos.txtMetodo || "", config.margin + 30, y);
   y += config.lineHeight * 2;
 
   // Encabezado de tabla
@@ -81,9 +81,9 @@ export default function Panel3d_Digitalizado(datos = {}) {
 
   // Datos
   const tests = [
-    { label: "Cocaína (COC)", key: "cocaina" },
-    { label: "Marihuana(THC)", key: "marihuana" },
-    { label: "Éxtasis (MDMA)", key: "extasis" },
+    { label: "Cocaína (COC)", key: "txtCocaina" },
+    { label: "Marihuana(THC)", key: "txtMarihuana" },
+    { label: "Éxtasis (MDMA)", key: "txtExtasis" },
   ];
   
   tests.forEach(({ label, key }) => {

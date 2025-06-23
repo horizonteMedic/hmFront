@@ -81,7 +81,7 @@ const header_Panel10d_Digitalizado = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(formatDateToLong(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
   
   // Reseteo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);

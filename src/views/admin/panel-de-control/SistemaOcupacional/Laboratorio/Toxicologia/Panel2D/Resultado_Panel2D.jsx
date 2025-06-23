@@ -2,10 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from './controller2D';
+import { PrintHojaR, SubmitPanel2D, VerifyTR } from './controller2D';
 
-const PRUEBAS = ['MARIHUANA (THC)', 'COCAINA (COC)'];
-
+import Swal from 'sweetalert2';
 export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
  const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -15,31 +14,18 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
     fecha: today,
     nombres: '',
     edad: '',
-    resultados: PRUEBAS.map(() => ''),
+    valueM: '',
+    valueC: '',
+    metodo: '',
     medico: ''
   });
   const [status, setStatus] = useState('');
-
-  useEffect(() => {
-    setForm(f => ({ ...f, fecha: today }));
-  }, [today]);
 
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(f => ({ ...f, [name]: value }));
   };
 
-  const handleResultadoChange = (idx, value) => {
-    setForm(f => {
-      const r = f.resultados.slice();
-      r[idx] = value;
-      return { ...f, resultados: r };
-    });
-  };
-
-  const handleSave = async () => {
-
-  };
 
   const handleClear = () => {
     setForm({
@@ -47,13 +33,32 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
       fecha: today,
       nombres: '',
       edad: '',
-      resultados: PRUEBAS.map(() => ''),
-      medico: ''
+      valueM: '',
+      valueC: '',
+      medico: '',
+      metodo: ''
     });
-    setStatus('Formulario limpiado');
   };
 
   const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Panel 2D?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,tabla,token);
+      }
+    });
   };
 
   return (
@@ -110,21 +115,30 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
           <input
             className="border rounded px-2 py-1 w-full"
             readOnly
-            value="MÉTODO : INMUNOCROMATOGRÁFICO"
+            disabled
+            value={form.metodo}
           />
         </div>
         {/* Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          {PRUEBAS.map((label, idx) => (
-            <div key={idx} className="flex items-center gap-2">
-              <span className="flex-1 font-semibold">{label}</span>
+            <div  className="flex items-center gap-2">
+              <span className="flex-1 font-semibold">MARIHUANA (THC)</span>
               <input
-                value={form.resultados[idx]}
-                onChange={e => handleResultadoChange(idx, e.target.value)}
+                name='valueM'
+                value={form.valueM}
+                onChange={handleChange}
                 className="border rounded px-2 py-1 w-40"
               />
             </div>
-          ))}
+            <div  className="flex items-center gap-2">
+              <span className="flex-1 font-semibold">COCAINA (COC)</span>
+              <input
+                name='valueC'
+                value={form.valueC}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 w-40"
+              />
+            </div>
         </div>
         {/* Médico */}
         <div className="flex items-center gap-2">
@@ -138,7 +152,7 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={handleSave}
+              onClick={() => {SubmitPanel2D(form,userlogued,token,handleClear,tabla)}}
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
@@ -154,7 +168,7 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
           <div className="flex flex-col items-end">
             <span className="font-bold italic">IMPRIMIR</span>
             <div className="flex items-center gap-2 mt-2">
-              <input name="printCount" className="border rounded px-2 py-1 w-24" placeholder="Veces" />
+              <input name="norden" className="border rounded px-2 py-1 w-24" value={form.norden} onChange={handleChange} />
               <button
                 type="button"
                 onClick={handlePrint}

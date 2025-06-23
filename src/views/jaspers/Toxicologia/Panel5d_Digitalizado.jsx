@@ -81,11 +81,11 @@ export default function Panel5d_Digitalizado(datos = {}) {
 
   // Datos
   const tests = [
-    { label: "Cocaína", key: "cocaina" },
-    { label: "Marihuana", key: "marihuana" },
-    { label: "Anfetamina en Orina", key: "anfetamina" },
-    { label: "Metanfetamina", key: "metanfetamina" },
-    { label: "Benzodiacepina", key: "benzodiacepina" },
+    { label: "Cocaína", key: "txtrCocaina" },
+    { label: "Marihuana", key: "txtrMarihuana" },
+    { label: "Anfetamina en Orina", key: "txtrAnfetamina" },
+    { label: "Metanfetamina", key: "txtrMethanfetamina" },
+    { label: "Benzodiacepina", key: "txtrBenzodiacepina" },
   ];
   
   tests.forEach(({ label, key }) => {

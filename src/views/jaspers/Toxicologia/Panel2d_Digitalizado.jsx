@@ -60,7 +60,7 @@ export default function Panel2d_Digitalizado(datos = {}) {
   doc.setFont(config.font, "bold");
   doc.text("MÉTODO :", config.margin, y);
   doc.setFont(config.font, "normal");
-  doc.text(datos.metodo || "INMUNOCROMATOGRÁFICO", config.margin + 30, y);
+  doc.text(datos.txtMetodo || "", config.margin + 30, y);
   y += config.lineHeight * 2;
 
   // Encabezado de tabla
@@ -81,8 +81,8 @@ export default function Panel2d_Digitalizado(datos = {}) {
 
   // Datos
   const tests = [
-    { label: "Cocaína (COC)", key: "cocaina" },
-    { label: "Marihuana(THC)", key: "marihuana" },
+    { label: "Cocaína (COC)", key: "reCocaina" },
+    { label: "Marihuana(THC)", key: "reMarihuana" },
   ];
   
   tests.forEach(({ label, key }) => {

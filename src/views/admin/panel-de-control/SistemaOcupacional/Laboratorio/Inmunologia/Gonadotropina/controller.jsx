@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from '../../../../getFetch/getFetch.js';
-import { SubmitGonadotropina } from "./model.js";
+import { SubmitGonadotropina } from "../model/model.js";
 
 //CONTROLADOR DE ANALISIS BIOQUIMICOS
 export const Loading = (text) => {
@@ -120,10 +120,11 @@ export const PrintHojaR = (nro,token) => {
   getFetch(`/api/v01/ct/inmunologia/obtenerReporteLgonadotropina?nOrden=${nro}&nameService=lgonadotropina`,token)
   .then(async (res) => {
     if (res.norden) {
+      console.log(res)
       const nombre = res.nameJasper;
       console.log(nombre)
-      const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
+      const jasperModules = import.meta.glob('../../../../../../jaspers/Inmunologia/*.jsx');
+      const modulo = await jasperModules[`../../../../../../jaspers/Inmunologia/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
         modulo.default(res);

@@ -81,7 +81,7 @@ export default function LGonadotropina_Digitalizado(datos) {
     doc,
     y,
     'GONADOTROPINA CORIÓNICA HUMANA ²(²HCG)',
-    datos.resultado || ''
+    datos.txtResultado || ''
   );
 
   // === FOOTER ===
