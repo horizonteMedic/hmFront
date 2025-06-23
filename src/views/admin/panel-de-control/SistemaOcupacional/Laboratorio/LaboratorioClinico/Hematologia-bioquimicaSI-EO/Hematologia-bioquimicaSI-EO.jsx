@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import microscopioImg from './microscopio.webp';
 import { VerifyTR } from '../ControllerLC/ControllerLC';
 import { getFetch } from '../../../../getFetch/getFetch';
@@ -131,6 +131,28 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
     setFilteredMedicos([]);
   };
   
+  // Estado para N/A de Hematología
+  const [hematologiaNA, setHematologiaNA] = useState(false);
+
+  // Refs para inputs de Hematología
+  const hematologiaKeys = [
+    'hemoglobina','hematocrito','vsg','leucocitos','hematies','plaquetas',
+    'neutrofilos','abastonados','segmentados','monocitos','eosinofilos','basofilos','linfocitos'
+  ];
+  const hematologiaRefs = hematologiaKeys.map(() => useRef());
+
+  // Función para setear todos los campos de Hematología a 'N/A' o restaurar
+  const handleHematologiaNA = (checked) => {
+    setHematologiaNA(checked);
+    if (checked) {
+      setForm(prev => {
+        const newFields = {};
+        hematologiaKeys.forEach(k => { newFields[k] = 'N/A'; });
+        return { ...prev, ...newFields };
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2 w-full text-md">
       {/* Barra superior */}
@@ -193,29 +215,28 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center flex-1">
                         <label className="w-28 font-semibold shrink-0">Nombres :</label>
-                        <input name="paciente" value={form.paciente} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-full text-md" />
+                        <input name="paciente" value={form.paciente} className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100" disabled />
                     </div>
                     <div className="flex items-center">
                         <label className="font-semibold mr-2 shrink-0">G.F. Sang. Pedido</label>
-                        <input name="gfSangPedido" value={form.gfSangPedido} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-32 bg-gray-100 text-md" disabled />
+                        <input name="gfSangPedido" value={form.gfSangPedido} className="border border-gray-400 rounded-sm px-1 w-32 bg-gray-100 text-md" disabled />
                     </div>
                 </div>
                  <div className="flex items-center col-span-2">
                     <label className="w-28 font-semibold shrink-0">Emp. Contratista :</label>
-                    <input name="empContratista" value={form.empContratista} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-full text-md" />
+                    <input name="empContratista" value={form.empContratista} className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100" disabled />
                 </div>
                 <div className="flex items-center col-span-2">
                     <label className="w-28 font-semibold shrink-0">Empresa :</label>
-                    <input name="empresa" value={form.empresa} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-full text-md" />
-                    <div className="ml-2">
-                        <Checkbox label="N/A" checked={form.empresaNA} onChange={v => setField('empresaNA', v)} />
-                    </div>
+                    <input name="empresa" value={form.empresa} className="border border-gray-400 rounded-sm px-1 w-full text-md bg-gray-100" disabled />
                 </div>
             </div>
 
             {/* Hematología */}
             <fieldset className="border border-gray-400 p-2 mt-2">
-                <legend className="px-2 font-semibold text-md">Hematología</legend>
+                <legend className="px-2 font-semibold text-md flex items-center gap-4">Hematología
+                    <Checkbox label="N/A" checked={hematologiaNA} onChange={handleHematologiaNA} />
+                </legend>
                 <div className="grid grid-cols-2 gap-x-8">
                 {/* Left Column */}
                 <div className="space-y-1">
@@ -224,7 +245,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <div className="flex gap-2">
                             {['O','A','B','AB'].map(opt => (
                             <label key={opt} className="flex items-center gap-1">
-                                <input type="radio" name="grupo" value={opt} checked={form.grupo === opt} onClick={e => setField('grupo', form.grupo === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />{opt}
+                                <input type="radio" name="grupo" value={opt} checked={form.grupo === opt} onClick={e => setField('grupo', form.grupo === e.target.value ? '' : e.target.value)} disabled={form.empresaNA || hematologiaNA} />{opt}
                             </label>
                             ))}
                         </div>
@@ -233,20 +254,33 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <label className="w-32 font-semibold">Factor Rh :</label>
                         <div className="flex gap-2">
                             <label className="flex items-center gap-1">
-                                <input type="radio" name="rh" value="Rh(+)" checked={form.rh === 'Rh(+)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />Rh(+)
+                                <input type="radio" name="rh" value="Rh(+)" checked={form.rh === 'Rh(+)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA || hematologiaNA} />Rh(+)
                             </label>
                             <label className="flex items-center gap-1">
-                                <input type="radio" name="rh" value="Rh(-)" checked={form.rh === 'Rh(-)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />Rh(-)
+                                <input type="radio" name="rh" value="Rh(-)" checked={form.rh === 'Rh(-)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA || hematologiaNA} />Rh(-)
                             </label>
                         </div>
                     </div>
                     {[
                         ['hemoglobina','g/dl'], ['hematocrito','%'], ['vsg','mm/Hora'], 
                         ['leucocitos','mm³'], ['hematies','mm³'], ['plaquetas','mm³']
-                    ].map(([key, unit]) => (
+                    ].map(([key, unit], idx) => (
                     <div key={key} className="flex items-center">
                         <label className="w-32 font-semibold">{capitalize(key)} :</label>
-                        <input name={key} value={form[key]} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-24 text-md" disabled={form.empresaNA}/>
+                        <input
+                            name={key}
+                            value={form[key]}
+                            onChange={handleInputChange}
+                            className="border border-gray-400 rounded-sm px-1 w-24 text-md"
+                            disabled={form.empresaNA || hematologiaNA}
+                            ref={hematologiaRefs[idx]}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    const next = hematologiaRefs[idx + 1];
+                                    if (next && next.current) next.current.focus();
+                                }
+                            }}
+                        />
                         <span className="ml-2 w-16">{unit}</span>
                     </div>
                     ))}
@@ -256,10 +290,23 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                     {[
                         ['neutrofilos','%'], ['abastonados','%'], ['segmentados','%'], 
                         ['monocitos','%'], ['eosinofilos','%'], ['basofilos','%'], ['linfocitos','%']
-                    ].map(([key, unit]) => (
+                    ].map(([key, unit], idx) => (
                     <div key={key} className="flex items-center">
                         <label className="w-32 font-semibold">{capitalize(key)} :</label>
-                        <input name={key} value={form[key]} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-24 text-md" disabled={form.empresaNA}/>
+                        <input
+                            name={key}
+                            value={form[key]}
+                            onChange={handleInputChange}
+                            className="border border-gray-400 rounded-sm px-1 w-24 text-md"
+                            disabled={form.empresaNA || hematologiaNA}
+                            ref={hematologiaRefs[idx + 6]}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                    const next = hematologiaRefs[idx + 7];
+                                    if (next && next.current) next.current.focus();
+                                }
+                            }}
+                        />
                         <span className="ml-2">{unit}</span>
                     </div>
                     ))}

@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/LaboratorioClinico/Hematologia/Hematologia.jsx
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import { PrintHojaR, SubmitHematogramaLabClinic, VerifyTR } from './Controller'
@@ -57,6 +57,10 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
   const tabla = 'hemograma_autom'
   const [form, setForm] = useState(initialForm)
   const [status, setStatus] = useState('')
+
+  // Refs para focus automático en inputs de resultados y diferencial
+  const resultRefs = Array(PRUEBAS.length).fill().map(() => useRef());
+  const diffRefs = Array(DIFERENCIAL.length).fill().map(() => useRef());
 
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -117,7 +121,7 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
         <div>
           <h3 className="font-semibold mb-2">PRUEBAS</h3>
           <div className="space-y-2">
-            {PRUEBAS.map(({ key, label }) => (
+            {PRUEBAS.map(({ key, label }, idx) => (
               <div key={key} className="flex items-center gap-2">
                 <span className="flex-1">{label}</span>
                 <input
@@ -125,6 +129,17 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
                   name={key}
                   value={form[key]}
                   onChange={handleInputChange}
+                  ref={resultRefs[idx]}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (idx < PRUEBAS.length - 1) {
+                        resultRefs[idx + 1].current && resultRefs[idx + 1].current.focus();
+                      } else if (diffRefs[0]) {
+                        diffRefs[0].current && diffRefs[0].current.focus();
+                      }
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -133,7 +148,7 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
         <div>
           <h3 className="font-semibold mb-2">RECUENTO DIFERENCIAL</h3>
           <div className="space-y-2">
-            {DIFERENCIAL.map(({ key, label }) => (
+            {DIFERENCIAL.map(({ key, label }, idx) => (
               <div key={key} className="flex items-center gap-2">
                 <span className="flex-1">{label}</span>
                 <input
@@ -141,6 +156,15 @@ export default function Hematologia({ token, selectedSede, userlogued }) {
                   name={key}
                   value={form[key]}
                   onChange={handleInputChange}
+                  ref={diffRefs[idx]}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (idx < DIFERENCIAL.length - 1) {
+                        diffRefs[idx + 1].current && diffRefs[idx + 1].current.focus();
+                      }
+                    }
+                  }}
                 />
               </div>
             ))}

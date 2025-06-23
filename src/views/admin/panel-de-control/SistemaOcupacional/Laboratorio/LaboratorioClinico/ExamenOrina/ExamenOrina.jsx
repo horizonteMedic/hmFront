@@ -1,5 +1,5 @@
 // src/views/Orina/Orina.jsx
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons'
 import { SubmitHematologiaLabCLinico } from '../ControllerLC/ControllerLC'
@@ -57,6 +57,10 @@ const initialForm = {
 
 export default function ExamenOrina({token, selectedSede, userlogued, form, setForm, formH, ClearForm}) {
 
+  // Refs para inputs de Examen Químico, Sedimento y Drogas
+  const chemicalRefs = chemicalLabels.map(() => useRef());
+  const sedimentRefs = sedimentLabels.map(() => useRef());
+  const drugRefs = drugLabels.map(() => useRef());
 
   const setField = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }))
@@ -77,6 +81,14 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
       '_blank'
     )
   }
+
+  // Nueva función para manejar radios de drogas
+  const handleDrugRadio = (drug, value) => {
+    setForm(prev => ({
+      ...prev,
+      [drug]: value === 'Pos' ? 'POSITIVO' : value === 'Neg' ? 'NEGATIVO' : 'N/A',
+    }));
+  };
 
   return (
     <div className="p-4 grid grid-cols-5 gap-4 text-md">
@@ -128,7 +140,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
         <fieldset className="border p-2 rounded">
           <legend className="px-1 font-semibold">Examen Químico</legend>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            {chemicalLabels.map(lbl=>(
+            {chemicalLabels.map((lbl, idx, arr) => (
               <div key={lbl} className="grid grid-cols-2 items-center gap-2">
                 <label className="font-medium">{lbl.replace('Q','').replace('S','')}:</label>
                 <input
@@ -136,6 +148,17 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
                   name={lbl}
                   value={form[lbl]}
                   onChange={handleInputChange}
+                  ref={chemicalRefs[idx]}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (idx < arr.length - 1) {
+                        chemicalRefs[idx + 1].current && chemicalRefs[idx + 1].current.focus();
+                      } else if (sedimentRefs[0]) {
+                        sedimentRefs[0].current && sedimentRefs[0].current.focus();
+                      }
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -145,7 +168,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
         <fieldset className="border p-2 rounded">
           <legend className="px-1 font-semibold">Sedimento Unitario</legend>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            {sedimentLabels.map(lbl=>(
+            {sedimentLabels.map((lbl, idx, arr) => (
               <div key={lbl} className="grid grid-cols-2 items-center gap-2">
                 <label className="font-medium">{lbl.replace('Q','').replace('S','')}:</label>
                 <input
@@ -153,6 +176,17 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
                   name={lbl}
                   value={form[lbl]}
                   onChange={handleInputChange}
+                  ref={sedimentRefs[idx]}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (idx < arr.length - 1) {
+                        sedimentRefs[idx + 1].current && sedimentRefs[idx + 1].current.focus();
+                      } else if (drugRefs[0]) {
+                        drugRefs[0].current && drugRefs[0].current.focus();
+                      }
+                    }
+                  }}
                 />
               </div>
             ))}
@@ -163,7 +197,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
           <fieldset className="border p-2 rounded">
             <legend className="px-1 font-semibold">Drogas</legend>
             <div className="space-y-2">
-              {drugLabels.map(drug => (
+              {drugLabels.map((drug, idx, arr) => (
                 <div key={drug} className="grid grid-cols-[auto,1fr,auto] items-center gap-x-2">
                   <label className="font-medium">{drug}:</label>
                   <input
@@ -171,16 +205,43 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
                     name={drug}
                     value={form[drug]}
                     onChange={handleInputChange}
+                    ref={drugRefs[idx]}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (idx < arr.length - 1) {
+                          drugRefs[idx + 1].current && drugRefs[idx + 1].current.focus();
+                        }
+                      }
+                    }}
                   />
                   <div className="flex gap-2">
                     <label className="flex items-center gap-1">
-                      <input type="radio" name={`${drug}_result`} value="Pos" /> Pos.
+                      <input
+                        type="radio"
+                        name={`${drug}_result`}
+                        value="Pos"
+                        checked={form[drug] === 'POSITIVO'}
+                        onChange={() => handleDrugRadio(drug, 'Pos')}
+                      /> Pos.
                     </label>
                     <label className="flex items-center gap-1">
-                      <input type="radio" name={`${drug}_result`} value="Neg" /> Neg.
+                      <input
+                        type="radio"
+                        name={`${drug}_result`}
+                        value="Neg"
+                        checked={form[drug] === 'NEGATIVO'}
+                        onChange={() => handleDrugRadio(drug, 'Neg')}
+                      /> Neg.
                     </label>
                     <label className="flex items-center gap-1">
-                      <input type="radio" name={`${drug}_result`} value="NA" /> N/A
+                      <input
+                        type="radio"
+                        name={`${drug}_result`}
+                        value="NA"
+                        checked={form[drug] === 'N/A'}
+                        onChange={() => handleDrugRadio(drug, 'NA')}
+                      /> N/A
                     </label>
                   </div>
                 </div>
