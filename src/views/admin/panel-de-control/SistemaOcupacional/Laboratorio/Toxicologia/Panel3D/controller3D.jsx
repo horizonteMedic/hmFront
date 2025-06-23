@@ -101,9 +101,9 @@ export const SubmitPanel3D = async (form,user,token,limpiar,tabla) => {
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
       }).then((result) => {
-        limpiar()
         if (result.isConfirmed) {
           PrintHojaR(form.norden,tabla,token)
+          limpiar()
         }
       })
     }
