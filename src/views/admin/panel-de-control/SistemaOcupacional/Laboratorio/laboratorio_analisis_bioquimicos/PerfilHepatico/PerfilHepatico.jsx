@@ -9,13 +9,13 @@ const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
 const testFields = [
-  { label: 'TGO', name: 'tgo' },
-  { label: 'TGP', name: 'tgp' },
-  { label: 'GGT', name: 'ggt' },
   { label: 'FOSFATASA ALCALINA', name: 'fosfAlc' },
+  { label: 'GGT', name: 'ggt' },
+  { label: 'TGP', name: 'tgp' },
+  { label: 'TGO', name: 'tgo' },
   { label: 'BILIRRUBINA TOTAL', name: 'biliTotal' },
-  { label: 'BILIRRUBINA INDIRECTA', name: 'biliInd' },
   { label: 'BILIRRUBINA DIRECTA', name: 'biliDir' },
+  { label: 'BILIRRUBINA INDIRECTA', name: 'biliInd' },
   { label: 'PROTEINAS TOTALES', name: 'protTot' },
   { label: 'ALBUMINA', name: 'albumina' },
   { label: 'GLOBULINA SERICA', name: 'globSer' },

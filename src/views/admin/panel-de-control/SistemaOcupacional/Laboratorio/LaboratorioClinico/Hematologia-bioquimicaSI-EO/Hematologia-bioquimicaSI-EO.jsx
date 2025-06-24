@@ -126,11 +126,11 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   const handleHematologiaNA = (checked) => {
     setHematologiaNA(checked);
     const value = checked ? 'N/A' : '';
-    setForm(prev => {
-      const newFields = {};
+      setForm(prev => {
+        const newFields = {};
       hematologiaKeys.forEach(k => { newFields[k] = value; });
-      return { ...prev, ...newFields };
-    });
+        return { ...prev, ...newFields };
+      });
     if (checked) {
       setField('grupo', '');
       setField('rh', '');

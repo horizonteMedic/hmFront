@@ -11,7 +11,6 @@ function formatDate(dateString) {
   return `${day} de ${month} de ${year}`;
 }
 
-
 export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   // Logo
   doc.addImage(logo, 'PNG', 15, 10, 50, 15)
@@ -23,14 +22,14 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   doc.setFont(undefined, 'normal')
   doc.text('CUIDAMOS SU SALUD', 28, 31)
 
-  // Info Derecha
+  // Info Derecha (movida más a la izquierda)
   doc.setFontSize(11)
   doc.setFont(undefined, 'bold')
-  doc.text('Nro Orden:', 140, 20)
-  doc.text(datos.n_orden || '96639', 165, 20)
+  doc.text('Nro Orden:', 110, 20)
+  doc.text(datos.n_orden || '96639', 135, 20)
   doc.setFont(undefined, 'normal')
-  doc.text('Sede:', 140, 25)
-  doc.text(datos.sede || 'Trujillo-Piarda', 152, 25)
+  doc.text('Sede:', 110, 25)
+  doc.text(datos.sede || 'Trujillo-Piarda', 122, 25)
 
   // Título
   doc.setFontSize(16)
@@ -50,8 +49,6 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
     doc.setFont(undefined, 'normal')
     doc.text(value, patientDataX + labelWidth, y)
   }
-
-
 
   field('Apellidos y Nombres :', datos.paciente || 'HADY KATHERINE CASTILLO PLASENCIA', patientDataY)
   field('Edad :', (datos.edad || '31') + ' AÑOS', patientDataY + 5)

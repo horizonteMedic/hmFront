@@ -98,13 +98,13 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
     y += config.lineHeight.normal;
 
     const tests = [
-      { label: "TGO", key: "txtrTgo", ref: "Hasta 31 U/L" },
-      { label: "TGP", key: "txtrTgp", ref: ["Hombres  Hasta 40 U/L", "Mujeres  Hasta 35 U/L"] },
-      { label: "GGT", key: "txtrGgt", ref: ["Hombres  10 - 50 U/L", "Mujeres  8 - 35 U/L"] },
       { label: "FOSFATASA ALCALINA", key: "txtrFosfalcalina", ref: "Hasta 300 U/L" },
+      { label: "GGT", key: "txtrGgt", ref: ["Hombres  10 - 50 U/L", "Mujeres  8 - 35 U/L"] },
+      { label: "TGP", key: "txtrTgp", ref: ["Hombres  Hasta 40 U/L", "Mujeres  Hasta 35 U/L"] },
+      { label: "TGO", key: "txtrTgo", ref: "Hasta 31 U/L" },
       { label: "BILIRRUBINA TOTAL", key: "txtrBilirrTotal", ref: "0.2 - 1.20 mg/dL" },
-      { label: "BILIRRUBINA INDIRECTA", key: "txtrBilirrIndirecta", ref: "0.1 - 1 mg/dL" },
       { label: "BILIRRUBINA DIRECTA", key: "txtrBilirrDirecta", ref: "Hasta 0.25 mg/dL" },
+      { label: "BILIRRUBINA INDIRECTA", key: "txtrBilirrIndirecta", ref: "0.1 - 1 mg/dL" },
       { label: "PROTEÍNAS TOTALES", key: "txtrProteTotales", ref: "6.6 - 8.3 g/dL" },
       { label: "ALBÚMINA", key: "txtrAlbumina", ref: "3.5 - 5.5 g/dL" },
       { label: "GLOBULINA SÉRICA", key: "txtrGlobulina", ref: "2.3 - 3.5 g/dL" },

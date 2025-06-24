@@ -10,19 +10,19 @@ const headerAnalisisBioquimicos = (doc, datos = {}) => {
   doc.addImage(img, "PNG", margin, y, 50, 16);
   y += 18;
 
-  // 2. Número de Orden (alineado a la derecha)
+  // 2. Número de Orden (movido más a la izquierda)
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("Nro Orden :", pageW - margin - 60, y);
+  doc.text("Nro Orden :", pageW - margin - 90, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.n_orden || datos.norden || ""}`, pageW - margin - 10, y, { align: "right" });
+  doc.text(`${datos.n_orden || datos.norden || ""}`, pageW - margin - 40, y, { align: "right" });
   y += 8;
 
-  // 3. Sede (alineado a la derecha, debajo del nro orden)
+  // 3. Sede (movido más a la izquierda, alineado con Nro Orden)
   doc.setFont("helvetica", "bold");
-  doc.text("Sede :", pageW - margin - 60, y);
+  doc.text("Sede :", pageW - margin - 90, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.sede || ""}`, pageW - margin - 10, y, { align: "right" });
+  doc.text(`${datos.sede || ""}`, pageW - margin - 40, y, { align: "right" });
 };
 
 export default headerAnalisisBioquimicos;

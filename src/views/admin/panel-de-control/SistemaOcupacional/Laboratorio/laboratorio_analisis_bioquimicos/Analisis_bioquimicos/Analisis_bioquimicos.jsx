@@ -7,6 +7,8 @@ import { GetInfoPacAnalisisBio, Loading, PrintHojaR, SubmitAnalsisiBio, VerifyTR
 import { GetTableAnalBio } from '../model/model'
 import { getFetch } from '../../../../getFetch/getFetch'
 import Swal from 'sweetalert2'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
 
 export default function AnalisisBioquimicos({ token, selectedSede, userlogued }) {
   const tabla = 'analisis_bioquimicos'
@@ -30,6 +32,9 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
   const [listDoc, setListDoc] = useState([])
   const [refresh, setRefresh] = useState(0)
   const [exams, setExams] = useState([])
+  const [startDate, setStartDate] = useState(new Date());
+  const [pacientesCompletados, setPacientesCompletados] = useState(0);
+  const [pacientesFaltantes, setPacientesFaltantes] = useState(0);
 
   //Datos de tabla
   useEffect(() => {
@@ -49,6 +54,17 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
         });
     }
   }, [searchParams.code, searchParams.nombre, refresh]);
+
+  useEffect(() => {
+    if (exams && exams.length > 0) {
+      const completados = exams.filter(e => e.color === 'VERDE').length;
+      setPacientesCompletados(completados);
+      setPacientesFaltantes(exams.length - completados);
+    } else {
+      setPacientesCompletados(0);
+      setPacientesFaltantes(0);
+    }
+  }, [exams]);
 
   //NOMBRES DEL DOCTOR
   useEffect(() => {
@@ -261,12 +277,12 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
           {/* Parámetros Bioquímicos */}
           <Section>
             {[
-              { key: 'creatinina',     label: 'Creatinina',     hint: '0.8 - 1.4 mg/dl' },
-              { key: 'colesterolTotal',label: 'Colesterol Total',hint: '< 200 mg/dl' },
-              { key: 'trigliceridos',  label: 'Triglicéridos',   hint: '< 150 mg/dl' },
-              { key: 'ldl',            label: 'L.D.L Colesterol',hint: '< 129 mg/dl' },
-              { key: 'hdl',            label: 'H.D.L Colesterol',hint: '40 - 60 mg/dl' },
-              { key: 'vldl',           label: 'V.L.D.L Colesterol',hint: '< 30 mg/dl' },
+              { key: 'creatinina',      label: 'Creatinina',        hint: '0.8 - 1.4 mg/dl' },
+              { key: 'colesterolTotal', label: 'Colesterol Total',  hint: '< 200 mg/dl' },
+              { key: 'trigliceridos',   label: 'Triglicéridos',    hint: '< 150 mg/dl' },
+              { key: 'hdl',             label: 'H.D.L. Colesterol', hint: '40 - 60 mg/dl' },
+              { key: 'ldl',             label: 'L.D.L. Colesterol', hint: '< 129 mg/dl' },
+              { key: 'vldl',            label: 'V.L.D.L. Colesterol',hint: '< 30 mg/dl' },
             ].map(({ key, label, hint }, idx, arr) => (
               <div key={key} className="flex items-center gap-4">
                 <span className="font-medium min-w-[150px] text-lg">{label}:</span>
@@ -318,6 +334,30 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
             }}
             onKeyUp={(event) => {SearchCode(event)}}
           />
+          <div className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
+            <div className="bg-white p-4 rounded-md mt-4 flex items-center justify-between">
+              <div className="flex items-center">
+                <label htmlFor="fecha" className="mr-2 font-medium">Fecha:</label>
+                <DatePicker
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  dateFormat="dd/MM/yyyy"
+                  className="border border-gray-300 rounded-md p-2"
+                />
+              </div>
+              <div>
+                <span className="mr-4">
+                  <span className="font-semibold text-green-500">Pacientes completados:</span> {pacientesCompletados}
+                </span>
+                <span>
+                  <span className="font-semibold text-red-500">Pacientes faltantes:</span> {pacientesFaltantes}
+                </span>
+              </div>
+            </div>
+            <div className="text-center mt-2 text-sm text-gray-500">
+              (Click izquierdo para importar datos | Click derecho para imprimir)
+            </div>
+          </div>
           <Table data={exams} tabla={tabla} set={setForm} token={token} clean={handleClear} setMed={setSearchMedico} />
         </div>
       </div>
