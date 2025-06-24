@@ -80,7 +80,7 @@ const header_Hematologia = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(String(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
   y += lineHeight;
 
   // --- Muestra ---
@@ -89,7 +89,7 @@ const header_Hematologia = (doc, datos = {}) => {
   doc.text(muestraLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const muestraLabelWidth = doc.getTextWidth(muestraLabel);
-  doc.text((datos.muestra || '').toUpperCase(), patientDataX + muestraLabelWidth + 2, y);
+  doc.text('SANGRE TOTAL C/ EDTA'.toUpperCase(), patientDataX + muestraLabelWidth + 2, y);
 
   // Reseteo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);

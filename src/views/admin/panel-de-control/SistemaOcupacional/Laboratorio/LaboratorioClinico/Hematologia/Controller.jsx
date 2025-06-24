@@ -132,8 +132,8 @@ export const PrintHojaR = (nro,token) => {
     if (res.norden) {
       const nombre = res.nameJasper;
       console.log(nombre)
-      const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
+      const jasperModules = import.meta.glob('../../../../../../jaspers/LaboratorioClinico/*.jsx');
+      const modulo = await jasperModules[`../../../../../../jaspers/LaboratorioClinico/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
         modulo.default(res);
