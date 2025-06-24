@@ -34,6 +34,24 @@ export default function Microbiologia({ token, selectedSede, userlogued }) {
     setForm(f => ({ ...f, [name]: value }))
   }
   
+  const handleExamenDirectoChange = (checked) => {
+    setForm(prev => {
+      const newState = { ...prev, examenDirecto: checked };
+      if (checked) {
+        // Examen Directo is checked, so BK1 and BK2 fields are disabled and should be cleared
+        newState.bk1 = '';
+        newState.bk1Radio = '';
+        newState.bk2 = '';
+        newState.bk2Radio = '';
+      } else {
+        // Examen Directo is unchecked, so KOH fields are disabled and should be cleared
+        newState.koh = '';
+        newState.kohRadio = '';
+      }
+      return newState;
+    });
+  };
+
   const handleSave = async () => {
     try {
       // await fetch...
@@ -116,7 +134,7 @@ export default function Microbiologia({ token, selectedSede, userlogued }) {
       <Checkbox
         label="Examen Directo"
         checked={form.examenDirecto}
-        onChange={v => setForm(f => ({ ...f, examenDirecto: v }))}
+        onChange={handleExamenDirectoChange}
       />
 
       <div className="text-center font-semibold">MUESTRA: ESPUTO</div>

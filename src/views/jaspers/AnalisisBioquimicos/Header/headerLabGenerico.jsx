@@ -9,21 +9,21 @@ const headerMicrobiologia = (doc, datos = {}) => {
   doc.addImage(img, "PNG", margin, y, 50, 16);
   y += 18;
 
-  // 2. Nro Orden (derecha)
+  // 2. Nro Orden (movido más a la izquierda)
   doc.setFontSize(11);
   doc.setFont("helvetica", "bold");
-  doc.text("Nro Orden :", pageW - margin - 60, y);
+  doc.text("Nro Orden :", pageW - margin - 90, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.n_orden || datos.norden || ""}`, pageW - margin - 10, y, {
+  doc.text(`${datos.n_orden || datos.norden || ""}`, pageW - margin - 40, y, {
     align: "right",
   });
   y += 7;
 
-  // 3. Sede (derecha)
+  // 3. Sede (movido más a la izquierda, alineado con Nro Orden)
   doc.setFont("helvetica", "bold");
-  doc.text("Sede :", pageW - margin - 60, y);
+  doc.text("Sede :", pageW - margin - 90, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.sede || ""}`, pageW - margin - 10, y, { align: "right" });
+  doc.text(`${datos.sede || ""}`, pageW - margin - 40, y, { align: "right" });
   y += 12;
 
   // 4. Apellidos y Nombres (izquierda)

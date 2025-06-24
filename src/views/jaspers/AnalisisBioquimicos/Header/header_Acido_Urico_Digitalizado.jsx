@@ -29,11 +29,11 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
     doc.setFont("helvetica", "bold").text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2. Nro Orden (derecha) - SIN el sufijo "-TP"
-  const rightColX = pageW - margin;
+  // 2. Nro Orden (movido más a la izquierda)
+  const rightColX = pageW - margin - 30; // Movido 30 unidades a la izquierda
   doc.setFontSize(11).setFont("helvetica", "normal");
   const nroOrdenLabel = "Nro Orden :";
-  const nroOrdenValue = String(datos.norden || ''); // <-- Sin "-TP"
+  const nroOrdenValue = String(datos.norden || '');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
@@ -45,6 +45,11 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
     nroOrdenX + nroOrdenLabelWidth + 1, y + 6.5,
     nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 6.5
   );
+
+  // Sede (debajo, alineado con el Nro Orden)
+  doc.setFontSize(9).setFont("helvetica", "normal");
+  doc.text(datos.sede || "Trujillo-Pierola", rightColX, y + 11, { align: "right" });
+
   // 3. Bloque de datos del paciente
   y = 40; 
   const lineHeight = 6;

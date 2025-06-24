@@ -12,17 +12,17 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   const img = "./img/logo-color.png"; // Ajusta la ruta si es necesario
   doc.addImage(img, "PNG", margin, y, 50, 16);
 
-  // --- Nro Orden con sufijo "-TP" a la derecha ---
+  // --- Nro Orden con sufijo "-TP" a la derecha (movido más a la izquierda) ---
   const nro = datos.norden ? `${datos.norden}-TP` : "";
   doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text(nro, pageW - margin, y + 2, { align: "right" });
+  doc.text(nro, pageW - margin - 30, y + 2, { align: "right" });
 
-  // --- Sede debajo del Nro Orden ---
+  // --- Sede debajo del Nro Orden (alineado con el nuevo Nro Orden) ---
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(`Sede : ${datos.sede || ""}`, pageW - margin, y + 8, { align: "right" });
+  doc.text(`Sede : ${datos.sede || ""}`, pageW - margin - 30, y + 8, { align: "right" });
 
-  // --- Fecha debajo de la Sede ---
-  doc.text(`Fecha : ${datos.fechaLab || ""}`, pageW - margin, y + 14, { align: "right" });
+  // --- Fecha debajo de la Sede (alineado con Sede) ---
+  doc.text(`Fecha : ${datos.fechaLab || ""}`, pageW - margin - 30, y + 14, { align: "right" });
 
   // --- Título centrado ---
   doc.setFont("helvetica", "bold").setFontSize(14);
