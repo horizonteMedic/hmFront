@@ -76,27 +76,13 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     y += config.lineHeight;
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     // DATOS DE PRUEBAS
-    if (datos.examenDirecto) {
-      drawResultRow(
-        doc,
-        y,
-        "EXAMEN DIRECTO (KOH)",
-        datos.txtKoh ?? "N/A"
-      );
-    } else {
-      y = drawResultRow(
-        doc,
-        y,
-        "Examen de BK - BACILOSCOPIA 1° Muestra",
-        datos.txtMuestra1 ?? "N/A"
-      );
-      drawResultRow(
-        doc,
-        y,
-        "Examen de BK - BACILOSCOPIA 2° Muestra",
-        datos.txtMuestra2 ?? "N/A"
-      );
-    }
+    drawResultRow(
+      doc,
+      y,
+      "EXAMEN DIRECTO (KOH)",
+      datos.txtKoh ?? "N/A"
+    );
+    
     if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;

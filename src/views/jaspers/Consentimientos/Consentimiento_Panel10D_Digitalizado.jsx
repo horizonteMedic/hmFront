@@ -140,7 +140,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeMarih ? "X" : "    "})`,
           `SI (${datos.antConsumeMarih ? "X" : "    "})`,
           datos.antConsumeMarih && datos.fechaConsumeMarih
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMarih); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeMarih}`
             : ''
         ],
         [
@@ -148,7 +148,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeCocacina ? "X" : "    "})`,
           `SI (${datos.antConsumeCocacina ? "X" : "    "})`,
           datos.antConsumeCocacina && datos.fechaConsumeCocacina
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeCocacina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeCocacina}`
             : ''
         ],
         [
@@ -156,7 +156,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`,
           `SI (${datos.antConsumeHojaCoca ? "X" : "    "})`,
           datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumoHojaCoca); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumoHojaCoca}`
             : ''
         ],
         [
@@ -164,7 +164,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`,
           `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`,
           datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeAnfetamina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeAnfetamina}`
             : ''
         ],
         [
@@ -172,7 +172,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`,
           `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`,
           datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeOpiacesos
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeOpiacesos); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeOpiacesos}`
             : ''
         ],
         [
@@ -180,7 +180,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`,
           `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})`,
           datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeBenzodiacepinas); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeBenzodiacepinas}`
             : ''
         ],
         [
@@ -188,7 +188,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeOpiacesos ? "X" : "    "})`,
           `SI (${datos.antConsumeOpiacesos ? "X" : "    "})`,
           datos.antConsumeOpiacesos && datos.fechaConsumeOpiacesos
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeOpiacesos); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeOpiacesos}`
             : ''
         ],
         [
@@ -196,7 +196,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeBarbituricos ? "X" : "    "})`,
           `SI (${datos.antConsumeBarbituricos ? "X" : "    "})`,
           datos.antConsumeBarbituricos && datos.fechaConsumeBarbituricos
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeBarbituricos); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeBarbituricos}`
             : ''
         ],
         [
@@ -204,7 +204,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeMetadona ? "X" : "    "})`,
           `SI (${datos.antConsumeMetadona ? "X" : "    "})`,
           datos.antConsumeMetadona && datos.fechaConsumeMetadona
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMetadona); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeMetadona}`
             : ''
         ],
         [
@@ -212,7 +212,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeFenciclidina ? "X" : "    "})`,
           `SI (${datos.antConsumeFenciclidina ? "X" : "    "})`,
           datos.antConsumeFenciclidina && datos.fechaConsumeFenciclidina
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeFenciclidina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeFenciclidina}`
             : ''
         ],
         [
@@ -220,7 +220,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           `NO (${!datos.antConsumeAntidepreTricicli ? "X" : "    "})`,
           `SI (${datos.antConsumeAntidepreTricicli ? "X" : "    "})`,
           datos.antConsumeAntidepreTricicli && datos.fechaConsumeAntidepreTricicli
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeAntidepreTricicli); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeAntidepreTricicli}`
             : ''
         ],
       ],
