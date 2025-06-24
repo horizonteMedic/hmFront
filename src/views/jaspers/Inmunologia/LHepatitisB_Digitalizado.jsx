@@ -24,7 +24,7 @@ export default function LHepatitisB_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 58;
+    let y = 75;
 
   // Título principal
   doc.setFont(undefined, 'bold');
@@ -38,7 +38,7 @@ export default function LHepatitisB_Digitalizado(datos) {
     startY: y,
     body: [
       [{ content: 'MUESTRA : SUERO', styles: { fontStyle: 'bold' } }],
-      [{ content: 'MÉTODO : INMUNOENSA... CROMATOGRÁFICO', styles: { fontStyle: 'bold' } }]
+      [{ content: 'MÉTODO : INMUNOENSAYO CROMATOGRÁFICO', styles: { fontStyle: 'bold' } }]
     ],
     theme: 'plain',
     styles: { fontSize: 11, cellPadding: 1 },

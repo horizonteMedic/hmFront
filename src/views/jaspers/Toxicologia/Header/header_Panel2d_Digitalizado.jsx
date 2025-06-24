@@ -59,8 +59,8 @@ const header_Panel2d_Digitalizado = (doc, datos = {}) => {
 
 
   // --- Datos del paciente (más abajo) ---
-  y += 20;
-  const patientDataX = margin + 80;
+  y += 30;
+  const patientDataX = margin;
   
   const drawPatientDataRow = (label, value) => {
     doc.setFontSize(11).setFont('helvetica', 'bold');

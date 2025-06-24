@@ -205,18 +205,7 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
       </div>
 
       <div className="grid grid-cols-12 gap-2 items-center mt-4">
-        <div className="col-span-4 flex items-center">
-          <Checkbox
-            label={<span className="font-bold">PRUEBA HEPATITIS</span>}
-            checked={form.hepatitis}
-            onChange={v => {
-              setForm(f => ({ ...f, hepatitis: v, hepatitisA: '' }));
-              if (v) {
-                setTimeout(() => hepatitisARef.current?.focus(), 0);
-              }
-            }}
-          />
-        </div>
+        
         <div className="col-span-4 flex items-center">
           {form.hepatitis && (
             <input
@@ -247,12 +236,7 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
           name="medico"
           value={form.medico}
           onChange={handleFormChange}
-          ref={medicoRef}
-          onKeyUp={e => {
-            if (e.key === 'Enter') {
-              printRef.current?.focus();
-            }
-          }}
+          disabled
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>

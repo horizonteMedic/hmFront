@@ -224,8 +224,8 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
           className="border rounded px-2 py-1 min-w-[220px]"
           name="medico"
           value={form.medico}
-          disabled
           onChange={handleFormChange}
+          disabled
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
