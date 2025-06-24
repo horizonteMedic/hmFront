@@ -373,8 +373,8 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
     // Definir variables para nombre y DNI del testigo
-    const nombreTestigo = datos.nombreTestigo || '______________________________';
-    const dniTestigo = datos.dniTestigo || '__________';
+    const nombreTestigo = datos.usuarioRegistrado || '______________________________';
+    const dniTestigo = String(datos.dniUsuario) || '__________';
     // Mostrar solo Nombre Completo y DNI debajo de la firma del testigo
     doc.setFont(undefined, 'normal');
     doc.setFontSize(8);
