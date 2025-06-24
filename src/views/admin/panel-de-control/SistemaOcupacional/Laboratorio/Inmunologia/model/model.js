@@ -80,11 +80,12 @@ export function SubmitInmunologia(data,user,token) {
 }
 
 export function SubmitHepatitis(data,user,token) {
+    console.log(data)
     const body = {
-        fecha: data.fecha,
-        txtMarca: data.tificoO,
-        txtHepatitisa: data.tificoH,
-        txtHepatitisb: data.paratificoA,
+        fechaExamen: data.fecha,
+        txtMarca: data.marca,
+        txtHepatitisa: data.resultadoHAV,
+        txtHepatitisb: data.resultadoHBsAg,
         userRegistro: user,
         userMedicoOcup: "",
         norden: data.norden,

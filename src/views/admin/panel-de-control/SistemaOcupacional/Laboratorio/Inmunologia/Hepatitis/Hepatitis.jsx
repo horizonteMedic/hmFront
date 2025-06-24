@@ -10,7 +10,7 @@ const date = new Date();
 
 export default function Hepatitis({ token, selectedSede, userlogued }) {
   // Individual useState hooks for each form field
-    const tabla = 'inmunologia'
+    const tabla = 'lhepatitis'
 
   const [form, setForm] = useState({
     norden: '',
@@ -32,16 +32,6 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
-
-  const handleSave = async () => {
-    try {
-      // POST placeholder
-      // await fetch(`${apiBase}/hepatitis`,{...})
-      Swal.fire('Guardado','Datos guardados','success')
-    } catch {
-      Swal.fire('Error','No se pudo guardar','error')
-    }
-  }
 
   const handleClear = () => {
     setForm({
@@ -122,8 +112,8 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
       </div>
 
       <div className="flex items-center gap-6 mt-2">
-        <Checkbox label="HEPATITIS A (HAV)" checked={form.hav} onChange={v => setForm(p => ({ ...p, hav: v }))} />
-        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={v => setForm(p => ({ ...p, hbsag: v }))} />
+        <Checkbox label="HEPATITIS A (HAV)" checked={form.hav} onChange={v => setForm(p => ({ ...p, hav: v, hbsag: false, resultadoHBsAg: ''  }))} />
+        <Checkbox label="HEPATITIS B (HBsAg)" checked={form.hbsag} onChange={v => setForm(p => ({ ...p, hbsag: v, hav: false, resultadoHAV: '' }))} />
       </div>
 
       <div className="flex items-center gap-2 mt-2">
@@ -274,7 +264,7 @@ function Field({ label, name, type='text', value, onChange, disabled, dynamicWid
 function Checkbox({ label, checked, onChange }) {
   return (
     <label className="flex items-center gap-2">
-      <input type="checkbox" checked={checked} onChange={e=>onChange(e.target.checked)} />
+      <input type="radio" checked={checked} onChange={e=>onChange(e.target.checked)} />
       {label}
     </label>
   )
