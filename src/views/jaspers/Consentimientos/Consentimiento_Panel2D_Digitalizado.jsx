@@ -152,7 +152,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
           `NO ( ${!datos.antConsumeMarih ? "X" : " "} )`,
           `SI ( ${datos.antConsumeMarih ? "X" : " "} )`,
           datos.antConsumeMarih && datos.fechaConsumeMarih
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMarih); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeMarih}`
             : ''
         ],
         [
@@ -160,7 +160,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
           `NO ( ${!datos.antConsumeHojaCoca ? "X" : " "} )`,
           `SI ( ${datos.antConsumeHojaCoca ? "X" : " "} )`,
           datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumoHojaCoca); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumoHojaCoca}`
             : ''
         ],
         [
@@ -168,7 +168,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
           `NO ( ${!datos.antConsumeCocacina ? "X" : " "} )`,
           `SI ( ${datos.antConsumeCocacina ? "X" : " "} )`,
           datos.antConsumeCocacina && datos.fechaConsumeCocacina
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeCocacina); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeCocacina}`
             : ''
         ],
       ],

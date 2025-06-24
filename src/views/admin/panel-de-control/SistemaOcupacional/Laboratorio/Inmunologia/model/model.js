@@ -25,6 +25,7 @@ export function SubmitGonadotropina(data,user,token) {
 }
 
 export function SubmitMicrobiologia(data,user,token) {
+    console.log(data)
     const body = {
         fecha: data.fecha,
         txtMuestra1: data.bk1,

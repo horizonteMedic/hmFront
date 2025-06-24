@@ -372,17 +372,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       const selloBase64 = canvas.toDataURL('image/png');
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
-
-    // Agregar nombre y DNI del testigo o responsable debajo de la línea
-    const nombreTestigo = datos.nombreTestigo || '______________________________';
-    const dniTestigo = datos.dniTestigo || '__________';
-    doc.setFont(undefined, 'normal');
-    doc.setFontSize(9);
-    doc.text(`Nombre Completo: ${nombreTestigo}`, 100, y + 6);
-    doc.text(`DNI: ${dniTestigo}`, 100, y + 11);
-
     footer(doc, datos);
-
     // Mostrar PDF
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);

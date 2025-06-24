@@ -18,7 +18,7 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
     valueM: '',
     valueC: '',
     valueE: '',
-    metodo: '',
+    metodo: 'METODO: INMUNOCROMATOGRAFICO',
   });
 
   // Refs para navegación
@@ -40,8 +40,21 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       valueM: '',
       valueC: '',
       valueE: '',
-      metodo: '',
+      metodo: 'METODO: INMUNOCROMATOGRAFICO',
     });
+  };
+
+  const handleSeat = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      valueM: '',
+      valueC: '',
+      valueE: '',
+      metodo: 'METODO: INMUNOCROMATOGRAFICO',
+    }));
   };
 
   const handleFechaFocus = e => e.target.showPicker?.();
@@ -83,8 +96,8 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
             onChange={e => handleChange(e.target)}
             onKeyUp={(event) => {
               if(event.key === 'Enter') {
+                handleSeat()
                 VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-                fechaRef.current?.focus();
               }
             }}
             className="border rounded px-3 py-2 w-32"
@@ -135,9 +148,10 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
         <div className="font-semibold">PRUEBA RÁPIDA CUALITATIVA</div>
         <input
           className="border rounded px-3 py-2 w-full mt-1 mb-2"
-          disabled
+          onChange={e => handleChange(e.target)}
+          name='metodo'
           value={form.metodo}
-          readOnly
+
         />
       </div>
 

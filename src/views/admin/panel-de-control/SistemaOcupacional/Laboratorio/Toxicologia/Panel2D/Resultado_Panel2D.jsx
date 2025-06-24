@@ -16,7 +16,7 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
     edad: '',
     valueM: '',
     valueC: '',
-    metodo: '',
+    metodo: 'METODO: INMUNOCROMATOGRAFICO',
     medico: ''
   });
   const [status, setStatus] = useState('');
@@ -41,7 +41,7 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
       valueM: '',
       valueC: '',
       medico: '',
-      metodo: ''
+      metodo: 'METODO: INMUNOCROMATOGRAFICO'
     });
   };
 
@@ -130,8 +130,8 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
         <div className="mb-4">
           <input
             className="border rounded px-2 py-1 w-full"
-            readOnly
-            disabled
+            onChange={handleChange}
+            name='metodo'
             value={form.metodo}
           />
         </div>

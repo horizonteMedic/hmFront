@@ -84,7 +84,7 @@ const headerHepatitisDigitalizado = (doc, datos = {}) => {
   doc.text("Fecha :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
   const labelWidthFecha = doc.getTextWidth("Fecha :");
-  doc.text(String(datos.fecha), patientDataX + labelWidthFecha + 2, patientDataY);
+  doc.text(String(datos.fechaExamen), patientDataX + labelWidthFecha + 2, patientDataY);
   
   // Reseteo de estilos para no afectar el resto del documento
   doc.setFont('helvetica', 'normal');

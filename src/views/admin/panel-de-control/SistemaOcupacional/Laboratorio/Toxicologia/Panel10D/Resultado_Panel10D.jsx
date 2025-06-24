@@ -25,7 +25,7 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
     valueMetadona: '',
     valueFenci: '',
     valueAnti: '',
-    metodo: ''
+    metodo: 'METODO: INMUNOCROMATOGRAFICO'
   });
 
   // Refs para navegación
@@ -63,9 +63,29 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
       valueMetadona: '',
       valueFenci: '',
       valueAnti: '',
-      metodo: '',
+      metodo: 'METODO: INMUNOCROMATOGRAFICO',
     });
   };
+
+  const handleSeat = () => {
+    setForm(prev => ({
+      ...prev,
+      fecha: today,
+      nombres: '',
+      edad: '',
+      valueM: '',
+      valueC: '',
+      valueAn: '',
+      valueMet: '',
+      valueBen: '',
+      valueOpi: '',
+      valueBar: '',
+      valueMetadona: '',
+      valueFenci: '',
+      valueAnti: '',
+      metodo: '',
+    }))
+  }
 
   const handleFechaFocus = e => {
     e.target.showPicker?.();
@@ -108,8 +128,8 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
             value={form.norden}
             onKeyUp={(event) => {
               if(event.key === 'Enter') {
+                handleSeat()
                 VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-                fechaRef.current?.focus();
               }
             }}
             onChange={handleChange}
@@ -162,8 +182,8 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
         <input
           className="border rounded px-3 py-2 w-full mt-1 mb-2"
           value={form.metodo}
-          disabled
-          readOnly
+          onChange={handleChange}
+          name='metodo'
         />
       </div>
 

@@ -98,17 +98,17 @@ export const SubmitPanel5D = async (form,user,token,limpiar,tabla) => {
   Loading('Registrando Datos')
   SubmitToxPanel5D(form,user, token)
   .then((res) => {
-    if (res.codAb) {
-      Swal.fire({title: 'Exito', text:`Se ha Registrado/Actualizado con EXito,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
-        limpiar()
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden,tabla,token)
-        }
-      })
-    }
+    if (res.id === 1 || res.id === 0) {
+    Swal.fire({title: 'Exito', text:`Se ha Registrado/Actualizado con Exito,\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+    }).then((result) => {
+      limpiar()
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,tabla,token)
+      }
+    })
+  }
   })
 }
 
