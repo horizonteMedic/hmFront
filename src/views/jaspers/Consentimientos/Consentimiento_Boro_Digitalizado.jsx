@@ -123,7 +123,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       { text: ', autorizo al POLICLINICO HORIZONTE MEDIC, para que se me realice el examen toxicológico de drogas en orina y/o saliva, según los protocolos establecidos y que los resultados se entreguen directamente a la empresa.', bold: false },
     ];
     const maxWidth = pageW - 2 * margin - 4;
-    const interlineado = 7;
+    const interlineado = 5;
     function armarLineas(bloques, maxWidth) {
       let lineas = [];
       let lineaActual = [];
@@ -182,7 +182,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       });
       yBloque += interlineado;
     });
-    y = yBloque + 6;
+    y = yBloque + 4;
 
     // Preguntas
     doc.setFont(undefined, 'normal');
@@ -191,9 +191,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const introPregLines = doc.splitTextToSize(introPreg, pageW - 2 * margin - 4);
     introPregLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 6;
+      y += 4;
     });
-    y += 2;
+    y += 1;
     // Enfermedad
     doc.text('- ¿Sufre alguna enfermedad?', margin, y);
     doc.text(`SI ( ${datos.antBoroAlgunaEnfermedad ? 'X' : ' '} )`, margin + 92, y);
@@ -202,7 +202,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       doc.text('¿Cuál (es):', margin + 145, y);
       doc.text(`${datos.critCualAlgunaEnfermedad || ''}`, margin + 168, y);
     }
-    y += 8;
+    y += 5;
     // Medicamento
     doc.text('- ¿Consume regularmente algún medicamento?', margin, y);
     doc.text(`SI ( ${datos.antBoroAlgunMedicamento ? 'X' : ' '} )`, margin + 92, y);
@@ -211,25 +211,25 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       doc.text('¿Cuál (es):', margin + 145, y);
       doc.text(`${datos.critCualAlgunMedicamento || ''}`, margin + 168, y);
     }
-    y += 8;
+    y += 5;
     // Mate de coca
     doc.text('- ¿Consume regularmente mate de coca?', margin, y);
     doc.text(`SI ( ${datos.antBoroConsumenMateCoca ? 'X' : ' '} )`, margin + 92, y);
     doc.text(`NO ( ${!datos.antBoroConsumenMateCoca ? 'X' : ' '} )`, margin + 110, y);
-    y += 8;
+    y += 5;
     // Texto justificado para la pregunta larga
     const mateMsg = 'Si la respuesta es SI: ¿Cuándo consumió por última vez?';
     const mateLines = doc.splitTextToSize(mateMsg, pageW - 2 * margin - 4);
     mateLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 6;
+      y += 4;
     });
     if (datos.antBoroConsumenMateCoca) {
       doc.text('CUANDO:', margin + 7, y);
       doc.text(`${datos.critFechaConsumoMateCoca || ''}`, margin + 32, y);
-      y += 10;
+      y += 7;
     } else {
-      y += 4;
+      y += 2;
     }
     // Hoja de coca
     doc.text('- ¿Consume o mastica hoja de coca?', margin, y);
@@ -238,28 +238,28 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     if (datos.masticaHojaCoca && datos.fechaConsumoHojaCoca) {
       doc.text(`CUANDO: ${datos.fechaConsumoHojaCoca}`, margin + 145, y);
     }
-    y += 8;
+    y += 5;
     // Texto justificado para la pregunta larga
     const hojaMsg = 'Si la respuesta es SI, se procederá a reprogramar la toma de la muestra en 5 días, caso contrario se tomará la muestra bajo responsabilidad del paciente.';
     const hojaLines = doc.splitTextToSize(hojaMsg, pageW - 2 * margin - 4);
     hojaLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 6;
+      y += 4;
     });
-    y += 2;
+    y += 1;
     // Tratamiento quirúrgico/dental
     doc.text('- ¿Se realizó algún tratamiento quirúrgico o dental en las últimas 48 horas?', margin, y);
     doc.text(`SI ( ${datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 142, y);
     doc.text(`NO ( ${!datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 160, y);
-    y += 8;
+    y += 5;
     // Texto justificado para la pregunta larga
     const tratMsg = 'Si la respuesta es SI, indicar qué tratamiento se realizó, cual es nombre del cirujano, donde y cuando se realizó dicho procedimiento o tratamiento';
     const tratLines = doc.splitTextToSize(tratMsg, pageW - 2 * margin - 4);
     tratLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 6;
+      y += 4;
     });
-    y += 2;
+    y += 1;
     // Mostrar bloque apilado a la derecha para Cual, Donde, Cuando
     const rightMargin = pageW - margin;
     let yCampos = y;
@@ -268,20 +268,20 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text('Cual:', rightMargin - 60, yCampos, { align: 'right' });
     doc.setFont('helvetica', 'bold');
     doc.text(`${datos.critCualTratQuirugODental || ''}`, rightMargin, yCampos, { align: 'right' });
-    yCampos += 7;
+    yCampos += 5;
     // Donde
     const dondeValue = `${datos.critDondeTratQuirugODental || ''}`;
     doc.setFont('helvetica', 'normal');
     doc.text('Donde:', rightMargin - 60, yCampos, { align: 'right' });
     doc.setFont('helvetica', 'bold');
     doc.text(dondeValue, rightMargin, yCampos, { align: 'right' });
-    yCampos += 7;
+    yCampos += 5;
     // Cuando
     doc.setFont('helvetica', 'normal');
     doc.text('Cuando:', rightMargin - 60, yCampos, { align: 'right' });
     doc.setFont('helvetica', 'bold');
     doc.text(`${datos.critCuandoTratQuirugODental || ''}`, rightMargin, yCampos, { align: 'right' });
-    y = yCampos + 4;
+    y = yCampos + 2;
 
     // Fecha del examen en la parte inferior
     y += 10;
@@ -373,6 +373,16 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
 
+    // Agregar nombre y DNI del testigo o responsable debajo de la línea
+    const nombreTestigo = datos.nombreTestigo || '______________________________';
+    const dniTestigo = datos.dniTestigo || '__________';
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(9);
+    doc.text(`Nombre Completo: ${nombreTestigo}`, 100, y + 6);
+    doc.text(`DNI: ${dniTestigo}`, 100, y + 11);
+
+    footer(doc, datos);
+
     // Mostrar PDF
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -384,7 +394,6 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-  
   })
   
 } 
