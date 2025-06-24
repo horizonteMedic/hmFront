@@ -97,7 +97,7 @@ export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedic
         //BIO
         glucosa: res.txtGlucosaBio,
         creatinina: res.txtCreatininaBio,
-        rprPos: res.chkPositivo ? true : false,
+        rpr: res.chkPositivo === true ? 'POSITIVO' : res.chkNegativo === true ? 'NEGATIVO' : res.chkNegativo === false && res.chkPositivo === false ? 'N/A' : '',
         vih: res.txtVih,
       }));
       setO(prev => ({

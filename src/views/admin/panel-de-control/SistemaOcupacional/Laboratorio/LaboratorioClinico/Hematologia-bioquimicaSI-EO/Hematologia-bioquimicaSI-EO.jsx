@@ -374,7 +374,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <div className="flex items-center gap-2 justify-center">
                             <Checkbox label="+" checked={form.rpr === 'POSITIVO'} onChange={() => { setField('rpr', 'POSITIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
                             <Checkbox label="-" checked={form.rpr === 'NEGATIVO'} onChange={() => { setField('rpr', 'NEGATIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
-                            <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); setField('rpr', v ? 'N/A' : ''); }} />
+                            <Checkbox label="N/A" checked={form.rprNA || form.rpr === 'N/A'} onChange={v => { setField('rprNA', v); setField('rpr', v ? 'N/A' : ''); }} />
                         </div>
                     </div>
                     <div className="pl-4 space-y-1">
@@ -385,7 +385,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <div className="flex items-center gap-2 justify-center">
                             <Checkbox label="+" checked={form.vih === 'POSITIVO'} onChange={() => { setField('vih', 'POSITIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
                             <Checkbox label="-" checked={form.vih === 'NEGATIVO'} onChange={() => { setField('vih', 'NEGATIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
-                            <Checkbox label="N/A" checked={form.vihNA} onChange={v => { setField('vihNA', v); setField('vih', v ? 'N/A' : ''); }} />
+                            <Checkbox label="N/A" checked={form.vihNA || form.vih === 'N/A'} onChange={v => { setField('vihNA', v); setField('vih', v ? 'N/A' : ''); }} />
                         </div>
                     </div>
                 </div>

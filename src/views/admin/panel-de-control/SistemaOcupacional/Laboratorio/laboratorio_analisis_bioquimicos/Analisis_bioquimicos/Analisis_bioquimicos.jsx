@@ -165,6 +165,10 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
     setFilteredMedicos([]);
   };
 
+  const RefreshTable = () => {
+    setRefresh(refresh +1)
+  }
+
   // refs para inputs de parámetros bioquímicos
   const bioRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
@@ -308,7 +312,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
 
           {/* Acciones */}
           <div className="flex gap-4 pt-4 border-t border-gray-200">
-            <ActionButton onClick={() => {SubmitAnalsisiBio(form,userlogued,token,handleClear,tabla)}} color="green" icon={faSave}>Guardar/Actualizar</ActionButton>
+            <ActionButton onClick={() => {SubmitAnalsisiBio(form,userlogued,token,handleClear,tabla,RefreshTable)}} color="green" icon={faSave}>Guardar/Actualizar</ActionButton>
             <ActionButton onClick={handleClear} color="yellow" icon={faBroom}>Limpiar</ActionButton>
           </div>
         </div>

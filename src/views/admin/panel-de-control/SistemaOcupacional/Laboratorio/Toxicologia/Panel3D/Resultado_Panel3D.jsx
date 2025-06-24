@@ -15,10 +15,10 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
     fecha: today,
     nombres: '',
     edad: '',
-    valueM: '',
-    valueC: '',
-    valueE: '',
-    metodo: 'METODO: INMUNOCROMATOGRAFICO',
+    valueM: 'NEGATIVO',
+    valueC: 'NEGATIVO',
+    valueE: 'NEGATIVO',
+    metodo: 'INMUNOCROMATOGRAFICO',
   });
 
   // Refs para navegación
@@ -37,10 +37,10 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       fecha: today,
       nombres: '',
       edad: '',
-      valueM: '',
-      valueC: '',
-      valueE: '',
-      metodo: 'METODO: INMUNOCROMATOGRAFICO',
+      valueM: 'NEGATIVO',
+      valueC: 'NEGATIVO',
+      valueE: 'NEGATIVO',
+      metodo: 'INMUNOCROMATOGRAFICO',
     });
   };
 
@@ -50,9 +50,9 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       fecha: today,
       nombres: '',
       edad: '',
-      valueM: '',
-      valueC: '',
-      valueE: '',
+      valueM: 'NEGATIVO',
+      valueC: 'NEGATIVO',
+      valueE: 'NEGATIVO',
       metodo: 'METODO: INMUNOCROMATOGRAFICO',
     }));
   };

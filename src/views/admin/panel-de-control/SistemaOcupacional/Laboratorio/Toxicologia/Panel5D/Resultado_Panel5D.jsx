@@ -13,11 +13,11 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
     fecha: today,
     nombres: '',
     edad: '',
-    valueM: '',
-    valueC: '',
-    valueAn: '',
-    valueMet: '',
-    valueBen: '',
+    valueM: 'NEGATIVO',
+    valueC: 'NEGATIVO',
+    valueAn: 'NEGATIVO',
+    valueMet: 'NEGATIVO',
+    valueBen: 'NEGATIVO',
   });
 
   // Refs para navegación
@@ -40,11 +40,11 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
       fecha: today,
       nombres: '',
       edad: '',
-      valueM: '',
-      valueC: '',
-      valueAn: '',
-      valueMet: '',
-      valueBen: '',
+      valueM: 'NEGATIVO',
+      valueC: 'NEGATIVO',
+      valueAn: 'NEGATIVO',
+      valueMet: 'NEGATIVO',
+      valueBen: 'NEGATIVO',
     });
   };
 
@@ -54,11 +54,11 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
       fecha: today,
       nombres: '',
       edad: '',
-      valueM: '',
-      valueC: '',
-      valueAn: '',
-      valueMet: '',
-      valueBen: '',
+      valueM: 'NEGATIVO',
+      valueC: 'NEGATIVO',
+      valueAn: 'NEGATIVO',
+      valueMet: 'NEGATIVO',
+      valueBen: 'NEGATIVO',
     }));
   };
 

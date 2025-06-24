@@ -79,7 +79,7 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
 
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     doc.text(datos.txtPrueba, tableCols.col1, y);
-    doc.text(String(datos.txtResultado + ' mg/dL' || ''), tableCols.col2, y, { align: "center" });
+    doc.text(String(datos.txtResultado  || ''), tableCols.col2, y, { align: "center" });
     
     const valoresNormales = ["Mujeres : 2.5 - 6.8 mg/dl", "Hombres : 3.6 - 7.7 mg/dl"];
     let tempY = y;

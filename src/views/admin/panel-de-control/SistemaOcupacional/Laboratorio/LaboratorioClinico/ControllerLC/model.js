@@ -27,8 +27,8 @@ export function SubmitHematologia(data, dataO, token, user) {
         txtLinfocitosHematologia: data.linfocitos,
         txtGlucosaBio: data.glucosa,
         txtCreatininaBio: data.creatinina,
-        chkPositivo: data.rprPos === true ? true : false,
-        chkNegativo: data.rprPos === false ? true : false,
+        chkPositivo: data.rpr === 'POSITIVO' ? true : false,
+        chkNegativo: data.rpr === 'NEGATIVO' ? true : false,
         txtVih: data.vih,
         //ORINA
         txtColorEf: dataO.Color,

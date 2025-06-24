@@ -78,7 +78,7 @@ export default function LHepatitisB_Digitalizado(datos) {
       const sigW = 70;
       const sigH = 35;
       const sigX = 80; // o cualquier X deseado
-      const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -118,7 +118,7 @@ export default function LHepatitisB_Digitalizado(datos) {
       const sigW = 70;
       const sigH = 35;
       const sigX = 130; // o cualquier X deseado
-      const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

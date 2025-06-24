@@ -15,17 +15,17 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
     fecha: today,
     nombres: '',
     edad: '',
-    valueM: '',
-    valueC: '',
-    valueAn: '',
-    valueMet: '',
-    valueBen: '',
-    valueOpi: '',
-    valueBar: '',
-    valueMetadona: '',
-    valueFenci: '',
-    valueAnti: '',
-    metodo: 'METODO: INMUNOCROMATOGRAFICO'
+    valueM: 'NEGATIVO',
+    valueC: 'NEGATIVO',
+    valueAn: 'NEGATIVO',
+    valueMet: 'NEGATIVO',
+    valueBen: 'NEGATIVO',
+    valueOpi: 'NEGATIVO',
+    valueBar: 'NEGATIVO',
+    valueMetadona: 'NEGATIVO',
+    valueFenci: 'NEGATIVO',
+    valueAnti: 'NEGATIVO',
+    metodo: 'INMUNOCROMATOGRAFICO'
   });
 
   // Refs para navegación
@@ -63,7 +63,7 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
       valueMetadona: '',
       valueFenci: '',
       valueAnti: '',
-      metodo: 'METODO: INMUNOCROMATOGRAFICO',
+      metodo: 'INMUNOCROMATOGRAFICO',
     });
   };
 
@@ -83,7 +83,7 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
       valueMetadona: '',
       valueFenci: '',
       valueAnti: '',
-      metodo: '',
+      metodo: 'INMUNOCROMATOGRAFICO',
     }))
   }
 

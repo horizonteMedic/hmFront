@@ -76,7 +76,7 @@ export default function BioquimicaAcidoUrico({ token, selectedSede, userlogued }
       }
     });
   }
-
+  console.log(form)
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
   <h2 className="text-2xl font-bold text-center">ÁCIDO ÚRICO</h2>

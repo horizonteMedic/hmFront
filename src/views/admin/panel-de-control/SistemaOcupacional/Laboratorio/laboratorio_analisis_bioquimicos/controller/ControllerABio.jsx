@@ -90,7 +90,7 @@ export const GetInfoPacAnalisisBio = (nro,tabla,set,token,setMed) => {
   })
 }
 
-export const SubmitAnalsisiBio = async (form,user,token,limpiar,tabla) => {
+export const SubmitAnalsisiBio = async (form,user,token,limpiar,tabla,RefreshTable) => {
   if (!form.norden) {
     await Swal.fire('Error', 'Datos Incompletos','error')
     return
@@ -104,6 +104,7 @@ export const SubmitAnalsisiBio = async (form,user,token,limpiar,tabla) => {
         cancelButtonColor: "#d33",
       }).then((result) => {
         limpiar()
+        RefreshTable()
         if (result.isConfirmed) {
           PrintHojaR(form.norden,tabla,token)
         }

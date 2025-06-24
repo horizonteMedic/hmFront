@@ -14,9 +14,9 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
     fecha: today,
     nombres: '',
     edad: '',
-    valueM: '',
-    valueC: '',
-    metodo: 'METODO: INMUNOCROMATOGRAFICO',
+    valueM: 'NEGATIVO',
+    valueC: 'NEGATIVO',
+    metodo: 'INMUNOCROMATOGRAFICO',
     medico: ''
   });
   const [status, setStatus] = useState('');
@@ -38,10 +38,10 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
       fecha: today,
       nombres: '',
       edad: '',
-      valueM: '',
-      valueC: '',
+      valueM: 'NEGATIVO',
+      valueC: 'NEGATIVO',
       medico: '',
-      metodo: 'METODO: INMUNOCROMATOGRAFICO'
+      metodo: 'INMUNOCROMATOGRAFICO'
     });
   };
 
@@ -81,7 +81,6 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
               onKeyUp={(event) => {
                 if(event.key === 'Enter') {
                   VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-                  fechaRef.current?.focus();
                 }
               }}
               className="border rounded px-2 py-1 flex-1"
