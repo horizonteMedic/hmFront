@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Toxicologia/Panel2D/Resultado_Panel2D.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { PrintHojaR, SubmitPanel2D, VerifyTR } from './controller2D';
@@ -21,11 +21,16 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
   });
   const [status, setStatus] = useState('');
 
+  // Refs para navegación
+  const fechaRef = useRef(null);
+  const valueMRef = useRef(null);
+  const valueCRef = useRef(null);
+  const printRef = useRef(null);
+
   const handleChange = e => {
     const { name, value } = e.target;
     setForm(f => ({ ...f, [name]: value }));
   };
-
 
   const handleClear = () => {
     setForm({
@@ -73,7 +78,12 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
               name="norden"
               value={form.norden}
               onChange={handleChange}
-              onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
+              onKeyUp={(event) => {
+                if(event.key === 'Enter') {
+                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                  fechaRef.current?.focus();
+                }
+              }}
               className="border rounded px-2 py-1 flex-1"
             />
           </div>
@@ -85,6 +95,12 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
               value={form.fecha}
               onChange={handleChange}
               className="border rounded px-2 py-1 flex-1"
+              ref={fechaRef}
+              onKeyUp={e => {
+                if (e.key === 'Enter') {
+                  valueMRef.current?.focus();
+                }
+              }}
             />
           </div>
         </div>
@@ -121,22 +137,34 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
         </div>
         {/* Resultados */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div  className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <span className="flex-1 font-semibold">MARIHUANA (THC)</span>
               <input
                 name='valueM'
                 value={form.valueM}
                 onChange={handleChange}
                 className="border rounded px-2 py-1 w-40"
+                ref={valueMRef}
+                onKeyUp={e => {
+                  if (e.key === 'Enter') {
+                    valueCRef.current?.focus();
+                  }
+                }}
               />
             </div>
-            <div  className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <span className="flex-1 font-semibold">COCAINA (COC)</span>
               <input
                 name='valueC'
                 value={form.valueC}
                 onChange={handleChange}
                 className="border rounded px-2 py-1 w-40"
+                ref={valueCRef}
+                onKeyUp={e => {
+                  if (e.key === 'Enter') {
+                    printRef.current?.focus();
+                  }
+                }}
               />
             </div>
         </div>
@@ -168,7 +196,13 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
           <div className="flex flex-col items-end">
             <span className="font-bold italic">IMPRIMIR</span>
             <div className="flex items-center gap-2 mt-2">
-              <input name="norden" className="border rounded px-2 py-1 w-24" value={form.norden} onChange={handleChange} />
+              <input 
+                name="norden" 
+                className="border rounded px-2 py-1 w-24" 
+                value={form.norden} 
+                onChange={handleChange}
+                ref={printRef}
+              />
               <button
                 type="button"
                 onClick={handlePrint}

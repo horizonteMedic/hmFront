@@ -1,4 +1,4 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Toxicologia/Resultado_Panel3D/Rseultado_Resultado_Panel3D.jsx
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Toxicologia/Panel3D/Resultado_Panel3D.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
@@ -19,17 +19,17 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
     valueC: '',
     valueE: '',
     metodo: '',
-    
   });
-  const fechaRef = useRef(null);
 
-  // Si recibes initialData desde la API, ajusta aquí…
- 
+  // Refs para navegación
+  const fechaRef = useRef(null);
+  const valueCRef = useRef(null);
+  const valueMRef = useRef(null);
+  const valueERef = useRef(null);
+  const printRef = useRef(null);
 
   const handleChange = ({ name, value }) =>
     setForm(f => ({ ...f, [name]: value.toUpperCase() }));
-
- 
 
   const handleLimpiar = () => {
     setForm({
@@ -45,11 +45,6 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
   };
 
   const handleFechaFocus = e => e.target.showPicker?.();
-
-  const handleSave = async () => {
-    // Ejemplo de llamada API
-    
-  };
 
   const handlePrint = () => {
     if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
@@ -72,7 +67,6 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
     });
   };
 
-  // ancho dinámico para nombres
   const nameWidth = Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10));
 
   return (
@@ -87,7 +81,12 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
             name="norden"
             value={form.norden}
             onChange={e => handleChange(e.target)}
-            onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede)}}
+            onKeyUp={(event) => {
+              if(event.key === 'Enter') {
+                VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                fechaRef.current?.focus();
+              }
+            }}
             className="border rounded px-3 py-2 w-32"
           />
         </div>
@@ -101,6 +100,11 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
             className="border rounded px-3 py-2 w-40"
             ref={fechaRef}
             onFocus={handleFechaFocus}
+            onKeyUp={e => {
+              if (e.key === 'Enter') {
+                valueCRef.current?.focus();
+              }
+            }}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -147,6 +151,12 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
             className="border rounded px-3 py-2 w-40"
             value={form.valueC}
             onChange={e => handleChange(e.target)}
+            ref={valueCRef}
+            onKeyUp={e => {
+              if (e.key === 'Enter') {
+                valueMRef.current?.focus();
+              }
+            }}
           />
         <div className="flex items-center">MARIHUANA (THC)</div>
           <input
@@ -154,6 +164,12 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
             className="border rounded px-3 py-2 w-40"
             value={form.valueM}
             onChange={e => handleChange(e.target)}
+            ref={valueMRef}
+            onKeyUp={e => {
+              if (e.key === 'Enter') {
+                valueERef.current?.focus();
+              }
+            }}
           />
         <div className="flex items-center">EXTASIS (MDMA)</div>
           <input
@@ -161,6 +177,12 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
             className="border rounded px-3 py-2 w-40"
             value={form.valueE}
             onChange={e => handleChange(e.target)}
+            ref={valueERef}
+            onKeyUp={e => {
+              if (e.key === 'Enter') {
+                printRef.current?.focus();
+              }
+            }}
           />
       </div>
 
@@ -168,7 +190,13 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       <div className="flex flex-wrap items-center justify-end gap-4">
         <div className="flex items-center gap-2 mr-8">
           <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
-          <input className="border rounded px-3 py-2 w-28" name='norden' value={form.norden} onChange={e => handleChange(e.target)} />
+          <input 
+            className="border rounded px-3 py-2 w-28" 
+            name='norden' 
+            value={form.norden} 
+            onChange={e => handleChange(e.target)}
+            ref={printRef}
+          />
           <button onClick={handlePrint} type="button"
             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
             <FontAwesomeIcon icon={faPrint}/>
@@ -184,7 +212,7 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
         </button>
       </div>
     </form>
-);
+  );
 };
 
 export default Resultado_Panel3D;

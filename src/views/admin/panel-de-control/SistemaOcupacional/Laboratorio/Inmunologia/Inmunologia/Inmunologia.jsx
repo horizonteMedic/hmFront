@@ -28,7 +28,16 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
     medico: ''
   });
   
-  const fechaRef = useRef(null)
+  // Refs para cada campo
+  const fechaRef = useRef(null);
+  const tificoORef = useRef(null);
+  const tificoHRef = useRef(null);
+  const paratificoARef = useRef(null);
+  const paratificoBRef = useRef(null);
+  const brucellaRef = useRef(null);
+  const hepatitisARef = useRef(null);
+  const medicoRef = useRef(null);
+  const printRef = useRef(null);
 
   const handleFormChange = e => {
     const { name, value } = e.target;
@@ -121,6 +130,7 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
             if (e.key === 'Enter') {
               handleSeat()
               VerifyTR(form.norden,tabla,token,setForm, selectedSede)
+              fechaRef.current?.focus();
             }
           }}
         />
@@ -131,6 +141,11 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
           value={form.fecha}
           onChange={handleFormChange}
           inputRef={fechaRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              tificoORef.current?.focus();
+            }
+          }}
         />
       </div>
 
@@ -162,12 +177,12 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
         <div className="col-span-8"></div>
 
         {[
-          { name: 'tificoO', label: 'TIFICO O' },
-          { name: 'tificoH', label: 'TIFICO H' },
-          { name: 'paratificoA', label: 'PARATIFICO A' },
-          { name: 'paratificoB', label: 'PARATIFICO B' },
-          { name: 'brucella', label: 'Brucella abortus' },
-        ].map(({ name, label }) => (
+          { name: 'tificoO', label: 'TIFICO O', ref: tificoORef, nextRef: tificoHRef },
+          { name: 'tificoH', label: 'TIFICO H', ref: tificoHRef, nextRef: paratificoARef },
+          { name: 'paratificoA', label: 'PARATIFICO A', ref: paratificoARef, nextRef: paratificoBRef },
+          { name: 'paratificoB', label: 'PARATIFICO B', ref: paratificoBRef, nextRef: brucellaRef },
+          { name: 'brucella', label: 'Brucella abortus', ref: brucellaRef, nextRef: medicoRef },
+        ].map(({ name, label, ref, nextRef }) => (
           <React.Fragment key={name}>
             <div className="col-span-2 flex items-center">{label}</div>
             <div className="col-span-2">
@@ -176,6 +191,12 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
                 className="border rounded px-2 py-1 w-full"
                 value={form[name]}
                 onChange={handleFormChange}
+                ref={ref}
+                onKeyUp={e => {
+                  if (e.key === 'Enter' && nextRef) {
+                    nextRef.current?.focus();
+                  }
+                }}
               />
             </div>
             <div className="col-span-8"></div>
@@ -188,7 +209,12 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
           <Checkbox
             label={<span className="font-bold">PRUEBA HEPATITIS</span>}
             checked={form.hepatitis}
-            onChange={v => setForm(f => ({ ...f, hepatitis: v, hepatitisA: '' }))}
+            onChange={v => {
+              setForm(f => ({ ...f, hepatitis: v, hepatitisA: '' }));
+              if (v) {
+                setTimeout(() => hepatitisARef.current?.focus(), 0);
+              }
+            }}
           />
         </div>
         <div className="col-span-4 flex items-center">
@@ -200,6 +226,12 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
               onChange={handleFormChange}
               placeholder="Prueba Rápida HEPATITIS A"
               disabled={!form.hepatitis}
+              ref={hepatitisARef}
+              onKeyUp={e => {
+                if (e.key === 'Enter') {
+                  medicoRef.current?.focus();
+                }
+              }}
             />
           )}
         </div>
@@ -215,6 +247,12 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
           name="medico"
           value={form.medico}
           onChange={handleFormChange}
+          ref={medicoRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              printRef.current?.focus();
+            }
+          }}
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
@@ -237,6 +275,7 @@ export default function Inmunologia({ token, selectedSede, userlogued }) {
               value={form.norden}
               onChange={handleFormChange}
               className="border rounded px-2 py-1 w-24"
+              ref={printRef}
             />
             <ActionButton color="blue" icon={faPrint} onClick={handlePrint} />
           </div>
