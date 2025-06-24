@@ -277,7 +277,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
               value={form.printValue}
               onChange={handleInputChange}
               placeholder="Código..."
-              className="border rounded p-1 w-full flex-grow"
+              className="border rounded p-1 w-32"
             />
             <button onClick={handlePrint}>
               <FontAwesomeIcon icon={faPrint} className="text-2xl text-blue-700" />
