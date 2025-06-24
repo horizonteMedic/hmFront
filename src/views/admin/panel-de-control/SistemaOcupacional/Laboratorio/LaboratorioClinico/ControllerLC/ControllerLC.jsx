@@ -79,7 +79,7 @@ export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedic
         responsable: res.resLab,
         empContratista: res.contrata,
         grupo: res.chka ? 'A' : res.chkab ? 'AB' : res.chkb ? 'B' : res.chko ? 'O' : '',
-        rh: res.rbrhnegativo ? '-' : '+',
+        rh: res.rbrhpositivo ? 'Rh(+)' : 'Rh(-)',
         //HEMATOLOGIA
         hemoglobina: res.txtHemoglobina,
         hematocrito: res.txtHematocrito,
