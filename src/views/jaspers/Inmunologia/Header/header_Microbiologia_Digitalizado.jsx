@@ -50,28 +50,32 @@ const headerMicrobiologiaDigitalizado = (doc, datos = {}) => {
   doc.line(valueX, nroOrdenY + 1.5, valueX + nordenWidth, nroOrdenY + 1.5);
   
   // --- Datos del paciente (Segundo bloque, más abajo) ---
-  let patientDataY = y + 20;
+  let patientDataY = y + 35;
+  const patientDataX = margin;
 
   // --- Apellidos y Nombres ---
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text("Apellidos y Nombres :", labelEndX, patientDataY, { align: 'right' });
+  doc.text("Apellidos y Nombres :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.nombres || '').toUpperCase(), valueX, patientDataY);
+  const labelWidthNombres = doc.getTextWidth("Apellidos y Nombres :");
+  doc.text(String(datos.nombres || '').toUpperCase(), patientDataX + labelWidthNombres + 2, patientDataY);
   patientDataY += lineHeight;
   
   // --- Edad ---
   doc.setFont('helvetica', 'bold');
-  doc.text("Edad :", labelEndX, patientDataY, { align: 'right' });
+  doc.text("Edad :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.edad ? `${datos.edad} AÑOS` : ''), valueX, patientDataY);
+  const labelWidthEdad = doc.getTextWidth("Edad :");
+  doc.text(String(datos.edad ? `${datos.edad} AÑOS` : ''), patientDataX + labelWidthEdad + 2, patientDataY);
   patientDataY += lineHeight;
 
   // --- Fecha ---
   doc.setFont('helvetica', 'bold');
-  doc.text("Fecha :", labelEndX, patientDataY, { align: 'right' });
+  doc.text("Fecha :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.fecha), valueX, patientDataY);
+  const labelWidthFecha = doc.getTextWidth("Fecha :");
+  doc.text(String(datos.fecha), patientDataX + labelWidthFecha + 2, patientDataY);
   
   // Reseteo de estilos para no afectar el resto del documento
   doc.setFont('helvetica', 'normal');

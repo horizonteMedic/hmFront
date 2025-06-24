@@ -41,7 +41,7 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   doc.setFontSize(10)
   doc.setFont(undefined, 'normal')
   const patientDataY = 55
-  const patientDataX = 20
+  const patientDataX = 15
   const labelWidth = 45;
 
   const field = (label, value, y) => {

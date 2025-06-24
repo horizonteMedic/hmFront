@@ -48,7 +48,7 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
   // 3. Bloque de datos del paciente
   y = 40; 
   const lineHeight = 6;
-  const patientDataX = margin + 80;
+  const patientDataX = margin;
   
   const drawPatientDataRow = (label, value) => {
     doc.setFontSize(11).setFont('helvetica', 'bold');

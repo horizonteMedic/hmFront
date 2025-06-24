@@ -144,12 +144,15 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   // Función para setear todos los campos de Hematología a 'N/A' o restaurar
   const handleHematologiaNA = (checked) => {
     setHematologiaNA(checked);
+    const value = checked ? 'N/A' : '';
+    setForm(prev => {
+      const newFields = {};
+      hematologiaKeys.forEach(k => { newFields[k] = value; });
+      return { ...prev, ...newFields };
+    });
     if (checked) {
-      setForm(prev => {
-        const newFields = {};
-        hematologiaKeys.forEach(k => { newFields[k] = 'N/A'; });
-        return { ...prev, ...newFields };
-      });
+      setField('grupo', '');
+      setField('rh', '');
     }
   };
 
@@ -322,14 +325,14 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                     <label className="w-24 font-semibold">Glucosa :</label>
                     <input name="glucosa" value={form.glucosa} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.glucosaNA}/>
                     <span className="w-12">mg/dl</span>
-                    <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => setField('glucosaNA', v)} />
+                    <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => { setField('glucosaNA', v); setField('glucosa', v ? 'N/A' : ''); }} />
                     <span className="ml-4 text-md">Valores normales 70 - 110 mg/dl</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <label className="w-24 font-semibold">Creatinina :</label>
                     <input name="creatinina" value={form.creatinina} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.creatininaNA}/>
                     <span className="w-12">mg/dl</span>
-                    <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => setField('creatininaNA', v)} />
+                    <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => { setField('creatininaNA', v); setField('creatinina', v ? 'N/A' : ''); }} />
                     <span className="ml-4 text-md">Valores normales 0.8 - 1.4 mg/dl</span>
                 </div>
                 </div>
@@ -347,7 +350,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <div className="flex items-center gap-2 justify-center">
                             <Checkbox label="+" checked={form.rpr === 'POSITIVO'} onChange={() => { setField('rpr', 'POSITIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
                             <Checkbox label="-" checked={form.rpr === 'NEGATIVO'} onChange={() => { setField('rpr', 'NEGATIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
-                            <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); if (v) setField('rpr', ''); }} />
+                            <Checkbox label="N/A" checked={form.rprNA} onChange={v => { setField('rprNA', v); setField('rpr', v ? 'N/A' : ''); }} />
                         </div>
                     </div>
                     <div className="pl-4 space-y-1">
@@ -358,7 +361,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <div className="flex items-center gap-2 justify-center">
                             <Checkbox label="+" checked={form.vih === 'POSITIVO'} onChange={() => { setField('vih', 'POSITIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
                             <Checkbox label="-" checked={form.vih === 'NEGATIVO'} onChange={() => { setField('vih', 'NEGATIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
-                            <Checkbox label="N/A" checked={form.vihNA} onChange={v => { setField('vihNA', v); if(v) setField('vih', ''); }} />
+                            <Checkbox label="N/A" checked={form.vihNA} onChange={v => { setField('vihNA', v); setField('vih', v ? 'N/A' : ''); }} />
                         </div>
                     </div>
                 </div>

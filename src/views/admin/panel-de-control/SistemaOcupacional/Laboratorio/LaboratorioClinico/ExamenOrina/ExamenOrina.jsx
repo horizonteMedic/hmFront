@@ -271,16 +271,16 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
         <fieldset className="border p-2 rounded">
           <legend className="px-1 font-semibold">Imprimir</legend>
           <div className="flex items-center gap-2">
-            <label className="font-medium">Nro Orden</label>
+            <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
             <input
               name="printValue"
               value={form.printValue}
               onChange={handleInputChange}
-              placeholder="Código..."
-              className="border rounded p-1 w-32"
+              className="border rounded px-3 py-2 w-28"
             />
-            <button onClick={handlePrint}>
-              <FontAwesomeIcon icon={faPrint} className="text-2xl text-blue-700" />
+            <button onClick={handlePrint}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              <FontAwesomeIcon icon={faPrint}/>
             </button>
           </div>
         </fieldset>

@@ -60,8 +60,8 @@ const header_InmunologiaLab_Digitalizado = (doc, datos = {}) => {
   y += lineHeight;
 
   // --- Datos del paciente ---
-  y += 5;
-  const patientDataX = margin + 80;
+  y += 20;
+  const patientDataX = margin;
   
   const drawPatientDataRow = (label, value) => {
     doc.setFontSize(11).setFont('helvetica', 'bold');
