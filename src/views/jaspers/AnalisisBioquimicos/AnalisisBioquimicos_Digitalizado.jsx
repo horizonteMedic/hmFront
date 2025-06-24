@@ -158,7 +158,7 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
 
       // Posicionar la imagen con el centro en (sigX + 120, sigY + 35)
       const imgX = sigX + 120 - imgW / 2;
-      const imgY = sigY + 35 - imgH / 2;
+      const imgY = sigY + 15 - imgH / 2;
 
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }

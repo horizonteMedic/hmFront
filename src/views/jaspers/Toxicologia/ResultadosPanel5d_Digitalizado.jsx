@@ -36,7 +36,7 @@ const drawResultRow = (doc, y, label, result, units) => {
 
 // --- Componente Principal ---
 
-export default function Panel5d_Digitalizado(datos = {}) {
+export default function ResultadosPanel5d_Digitalizado(datos = {}) {
   const doc = new jsPDF();
   const pageW = doc.internal.pageSize.getWidth();
 
