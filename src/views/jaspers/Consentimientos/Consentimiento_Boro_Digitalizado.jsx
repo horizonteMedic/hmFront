@@ -372,7 +372,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       const selloBase64 = canvas.toDataURL('image/png');
       doc.addImage(selloBase64, 'PNG', selloX, selloY, selloW, selloH);
     }
-
+    footer(doc, datos);
     // Mostrar PDF
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
