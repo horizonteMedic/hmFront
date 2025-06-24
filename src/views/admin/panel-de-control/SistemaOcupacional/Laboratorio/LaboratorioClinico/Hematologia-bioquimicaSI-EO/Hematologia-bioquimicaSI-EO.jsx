@@ -22,6 +22,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
     setForm({
       ficha: true,
       norden: '',
+      fecha: today,
       responsable: '',
       paciente: '',
       empContratista: '',
@@ -86,27 +87,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
     setField('gfSangPedido', `${grupo} ${rh}`.trim());
   }, [form.grupo, form.rh]);
 
-  useEffect(() => {
-    const isNA = form.empresaNA;
-    const value = isNA ? 'N/A' : '';
-    const fieldsToUpdate = {
-      hemoglobina: value,
-      hematocrito: value,
-      vsg: value,
-      leucocitos: value,
-      hematies: value,
-      plaquetas: value,
-      linfocitos: value,
-      neutrofilos: value,
-      abastonados: value,
-      segmentados: value,
-      monocitos: value,
-      eosinofilos: value,
-      basofilos: value
-    };
-    setForm(prev => ({...prev, ...fieldsToUpdate}));
-  }, [form.empresaNA]);
-
+  
   //AUTOCOMPLETAR DEL DOC
   const [searchMedico, setSearchMedico]  = useState(form.responsable);
   const [filteredMedicos, setFilteredMedicos] = useState([]);
@@ -213,8 +194,51 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
       {/* Contenido principal */}
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1 bg-white p-4 rounded shadow font-sans text-md">
+          
             {/* Top general section */}
             <div className="space-y-1">
+              <div className="flex items-center gap-x-4">
+                <label className="font-medium mb-1">Responsable Lab<span className="text-sm ml-1"></span></label>
+                <div className="flex items-center gap-2 relative w-full">
+                  <input
+                    type='text'
+                    autoComplete='off'
+                    name='responsable'
+                    value={searchMedico}
+                    onChange={handleMedicoSearch}
+                    className={`border rounded px-2 py-1 flex-1 w-full  bg-gray-100}`}
+                    onKeyUp={e => {
+                      if (e.key === 'Enter' && filteredMedicos.length > 0) {
+                        e.preventDefault();
+                        handleSelectMedico(filteredMedicos[0]);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchMedico) {
+                        setFilteredMedicos(
+                          listDoc.filter(m =>
+                            m.toLowerCase().includes(searchMedico.toLowerCase())
+                          )
+                        );
+                      }
+                    }}
+                    onBlur={() => setTimeout(() => setFilteredMedicos([]), 100)}
+                  />
+                  {searchMedico && filteredMedicos.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredMedicos.map(m => (
+                        <li
+                          key={m}
+                          className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg"
+                          onMouseDown={() => handleSelectMedico(m)}
+                        >
+                          {m}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center flex-1">
                         <label className="w-28 font-semibold shrink-0">Nombres :</label>
