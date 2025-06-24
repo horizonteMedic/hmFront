@@ -54,6 +54,9 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
       img.onload = () => res(img);
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
+
+  let y = 75;
+
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
@@ -190,7 +193,4 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
       iframe.contentWindow.print();
     };
   })
-  let y = 65; 
-
-  
 } 

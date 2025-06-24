@@ -60,7 +60,7 @@ export default function LGonadotropina_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 65; 
+    let y = 80; 
 
     // === TÍTULO ===
     drawUnderlinedTitle(doc, 'INMUNOLOGÍA', y);

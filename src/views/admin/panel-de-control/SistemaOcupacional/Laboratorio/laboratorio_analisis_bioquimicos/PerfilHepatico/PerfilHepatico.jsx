@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/PerfilHepatico.jsx
-import React, { useReducer, useCallback, useState } from 'react'
+import React, { useReducer, useCallback, useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -42,6 +42,9 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
     printCount: '',
     medico: ''
   })
+  
+  // Refs para inputs de pruebas
+  const testRefs = useRef(testFields.map(() => React.createRef()));
   
   const handleFormChange = e => {
     const { name, value } = e.target;
@@ -167,7 +170,7 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
         <div className="col-span-2 font-bold text-center mb-2">PRUEBAS</div>
         <div className="col-span-3 font-bold text-center mb-2">RESULTADOS</div>
 
-        {testFields.map(({ label, name }) => (
+        {testFields.map(({ label, name }, idx, arr) => (
           <React.Fragment key={name}>
             <label className="col-span-2 font-semibold text-right">{label}</label>
             <div className="col-span-3">
@@ -176,6 +179,15 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
                 value={form[name]}
                 onChange={handleFormChange}
                 className="border rounded px-2 py-1 w-full"
+                ref={testRefs.current[idx]}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (idx < arr.length - 1) {
+                      testRefs.current[idx + 1].current && testRefs.current[idx + 1].current.focus();
+                    }
+                  }
+                }}
               />
             </div>
           </React.Fragment>
@@ -192,6 +204,7 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
           className="border rounded px-2 py-1 min-w-[220px]"
           value={form.medico || ''}
           onChange={handleFormChange}
+          disabled
         >
           <option value="">Seleccionar medico</option>
           <option value="medico1">Dr. Juan Pérez</option>
