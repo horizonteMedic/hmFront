@@ -141,7 +141,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
     {
       label: 'Examen de Orina',
       icon: faTint,
-      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm}/>
+      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm}/>
     },
     {
       label: 'Hematograma',

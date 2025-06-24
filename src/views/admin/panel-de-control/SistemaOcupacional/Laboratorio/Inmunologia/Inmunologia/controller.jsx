@@ -74,7 +74,7 @@ export const GetInfoInmunologiaLab = (nro,tabla,set,token) => {
       set(prev => ({
         ...prev,
         ...res,
-        fecha: res.fechaExamen,
+        fecha: res.fecha,
         tificoO: res.txtTificoO,
         tificoH: res.txtTificoH,
         paratificoA: res.txtParatificoA,

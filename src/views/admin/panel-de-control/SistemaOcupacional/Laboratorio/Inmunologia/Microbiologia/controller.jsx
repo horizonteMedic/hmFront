@@ -75,7 +75,8 @@ export const GetInfoMicrobio = (nro,tabla,set,token) => {
       set(prev => ({
         ...prev,
         ...res,
-        fecha: res.fechaExamen,
+        fecha: res.fecha,
+        examenDirecto: res.txtKoh ? true : false,
         bk1: res.txtMuestra1,
         bk2: res.txtMuestra2,
         koh: res.txtKoh

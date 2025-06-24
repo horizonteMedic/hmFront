@@ -2,8 +2,8 @@
 import React, { useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPrint, faSave, faBroom } from '@fortawesome/free-solid-svg-icons'
-import { SubmitHematologiaLabCLinico } from '../ControllerLC/ControllerLC'
-
+import { PrintHojaR, SubmitHematologiaLabCLinico } from '../ControllerLC/ControllerLC'
+import Swal from 'sweetalert2'
 const physicalLabels  = ['Incoloro','Medicamentosa','Transparente','Turbio','No Aplica']
 const chemicalLabels  = ['Nitritos','Proteínas','Cetonas','LeucocitosQ','AcAscorbico','Urobilinogeno','Bilirrubina','GlucosaQ','Sangre']
 const sedimentLabels  = ['LeucocitosS', 'Hematies', 'CelEpiteliales', 'Cristales', 'Cilindros', 'Bacterias', 'GramSC', 'Otros']
@@ -55,7 +55,7 @@ const initialForm = {
   printValue: ''
 }
 
-export default function ExamenOrina({token, selectedSede, userlogued, form, setForm, formH, ClearForm}) {
+export default function ExamenOrina({token, selectedSede, userlogued, form, setForm, formH, ClearForm, setFormH}) {
 
   // Refs para inputs de Examen Químico, Sedimento y Drogas
   const chemicalRefs = chemicalLabels.map(() => useRef());
@@ -73,13 +73,27 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
 
   const handleClear = () => {
     ClearForm()
-    setForm(initialForm)}
+  }
   
   const handlePrint = () => {
-    window.open(
-      `/api/orina/print/${form.printValue}`,
-      '_blank'
-    )
+    if (!formH.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Laboratorio Clinico?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${formH.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(formH.norden,token);
+      }
+    });
   }
 
   // Nueva función para manejar radios de drogas
@@ -273,9 +287,9 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
           <div className="flex items-center gap-2">
             <span className="font-semibold text-blue-900 italic">IMPRIMIR</span>
             <input
-              name="printValue"
-              value={form.printValue}
-              onChange={handleInputChange}
+              name="norden"
+              value={formH.norden}
+              onChange={(e) => {setFormH(prev => ({...prev, norden: e.target.value}))}}
               className="border rounded px-3 py-2 w-28"
             />
             <button onClick={handlePrint}
