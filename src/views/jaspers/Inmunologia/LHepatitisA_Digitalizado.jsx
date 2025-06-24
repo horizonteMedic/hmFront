@@ -1,14 +1,49 @@
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-import header from "../components/header";
-import footer from "../components/footer";
 import headerHepatitisDigitalizado from "./Header/header_Hepatitis_Digitalizado";
+import footer from "../components/footer";
 
-export default function LHepatitisB_Digitalizado(datos) {
+// --- Configuración Centralizada (Estándar) ---
+const config = {
+  margin: 15,
+  fontSize: {
+    title: 14,
+    header: 11,
+    body: 11,
+  },
+  font: 'helvetica',
+  lineHeight: 8,
+};
+
+// --- Funciones de Ayuda (Estándar) ---
+
+const drawUnderlinedTitle = (doc, text, y) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+  doc.text(text, pageW / 2, y, { align: "center" });
+  const textWidth = doc.getTextWidth(text);
+  const x = (pageW - textWidth) / 2;
+  doc.setLineWidth(0.5);
+  doc.line(x, y + 1.5, x + textWidth, y + 1.5);
+  doc.setLineWidth(0.2); // Reset
+};
+
+const drawResultRow = (doc, y, label, value) => {
+  const pageW = doc.internal.pageSize.getWidth();
+  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
+  doc.text(label, config.margin, y);
+  doc.text(value, pageW - config.margin, y, { align: "right" });
+  return y + config.lineHeight;
+};
+
+// --- Componente Principal ---
+
+export default function LHepatitisA_Digitalizado(datos = {}) {
   const doc = new jsPDF();
-  
-  headerHepatitisDigitalizado(doc, datos)
-   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const pageW = doc.internal.pageSize.getWidth();
+
+  // === HEADER ===
+  headerHepatitisDigitalizado(doc, datos);
+const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro";
   const loadImg = src =>
@@ -24,49 +59,44 @@ export default function LHepatitisB_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 58;
 
-  // Título principal
-  doc.setFont(undefined, 'bold');
-  doc.setFontSize(14);
-  doc.text('INMUNOLOGÍA', 105, y, { align: 'center' });
-  doc.setFontSize(11);
+    // === TÍTULO ===
+    drawUnderlinedTitle(doc, 'INMUNOLOGÍA', y);
+    y += config.lineHeight * 2;
+    
+    // === MUESTRA Y MÉTODO ===
+    doc.setFontSize(config.fontSize.header);
+    doc.setFont(config.font, 'bold');
+    doc.text('MUESTRA :', config.margin, y);
+    doc.setFont(config.font, 'normal');
+    doc.text('SUERO', config.margin + 30, y);
+    y += config.lineHeight;
 
-  // Muestra y método
-  y += 8;
-  autoTable(doc, {
-    startY: y,
-    body: [
-      [{ content: 'MUESTRA : SUERO', styles: { fontStyle: 'bold' } }],
-      [{ content: 'MÉTODO : INMUNOENSA... CROMATOGRÁFICO', styles: { fontStyle: 'bold' } }]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 11, cellPadding: 1 },
-    margin: { left: 15, right: 15 },
-    tableWidth: 180
-  });
+    doc.setFont(config.font, 'bold');
+    doc.text('MÉTODO :', config.margin, y);
+    doc.setFont(config.font, 'normal');
+    doc.text('INMUNOENSAYO CROMATOGRÁFICO', config.margin + 30, y);
+    y += config.lineHeight * 2;
 
-  // Tabla de resultado
-  autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 2,
-    head: [[
-      { content: 'PRUEBA CUALITATIVO', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'RESULTADO', styles: { halign: 'center', fontStyle: 'bold' } }
-    ]],
-    body: [
-      [
-        `HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`,
-        datos.txtHepatitisb || ''
-      ]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 11, cellPadding: 2 },
-    margin: { left: 15, right: 15 },
-    tableWidth: 180
-  });
+    // === ENCABEZADO DE TABLA ===
+    doc.setFont(config.font, 'bold');
+    doc.text('PRUEBA CUALITATIVO', config.margin, y);
+    doc.text('RESULTADO', pageW - config.margin, y, { align: 'right' });
+    
+    y += 3;
+    doc.setLineWidth(0.3);
+    doc.line(config.margin, y, pageW - config.margin, y);
+    y += config.lineHeight;
 
-  // Recuadros de imagen
-  if (s1) {
+    // === CUERPO DE TABLA ===
+    // Nota: Se usa 'hepatitisb' de los datos, que corresponde a "HEPATITIS B (HBsAg)".
+    drawResultRow(
+      doc,
+      y,
+      'HEPATITIS A (HBsAg) - RAPID TEST - MONTEST',
+      datos.txtHepatitisa || ''
+    );
+    if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
@@ -145,19 +175,22 @@ export default function LHepatitisB_Digitalizado(datos) {
 
       // Actualiza Y si después quieres seguir dibujando debajo
     }
-  footer(doc, datos);
+    // === FOOTER ===
+    footer(doc, datos);
 
-  // Mostrar PDF
-  const pdfBlob = doc.output("blob");
-  const pdfUrl = URL.createObjectURL(pdfBlob);
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.src = pdfUrl;
-  document.body.appendChild(iframe);
-  iframe.onload = function () {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
+    // === IMPRIMIR ===
+    const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = pdfUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = function () {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
   })
+  let y = 65; 
+
   
 } 

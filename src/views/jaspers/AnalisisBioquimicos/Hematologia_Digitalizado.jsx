@@ -2,12 +2,28 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import header from "../components/header";
 import footer from "../components/footer";
+import Header_HematologiaBioquimica from "./Header/Header_HematologiaBioquimica ";
 
 export default function Hematologia_Digitalizado(datos) {
   const doc = new jsPDF();
   header(doc, datos);
+  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+  const isValidUrl = url => url && url !== "Sin registro";
+  const loadImg = src =>
+    new Promise((res, rej) => {
+      const img = new Image();
+      img.src = src;
+      img.crossOrigin = 'anonymous';
+      img.onload = () => res(img);
+      img.onerror = () => rej(`No se pudo cargar ${src}`);
+    });
+  Promise.all([
+    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
+    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
+  ]).then(([s1, s2]) => {
 
-  let y = 58;
+    let y = 58;
 
   // Título principal
   doc.setFont(undefined, 'bold');
@@ -26,25 +42,25 @@ export default function Hematologia_Digitalizado(datos) {
     body: [
       [
         { content: 'HEMOGLOBINA', styles: { fontStyle: 'bold' } },
-        datos.txthemoglobina || '',
+        datos.txtHemoglobina || '',
         'Mujeres 12 - 16 g/dL\nHombres 14 - 18 g/dL'
       ],
       [
         { content: 'HEMATOCRITO', styles: { fontStyle: 'bold' } },
-        datos.txthematocrito || '',
+        datos.txtHematocrito || '',
         'Mujeres 38 - 50 %\nHombres 40 - 54 %'
       ],
       [
         { content: 'HEMATÍES', styles: { fontStyle: 'bold' } },
-        datos.txthematies || '',
+        datos.txtHematies || '',
         '4.0 - 5.5 x 10^6/mm³'
       ],
-      ['Volumen Corpuscular Medio', datos.txtvolumen || '', '80 - 100 fL'],
-      ['Hemoglobina Corpuscular Media', datos.txthemocorpuscular || '', '26 - 34 pg'],
-      ['Concentración de la Hemoglobina Corpuscular Media', datos.txtconcentracion || '', '31 - 37  g/dl'],
+      ['Volumen Corpuscular Medio', datos.txtVolumen || '', '80 - 100 fL'],
+      ['Hemoglobina Corpuscular Media', datos.txtHemocorpuscular || '', '26 - 34 pg'],
+      ['Concentración de la Hemoglobina Corpuscular Media', datos.txtConcentracion || '', '31 - 37  g/dl'],
       [
         { content: 'LEUCOCITOS', styles: { fontStyle: 'bold' } },
-        datos.txtleucocitos || '',
+        datos.txtLeucocitos || '',
         '4 - 10 x 10^3/mm³'
       ],
       [
@@ -54,42 +70,42 @@ export default function Hematologia_Digitalizado(datos) {
       ],
       [
         { content: 'NEUTRÓFILOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtneutrofilos || '',
+        datos.txtNeutrofilos || '',
         '55-65 %'
       ],
       [
         { content: 'ABASTONADOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtabastonados || '',
+        datos.txtAbastonados || '',
         '0 - 5 %'
       ],
       [
         { content: 'SEGMENTADOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtsegmentados || '',
+        datos.txtSegmentados || '',
         '55 - 65 %'
       ],
       [
         { content: 'MONOCITOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtmonocitos || '',
+        datos.txtMonocitos || '',
         '4 - 8 %'
       ],
       [
         { content: 'EOSINÓFILOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txteosinofilos || '',
+        datos.txtEosinofios || '',
         '0 - 4 %'
       ],
       [
         { content: 'BASÓFILOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtbasofilos || '',
+        datos.txtBasofilos || '',
         '0 - 1 %'
       ],
       [
         { content: 'LINFOCITOS (%)', styles: { fontStyle: 'bold' } },
-        datos.txtlinfocitos || '',
+        datos.txtLinfocitos || '',
         '20 - 40 %'
       ],
       [
         { content: 'PLAQUETAS', styles: { fontStyle: 'bold' } },
-        datos.txtplaquetas || '',
+        datos.txtPlaquetas || '',
         '1.5 - 4.5 x 10^5/mm³'
       ],
     ],
@@ -105,6 +121,85 @@ export default function Hematologia_Digitalizado(datos) {
     tableWidth: 180,
     didDrawPage: () => {}
   });
+  if (s1) {
+        const canvas = document.createElement('canvas');
+        canvas.width = s1.width;
+        canvas.height = s1.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(s1, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+
+        // Dimensiones del área del sello
+        const sigW = 70;
+        const sigH = 35;
+        const sigX = 80; // o cualquier X deseado
+        const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
+
+        // Tamaño máximo dentro del área
+        const maxImgW = sigW - 10;
+        const maxImgH = sigH - 10;
+
+        let imgW = s1.width;
+        let imgH = s1.height;
+
+        const scaleW = maxImgW / imgW;
+        const scaleH = maxImgH / imgH;
+        const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+
+        imgW *= scale;
+        imgH *= scale;
+
+        // Centramos dentro del rectángulo
+        const imgX = sigX + (sigW - imgW) / 2;
+        const imgY = sigY + (sigH - imgH) / 2;
+
+        // Dibujar el borde si quieres
+
+        // Insertar la imagen del sello
+        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+
+        // Actualiza Y si después quieres seguir dibujando debajo
+      }
+
+      if (s2) {
+        const canvas = document.createElement('canvas');
+        canvas.width = s2.width;
+        canvas.height = s2.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(s2, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+
+        // Dimensiones del área del sello
+        const sigW = 70;
+        const sigH = 35;
+        const sigX = 130; // o cualquier X deseado
+        const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
+
+        // Tamaño máximo dentro del área
+        const maxImgW = sigW - 10;
+        const maxImgH = sigH - 10;
+
+        let imgW = s2.width;
+        let imgH = s2.height;
+
+        const scaleW = maxImgW / imgW;
+        const scaleH = maxImgH / imgH;
+        const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+
+        imgW *= scale;
+        imgH *= scale;
+
+        // Centramos dentro del rectángulo
+        const imgX = sigX + (sigW - imgW) / 2;
+        const imgY = sigY + (sigH - imgH) / 2;
+
+        // Dibujar el borde si quieres
+
+        // Insertar la imagen del sello
+        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+
+        // Actualiza Y si después quieres seguir dibujando debajo
+      }
 
   footer(doc, datos);
 
@@ -119,4 +214,6 @@ export default function Hematologia_Digitalizado(datos) {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
   };
+  })
+  
 } 
