@@ -55,7 +55,7 @@ const initialForm = {
   printValue: ''
 }
 
-export default function ExamenOrina({token, selectedSede, userlogued, form, setForm, formH, ClearForm, setFormH}) {
+export default function ExamenOrina({token, selectedSede, userlogued, form, setForm, formH, ClearForm, setFormH, ClearFormO}) {
 
   // Refs para inputs de Examen Químico, Sedimento y Drogas
   const chemicalRefs = chemicalLabels.map(() => useRef());
@@ -73,6 +73,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
 
   const handleClear = () => {
     ClearForm()
+    ClearFormO()
   }
   
   const handlePrint = () => {

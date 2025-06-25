@@ -188,7 +188,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     doc.setFont("helvetica", "normal");
       const sedL = [
       { label: "Cel. Epiteliales",    key: "txtCelEpitelialesSu" },
-      { label: "Leucocitos",          key: "txtCelEpitelialesSu" },
+      { label: "Leucocitos",          key: "txtLeucocitosSu" },
       { label: "Hematíes",            key: "txtHematiesSu" },
       { label: "Cristales",           key: "txtCristalesSu" },
     ];

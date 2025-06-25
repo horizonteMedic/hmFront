@@ -96,7 +96,7 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
     drawResultRow(
       doc,
       y,
-      'HEPATITIS A (HBsAg) - RAPID TEST - MONTEST',
+      'HEPATITIS A (HAV) - RAPID TEST - MONTEST',
       datos.txtHepatitisa || ''
     );
     if (s1) {

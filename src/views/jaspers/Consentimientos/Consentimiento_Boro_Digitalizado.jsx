@@ -286,13 +286,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     // Fecha del examen en la parte inferior
     y += 10;
     doc.setFont('helvetica', 'normal');
-    if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = String(f.getDate()).padStart(2, '0');
-      const mes = String(f.getMonth() + 1).padStart(2, '0');
-      const anio = f.getFullYear();
-      doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align: 'right' });
-    }
+    
     y += 2;
 
     // Más espacio antes de la firma y huella

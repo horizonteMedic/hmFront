@@ -85,10 +85,9 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
 
   const handleClear = () => {
     setForm({
-      examType: 'ficha', norden: '', medico: '', paciente: '', fecha: today,
+      examType: 'ficha', norden: '', paciente: '', fecha: today,
       creatinina: '', colesterolTotal: '', ldl: '', hdl: '', vldl: '', trigliceridos: ''
     })
-    setSearchMedico("")
   }
 
   // Debounce para evitar demasiadas llamadas

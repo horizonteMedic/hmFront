@@ -147,7 +147,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
         ['CONSUME COCAÍNA ', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})`, datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${datos.fechaConsumeCocacina}` : ''],
         ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})`, datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${datos.fechaConsumoHojaCoca}` : ''],
         ['CONSUME ANFETAMINAS ', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${datos.fechaConsumeAnfetamina}` : ''],
-        ['CONSUME METANFETAMINAS ', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeOpiacesos ? `Cuando: ${datos.fechaConsumeOpiacesos}` : ''],
+        ['CONSUME METANFETAMINAS ', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${datos.fechaConsumeMethanfetamina}` : ''],
         ['CONSUME BENZODIAZEPINAS', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})`, datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${datos.fechaConsumeBenzodiacepinas}` : ''],
       ],
       theme: 'plain',

@@ -131,6 +131,53 @@ const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
       vihPos: false
     });
   }
+  const ClearFormO = () => {
+    setFormO({
+      Incoloro: false,
+    Medicamentosa: false,
+    Transparente: false,
+    Turbio: false,
+    NoAplica: false,
+    Color: '',
+    Aspecto: 'N/A',
+    Densidad: '',
+    PH: '',
+    // Examen Químico
+    Nitritos: 'NEGATIVO',
+    Proteínas: 'NEGATIVO',
+    Cetonas: 'NEGATIVO',
+    LeucocitosQ: 'NEGATIVO',
+    AcAscorbico: 'NEGATIVO',
+    Urobilinogeno: 'NEGATIVO',
+    Bilirrubina: 'NEGATIVO',
+    GlucosaQ: 'NEGATIVO',
+    Sangre: 'NEGATIVO',
+    // Sedimento
+    LeucocitosS: '',
+    Hematies: '',
+    CelEpiteliales: '',
+    Cristales: '',
+    Cilindros: '',
+    Bacterias: '',
+    GramSC: '',
+    Otros: '',
+    // Drogas
+    Cocaina: '',
+    Marihuana: '',
+    ScreeningPos: false,
+    ScreeningNeg: false,
+    ScreeningNA: false,
+    ConfirmPos: false,
+    ConfirmNeg: false,
+    ConfirmNA: false,
+    // Observaciones
+    observaciones: '',
+    // Imprimir
+    printOrden: false,
+    printRecibo: false,
+    printValue: ''
+    })
+  }
 
   const tabs = [
     {
@@ -141,7 +188,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
     {
       label: 'Examen de Orina',
       icon: faTint,
-      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm}/>
+      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO}/>
     },
     {
       label: 'Hematograma',

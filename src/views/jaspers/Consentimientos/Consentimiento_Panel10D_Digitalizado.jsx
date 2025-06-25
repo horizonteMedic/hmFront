@@ -171,8 +171,8 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           'CONSUME METANFETAMINAS (MET)',
           `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`,
           `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`,
-          datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeOpiacesos
-            ? `Cuando: ${datos.fechaConsumeOpiacesos}`
+          datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina
+            ? `Cuando: ${datos.fechaConsumeMethanfetamina}`
             : ''
         ],
         [

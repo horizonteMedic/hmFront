@@ -143,7 +143,7 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
           `NO (${!datos.antConsumeMarih ? "X" : "    "})`,
           `SI (${datos.antConsumeMarih ? "X" : "    "})`,
           datos.antConsumeMarih && datos.fechaConsumeMarih
-            ? `Cuando: ${(() => { const f = new Date(datos.fechaConsumeMarih); return `${String(f.getDate()).padStart(2, '0')}/${String(f.getMonth() + 1).padStart(2, '0')}/${f.getFullYear()}`; })()}`
+            ? `Cuando: ${datos.fechaConsumeMarih}`
             : ''
         ],
       ],
@@ -159,11 +159,7 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = String(f.getDate()).padStart(2, '0');
-      const mes = String(f.getMonth() + 1).padStart(2, '0');
-      const anio = f.getFullYear();
-      doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align: 'right' });
+      doc.text(`${datos.fecha}`, pageW - margin, y, { align: 'right' });
     }
     y += 12;
 

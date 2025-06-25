@@ -58,6 +58,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
         ...prev,
         ...res,
         paciente: res.nombresApellidos,
+        empContratista: res.contrata
         }));
     })
     .finally(() => {

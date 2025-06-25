@@ -53,7 +53,7 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       valueM: 'NEGATIVO',
       valueC: 'NEGATIVO',
       valueE: 'NEGATIVO',
-      metodo: 'METODO: INMUNOCROMATOGRAFICO',
+      metodo: 'INMUNOCROMATOGRAFICO',
     }));
   };
 
