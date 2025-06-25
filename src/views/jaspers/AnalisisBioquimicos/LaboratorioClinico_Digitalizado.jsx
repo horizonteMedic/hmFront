@@ -34,7 +34,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     doc.text("HEMATOLOGÍA", pageW / 2, y, { align: "center" });
     y += 5;
 
-    // === TABLA HEMATOLOGÍA con fila inicial vacía ===
+    // === TABLA HEMATOLOGÍA ===
     const leftItems = [
       { label: "Grupo Sanguíneo", value: `${datos.chko ? 'O' : datos.chka ? 'A' : datos.chkb ? 'B' : datos.chkab ? 'AB' : ''}`, suffix: "" },
       { label: "Factor Rh",       value: `${datos.rbrhpositivo ? 'POSITIVO' : 'NEGATIVO'}`,      suffix: "" },
@@ -55,9 +55,8 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       { label: "Monocitos",    key: "txtMonocitosHematologia",    suffix: " %" },
     ];
 
-    // Definimos una fila extra al principio
-    const baseRows = Math.max(leftItems.length, rightItems.length);
-    const totalRows = baseRows + 1;    // +1 para fila vacía arriba
+    // Definimos filas según la cantidad de datos
+    const totalRows = Math.max(leftItems.length, rightItems.length);
     const rowH = 6.5;
     const tableW = pageW - margin * 4; // estrecha
     const tableX = margin * 2;         // centrada
@@ -73,34 +72,30 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       doc.line(tableX, yy, tableX + tableW, yy);
     }
 
-    // Relleno de datos (i=0 queda en blanco)
+    // Relleno de datos (sin filas vacías)
     doc.setFontSize(10);
     for (let i = 0; i < totalRows; i++) {
       const rowY = y + rowH * (i + 1) - 2;
-      // saltamos la fila 0 para dejarla vacía
-      if (i > 0) {
-        const idx = i - 1;
-        // izquierda
-        if (leftItems[idx]) {
-          const { label, key, value, suffix } = leftItems[idx];
-          const val = value != null
-            ? value + suffix
-            : (key && datos[key] != null ? datos[key] + suffix : "N/A");
-          doc.setFont("helvetica", "normal").text(label + " :", tableX + 2, rowY);
-          doc.setFont("helvetica", "bold")
-            .text(val, tableX + tableW * 0.25, rowY);
-        }
-        // derecha
-        if (rightItems[idx]) {
-          const { label, key, value, suffix } = rightItems[idx];
-          const val = value != null
-            ? value + suffix
-            : (key && datos[key] != null ? datos[key] + suffix : "N/A");
-          doc.setFont("helvetica", "normal")
-            .text(label + " :", tableX + tableW / 2 + 2, rowY);
-          doc.setFont("helvetica", "bold")
-            .text(val, tableX + tableW - 2, rowY, { align: "right" });
-        }
+      // izquierda
+      if (leftItems[i]) {
+        const { label, key, value, suffix } = leftItems[i];
+        const val = value != null
+          ? value + suffix
+          : (key && datos[key] != null ? datos[key] + suffix : "N/A");
+        doc.setFont("helvetica", "normal").text(label + " :", tableX + 2, rowY);
+        doc.setFont("helvetica", "bold")
+          .text(val, tableX + tableW * 0.25, rowY);
+      }
+      // derecha
+      if (rightItems[i]) {
+        const { label, key, value, suffix } = rightItems[i];
+        const val = value != null
+          ? value + suffix
+          : (key && datos[key] != null ? datos[key] + suffix : "N/A");
+        doc.setFont("helvetica", "normal")
+          .text(label + " :", tableX + tableW / 2 + 2, rowY);
+        doc.setFont("helvetica", "bold")
+          .text(val, tableX + tableW - 2, rowY, { align: "right" });
       }
     }
 
@@ -109,14 +104,16 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
 
     // === BIOQUÍMICA ===
     doc.setFont("helvetica", "bold").setFontSize(12);
-    doc.text("BIOQUÍMICA", margin, y);
+    doc.text("BIOQUÍMICA", pageW / 2, y, { align: "center" });
     doc.setFont("helvetica", "normal").setFontSize(10);
+    const bioqMargin = margin + 10;
+    const bioqRight = pageW - margin - 10;
     y += 5;
-    doc.text(`Glucosa    : ${datos.txtGlucosaBio || "N/A"} mg/dl`, margin, y);
-    doc.text(`Valores Normales 70 - 110 mg/dl`, pageW - margin, y, { align: "right" });
+    doc.text(`Glucosa    : ${datos.txtGlucosaBio || "N/A"} mg/dl`, bioqMargin, y);
+    doc.text(`Valores Normales 70 - 110 mg/dl`, bioqRight, y, { align: "right" });
     y += 5;
-    doc.text(`Creatinina : ${datos.txtCreatininaBio || "N/A"} mg/dl`, margin, y);
-    doc.text(`Valores Normales 0.8 - 1.4 mg/dl`, pageW - margin, y, { align: "right" });
+    doc.text(`Creatinina : ${datos.txtCreatininaBio || "N/A"} mg/dl`, bioqMargin, y);
+    doc.text(`Valores Normales 0.8 - 1.4 mg/dl`, bioqRight, y, { align: "right" });
 
     // === SERO - INMUNOLÓGICO ===
     y += 10;
@@ -124,8 +121,8 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     doc.text("SERO - INMUNOLÓGICO", pageW / 2, y, { align: "center" });
     doc.setFont("helvetica", "normal").setFontSize(10);
     y += 5;
-    doc.text(`RPR : ${datos.rprPos || "N/A"}`, margin, y);
-    doc.text(`VIH : ${datos.txtVih || "N/A"}`, pageW - margin, y, { align: "right" });
+    doc.text(`RPR : ${datos.rprPos || "N/A"}`, bioqMargin, y);
+    doc.text(`VIH : ${datos.txtVih || "N/A"}`, bioqRight, y, { align: "right" });
 
     // === EXAMEN DE ORINA ===
     y += 10;
@@ -135,19 +132,19 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     // Examen Físico
     doc.setFont("helvetica", "bold").setFontSize(10);
     y += 7;
-    doc.text("Examen Físico :", margin, y);
+    doc.text("Examen Físico :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
     y += 5;
-    doc.text(`Color    : ${datos.txtColorEf || "N/A"}`, margin, y);
-    doc.text(`Aspecto : ${datos.txtAspectoEf || "N/A"}`, pageW - margin, y, { align: "right" });
+    doc.text(`Color    : ${datos.txtColorEf || "N/A"}`, bioqMargin, y);
+    doc.text(`Aspecto : ${datos.txtAspectoEf || "N/A"}`, bioqRight, y, { align: "right" });
     y += 5;
-    doc.text(`Densidad: ${datos.txtDensidadEf || "N/A"}`, margin, y);
-    doc.text(`pH       : ${datos.txtPhEf || "N/A"}`, pageW - margin, y, { align: "right" });
+    doc.text(`Densidad: ${datos.txtDensidadEf || "N/A"}`, bioqMargin, y);
+    doc.text(`pH       : ${datos.txtPhEf || "N/A"}`, bioqRight, y, { align: "right" });
 
     // Examen Químico
     doc.setFont("helvetica", "bold").setFontSize(10);
     y += 9;
-    doc.text("Examen Químico :", margin, y);
+    doc.text("Examen Químico :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
     const chemL = [
       { label: "Nitritos",        key: "txtNitritosEq" },
@@ -170,21 +167,21 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       if (chemL[i]) {
         const { label, key } = chemL[i];
         const v = datos[key] || "N/A";
-        doc.text(`${label} : ${v}`, margin, y);
+        doc.text(`${label} : ${v}`, bioqMargin, y);
       }
 
       // Lado derecho
       if (chemR[i]) {
         const { label, key } = chemR[i];
         const v = datos[key] || "N/A";
-        doc.text(`${label} : ${v}`, pageW - margin, y, { align: "right" });
+        doc.text(`${label} : ${v}`, bioqRight, y, { align: "right" });
       }
     }
 
     // Sedimento Unitario
     y += 9;
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("Sedimento Unitario :", margin, y);
+    doc.text("Sedimento Unitario :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
       const sedL = [
       { label: "Cel. Epiteliales",    key: "txtCelEpitelialesSu" },
@@ -204,25 +201,37 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
 
       if (sedL[i]) {
         const { label, key } = sedL[i];
-        doc.text(`${label} : ${datos[key] || "N/A"}`, margin, y);
+        doc.text(`${label} : ${datos[key] || "N/A"}`, bioqMargin, y);
       }
 
       if (sedR[i]) {
         const { label, key } = sedR[i];
-        doc.text(`${label} : ${datos[key] || "N/A"}`, pageW - margin, y, { align: "right" });
+        doc.text(`${label} : ${datos[key] || "N/A"}`, bioqRight, y, { align: "right" });
       }
     }
 
     // === DROGAS & OBSERVACIONES ===
     y += 8;
+    // Izquierda: Drogas y Cocaína
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("Drogas :", margin, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Cocaína : ${datos.txtCocaina || "N/A"}`, margin + 20, y);
+    const drogasLabel = "Drogas :";
+    doc.text(drogasLabel, bioqMargin, y);
+    const drogasLabelWidth = doc.getTextWidth(drogasLabel);
     doc.setFont("helvetica", "bold");
-    doc.text("Marihuana :", pageW - margin - 30, y);
+    const cocainaLabel = "Cocaína:";
+    doc.text(cocainaLabel, bioqMargin + drogasLabelWidth + 6, y);
+    const cocainaLabelWidth = doc.getTextWidth(cocainaLabel);
     doc.setFont("helvetica", "normal");
-    doc.text(datos.txtMarihuana || "N/A", pageW - margin, y, { align: "right" });
+    doc.text(String(datos.txtCocaina || "N/A"), bioqMargin + drogasLabelWidth + 6 + cocainaLabelWidth + 4, y);
+
+    // Derecha: Marihuana
+    doc.setFont("helvetica", "bold");
+    const marihuanaLabel = "Marihuana:";
+    const marihuanaLabelWidth = doc.getTextWidth(marihuanaLabel);
+    // Calcula la posición para que el dato quede pegado al margen derecho
+    doc.text(marihuanaLabel, bioqRight - marihuanaLabelWidth - 30, y); // 30 de espacio para el dato
+    doc.setFont("helvetica", "normal");
+    doc.text(String(datos.txtMarihuana || "N/A"), bioqRight, y, { align: "right" });
 
     y += 6;
     doc.setFont("helvetica", "bold").setFontSize(10);
@@ -313,6 +322,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     }
 
     // === FOOTER ===
+    y += 15; // Espacio extra antes del footer
     footer(doc, datos);
 
     // === IMPRIMIR ===

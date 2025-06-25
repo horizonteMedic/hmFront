@@ -12,60 +12,74 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   const img = "./img/logo-color.png"; // Ajusta la ruta si es necesario
   doc.addImage(img, "PNG", margin, y, 50, 16);
 
-  // --- Nro Orden con sufijo "-TP" a la derecha (movido más a la izquierda) ---
-  const nro = datos.norden ? `${datos.norden}-TP` : "";
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text(nro, pageW - margin - 30, y + 2, { align: "right" });
-
   // --- Sede debajo del Nro Orden (alineado con el nuevo Nro Orden) ---
   doc.setFont("helvetica", "normal").setFontSize(10);
   doc.text(`Sede : ${datos.sede || ""}`, pageW - margin - 30, y + 8, { align: "right" });
 
   // --- Fecha debajo de la Sede (alineado con Sede) ---
-  doc.text(`Fecha : ${datos.fechaLab || ""}`, pageW - margin - 30, y + 14, { align: "right" });
+  // Formatea la fecha a dd/mm/yyyy
+  let fechaFormateada = "";
+  if (datos.fechaLab) {
+    const d = new Date(datos.fechaLab);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    fechaFormateada = `${day}/${month}/${year}`;
+  }
+  doc.text(`Fecha : ${fechaFormateada}`, pageW - margin - 30, y + 14, { align: "right" });
 
   // --- Título centrado ---
   doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text("LABORATORIO CLÍNICO", pageW / 2, y + 24, { align: "center" });
+  doc.text("LABORATORIO CLÍNICO", pageW / 2, y + 20, { align: "center" });
 
-  // Avanzamos la línea base para los datos de trabajador/ficha
-  let y2 = y +  thirty; // 10 + 20
+  // Nuevo bloque de datos, más arriba y ordenado
+  let yDatos = y + 27; // Subido más cerca del logo
+  const leftX = margin;
+  const rightX = pageW / 2 + 30;
 
-  // --- Trabajador a la izquierda ---
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("Trabajador :", margin, y2);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.nombres || "", margin + 30, y2);
+  // Primera línea: Trabajador y N° Ficha
+  if (datos.nombres) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    const label = "Trabajador:";
+    doc.text(label, leftX, yDatos);
+    const labelWidth = doc.getTextWidth(label);
+    doc.setFont("helvetica", "normal");
+    let xDato = leftX + labelWidth + 4;
+    doc.text(String(datos.nombres), xDato, yDatos);
+    // Si hay número de ficha, lo mostramos al costado
+    if (datos.norden) {
+      const nombreWidth = doc.getTextWidth(String(datos.nombres));
+      const fichaLabel = "N° Ficha:";
+      doc.setFont("helvetica", "bold");
+      doc.text(fichaLabel, xDato + nombreWidth + 12, yDatos); // 12 de espacio entre nombre y ficha
+      const fichaLabelWidth = doc.getTextWidth(fichaLabel);
+      doc.setFont("helvetica", "normal");
+      doc.text(String(datos.norden), xDato + nombreWidth + 12 + fichaLabelWidth + 4, yDatos);
+    }
+    yDatos += 6;
+  }
 
-  // --- N° Ficha a la derecha de la mitad ---
-  const fichaXStart = pageW / 2 + 10;
-  doc.setFont("helvetica", "bold");
-  doc.text("N° Ficha :", fichaXStart, y2);
+  // Segunda línea: Contrata
+  if (datos.contrata) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    const label = "Contrata:";
+    doc.text(label, leftX, yDatos);
+    const labelWidth = doc.getTextWidth(label);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(datos.contrata), leftX + labelWidth + 4, yDatos);
+    yDatos += 6;
+  }
 
-  // Caja para el número de ficha
-  const ficha = String(datos.norden) || "";
-  const boxW = 25;
-  const boxH = 6;
-  const boxX = fichaXStart + 20;
-  const boxY = y2 - 4;
-  doc.setLineWidth(0.3).rect(boxX, boxY, boxW, boxH);
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(ficha, boxX + boxW / 2, y2, { align: "center" });
-
-  // Bajamos para la siguiente línea
-  y2 += 8;
-
-  // --- Empresa Contratista a la izquierda ---
-  doc.setFont("helvetica", "bold");
-  doc.text("Empresa Contratista :", margin, y2);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.contrata || "N/A", margin + 45, y2);
-
-  // --- Empresa principal a la derecha ---
-  doc.setFont("helvetica", "bold");
-  doc.text("Empresa :", fichaXStart, y2);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa || "", fichaXStart + 25, y2);
+  // Tercera línea: Empresa
+  if (datos.empresa) {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    const label = "Empresa:";
+    doc.text(label, leftX, yDatos);
+    const labelWidth = doc.getTextWidth(label);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(datos.empresa), leftX + labelWidth + 4, yDatos);
+    yDatos += 6;
+  }
 };
 
 export default Header_HematologiaBioquimica;

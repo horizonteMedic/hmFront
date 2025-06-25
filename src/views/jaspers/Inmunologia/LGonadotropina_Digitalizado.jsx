@@ -92,11 +92,10 @@ export default function LGonadotropina_Digitalizado(datos) {
     y += config.lineHeight;
 
     // === CUERPO DE TABLA ===
-    doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
     drawResultRow(
       doc,
       y,
-      'GONADOTROPINA CORIÓNICA HUMANA ²(²HCG)',
+      'GONADOTROPINA CORIÓNICA HUMANA β(βHCG)',
       datos.txtResultado || ''
     );
 

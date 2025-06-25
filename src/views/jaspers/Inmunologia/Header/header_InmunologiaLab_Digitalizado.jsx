@@ -66,7 +66,7 @@ const header_InmunologiaLab_Digitalizado = (doc, datos = {}) => {
 
   // --- Sede ---
   const rightColX = pageW - margin;
-  const lineHeight = 6;
+  const lineHeight = 8;
   doc.setFontSize(10).setFont('helvetica', 'normal');
   doc.text(`Sede : ${datos.sede || ''}`, rightColX, y + 5, { align: 'right' });
 
@@ -96,7 +96,7 @@ const header_InmunologiaLab_Digitalizado = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 4, y);
     y += lineHeight;
   };
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
@@ -106,7 +106,7 @@ const header_InmunologiaLab_Digitalizado = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(String(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(String(datos.fecha), patientDataX + fechaLabelWidth + 4, y);
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
 
