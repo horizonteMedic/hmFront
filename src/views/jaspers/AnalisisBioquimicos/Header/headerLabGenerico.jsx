@@ -14,7 +14,7 @@ const headerMicrobiologia = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Nro Orden :", pageW - margin - 90, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.n_orden || datos.norden || ""}`, pageW - margin - 40, y, {
+  doc.text(`${ datos.norden || ""}`, pageW - margin - 40, y, {
     align: "right",
   });
   y += 7;
@@ -31,7 +31,7 @@ const headerMicrobiologia = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Apellidos y Nombres :", margin, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.nombre || datos.nombres || ""}`, margin + 55, y);
+  doc.text(`${ datos.nombres || ""}`, margin + 55, y);
   y += 7;
 
   // 5. Edad (izquierda)

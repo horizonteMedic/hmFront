@@ -15,7 +15,7 @@ const headerAnalisisBioquimicos = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Nro Orden :", pageW - margin - 90, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.n_orden || datos.norden || ""}`, pageW - margin - 40, y, { align: "right" });
+  doc.text(`${ datos.norden || ""}`, pageW - margin - 40, y, { align: "right" });
   y += 8;
 
   // 3. Sede (movido más a la izquierda, alineado con Nro Orden)
