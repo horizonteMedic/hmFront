@@ -118,7 +118,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     // === SERO - INMUNOLÓGICO ===
     y += 10;
     doc.setFont("helvetica", "bold").setFontSize(12);
-    doc.text("SERO - INMUNOLÓGICO", pageW / 2, y, { align: "center" });
+    doc.text("SUERO - INMUNOLÓGICO", pageW / 2, y, { align: "center" });
     doc.setFont("helvetica", "normal").setFontSize(10);
     y += 5;
     doc.text(`RPR : ${datos.rprPos || "N/A"}`, bioqMargin, y);
@@ -181,7 +181,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     // Sedimento Unitario
     y += 9;
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("Sedimento Unitario :", bioqMargin, y);
+    doc.text("Sedimento Urinario :", bioqMargin, y);
     doc.setFont("helvetica", "normal");
       const sedL = [
       { label: "Cel. Epiteliales",    key: "txtCelEpitelialesSu" },
