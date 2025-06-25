@@ -313,7 +313,6 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     }
 
     // === FOOTER ===
-    footer(doc, datos);
 
     // === IMPRIMIR ===
     const pdfBlob = doc.output("blob");
