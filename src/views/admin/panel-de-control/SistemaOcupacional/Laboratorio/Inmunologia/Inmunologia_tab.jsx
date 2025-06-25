@@ -7,20 +7,25 @@ import Microbiologia from './Microbiologia/Microbiologia';
 import Inmunologia from './Inmunologia/Inmunologia';
 import Hepatitis from './Hepatitis/Hepatitis';
 
-const InmunologiaTab = ({token, selectedSede, userlogued}) => {
+const InmunologiaTab = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { label: 'L. Gonadotropina', icon: faMars, component: <Gonadotropina token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'Microbiología', icon: faMicroscope, component: <Microbiologia token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'Inmunología', icon: faVirus, component: <Inmunologia  token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'L. Hepatitis', icon: faSyringe, component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
+    { label: 'L. Gonadotropina', icon: faMars, vista: 'Inmunologia',
+      permiso: 'Acceso L. Gonadotropina',component: <Gonadotropina token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Microbiología', icon: faMicroscope, vista: 'Inmunologia',
+      permiso: 'Acceso Microbiologia', component: <Microbiologia token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Inmunología', icon: faVirus,vista: 'Inmunologia',
+      permiso: 'Acceso Inmunologia', component: <Inmunologia  token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'L. Hepatitis', icon: faSyringe,vista: 'Inmunologia',
+      permiso: 'Acceso L. Hepatitis', component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
   ];
+    const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 
   return (
     <div className="w-full">
       <div className="flex space-x-1">
-        {tabs.map((tab, idx) => (
+        {tabsConPermiso.map((tab, idx) => (
           <button
             key={tab.label}
             onClick={() => setActiveTab(idx)}

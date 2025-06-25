@@ -12,19 +12,27 @@ import ConsMarihuana from './ConsMarihuana/ConsMarihuana';
 import Boro from './Boro/Boro';
 import { PrintHojaRMasivo } from './Controller/ControllerC';
 
-const Consentimientos = ({ token, selectedSede, userlogued }) => {
+const Consentimientos = ({ token, selectedSede, userlogued, permiso }) => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [norden, setNorden] = useState('')
   const tabs = [
-    { label: 'Muestra Sangre', icon: faTint,   component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Panel 2D',       icon: faSquare, component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Panel 3D',       icon: faCube,   component: <Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Panel 5D',       icon: faLayerGroup, component: <Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Panel 10D',      icon: faThLarge, component: <Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Cons. Marihuana',icon: faLeaf,   component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'BORO',           icon: faFlask,  component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Muestra Sangre', icon: faTint,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Muestra Sangre',   component: <MuestraDeSangre token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 2D',       icon: faSquare,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 3D',       icon: faCube,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Panel 3D',   component: <Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 5D',       icon: faLayerGroup,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 10D',      icon: faThLarge,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Panel 10D', component: <Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Cons. Marihuana',icon: faLeaf,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Cons. Marihuana',   component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'BORO',           icon: faFlask,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - BORO',  component: <Boro token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
   ];
+    const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 
   if (loading) return <Loading />;
 
@@ -33,7 +41,7 @@ const Consentimientos = ({ token, selectedSede, userlogued }) => {
       <div className="flex justify-between items-center overflow-x-auto">
         {/* Sección izquierda: tabs */}
         <div className="flex space-x-2">
-          {tabs.map((tab, idx) => (
+          {tabsConPermiso.map((tab, idx) => (
             <button
               key={idx}
               onClick={() => setActiveTab(idx)}

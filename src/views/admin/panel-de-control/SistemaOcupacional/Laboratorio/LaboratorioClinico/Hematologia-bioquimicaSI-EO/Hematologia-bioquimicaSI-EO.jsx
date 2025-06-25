@@ -167,7 +167,11 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
           </label>
           <label className="font-medium flex items-center whitespace-nowrap">
             DNI:
+<<<<<<< HEAD
             <input className="border rounded px-2 py-1 w-28 text-md ml-1 bg-gray-100" disabled />
+=======
+            <input value={form.dni} className="border rounded px-2 py-1 w-28 text-md ml-1" />
+>>>>>>> 86a1abc9eaf82c39a07e6995650f95e5062f752c
           </label>
           <label className="font-medium flex items-center whitespace-nowrap">
             Fecha:

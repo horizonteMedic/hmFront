@@ -7,37 +7,47 @@ import Bioquimica from './Bioquimica/Perfil_Renal';
 import BioquimicaAcidoUrico from './BioquimicaAcidoUrico/BioquimicaAcidoUrico';
 import PerfilHepatico from './PerfilHepatico/PerfilHepatico';
 
-const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued }) => {
+const LaboratorioAnalisisBioquimicos = ({ token, selectedSede, userlogued, permiso }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     {
       label: 'Análisis Bioquímicos',
       icon: faFlask,
+      vista: 'Analisis Bioquimico',
+      permiso: 'Acceso Analisis Bioquimicos',
       component: <AnalisisBioquimicos token={token} selectedSede={selectedSede} userlogued={userlogued} />
     },
     {
       label: 'Perfil Renal',
       icon: faFilter,
+      vista: 'Analisis Bioquimico',
+      permiso: 'Acceso Perfil Renal',
       component: <Bioquimica token={token} selectedSede={selectedSede} userlogued={userlogued} />
     },
     {
       label: 'Ácido Úrico',
       icon: faTint,
+      vista: 'Analisis Bioquimico',
+      permiso: 'Acceso Acido Urico',
       component: <BioquimicaAcidoUrico token={token} selectedSede={selectedSede} userlogued={userlogued} />
     },
     {
       label: 'Perfil Hepático',
       icon: faLungs,
+      vista: 'Analisis Bioquimico',
+      permiso: 'Acceso Perfil Hepatico',
       component: <PerfilHepatico token={token} selectedSede={selectedSede} userlogued={userlogued} />
     }
   ];
+
+    const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 
   return (
     <div className="w-full">
       {/* Tabs */}
       <div className="flex space-x-1 overflow-x-auto">
-        {tabs.map((tab, idx) => (
+        {tabsConPermiso.map((tab, idx) => (
           <button
             key={idx}
             onClick={() => setActiveTab(idx)}

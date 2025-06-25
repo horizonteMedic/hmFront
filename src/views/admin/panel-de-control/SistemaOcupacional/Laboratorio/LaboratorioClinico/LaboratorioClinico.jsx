@@ -7,7 +7,7 @@ import HematologiaBioquimicaSIEO from './Hematologia-bioquimicaSI-EO/Hematologia
 import ExamenOrina from './ExamenOrina/ExamenOrina';
 import Hematologia from './Hematologia/Hematologia';
 
-const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
+const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
   const date = new Date();
@@ -183,25 +183,34 @@ const LaboratorioClinico = ({token, selectedSede, userlogued}) => {
     {
       label: 'Hematología - Bioquímica SI-EO',
       icon: faMicroscope,
-      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} setFormO={setFormO}/>
+      vista: 'Laboratorio Clinico Formulario',
+      permiso: 'Acceso Hematologia - Bioquimica SI-EO',
+      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} setFormO={setFormO} />
     },
     {
       label: 'Examen de Orina',
       icon: faTint,
-      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO}/>
+      vista: 'Laboratorio Clinico Formulario',
+      permiso: 'Acceso Hematologia - Bioquimica SI-EO',
+      component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO} />
     },
     {
       label: 'Hematograma',
       icon: faHeartbeat,
-      component: <Hematologia token={token} selectedSede={selectedSede} userlogued={userlogued}/>
+      vista: 'Laboratorio Clinico Formulario',
+      permiso: 'Acceso Hematograma',
+      component: <Hematologia token={token} selectedSede={selectedSede} userlogued={userlogued} />
     }
   ];
+
+  const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
+
 
   return (
     <div className="w-full">
       {/* Tabs */}
       <div className="flex space-x-1 overflow-x-auto">
-        {tabs.map((tab, idx) => (
+        {tabsConPermiso.map((tab, idx) => (
           <button
             key={idx}
             onClick={() => setActiveTab(idx)}
