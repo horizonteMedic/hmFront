@@ -499,12 +499,12 @@ const TabComponent = () => {
 
               {/* ——— Contenido según pestaña ——— */}
               <div className={styles.labContent}>
-                {labTab === 0 && <LaboratorioClinico token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>}
-                {labTab === 1 && <LaboratorioAnalisisBioquimicos token={token} selectedSede={selectSede} userlogued={userlogued.sub}/>}
-                {labTab === 2 && <InmunologiaTab token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
-                {labTab === 3 && <Toxicologia token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
+                {labTab === 0 && <LaboratorioClinico token={token} selectedSede={selectSede} userlogued={userlogued.sub} permiso={tienePermisoEnVista}/>}
+                {labTab === 1 && <LaboratorioAnalisisBioquimicos token={token} selectedSede={selectSede} userlogued={userlogued.sub} permiso={tienePermisoEnVista}/>}
+                {labTab === 2 && <InmunologiaTab token={token} selectedSede={selectSede} userlogued={userlogued.sub} permiso={tienePermisoEnVista}/>}
+                {labTab === 3 && <Toxicologia token={token} selectedSede={selectSede} userlogued={userlogued.sub} permiso={tienePermisoEnVista}/>}
                 {labTab === 4 && (
-                  <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub} />
+                  <Consentimientos token={token} selectedSede={selectSede} userlogued={userlogued.sub} permiso={tienePermisoEnVista}/>
                 )}
                 {labTab === 5 && <Manipuladores token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}
                 {labTab === 6 && <PruebasCovid token={token} selectedSede={selectSede} userlogued={userlogued.sub} />}

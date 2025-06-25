@@ -7,20 +7,25 @@ import Resultado_Panel3D from './Panel3D/Resultado_Panel3D';
 import Resultado_Panel5D from './Panel5D/Resultado_Panel5D';
 import Resultado_Panel10D from './Panel10D/Resultado_Panel10D';
 
-const Toxicologia = ({token, selectedSede, userlogued}) => {
+const Toxicologia = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { label: 'Panel 2D', icon: faSquare, component: <Resultado_Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'Panel 3D', icon: faCube, component: <Resultado_Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'Panel 5D', icon: faLayerGroup, component: <Resultado_Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'Panel 10D', icon: faThLarge, component: <Resultado_Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
+    { label: 'Panel 2D', icon: faSquare,vista: 'Toxicologia',
+      permiso: 'Acceso Tox - Panel 2D', component: <Resultado_Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Panel 3D', icon: faCube, vista: 'Toxicologia',
+      permiso: 'Acceso Tox - Panel 3D', component: <Resultado_Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Panel 5D', icon: faLayerGroup, vista: 'Toxicologia',
+      permiso: 'Acceso Tox - Panel 5D', component: <Resultado_Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'Panel 10D', icon: faThLarge, vista: 'Toxicologia',
+      permiso: 'Acceso Tox - Panel 10D', component: <Resultado_Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
   ];
+    const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 
   return (
     <div className="w-full">
       <div className="flex space-x-1">
-        {tabs.map((tab, idx) => (
+        {tabsConPermiso.map((tab, idx) => (
           <button
             key={tab.label}
             className={`px-6 py-2 border rounded-t-lg transition-all duration-150 text-base font-semibold focus:outline-none ${
