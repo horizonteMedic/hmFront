@@ -163,11 +163,11 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
           </label>
           <label className="font-medium flex items-center whitespace-nowrap">
             N° Recibo:
-            <input className="border rounded px-2 py-1 w-28 text-md ml-1" />
+            <input className="border rounded px-2 py-1 w-28 text-md ml-1 bg-gray-100" disabled />
           </label>
           <label className="font-medium flex items-center whitespace-nowrap">
             DNI:
-            <input className="border rounded px-2 py-1 w-28 text-md ml-1" />
+            <input className="border rounded px-2 py-1 w-28 text-md ml-1 bg-gray-100" disabled />
           </label>
           <label className="font-medium flex items-center whitespace-nowrap">
             Fecha:
@@ -272,7 +272,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <div className="flex gap-2">
                             {['O','A','B','AB'].map(opt => (
                             <label key={opt} className="flex items-center gap-1">
-                                <input type="radio" name="grupo" value={opt} checked={form.grupo === opt} onClick={e => setField('grupo', form.grupo === e.target.value ? '' : e.target.value)} disabled={form.empresaNA || hematologiaNA} />{opt}
+                                <input type="radio" name="grupo" value={opt} checked={form.grupo === opt} onClick={e => setField('grupo', form.grupo === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />{opt}
                             </label>
                             ))}
                         </div>
@@ -281,10 +281,10 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <label className="w-32 font-semibold">Factor Rh :</label>
                         <div className="flex gap-2">
                             <label className="flex items-center gap-1">
-                                <input type="radio" name="rh" value="Rh(+)" checked={form.rh === 'Rh(+)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA || hematologiaNA} />Rh(+)
+                                <input type="radio" name="rh" value="Rh(+)" checked={form.rh === 'Rh(+)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />Rh(+)
                             </label>
                             <label className="flex items-center gap-1">
-                                <input type="radio" name="rh" value="Rh(-)" checked={form.rh === 'Rh(-)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA || hematologiaNA} />Rh(-)
+                                <input type="radio" name="rh" value="Rh(-)" checked={form.rh === 'Rh(-)'} onClick={e => setField('rh', form.rh === e.target.value ? '' : e.target.value)} disabled={form.empresaNA} />Rh(-)
                             </label>
                         </div>
                     </div>
@@ -299,7 +299,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                             value={form[key]}
                             onChange={handleInputChange}
                             className="border border-gray-400 rounded-sm px-1 w-24 text-md"
-                            disabled={form.empresaNA || hematologiaNA}
+                            disabled={form.empresaNA}
                             ref={hematologiaRefs[idx]}
                             onKeyDown={e => {
                                 if (e.key === 'Enter') {
@@ -325,7 +325,7 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                             value={form[key]}
                             onChange={handleInputChange}
                             className="border border-gray-400 rounded-sm px-1 w-24 text-md"
-                            disabled={form.empresaNA || hematologiaNA}
+                            disabled={form.empresaNA}
                             ref={hematologiaRefs[idx + 6]}
                             onKeyDown={e => {
                                 if (e.key === 'Enter') {
@@ -372,8 +372,9 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <input name="rpr" value={form.rprNA ? 'N/A' : form.rpr} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 flex-1 text-md" disabled={form.rprNA} />
                         </div>
                         <div className="flex items-center gap-2 justify-center">
-                            <Checkbox label="+" checked={form.rpr === 'POSITIVO'} onChange={() => { setField('rpr', 'POSITIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
                             <Checkbox label="-" checked={form.rpr === 'NEGATIVO'} onChange={() => { setField('rpr', 'NEGATIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
+
+                            <Checkbox label="+" checked={form.rpr === 'POSITIVO'} onChange={() => { setField('rpr', 'POSITIVO'); setField('rprNA', false); }} disabled={form.rprNA}/>
                             <Checkbox label="N/A" checked={form.rprNA || form.rpr === 'N/A'} onChange={v => { setField('rprNA', v); setField('rpr', v ? 'N/A' : ''); }} />
                         </div>
                     </div>
@@ -383,8 +384,8 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                         <input name="vih" value={form.vihNA ? 'N/A' : form.vih} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 flex-1 text-md" disabled={form.vihNA}/>
                         </div>
                         <div className="flex items-center gap-2 justify-center">
-                            <Checkbox label="+" checked={form.vih === 'POSITIVO'} onChange={() => { setField('vih', 'POSITIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
                             <Checkbox label="-" checked={form.vih === 'NEGATIVO'} onChange={() => { setField('vih', 'NEGATIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
+                            <Checkbox label="+" checked={form.vih === 'POSITIVO'} onChange={() => { setField('vih', 'POSITIVO'); setField('vihNA', false); }} disabled={form.vihNA}/>
                             <Checkbox label="N/A" checked={form.vihNA || form.vih === 'N/A'} onChange={v => { setField('vihNA', v); setField('vih', v ? 'N/A' : ''); }} />
                         </div>
                     </div>

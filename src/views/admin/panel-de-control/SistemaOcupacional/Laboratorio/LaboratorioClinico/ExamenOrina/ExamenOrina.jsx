@@ -32,14 +32,14 @@ const initialForm = {
   GlucosaQ: 'NEGATIVO',
   Sangre: 'NEGATIVO',
   // Sedimento
-  LeucocitosS: '',
-  Hematies: '',
-  CelEpiteliales: '',
-  Cristales: '',
-  Cilindros: '',
-  Bacterias: '',
-  GramSC: '',
-  Otros: '',
+  LeucocitosS: 'ESCASAS',
+  Hematies: 'NO SE OBSERVAN',
+  CelEpiteliales: 'ESCASAS',
+  Cristales: 'NO SE OBSERVAN',
+  Cilindros: 'NO SE OBSERVAN',
+  Bacterias: 'NO SE OBSERVAN',
+  GramSC: 'NO SE OBSERVAN',
+  Otros: 'NO SE OBSERVAN',
   // Drogas
   Cocaina: '',
   Marihuana: '',
@@ -67,13 +67,21 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
   }
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target
-    setField(name, type === 'checkbox' ? checked : value)
+    const { name, value } = e.target;
+    if (name === 'LeucocitosS') {
+      // Solo permitir números, guiones y espacios
+      if (/^[0-9\-\s]*$/.test(value)) {
+        setForm(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setForm(prev => ({ ...prev, [name]: value }));
+    }
   }
 
   const handleClear = () => {
-    ClearForm()
-    ClearFormO()
+    setForm(initialForm);
+    ClearForm();
+    ClearFormO();
   }
   
   const handlePrint = () => {
@@ -105,6 +113,51 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
     }));
   };
 
+  // Nueva función para manejar el cambio de No Aplica
+  const handleNoAplicaChange = (checked) => {
+    setForm(prev => {
+      if (checked) {
+        // Marcar todo como N/A
+        return {
+          ...prev,
+          NoAplica: true,
+          Incoloro: false,
+          Medicamentosa: false,
+          Transparente: false,
+          Turbio: false,
+          Color: 'N/A',
+          Aspecto: 'N/A',
+          Densidad: 'N/A',
+          PH: 'N/A',
+          Nitritos: 'N/A',
+          Proteínas: 'N/A',
+          Cetonas: 'N/A',
+          LeucocitosQ: 'N/A',
+          AcAscorbico: 'N/A',
+          Urobilinogeno: 'N/A',
+          Bilirrubina: 'N/A',
+          GlucosaQ: 'N/A',
+          Sangre: 'N/A',
+          LeucocitosS: 'N/A',
+          Hematies: 'N/A',
+          CelEpiteliales: 'N/A',
+          Cristales: 'N/A',
+          Cilindros: 'N/A',
+          Bacterias: 'N/A',
+          GramSC: 'N/A',
+          Otros: 'N/A',
+        };
+      } else {
+        // Restaurar valores por defecto
+        return {
+          ...prev,
+          ...initialForm,
+          NoAplica: false
+        };
+      }
+    });
+  };
+
   return (
     <div className="p-4 grid grid-cols-5 gap-4 text-md">
       {/* == IZQUIERDA: 3/5 == */}
@@ -118,7 +171,8 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
                   type="checkbox"
                   name={opt}
                   checked={form[opt]}
-                  onChange={handleInputChange}
+                  onChange={opt === 'No Aplica' ? e => handleNoAplicaChange(e.target.checked) : handleInputChange}
+                  disabled={opt !== 'No Aplica'}
                 />
                 {opt}
               </label>

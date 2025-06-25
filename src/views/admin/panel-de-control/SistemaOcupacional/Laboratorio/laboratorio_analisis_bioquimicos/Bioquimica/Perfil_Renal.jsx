@@ -25,6 +25,8 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
   });
 
   const creatininaRef = useRef(null);
+  const ureaRef = useRef(null);
+  const acidoUricoRef = useRef(null);
 
   const handleFormChange = e => {
     const { name, value } = e.target;
@@ -144,6 +146,9 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
           onChange={handleFormChange}
           className="border rounded px-2 py-1 w-full"
           ref={creatininaRef}
+          onKeyDown={e => {
+            if (e.key === 'Enter') ureaRef.current && ureaRef.current.focus();
+          }}
         />
 
         <label className="font-semibold text-left">UREA SÉRICA</label>
@@ -152,6 +157,10 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
           value={form.urea}
           onChange={handleFormChange}
           className="border rounded px-2 py-1 w-full"
+          ref={ureaRef}
+          onKeyDown={e => {
+            if (e.key === 'Enter') acidoUricoRef.current && acidoUricoRef.current.focus();
+          }}
         />
 
         <label className="font-semibold text-left">ÁCIDO ÚRICO SÉRICO</label>
@@ -160,6 +169,7 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
           value={form.acidoUrico}
           onChange={handleFormChange}
           className="border rounded px-2 py-1 w-full"
+          ref={acidoUricoRef}
         />
       </div>
 
@@ -203,14 +213,23 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
   )
 }
 
-function Field({ label, name, type = 'text', value, onChange, disabled, onKeyUp }) {
+const Field = React.forwardRef(function Field({ label, name, type = 'text', value, onChange, disabled, onKeyUp }, ref) {
   return (
     <div className="flex flex-col">
       <label className="font-medium mb-1">{label}</label>
-      <input type={type} name={name} value={value} disabled={disabled} onChange={onChange} onKeyUp={onKeyUp} className={`border rounded px-2 py-1 ${disabled ? 'bg-gray-100' : ''}`} />
+      <input
+        type={type}
+        name={name}
+        value={value}
+        disabled={disabled}
+        onChange={onChange}
+        onKeyUp={onKeyUp}
+        ref={ref}
+        className={`border rounded px-2 py-1 ${disabled ? 'bg-gray-100' : ''}`}
+      />
     </div>
   )
-}
+});
 
 function ActionButton({ color, icon, onClick, children }) {
   const bg = {
