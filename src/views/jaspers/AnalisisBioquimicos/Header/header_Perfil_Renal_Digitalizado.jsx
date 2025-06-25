@@ -26,7 +26,7 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   doc.setFontSize(11)
   doc.setFont(undefined, 'bold')
   doc.text('Nro Orden:', 110, 20)
-  doc.text(datos.norden || '', 135, 20)
+  doc.text(String(datos.norden) || '', 135, 20)
   doc.setFont(undefined, 'normal')
   doc.text('Sede:', 110, 25)
   doc.text(datos.sede || 'Trujillo-Piarda', 122, 25)
