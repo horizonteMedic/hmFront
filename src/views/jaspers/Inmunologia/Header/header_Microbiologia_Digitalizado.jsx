@@ -31,53 +31,75 @@ const headerMicrobiologiaDigitalizado = (doc, datos = {}) => {
     doc.text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2. Bloque de datos del paciente a la derecha
-  const labelEndX = pageW - 105; // Coordenada X donde terminan las etiquetas
-  const valueX = labelEndX + 3;    // Coordenada X donde comienzan los valores
-  const lineHeight = 6;
+  // --- Código de color ---
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  let boxSize = 15;
+  let boxX = pageW - margin - boxSize;
+  let boxY = y + 2;
+  if (colorValido) {
+    let color = datos.codigoColor || "#008f39";
+    let boxText = (datos.textoColor || "F").toUpperCase();
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+    // Solo renderiza si color es válido
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1
+    });
+    // Reset color settings after drawing the colored elements
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2);
+  }
 
-  // --- Nro Orden (Primer bloque, más arriba) ---
-  let nroOrdenY = y + 8;
+  // --- Nro Orden pegado a la derecha o ajustado si hay color ---
+  const nroOrdenLabel = "Nro Orden :";
+  const nroOrdenValue = String(datos.norden || '');
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
-  doc.text("Nro Orden :", labelEndX, nroOrdenY, { align: 'right' });
+  const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
+  const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
+  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 10) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
+  let nroOrdenY = y + 8;
+  doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(11);
-  const nordenText = String(datos.norden || '');
-  doc.text(nordenText, valueX, nroOrdenY);
-  const nordenWidth = doc.getTextWidth(nordenText);
+  doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, nroOrdenY);
   doc.setLineWidth(0.3);
-  doc.line(valueX, nroOrdenY + 1.5, valueX + nordenWidth, nroOrdenY + 1.5);
-  
+  doc.line(nroOrdenX + nroOrdenLabelWidth + 2, nroOrdenY + 1.5, nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, nroOrdenY + 1.5);
+
   // --- Datos del paciente (Segundo bloque, más abajo) ---
   let patientDataY = y + 35;
   const patientDataX = margin;
-
-  // --- Apellidos y Nombres ---
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text("Apellidos y Nombres :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
   const labelWidthNombres = doc.getTextWidth("Apellidos y Nombres :");
   doc.text(String(datos.nombres || '').toUpperCase(), patientDataX + labelWidthNombres + 2, patientDataY);
-  patientDataY += lineHeight;
-  
-  // --- Edad ---
+  patientDataY += 6;
   doc.setFont('helvetica', 'bold');
   doc.text("Edad :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
   const labelWidthEdad = doc.getTextWidth("Edad :");
   doc.text(String(datos.edad ? `${datos.edad} AÑOS` : ''), patientDataX + labelWidthEdad + 2, patientDataY);
-  patientDataY += lineHeight;
-
-  // --- Fecha ---
+  patientDataY += 6;
   doc.setFont('helvetica', 'bold');
   doc.text("Fecha :", patientDataX, patientDataY);
   doc.setFont('helvetica', 'normal');
   const labelWidthFecha = doc.getTextWidth("Fecha :");
   doc.text(String(datos.fecha), patientDataX + labelWidthFecha + 2, patientDataY);
-  
-  // Reseteo de estilos para no afectar el resto del documento
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setLineWidth(0.2);

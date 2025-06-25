@@ -68,7 +68,11 @@ export default function LBioquimica_Digitalizado(datos) {
 
       if (isHeader) {
         doc.setFont(undefined, 'bold');
-        doc.text(prueba, config.pageWidth / 2, rowY, { align: 'center' });
+        if (prueba === 'PERFIL RENAL') {
+          doc.text(prueba, config.table.col1X, rowY);
+        } else {
+          doc.text(prueba, config.pageWidth / 2, rowY, { align: 'center' });
+        }
         y += 8;
         return;
       }

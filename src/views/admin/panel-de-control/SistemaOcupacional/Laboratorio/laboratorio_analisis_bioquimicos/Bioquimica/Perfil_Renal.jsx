@@ -1,5 +1,5 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/Analisis_bioquimicos/PerfilRenal.jsx
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons'
 import Swal from 'sweetalert2'
@@ -23,6 +23,8 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
     printCount: '',
     medico: ''
   });
+
+  const creatininaRef = useRef(null);
 
   const handleFormChange = e => {
     const { name, value } = e.target;
@@ -100,10 +102,12 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
           value={form.norden}
           onChange={handleFormChange}
           onKeyUp={e => {
-          if (e.key === 'Enter') {
-            handleSeat()
-            VerifyTR(form.norden,tabla,token,setForm, selectedSede)
-          }}}
+            if (e.key === 'Enter') {
+              handleSeat()
+              VerifyTR(form.norden,tabla,token,setForm, selectedSede)
+              if (creatininaRef.current) creatininaRef.current.focus();
+            }
+          }}
         />
         <Field
           label="Fecha"
@@ -139,6 +143,7 @@ export default function PerfilRenal({ token, selectedSede,userlogued }) {
           value={form.creatinina}
           onChange={handleFormChange}
           className="border rounded px-2 py-1 w-full"
+          ref={creatininaRef}
         />
 
         <label className="font-semibold text-left">UREA SÉRICA</label>
