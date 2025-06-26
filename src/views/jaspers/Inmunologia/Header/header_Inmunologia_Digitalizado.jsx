@@ -66,7 +66,7 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
 
   // --- Sede ---
   const rightColX = pageW - margin;
-  const lineHeight = 6;
+  const lineHeight = 8;
   doc.setFontSize(10).setFont('helvetica', 'normal');
   doc.text(`Sede : ${datos.sede || ''}`, rightColX, y + 5, { align: 'right' });
 
@@ -80,10 +80,9 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
   let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 10) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
   y += 10;
   doc.text(nroOrdenLabel, nroOrdenX, y);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold').setFontSize(18);
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y);
-  doc.setLineWidth(0.3);
+  doc.setLineWidth(0.5);
   doc.line(nroOrdenX + nroOrdenLabelWidth + 2, y + 1.5, nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 1.5);
 
   y += lineHeight;
@@ -94,9 +93,12 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
   const drawPatientDataRow = (label, value) => {
     doc.setFontSize(11).setFont('helvetica', 'bold');
     doc.text(label, patientDataX, y);
+    let valueX = patientDataX + doc.getTextWidth(label) + 4;
+    if (label.toLowerCase().includes('apellidos y nombres')) {
+      if (doc.getTextWidth(label) < 23) valueX = patientDataX + 23;
+    }
     doc.setFont('helvetica', 'normal');
-    const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value).toUpperCase(), valueX, y);
     y += lineHeight;
   };
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
@@ -104,9 +106,9 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
   doc.setFontSize(11).setFont('helvetica', 'bold');
   const fechaLabel = "Fecha :";
   doc.text(fechaLabel, patientDataX, y);
+  let valueXFecha = patientDataX + doc.getTextWidth(fechaLabel) + 4;
   doc.setFont('helvetica', 'normal');
-  const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(formatDateToLong(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(formatDateToLong(datos.fecha), valueXFecha, y);
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
 

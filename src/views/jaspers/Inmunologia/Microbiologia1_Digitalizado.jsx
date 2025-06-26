@@ -55,7 +55,7 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
-    let y = 65;
+    let y = 80;
     // TÍTULO
     drawUnderlinedTitle(doc, "MICROBIOLOGÍA", y, config.fontSize.title);
     y += config.lineHeight * 2;
@@ -68,7 +68,7 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     // ENCABEZADO DE TABLA
     doc.setFont(config.font, "bold");
     doc.text("PRUEBA", config.margin, y);
-    doc.text("RESULTADO", pageW - config.margin, y, { align: "right" });
+    doc.text("RESULTADO", pageW - config.margin - 25, y, { align: "right" });
     y += 4;
     doc.setLineWidth(0.5);
     doc.line(config.margin, y, pageW - config.margin, y);
@@ -76,12 +76,8 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     y += config.lineHeight;
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     // DATOS DE PRUEBAS
-    drawResultRow(
-      doc,
-      y,
-      "EXAMEN DIRECTO (KOH)",
-      datos.txtKoh ?? "N/A"
-    );
+    doc.text("EXAMEN DIRECTO (KOH)", config.margin, y);
+    doc.text(datos.txtKoh ?? "N/A", pageW - config.margin - 25, y, { align: "right" });
     
     if (s1) {
       const canvas = document.createElement('canvas');
@@ -92,8 +88,8 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
       const selloBase64 = canvas.toDataURL('image/png');
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80;
-      const sigY = 190;
+      const sigX = (pageW - sigW) / 2;
+      const sigY = 210;
       const maxImgW = sigW - 10;
       const maxImgH = sigH - 10;
       let imgW = s1.width;
@@ -116,8 +112,8 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
       const selloBase64 = canvas.toDataURL('image/png');
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130;
-      const sigY = 190;
+      const sigX = (pageW - sigW) / 2;
+      const sigY = 210;
       const maxImgW = sigW - 10;
       const maxImgH = sigH - 10;
       let imgW = s2.width;

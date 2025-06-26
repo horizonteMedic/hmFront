@@ -55,7 +55,7 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
 
-  let y = 75;
+  let y = 90;
 
   Promise.all([
     isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
@@ -84,7 +84,7 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
     // === ENCABEZADO DE TABLA ===
     doc.setFont(config.font, 'bold');
     doc.text('PRUEBA CUALITATIVO', config.margin, y);
-    doc.text('RESULTADO', pageW - config.margin, y, { align: 'right' });
+    doc.text('RESULTADO', pageW - config.margin - 25, y, { align: 'right' });
     
     y += 3;
     doc.setLineWidth(0.3);
@@ -93,12 +93,9 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
 
     // === CUERPO DE TABLA ===
     // Nota: Se usa 'hepatitisb' de los datos, que corresponde a "HEPATITIS B (HBsAg)".
-    drawResultRow(
-      doc,
-      y,
-      'HEPATITIS A (HAV) - RAPID TEST - MONTEST',
-      datos.txtHepatitisa || ''
-    );
+    doc.text('HEPATITIS A (HAV) - RAPID TEST - MONTEST', config.margin, y);
+    doc.text(datos.txtHepatitisa || '', pageW - config.margin - 25, y, { align: 'right' });
+
     if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
@@ -110,8 +107,8 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -150,8 +147,8 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

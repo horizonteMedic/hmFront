@@ -10,9 +10,16 @@ const headerConsentimiento = (doc, datos = {}) => {
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.text("Nro Orden :", pageW - 110, y + 6);
-  doc.setFontSize(13);
+  doc.setFontSize(17);
   doc.text(`${datos.norden || ''}`, pageW - 75, y + 6);
-  doc.setFontSize(9);
+  
+  // Add underline to the order number
+  const textWidth = doc.getTextWidth(`${datos.norden || ''}`);
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.line(pageW - 75, y + 8, pageW - 75 + textWidth, y + 8);
+  
+  doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text("Sede :", pageW - 110, y + 14);
   doc.setFont('helvetica', 'normal');

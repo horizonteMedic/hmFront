@@ -11,11 +11,17 @@ const headerAnalisisBioquimicos = (doc, datos = {}) => {
   y += 18;
 
   // 2. Número de Orden (movido más a la izquierda)
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.text("Nro Orden :", pageW - margin - 90, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(`${ datos.norden || ""}`, pageW - margin - 40, y, { align: "right" });
+  const nroOrdenLabel = "Nro Orden :";
+  const nroOrdenValue = String(datos.norden || "");
+  doc.setFontSize(11).setFont("helvetica", "bold");
+  doc.text(nroOrdenLabel, pageW - margin - 90, y);
+  doc.setFontSize(18).setFont("helvetica", "bold");
+  doc.text(nroOrdenValue, pageW - margin - 40, y, { align: "right" });
+  // Subrayado
+  const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
+  doc.setLineWidth(0.7);
+  doc.line(pageW - margin - 40 - nroOrdenValueWidth, y + 1.5, pageW - margin - 40, y + 1.5);
+  doc.setLineWidth(0.2);
   y += 8;
 
   // 3. Sede (movido más a la izquierda, alineado con Nro Orden)

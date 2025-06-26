@@ -71,10 +71,9 @@ const headerMicrobiologia1Digitalizado = (doc, datos = {}) => {
   let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 10) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
   let nroOrdenY = y + 8;
   doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(11);
+  doc.setFont('helvetica', 'bold').setFontSize(18);
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, nroOrdenY);
-  doc.setLineWidth(0.3);
+  doc.setLineWidth(0.5);
   doc.line(nroOrdenX + nroOrdenLabelWidth + 2, nroOrdenY + 1.5, nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, nroOrdenY + 1.5);
 
   // --- Datos del paciente ---
@@ -83,21 +82,23 @@ const headerMicrobiologia1Digitalizado = (doc, datos = {}) => {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.text("Apellidos y Nombres :", patientDataX, patientDataY);
-  doc.setFont('helvetica', 'normal');
   const labelWidthNombres = doc.getTextWidth("Apellidos y Nombres :");
-  doc.text(String(datos.nombres || '').toUpperCase(), patientDataX + labelWidthNombres + 2, patientDataY);
-  patientDataY += 6;
+  let valueXNombres = patientDataX + labelWidthNombres + 4;
+  if (labelWidthNombres < 23) valueXNombres = patientDataX + 23;
+  doc.setFont('helvetica', 'normal');
+  doc.text(String(datos.nombres || '').toUpperCase(), valueXNombres, patientDataY);
+  patientDataY += 8;
   doc.setFont('helvetica', 'bold');
   doc.text("Edad :", patientDataX, patientDataY);
-  doc.setFont('helvetica', 'normal');
   const labelWidthEdad = doc.getTextWidth("Edad :");
-  doc.text(String(datos.edad ? `${datos.edad} AÑOS` : ''), patientDataX + labelWidthEdad + 2, patientDataY);
-  patientDataY += 6;
+  doc.setFont('helvetica', 'normal');
+  doc.text(String(datos.edad ? `${datos.edad} AÑOS` : ''), patientDataX + labelWidthEdad + 4, patientDataY);
+  patientDataY += 8;
   doc.setFont('helvetica', 'bold');
   doc.text("Fecha :", patientDataX, patientDataY);
-  doc.setFont('helvetica', 'normal');
   const labelWidthFecha = doc.getTextWidth("Fecha :");
-  doc.text(String(datos.fecha), patientDataX + labelWidthFecha + 2, patientDataY);
+  doc.setFont('helvetica', 'normal');
+  doc.text(String(datos.fecha), patientDataX + labelWidthFecha + 4, patientDataY);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setLineWidth(0.2);

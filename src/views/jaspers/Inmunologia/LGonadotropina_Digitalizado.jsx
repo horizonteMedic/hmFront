@@ -60,7 +60,7 @@ export default function LGonadotropina_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 80; 
+    let y = 90; 
 
     // === TÍTULO ===
     drawUnderlinedTitle(doc, 'INMUNOLOGÍA', y);
@@ -84,7 +84,7 @@ export default function LGonadotropina_Digitalizado(datos) {
     doc.setFont(config.font, 'bold');
     doc.setFontSize(config.fontSize.header);
     doc.text('PRUEBA CUALITATIVO', config.margin, y);
-    doc.text('RESULTADO', pageW - config.margin, y, { align: 'right' });
+    doc.text('RESULTADO', pageW - config.margin - 25, y, { align: 'right' });
     
     y += 3;
     doc.setLineWidth(0.3);
@@ -92,13 +92,8 @@ export default function LGonadotropina_Digitalizado(datos) {
     y += config.lineHeight;
 
     // === CUERPO DE TABLA ===
-    doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
-    drawResultRow(
-      doc,
-      y,
-      'GONADOTROPINA CORIÓNICA HUMANA ²(²HCG)',
-      datos.txtResultado || ''
-    );
+    doc.text('GONADOTROPINA CORIÓNICA HUMANA β(βHCG)', config.margin, y);
+    doc.text(datos.txtResultado || '', pageW - config.margin - 25, y, { align: 'right' });
 
     if (s1) {
       const canvas = document.createElement('canvas');
@@ -111,8 +106,8 @@ export default function LGonadotropina_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -151,8 +146,8 @@ export default function LGonadotropina_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

@@ -57,7 +57,7 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
 
 
     // === CUERPO ===
-    let y = 80;
+    let y = 90;
 
     // Título
     drawUnderlinedTitle(doc, "INMUNOLOGÍA", y);
@@ -83,7 +83,7 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
     // Encabezado de tabla
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("PRUEBA CUALITATIVO", config.margin, y);
-    doc.text("RESULTADOS", pageW - config.margin, y, { align: "right" });
+    doc.text("RESULTADOS", pageW - config.margin - 25, y, { align: "right" });
     y += 3;
 
     // Línea
@@ -102,7 +102,9 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     testsAglu.forEach(({ label, key }) => {
       const value = datos[key] != null ? datos[key] : "N/A";
-      y = drawResultRow(doc, y, label, value);
+      doc.text(label, config.margin, y);
+      doc.text(value, pageW - config.margin - 25, y, { align: "right" });
+      y += config.lineHeight;
     });
 
     if (s1) {
@@ -116,8 +118,8 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -156,8 +158,8 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

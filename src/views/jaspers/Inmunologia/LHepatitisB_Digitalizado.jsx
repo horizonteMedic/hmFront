@@ -24,7 +24,7 @@ export default function LHepatitisB_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 75;
+    let y = 90;
 
   // Título principal
   doc.setFont(undefined, 'bold');
@@ -51,7 +51,7 @@ export default function LHepatitisB_Digitalizado(datos) {
     startY: doc.lastAutoTable.finalY + 2,
     head: [[
       { content: 'PRUEBA CUALITATIVO', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'RESULTADO', styles: { halign: 'center', fontStyle: 'bold' } }
+      { content: 'RESULTADO', styles: { halign: 'right', fontStyle: 'bold', cellPadding: { right: 25 } } }
     ]],
     body: [
       [
@@ -65,6 +65,15 @@ export default function LHepatitisB_Digitalizado(datos) {
     tableWidth: 180
   });
 
+  // Línea divisora bajo los encabezados de la tabla de resultados
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  // Calcula la posición Y justo debajo de los encabezados
+  const yLine = doc.lastAutoTable.finalY - doc.lastAutoTable.rowHeight + 3; // Ajusta si es necesario
+  doc.setLineWidth(0.3);
+  doc.line(margin, yLine, pageW - margin, yLine);
+  doc.setLineWidth(0.2); // Reset
+
   // Recuadros de imagen
   if (s1) {
       const canvas = document.createElement('canvas');
@@ -77,8 +86,8 @@ export default function LHepatitisB_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (doc.internal.pageSize.getWidth() - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -117,8 +126,8 @@ export default function LHepatitisB_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (doc.internal.pageSize.getWidth() - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
