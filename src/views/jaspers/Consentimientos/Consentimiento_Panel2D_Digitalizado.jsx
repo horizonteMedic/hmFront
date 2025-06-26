@@ -59,11 +59,11 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
     const dni = String(datos.dni || '__________');
     // Construir bloques de texto (normales y negrita)
     const bloques = [
-      { text: 'Yo ', bold: false },
+      { text: 'Yo' + '\u00A0\u00A0', bold: false },
       { text: nombre, bold: true },
       { text: ', de ', bold: false },
       { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI nº ', bold: false },
+      { text: ' años de edad, identificado con DNI Nº ', bold: false },
       { text: dni, bold: true },
       { text: '; habiendo recibido consejería e información acerca de la prueba para Marihuana y Cocaína en orina; y en pleno uso de mis facultades mentales ', bold: false },
       { text: 'AUTORIZO', bold: true },
@@ -151,6 +151,25 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
       return `(  ${checked ? 'X' : filler + filler}  )`;
     }
     
+    function formatFechaLarga(fechaStr) {
+      if (!fechaStr) return '';
+      const f = new Date(fechaStr);
+      const dia = f.getDate();
+      const mes = f.getMonth();
+      const anio = f.getFullYear();
+      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+      return `${dia} de ${meses[mes]} de ${anio}`;
+    }
+
+    function formatFechaCorta(fechaStr) {
+      if (!fechaStr) return '';
+      const f = new Date(fechaStr);
+      const dia = String(f.getDate()).padStart(2, '0');
+      const mes = String(f.getMonth() + 1).padStart(2, '0');
+      const anio = f.getFullYear();
+      return `${dia}/${mes}/${anio}`;
+    }
+    
     autoTable(doc, {
       startY: antY,
       body: [
@@ -159,7 +178,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
           `NO ${checkBox(!datos.antConsumeMarih)}`,
           `SI ${checkBox(datos.antConsumeMarih)}`,
           datos.antConsumeMarih && datos.fechaConsumeMarih
-            ? `Cuando: ${datos.fechaConsumeMarih}`
+            ? `Cuando: ${formatFechaCorta(datos.fechaConsumeMarih)}`
             : ''
         ],
         [
@@ -167,7 +186,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
           `NO ${checkBox(!datos.antConsumeHojaCoca)}`,
           `SI ${checkBox(datos.antConsumeHojaCoca)}`,
           datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca
-            ? `Cuando: ${datos.fechaConsumoHojaCoca}`
+            ? `Cuando: ${formatFechaCorta(datos.fechaConsumoHojaCoca)}`
             : ''
         ],
         [
@@ -175,7 +194,7 @@ export default function Consentimiento_Panel2D_Digitalizado(datos) {
           `NO ${checkBox(!datos.antConsumeCocacina)}`,
           `SI ${checkBox(datos.antConsumeCocacina)}`,
           datos.antConsumeCocacina && datos.fechaConsumeCocacina
-            ? `Cuando: ${datos.fechaConsumeCocacina}`
+            ? `Cuando: ${formatFechaCorta(datos.fechaConsumeCocacina)}`
             : ''
         ],
       ],

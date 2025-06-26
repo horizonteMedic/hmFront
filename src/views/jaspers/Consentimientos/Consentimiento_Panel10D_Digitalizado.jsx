@@ -157,61 +157,61 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
           'CONSUME COCAÍNA (COC)',
           `NO ${checkBox(!datos.antConsumeCocacina)}`,
           `SI ${checkBox(datos.antConsumeCocacina)}`,
-          datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${datos.fechaConsumeCocacina}` : ''
+          datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${formatearFecha(datos.fechaConsumeCocacina)}` : ''
         ],
         [
           'CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS',
           `NO ${checkBox(!datos.antConsumeHojaCoca)}`,
           `SI ${checkBox(datos.antConsumeHojaCoca)}`,
-          datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${datos.fechaConsumoHojaCoca}` : ''
+          datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${formatearFecha(datos.fechaConsumoHojaCoca)}` : ''
         ],
         [
           'CONSUME ANFETAMINAS (AMP)',
           `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`,
           `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`,
-          datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${datos.fechaConsumeAnfetamina}` : ''
+          datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}` : ''
         ],
         [
           'CONSUME METANFETAMINAS (MET)',
           `NO ${checkBox(!datos.antConsumeMethanfetaminaOOpiaceos)}`,
           `SI ${checkBox(datos.antConsumeMethanfetaminaOOpiaceos)}`,
-          datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${datos.fechaConsumeMethanfetamina}` : ''
+          datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeMethanfetamina)}` : ''
         ],
         [
           'CONSUME BENZODIAZEPINAS (BZO)',
           `NO ${checkBox(!datos.antConsumeBenzodiacepinas)}`,
           `SI ${checkBox(datos.antConsumeBenzodiacepinas)}`,
-          datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${datos.fechaConsumeBenzodiacepinas}` : ''
+          datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${formatearFecha(datos.fechaConsumeBenzodiacepinas)}` : ''
         ],
         [
           'CONSUME OPIÁCEOS (OPI)',
           `NO ${checkBox(!datos.antConsumeOpiacesos)}`,
           `SI ${checkBox(datos.antConsumeOpiacesos)}`,
-          datos.antConsumeOpiacesos && datos.fechaConsumeOpiacesos ? `Cuando: ${datos.fechaConsumeOpiacesos}` : ''
+          datos.antConsumeOpiacesos && datos.fechaConsumeOpiacesos ? `Cuando: ${formatearFecha(datos.fechaConsumeOpiacesos)}` : ''
         ],
         [
           'CONSUME BARBITÚRICOS (BAR)',
           `NO ${checkBox(!datos.antConsumeBarbituricos)}`,
           `SI ${checkBox(datos.antConsumeBarbituricos)}`,
-          datos.antConsumeBarbituricos && datos.fechaConsumeBarbituricos ? `Cuando: ${datos.fechaConsumeBarbituricos}` : ''
+          datos.antConsumeBarbituricos && datos.fechaConsumeBarbituricos ? `Cuando: ${formatearFecha(datos.fechaConsumeBarbituricos)}` : ''
         ],
         [
           'CONSUME METADONA (MTD)',
           `NO ${checkBox(!datos.antConsumeMetadona)}`,
           `SI ${checkBox(datos.antConsumeMetadona)}`,
-          datos.antConsumeMetadona && datos.fechaConsumeMetadona ? `Cuando: ${datos.fechaConsumeMetadona}` : ''
+          datos.antConsumeMetadona && datos.fechaConsumeMetadona ? `Cuando: ${formatearFecha(datos.fechaConsumeMetadona)}` : ''
         ],
         [
           'CONSUME FENCICLIDINA (PCP)',
           `NO ${checkBox(!datos.antConsumeFenciclidina)}`,
           `SI ${checkBox(datos.antConsumeFenciclidina)}`,
-          datos.antConsumeFenciclidina && datos.fechaConsumeFenciclidina ? `Cuando: ${datos.fechaConsumeFenciclidina}` : ''
+          datos.antConsumeFenciclidina && datos.fechaConsumeFenciclidina ? `Cuando: ${formatearFecha(datos.fechaConsumeFenciclidina)}` : ''
         ],
         [
           'CONSUME ANTIDEPRESIVOS TRICÍCLICOS (TCA)',
           `NO ${checkBox(!datos.antConsumeAntidepreTricicli)}`,
           `SI ${checkBox(datos.antConsumeAntidepreTricicli)}`,
-          datos.antConsumeAntidepreTricicli && datos.fechaConsumeAntidepreTricicli ? `Cuando: ${datos.fechaConsumeAntidepreTricicli}` : ''
+          datos.antConsumeAntidepreTricicli && datos.fechaConsumeAntidepreTricicli ? `Cuando: ${formatearFecha(datos.fechaConsumeAntidepreTricicli)}` : ''
         ],
       ],
       theme: 'plain',
