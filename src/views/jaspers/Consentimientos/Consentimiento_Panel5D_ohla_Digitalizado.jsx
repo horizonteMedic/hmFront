@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import headerConsentimiento from "../components/headerConsentimiento";
+import headerConsentimiento from "./header/headerConsentimiento.jsx";
 import footer from "../components/footer";
 
 export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
@@ -55,11 +55,11 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     const edad = String(datos.edad || '___');
     const dni = String(datos.dni || '__________');
     const bloques = [
-      { text: 'Yo ', bold: false },
+      { text: 'Yo  ', bold: false },
       { text: nombre, bold: true },
       { text: ', de ', bold: false },
       { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI nº ', bold: false },
+      { text: ' años de edad, identificado con DNI N° ', bold: false },
       { text: dni, bold: true },
       { text: '; habiendo recibido consejería e información acerca de la prueba para el panel de 5D drogas en orina; y en pleno uso de mis facultades mentales ', bold: false },
       { text: 'AUTORIZO', bold: true },
@@ -139,16 +139,30 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     doc.text('ANTECEDENTES:', margin, y);
     y += 6;
 
+    function formatearFecha(fecha) {
+      if (!fecha) return '';
+      const f = new Date(fecha);
+      const dia = String(f.getDate()).padStart(2, '0');
+      const mes = String(f.getMonth() + 1).padStart(2, '0');
+      const anio = f.getFullYear();
+      return `${dia}/${mes}/${anio}`;
+    }
+
+    function checkBox(checked) {
+      const filler = '\u00A0';
+      return `(  ${checked ? 'X' : filler + filler}  )`;
+    }
+
     // Tabla de antecedentes
     autoTable(doc, {
       startY: y,
       body: [
-        ['CONSUME MARIHUANA ', `NO (${!datos.antConsumeMarih ? "X" : "    "})`, `SI (${datos.antConsumeMarih ? "X" : "    "})`, datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${datos.fechaConsumeMarih}` : ''],
-        ['CONSUME COCAÍNA ', `NO (${!datos.antConsumeCocacina ? "X" : "    "})`, `SI (${datos.antConsumeCocacina ? "X" : "    "})`, datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${datos.fechaConsumeCocacina}` : ''],
-        ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO (${!datos.antConsumeHojaCoca ? "X" : "    "})`, `SI (${datos.antConsumeHojaCoca ? "X" : "    "})`, datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${datos.fechaConsumoHojaCoca}` : ''],
-        ['CONSUME ANFETAMINAS ', `NO (${!datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, `SI (${datos.antConsumeAnfetaminaOExtasis ? "X" : "    "})`, datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${datos.fechaConsumeAnfetamina}` : ''],
-        ['CONSUME METANFETAMINAS ', `NO (${!datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, `SI (${datos.antConsumeMethanfetaminaOOpiaceos ? "X" : "    "})`, datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${datos.fechaConsumeMethanfetamina}` : ''],
-        ['CONSUME BENZODIAZEPINAS', `NO (${!datos.antConsumeBenzodiacepinas ? "X" : "    "})`, `SI (${datos.antConsumeBenzodiacepinas ? "X" : "    "})`, datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${datos.fechaConsumeBenzodiacepinas}` : ''],
+        ['CONSUME MARIHUANA ', `NO ${checkBox(!datos.antConsumeMarih)}`, `SI ${checkBox(datos.antConsumeMarih)}`, datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${formatearFecha(datos.fechaConsumeMarih)}` : ''],
+        ['CONSUME COCAÍNA ', `NO ${checkBox(!datos.antConsumeCocacina)}`, `SI ${checkBox(datos.antConsumeCocacina)}`, datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${formatearFecha(datos.fechaConsumeCocacina)}` : ''],
+        ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO ${checkBox(!datos.antConsumeHojaCoca)}`, `SI ${checkBox(datos.antConsumeHojaCoca)}`, datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${formatearFecha(datos.fechaConsumoHojaCoca)}` : ''],
+        ['CONSUME ANFETAMINAS ', `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`, `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`, datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}` : ''],
+        ['CONSUME METANFETAMINAS ', `NO ${checkBox(!datos.antConsumeMethanfetaminaOOpiaceos)}`, `SI ${checkBox(datos.antConsumeMethanfetaminaOOpiaceos)}`, datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeMethanfetamina)}` : ''],
+        ['CONSUME BENZODIAZEPINAS', `NO ${checkBox(!datos.antConsumeBenzodiacepinas)}`, `SI ${checkBox(datos.antConsumeBenzodiacepinas)}`, datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${formatearFecha(datos.fechaConsumeBenzodiacepinas)}` : ''],
       ],
       theme: 'plain',
       styles: { fontSize: 11, cellPadding: 1 },
@@ -162,10 +176,12 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     doc.setFontSize(10);
     if (datos.fecha) {
       const f = new Date(datos.fecha);
-      const dia = String(f.getDate()).padStart(2, '0');
-      const mes = String(f.getMonth() + 1).padStart(2, '0');
+      const dia = f.getDate();
+      const mes = f.getMonth();
       const anio = f.getFullYear();
-      doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align: 'right' });
+      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+      const rightMargin = 20;
+      doc.text(`${dia} de ${meses[mes]} de ${anio}`, pageW - rightMargin, y, { align: 'right' });
     }
     y += 12;
 
@@ -197,13 +213,29 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
       doc.addImage(huellaBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
     // Firma paciente
-    doc.line(65, baseY + 32, 115, baseY + 32);
-    doc.text('Firma del Paciente', 90, baseY + 38, { align: 'center' });
+    const lineX1P = 65;
+    const lineX2P = 115;
+    const lineYP = baseY + 32;
+    const centerXP = (lineX1P + lineX2P) / 2;
+    doc.line(lineX1P, lineYP, lineX2P, lineYP);
+    doc.text('Firma del Paciente', centerXP, lineYP + 6, { align: 'center' });
     if (firmap) {
-      const firmaW = 50;
-      const firmaH = (firmap.height / firmap.width) * firmaW;
-      const firmaX = 65;
-      const firmaY = baseY + 32 - firmaH - 1;
+      const sigW = 70;
+      const sigH = 30;
+      const sigX = centerXP - sigW / 2;
+      const sigY = lineYP - sigH;
+
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+      let imgW = firmap.width;
+      let imgH = firmap.height;
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
 
       const canvas = document.createElement('canvas');
       canvas.width = firmap.width;
@@ -211,7 +243,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(firmap, 0, 0);
       const firmaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
+      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
     // Firma consejero
     doc.line(135, baseY + 32, 185, baseY + 32);

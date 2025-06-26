@@ -23,10 +23,10 @@ const drawRow = (doc, y, test, datos, cols) => {
   doc.text(test.label, cols.col1, y);
   
   const result = datos[test.key] != null ? String(datos[test.key]) : "0";
-  doc.text(result, cols.col2, y, { align: "center" });
+  doc.text(result, cols.col2, y, { align: "left" });
 
   if (typeof test.ref === "string") {
-    doc.text(test.ref, cols.col3, y, { align: "right" });
+    doc.text(test.ref, cols.col3, y, { align: "left" });
     return y + config.lineHeight.normal;
   } else if (Array.isArray(test.ref)) {
     let tempY = y;
@@ -37,7 +37,7 @@ const drawRow = (doc, y, test, datos, cols) => {
       const valuePart = parts[1] || '';
       const textRightAligned = labelPart.trim() + " " + valuePart.trim();
 
-      doc.text(textRightAligned, cols.col3, tempY, { align: "right" });
+      doc.text(textRightAligned, cols.col3, tempY, { align: "left" });
       if (index < test.ref.length - 1) {
         tempY += config.lineHeight.small;
       }
@@ -85,14 +85,14 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
 
     const tableCols = {
       col1: config.margin,
-      col2: pageW / 2,
-      col3: pageW - config.margin,
+      col2: 90,
+      col3: 135,
     };
 
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("PRUEBA", tableCols.col1, y);
-    doc.text("RESULTADO", tableCols.col2, y, { align: "center" });
-    doc.text("RANGO REFERENCIAL", tableCols.col3, y, { align: "right" });
+    doc.text("RESULTADO", tableCols.col2, y, { align: "left" });
+    doc.text("RANGO REFERENCIAL", tableCols.col3, y, { align: "left" });
     y += 3;
     doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
     y += config.lineHeight.normal;
@@ -125,8 +125,8 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = y + 20; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = y + 20;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -137,7 +137,7 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
@@ -146,12 +146,7 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     if (s2) {
@@ -165,8 +160,8 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = y + 20; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = y + 20;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -177,7 +172,7 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
@@ -186,12 +181,7 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     footer(doc, datos);

@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import headerConsentimiento from "../components/headerConsentimiento";
+import headerConsentimiento from "./header/headerConsentimiento.jsx";
 import footer from "../components/footer";
 
 export default function Consentimiento_Boro_Digitalizado(datos) {
@@ -46,7 +46,15 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     // Encabezado de datos principales
     y += 2;
     // Tabla centrada para Fecha, Hora, Ciudad
-    const fechaStr = datos.fecha || '';
+    let fechaStr = datos.fecha || '';
+    if (datos.fecha) {
+      const f = new Date(datos.fecha);
+      const dia = f.getDate();
+      const mes = f.getMonth();
+      const anio = f.getFullYear();
+      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+      fechaStr = `${dia} de ${meses[mes]} de ${anio}`;
+    }
     const horaStr = datos.horaExamen || '';
     const ciudadStr = datos.sede || '';
     autoTable(doc, {
@@ -64,9 +72,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       theme: 'grid',
       styles: {
         fontSize: 10,
-        cellPadding: 2,
-        lineWidth: 0.2,
-        lineColor: [180,180,180],
+        cellPadding: 0.5,
+        lineWidth: 0.1,
+        lineColor: [0,0,0],
         halign: 'center',
         valign: 'middle',
       },
@@ -74,22 +82,22 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
         fillColor: [255,255,255],
         textColor: [0,0,0],
         fontStyle: 'bold',
-        lineWidth: 0.5,
-        lineColor: [180,180,180],
+        lineWidth: 0.1,
+        lineColor: [0,0,0],
       },
       bodyStyles: {
         fillColor: [255,255,255],
         textColor: [0,0,0],
-        lineWidth: 0.2,
-        lineColor: [180,180,180],
+        lineWidth: 0.1,
+        lineColor: [0,0,0],
       },
-      tableLineWidth: 0.2,
-      tableLineColor: [180,180,180],
-      margin: { left: (pageW - 120) / 2, right: (pageW - 120) / 2 }, // Centrado, ancho aprox 120
+      tableLineWidth: 0.1,
+      tableLineColor: [0,0,0],
+      margin: { left: (pageW - 150) / 2, right: (pageW - 150) / 2 }, // Centrado, ancho aprox 150
       columnStyles: {
-        0: { cellWidth: 40 },
-        1: { cellWidth: 40 },
-        2: { cellWidth: 40 },
+        0: { cellWidth: 50 },
+        1: { cellWidth: 50 },
+        2: { cellWidth: 50 },
       },
       didDrawPage: (data) => {
         y = data.cursor.y + 2;
@@ -108,7 +116,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const trabajador = datos.trabajador ? 'X' : ' ';
     const postulante = datos.postulante ? 'X' : ' ';
     const bloques = [
-      { text: 'Yo ', bold: false },
+      { text: 'Yo  ', bold: false },
       { text: nombre, bold: true },
       { text: ' de ', bold: false },
       { text: edad, bold: true },
@@ -199,8 +207,8 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`SI ( ${datos.antBoroAlgunaEnfermedad ? 'X' : ' '} )`, margin + 92, y);
     doc.text(`NO ( ${!datos.antBoroAlgunaEnfermedad ? 'X' : ' '} )`, margin + 110, y);
     if (datos.antBoroAlgunaEnfermedad) {
-      doc.text('¿Cuál (es):', margin + 145, y);
-      doc.text(`${datos.critCualAlgunaEnfermedad || ''}`, margin + 168, y);
+      doc.text('¿Cuál (es):', margin + 130, y);
+      doc.text(`${datos.critCualAlgunaEnfermedad || ''}`, margin + 150, y);
     }
     y += 5;
     // Medicamento
@@ -208,8 +216,8 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`SI ( ${datos.antBoroAlgunMedicamento ? 'X' : ' '} )`, margin + 92, y);
     doc.text(`NO ( ${!datos.antBoroAlgunMedicamento ? 'X' : ' '} )`, margin + 110, y);
     if (datos.antBoroAlgunMedicamento) {
-      doc.text('¿Cuál (es):', margin + 145, y);
-      doc.text(`${datos.critCualAlgunMedicamento || ''}`, margin + 168, y);
+      doc.text('¿Cuál (es):', margin + 130, y);
+      doc.text(`${datos.critCualAlgunMedicamento || ''}`, margin + 150, y);
     }
     y += 5;
     // Mate de coca
@@ -222,11 +230,19 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const mateLines = doc.splitTextToSize(mateMsg, pageW - 2 * margin - 4);
     mateLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 4;
+      y += 6;
     });
     if (datos.antBoroConsumenMateCoca) {
-      doc.text('CUANDO:', margin + 7, y);
-      doc.text(`${datos.critFechaConsumoMateCoca || ''}`, margin + 32, y);
+      doc.text('CUANDO:', margin + 130, y);
+      let fechaMate = datos.critFechaConsumoMateCoca || '';
+      if (fechaMate && !isNaN(Date.parse(fechaMate))) {
+        const f = new Date(fechaMate);
+        const dia = String(f.getDate()).padStart(2, '0');
+        const mes = String(f.getMonth() + 1).padStart(2, '0');
+        const anio = f.getFullYear();
+        fechaMate = `${dia}-${mes}-${anio}`;
+      }
+      doc.text(fechaMate, margin + 150, y);
       y += 7;
     } else {
       y += 2;
@@ -236,7 +252,16 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`SI ( ${datos.masticaHojaCoca ? 'X' : ' '} )`, margin + 92, y);
     doc.text(`NO ( ${!datos.masticaHojaCoca ? 'X' : ' '} )`, margin + 110, y);
     if (datos.masticaHojaCoca && datos.fechaConsumoHojaCoca) {
-      doc.text(`CUANDO: ${datos.fechaConsumoHojaCoca}`, margin + 145, y);
+      doc.text('CUANDO:', margin + 130, y);
+      let fechaHoja = datos.fechaConsumoHojaCoca;
+      if (fechaHoja && !isNaN(Date.parse(fechaHoja))) {
+        const f = new Date(fechaHoja);
+        const dia = String(f.getDate()).padStart(2, '0');
+        const mes = String(f.getMonth() + 1).padStart(2, '0');
+        const anio = f.getFullYear();
+        fechaHoja = `${dia}-${mes}-${anio}`;
+      }
+      doc.text(fechaHoja, margin + 150, y);
     }
     y += 5;
     // Texto justificado para la pregunta larga
@@ -244,9 +269,11 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const hojaLines = doc.splitTextToSize(hojaMsg, pageW - 2 * margin - 4);
     hojaLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 4;
+      y += 6;
     });
     y += 1;
+    // Espacio extra entre preguntas largas
+    y += 5;
     // Tratamiento quirúrgico/dental
     doc.text('- ¿Se realizó algún tratamiento quirúrgico o dental en las últimas 48 horas?', margin, y);
     doc.text(`SI ( ${datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 142, y);
@@ -257,30 +284,33 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     const tratLines = doc.splitTextToSize(tratMsg, pageW - 2 * margin - 4);
     tratLines.forEach(line => {
       doc.text(line, margin, y);
-      y += 4;
+      y += 6;
     });
     y += 1;
-    // Mostrar bloque apilado a la derecha para Cual, Donde, Cuando
-    const rightMargin = pageW - margin;
+    // Mostrar bloque con etiquetas y respuestas pegadas y alineadas a la derecha, todo en negrita
     let yCampos = y;
-    // Cual
-    doc.setFont('helvetica', 'normal');
-    doc.text('Cual:', rightMargin - 60, yCampos, { align: 'right' });
+    const rightX = pageW - margin;
+    const etiquetaX = rightX - 40;
+    const respuestaX = etiquetaX + 5;
     doc.setFont('helvetica', 'bold');
-    doc.text(`${datos.critCualTratQuirugODental || ''}`, rightMargin, yCampos, { align: 'right' });
-    yCampos += 5;
-    // Donde
-    const dondeValue = `${datos.critDondeTratQuirugODental || ''}`;
+    doc.text('CUAL', etiquetaX, yCampos, { align: 'right' });
     doc.setFont('helvetica', 'normal');
-    doc.text('Donde:', rightMargin - 60, yCampos, { align: 'right' });
+    doc.text(':', etiquetaX + 2, yCampos);
+    doc.text(`${datos.critCualTratQuirugODental || ''}`, respuestaX, yCampos);
+
+    yCampos += 8;
     doc.setFont('helvetica', 'bold');
-    doc.text(dondeValue, rightMargin, yCampos, { align: 'right' });
-    yCampos += 5;
-    // Cuando
+    doc.text('DONDE', etiquetaX, yCampos, { align: 'right' });
     doc.setFont('helvetica', 'normal');
-    doc.text('Cuando:', rightMargin - 60, yCampos, { align: 'right' });
+    doc.text(':', etiquetaX + 2, yCampos);
+    doc.text(`${datos.critDondeTratQuirugODental || ''}`, respuestaX, yCampos);
+
+    yCampos += 8;
     doc.setFont('helvetica', 'bold');
-    doc.text(`${datos.critCuandoTratQuirugODental || ''}`, rightMargin, yCampos, { align: 'right' });
+    doc.text('CUANDO', etiquetaX, yCampos, { align: 'right' });
+    doc.setFont('helvetica', 'normal');
+    doc.text(':', etiquetaX + 2, yCampos);
+    doc.text(`${datos.critCuandoTratQuirugODental || ''}`, respuestaX, yCampos);
     y = yCampos + 2;
 
     // Fecha del examen en la parte inferior
@@ -295,18 +325,33 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     // Línea horizontal antes del texto de firma
     const firmaText = 'Firma y Huella del trabajador / paciente evaluado';
     const firmaTextWidth = doc.getTextWidth(firmaText);
-    const lineaBaseY = y - 4;
+    const lineX1P = 18;
+    const lineX2P = 18 + firmaTextWidth;
+    const lineYP = y - 4;
+    const centerXP = (lineX1P + lineX2P) / 2;
     doc.setDrawColor(100);
-    doc.line(18, lineaBaseY, 18 + firmaTextWidth, lineaBaseY);
+    doc.line(lineX1P, lineYP, lineX2P, lineYP);
     doc.setFont(undefined, 'bold');
-    doc.text(firmaText, 18, y);
+    doc.text(firmaText, centerXP, y, { align: 'center' });
 
-    // Firma primero, luego huella
+    // Firma paciente centrada sobre la línea
     if (firmap) {
-      const firmaW = 26;
-      const firmaH = (firmap.height / firmap.width) * firmaW;
-      const firmaX = 18 + firmaTextWidth * 0.25 - firmaW / 2;
-      const firmaY = lineaBaseY - firmaH - 2;
+      const sigW = 70;
+      const sigH = 30;
+      const sigX = centerXP - sigW / 2;
+      const sigY = lineYP - sigH;
+
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+      let imgW = firmap.width;
+      let imgH = firmap.height;
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
 
       const canvas = document.createElement('canvas');
       canvas.width = firmap.width;
@@ -314,14 +359,15 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(firmap, 0, 0);
       const firmaBase64 = canvas.toDataURL('image/png');
-      doc.addImage(firmaBase64, 'PNG', firmaX, firmaY, firmaW, firmaH);
+      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
 
+    // Huella (sin cambios)
     if (huellap) {
       const huellaW = 16;
       const huellaH = (huellap.height / huellap.width) * huellaW;
       const huellaX = 18 + firmaTextWidth * 0.75 - huellaW / 2;
-      const huellaY = lineaBaseY - huellaH - 2;
+      const huellaY = lineYP - huellaH - 2;
 
       const canvas = document.createElement('canvas');
       canvas.width = huellap.width;

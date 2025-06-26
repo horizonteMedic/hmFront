@@ -45,7 +45,7 @@ const header_Panel10d_Digitalizado = (doc, datos = {}) => {
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
   doc.text(nroOrdenLabel, nroOrdenX, y + 5);
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('helvetica', 'bold').setFontSize(18);
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y + 5);
   doc.setLineWidth(0.5);
   doc.line(
@@ -63,11 +63,17 @@ const header_Panel10d_Digitalizado = (doc, datos = {}) => {
   const patientDataX = margin;
   
   const drawPatientDataRow = (label, value) => {
+    const labelWithColon = label.endsWith(':') ? label : label + ' :';
     doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text(label, patientDataX, y);
+    doc.text(labelWithColon, patientDataX, y);
+    let valueX = patientDataX + doc.getTextWidth(labelWithColon) + 2;
+    if (label.toLowerCase().includes('apellidos y nombres')) {
+      // 8mm ≈ 23 px (aprox)
+      const minGap = 23;
+      if (doc.getTextWidth(labelWithColon) < minGap) valueX = patientDataX + minGap;
+    }
     doc.setFont('helvetica', 'normal');
-    const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value).toUpperCase(), valueX, y);
     y += lineHeight;
   };
   

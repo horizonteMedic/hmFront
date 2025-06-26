@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import headerConsentimiento from "../components/headerConsentimiento";
+import headerConsentimiento from "./header/headerConsentimiento.jsx";
 import footer from "../components/footer";
 
 export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
@@ -52,11 +52,11 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
 
     // Construir bloques de texto (normales y negrita)
     const bloques = [
-      { text: 'Yo ', bold: false },
+      { text: 'Yo  ', bold: false },
       { text: nombre, bold: true },
       { text: ', de ', bold: false },
       { text: edad, bold: true },
-      { text: ' años de edad, identificado con DNI nº ', bold: false },
+      { text: ' años de edad, identificado con DNI N° ', bold: false },
       { text: dni, bold: true },
       { text: '; habiendo recibido consejería e información acerca de los exámenes en sangre que se me va a realizar según solicitud del protocolo médico de la empresa ', bold: false },
       { text: empresa, bold: true },
@@ -138,11 +138,13 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     // ─── 4) FECHA ─────────────────────────────────────
     doc.setFont('helvetica','normal').setFontSize(10);
     if (datos.fecha) {
-      const f   = new Date(datos.fecha);
-      const dia = String(f.getDate()).padStart(2,'0');
-      const mes = String(f.getMonth()+1).padStart(2,'0');
-      const anio= f.getFullYear();
-      doc.text(`${dia}/${mes}/${anio}`, pageW - margin, y, { align:'right' });
+      const f = new Date(datos.fecha);
+      const dia = f.getDate();
+      const mes = f.getMonth();
+      const anio = f.getFullYear();
+      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+      const rightMargin = 20;
+      doc.text(`${dia} de ${meses[mes]} de ${anio}`, pageW - rightMargin, y, { align: 'right' });
     }
     y += 15;
 
@@ -165,27 +167,71 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
     }
 
     // Firma paciente
-    doc.line(65, baseY+32,115,baseY+32)
-       .text('Firma del Paciente',90,baseY+38,{align:'center'});
+    const lineX1P = 65;
+    const lineX2P = 115;
+    const lineYP = baseY + 32;
+    const centerXP = (lineX1P + lineX2P) / 2;
+    doc.line(lineX1P, lineYP, lineX2P, lineYP)
+       .text('Firma del Paciente', centerXP, lineYP + 6, {align:'center'});
     if (firmap) {
-      const fW=40, fH=(firmap.height/firmap.width)*fW;
-      const xF=70+(50-fW)/2, yF=baseY+32-fH-2;
-      const cvf=document.createElement('canvas');
-      cvf.width=firmap.width;cvf.height=firmap.height;
-      cvf.getContext('2d').drawImage(firmap,0,0);
-      doc.addImage(cvf.toDataURL('image/png'),'PNG',xF,yF,fW,fH);
+      const sigW = 70;
+      const sigH = 30;
+      const sigX = centerXP - sigW / 2;
+      const sigY = lineYP - sigH;
+
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+      let imgW = firmap.width;
+      let imgH = firmap.height;
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = firmap.width;
+      canvas.height = firmap.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(firmap, 0, 0);
+      const firmaBase64 = canvas.toDataURL('image/png');
+      doc.addImage(firmaBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
 
     // Firma y sello consejero
-    doc.line(135, baseY+32,185,baseY+32)
-       .text('Firma y sello del Consejero',160,baseY+38,{align:'center'});
+    const lineX1 = 135;
+    const lineX2 = 185;
+    const lineY = baseY + 32;
+    const centerX = (lineX1 + lineX2) / 2;
+    doc.line(lineX1, lineY, lineX2, lineY)
+       .text('Firma y sello del Consejero', centerX, lineY + 6, {align:'center'});
     if (sellop) {
-      const sW=35, sH=(sellop.height/sellop.width)*sW;
-      const xS=135+(50-sW)/2, yS=baseY+32-sH-2;
-      const cvs=document.createElement('canvas');
-      cvs.width=sellop.width;cvs.height=sellop.height;
-      cvs.getContext('2d').drawImage(sellop,0,0);
-      doc.addImage(cvs.toDataURL('image/png'),'PNG',xS,yS,sW,sH);
+      const sigW = 70;
+      const sigH = 30;
+      const sigX = centerX - sigW / 2;
+      const sigY = lineY - sigH;
+
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+      let imgW = sellop.width;
+      let imgH = sellop.height;
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+      imgW *= scale;
+      imgH *= scale;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = sellop.width;
+      canvas.height = sellop.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(sellop, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
 
     footer(doc, datos);

@@ -8,7 +8,7 @@ const config = {
   margin: 15,
   col1X: 15,
   col2X: 115,
-  col3X: 185,
+  col3X: 170,
   fontSize: {
     title: 14,
     header: 11,
@@ -124,7 +124,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
           // Dimensiones del área del sello
           const sigW = 70;
           const sigH = 35;
-          const sigX = 80; // o cualquier X deseado
+          const sigX = (pageW - sigW) / 2; // Centrado horizontal
           const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
 
           // Tamaño máximo dentro del área
@@ -164,7 +164,7 @@ export default function Panel10d_Digitalizado(datos = {}) {
           // Dimensiones del área del sello
           const sigW = 70;
           const sigH = 35;
-          const sigX = 130; // o cualquier X deseado
+          const sigX = (pageW - sigW) / 2; // Centrado horizontal
           const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
 
           // Tamaño máximo dentro del área

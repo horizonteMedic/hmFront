@@ -69,7 +69,7 @@ export default function Microbiologia_Digitalizado(datos = {}) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    let y = 65; 
+    let y = 80; // Bajar el contenido
 
     // === TÍTULO con subrayado ===
     drawUnderlinedTitle(doc, "MICROBIOLOGÍA", y, config.fontSize.title);
@@ -87,7 +87,7 @@ export default function Microbiologia_Digitalizado(datos = {}) {
     // === ENCABEZADO DE TABLA ===
     doc.setFont(config.font, "bold");
     doc.text("PRUEBA", config.margin, y);
-    doc.text("RESULTADO", pageW - config.margin, y, { align: "right" });
+    doc.text("RESULTADO", pageW - config.margin - 25, y, { align: "right" }); // Más a la izquierda
 
     y += 4;
     doc.setLineWidth(0.5);
@@ -100,25 +100,15 @@ export default function Microbiologia_Digitalizado(datos = {}) {
     // === Datos de pruebas (Condicional) ===
     // Dependiendo de si es un examen directo o no, se muestran diferentes pruebas.
     if (datos.examenDirecto) {
-      drawResultRow(
-        doc,
-        y,
-        "EXAMEN DIRECTO (KOH)",
-        datos.txtKoh ?? "N/A"
-      );
+      // Resultado más a la izquierda
+      doc.text("EXAMEN DIRECTO (KOH)", config.margin, y);
+      doc.text(datos.txtKoh ?? "N/A", pageW - config.margin - 25, y, { align: "right" });
     } else {
-      y = drawResultRow(
-        doc,
-        y,
-        "Examen de BK - BACILOSCOPIA 1° Muestra",
-        datos.txtMuestra1 ?? "N/A"
-      );
-      drawResultRow(
-        doc,
-        y,
-        "Examen de BK - BACILOSCOPIA 2° Muestra",
-        datos.txtMuestra2 ?? "N/A"
-      );
+      doc.text("Examen de BK - BACILOSCOPIA 1° Muestra", config.margin, y);
+      doc.text(datos.txtMuestra1 ?? "N/A", pageW - config.margin - 25, y, { align: "right" });
+      y += config.lineHeight;
+      doc.text("Examen de BK - BACILOSCOPIA 2° Muestra", config.margin, y);
+      doc.text(datos.txtMuestra2 ?? "N/A", pageW - config.margin - 25, y, { align: "right" });
     }
     if (s1) {
       const canvas = document.createElement('canvas');
@@ -131,8 +121,8 @@ export default function Microbiologia_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -171,8 +161,8 @@ export default function Microbiologia_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 210; // Más abajo
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

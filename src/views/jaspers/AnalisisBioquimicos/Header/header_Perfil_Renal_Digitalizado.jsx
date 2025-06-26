@@ -25,8 +25,17 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   // Info Derecha (movida más a la izquierda)
   doc.setFontSize(11)
   doc.setFont(undefined, 'bold')
-  doc.text('Nro Orden:', 110, 20)
-  doc.text(String(datos.norden) || '', 135, 20)
+  const nroOrdenLabel = 'Nro Orden:';
+  const nroOrdenValue = String(datos.norden) || '';
+  const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
+  doc.text(nroOrdenLabel, 110, 20)
+  doc.setFontSize(18)
+  doc.text(nroOrdenValue, 110 + nroOrdenLabelWidth + 4, 20)
+  // Subrayado
+  const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
+  doc.setLineWidth(0.7);
+  doc.line(110 + nroOrdenLabelWidth + 4, 21.5, 110 + nroOrdenLabelWidth + 4 + nroOrdenValueWidth, 21.5);
+  doc.setLineWidth(0.2);
   doc.setFont(undefined, 'normal')
   doc.text('Sede:', 110, 25)
   doc.text(datos.sede || 'Trujillo-Piarda', 122, 25)
@@ -47,7 +56,8 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
     doc.setFont(undefined, 'bold')
     doc.text(label, patientDataX, y)
     doc.setFont(undefined, 'normal')
-    doc.text(value, patientDataX + labelWidth, y)
+    const labelW = doc.getTextWidth(label);
+    doc.text(value, patientDataX + labelW + 4, y)
   }
 
   field('Apellidos y Nombres :', datos.nombres || 'HADY KATHERINE CASTILLO PLASENCIA', patientDataY)

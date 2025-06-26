@@ -30,21 +30,22 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
   }
 
   // 2. Nro Orden (movido más a la izquierda)
-  const rightColX = pageW - margin - 30; // Movido 30 unidades a la izquierda
-  doc.setFontSize(11).setFont("helvetica", "normal");
+  const rightColX = pageW - margin - 30;
   const nroOrdenLabel = "Nro Orden :";
   const nroOrdenValue = String(datos.norden || '');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
-  
+  doc.setFontSize(11).setFont("helvetica", "normal");
   doc.text(nroOrdenLabel, nroOrdenX, y + 5);
-  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18).setFont("helvetica", "bold");
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y + 5);
-  doc.setLineWidth(0.5).line(
-    nroOrdenX + nroOrdenLabelWidth + 1, y + 6.5,
+  doc.setLineWidth(0.7);
+  doc.line(
+    nroOrdenX + nroOrdenLabelWidth + 2, y + 6.5,
     nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 6.5
   );
+  doc.setLineWidth(0.2);
 
   // Sede (debajo, alineado con el Nro Orden)
   doc.setFontSize(9).setFont("helvetica", "normal");
@@ -60,7 +61,7 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + 4, y);
     y += lineHeight;
   };
   

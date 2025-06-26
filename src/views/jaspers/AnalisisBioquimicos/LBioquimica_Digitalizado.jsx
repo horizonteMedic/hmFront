@@ -34,8 +34,8 @@ export default function LBioquimica_Digitalizado(datos) {
         x: 15,
         y: 0, 
         col1X: 20,
-        col2X: 85,
-        col3X: 120,
+        col2X: 75,
+        col3X: 110,
         col3Width: 70, 
       }
     };
@@ -130,9 +130,9 @@ export default function LBioquimica_Digitalizado(datos) {
 
       // Dimensiones del área del sello
       const sigW = 70;
-      const sigH = 30;
-      const sigX = config.table.col3X - 70; // o cualquier X deseado
-      const sigY = y + 20; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigH = 35;
+      const sigX = (config.pageWidth - sigW) / 2; // Centrado horizontal
+      const sigY = y + 20;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -143,7 +143,7 @@ export default function LBioquimica_Digitalizado(datos) {
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
@@ -152,12 +152,7 @@ export default function LBioquimica_Digitalizado(datos) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     if (s2) {
@@ -170,9 +165,9 @@ export default function LBioquimica_Digitalizado(datos) {
 
       // Dimensiones del área del sello
       const sigW = 70;
-      const sigH = 30;
-      const sigX = config.table.col3X - 20; // o cualquier X deseado
-      const sigY = y + 20; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigH = 35;
+      const sigX = (config.pageWidth - sigW) / 2; // Centrado horizontal
+      const sigY = y + 20;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -183,7 +178,7 @@ export default function LBioquimica_Digitalizado(datos) {
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
@@ -192,12 +187,7 @@ export default function LBioquimica_Digitalizado(datos) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     footer(doc, datos, y);

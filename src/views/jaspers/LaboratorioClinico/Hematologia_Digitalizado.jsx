@@ -158,8 +158,9 @@ export default function Hematologia_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = 235; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const pageW = doc.internal.pageSize.getWidth();
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 235; // Mantén la posición vertical
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -170,7 +171,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
@@ -179,12 +180,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     if (s2) {
@@ -198,8 +194,9 @@ export default function Hematologia_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const pageW = doc.internal.pageSize.getWidth();
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigY = 190; // Mantén la posición vertical
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -210,7 +207,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
@@ -219,12 +216,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
     footer(doc, datos);
 

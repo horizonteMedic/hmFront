@@ -22,7 +22,7 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   header_Inmunologia_Digitalizado(doc, datos);
 
   // === CUERPO ===
-  let y = 80; // Posición Y inicial después del nuevo header
+  let y = 90; // Posición Y inicial después del nuevo header
 
   // Título
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
@@ -32,7 +32,7 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   // Encabezado de tabla
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
   doc.text("PRUEBA", config.margin, y);
-  doc.text("RESULTADO", pageW - config.margin, y, { align: "right" });
+  doc.text("RESULTADO", pageW - config.margin - 25, y, { align: "right" });
   y += 2;
   
   // Línea
@@ -53,7 +53,7 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   
   // Dibujar el resultado (verticalmente centrado con respecto a las etiquetas)
   const resultY = y - 2.5; // (5 / 2)
-  doc.text(testValue, pageW - config.margin, resultY, { align: "right" });
+  doc.text(testValue, pageW - config.margin - 25, resultY, { align: "right" });
 
   // === FOOTER ===
   footer(doc, datos);
