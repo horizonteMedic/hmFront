@@ -65,7 +65,7 @@ const headerHR = (doc, datos) => {
     .text(
       `SEDE: ${datos.nombreSede || ""}`,
       margin,
-      20 + yOffset,
+      25 + yOffset,
       { align: "left" }
     );
 
@@ -90,14 +90,14 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.examen || ""}`, margin + 20, y1);
   
   doc.setFont("helvetica", "bold");
-  doc.text("FECHA:", margin + 60, y1);
+  doc.text("FECHA:", margin + 80, y1);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.fecha || ""}`, margin + 75, y1);
+  doc.text(`${datos.fecha || ""}`, margin + 95, y1);
   
   doc.setFont("helvetica", "bold");
-  doc.text("HORA:", margin + 100, y1);
+  doc.text("HORA:", margin + 120, y1);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.hora || ""}`, margin + 115, y1);
+  doc.text(`${datos.hora || ""}`, margin + 135, y1);
   
   doc.setFont("helvetica", "bold");
   doc.text("N° DE ORDEN:", margin + 145, y1-6);
