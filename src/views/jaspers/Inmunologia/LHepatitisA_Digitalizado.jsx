@@ -84,7 +84,8 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
     // === ENCABEZADO DE TABLA ===
     doc.setFont(config.font, 'bold');
     doc.text('PRUEBA CUALITATIVO', config.margin, y);
-    doc.text('RESULTADO', pageW - config.margin - 25, y, { align: 'right' });
+    const resultColX = pageW / 2 + 40;
+    doc.text('RESULTADO', resultColX, y, { align: 'left' });
     
     y += 3;
     doc.setLineWidth(0.3);
@@ -92,89 +93,51 @@ const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLO
     y += config.lineHeight;
 
     // === CUERPO DE TABLA ===
-    // Nota: Se usa 'hepatitisb' de los datos, que corresponde a "HEPATITIS B (HBsAg)".
+    doc.setFont(config.font, 'normal');
     doc.text('HEPATITIS A (HAV) - RAPID TEST - MONTEST', config.margin, y);
-    doc.text(datos.txtHepatitisa || '', pageW - config.margin - 25, y, { align: 'right' });
+    doc.text(datos.txtHepatitisa || '', resultColX, y, { align: 'left' });
 
-    if (s1) {
+    const imgW = 60, imgH = 25;
+    const marginInterno = 10;
+    if (s1 && s2) {
+      // Dos firmas, una a la izquierda y otra a la derecha
+      const addSello = (img, left) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        const imgX = left ? marginInterno : pageW - marginInterno - imgW;
+        const imgY = 210;
+        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      };
+      addSello(s1, true);
+      addSello(s2, false);
+    } else if (s1) {
+      // Solo una firma, centrada
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = 210; // Más abajo
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
+      const imgX = (pageW - imgW) / 2;
+      const imgY = 210;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
-    }
-
-    if (s2) {
+    } else if (s2) {
+      // Solo la segunda firma, centrada
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = 210; // Más abajo
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
+      const imgX = (pageW - imgW) / 2;
+      const imgY = 210;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
+
     // === FOOTER ===
     footer(doc, datos);
 

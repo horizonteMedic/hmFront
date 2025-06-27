@@ -86,7 +86,16 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
        .text("FECHA", labelX, textY, { align: "left" });
     doc.setFont("helvetica", "normal")
        .text(":", colonX, textY, { align: "center" });
-    doc.text(datos.fecha || "-", valueX, textY, { align: "left" });
+    // Formato de fecha dd/mm/yyyy
+    const formatDateToShort = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(`${dateString}T00:00:00`);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+    doc.text(formatDateToShort(datos.fecha), valueX, textY, { align: "left" });
 
     // —— TESTS ——
     let currentY = y + rowH * 2 - 2;
@@ -102,66 +111,53 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
     });
 
     // ==== FIRMA ====
-    const sigW = 70, sigH = 30, sigX = tableX, sigY = y + tableH + 10;
-    doc.setLineWidth(0.3).roundedRect(sigX, sigY, sigW, sigH, 2, 2);
-    // ... (insert sello1 y sello2 igual que antes) …
-    if (s1) {
+    const recW = 150, recH = 30;
+    const recX = (pageW - recW) / 2;
+    const recY = y + tableH + 30; // más abajo
+
+    doc.setLineWidth(0.3).roundedRect(recX, recY, recW, recH, 2, 2);
+
+    const imgW = 60, imgH = 25;
+    const marginInterno = 10;
+    if (s1 && s2) {
+      // Dos firmas, una a la izquierda y otra a la derecha dentro del recuadro
+      const addSello = (img, left) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        const imgX = left ? recX + marginInterno : recX + recW - marginInterno - imgW;
+        const imgY = recY + (recH - imgH) / 2;
+        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      };
+      addSello(s1, true);  // Izquierda
+      addSello(s2, false); // Derecha
+    } else if (s1) {
+      // Solo una firma, centrada en el recuadro
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Tamaño máximo permitido dentro del cuadro
-      const maxImgW = sigW - 10; // margen horizontal dentro del cuadro
-      const maxImgH = sigH - 10; // margen vertical dentro del cuadro
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      // Escalado proporcional si la imagen es más grande que el área
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // máximo 1 para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
+      const imgX = recX + (recW - imgW) / 2;
+      const imgY = recY + (recH - imgH) / 2;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    if (s2) {
+    } else if (s2) {
+      // Solo la segunda firma, centrada
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Tamaño máximo deseado
-      const maxImgW = 60;
-      const maxImgH = 30;
-
-      // Calcular dimensiones proporcionales
-      let imgW = maxImgW;
-      let imgH = (s2.height / s2.width) * imgW;
-
-      if (imgH > maxImgH) {
-        imgH = maxImgH;
-        imgW = (s2.width / s2.height) * imgH;
-      }
-
-      // Posicionar la imagen con el centro en (sigX + 120, sigY + 35)
-      const imgX = sigX + 120 - imgW / 2;
-      const imgY = sigY + 15 - imgH / 2;
-
+      const imgX = recX + (recW - imgW) / 2;
+      const imgY = recY + (recH - imgH) / 2;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
+
     // ==== FOOTER ====
     footer(doc, datos);
 

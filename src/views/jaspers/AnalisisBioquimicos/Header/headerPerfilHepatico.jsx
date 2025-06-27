@@ -1,19 +1,17 @@
 // src/views/jaspers/AnalisisBioquimicos/Header/headerPerfilHepatico.jsx
 
 /**
- * Formatea una fecha en formato "04 noviembre 2024".
+ * Formatea una fecha en formato "04/11/2024".
  * @param {string} dateString - La fecha en formato YYYY-MM-DD.
  * @returns {string} - La fecha formateada.
  */
-const formatDateToLong = (dateString) => {
+const formatDateToShort = (dateString) => {
   if (!dateString) return '';
-  // Aseguramos que la fecha se interprete en la zona horaria local y no en UTC.
   const date = new Date(`${dateString}T00:00:00`);
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 const headerPerfilHepatico = (doc, datos = {}) => {
@@ -63,7 +61,8 @@ const headerPerfilHepatico = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + 2, y);
+    const extraSpace = label === 'Apellidos y Nombres :' ? 8 : 2;
+    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + extraSpace, y);
     y += lineHeight;
   };
   
@@ -77,7 +76,7 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(String(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(formatDateToShort(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
   
   // Reseteo de estilos para el cuerpo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);

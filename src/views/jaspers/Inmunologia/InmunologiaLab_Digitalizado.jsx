@@ -82,14 +82,15 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
 
     // Encabezado de tabla
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-    doc.text("PRUEBA CUALITATIVO", config.margin, y);
-    doc.text("RESULTADOS", pageW - config.margin - 25, y, { align: "right" });
+    const colW = 60;
+    const col1X = config.margin;
+    const col2X = (pageW / 2) + colW;
+    doc.text("PRUEBA CUALITATIVO", col1X, y);
+    doc.text("RESULTADOS", col2X, y, { align: "center" });
     y += 3;
-
     // Línea
     doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
     y += config.lineHeight;
-
     // Datos
     const testsAglu = [
       { label: "TIFICO O", key: "txtTificoO" },
@@ -98,12 +99,11 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
       { label: "PARATIFICO B", key: "txtParatificoB" },
       { label: "Brucella abortus", key: "txtBrucella" },
     ];
-    
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     testsAglu.forEach(({ label, key }) => {
       const value = datos[key] != null ? datos[key] : "N/A";
-      doc.text(label, config.margin, y);
-      doc.text(value, pageW - config.margin - 25, y, { align: "right" });
+      doc.text(label, col1X, y);
+      doc.text(value, col2X, y, { align: "center" });
       y += config.lineHeight;
     });
 
@@ -119,7 +119,7 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
       const sigW = 70;
       const sigH = 35;
       const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = 210; // Más abajo
+      const sigY = 190; // Más arriba
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -159,7 +159,7 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
       const sigW = 70;
       const sigH = 35;
       const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = 210; // Más abajo
+      const sigY = 190; // Más arriba
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

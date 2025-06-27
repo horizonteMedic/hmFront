@@ -2,9 +2,25 @@ import jsPDF from "jspdf";
 import footer from "../components/footer";
 import header_Perfil_Renal_Digitalizado from "./Header/header_Perfil_Renal_Digitalizado";
 
+const config = {
+  margin: 15,
+  fontSize: {
+    title: 14,
+    subtitle: 11,
+    header: 11,
+    body: 10,
+  },
+  lineHeight: {
+    normal: 7,
+    small: 5,
+  },
+  font: 'helvetica',
+};
+
 export default function LBioquimica_Digitalizado(datos) {
   const doc = new jsPDF();
-  
+  const pageW = doc.internal.pageSize.getWidth();
+
   header_Perfil_Renal_Digitalizado(doc, datos);
 
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
@@ -23,80 +39,29 @@ export default function LBioquimica_Digitalizado(datos) {
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-    const config = {
-      startY: 83,
-      h1Size: 14,
-      h2Size: 11,
-      bodySize: 10,
-      xMargin: 15,
-      pageWidth: doc.internal.pageSize.getWidth(),
-      table: {
-        x: 15,
-        y: 0, 
-        col1X: 20,
-        col2X: 75,
-        col3X: 110,
-        col3Width: 70, 
-      }
+    let y = 83;
+
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
+    doc.text('BIOQUÍMICA', pageW / 2, y, { align: 'center' });
+    y += config.lineHeight.normal * 1.5;
+
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
+    doc.text('MUESTRA : SUERO', config.margin, y);
+    y += config.lineHeight.normal * 1.5;
+
+    const tableCols = {
+      col1: config.margin,
+      col2: 100,
+      col3: 135,
     };
-    
-    let y = config.startY;
 
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(config.h1Size);
-    doc.text('BIOQUÍMICA', config.pageWidth / 2, y, { align: 'center' });
-    y += 8;
-
-    doc.setFontSize(config.h2Size);
-    doc.text('MUESTRA : SUERO', config.xMargin, y);
-    y += 10;
-    
-    config.table.y = y;
-
-    doc.setFont(undefined, 'bold');
-    doc.setFontSize(config.bodySize);
-    doc.text('PRUEBA', config.table.col1X, config.table.y);
-    doc.text('RESULTADO', config.table.col2X, config.table.y);
-    doc.text('VALORES NORMALES', config.table.col3X, config.table.y);
-    y += 2;
-    doc.line(config.xMargin, y, config.pageWidth - config.xMargin, y);
-    y += 5;
-
-    const drawRow = (prueba, resultado, normales, isHeader = false) => {
-      const rowY = y;
-      const lineHeight = doc.getTextDimensions('A').h;
-
-      if (isHeader) {
-        doc.setFont(undefined, 'bold');
-        if (prueba === 'PERFIL RENAL') {
-          doc.text(prueba, config.table.col1X, rowY);
-        } else {
-          doc.text(prueba, config.pageWidth / 2, rowY, { align: 'center' });
-        }
-        y += 8;
-        return;
-      }
-
-      doc.setFont(undefined, 'normal');
-      doc.setFontSize(config.bodySize);
-      
-      const pruebaLines = doc.splitTextToSize(prueba, config.table.col2X - config.table.col1X - 5);
-      doc.text(pruebaLines, config.table.col1X, rowY);
-      
-      doc.text(resultado, config.table.col2X, rowY);
-      
-      const normalesLines = doc.splitTextToSize(normales, config.table.col3Width);
-      doc.text(normalesLines, config.table.col3X, rowY);
-      
-      const maxLines = Math.max(
-          (Array.isArray(pruebaLines) ? pruebaLines.length : 1),
-          (Array.isArray(normalesLines) ? normalesLines.length : 1)
-      );
-      
-      y += maxLines * lineHeight + 4;
-    }
-    
-    drawRow('PERFIL RENAL', '', '', true);
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text('PRUEBA', tableCols.col1, y);
+    doc.text('RESULTADO', tableCols.col2, y, { align: 'center' });
+    doc.text('VALORES NORMALES', tableCols.col3, y, { align: 'left' });
+    y += 3;
+    doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
+    y += config.lineHeight.normal;
 
     const dataRows = [
       {
@@ -116,82 +81,58 @@ export default function LBioquimica_Digitalizado(datos) {
       }
     ];
 
+    doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     dataRows.forEach(row => {
-      drawRow(row.prueba, row.resultado, row.normales);
+      // Prueba
+      doc.text(row.prueba, tableCols.col1, y);
+      // Resultado centrado
+      doc.text(String(row.resultado), tableCols.col2, y, { align: 'center' });
+      // Valores normales (puede ser multilinea)
+      const normalesLines = String(row.normales).split('\n');
+      normalesLines.forEach((line, idx) => {
+        doc.text(line, tableCols.col3, y + idx * config.lineHeight.small, { align: 'left' });
+      });
+      // Ajusta y para la siguiente fila
+      y += Math.max(config.lineHeight.normal, normalesLines.length * config.lineHeight.small + 2);
     });
 
-    if (s1) {
+    // Dimensiones fijas del área del sello
+    const imgW = 60; // ancho fijo en mm
+    const imgH = 25; // alto fijo en mm
+    const sigY = y + 20;
+    const firmaMargin = 40; // margen lateral personalizado para juntar más las firmas
+
+    if (s1 && !s2) {
+      // Solo un sello, centrado
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (config.pageWidth - sigW) / 2; // Centrado horizontal
-      const sigY = y + 20;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
+      // Centrado horizontal
+      const imgX = (pageW - imgW) / 2;
+      const imgY = sigY;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (config.pageWidth - sigW) / 2; // Centrado horizontal
-      const sigY = y + 20;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    } else if (s1 && s2) {
+      // Dos sellos, uno a la izquierda y otro a la derecha
+      const addSello = (img, left) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        // Izquierda o derecha, usando firmaMargin para acercarlas
+        const imgX = left ? firmaMargin : pageW - firmaMargin - imgW;
+        const imgY = sigY;
+        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      };
+      addSello(s1, true);  // Izquierda
+      addSello(s2, false); // Derecha
     }
 
     footer(doc, datos, y);
-    
     const pdfBlob = doc.output("blob");
     const pdfUrl = URL.createObjectURL(pdfBlob);
     const iframe = document.createElement('iframe');
@@ -202,10 +143,5 @@ export default function LBioquimica_Digitalizado(datos) {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
     };
-
-
-  })
-
-
-  
+  });
 } 

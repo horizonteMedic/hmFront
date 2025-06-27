@@ -1,67 +1,68 @@
 import logo from '../../../../../public/img/logo-color.png'
 
-const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
-
-function formatDate(dateString) {
-  if (!dateString) return '04 noviembre 2024';
-  const date = new Date(dateString.replace(/-/g, '/'));
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = meses[date.getMonth()];
+const formatDateToShort = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(`${dateString}T00:00:00`);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
-  return `${day} de ${month} de ${year}`;
-}
+  return `${day}/${month}/${year}`;
+};
 
 export default function header_Perfil_Renal_Digitalizado(doc, datos) {
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 15;
+  let y = 10;
+
   // Logo
-  doc.addImage(logo, 'PNG', 15, 10, 50, 15)
+  doc.addImage(logo, 'PNG', margin, y, 60, 20);
 
-  // Título de la empresa
-  doc.setFont(undefined, 'bold')
-  doc.setFontSize(8)
-  doc.text('POLICLINICO HORIZONTE MEDIC', 19.5, 28)
-  doc.setFont(undefined, 'normal')
-  doc.text('CUIDAMOS SU SALUD', 28, 31)
-
-  // Info Derecha (movida más a la izquierda)
-  doc.setFontSize(11)
-  doc.setFont(undefined, 'bold')
-  const nroOrdenLabel = 'Nro Orden:';
-  const nroOrdenValue = String(datos.norden) || '';
+  // Nro Orden (derecha)
+  const rightColX = pageW - margin;
+  const nroOrdenLabel = 'Nro Orden :';
+  const nroOrdenValue = String(datos.norden || '');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
-  doc.text(nroOrdenLabel, 110, 20)
-  doc.setFontSize(18)
-  doc.text(nroOrdenValue, 110 + nroOrdenLabelWidth + 4, 20)
-  // Subrayado
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
+  const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
+  doc.setFontSize(11).setFont('helvetica', 'normal');
+  doc.text(nroOrdenLabel, nroOrdenX, y + 5);
+  doc.setFontSize(18).setFont('helvetica', 'bold');
+  doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y + 5);
   doc.setLineWidth(0.7);
-  doc.line(110 + nroOrdenLabelWidth + 4, 21.5, 110 + nroOrdenLabelWidth + 4 + nroOrdenValueWidth, 21.5);
+  doc.line(
+    nroOrdenX + nroOrdenLabelWidth + 2, y + 6.5,
+    nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 6.5
+  );
   doc.setLineWidth(0.2);
-  doc.setFont(undefined, 'normal')
-  doc.text('Sede:', 110, 25)
-  doc.text(datos.sede || 'Trujillo-Piarda', 122, 25)
+
+  // Sede (debajo, alineado con el Nro Orden)
+  doc.setFontSize(9).setFont('helvetica', 'normal');
+  doc.text(datos.sede || 'Trujillo-Pierola', rightColX, y + 11, { align: 'right' });
 
   // Título
-  doc.setFontSize(16)
-  doc.setFont(undefined, 'bold')
-  doc.text('ANÁLISIS CLÍNICOS', 105, 45, { align: 'center' })
+  doc.setFontSize(16).setFont('helvetica', 'bold');
+  doc.text('ANÁLISIS CLÍNICOS', pageW / 2, 45, { align: 'center' });
 
   // Datos del paciente
-  doc.setFontSize(10)
-  doc.setFont(undefined, 'normal')
-  const patientDataY = 55
-  const patientDataX = 15
-  const labelWidth = 55;
+  y = 55;
+  const lineHeight = 6;
+  const patientDataX = margin;
 
-  const field = (label, value, y) => {
-    doc.setFont(undefined, 'bold')
-    doc.text(label, patientDataX, y)
-    doc.setFont(undefined, 'normal')
-    const labelW = doc.getTextWidth(label);
-    doc.text(value, patientDataX + labelW + 4, y)
-  }
+  const drawPatientDataRow = (label, value) => {
+    doc.setFontSize(11).setFont('helvetica', 'bold');
+    doc.text(label, patientDataX, y);
+    doc.setFont('helvetica', 'normal');
+    const labelWidth = doc.getTextWidth(label);
+    const extraSpace = label === 'Apellidos y Nombres :' ? 8 : 2;
+    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + extraSpace, y);
+    y += lineHeight;
+  };
 
-  field('Apellidos y Nombres :', datos.nombres || 'HADY KATHERINE CASTILLO PLASENCIA', patientDataY)
-  field('Edad :', (datos.edad || '31') + ' AÑOS', patientDataY + 5)
-  field('DNI :', String(datos.dni) || '72384273', patientDataY + 10)
-  field('Fecha :', String(datos.fechaExamen), patientDataY + 15)
+  drawPatientDataRow('Apellidos y Nombres :', datos.nombres);
+  drawPatientDataRow('Edad :', datos.edad ? `${datos.edad} AÑOS` : '');
+  drawPatientDataRow('DNI :', String(datos.dni));
+  drawPatientDataRow('Fecha :', formatDateToShort(datos.fechaExamen));
+
+  // Reseteo de estilos para el cuerpo
+  doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 } 
