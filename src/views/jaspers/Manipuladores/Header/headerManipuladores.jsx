@@ -11,16 +11,16 @@ const headerManipuladores = (doc, datos = {}) => {
 
   // 2. Sede (derecha)
   doc.setFontSize(11).setFont("helvetica", "bold");
-  doc.text("Sede :", pageW - margin - 60, y);
+  doc.text("Sede :", pageW - margin - 100, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.sede || ""}`, pageW - margin - 10, y, { align: "right" });
+  doc.text(`${datos.sede || ""}`, pageW - margin - 20, y, { align: "right" });
   y += 7;
 
   // 3. Nro Orden (derecha)
   doc.setFont("helvetica", "bold");
-  doc.text("Nro Orden :", pageW - margin - 60, y);
+  doc.text("Nro Orden :", pageW - margin - 70, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.n_orden || ""}`, pageW - margin - 10, y, { align: "right" });
+  doc.text(`${datos.norden || ""}`, pageW - margin - 30, y, { align: "right" });
   y += 12;
 
   // 4. Apellidos y Nombres (izquierda)
@@ -48,7 +48,7 @@ const headerManipuladores = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text("Muestra :", margin, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.muestra || ""}`, margin + 25, y);
+  doc.text(`HECES`, margin + 25, y);
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
