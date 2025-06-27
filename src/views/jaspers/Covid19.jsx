@@ -66,8 +66,7 @@ export default function Covid19Examen (datos = {})  {
 
     // TRIAJE
     let triajeY = flowY + ovalHeight + 6;
-    doc.roundedRect(leftEdge, triajeY, ovalWidth, ovalHeight, cornerRadius, cornerRadius);
-    doc.text("TRIAJE", centerX, triajeY + 5, { align: "center" });
+    drawBox(doc, "TRIAJE", leftEdge, triajeY, ovalWidth, ovalHeight, cornerRadius, datos.triaje)
 
     // Línea vertical: TRIAJE -> COVID 19
     doc.line(centerX, triajeY + ovalHeight, centerX, triajeY + ovalHeight + 6);
@@ -76,8 +75,7 @@ export default function Covid19Examen (datos = {})  {
     let covidY = triajeY + ovalHeight + 6;
     const rectWidth = 35;
     const rectHeight = 8;
-    doc.rect(leftEdge, covidY, rectWidth, rectHeight);
-    doc.text("COVID 19", centerX, covidY + 5, { align: "center" });
+    drawBox(doc, "COVID 19", leftEdge, covidY, rectWidth, rectHeight, cornerRadius, datos.covid1 ? true : datos.covid2 ? true : false)
 
     // b) LÍNEA TRONCAL HORIZONTAL (debajo de COVID 19)
     const trunkY = covidY + rectHeight + 10; // un poco más cercano a COVID
@@ -101,17 +99,11 @@ export default function Covid19Examen (datos = {})  {
 
     // c) Dibujamos cada caja, colgando con una línea corta
     const smallLine = 4; // pequeña línea vertical
-    boxes.forEach((name, i) => {
-      const boxX = rowStartX + i * (boxW + boxGap);
-      const boxCenterX = boxX + boxW / 2;
-      // Línea vertical corta
-      doc.line(boxCenterX, trunkY, boxCenterX, trunkY + smallLine);
-
-      // Caja
-      const boxTopY = trunkY + smallLine;
-      doc.rect(boxX, boxTopY, boxW, boxH);
-      doc.text(name, boxCenterX, boxTopY + 5, { align: "center" });
-    });
+    const boxX = rowStartX  * (boxW + boxGap);
+    const boxCenterX = boxX + boxW / 2;
+    // Línea vertical corta
+    doc.line(boxCenterX, trunkY, boxCenterX, trunkY + smallLine);
+    drawC(doc,"PRIMERA", boxCenterX, trunkY,25,10);
 
     // -----------------------------------------------------------------------
     // NUEVO: LÍNEA HORIZONTAL DEBAJO DE SEGUNDA, PA, HOTEL, PCON
@@ -149,13 +141,11 @@ export default function Covid19Examen (datos = {})  {
     const bigRowX = centerX - totalBigWidth / 2;
 
     // EVALUACION MEDICA
-    doc.rect(bigRowX, bigRowY, bigBoxW, bigBoxH);
-    doc.text("EVALUACION MEDICA", bigRowX + bigBoxW / 2, bigRowY + 5, { align: "center" });
+    drawBox(doc, "CEVALUACION MEDICA", bigRowX, bigRowY, bigBoxW, bigBoxH, cornerRadius)
 
     // ALTA EPIDEMIOLOGICA
     const altaX = bigRowX + bigBoxW + bigGap;
-    doc.rect(altaX, bigRowY, bigBoxW, bigBoxH);
-    doc.text("ALTA EPIDEMIOLOGICA", altaX + bigBoxW / 2, bigRowY + 5, { align: "center" });
+    drawBox(doc, "ALTA EPIDEMIOLOGICA", altaX, bigRowY, bigBoxW, bigBoxH, cornerRadius)
 
     // -----------------------------------------------------------------------
     // QUITADO: Antes conectábamos PA -> EVALUACION MEDICA y HOTEL -> ALTA
@@ -187,15 +177,14 @@ export default function Covid19Examen (datos = {})  {
     // 6) Tabla de síntomas (opcional)
     autoTable(doc, {
       startY: finalY,
-      head: [[]],
       body: [
-        ["Tos", "Fiebre/ Escalofrío", "Cefalea"],
-        ["Dolor de Garganta", "Malestar General", "Irritabilidad"],
-        ["Congestión Nasal", "Diarrea", "Dolor"],
-        ["Dificultad respiratoria", "Nauseas Vómitos", "Otros:"],
+        ["Tos"," ", "Fiebre/ Escalofrío"," ", "Cefalea"," "],
+        ["Dolor de Garganta", " ", "Malestar General", " ", "Irritabilidad", " "],
+        ["Congestión Nasal", " ", "Diarrea", " ", "Dolor", " "],
+        ["Dificultad respiratoria", " ", "Nauseas Vómitos", " ", "Otros:", " "],
         [
-          { content: "Persona de contacto:", colSpan: 1 },
-          { content: "Celular del contacto:", colSpan: 2 },
+          { content: "Persona de contacto:", colSpan: 2 },
+          { content: "Celular del contacto:", colSpan: 4 },
         ],
       ],
       theme: "grid",
