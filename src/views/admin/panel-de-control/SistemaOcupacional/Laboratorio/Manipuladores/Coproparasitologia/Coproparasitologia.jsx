@@ -73,6 +73,19 @@ export default function Coproparasitologia({
       },
     }));
   };
+  const handleFieldChangeXCampo = (section, field, value) => {
+    setValues((v) => ({
+      ...v,
+      [section]: {
+        ...v[section],
+        [field]: v[section][field].toUpperCase().includes("X CAMPO")
+          ? ""
+          : /\d/.test(v[section][field])
+          ? v[section][field] + " X CAMPO"
+          : " X CAMPO",
+      },
+    }));
+  };
 
   const handleClear = () => {
     setValues(initial);
@@ -210,13 +223,13 @@ export default function Coproparasitologia({
                         ? ["MARRON", "MOSTAZA", "VERDOSO"]
                         : field === "aspecto"
                         ? ["SOLIDO", "SEMISOLIDO", "DIARREICO"]
-                        : ["Ausente", "Presente"]
+                        : ["AUSENTE", "PRESENTE"]
                       ).map((opt) => (
                         <label key={opt} className="flex items-center gap-1">
                           <input
                             type="checkbox"
                             onChange={() => handleFieldChange(key, field, opt)}
-                            checked={values[key][field] === opt.toUpperCase()}
+                            checked={values[key][field] === opt.toUpperCase()} 
                             disabled={isCopro && idx > 0}
                           />
                           {opt}
@@ -252,30 +265,25 @@ export default function Coproparasitologia({
                     className="border rounded px-2 py-1 w-full mb-2"
                   />
                   <div className="flex flex-wrap gap-3 items-center">
-                    {["leucocitos", "hematies"].includes(field) && (
-                      <input
-                        placeholder="__x campo"
-                        value={values[key][field + "Count"]}
-                        onChange={(e) =>
-                          handleFieldChange(
-                            key,
-                            field + "Count",
-                            e.target.value
-                          )
-                        }
-                        disabled={isCopro && idx > 0}
-                        className="border rounded px-2 py-1 w-24"
-                      />
-                    )}
                     {(["parasitos"].includes(field)
-                      ? ["Ausente", "Presente"]
-                      : ["No se observan"]
+                      ? ["AUSENTE", "PRESENTE"]
+                      : ["NO SE OBSERVAN", "X CAMPO"]
                     ).map((opt) => (
                       <label key={opt} className="flex items-center gap-1">
                         <input
                           type="checkbox"
-                          onChange={() => handleFieldChange(key, field, opt)}
-                          checked={values[key][field] === opt.toUpperCase()}
+                          onChange={() => {
+                            if (opt == "X CAMPO") {
+                              handleFieldChangeXCampo(key, field, opt);
+                            } else {
+                              handleFieldChange(key, field, opt);
+                            }
+                          }}
+                          checked={//values[key][field] === opt.toUpperCase()
+                            opt === "X CAMPO"
+                              ? values[key][field].toUpperCase().includes("X CAMPO")
+                              : values[key][field] === opt.toUpperCase()
+                          }
                           disabled={isCopro && idx > 0}
                         />
                         {opt}
