@@ -52,39 +52,39 @@ export function SubmitCoproParasitologia(data, user, token) {
         "txtmocoFecal": data.heces1.moco,
         "txtsangrev": data.heces1.sangre,
         "txtrestosa": data.heces1.restos,
+        "txtgrasa": data.heces1.grasa,
 
         "txtleucocitos": data.micro1.leucocitos,
         "txthematies": data.micro1.hematies,
-        "txtlugol": data.micro1.lugol,
+        "txtlugol": data.micro1.parasitos,
+        //==
+        "txtcolor1": data.isCopro ? "" : data.heces2.color,
+        "txtaspecto1": data.isCopro ? "" : data.heces2.aspecto,
+        "txtmocoFecal1": data.isCopro ? "" : data.heces2.moco,
+        "txtsangrev1": data.isCopro ? "" : data.heces2.sangre,
+        "txtrestosa1": data.isCopro ? "" : data.heces2.restos,
+        "txtgrasa1": data.isCopro ? "" : data.heces2.grasa,
 
-        "txtcolor1": data.heces2.color,
-        "txtaspecto1": data.heces2.aspecto,
-        "txtmocoFecal1": data.heces2.moco,
-        "txtsangrev1": data.heces2.sangre,
-        "txtrestosa1": data.heces2.restos,
+        "txtleucocitos1": data.isCopro ? "" : data.micro2.leucocitos,
+        "txthematies1": data.isCopro ? "" : data.micro2.hematies,
+        "txtlugol1": data.isCopro ? "" : data.micro2.parasitos,
 
-        "txtleucocitos1": data.micro2.leucocitos,
-        "txthematies1": data.micro2.hematies,
-        "txtlugol1": data.micro2.lugol,
+        "txtcolor2": data.isCopro ? "" : data.heces3.color,
+        "txtaspecto2": data.isCopro ? "" : data.heces3.aspecto,
+        "txtmocoFecal2": data.isCopro ? "" : data.heces3.moco,
+        "txtsangrev2": data.isCopro ? "" : data.heces3.sangre,
+        "txtrestosa2": data.isCopro ? "" : data.heces3.restos,
+        "txtgrasa2": data.isCopro ? "" : data.heces3.grasa,
 
-        "txtcolor2": data.heces3.color,
-        "txtaspecto2": data.heces3.aspecto,
-        "txtmocoFecal2": data.heces3.moco,
-        "txtsangrev2": data.heces3.sangre,
-        "txtrestosa2": data.heces3.restos,
+        "txtleucocitos2": data.isCopro ? "" : data.micro3.leucocitos,
+        "txthematies2": data.isCopro ? "" : data.micro3.hematies,
+        "txtlugol2": data.isCopro ? "" : data.micro3.parasitos,
 
-        "txtleucocitos2": data.micro3.leucocitos,
-        "txthematies2": data.micro3.hematies,
-        "txtlugol2": data.micro3.lugol,
-
-        "txtgrasa": data.heces1.grasa,
-        "txtgrasa1": data.heces2.grasa,
-        "txtgrasa2": data.heces3.grasa,
-        
         "userRegistro": user,
         "userMedicoOcup": "",
         "tipoCoproparasitologico": data.isCopro
     }
+
 
     const url = `${URLAzure}/api/v01/ct/manipuladores/registrarActualizarManipuladoresCoproparasitologico`
     console.log("tokensasasass", token);

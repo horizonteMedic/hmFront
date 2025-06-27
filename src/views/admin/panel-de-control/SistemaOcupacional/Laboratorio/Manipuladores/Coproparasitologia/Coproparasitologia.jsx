@@ -56,6 +56,8 @@ export default function Coproparasitologia({
   });
   initial.norden = "";
   initial.fecha = today;
+  initial.nombres = "";
+  initial.edad = "";
 
   const [values, setValues] = useState(initial);
   const [isCopro, setIsCopro] = useState(false);
@@ -132,7 +134,8 @@ export default function Coproparasitologia({
                     tabla,
                     token,
                     setValues,
-                    selectedSede
+                    selectedSede,
+                    setIsCopro
                   );
                 }
               }}
