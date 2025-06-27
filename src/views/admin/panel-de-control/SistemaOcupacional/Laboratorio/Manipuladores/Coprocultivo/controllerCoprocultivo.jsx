@@ -85,7 +85,7 @@ export const GetInfoCoprocultivo = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
-          fecha: res.fechaExamen,
+          fecha: res.fecha,
           muestra: res.txtmuestra,
           color: res.txtcolor,
           consistencia: res.txtconsistencia,
