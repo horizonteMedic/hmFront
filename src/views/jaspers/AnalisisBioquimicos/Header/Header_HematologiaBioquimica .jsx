@@ -24,7 +24,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   let datosY = y + 2;
   // N° Ficha (solo número, sin label, más grande, subrayado)
   if (datos.norden) {
-    doc.setFont("helvetica", "bold").setFontSize(18); // más grande
+    doc.setFont("helvetica", "bold").setFontSize(22); // aún más grande
     doc.text(String(datos.norden), datosX, datosY, { align: "right" });
     // Subrayado negro debajo del número
     const fichaWidth = doc.getTextWidth(String(datos.norden));

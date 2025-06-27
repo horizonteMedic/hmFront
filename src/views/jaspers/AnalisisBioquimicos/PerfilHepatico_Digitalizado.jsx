@@ -23,7 +23,7 @@ const drawRow = (doc, y, test, datos, cols) => {
   doc.text(test.label, cols.col1, y);
   
   const result = datos[test.key] != null ? String(datos[test.key]) : "0";
-  doc.text(result, cols.col2, y, { align: "left" });
+  doc.text(result, cols.col2, y, { align: "center" });
 
   if (typeof test.ref === "string") {
     doc.text(test.ref, cols.col3, y, { align: "left" });
@@ -85,13 +85,13 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
 
     const tableCols = {
       col1: config.margin,
-      col2: 90,
+      col2: 100,
       col3: 135,
     };
 
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("PRUEBA", tableCols.col1, y);
-    doc.text("RESULTADO", tableCols.col2, y, { align: "left" });
+    doc.text("RESULTADO", tableCols.col2, y, { align: "center" });
     doc.text("RANGO REFERENCIAL", tableCols.col3, y, { align: "left" });
     y += 3;
     doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
@@ -114,7 +114,14 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       y = drawRow(doc, y, test, datos, tableCols);
     });
 
-    if (s1) {
+    // Dimensiones fijas del área del sello
+    const imgW = 60; // ancho fijo en mm
+    const imgH = 25; // alto fijo en mm
+    const sigY = y + 20;
+    const firmaMargin = 40; // margen lateral personalizado para juntar más las firmas
+
+    if (s1 && !s2) {
+      // Solo un sello, centrado
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
@@ -122,66 +129,26 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = y + 20;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
+      // Centrado horizontal
+      const imgX = (pageW - imgW) / 2;
+      const imgY = sigY;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = y + 20;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    } else if (s1 && s2) {
+      // Dos sellos, uno a la izquierda y otro a la derecha
+      const addSello = (img, left) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const selloBase64 = canvas.toDataURL('image/png');
+        // Izquierda o derecha, usando firmaMargin para acercarlas
+        const imgX = left ? firmaMargin : pageW - firmaMargin - imgW;
+        const imgY = sigY;
+        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      };
+      addSello(s1, true);  // Izquierda
+      addSello(s2, false); // Derecha
     }
 
     footer(doc, datos);

@@ -45,7 +45,7 @@ const header_Hematologia = (doc, datos = {}) => {
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
   doc.text(nroOrdenLabel, nroOrdenX, y + 5);
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('helvetica', 'bold').setFontSize(20);
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y + 5);
   doc.setLineWidth(0.5);
   doc.line(
@@ -66,7 +66,7 @@ const header_Hematologia = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 8, y);
     y += lineHeight;
   };
   
@@ -80,7 +80,16 @@ const header_Hematologia = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(String(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
+  // Formatear fecha como dd/mm/yyyy
+  let fechaFormateada = '';
+  if (datos.fechaExamen) {
+    const d = new Date(datos.fechaExamen);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    fechaFormateada = `${day}/${month}/${year}`;
+  }
+  doc.text(fechaFormateada, patientDataX + fechaLabelWidth + 8, y);
   y += lineHeight;
 
   // --- Muestra ---

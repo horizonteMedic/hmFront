@@ -14,6 +14,20 @@ const formatDateToLong = (dateString) => {
 };
 
 /**
+ * Formatea una fecha en formato dd/mm/yyyy.
+ * @param {string} dateString - La fecha en formato YYYY-MM-DD.
+ * @returns {string} - La fecha formateada.
+ */
+const formatDateToShort = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(`${dateString}T00:00:00`);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+/**
  * Dibuja el encabezado para el reporte de Inmunología genérico.
  * @param {jsPDF} doc - La instancia del documento jsPDF.
  * @param {object} datos - Los datos a imprimir.
@@ -23,7 +37,7 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
   let y = 10;
 
-  // 1. Logo a la izquierda
+  // Logo a la izquierda
   const img = "./img/logo-color.png";
   try {
     doc.addImage(img, "PNG", margin, y, 60, 20);
@@ -32,7 +46,7 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
     doc.text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // --- Código de color ---
+  // --- Cuadro de color a la derecha ---
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
@@ -40,11 +54,9 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();
-    // Draw box outline in black
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
     doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
-    // Solo renderiza si color es válido
     doc.setDrawColor(color);
     doc.setLineWidth(2);
     doc.setLineCap('round');
@@ -58,57 +70,56 @@ const header_Inmunologia_Digitalizado = (doc, datos = {}) => {
       baseline: "middle",
       maxWidth: boxSize - 1
     });
-    // Reset color settings after drawing the colored elements
     doc.setDrawColor(0);
     doc.setTextColor(0);
     doc.setLineWidth(0.2);
   }
 
-  // --- Sede ---
-  const rightColX = pageW - margin;
-  const lineHeight = 8;
-  doc.setFontSize(10).setFont('helvetica', 'normal');
-  doc.text(`Sede : ${datos.sede || ''}`, rightColX, y + 5, { align: 'right' });
-
-  // --- Nro Orden pegado a la derecha o ajustado si hay color ---
+  // --- Nro Orden y sede alineados a la derecha, sede bajo el número ---
   const nroOrdenLabel = "Nro Orden :";
   const nroOrdenValue = String(datos.norden || '');
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
-  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 10) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
-  y += 10;
-  doc.text(nroOrdenLabel, nroOrdenX, y);
+  let rightMargin = pageW - margin - (boxSize + 10);
+  let nroOrdenX = rightMargin - nroOrdenLabelWidth - nroOrdenValueWidth - 2;
+  let nroOrdenY = y + 8;
+  // Primera línea: label y número
+  doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY, { align: 'left' });
   doc.setFont('helvetica', 'bold').setFontSize(18);
-  doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y);
+  doc.text(nroOrdenValue, rightMargin - nroOrdenValueWidth, nroOrdenY, { align: 'left' });
   doc.setLineWidth(0.5);
-  doc.line(nroOrdenX + nroOrdenLabelWidth + 2, y + 1.5, nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 1.5);
-
-  y += lineHeight;
+  doc.line(rightMargin - nroOrdenValueWidth, nroOrdenY + 1.5, rightMargin, nroOrdenY + 1.5);
+  // Segunda línea: sede alineada con el número
+  doc.setFontSize(12).setFont('helvetica', 'normal');
+  const sedeText = (datos.sede || '').toUpperCase();
+  const sedeWidth = doc.getTextWidth(sedeText);
+  doc.text(sedeText, rightMargin - sedeWidth, nroOrdenY + 10, { align: 'left' });
 
   // --- Datos del paciente ---
-  y += 20;
+  let yDatos = nroOrdenY + 28;
   const patientDataX = margin;
+  const lineHeight = 8;
   const drawPatientDataRow = (label, value) => {
     doc.setFontSize(11).setFont('helvetica', 'bold');
-    doc.text(label, patientDataX, y);
+    doc.text(label, patientDataX, yDatos);
     let valueX = patientDataX + doc.getTextWidth(label) + 4;
     if (label.toLowerCase().includes('apellidos y nombres')) {
       if (doc.getTextWidth(label) < 23) valueX = patientDataX + 23;
     }
     doc.setFont('helvetica', 'normal');
-    doc.text(String(value).toUpperCase(), valueX, y);
-    y += lineHeight;
+    doc.text(String(value).toUpperCase(), valueX, yDatos);
+    yDatos += lineHeight;
   };
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
   drawPatientDataRow("Edad :", datos.edad ? `${datos.edad} AÑOS` : '');
   doc.setFontSize(11).setFont('helvetica', 'bold');
   const fechaLabel = "Fecha :";
-  doc.text(fechaLabel, patientDataX, y);
+  doc.text(fechaLabel, patientDataX, yDatos);
   let valueXFecha = patientDataX + doc.getTextWidth(fechaLabel) + 4;
   doc.setFont('helvetica', 'normal');
-  doc.text(formatDateToLong(datos.fecha), valueXFecha, y);
+  doc.text(formatDateToShort(datos.fecha), valueXFecha, yDatos);
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
 
