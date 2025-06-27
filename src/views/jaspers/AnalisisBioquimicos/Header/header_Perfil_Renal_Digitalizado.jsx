@@ -34,10 +34,17 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
     nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, y + 6.5
   );
   doc.setLineWidth(0.2);
+<<<<<<< HEAD
 
   // Sede (debajo, alineado con el Nro Orden)
   doc.setFontSize(9).setFont('helvetica', 'normal');
   doc.text(datos.sede || 'Trujillo-Pierola', rightColX, y + 11, { align: 'right' });
+=======
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  // doc.setFont(undefined, 'normal')
+  doc.text('Sede:', 110, 27)
+  doc.text(datos.sede || 'Trujillo-Pierola', 122, 27)
+>>>>>>> ac56af38d6f762c1388aeaeb2a38a41562b31233
 
   // Título
   doc.setFontSize(16).setFont('helvetica', 'bold');

@@ -110,9 +110,72 @@ export default function LBioquimica_Digitalizado(datos) {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
+<<<<<<< HEAD
       // Centrado horizontal
       const imgX = (pageW - imgW) / 2;
       const imgY = sigY;
+=======
+
+      // Dimensiones del área del sello
+      const sigW = 70;
+      const sigH = 35;
+      const sigX = ((config.pageWidth - sigW) / 2) - (s2 ? 40 : 0); // Centrado horizontal
+      const sigY = y + 20;
+
+      // Tamaño máximo dentro del área
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+
+      let imgW = s1.width;
+      let imgH = s1.height;
+
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+
+      imgW *= scale;
+      imgH *= scale;
+
+      // Centramos dentro del rectángulo
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
+
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    }
+
+    if (s2) {
+      const canvas = document.createElement('canvas');
+      canvas.width = s2.width;
+      canvas.height = s2.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(s2, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+
+      // Dimensiones del área del sello
+      const sigW = 70;
+      const sigH = 35;
+      const sigX = ((config.pageWidth - sigW) / 2) + 40; // Centrado horizontal
+      const sigY = y + 20;
+
+      // Tamaño máximo dentro del área
+      const maxImgW = sigW - 10;
+      const maxImgH = sigH - 10;
+
+      let imgW = s2.width;
+      let imgH = s2.height;
+
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+
+      imgW *= scale;
+      imgH *= scale;
+
+      // Centramos dentro del rectángulo
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
+
+>>>>>>> ac56af38d6f762c1388aeaeb2a38a41562b31233
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     } else if (s1 && s2) {
       // Dos sellos, uno a la izquierda y otro a la derecha

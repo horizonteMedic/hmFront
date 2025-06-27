@@ -1,6 +1,7 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch.js";
-import { SubmitCoprocultivo } from "../model.js";
+import { SubmitCoproParasitologia } from "../model.js";
+// import { SubmitCoprocultivo } from "../model.js";
 
 export const Loading = (text) => {
   Swal.fire({
@@ -32,7 +33,7 @@ export const Loading = (text) => {
   });
 };
 
-export const VerifyTR = async (nro, tabla, token, set, sede) => {
+export const VerifyTR = async (nro, tabla, token, set, sede, setIsCopro) => {
   if (!nro) {
     await Swal.fire(
       "Error",
@@ -51,7 +52,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       //No tiene registro previo
       GetInfoPac(nro, set, token, sede);
     } else {
-      GetInfoCoprocultivo(nro, tabla, set, token);
+      GetInfoCoproParasitologia(nro, tabla, set, token,setIsCopro);
     }
   });
 };
@@ -74,33 +75,59 @@ export const GetInfoPac = (nro, set, token, sede) => {
     });
 };
 
-export const GetInfoCoprocultivo = (nro, tabla, set, token) => {
+export const GetInfoCoproParasitologia = (nro, tabla, set, token,setIsCopro) => {
+  console.log("token", token);
   getFetch(
-    `/api/v01/ct/manipuladores/obtenerReporteCoprocultivo?nOrden=${nro}&nameService=${tabla}`,
+    `/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico?nOrden=${nro}&nameService=${tabla}`,
     token
   )
     .then((res) => {
       if (res.norden) {
-        console.log(res);
+        console.log("respuestaaa", res);
+        setIsCopro(res.tipoCoproparasitologico);
         set((prev) => ({
           ...prev,
           ...res,
           fecha: res.fecha,
-          muestra: res.txtmuestra,
-          color: res.txtcolor,
-          consistencia: res.txtconsistencia,
-          moco_fecal: res.txtmoco_fecal,
-          sangrev: res.txtsangrev,
-          restosa: res.txtrestosa,
-          leucocitos: res.txtleucocitos,
-          hematies: res.txthematies,
-          parasitos: res.txtparasitos,
-          gotasg: res.txtgotasg,
-          levaduras: res.txtlevaduras,
-          identificacion: res.txtidentificacion,
-          florac: res.txtflorac,
-          resultado: res.txtresultado,
-          observaciones: res.txtobservaciones,
+          heces1: {
+            color: res.txtcolor,
+            aspecto: res.txtaspecto,
+            moco: res.txtmocoFecal,
+            sangre: res.txtsangrev,
+            restos: res.txtrestosa,
+            grasa: res.txtgrasa,
+          },
+          micro1: {
+            leucocitos: res.txtleucocitos,
+            hematies: res.txthematies,
+            parasitos: res.txtlugol,
+          },
+          heces2: {
+            color: res.txtcolor1,
+            aspecto: res.txtaspecto1,
+            moco: res.txtmocoFecal1,
+            sangre: res.txtsangrev1,
+            restos: res.txtrestosa1,
+            grasa: res.txtgrasa1,
+          },
+          micro2: {
+            leucocitos: res.txtleucocitos1,
+            hematies: res.txthematies1,
+            parasitos: res.txtlugol1,
+          },
+          heces3: {
+            color: res.txtcolor2,
+            aspecto: res.txtaspecto2,
+            moco: res.txtmocoFecal2,
+            sangre: res.txtsangrev2,
+            restos: res.txtrestosa2,
+            grasa: res.txtgrasa2,
+          },
+          micro3: {
+            leucocitos: res.txtleucocitos2,
+            hematies: res.txthematies2,
+            parasitos: res.txtlugol2,
+          },
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -111,7 +138,7 @@ export const GetInfoCoprocultivo = (nro, tabla, set, token) => {
     });
 };
 
-export const SubmitCoprocultivoManipulador = async (
+export const SubmitCoproParasitologiaManipulador = async (
   form,
   token,
   user,
@@ -123,7 +150,8 @@ export const SubmitCoprocultivoManipulador = async (
     return;
   }
   Loading("Registrando Datos");
-  SubmitCoprocultivo(form, user, token).then((res) => {
+  console.log("formulario", form);
+  SubmitCoproParasitologia(form, user, token).then((res) => {
     console.log(res);
     if (res.id === 1 || res.id === 0) {
       Swal.fire({
@@ -149,7 +177,7 @@ export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(
-    `/api/v01/ct/manipuladores/obtenerReporteCoprocultivo?nOrden=${nro}&nameService=${tabla}`, //revisar
+    `/api/v01/ct/manipuladores/obtenerReporteCoproparasitologico?nOrden=${nro}&nameService=${tabla}`, //revisar
     token
   ).then(async (res) => {
     if (res.norden) {
