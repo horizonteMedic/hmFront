@@ -1,12 +1,34 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/PruebasCovid/PcuanAntigenos/PcuanAntigenos.jsx
-import React, { useState, useEffect } from 'react';
+// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/PruebasCovid/ExamenCuantitativo/ExamenCuantitativo.jsx
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 
-export default function PcuanAntigenos({ apiBase, token, selectedSede }) {
+const MARCAS = [
+  {
+    value: 'INSE COVID-19 IGM/IGG TEST CASSETTE',
+    tecnica: 'Inmunocromatografía',
+    sensibilidad: '95.60%',
+    especificidad: '96.00%'
+  },
+  {
+    value: 'ID-19 IGM/IGG TEST CASSETTE',
+    tecnica: 'Inmunocromatografía',
+    sensibilidad: '95.60%',
+    especificidad: '96.00%'
+  }
+];
+
+const DEFAULT_TECNICA = {
+  tecnica: 'Inmunocromatografía',
+  sensibilidad: '95.60%',
+  especificidad: '96.00%'
+};
+
+export default function ExamenCuantitativo({ apiBase, token, selectedSede }) {
+  const today = new Date().toISOString().split('T')[0];
   const [form, setForm] = useState({
     norden: '',
-    fecha: '',
+    fecha: today,
     nombres: '',
     dni: '',
     edad: '',
@@ -14,34 +36,43 @@ export default function PcuanAntigenos({ apiBase, token, selectedSede }) {
     doctor: 'N/A',
     valorIgm: '',
     valorIgg: '',
-    reactivoIgm: false,
-    reactivoIgg: false,
+    igmReactivo: false,
+    igmNoReactivo: false,
+    iggReactivo: false,
+    iggNoReactivo: false,
     invalido: false
   });
   const [status, setStatus] = useState('');
+  const nombreInputRef = useRef(null);
 
-  // Inicializar la fecha
   useEffect(() => {
-    setForm(f => ({ ...f, fecha: new Date().toISOString().split('T')[0] }));
+    setForm(f => ({ ...f, fecha: today }));
   }, []);
+
+  // Ajuste dinámico del ancho del input de nombres
+  useEffect(() => {
+    if (nombreInputRef.current) {
+      const len = form.nombres?.length || 0;
+      const min = 120, max = 400;
+      nombreInputRef.current.style.width = `${Math.min(max, Math.max(min, len * 10))}px`;
+    }
+  }, [form.nombres]);
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
-    setForm(f => ({
-      ...f,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    if (type === 'checkbox') {
+      setForm(f => ({ ...f, [name]: checked }));
+    } else {
+      setForm(f => ({ ...f, [name]: value }));
+    }
   };
 
   const handleSave = async () => {
     try {
       const payload = { ...form, sede: selectedSede };
-      const res = await fetch(`${apiBase}/pcuanantigenos`, {
+      const res = await fetch(`${apiBase}/examencuantitativo`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error('Error al guardar');
@@ -57,160 +88,150 @@ export default function PcuanAntigenos({ apiBase, token, selectedSede }) {
       marca: '',
       valorIgm: '',
       valorIgg: '',
-      reactivoIgm: false,
-      reactivoIgg: false,
+      igmReactivo: false,
+      igmNoReactivo: false,
+      iggReactivo: false,
+      iggNoReactivo: false,
       invalido: false
     }));
     setStatus('Formulario limpiado');
   };
 
   const handlePrint = () => {
-    window.open(`${apiBase}/pcuanantigenos/print?norden=${form.norden}`, '_blank');
+    window.open(`${apiBase}/examencuantitativo/print?norden=${form.norden}`, '_blank');
   };
 
+  const selectedMarca = MARCAS.find(m => m.value === form.marca) || DEFAULT_TECNICA;
+
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
-      <h2 className="text-2xl font-bold text-center mb-6">COVID-19 Prueba Cuantitativa (Antígenos)</h2>
-      <form onSubmit={e => { e.preventDefault(); handleSave(); }} className="space-y-6 text-base">
-        {/* Encabezado paciente */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="min-w-[90px] font-semibold">N° Orden:</label>
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 flex-1"
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="min-w-[90px] font-semibold">Fecha:</label>
-            <input
-              name="fecha"
-              type="date"
-              value={form.fecha}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 flex-1"
-            />
-          </div>
+    <form className="w-full max-w-4xl mx-auto bg-white p-8 rounded shadow" onSubmit={e => { e.preventDefault(); handleSave(); }}>
+      {/* Título principal */}
+      <div className="text-2xl font-bold text-center mb-8">COVID-19 Prueba Cuantitativa (Antígenos)</div>
+
+      {/* Encabezado */}
+      <div className="flex flex-wrap items-center gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <label className="font-semibold text-base">N° Orden :</label>
+          <input name="norden" value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" />
         </div>
-        <div className="flex flex-col md:flex-row gap-4">
-          {['nombres','dni','edad'].map(field => (
-            <div key={field} className="flex-1 flex items-center gap-2">
-              <label className="min-w-[90px] font-semibold">
-                {field === 'dni' ? 'DNI:' : field === 'edad' ? 'Edad:' : 'Nombres y Apellidos:'}
-              </label>
-              <input
-                name={field}
-                value={form[field]}
-                disabled
-                className="border rounded px-2 py-1 bg-gray-100 flex-1"
-              />
+        <div className="flex items-center gap-2">
+          <label className="font-semibold text-base">Fecha :</label>
+          <input name="fecha" type="date" value={form.fecha} onChange={handleChange} className="border rounded px-3 py-2 w-44 text-base" />
+        </div>
+      </div>
+
+      {/* Datos personales */}
+      <div className="flex flex-wrap gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <label className="font-semibold text-base">Nombres y Apellidos :</label>
+          <input
+            name="nombres"
+            value={form.nombres}
+            disabled
+            ref={nombreInputRef}
+            className="border rounded px-3 py-2 text-base bg-gray-100 cursor-not-allowed transition-all duration-200"
+            style={{ minWidth: 120, maxWidth: 400 }}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="font-semibold text-base">DNI :</label>
+          <input name="dni" value={form.dni} disabled className="border rounded px-3 py-2 w-32 text-base bg-gray-100 cursor-not-allowed" />
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="font-semibold text-base">Edad :</label>
+          <input name="edad" value={form.edad} disabled className="border rounded px-3 py-2 w-20 text-base bg-gray-100 cursor-not-allowed" />
+        </div>
+      </div>
+
+      {/* Sección COVID-19 Prueba Rápida */}
+      <div className="border rounded p-4 mb-8">
+        <div className="font-bold text-base mb-2">COVID - 19 Prueba Rápida</div>
+        <div className="flex flex-wrap gap-6 items-start">
+          <div className="flex flex-col gap-4 flex-1 min-w-[260px]">
+            <div className="flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[70px]">MARCA:</label>
+              <select name="marca" value={form.marca} onChange={handleChange} className="border rounded px-2 py-1 flex-1">
+                <option value="">--Seleccione--</option>
+                {MARCAS.map(m => <option key={m.value} value={m.value}>{m.value}</option>)}
+              </select>
+              <button type="button" className="ml-2 bg-gray-200 border border-gray-400 px-2 py-1 rounded text-base">📄</button>
             </div>
-          ))}
-        </div>
-
-        {/* COVID-19 */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <label className="min-w-[120px] font-semibold">Marca:</label>
-            <select
-              name="marca"
-              value={form.marca}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 flex-1"
-            >
-              <option value="">--Seleccione--</option>
-              <option>INS E COVID-19 IGM/IGG TEST CASSETTE</option>
-              <option>ID-19 IGM/IGG TEST CASSETTE</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-2">
-            <label className="min-w-[120px] font-semibold">Doctor:</label>
-            <input
-              name="doctor"
-              value={form.doctor}
-              disabled
-              className="border rounded px-2 py-1 bg-gray-100 flex-1"
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { name: 'valorIgm', label: 'Valor IGM' },
-              { name: 'valorIgg', label: 'Valor IGG' }
-            ].map(({name,label}) => (
-              <div key={name} className="flex items-center gap-2">
-                <label className="min-w-[120px] font-semibold">{label}:</label>
-                <input
-                  name={name}
-                  value={form[name]}
-                  onChange={handleChange}
-                  className="border rounded px-2 py-1 flex-1"
-                />
+            <div className="flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[70px]">Doctor:</label>
+              <input name="doctor" value={form.doctor} disabled className="border rounded px-2 py-1 flex-1 bg-gray-100 cursor-not-allowed" />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[90px]">VALOR IGM:</label>
+              <input name="valorIgm" value={form.valorIgm} onChange={handleChange} className="border rounded px-2 py-1 flex-1" />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[90px]">VALOR IGG:</label>
+              <input name="valorIgg" value={form.valorIgg} onChange={handleChange} className="border rounded px-2 py-1 flex-1" />
+            </div>
+            {/* Checkboxes */}
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">IgM:</span>
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" name="igmReactivo" checked={form.igmReactivo} onChange={handleChange} /> Reactivo
+                </label>
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" name="igmNoReactivo" checked={form.igmNoReactivo} onChange={handleChange} /> No Reactivo
+                </label>
               </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              { name: 'reactivoIgm', label: 'IgM Reactivo' },
-              { name: 'reactivoIgg', label: 'IgG Reactivo' }
-            ].map(({name,label}) => (
-              <label key={name} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name={name}
-                  checked={form[name]}
-                  onChange={handleChange}
-                />
-                <span className="font-semibold">{label}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold">IgG:</span>
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" name="iggReactivo" checked={form.iggReactivo} onChange={handleChange} /> Reactivo
+                </label>
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" name="iggNoReactivo" checked={form.iggNoReactivo} onChange={handleChange} /> No Reactivo
+                </label>
+              </div>
+              <label className="flex items-center gap-1">
+                <input type="checkbox" name="invalido" checked={form.invalido} onChange={handleChange} /> Inválido
               </label>
-            ))}
+            </div>
           </div>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="invalido"
-              checked={form.invalido}
-              onChange={handleChange}
-            />
-            <span className="font-semibold">Inválido</span>
-          </label>
+          {/* Cuadros de técnica IGM e IGG */}
+          <div className="flex flex-col gap-4 flex-1 min-w-[260px]">
+            <div className="border rounded bg-gray-50 p-4 text-base min-h-[80px]" style={{ minWidth: 220 }}>
+              <div className="font-bold mb-1">IGM:</div>
+              <div><span className="font-semibold">Técnica:</span> {selectedMarca.tecnica}</div>
+              <div><span className="font-semibold">SENSIBILIDAD:</span> {selectedMarca.sensibilidad}</div>
+              <div><span className="font-semibold">ESPECIFICIDAD:</span> {selectedMarca.especificidad}</div>
+            </div>
+            <div className="border rounded bg-gray-50 p-4 text-base min-h-[80px]" style={{ minWidth: 220 }}>
+              <div className="font-bold mb-1">IGG:</div>
+              <div><span className="font-semibold">Técnica:</span> {selectedMarca.tecnica}</div>
+              <div><span className="font-semibold">SENSIBILIDAD:</span> {selectedMarca.sensibilidad}</div>
+              <div><span className="font-semibold">ESPECIFICIDAD:</span> {selectedMarca.especificidad}</div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Botones */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 text-base"
-            >
-              <FontAwesomeIcon icon={faSave}/> Guardar cambios
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 text-base"
-            >
-              <FontAwesomeIcon icon={faBroom}/> Limpiar
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            <input
-              placeholder="Veces"
-              className="border rounded px-2 py-1 w-24 text-base"
-            />
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2 text-base"
-            >
-              <FontAwesomeIcon icon={faPrint}/>
+      {/* Botones al final */}
+      <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
+        <div className="flex gap-3">
+          <button type="button" onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleClear}>
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
+        <div className="flex flex-col items-center">
+          <span className="font-bold text-blue-900 text-xs italic">IMPRIMIR</span>
+          <div className="flex gap-1 mt-1">
+            <input className="border rounded px-2 py-1 w-24" value={form.norden} name="norden" onChange={handleChange}/>
+            <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" onClick={handlePrint}>
+              <FontAwesomeIcon icon={faPrint} />
             </button>
           </div>
         </div>
-
-        {status && <p className="mt-4 text-center text-green-600 text-base">{status}</p>}
-      </form>
-    </div>
+      </div>
+      {status && <p className="mt-4 text-center text-green-600 text-base">{status}</p>}
+    </form>
   );
 }

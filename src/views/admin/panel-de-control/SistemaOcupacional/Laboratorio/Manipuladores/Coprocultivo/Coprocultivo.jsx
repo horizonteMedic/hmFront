@@ -19,7 +19,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
     nombres: "",
     edad: "",
     // MUESTRA
-    muestra: "",
+    muestra: "HECES",
     color: "",
     consistencia: "",
     moco_fecal: "",
@@ -34,7 +34,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
     gotasg: "",
     levaduras: "",
     // IDENTIFICACIÓN
-    identificacion: "",
+    identificacion: "Escherichia coli(*)",
     florac: "",
     // RESULTADO
     resultado: "",
@@ -52,6 +52,12 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
       [name]: f[name] === value.toUpperCase() ? "" : value.toUpperCase(),
     }));
   };
+  const handleCheckRadioXValue = (name) => {
+    setForm((f) => ({
+      ...f,
+      [name]: f[name].toUpperCase().includes("X CAMPO") ? "" : /\d/.test(f[name]) ? f[name] + " X CAMPO" : " X CAMPO",
+    }));
+  };
 
   const handleClear = () => {
     setForm((f) => ({
@@ -61,7 +67,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
       nombres: "",
       edad: "",
       // MUESTRA
-      muestra: "",
+      muestra: "HECES",
       color: "",
       consistencia: "",
       moco_fecal: "",
@@ -76,7 +82,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
       gotasg: "",
       levaduras: "",
       // IDENTIFICACIÓN
-      identificacion: "",
+      identificacion: "Escherichia coli(*)",
       florac: "",
       // RESULTADO
       resultado: "",
@@ -113,11 +119,6 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
     <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold text-center mb-6">COPROCULTIVO</h2>
       <div
-        // onSubmit={(e) => {
-        //   e.preventDefault();
-        //   // handleSave();
-        //   SubmitCoprocultivoManipulador(form, userlogued, token, handleClear, tabla);
-        // }}
         className="space-y-6"
       >
         {/* Encabezado */}
@@ -383,19 +384,21 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
                       }
                     />
                     No se observan
+                  </label>                  
+                  <label className="flex items-center gap-1 text-base">
+                    <input
+                      type="checkbox"
+                      name="leucocitos"
+                      value="__x campo"
+                      onChange={() =>
+                        handleCheckRadioXValue("leucocitos") 
+                      }
+                      checked={
+                        form.leucocitos.toUpperCase().includes("X CAMPO")
+                      }
+                    />
+                    __x campo
                   </label>
-                  <input
-                    name="leucocitos_count"
-                    placeholder="__x campo"
-                    value={form.leucocitos_count}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        [e.target.name]: e.target.value,
-                      }))
-                    }
-                    className="border rounded px-2 py-1 text-base w-24"
-                  />
                 </div>
               </div>
               {/* Hematíes */}
@@ -420,22 +423,26 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
                       onChange={() =>
                         handleCheckRadio("hematies", "No se observan")
                       }
-                      checked={form.hematies === "No se observan".toUpperCase()}
+                      checked={
+                        form.hematies === "No se observan".toUpperCase()
+                      }
                     />
                     No se observan
+                  </label>                  
+                  <label className="flex items-center gap-1 text-base">
+                    <input
+                      type="checkbox"
+                      name="hematies"
+                      value="__x campo"
+                      onChange={() =>
+                        handleCheckRadioXValue("hematies")
+                      }
+                      checked={
+                        form.hematies.toUpperCase().includes("X CAMPO")
+                      }
+                    />
+                    __x campo
                   </label>
-                  <input
-                    name="hematies_count"
-                    placeholder="__x campo"
-                    value={form.hematies_count}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        [e.target.name]: e.target.value,
-                      }))
-                    }
-                    className="border rounded px-2 py-1 text-base w-24"
-                  />
                 </div>
               </div>
               {/* Parásitos */}

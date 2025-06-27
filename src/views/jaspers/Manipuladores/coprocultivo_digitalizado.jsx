@@ -1,6 +1,6 @@
 // src/views/jaspers/AnalisisBioquimicos/coprocultivo_digitalizado.jsx
 import jsPDF from "jspdf";
-import headerManipuladores from "./Header/headerManipuladores";
+import headerCoprocultivoDigitalizado from "./Header/headerCoprocultivoDigitalizado";
 import footer from "../components/footer";
 
 export default function Coprocultivo_Digitalizado(datos = {}) {
@@ -9,7 +9,7 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
   const margin = 15;
 
   // === HEADER ===
-  headerManipuladores(doc, datos);
+  headerCoprocultivoDigitalizado(doc, datos);
 
   // Empezamos debajo del header
   let y = 80;
@@ -27,15 +27,15 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
   y += 8;
   doc.setFont("helvetica", "normal");
   [
-    ["Muestra", datos.muestra || ""],
-    ["Color", ""],
-    ["Consistencia", ""],
-    ["Moco Fecal", ""],
-    ["Sangre Visible", ""],
-    ["Restos Alimenticios", ""],
+    ["Muestra", datos.txtmuestra ? ":  "+ datos.txtmuestra.toUpperCase() : "Heces"],
+    ["Color", datos.txtcolor ? ":  "+ datos.txtcolor.toUpperCase() : ""],
+    ["Consistencia", datos.txtconsistencia ? ":  "+ datos.txtconsistencia.toUpperCase() : ""],
+    ["Moco Fecal", datos.txtmoco_fecal ? ":  "+ datos.txtmoco_fecal.toUpperCase() : ""],
+    ["Sangre Visible", datos.txtsangrev ? ":  "+ datos.txtsangrev.toUpperCase() : ""],
+    ["Restos Alimenticios", datos.txtrestosa ? ":  "+ datos.txtrestosa.toUpperCase() : ""],
   ].forEach(([label, val]) => {
-    doc.text(label + " :", xLeft, y);
-    doc.text(val, xValue, y, { align: "right" });
+    doc.text(label, xLeft, y);
+    doc.text(val, xLeft + 45, y, { align: "left" });
     y += 7;
   });
 
@@ -46,14 +46,14 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
   y += 8;
   doc.setFont("helvetica", "normal");
   [
-    "Leucocitos",
-    "Hematíes",
-    "Parásitos",
-    "Gotas de grasa",
-    "Levaduras",
-  ].forEach((label) => {
-    doc.text(label + " :", xLeft, y);
-    doc.text("", xValue, y, { align: "right" });
+    ["Leucocitos", datos.txtleucocitos ? ":  " + datos.txtleucocitos.toUpperCase() : ""],
+    ["Hematíes", datos.txthematies ? ":  " + datos.txthematies.toUpperCase() : ""],
+    ["Parásitos", datos.txtparasitos ? ":  " + datos.txtparasitos.toUpperCase() : ""],
+    ["Gotas de grasa", datos.txtgotasg ? ":  " + datos.txtgotasg.toUpperCase() : ""],
+    ["Levaduras", datos.txtlevaduras ? ":  " + datos.txtlevaduras.toUpperCase() : ""],
+  ].forEach(([label, val]) => {
+    doc.text(label, xLeft, y);
+    doc.text(val, xLeft + 45, y, { align: "left" });
     y += 7;
   });
 
@@ -64,10 +64,10 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
   y += 8;
   doc.setFont("helvetica", "normal");
   doc.text("Identificación :", xLeft, y);
-  doc.text(datos.identificacion || "Escherichia coli (*)", xValue, y, { align: "right" });
+  doc.text(datos.txtidentificacion || "", xLeft + 45, y, { align: "left" });
   y += 7;
   doc.text("Flora Coliforme :", xLeft, y);
-  doc.text("", xValue, y, { align: "right" });
+  doc.text(datos.txtflorac || "", xLeft + 45, y, { align: "left" });
   y += 8;
 
   // Comentario
@@ -86,12 +86,11 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
 
   // Mensajes fijos de resultados
   doc.text(
-    "No se aisló Echerichia Coli Enteroinvasiva - Enteropatógena - Enterohemorragica.",
+    datos.txtobservaciones ||" ",
     xLeft,
     y
   );
-  y += 7;
-  doc.text("No se aisló bacteria patógenas.", xLeft, y);
+
 
   // === FOOTER ===
   footer(doc, datos);
