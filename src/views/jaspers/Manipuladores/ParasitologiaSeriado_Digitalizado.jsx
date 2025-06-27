@@ -3,7 +3,7 @@ import jsPDF from "jspdf";
 import headerManipuladores from "./Header/headerManipuladores";
 import footer from "../components/footer";
 
-export default function CoproparasitologicoSeriado_Digitalizado(datos = {}) {
+export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
