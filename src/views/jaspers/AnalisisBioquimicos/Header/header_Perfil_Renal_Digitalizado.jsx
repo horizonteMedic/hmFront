@@ -36,9 +36,10 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   doc.setLineWidth(0.7);
   doc.line(110 + nroOrdenLabelWidth + 4, 21.5, 110 + nroOrdenLabelWidth + 4 + nroOrdenValueWidth, 21.5);
   doc.setLineWidth(0.2);
-  doc.setFont(undefined, 'normal')
-  doc.text('Sede:', 110, 25)
-  doc.text(datos.sede || 'Trujillo-Piarda', 122, 25)
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+  // doc.setFont(undefined, 'normal')
+  doc.text('Sede:', 110, 27)
+  doc.text(datos.sede || 'Trujillo-Pierola', 122, 27)
 
   // Título
   doc.setFontSize(16)

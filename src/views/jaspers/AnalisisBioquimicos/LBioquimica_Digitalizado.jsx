@@ -131,7 +131,7 @@ export default function LBioquimica_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = (config.pageWidth - sigW) / 2; // Centrado horizontal
+      const sigX = ((config.pageWidth - sigW) / 2) - (s2 ? 40 : 0); // Centrado horizontal
       const sigY = y + 20;
 
       // Tamaño máximo dentro del área
@@ -166,7 +166,7 @@ export default function LBioquimica_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = (config.pageWidth - sigW) / 2; // Centrado horizontal
+      const sigX = ((config.pageWidth - sigW) / 2) + 40; // Centrado horizontal
       const sigY = y + 20;
 
       // Tamaño máximo dentro del área
