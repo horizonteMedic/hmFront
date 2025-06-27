@@ -90,8 +90,39 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
       observaciones:
         "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
       }));
-    setStatus("Formulario limpiado");
   };
+
+  const handleClearnotO = () => {
+    setForm((f) => ({
+      ...f,
+      fecha: today,
+      nombres: "",
+      edad: "",
+      // MUESTRA
+      muestra: "HECES",
+      color: "",
+      consistencia: "",
+      moco_fecal: "",
+      sangrev: "",
+      restosa: "",
+      // MICROSCÓPICO
+      leucocitos: "",
+      leucocitos_count: "",
+      hematies: "",
+      hematies_count: "",
+      parasitos: "",
+      gotasg: "",
+      levaduras: "",
+      // IDENTIFICACIÓN
+      identificacion: "Escherichia coli(*)",
+      florac: "",
+      // RESULTADO
+      resultado: "",
+      // OBSERVACIONES
+      observaciones:
+        "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
+      }));
+  }
 
   const handlePrint = () => {
     if (!form.norden)
@@ -132,6 +163,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
               value={form.norden}
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
+                  handleClearnotO()
                   VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                 }
               }}

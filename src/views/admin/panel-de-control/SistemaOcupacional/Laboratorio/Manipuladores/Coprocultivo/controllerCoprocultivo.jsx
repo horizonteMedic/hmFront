@@ -171,5 +171,8 @@ export const PrintHojaR = (nro, token, tabla) => {
         );
       }
     }
-  });
+  })
+  .finally(() => {
+    Swal.close()
+  })
 };

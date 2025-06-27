@@ -58,14 +58,14 @@ doc.line(
   doc.text("Fecha :", margin, y);
   doc.setFont("helvetica", "normal");
 
-const fechaISO = datos.fecha ;
-const fecha = new Date(fechaISO);
+  const [anio, mes, dia] = datos.fecha.split("-");
+  const fecha = new Date(`${anio}-${mes}-${dia}T12:00:00`); // Hora neutral para evitar desfase por zona horaria
 
-const dia = String(fecha.getDate()).padStart(2, "0");
-const mes = fecha.toLocaleString("es-ES", { month: "long" }); // mes como texto
-const anio = fecha.getFullYear();
+  const diaStr = String(fecha.getDate()).padStart(2, "0");
+  const mesStr = fecha.toLocaleString("es-ES", { month: "long" });
+  const anioStr = fecha.getFullYear();
 
-const formato = `${dia} ${mes} ${anio}`;
+  const formato = `${diaStr} ${mesStr} ${anioStr}`;
   doc.text(`${datos.fecha ? formato : ""}`, margin + 22, y);
   y += 7;
 
@@ -74,6 +74,40 @@ const formato = `${dia} ${mes} ${anio}`;
   doc.text("Muestra :", margin, y);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.txtmuestra || ""}`, margin + 25, y);
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  if (colorValido) {
+    let color = datos.codigoColor || "#008f39";
+    let boxText = (datos.textoColor || "F").toUpperCase();
+  
+    const boxSize = 15;
+    const boxX = pageW - margin - boxSize;
+    const boxY = 10 + 2;
+    
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+
+    // Solo renderiza si color es válido
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1
+    });
+    
+    // Reset color settings after drawing the colored elements
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2)
+  }
 };
 
 export default headerCoprocultivoDigitalizado;
