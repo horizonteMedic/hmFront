@@ -183,6 +183,7 @@ export const SubmitConsentimientoLab = async (form, tabla, token, user, fechaCoc
 export const PrintHojaR = async (datos,tabla,token, boro = false) => {
   Loading('Cargando Formato a Imprimir')
    // Ej: 'ConsentimientoPanel10D'
+  let errorEncontrado = false;
   if (boro === true) {
     getFetch(`/api/v01/ct/laboratorio/consentimientoLaboratorioBoro?nOrden=${datos.norden}&nameConset=${tabla}`,token)
     .then(async (res) => {
@@ -198,10 +199,16 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
           console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
         }
       }
+      Swal.close();
     })
-    .finally(() => {
-      Swal.close()
-    })
+    .catch((error) => {
+        console.error("Error al obtener el consentimiento:", error);
+        Swal.fire({
+          icon: "error",
+          title: "N° Orden no existente",
+          text: "Por favor, ingrese un N° Orden válido.",
+        });
+    });
   } else{
     getFetch(`/api/v01/ct/laboratorio/consentimiento-laboratorio?nOrden=${datos.norden}&nameConset=${tabla}`,token)
     .then(async (res) => {
@@ -217,10 +224,23 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
           console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
         }
       }
+      
     })
-    .finally(() => {
-      Swal.close()
-    })
+    .catch((error) => {
+        console.error("Error al obtener el consentimiento:", error);
+        
+        errorEncontrado = true;
+        Swal.fire({
+        icon: "error",
+        title: "N° Orden no existente",
+        text: "Por favor, ingrese un N° Orden válido.",
+        });
+    });
+    // .finally(() => {
+    //   if(!errorEncontrado) {
+    //     Swal.close();
+    //   }
+    // })
   }
   
 }

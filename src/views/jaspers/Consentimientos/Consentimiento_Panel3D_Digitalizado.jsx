@@ -56,7 +56,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
       const edad = String(datos.edad || '___');
       const dni = String(datos.dni || '__________');
       const bloques = [
-        { text: 'Yo  ', bold: false },
+        { text: 'Yo' + '\u00A0\u00A0', bold: false },
         { text: nombre, bold: true },
         { text: ' de ', bold: false },
         { text: edad, bold: true },
@@ -161,7 +161,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
             `NO ${checkBox(!datos.antConsumeHojaCoca)}`,
             `SI ${checkBox(datos.antConsumeHojaCoca)}`,
             datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca
-              ? `Cuando: ${datos.fechaConsumoHojaCoca}`
+              ? `Cuando: ${formatearFecha(datos.fechaConsumoHojaCoca)}`
               : ''
           ],
           [
@@ -169,7 +169,7 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
             `NO ${checkBox(!datos.antConsumeCocacina)}`,
             `SI ${checkBox(datos.antConsumeCocacina)}`,
             datos.antConsumeCocacina && datos.fechaConsumeCocacina
-              ? `Cuando: ${datos.fechaConsumeCocacina}`
+              ? `Cuando: ${formatearFecha(datos.fechaConsumeCocacina)}`
               : ''
           ],
           [
@@ -177,14 +177,14 @@ export default function Consentimiento_Panel3D_Digitalizado(datos) {
             `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`,
             `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`,
             datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina
-              ? `Cuando: ${datos.fechaConsumeAnfetamina}`
+              ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}`
               : ''
           ],
         ],
         theme: 'plain',
         styles: { fontSize: 11, cellPadding: 1 },
-        columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
-        margin: { left: 18 },
+        columnStyles: { 0: { cellWidth: 105 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
+        margin: { left: 14 },
         didDrawPage: () => {}
       });
 

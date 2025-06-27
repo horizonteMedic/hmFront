@@ -225,24 +225,17 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`SI ( ${datos.antBoroConsumenMateCoca ? 'X' : ' '} )`, margin + 92, y);
     doc.text(`NO ( ${!datos.antBoroConsumenMateCoca ? 'X' : ' '} )`, margin + 110, y);
     y += 5;
-    // Texto justificado para la pregunta larga
-    const mateMsg = 'Si la respuesta es SI: ¿Cuándo consumió por última vez?';
-    const mateLines = doc.splitTextToSize(mateMsg, pageW - 2 * margin - 4);
-    mateLines.forEach(line => {
-      doc.text(line, margin, y);
-      y += 6;
-    });
     if (datos.antBoroConsumenMateCoca) {
-      doc.text('CUANDO:', margin + 130, y);
       let fechaMate = datos.critFechaConsumoMateCoca || '';
       if (fechaMate && !isNaN(Date.parse(fechaMate))) {
         const f = new Date(fechaMate);
         const dia = String(f.getDate()).padStart(2, '0');
         const mes = String(f.getMonth() + 1).padStart(2, '0');
         const anio = f.getFullYear();
-        fechaMate = `${dia}-${mes}-${anio}`;
+        fechaMate = `${dia}/${mes}/${anio}`;
       }
-      doc.text(fechaMate, margin + 150, y);
+      const textoCompleto = 'Si la respuesta es SI: ¿Cuándo consumió por última vez?     Fecha: ' + fechaMate;
+      doc.text(textoCompleto, margin, y);
       y += 7;
     } else {
       y += 2;
@@ -252,14 +245,14 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     doc.text(`SI ( ${datos.masticaHojaCoca ? 'X' : ' '} )`, margin + 92, y);
     doc.text(`NO ( ${!datos.masticaHojaCoca ? 'X' : ' '} )`, margin + 110, y);
     if (datos.masticaHojaCoca && datos.fechaConsumoHojaCoca) {
-      doc.text('CUANDO:', margin + 130, y);
+      doc.text('Cuando:', margin + 130, y);
       let fechaHoja = datos.fechaConsumoHojaCoca;
       if (fechaHoja && !isNaN(Date.parse(fechaHoja))) {
         const f = new Date(fechaHoja);
         const dia = String(f.getDate()).padStart(2, '0');
         const mes = String(f.getMonth() + 1).padStart(2, '0');
         const anio = f.getFullYear();
-        fechaHoja = `${dia}-${mes}-${anio}`;
+        fechaHoja = `${dia}/${mes}/${anio}`;
       }
       doc.text(fechaHoja, margin + 150, y);
     }
@@ -276,8 +269,8 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     y += 5;
     // Tratamiento quirúrgico/dental
     doc.text('- ¿Se realizó algún tratamiento quirúrgico o dental en las últimas 48 horas?', margin, y);
-    doc.text(`SI ( ${datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 142, y);
-    doc.text(`NO ( ${!datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 160, y);
+    doc.text(`SI ( ${datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 139, y);
+    doc.text(`NO ( ${!datos.antBoroTratQuirugODental ? 'X' : ' '} )`, margin + 155, y); 
     y += 5;
     // Texto justificado para la pregunta larga
     const tratMsg = 'Si la respuesta es SI, indicar qué tratamiento se realizó, cual es nombre del cirujano, donde y cuando se realizó dicho procedimiento o tratamiento';

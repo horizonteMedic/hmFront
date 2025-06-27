@@ -160,7 +160,7 @@ export default function Consentimiento_Marihuana_Digitalizado(datos) {
       theme: 'plain',
       styles: { fontSize: 11, cellPadding: 1 },
       columnStyles: { 0: { cellWidth: 95 }, 1: { cellWidth: 20 }, 2: { cellWidth: 20 }, 3: { cellWidth: 50 } },
-      margin: { left: 18 },
+      margin: { left: 14 },
       didDrawPage: () => {}
     });
 

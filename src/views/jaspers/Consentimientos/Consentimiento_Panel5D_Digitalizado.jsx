@@ -55,7 +55,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
     const edad = String(datos.edad || '___');
     const dni = String(datos.dni || '__________');
     const bloques = [
-      { text: 'Yo  ', bold: false },
+      { text: 'Yo' + '\u00A0\u00A0', bold: false },
       { text: nombre, bold: true },
       { text: ', de ', bold: false },
       { text: edad, bold: true },
