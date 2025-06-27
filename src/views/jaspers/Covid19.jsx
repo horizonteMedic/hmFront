@@ -6,10 +6,9 @@ import headerHR from "./components/headerHR";
 import drawBox from "./components/drawBox";
 import drawC from "./components/drawC";
 
-export default function Covid19Examen ()  {
+export default function Covid19Examen (datos = {})  {
 
     const doc = new jsPDF();
-    const datos = {}
     // Llamamos al header (si tienes un encabezado personalizado)
     headerHR(doc,datos);
 
@@ -19,7 +18,7 @@ export default function Covid19Examen ()  {
     doc.setTextColor(0, 0, 0);
 
     const pageWidth = doc.internal.pageSize.getWidth();
-    let startY = 50;
+    let startY = 80;
 
     
 
@@ -59,8 +58,8 @@ export default function Covid19Examen ()  {
     // ADMISION
     let flowY = startY;
     let leftEdge = centerX - ovalWidth / 2;
-    doc.roundedRect(leftEdge, flowY, ovalWidth, ovalHeight, cornerRadius, cornerRadius);
-    doc.text("ADMISION", centerX, flowY + 5, { align: "center" });
+    drawBox(doc, "ADMISION", leftEdge, flowY, ovalWidth, ovalHeight, cornerRadius, datos.orden);
+    
 
     // Línea vertical: ADMISION -> TRIAJE
     doc.line(centerX, flowY + ovalHeight, centerX, flowY + ovalHeight + 6);
@@ -218,7 +217,7 @@ export default function Covid19Examen ()  {
     });
 
     // 7) Footer
-    footer(doc);
+    footer(doc,datos);
 
     // Abre el PDF
     const blob   = doc.output("blob");
