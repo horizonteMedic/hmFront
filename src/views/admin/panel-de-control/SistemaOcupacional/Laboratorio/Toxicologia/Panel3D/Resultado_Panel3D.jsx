@@ -156,48 +156,73 @@ const Resultado_Panel3D = ({ token, selectedSede, userlogued }) => {
       </div>
 
       {/* Resultados */}
-      <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-8">
+      <div className="grid grid-cols-3 gap-x-4 gap-y-2 mb-8">
         <div className="font-bold">PRUEBAS</div>
+        <div className="font-bold"> </div>
         <div className="font-bold">RESULTADOS</div>
         <div className="flex items-center">COCAINA (COC)</div>
-          <input
-            name='valueC'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueC}
-            onChange={e => handleChange(e.target)}
-            ref={valueCRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueMRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueC === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueC: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueC === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueC: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueC'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueC}
+          onChange={e => handleChange(e.target)}
+          ref={valueCRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueMRef.current?.focus();
+            }
+          }}
+        />
         <div className="flex items-center">MARIHUANA (THC)</div>
-          <input
-            name='valueM'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueM}
-            onChange={e => handleChange(e.target)}
-            ref={valueMRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueERef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueM === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueM: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueM === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueM: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueM'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueM}
+          onChange={e => handleChange(e.target)}
+          ref={valueMRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueERef.current?.focus();
+            }
+          }}
+        />
         <div className="flex items-center">EXTASIS (MDMA)</div>
-          <input
-            name='valueE'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueE}
-            onChange={e => handleChange(e.target)}
-            ref={valueERef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                printRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueE === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueE: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueE === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueE: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueE'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueE}
+          onChange={e => handleChange(e.target)}
+          ref={valueERef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              printRef.current?.focus();
+            }
+          }}
+        />
       </div>
 
       {/* Botones */}

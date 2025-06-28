@@ -341,10 +341,11 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     y += 6;
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("Observaciones :", bioqMargin, y);
+    y += 6; // Espacio después del título
     doc.setFont("helvetica", "normal");
     const obs = doc.splitTextToSize(datos.txtObservacionesLb || "", pageW - contentMargin * 2);
-    doc.text(obs, bioqMargin, y + 2);
-    y += obs.length * 5 + 2;
+    doc.text(obs, bioqMargin, y);
+    y += obs.length * 5 + 10; // Mantén el espacio extra debajo
 
     if (s1) {
       const canvas = document.createElement('canvas');

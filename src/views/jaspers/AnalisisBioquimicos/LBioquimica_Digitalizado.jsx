@@ -110,10 +110,10 @@ export default function LBioquimica_Digitalizado(datos) {
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
+      // Dimensiones del área del sello - Primera firma (más pequeña)
+      const sigW = 60;
       const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
+      const sigX = (pageW - 160) / 2;
       const sigY = y + 20;
 
       // Tamaño máximo dentro del área
@@ -145,10 +145,10 @@ export default function LBioquimica_Digitalizado(datos) {
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
+      // Dimensiones del área del sello - Segunda firma (más ancha)
+      const sigW = 100;
       const sigH = 35;
-      const sigX = (pageW - sigW) / 2 + 70; // Centrado horizontal
+      const sigX = (pageW - 160) / 2 + 60;
       const sigY = y + 20;
 
       // Tamaño máximo dentro del área

@@ -52,7 +52,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();
     fechaFormateada = `${day}/${month}/${year}`;
-    doc.text(`Fecha: ${datos.fechaLab}`, datosX, datosY, { align: "right" });
+    doc.text(`Fecha: ${fechaFormateada}`, datosX, datosY, { align: "right" });
     datosY += 6;
   }
 

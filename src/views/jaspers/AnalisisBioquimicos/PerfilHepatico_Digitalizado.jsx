@@ -134,21 +134,30 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       const imgY = sigY;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     } else if (s1 && s2) {
-      // Dos sellos, uno a la izquierda y otro a la derecha
-      const addSello = (img, left) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        // Izquierda o derecha, usando firmaMargin para acercarlas
-        const imgX = left ? firmaMargin : pageW - firmaMargin - imgW;
-        const imgY = sigY;
-        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-      };
-      addSello(s1, true);  // Izquierda
-      addSello(s2, false); // Derecha
+      // Dos sellos, uno a la izquierda (normal) y otro a la derecha (más pequeño)
+      // Primera firma (sello1) - tamaño normal
+      const canvas1 = document.createElement('canvas');
+      canvas1.width = s1.width;
+      canvas1.height = s1.height;
+      const ctx1 = canvas1.getContext('2d');
+      ctx1.drawImage(s1, 0, 0);
+      const selloBase64_1 = canvas1.toDataURL('image/png');
+      const imgX1 = firmaMargin;
+      const imgY1 = sigY;
+      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, imgW, imgH);
+
+      // Segunda firma (sello2) - ancho y alto fijos en mm
+      const smallW = 30; // ancho fijo en mm
+      const smallH = 25; // alto fijo en mm
+      const canvas2 = document.createElement('canvas');
+      canvas2.width = s2.width;
+      canvas2.height = s2.height;
+      const ctx2 = canvas2.getContext('2d');
+      ctx2.drawImage(s2, 0, 0);
+      const selloBase64_2 = canvas2.toDataURL('image/png');
+      const imgX2 = pageW - firmaMargin - smallW;
+      const imgY2 = sigY + (imgH - smallH) / 2;
+      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, smallW, smallH);
     }
 
     footer(doc, datos);

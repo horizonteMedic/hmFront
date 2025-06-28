@@ -70,7 +70,9 @@ const headerMicrobiologiaDigitalizado = (doc, datos = {}) => {
   doc.setFont('helvetica', 'bold');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
-  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 18) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
+  // Aumenta el margen derecho sumando 20mm
+  let extraMargin = 20;
+  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 18 - extraMargin) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth - extraMargin);
   let nroOrdenY = y + 8;
   doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY);
   doc.setFont('helvetica', 'bold').setFontSize(18);

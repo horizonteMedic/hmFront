@@ -75,7 +75,16 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(String(datos.fecha), patientDataX + fechaLabelWidth + 2, y);
+  // Mostrar la fecha en formato dd/mm/yyyy
+  let fechaFormateada = '';
+  if (datos.fecha) {
+    const date = new Date(`${datos.fecha}T00:00:00`);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    fechaFormateada = `${day}/${month}/${year}`;
+  }
+  doc.text(fechaFormateada, patientDataX + fechaLabelWidth + 2, y);
   
   // Reseteo de estilos para el cuerpo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);

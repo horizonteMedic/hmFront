@@ -104,20 +104,30 @@ export default function LGonadotropina_Digitalizado(datos) {
     const imgW = 60, imgH = 25;
     const marginInterno = 40;
     if (s1 && s2) {
-      // Dos firmas, una a la izquierda y otra a la derecha
-      const addSello = (img, left) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        const imgX = left ? marginInterno : pageW - marginInterno - imgW;
-        const imgY = 210;
-        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-      };
-      addSello(s1, true);
-      addSello(s2, false);
+      // Dos firmas, una a la izquierda (normal) y otra a la derecha (más pequeña)
+      // Primera firma (sello1) - tamaño normal
+      const canvas1 = document.createElement('canvas');
+      canvas1.width = s1.width;
+      canvas1.height = s1.height;
+      const ctx1 = canvas1.getContext('2d');
+      ctx1.drawImage(s1, 0, 0);
+      const selloBase64_1 = canvas1.toDataURL('image/png');
+      const imgX1 = marginInterno;
+      const imgY1 = 210;
+      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, imgW, imgH);
+
+      // Segunda firma (sello2) - ancho y alto fijos
+      const smallW = 30; // ancho fijo en mm
+      const smallH = 25; // alto fijo en mm
+      const canvas2 = document.createElement('canvas');
+      canvas2.width = s2.width;
+      canvas2.height = s2.height;
+      const ctx2 = canvas2.getContext('2d');
+      ctx2.drawImage(s2, 0, 0);
+      const selloBase64_2 = canvas2.toDataURL('image/png');
+      const imgX2 = pageW - marginInterno - smallW;
+      const imgY2 = 210;
+      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, smallW, smallH);
     } else if (s1) {
       // Solo una firma, centrada
       const canvas = document.createElement('canvas');
@@ -130,16 +140,18 @@ export default function LGonadotropina_Digitalizado(datos) {
       const imgY = 210;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     } else if (s2) {
-      // Solo la segunda firma, centrada
+      // Solo la segunda firma, centrada y con tamaño pequeño
+      const smallW = 30;
+      const smallH = 25;
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = (pageW - imgW) / 2;
+      const imgX = (pageW - smallW) / 2;
       const imgY = 210;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, smallW, smallH);
     }
 
     // === FOOTER ===

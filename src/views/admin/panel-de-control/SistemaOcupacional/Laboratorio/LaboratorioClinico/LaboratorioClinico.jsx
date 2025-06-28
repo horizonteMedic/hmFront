@@ -195,7 +195,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO} />
     },
     {
-      label: 'Hematograma',
+      label: 'Hemograma',
       icon: faHeartbeat,
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematograma',

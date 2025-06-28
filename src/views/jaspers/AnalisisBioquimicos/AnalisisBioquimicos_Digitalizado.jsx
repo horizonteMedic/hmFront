@@ -118,22 +118,31 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
     doc.setLineWidth(0.3).roundedRect(recX, recY, recW, recH, 2, 2);
 
     const imgW = 60, imgH = 25;
+    const smallW = 30, smallH = 25;
     const marginInterno = 10;
     if (s1 && s2) {
-      // Dos firmas, una a la izquierda y otra a la derecha dentro del recuadro
-      const addSello = (img, left) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        const imgX = left ? recX + marginInterno : recX + recW - marginInterno - imgW;
-        const imgY = recY + (recH - imgH) / 2;
-        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-      };
-      addSello(s1, true);  // Izquierda
-      addSello(s2, false); // Derecha
+      // Dos firmas, una a la izquierda (normal) y otra a la derecha (más pequeña) dentro del recuadro
+      // Primera firma (sello1) - tamaño normal
+      const canvas1 = document.createElement('canvas');
+      canvas1.width = s1.width;
+      canvas1.height = s1.height;
+      const ctx1 = canvas1.getContext('2d');
+      ctx1.drawImage(s1, 0, 0);
+      const selloBase64_1 = canvas1.toDataURL('image/png');
+      const imgX1 = recX + marginInterno;
+      const imgY1 = recY + (recH - imgH) / 2;
+      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, imgW, imgH);
+
+      // Segunda firma (sello2) - más pequeña
+      const canvas2 = document.createElement('canvas');
+      canvas2.width = s2.width;
+      canvas2.height = s2.height;
+      const ctx2 = canvas2.getContext('2d');
+      ctx2.drawImage(s2, 0, 0);
+      const selloBase64_2 = canvas2.toDataURL('image/png');
+      const imgX2 = recX + recW - marginInterno - smallW;
+      const imgY2 = recY + (recH - smallH) / 2;
+      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, smallW, smallH);
     } else if (s1) {
       // Solo una firma, centrada en el recuadro
       const canvas = document.createElement('canvas');
@@ -146,16 +155,16 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
       const imgY = recY + (recH - imgH) / 2;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     } else if (s2) {
-      // Solo la segunda firma, centrada
+      // Solo la segunda firma, centrada y más pequeña
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-      const imgX = recX + (recW - imgW) / 2;
-      const imgY = recY + (recH - imgH) / 2;
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      const imgX = recX + (recW - smallW) / 2;
+      const imgY = recY + (recH - smallH) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, smallW, smallH);
     }
 
     // ==== FOOTER ====
