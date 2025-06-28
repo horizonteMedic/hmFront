@@ -349,14 +349,14 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                     <label className="w-24 font-semibold">Glucosa :</label>
                     <input name="glucosa" value={form.glucosa} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.glucosaNA}/>
                     <span className="w-12">mg/dl</span>
-                    <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => { setField('glucosaNA', v); setField('glucosa', v ? 'N/A' : ''); }} />
+                    <Checkbox label="N/A" checked={form.glucosaNA || form.glucosa === "N/A"} onChange={v => { setField('glucosaNA', v); setField('glucosa', v ? 'N/A' : ''); }} />
                     <span className="ml-4 text-md">Valores normales 70 - 110 mg/dl</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <label className="w-24 font-semibold">Creatinina :</label>
                     <input name="creatinina" value={form.creatinina} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.creatininaNA}/>
                     <span className="w-12">mg/dl</span>
-                    <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => { setField('creatininaNA', v); setField('creatinina', v ? 'N/A' : ''); }} />
+                    <Checkbox label="N/A" checked={form.creatininaNA || form.creatinina === "N/A"} onChange={v => { setField('creatininaNA', v); setField('creatinina', v ? 'N/A' : ''); }} />
                     <span className="ml-4 text-md">Valores normales 0.8 - 1.4 mg/dl</span>
                 </div>
                 </div>

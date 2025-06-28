@@ -51,16 +51,16 @@ export default function LHepatitisB_Digitalizado(datos) {
     startY: doc.lastAutoTable.finalY + 2,
     head: [[
       { content: 'PRUEBA CUALITATIVO', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'RESULTADO', styles: { halign: 'left', fontStyle: 'bold', cellPadding: { left: 140 } } }
+      { content: 'RESULTADO', styles: { halign: 'left', fontStyle: 'bold',  } }
     ]],
     body: [
       [
         { content: `HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`, styles: { fontStyle: 'normal', halign: 'left' } },
-        { content: datos.txtHepatitisb || '', styles: { fontStyle: 'normal', halign: 'left', cellPadding: { left: 140 } } }
+        { content: datos.txtHepatitisb || '', styles: { fontStyle: 'normal', halign: 'left',  } }
       ]
     ],
     theme: 'plain',
-    styles: { fontSize: 11, cellPadding: 2 },
+    styles: { fontSize: 11,},
     margin: { left: 15, right: 15 },
     tableWidth: 180
   });
@@ -69,8 +69,7 @@ export default function LHepatitisB_Digitalizado(datos) {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   // Calcula la posición Y justo debajo de los encabezados
-  const yLine = doc.lastAutoTable.finalY - doc.lastAutoTable.rowHeight + 3; // Ajusta si es necesario
-  doc.setLineWidth(0.3);
+  const yLine = doc.lastAutoTable.finalY + 1;  doc.setLineWidth(0.3);
   doc.line(margin, yLine, pageW - margin, yLine);
   doc.setLineWidth(0.2); // Reset
 

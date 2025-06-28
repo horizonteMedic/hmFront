@@ -48,12 +48,8 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     // Tabla centrada para Fecha, Hora, Ciudad
     let fechaStr = datos.fecha || '';
     if (datos.fecha) {
-      const f = new Date(datos.fecha);
-      const dia = f.getDate();
-      const mes = f.getMonth();
-      const anio = f.getFullYear();
-      const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-      fechaStr = `${dia} de ${meses[mes]} de ${anio}`;
+      const [anio, mes, dia] = datos.fecha.split('-');
+      fechaStr = `${dia}/${mes}/${anio}`;
     }
     const horaStr = datos.horaExamen || '';
     const ciudadStr = datos.sede || '';
@@ -232,9 +228,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
         const dia = String(f.getDate()).padStart(2, '0');
         const mes = String(f.getMonth() + 1).padStart(2, '0');
         const anio = f.getFullYear();
-        fechaMate = `${dia}/${mes}/${anio}`;
+        fechaMate = `${datos.antBoroConsumenMateCoca}`;
       }
-      const textoCompleto = 'Si la respuesta es SI: ¿Cuándo consumió por última vez?     Fecha: ' + fechaMate;
+      const textoCompleto = `Si la respuesta es SI: ¿Cuándo consumió por última vez?     Fecha:   ${datos.critFechaConsumoMateCoca}`;
       doc.text(textoCompleto, margin, y);
       y += 7;
     } else {
@@ -252,9 +248,9 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
         const dia = String(f.getDate()).padStart(2, '0');
         const mes = String(f.getMonth() + 1).padStart(2, '0');
         const anio = f.getFullYear();
-        fechaHoja = `${dia}/${mes}/${anio}`;
+        fechaHoja = `${datos.fechaConsumoHojaCoca}`;
       }
-      doc.text(fechaHoja, margin + 150, y);
+      doc.text(`${fechaHoja}`, margin + 150, y);
     }
     y += 5;
     // Texto justificado para la pregunta larga

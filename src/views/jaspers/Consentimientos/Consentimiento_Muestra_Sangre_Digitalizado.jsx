@@ -144,7 +144,7 @@ export default function Consentimiento_Muestra_Sangre_Digitalizado(datos) {
       const anio = f.getFullYear();
       const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
       const rightMargin = 20;
-      doc.text(`${dia} de ${meses[mes]} de ${anio}`, pageW - rightMargin, y, { align: 'right' });
+      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
     }
     y += 15;
 

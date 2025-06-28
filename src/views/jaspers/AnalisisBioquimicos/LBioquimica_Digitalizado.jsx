@@ -102,24 +102,18 @@ export default function LBioquimica_Digitalizado(datos) {
     const sigY = y + 20;
     const firmaMargin = 40; // margen lateral personalizado para juntar más las firmas
 
-    if (s1 && !s2) {
-      // Solo un sello, centrado
+    if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-<<<<<<< HEAD
-      // Centrado horizontal
-      const imgX = (pageW - imgW) / 2;
-      const imgY = sigY;
-=======
 
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = ((config.pageWidth - sigW) / 2) - (s2 ? 40 : 0); // Centrado horizontal
+      const sigX = (pageW - sigW) / 2; // Centrado horizontal
       const sigY = y + 20;
 
       // Tamaño máximo dentro del área
@@ -154,7 +148,7 @@ export default function LBioquimica_Digitalizado(datos) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 35;
-      const sigX = ((config.pageWidth - sigW) / 2) + 40; // Centrado horizontal
+      const sigX = (pageW - sigW) / 2 + 70; // Centrado horizontal
       const sigY = y + 20;
 
       // Tamaño máximo dentro del área
@@ -175,24 +169,7 @@ export default function LBioquimica_Digitalizado(datos) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
->>>>>>> ac56af38d6f762c1388aeaeb2a38a41562b31233
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    } else if (s1 && s2) {
-      // Dos sellos, uno a la izquierda y otro a la derecha
-      const addSello = (img, left) => {
-        const canvas = document.createElement('canvas');
-        canvas.width = img.width;
-        canvas.height = img.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0);
-        const selloBase64 = canvas.toDataURL('image/png');
-        // Izquierda o derecha, usando firmaMargin para acercarlas
-        const imgX = left ? firmaMargin : pageW - firmaMargin - imgW;
-        const imgY = sigY;
-        doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-      };
-      addSello(s1, true);  // Izquierda
-      addSello(s2, false); // Derecha
     }
 
     footer(doc, datos, y);

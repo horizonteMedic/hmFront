@@ -33,7 +33,7 @@ const header_Panel5d_Digitalizado = (doc, datos = {}) => {
   }
 
   // 2. Bloque de datos a la derecha
-  const rightColX = pageW - margin;
+  const rightColX = pageW - margin - 30;
   const lineHeight = 6;
   
   // --- Nro Orden ---

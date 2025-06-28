@@ -135,8 +135,6 @@ export const PrintHojaR = (nro,token,tabla) => {
       Swal.close()
     }
   })
-  .catch(async() => {
-    await Swal.fire('Error','No se encontro el registro','error')
-  })
+
   
 }
