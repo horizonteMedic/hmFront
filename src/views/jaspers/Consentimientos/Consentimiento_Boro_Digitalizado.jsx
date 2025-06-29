@@ -327,7 +327,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     if (firmap) {
       const sigW = 70;
       const sigH = 30;
-      const sigX = centerXP - sigW / 2;
+      const sigX = centerXP - sigW / 2 -20;
       const sigY = lineYP - sigH;
 
       const maxImgW = sigW - 10;
