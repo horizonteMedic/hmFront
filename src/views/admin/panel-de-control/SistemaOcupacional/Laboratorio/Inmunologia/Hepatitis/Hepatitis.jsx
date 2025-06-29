@@ -17,7 +17,7 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
     fecha: today,
     nombres: '',
     edad: '',
-    hav: false,
+    hav: true,
     hbsag: false,
     marca: 'RAPID TEST - MONTEST',
     resultadoHAV: '',
@@ -39,7 +39,7 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
       fecha: today,
       nombres: '',
       edad: '',
-      hav: false,
+      hav: true,
       hbsag: false,
       marca: 'RAPID TEST - MONTEST',
       resultadoHAV: '',
@@ -57,7 +57,7 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
       fecha: today,
       nombres: '',
       edad: '',
-      hav: false,
+      hav: true,
       hbsag: false,
       marca: 'RAPID TEST - MONTEST',
       resultadoHAV: '',
@@ -91,8 +91,8 @@ export default function Hepatitis({ token, selectedSede, userlogued }) {
   }
 
   // Lógica para habilitar/deshabilitar campos según el check (mejorada para cambio instantáneo y limpieza al desmarcar)
-
-
+console.log(form.resultadoHBsAgRadio)
+console.log(form.resultadoHBsAg)
   return (
     <div className="max-w-6xl w-[950px] mx-auto bg-white rounded shadow p-8 space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

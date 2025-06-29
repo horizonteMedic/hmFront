@@ -220,7 +220,7 @@ export default function Microbiologia({ token, selectedSede, userlogued }) {
           />
         </div>
         <div className="col-span-6 flex gap-4">
-          {["BAAR - NEGATIVO", "BAAR - POSITIVO", "N/A"].map(opt => (
+          {["NEGATIVO", "POSITIVO", "N/A"].map(opt => (
             <label key={opt} className="flex items-center gap-1">
               <input
                 type="checkbox"

@@ -75,12 +75,13 @@ export const GetInfoHepatitisLab = (nro,tabla,set,token) => {
         ...prev,
         ...res,
         fecha: res.fechaExamen,
-        hav: res.txtHepatitisa ? true : false,
-        hbsag: res.txtHepatitisb ? true : false,
+        hav: res.txtHepatitisa === "" ? false : true,
+        hbsag: res.txtHepatitisb === "" ? false : true,
         marca: res.txtMarca,
         resultadoHAV: res.txtHepatitisa,
-        resultadoHAVRadio: '',
-        resultadoHBsAg: res.txtHepatitisb
+        resultadoHAVRadio: res.txtHepatitisa,
+        resultadoHBsAg: res.txtHepatitisb,
+        resultadoHBsAgRadio: res.txtHepatitisb
       }));
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')

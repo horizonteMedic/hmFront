@@ -8,7 +8,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
   headerConsentimiento(doc,datos);
   const huella = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
   const firma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro";
 
   const loadImg = src =>
