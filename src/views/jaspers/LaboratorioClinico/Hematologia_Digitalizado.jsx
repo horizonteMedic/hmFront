@@ -44,14 +44,14 @@ export default function Hematologia_Digitalizado(datos = {}) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text("PRUEBA", col1, y);
-        doc.text("RESULTADO", col2, y);
+        doc.text("RESULTADO", col2 + 17.5, y, { align: 'center' });
         doc.text("VALORES NORMALES", col3, y);
         y += lineHeight + 2;
 
         // --- BLOQUE 1 ---
         doc.setFont('helvetica', 'bold');
         doc.text("HEMOGLOBINA", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtHemoglobina}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtHemoglobina}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("Mujeres 12 - 16 g/dL", col3, y);
         y += lineHeightSmall;
@@ -60,7 +60,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text("HEMATOCRITO", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtHematocrito}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtHematocrito}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("Mujeres 38 - 50 %", col3, y);
         y += lineHeightSmall;
@@ -71,20 +71,20 @@ export default function Hematologia_Digitalizado(datos = {}) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text("HEMATÍES", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtHematies}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtHematies}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("4.0 - 5.5 x 10^6/mm³", col3, y);
         y += lineHeight + 1;
         doc.setFontSize(10);
         doc.setFont('helvetica', 'normal');
         doc.text("Volumen Corpuscular Medio", col1 + indent, y);
-        doc.text(`${datos.txtVolumen}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtVolumen}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("80 - 100 fL", col3, y);
         y += lineHeight;
         doc.setFontSize(10);
         doc.text("Hemoglobina Corpuscular Media", col1 + indent, y);
-        doc.text(`${datos.txtHemocorpuscular}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtHemocorpuscular}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("26 - 34 pg", col3, y);
         y += lineHeight;
@@ -92,7 +92,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
         doc.text("Concentración de la Hemoglobina", col1 + indent, y);
         y += lineHeightSmall;
         doc.text("Corpuscular Media", col1 + indent, y);
-        doc.text(`${datos.txtConcentracion}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtConcentracion}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("31 - 37 g/dl", col3, y - lineHeightSmall);
         y += lineHeight + 2;
@@ -101,7 +101,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text("LEUCOCITOS", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtLeucocitos}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtLeucocitos}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("4 - 10 x 10^3/mm³", col3, y);
         y += lineHeight + 2;
@@ -130,7 +130,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
 
             // Muestra el valor desde datos, si no existe muestra "-"
             const value = datos[key] ?? "-";
-            doc.text(String(value), col2, y);  // Valor actual
+            doc.text(String(value), col2 + 17.5, y, { align: 'center' });  // Valor centrado
             doc.text(normal, col3, y);         // Rango normal
 
             doc.setFontSize(10);
@@ -142,7 +142,7 @@ export default function Hematologia_Digitalizado(datos = {}) {
         doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.text("PLAQUETAS", col1, y); doc.setFont('helvetica', 'normal');
-        doc.text(`${datos.txtPlaquetas}`, col2, y); doc.setFont('helvetica', 'normal');
+        doc.text(`${datos.txtPlaquetas}`, col2 + 17.5, y, { align: 'center' }); doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.text("1.5 - 4.5 x 10^5/mm³", col3, y);
         y += lineHeight;

@@ -23,7 +23,7 @@ const drawRow = (doc, y, test, datos, cols) => {
   doc.text(test.label, cols.col1, y);
   
   const result = datos[test.key] != null ? String(datos[test.key]) : "0";
-  doc.text(result, cols.col2, y, { align: "left" });
+  doc.text(result, cols.col2, y, { align: "center" });
 
   if (typeof test.ref === "string") {
     doc.text(test.ref, cols.col3, y, { align: "left" });
@@ -85,13 +85,13 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
 
     const tableCols = {
       col1: config.margin,
-      col2: 90,
+      col2: 100,
       col3: 135,
     };
 
     doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
     doc.text("PRUEBA", tableCols.col1, y);
-    doc.text("RESULTADO", tableCols.col2, y, { align: "left" });
+    doc.text("RESULTADO", tableCols.col2, y, { align: "center" });
     doc.text("RANGO REFERENCIAL", tableCols.col3, y, { align: "left" });
     y += 3;
     doc.setLineWidth(0.4).line(config.margin, y, pageW - config.margin, y);
@@ -114,7 +114,14 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       y = drawRow(doc, y, test, datos, tableCols);
     });
 
-    if (s1) {
+    // Dimensiones fijas del área del sello
+    const imgW = 60; // ancho fijo en mm
+    const imgH = 25; // alto fijo en mm
+    const sigY = y + 20;
+    const firmaMargin = 40; // margen lateral personalizado para juntar más las firmas
+
+    if (s1 && !s2) {
+      // Solo un sello, centrado
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
@@ -122,66 +129,35 @@ export default function PerfilHepatico_Digitalizado(datos = {}) {
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = y + 20;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
+      // Centrado horizontal
+      const imgX = (pageW - imgW) / 2;
+      const imgY = sigY;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
+    } else if (s1 && s2) {
+      // Dos sellos, uno a la izquierda (normal) y otro a la derecha (más pequeño)
+      // Primera firma (sello1) - tamaño normal
+      const canvas1 = document.createElement('canvas');
+      canvas1.width = s1.width;
+      canvas1.height = s1.height;
+      const ctx1 = canvas1.getContext('2d');
+      ctx1.drawImage(s1, 0, 0);
+      const selloBase64_1 = canvas1.toDataURL('image/png');
+      const imgX1 = firmaMargin;
+      const imgY1 = sigY;
+      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, imgW, imgH);
 
-    if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = y + 20;
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1);
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      // Segunda firma (sello2) - ancho y alto fijos en mm
+      const smallW = 30; // ancho fijo en mm
+      const smallH = 25; // alto fijo en mm
+      const canvas2 = document.createElement('canvas');
+      canvas2.width = s2.width;
+      canvas2.height = s2.height;
+      const ctx2 = canvas2.getContext('2d');
+      ctx2.drawImage(s2, 0, 0);
+      const selloBase64_2 = canvas2.toDataURL('image/png');
+      const imgX2 = pageW - firmaMargin - smallW;
+      const imgY2 = sigY + (imgH - smallH) / 2;
+      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, smallW, smallH);
     }
 
     footer(doc, datos);

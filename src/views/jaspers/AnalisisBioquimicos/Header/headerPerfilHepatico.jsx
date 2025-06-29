@@ -1,19 +1,17 @@
 // src/views/jaspers/AnalisisBioquimicos/Header/headerPerfilHepatico.jsx
 
 /**
- * Formatea una fecha en formato "04 noviembre 2024".
+ * Formatea una fecha en formato "04/11/2024".
  * @param {string} dateString - La fecha en formato YYYY-MM-DD.
  * @returns {string} - La fecha formateada.
  */
-const formatDateToLong = (dateString) => {
+const formatDateToShort = (dateString) => {
   if (!dateString) return '';
-  // Aseguramos que la fecha se interprete en la zona horaria local y no en UTC.
   const date = new Date(`${dateString}T00:00:00`);
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 const headerPerfilHepatico = (doc, datos = {}) => {
@@ -31,7 +29,7 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   }
 
   // 2. Nro Orden (derecha)
-  const rightColX = pageW - margin;
+  const rightColX = pageW - margin - 20;
   // Nro Orden grande, negrita y subrayado
   const nroOrdenLabel = "Nro Orden :";
   const nroOrdenValue = String(datos.norden || '');
@@ -63,7 +61,8 @@ const headerPerfilHepatico = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + 2, y);
+    const extraSpace = label === 'Apellidos y Nombres :' ? 8 : 2;
+    doc.text(String(value || '').toUpperCase(), patientDataX + labelWidth + extraSpace, y);
     y += lineHeight;
   };
   
@@ -77,10 +76,44 @@ const headerPerfilHepatico = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(String(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
+  doc.text(formatDateToShort(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
   
   // Reseteo de estilos para el cuerpo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  if (colorValido) {
+    let color = datos.codigoColor || "#008f39";
+    let boxText = (datos.textoColor || "F").toUpperCase();
+  
+    const boxSize = 15;
+    const boxX = pageW - margin - boxSize;
+    const boxY = 10 + 2;
+    
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+
+    // Solo renderiza si color es válido
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1
+    });
+    
+    // Reset color settings after drawing the colored elements
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2)
+  }
 };
 
 export default headerPerfilHepatico;

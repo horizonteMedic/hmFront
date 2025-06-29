@@ -33,7 +33,7 @@ const header_Hematologia = (doc, datos = {}) => {
   }
 
   // 2. Bloque de datos a la derecha
-  const rightColX = pageW - margin;
+  const rightColX = pageW - margin - 20;
   const lineHeight = 6;
   
   // --- Nro Orden ---
@@ -45,7 +45,7 @@ const header_Hematologia = (doc, datos = {}) => {
   const nroOrdenX = rightColX - nroOrdenValueWidth - nroOrdenLabelWidth - 2;
   doc.text(nroOrdenLabel, nroOrdenX, y + 5);
 
-  doc.setFont('helvetica', 'bold');
+  doc.setFont('helvetica', 'bold').setFontSize(20);
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, y + 5);
   doc.setLineWidth(0.5);
   doc.line(
@@ -66,7 +66,7 @@ const header_Hematologia = (doc, datos = {}) => {
     doc.text(label, patientDataX, y);
     doc.setFont('helvetica', 'normal');
     const labelWidth = doc.getTextWidth(label);
-    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 2, y);
+    doc.text(String(value).toUpperCase(), patientDataX + labelWidth + 8, y);
     y += lineHeight;
   };
   
@@ -80,7 +80,16 @@ const header_Hematologia = (doc, datos = {}) => {
   doc.text(fechaLabel, patientDataX, y);
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
-  doc.text(String(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
+  // Formatear fecha como dd/mm/yyyy
+  let fechaFormateada = '';
+  if (datos.fechaExamen) {
+    const d = new Date(datos.fechaExamen);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    fechaFormateada = `${day}/${month}/${year}`;
+  }
+  doc.text(fechaFormateada, patientDataX + fechaLabelWidth + 8, y);
   y += lineHeight;
 
   // --- Muestra ---
@@ -93,6 +102,40 @@ const header_Hematologia = (doc, datos = {}) => {
 
   // Reseteo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  if (colorValido) {
+    let color = datos.codigoColor || "#008f39";
+    let boxText = (datos.textoColor || "F").toUpperCase();
+  
+    const boxSize = 15;
+    const boxX = pageW - margin - boxSize;
+    const boxY = 10 + 2;
+    
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+
+    // Solo renderiza si color es válido
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1
+    });
+    
+    // Reset color settings after drawing the colored elements
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2)
+  }
 };
 
 export default header_Hematologia; 

@@ -134,10 +134,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
     y += 6;
     function formatearFecha(fecha) {
       if (!fecha) return '';
-      const f = new Date(fecha);
-      const dia = String(f.getDate()).padStart(2, '0');
-      const mes = String(f.getMonth() + 1).padStart(2, '0');
-      const anio = f.getFullYear();
+      const [anio, mes, dia] = fecha.split('-');
       return `${dia}/${mes}/${anio}`;
     }
     function checkBox(checked) {
@@ -232,7 +229,7 @@ export default function Consentimiento_Panel10D_Digitalizado(datos) {
       const anio = f.getFullYear();
       const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
       const rightMargin = 20;
-      doc.text(`${dia} de ${meses[mes]} de ${anio}`, pageW - rightMargin, y, { align: 'right' });
+      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
     }
     y += 12;
 

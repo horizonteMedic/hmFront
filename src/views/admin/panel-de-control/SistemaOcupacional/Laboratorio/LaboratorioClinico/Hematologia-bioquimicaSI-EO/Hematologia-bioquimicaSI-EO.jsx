@@ -3,7 +3,7 @@ import microscopioImg from './microscopio.webp';
 import { VerifyTR } from '../ControllerLC/ControllerLC';
 import { getFetch } from '../../../../getFetch/getFetch';
 
-export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, form, setForm, setFormO }) => {
+export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, form, setForm, setFormO, listDoc, setSearchMedico, searchMedico }) => {
   const tabla = 'lab_clinico';
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -68,18 +68,6 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   }
 
   const [status, setStatus] = useState('');
-  const [listDoc, setListDoc] = useState([])
-
-//NOMBRES DEL DOCTOR
-  useEffect(() => {
-    getFetch(`/api/v01/ct/laboratorio/listadoUsuariosPorPrioridadNameUser?nameUser=${userlogued}`,token)
-      .then((res) => {
-        setListDoc(res)
-        setForm(f => ({ ...f, responsable: res[0] }))
-        setSearchMedico(res[0])
-      })
-      .catch(() => {});
-  },[])
 
   useEffect(() => {
     const grupo = form.grupo || '';
@@ -89,7 +77,6 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
 
   
   //AUTOCOMPLETAR DEL DOC
-  const [searchMedico, setSearchMedico]  = useState(form.responsable);
   const [filteredMedicos, setFilteredMedicos] = useState([]);
 
   const handleMedicoSearch = e => {
@@ -115,6 +102,21 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   // Estado para N/A de Hematología
   const [hematologiaNA, setHematologiaNA] = useState(false);
 
+  // Desmarcar N/A si se traen datos reales
+  useEffect(() => {
+    // Si alguno de los campos de Hematología o Bioquímica tiene valor distinto de '' y distinto de 'N/A', desmarcar N/A
+    const hematoCampos = [
+      ...hematologiaKeys,
+      'glucosa', 'creatinina'
+    ];
+    const hayDatos = hematoCampos.some(k => form[k] && form[k] !== 'N/A');
+    if (hayDatos) {
+      if (hematologiaNA) setHematologiaNA(false);
+      if (form.glucosaNA) setField('glucosaNA', false);
+      if (form.creatininaNA) setField('creatininaNA', false);
+    }
+  }, [form]);
+
   // Refs para inputs de Hematología
   const hematologiaKeys = [
     'hemoglobina','hematocrito','vsg','leucocitos','hematies','plaquetas',
@@ -126,11 +128,22 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   const handleHematologiaNA = (checked) => {
     setHematologiaNA(checked);
     const value = checked ? 'N/A' : '';
-      setForm(prev => {
-        const newFields = {};
-      hematologiaKeys.forEach(k => { newFields[k] = value; });
-        return { ...prev, ...newFields };
+    setForm(prev => {
+      const newFields = {};
+      hematologiaKeys.forEach(k => {
+        if (["hemoglobina","hematocrito"].includes(k)) {
+          newFields[k] = checked ? '' : '';
+        } else {
+          newFields[k] = value;
+        }
       });
+      // Bioquímica: glucosa libre, creatinina sí N/A
+      newFields['glucosa'] = checked ? '' : '';
+      newFields['glucosaNA'] = false;
+      newFields['creatinina'] = value;
+      newFields['creatininaNA'] = checked;
+      return { ...prev, ...newFields };
+    });
     if (checked) {
       setField('grupo', '');
       setField('rh', '');
@@ -157,7 +170,18 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
               name="norden"
               value={form.norden}
               onChange={handleInputChange}
-              onKeyUp={event => { if (event.key === 'Enter')handleClear(),VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede,setSearchMedico),GetTable(form.norden) }}
+              onKeyUp={event => {
+                if (event.key === 'Enter') {
+                  if (!form.norden) {
+                    window.Swal && window.Swal.fire('Error', 'Debe Introducir un Nro de Historia Clínica válido', 'error');
+                    event.preventDefault();
+                    return;
+                  }
+                  handleClear();
+                  VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede, setSearchMedico);
+                  GetTable(form.norden);
+                }
+              }}
               className="border rounded px-2 py-1 w-28 text-md ml-1"
             />
           </label>
@@ -349,14 +373,14 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
                     <label className="w-24 font-semibold">Glucosa :</label>
                     <input name="glucosa" value={form.glucosa} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.glucosaNA}/>
                     <span className="w-12">mg/dl</span>
-                    <Checkbox label="N/A" checked={form.glucosaNA} onChange={v => { setField('glucosaNA', v); setField('glucosa', v ? 'N/A' : ''); }} />
+                    <Checkbox label="N/A" checked={form.glucosaNA || form.glucosa === "N/A"} onChange={v => { setField('glucosaNA', v); setField('glucosa', v ? 'N/A' : ''); }} />
                     <span className="ml-4 text-md">Valores normales 70 - 110 mg/dl</span>
                 </div>
                 <div className="flex items-center gap-2">
                     <label className="w-24 font-semibold">Creatinina :</label>
                     <input name="creatinina" value={form.creatinina} onChange={handleInputChange} className="border border-gray-400 rounded-sm px-1 w-28 text-md" disabled={form.creatininaNA}/>
                     <span className="w-12">mg/dl</span>
-                    <Checkbox label="N/A" checked={form.creatininaNA} onChange={v => { setField('creatininaNA', v); setField('creatinina', v ? 'N/A' : ''); }} />
+                    <Checkbox label="N/A" checked={form.creatininaNA || form.creatinina === "N/A"} onChange={v => { setField('creatininaNA', v); setField('creatinina', v ? 'N/A' : ''); }} />
                     <span className="ml-4 text-md">Valores normales 0.8 - 1.4 mg/dl</span>
                 </div>
                 </div>

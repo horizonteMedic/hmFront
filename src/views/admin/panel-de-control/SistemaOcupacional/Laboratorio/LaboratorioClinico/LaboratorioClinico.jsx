@@ -1,12 +1,12 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/LaboratorioClinico/LaboratorioClinico.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMicroscope, faTint, faHeartbeat } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import HematologiaBioquimicaSIEO from './Hematologia-bioquimicaSI-EO/Hematologia-bioquimicaSI-EO';
 import ExamenOrina from './ExamenOrina/ExamenOrina';
 import Hematologia from './Hematologia/Hematologia';
-
+import { getFetch } from '../../../getFetch/getFetch';
 const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
   const navigate = useNavigate();
@@ -99,6 +99,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     setForm({
       ficha: true,
       norden: '',
+      fecha: today,
       responsable: '',
       paciente: '',
       empContratista: '',
@@ -179,13 +180,27 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     })
   }
 
+  const [listDoc, setListDoc] = useState([])
+  const [searchMedico, setSearchMedico]  = useState(form.responsable);
+  
+  useEffect(() => {
+    getFetch(`/api/v01/ct/laboratorio/listadoUsuariosPorPrioridadNameUser?nameUser=${userlogued}`,token)
+      .then((res) => {
+        setListDoc(res)
+        setForm(f => ({ ...f, responsable: res[0] }))
+        setSearchMedico(res[0])
+      })
+      .catch(() => {});
+  },[])
+
   const tabs = [
     {
       label: 'Hematología - Bioquímica SI-EO',
       icon: faMicroscope,
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematologia - Bioquimica SI-EO',
-      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} setFormO={setFormO} />
+      component: <HematologiaBioquimicaSIEO token={token} selectedSede={selectedSede} userlogued={userlogued} form={form} setForm={setForm} setFormO={setFormO}
+      listDoc={listDoc} setSearchMedico={setSearchMedico} searchMedico={searchMedico}/>
     },
     {
       label: 'Examen de Orina',
@@ -195,7 +210,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       component: <ExamenOrina token={token} selectedSede={selectedSede} userlogued={userlogued} form={formO} setForm={setFormO} formH={form} ClearForm={ClearForm} setFormH={setForm} ClearFormO={ClearFormO} />
     },
     {
-      label: 'Hematograma',
+      label: 'Hemograma',
       icon: faHeartbeat,
       vista: 'Laboratorio Clinico Formulario',
       permiso: 'Acceso Hematograma',

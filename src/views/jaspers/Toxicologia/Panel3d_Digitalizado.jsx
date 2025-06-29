@@ -159,7 +159,7 @@ export default function Panel3d_Digitalizado(datos = {}) {
         // Dimensiones del área del sello
         const sigW = 70;
         const sigH = 35;
-        const sigX = (pageW - sigW) / 2; // Centrado horizontal
+        const sigX = (pageW - sigW) / 2 + 50; // Centrado horizontal
         const sigY = 210; // ⬅️ Aquí usas el Y actual + espacio deseado
 
         // Tamaño máximo dentro del área

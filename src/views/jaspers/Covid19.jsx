@@ -66,8 +66,7 @@ export default function Covid19Examen (datos = {})  {
 
     // TRIAJE
     let triajeY = flowY + ovalHeight + 6;
-    doc.roundedRect(leftEdge, triajeY, ovalWidth, ovalHeight, cornerRadius, cornerRadius);
-    doc.text("TRIAJE", centerX, triajeY + 5, { align: "center" });
+    drawBox(doc, "TRIAJE", leftEdge, triajeY, ovalWidth, ovalHeight, cornerRadius, datos.triaje)
 
     // Línea vertical: TRIAJE -> COVID 19
     doc.line(centerX, triajeY + ovalHeight, centerX, triajeY + ovalHeight + 6);
@@ -76,8 +75,7 @@ export default function Covid19Examen (datos = {})  {
     let covidY = triajeY + ovalHeight + 6;
     const rectWidth = 35;
     const rectHeight = 8;
-    doc.rect(leftEdge, covidY, rectWidth, rectHeight);
-    doc.text("COVID 19", centerX, covidY + 5, { align: "center" });
+    drawBox(doc, "COVID 19", leftEdge, covidY, rectWidth, rectHeight, cornerRadius, datos.covid1 ? true : datos.covid2 ? true : false)
 
     // b) LÍNEA TRONCAL HORIZONTAL (debajo de COVID 19)
     const trunkY = covidY + rectHeight + 10; // un poco más cercano a COVID
@@ -93,25 +91,28 @@ export default function Covid19Examen (datos = {})  {
     const paLeft = centerX - boxW / 2;
     const rowStartX = paLeft - paIndex * (boxW + boxGap);
 
-    // Línea troncal
-    doc.line(rowStartX, trunkY, rowStartX + totalBoxesWidth, trunkY);
-
+    
     // Línea vertical: COVID 19 -> trunkY
     doc.line(centerX, covidY + rectHeight, centerX, trunkY);
-
+    // Línea troncal
+    doc.line(20, trunkY, 180, trunkY);
+    
     // c) Dibujamos cada caja, colgando con una línea corta
     const smallLine = 4; // pequeña línea vertical
-    boxes.forEach((name, i) => {
-      const boxX = rowStartX + i * (boxW + boxGap);
-      const boxCenterX = boxX + boxW / 2;
-      // Línea vertical corta
-      doc.line(boxCenterX, trunkY, boxCenterX, trunkY + smallLine);
-
-      // Caja
-      const boxTopY = trunkY + smallLine;
-      doc.rect(boxX, boxTopY, boxW, boxH);
-      doc.text(name, boxCenterX, boxTopY + 5, { align: "center" });
-    });
+    const boxX = rowStartX  * (boxW + boxGap);
+    const boxCenterX = boxX + boxW / 2;
+    // Línea vertical corta
+    doc.line(boxCenterX, trunkY, boxCenterX, trunkY + smallLine);
+    drawC(doc,"PRIMERA", 10, trunkY+5,25,10, datos.tipoooo === 'P1' ? true : false);
+    drawC(doc,"SEGUNDA", 50, trunkY+5,25,10, datos.tipoooo === 'P2' ? true : false);
+    drawC(doc,"PA", 90, trunkY+5,25,10, datos.tipoooo === 'PA' ? true : false);
+    drawC(doc,"HOTEL", 130, trunkY+5,25,10, datos.tipoooo === 'PC' ? true : false);
+    drawC(doc,"PCON", 170, trunkY+5,25,10, datos.tipoooo === 'PCON' ? true : false);
+    doc.line(20,trunkY ,20,trunkY +5)
+    doc.line(60,trunkY ,60,trunkY +5)
+    doc.line(100,trunkY ,100,trunkY +5)
+    doc.line(140,trunkY ,140,trunkY +5)
+    doc.line(180,trunkY ,180,trunkY +5)
 
     // -----------------------------------------------------------------------
     // NUEVO: LÍNEA HORIZONTAL DEBAJO DE SEGUNDA, PA, HOTEL, PCON
@@ -121,7 +122,7 @@ export default function Covid19Examen (datos = {})  {
     const lastIndex = 4;   // "PCON"
 
     // Ajusta la altura donde quieres la nueva línea
-    const lineBelowBoxesY = trunkY + smallLine + boxH + 10;
+    const lineBelowBoxesY = trunkY + smallLine + boxH + 10 ;
 
     // X del centro de la "SEGUNDA"
     const secondBoxCenterX = rowStartX + secondIndex * (boxW + boxGap) + boxW / 2;
@@ -129,15 +130,15 @@ export default function Covid19Examen (datos = {})  {
     const lastBoxCenterX = rowStartX + lastIndex * (boxW + boxGap) + boxW / 2;
 
     // Dibujamos la línea horizontal
-    doc.line(secondBoxCenterX, lineBelowBoxesY, lastBoxCenterX, lineBelowBoxesY);
+    doc.line(20, lineBelowBoxesY, lastBoxCenterX, lineBelowBoxesY);
 
     // Bajamos líneas verticales desde cada caja [SEGUNDA..PCON]
     for (let i = secondIndex; i <= lastIndex; i++) {
       const boxX = rowStartX + i * (boxW + boxGap);
       const boxCenterX = boxX + boxW / 2;
-      doc.line(boxCenterX, trunkY + smallLine + boxH, boxCenterX, lineBelowBoxesY);
+      doc.line(boxCenterX, trunkY + smallLine + boxH +3, boxCenterX, lineBelowBoxesY);
     }
-
+    doc.line(20,trunkY + smallLine + boxH +3,20,lineBelowBoxesY)
     // d) EVALUACION MEDICA y ALTA EPIDEMIOLOGICA
     // Menor espacio debajo
     const bigBoxW = 60;
@@ -149,13 +150,11 @@ export default function Covid19Examen (datos = {})  {
     const bigRowX = centerX - totalBigWidth / 2;
 
     // EVALUACION MEDICA
-    doc.rect(bigRowX, bigRowY, bigBoxW, bigBoxH);
-    doc.text("EVALUACION MEDICA", bigRowX + bigBoxW / 2, bigRowY + 5, { align: "center" });
+    drawC(doc, "EVALUACION MEDICA", bigRowX, bigRowY, bigBoxW, bigBoxH, datos.anexo7c)
 
     // ALTA EPIDEMIOLOGICA
     const altaX = bigRowX + bigBoxW + bigGap;
-    doc.rect(altaX, bigRowY, bigBoxW, bigBoxH);
-    doc.text("ALTA EPIDEMIOLOGICA", altaX + bigBoxW / 2, bigRowY + 5, { align: "center" });
+    drawC(doc, "ALTA EPIDEMIOLOGICA", altaX, bigRowY, bigBoxW, bigBoxH, datos.altaepidemiologica)
 
     // -----------------------------------------------------------------------
     // QUITADO: Antes conectábamos PA -> EVALUACION MEDICA y HOTEL -> ALTA
@@ -182,20 +181,19 @@ export default function Covid19Examen (datos = {})  {
     doc.line(hotelNewLineX, lineBelowBoxesY, altaX + bigBoxW / 2, bigRowY);
 
     // Ajustamos para seguir debajo de esas cajas
-    let finalY = bigRowY + bigBoxH + 5;
+    let finalY = bigRowY + bigBoxH + 8;
 
     // 6) Tabla de síntomas (opcional)
     autoTable(doc, {
       startY: finalY,
-      head: [[]],
       body: [
-        ["Tos", "Fiebre/ Escalofrío", "Cefalea"],
-        ["Dolor de Garganta", "Malestar General", "Irritabilidad"],
-        ["Congestión Nasal", "Diarrea", "Dolor"],
-        ["Dificultad respiratoria", "Nauseas Vómitos", "Otros:"],
+        ["Tos"," ", "Fiebre/ Escalofrío"," ", "Cefalea"," "],
+        ["Dolor de Garganta", " ", "Malestar General", " ", "Irritabilidad", " "],
+        ["Congestión Nasal", " ", "Diarrea", " ", "Dolor", " "],
+        ["Dificultad respiratoria", " ", "Nauseas Vómitos", " ", "Otros:", " "],
         [
-          { content: "Persona de contacto:", colSpan: 1 },
-          { content: "Celular del contacto:", colSpan: 2 },
+          { content: "Persona de contacto:", colSpan: 2 },
+          { content: "Celular del contacto:", colSpan: 4 },
         ],
       ],
       theme: "grid",

@@ -117,6 +117,7 @@ export const PrintHojaR = (nro,token,tabla) => {
   Loading('Cargando Formato a Imprimir')
   getFetch(`/api/v01/ct/analisisBioquimico/obtenerReportePerfilRenal?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
+    console.log('a')
     if (res.norden) {
       console.log(res)
       const nombre = res.nameJasper;
@@ -129,9 +130,11 @@ export const PrintHojaR = (nro,token,tabla) => {
       } else {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
+      Swal.close()
+    } else {
+      Swal.close()
     }
   })
-  .finally(() => {
-    Swal.close()
-  })
+
+  
 }

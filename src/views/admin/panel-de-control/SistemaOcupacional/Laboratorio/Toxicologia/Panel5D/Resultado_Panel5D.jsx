@@ -149,74 +149,115 @@ const Rseultado_Panel5D = ({ token, selectedSede, userlogued }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-8">
+      <div className="grid grid-cols-3 gap-x-4 gap-y-2 mb-8">
         <div className="font-bold">PRUEBAS</div>
+        <div className="font-bold"> </div>
         <div className="font-bold">RESULTADOS</div>
         <div className="flex items-center">COCAINA</div>
-          <input
-            name='valueC'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueC}
-            onChange={handleChange}
-            ref={valueCRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueMRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueC === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueC: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueC === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueC: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueC'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueC}
+          onChange={handleChange}
+          ref={valueCRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueMRef.current?.focus();
+            }
+          }}
+        />
         <div className="flex items-center">MARIHUANA</div>
-          <input
-            name='valueM'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueM}
-            onChange={handleChange}
-            ref={valueMRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueAnRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueM === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueM: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueM === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueM: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueM'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueM}
+          onChange={handleChange}
+          ref={valueMRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueAnRef.current?.focus();
+            }
+          }}
+        />
         <div className="flex items-center">ANFETAMINA EN ORINA</div>
-          <input
-            name='valueAn'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueAn}
-            onChange={handleChange}
-            ref={valueAnRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueMetRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueAn === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueAn: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueAn === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueAn: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueAn'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueAn}
+          onChange={handleChange}
+          ref={valueAnRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueMetRef.current?.focus();
+            }
+          }}
+        />
         <div className="flex items-center">METHANFETAMINA</div>
-          <input
-            name='valueMet'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueMet}
-            onChange={handleChange}
-            ref={valueMetRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                valueBenRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueMet === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueMet: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueMet === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueMet: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueMet'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueMet}
+          onChange={handleChange}
+          ref={valueMetRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueBenRef.current?.focus();
+            }
+          }}
+        />
         <div className="flex items-center">BENZODIAZEPINA</div>
-          <input
-            name='valueBen'
-            className="border rounded px-3 py-2 w-40"
-            value={form.valueBen}
-            onChange={handleChange}
-            ref={valueBenRef}
-            onKeyUp={e => {
-              if (e.key === 'Enter') {
-                printRef.current?.focus();
-              }
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueBen === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueBen: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueBen === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueBen: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueBen'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueBen}
+          onChange={handleChange}
+          ref={valueBenRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              printRef.current?.focus();
+            }
+          }}
+        />
       </div>
 
       <div className="flex flex-wrap items-center justify-end gap-4">

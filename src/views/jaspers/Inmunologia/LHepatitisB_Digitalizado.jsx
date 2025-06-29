@@ -47,113 +47,63 @@ export default function LHepatitisB_Digitalizado(datos) {
   });
 
   // Tabla de resultado
-  autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 2,
-    head: [[
-      { content: 'PRUEBA CUALITATIVO', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'RESULTADO', styles: { halign: 'right', fontStyle: 'bold', cellPadding: { right: 25 } } }
-    ]],
-    body: [
-      [
-        `HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`,
-        datos.txtHepatitisb || ''
-      ]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 11, cellPadding: 2 },
-    margin: { left: 15, right: 15 },
-    tableWidth: 180
-  });
-
-  // Línea divisora bajo los encabezados de la tabla de resultados
-  const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
-  // Calcula la posición Y justo debajo de los encabezados
-  const yLine = doc.lastAutoTable.finalY - doc.lastAutoTable.rowHeight + 3; // Ajusta si es necesario
+  let yTable = doc.lastAutoTable.finalY + 8;
+  // Encabezados
+  doc.setFont('helvetica', 'bold');
+  doc.text('PRUEBA CUALITATIVO', 15, yTable);
+  doc.text('RESULTADO', 105 + 40, yTable, { align: 'left' });
+  yTable += 3;
   doc.setLineWidth(0.3);
-  doc.line(margin, yLine, pageW - margin, yLine);
-  doc.setLineWidth(0.2); // Reset
+  doc.line(15, yTable, doc.internal.pageSize.getWidth() - 15, yTable);
+  doc.setLineWidth(0.2);
+  yTable += 8;
+  // Fila de datos
+  doc.setFont('helvetica', 'normal');
+  doc.text(`HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`, 15, yTable);
+  doc.text(datos.txtHepatitisb || '', 105 + 40, yTable, { align: 'left' });
 
   // Recuadros de imagen
-  if (s1) {
+  const imgW = 60, imgH = 25;
+  const marginInterno = 10;
+  if (s1 && s2) {
+    // Dos firmas, una a la izquierda y otra a la derecha
+    const addSello = (img, left) => {
       const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
+      canvas.width = img.width;
+      canvas.height = img.height;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
+      ctx.drawImage(img, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (doc.internal.pageSize.getWidth() - sigW) / 2; // Centrado horizontal
-      const sigY = 210; // Más abajo
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
+      const imgX = left ? marginInterno : doc.internal.pageSize.getWidth() - marginInterno - imgW;
+      const imgY = 210;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    };
+    addSello(s1, true);
+    addSello(s2, false);
+  } else if (s1) {
+    // Solo una firma, centrada
+    const canvas = document.createElement('canvas');
+    canvas.width = s1.width;
+    canvas.height = s1.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(s1, 0, 0);
+    const selloBase64 = canvas.toDataURL('image/png');
+    const imgX = (doc.internal.pageSize.getWidth() - imgW) / 2;
+    const imgY = 210;
+    doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+  } else if (s2) {
+    // Solo la segunda firma, centrada
+    const canvas = document.createElement('canvas');
+    canvas.width = s2.width;
+    canvas.height = s2.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(s2, 0, 0);
+    const selloBase64 = canvas.toDataURL('image/png');
+    const imgX = (doc.internal.pageSize.getWidth() - imgW) / 2;
+    const imgY = 210;
+    doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+  }
 
-      // Actualiza Y si después quieres seguir dibujando debajo
-    }
-
-    if (s2) {
-      const canvas = document.createElement('canvas');
-      canvas.width = s2.width;
-      canvas.height = s2.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(s2, 0, 0);
-      const selloBase64 = canvas.toDataURL('image/png');
-
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (doc.internal.pageSize.getWidth() - sigW) / 2; // Centrado horizontal
-      const sigY = 210; // Más abajo
-
-      // Tamaño máximo dentro del área
-      const maxImgW = sigW - 10;
-      const maxImgH = sigH - 10;
-
-      let imgW = s2.width;
-      let imgH = s2.height;
-
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
-    }
   footer(doc, datos);
 
   // Mostrar PDF

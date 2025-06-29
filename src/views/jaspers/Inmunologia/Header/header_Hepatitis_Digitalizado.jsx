@@ -71,7 +71,7 @@ const headerHepatitisDigitalizado = (doc, datos = {}) => {
   doc.setFont('helvetica', 'bold');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
-  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 10) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
+  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 18) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
   let nroOrdenY = y + 8;
   doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY);
   doc.setFont('helvetica', 'bold').setFontSize(18);
@@ -107,7 +107,7 @@ const headerHepatitisDigitalizado = (doc, datos = {}) => {
   doc.text("Fecha :", patientDataX, patientDataY);
   const labelWidthFecha = doc.getTextWidth("Fecha :");
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.fechaExamen), patientDataX + labelWidthFecha + 4, patientDataY);
+  doc.text(formatDateToNumeric(datos.fechaExamen), patientDataX + labelWidthFecha + 4, patientDataY);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setLineWidth(0.2);

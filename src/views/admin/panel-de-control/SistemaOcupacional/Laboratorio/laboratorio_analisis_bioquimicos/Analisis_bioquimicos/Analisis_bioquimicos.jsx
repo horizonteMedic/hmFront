@@ -36,6 +36,57 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
   const [pacientesCompletados, setPacientesCompletados] = useState(0);
   const [pacientesFaltantes, setPacientesFaltantes] = useState(0);
 
+  // Calcula VLDL, HDL y LDL automáticamente
+  useEffect(() => {
+    // Si todos los campos base están vacíos, limpiar LDL, HDL y VLDL
+    if (
+      !form.colesterolTotal && !form.trigliceridos && !form.hdl && !form.vldl
+    ) {
+      setForm(f => ({ ...f, hdl: '', vldl: '', ldl: '' }));
+      return;
+    }
+
+    // HDL depende solo de colesterolTotal
+    let hdl = '';
+    if (form.colesterolTotal === '-') {
+      hdl = '-';
+    } else if (form.colesterolTotal) {
+      const colesterolTotal = parseFloat(form.colesterolTotal);
+      hdl = !isNaN(colesterolTotal) ? (colesterolTotal * 0.25).toFixed(2) : '';
+    }
+
+    // VLDL depende solo de trigliceridos
+    let vldl = '';
+    if (form.trigliceridos === '-') {
+      vldl = '-';
+    } else if (form.trigliceridos) {
+      const trigliceridos = parseFloat(form.trigliceridos);
+      vldl = !isNaN(trigliceridos) ? (trigliceridos / 5).toFixed(2) : '';
+    }
+
+    // LDL depende de colesterolTotal, vldl y hdl
+    let ldl = '';
+    if (
+      form.colesterolTotal === '-' ||
+      vldl === '-' ||
+      hdl === '-'
+    ) {
+      ldl = '-';
+    } else if (form.colesterolTotal && vldl && hdl) {
+      const colesterolTotal = parseFloat(form.colesterolTotal);
+      const vldlNum = parseFloat(vldl);
+      const hdlNum = parseFloat(hdl);
+      if (!isNaN(colesterolTotal) && !isNaN(vldlNum) && !isNaN(hdlNum)) {
+        ldl = (colesterolTotal - vldlNum - hdlNum).toFixed(2);
+      }
+    }
+
+    setForm(f => {
+      if (f.vldl === vldl && f.hdl === hdl && f.ldl === ldl) return f;
+      return { ...f, vldl, hdl, ldl };
+    });
+  }, [form.trigliceridos, form.colesterolTotal]);
+
   //Datos de tabla
   useEffect(() => {
     if (searchParams.code === "" && searchParams.nombre === "") {
@@ -287,24 +338,30 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
               { key: 'ldl',             label: 'L.D.L. Colesterol', hint: '< 129 mg/dl' },
               { key: 'vldl',            label: 'V.L.D.L. Colesterol',hint: '< 30 mg/dl' },
             ].map(({ key, label, hint }, idx, arr) => (
-              <div key={key} className="flex items-center gap-4">
-                <span className="font-medium min-w-[150px] text-lg">{label}:</span>
-                <input
-                  className="border rounded px-2 py-1 w-32 text-lg"
-                  name={key}
-                  value={form[key]}
-                  onChange={handleFormChange}
-                  ref={bioRefs[idx]}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (idx < arr.length - 1) {
-                        bioRefs[idx + 1].current && bioRefs[idx + 1].current.focus();
+              <div key={key} className="flex flex-col gap-1">
+                <div className="flex items-center gap-4">
+                  <span className="font-medium min-w-[150px] text-lg">{label}:</span>
+                  <input
+                    className="border rounded px-2 py-1 w-32 text-lg"
+                    name={key}
+                    value={form[key]}
+                    onChange={handleFormChange}
+                    ref={bioRefs[idx]}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (idx < arr.length - 1) {
+                          bioRefs[idx + 1].current && bioRefs[idx + 1].current.focus();
+                        }
                       }
-                    }
-                  }}
-                />
-                <span className="text-gray-500 text-lg">(V.N. {hint})</span>
+                    }}
+                  />
+                  <span className="text-gray-500 text-lg">(V.N. {hint})</span>
+                </div>
+                {/* Validación visual para dos decimales */}
+                {['hdl','ldl','vldl'].includes(key) && form[key] && form[key] !== '-' && !/^-?\d*\.\d{2}$/.test(form[key]) && (
+                  <span className="text-red-500 text-xs ml-[150px]">Debe tener dos decimales, ej: 9.00</span>
+                )}
               </div>
             ))}
           </Section>
@@ -318,49 +375,35 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
 
         {/* DERECHA 50% */}
         <div className="w-1/2 bg-white rounded shadow p-4 flex flex-col gap-4">
-          <SearchField
-            label="Buscar"
-            name="nombre"
-            value={searchParams.nombre}
-            onChange={handleNombreChange}
-            onSearch={() => Swal.fire('Buscar', JSON.stringify(searchParams), 'info')}
-          />
-          <SearchField
-            label="Código"
-            name="code"
+          {/* Agrupar Buscar y Código en la misma línea */}
+          <div className="flex gap-2 items-center w-full max-w-full">
+            <span className="font-medium text-lg">Buscar:</span>
+            <input
+              name="nombre"
+              value={searchParams.nombre}
+              onChange={handleNombreChange}
+              className="border rounded px-2 py-1 text-lg flex-1 min-w-0"
+              style={{ maxWidth: 400 }}
+            />
+            <button onClick={() => Swal.fire('Buscar', JSON.stringify(searchParams), 'info')} className="p-2 bg-gray-200 rounded ml-1">
+              <FontAwesomeIcon icon={faSearch} />
+            </button>
+            <span className="font-medium text-lg ml-2">Código:</span>
+            <input
+              name="code"
             value={searchParams.code}
-            onChange={(e) => {
-              const value = e.target.value;
-              if (/^\d{0,7}$/.test(value)) {
-                setSearchParams(prev => ({...prev, code: value, nombre: ""}))
-              }
-            }}
-            onKeyUp={(event) => {SearchCode(event)}}
-          />
-          <div className="bg-gray-100 p-4 rounded-md shadow-md mb-4">
-            <div className="bg-white p-4 rounded-md mt-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <label htmlFor="fecha" className="mr-2 font-medium">Fecha:</label>
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  dateFormat="dd/MM/yyyy"
-                  className="border border-gray-300 rounded-md p-2"
-                />
-              </div>
-              <div>
-                <span className="mr-4">
-                  <span className="font-semibold text-green-500">Pacientes completados:</span> {pacientesCompletados}
-                </span>
-                <span>
-                  <span className="font-semibold text-red-500">Pacientes faltantes:</span> {pacientesFaltantes}
-                </span>
-              </div>
-            </div>
-            <div className="text-center mt-2 text-sm text-gray-500">
-              (Click izquierdo para importar datos | Click derecho para imprimir)
-            </div>
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\\d{0,7}$/.test(value)) {
+                  setSearchParams(prev => ({...prev, code: value, nombre: ""}))
+                }
+              }}
+              onKeyUp={(event) => {SearchCode(event)}}
+              className="border rounded px-2 py-1 text-lg"
+              style={{ width: 120 }}
+            />
           </div>
+         
           <Table data={exams} tabla={tabla} set={setForm} token={token} clean={handleClear} setMed={setSearchMedico} />
         </div>
       </div>
@@ -391,25 +434,6 @@ function Radio({ label, ...props }) {
       <input type="radio" {...props} className="form-radio" />
       {label}
     </label>
-  )
-}
-
-function SearchField({ label, name, value, onChange, onSearch, onKeyUp }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="font-medium text-lg">{label}:</span>
-      <input
-        name={name}
-        value={value}
-        onChange={onChange}
-        onKeyUp={onKeyUp}
-        className="border rounded px-2 py-1 flex-1 text-lg" />
-      {onSearch && (
-        <button onClick={onSearch} className="p-2 bg-gray-200 rounded">
-          <FontAwesomeIcon icon={faSearch} />
-        </button>
-      )}
-    </div>
   )
 }
 

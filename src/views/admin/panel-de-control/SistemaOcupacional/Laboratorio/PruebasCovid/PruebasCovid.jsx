@@ -18,19 +18,19 @@ export default function PruebasCovid({ apiBase, token, selectedSede }) {
   const tabs = [
     {
       id: 'antigenos-cual',
-      label: 'P. Cualitativos Antígenos',
+      label: 'P. Cual Antig',
       icon: faVial,
       Component: PcualAntig
     },
     {
       id: 'antigenos',
-      label: 'P. Cuantitativos Antígenos',
+      label: 'P. Cuan. Antígenos',
       icon: faVirus,
       Component: PcuanAntigenos
     },
     {
       id: 'anticuerpos',
-      label: 'P. Cuantitativos Anticuerpos',
+      label: 'P. Cuan. Anticuerpos',
       icon: faDroplet,
       Component: PcuanAnticuerpos
     },

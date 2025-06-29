@@ -1,13 +1,15 @@
 /**
- * Formatea una fecha en formato "dd mes yyyy" (ej. "04 noviembre 2024").
+ * Formatea una fecha en formato "dd/mm/yyyy" (ej. "04/11/2024").
  * @param {string} dateString - La fecha en formato YYYY-MM-DD.
  * @returns {string} - La fecha formateada.
  */
-const formatDateToSpanish = (dateString) => {
+const formatDateToShort = (dateString) => {
   if (!dateString) return '';
   const date = new Date(`${dateString}T00:00:00`);
-  const options = { year: 'numeric', month: 'long', day: '2-digit' };
-  return new Intl.DateTimeFormat('es-ES', options).format(date).replace(/ de/g, '');
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
 };
 
 /**
@@ -68,7 +70,9 @@ const headerMicrobiologia1Digitalizado = (doc, datos = {}) => {
   doc.setFont('helvetica', 'bold');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
-  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 10) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth);
+  // Aumenta el margen derecho sumando 20mm
+  let extraMargin = 20;
+  let nroOrdenX = colorValido ? (boxX - nroOrdenValueWidth - nroOrdenLabelWidth - 18 - extraMargin) : (pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth - extraMargin);
   let nroOrdenY = y + 8;
   doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY);
   doc.setFont('helvetica', 'bold').setFontSize(18);
@@ -98,7 +102,7 @@ const headerMicrobiologia1Digitalizado = (doc, datos = {}) => {
   doc.text("Fecha :", patientDataX, patientDataY);
   const labelWidthFecha = doc.getTextWidth("Fecha :");
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.fecha), patientDataX + labelWidthFecha + 4, patientDataY);
+  doc.text(formatDateToShort(datos.fecha), patientDataX + labelWidthFecha + 4, patientDataY);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setLineWidth(0.2);

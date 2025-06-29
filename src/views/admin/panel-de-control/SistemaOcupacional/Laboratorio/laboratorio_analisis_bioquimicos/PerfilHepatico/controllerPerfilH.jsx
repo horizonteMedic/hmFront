@@ -136,9 +136,12 @@ export const PrintHojaR = (nro,token,tabla) => {
       } else {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
+    Swal.close()
+    } else {
+      Swal.close()
     }
   })
-  .finally(() => {
-    Swal.close()
+  .catch(async() => {
+    await Swal.fire('Error','No se encontro el registro','error')
   })
 }

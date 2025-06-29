@@ -86,7 +86,16 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
        .text("FECHA", labelX, textY, { align: "left" });
     doc.setFont("helvetica", "normal")
        .text(":", colonX, textY, { align: "center" });
-    doc.text(datos.fecha || "-", valueX, textY, { align: "left" });
+    // Formato de fecha dd/mm/yyyy
+    const formatDateToShort = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(`${dateString}T00:00:00`);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+    doc.text(formatDateToShort(datos.fecha), valueX, textY, { align: "left" });
 
     // —— TESTS ——
     let currentY = y + rowH * 2 - 2;
@@ -102,66 +111,62 @@ export default function AnalisisBioquimicos_Digitalizado(datos = {}) {
     });
 
     // ==== FIRMA ====
-    const sigW = 70, sigH = 30, sigX = tableX, sigY = y + tableH + 10;
-    doc.setLineWidth(0.3).roundedRect(sigX, sigY, sigW, sigH, 2, 2);
-    // ... (insert sello1 y sello2 igual que antes) …
-    if (s1) {
+    const recW = 150, recH = 30;
+    const recX = (pageW - recW) / 2;
+    const recY = y + tableH + 30; // más abajo
+
+    doc.setLineWidth(0.3).roundedRect(recX, recY, recW, recH, 2, 2);
+
+    const imgW = 60, imgH = 25;
+    const smallW = 30, smallH = 25;
+    const marginInterno = 10;
+    if (s1 && s2) {
+      // Dos firmas, una a la izquierda (normal) y otra a la derecha (más pequeña) dentro del recuadro
+      // Primera firma (sello1) - tamaño normal
+      const canvas1 = document.createElement('canvas');
+      canvas1.width = s1.width;
+      canvas1.height = s1.height;
+      const ctx1 = canvas1.getContext('2d');
+      ctx1.drawImage(s1, 0, 0);
+      const selloBase64_1 = canvas1.toDataURL('image/png');
+      const imgX1 = recX + marginInterno;
+      const imgY1 = recY + (recH - imgH) / 2;
+      doc.addImage(selloBase64_1, 'PNG', imgX1, imgY1, imgW, imgH);
+
+      // Segunda firma (sello2) - más pequeña
+      const canvas2 = document.createElement('canvas');
+      canvas2.width = s2.width;
+      canvas2.height = s2.height;
+      const ctx2 = canvas2.getContext('2d');
+      ctx2.drawImage(s2, 0, 0);
+      const selloBase64_2 = canvas2.toDataURL('image/png');
+      const imgX2 = recX + recW - marginInterno - smallW;
+      const imgY2 = recY + (recH - smallH) / 2;
+      doc.addImage(selloBase64_2, 'PNG', imgX2, imgY2, smallW, smallH);
+    } else if (s1) {
+      // Solo una firma, centrada en el recuadro
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
       canvas.height = s1.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Tamaño máximo permitido dentro del cuadro
-      const maxImgW = sigW - 10; // margen horizontal dentro del cuadro
-      const maxImgH = sigH - 10; // margen vertical dentro del cuadro
-
-      let imgW = s1.width;
-      let imgH = s1.height;
-
-      // Escalado proporcional si la imagen es más grande que el área
-      const scaleW = maxImgW / imgW;
-      const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // máximo 1 para no escalar de más
-
-      imgW *= scale;
-      imgH *= scale;
-
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
-
+      const imgX = recX + (recW - imgW) / 2;
+      const imgY = recY + (recH - imgH) / 2;
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-    }
-
-    if (s2) {
+    } else if (s2) {
+      // Solo la segunda firma, centrada y más pequeña
       const canvas = document.createElement('canvas');
       canvas.width = s2.width;
       canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
-
-      // Tamaño máximo deseado
-      const maxImgW = 60;
-      const maxImgH = 30;
-
-      // Calcular dimensiones proporcionales
-      let imgW = maxImgW;
-      let imgH = (s2.height / s2.width) * imgW;
-
-      if (imgH > maxImgH) {
-        imgH = maxImgH;
-        imgW = (s2.width / s2.height) * imgH;
-      }
-
-      // Posicionar la imagen con el centro en (sigX + 120, sigY + 35)
-      const imgX = sigX + 120 - imgW / 2;
-      const imgY = sigY + 15 - imgH / 2;
-
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      const imgX = recX + (recW - smallW) / 2;
+      const imgY = recY + (recH - smallH) / 2;
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, smallW, smallH);
     }
+
     // ==== FOOTER ====
     footer(doc, datos);
 

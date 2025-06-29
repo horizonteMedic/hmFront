@@ -29,7 +29,7 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
 
   const handleChange = e => {
     const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
+    setForm(f => ({ ...f, [name]: value.toUpperCase() }));
   };
 
   const handleClear = () => {
@@ -135,37 +135,52 @@ export default function Resultado_Panel2D({ token, selectedSede, userlogued }) {
           />
         </div>
         {/* Resultados */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="flex items-center gap-2">
-              <span className="flex-1 font-semibold">MARIHUANA (THC)</span>
-              <input
-                name='valueM'
-                value={form.valueM}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 w-40"
-                ref={valueMRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueCRef.current?.focus();
-                  }
-                }}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="flex-1 font-semibold">COCAINA (COC)</span>
-              <input
-                name='valueC'
-                value={form.valueC}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 w-40"
-                ref={valueCRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    printRef.current?.focus();
-                  }
-                }}
-              />
-            </div>
+        <div className="grid grid-cols-3 gap-x-4 gap-y-2 mb-6">
+          <div className="font-bold">PRUEBAS</div>
+          <div className="font-bold"> </div>
+          <div className="font-bold">RESULTADOS</div>
+          <div className="flex items-center">MARIHUANA (THC)</div>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={form.valueM === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueM: 'POSITIVO'}))} /> Positivo
+            </label>
+            <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+              <input type="checkbox" checked={form.valueM === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueM: 'NEGATIVO'}))} /> Negativo
+            </label>
+          </div>
+          <input
+            name='valueM'
+            value={form.valueM}
+            onChange={handleChange}
+            className="border rounded px-2 py-1 w-32"
+            ref={valueMRef}
+            onKeyUp={e => {
+              if (e.key === 'Enter') {
+                valueCRef.current?.focus();
+              }
+            }}
+          />
+          <div className="flex items-center">COCAINA (COC)</div>
+          <div className="flex items-center gap-2">
+            <label className="flex items-center gap-1">
+              <input type="checkbox" checked={form.valueC === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueC: 'POSITIVO'}))} /> Positivo
+            </label>
+            <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+              <input type="checkbox" checked={form.valueC === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueC: 'NEGATIVO'}))} /> Negativo
+            </label>
+          </div>
+          <input
+            name='valueC'
+            value={form.valueC}
+            onChange={handleChange}
+            className="border rounded px-2 py-1 w-32"
+            ref={valueCRef}
+            onKeyUp={e => {
+              if (e.key === 'Enter') {
+                printRef.current?.focus();
+              }
+            }}
+          />
         </div>
         {/* Médico */}
         <div className="flex items-center gap-2">

@@ -1,58 +1,61 @@
-// This file will be renamed to headerLabGenerico.jsx
-const headerMicrobiologia = (doc, datos = {}) => {
+// src/views/jaspers/AnalisisBioquimicos/Header/headerManipuladores.jsx
+const headerManipuladores = (doc, datos = {}, yStart = 10) => {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
-  let y = 10;
+  let y = yStart;
+  const blockOffset = 10;
 
   // 1. Logo
   const img = "./img/logo-color.png";
   doc.addImage(img, "PNG", margin, y, 50, 16);
   y += 18;
 
-  // 2. Nro Orden (movido más a la izquierda)
-  const nroOrdenLabel = "Nro Orden :";
-  const nroOrdenValue = String(datos.norden || "");
+  // 2. Sede (derecha)
   doc.setFontSize(11).setFont("helvetica", "bold");
-  doc.text(nroOrdenLabel, pageW - margin - 90, y);
-  doc.setFontSize(18).setFont("helvetica", "bold");
-  doc.text(nroOrdenValue, pageW - margin - 40, y, { align: "right" });
-  // Subrayado
-  const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
-  doc.setLineWidth(0.7);
-  doc.line(pageW - margin - 40 - nroOrdenValueWidth, y + 1.5, pageW - margin - 40, y + 1.5);
-  doc.setLineWidth(0.2);
+  doc.text("Sede :", pageW - margin - 100, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.sede || ""}`, pageW - margin - 20, y, { align: "right" });
   y += 7;
 
-  // 3. Sede (movido más a la izquierda, alineado con Nro Orden)
+  // 3. Nro Orden (derecha)
   doc.setFont("helvetica", "bold");
-  doc.text("Sede :", pageW - margin - 90, y);
+  doc.text("Nro Orden :", pageW - margin - 70, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.sede || ""}`, pageW - margin - 40, y, { align: "right" });
+  doc.text(`${datos.norden || ""}`, pageW - margin - 30, y, { align: "right" });
   y += 12;
 
   // 4. Apellidos y Nombres (izquierda)
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  const labelNombres = "Apellidos y Nombres :";
-  doc.text(labelNombres, margin, y);
+  doc.setFontSize(11).setFont("helvetica", "bold");
+  doc.text("Apellidos y Nombres :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  const labelNombresWidth = doc.getTextWidth(labelNombres);
-  doc.text(`${ datos.nombres || "" }`, margin + labelNombresWidth + 4, y);
+  doc.text(`${datos.nombre || datos.nombres || ""}`, margin + 55 + blockOffset, y);
   y += 7;
 
   // 5. Edad (izquierda)
   doc.setFont("helvetica", "bold");
-  const labelEdad = "Edad :";
-  doc.text("Edad :", margin, y);
+  doc.text("Edad :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.edad || ""} AÑOS`, margin + 20, y);
+  doc.text(`${datos.edad || ""} AÑOS`, margin + 20 + blockOffset, y);
   y += 7;
 
   // 6. Fecha (izquierda)
   doc.setFont("helvetica", "bold");
-  doc.text("Fecha :", margin, y);
+  doc.text("Fecha :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.fecha || ""}`, margin + 22, y);
+  let fecha = datos.fecha || "";
+  if (fecha && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    // yyyy-mm-dd => dd/mm/yyyy
+    const [a, m, d] = fecha.split("-");
+    fecha = `${d}/${m}/${a}`;
+  }
+  doc.text(fecha, margin + 22 + blockOffset, y);
+  y += 7;
+
+  // 7. Muestra (izquierda)
+  doc.setFont("helvetica", "bold");
+  doc.text("Muestra :", margin + blockOffset, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(`HECES`, margin + 25 + blockOffset, y);
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
@@ -89,4 +92,4 @@ const headerMicrobiologia = (doc, datos = {}) => {
   }
 };
 
-export default headerMicrobiologia;
+export default headerManipuladores;

@@ -188,139 +188,220 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
       </div>
 
       {/* Resultados */}
-      <div className="grid grid-cols-2 gap-x-8 gap-y-2 mb-8">
+      <div className="grid grid-cols-3 gap-x-4 gap-y-2 mb-8">
         <div className="font-bold">PRUEBAS</div>
+        <div className="font-bold"> </div>
         <div className="font-bold">RESULTADOS</div>
-          <div className="flex items-center">COCAINA (COC)</div>
-              <input
-                name='valueC'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueC}
-                onChange={handleChange}
-                ref={valueCRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueMRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">MARIHUANA (THC)</div>
-              <input
-                name='valueM'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueM}
-                onChange={handleChange}
-                ref={valueMRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueAnRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">ANFETAMINA (AMP)</div>
-              <input
-                name='valueAn'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueAn}
-                onChange={handleChange}
-                ref={valueAnRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueMetRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">METANFETAMINA (MET)</div>
-              <input
-                name='valueMet'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueMet}
-                onChange={handleChange}
-                ref={valueMetRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueBenRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">BENZODIAZEPINA (BZO)</div>
-              <input
-                name='valueBen'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueBen}
-                onChange={handleChange}
-                ref={valueBenRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueOpiRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">OPIÁCEOS (OPI)</div>
-              <input
-                name='valueOpi'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueOpi}
-                onChange={handleChange}
-                ref={valueOpiRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueBarRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">BARBITÚRICOS (BAR)</div>
-              <input
-                name='valueBar'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueBar}
-                onChange={handleChange}
-                ref={valueBarRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueMetadonaRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">METADONA (MTD)</div>
-              <input
-                name='valueMetadona'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueMetadona}
-                onChange={handleChange}
-                ref={valueMetadonaRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueFenciRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">FENCICLIDINA (PCP)</div>
-              <input
-                name='valueFenci'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueFenci}
-                onChange={handleChange}
-                ref={valueFenciRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    valueAntiRef.current?.focus();
-                  }
-                }}
-              />
-          <div className="flex items-center">ANTIDEPRESIVOS TRICÍCLICOS (TCA)</div>
-              <input
-                name='valueAnti'
-                className="border rounded px-3 py-2 w-40"
-                value={form.valueAnti}
-                onChange={handleChange}
-                ref={valueAntiRef}
-                onKeyUp={e => {
-                  if (e.key === 'Enter') {
-                    printRef.current?.focus();
-                  }
-                }}
-              />
+        <div className="flex items-center">COCAINA (COC)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueC === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueC: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueC === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueC: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueC'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueC}
+          onChange={handleChange}
+          ref={valueCRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueMRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">MARIHUANA (THC)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueM === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueM: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueM === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueM: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueM'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueM}
+          onChange={handleChange}
+          ref={valueMRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueAnRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">ANFETAMINA (AMP)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueAn === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueAn: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueAn === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueAn: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueAn'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueAn}
+          onChange={handleChange}
+          ref={valueAnRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueMetRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">METANFETAMINA (MET)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueMet === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueMet: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueMet === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueMet: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueMet'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueMet}
+          onChange={handleChange}
+          ref={valueMetRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueBenRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">BENZODIAZEPINA (BZO)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueBen === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueBen: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueBen === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueBen: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueBen'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueBen}
+          onChange={handleChange}
+          ref={valueBenRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueOpiRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">OPIÁCEOS (OPI)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueOpi === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueOpi: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueOpi === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueOpi: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueOpi'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueOpi}
+          onChange={handleChange}
+          ref={valueOpiRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueBarRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">BARBITÚRICOS (BAR)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueBar === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueBar: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueBar === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueBar: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueBar'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueBar}
+          onChange={handleChange}
+          ref={valueBarRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueMetadonaRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">METADONA (MTD)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueMetadona === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueMetadona: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueMetadona === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueMetadona: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueMetadona'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueMetadona}
+          onChange={handleChange}
+          ref={valueMetadonaRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueFenciRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">FENCICLIDINA (PCP)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueFenci === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueFenci: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueFenci === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueFenci: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueFenci'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueFenci}
+          onChange={handleChange}
+          ref={valueFenciRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              valueAntiRef.current?.focus();
+            }
+          }}
+        />
+        <div className="flex items-center">ANTIDEPRESIVOS TRICÍCLICOS (TCA)</div>
+        <div className="flex items-center gap-2">
+          <label className="flex items-center gap-1">
+            <input type="checkbox" checked={form.valueAnti === 'POSITIVO'} onChange={() => setForm(f => ({...f, valueAnti: 'POSITIVO'}))} /> Positivo
+          </label>
+          <label className="flex items-center gap-1" style={{ marginLeft: '24px' }}>
+            <input type="checkbox" checked={form.valueAnti === 'NEGATIVO'} onChange={() => setForm(f => ({...f, valueAnti: 'NEGATIVO'}))} /> Negativo
+          </label>
+        </div>
+        <input
+          name='valueAnti'
+          className="border rounded px-3 py-2 w-32"
+          value={form.valueAnti}
+          onChange={handleChange}
+          ref={valueAntiRef}
+          onKeyUp={e => {
+            if (e.key === 'Enter') {
+              printRef.current?.focus();
+            }
+          }}
+        />
       </div>
 
       {/* Botones */}

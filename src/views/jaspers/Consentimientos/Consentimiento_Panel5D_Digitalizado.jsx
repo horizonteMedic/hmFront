@@ -8,7 +8,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
   headerConsentimiento(doc, datos);
   const huella = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
   const firma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
-  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
   const isValidUrl = url => url && url !== "Sin registro";
 
   const loadImg = src =>
@@ -141,10 +141,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
 
     function formatearFecha(fecha) {
       if (!fecha) return '';
-      const f = new Date(fecha);
-      const dia = String(f.getDate()).padStart(2, '0');
-      const mes = String(f.getMonth() + 1).padStart(2, '0');
-      const anio = f.getFullYear();
+      const [anio, mes, dia] = fecha.split('-');
       return `${dia}/${mes}/${anio}`;
     }
 
@@ -181,7 +178,7 @@ export default function Consentimiento_Panel5D_Digitalizado(datos) {
       const anio = f.getFullYear();
       const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
       const rightMargin = 20;
-      doc.text(`${dia} de ${meses[mes]} de ${anio}`, pageW - rightMargin, y, { align: 'right' });
+      doc.text(`${datos.fecha}`, pageW - rightMargin, y, { align: 'right' });
     }
     y += 12;
 

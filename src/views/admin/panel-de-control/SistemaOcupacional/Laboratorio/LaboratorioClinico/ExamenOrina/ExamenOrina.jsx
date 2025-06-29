@@ -68,14 +68,9 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'LeucocitosS') {
-      // Solo permitir números, guiones y espacios
-      if (/^[0-9\-\s]*$/.test(value)) {
-        setForm(prev => ({ ...prev, [name]: value }));
-      }
-    } else {
+
       setForm(prev => ({ ...prev, [name]: value }));
-    }
+    
   }
 
   const handleClear = () => {
@@ -111,6 +106,34 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
       ...prev,
       [drug]: value === 'Pos' ? 'POSITIVO' : value === 'Neg' ? 'NEGATIVO' : 'N/A',
     }));
+  };
+
+  const handleNoAplicaChangeExamenF = (checked) => {
+    setForm(prev => {
+      if (checked) {
+        // Marcar todo como N/A
+        return {
+          ...prev,
+          NoAplica: true,
+          Incoloro: false,
+          Medicamentosa: false,
+          Transparente: false,
+          Turbio: false,
+          Color: 'N/A',
+          Aspecto: 'N/A',
+          Densidad: 'N/A',
+          PH: 'N/A',
+        };
+      } else {
+        // Restaurar valores por defecto
+        return {
+          ...prev,
+          Densidad: '',
+          PH: '',
+          NoAplica: false
+        };
+      }
+    });
   };
 
   // Nueva función para manejar el cambio de No Aplica
@@ -171,7 +194,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
                   type="checkbox"
                   name={opt}
                   checked={form[opt]}
-                  onChange={opt === 'No Aplica' ? e => handleNoAplicaChange(e.target.checked) : handleInputChange}
+                  onChange={opt === 'No Aplica' ? e => handleNoAplicaChangeExamenF(e.target.checked) : handleInputChange}
                   disabled={opt !== 'No Aplica'}
                 />
                 {opt}
@@ -183,16 +206,22 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
               <label className="font-medium">Color :</label>
               <select name="Color" value={form.Color} onChange={handleInputChange} className="border rounded p-1 w-full">
                 <option>N/A</option>
-                <option>Amarillo</option>
-                <option>Rojo</option>
+                <option>AMARILLO CLARO</option>
+                <option>AMARILLO PAJIZO</option>
+                <option>AMARILLO AMBAR</option>
+                <option>AMBAR</option>
+                <option>INCOLORO</option>
+                <option>MEDICAMENTOSO</option>
+                <option>SANGUINOLENTO</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2 items-center">
               <label className="font-medium">Aspecto :</label>
               <select name="Aspecto" value={form.Aspecto} onChange={handleInputChange} className="border rounded p-1 w-full">
                 <option>N/A</option>
-                <option>Claro</option>
-                <option>Turbio</option>
+                <option>LIGERAMENTE TURBIO</option>
+                <option>TRANSPARENTE</option>
+                <option>TURBIO</option>
               </select>
             </div>
             <div className="grid grid-cols-2 gap-2 items-center">

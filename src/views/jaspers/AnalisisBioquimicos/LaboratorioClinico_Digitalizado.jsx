@@ -97,6 +97,18 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         doc.setFont("helvetica", "bold");
         doc.text(val, rightX + labelW + 8, yTable + rowH * (i + 0.7), { align: "left" });
       }
+      // Línea horizontal debajo de Leucocitos (derecha)
+      if (rightItems[i] && rightItems[i].label === "Leucocitos") {
+        // Línea negra, más delgada y discontinua
+        doc.setDrawColor(0, 0, 0); // Negro
+        doc.setLineWidth(0.4);
+        doc.setLineDash([2, 2], 0);
+        const yLinea = yTable + rowH * (i + 1.1);
+        doc.line(rightX - 8, yLinea, rightX + labelW + valueW + 8, yLinea);
+        doc.setLineDash([]);
+        doc.setDrawColor(0); // Reset color
+        doc.setLineWidth(0.5);
+      }
     }
     y = yTable + tableH + 8; // avanza Y para el siguiente bloque
 
@@ -309,33 +321,31 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
 
     // === DROGAS & OBSERVACIONES ===
     y += 8;
-    // Izquierda: Drogas y Cocaína
+    // Label principal
     doc.setFont("helvetica", "bold").setFontSize(10);
-    const drogasLabel = "Drogas :";
-    doc.text(drogasLabel, bioqMargin, y);
-    const drogasLabelWidth = doc.getTextWidth(drogasLabel);
+    doc.text("Drogas :", bioqMargin, y);
+    y += 6;
+    // Resultados en dos columnas
+    const drogaCol1Label = "Cocaína:";
+    const drogaCol1Value = String(datos.txtCocaina || "N/A");
+    const drogaCol2Label = "Marihuana:";
+    const drogaCol2Value = String(datos.txtMarihuana || "N/A");
     doc.setFont("helvetica", "bold");
-    const cocainaLabel = "Cocaína:";
-    doc.text(cocainaLabel, bioqMargin + drogasLabelWidth + 6, y);
-    const cocainaLabelWidth = doc.getTextWidth(cocainaLabel);
+    doc.text(drogaCol1Label, bioqMargin + 10, y);
     doc.setFont("helvetica", "normal");
-    doc.text(String(datos.txtCocaina || "N/A"), bioqMargin + drogasLabelWidth + 6 + cocainaLabelWidth + 4, y);
-
-    // Derecha: Marihuana
+    doc.text(drogaCol1Value, bioqMargin + 10 + doc.getTextWidth(drogaCol1Label) + 4, y);
     doc.setFont("helvetica", "bold");
-    const marihuanaLabel = "Marihuana:";
-    const marihuanaLabelWidth = doc.getTextWidth(marihuanaLabel);
-    doc.text(marihuanaLabel, bioqRight - marihuanaLabelWidth - 30, y);
+    doc.text(drogaCol2Label, bioqRight - 60, y);
     doc.setFont("helvetica", "normal");
-    doc.text(String(datos.txtMarihuana || "N/A"), bioqRight, y, { align: "right" });
-
+    doc.text(drogaCol2Value, bioqRight - 60 + doc.getTextWidth(drogaCol2Label) + 4, y);
     y += 6;
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("Observaciones :", bioqMargin, y);
+    y += 6; // Espacio después del título
     doc.setFont("helvetica", "normal");
     const obs = doc.splitTextToSize(datos.txtObservacionesLb || "", pageW - contentMargin * 2);
-    doc.text(obs, bioqMargin, y + 2);
-    y += obs.length * 5 + 2;
+    doc.text(obs, bioqMargin, y);
+    y += obs.length * 5 + 10; // Mantén el espacio extra debajo
 
     if (s1) {
       const canvas = document.createElement('canvas');
@@ -348,9 +358,9 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 30;
-      // Centrar el sello en el espacio abierto
-      const sigX = (pageW - sigW) / 2;
-      const sigY = y - 60; // ⬅️ Aquí usas el Y actual + espacio deseado
+      // Apilar a la derecha
+      const sigX = pageW - sigW + 3;
+      const sigY = y - 80;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -370,12 +380,8 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
       // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     if (s2) {
@@ -389,9 +395,9 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       // Dimensiones del área del sello
       const sigW = 70;
       const sigH = 30;
-      // Centrar el sello en el espacio abierto
-      const sigX = (pageW - sigW) / 2;
-      const sigY = y - 40; // ⬅️ Aquí usas el Y actual + espacio deseado
+      // Apilar a la derecha, debajo del primero
+      const sigX = pageW - sigW + 3;
+      const sigY = y - 80 + sigH;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -411,12 +417,8 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       const imgX = sigX + (sigW - imgW) / 2;
       const imgY = sigY + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
       // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     // === IMPRIMIR ===

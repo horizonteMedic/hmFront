@@ -92,9 +92,17 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
 
     // Posiciona la fecha justo debajo de la sección "Valores Normales".
     const dateYPosition = tempY + config.lineHeight.normal * 2;
-    const footerDate = String(datos.fecha);
+    // Mostrar la fecha en formato '01 de junio de 2025'
+    let fechaFormateada = '';
+    if (datos.fecha) {
+      const date = new Date(`${datos.fecha}T00:00:00`);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = date.toLocaleString('es-ES', { month: 'long' });
+      const year = date.getFullYear();
+      fechaFormateada = `${day} de ${month} de ${year}`;
+    }
     doc.setFontSize(10).setFont(config.font, 'normal');
-    doc.text(footerDate, pageW - config.margin, dateYPosition, { align: 'right' });
+    doc.text(fechaFormateada, pageW - config.margin, dateYPosition, { align: 'right' });
 
     if (s1) {
       const canvas = document.createElement('canvas');
@@ -104,11 +112,11 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
+      // Dimensiones del área del sello - Primera firma (más pequeña)
+      const sigW = 60;
       const sigH = 35;
-      const sigX = 80; // o cualquier X deseado
-      const sigY = y + 70; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - 160) / 2;
+      const sigY = y + 70;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
@@ -144,11 +152,11 @@ export default function AnalisisClinicosB_Digitalizado(datos = {}) {
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
+      // Dimensiones del área del sello - Segunda firma (más ancha)
+      const sigW = 100;
       const sigH = 35;
-      const sigX = 130; // o cualquier X deseado
-      const sigY = y + 70; // ⬅️ Aquí usas el Y actual + espacio deseado
+      const sigX = (pageW - 160) / 2 + 60;
+      const sigY = y + 70;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;

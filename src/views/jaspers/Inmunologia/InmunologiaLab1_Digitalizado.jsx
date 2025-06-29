@@ -31,8 +31,11 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
 
   // Encabezado de tabla
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
-  doc.text("PRUEBA", config.margin, y);
-  doc.text("RESULTADO", pageW - config.margin - 25, y, { align: "right" });
+  const colW = 60;
+  const col1X = config.margin;
+  const col2X = (pageW / 2) + colW;
+  doc.text("PRUEBA", col1X, y);
+  doc.text("RESULTADO", col2X, y, { align: "center" });
   y += 2;
   
   // Línea
@@ -46,14 +49,14 @@ export default function InmunologiaLab1_Digitalizado(datos = {}) {
   const testLabel2 = "HEPATITIS A";
   const testValue = datos.hepatitisA != null ? datos.hepatitisA : "N/A";
   
-  // Dibujar etiquetas de prueba
-  doc.text(testLabel1, config.margin, y);
-  y += 5; // Espacio entre las dos líneas de la etiqueta
-  doc.text(testLabel2, config.margin, y);
+  // Dibujar etiquetas de prueba alineadas a la izquierda
+  doc.text(testLabel1, col1X, y);
+  y += 5;
+  doc.text(testLabel2, col1X, y);
   
-  // Dibujar el resultado (verticalmente centrado con respecto a las etiquetas)
-  const resultY = y - 2.5; // (5 / 2)
-  doc.text(testValue, pageW - config.margin - 25, resultY, { align: "right" });
+  // Dibujar el resultado centrado
+  const resultY = y - 2.5;
+  doc.text(testValue, col2X, resultY, { align: "center" });
 
   // === FOOTER ===
   footer(doc, datos);

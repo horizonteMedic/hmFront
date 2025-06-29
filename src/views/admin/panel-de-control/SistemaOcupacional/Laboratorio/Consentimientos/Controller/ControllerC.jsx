@@ -198,6 +198,7 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
         } else {
           console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
         }
+        Swal.close()
       }
       Swal.close();
     })
@@ -223,6 +224,7 @@ export const PrintHojaR = async (datos,tabla,token, boro = false) => {
         } else {
           console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
         }
+        Swal.close()
       }
       
     })
