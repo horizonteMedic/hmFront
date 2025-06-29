@@ -9,6 +9,7 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
   const margin = 15;
 
   
+  
   // === HEADER ===
   headerCoprocultivoDigitalizado(doc, datos);
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
