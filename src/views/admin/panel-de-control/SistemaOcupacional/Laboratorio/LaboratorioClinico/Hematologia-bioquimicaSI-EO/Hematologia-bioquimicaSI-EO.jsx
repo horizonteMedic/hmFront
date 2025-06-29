@@ -115,6 +115,21 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   // Estado para N/A de Hematología
   const [hematologiaNA, setHematologiaNA] = useState(false);
 
+  // Desmarcar N/A si se traen datos reales
+  useEffect(() => {
+    // Si alguno de los campos de Hematología o Bioquímica tiene valor distinto de '' y distinto de 'N/A', desmarcar N/A
+    const hematoCampos = [
+      ...hematologiaKeys,
+      'glucosa', 'creatinina'
+    ];
+    const hayDatos = hematoCampos.some(k => form[k] && form[k] !== 'N/A');
+    if (hayDatos) {
+      if (hematologiaNA) setHematologiaNA(false);
+      if (form.glucosaNA) setField('glucosaNA', false);
+      if (form.creatininaNA) setField('creatininaNA', false);
+    }
+  }, [form]);
+
   // Refs para inputs de Hematología
   const hematologiaKeys = [
     'hemoglobina','hematocrito','vsg','leucocitos','hematies','plaquetas',
@@ -129,15 +144,15 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
     setForm(prev => {
       const newFields = {};
       hematologiaKeys.forEach(k => {
-        if (["hemoglobina","hematocrito","leucocitos"].includes(k)) {
+        if (["hemoglobina","hematocrito"].includes(k)) {
           newFields[k] = checked ? '' : '';
         } else {
           newFields[k] = value;
         }
       });
-      // También setear glucosa y creatinina en Bioquímica
-      newFields['glucosa'] = value;
-      newFields['glucosaNA'] = checked;
+      // Bioquímica: glucosa libre, creatinina sí N/A
+      newFields['glucosa'] = checked ? '' : '';
+      newFields['glucosaNA'] = false;
       newFields['creatinina'] = value;
       newFields['creatininaNA'] = checked;
       return { ...prev, ...newFields };
@@ -168,7 +183,18 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
               name="norden"
               value={form.norden}
               onChange={handleInputChange}
-              onKeyUp={event => { if (event.key === 'Enter')handleClear(),VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede,setSearchMedico),GetTable(form.norden) }}
+              onKeyUp={event => {
+                if (event.key === 'Enter') {
+                  if (!form.norden) {
+                    window.Swal && window.Swal.fire('Error', 'Debe Introducir un Nro de Historia Clínica válido', 'error');
+                    event.preventDefault();
+                    return;
+                  }
+                  handleClear();
+                  VerifyTR(form.norden, tabla, token, setForm, setFormO, selectedSede, setSearchMedico);
+                  GetTable(form.norden);
+                }
+              }}
               className="border rounded px-2 py-1 w-28 text-md ml-1"
             />
           </label>
