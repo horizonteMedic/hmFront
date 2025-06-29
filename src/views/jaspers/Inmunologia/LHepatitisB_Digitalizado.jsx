@@ -47,31 +47,20 @@ export default function LHepatitisB_Digitalizado(datos) {
   });
 
   // Tabla de resultado
-  autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 2,
-    head: [[
-      { content: 'PRUEBA CUALITATIVO', styles: { halign: 'center', fontStyle: 'bold' } },
-      { content: 'RESULTADO', styles: { halign: 'left', fontStyle: 'bold',  } }
-    ]],
-    body: [
-      [
-        { content: `HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`, styles: { fontStyle: 'normal', halign: 'left' } },
-        { content: datos.txtHepatitisb || '', styles: { fontStyle: 'normal', halign: 'left',  } }
-      ]
-    ],
-    theme: 'plain',
-    styles: { fontSize: 11,},
-    margin: { left: 15, right: 15 },
-    tableWidth: 180
-  });
-
-  // Línea divisora bajo los encabezados de la tabla de resultados
-  const pageW = doc.internal.pageSize.getWidth();
-  const margin = 15;
-  // Calcula la posición Y justo debajo de los encabezados
-  const yLine = doc.lastAutoTable.finalY + 1;  doc.setLineWidth(0.3);
-  doc.line(margin, yLine, pageW - margin, yLine);
-  doc.setLineWidth(0.2); // Reset
+  let yTable = doc.lastAutoTable.finalY + 8;
+  // Encabezados
+  doc.setFont('helvetica', 'bold');
+  doc.text('PRUEBA CUALITATIVO', 15, yTable);
+  doc.text('RESULTADO', 105 + 40, yTable, { align: 'left' });
+  yTable += 3;
+  doc.setLineWidth(0.3);
+  doc.line(15, yTable, doc.internal.pageSize.getWidth() - 15, yTable);
+  doc.setLineWidth(0.2);
+  yTable += 8;
+  // Fila de datos
+  doc.setFont('helvetica', 'normal');
+  doc.text(`HEPATITIS B (HBsAg) - ${datos.txtMarca || ''}`, 15, yTable);
+  doc.text(datos.txtHepatitisb || '', 105 + 40, yTable, { align: 'left' });
 
   // Recuadros de imagen
   const imgW = 60, imgH = 25;

@@ -126,11 +126,22 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   const handleHematologiaNA = (checked) => {
     setHematologiaNA(checked);
     const value = checked ? 'N/A' : '';
-      setForm(prev => {
-        const newFields = {};
-      hematologiaKeys.forEach(k => { newFields[k] = value; });
-        return { ...prev, ...newFields };
+    setForm(prev => {
+      const newFields = {};
+      hematologiaKeys.forEach(k => {
+        if (["hemoglobina","hematocrito","leucocitos"].includes(k)) {
+          newFields[k] = checked ? '' : '';
+        } else {
+          newFields[k] = value;
+        }
       });
+      // También setear glucosa y creatinina en Bioquímica
+      newFields['glucosa'] = value;
+      newFields['glucosaNA'] = checked;
+      newFields['creatinina'] = value;
+      newFields['creatininaNA'] = checked;
+      return { ...prev, ...newFields };
+    });
     if (checked) {
       setField('grupo', '');
       setField('rh', '');

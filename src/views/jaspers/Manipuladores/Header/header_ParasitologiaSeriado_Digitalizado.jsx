@@ -1,8 +1,9 @@
 // src/views/jaspers/AnalisisBioquimicos/Header/headerManipuladores.jsx
-const headerManipuladores = (doc, datos = {}) => {
+const headerManipuladores = (doc, datos = {}, yStart = 10) => {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
-  let y = 10;
+  let y = yStart;
+  const blockOffset = 10;
 
   // 1. Logo
   const img = "./img/logo-color.png";
@@ -25,30 +26,36 @@ const headerManipuladores = (doc, datos = {}) => {
 
   // 4. Apellidos y Nombres (izquierda)
   doc.setFontSize(11).setFont("helvetica", "bold");
-  doc.text("Apellidos y Nombres :", margin, y);
+  doc.text("Apellidos y Nombres :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.nombre || datos.nombres || ""}`, margin + 55, y);
+  doc.text(`${datos.nombre || datos.nombres || ""}`, margin + 55 + blockOffset, y);
   y += 7;
 
   // 5. Edad (izquierda)
   doc.setFont("helvetica", "bold");
-  doc.text("Edad :", margin, y);
+  doc.text("Edad :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.edad || ""} AÑOS`, margin + 20, y);
+  doc.text(`${datos.edad || ""} AÑOS`, margin + 20 + blockOffset, y);
   y += 7;
 
   // 6. Fecha (izquierda)
   doc.setFont("helvetica", "bold");
-  doc.text("Fecha :", margin, y);
+  doc.text("Fecha :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.fecha || ""}`, margin + 22, y);
+  let fecha = datos.fecha || "";
+  if (fecha && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    // yyyy-mm-dd => dd/mm/yyyy
+    const [a, m, d] = fecha.split("-");
+    fecha = `${d}/${m}/${a}`;
+  }
+  doc.text(fecha, margin + 22 + blockOffset, y);
   y += 7;
 
   // 7. Muestra (izquierda)
   doc.setFont("helvetica", "bold");
-  doc.text("Muestra :", margin, y);
+  doc.text("Muestra :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`HECES`, margin + 25, y);
+  doc.text(`HECES`, margin + 25 + blockOffset, y);
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
