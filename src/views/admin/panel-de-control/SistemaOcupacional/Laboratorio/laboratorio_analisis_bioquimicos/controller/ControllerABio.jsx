@@ -75,9 +75,9 @@ export const GetInfoPacAnalisisBio = (nro,tabla,set,token,setMed) => {
         medico : res.txtReponsable,
         creatinina: res.txtCreatinina,
         colesterolTotal: res.txtColesterol,
-        ldl: res.txtLdlColesterol,
-        hdl: res.txtHdlColesterol,
-        vldl: res.txtVldlColesterol,
+        ldl: res.txtLdlColesterol !== undefined && res.txtLdlColesterol !== null && res.txtLdlColesterol !== '' ? (parseFloat(res.txtLdlColesterol).toFixed(2)) : '',
+        hdl: res.txtHdlColesterol !== undefined && res.txtHdlColesterol !== null && res.txtHdlColesterol !== '' ? (parseFloat(res.txtHdlColesterol).toFixed(2)) : '',
+        vldl: res.txtVldlColesterol !== undefined && res.txtVldlColesterol !== null && res.txtVldlColesterol !== '' ? (parseFloat(res.txtVldlColesterol).toFixed(2)) : '',
         trigliceridos: res.txtTrigliseridos
       }));
       setMed(res.txtReponsable)

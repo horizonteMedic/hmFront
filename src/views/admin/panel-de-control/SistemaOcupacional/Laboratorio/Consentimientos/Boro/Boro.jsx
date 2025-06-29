@@ -188,9 +188,9 @@ const Boro = ({ token, selectedSede, userlogued }) => {
               readOnly
               className="border-b border-gray-400 px-2 py-1 bg-gray-100 cursor-not-allowed text-lg"
               style={{ 
-                width: `${Math.min(50, Math.max(30, (String(form.edad)?.length || 0) * 14))}px`,
-                minWidth: '30px',
-                maxWidth: '50px'
+                width: `${Math.min(80, Math.max(50, (String(form.edad)?.length || 0) * 14))}px`,
+                minWidth: '50px',
+                maxWidth: '80px'
               }}
             />
           </div>
