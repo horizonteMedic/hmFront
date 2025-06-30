@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from '../PcuanAntigenos/controllerPCuantAntigenos';
 
 const sintomasList = [
   'Tos','Dolor de garganta','Congestión nasal','Dificultad respiratoria',
@@ -21,6 +22,7 @@ const DEFAULT_METODO = {
     2,
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
+  const tabla = 'examen_inmunologico'
 
 export default function PcualAntig({ token, selectedSede }) {
 
@@ -78,8 +80,25 @@ export default function PcualAntig({ token, selectedSede }) {
     }
   };
 
-  const handleClear = () => {
-    setForm(f => ({
+  const handleClear = (boolean) => {
+    if (boolean = true) {
+      setForm(({
+      norden: '',
+        fecha: today,
+        nombres: '',
+        dni: '',
+        edad: '',
+        marca: '',
+        doctor: 'N/A',
+        positivo: false,
+        negativo: false,
+        fechaSintomas: '',
+        sintomas: [],
+        marsa: false
+      }));
+      setStatus('Formulario limpiado');
+    } else {
+      setForm(f => ({
       ...f,
       marca: '',
       positivo: false,
@@ -87,14 +106,16 @@ export default function PcualAntig({ token, selectedSede }) {
       fechaSintomas: '',
       sintomas: [],
       marsa: false
-    }));
-    setStatus('Formulario limpiado');
+      }));
+      setStatus('Formulario limpiado');
+    }
+    
   };
 
   const handlePrint = () => {
     window.open(`${apiBase}/pcualantig/print?norden=${form.norden}`, '_blank');
   };
-
+  console.log(form)
   return (
     <form className="w-full max-w-4xl mx-auto bg-white p-8 rounded shadow text-base" onSubmit={e=>{e.preventDefault();handleSave();}}>
       <div className="text-2xl font-bold text-center mb-8">COVID-19 Prueba Cualitativa (Antígenos)</div>
@@ -103,7 +124,13 @@ export default function PcualAntig({ token, selectedSede }) {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">N° Orden :</label>
-          <input name="norden" value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" />
+          <input name="norden" value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" 
+          onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            handleClear(false);
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+          }
+        }}/>
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">Fecha :</label>

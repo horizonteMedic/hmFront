@@ -10,9 +10,16 @@ import { getFetch } from "../../../getFetch/getFetch.js";
 import { useAuthStore } from "../../../../../../store/auth.js";
 import { URLAzure } from "../../../../../config/config";
 
-const ConsentimientoDigitalizacion = ({token, userlogued}) => {
+const datee = new Date();
+  const today = `${datee.getFullYear()}-${String(datee.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(datee.getDate()).padStart(2, "0")}`;
+  const tabla = 'consen_digit'
+
+const ConsentimientoDigitalizacion = ({token, userlogued, selectedSede}) => {
   const [orderNumber, setOrderNumber] = useState('');
-  const [date, setDate] = useState('');
+  const [date, setDate] = useState(today);
   const [name, setName] = useState('');
   const [dni, setDni] = useState('');
   const [authorized, setAuthorized] = useState(true);
@@ -24,6 +31,12 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
       text: body,
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       didOpen: () => {
         Swal.showLoading();
       }
@@ -32,10 +45,58 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
 
   const handeSearchNo = async () => {
     try {
-      Swalwait('Buscando Datos','Espere por favor...')
-      const res = await GetNoConsentimiento(orderNumber,token)
-      
-      if (res.dni) {
+      await Swalwait('Buscando Datos','Espere por favor...')
+      const res = await GetNoConsentimiento(orderNumber,tabla,token)
+      if (res.id === 1) {
+        getFetch(`/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado/${orderNumber}`,token)
+        .then(async(res) => {
+          if (res.dni) {
+            await Promise.all([
+              new Promise(resolve => {
+                setDni(res.dni)
+                resolve()
+              }),
+              new Promise(resolve => {
+                setName(res.nombres)
+                resolve()
+              }),
+              new Promise(resolve => {
+                setDate(res.fecha_examen)
+                resolve()
+              }),
+              new Promise(resolve => {
+                setSaveButton(true)
+                resolve()
+              })
+            ])
+            Swal.close()
+          }
+        })
+      } else if (res.id === 0) {
+        getFetch(`/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${orderNumber}&nomSede=${selectedSede}`,token)
+        .then(async(res) => {
+          if (res.dni) {
+            await Promise.all([
+              new Promise(resolve => {
+                setDni(res.dni)
+                resolve()
+              }),
+              new Promise(resolve => {
+                setName(res.nombresApellidos)
+                resolve()
+              }),
+              new Promise(resolve => {
+                setSaveButton(true)
+                resolve()
+              })
+            ])
+            Swal.close()
+          } else {
+            Swal.fire('Error', 'Ha ocurrido un error','error')
+          }
+        })
+      }
+      /*if (res.dni) {
         await Promise.all([
           new Promise(resolve => {
             setDni(res.dni)
@@ -57,7 +118,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
         Swal.close()
       } else {
         Swal.fire('Error', 'Ha ocurrido un error','error')
-      }
+      }*/
     } catch (error) {
       Swal.fire('Error', 'Ha ocurrido un error','error')
     }
@@ -65,7 +126,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
 
   const handleReset = () => {
     setOrderNumber('');
-    setDate('');
+    setDate(today);
     setName('');
     setDni('');
   };
@@ -74,8 +135,10 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
     Swalwait('Enviando Datos','Espere por favor...')
     const data = {
       user: userlogued,
-      norden: orderNumber
+      norden: orderNumber,
+      fecha: date
     }
+    console.log(data)
     SubmitConsentimiento(data,token)
     .then((res) => {
       handleReset()
@@ -96,12 +159,6 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
     authorized;
 
   const handlePrint = () => {
-    if (!String(dni).trim() && !String(orderNumber).trim()) {
-      return Swal.fire('Error', 'Ingrese DNI y Nro orden', 'error');
-    }
-    if (!String(dni).trim()) {
-      return Swal.fire('Error', 'Ingrese DNI', 'error');
-    }
     if (!String(orderNumber).trim()) {
       return Swal.fire('Error', 'Ingrese Nro orden', 'error');
     }
@@ -134,7 +191,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
       Swal.close();
     });
   };
-  console.log(date)
+  
   return (
     <div className="max-w mx-auto bg-white rounded-xl shadow-lg p-8">
       <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
@@ -144,7 +201,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued}) => {
             type="text"
             value={orderNumber}
             onChange={e => setOrderNumber(e.target.value)}
-            onKeyDown={e => {
+            onKeyUp={e => {
               if (e.key === 'Enter') {
                 handeSearchNo();
               }

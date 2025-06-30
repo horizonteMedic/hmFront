@@ -131,6 +131,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       vihNA: false,
       vihPos: false
     });
+    setSearchMedico(listDoc[0])
   }
   const ClearFormO = () => {
     setFormO({

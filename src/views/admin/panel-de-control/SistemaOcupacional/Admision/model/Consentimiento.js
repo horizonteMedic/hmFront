@@ -1,6 +1,6 @@
 import { URLAzure } from "../../../../../config/config"
 
-export function GetNoConsentimiento(norden,token) {
+export function GetNoConsentimiento(norden,tabla,token) {
     const options = {
         method: 'GET',
         headers: {
@@ -9,16 +9,17 @@ export function GetNoConsentimiento(norden,token) {
         }
     }
     
-    return fetch(URLAzure+`/api/v01/ct/infoPersonalPaciente/busquedaPorNorden/${norden}`,options)
+    return fetch(URLAzure+`/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${norden}&nomService=${tabla}`,options)
     .then(res => res.json()).then(response => response) 
 }
 
 export function SubmitConsentimiento(datos,token) {
-
+    console.log(datos.fecha)
     const data = {
         autoriza: true,
         userRegistro: datos.user,
-        norden: datos.norden
+        fechaExamen: datos.fecha,
+        norden: datos.norden    
     }
 
     const options = {
