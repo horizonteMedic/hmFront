@@ -27,6 +27,29 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
     const [chkValue, setChecked] = useState(false);
     const [base64, setBase64] = useState("")
     const [FirmaView, setFirmaView] = useState(Firma)
+    const [firmaEnCurso, setFirmaEnCurso] = useState(false);
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+            const hasImage = Array.from(imageBox.current?.children || []).some(child => child.tagName === 'IMG');
+            if (hasImage) {
+                setFirmaEnCurso(false); // Reactiva el botón
+                clearTimeout(timeoutRef.current); // ✅ Cancela el timeout de seguridad
+            }
+            }
+        });
+
+        if (imageBox.current) {
+            observer.observe(imageBox.current, { childList: true, subtree: true });
+        }
+
+        return () => {
+            observer.disconnect();
+            clearTimeout(timeoutRef.current);
+        };
+    }, []);
 
     useEffect(() => {
         // When the form is first drawn call the bodyOnLoad() function to initialise the SigCaptX session
@@ -226,13 +249,28 @@ const NewPad = ({close, DNI, Firma, setFirma}) => {
                             <span>Limpiar</span>
                         </button>
                         <button 
+                            disabled={firmaEnCurso}
                             onClick={(e) => {
                                 e.preventDefault();
-                                window.capture("jhon", "Cabrera", imageBox.current, txtSignature.current, chkSigText.current, chkB64.current);
+                                setFirmaEnCurso(true); // desactiva el botón
+                                 // ⏱️ Timeout de seguridad (10s)
+                                timeoutRef.current = setTimeout(() => {
+                                setFirmaEnCurso(false); // Se vuelve a habilitar automáticamente
+                                console.warn("No se detectó firma. Botón reactivado por timeout.");
+                                }, 5000); // 10,000 ms = 10 segundos
+
+                                window.capture(
+                                "jhon", "Cabrera",
+                                imageBox.current,
+                                txtSignature.current,
+                                chkSigText.current,
+                                chkB64.current
+                                );
                                 setFirmaView({id:0,url:''});
                             }}  
-                            className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2"
-                        >
+                            className={`px-6 py-2 rounded-lg text-white transition-colors flex items-center gap-2
+                                ${firmaEnCurso ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+                            >
                             <FontAwesomeIcon icon={faPlay} />
                             <span>Iniciar</span>
                         </button>

@@ -16,8 +16,14 @@ const DEFAULT_METODO = {
   especificidad: '100.00%'
 };
 
-export default function PcualAntig({ apiBase, token, selectedSede }) {
-  const today = new Date().toISOString().split('T')[0];
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")}`;
+
+export default function PcualAntig({ token, selectedSede }) {
+
   const [form, setForm] = useState({
     norden: '',
     fecha: today,
@@ -34,10 +40,6 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
   });
   const [status, setStatus] = useState('');
   const nombreInputRef = useRef(null);
-
-  useEffect(() => {
-    setForm(f => ({ ...f, fecha: today }));
-  }, []);
 
   // Ajuste dinámico del ancho del input de nombres
   useEffect(() => {
@@ -178,7 +180,7 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
       </div>
 
       {/* Síntomas */}
-      <fieldset className="border rounded p-4 mb-4">
+      <fieldset className="border rounded p-4 mb-4 flex flex-col">
         <legend className="font-bold mb-2">Síntomas</legend>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-base">
           {sintomasList.map(s => (
@@ -188,6 +190,10 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
             </label>
           ))}
         </div>
+        <label className="mt-4 block font-semibold text-base mb-1">
+          Observaciones:
+        </label>
+        <textarea type="text" className="border rounded px-2 py-1 text-base w-full" rows={4} />
       </fieldset>
 
       {/* Botones al final */}
