@@ -1,5 +1,6 @@
 // src/views/jaspers/AnalisisBioquimicos/Coproparasitologico_Digitalizado.jsx
 import jsPDF from "jspdf";
+import headerManipuladores from "./Header/header_ParasitologiaSeriado_Digitalizado";
 // import headerManipuladores from "./Header/headerManipuladores";
 import footer from "../components/footer";
 

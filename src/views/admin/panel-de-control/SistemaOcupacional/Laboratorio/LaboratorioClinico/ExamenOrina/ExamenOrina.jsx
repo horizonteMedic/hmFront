@@ -68,21 +68,9 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'LeucocitosS') {
-      // Siempre permitir vaciar o si pasa validación
-    if (value === '' || /^[0-9\-\s]*$/.test(value)) {
+
       setForm(prev => ({ ...prev, [name]: value }));
-      } else {
-        // Si el valor actual es inválido (como "NO SE OBSERVA"),
-        // pero ya está en el formulario, permitir al menos el borrado
-        const current = form[name] || '';
-        if (!/^[0-9\-\s]*$/.test(current)) {
-          setForm(prev => ({ ...prev, [name]: value }));
-        }
-      }
-    } else {
-      setForm(prev => ({ ...prev, [name]: value }));
-    }
+    
   }
 
   const handleClear = () => {

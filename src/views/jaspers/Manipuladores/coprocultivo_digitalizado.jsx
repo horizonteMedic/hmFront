@@ -137,7 +137,7 @@ export default function Coprocultivo_Digitalizado(datos = {}) {
     y += 8;
     doc.setFont("helvetica", "normal");
     doc.text("Resultado :", xLeft, y-2);
-    doc.text("", xValue, y-2, { align: "right" });
+    doc.text(datos.txtresultado, xLeft + 85, y-2, { align: "right" });
     y += 8;
 
     // Mensajes fijos de resultados

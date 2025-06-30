@@ -3,7 +3,7 @@ import microscopioImg from './microscopio.webp';
 import { VerifyTR } from '../ControllerLC/ControllerLC';
 import { getFetch } from '../../../../getFetch/getFetch';
 
-export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, form, setForm, setFormO }) => {
+export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, form, setForm, setFormO, listDoc, setSearchMedico, searchMedico }) => {
   const tabla = 'lab_clinico';
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -68,18 +68,6 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
   }
 
   const [status, setStatus] = useState('');
-  const [listDoc, setListDoc] = useState([])
-
-//NOMBRES DEL DOCTOR
-  useEffect(() => {
-    getFetch(`/api/v01/ct/laboratorio/listadoUsuariosPorPrioridadNameUser?nameUser=${userlogued}`,token)
-      .then((res) => {
-        setListDoc(res)
-        setForm(f => ({ ...f, responsable: res[0] }))
-        setSearchMedico(res[0])
-      })
-      .catch(() => {});
-  },[])
 
   useEffect(() => {
     const grupo = form.grupo || '';
@@ -89,7 +77,6 @@ export const HematologiaBioquimicaSIEO = ({ token, selectedSede, userlogued, for
 
   
   //AUTOCOMPLETAR DEL DOC
-  const [searchMedico, setSearchMedico]  = useState(form.responsable);
   const [filteredMedicos, setFilteredMedicos] = useState([]);
 
   const handleMedicoSearch = e => {
