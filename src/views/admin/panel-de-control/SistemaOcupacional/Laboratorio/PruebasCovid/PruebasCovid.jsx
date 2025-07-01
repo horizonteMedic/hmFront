@@ -28,24 +28,6 @@ export default function PruebasCovid({ apiBase, token, selectedSede }) {
       icon: faVirus,
       Component: PcuanAntigenos
     },
-    {
-      id: 'anticuerpos',
-      label: 'P. Cuan. Anticuerpos',
-      icon: faDroplet,
-      Component: PcuanAnticuerpos
-    },
-    {
-      id: 'cuantitativo',
-      label: 'Examen Cuantitativo',
-      icon: faChartLine,
-      Component: PruebasCovidCuantitativo
-    },
-    {
-      id: 'inmunologico',
-      label: 'Examen Inmunológico',
-      icon: faBiohazard,
-      Component: ExamenInmunologico
-    },
     
   ];
 

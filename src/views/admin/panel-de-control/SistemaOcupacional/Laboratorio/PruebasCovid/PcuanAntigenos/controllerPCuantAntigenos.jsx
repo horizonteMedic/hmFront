@@ -2,7 +2,6 @@ import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch.js";
 import { SubmitCuantAntigenos } from "../model.js";
 
-
 export const Loading = (text) => {
   Swal.fire({
     title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -99,13 +98,7 @@ export const GetInfoService = (nro, tabla, set, token) => {
     });
 };
 
-export const SubmitData= async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla
-) => {
+export const SubmitData = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -146,10 +139,10 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../../../jaspers/Manipuladores/*.jsx"
+          "../../../../../../jaspers/Covid/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../../../jaspers/Manipuladores/${nombre}.jsx`
+          `../../../../../../jaspers/Covid/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {

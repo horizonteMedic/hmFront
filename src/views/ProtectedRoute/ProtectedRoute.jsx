@@ -60,6 +60,7 @@ export function ProtectedRoute() {
     }
 
     const isRouteAllowed = (route) => {
+      if (route === "/HistoriaOcupacional") return true;
       const routeName = protectedRoutes[route];
       return listView.includes(routeName);
     };

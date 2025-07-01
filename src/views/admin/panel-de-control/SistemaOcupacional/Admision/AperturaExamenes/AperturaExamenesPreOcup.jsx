@@ -698,6 +698,10 @@ const AperturaExamenesPreOcup = (props) => {
       text: 'Espere por favor...',
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showConfirmButton: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       didOpen: () => {
         Swal.showLoading();
       }

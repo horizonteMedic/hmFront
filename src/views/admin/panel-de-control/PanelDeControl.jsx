@@ -23,13 +23,14 @@ const Dashboard = ({TotalView}) => {
   const listView = useAuthStore(state => state.listView);
 
   // Cards principales (sin cambios)
- const filteredCards = [
+  const filteredCards = [
     { to: "/roles", name: "Menú de Roles", icon: faCodeBranch, title: "Roles" },
     { to: "/accesos", name: "Menú de Accesos", icon: faUserLock, title: "Accesos" },
     { to: "/reporte-pacientes", name: "Reportes", icon: faFileLines, title: "Reportes" },
     { to: "/matriz-postulante", name: "Matriz Postulante", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
-    { to: "/SistemaOcupacional", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Sistema Ocupacional" }
+    { to: "/SistemaOcupacional", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Sistema Ocupacional" },
+    { to: "/HistoriaOcupacional", name: "Historia Ocupacional", icon: faNotesMedical, title: "Historia Ocupacional" }
   ].filter(card => listView.includes(card.name));
 
   // Cards adicionales en la tarjeta elevada con nuevo estilo

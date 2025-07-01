@@ -31,6 +31,7 @@ import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeRecl
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 import Test from './views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/BioquimicaAcidoUrico/BioquimicaAcidoUrico'
+import HistoriaOcupacional from './views/admin/panel-de-control/HistoriaOcupacional/HistoriaOcupacional.jsx';
 //jaspers
 import Ficha from './views/jaspers//Covid/pcualitativaantigeno.jsx'
 // import Test from './views/jaspers/AnalisisBioquimicos/Hematologia_Digitalizado'
@@ -112,7 +113,7 @@ const AppContent = () => {
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
           <Route path="/protocolos" element={<Protocolos />} />
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
-
+          <Route path="/HistoriaOcupacional" element={<HistoriaOcupacional />} />
         </Route>
         <Route path='/RegistroP' element={<Formulario/>}/>
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>

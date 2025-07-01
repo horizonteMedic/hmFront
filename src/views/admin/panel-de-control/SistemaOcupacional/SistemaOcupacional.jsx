@@ -382,7 +382,7 @@ const TabComponent = () => {
                     />
                   )}
                   {subTab === 1 && (
-                    <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} />
+                    <ConsentimientoDigitalizacion token={token} userlogued={userlogued.sub} selectedSede={selectSede}/>
                   )}
                   {subTab === 2 && (
                     <AperturaExamenesPreOcup
