@@ -17,7 +17,7 @@ export function SubmitCuantAntigenos(data, user, token) {
         "chkIggReactivo": false,
         "chkIggNoReactivo": false,
         "chkInvalido": false,
-        "txtObservaciones": "",        
+        "txtObservaciones": "",
         "txtVrIgm": "",
         "txtVrIgg": "",
         "valorIgg": 0,
@@ -30,7 +30,7 @@ export function SubmitCuantAntigenos(data, user, token) {
     }
 
 
-    const url = `${URLAzure}/api/v01/ct/manipuladores/registrarActualizarManipuladoresCoproparasitologico`
+    const url = `${URLAzure}/api/v01/ct/pruebasCovid/registrarActualizarExamenInmunologico`
     console.log("tokensasasass", token);
     const options = {
         method: 'POST',

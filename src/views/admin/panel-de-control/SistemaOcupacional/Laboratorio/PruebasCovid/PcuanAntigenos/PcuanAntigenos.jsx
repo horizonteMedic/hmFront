@@ -1,18 +1,11 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/PruebasCovid/PcuanAntigenos/PcuanAntigenos.jsx
+
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
-import { SubmitData, VerifyTR } from "./controllerPCuantAntigenos";
-
-const MARCAS = [
-  {
-    value: "ID-19 IGM/IGG TEST CASSETTE",
-    tecnica: "Inmunofluorescencia",
-    sensibilidad: "95.00%",
-    especificidad: "95.00%",
-  },
-  // Puedes agregar más marcas aquí si es necesario
-];
+import { PrintHojaR, SubmitData, VerifyTR } from "./controllerPCuantAntigenos";
+import Swal from "sweetalert2";
+import { URLAzure } from "../../../../../../config/config";
 
 const DEFAULT_TECNICA = {
   tecnica: "Inmunofluorescencia",
@@ -27,6 +20,41 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
 export default function PcuanAntigenos({ token, selectedSede, userlogued }) {
+  //   const MARCAS = [
+  //    {
+  //      value: "ID-19 IGM/IGG TEST CASSETTE",
+  //      tecnica: "Inmunofluorescencia",
+  //      sensibilidad: "95.00%",
+  //      especificidad: "95.00%",
+  //    },
+  //    Puedes agregar más marcas aquí si es necesario
+  // ];}
+  const [marcas, setMarcas] = useState([]);
+  useEffect(() => {
+    const fetchMarcas = async () => {
+      try {
+        const options = {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        };
+        const response = await fetch(
+          `${URLAzure}/api/v01/ct/pruebasCovid/obtenerMarcasCovid`,
+          options
+        );
+        if (!response.ok) throw new Error("Error al cargar marcas");
+        const data = await response.json();
+        setMarcas(data);
+      } catch (error) {
+        console.error("Error fetching marcas:", error);
+        Swal.fire("Error", "No se pudieron cargar las marcas", "error");
+      }
+    };
+    fetchMarcas();
+  }, []);
+
   const [form, setForm] = useState({
     norden: "",
     fecha: today,
@@ -65,7 +93,7 @@ export default function PcuanAntigenos({ token, selectedSede, userlogued }) {
     if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
     Swal.fire({
-      title: "¿Desea Imprimir Coprocultivo?",
+      title: "¿Desea Imprimir Prueba Cuantitativa de Antígenos?",
       html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: "question",
       showCancelButton: true,
@@ -100,7 +128,7 @@ export default function PcuanAntigenos({ token, selectedSede, userlogued }) {
   };
 
   const selectedMarca =
-    MARCAS.find((m) => m.value === form.marca) || DEFAULT_TECNICA;
+    marcas.find((m) => m.value === form.marca) || DEFAULT_TECNICA;
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white p-8 rounded shadow">
@@ -189,9 +217,9 @@ export default function PcuanAntigenos({ token, selectedSede, userlogued }) {
                 className="border rounded px-2 py-1 flex-1"
               >
                 <option value="">--Seleccione--</option>
-                {MARCAS.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.value}
+                {marcas.map((m) => (
+                  <option key={m.id} value={m.mensaje}>
+                    {m.mensaje}
                   </option>
                 ))}
               </select>
@@ -232,16 +260,14 @@ export default function PcuanAntigenos({ token, selectedSede, userlogued }) {
               style={{ minWidth: 220 }}
             >
               <div>
-                <span className="font-semibold">Tecnica:</span>{" "}
-                {selectedMarca.tecnica}
+                <span className="font-semibold">Tecnica:</span>
+                Inmunofluorescencia
               </div>
               <div>
-                <span className="font-semibold">SENSIBILIDAD:</span>{" "}
-                {selectedMarca.sensibilidad}
+                <span className="font-semibold">SENSIBILIDAD:</span>95.00%
               </div>
               <div>
-                <span className="font-semibold">ESPECIFICIDAD:</span>{" "}
-                {selectedMarca.especificidad}
+                <span className="font-semibold">ESPECIFICIDAD:</span>95.00%
               </div>
             </div>
           </div>
