@@ -129,7 +129,7 @@ export function generatePdf({ nombre, edad, dni, orderNumber, FirmaP, HuellaP, j
 
       // DNI y Fecha bajo Firma Manuscrita
       const dniLine  = `DNI: ${dni || ''}`;
-      const dateLine = `Fecha: ${formattedDate}`;
+      const dateLine = `Fecha: ${jasper.fecha_examen}`;
       const wDni1    = doc.getTextWidth(dniLine);
       const wDate1   = doc.getTextWidth(dateLine);
       doc.text(dniLine,  center1 - wDni1 / 2,  sectionY + textOffset * 2);

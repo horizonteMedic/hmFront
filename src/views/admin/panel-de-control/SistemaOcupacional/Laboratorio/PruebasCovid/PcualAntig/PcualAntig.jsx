@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
+import { VerifyTR } from '../PcuanAntigenos/controllerPCuantAntigenos';
 
 const sintomasList = [
   'Tos','Dolor de garganta','Congestión nasal','Dificultad respiratoria',
@@ -16,8 +17,15 @@ const DEFAULT_METODO = {
   especificidad: '100.00%'
 };
 
-export default function PcualAntig({ apiBase, token, selectedSede }) {
-  const today = new Date().toISOString().split('T')[0];
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")}`;
+  const tabla = 'examen_inmunologico'
+
+export default function PcualAntig({ token, selectedSede }) {
+
   const [form, setForm] = useState({
     norden: '',
     fecha: today,
@@ -34,10 +42,6 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
   });
   const [status, setStatus] = useState('');
   const nombreInputRef = useRef(null);
-
-  useEffect(() => {
-    setForm(f => ({ ...f, fecha: today }));
-  }, []);
 
   // Ajuste dinámico del ancho del input de nombres
   useEffect(() => {
@@ -76,8 +80,25 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
     }
   };
 
-  const handleClear = () => {
-    setForm(f => ({
+  const handleClear = (boolean) => {
+    if (boolean = true) {
+      setForm(({
+      norden: '',
+        fecha: today,
+        nombres: '',
+        dni: '',
+        edad: '',
+        marca: '',
+        doctor: 'N/A',
+        positivo: false,
+        negativo: false,
+        fechaSintomas: '',
+        sintomas: [],
+        marsa: false
+      }));
+      setStatus('Formulario limpiado');
+    } else {
+      setForm(f => ({
       ...f,
       marca: '',
       positivo: false,
@@ -85,14 +106,16 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
       fechaSintomas: '',
       sintomas: [],
       marsa: false
-    }));
-    setStatus('Formulario limpiado');
+      }));
+      setStatus('Formulario limpiado');
+    }
+    
   };
 
   const handlePrint = () => {
     window.open(`${apiBase}/pcualantig/print?norden=${form.norden}`, '_blank');
   };
-
+  console.log(form)
   return (
     <form className="w-full max-w-4xl mx-auto bg-white p-8 rounded shadow text-base" onSubmit={e=>{e.preventDefault();handleSave();}}>
       <div className="text-2xl font-bold text-center mb-8">COVID-19 Prueba Cualitativa (Antígenos)</div>
@@ -101,7 +124,13 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">N° Orden :</label>
-          <input name="norden" value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" />
+          <input name="norden" value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" 
+          onKeyUp={(e) => {
+          if (e.key === "Enter") {
+            handleClear(false);
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+          }
+        }}/>
         </div>
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">Fecha :</label>
@@ -178,7 +207,7 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
       </div>
 
       {/* Síntomas */}
-      <fieldset className="border rounded p-4 mb-4">
+      <fieldset className="border rounded p-4 mb-4 flex flex-col">
         <legend className="font-bold mb-2">Síntomas</legend>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-base">
           {sintomasList.map(s => (
@@ -188,6 +217,10 @@ export default function PcualAntig({ apiBase, token, selectedSede }) {
             </label>
           ))}
         </div>
+        <label className="mt-4 block font-semibold text-base mb-1">
+          Observaciones:
+        </label>
+        <textarea type="text" className="border rounded px-2 py-1 text-base w-full" rows={4} />
       </fieldset>
 
       {/* Botones al final */}
