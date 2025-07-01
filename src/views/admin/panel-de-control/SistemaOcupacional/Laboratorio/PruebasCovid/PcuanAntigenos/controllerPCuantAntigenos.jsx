@@ -153,8 +153,14 @@ export const PrintHojaR = (nro, token, tabla) => {
           );
         }
       }
-    })
-    .finally(() => {
       Swal.close();
+    })
+    .catch((error) => {
+      console.error("Error al encontrar el documento:", error);
+      Swal.fire({
+        icon: "error",
+        title: "N° Orden no existente",
+        text: "Por favor, ingrese un N° Orden válido.",
+      });
     });
 };

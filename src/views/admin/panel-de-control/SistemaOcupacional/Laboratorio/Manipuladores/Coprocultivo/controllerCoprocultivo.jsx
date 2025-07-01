@@ -151,28 +151,29 @@ export const PrintHojaR = (nro, token, tabla) => {
   getFetch(
     `/api/v01/ct/manipuladores/obtenerReporteCoprocultivo?nOrden=${nro}&nameService=${tabla}`, //revisar
     token
-  ).then(async (res) => {
-    if (res.norden) {
-      console.log(res);
-      const nombre = res.nameJasper;
-      console.log(nombre);
-      const jasperModules = import.meta.glob(
-        "../../../../../../jaspers/Manipuladores/*.jsx"
-      );
-      const modulo = await jasperModules[
-        `../../../../../../jaspers/Manipuladores/${nombre}.jsx`
-      ]();
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === "function") {
-        modulo.default(res);
-      } else {
-        console.error(
-          `El archivo ${nombre}.jsx no exporta una función por defecto`
+  )
+    .then(async (res) => {
+      if (res.norden) {
+        console.log(res);
+        const nombre = res.nameJasper;
+        console.log(nombre);
+        const jasperModules = import.meta.glob(
+          "../../../../../../jaspers/Manipuladores/*.jsx"
         );
+        const modulo = await jasperModules[
+          `../../../../../../jaspers/Manipuladores/${nombre}.jsx`
+        ]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === "function") {
+          modulo.default(res);
+        } else {
+          console.error(
+            `El archivo ${nombre}.jsx no exporta una función por defecto`
+          );
+        }
       }
-    }
-  })
-  .finally(() => {
-    Swal.close()
-  })
+    })
+    .finally(() => {
+      Swal.close();
+    });
 };
