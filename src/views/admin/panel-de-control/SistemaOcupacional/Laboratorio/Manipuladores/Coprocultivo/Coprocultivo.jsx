@@ -2,7 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
-import { PrintHojaR, VerifyTR,SubmitCoprocultivoManipulador } from "./controllerCoprocultivo";
+import {
+  PrintHojaR,
+  VerifyTR,
+  SubmitCoprocultivoManipulador,
+} from "./controllerCoprocultivo";
 import Swal from "sweetalert2";
 
 export default function Coprocultivo({ token, selectedSede, userlogued }) {
@@ -55,7 +59,11 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
   const handleCheckRadioXValue = (name) => {
     setForm((f) => ({
       ...f,
-      [name]: f[name].toUpperCase().includes("X CAMPO") ? "" : /\d/.test(f[name]) ? f[name] + " X CAMPO" : " X CAMPO",
+      [name]: f[name].toUpperCase().includes("X CAMPO")
+        ? ""
+        : /\d/.test(f[name])
+        ? f[name] + " X CAMPO"
+        : " X CAMPO",
     }));
   };
 
@@ -89,7 +97,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
       // OBSERVACIONES
       observaciones:
         "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
-      }));
+    }));
   };
 
   const handleClearnotO = () => {
@@ -121,8 +129,8 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
       // OBSERVACIONES
       observaciones:
         "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
-      }));
-  }
+    }));
+  };
 
   const handlePrint = () => {
     if (!form.norden)
@@ -149,9 +157,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
   return (
     <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold text-center mb-6">COPROCULTIVO</h2>
-      <div
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         {/* Encabezado */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex items-center gap-2">
@@ -163,7 +169,7 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
               value={form.norden}
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
-                  handleClearnotO()
+                  handleClearnotO();
                   VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                 }
               }}
@@ -416,18 +422,16 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
                       }
                     />
                     No se observan
-                  </label>                  
+                  </label>
                   <label className="flex items-center gap-1 text-base">
                     <input
                       type="checkbox"
                       name="leucocitos"
                       value="__x campo"
-                      onChange={() =>
-                        handleCheckRadioXValue("leucocitos") 
-                      }
-                      checked={
-                        form.leucocitos.toUpperCase().includes("X CAMPO")
-                      }
+                      onChange={() => handleCheckRadioXValue("leucocitos")}
+                      checked={form.leucocitos
+                        .toUpperCase()
+                        .includes("X CAMPO")}
                     />
                     __x campo
                   </label>
@@ -455,23 +459,17 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
                       onChange={() =>
                         handleCheckRadio("hematies", "No se observan")
                       }
-                      checked={
-                        form.hematies === "No se observan".toUpperCase()
-                      }
+                      checked={form.hematies === "No se observan".toUpperCase()}
                     />
                     No se observan
-                  </label>                  
+                  </label>
                   <label className="flex items-center gap-1 text-base">
                     <input
                       type="checkbox"
                       name="hematies"
                       value="__x campo"
-                      onChange={() =>
-                        handleCheckRadioXValue("hematies")
-                      }
-                      checked={
-                        form.hematies.toUpperCase().includes("X CAMPO")
-                      }
+                      onChange={() => handleCheckRadioXValue("hematies")}
+                      checked={form.hematies.toUpperCase().includes("X CAMPO")}
                     />
                     __x campo
                   </label>
@@ -695,7 +693,15 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
           <div className="flex gap-3">
             <button
               // type="submit"
-              onClick={() =>{SubmitCoprocultivoManipulador(form, token, userlogued, handleClear, tabla);}}
+              onClick={() => {
+                SubmitCoprocultivoManipulador(
+                  form,
+                  token,
+                  userlogued,
+                  handleClear,
+                  tabla
+                );
+              }}
               className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
