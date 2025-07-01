@@ -1,7 +1,13 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../../getFetch/getFetch.js";
-import { SubmitCuantAntigenos } from "../model.js";
+import { SubmitCualitAntigenos, SubmitCuantAntigenos } from "../model.js";
 
+const sintomasList = [
+  'Tos','Dolor de garganta','Congestión nasal','Dificultad respiratoria',
+  'Fiebre/Escalofrío','Malestar general','Pérdida olfato o gusto',
+  'Diarrea','Náuseas/vómitos','Cefalea','Irritabilidad/confusión',
+  'Dolor','Expectoración'
+];
 
 export const Loading = (text) => {
   Swal.fire({
@@ -83,12 +89,32 @@ export const GetInfoService = (nro, tabla, set, token) => {
     .then((res) => {
       if (res.norden) {
         console.log(res);
+
+         const observacionesRaw = res.txtObservaciones || '';
+
+        // Normaliza: quita guiones, espacios y pasa a minúsculas
+        const observacionesNormalizadas = observacionesRaw
+          .split('\n')
+          .map(linea => linea.replace(/^-\s*/, '').trim().toLowerCase());
+
+        // Normaliza la lista de síntomas también
+        const sintomasMarcados = sintomasList.filter(sintoma => {
+          const sintomaNorm = sintoma.trim().toLowerCase();
+          return observacionesNormalizadas.some(obs => obs === sintomaNorm);
+        });
+
         set((prev) => ({
           ...prev,
           ...res,
           fecha: res.fechaExamen,
           marca: res.cboMarca,
           valor: res.valorIgm,
+          positivo: res.chkIgmReactivo === true ? true : false,
+          negativo: res.chkIggReactivo === true ? true : false,
+          fechaSintomas: res.fechaSintomas,
+          marsa: res.formatoMarsa,
+          observaciones: res.txtObservaciones,
+          sintomas: sintomasMarcados
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -99,13 +125,7 @@ export const GetInfoService = (nro, tabla, set, token) => {
     });
 };
 
-export const SubmitData= async (
-  form,
-  token,
-  user,
-  limpiar,
-  tabla
-) => {
+export const SubmitData = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -133,6 +153,34 @@ export const SubmitData= async (
   });
 };
 
+export const SubmitDataCual = async (form, token, user, limpiar, tabla) => {
+  if (!form.norden) {
+    await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  Loading("Registrando Datos");
+  SubmitCualitAntigenos(form, user, token).then((res) => {
+    console.log(res);
+    if (res.id === 1 || res.id === 0) {
+      Swal.fire({
+        title: "Exito",
+        text: `${res.mensaje},\n¿Desea imprimir?`,
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        limpiar();
+        if (result.isConfirmed) {
+          PrintHojaR(form.norden, token, tabla);
+        }
+      });
+    } else {
+      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
+    }
+  });
+}
+
 export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
 
@@ -146,10 +194,10 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../../../jaspers/Manipuladores/*.jsx"
+          "../../../../../../jaspers/Covid/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../../../jaspers/Manipuladores/${nombre}.jsx`
+          `../../../../../../jaspers/Covid/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
@@ -160,8 +208,14 @@ export const PrintHojaR = (nro, token, tabla) => {
           );
         }
       }
-    })
-    .finally(() => {
       Swal.close();
+    })
+    .catch((error) => {
+      console.error("Error al encontrar el documento:", error);
+      Swal.fire({
+        icon: "error",
+        title: "N° Orden no existente",
+        text: "Por favor, ingrese un N° Orden válido.",
+      });
     });
 };

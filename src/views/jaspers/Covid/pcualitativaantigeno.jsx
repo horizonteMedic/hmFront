@@ -37,7 +37,7 @@ export default function pcualitativaantigeno(datos = {}) {
   header_PCualitativoAntigeno(doc, datos);
 
   // === CUERPO ===
-  let y = 80;
+  let y = 90;  // <–– desplazado 10 puntos más abajo
 
   // 1) TÍTULO
   drawUnderlinedTitle(doc, "PRUEBA CUALITATIVA DE ANTÍGENOS", y);
@@ -48,7 +48,7 @@ export default function pcualitativaantigeno(datos = {}) {
      .setFontSize(config.fontSize.body)
      .text("MARCA:", config.margin, y);
   doc.setFont(config.font, "normal")
-     .text(datos.cbomarca || "-", config.margin + 30, y);
+     .text(datos.cboMarca || "-", config.margin + 30, y);
   y += config.lineHeight * 2;
 
   // 3) ENCABEZADOS DE TABLA
@@ -67,7 +67,7 @@ export default function pcualitativaantigeno(datos = {}) {
      .setFontSize(config.fontSize.body)
      .text("Antígenos virales SARS-CoV-2", config.col1X, y);
 
-  const reactivo = datos.chkigm_reactivo === true;
+  const reactivo = datos.chkIgmReactivo === true;
   const textoResultado = reactivo ? "Reactivo" : "No reactivo";
   doc.text(textoResultado, config.col2X, y);
 
@@ -102,7 +102,7 @@ export default function pcualitativaantigeno(datos = {}) {
      .text("SINTOMATOLOGÍA", config.margin, y);
   y += config.lineHeight;
 
-  const obs = datos.txtobservaciones;
+  const obs = datos.txtObservaciones;
   const sintoma = !obs || obs.trim() === ""
     ? "Paciente declara no tener síntomas"
     : `Paciente declara tener:\n\n${obs}`;
@@ -114,9 +114,13 @@ export default function pcualitativaantigeno(datos = {}) {
      .text(sintLines, config.margin, y);
 
   // === FOOTER ===
-  if (typeof footer === "function") {
-    footer(doc, datos);
-  }
+   footer(doc, datos);
 
-  return doc;
+  const blob = doc.output("blob");
+   const url = URL.createObjectURL(blob);
+   const iframe = document.createElement("iframe");
+   iframe.style.display = "none";
+   iframe.src = url;
+   document.body.appendChild(iframe);
+   iframe.onload = () => iframe.contentWindow.print();
 }
