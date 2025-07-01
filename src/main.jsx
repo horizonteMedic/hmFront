@@ -32,9 +32,7 @@ import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 import Test from './views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/BioquimicaAcidoUrico/BioquimicaAcidoUrico'
 //jaspers
-import Ficha from './views/jaspers/Covid/pcualitativaantigeno.jsx'
-import header_PCualitativoAntigeno from './views/jaspers/Covid/header/header_PCualitativoAntigeno'
-import pcualitativaantigeno from './views/jaspers/Covid/pcualitativaantigeno.jsx'
+import Ficha from './views/jaspers//Covid/pcualitativaantigeno.jsx'
 // import Test from './views/jaspers/AnalisisBioquimicos/Hematologia_Digitalizado'
 const App = () => {
   return (
@@ -119,7 +117,7 @@ const AppContent = () => {
         <Route path='/RegistroP' element={<Formulario/>}/>
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/fichapi" element={<FichaCualitativaImprimir />} />
+        <Route path="/fichapi" element={<Ficha />} />
         <Route path="/test" element={<Test />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
@@ -128,37 +126,4 @@ const AppContent = () => {
   );
 }
 
-// Componente para imprimir el PDF de pcualitativaantigeno
-function FichaCualitativaImprimir() {
-  // Puedes ajustar estos datos de ejemplo o recibirlos por props/query
-  const datos = {
-    cbomarca: 'MarcaX',
-    resultado: 'No reactivo',
-    txtvrigm: 'Sin observaciones',
-    nombre: 'Juan Pérez',
-    edad: 35,
-    cod_pa: '12345678',
-    fecha_examen: '2024-06-01',
-    numero: '000123',
-    // agrega aquí los campos que use tu header si es necesario
-  };
-
-  const handleImprimir = () => {
-    const doc = pcualitativaantigeno(datos);
-    // Mostrar en nueva pestaña
-    const pdfBlob = doc.output('blob');
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    window.open(pdfUrl);
-  };
-
-  return (
-    <div style={{padding: 40, textAlign: 'center'}}>
-      <h2>Imprimir Ficha Cualitativa Antígeno COVID-19</h2>
-      <button className="btn btn-primary" onClick={handleImprimir}>
-        Imprimir PDF
-      </button>
-    </div>
-  );
-}
-
-createRoot(document.getElementById('root')).render(<App />);
+createRoot(document.getElementById('root')).render(<App />);

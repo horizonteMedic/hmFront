@@ -37,7 +37,7 @@ export default function pcualitativaantigeno(datos = {}) {
   header_PCualitativoAntigeno(doc, datos);
 
   // === CUERPO ===
-  let y = 80;
+  let y = 90;  // <–– desplazado 10 puntos más abajo
 
   // 1) TÍTULO
   drawUnderlinedTitle(doc, "PRUEBA CUALITATIVA DE ANTÍGENOS", y);
