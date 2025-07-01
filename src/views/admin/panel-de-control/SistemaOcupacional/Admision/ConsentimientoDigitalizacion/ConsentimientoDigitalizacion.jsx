@@ -32,8 +32,6 @@ const ConsentimientoDigitalizacion = ({token, userlogued, selectedSede}) => {
       allowOutsideClick: false,
       allowEscapeKey: false,
       showConfirmButton: false,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
       showCancelButton: true,
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!",
