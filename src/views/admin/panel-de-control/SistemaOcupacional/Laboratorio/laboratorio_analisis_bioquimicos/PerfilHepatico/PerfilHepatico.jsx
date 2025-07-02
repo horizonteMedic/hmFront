@@ -48,7 +48,26 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
   
   const handleFormChange = e => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
+    setForm(prev => {
+      let updated = { ...prev, [name]: value };
+      // Cálculo automático de Bilirrubina Total
+      if (name === 'biliDir' || name === 'biliInd') {
+        const dir = parseFloat(name === 'biliDir' ? value : updated.biliDir);
+        const ind = parseFloat(name === 'biliInd' ? value : updated.biliInd);
+        if (!isNaN(dir) && !isNaN(ind)) {
+          updated.biliTotal = (dir + ind).toFixed(2);
+        }
+      }
+      // Cálculo automático de Globulina Sérica
+      if (name === 'protTot' || name === 'albumina') {
+        const prot = parseFloat(name === 'protTot' ? value : updated.protTot);
+        const alb = parseFloat(name === 'albumina' ? value : updated.albumina);
+        if (!isNaN(prot) && !isNaN(alb)) {
+          updated.globSer = (prot - alb).toFixed(2);
+        }
+      }
+      return updated;
+    });
   };
 
   const handleSave = useCallback(async () => {

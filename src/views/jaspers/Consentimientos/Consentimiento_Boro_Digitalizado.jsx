@@ -47,9 +47,15 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     y += 2;
     // Tabla centrada para Fecha, Hora, Ciudad
     let fechaStr = datos.fecha || '';
+    function toDDMMYYYY(fecha) {
+      if (!fecha) return '';
+      if (fecha.includes('/')) return fecha; // ya está en formato correcto
+      const [anio, mes, dia] = fecha.split('-');
+      if (!anio || !mes || !dia) return fecha;
+      return `${dia}/${mes}/${anio}`;
+    }
     if (datos.fecha) {
-      const [anio, mes, dia] = datos.fecha.split('-');
-      fechaStr = `${dia}/${mes}/${anio}`;
+      fechaStr = toDDMMYYYY(datos.fecha);
     }
     const horaStr = datos.horaExamen || '';
     const ciudadStr = datos.sede || '';
@@ -223,14 +229,8 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     y += 5;
     if (datos.antBoroConsumenMateCoca) {
       let fechaMate = datos.critFechaConsumoMateCoca || '';
-      if (fechaMate && !isNaN(Date.parse(fechaMate))) {
-        const f = new Date(fechaMate);
-        const dia = String(f.getDate()).padStart(2, '0');
-        const mes = String(f.getMonth() + 1).padStart(2, '0');
-        const anio = f.getFullYear();
-        fechaMate = `${datos.antBoroConsumenMateCoca}`;
-      }
-      const textoCompleto = `Si la respuesta es SI: ¿Cuándo consumió por última vez?     Fecha:   ${datos.critFechaConsumoMateCoca}`;
+      fechaMate = toDDMMYYYY(fechaMate);
+      const textoCompleto = `Si la respuesta es SI: ¿Cuándo consumió por última vez?     Fecha:   ${fechaMate}`;
       doc.text(textoCompleto, margin, y);
       y += 7;
     } else {
@@ -243,13 +243,7 @@ export default function Consentimiento_Boro_Digitalizado(datos) {
     if (datos.masticaHojaCoca && datos.fechaConsumoHojaCoca) {
       doc.text('Cuando:', margin + 130, y);
       let fechaHoja = datos.fechaConsumoHojaCoca;
-      if (fechaHoja && !isNaN(Date.parse(fechaHoja))) {
-        const f = new Date(fechaHoja);
-        const dia = String(f.getDate()).padStart(2, '0');
-        const mes = String(f.getMonth() + 1).padStart(2, '0');
-        const anio = f.getFullYear();
-        fechaHoja = `${datos.fechaConsumoHojaCoca}`;
-      }
+      fechaHoja = toDDMMYYYY(fechaHoja);
       doc.text(`${fechaHoja}`, margin + 150, y);
     }
     y += 5;

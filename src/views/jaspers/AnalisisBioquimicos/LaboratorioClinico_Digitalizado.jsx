@@ -101,9 +101,10 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       if (rightItems[i] && rightItems[i].label === "Leucocitos") {
         // Línea negra, más delgada y discontinua
         doc.setDrawColor(0, 0, 0); // Negro
-        doc.setLineWidth(0.4);
-        doc.setLineDash([2, 2], 0);
-        const yLinea = yTable + rowH * (i + 1.1);
+        doc.setLineWidth(0.2); // más delgada
+        doc.setLineDash([1, 1], 0); // guiones más juntos y cortos
+        const yLinea = yTable + rowH * (i + 0.95); // más pegada a la fila
+        // Largo original
         doc.line(rightX - 8, yLinea, rightX + labelW + valueW + 8, yLinea);
         doc.setLineDash([]);
         doc.setDrawColor(0); // Reset color
@@ -360,7 +361,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       const sigH = 30;
       // Apilar a la derecha
       const sigX = pageW - sigW + 3;
-      const sigY = y - 80;
+      const sigY = y - 85;
 
       // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
