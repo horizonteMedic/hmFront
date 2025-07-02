@@ -23,7 +23,27 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
   // === HEADER ===
   header_PCualitativoAntigenoMarsa(doc, datos);
 
-  // === CUERPO ===
+  const sello1 = datos.digitalizacion?.find(
+    (d) => d.nombreDigitalizacion === "FIRMAP"
+  );
+  const sello2 = datos.digitalizacion?.find(
+    (d) => d.nombreDigitalizacion === "HUELLA"
+  );
+  const isValidUrl = (url) => url && url !== "Sin registro";
+  const loadImg = (src) =>
+    new Promise((res, rej) => {
+      const img = new Image();
+      img.src = src;
+      img.crossOrigin = "anonymous";
+      img.onload = () => res(img);
+      img.onerror = () => rej(`No se pudo cargar ${src}`);
+    });
+  Promise.all([
+    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
+    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
+  ]).then(([s1, s2]) => {
+
+      // === CUERPO ===
   let y = 70;
   // Título
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
@@ -109,10 +129,88 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
   doc.rect(config.margin + 70, y, 30, 30); // Huella
   doc.text("Huella Digital", config.margin + 72, y + 6);
 
-  // Footer
-  if (typeof footer === "function") {
-    footer(doc, datos);
-  }
+  if (s1) {
+  const canvas = document.createElement("canvas");
+  canvas.width = s1.width;
+  canvas.height = s1.height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(s1, 0, 0);
+  const selloBase64 = canvas.toDataURL("image/png");
 
-  return doc;
+  // 📦 Área del rectángulo donde irá la firma
+  const sigX = config.margin;   // misma X que el rectángulo
+  const sigY = y;               // misma Y que el rectángulo
+  const sigW = 60;              // mismo ancho que el rectángulo
+  const sigH = 18;              // mismo alto que el rectángulo
+
+  // 🔄 Escalado proporcional para que la imagen encaje dentro del área
+  const maxImgW = sigW - 4;     // dejamos un pequeño margen interno
+  const maxImgH = sigH - 4;
+
+  let imgW = s1.width;
+  let imgH = s1.height;
+
+  const scaleW = maxImgW / imgW;
+  const scaleH = maxImgH / imgH;
+  const scale = Math.min(scaleW, scaleH, 1); // escalar sin sobrepasar
+
+  imgW *= scale;
+  imgH *= scale;
+
+  // 📍 Centramos dentro del rectángulo
+  const imgX = sigX + (sigW - imgW) / 2;
+  const imgY = sigY + (sigH - imgH) / 2;
+
+  // 🖼️ Insertar firma
+  doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
+}
+
+    if (s2) {
+  const canvas = document.createElement("canvas");
+  canvas.width = s2.width;
+  canvas.height = s2.height;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(s2, 0, 0);
+  const selloBase64 = canvas.toDataURL("image/png");
+
+  // 📦 Área del cuadro de huella (mismo que el rectángulo)
+  const sigX = config.margin + 70;
+  const sigY = y;
+  const sigW = 30;
+  const sigH = 30;
+
+  // 🔄 Escalar imagen a máximo tamaño permitiendo márgenes
+  const maxImgW = sigW - 4;
+  const maxImgH = sigH - 4;
+
+  let imgW = s2.width;
+  let imgH = s2.height;
+
+  const scaleW = maxImgW / imgW;
+  const scaleH = maxImgH / imgH;
+  const scale = Math.min(scaleW, scaleH, 1);
+
+  imgW *= scale;
+  imgH *= scale;
+
+  // 📍 Centramos dentro del rectángulo
+  const imgX = sigX + (sigW - imgW) / 2;
+  const imgY = sigY + (sigH - imgH) / 2;
+
+  // 🖼️ Agregamos la huella digital
+  doc.addImage(selloBase64, "PNG", imgX, imgY, imgW, imgH);
+}
+
+  // Footer
+    footer(doc, datos);
+  
+  const pdfBlob = doc.output("blob");
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = pdfUrl;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
+  })
+  
 }
