@@ -33,7 +33,7 @@ const header_PCualitativoAntigeno = (doc, datos = {}) => {
 
   // 2. Número de orden a la derecha
   const nroOrdenLabel = "Nro Orden :";
-  const nroOrdenValue = String(datos.numero || '');
+  const nroOrdenValue = String(datos.norden || '');
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
@@ -56,7 +56,7 @@ const header_PCualitativoAntigeno = (doc, datos = {}) => {
   const labelWidthNombres = doc.getTextWidth("Paciente :");
   let valueXNombres = patientDataX + labelWidthNombres + 4;
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.nombre || '').toUpperCase(), valueXNombres, patientDataY);
+  doc.text(String(datos.nombres || '').toUpperCase(), valueXNombres, patientDataY);
   patientDataY += 8;
   doc.setFont('helvetica', 'bold');
   doc.text("Edad :", patientDataX, patientDataY);
@@ -68,7 +68,7 @@ const header_PCualitativoAntigeno = (doc, datos = {}) => {
   doc.text("Fecha :", patientDataX, patientDataY);
   const labelWidthFecha = doc.getTextWidth("Fecha :");
   doc.setFont('helvetica', 'normal');
-  doc.text(formatDateToShort(datos.fecha_examen), patientDataX + labelWidthFecha + 4, patientDataY);
+  doc.text(formatDateToShort(datos.fechaExamen), patientDataX + labelWidthFecha + 4, patientDataY);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.setLineWidth(0.2);

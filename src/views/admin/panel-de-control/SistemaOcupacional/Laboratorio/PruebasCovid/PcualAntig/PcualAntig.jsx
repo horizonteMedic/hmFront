@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import { VerifyTR } from '../PcuanAntigenos/controllerPCuantAntigenos';
-
+import { PrintHojaR, SubmitDataCual, VerifyTR } from '../PcuanAntigenos/controllerPCuantAntigenos';
+import { getFetch } from '../../../../getFetch/getFetch';
+import Swal from 'sweetalert2';
 const sintomasList = [
   'Tos','Dolor de garganta','Congestión nasal','Dificultad respiratoria',
   'Fiebre/Escalofrío','Malestar general','Pérdida olfato o gusto',
@@ -24,7 +25,7 @@ const DEFAULT_METODO = {
   )}-${String(date.getDate()).padStart(2, "0")}`;
   const tabla = 'examen_inmunologico'
 
-export default function PcualAntig({ token, selectedSede }) {
+export default function PcualAntig({ token, selectedSede, userlogued }) {
 
   const [form, setForm] = useState({
     norden: '',
@@ -36,11 +37,14 @@ export default function PcualAntig({ token, selectedSede }) {
     doctor: 'N/A',
     positivo: false,
     negativo: false,
-    fechaSintomas: '',
+    fechaSintomas: today,
     sintomas: [],
-    marsa: false
+    marsa: false,
+    observaciones: ''
   });
   const [status, setStatus] = useState('');
+  const [marcas, setMarcas] = useState([])
+  const [carga, setCarga] = useState(true)
   const nombreInputRef = useRef(null);
 
   // Ajuste dinámico del ancho del input de nombres
@@ -52,14 +56,54 @@ export default function PcualAntig({ token, selectedSede }) {
     }
   }, [form.nombres]);
 
+  useEffect(() => {
+    getFetch(`/api/v01/ct/pruebasCovid/obtenerMarcasCovid`,token)
+    .then((res) => {
+      setCarga(false)
+      setMarcas(res)
+    })
+  },[])
+
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
+    
     setForm(f => {
       if (type === 'checkbox' && name === 'sintomas') {
-        const list = new Set(f.sintomas);
-        checked ? list.add(value) : list.delete(value);
-        return { ...f, sintomas: [...list] };
+        const sintomasActuales = new Set(f.sintomas);
+        checked ? sintomasActuales.add(value) : sintomasActuales.delete(value);
+        const sintomasArray = [...sintomasActuales];
+
+        // Obtener líneas actuales del campo observaciones
+        const lineasActuales = (f.observaciones || "").split("\n");
+
+        // Filtrar: deja todas las líneas que NO son síntomas conocidos
+        const lineasNoSintomas = lineasActuales.filter((linea) => {
+          const contenido = linea.trim().replace(/^- /, "").toLowerCase();
+          return !sintomasList.some((s) => s.toLowerCase() === contenido);
+        });
+
+        // Agregar los síntomas seleccionados como nuevas líneas
+        const nuevasLineasSintomas = sintomasArray.map((s) => `- ${s}`);
+
+        // Combinar y limpiar doble salto de línea
+        const nuevasObservaciones = [...lineasNoSintomas, ...nuevasLineasSintomas]
+          .filter((linea, index, arr) => arr.indexOf(linea) === index) // eliminar duplicados
+          .join("\n");
+
+        return {
+          ...f,
+          sintomas: sintomasArray,
+          observaciones: nuevasObservaciones,
+        };
       }
+      if (name === 'observaciones') {
+        console.log('a')
+          return {
+          ...f,
+          observaciones: value, // solo actualiza el texto
+        };
+      }
+
       if (type === 'checkbox') return { ...f, [name]: checked };
       return { ...f, [name]: value };
     });
@@ -80,40 +124,62 @@ export default function PcualAntig({ token, selectedSede }) {
     }
   };
 
-  const handleClear = (boolean) => {
-    if (boolean = true) {
-      setForm(({
+  const handleClear = () => {
+    setForm({
       norden: '',
-        fecha: today,
-        nombres: '',
-        dni: '',
-        edad: '',
-        marca: '',
-        doctor: 'N/A',
-        positivo: false,
-        negativo: false,
-        fechaSintomas: '',
-        sintomas: [],
-        marsa: false
-      }));
-      setStatus('Formulario limpiado');
-    } else {
-      setForm(f => ({
+    fecha: today,
+    nombres: '',
+    dni: '',
+    edad: '',
+    marca: '',
+    doctor: 'N/A',
+    positivo: false,
+    negativo: false,
+    fechaSintomas: today,
+    sintomas: [],
+    marsa: false,
+    observaciones: ''
+    })
+  }
+    
+  const handleClearnor = () => {
+    setForm((f) => ({
       ...f,
+      fecha: today,
+      nombres: '',
+      dni: '',
+      edad: '',
       marca: '',
+      doctor: 'N/A',
       positivo: false,
       negativo: false,
-      fechaSintomas: '',
+      fechaSintomas: today,
       sintomas: [],
-      marsa: false
-      }));
-      setStatus('Formulario limpiado');
-    }
-    
-  };
+      marsa: false,
+      observaciones: ''
+    }));
+  }
 
   const handlePrint = () => {
-    window.open(`${apiBase}/pcualantig/print?norden=${form.norden}`, '_blank');
+    if (!form.norden)
+    return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+  Swal.fire({
+    title: "¿Desea Imprimir Prueba Cualitativa de Antígenos?",
+    html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Sí, Imprimir",
+    cancelButtonText: "Cancelar",
+    customClass: {
+      title: "swal2-title",
+      confirmButton: "swal2-confirm",
+      cancelButton: "swal2-cancel",
+    },
+  }).then((result) => {
+    if (result.isConfirmed) {
+      PrintHojaR(form.norden, token, tabla);
+    }
+  });
   };
   console.log(form)
   return (
@@ -124,10 +190,10 @@ export default function PcualAntig({ token, selectedSede }) {
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <div className="flex items-center gap-2">
           <label className="font-semibold text-base">N° Orden :</label>
-          <input name="norden" value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" 
+          <input name="norden" disabled={carga} value={form.norden} onChange={handleChange} className="border rounded px-3 py-2 w-40 text-base" 
           onKeyUp={(e) => {
           if (e.key === "Enter") {
-            handleClear(false);
+            handleClearnor();
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
           }
         }}/>
@@ -170,8 +236,9 @@ export default function PcualAntig({ token, selectedSede }) {
             <label className="font-semibold text-base min-w-[70px]">MARCA:</label>
             <select name="marca" value={form.marca} onChange={handleChange} className="border rounded px-2 py-1 flex-1">
               <option value="">--Seleccione--</option>
-              <option>RAPID RESPONSE COVID-19 IGM/IGG TEST CASSETTE</option>
-              <option>OTRA MARCA</option>
+              {marcas.map((option, index) => (
+                <option key={option.id}>{option.mensaje}</option>
+              ))}
             </select>
           </div>
           <div className="flex items-center gap-2">
@@ -191,11 +258,11 @@ export default function PcualAntig({ token, selectedSede }) {
       {/* Positivo / Negativo */}
       <div className="flex gap-8 mb-4">
         <label className="flex items-center gap-2">
-          <input type="checkbox" name="positivo" checked={form.positivo} onChange={handleChange} />
+          <input type="radio" name="positivo" checked={form.positivo} onChange={() => {setForm(f => ({...f, positivo: true, negativo: false}))}} />
           <span className="font-semibold">Positivo</span>
         </label>
         <label className="flex items-center gap-2">
-          <input type="checkbox" name="negativo" checked={form.negativo} onChange={handleChange} />
+          <input type="radio" name="negativo" checked={form.negativo} onChange={() => {setForm(f => ({...f, negativo: true, positivo: false}))}} />
           <span className="font-semibold">Negativo</span>
         </label>
       </div>
@@ -220,13 +287,13 @@ export default function PcualAntig({ token, selectedSede }) {
         <label className="mt-4 block font-semibold text-base mb-1">
           Observaciones:
         </label>
-        <textarea type="text" className="border rounded px-2 py-1 text-base w-full" rows={4} />
+        <textarea type="text" value={form.observaciones} name='observaciones' onChange={handleChange} className="border rounded px-2 py-1 text-base w-full" rows={4} />
       </fieldset>
 
       {/* Botones al final */}
       <div className="flex flex-col md:flex-row gap-4 mt-6 items-center justify-between">
         <div className="flex gap-3">
-          <button type="button" onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
+          <button type="button" onClick={() => {SubmitDataCual(form,token,userlogued,handleClear,tabla)}} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" onClick={handleClear}>
