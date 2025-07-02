@@ -96,6 +96,14 @@ export default function PcualAntig({ token, selectedSede, userlogued }) {
           observaciones: nuevasObservaciones,
         };
       }
+      if (name === 'observaciones') {
+        console.log('a')
+          return {
+          ...f,
+          observaciones: value, // solo actualiza el texto
+        };
+      }
+
       if (type === 'checkbox') return { ...f, [name]: checked };
       return { ...f, [name]: value };
     });
@@ -279,7 +287,7 @@ export default function PcualAntig({ token, selectedSede, userlogued }) {
         <label className="mt-4 block font-semibold text-base mb-1">
           Observaciones:
         </label>
-        <textarea type="text" value={form.observaciones} name='observaciones' className="border rounded px-2 py-1 text-base w-full" rows={4} />
+        <textarea type="text" value={form.observaciones} name='observaciones' onChange={handleChange} className="border rounded px-2 py-1 text-base w-full" rows={4} />
       </fieldset>
 
       {/* Botones al final */}

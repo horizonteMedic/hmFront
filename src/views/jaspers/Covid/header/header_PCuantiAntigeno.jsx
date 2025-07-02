@@ -5,16 +5,7 @@
  * @param {string} dateString - La fecha en formato YYYY-MM-DD.
  * @returns {string} - La fecha formateada.
  */
-<<<<<<< HEAD
-const formatDateToLong = (dateString) => {
-  if (!dateString) return '';
-  const date = new Date(`${dateString}T00:00:00`);
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-=======
+
 const formatDateToShort = (dateString) => {
   if (!dateString) return "";
   const date = new Date(`${dateString}T00:00:00`);
@@ -22,7 +13,6 @@ const formatDateToShort = (dateString) => {
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
->>>>>>> 07f4572f94e5eeab95a0fa4e8f7243dd78103763
 };
 
 const header_PCuantiAntigeno = (doc, datos = {}) => {
@@ -41,12 +31,6 @@ const header_PCuantiAntigeno = (doc, datos = {}) => {
       .text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-<<<<<<< HEAD
-  // 2. Número a la derecha
-  const numeroValue = String(datos.numero || '');
-  doc.setFont('helvetica', 'bold').setFontSize(17);
-  doc.text(numeroValue, pageW - margin - 40, y + 10, { align: 'right' });
-=======
   // 2. Nro Orden (derecha)
   const rightColX = pageW - margin - 20;
   // Nro Orden grande, negrita y subrayado
@@ -67,7 +51,6 @@ const header_PCuantiAntigeno = (doc, datos = {}) => {
     y + 6.5
   );
   doc.setLineWidth(0.2);
->>>>>>> 07f4572f94e5eeab95a0fa4e8f7243dd78103763
 
   // Sede (debajo, alineado con el Nro Orden)
   doc.setFontSize(9).setFont("helvetica", "normal");
@@ -75,32 +58,7 @@ const header_PCuantiAntigeno = (doc, datos = {}) => {
     align: "right",
   });
 
-<<<<<<< HEAD
-  doc.setFontSize(11).setFont('helvetica', 'bold');
-  doc.text("PACIENTE:", labelX, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.nombre || ''), valueX, y);
-  y += lineHeight;
 
-  doc.setFont('helvetica', 'bold');
-  doc.text("EDAD :", labelX, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(datos.edad ? `${datos.edad} años` : '', valueX, y);
-  y += lineHeight;
-
-  doc.setFont('helvetica', 'bold');
-  doc.text("DNI:", labelX, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.cod_pa || ''), valueX, y);
-  y += lineHeight;
-
-  doc.setFont('helvetica', 'bold');
-  doc.text("FECHA :", labelX, y);
-  doc.setFont('helvetica', 'normal');
-  doc.text(formatDateToLong(datos.fecha_examen), valueX, y);
-
-  doc.setFont('helvetica', 'normal').setFontSize(10);
-=======
   // 3. Bloque de datos del paciente
   y = 48;
   const lineHeight = 6;
@@ -173,7 +131,6 @@ const header_PCuantiAntigeno = (doc, datos = {}) => {
     doc.setTextColor(0);
     doc.setLineWidth(0.2);
   }
->>>>>>> 07f4572f94e5eeab95a0fa4e8f7243dd78103763
 };
 
 export default header_PCuantiAntigeno; 

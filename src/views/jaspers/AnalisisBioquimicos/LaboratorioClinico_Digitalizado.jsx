@@ -43,7 +43,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     doc.setFontSize(11);
     const leftItems = [
       { label: "Grupo Sanguíneo", value: `${datos.chko ? 'O' : datos.chka ? 'A' : datos.chkb ? 'B' : datos.chkab ? 'AB' : ''}`, suffix: "" },
-      { label: "Factor Rh",       value: `${datos.rbrhpositivo ? 'POSITIVO' : 'NEGATIVO'}`,      suffix: "" },
+      { label: "Factor Rh",       value: `${datos.rbrhpositivo === true ? 'POSITIVO' : datos.rbrhnegativo === true ? 'NEGATIVO' : ''}`,      suffix: "" },
       { label: "Hematocrito",     key: "txtHematocrito",    suffix: " %" },
       { label: "Hemoglobina",     key: "txtHemoglobina",    suffix: " g/dl" },
       { label: "Hematíes",        key: "txtHematiesHematologia",       suffix: "" },
