@@ -83,7 +83,7 @@ const header_Hematologia = (doc, datos = {}) => {
   // Formatear fecha como dd/mm/yyyy
   let fechaFormateada = '';
   if (datos.fechaExamen) {
-    const d = new Date(datos.fechaExamen);
+    const d = new Date(`${datos.fechaExamen}T00:00:00`);
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();

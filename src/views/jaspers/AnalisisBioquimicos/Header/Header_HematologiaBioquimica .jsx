@@ -47,7 +47,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   // Fecha
   let fechaFormateada = "";
   if (datos.fechaLab) {
-    const d = new Date(datos.fechaLab);
+    const d = new Date(`${datos.fechaLab}T00:00:00`);
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     const year = d.getFullYear();

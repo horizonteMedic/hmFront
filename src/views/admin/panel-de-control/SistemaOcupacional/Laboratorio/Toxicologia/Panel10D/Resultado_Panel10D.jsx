@@ -114,7 +114,7 @@ const Rseultado_Panel10D = ({ token, selectedSede, userlogued }) => {
 
   // ancho dinámico para el campo nombres
   const nameWidth = Math.min(400, Math.max(120, (form.nombres?.length || 0) * 10));
-
+  console.log(form)
   return (
     <form className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold mb-6 text-center">PANEL 10D</h2>
