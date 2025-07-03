@@ -65,6 +65,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     xileno_hrs: "",
     plaguicidas_hrs: "",
     organofosforados_hrs: "",
+
     plomo_anios: "",
     mercurio_anios: "",
     tolueno_anios: "",
@@ -87,6 +88,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     od_4000: "",
     od_6000: "",
     od_8000: "",
+
     oi_500: "",
     oi_1000: "",
     oi_2000: "",
@@ -94,6 +96,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     oi_4000: "",
     oi_6000: "",
     oi_8000: "",
+
     diagnostico_od: "",
     diagnostico_oi: "",
     comentarios_audiometria: "",
@@ -154,6 +157,14 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+
+    // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
+    if (/^\d*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
 
   const handleClear = () => {
     setForm(initialFormState);
@@ -185,6 +196,19 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
       }
     });
   };
+  const tipoHipoacusia = (promedio) => {
+    let textoPromedio = "";
+    if (promedio >= -10 && promedio <= 25) textoPromedio = "Normal";
+    else if (promedio > 25 && promedio <= 40) textoPromedio = "Hipoacusia leve";
+    else if (promedio > 40 && promedio <= 55)
+      textoPromedio = "Hipoacusia moderada";
+    else if (promedio > 55 && promedio <= 70)
+      textoPromedio = "Hipoacusia moderada-severa";
+    else if (promedio > 70 && promedio <= 90)
+      textoPromedio = "Hipoacusia severa";
+    else if (promedio > 90) textoPromedio = "Hipoacusia profunda";
+    return textoPromedio;
+  };
   const calcularOidos = () => {
     try {
       const odValues = [
@@ -199,14 +223,17 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
         .map((v) => parseFloat(v) || 0)
         .filter((v) => v >= 25);
 
-      const odPromedio = (
+      let odPromedio = (
         odValues.reduce((acc, val) => acc + val, 0) / odValues.length
       ).toFixed(2);
 
+      odPromedio = isNaN(odPromedio) ? 0 : odPromedio;
+
       console.log("Oído Derecho - Promedio:", odPromedio);
+
       setForm((f) => ({
         ...f,
-        diagnostico_od: odPromedio + "",
+        diagnostico_od: tipoHipoacusia(odPromedio),
       }));
 
       const oiValues = [
@@ -219,15 +246,17 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
         form.oi_8000,
       ]
         .map((v) => parseFloat(v) || 0)
-        .filter((v) => v >= 25);
-      const oiPromedio = (
+        .filter((v) => v > 25);
+      let oiPromedio = (
         oiValues.reduce((acc, val) => acc + val, 0) / oiValues.length
       ).toFixed(2);
+      oiPromedio = isNaN(oiPromedio) ? 0 : oiPromedio;
 
       console.log("Oído Izquierdo - Promedio:", oiPromedio);
+
       setForm((f) => ({
         ...f,
-        diagnostico_oi: oiPromedio + "",
+        diagnostico_oi: tipoHipoacusia(oiPromedio) + "",
       }));
     } catch (error) {
       console.error("Error al calcular el oído derecho:", error);
@@ -554,36 +583,26 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       <div className="flex items-center gap-2">
                         <label>Años de Exposición (Aprox.):</label>
                         <input
-                          type="number"
+                          type="text"
                           name="anios_exposicion"
                           min="0"
                           max="150"
                           value={form.anios_exposicion}
                           disabled={form.exposicion_ruido === "NO"}
-                          onChange={(e) =>
-                            setForm((f) => ({
-                              ...f,
-                              anios_exposicion: e.target.value,
-                            }))
-                          }
+                          onChange={handleChangeNumber}
                           className="border rounded px-2 py-1 w-24"
                         />
                       </div>
                       <div className="flex items-center gap-2">
                         <label>Meses:</label>
                         <input
-                          type="number"
+                          type="text"
                           name="meses_exposicion"
                           min="0"
                           max="12"
                           value={form.meses_exposicion}
                           disabled={form.exposicion_ruido === "NO"}
-                          onChange={(e) =>
-                            setForm((f) => ({
-                              ...f,
-                              meses_exposicion: e.target.value,
-                            }))
-                          }
+                          onChange={handleChangeNumber}
                           className="border rounded px-2 py-1 w-24"
                         />
                       </div>
@@ -942,10 +961,10 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       <div key={hz}>
                         <p>{hz}</p>
                         <input
-                          type="number"
+                          type="text"
                           name={`od_${hz}`}
                           value={form[`od_${hz}`] || ""}
-                          onChange={handleChange}
+                          onChange={handleChangeNumber}
                           // placeholder="dB"
                           className="border rounded px-1 py-1 text-center w-full"
                         />
@@ -968,10 +987,10 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       <div key={hz}>
                         <p>{hz}</p>
                         <input
-                          type="number"
+                          type="text"
                           name={`oi_${hz}`}
                           value={form[`oi_${hz}`] || ""}
-                          onChange={handleChange}
+                          onChange={handleChangeNumber}
                           // placeholder="dB"
                           className="border rounded px-1 py-1 text-center w-full"
                         />
@@ -1050,10 +1069,10 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       <div key={`od_o_${hz}`}>
                         <p>{hz}</p>
                         <input
-                          type="number"
+                          type="text"
                           name={`od_o_${hz}`}
                           value={form[`od_o_${hz}`] || ""}
-                          onChange={handleChange}
+                          onChange={handleChangeNumber}
                           // placeholder="dB"
                           className="border rounded px-1 py-1 text-center w-full"
                         />
@@ -1076,10 +1095,10 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       <div key={`oi_o_${hz}`}>
                         <p>{hz}</p>
                         <input
-                          type="number"
+                          type="text"
                           name={`oi_o_${hz}`}
                           value={form[`oi_o_${hz}`] || ""}
-                          onChange={handleChange}
+                          onChange={handleChangeNumber}
                           // placeholder="dB"
                           className="border rounded px-1 py-1 text-center w-full"
                         />
