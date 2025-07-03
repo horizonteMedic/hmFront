@@ -9,8 +9,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
-import { SubmitCoprocultivoManipulador } from "../../Laboratorio/Manipuladores/Coprocultivo/controllerCoprocultivo";
-
+import {
+  SubmitDataService,
+  VerifyTR,
+  PrintHojaR,
+} from "./controllerAudiometria";
 export default function Audiometria({ token, selectedSede, userlogued }) {
   const tabla = "audiometria_2023";
   const date = new Date();
@@ -19,7 +22,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
 
-  const [form, setForm] = useState({
+  const initialFormState = {
     norden: "",
     fecha: today,
     nombres: "",
@@ -113,7 +116,12 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     oi_o_4000: "",
     oi_o_6000: "",
     oi_o_8000: "",
-  });
+
+    empresa: "",
+    contrata: "",
+  };
+
+  const [form, setForm] = useState(initialFormState);
   const [status, setStatus] = useState("");
 
   // inicializa fecha hoy
@@ -148,111 +156,12 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
   };
 
   const handleClear = () => {
-    setForm((f) => ({
-      ...f,
-      norden: "",
-      fecha: today,
-      nombres: "",
-      edad: "",
-
-      sordera: "NO",
-      acufenos: "NO",
-      vertigo: "NO",
-      otalgia: "NO",
-      secrecion_otica: "NO",
-      otros_sintomas_orl: "",
-
-      rinitis: "NO",
-      sinusitis: "NO",
-      otitis_media_cronica: "NO",
-      medicamentos_ototoxicos: "NO",
-      meningitis: "NO",
-      tec: "NO",
-      sordera_am: "NO",
-      parotiditis: "NO",
-      sarampion: "NO",
-      tbc: "NO",
-      cuales_antecedentes: "",
-
-      exposicion_ruido: "NO",
-      protectores_auditivos: "NO",
-      exposicion_quimicos: "NO",
-
-      promedio_horas: "",
-      anios_exposicion: "",
-      meses_exposicion: "",
-
-      // tipo_protectores: [],
-      tapones: false,
-      orejeras: false,
-
-      plomo_hrs: "", // New fields
-      mercurio_hrs: "",
-      tolueno_hrs: "",
-      xileno_hrs: "",
-      plaguicidas_hrs: "",
-      organofosforados_hrs: "",
-      plomo_anios: "",
-      mercurio_anios: "",
-      tolueno_anios: "",
-      xileno_anios: "",
-      plaguicidas_anios: "",
-      organofosforados_anios: "",
-      otros_quimicos: "",
-
-      practica_tiro: "NO",
-      uso_walkman: "NO",
-      otros_antecedentes: "NO",
-      cuales_antecedentes_extralaborales: "",
-      otoscopia_odiocho: "Normal",
-      otoscopia_odilzquierdo: "Normal",
-
-      od_500: "",
-      od_1000: "",
-      od_2000: "",
-      od_3000: "",
-      od_4000: "",
-      od_6000: "",
-      od_8000: "",
-      oi_500: "",
-      oi_1000: "",
-      oi_2000: "",
-      oi_3000: "",
-      oi_4000: "",
-      oi_6000: "",
-      oi_8000: "",
-      diagnostico_od: "",
-      diagnostico_oi: "",
-      comentarios_audiometria: "",
-
-      proteccion_simpleODoble: "false",
-      control_semestralOAnual: "",
-      recomendaciones_otras: "",
-
-      od_o_500: "",
-      od_o_1000: "",
-      od_o_2000: "",
-      od_o_3000: "",
-      od_o_4000: "",
-      od_o_6000: "",
-      od_o_8000: "",
-      oi_o_500: "",
-      oi_o_1000: "",
-      oi_o_2000: "",
-      oi_o_3000: "",
-      oi_o_4000: "",
-      oi_o_6000: "",
-      oi_o_8000: "",
-    }));
+    setForm(initialFormState);
+    setStatus("Formulario limpiado");
   };
 
   const handleClearnotO = () => {
-    setForm((f) => ({
-      ...f,
-      fecha: today,
-      nombres: "",
-      edad: "",
-    }));
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
 
   const handlePrint = () => {
@@ -272,19 +181,68 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla);
       }
     });
   };
+  const calcularOidos = () => {
+    try {
+      const odValues = [
+        form.od_500,
+        form.od_1000,
+        form.od_2000,
+        form.od_3000,
+        form.od_4000,
+        form.od_6000,
+        form.od_8000,
+      ]
+        .map((v) => parseFloat(v) || 0)
+        .filter((v) => v >= 25);
+
+      const odPromedio = (
+        odValues.reduce((acc, val) => acc + val, 0) / odValues.length
+      ).toFixed(2);
+
+      console.log("Oído Derecho - Promedio:", odPromedio);
+      setForm((f) => ({
+        ...f,
+        diagnostico_od: odPromedio + "",
+      }));
+
+      const oiValues = [
+        form.oi_500,
+        form.oi_1000,
+        form.oi_2000,
+        form.oi_3000,
+        form.oi_4000,
+        form.oi_6000,
+        form.oi_8000,
+      ]
+        .map((v) => parseFloat(v) || 0)
+        .filter((v) => v >= 25);
+      const oiPromedio = (
+        oiValues.reduce((acc, val) => acc + val, 0) / oiValues.length
+      ).toFixed(2);
+
+      console.log("Oído Izquierdo - Promedio:", oiPromedio);
+      setForm((f) => ({
+        ...f,
+        diagnostico_oi: oiPromedio + "",
+      }));
+    } catch (error) {
+      console.error("Error al calcular el oído derecho:", error);
+      Swal.fire("Error", "No se pudo calcular el oído derecho", "error");
+    }
+  };
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="w-full max-w-[90vw] lg:max-w-[70vw] mx-auto bg-white rounded shadow p-6">
       <h2 className="text-2xl font-bold text-center mb-6">AUDIOMETRIA</h2>
       <div className="space-y-6">
         {/* Encabezado */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[90px] text-base">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
               Nro Ficha:
             </label>
             <input
@@ -293,24 +251,22 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
                   handleClearnotO();
-                  // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                 }
               }}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-              }
+              onChange={handleChange}
               className="border rounded px-2 py-1 text-base flex-1"
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base">Fecha:</label>
+            <label className="font-semibold text-base min-w-[50px]">
+              Fecha:
+            </label>
             <input
               type="date"
               name="fecha"
               value={form.fecha}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-              }
+              onChange={handleChange}
               className="border rounded px-2 py-1 text-base flex-1"
             />
           </div>
@@ -318,7 +274,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
         {/* Paciente */}
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[90px] text-base">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
               Nombres:
             </label>
             <input
@@ -329,12 +285,38 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base">Edad:</label>
+            <label className="font-semibold text-base min-w-[50px]">
+              Edad:
+            </label>
             <input
               name="edad"
               value={form.edad}
               disabled
               className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
+            />
+          </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Empresa:
+            </label>
+            <input
+              name="empresa"
+              value={form.empresa}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+            />
+          </div>
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] text-base">
+              Contrata:
+            </label>
+            <input
+              name="contrata"
+              value={form.contrata}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
             />
           </div>
         </div>
@@ -735,10 +717,16 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                         "tolueno",
                         "xileno",
                         "plaguicidas",
-                        "organofo.",
+                        "organofosforados",
                       ].map((chem) => (
                         <div key={chem} className="flex flex-col items-center">
-                          <label className="capitalize">{chem}</label>
+                          <label className="capitalize">
+                            {chem.length > 5
+                              ? chem.slice(0, 1).toUpperCase() +
+                                chem.slice(1, 5) +
+                                "."
+                              : chem.slice(0, 1).toUpperCase() + chem.slice(1)}
+                          </label>
                           <input
                             type="text"
                             name={`${chem}_hrs`}
@@ -773,7 +761,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                   </div>
 
                   <div className="grid grid-cols-1 gap-4">
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
                       {/* Antecedentes Extra-Laborales: */}
                       <div className="border rounded p-4 mt-6">
                         <h3 className="font-semibold text-lg mb-4">
@@ -945,7 +933,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               <div className="flex flex-col p-4 border rounded items-center justify-center">
                 <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
                 <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
-                  <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="flex flex-col items-start  gap-2">
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
@@ -971,7 +959,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               <div className="flex flex-col p-4 border rounded items-center justify-center">
                 <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
                 <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
-                  <div className="flex flex-col items-center justify-center gap-2">
+                  <div className="flex flex-col items-start gap-2">
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
@@ -1001,9 +989,9 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                 <button
                   type="button"
                   onClick={() => {
-                    // Handle button click
+                    calcularOidos();
                   }}
-                  className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2  w-[40%] sm:w-[30%] "
+                  className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2 w-full  max-w-[120px]"
                 >
                   <FontAwesomeIcon icon={faStethoscope} /> Diagnosticar
                 </button>
@@ -1053,7 +1041,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               <div className="flex flex-col p-4 border rounded items-center justify-center">
                 <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
                 <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
-                  <div className="flex flex-col items-start justify-center gap-2">
+                  <div className="flex flex-col items-start  gap-2">
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
@@ -1079,7 +1067,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               <div className="flex flex-col p-4 border rounded items-center justify-center">
                 <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
                 <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
-                  <div className="flex flex-col items-start justify-center gap-2">
+                  <div className="flex flex-col items-start gap-2">
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
@@ -1202,15 +1190,9 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex gap-3">
             <button
-              // type="submit"
+              type="button"
               onClick={() => {
-                // SubmitCoprocultivoManipulador(
-                //   form,
-                //   token,
-                //   userlogued,
-                //   handleClear,
-                //   tabla
-                // );
+                SubmitDataService(form, token, userlogued, handleClear, tabla);
               }}
               className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
             >
@@ -1230,17 +1212,13 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               <input
                 name="norden"
                 value={form.norden}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-                }
+                onChange={handleChange}
                 className="border rounded px-2 py-1 text-base w-24"
               />
 
               <button
                 type="button"
-                onClick={() => {
-                  //handlePrint
-                }}
+                onClick={handlePrint}
                 className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faPrint} />
