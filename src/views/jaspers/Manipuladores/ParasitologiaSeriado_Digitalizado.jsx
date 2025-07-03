@@ -12,7 +12,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   let y;
 
   // Definir columna para los datos
-  const xDato = xLeft + 55;
+  const xDato = xLeft + 65;
 
   // === PRIMERA PÁGINA (con header) ===
   headerManipuladores(doc, datos, 0);
@@ -37,118 +37,127 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
   doc.text("COPROPARASITOLÓGICO SERIADO", pageW / 2, y, { align: "center" });
   y += 12;
 
-  // MUESTRA I
+  // MUESTRA: HECES I
   doc.setFont("helvetica", "bold").setFontSize(11);
-  doc.text("Muestra", xLeft, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(":", xDato - 5, y);
-  doc.text(datos.muestra1 || "MUESTRA FRESCA", xDato, y);
+  doc.text("MUESTRA: HECES I", xLeft, y);
   y += 7;
+  // EXAMEN MACROSCÓPICO I
+  doc.setFont("helvetica", "bold");
+  doc.text("EXAMEN MACROSCÓPICO I", xLeft, y);
+  y += 7;
+  doc.setFont("helvetica", "normal");
   [
-    ["Color", "txtcolor"],
-    ["Consistencia", "txtaspecto"],
-    ["Moco Fecal", "txtmocoFecal"],
-    ["Grasa", "txtgrasa"],
-    ["Sangre Visible", "txtsangrev"],
-    ["Restos Alimenticios", "txtrestosa"]
+    ["COLOR", "txtcolor"],
+    ["ASPECTO", "txtaspecto"],
+    ["MOCO FECAL", "txtmocoFecal"],
+    ["SANGRE VISIBLE", "txtsangrev"],
+    ["RESTOS ALIMENTICIOS", "txtrestosa"],
+    ["GRASA", "txtgrasa"]
   ].forEach(([lbl, key]) => {
     doc.text(lbl, xLeft, y);
-    doc.text(":", xDato - 5, y);
-    doc.text(datos[key] || "", xDato, y);
+    doc.text(":", xDato, y);
+    doc.text(datos[key] || "", xDato + 4, y);
     y += 7;
   });
 
   // EXAMEN MICROSCÓPICO I
   y += 6;
   doc.setFont("helvetica", "bold");
-  doc.text("Examen Microscópico I", xLeft, y);
+  doc.text("EXAMEN MICROSCÓPICO I", xLeft, y);
   y += 7;
   doc.setFont("helvetica", "normal");
   [
-    ["Leucocitos", "txtleucocitos"],
-    ["Hematíes", "txthematies"],
-    ["Investigación de Parásitos", "txtlugol"]
+    ["LEUCOCITOS", "txtleucocitos"],
+    ["HEMATÍES", "txthematies"],
+    ["INVESTIGACIÓN DE PARÁSITOS", "txtlugol"]
   ].forEach(([lbl, key]) => {
     doc.text(lbl, xLeft, y);
-    doc.text(":", xDato - 5, y);
-    doc.text(datos[key] || "", xDato, y);
+    doc.text(":", xDato, y);
+    doc.text(datos[key] || "", xDato + 4, y);
     y += 7;
   });
 
-  // MUESTRA II
+  // MUESTRA: HECES II
   y += 10;
   doc.setFont("helvetica", "bold");
-  doc.text("Muestra", xLeft, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(":", xDato - 5, y);
-  doc.text(datos.muestra2 || "HECES II", xDato, y);
+  doc.text("MUESTRA: HECES II", xLeft, y);
   y += 7;
+  // EXAMEN MACROSCÓPICO II
+  doc.setFont("helvetica", "bold");
+  doc.text("EXAMEN MACROSCÓPICO II", xLeft, y);
+  y += 7;
+  doc.setFont("helvetica", "normal");
   [
-    ["Color", "txtcolor1"],
-    ["Consistencia", "txtaspecto1"],
-    ["Moco Fecal", "txtmocoFecal1"],
-    ["Grasa", "txtgrasa1"],
-    ["Sangre Visible", "txtsangrev1"],
-    ["Restos Alimenticios", "txtrestosa1"]
+    ["COLOR", "txtcolor1"],
+    ["ASPECTO", "txtaspecto1"],
+    ["MOCO FECAL", "txtmocoFecal1"],
+    ["SANGRE VISIBLE", "txtsangrev1"],
+    ["RESTOS ALIMENTICIOS", "txtrestosa1"],
+    ["GRASA", "txtgrasa1"]
   ].forEach(([lbl, key]) => {
     doc.text(lbl, xLeft, y);
-    doc.text(":", xDato - 5, y);
-    doc.text(datos[key] || "", xDato, y);
+    doc.text(":", xDato, y);
+    doc.text(datos[key] || "", xDato + 4, y);
     y += 7;
   });
 
-  // EXAMEN MICROSCÓPICO II
-  y += 6;
-  doc.setFont("helvetica", "bold");
-  doc.text("Examen Microscópico II", xLeft, y);
-  y += 7;
-  doc.setFont("helvetica", "normal");
-  [
-    ["Leucocitos", "txtleucocitos1"],
-    ["Hematíes", "txthematies1"],
-    ["Investigación de Parásitos", "txtlugol1"]
-  ].forEach(([lbl, key]) => {
-    doc.text(lbl, xLeft, y);
-    doc.text(":", xDato - 5, y);
-    doc.text(datos[key] || "", xDato, y);
-    y += 7;
-  });
 
   // === SEGUNDA PÁGINA (SIN header) ===
   doc.addPage();
-  y = 20;
+  // Header en la página 2
+  headerManipuladores(doc, datos, 1);
+  y = 80;
+  // EXAMEN MICROSCÓPICO II (igual que en la página 1)
   doc.setFont("helvetica", "bold").setFontSize(11);
-  doc.text("Muestra", xLeft, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(":", xDato - 5, y);
-  doc.text(datos.muestra3 || "HECES III", xDato, y);
+  doc.text("EXAMEN MICROSCÓPICO II", xLeft, y);
   y += 7;
+  doc.setFont("helvetica", "normal").setFontSize(11);
   [
-    ["Color", "txtcolor2"],
-    ["Consistencia", "txtaspecto2"],
-    ["Moco Fecal", "txtmocoFecal2"],
-    ["Grasa", "txtgrasa2"],
-    ["Sangre Visible", "txtsangrev2"],
-    ["Restos Alimenticios", "txtrestosa2"]
+    ["LEUCOCITOS", "txtleucocitos1"],
+    ["HEMATÍES", "txthematies1"],
+    ["INVESTIGACIÓN DE PARÁSITOS", "txtlugol1"]
   ].forEach(([lbl, key]) => {
     doc.text(lbl, xLeft, y);
-    doc.text(":", xDato - 5, y);
-    doc.text(datos[key] || "", xDato, y);
+    doc.text(":", xDato, y);
+    doc.text(datos[key] || "", xDato + 4, y);
+    y += 7;
+  });
+  y += 10;
+  // MUESTRA: HECES III
+  doc.setFont("helvetica", "bold");
+  doc.text("MUESTRA: HECES III", xLeft, y);
+  y += 7;
+  // EXAMEN MACROSCÓPICO III
+  doc.setFont("helvetica", "bold");
+  doc.text("EXAMEN MACROSCÓPICO III", xLeft, y);
+  y += 7;
+  doc.setFont("helvetica", "normal");
+  [
+    ["COLOR", "txtcolor2"],
+    ["ASPECTO", "txtaspecto2"],
+    ["MOCO FECAL", "txtmocoFecal2"],
+    ["SANGRE VISIBLE", "txtsangrev2"],
+    ["RESTOS ALIMENTICIOS", "txtrestosa2"],
+    ["GRASA", "txtgrasa2"]
+  ].forEach(([lbl, key]) => {
+    doc.text(lbl, xLeft, y);
+    doc.text(":", xDato, y);
+    doc.text(datos[key] || "", xDato + 4, y);
     y += 7;
   });
   y += 6;
   doc.setFont("helvetica", "bold");
-  doc.text("Examen Microscópico III", xLeft, y);
+  doc.text("EXAMEN MICROSCÓPICO III", xLeft, y);
   y += 7;
   doc.setFont("helvetica", "normal");
   [
-    ["Leucocitos", "txtleucocitos2"],
-    ["Hematíes", "txthematies2"],
-    ["Investigación de Parásitos", "txtlugol2"]
+    ["LEUCOCITOS", "txtleucocitos2"],
+    ["HEMATÍES", "txthematies2"],
+    ["INVESTIGACIÓN DE PARÁSITOS", "txtlugol2"]
   ].forEach(([lbl, key]) => {
     doc.text(lbl, xLeft, y);
-    doc.text(":", xDato - 5, y);
-    doc.text(datos[key] || "", xDato, y);
+    doc.text(":", xDato, y);
+    doc.text(datos[key] || "", xDato + 4, y);
     y += 7;
   });
 

@@ -28,17 +28,24 @@ const headerManipuladores = (doc, datos = {}, yStart = 10) => {
   doc.setFontSize(11).setFont("helvetica", "bold");
   doc.text("Apellidos y Nombres :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.nombre || datos.nombres || ""}`, margin + 55 + blockOffset, y);
+  doc.text(`${datos.nombre || datos.nombres || ""}`, margin + blockOffset + 45, y);
   y += 7;
 
   // 5. Edad (izquierda)
   doc.setFont("helvetica", "bold");
   doc.text("Edad :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.edad || ""} AÑOS`, margin + 20 + blockOffset, y);
+  doc.text(`${datos.edad || ""} AÑOS`, margin + blockOffset + 20, y);
   y += 7;
 
-  // 6. Fecha (izquierda)
+  // 6. DNI (izquierda)
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI :", margin + blockOffset, y);
+  doc.setFont("helvetica", "normal");
+  doc.text(`${datos.dni || ""}`, margin + blockOffset + 15, y);
+  y += 7;
+
+  // 7. Fecha (izquierda)
   doc.setFont("helvetica", "bold");
   doc.text("Fecha :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
@@ -48,14 +55,14 @@ const headerManipuladores = (doc, datos = {}, yStart = 10) => {
     const [a, m, d] = fecha.split("-");
     fecha = `${d}/${m}/${a}`;
   }
-  doc.text(fecha, margin + 22 + blockOffset, y);
+  doc.text(fecha, margin + blockOffset + 20, y);
   y += 7;
 
-  // 7. Muestra (izquierda)
+  // 8. Muestra (izquierda)
   doc.setFont("helvetica", "bold");
   doc.text("Muestra :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
-  doc.text(`HECES`, margin + 25 + blockOffset, y);
+  doc.text(`HECES`, margin + blockOffset + 22, y);
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
