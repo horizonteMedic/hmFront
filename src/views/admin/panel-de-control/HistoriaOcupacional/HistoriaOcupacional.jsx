@@ -28,6 +28,8 @@ const HistoriaOcupacional = () => {
     'CONSTRUCTORA ANDINA',
     'SERVICIOS GENERALES SAC',
     'INDUSTRIAS DEL SUR',
+    'ASAMBLEA DE HERMANITAS',
+
   ];
   const altitudOptions = [
     '',
@@ -41,6 +43,8 @@ const HistoriaOcupacional = () => {
     'MANTENIMIENTO',
     'ADMINISTRACIÓN',
     'LOGÍSTICA',
+    'TESTER DE CUCA',
+
   ];
   const riesgosOptions = [
     '',
@@ -49,6 +53,8 @@ const HistoriaOcupacional = () => {
     'QUÍMICOS',
     'BIOLÓGICOS',
     'ERGONÓMICOS',
+    'NINGUNO',
+
   ];
   const proteccionOptions = [
     'CASCOS, LENTES, GUANTES',
@@ -56,6 +62,7 @@ const HistoriaOcupacional = () => {
     'CHALECO ANTIBALA',
     'EPPS BASICO',
     'EPPS COMPLETO',
+    'LA DE PAPÁ DIOS',
     'NINGUNO',
   ];
 
