@@ -1,7 +1,12 @@
 // src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Manipuladores/Coprocultivo/Coprocultivo.jsx
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSave,
+  faBroom,
+  faPrint,
+  faStethoscope,
+} from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
 import { SubmitCoprocultivoManipulador } from "../../Laboratorio/Manipuladores/Coprocultivo/controllerCoprocultivo";
@@ -64,6 +69,50 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     plaguicidas_anios: "",
     organofosforados_anios: "",
     otros_quimicos: "",
+
+    practica_tiro: "NO",
+    uso_walkman: "NO",
+    otros_antecedentes: "NO",
+    cuales_antecedentes_extralaborales: "",
+    otoscopia_odiocho: "Normal",
+    otoscopia_odilzquierdo: "Normal",
+
+    od_500: "",
+    od_1000: "",
+    od_2000: "",
+    od_3000: "",
+    od_4000: "",
+    od_6000: "",
+    od_8000: "",
+    oi_500: "",
+    oi_1000: "",
+    oi_2000: "",
+    oi_3000: "",
+    oi_4000: "",
+    oi_6000: "",
+    oi_8000: "",
+    diagnostico_od: "",
+    diagnostico_oi: "",
+    comentarios_audiometria: "",
+
+    proteccion_simpleODoble: "",
+    control_semestralOAnual: "",
+    recomendaciones_otras: "",
+
+    od_o_500: "",
+    od_o_1000: "",
+    od_o_2000: "",
+    od_o_3000: "",
+    od_o_4000: "",
+    od_o_6000: "",
+    od_o_8000: "",
+    oi_o_500: "",
+    oi_o_1000: "",
+    oi_o_2000: "",
+    oi_o_3000: "",
+    oi_o_4000: "",
+    oi_o_6000: "",
+    oi_o_8000: "",
   });
   const [status, setStatus] = useState("");
 
@@ -150,6 +199,50 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
       plaguicidas_anios: "",
       organofosforados_anios: "",
       otros_quimicos: "",
+
+      practica_tiro: "NO",
+      uso_walkman: "NO",
+      otros_antecedentes: "NO",
+      cuales_antecedentes_extralaborales: "",
+      otoscopia_odiocho: "Normal",
+      otoscopia_odilzquierdo: "Normal",
+
+      od_500: "",
+      od_1000: "",
+      od_2000: "",
+      od_3000: "",
+      od_4000: "",
+      od_6000: "",
+      od_8000: "",
+      oi_500: "",
+      oi_1000: "",
+      oi_2000: "",
+      oi_3000: "",
+      oi_4000: "",
+      oi_6000: "",
+      oi_8000: "",
+      diagnostico_od: "",
+      diagnostico_oi: "",
+      comentarios_audiometria: "",
+
+      proteccion_simpleODoble: "false",
+      control_semestralOAnual: "",
+      recomendaciones_otras: "",
+
+      od_o_500: "",
+      od_o_1000: "",
+      od_o_2000: "",
+      od_o_3000: "",
+      od_o_4000: "",
+      od_o_6000: "",
+      od_o_8000: "",
+      oi_o_500: "",
+      oi_o_1000: "",
+      oi_o_2000: "",
+      oi_o_3000: "",
+      oi_o_4000: "",
+      oi_o_6000: "",
+      oi_o_8000: "",
     }));
   };
 
@@ -311,7 +404,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               <h3 className="font-semibold text-lg mb-4">
                 Antecedentes Médicos de importancia:
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
                 {/* Columna 1 */}
                 <div className="space-y-2">
                   {[
@@ -396,15 +489,12 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                 />
               </div>
             </div>
-          </div>
-          <div>
             <div className="border rounded p-4 mt-6">
               <h3 className="font-semibold text-lg mb-4">
                 Exposición Ocupacional:
               </h3>
               <div className="grid grid-cols-1 gap-4">
-                {/* Columna 1 */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center gap-4">
                     <label className="w-40">Exposición al ruido:</label>
                     <label className="flex items-center gap-1">
@@ -430,8 +520,13 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       NO
                     </label>
                   </div>
-
-                  <div className="border rounded p-4 mt-6">
+                  <div
+                    className={`border rounded p-4 mt-6 ${
+                      form.exposicion_ruido === "NO"
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                    }`}
+                  >
                     <h3 className="font-semibold text-lg mb-4">
                       Exposición a Ruido (Promedio de horas por día)
                     </h3>
@@ -512,7 +607,17 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       </div>
                     </div>
                   </div>
-
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div className="border rounded p-4 mt-6">
+              <h3 className="font-semibold text-lg mb-4">
+                Exposición Ocupacional:
+              </h3>
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-12">
                   <div className="flex items-center gap-4">
                     <label className="w-40">
                       Uso de Protectores Auditivos:
@@ -541,7 +646,13 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                     </label>
                   </div>
 
-                  <div className="border rounded p-4 mt-6">
+                  <div
+                    className={`border rounded p-4 mt-6 ${
+                      form.protectores_auditivos === "NO"
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                    }`}
+                  >
                     <h3 className="font-semibold text-lg mb-4">
                       Tipo de Protectores:
                     </h3>
@@ -598,14 +709,25 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       NO
                     </label>
                   </div>
-                  <div className="border rounded p-4 mt-6">
+                  {/* Químicos a los que está expuesto: */}
+                  <div
+                    className={`border rounded p-4 mt-6 ${
+                      form.exposicion_quimicos === "NO"
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                    }`}
+                  >
                     <h3 className="font-semibold text-lg mb-4">
                       Químicos a los que está expuesto:
                     </h3>
                     <div className="grid grid-cols-7 gap-4 mb-2">
                       <div className="flex flex-col items-center">
-                        <label className=" rounded  py-1 w-full text-center mt-7">{"ga2"}</label>
-                        <label className=" rounded px-2 py-1 w-full text-center">{"ga3"}</label>
+                        <label className=" rounded  py-1 w-full  mt-7">
+                          {"Hrs./dia"}
+                        </label>
+                        <label className="rounded  py-1 w-full ">
+                          {"Tpo.(Años)"}
+                        </label>
                       </div>
                       {[
                         "plomo",
@@ -649,7 +771,428 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                       />
                     </div>
                   </div>
+
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      {/* Antecedentes Extra-Laborales: */}
+                      <div className="border rounded p-4 mt-6">
+                        <h3 className="font-semibold text-lg mb-4">
+                          Antecedentes Extra-Laborales:
+                        </h3>
+                        <div className="space-y-3">
+                          {[
+                            ["practica_tiro", "Práctica de tiro"],
+                            ["uso_walkman", "Uso de Walkman"],
+                            ["otros_antecedentes", "Otros"],
+                          ].map(([name, label]) => (
+                            <div
+                              key={name}
+                              className="grid grid-cols-[100px,1fr] "
+                            >
+                              <label>{label}:</label>
+                              <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-1">
+                                  <input
+                                    type="radio"
+                                    name={name}
+                                    checked={form[name] === "SI"}
+                                    onChange={() =>
+                                      handleCheckRadio(name, "SI")
+                                    }
+                                  />
+                                  SI
+                                </label>
+                                <label className="flex items-center gap-1">
+                                  <input
+                                    type="radio"
+                                    name={name}
+                                    checked={form[name] === "NO"}
+                                    onChange={() =>
+                                      handleCheckRadio(name, "NO")
+                                    }
+                                  />
+                                  NO
+                                </label>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3">
+                          <label className="block font-medium mb-1">
+                            Cuáles:
+                          </label>
+                          <input
+                            type="text"
+                            name="cuales_antecedentes_extralaborales"
+                            value={form.cuales_antecedentes_extralaborales}
+                            onChange={(e) =>
+                              setForm((f) => ({
+                                ...f,
+                                cuales_antecedentes_extralaborales:
+                                  e.target.value,
+                              }))
+                            }
+                            className="w-full border rounded px-2 py-1 text-base"
+                          />
+                        </div>
+                      </div>
+                      {/* Otoscopia: */}
+                      <div className="border rounded p-4 mt-6">
+                        <h3 className="font-semibold text-lg mb-4">
+                          Otoscopia:
+                        </h3>
+                        <div className=" w-full  space-y-3">
+                          <div className="flex items-center gap-4">
+                            <label className="w-40">Oído Derecho:</label>
+                            <label className="flex items-center gap-1">
+                              <input
+                                type="radio"
+                                name="otoscopia_odiocho"
+                                checked={form.otoscopia_odiocho.includes(
+                                  "Normal"
+                                )}
+                                onChange={() =>
+                                  setForm((f) => ({
+                                    ...f,
+                                    otoscopia_odiocho: "Normal",
+                                  }))
+                                }
+                              />
+                              Normal
+                            </label>
+                            <label className="flex items-center gap-1">
+                              <input
+                                type="radio"
+                                name="otoscopia_odiocho"
+                                checked={form.otoscopia_odiocho.includes(
+                                  "Anormal"
+                                )}
+                                onChange={() =>
+                                  setForm((f) => ({
+                                    ...f,
+                                    otoscopia_odiocho: "Anormal",
+                                  }))
+                                }
+                              />
+                              Anormal
+                            </label>
+                          </div>
+                          <input
+                            name="otoscopia_odiocho"
+                            value={form.otoscopia_odiocho}
+                            onChange={handleChange}
+                            // readOnly
+                            className="border rounded px-2 py-1 text-base w-full mb-1"
+                          />
+                          <div className="flex gap-4">
+                            <label className="w-40">Oído Izquierdo:</label>
+                            <label className="flex items-center gap-1">
+                              <input
+                                type="radio"
+                                name="otoscopia_odilzquierdo"
+                                checked={form.otoscopia_odilzquierdo.includes(
+                                  "Normal"
+                                )}
+                                onChange={() =>
+                                  setForm((f) => ({
+                                    ...f,
+                                    otoscopia_odilzquierdo: "Normal",
+                                  }))
+                                }
+                              />
+                              Normal
+                            </label>
+                            <label className="flex items-center gap-1">
+                              <input
+                                type="radio"
+                                name="otoscopia_odilzquierdo"
+                                checked={form.otoscopia_odilzquierdo.includes(
+                                  "Anormal"
+                                )}
+                                onChange={() =>
+                                  setForm((f) => ({
+                                    ...f,
+                                    otoscopia_odilzquierdo: "Anormal",
+                                  }))
+                                }
+                              />
+                              Anormal
+                            </label>
+                          </div>
+                          <input
+                            name="otoscopia_odilzquierdo"
+                            value={form.otoscopia_odilzquierdo}
+                            onChange={handleChange}
+                            className="border rounded px-2 py-1 text-base w-full mb-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sección de Audiometría*/}
+        <div className="border rounded p-4 mt-6 ">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 ">
+            {/* Audiometría  Área  */}
+            <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
+              <h4 className="font-semibold text-lg ">Audiometría Área:</h4>
+              {/* Oído Derecho */}
+              <div className="flex flex-col p-4 border rounded items-center justify-center">
+                <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
+                <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <p>hz</p>
+                    <p>dB (A)</p>
+                  </div>
+                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
+                    (hz) => (
+                      <div key={hz}>
+                        <p>{hz}</p>
+                        <input
+                          type="number"
+                          name={`od_${hz}`}
+                          value={form[`od_${hz}`] || ""}
+                          onChange={handleChange}
+                          // placeholder="dB"
+                          className="border rounded px-1 py-1 text-center w-full"
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Oído Izquierdo */}
+              <div className="flex flex-col p-4 border rounded items-center justify-center">
+                <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
+                <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <p>hz</p>
+                    <p>dB (A)</p>
+                  </div>
+                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
+                    (hz) => (
+                      <div key={hz}>
+                        <p>{hz}</p>
+                        <input
+                          type="number"
+                          name={`oi_${hz}`}
+                          value={form[`oi_${hz}`] || ""}
+                          onChange={handleChange}
+                          // placeholder="dB"
+                          className="border rounded px-1 py-1 text-center w-full"
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Diagnóstico y Comentarios */}
+            <div className="grid grid-cols-1  gap-4 border rounded p-4">
+              <div className="flex justify-between items-center ">
+                <label className="font-semibold text-lg ">Diagnóstico:</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Handle button click
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2  w-[40%] sm:w-[30%] "
+                >
+                  <FontAwesomeIcon icon={faStethoscope} /> Diagnosticar
+                </button>
+              </div>
+
+              <div>
+                <label className="block font-medium mb-1">
+                  Diagnóstico Oído Derecho:
+                </label>
+                <input
+                  type="text"
+                  name="diagnostico_od"
+                  value={form.diagnostico_od || ""}
+                  onChange={handleChange}
+                  className="w-full border rounded px-2 py-1"
+                />
+              </div>
+              <div>
+                <label className="block font-medium mb-1">
+                  Diagnóstico Oído Izquierdo:
+                </label>
+                <input
+                  type="text"
+                  name="diagnostico_oi"
+                  value={form.diagnostico_oi || ""}
+                  onChange={handleChange}
+                  className="w-full border rounded px-2 py-1"
+                />
+              </div>
+              <div>
+                <label className="block font-medium mb-1">Comentarios:</label>
+                <textarea
+                  name="comentarios_audiometria"
+                  value={form.comentarios_audiometria || ""}
+                  onChange={handleChange}
+                  className="w-full border rounded px-2 py-1"
+                  rows={3}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-6">
+            {/* Audiometría Ósea */}
+            <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
+              <h4 className="font-semibold text-lg ">Audiometría Ósea:</h4>
+              {/* Oído Derecho */}
+              <div className="flex flex-col p-4 border rounded items-center justify-center">
+                <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
+                <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
+                  <div className="flex flex-col items-start justify-center gap-2">
+                    <p>hz</p>
+                    <p>dB (A)</p>
+                  </div>
+                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
+                    (hz) => (
+                      <div key={`od_o_${hz}`}>
+                        <p>{hz}</p>
+                        <input
+                          type="number"
+                          name={`od_o_${hz}`}
+                          value={form[`od_o_${hz}`] || ""}
+                          onChange={handleChange}
+                          // placeholder="dB"
+                          className="border rounded px-1 py-1 text-center w-full"
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Oído Izquierdo */}
+              <div className="flex flex-col p-4 border rounded items-center justify-center">
+                <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
+                <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
+                  <div className="flex flex-col items-start justify-center gap-2">
+                    <p>hz</p>
+                    <p>dB (A)</p>
+                  </div>
+                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
+                    (hz) => (
+                      <div key={`oi_o_${hz}`}>
+                        <p>{hz}</p>
+                        <input
+                          type="number"
+                          name={`oi_o_${hz}`}
+                          value={form[`oi_o_${hz}`] || ""}
+                          onChange={handleChange}
+                          // placeholder="dB"
+                          className="border rounded px-1 py-1 text-center w-full"
+                        />
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Recomendaciones */}
+            <div className="border rounded p-4">
+              <h3 className="font-semibold text-lg mb-4">Recomendaciones:</h3>
+
+              <div className="mb-4">
+                <label className="block mb-2">
+                  Uso adecuado de Protección Auditiva:
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="proteccion_simpleODoble"
+                      checked={form.proteccion_simpleODoble === "simple"}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          proteccion_simpleODoble: e.target.checked
+                            ? "simple"
+                            : "",
+                        }))
+                      }
+                    />
+                    Simple
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="proteccion_simpleODoble"
+                      checked={form.proteccion_simpleODoble === "doble"}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          proteccion_simpleODoble: e.target.checked
+                            ? "doble"
+                            : "",
+                        }))
+                      }
+                    />
+                    Doble
+                  </label>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block mb-2">Control audiométrico:</label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="control_semestralOAnual"
+                      checked={form.control_semestralOAnual === "semestral"}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          control_semestralOAnual: e.target.checked
+                            ? "semestral"
+                            : "",
+                        }))
+                      }
+                    />
+                    Semestral
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="control_semestralOAnual"
+                      checked={form.control_semestralOAnual === "anual"}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          control_semestralOAnual: e.target.checked
+                            ? "anual"
+                            : "",
+                        }))
+                      }
+                    />
+                    Anual
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <label className="font-medium block mb-2">Otras:</label>
+                <textarea
+                  name="recomendaciones_otras"
+                  value={form.recomendaciones_otras || ""}
+                  onChange={handleChange}
+                  rows={3}
+                  className="w-full border rounded px-2 py-1 text-base"
+                ></textarea>
               </div>
             </div>
           </div>

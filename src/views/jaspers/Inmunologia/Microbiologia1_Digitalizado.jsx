@@ -6,8 +6,8 @@ import footer from "../components/footer";
 const config = {
   margin: 15,
   fontSize: {
-    title: 14,
-    header: 11,
+    title: 15,
+    header: 12,
     body: 11,
   },
   font: 'helvetica',
@@ -59,15 +59,19 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     // TÍTULO
     drawUnderlinedTitle(doc, "MICROBIOLOGÍA", y, config.fontSize.title);
     y += config.lineHeight * 2;
+    // NUEVO: EXAMEN DIRECTO
+    doc.setFont(config.font, "bold").setFontSize(config.fontSize.header);
+    doc.text("EXAMEN DIRECTO", config.margin, y);
+    y += config.lineHeight;
     // MUESTRA
     doc.setFontSize(config.fontSize.header).setFont(config.font, "bold");
     doc.text("MUESTRA :", config.margin, y);
     doc.setFont(config.font, "normal");
-    doc.text(datos.muestra || "ESPUTO", config.margin + 25, y);
+    doc.text(datos.muestra || "RASPADO DE LECHO UNGUEAL", config.margin + 25, y);
     y += config.lineHeight * 2;
     // ENCABEZADO DE TABLA
     doc.setFont(config.font, "bold");
-    doc.text("PRUEBA", config.margin, y);
+    doc.text("PRUEBA CUALITATIVA", config.margin, y);
     const resultColX = pageW / 2 + 10;
     doc.text("RESULTADO", resultColX, y, { align: "left" });
     y += 4;
@@ -77,7 +81,9 @@ export default function Microbiologia1_Digitalizado(datos = {}) {
     y += config.lineHeight;
     doc.setFont(config.font, "normal").setFontSize(config.fontSize.body);
     // DATOS DE PRUEBAS
-    doc.text("EXAMEN DIRECTO (KOH)", config.margin, y);
+    doc.text("EXAMEN DIRECTO", config.margin, y);
+    y += config.lineHeight;
+    doc.text("KOH:", config.margin, y);
     doc.text(datos.txtKoh ?? "N/A", resultColX, y, { align: "left" });
     
     // Firmas/sellos

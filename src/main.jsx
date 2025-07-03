@@ -33,8 +33,10 @@ import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupaciona
 import Test from './views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/BioquimicaAcidoUrico/BioquimicaAcidoUrico'
 import HistoriaOcupacional from './views/admin/panel-de-control/HistoriaOcupacional/HistoriaOcupacional.jsx';
 //jaspers
-import Ficha from './views/jaspers//Covid/pcualitativaantigeno.jsx'
+import Ficha from './views/jaspers/HistoriaOcupacional/HistoriaOcupacional_Digitalizado.jsx'
 // import Test from './views/jaspers/AnalisisBioquimicos/Hematologia_Digitalizado'
+import Espirometria from './views/admin/panel-de-control/SistemaOcupacional/Espirometria/Espirometria.jsx';
+import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/Oftalmologia.jsx';
 const App = () => {
   return (
     <React.StrictMode>
@@ -115,6 +117,8 @@ const AppContent = () => {
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
           <Route path="/HistoriaOcupacional" element={<HistoriaOcupacional />} />
         </Route>
+        <Route path="/Espirometria" element={<Espirometria />} />
+        <Route path="/Oftalmologia" element={<Oftalmologia />} />
         <Route path='/RegistroP' element={<Formulario/>}/>
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />

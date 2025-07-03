@@ -50,20 +50,20 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
     const { name, value } = e.target;
     setForm(prev => {
       let updated = { ...prev, [name]: value };
-      // Cálculo automático de Bilirrubina Total
-      if (name === 'biliDir' || name === 'biliInd') {
+      // Cálculo automático de Bilirrubina Indirecta
+      if (name === 'biliTotal' || name === 'biliDir') {
+        const total = parseFloat(name === 'biliTotal' ? value : updated.biliTotal);
         const dir = parseFloat(name === 'biliDir' ? value : updated.biliDir);
-        const ind = parseFloat(name === 'biliInd' ? value : updated.biliInd);
-        if (!isNaN(dir) && !isNaN(ind)) {
-          updated.biliTotal = (dir + ind).toFixed(2);
+        if (!isNaN(total) && !isNaN(dir)) {
+          updated.biliInd = (total - dir).toFixed(2);
         }
       }
-      // Cálculo automático de Globulina Sérica
-      if (name === 'protTot' || name === 'albumina') {
-        const prot = parseFloat(name === 'protTot' ? value : updated.protTot);
+      // Cálculo automático de Proteínas Totales
+      if (name === 'albumina' || name === 'globSer') {
         const alb = parseFloat(name === 'albumina' ? value : updated.albumina);
-        if (!isNaN(prot) && !isNaN(alb)) {
-          updated.globSer = (prot - alb).toFixed(2);
+        const glob = parseFloat(name === 'globSer' ? value : updated.globSer);
+        if (!isNaN(alb) && !isNaN(glob)) {
+          updated.protTot = (alb - glob).toFixed(2);
         }
       }
       return updated;
