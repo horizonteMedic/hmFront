@@ -56,14 +56,18 @@ export default function PerfilHepatico({ token, selectedSede, userlogued }) {
         const dir = parseFloat(name === 'biliDir' ? value : updated.biliDir);
         if (!isNaN(total) && !isNaN(dir)) {
           updated.biliInd = (total - dir).toFixed(2);
+        } else {
+          updated.biliInd = '';
         }
       }
-      // Cálculo automático de Proteínas Totales
-      if (name === 'albumina' || name === 'globSer') {
+      // Cálculo automático de Globulina
+      if (name === 'protTot' || name === 'albumina') {
+        const prot = parseFloat(name === 'protTot' ? value : updated.protTot);
         const alb = parseFloat(name === 'albumina' ? value : updated.albumina);
-        const glob = parseFloat(name === 'globSer' ? value : updated.globSer);
-        if (!isNaN(alb) && !isNaN(glob)) {
-          updated.protTot = (alb - glob).toFixed(2);
+        if (!isNaN(prot) && !isNaN(alb)) {
+          updated.globSer = (prot - alb).toFixed(2);
+        } else {
+          updated.globSer = '';
         }
       }
       return updated;
