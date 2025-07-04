@@ -3,9 +3,9 @@ import autoTable from "jspdf-autotable";
 import headerConsentimiento from "./header/headerConsentimiento.jsx";
 import footer from "../components/footer";
 
-export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
+export default function Consentimiento_Panel5D_Digitalizado(datos) {
   const doc = new jsPDF();
-  headerConsentimiento(doc,datos);
+  headerConsentimiento(doc, datos);
   const huella = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
   const firma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
   const sello = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
@@ -41,8 +41,8 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     doc.setLineWidth(0.2);
     y += 10;
     // Segunda línea del título
-    doc.text('(COCAÍNA, MARIHUANA, ANFETAMINA, METHANFETAMINA Y BENZODIAZEPINA)', pageW / 2, y, { align: 'center' });
-    let wT2 = doc.getTextWidth('(COCAÍNA, MARIHUANA, ANFETAMINA, METHANFETAMINA Y BENZODIAZEPINA)');
+    doc.text('(COCAÍNA, MARIHUANA, ÉXTASIS, OPIÁCEOS Y BENZODIACEPINA)', pageW / 2, y, { align: 'center' });
+    let wT2 = doc.getTextWidth('(COCAÍNA, MARIHUANA, ÉXTASIS, OPIÁCEOS Y BENZODIACEPINA)');
     let xT2 = (pageW - wT2) / 2;
     doc.setLineWidth(0.7);
     doc.line(xT2, y + 2, xT2 + wT2, y + 2);
@@ -55,7 +55,7 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     const edad = String(datos.edad || '___');
     const dni = String(datos.dni || '__________');
     const bloques = [
-      { text: 'Yo  ', bold: false },
+      { text: 'Yo' + '\u00A0\u00A0', bold: false },
       { text: nombre, bold: true },
       { text: ', de ', bold: false },
       { text: edad, bold: true },
@@ -157,8 +157,8 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
         ['CONSUME MARIHUANA ', `NO ${checkBox(!datos.antConsumeMarih)}`, `SI ${checkBox(datos.antConsumeMarih)}`, datos.antConsumeMarih && datos.fechaConsumeMarih ? `Cuando: ${formatearFecha(datos.fechaConsumeMarih)}` : ''],
         ['CONSUME COCAÍNA ', `NO ${checkBox(!datos.antConsumeCocacina)}`, `SI ${checkBox(datos.antConsumeCocacina)}`, datos.antConsumeCocacina && datos.fechaConsumeCocacina ? `Cuando: ${formatearFecha(datos.fechaConsumeCocacina)}` : ''],
         ['CONSUME HOJA DE COCA EN LOS 14 DÍAS PREVIOS', `NO ${checkBox(!datos.antConsumeHojaCoca)}`, `SI ${checkBox(datos.antConsumeHojaCoca)}`, datos.antConsumeHojaCoca && datos.fechaConsumoHojaCoca ? `Cuando: ${formatearFecha(datos.fechaConsumoHojaCoca)}` : ''],
-        ['CONSUME ANFETAMINAS ', `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`, `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`, datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}` : ''],
-        ['CONSUME METANFETAMINAS ', `NO ${checkBox(!datos.antConsumeMethanfetaminaOOpiaceos)}`, `SI ${checkBox(datos.antConsumeMethanfetaminaOOpiaceos)}`, datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeMethanfetamina)}` : ''],
+        ['CONSUME ÉXTASIS ', `NO ${checkBox(!datos.antConsumeAnfetaminaOExtasis)}`, `SI ${checkBox(datos.antConsumeAnfetaminaOExtasis)}`, datos.antConsumeAnfetaminaOExtasis && datos.fechaConsumeAnfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeAnfetamina)}` : ''],
+        ['CONSUME OPIÁCEOS ', `NO ${checkBox(!datos.antConsumeMethanfetaminaOOpiaceos)}`, `SI ${checkBox(datos.antConsumeMethanfetaminaOOpiaceos)}`, datos.antConsumeMethanfetaminaOOpiaceos && datos.fechaConsumeMethanfetamina ? `Cuando: ${formatearFecha(datos.fechaConsumeMethanfetamina)}` : ''],
         ['CONSUME BENZODIAZEPINAS', `NO ${checkBox(!datos.antConsumeBenzodiacepinas)}`, `SI ${checkBox(datos.antConsumeBenzodiacepinas)}`, datos.antConsumeBenzodiacepinas && datos.fechaConsumeBenzodiacepinas ? `Cuando: ${formatearFecha(datos.fechaConsumeBenzodiacepinas)}` : ''],
       ],
       theme: 'plain',
@@ -279,3 +279,4 @@ export default function Consentimiento_Panel5D_ohla_Digitalizado(datos) {
     alert('Error generando PDF: ' + err);
   });
 } 
+

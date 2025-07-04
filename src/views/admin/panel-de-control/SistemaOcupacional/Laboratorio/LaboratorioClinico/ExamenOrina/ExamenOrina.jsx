@@ -22,8 +22,8 @@ const initialForm = {
   Densidad: '',
   PH: '',
   // Examen Químico
-  Nitritos: '0-0',
-  Proteínas: '0-1',
+  Nitritos: 'NEGATIVO',
+  Proteínas: 'NEGATIVO',
   Cetonas: 'NEGATIVO',
   LeucocitosQ: 'NEGATIVO',
   AcAscorbico: 'NEGATIVO',
@@ -32,8 +32,8 @@ const initialForm = {
   GlucosaQ: 'NEGATIVO',
   Sangre: 'NEGATIVO',
   // Sedimento
-  LeucocitosS: 'ESCASAS',
-  Hematies: 'NO SE OBSERVAN',
+  LeucocitosS: '',
+  Hematies: '',
   CelEpiteliales: 'ESCASAS',
   Cristales: 'NO SE OBSERVAN',
   Cilindros: 'NO SE OBSERVAN',
@@ -140,40 +140,29 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
   const handleNoAplicaChange = (checked) => {
     setForm(prev => {
       if (checked) {
-        // Marcar todo como N/A
-        return {
-          ...prev,
-          NoAplica: true,
-          Incoloro: false,
-          Medicamentosa: false,
-          Transparente: false,
-          Turbio: false,
-          Color: 'N/A',
-          Aspecto: 'N/A',
-          Densidad: 'N/A',
-          PH: 'N/A',
-          Nitritos: 'N/A',
-          Proteínas: 'N/A',
-          Cetonas: 'N/A',
-          LeucocitosQ: 'N/A',
-          AcAscorbico: 'N/A',
-          Urobilinogeno: 'N/A',
-          Bilirrubina: 'N/A',
-          GlucosaQ: 'N/A',
-          Sangre: 'N/A',
-          LeucocitosS: 'N/A',
-          Hematies: 'N/A',
-          CelEpiteliales: 'N/A',
-          Cristales: 'N/A',
-          Cilindros: 'N/A',
-          Bacterias: 'N/A',
-          GramSC: 'N/A',
-          Otros: 'N/A',
-        };
+        let newForm = { ...prev };
+        Object.keys(newForm).forEach(key => {
+          // Poner 'N/A' en todos los campos string
+          if (typeof newForm[key] === 'string') {
+            newForm[key] = 'N/A';
+          }
+          // Desmarcar todos los radios de drogas
+          if ([
+            'ScreeningPos','ScreeningNeg','ScreeningNA',
+            'ConfirmPos','ConfirmNeg','ConfirmNA'
+          ].includes(key)) {
+            newForm[key] = false;
+          }
+        });
+        // Asegurar que los campos de drogas queden vacíos
+        newForm.Cocaina = 'N/A';
+        newForm.Marihuana = 'N/A';
+        // Observaciones también en N/A
+        newForm.observaciones = 'N/A';
+        newForm.NoAplica = true;
+        return newForm;
       } else {
-        // Restaurar valores por defecto
         return {
-          ...prev,
           ...initialForm,
           NoAplica: false
         };
@@ -194,7 +183,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
                   type="checkbox"
                   name={opt}
                   checked={form[opt]}
-                  onChange={opt === 'No Aplica' ? e => handleNoAplicaChangeExamenF(e.target.checked) : handleInputChange}
+                  onChange={opt === 'No Aplica' ? e => handleNoAplicaChange(e.target.checked) : handleInputChange}
                   disabled={opt !== 'No Aplica'}
                 />
                 {opt}
@@ -269,23 +258,28 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
             {sedimentLabels.map((lbl, idx, arr) => (
               <div key={lbl} className="grid grid-cols-2 items-center gap-2">
                 <label className="font-medium">{lbl.replace('Q','').replace('S','')}:</label>
-                <input
-                  className="border rounded p-1 w-full"
-                  name={lbl}
-                  value={form[lbl]}
-                  onChange={handleInputChange}
-                  ref={sedimentRefs[idx]}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (idx < arr.length - 1) {
-                        sedimentRefs[idx + 1].current && sedimentRefs[idx + 1].current.focus();
-                      } else if (drugRefs[0]) {
-                        drugRefs[0].current && drugRefs[0].current.focus();
+                <div className="flex items-center gap-2">
+                  <input
+                    className="border rounded p-1 w-full"
+                    name={lbl}
+                    value={form[lbl]}
+                    onChange={handleInputChange}
+                    ref={sedimentRefs[idx]}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (idx < arr.length - 1) {
+                          sedimentRefs[idx + 1].current && sedimentRefs[idx + 1].current.focus();
+                        } else if (drugRefs[0]) {
+                          drugRefs[0].current && drugRefs[0].current.focus();
+                        }
                       }
-                    }
-                  }}
-                />
+                    }}
+                  />
+                  {(lbl === 'LeucocitosS' || lbl === 'Hematies') && form[lbl] && (
+                    <span className="text-xs text-gray-500">x campos</span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
