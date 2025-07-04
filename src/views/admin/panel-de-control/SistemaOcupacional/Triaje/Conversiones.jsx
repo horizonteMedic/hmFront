@@ -114,7 +114,12 @@ export const GetFC = async (event,triaje,set) => {
         return
     }
     if (event.key === 'Enter') {
-        if (triaje.fCardiaca < 60 || triaje.fCardiaca > 100) {
+        // if (triaje.fCardiaca < 60 || triaje.fCardiaca > 100) {
+        //     set(d => ({ ...d, fCardiaca: '' }))
+        //     await Swal.fire('Error','No se permite este dato','error')
+        //     return
+        // }
+        if (triaje.fCardiaca < 40) {
             set(d => ({ ...d, fCardiaca: '' }))
             await Swal.fire('Error','No se permite este dato','error')
             return

@@ -142,17 +142,6 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     }));
   };
 
-  // const handleCheckRadioMultiple = (name, value) => {
-  //   setForm((f) => {
-  //     const currentTypes = f[name] || [];
-  //     if (currentTypes.includes(value)) {
-  //       return { ...f, [name]: currentTypes.filter((v) => v !== value) };
-  //     } else {
-  //       return { ...f, [name]: [...currentTypes, value] };
-  //     }
-  //   });
-  // };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -752,7 +741,6 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                             value={form[`${chem}_hrs`] || ""}
                             onChange={handleChange}
                             className="border rounded px-2 py-1 w-full text-center"
-                            // placeholder="Hrs./día"
                           />
                           <input
                             type="text"
