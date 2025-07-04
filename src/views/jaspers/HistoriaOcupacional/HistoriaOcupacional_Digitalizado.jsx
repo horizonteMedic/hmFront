@@ -36,7 +36,82 @@ const drawResultRow = (doc, y, label, value) => {
 export default function InmunologiaLab_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
-
+  const datoss = {
+    detalles: [
+    {
+        "fecha": "2023-01-11",
+        "empresa": "Minerales del Sur",
+        "actividad": "Perforación y voladura",
+        "areaEmpresa": "Superficie",
+        "ocupacion": "Técnico de seguridad",
+        "superficie": "Sí",
+        "socavon": "No",
+        "riesgo": "Polvo, gases",
+        "proteccion": "Mascarilla, gafas de seguridad",
+        "altitud": "2800 msnm"
+    },
+    {
+        "fecha": "2021-03-16",
+        "empresa": "Minera Andina Del Peru SAC",
+        "actividad": "Extracción de minerales",
+        "areaEmpresa": "Subterránea",
+        "ocupacion": "Operador de maquinaria",
+        "superficie": "No",
+        "socavon": "Sí",
+        "riesgo": "Ruido, vibraciones",
+        "proteccion": "Casco, tapones auditivos",
+        "altitud": "3000 msnm"
+    },
+    {
+        "fecha": null,
+        "empresa": null,
+        "actividad": null,
+        "areaEmpresa": null,
+        "ocupacion": null,
+        "superficie": null,
+        "socavon": null,
+        "riesgo": null,
+        "proteccion": null,
+        "altitud": null
+    },
+    {
+        "fecha": null,
+        "empresa": null,
+        "actividad": null,
+        "areaEmpresa": null,
+        "ocupacion": null,
+        "superficie": null,
+        "socavon": null,
+        "riesgo": null,
+        "proteccion": null,
+        "altitud": null
+    },
+    {
+        "fecha": null,
+        "empresa": null,
+        "actividad": null,
+        "areaEmpresa": null,
+        "ocupacion": null,
+        "superficie": null,
+        "socavon": null,
+        "riesgo": null,
+        "proteccion": null,
+        "altitud": null
+    },
+    {
+        "fecha": null,
+        "empresa": null,
+        "actividad": null,
+        "areaEmpresa": null,
+        "ocupacion": null,
+        "superficie": null,
+        "socavon": null,
+        "riesgo": null,
+        "proteccion": null,
+        "altitud": null
+    }
+]
+  }
   // === HEADER ===
   header_HistoriaOcupacional(doc, datos);
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
@@ -61,26 +136,34 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
     autoTable(doc, {
       startY: y,
       head: [
-  [
-    { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } }, // Agrupa
-    { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-  ],
-  [
-    { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold' } },
-    { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' } },
-  ]
-]
-,
-      body: [
-        
+        [
+          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } }, // Agrupa
+          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+        ],
+        [
+          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' } },
+        ]
       ],
+      body: datoss.detalles.map(d => [
+        d.fecha || '',
+        d.empresa || '',
+        d.altitud || '',
+        d.actividad || '',
+        d.areaEmpresa || '',
+        d.ocupacion || '',
+        d.socavon || '',   // Subsuelo
+        d.superficie || '',// Superficie
+        d.riesgo || '',
+        d.proteccion || ''
+      ]),
       theme: "grid",
       styles: {
         fontSize: 7,

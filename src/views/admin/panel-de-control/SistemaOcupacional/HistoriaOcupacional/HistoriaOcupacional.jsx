@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import styles from './HistoriaOcupacional.module.css';
+import { VerifyTR } from './controller/controllerHO';
 
-const HistoriaOcupacional = () => {
+ const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const tabla = 'historia_oc_info'
+
+const HistoriaOcupacional = ({token,userlogued,selectedSede}) => {
   const [nroOrden, setNroOrden] = useState('');
   // Simulación: nombre se llena automáticamente al ingresar nroOrden
   const nombreCompleto = nroOrden ? 'Juan Pérez Gómez' : '';
-
+  const [form, setForm] = useState({
+    norden: "",
+    nombres: "",
+    fecha: today,
+    //Area de trabajo
+    areaO: ""
+  })
   const [rowData, setRowData] = useState({
     ano: '',
     empresa: '',
@@ -22,6 +33,7 @@ const HistoriaOcupacional = () => {
   const [registros, setRegistros] = useState([]);
 
   // Opciones random de ejemplo para los selects
+  //ALGUNOS YA TREEN DATOS DE VERITAS
   const empresaOptions = [
     '',
     'EMPRESA MINERA S.A.',
@@ -88,6 +100,26 @@ const HistoriaOcupacional = () => {
     });
   };
 
+  const handleClean = () => {
+    setForm({
+      norden: "",
+    nombres: "",
+    fecha: today,
+    })
+  }
+
+  const handleset = () => {
+    setForm(f => ({
+      ...f,
+      nombres: "",
+      fecha: today,
+    }))
+  }
+
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+  };
+
   return (
     <div className={styles.historiaOcupacionalContainer} style={{ fontSize: 13, color: '#000' }}>
       <h1 className={styles.tituloPrincipal} style={{ fontSize: 15, color: '#000', fontWeight: 'bold' }}>HISTORIAL OCUPACIONAL</h1>
@@ -98,9 +130,16 @@ const HistoriaOcupacional = () => {
             <label style={{ color: '#000' }}>N° Orden :</label>
             <input
               type="text"
+              name='norden'
               className={styles.inputSmall}
-              value={nroOrden}
-              onChange={e => setNroOrden(e.target.value)}
+              value={form.norden}
+              onKeyUp={(event) => {
+                if (event.key === 'Enter'){
+                  handleset()
+                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                }
+              }}
+              onChange={e => handleInputChange(e)}
               placeholder=""
               style={{ fontSize: 13, color: '#000' }}
             />
@@ -110,7 +149,8 @@ const HistoriaOcupacional = () => {
             <input
               type="text"
               className={styles.inputLarge}
-              value={nombreCompleto}
+              value={form.nombres}
+              name='nombres'
               disabled
               placeholder="Nombre y Apellido"
               style={{ fontSize: 13, color: '#000' }}
@@ -118,11 +158,11 @@ const HistoriaOcupacional = () => {
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Área de Trabajo :</label>
-            <input type="text" className={styles.inputXLarge} style={{ fontSize: 13, color: '#000' }} />
+            <input type="text" value={form.areaO} name='areaO' onChange={handleInputChange} className={styles.inputXLarge} style={{ fontSize: 13, color: '#000' }} />
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Fecha :</label>
-            <input type="text" className={styles.inputSmall} placeholder="dd/mm/aa" style={{ fontSize: 13, color: '#000' }} />
+            <input type="text" value={form.fecha} onChange={handleInputChange} name='fecha' className={styles.inputSmall} placeholder="dd/mm/aa" style={{ fontSize: 13, color: '#000' }} />
           </div>
         </div>
       </fieldset>
@@ -308,7 +348,7 @@ const HistoriaOcupacional = () => {
           <button style={{ height: 32, background: '#059669', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', marginRight: 8, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
             <i className="fas fa-save" style={{ marginRight: 6 }}></i> Guardar/Actualizar
           </button>
-          <button style={{ height: 32, background: '#fc6b03', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
+          <button onClick={handleClean} style={{ height: 32, background: '#fc6b03', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
             <i className="fas fa-broom" style={{ marginRight: 6 }}></i> Limpiar
           </button>
         </fieldset>
