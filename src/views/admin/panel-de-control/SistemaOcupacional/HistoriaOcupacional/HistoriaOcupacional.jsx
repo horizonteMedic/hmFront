@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import styles from './HistoriaOcupacional.module.css';
-import { SubmiteHistoriaOcupacionalController, VerifyTR } from './controller/controllerHO';
+import { PrintHojaR, SubmiteHistoriaOcupacionalController, VerifyTR } from './controller/controllerHO';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
+
 
  const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -105,6 +106,28 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
   };
+
+  
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Hepatitis?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
+  }
   
   return (
     <div className={styles.historiaOcupacionalContainer} style={{ fontSize: 13, color: '#000' }}>
@@ -327,8 +350,8 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
           EPP: Equipo de Protección Personal
           <div style={{ marginTop: 8, fontSize: 13 }}>
             Imprimir N° Orden :
-            <input type="text" style={{ width: 80, marginLeft: 8, border: '1px solid #ccc', borderRadius: 3, padding: '2px 6px', fontSize: 13, color: '#000' }} />
-            <button style={{ marginLeft: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#000', fontSize: 16 }}>
+            <input type="text" value={form.norden} name='norden' onChange={handleInputChange} style={{ width: 80, marginLeft: 8, border: '1px solid #ccc', borderRadius: 3, padding: '2px 6px', fontSize: 13, color: '#000' }} />
+            <button onClick={handlePrint} style={{ marginLeft: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#000', fontSize: 16 }}>
               <i className="fas fa-print"></i>
             </button>
           </div>

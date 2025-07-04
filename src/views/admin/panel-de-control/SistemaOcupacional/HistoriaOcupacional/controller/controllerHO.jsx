@@ -113,15 +113,15 @@ export const SubmiteHistoriaOcupacionalController = async (form,token,user,limpi
 
 export const PrintHojaR = (nro,token,tabla) => {
   Loading('Cargando Formato a Imprimir')
-  getFetch(`/api/v01/ct/analisisBioquimico/obtenerReportePerfilRenal?nOrden=${nro}&nameService=${tabla}`,token)
+  getFetch(`/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
     console.log('a')
     if (res.norden) {
       console.log(res)
       const nombre = res.nameJasper;
       console.log(nombre)
-      const jasperModules = import.meta.glob('../../../../../../jaspers/AnalisisBioquimicos/*.jsx');
-      const modulo = await jasperModules[`../../../../../../jaspers/AnalisisBioquimicos/${nombre}.jsx`]();
+      const jasperModules = import.meta.glob('../../../../../jaspers/HistoriaOcupacional/*.jsx');
+      const modulo = await jasperModules[`../../../../../jaspers/HistoriaOcupacional/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
         modulo.default(res);

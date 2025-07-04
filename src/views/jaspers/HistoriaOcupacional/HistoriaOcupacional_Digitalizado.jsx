@@ -17,25 +17,12 @@ const config = {
 
 // --- Funciones de Ayuda (Estándar) ---
 
-const drawUnderlinedTitle = (doc, text, y) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text(text, pageW / 2, y, { align: "center" });
-};
-
-const drawResultRow = (doc, y, label, value) => {
-  const pageW = doc.internal.pageSize.getWidth();
-  doc.setFont(config.font, 'normal').setFontSize(config.fontSize.body);
-  doc.text(label, config.margin, y);
-  doc.text(value, pageW - config.margin, y, { align: "right" });
-  return y + config.lineHeight;
-};
-
 // --- Componente Principal ---
 
-export default function InmunologiaLab_Digitalizado(datos = {}) {
+export default function HistoriaOcupacional_Digitalizado(datos = {}) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
+  console.log('wasa')
   const datoss = {
     detalles: [
     {
@@ -152,7 +139,7 @@ export default function InmunologiaLab_Digitalizado(datos = {}) {
           { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' } },
         ]
       ],
-      body: datoss.detalles.map(d => [
+      body: datos.detalles?.map(d => [
         d.fecha || '',
         d.empresa || '',
         d.altitud || '',
