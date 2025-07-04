@@ -47,6 +47,7 @@ const Navbar = () => {
     //{ to: "/Oftalmologia", name: "Oftalmología", label: "Oftalmología", icon: faNotesMedical }
   ];
 
+  
   const Logoutbutton = () => {
     return (
       <button
