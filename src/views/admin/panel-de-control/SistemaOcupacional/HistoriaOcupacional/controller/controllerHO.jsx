@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../../getFetch/getFetch.js";
+import { SubmitHistoriaOcupacional } from "../model/model.js";
 
 export const Loading = (text) => {
     Swal.fire({
@@ -32,7 +33,7 @@ export const Loading = (text) => {
 }
 
 
-export const VerifyTR = async (nro,tabla,token,set,sede) => {
+export const VerifyTR = async (nro,tabla,token,set,sede,setTable) => {
     if (!nro) { 
       await Swal.fire('Error', 'Debe Introducir un Nro de Historia Clinica valido', 'error') 
       return
@@ -44,7 +45,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoHistoriaOcupacinal(nro,tabla,set,token)
+            GetInfoHistoriaOcupacinal(nro,tabla,set,token,setTable)
         }
     })
 }
@@ -65,7 +66,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
 }
 
 
-export const GetInfoHistoriaOcupacinal = (nro,tabla,set,token) => {
+export const GetInfoHistoriaOcupacinal = (nro,tabla,set,token,setTable) => {
   getFetch(`/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
@@ -73,11 +74,9 @@ export const GetInfoHistoriaOcupacinal = (nro,tabla,set,token) => {
       set(prev => ({
         ...prev,
         ...res,
-        fecha: res.fechaExamen,
-        creatinina: res.txtCreatinina,
-        urea: res.txtUreaSerica,
-        acidoUrico: res.txtAcidoUrico,
+        fecha: res.fechaHo,
       }));
+      setTable(res.detalles)
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
     }
@@ -87,13 +86,13 @@ export const GetInfoHistoriaOcupacinal = (nro,tabla,set,token) => {
   })
 }
 
-export const SubmitePerfilRenalLab = async (form,token,user,limpiar,tabla) => {
+export const SubmiteHistoriaOcupacionalController = async (form,token,user,limpiar,tabla,registros) => {
     if (!form.norden) {
         await Swal.fire('Error', 'Datos Incompletos','error')
         return
     }
     Loading('Registrando Datos')
-    SubmitPerfilRenal(form,user,token)
+    SubmitHistoriaOcupacional(form,registros,user,token)
     .then((res) => {
         console.log(res)
         if (res.id === 1 || res.id === 0) {

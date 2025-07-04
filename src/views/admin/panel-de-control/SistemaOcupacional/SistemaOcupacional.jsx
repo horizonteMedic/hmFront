@@ -861,7 +861,7 @@ const TabComponent = () => {
                 </button>
               </div>
                 <div>
-                  <HistoriaOcupacional token={token} userlogued={userlogued.sub} selectedSede={selectSede}/>
+                  <HistoriaOcupacional token={token} userlogued={userlogued.sub} selectedSede={selectSede} listas={listasCombos}/>
                 <div>
                 </div>
               </div>
