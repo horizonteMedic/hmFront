@@ -15,8 +15,10 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
+          
           codAu: res.codAu,
           fecha: res.fechaAu,
+          fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
           sordera: res.rbsasorderaSi ? "SI" : "NO",
           acufenos: res.rbsaacufenosSi ? "SI" : "NO",
           vertigo: res.rbsavertigoSi ? "SI" : "NO",
@@ -296,6 +298,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
   });
 };
+function convertirFecha(fecha) {
+  if (fecha === "") return "";
+  const [dia, mes, anio] = fecha.split("-");
+  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
+}
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
@@ -392,6 +399,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
       set((prev) => ({
         ...prev,
         ...res,
+        fechaNac: convertirFecha(res.fechaNac),
         nombres: res.nombresApellidos,
       }));
     })

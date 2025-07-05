@@ -71,9 +71,9 @@ import { useAuthStore } from "../../../../store/auth";
 import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
 import Audiometria from "./Audiometria/Audiometria/Audiometria.jsx";
-import AudiometriaOhla from "./Audiometria/AudiometriaOhla/AudiometriaOhla.jsx";
 import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/AudiometriaCuestionario.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
+import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -791,7 +791,9 @@ const TabComponent = () => {
                 </button>
               </div>
               <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Audiometria</h2>
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Audiometria
+                </h2>
               </div>
               <div>
                 <div className={styles.tabHeader}>
@@ -821,7 +823,6 @@ const TabComponent = () => {
                   >
                     Cuestionario de Audiometria
                   </button>
-                  
                 </div>
                 <div>
                   {subTab === 0 && (
@@ -832,7 +833,7 @@ const TabComponent = () => {
                     />
                   )}
                   {subTab === 1 && (
-                    <AudiometriaOhla
+                    <AudiometriaOhlaTabSelector
                       token={token}
                       userlogued={userlogued.sub}
                       selectedSede={selectSede}
@@ -860,10 +861,14 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-                <div>
-                  <HistoriaOcupacional token={token} userlogued={userlogued.sub} selectedSede={selectSede} listas={listasCombos}/>
-                <div>
-                </div>
+              <div>
+                <HistoriaOcupacional
+                  token={token}
+                  userlogued={userlogued.sub}
+                  selectedSede={selectSede}
+                  listas={listasCombos}
+                />
+                <div></div>
               </div>
             </div>
           )}

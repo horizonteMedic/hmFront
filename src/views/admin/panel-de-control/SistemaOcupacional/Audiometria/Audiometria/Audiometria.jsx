@@ -35,8 +35,11 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     codAu: "",
     norden: "",
     fecha: today,
+    dni: "",
+    fechaNac: "",
     nombres: "",
     edad: "",
+    nomExam:"",
 
     sordera: "NO",
     acufenos: "NO",
@@ -136,8 +139,6 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
 
   const [form, setForm] = useState(initialFormState);
   const [status, setStatus] = useState("");
-
-  // inicializa fecha hoy
 
   const handleCheckRadio = (name, value) => {
     setForm((f) => ({
@@ -294,7 +295,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base min-w-[50px]">
+            <label className="font-semibold text-base min-w-[50px] md:min-w-[90px]">
               Fecha:
             </label>
             <input
@@ -319,15 +320,53 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
             />
           </div>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className=" flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[50px]  md:min-w-[90px]">
+                Edad:
+              </label>
+              <input
+                name="edad"
+                value={form.edad}
+                disabled
+                className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
+              />
+            </div>
+          
+            <div className=" flex xl:justify-end items-center gap-4">
+              <label className="font-semibold text-base min-w-[50px] ">
+                Fecha de Nacimiento:
+              </label>
+              <input
+                name="fechaNac"
+                value={form.fechaNac}
+                disabled
+                className="border rounded px-2 py-1 text-base w-24 bg-gray-100 min-w-36"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base min-w-[50px]">
-              Edad:
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              DNI:
             </label>
             <input
-              name="edad"
-              value={form.edad}
+              name="dni"
+              value={form.dni}
               disabled
-              className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+            />
+          </div>
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Ex. Médico:
+            </label>
+            <input
+              name="nomExam"
+              value={form.nomExam}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
             />
           </div>
         </div>
@@ -344,7 +383,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] text-base">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
               Contrata:
             </label>
             <input
