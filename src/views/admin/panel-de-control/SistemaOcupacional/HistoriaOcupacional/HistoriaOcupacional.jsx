@@ -1,51 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './HistoriaOcupacional.module.css';
+import { PrintHojaR, SubmiteHistoriaOcupacionalController, VerifyTR } from './controller/controllerHO';
+import { getFetch } from '../../getFetch/getFetch';
+import Swal from 'sweetalert2';
 
-const HistoriaOcupacional = () => {
+
+ const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+const tabla = 'historia_oc_info'
+
+const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
   const [nroOrden, setNroOrden] = useState('');
   // Simulación: nombre se llena automáticamente al ingresar nroOrden
   const nombreCompleto = nroOrden ? 'Juan Pérez Gómez' : '';
-
+  const [form, setForm] = useState({
+    norden: "",
+    nombres: "",
+    fecha: today,
+    //Area de trabajo
+    areaO: "",
+    dni: ""
+  })
   const [rowData, setRowData] = useState({
-    ano: '',
+    fecha: '',
     empresa: '',
     altitud: '',
     actividad: '',
     areaEmpresa: '',
     ocupacion: '',
-    tiempoSuperficie: '',
-    tiempoSocavon: '',
-    riesgos: '',
+    superficie: '',
+    socavon: '',
+    riesgo: '',
     proteccion: '',
   });
 
   const [registros, setRegistros] = useState([]);
-
+  console.log(registros)
+  //listas
+  const {EmpresasMulti,AlturaMulti,AreaMulti} = listas
   // Opciones random de ejemplo para los selects
-  const empresaOptions = [
-    '',
-    'EMPRESA MINERA S.A.',
-    'CONSTRUCTORA ANDINA',
-    'SERVICIOS GENERALES SAC',
-    'INDUSTRIAS DEL SUR',
-    'ASAMBLEA DE HERMANITAS',
+  //ALGUNOS YA TREEN DATOS DE VERITAS
 
-  ];
-  const altitudOptions = [
-    '',
-    'BAJA (< 1000 MSNM)',
-    'MEDIA (1000-2500 MSNM)',
-    'ALTA (> 2500 MSNM)',
-  ];
-  const areaEmpresaOptions = [
-    '',
-    'PRODUCCIÓN',
-    'MANTENIMIENTO',
-    'ADMINISTRACIÓN',
-    'LOGÍSTICA',
-    'TESTER DE CUCA',
-
-  ];
   const riesgosOptions = [
     '',
     'RUIDO',
@@ -70,24 +65,70 @@ const HistoriaOcupacional = () => {
     setRowData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleRegistrar = () => {
+  const handleRegistrar = async () => {
     // Validar que al menos año y empresa estén llenos (puedes ajustar la validación)
-    if (!rowData.ano || !rowData.empresa) return;
+    if (!rowData.fecha || !rowData.empresa){
+      await Swal.fire("Error","Faltan datos","error")
+      return
+    } 
     setRegistros(prev => [...prev, rowData]);
     setRowData({
-      ano: '',
+      fecha: '',
       empresa: '',
       altitud: '',
       actividad: '',
       areaEmpresa: '',
       ocupacion: '',
-      tiempoSuperficie: '',
-      tiempoSocavon: '',
-      riesgos: '',
+      superficie: '',
+      socavon: '',
+      riesgo: '',
       proteccion: '',
     });
   };
 
+  const handleClean = () => {
+    setForm({
+      norden: "",
+    nombres: "",
+    fecha: today,
+    })
+  }
+
+  const handleset = () => {
+    setForm(f => ({
+      ...f,
+      nombres: "",
+      fecha: today,
+    }))
+    setRegistros([])
+  }
+
+  const handleInputChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+  };
+
+  
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire('Error', 'Debe colocar un N° Orden', 'error')
+    Swal.fire({
+      title: '¿Desea Imprimir Hepatitis?',
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, Imprimir',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        title: 'swal2-title',
+        confirmButton: 'swal2-confirm',
+        cancelButton: 'swal2-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden,token,tabla);
+      }
+    });
+  }
+  
   return (
     <div className={styles.historiaOcupacionalContainer} style={{ fontSize: 13, color: '#000' }}>
       <h1 className={styles.tituloPrincipal} style={{ fontSize: 15, color: '#000', fontWeight: 'bold' }}>HISTORIAL OCUPACIONAL</h1>
@@ -98,9 +139,16 @@ const HistoriaOcupacional = () => {
             <label style={{ color: '#000' }}>N° Orden :</label>
             <input
               type="text"
+              name='norden'
               className={styles.inputSmall}
-              value={nroOrden}
-              onChange={e => setNroOrden(e.target.value)}
+              value={form.norden}
+              onKeyUp={(event) => {
+                if (event.key === 'Enter'){
+                  handleset()
+                  VerifyTR(form.norden, tabla, token, setForm, selectedSede,setRegistros);
+                }
+              }}
+              onChange={e => handleInputChange(e)}
               placeholder=""
               style={{ fontSize: 13, color: '#000' }}
             />
@@ -110,7 +158,8 @@ const HistoriaOcupacional = () => {
             <input
               type="text"
               className={styles.inputLarge}
-              value={nombreCompleto}
+              value={form.nombres}
+              name='nombres'
               disabled
               placeholder="Nombre y Apellido"
               style={{ fontSize: 13, color: '#000' }}
@@ -118,11 +167,11 @@ const HistoriaOcupacional = () => {
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Área de Trabajo :</label>
-            <input type="text" className={styles.inputXLarge} style={{ fontSize: 13, color: '#000' }} />
+            <input type="text" value={form.areaO} name='areaO' onChange={handleInputChange} className={styles.inputXLarge} style={{ fontSize: 13, color: '#000' }} />
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Fecha :</label>
-            <input type="text" className={styles.inputSmall} placeholder="dd/mm/aa" style={{ fontSize: 13, color: '#000' }} />
+            <input type="text" value={form.fecha} onChange={handleInputChange} name='fecha' className={styles.inputSmall} placeholder="dd/mm/aa" style={{ fontSize: 13, color: '#000' }} />
           </div>
         </div>
       </fieldset>
@@ -147,15 +196,15 @@ const HistoriaOcupacional = () => {
           </thead>
           <tbody>
             <tr>
-              <td><input type="text" className={styles.inputTable} value={rowData.ano} onChange={e => handleRowChange('ano', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td><input type="text" className={styles.inputTable} value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
               <td>{rowData.empresa}</td>
               <td>{rowData.altitud}</td>
               <td><input type="text" className={styles.inputTable} value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
               <td>{rowData.areaEmpresa}</td>
               <td><input type="text" className={styles.inputTable} value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td><input type="text" className={styles.inputTable} value={rowData.tiempoSuperficie} onChange={e => handleRowChange('tiempoSuperficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td><input type="text" className={styles.inputTable} value={rowData.tiempoSocavon} onChange={e => handleRowChange('tiempoSocavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.riesgos}</td>
+              <td><input type="text" className={styles.inputTable} value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td>{rowData.riesgo}</td>
               <td>{rowData.proteccion}</td>
             </tr>
           </tbody>
@@ -186,8 +235,9 @@ const HistoriaOcupacional = () => {
           onChange={e => handleRowChange('empresa', e.target.value)}
           style={{ minWidth: 180, fontSize: 13, color: '#000' }}
         >
-          {empresaOptions.map(opt => (
-            <option key={opt} value={opt}>{opt === '' ? 'Empresa...' : opt}</option>
+          <option value=""></option>
+          {EmpresasMulti.map(opt => (
+            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
           ))}
         </select>
         <select
@@ -195,9 +245,10 @@ const HistoriaOcupacional = () => {
           value={rowData.altitud}
           onChange={e => handleRowChange('altitud', e.target.value)}
           style={{ minWidth: 120, fontSize: 13, color: '#000' }}
-        >
-          {altitudOptions.map(opt => (
-            <option key={opt} value={opt}>{opt === '' ? 'Altitud...' : opt}</option>
+        > 
+          <option value=""></option>
+          {AlturaMulti.map(opt => (
+            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
           ))}
         </select>
         <select
@@ -206,14 +257,15 @@ const HistoriaOcupacional = () => {
           onChange={e => handleRowChange('areaEmpresa', e.target.value)}
           style={{ minWidth: 180, fontSize: 13, color: '#000' }}
         >
-          {areaEmpresaOptions.map(opt => (
-            <option key={opt} value={opt}>{opt === '' ? 'Área Empresa...' : opt}</option>
+          <option value=""></option>
+          {AreaMulti.map(opt => (
+            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
           ))}
         </select>
         <select
           className={styles.inputLarge}
-          value={rowData.riesgos}
-          onChange={e => handleRowChange('riesgos', e.target.value)}
+          value={rowData.riesgo}
+          onChange={e => handleRowChange('riesgo', e.target.value)}
           style={{ minWidth: 180, fontSize: 13, color: '#000' }}
         >
           {riesgosOptions.map(opt => (
@@ -263,15 +315,15 @@ const HistoriaOcupacional = () => {
               <tbody>
                 {registros.map((reg, idx) => (
                   <tr key={idx}>
-                    <td>{reg.ano}</td>
+                    <td>{reg.fecha}</td>
                     <td>{reg.empresa}</td>
                     <td>{reg.altitud}</td>
                     <td>{reg.actividad}</td>
                     <td>{reg.areaEmpresa}</td>
                     <td>{reg.ocupacion}</td>
-                    <td>{reg.tiempoSuperficie}</td>
-                    <td>{reg.tiempoSocavon}</td>
-                    <td>{reg.riesgos}</td>
+                    <td>{reg.superficie}</td>
+                    <td>{reg.socavon}</td>
+                    <td>{reg.riesgo}</td>
                     <td>{reg.proteccion}</td>
                   </tr>
                 ))}
@@ -298,17 +350,17 @@ const HistoriaOcupacional = () => {
           EPP: Equipo de Protección Personal
           <div style={{ marginTop: 8, fontSize: 13 }}>
             Imprimir N° Orden :
-            <input type="text" style={{ width: 80, marginLeft: 8, border: '1px solid #ccc', borderRadius: 3, padding: '2px 6px', fontSize: 13, color: '#000' }} />
-            <button style={{ marginLeft: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#000', fontSize: 16 }}>
+            <input type="text" value={form.norden} name='norden' onChange={handleInputChange} style={{ width: 80, marginLeft: 8, border: '1px solid #ccc', borderRadius: 3, padding: '2px 6px', fontSize: 13, color: '#000' }} />
+            <button onClick={handlePrint} style={{ marginLeft: 4, background: 'none', border: 'none', cursor: 'pointer', color: '#000', fontSize: 16 }}>
               <i className="fas fa-print"></i>
             </button>
           </div>
         </div>
         <fieldset style={{ border: '1px solid #bbb', borderRadius: 4, padding: 8, minWidth: 260 }}>
-          <button style={{ height: 32, background: '#059669', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', marginRight: 8, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
+          <button onClick={() => {SubmiteHistoriaOcupacionalController(form,token,userlogued,handleClean,tabla,registros)}} style={{ height: 32, background: '#059669', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', marginRight: 8, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
             <i className="fas fa-save" style={{ marginRight: 6 }}></i> Guardar/Actualizar
           </button>
-          <button style={{ height: 32, background: '#fc6b03', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
+          <button onClick={handleClean} style={{ height: 32, background: '#fc6b03', color: '#fff', border: 'none', borderRadius: 3, padding: '0 16px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', fontSize: 13 }}>
             <i className="fas fa-broom" style={{ marginRight: 6 }}></i> Limpiar
           </button>
         </fieldset>

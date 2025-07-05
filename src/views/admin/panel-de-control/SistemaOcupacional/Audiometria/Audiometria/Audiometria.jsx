@@ -21,8 +21,18 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     2,
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
+  const chemicals = [
+    "plomo",
+    "mercurio",
+    "tolueno",
+    "xileno",
+    "plaguicidas",
+    "organofosforados",
+  ];
+  const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
 
   const initialFormState = {
+    codAu: "",
     norden: "",
     fecha: today,
     nombres: "",
@@ -142,17 +152,6 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
     }));
   };
 
-  // const handleCheckRadioMultiple = (name, value) => {
-  //   setForm((f) => {
-  //     const currentTypes = f[name] || [];
-  //     if (currentTypes.includes(value)) {
-  //       return { ...f, [name]: currentTypes.filter((v) => v !== value) };
-  //     } else {
-  //       return { ...f, [name]: [...currentTypes, value] };
-  //     }
-  //   });
-  // };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
@@ -173,6 +172,13 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
 
   const handleClearnotO = () => {
     setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  };
+  const getNextArrayItem = (pre = "", current, post = "", array, next = "") => {
+    const index = array.indexOf(current);
+    if (index === -1 || index === array.length - 1) {
+      return next; // No existe o ya es el último
+    }
+    return `${pre}${array[index + 1]}${post}`;
   };
 
   const handlePrint = () => {
@@ -730,14 +736,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                           {"Tpo.(Años)"}
                         </label>
                       </div>
-                      {[
-                        "plomo",
-                        "mercurio",
-                        "tolueno",
-                        "xileno",
-                        "plaguicidas",
-                        "organofosforados",
-                      ].map((chem) => (
+                      {chemicals.map((chem, index) => (
                         <div key={chem} className="flex flex-col items-center">
                           <label className="capitalize">
                             {chem.length > 5
@@ -752,7 +751,22 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                             value={form[`${chem}_hrs`] || ""}
                             onChange={handleChange}
                             className="border rounded px-2 py-1 w-full text-center"
-                            // placeholder="Hrs./día"
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                document
+                                  .getElementsByName(
+                                    `${getNextArrayItem(
+                                      "",
+                                      chem,
+                                      "_hrs",
+                                      chemicals,
+                                      "plomo_anios"
+                                    )}`
+                                  )?.[0]
+                                  ?.focus();
+                              }
+                            }}
                           />
                           <input
                             type="text"
@@ -760,7 +774,23 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                             value={form[`${chem}_anios`] || ""}
                             onChange={handleChange}
                             className="border rounded px-2 py-1 w-full text-center mt-1"
-                            // placeholder="Años"
+                            onKeyUp={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+
+                                document
+                                  .getElementsByName(
+                                    `${getNextArrayItem(
+                                      "",
+                                      chem,
+                                      "_anios",
+                                      chemicals,
+                                      ""
+                                    )}`
+                                  )?.[0]
+                                  ?.focus();
+                              }
+                            }}
                           />
                         </div>
                       ))}
@@ -956,21 +986,35 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
-                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
-                    (hz) => (
-                      <div key={hz}>
-                        <p>{hz}</p>
-                        <input
-                          type="text"
-                          name={`od_${hz}`}
-                          value={form[`od_${hz}`] || ""}
-                          onChange={handleChangeNumber}
-                          // placeholder="dB"
-                          className="border rounded px-1 py-1 text-center w-full"
-                        />
-                      </div>
-                    )
-                  )}
+                  {frecuencias.map((hz) => (
+                    <div key={hz}>
+                      <p>{hz}</p>
+                      <input
+                        type="text"
+                        name={`od_${hz}`}
+                        value={form[`od_${hz}`] || ""}
+                        onChange={handleChangeNumber}
+                        // placeholder="dB"
+                        className="border rounded px-1 py-1 text-center w-full"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            document
+                              .getElementsByName(
+                                `${getNextArrayItem(
+                                  "od_",
+                                  hz,
+                                  "",
+                                  frecuencias,
+                                  "oi_500"
+                                )}`
+                              )?.[0]
+                              ?.focus();
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -982,21 +1026,35 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
-                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
-                    (hz) => (
-                      <div key={hz}>
-                        <p>{hz}</p>
-                        <input
-                          type="text"
-                          name={`oi_${hz}`}
-                          value={form[`oi_${hz}`] || ""}
-                          onChange={handleChangeNumber}
-                          // placeholder="dB"
-                          className="border rounded px-1 py-1 text-center w-full"
-                        />
-                      </div>
-                    )
-                  )}
+                  {frecuencias.map((hz) => (
+                    <div key={hz}>
+                      <p>{hz}</p>
+                      <input
+                        type="text"
+                        name={`oi_${hz}`}
+                        value={form[`oi_${hz}`] || ""}
+                        onChange={handleChangeNumber}
+                        // placeholder="dB"
+                        className="border rounded px-1 py-1 text-center w-full"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            document
+                              .getElementsByName(
+                                `${getNextArrayItem(
+                                  "oi_",
+                                  hz,
+                                  "",
+                                  frecuencias,
+                                  ""
+                                )}`
+                              )?.[0]
+                              ?.focus();
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -1064,21 +1122,35 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
-                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
-                    (hz) => (
-                      <div key={`od_o_${hz}`}>
-                        <p>{hz}</p>
-                        <input
-                          type="text"
-                          name={`od_o_${hz}`}
-                          value={form[`od_o_${hz}`] || ""}
-                          onChange={handleChangeNumber}
-                          // placeholder="dB"
-                          className="border rounded px-1 py-1 text-center w-full"
-                        />
-                      </div>
-                    )
-                  )}
+                  {frecuencias.map((hz) => (
+                    <div key={`od_o_${hz}`}>
+                      <p>{hz}</p>
+                      <input
+                        type="text"
+                        name={`od_o_${hz}`}
+                        value={form[`od_o_${hz}`] || ""}
+                        onChange={handleChangeNumber}
+                        // placeholder="dB"
+                        className="border rounded px-1 py-1 text-center w-full"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            document
+                              .getElementsByName(
+                                `${getNextArrayItem(
+                                  "od_o_",
+                                  hz,
+                                  "",
+                                  frecuencias,
+                                  "oi_o_500"
+                                )}`
+                              )?.[0]
+                              ?.focus();
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -1090,21 +1162,35 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                     <p>hz</p>
                     <p>dB (A)</p>
                   </div>
-                  {["500", "1000", "2000", "3000", "4000", "6000", "8000"].map(
-                    (hz) => (
-                      <div key={`oi_o_${hz}`}>
-                        <p>{hz}</p>
-                        <input
-                          type="text"
-                          name={`oi_o_${hz}`}
-                          value={form[`oi_o_${hz}`] || ""}
-                          onChange={handleChangeNumber}
-                          // placeholder="dB"
-                          className="border rounded px-1 py-1 text-center w-full"
-                        />
-                      </div>
-                    )
-                  )}
+                  {frecuencias.map((hz) => (
+                    <div key={`oi_o_${hz}`}>
+                      <p>{hz}</p>
+                      <input
+                        type="text"
+                        name={`oi_o_${hz}`}
+                        value={form[`oi_o_${hz}`] || ""}
+                        onChange={handleChangeNumber}
+                        // placeholder="dB"
+                        className="border rounded px-1 py-1 text-center w-full"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            document
+                              .getElementsByName(
+                                `${getNextArrayItem(
+                                  "oi_o_",
+                                  hz,
+                                  "",
+                                  frecuencias,
+                                  ""
+                                )}`
+                              )?.[0]
+                              ?.focus();
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

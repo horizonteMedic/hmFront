@@ -129,6 +129,12 @@ const ConsentimientoDigitalizacion = ({token, userlogued, selectedSede}) => {
     setDni('');
   };
 
+  const handleResetNot = () => {
+    setDate(today);
+    setName('');
+    setDni('');
+  };
+
   const handleSave = () => {
     Swalwait('Enviando Datos','Espere por favor...')
     const data = {
@@ -156,7 +162,27 @@ const ConsentimientoDigitalizacion = ({token, userlogued, selectedSede}) => {
     String(dni).trim() &&
     authorized;
 
-  const handlePrint = () => {
+  const PrintValidation = (dni) => {
+    Promise.all([
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/HUELLA`),
+      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/FIRMAP`),
+      getFetch(`/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado/${orderNumber}`, token)
+    ])
+    .then(([Huella, Firma, jasper]) => {
+      const huellaData = Huella.id === 1 ? { id: 1, url: Huella.mensaje } : { id: 0, url: '' };
+      const firmaData = Firma.id === 1 ? { id: 1, url: Firma.mensaje } : { id: 0, url: '' };
+      generatePdf({ nombre: jasper.nombres, dni, orderNumber, FirmaP: firmaData, HuellaP: huellaData, token: token, jasper });
+    })
+    .catch(error => {
+      Swal.fire('Error', 'No se pudo generar el consentimiento', 'error');
+      console.error(error);
+    })
+    .finally(() => {
+      Swal.close();
+    });
+  }
+
+  const handlePrint = async () => {
     if (!String(orderNumber).trim()) {
       return Swal.fire('Error', 'Ingrese Nro orden', 'error');
     }
@@ -170,24 +196,16 @@ const ConsentimientoDigitalizacion = ({token, userlogued, selectedSede}) => {
         Swal.showLoading();
       }
     });
-
-    Promise.all([
-      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/HUELLA`),
-      VerifyHoF(`/api/v01/st/registros/detalleUrlArchivosEmpleados/${dni}/FIRMAP`),
-      getFetch(`/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado/${orderNumber}`, token)
-    ])
-    .then(([Huella, Firma, jasper]) => {
-      const huellaData = Huella.id === 1 ? { id: 1, url: Huella.mensaje } : { id: 0, url: '' };
-      const firmaData = Firma.id === 1 ? { id: 1, url: Firma.mensaje } : { id: 0, url: '' };
-      generatePdf({ nombre: name, dni, orderNumber, FirmaP: firmaData, HuellaP: huellaData, token: token, jasper });
-    })
-    .catch(error => {
-      Swal.fire('Error', 'No se pudo generar el consentimiento', 'error');
-      console.error(error);
-    })
-    .finally(() => {
-      Swal.close();
-    });
+    const res = await GetNoConsentimiento(orderNumber,tabla,token)
+    if (res.id === 1) {
+      getFetch(`/api/v01/ct/consentDigit/infoFormatoConsentDigitalizado/${orderNumber}`,token)
+      .then((res) => {
+        PrintValidation(res.dni)
+      })
+    } else {
+      Swal.fire('Error','No existe un consentimiento con este N° de Orden','error')
+    }
+    
   };
   
   return (
@@ -201,6 +219,7 @@ const ConsentimientoDigitalizacion = ({token, userlogued, selectedSede}) => {
             onChange={e => setOrderNumber(e.target.value)}
             onKeyUp={e => {
               if (e.key === 'Enter') {
+                handleResetNot()
                 handeSearchNo();
               }
             }}
