@@ -14,7 +14,6 @@ import {
   VerifyTR,
   PrintHojaR,
 } from "./controllerAudiometria";
-import e from "cors";
 export default function Audiometria({ token, selectedSede, userlogued }) {
   const tabla = "audiometria_2023";
   const date = new Date();
