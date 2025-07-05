@@ -2,7 +2,7 @@ import { URLAzure } from "../../../../../config/config";
 
 export function SubmitHistoriaOcupacional(data,registros,user,token) {
     const body = {
-        "codHo": data.codHo ? data.codHo : 0,
+        "codHo": data.codHo ? data.codHo : null,
         "norden": data.norden,
         "areaO": data.areaO,
         "fechaHo": data.fecha,
