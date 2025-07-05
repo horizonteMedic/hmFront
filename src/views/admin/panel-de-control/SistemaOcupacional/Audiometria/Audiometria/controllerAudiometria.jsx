@@ -15,6 +15,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
+          codAu: res.codAu,
           fecha: res.fechaAu,
           sordera: res.rbsasorderaSi ? "SI" : "NO",
           acufenos: res.rbsaacufenosSi ? "SI" : "NO",
@@ -146,7 +147,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   }
   Loading("Registrando Datos");
   const body = {
-    codAu: 0,
+    codAu: form.codAu,
     norden: form.norden,
     fechaAu: form.fecha,
 
