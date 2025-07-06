@@ -138,7 +138,11 @@ export default function ReporteExamen1 (datos){
             styles: { fontSize: 8, textColor: [0, 0, 0] },
             headStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
         });
-        footer(doc,datos)
+
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Registrado por : ${datos.userRegistro || ""}`, 17, headspace+185);
+        footer(doc,datos);
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

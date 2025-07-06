@@ -15,22 +15,123 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
-          fecha: res.fecha,
-          muestra: res.txtmuestra,
-          color: res.txtcolor,
-          consistencia: res.txtconsistencia,
-          moco_fecal: res.txtmoco_fecal,
-          sangrev: res.txtsangrev,
-          restosa: res.txtrestosa,
-          leucocitos: res.txtleucocitos,
-          hematies: res.txthematies,
-          parasitos: res.txtparasitos,
-          gotasg: res.txtgotasg,
-          levaduras: res.txtlevaduras,
-          identificacion: res.txtidentificacion,
-          florac: res.txtflorac,
-          resultado: res.txtresultado,
-          observaciones: res.txtobservaciones,
+          
+          codAu: res.codAu,
+          fecha: res.fechaAu,
+          fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
+          sordera: res.rbsasorderaSi ? "SI" : "NO",
+          acufenos: res.rbsaacufenosSi ? "SI" : "NO",
+          vertigo: res.rbsavertigoSi ? "SI" : "NO",
+          otalgia: res.rbsaotalgiaSi ? "SI" : "NO",
+          secrecion_otica: res.rbsasecrecionSi ? "SI" : "NO",
+          otros_sintomas_orl: res.txtsaotrossintomas,
+
+          rinitis: res.rbamrenitisSi ? "SI" : "NO",
+          sinusitis: res.rbamsinusitisSi ? "SI" : "NO",
+          otitis_media_cronica: res.rbamotitisSi ? "SI" : "NO",
+          medicamentos_ototoxicos: res.rbamototoxicosSi ? "SI" : "NO",
+          meningitis: res.rbammeningitisSi ? "SI" : "NO",
+          tec: res.rbamtecSi ? "SI" : "NO",
+          sordera_am: res.rbamsorderaSi ? "SI" : "NO",
+          parotiditis: res.rbamparotiditisSi ? "SI" : "NO",
+          sarampion: res.rbamsarampionSi ? "SI" : "NO",
+          tbc: res.rbamtbcSi ? "SI" : "NO",
+          cuales_antecedentes: res.txtamcuales,
+
+          exposicion_ruido: res.rbeoexposicionSi ? "SI" : "NO",
+          protectores_auditivos: res.rbeoprotectoresSi ? "SI" : "NO",
+          exposicion_quimicos: res.rbeosustanciasSi ? "SI" : "NO",
+
+          promedio_horas: res.rbte0a2
+            ? "0-2"
+            : res.rbte2a4
+            ? "2-4"
+            : res.rbte4a6
+            ? "4-6"
+            : res.rbte6a8
+            ? "6-8"
+            : res.rbte8a10
+            ? "8-10"
+            : res.rbte10a12
+            ? "10-12"
+            : res.rbtem12
+            ? ">12"
+            : res.rbteeventual
+            ? "eventual"
+            : "",
+          anios_exposicion: res.txtanios,
+          meses_exposicion: res.txtmeses,
+
+          tapones: res.chktapones,
+          orejeras: res.chkorejeras,
+          plomo_hrs: res.txthplomo,
+          mercurio_hrs: res.txthmercurio,
+          tolueno_hrs: res.txthtolueno,
+          xileno_hrs: res.txthxileno,
+          plaguicidas_hrs: res.txthplaguic,
+          organofosforados_hrs: res.txthorganofos,
+
+          plomo_anios: res.txttplomo,
+          mercurio_anios: res.txttmercurio,
+          tolueno_anios: res.txtttolueno,
+          xileno_anios: res.txttxileno,
+          plaguicidas_anios: res.txttplaguic,
+          organofosforados_anios: res.txttorganofos,
+          otros_quimicos: res.txteootros,
+
+          practica_tiro: res.rbaepraticaSi ? "SI" : "NO",
+          uso_walkman: res.rbaeusoSi ? "SI" : "NO",
+          otros_antecedentes: res.rbaeotrosSi ? "SI" : "NO",
+          cuales_antecedentes_extralaborales: res.txtaecuales,
+          otoscopia_odiochos: res.txtood,
+          otoscopia_odilzquierdo: res.txtooi,
+
+          od_500: res.od500,
+          od_1000: res.od1000,
+          od_2000: res.od2000,
+          od_3000: res.od3000,
+          od_4000: res.od4000,
+          od_6000: res.od6000,
+          od_8000: res.od8000,
+
+          oi_500: res.oi500,
+          oi_1000: res.oi1000,
+          oi_2000: res.oi2000,
+          oi_3000: res.oi3000,
+          oi_4000: res.oi4000,
+          oi_6000: res.oi6000,
+          oi_8000: res.oi8000,
+
+          diagnostico_od: res.txtdiagOd,
+          diagnostico_oi: res.txtdiagOi,
+          comentarios_audiometria: res.txtcomentarios,
+          proteccion_simpleODoble: res.chkrpasimple
+            ? "simple"
+            : res.chkrpadoble
+            ? "doble"
+            : "",
+          control_semestralOAnual: res.chkcasemestral
+            ? "semestral"
+            : res.chkcaanual
+            ? "anual"
+            : "",
+          recomendaciones_otras: res.txtotrasrecomendaciones,
+
+          od_o_500: res.od1500,
+          od_o_1000: res.od11000,
+          od_o_2000: res.od12000,
+          od_o_3000: res.od13000,
+          od_o_4000: res.od14000,
+          od_o_6000: res.od16000,
+          od_o_8000: res.od18000,
+
+          oi_o_500: res.oi1500,
+          oi_o_1000: res.oi11000,
+          oi_o_2000: res.oi12000,
+          oi_o_3000: res.oi13000,
+          oi_o_4000: res.oi14000,
+          oi_o_6000: res.oi16000,
+          oi_o_8000: res.oi18000,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -48,7 +149,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   }
   Loading("Registrando Datos");
   const body = {
-    codAu: 0,
+    codAu: form.codAu,
     norden: form.norden,
     fechaAu: form.fecha,
 
@@ -197,6 +298,11 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     }
   });
 };
+function convertirFecha(fecha) {
+  if (fecha === "") return "";
+  const [dia, mes, anio] = fecha.split("-");
+  return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
+}
 
 export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
@@ -208,10 +314,10 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          `../../../../../../jaspers/Manipuladores/*.jsx`
+          `../../../../../../jaspers/Audiometria/*.jsx`
         );
         const modulo = await jasperModules[
-          `../../../../../../jaspers/Manipuladores/${nombre}.jsx`
+          `../../../../../../jaspers/Audiometria/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
@@ -293,6 +399,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
       set((prev) => ({
         ...prev,
         ...res,
+        fechaNac: convertirFecha(res.fechaNac),
         nombres: res.nombresApellidos,
       }));
     })

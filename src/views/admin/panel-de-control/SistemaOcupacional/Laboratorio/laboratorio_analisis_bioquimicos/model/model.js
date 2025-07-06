@@ -25,7 +25,7 @@ export function GetTableAnalBio(data,sede,token) {
 
 export function SubmitLabAnalBio(data,user,token) {
     const body = {
-        codAb: data.codAb ? data.codAb : "0",
+        codAb: data.codAb ? data.codAb : null,
         fechaAb: data.fecha,
         txtReponsable: data.medico,
         txtCreatinina: data.creatinina,
@@ -38,7 +38,7 @@ export function SubmitLabAnalBio(data,user,token) {
         userMedicoOcup: "",
         nOrden: data.norden,
     };    
-    console.log(JSON.stringify(body))
+    
     const url = `${URLAzure}/api/v01/ct/laboratorio/registrarActualizarAnalisisBioquimico`
         const options = {
             method: 'POST',

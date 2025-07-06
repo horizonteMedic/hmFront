@@ -3,7 +3,7 @@ import { URLAzure } from "../../../../../../config/config";
 export function SubmitHematologia(data, dataO, token, user) {
    
     const body = {
-        codLabclinico: data.codLabclinico ? data.codLabclinico : "0",
+        codLabclinico: data.codLabclinico ? data.codLabclinico : null,
         fechaLab: data.fecha,
         resLab: data.responsable,
         chko: data.grupo === "O" ? true : false,

@@ -64,14 +64,16 @@ import {
   faMicroscope,
   faVialVirus,
   faNotesMedical,
+  faFileWaveform,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
 import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
 import Audiometria from "./Audiometria/Audiometria/Audiometria.jsx";
-import AudiometriaOhla from "./Audiometria/AudiometriaOhla/AudiometriaOhla.jsx";
 import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/AudiometriaCuestionario.jsx";
+import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
+import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -258,6 +260,19 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faVial} />
                   </span>
                   <span className={styles.title}>Laboratorio</span>
+                </div>
+              )}
+              {tieneVista("Coproparasitologico") && (
+                <div
+                  className={`${styles.gridItem} ${
+                    activeTab === 3 ? styles.active : ""
+                  }`}
+                  onClick={() => setActiveTab(16)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faFileWaveform} />
+                  </span>
+                  <span className={styles.title}>Historia Ocupacional</span>
                 </div>
               )}
               {tieneVista("Coproparasitologico") && (
@@ -481,6 +496,7 @@ const TabComponent = () => {
                       DNIG={DNIG}
                       selectedSede={selectSede}
                       token={token}
+                      userlogued={userlogued.sub}
                       PrecioC={ComboboxPrecioExamenMulti}
                       ChangeDNI={(nuevoDNI) => {
                         setDNIG(nuevoDNI);
@@ -776,7 +792,9 @@ const TabComponent = () => {
                 </button>
               </div>
               <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Audiometria</h2>
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Audiometria
+                </h2>
               </div>
               <div>
                 <div className={styles.tabHeader}>
@@ -806,7 +824,6 @@ const TabComponent = () => {
                   >
                     Cuestionario de Audiometria
                   </button>
-                  
                 </div>
                 <div>
                   {subTab === 0 && (
@@ -817,7 +834,7 @@ const TabComponent = () => {
                     />
                   )}
                   {subTab === 1 && (
-                    <AudiometriaOhla
+                    <AudiometriaOhlaTabSelector
                       token={token}
                       userlogued={userlogued.sub}
                       selectedSede={selectSede}
@@ -834,22 +851,28 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-          {/* {activeTab === 7 && (
+          {/*HISTORIA OCUPACIONL */}
+          {activeTab === 16 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
+                  onClick={() => setActiveTab(null)}
                 >
                   ← Atrás
                 </button>
               </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Exámenes</h2>
+              <div>
+                <HistoriaOcupacional
+                  token={token}
+                  userlogued={userlogued.sub}
+                  selectedSede={selectSede}
+                  listas={listasCombos}
+                />
+                <div></div>
               </div>
-              <ExamenesLaboratorio token={token} selectedSede={selectSede} userlogued={userlogued.sub} activeTabExamenes={activeTabExamenes} setActiveTabExamenes={setActiveTabExamenes} />
             </div>
-          )} */}
+          )}
         </div>
       </div>
 
