@@ -19,8 +19,9 @@ const AperturaExamenesPreOcup = (props) => {
   const [stardate, setStartDate] = useState(new Date());
   const jasperModules = import.meta.glob('../../../../../jaspers/*.jsx'); // ajusta si usas .jsx
   const dniRef = useRef(null);
+  const {userlogued} = props;
   const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
-    ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth } = props.listas
+    ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth} = props.listas
   
     const [isEmpresaModalOpen, setIsEmpresaModalOpen] = useState(false);
   const [isContrataModalOpen, setIsContrataModalOpen] = useState(false);
@@ -706,7 +707,7 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-    SubmitHistoriaC(datos,props.selectedSede,props.token,2)
+    SubmitHistoriaC({...datos,user_registro: userlogued},props.selectedSede,props.token,2)
     .then((res) => {
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido editar la Historia Clinica', 'error');
@@ -739,7 +740,7 @@ const AperturaExamenesPreOcup = (props) => {
         Swal.showLoading();
       }
     });
-    SubmitHistoriaC(datos,props.selectedSede,props.token,1)
+    SubmitHistoriaC({...datos,user_registro: userlogued},props.selectedSede,props.token,1)
     .then((res) => {
       if (!res.id) {
           Swal.fire('Error', 'No se ha podido registrar la Historia Clinica', 'error');
@@ -817,7 +818,7 @@ const AperturaExamenesPreOcup = (props) => {
   
   return (
     <div >
-        <div className="grid md:grid-cols-2 sm:flex-col gap-5 ">
+        <div className="grid md:grid-cols-2 sm:flex-col gap-5 px-4">
           <div className="w-full sm:w-full md:w-auto text-lg font-semibold  ">
             <div className="mb-1 pb-2">
               <h2 className="text-lg font-bold">Datos</h2>

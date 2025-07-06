@@ -496,6 +496,7 @@ const TabComponent = () => {
                       DNIG={DNIG}
                       selectedSede={selectSede}
                       token={token}
+                      userlogued={userlogued.sub}
                       PrecioC={ComboboxPrecioExamenMulti}
                       ChangeDNI={(nuevoDNI) => {
                         setDNIG(nuevoDNI);
