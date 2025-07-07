@@ -624,7 +624,7 @@ export const HematologiaBioquimicaSIEO = ({
                   </label>
                   <input
                     name="rpr"
-                    value={rprNA ? "N/A" : form.rpr}
+                    value={form.rpr}
                     onChange={handleInputChange}
                     className={`border border-gray-300 rounded-lg px-3 py-1 flex-1 text-md shadow-sm font-medium bg-white focus:ring-2 focus:ring-gray-300 transition-all ${
                       rprNA ? "bg-gray-200 text-gray-500" : "text-gray-900"
@@ -640,7 +640,6 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("rpr", "NEGATIVO");
                       setField("rprNA", false);
                     }}
-                    disabled={rprNA}
                   />
                   <Checkbox
                     label={<span className="font-medium">+</span>}
@@ -649,11 +648,10 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("rpr", "POSITIVO");
                       setField("rprNA", false);
                     }}
-                    disabled={rprNA}
                   />
                   <Checkbox
                     label={<span className="font-medium">N/A</span>}
-                    checked={rprNA}
+                    checked={form.rpr === "N/A"}
                     onChange={(v) => {
                       setRprNA(v);
                       setField("rprNA", v);
@@ -669,7 +667,7 @@ export const HematologiaBioquimicaSIEO = ({
                   </label>
                   <input
                     name="vih"
-                    value={vihNA ? "N/A" : form.vih}
+                    value={form.vih}
                     onChange={handleInputChange}
                     className={`border border-gray-300 rounded-lg px-3 py-1 flex-1 text-md shadow-sm font-medium bg-white focus:ring-2 focus:ring-gray-300 transition-all ${
                       vihNA ? "bg-gray-200 text-gray-500" : "text-gray-900"
@@ -685,7 +683,6 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("vih", "NEGATIVO");
                       setField("vihNA", false);
                     }}
-                    disabled={vihNA}
                   />
                   <Checkbox
                     label={<span className="font-medium">+</span>}
@@ -694,11 +691,10 @@ export const HematologiaBioquimicaSIEO = ({
                       setField("vih", "POSITIVO");
                       setField("vihNA", false);
                     }}
-                    disabled={vihNA}
                   />
                   <Checkbox
                     label={<span className="font-medium">N/A</span>}
-                    checked={vihNA}
+                    checked={form.vih === "N/A"}
                     onChange={(v) => {
                       setVihNA(v);
                       setField("vihNA", v);
