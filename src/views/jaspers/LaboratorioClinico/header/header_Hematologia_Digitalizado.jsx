@@ -33,7 +33,7 @@ const header_Hematologia = (doc, datos = {}) => {
   }
 
   // 2. Bloque de datos a la derecha
-  const rightColX = pageW - margin - 20;
+  const rightColX = pageW - margin - 30;
   const lineHeight = 6;
   
   // --- Nro Orden ---

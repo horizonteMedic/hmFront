@@ -30,12 +30,10 @@ export const HematologiaBioquimicaSIEO = ({
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleClear = (resetNorden = true) => {
+  const handleClear = () => {
     setForm((f) => ({
-      ficha: true,
-      norden: resetNorden ? "" : f.norden,
+      ...f,
       fecha: today,
-      responsable: "",
       paciente: "",
       empContratista: "",
       empresa: "",
@@ -59,9 +57,9 @@ export const HematologiaBioquimicaSIEO = ({
       glucosaNA: false,
       creatinina: "",
       creatininaNA: false,
-      rpr: "",
+      rpr: "N/A",
       rprNA: false,
-      vih: "",
+      vih: "N/A",
       vihNA: false,
       gfSangPedido: "",
     }));
@@ -211,7 +209,7 @@ export const HematologiaBioquimicaSIEO = ({
                     event.preventDefault();
                     return;
                   }
-                  handleClear(false);
+                  handleClear();
                   VerifyTR(
                     form.norden,
                     tabla,
