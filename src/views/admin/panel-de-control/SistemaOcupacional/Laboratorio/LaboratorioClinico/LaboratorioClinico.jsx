@@ -41,10 +41,10 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     glucosaNA: false,
     creatinina: '',
     creatininaNA: false,
-    rpr: '',
+    rpr: 'N/A',
     rprNA: false,
     rprPos: false,
-    vih: '',
+    vih: 'N/A',
     vihNA: false,
     vihPos: false
   })
@@ -124,10 +124,10 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       glucosaNA: false,
       creatinina: '',
       creatininaNA: false,
-      rpr: '',
+      rpr: 'N/A',
       rprNA: false,
       rprPos: false,
-      vih: '',
+      vih: 'N/A',
       vihNA: false,
       vihPos: false
     });
