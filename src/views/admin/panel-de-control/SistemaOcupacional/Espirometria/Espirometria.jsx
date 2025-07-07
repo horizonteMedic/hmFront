@@ -1,112 +1,203 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom } from '@fortawesome/free-solid-svg-icons';
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faBroom } from "@fortawesome/free-solid-svg-icons";
+import { SubmitDataService, VerifyTR } from "./controllerEspirometria";
 
+const tabla = "funcion_abs";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
 const initialForm = {
-  norden: '',
-  fecha: '',
-  codExam: '',
-  nombres: '',
-  edad: '',
+  norden: "",
+  fecha: today,
+  codExam: "",
+  codAbs: "",
+  nombres: "",
+
+  edad: "",
   pasoExamen: false,
-  fvc: '',
-  fev1: '',
-  fev1_fvc: '',
-  fef: '',
-  peso: '',
-  talla: '',
-  fvcTeorico: '',
-  fev1Teorico: '',
-  interpretacion: '',
+  fvc: "",
+  fev1: "",
+  fev1_fvc: "",
+  fef: "",
+  peso: "",
+  talla: "",
+  fvcTeorico: "",
+  fev1Teorico: "",
+  interpretacion: "",
 };
 
-export default function Espirometria() {
+export default function Espirometria({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialForm);
 
-  const setField = (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
   };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setField(name, type === 'checkbox' ? checked : value);
+  const toggleCheckBox = (e) => {
+    const { name } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: !f[name],
+    }));
   };
 
   const handleClear = () => {
     setForm(initialForm);
   };
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialForm, norden: prev.norden }));
+  };
 
   const handleSave = () => {
-
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    handleClearnotO();
+  };
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   return (
-    <div className="mx-auto bg-white rounded shadow p-6 space-y-6" style={{ width: '30%' }}>
-      <h2 className="text-2xl font-bold text-center">ESPIROMETRÍA</h2>
+    <div className="mx-auto bg-white rounded shadow p-6 max-w-[90%] md:max-w-[70%] xl:max-w-[50%]">
+      <h2 className="text-2xl font-bold text-center ">ESPIROMETRÍA</h2>
       {/* Encabezado */}
-      <div className="grid grid-cols-2 gap-4 items-center">
+      <div className="grid grid-cols-2 gap-4 items-center mt-6 mb-4">
         <Field
           label="Nro Orden"
           name="norden"
           value={form.norden}
-          onChange={handleInputChange}
+          onKeyUp={handleSearch}
+          onChange={handleChange}
         />
-        <Field label="Fecha" name="fecha" type="date" value={form.fecha} onChange={handleInputChange} />
-        <Field label="Cod Exam." name="codExam" value={form.codExam} onChange={handleInputChange} />
+        <Field
+          label="Fecha"
+          name="fecha"
+          type="date"
+          value={form.fecha}
+          onChange={handleChange}
+        />
+        <Field
+          label="Cod Exam."
+          name="codExam"
+          value={form.codExam}
+          disabled
+          onChange={handleChange}
+        />
         <Field
           label="Nombres"
           name="nombres"
           value={form.nombres}
-          onChange={handleInputChange}
+          onChange={handleChange}
           className="col-span-2"
           disabled
         />
         <div className="col-span-2">
           <div className="flex items-center gap-4 mb-1">
             <label className="font-semibold">Edad</label>
+            <input
+              type="text"
+              name="edad"
+              value={form.edad}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 w-32 bg-gray-50"
+              disabled
+            />
             <span>años</span>
             <label className="flex items-center font-semibold ml-4">
               <input
                 type="checkbox"
                 name="pasoExamen"
                 checked={form.pasoExamen}
-                onChange={handleInputChange}
+                onChange={(e) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    fvc: e.target.checked ? "N/A" : "",
+                    fev1: e.target.checked ? "N/A" : "",
+                    fev1_fvc: e.target.checked ? "N/A" : "",
+                    fef: e.target.checked ? "N/A" : "",
+                    interpretacion: e.target.checked
+                      ? "NO SE REALIZÓ ESPIROMETRÍA"
+                      : "",
+                  }));
+                  toggleCheckBox(e);
+                }}
                 className="mr-1 accent-blue-600 w-5 h-5"
               />
               No Paso Examen
             </label>
           </div>
-          <input
-            type="text"
-            name="edad"
-            value={form.edad}
-            onChange={handleInputChange}
-            className="border rounded px-2 py-1 w-32 bg-gray-50"
-            disabled
-          />
         </div>
       </div>
       <hr />
       {/* Resultados */}
-      <div className="grid grid-cols-3 gap-4 items-center">
-        <Field label="FVC %" name="fvc" value={form.fvc} onChange={handleInputChange} />
-        <Field label="Peso" name="peso" value={form.peso} onChange={handleInputChange} inputClass="bg-blue-200" />
-        <Field label="FVC Teórico" name="fvcTeorico" value={form.fvcTeorico} onChange={handleInputChange} />
-        <Field label="FEV1 %" name="fev1" value={form.fev1} onChange={handleInputChange} />
-        <Field label="Talla" name="talla" value={form.talla} onChange={handleInputChange} inputClass="bg-blue-200" />
-        <Field label="FEV1 Teórico" name="fev1Teorico" value={form.fev1Teorico} onChange={handleInputChange} />
-        <Field label="FEV1/FVC %" name="fev1_fvc" value={form.fev1_fvc} onChange={handleInputChange} />
+      <div className="grid grid-cols-3 gap-4 items-center mt-6">
+        <Field
+          label="FVC %"
+          name="fvc"
+          value={form.fvc}
+          onChange={handleChange}
+        />
+        <Field
+          label="Peso"
+          name="peso"
+          value={form.peso}
+          onChange={handleChange}
+          disabled
+          inputClass="bg-blue-200"
+        />
+        <Field
+          label="FVC Teórico"
+          name="fvcTeorico"
+          value={form.fvcTeorico}
+          onChange={handleChange}
+        />
+        <Field
+          label="FEV1 %"
+          name="fev1"
+          value={form.fev1}
+          onChange={handleChange}
+        />
+        <Field
+          label="Talla"
+          name="talla"
+          value={form.talla}
+          onChange={handleChange}
+          disabled
+          inputClass="bg-blue-200"
+        />
+        <Field
+          label="FEV1 Teórico"
+          name="fev1Teorico"
+          value={form.fev1Teorico}
+          onChange={handleChange}
+        />
+        <Field
+          label="FEV1/FVC %"
+          name="fev1_fvc"
+          value={form.fev1_fvc}
+          onChange={handleChange}
+        />
         <div></div>
         <div></div>
-        <Field label="FEF 25-75 %" name="fef" value={form.fef} onChange={handleInputChange} />
+        <Field
+          label="FEF 25-75 %"
+          name="fef"
+          value={form.fef}
+          onChange={handleChange}
+        />
       </div>
       {/* Interpretación */}
-      <div>
+      <div className="py-4">
         <label className="font-semibold block mb-1">Interpretación</label>
         <textarea
           name="interpretacion"
           value={form.interpretacion}
-          onChange={handleInputChange}
+          onChange={handleChange}
           className="border rounded px-2 py-1 w-full min-h-[60px]"
         />
       </div>
@@ -123,7 +214,19 @@ export default function Espirometria() {
   );
 }
 
-function Field({ label, name, type = 'text', value, onChange, onKeyDown, className = '', inputClass = '', style, disabled = false }) {
+function Field({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  onKeyDown,
+  className = "",
+  inputClass = "",
+  onKeyUp = () => {},
+  style,
+  disabled = false,
+}) {
   return (
     <div className={`flex flex-col ${className}`} style={style}>
       <label className="font-semibold mb-1">{label}</label>
@@ -132,18 +235,22 @@ function Field({ label, name, type = 'text', value, onChange, onKeyDown, classNa
         name={name}
         value={value}
         onChange={onChange}
+        onKeyUp={onKeyUp}
         onKeyDown={onKeyDown}
         disabled={disabled}
-        className={`border rounded px-2 py-1 ${disabled ? '' : 'cursor-text'} ${inputClass}`}
+        className={`border rounded px-2 py-1 ${
+          disabled ? "" : "cursor-text"
+        } ${inputClass}`}
       />
     </div>
   );
 }
 
 function Button({ onClick, color, icon, children }) {
-  const bg = color === 'green'
-    ? 'bg-green-600 hover:bg-green-700'
-    : 'bg-yellow-400 hover:bg-yellow-500';
+  const bg =
+    color === "green"
+      ? "bg-green-600 hover:bg-green-700"
+      : "bg-yellow-400 hover:bg-yellow-500";
   return (
     <button
       onClick={onClick}
