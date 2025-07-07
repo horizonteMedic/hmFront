@@ -827,7 +827,9 @@ const TabComponent = () => {
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
+                  onClick={() => {
+                    setActiveTab(null), setSubTab(0);
+                  }}
                 >
                   ← Atrás
                 </button>

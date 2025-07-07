@@ -54,8 +54,8 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
           txtsangrev: "SANGRE VISIBLE",
           txtrestosa: "RESTOS ALIMENTICIOS"
         }[key];
-        doc.text(label + " :", xLeft, y);
-        doc.text(datos[key] || "", xRight, y, { align: "right" });
+        doc.text(label + " ", xLeft, y);
+        doc.text(`:  ${datos[key] || ""}`, xLeft + 65, y, { align: "left" });
         y += 7;
       });
 
@@ -72,7 +72,7 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
           txtlugol: "INVESTIGACIÓN DE PARÁSITOS"
         }[key];
         doc.text(label + " :", xLeft, y);
-        doc.text(datos[key] || "", xRight, y, { align: "right" });
+        doc.text(`:  ${datos[key] || ""}`, xLeft+65, y, { align: "left" });
         y += 7;
       });
 
