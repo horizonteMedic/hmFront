@@ -715,6 +715,7 @@ export const HematologiaBioquimicaSIEO = ({
           </div>
         </div>
 
+
         <div className="bg-white p-4 rounded shadow w-full lg:w-1/3 flex flex-col justify-between">
           <Section title="Registros anteriores">
             <table className="w-full text-md border border-gray-300 rounded-lg overflow-hidden">
