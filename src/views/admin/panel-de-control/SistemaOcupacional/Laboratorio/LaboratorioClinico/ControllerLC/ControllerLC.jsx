@@ -71,6 +71,7 @@ export const GetInfoExamenHematologia = (nro,tabla,set,setO,token,setSearchMedic
   getFetch(`/api/v01/ct/laboratorio/obtenerReporteLaboratorioClinico?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     console.log(res)
+    console.log(res.chkPositivo === true ? 'POSITIVO' : res.chkNegativo === true ? 'NEGATIVO' : res.chkNegativo === false && res.chkPositivo === false ? 'N/A' : '')
     if (res.norden) {
       set(prev => ({
         ...prev,
