@@ -136,3 +136,21 @@ export const PrintHojaR = (nro,token,tabla) => {
 
   
 }
+
+//AUTOCOMPLETABLES
+export const handleSearch = (e,setSearch,change,setFiltered,list) => {
+  console.log(e.target.value.toUpperCase())
+  const v = e.target.value.toUpperCase();
+  setSearch(v);
+  change(e.target.name, v);
+  setFiltered(
+    v ? list.filter((m) => m.mensaje.toLowerCase().includes(v.toLowerCase())) : []
+  );
+};
+
+export const handleSelect = (e,value,setSearch,change,setFiltered) => {
+
+  setSearch(value.mensaje);
+  change(e.target.name, value.mensaje);
+  setFiltered([]);
+};
