@@ -81,13 +81,13 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
           value={form.fecha}
           onChange={handleChange}
         />
-        <Field
+        {/* <Field
           label="Cod Exam."
           name="codExam"
           value={form.codExam}
           disabled
           onChange={handleChange}
-        />
+        /> */}
         <Field
           label="Nombres"
           name="nombres"
