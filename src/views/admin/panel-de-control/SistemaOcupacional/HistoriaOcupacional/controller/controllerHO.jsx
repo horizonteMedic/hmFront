@@ -148,9 +148,9 @@ export const handleSearch = (e,setSearch,change,setFiltered,list) => {
   );
 };
 
-export const handleSelect = (e,value,setSearch,change,setFiltered) => {
-
-  setSearch(value.mensaje);
-  change(e.target.name, value.mensaje);
+export const handleSelect = (e,name,value,setSearch,change,setFiltered) => {
+  console.log(value)
+  setSearch(value);
+  change(name, value);
   setFiltered([]);
 };

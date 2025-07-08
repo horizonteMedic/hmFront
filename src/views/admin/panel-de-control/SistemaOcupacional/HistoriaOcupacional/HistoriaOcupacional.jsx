@@ -205,16 +205,17 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
           </thead>
           <tbody>
             <tr>
-              <td><input type="text" className={styles.inputTable} value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.empresa}</td>
-              <td>{rowData.altitud}</td>
-              <td><input type="text" className={styles.inputTable} value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.areaEmpresa}</td>
-              <td><input type="text" className={styles.inputTable} value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td><input type="text" className={styles.inputTable} value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.riesgo}</td>
-              <td>{rowData.proteccion}</td>
+              <td className='w-auto'><input type="text" className={`${styles.inputTable} w-full py-1`} value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'><input type="text" className={`${styles.inputTable} w-full`} value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'>{rowData.altitud}</td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'>{rowData.areaEmpresa}</td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'>{rowData.riesgo}</td>
+              <td className='w-auto'>{rowData.proteccion}</td>
+              
             </tr>
           </tbody>
         </table>
@@ -245,7 +246,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
             onKeyUp={(e) => {
               if (e.key === "Enter" && filteredEmpresa.length > 0) {
                 e.preventDefault();
-                handleSelect(e,filteredEmpresa[0],setSearchEmpresa,handleRowChange,setFilteredEmpresa);
+                handleSelect(e,e.target.name,filteredEmpresa[0].mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa);
               }
             }}
             onBlur={() => setTimeout(() => setFilteredEmpresa([]), 100)}/>
@@ -254,9 +255,8 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
               {filteredEmpresa.map((opt) => (
                 <li
                   key={opt.id}
-                  name="empresa"
                   className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                  onMouseDown={(e) => handleSelect(e,filteredEmpresa[0],setSearchEmpresa,handleRowChange,setFilteredEmpresa)}
+                  onMouseDown={(e) => handleSelect(e,'empresa',opt.mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa)}
                 >
                   {opt.mensaje}
                 </li>
@@ -271,7 +271,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
             onKeyUp={(e) => {
               if (e.key === "Enter" && filteredAltitud.length > 0) {
                 e.preventDefault();
-                handleSelect(e,filteredAltitud[0],setSearchAltitud,handleRowChange,setFilteredAltitud);
+                handleSelect(e,e.target.name,filteredAltitud[0].mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud);
               }
             }}
             onBlur={() => setTimeout(() => setFilteredAltitud([]), 100)}/>
@@ -282,7 +282,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
                     key={opt.id}
                     name="altitud"
                     className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                    onMouseDown={(e) => handleSelect(e,filteredAltitud[0],setSearchAltitud,handleRowChange,setFilteredAltitud)}
+                    onMouseDown={(e) => handleSelect(e,'altitud',opt.mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud)}
                   >
                     {opt.mensaje}
                   </li>
@@ -290,17 +290,6 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
               </ul>
             )}
         </div>
-        {/*<select
-          className={styles.inputMedium}
-          value={rowData.altitud}
-          onChange={e => handleRowChange('altitud', e.target.value)}
-          style={{ minWidth: 120, fontSize: 13, color: '#000' }}
-        > 
-          <option value=""></option>
-          {AlturaMulti.map(opt => (
-            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
-          ))}
-        </select>*/}
         {/*AREAS*/}
         <div className='relative'>
             <input type="text" autoComplete='off' className={styles.inputLarge} value={searchArea} name='areaEmpresa'
@@ -308,7 +297,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
             onKeyUp={(e) => {
               if (e.key === "Enter" && filteredArea.length > 0) {
                 e.preventDefault();
-                handleSelect(e,filteredArea[0],setSearchArea,handleRowChange,setFilteredArea);
+                handleSelect(e,e.target.name,filteredArea[0].mensaje,setSearchArea,handleRowChange,setFilteredArea);
               }
             }}
             onBlur={() => setTimeout(() => setFilteredArea([]), 100)}/>
@@ -319,7 +308,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
                   key={opt.id}
                   name="areaEmpresa"
                   className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                  onMouseDown={(e) => handleSelect(e,filteredArea[0],setSearchArea,handleRowChange,setFilteredArea)}
+                  onMouseDown={(e) => handleSelect(e,'areaEmpresa',opt.mensaje,setSearchArea,handleRowChange,setFilteredArea)}
                 >
                   {opt.mensaje}
                 </li>

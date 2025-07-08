@@ -30,10 +30,9 @@ import Protocolos from './views/admin/panel-de-control/Configuracion/Protocolos/
 import LibroDeReclamaciones from './views/admin/LibroDeReclamaciones/LibroDeReclamaciones.jsx'
 import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
-import Test from './views/admin/panel-de-control/SistemaOcupacional/Laboratorio/laboratorio_analisis_bioquimicos/BioquimicaAcidoUrico/BioquimicaAcidoUrico'
 import HistoriaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/HistoriaOcupacional/HistoriaOcupacional.jsx';
 //jaspers
-import Ficha from './views/jaspers/Consentimientos/Consentimiento_Boro_Digitalizado.jsx'
+import Ficha from './views/jaspers/Covid/pcualitativaantigenoMarsa.jsx'
 // import Test from './views/jaspers/AnalisisBioquimicos/Hematologia_Digitalizado'
 import Espirometria from './views/admin/panel-de-control/SistemaOcupacional/Espirometria/Espirometria.jsx';
 import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/Oftalmologia.jsx';
@@ -123,7 +122,6 @@ const AppContent = () => {
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />
         <Route path="/fichapi" element={<Ficha />} />
-        <Route path="/test" element={<Test />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
       

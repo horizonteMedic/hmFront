@@ -10,6 +10,10 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
   const margin = 15;
   const xLeft = margin * 2;
   const xRight = pageW - margin * 2;
+  let y;
+
+  // Definir columna para los datos
+  const xDato = xLeft + 65;
 
   // HEADER
   headerManipuladores(doc, datos);
@@ -30,32 +34,32 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
   ]).then(([s1, s2]) => {
 
       // BODY
-      let y = 80;
+      y = 80;
       doc.setFont("helvetica", "bold").setFontSize(14);
       doc.text("COPROPARASITOLÓGICO", pageW / 2, y, { align: "center" });
       y += 12;
 
       // MUESTRA I
       doc.setFont("helvetica", "bold").setFontSize(11);
-      doc.text("MUESTRA: " + "HECES I", xLeft, y);
-      y += 10;
+      doc.text("MUESTRA: HECES I", xLeft, y);
+      y += 7;
 
       // EXAMEN MACROSCÓPICO I
       doc.setFont("helvetica", "bold");
       doc.text("EXAMEN MACROSCÓPICO I", xLeft, y);
-      y += 8;
+      y += 7;
       doc.setFont("helvetica", "normal");
-      ["txtcolor","txtaspecto","txtmocoFecal","txtgrasa","txtsangrev","txtrestosa"].forEach(key => {
-        const label = {
-          txtcolor: "COLOR",
-          txtaspecto: "ASPECTO",
-          txtmocoFecal: "MOCO FECAL",
-          txtgrasa: "GRASA",
-          txtsangrev: "SANGRE VISIBLE",
-          txtrestosa: "RESTOS ALIMENTICIOS"
-        }[key];
-        doc.text(label + " :", xLeft, y);
-        doc.text(datos[key] || "", xRight, y, { align: "right" });
+      [
+        ["COLOR", "txtcolor"],
+        ["ASPECTO", "txtaspecto"],
+        ["MOCO FECAL", "txtmocoFecal"],
+        ["SANGRE VISIBLE", "txtsangrev"],
+        ["RESTOS ALIMENTICIOS", "txtrestosa"],
+        ["GRASA", "txtgrasa"]
+      ].forEach(([lbl, key]) => {
+        doc.text(lbl, xLeft, y);
+        doc.text(":", xDato, y);
+        doc.text(datos[key] || "", xDato + 4, y);
         y += 7;
       });
 
@@ -63,19 +67,20 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
       y += 6;
       doc.setFont("helvetica", "bold");
       doc.text("EXAMEN MICROSCÓPICO I", xLeft, y);
-      y += 8;
+      y += 7;
       doc.setFont("helvetica", "normal");
-      ["txtleucocitos","txthematies","txtlugol"].forEach(key => {
-        const label = {
-          txtleucocitos: "LEUCOCITOS",
-          txthematies: "HEMATÍES",
-          txtlugol: "INVESTIGACIÓN DE PARÁSITOS"
-        }[key];
-        doc.text(label + " :", xLeft, y);
-        doc.text(datos[key] || "", xRight, y, { align: "right" });
+      [
+        ["LEUCOCITOS", "txtleucocitos"],
+        ["HEMATÍES", "txthematies"],
+        ["INVESTIGACIÓN DE PARÁSITOS", "txtlugol"]
+      ].forEach(([lbl, key]) => {
+        doc.text(lbl, xLeft, y);
+        doc.text(":", xDato, y);
+        doc.text(datos[key] || "", xDato + 4, y);
         y += 7;
       });
 
+      // Firma (sello) centrada justo después del contenido
       if (s1) {
         const canvas = document.createElement('canvas');
         canvas.width = s1.width;
@@ -83,39 +88,27 @@ export default function Coproparasitologico_Digitalizado(datos = {}) {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(s1, 0, 0);
         const selloBase64 = canvas.toDataURL('image/png');
-
         // Dimensiones del área del sello
         const sigW = 70;
         const sigH = 35;
-        const sigX = (pageW - sigW) / 2 + 60; // Centrado horizontal
-        const sigY = 190; // ⬅️ Aquí usas el Y actual + espacio deseado
-
+        const sigX = (pageW - sigW) / 2;
+        const sigY = y + 5;
         // Tamaño máximo dentro del área
         const maxImgW = sigW - 10;
         const maxImgH = sigH - 10;
-
         let imgW = s1.width;
         let imgH = s1.height;
-
         const scaleW = maxImgW / imgW;
         const scaleH = maxImgH / imgH;
-        const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
-
+        const scale = Math.min(scaleW, scaleH, 1);
         imgW *= scale;
         imgH *= scale;
-
         // Centramos dentro del rectángulo
         const imgX = sigX + (sigW - imgW) / 2;
         const imgY = sigY + (sigH - imgH) / 2;
-
-        // Dibujar el borde si quieres
-
-        // Insertar la imagen del sello
         doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-        // Actualiza Y si después quieres seguir dibujando debajo
+        y = imgY + imgH + 5;
       }
-
 
       // FOOTER
       footer(doc, datos);
