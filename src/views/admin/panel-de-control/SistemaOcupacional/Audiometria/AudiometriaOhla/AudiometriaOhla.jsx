@@ -1,51 +1,150 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Manipuladores/Coprocultivo/Coprocultivo.jsx
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
+import {
+  faSave,
+  faBroom,
+  faPrint,
+  faStethoscope,
+} from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
-import { SubmitCoprocultivoManipulador } from "../../Laboratorio/Manipuladores/Coprocultivo/controllerCoprocultivo";
+import {
+  SubmitDataService,
+  VerifyTR,
+  PrintHojaR,
+} from "../Audiometria/controllerAudiometria";
 
 export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
-  const tabla = "ac_coprocultivo";
+  const tabla = "audiometria_2023";
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
 
-  const [form, setForm] = useState({
+  const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
+
+  const initialFormState = {
+    codAu: "",
     norden: "",
     fecha: today,
+    fechaNac: "",
     nombres: "",
     edad: "",
-    // MUESTRA
-    muestra: "HECES",
-    color: "",
-    consistencia: "",
-    moco_fecal: "",
-    sangrev: "",
-    restosa: "",
-    // MICROSCÓPICO
-    leucocitos: "",
-    leucocitos_count: "",
-    hematies: "",
-    hematies_count: "",
-    parasitos: "",
-    gotasg: "",
-    levaduras: "",
-    // IDENTIFICACIÓN
-    identificacion: "Escherichia coli(*)",
-    florac: "",
-    // RESULTADO
-    resultado: "",
-    // OBSERVACIONES
-    observaciones:
-      "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
-  });
-  const [status, setStatus] = useState("");
+    dni: "",
+    nomExam: "",
+    no_paso_Examen: false,
+    activar_grafico: false,
 
-  // inicializa fecha hoy
+    od_500: "",
+    od_1000: "",
+    od_2000: "",
+    od_3000: "",
+    od_4000: "",
+    od_6000: "",
+    od_8000: "",
+
+    oi_500: "",
+    oi_1000: "",
+    oi_2000: "",
+    oi_3000: "",
+    oi_4000: "",
+    oi_6000: "",
+    oi_8000: "",
+
+    od_o_500: "",
+    od_o_1000: "",
+    od_o_2000: "",
+    od_o_3000: "",
+    od_o_4000: "",
+    od_o_6000: "",
+    od_o_8000: "",
+
+    llenar_osea: false,
+    oi_o_500: "",
+    oi_o_1000: "",
+    oi_o_2000: "",
+    oi_o_3000: "",
+    oi_o_4000: "",
+    oi_o_6000: "",
+    oi_o_8000: "",
+
+    perdida_global: "",
+    asignar_especialista: false,
+
+    //derecha
+    nombres_search: "",
+    codigo_search: "",
+    diagnostico: "",
+
+    //antiguos
+    sordera: "NO",
+    acufenos: "NO",
+    vertigo: "NO",
+    otalgia: "NO",
+    secrecion_otica: "NO",
+    otros_sintomas_orl: "",
+
+    rinitis: "NO",
+    sinusitis: "NO",
+    otitis_media_cronica: "NO",
+    medicamentos_ototoxicos: "NO",
+    meningitis: "NO",
+    tec: "NO",
+    sordera_am: "NO",
+    parotiditis: "NO",
+    sarampion: "NO",
+    tbc: "NO",
+    cuales_antecedentes: "",
+
+    exposicion_ruido: "NO",
+    protectores_auditivos: "NO",
+    exposicion_quimicos: "NO",
+
+    promedio_horas: "",
+    anios_exposicion: "",
+    meses_exposicion: "",
+
+    // tipo_protectores: [],
+    tapones: false,
+    orejeras: false,
+
+    plomo_hrs: "", // New fields
+    mercurio_hrs: "",
+    tolueno_hrs: "",
+    xileno_hrs: "",
+    plaguicidas_hrs: "",
+    organofosforados_hrs: "",
+
+    plomo_anios: "",
+    mercurio_anios: "",
+    tolueno_anios: "",
+    xileno_anios: "",
+    plaguicidas_anios: "",
+    organofosforados_anios: "",
+    otros_quimicos: "",
+
+    practica_tiro: "NO",
+    uso_walkman: "NO",
+    otros_antecedentes: "NO",
+    cuales_antecedentes_extralaborales: "",
+    otoscopia_odiocho: "Normal",
+    otoscopia_odilzquierdo: "Normal",
+
+    diagnostico_od: "",
+    diagnostico_oi: "",
+    comentarios_audiometria: "",
+
+    proteccion_simpleODoble: "",
+    control_semestralOAnual: "",
+    recomendaciones_otras: "",
+
+    empresa: "",
+    contrata: "",
+  };
+  const [exams, setExams] = useState([]);
+  const [form, setForm] = useState(initialFormState);
+  const [status, setStatus] = useState("");
 
   const handleCheckRadio = (name, value) => {
     setForm((f) => ({
@@ -53,87 +152,47 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
       [name]: f[name] === value.toUpperCase() ? "" : value.toUpperCase(),
     }));
   };
-  const handleCheckRadioXValue = (name) => {
+  const toggleCheckBox = (name) => {
     setForm((f) => ({
       ...f,
-      [name]: f[name].toUpperCase().includes("X CAMPO")
-        ? ""
-        : /\d/.test(f[name])
-        ? f[name] + " X CAMPO"
-        : " X CAMPO",
+      [name]: !f[name],
     }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+
+    // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
+    if (/^\d*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
   };
 
   const handleClear = () => {
-    setForm((f) => ({
-      ...f,
-      norden: "",
-      fecha: today,
-      nombres: "",
-      edad: "",
-      // MUESTRA
-      muestra: "HECES",
-      color: "",
-      consistencia: "",
-      moco_fecal: "",
-      sangrev: "",
-      restosa: "",
-      // MICROSCÓPICO
-      leucocitos: "",
-      leucocitos_count: "",
-      hematies: "",
-      hematies_count: "",
-      parasitos: "",
-      gotasg: "",
-      levaduras: "",
-      // IDENTIFICACIÓN
-      identificacion: "Escherichia coli(*)",
-      florac: "",
-      // RESULTADO
-      resultado: "",
-      // OBSERVACIONES
-      observaciones:
-        "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
-    }));
+    setForm(initialFormState);
+    setStatus("Formulario limpiado");
   };
 
   const handleClearnotO = () => {
-    setForm((f) => ({
-      ...f,
-      fecha: today,
-      nombres: "",
-      edad: "",
-      // MUESTRA
-      muestra: "HECES",
-      color: "",
-      consistencia: "",
-      moco_fecal: "",
-      sangrev: "",
-      restosa: "",
-      // MICROSCÓPICO
-      leucocitos: "",
-      leucocitos_count: "",
-      hematies: "",
-      hematies_count: "",
-      parasitos: "",
-      gotasg: "",
-      levaduras: "",
-      // IDENTIFICACIÓN
-      identificacion: "Escherichia coli(*)",
-      florac: "",
-      // RESULTADO
-      resultado: "",
-      // OBSERVACIONES
-      observaciones:
-        "No se aisló Escherichia Coli Enteroinvasiva - Enteropatógena - Enterohemorrágica.\nNo se aisló bacteria patógenas.",
-    }));
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  };
+  const getNextArrayItem = (pre = "", current, post = "", array, next = "") => {
+    const index = array.indexOf(current);
+    if (index === -1 || index === array.length - 1) {
+      return next; // No existe o ya es el último
+    }
+    return `${pre}${array[index + 1]}${post}`;
   };
 
   const handlePrint = () => {
     if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
     Swal.fire({
-      title: "¿Desea Imprimir Coprocultivo?",
+      title: "¿Desea Imprimir Audiometría?",
       html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: "question",
       showCancelButton: true,
@@ -150,49 +209,141 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
       }
     });
   };
+  const tipoHipoacusia = (promedio) => {
+    let textoPromedio = "";
+    if (promedio >= -10 && promedio <= 25) textoPromedio = "Normal";
+    else if (promedio > 25 && promedio <= 40) textoPromedio = "Hipoacusia leve";
+    else if (promedio > 40 && promedio <= 55)
+      textoPromedio = "Hipoacusia moderada";
+    else if (promedio > 55 && promedio <= 70)
+      textoPromedio = "Hipoacusia moderada-severa";
+    else if (promedio > 70 && promedio <= 90)
+      textoPromedio = "Hipoacusia severa";
+    else if (promedio > 90) textoPromedio = "Hipoacusia profunda";
+    return textoPromedio;
+  };
+  const calcularOidos = () => {
+    try {
+      const odValues = [
+        form.od_500,
+        form.od_1000,
+        form.od_2000,
+        form.od_3000,
+        form.od_4000,
+        form.od_6000,
+        form.od_8000,
+      ]
+        .map((v) => parseFloat(v) || 0)
+        .filter((v) => v >= 25);
+
+      let odPromedio = (
+        odValues.reduce((acc, val) => acc + val, 0) / odValues.length
+      ).toFixed(2);
+
+      odPromedio = isNaN(odPromedio) ? 0 : odPromedio;
+
+      console.log("Oído Derecho - Promedio:", odPromedio);
+
+      setForm((f) => ({
+        ...f,
+        diagnostico_od: tipoHipoacusia(odPromedio),
+      }));
+
+      const oiValues = [
+        form.oi_500,
+        form.oi_1000,
+        form.oi_2000,
+        form.oi_3000,
+        form.oi_4000,
+        form.oi_6000,
+        form.oi_8000,
+      ]
+        .map((v) => parseFloat(v) || 0)
+        .filter((v) => v > 25);
+      let oiPromedio = (
+        oiValues.reduce((acc, val) => acc + val, 0) / oiValues.length
+      ).toFixed(2);
+      oiPromedio = isNaN(oiPromedio) ? 0 : oiPromedio;
+
+      console.log("Oído Izquierdo - Promedio:", oiPromedio);
+
+      setForm((f) => ({
+        ...f,
+        diagnostico_oi: tipoHipoacusia(oiPromedio) + "",
+      }));
+    } catch (error) {
+      console.error("Error al calcular el oído derecho:", error);
+      Swal.fire("Error", "No se pudo calcular el oído derecho", "error");
+    }
+  };
 
   return (
-    <div className="w-full max-w-[70vw] mx-auto bg-white rounded shadow p-6">
+    <div className="w-full max-w-[90vw]  mx-auto bg-white rounded shadow p-6 space-y-6">
       <h2 className="text-2xl font-bold text-center mb-6">AUDIOMETRIA OHLA</h2>
-      <div className="space-y-6">
-        {/* Encabezado */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[90px] text-base">
-              Nro Ficha:
-            </label>
-            <input
-              name="norden"
-              value={form.norden}
-              onKeyUp={(e) => {
-                if (e.key === "Enter") {
-                  handleClearnotO();
-                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-                }
-              }}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-              }
-              className="border rounded px-2 py-1 text-base flex-1"
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-[2.5fr_3fr] gap-6">
+        {/* Lado izquierdo */}
+        <div className="border rounded p-4 mt-6 flex flex-col gap-4">
+          {/* Encabezado */}
+
+          <div className="flex flex-col 2xl:flex-row gap-4">
+            <div className="flex-1 flex items-center gap-2">
+              <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+                Nro Ficha:
+              </label>
+              <input
+                name="norden"
+                value={form.norden}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    handleClearnotO();
+                    VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                  }
+                }}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base flex-1"
+              />
+            </div>
+            <div className="flex-1 flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[50px]">
+                Fecha:
+              </label>
+              <input
+                type="date"
+                name="fecha"
+                value={form.fecha}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base flex-1"
+              />
+            </div>
           </div>
-          <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base">Fecha:</label>
-            <input
-              type="date"
-              name="fecha"
-              value={form.fecha}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-              }
-              className="border rounded px-2 py-1 text-base flex-1"
-            />
+          {/* Paciente */}
+          <div className="flex flex-col 2xl:flex-row gap-4">
+            <div className="flex-1 flex items-center gap-2">
+              <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+                DNI:
+              </label>
+              <input
+                name="dni"
+                value={form.dni}
+                disabled
+                className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+              />
+            </div>
+            <div className="flex-1 flex items-center gap-4">
+              <label className="font-semibold min-w-[50px] text-base">
+                Fecha de Nacimiento:
+              </label>
+              <input
+                name="fechaNac"
+                value={form.fechaNac}
+                disabled
+                className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+              />
+            </div>
           </div>
-        </div>
-        {/* Paciente */}
-        <div className="flex flex-col md:flex-row gap-4">
+
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[90px] text-base">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
               Nombres:
             </label>
             <input
@@ -203,541 +354,472 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base">Edad:</label>
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Edad:
+            </label>
             <input
               name="edad"
               value={form.edad}
               disabled
-              className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
             />
           </div>
-        </div>
-
-        {/* Primera fila: MUESTRA | EXAMEN MICROSCÓPICO */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* MUESTRA */}
-          <fieldset className="bg-gray-100 border border-gray-300 rounded-md p-4">
-            <legend className="font-bold text-base mb-4">MUESTRA</legend>
-            <div className="space-y-3">
-              {/* Muestra text */}
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Muestra:
-                </label>
-                <input
-                  name="muestra"
-                  value={form.muestra}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-                  }
-                  className="border rounded px-2 py-1 text-base w-full"
-                />
-              </div>
-              {/* Color */}
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Color:
-                </label>
-                <input
-                  name="color"
-                  value={form.color}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex flex-wrap gap-3">
-                  {["Marrón", "Mostaza", "Verdoso"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="color"
-                        value={opt}
-                        onChange={() => handleCheckRadio("color", opt)}
-                        checked={form.color === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {/* Consistencia */}
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Consistencia:
-                </label>
-                <input
-                  name="consistencia"
-                  value={form.consistencia}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex flex-wrap gap-3">
-                  {["Sólido", "Semisólido", "Diarreico"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="consistencia"
-                        value={opt}
-                        onChange={() => handleCheckRadio("consistencia", opt)}
-                        checked={form.consistencia === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {/* Moco Fecal */}
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Moco Fecal:
-                </label>
-                <input
-                  name="moco_fecal"
-                  value={form.moco_fecal}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex flex-wrap gap-3">
-                  {["Ausente", "Presente"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="moco_fecal"
-                        value={opt}
-                        onChange={() => handleCheckRadio("moco_fecal", opt)}
-                        checked={form.moco_fecal === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {/* Sangre Visible */}
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Sangre Visible:
-                </label>
-                <input
-                  name="sangrev"
-                  value={form.sangrev}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex flex-wrap gap-3">
-                  {["Ausente", "Presente"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="sangrev"
-                        value={opt}
-                        onChange={() => handleCheckRadio("sangrev", opt)}
-                        checked={form.sangrev === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {/* Restos Alim. */}
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Restos Alimenticios:
-                </label>
-                <input
-                  name="restosa"
-                  value={form.restosa}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex flex-wrap gap-3">
-                  {["Ausente", "Presente"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="restosa"
-                        value={opt}
-                        onChange={() => handleCheckRadio("restosa", opt)}
-                        checked={form.restosa === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          {/* EXAMEN MICROSCÓPICO */}
-          <fieldset className="bg-gray-100 border border-gray-300 rounded-md p-4">
-            <legend className="font-bold text-base mb-4">
-              EXAMEN MICROSCÓPICO
-            </legend>
-            <div className="space-y-3">
-              {/* Leucocitos */}
-              <div className="flex flex-col">
-                <label className="block font-semibold text-base mb-1">
-                  Leucocitos:
-                </label>
-                <input
-                  name="leucocitos"
-                  value={form.leucocitos}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-                  }
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-1 text-base">
-                    <input
-                      type="checkbox"
-                      name="leucocitos"
-                      value="No se observan"
-                      onChange={() =>
-                        handleCheckRadio("leucocitos", "No se observan")
-                      }
-                      checked={
-                        form.leucocitos === "No se observan".toUpperCase()
-                      }
-                    />
-                    No se observan
-                  </label>
-                  <label className="flex items-center gap-1 text-base">
-                    <input
-                      type="checkbox"
-                      name="leucocitos"
-                      value="__x campo"
-                      onChange={() => handleCheckRadioXValue("leucocitos")}
-                      checked={form.leucocitos
-                        .toUpperCase()
-                        .includes("X CAMPO")}
-                    />
-                    __x campo
-                  </label>
-                </div>
-              </div>
-              {/* Hematíes */}
-              <div className="flex flex-col">
-                <label className="block font-semibold text-base mb-1">
-                  Hematíes:
-                </label>
-                <input
-                  name="hematies"
-                  value={form.hematies}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-                  }
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-1 text-base">
-                    <input
-                      type="checkbox"
-                      name="hematies"
-                      value="No se observan"
-                      onChange={() =>
-                        handleCheckRadio("hematies", "No se observan")
-                      }
-                      checked={form.hematies === "No se observan".toUpperCase()}
-                    />
-                    No se observan
-                  </label>
-                  <label className="flex items-center gap-1 text-base">
-                    <input
-                      type="checkbox"
-                      name="hematies"
-                      value="__x campo"
-                      onChange={() => handleCheckRadioXValue("hematies")}
-                      checked={form.hematies.toUpperCase().includes("X CAMPO")}
-                    />
-                    __x campo
-                  </label>
-                </div>
-              </div>
-              {/* Parásitos */}
-              <div className="flex flex-col">
-                <label className="block font-semibold text-base mb-1">
-                  Parásitos:
-                </label>
-                <input
-                  name="parasitos"
-                  value={form.parasitos}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex gap-3">
-                  {["Ausente", "Presente"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="parasitos"
-                        value={opt}
-                        onChange={() => handleCheckRadio("parasitos", opt)}
-                        checked={form.parasitos === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {/* Gotas de grasa */}
-              <div className="flex flex-col">
-                <label className="block font-semibold text-base mb-1">
-                  Gotas de grasa:
-                </label>
-                <input
-                  name="gotasg"
-                  value={form.gotasg}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex gap-3">
-                  {["Ausente", "Presente"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="gotasg"
-                        value={opt}
-                        onChange={() => handleCheckRadio("gotasg", opt)}
-                        checked={form.gotasg === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              {/* Levaduras */}
-              <div className="flex flex-col">
-                <label className="block font-semibold text-base mb-1">
-                  Levaduras:
-                </label>
-                <input
-                  name="levaduras"
-                  value={form.levaduras}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex gap-3">
-                  {["Ausente", "Presente"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="levaduras"
-                        value={opt}
-                        onChange={() => handleCheckRadio("levaduras", opt)}
-                        checked={form.levaduras === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-
-        {/* Segunda fila: IDENTIFICACIÓN Y ANTIBIOGRAMA | RESULTADO */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* IDENTIFICACIÓN Y ANTIBIOGRAMA */}
-          <fieldset className="bg-gray-100 border border-gray-300 rounded-md p-4">
-            <legend className="font-bold text-base mb-4">
-              IDENTIFICACIÓN Y ANTIBIOGRAMA
-            </legend>
-            <div className="space-y-3">
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Identificación:
-                </label>
-                <input
-                  name="identificacion"
-                  value={form.identificacion}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-                  }
-                  className="border rounded px-2 py-1 text-base w-full"
-                />
-              </div>
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Flora Coliforme:
-                </label>
-                <input
-                  name="florac"
-                  value={form.florac}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex gap-3">
-                  {["Presente", "Regular cantidad"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="florac"
-                        value={opt}
-                        onChange={() => handleCheckRadio("florac", opt)}
-                        checked={form.florac === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          {/* RESULTADO */}
-          <fieldset className="bg-gray-100 border border-gray-300 rounded-md p-4">
-            <legend className="font-bold text-base mb-4">RESULTADO</legend>
-            <div className="space-y-3">
-              <div>
-                <label className="block font-semibold text-base mb-1">
-                  Resultado:
-                </label>
-                <input
-                  name="resultado"
-                  value={form.resultado}
-                  readOnly
-                  placeholder="—"
-                  className="border rounded px-2 py-1 text-base w-full mb-1"
-                />
-                <div className="flex gap-3">
-                  {["Negativo", "Positivo"].map((opt) => (
-                    <label
-                      key={opt}
-                      className="flex items-center gap-1 text-base"
-                    >
-                      <input
-                        type="checkbox"
-                        name="resultado"
-                        value={opt}
-                        onChange={() => handleCheckRadio("resultado", opt)}
-                        checked={form.resultado === opt.toUpperCase()}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-
-        {/* Observaciones */}
-        <div>
-          <label className="block font-semibold text-base mb-1">
-            Observaciones:
-          </label>
-          <textarea
-            name="observaciones"
-            value={form.observaciones}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-            }
-            rows={4}
-            className="border rounded px-2 py-1 text-base w-full"
-          />
-        </div>
-
-        {/* Asignar Médico */}
-        <div>
-          <label className="block font-semibold text-base mb-1">
-            ASIGNAR MÉDICO:
-          </label>
-          <select
-            disabled
-            className="w-full border rounded px-2 py-1 bg-gray-100 text-base"
-          >
-            <option>--Seleccione--</option>
-          </select>
-        </div>
-
-        {/* Acciones */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex gap-3">
-            <button
-              // type="submit"
-              onClick={() => {
-                SubmitCoprocultivoManipulador(
-                  form,
-                  token,
-                  userlogued,
-                  handleClear,
-                  tabla
-                );
-              }}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-            </button>
-            <button
-              type="button"
-              onClick={handleClear}
-              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faBroom} /> Limpiar
-            </button>
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Ex. Médico:
+            </label>
+            <input
+              name="nomExam"
+              value={form.nomExam}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+            />
           </div>
-          <div className="flex flex-col items-end">
-            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-            <div className="flex items-center gap-2">
-              <input
-                name="norden"
-                value={form.norden}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
-                }
-                className="border rounded px-2 py-1 text-base w-24"
-              />
 
+          <div className="h-0.5 w-full bg-gray-200 rounded"></div>
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Empresa:
+            </label>
+            <input
+              name="empresa"
+              value={form.empresa}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+            />
+          </div>
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Contrata:
+            </label>
+            <input
+              name="contrata"
+              value={form.contrata}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+            />
+          </div>
+          {/* end  Encabezado */}
+          <div className="flex justify-end gap-4 py-1 pr-4">
+            <label className="flex items-center gap-2 select-none">
+              <input
+                type="checkbox"
+                name="no_paso_Examen"
+                checked={form.no_paso_Examen}
+                onChange={() => {
+                  toggleCheckBox("no_paso_Examen");
+                }}
+              />
+              No Paso Examen
+            </label>
+            <label className="flex items-center gap-2 select-none">
+              <input
+                type="checkbox"
+                name="activar_grafico"
+                checked={form.activar_grafico}
+                onChange={() => {
+                  toggleCheckBox("activar_grafico");
+                }}
+              />
+              Activar Gráfico
+            </label>
+          </div>
+          {/* Audiometría  Área  */}
+          <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
+            <h4 className="font-semibold text-lg ">Audiometría Área:</h4>
+            {/* Oído Derecho */}
+            <div className="flex flex-col p-4 border rounded items-center justify-center">
+              <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
+                <div className="flex flex-col items-start  gap-2">
+                  <p>hz</p>
+                  <p>dB (A)</p>
+                </div>
+                {frecuencias.map((hz) => (
+                  <div key={hz}>
+                    <p>{hz}</p>
+                    <input
+                      type="text"
+                      name={`od_${hz}`}
+                      value={form[`od_${hz}`] || ""}
+                      onChange={handleChangeNumber}
+                      // placeholder="dB"
+                      className="border rounded px-1 py-1 text-center w-full"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          document
+                            .getElementsByName(
+                              `${getNextArrayItem(
+                                "od_",
+                                hz,
+                                "",
+                                frecuencias,
+                                "oi_500"
+                              )}`
+                            )?.[0]
+                            ?.focus();
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Oído Izquierdo */}
+            <div className="flex flex-col p-4 border rounded items-center justify-center">
+              <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
+                <div className="flex flex-col items-start gap-2">
+                  <p>hz</p>
+                  <p>dB (A)</p>
+                </div>
+                {frecuencias.map((hz) => (
+                  <div key={hz}>
+                    <p>{hz}</p>
+                    <input
+                      type="text"
+                      name={`oi_${hz}`}
+                      value={form[`oi_${hz}`] || ""}
+                      onChange={handleChangeNumber}
+                      // placeholder="dB"
+                      className="border rounded px-1 py-1 text-center w-full"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          document
+                            .getElementsByName(
+                              `${getNextArrayItem(
+                                "oi_",
+                                hz,
+                                "",
+                                frecuencias,
+                                ""
+                              )}`
+                            )?.[0]
+                            ?.focus();
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          {/* Audiometría Ósea */}
+          <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
+            <div className="flex justify-between items-center pr-2">
+              <h4 className="font-semibold text-lg ">Audiometría Ósea:</h4>
+              <label className="flex items-center gap-2 select-none">
+                <input
+                  type="checkbox"
+                  name="llenar_osea"
+                  checked={form.llenar_osea}
+                  onChange={() => {
+                    toggleCheckBox("llenar_osea");
+                  }}
+                />
+                Llenar
+              </label>
+            </div>
+            {/* Oído Derecho */}
+            <div className="flex flex-col p-4 border rounded items-center justify-center">
+              <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
+
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold ">
+                <div className="flex flex-col items-start  gap-2">
+                  <p>hz</p>
+                  <p>dB (A)</p>
+                </div>
+                {frecuencias.map((hz) => (
+                  <div key={`od_o_${hz}`}>
+                    <p>{hz}</p>
+                    <input
+                      type="text"
+                      name={`od_o_${hz}`}
+                      value={form[`od_o_${hz}`] || ""}
+                      onChange={handleChangeNumber}
+                      // placeholder="dB"
+                      className="border rounded px-1 py-1 text-center w-full"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          document
+                            .getElementsByName(
+                              `${getNextArrayItem(
+                                "od_o_",
+                                hz,
+                                "",
+                                frecuencias,
+                                "oi_o_500"
+                              )}`
+                            )?.[0]
+                            ?.focus();
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Oído Izquierdo */}
+            <div className="flex flex-col p-4 border rounded items-center justify-center">
+              <h4 className="font-medium mb-2 w-full">Oído Izquierdo</h4>
+              <div className="grid grid-cols-8 gap-1 text-center text-sm font-semibold">
+                <div className="flex flex-col items-start gap-2">
+                  <p>hz</p>
+                  <p>dB (A)</p>
+                </div>
+                {frecuencias.map((hz) => (
+                  <div key={`oi_o_${hz}`}>
+                    <p>{hz}</p>
+                    <input
+                      type="text"
+                      name={`oi_o_${hz}`}
+                      value={form[`oi_o_${hz}`] || ""}
+                      onChange={handleChangeNumber}
+                      // placeholder="dB"
+                      className="border rounded px-1 py-1 text-center w-full"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          document
+                            .getElementsByName(
+                              `${getNextArrayItem(
+                                "oi_o_",
+                                hz,
+                                "",
+                                frecuencias,
+                                ""
+                              )}`
+                            )?.[0]
+                            ?.focus();
+                        }
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-row gap-4 pr-4">
+            <div className="flex-1 flex items-center gap-2">
+              <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+                % pérdida global:
+              </label>
+              <input
+                name="perdida_global"
+                value={form.perdida_global}
+                disabled
+                className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+              />
+            </div>
+            <label className="flex items-center gap-2 select-none">
+              <input
+                type="checkbox"
+                name="asignar_especialista"
+                checked={form.asignar_especialista}
+                onChange={() => {
+                  toggleCheckBox("asignar_especialista");
+                }}
+              />
+              Asignar Especialista
+            </label>
+          </div>
+        </div>
+        {/* Lado derecho */}
+        <div className="border rounded p-4 mt-6 flex flex-col gap-4">
+          {/* Search */}
+
+          <div className="flex flex-col 2xl:flex-row gap-4">
+            <div className="flex-1 flex items-center gap-2">
+              <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+                Nombres:
+              </label>
+              <input
+                name="nombres_search"
+                value={form.nombres_search}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    //search
+                  }
+                }}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base flex-1"
+              />
+            </div>
+            <div className="flex-1 flex items-center gap-2">
+              <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+                Código:
+              </label>
+              <input
+                name="codigo_search"
+                value={form.codigo_search}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    //search
+                  }
+                }}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base flex-1"
+              />
+            </div>
+          </div>
+          <div className="flex-1">
+            <Table
+              data={exams}
+              tabla={tabla}
+              set={setForm}
+              token={token}
+              clean={handleClear}
+            />
+          </div>
+          <div className="grid grid-cols-1  gap-4 border rounded p-4">
+            <div className="flex justify-end items-center ">
               <button
                 type="button"
-                onClick={handlePrint}
-                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                onClick={() => {
+                  // calcularOidos();
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2 w-full  max-w-[120px]"
               >
-                <FontAwesomeIcon icon={faPrint} />
+                <FontAwesomeIcon icon={faStethoscope} /> Diagnosticar
               </button>
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">Diagnóstico:</label>
+              <textarea
+                name="diagnostico"
+                value={form.diagnostico || ""}
+                onChange={handleChange}
+                className="w-full border rounded px-2 py-1"
+                rows={3}
+              />
             </div>
           </div>
         </div>
-
-        {status && (
-          <p className="mt-4 text-center text-green-600 text-base">{status}</p>
-        )}
       </div>
+
+      {/* Acciones */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              SubmitDataService(form, token, userlogued, handleClear, tabla);
+            }}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+          <div className="flex items-center gap-2">
+            <input
+              name="norden"
+              value={form.norden}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 text-base w-24"
+            />
+
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faPrint} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {status && (
+        <p className="mt-4 text-center text-green-600 text-base">{status}</p>
+      )}
+    </div>
+  );
+}
+
+function Table({ data, tabla, set, token, clean }) {
+  // confirmación antes de imprimir
+  const handlePrintConfirm = (nro) => {
+    Swal.fire({
+      title: "Confirmar impresión",
+      text: `¿Deseas imprimir la ficha Nº ${nro}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, imprimir",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(nro, tabla, token);
+      }
+    });
+  };
+
+  function clicktable(nro) {
+    clean();
+    Loading("Importando Datos");
+    // GetInfoPacAnalisisBio(nro, tabla, set, token, setMed);
+  }
+
+  return (
+    <div className="overflow-y-auto" style={{ maxHeight: "calc(12 * 4rem)" }}>
+      <table className="w-full table-auto border-collapse">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border px-2 py-1 text-left text-lg">Cod.</th>
+            <th className="border px-2 py-1 text-left text-lg">N° Orden</th>
+            <th className="border px-2 py-1 text-left text-lg">Nombres</th>
+            <th className="border px-2 py-1 text-left text-lg">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.length > 0 ? (
+            data.map((row, i) => (
+              <tr
+                key={i}
+                className={`hover:bg-gray-50 cursor-pointer text-lg ${
+                  row.color === "AMARILLO"
+                    ? "bg-[#ffff00]"
+                    : row.color === "VERDE"
+                    ? "bg-[#00ff00]"
+                    : "bg-[#ff6767]"
+                }`}
+                onClick={() => clicktable(row.n_orden)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  handlePrintConfirm(row.n_orden);
+                }}
+              >
+                <td className="border px-2 py-1 font-bold">{row.codigo}</td>
+                <td className="border px-2 py-1">{row.n_orden}</td>
+                <td className="border px-2 py-1">{row.nombres}</td>
+                <td className="border px-2 py-1">{row.fecha}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={5}
+                className="text-center py-4 text-gray-500 text-lg"
+              >
+                No hay datos
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }

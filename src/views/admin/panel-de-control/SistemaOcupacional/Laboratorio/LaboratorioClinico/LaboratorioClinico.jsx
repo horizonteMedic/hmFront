@@ -41,10 +41,10 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     glucosaNA: false,
     creatinina: '',
     creatininaNA: false,
-    rpr: '',
+    rpr: 'N/A',
     rprNA: false,
     rprPos: false,
-    vih: '',
+    vih: 'N/A',
     vihNA: false,
     vihPos: false
   })
@@ -124,10 +124,10 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       glucosaNA: false,
       creatinina: '',
       creatininaNA: false,
-      rpr: '',
+      rpr: 'N/A',
       rprNA: false,
       rprPos: false,
-      vih: '',
+      vih: 'N/A',
       vihNA: false,
       vihPos: false
     });
@@ -188,12 +188,14 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     getFetch(`/api/v01/ct/laboratorio/listadoUsuariosPorPrioridadNameUser?nameUser=${userlogued}`,token)
       .then((res) => {
         setListDoc(res)
+        console.log(res[0])
         setForm(f => ({ ...f, responsable: res[0] }))
         setSearchMedico(res[0])
       })
       .catch(() => {});
   },[])
-
+  console.log(searchMedico)
+  console.log('formulario',form.responsable)
   const tabs = [
     {
       label: 'Hematología - Bioquímica SI-EO',

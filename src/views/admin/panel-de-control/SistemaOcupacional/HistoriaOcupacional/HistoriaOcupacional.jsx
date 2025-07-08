@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './HistoriaOcupacional.module.css';
-import { PrintHojaR, SubmiteHistoriaOcupacionalController, VerifyTR } from './controller/controllerHO';
+import { handleSearch, handleSelect, PrintHojaR, SubmiteHistoriaOcupacionalController, VerifyTR } from './controller/controllerHO';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
 
@@ -35,7 +35,16 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
   });
 
   const [registros, setRegistros] = useState([]);
-  console.log(registros)
+  //AUTOCOMPLETABLES
+  const [searchEmpresa, setSearchEmpresa]  = useState("");
+  const [searchAltitud, setSearchAltitud]  = useState("");
+  const [searchArea, setSearchArea]  = useState("");
+
+  const [filteredEmpresa, setFilteredEmpresa] = useState([]);
+  const [filteredAltitud, setFilteredAltitud] = useState([]);
+  const [filteredArea, setFilteredArea] = useState([]);
+
+  
   //listas
   const {EmpresasMulti,AlturaMulti,AreaMulti} = listas
   // Opciones random de ejemplo para los selects
@@ -128,7 +137,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
       }
     });
   }
-  
+  console.log(AlturaMulti)
   return (
     <div className={styles.historiaOcupacionalContainer} style={{ fontSize: 13, color: '#000' }}>
       <h1 className={styles.tituloPrincipal} style={{ fontSize: 15, color: '#000', fontWeight: 'bold' }}>HISTORIAL OCUPACIONAL</h1>
@@ -196,16 +205,16 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
           </thead>
           <tbody>
             <tr>
-              <td><input type="text" className={styles.inputTable} value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.empresa}</td>
-              <td>{rowData.altitud}</td>
-              <td><input type="text" className={styles.inputTable} value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.areaEmpresa}</td>
-              <td><input type="text" className={styles.inputTable} value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td><input type="text" className={styles.inputTable} value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td>{rowData.riesgo}</td>
-              <td>{rowData.proteccion}</td>
+              <td className='w-auto'><input type="text" className={`${styles.inputTable} w-full py-1`} value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'><input type="text" className={`${styles.inputTable} w-full`} value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'>{rowData.altitud}</td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'>{rowData.areaEmpresa}</td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
+              <td className='w-auto'>{rowData.riesgo}</td>
+              <td className='w-auto'>{rowData.proteccion}</td>
             </tr>
           </tbody>
         </table>
@@ -229,39 +238,83 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
 
       {/* Buscadores debajo de la tabla */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2em', marginTop: 24, alignItems: 'flex-end' }}>
-        <select
-          className={styles.inputLarge}
-          value={rowData.empresa}
-          onChange={e => handleRowChange('empresa', e.target.value)}
-          style={{ minWidth: 180, fontSize: 13, color: '#000' }}
-        >
-          <option value=""></option>
-          {EmpresasMulti.map(opt => (
-            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
-          ))}
-        </select>
-        <select
-          className={styles.inputMedium}
-          value={rowData.altitud}
-          onChange={e => handleRowChange('altitud', e.target.value)}
-          style={{ minWidth: 120, fontSize: 13, color: '#000' }}
-        > 
-          <option value=""></option>
-          {AlturaMulti.map(opt => (
-            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
-          ))}
-        </select>
-        <select
-          className={styles.inputLarge}
-          value={rowData.areaEmpresa}
-          onChange={e => handleRowChange('areaEmpresa', e.target.value)}
-          style={{ minWidth: 180, fontSize: 13, color: '#000' }}
-        >
-          <option value=""></option>
-          {AreaMulti.map(opt => (
-            <option key={opt.id} value={opt.mensaje}>{opt.mensaje}</option>
-          ))}
-        </select>
+        {/*EMPRESA*/}
+        <div className='relative'>
+            <input type="text" autoComplete='off' className={styles.inputLarge} value={searchEmpresa} name='empresa'
+            onChange={(e) => {handleSearch(e,setSearchEmpresa,handleRowChange,setFilteredEmpresa,EmpresasMulti)}}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredEmpresa.length > 0) {
+                e.preventDefault();
+                handleSelect(e,e.target.name,filteredEmpresa[0].mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa);
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredEmpresa([]), 100)}/>
+          {searchEmpresa && filteredEmpresa.length > 0 && (
+            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+              {filteredEmpresa.map((opt) => (
+                <li
+                  key={opt.id}
+                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                  onMouseDown={(e) => handleSelect(e,'empresa',opt.mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa)}
+                >
+                  {opt.mensaje}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        {/*ALTITUD*/}
+        <div className='relative'>
+          <input type="text" autoComplete='off' className={styles.inputLarge} value={searchAltitud} name='altitud'
+            onChange={(e) => {handleSearch(e,setSearchAltitud,handleRowChange,setFilteredAltitud,AlturaMulti)}}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredAltitud.length > 0) {
+                e.preventDefault();
+                handleSelect(e,e.target.name,filteredAltitud[0].mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud);
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredAltitud([]), 100)}/>
+            {searchAltitud && filteredAltitud.length > 0 && (
+              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                {filteredAltitud.map((opt) => (
+                  <li
+                    key={opt.id}
+                    name="altitud"
+                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                    onMouseDown={(e) => handleSelect(e,'altitud',opt.mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud)}
+                  >
+                    {opt.mensaje}
+                  </li>
+                ))}
+              </ul>
+            )}
+        </div>
+        {/*AREAS*/}
+        <div className='relative'>
+            <input type="text" autoComplete='off' className={styles.inputLarge} value={searchArea} name='areaEmpresa'
+            onChange={(e) => {handleSearch(e,setSearchArea,handleRowChange,setFilteredArea,AreaMulti)}}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredArea.length > 0) {
+                e.preventDefault();
+                handleSelect(e,e.target.name,filteredArea[0].mensaje,setSearchArea,handleRowChange,setFilteredArea);
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredArea([]), 100)}/>
+          {searchArea && filteredArea.length > 0 && (
+            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+              {filteredArea.map((opt) => (
+                <li
+                  key={opt.id}
+                  name="areaEmpresa"
+                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                  onMouseDown={(e) => handleSelect(e,'areaEmpresa',opt.mensaje,setSearchArea,handleRowChange,setFilteredArea)}
+                >
+                  {opt.mensaje}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <select
           className={styles.inputLarge}
           value={rowData.riesgo}

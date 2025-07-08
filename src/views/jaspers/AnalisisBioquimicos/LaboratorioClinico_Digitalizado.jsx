@@ -162,7 +162,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
     y += 5;
     // Formato tabla clásico: dos columnas, etiquetas a la derecha, valores a la izquierda
     const sueroL = [
-      { label: "RPR", value: datos.rprPos || "N/A" },
+      { label: "RPR", value: datos.chkPositivo === true ? 'POSITIVO' : datos.chkNegativo === true ? 'NEGATIVO' : datos.chkNegativo === false && datos.chkPositivo === false ? 'N/A' : '' || "N/A" },
     ];
     const sueroR = [
       { label: "VIH", value: datos.txtVih || "N/A" },

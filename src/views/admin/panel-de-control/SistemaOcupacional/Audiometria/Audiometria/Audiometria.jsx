@@ -14,130 +14,130 @@ import {
   VerifyTR,
   PrintHojaR,
 } from "./controllerAudiometria";
+
+const tabla = "audiometria_2023";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+const chemicals = [
+  "plomo",
+  "mercurio",
+  "tolueno",
+  "xileno",
+  "plaguicidas",
+  "organofosforados",
+];
+const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
+const initialFormState = {
+  codAu: "",
+  norden: "",
+  fecha: today,
+  dni: "",
+  fechaNac: "",
+  nombres: "",
+  edad: "",
+  nomExam: "",
+
+  sordera: "NO",
+  acufenos: "NO",
+  vertigo: "NO",
+  otalgia: "NO",
+  secrecion_otica: "NO",
+  otros_sintomas_orl: "",
+
+  rinitis: "NO",
+  sinusitis: "NO",
+  otitis_media_cronica: "NO",
+  medicamentos_ototoxicos: "NO",
+  meningitis: "NO",
+  tec: "NO",
+  sordera_am: "NO",
+  parotiditis: "NO",
+  sarampion: "NO",
+  tbc: "NO",
+  cuales_antecedentes: "",
+
+  exposicion_ruido: "NO",
+  protectores_auditivos: "NO",
+  exposicion_quimicos: "NO",
+
+  promedio_horas: "",
+  anios_exposicion: "",
+  meses_exposicion: "",
+
+  // tipo_protectores: [],
+  tapones: false,
+  orejeras: false,
+
+  plomo_hrs: "", // New fields
+  mercurio_hrs: "",
+  tolueno_hrs: "",
+  xileno_hrs: "",
+  plaguicidas_hrs: "",
+  organofosforados_hrs: "",
+
+  plomo_anios: "",
+  mercurio_anios: "",
+  tolueno_anios: "",
+  xileno_anios: "",
+  plaguicidas_anios: "",
+  organofosforados_anios: "",
+  otros_quimicos: "",
+
+  practica_tiro: "NO",
+  uso_walkman: "NO",
+  otros_antecedentes: "NO",
+  cuales_antecedentes_extralaborales: "",
+  otoscopia_odiocho: "Normal",
+  otoscopia_odilzquierdo: "Normal",
+
+  od_500: "",
+  od_1000: "",
+  od_2000: "",
+  od_3000: "",
+  od_4000: "",
+  od_6000: "",
+  od_8000: "",
+
+  oi_500: "",
+  oi_1000: "",
+  oi_2000: "",
+  oi_3000: "",
+  oi_4000: "",
+  oi_6000: "",
+  oi_8000: "",
+
+  diagnostico_od: "",
+  diagnostico_oi: "",
+  comentarios_audiometria: "",
+
+  proteccion_simpleODoble: "",
+  control_semestralOAnual: "",
+  recomendaciones_otras: "",
+
+  od_o_500: "",
+  od_o_1000: "",
+  od_o_2000: "",
+  od_o_3000: "",
+  od_o_4000: "",
+  od_o_6000: "",
+  od_o_8000: "",
+  oi_o_500: "",
+  oi_o_1000: "",
+  oi_o_2000: "",
+  oi_o_3000: "",
+  oi_o_4000: "",
+  oi_o_6000: "",
+  oi_o_8000: "",
+
+  empresa: "",
+  contrata: "",
+};
 export default function Audiometria({ token, selectedSede, userlogued }) {
-  const tabla = "audiometria_2023";
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(date.getDate()).padStart(2, "0")}`;
-  const chemicals = [
-    "plomo",
-    "mercurio",
-    "tolueno",
-    "xileno",
-    "plaguicidas",
-    "organofosforados",
-  ];
-  const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
-
-  const initialFormState = {
-    codAu: "",
-    norden: "",
-    fecha: today,
-    nombres: "",
-    edad: "",
-
-    sordera: "NO",
-    acufenos: "NO",
-    vertigo: "NO",
-    otalgia: "NO",
-    secrecion_otica: "NO",
-    otros_sintomas_orl: "",
-
-    rinitis: "NO",
-    sinusitis: "NO",
-    otitis_media_cronica: "NO",
-    medicamentos_ototoxicos: "NO",
-    meningitis: "NO",
-    tec: "NO",
-    sordera_am: "NO",
-    parotiditis: "NO",
-    sarampion: "NO",
-    tbc: "NO",
-    cuales_antecedentes: "",
-
-    exposicion_ruido: "NO",
-    protectores_auditivos: "NO",
-    exposicion_quimicos: "NO",
-
-    promedio_horas: "",
-    anios_exposicion: "",
-    meses_exposicion: "",
-
-    // tipo_protectores: [],
-    tapones: false,
-    orejeras: false,
-
-    plomo_hrs: "", // New fields
-    mercurio_hrs: "",
-    tolueno_hrs: "",
-    xileno_hrs: "",
-    plaguicidas_hrs: "",
-    organofosforados_hrs: "",
-
-    plomo_anios: "",
-    mercurio_anios: "",
-    tolueno_anios: "",
-    xileno_anios: "",
-    plaguicidas_anios: "",
-    organofosforados_anios: "",
-    otros_quimicos: "",
-
-    practica_tiro: "NO",
-    uso_walkman: "NO",
-    otros_antecedentes: "NO",
-    cuales_antecedentes_extralaborales: "",
-    otoscopia_odiocho: "Normal",
-    otoscopia_odilzquierdo: "Normal",
-
-    od_500: "",
-    od_1000: "",
-    od_2000: "",
-    od_3000: "",
-    od_4000: "",
-    od_6000: "",
-    od_8000: "",
-
-    oi_500: "",
-    oi_1000: "",
-    oi_2000: "",
-    oi_3000: "",
-    oi_4000: "",
-    oi_6000: "",
-    oi_8000: "",
-
-    diagnostico_od: "",
-    diagnostico_oi: "",
-    comentarios_audiometria: "",
-
-    proteccion_simpleODoble: "",
-    control_semestralOAnual: "",
-    recomendaciones_otras: "",
-
-    od_o_500: "",
-    od_o_1000: "",
-    od_o_2000: "",
-    od_o_3000: "",
-    od_o_4000: "",
-    od_o_6000: "",
-    od_o_8000: "",
-    oi_o_500: "",
-    oi_o_1000: "",
-    oi_o_2000: "",
-    oi_o_3000: "",
-    oi_o_4000: "",
-    oi_o_6000: "",
-    oi_o_8000: "",
-
-    empresa: "",
-    contrata: "",
-  };
-
   const [form, setForm] = useState(initialFormState);
   const [status, setStatus] = useState("");
-
-  // inicializa fecha hoy
 
   const handleCheckRadio = (name, value) => {
     setForm((f) => ({
@@ -294,7 +294,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base min-w-[50px]">
+            <label className="font-semibold text-base min-w-[50px] md:min-w-[90px]">
               Fecha:
             </label>
             <input
@@ -319,15 +319,53 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
               className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
             />
           </div>
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className=" flex items-center gap-2">
+              <label className="font-semibold text-base min-w-[50px]  md:min-w-[90px]">
+                Edad:
+              </label>
+              <input
+                name="edad"
+                value={form.edad}
+                disabled
+                className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
+              />
+            </div>
+
+            <div className=" flex xl:justify-end items-center gap-4">
+              <label className="font-semibold text-base min-w-[50px] ">
+                Fecha de Nacimiento:
+              </label>
+              <input
+                name="fechaNac"
+                value={form.fechaNac}
+                disabled
+                className="border rounded px-2 py-1 text-base w-24 bg-gray-100 min-w-36"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold text-base min-w-[50px]">
-              Edad:
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              DNI:
             </label>
             <input
-              name="edad"
-              value={form.edad}
+              name="dni"
+              value={form.dni}
               disabled
-              className="border rounded px-2 py-1 text-base w-24 bg-gray-100"
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
+            />
+          </div>
+          <div className="flex-1 flex items-center gap-2">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
+              Ex. Médico:
+            </label>
+            <input
+              name="nomExam"
+              value={form.nomExam}
+              disabled
+              className="border rounded px-2 py-1 text-base flex-1 bg-gray-100"
             />
           </div>
         </div>
@@ -344,7 +382,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
             />
           </div>
           <div className="flex-1 flex items-center gap-2">
-            <label className="font-semibold min-w-[50px] text-base">
+            <label className="font-semibold min-w-[50px] md:min-w-[90px] text-base">
               Contrata:
             </label>
             <input

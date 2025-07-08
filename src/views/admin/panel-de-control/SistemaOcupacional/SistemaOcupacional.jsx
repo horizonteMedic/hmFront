@@ -71,9 +71,10 @@ import { useAuthStore } from "../../../../store/auth";
 import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
 import Audiometria from "./Audiometria/Audiometria/Audiometria.jsx";
-import AudiometriaOhla from "./Audiometria/AudiometriaOhla/AudiometriaOhla.jsx";
 import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/AudiometriaCuestionario.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
+import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
+import Espirometria from "./Espirometria/Espirometria.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -338,6 +339,7 @@ const TabComponent = () => {
               )}
               {tieneVista("Espirometria") && (
                 <div
+                  onClick={() => setActiveTab(14)}
                   className={`${styles.gridItem} ${
                     activeTab === 14 ? styles.active : ""
                   }`}
@@ -496,6 +498,7 @@ const TabComponent = () => {
                       DNIG={DNIG}
                       selectedSede={selectSede}
                       token={token}
+                      userlogued={userlogued.sub}
                       PrecioC={ComboboxPrecioExamenMulti}
                       ChangeDNI={(nuevoDNI) => {
                         setDNIG(nuevoDNI);
@@ -780,7 +783,7 @@ const TabComponent = () => {
               />
             </div>
           )}
-          {activeTab === 15 && (
+          {activeTab === 14 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
                 <button
@@ -791,7 +794,50 @@ const TabComponent = () => {
                 </button>
               </div>
               <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Audiometria</h2>
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Espirometria
+                </h2>
+              </div>
+              <div>
+                <div className={styles.tabHeader}>
+                  {/*Esto se va a mostrar por defecto */}
+                  <button
+                    className={`${styles.tabButton} ${
+                      subTab === 0 ? styles.active : ""
+                    }`}
+                    onClick={() => setSubTab(0)}
+                  >
+                    Espirometria
+                  </button>
+                </div>
+                <div>
+                  {subTab === 0 && (
+                    <Espirometria
+                      token={token}
+                      userlogued={userlogued.sub}
+                      selectedSede={selectSede}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          {activeTab === 15 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => {
+                    setActiveTab(null), setSubTab(0);
+                  }}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Audiometria
+                </h2>
               </div>
               <div>
                 <div className={styles.tabHeader}>
@@ -821,7 +867,6 @@ const TabComponent = () => {
                   >
                     Cuestionario de Audiometria
                   </button>
-                  
                 </div>
                 <div>
                   {subTab === 0 && (
@@ -832,7 +877,7 @@ const TabComponent = () => {
                     />
                   )}
                   {subTab === 1 && (
-                    <AudiometriaOhla
+                    <AudiometriaOhlaTabSelector
                       token={token}
                       userlogued={userlogued.sub}
                       selectedSede={selectSede}
@@ -860,10 +905,14 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-                <div>
-                  <HistoriaOcupacional token={token} userlogued={userlogued.sub} selectedSede={selectSede} listas={listasCombos}/>
-                <div>
-                </div>
+              <div>
+                <HistoriaOcupacional
+                  token={token}
+                  userlogued={userlogued.sub}
+                  selectedSede={selectSede}
+                  listas={listasCombos}
+                />
+                <div></div>
               </div>
             </div>
           )}
