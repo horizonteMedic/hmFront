@@ -14,10 +14,12 @@ import {
   VerifyTR,
   PrintHojaR,
   getInfoTabla,
+  Loading,
+  GetInfoServicio,
 } from "./controllerAudiometriaOhla";
 
 export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
-  const tabla = "audiometria_2023";
+  const tabla = "audiometria_po";
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
@@ -35,6 +37,8 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     nombres: "",
     edad: "",
     dni: "",
+    empresa: "",
+    contrata: "",
     nomExam: "",
     no_paso_Examen: false,
     activar_grafico: false,
@@ -351,8 +355,46 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                 type="checkbox"
                 name="no_paso_Examen"
                 checked={form.no_paso_Examen}
-                onChange={() => {
-                  toggleCheckBox("no_paso_Examen");
+                onChange={(e) => {
+                  setForm((prevForm) => {
+                    const { name } = e.target;
+                    const newValue = !prevForm[name];
+                    return {
+                      ...prevForm,
+                      [name]: newValue,
+                      od_500: newValue ? "-" : "",
+                      od_1000: newValue ? "-" : "",
+                      od_2000: newValue ? "-" : "",
+                      od_3000: newValue ? "-" : "",
+                      od_4000: newValue ? "-" : "",
+                      od_6000: newValue ? "-" : "",
+                      od_8000: newValue ? "-" : "",
+
+                      oi_500: newValue ? "-" : "",
+                      oi_1000: newValue ? "-" : "",
+                      oi_2000: newValue ? "-" : "",
+                      oi_3000: newValue ? "-" : "",
+                      oi_4000: newValue ? "-" : "",
+                      oi_6000: newValue ? "-" : "",
+                      oi_8000: newValue ? "-" : "",
+
+                      od_o_500: newValue ? "-" : "",
+                      od_o_1000: newValue ? "-" : "",
+                      od_o_2000: newValue ? "-" : "",
+                      od_o_3000: newValue ? "-" : "",
+                      od_o_4000: newValue ? "-" : "",
+                      od_o_6000: newValue ? "-" : "",
+                      od_o_8000: newValue ? "-" : "",
+
+                      oi_o_500: newValue ? "-" : "",
+                      oi_o_1000: newValue ? "-" : "",
+                      oi_o_2000: newValue ? "-" : "",
+                      oi_o_3000: newValue ? "-" : "",
+                      oi_o_4000: newValue ? "-" : "",
+                      oi_o_6000: newValue ? "-" : "",
+                      oi_o_8000: newValue ? "-" : "",
+                    };
+                  });
                 }}
               />
               No Paso Examen
@@ -590,7 +632,10 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                     obtenerInfoTabla();
                   }
                 }}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
+                }}
                 className="border rounded px-2 py-1 text-base flex-1"
               />
             </div>
@@ -606,7 +651,10 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                     obtenerInfoTabla();
                   }
                 }}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setForm((f) => ({ ...f, [name]: value, nombres_search: "" }));
+                }}
                 className="border rounded px-2 py-1 text-base flex-1"
               />
             </div>
@@ -707,7 +755,7 @@ function Table({ data, tabla, set, token, clean }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, tabla, token);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
@@ -715,7 +763,7 @@ function Table({ data, tabla, set, token, clean }) {
   function clicktable(nro) {
     clean();
     Loading("Importando Datos");
-    // GetInfoPacAnalisisBio(nro, tabla, set, token, setMed);
+    GetInfoServicio(nro, tabla, set, token);
   }
 
   return (
