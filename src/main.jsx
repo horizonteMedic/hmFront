@@ -32,7 +32,7 @@ import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 import HistoriaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/HistoriaOcupacional/HistoriaOcupacional.jsx';
 //jaspers
-import Ficha from './views/jaspers/Audiometria/Audiometria2021-_Digitalizado.jsx'
+import Ficha from './views/jaspers/Audiometria/'
 import Espirometria from './views/admin/panel-de-control/SistemaOcupacional/Espirometria/Espirometria.jsx';
 import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/Oftalmologia.jsx';
 const App = () => {
