@@ -2,15 +2,15 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeadphones, faFileAlt, } from '@fortawesome/free-solid-svg-icons';
-import Coproparasitologia from '../../Laboratorio/Manipuladores/Coproparasitologia/Coproparasitologia';
 import AudiometriaOhla from './AudiometriaOhla';
+import AudiometriaFichaAudiologica from './AudiometriaFichaAudiologica';
 
 const AudiometriaOhlaTabSelector = ({ token, selectedSede, userlogued }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     { label: 'Audiometría Ohla', icon: faHeadphones, component: <AudiometriaOhla token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Ficha Audiológica', icon: faFileAlt, component: <Coproparasitologia token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Ficha Audiológica', icon: faFileAlt, component: <AudiometriaFichaAudiologica /> },
    ];
 
   return (
