@@ -215,6 +215,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
               <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
               <td className='w-auto'>{rowData.riesgo}</td>
               <td className='w-auto'>{rowData.proteccion}</td>
+              
             </tr>
           </tbody>
         </table>
