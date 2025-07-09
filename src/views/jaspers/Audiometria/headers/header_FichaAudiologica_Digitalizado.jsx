@@ -1,9 +1,9 @@
 /**
- * Header para FICHA AUDIOLÓGICA (logo izq, título centrado, ficha/sede derecha)
+ * Header maqueta para FICHA AUDIOLÓGICA (logo izq, título centrado, ficha/sede derecha)
+ * Sólo muestra layout estático con espacios en blanco para valores
  * @param {jsPDF} doc - Instancia de jsPDF
- * @param {object} datos - Datos del paciente y ficha
  */
-const header_FichaAudiologica_Digitalizado = (doc, datos = {}) => {
+const header_FichaAudiologica_Maqueta = (doc) => {
   const margin = 18;
   const pageW  = doc.internal.pageSize.getWidth();
   let   y      = 12;
@@ -21,22 +21,15 @@ const header_FichaAudiologica_Digitalizado = (doc, datos = {}) => {
   // 2) BLOQUE "No Ficha" / "Sede" (ajustado a la derecha)
   const fichaBlockX = pageW - margin + 1;
   const fichaBlockY = y + 2;
-  const fichaLabel   = "No Ficha :";
-  const fichaValue   = String(datos.nroficha || "95877");
-  const sedeLabel    = "Sede     :";
-  const sedeValue    = String(datos.sede     || "Trujillo-Pierola");
 
-  // No Ficha
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(fichaLabel, fichaBlockX - 30, fichaBlockY);
+  doc.text("No Ficha :", fichaBlockX - 30, fichaBlockY);
   doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text(fichaValue, fichaBlockX + 6, fichaBlockY, { align: "right" });
+  doc.text("__________", fichaBlockX + 6, fichaBlockY, { align: "right" });
 
-  // Sede
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(sedeLabel, fichaBlockX - 30, fichaBlockY + 8);
-  doc.setFont("helvetica", "normal").setFontSize(8.5);
-  doc.text(sedeValue, fichaBlockX + 6, fichaBlockY + 8, { align: "right" });
+  doc.text("Sede     :", fichaBlockX - 30, fichaBlockY + 8);
+  doc.text("______________", fichaBlockX + 6, fichaBlockY + 8, { align: "right" });
 
   // 3) TÍTULO perfectamente centrado
   doc.setFont("helvetica", "bold").setFontSize(13);
@@ -49,86 +42,76 @@ const header_FichaAudiologica_Digitalizado = (doc, datos = {}) => {
      .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
      .setLineWidth(0.2);
 
-  // 4) Datos del paciente en filas
+  // 4) Layout de datos del paciente en filas (etiquetas + líneas en blanco)
   let datosY = y + 22;
   const labelW = 34;
   const sep    = 3;
   const col2X  = pageW / 2 - 10;
   const col3X  = pageW - margin - 60;
   const rowH   = 5.2;
-  doc.setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
 
-  // Fila 1: Apellidos y Nombres | Edad | Fecha
-  doc.setFont("helvetica", "bold");
-  doc.text("Apellidos y Nombres", margin, datosY);
-  doc.text(":", margin + labelW, datosY);
+  // Fila 1
+  doc.text("Apellidos y Nombres :", margin, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.nombres || ""), margin + labelW + sep, datosY, {
+  doc.text("__________________________", margin + labelW + sep, datosY, {
     maxWidth: col2X - (margin + labelW + sep) - 2
   });
 
   doc.setFont("helvetica", "bold");
-  doc.text("Edad", col2X, datosY);
-  doc.text(":", col2X + 15, datosY);
+  doc.text("Edad :", col2X, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.edad || ""), col2X + 19, datosY);
+  doc.text("____", col2X + 19, datosY);
 
   doc.setFont("helvetica", "bold");
-  doc.text("Fecha", col3X, datosY);
-  doc.text(":", col3X + 15, datosY);
+  doc.text("Fecha :", col3X, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.fecha || ""), col3X + 19, datosY);
+  doc.text("__________", col3X + 19, datosY);
 
-  // Fila 2: DNI | Cargo | Sexo
+  // Fila 2
   datosY += rowH;
   doc.setFont("helvetica", "bold");
-  doc.text("DNI", margin, datosY);
-  doc.text(":", margin + labelW, datosY);
+  doc.text("DNI :", margin, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.dni || ""), margin + labelW + sep, datosY, {
+  doc.text("__________", margin + labelW + sep, datosY, {
     maxWidth: col2X - (margin + labelW + sep) - 2
   });
 
   doc.setFont("helvetica", "bold");
-  doc.text("Cargo", col2X, datosY);
-  doc.text(":", col2X + 15, datosY);
+  doc.text("Cargo :", col2X, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.cargo || ""), col2X + 19, datosY);
+  doc.text("________________", col2X + 19, datosY);
 
   doc.setFont("helvetica", "bold");
-  doc.text("Sexo", col3X, datosY);
-  doc.text(":", col3X + 15, datosY);
+  doc.text("Sexo :", col3X, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.sexo || ""), col3X + 19, datosY);
+  doc.text("__", col3X + 19, datosY);
 
-  // Fila 3: Área de Trabajo | Contrata
+  // Fila 3
   datosY += rowH;
   doc.setFont("helvetica", "bold");
-  doc.text("Área de Trabajo", margin, datosY);
-  doc.text(":", margin + labelW, datosY);
+  doc.text("Área de Trabajo :", margin, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.areaTrabajo || ""), margin + labelW + sep, datosY, {
+  doc.text("__________________________", margin + labelW + sep, datosY, {
     maxWidth: col2X - (margin + labelW + sep) - 2
   });
 
   doc.setFont("helvetica", "bold");
-  doc.text("Contrata", col2X, datosY);
-  doc.text(":", col2X + 15, datosY);
+  doc.text("Contrata :", col2X, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.contrata || ""), col2X + 19, datosY);
+  doc.text("________________", col2X + 19, datosY);
 
-  // Fila 4: Empresa
+  // Fila 4
   datosY += rowH;
   doc.setFont("helvetica", "bold");
-  doc.text("Empresa", margin, datosY);
-  doc.text(":", margin + labelW, datosY);
+  doc.text("Empresa :", margin, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.empresa || ""), margin + labelW + sep, datosY, {
+  doc.text("__________________________", margin + labelW + sep, datosY, {
     maxWidth: col2X - (margin + labelW + sep) - 2
   });
 
-  // restaurar fuente normal
+  // Restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default header_FichaAudiologica_Digitalizado; 
+export default header_FichaAudiologica_Maqueta;
