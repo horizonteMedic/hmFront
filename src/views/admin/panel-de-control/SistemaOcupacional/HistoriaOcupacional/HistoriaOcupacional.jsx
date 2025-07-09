@@ -3,11 +3,30 @@ import styles from './HistoriaOcupacional.module.css';
 import { handleSearch, handleSelect, PrintHojaR, SubmiteHistoriaOcupacionalController, VerifyTR } from './controller/controllerHO';
 import { getFetch } from '../../getFetch/getFetch';
 import Swal from 'sweetalert2';
+import AutoResizeInput from './Inputs';
 
-
- const date = new Date();
+  const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-const tabla = 'historia_oc_info'
+  const tabla = 'historia_oc_info'
+
+  const riesgosOptions = [
+    {id: 1, title: 'INTERIOR MINA', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, MOVIMIENTO REPETITIVOS, ALTAS TEMPERATURAS, HUMEDAD, POLVO, EXPLOSIONES, APLASTAMIENTOS, DESCARGAS ELECTRICAS, INTOXICACION POR GASES, GOLPE, CAIDAS, RUIDO'},
+    {id: 1, title: 'MINA (SUPERFICIE O TAJO ABIERTO)', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, MOVIMIENTOS REPETITIVOS, HUMEDAD, INSOLACION'},
+    {id: 1, title: 'COCINA (COCINEROS O AYUDANTES DE COCINA)', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, QUEMADURAS, VAPORES ORGANICOS Y QUIMICOS, CORTES, CAIDAS'},
+    {id: 1, title: 'ALMACEN', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, MOVIMIENTOS REPETITIVOS, DERRUMBAMIENTO DE OBJETOS, QUEMADURAS, CORTES, CAIDAS DE ALTURA DE 1.80M, FRACTURAS'},
+    {id: 1, title: 'SOLDADOR', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, MOVIMIENTOS REPETITIVOS, QUEMADURAS, DESCARGAS ELECTRICAS, ELECTROCUCION, GOLPES, CORTES, CAIDAS SOBRE 1.8 M, RUIDO'},
+    {id: 1, title: 'OPERADOR DE EQUIPO PESADO', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, MOVIMIENTOS REPETITIVOS, VIBRACIONES, RUIDO, ESFUERZO VISUAL, INSOLACION, RUIDO'},
+    {id: 1, title: 'VALLIJERO', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, MOVIMIENTOS REPETITIVOS, HUMEDAD, DERMATITIS'},
+    {id: 1, title: 'AZAFATA', mensaje:'MOV. Y POSICIONES DISERGONOMICAS, TENDINITIS  ESTOS SON LOS RIESGOS QUE ELLAS MANEJAN ACTUALIZADOS'},
+  ];
+  const proteccionOptions = [
+    {id: 1, mensaje:'CASCO,LENTES,TAPONES AUDITIVOS,RESPIRADOR,CHALECO DE SEGURIDAD, OVERALL, GUANTES,ZAPATOS DE SEGURIDAD'},
+    {id: 2, mensaje:'MANDIL, MANDILON'},
+    {id: 3, mensaje:'CHALECO ANTIBALAS'},
+    {id: 4, mensaje:'EPPS BASICOS : "CASCO, LENTES, GUANTES,OVERAL,ZAPATOS DE SEGURIDAD"'},
+    {id: 5, mensaje:'EPPS COMPLETO : "CASCO, LENTES, GUANTES,TAPONES AUDITIVOS,RESPIRADOR, OREJERAS,ZAPATOS DE SEGURIDAD"'},
+    {id: 6, mensaje:'NINGUNO'}
+  ];
 
 const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
   const [nroOrden, setNroOrden] = useState('');
@@ -39,38 +58,43 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
   const [searchEmpresa, setSearchEmpresa]  = useState("");
   const [searchAltitud, setSearchAltitud]  = useState("");
   const [searchArea, setSearchArea]  = useState("");
+  const [searchRiesgo, setSearchRiesgo]  = useState("");
+  const [searchProt, setSearchProt]  = useState("");
 
   const [filteredEmpresa, setFilteredEmpresa] = useState([]);
   const [filteredAltitud, setFilteredAltitud] = useState([]);
   const [filteredArea, setFilteredArea] = useState([]);
-
+  const [filteredRiesgo, setFilteredRiesgo] = useState([]);
+  const [filteredProt, setFilteredProt] = useState([]);
   
   //listas
   const {EmpresasMulti,AlturaMulti,AreaMulti} = listas
   // Opciones random de ejemplo para los selects
   //ALGUNOS YA TREEN DATOS DE VERITAS
 
-  const riesgosOptions = [
-    '',
-    'RUIDO',
-    'POLVO',
-    'QUÍMICOS',
-    'BIOLÓGICOS',
-    'ERGONÓMICOS',
-    'NINGUNO',
-
-  ];
-  const proteccionOptions = [
-    'CASCOS, LENTES, GUANTES',
-    'MANDIL, MADILON',
-    'CHALECO ANTIBALA',
-    'EPPS BASICO',
-    'EPPS COMPLETO',
-    'LA DE PAPÁ DIOS',
-    'NINGUNO',
-  ];
+  
 
   const handleRowChange = (field, value) => {
+    const numero = Number(value); // solo para lógica de control
+
+    if (field === 'socavon') {
+      setRowData(prev => ({
+        ...prev,
+        socavon: value, // se guarda como string
+        superficie: numero !== 0 ? '0' : prev.superficie  // se resetea si socavon no es 0
+      }));
+      return;
+    }
+
+    if (field === 'superficie') {
+      setRowData(prev => ({
+        ...prev,
+        superficie: value,
+        socavon: numero !== 0 ? '0' : prev.socavon
+      }));
+      return;
+    }
+
     setRowData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -101,6 +125,22 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
     nombres: "",
     fecha: today,
     })
+    setRowData({
+      fecha: '',
+      empresa: '',
+      altitud: '',
+      actividad: '',
+      areaEmpresa: '',
+      ocupacion: '',
+      superficie: '',
+      socavon: '',
+      riesgo: '',
+      proteccion: '',
+    })
+    setRegistros([])
+    setSearchEmpresa("")
+    setSearchAltitud("")
+    setSearchArea("")
   }
 
   const handleset = () => {
@@ -110,6 +150,9 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
       fecha: today,
     }))
     setRegistros([])
+    setSearchEmpresa("")
+    setSearchAltitud("")
+    setSearchArea("")
   }
 
   const handleInputChange = (e) => {
@@ -137,7 +180,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
       }
     });
   }
-  console.log(AlturaMulti)
+  
   return (
     <div className={styles.historiaOcupacionalContainer} style={{ fontSize: 13, color: '#000' }}>
       <h1 className={styles.tituloPrincipal} style={{ fontSize: 15, color: '#000', fontWeight: 'bold' }}>HISTORIAL OCUPACIONAL</h1>
@@ -180,47 +223,203 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Fecha :</label>
-            <input type="text" value={form.fecha} onChange={handleInputChange} name='fecha' className={styles.inputSmall} placeholder="dd/mm/aa" style={{ fontSize: 13, color: '#000' }} />
+            <input type="date" value={form.fecha} onChange={handleInputChange} name='fecha' className={`${styles.inputSmall} w-auto`} placeholder="dd/mm/aa" style={{ fontSize: 13, color: '#000' }} />
           </div>
         </div>
       </fieldset>
       <div className={styles.tableWrapper}>
         <table className={styles.historiaTable} style={{ fontSize: 13, color: '#000' }}>
-          <thead>
-            <tr>
-              <th rowSpan={2}>Año</th>
-              <th rowSpan={2}>Empresa - Lugar Geográfico</th>
-              <th rowSpan={2}>Altitud</th>
-              <th rowSpan={2}>Actividad</th>
-              <th rowSpan={2}>Área Empresa</th>
-              <th rowSpan={2}>Ocupación</th>
-              <th colSpan={2} style={{textAlign: 'center'}}>Tiempo de Labor</th>
-              <th rowSpan={2}>Riesgos</th>
-              <th rowSpan={2}>Protección</th>
+          <thead className='w-auto'>
+            <tr className='w-auto'>
+              <th className='w-auto' rowSpan={2}>Año</th>
+              <th className='w-auto' rowSpan={2}>Empresa - Lugar Geográfico</th>
+              <th className='w-auto' rowSpan={2}>Altitud</th>
+              <th className='w-auto' rowSpan={2}>Actividad</th>
+              <th className='w-auto' rowSpan={2}>Área Empresa</th>
+              <th className='w-auto' rowSpan={2}>Ocupación</th>
+              <th className='w-auto' colSpan={2} style={{textAlign: 'center'}}>Tiempo de Labor</th>
+              <th className='w-auto' rowSpan={2}>Riesgos</th>
+              <th className='w-auto' rowSpan={2}>Protección</th>
             </tr>
             <tr>
+              <th>Socavon</th>
               <th>Superficie</th>
-              <th>Socavón</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className='w-auto'><input type="text" className={`${styles.inputTable} w-full py-1`} value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td className='w-auto'><input type="text" className={`${styles.inputTable} w-full`} value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td className='w-auto'>{rowData.altitud}</td>
-              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td className='w-auto'>{rowData.areaEmpresa}</td>
-              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td className='w-auto'><input type="text" className={styles.inputTable} value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} style={{ fontSize: 13, color: '#000' }} /></td>
-              <td className='w-auto'>{rowData.riesgo}</td>
-              <td className='w-auto'>{rowData.proteccion}</td>
+              <td> <AutoResizeInput value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.altitud} onChange={e => handleRowChange('altitud', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.areaEmpresa} onChange={e => handleRowChange('areaEmpresa', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.riesgo} onChange={e => handleRowChange('riesgo', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.proteccion} onChange={e => handleRowChange('proteccion', e.target.value)}/></td>
               
             </tr>
           </tbody>
         </table>
       </div>
 
+      {/* Buscadores debajo de la tabla */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2em', marginTop: 24, alignItems: 'flex-end' }}>
+        {/*EMPRESA*/}
+        <div className='relative'>
+          <div className='flex flex-col items-center justify-center'>
+              <label htmlFor="">Empresas</label>
+              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchEmpresa} name='empresa'
+                onChange={(e) => {handleSearch(e,setSearchEmpresa,handleRowChange,setFilteredEmpresa,EmpresasMulti)}}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter" && filteredEmpresa.length > 0) {
+                    e.preventDefault();
+                    handleSelect(e,e.target.name,filteredEmpresa[0].mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa);
+                  }
+                }}
+                onBlur={() => setTimeout(() => setFilteredEmpresa([]), 100)}/>
+              {searchEmpresa && filteredEmpresa.length > 0 && (
+                <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                  {filteredEmpresa.map((opt) => (
+                    <li
+                      key={opt.id}
+                      className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                      onMouseDown={(e) => handleSelect(e,'empresa',opt.mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa)}
+                    >
+                      {opt.mensaje}
+                    </li>
+                  ))}
+                </ul>
+              )}
+          </div>
+          
+        </div>
+        {/*ALTITUD*/}
+        <div className='relative'>
+          <div className='flex flex-col items-center justify-center'>
+              <label htmlFor="">Altitud</label>
+              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchAltitud} name='altitud'
+              onChange={(e) => {handleSearch(e,setSearchAltitud,handleRowChange,setFilteredAltitud,AlturaMulti)}}
+              onKeyUp={(e) => {
+                if (e.key === "Enter" && filteredAltitud.length > 0) {
+                  e.preventDefault();
+                  handleSelect(e,e.target.name,filteredAltitud[0].mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud);
+                }
+              }}
+              onBlur={() => setTimeout(() => setFilteredAltitud([]), 100)}/>
+              {searchAltitud && filteredAltitud.length > 0 && (
+                <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                  {filteredAltitud.map((opt) => (
+                    <li
+                      key={opt.id}
+                      name="altitud"
+                      className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                      onMouseDown={(e) => handleSelect(e,'altitud',opt.mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud)}
+                    >
+                      {opt.mensaje}
+                    </li>
+                  ))}
+                </ul>
+              )}
+          </div> 
+        </div>
+        {/*AREAS*/}
+        <div className='relative'>
+          <div className='flex flex-col items-center justify-center'>
+            <label htmlFor="">Areas</label>
+              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchArea} name='areaEmpresa'
+            onChange={(e) => {handleSearch(e,setSearchArea,handleRowChange,setFilteredArea,AreaMulti)}}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredArea.length > 0) {
+                e.preventDefault();
+                handleSelect(e,e.target.name,filteredArea[0].mensaje,setSearchArea,handleRowChange,setFilteredArea);
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredArea([]), 100)}/>
+            {searchArea && filteredArea.length > 0 && (
+              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                {filteredArea.map((opt) => (
+                  <li
+                    key={opt.id}
+                    name="areaEmpresa"
+                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                    onMouseDown={(e) => handleSelect(e,'areaEmpresa',opt.mensaje,setSearchArea,handleRowChange,setFilteredArea)}
+                  >
+                    {opt.mensaje}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+            
+        </div>
+        {/*RIESGOS */}
+        <div className='relative'>
+          <div className='flex flex-col items-center justify-center'>
+            <label htmlFor="">Riesgos</label>
+              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchRiesgo} name='riesgo'
+            onChange={(e) => {handleSearch(e,setSearchRiesgo,handleRowChange,setFilteredRiesgo,riesgosOptions)}}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredRiesgo.length > 0) {
+                e.preventDefault();
+                handleSelect(e,e.target.name,filteredRiesgo[0].mensaje,setSearchRiesgo,handleRowChange,setFilteredRiesgo);
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredRiesgo([]), 100)}/>
+            {searchRiesgo && filteredRiesgo.length > 0 && (
+              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                {filteredRiesgo.map((opt) => (
+                  <li
+                    key={opt.id}
+                    name="riesgo"
+                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                    onMouseDown={(e) => handleSelect(e,'riesgo',opt.mensaje,setSearchRiesgo,handleRowChange,setFilteredRiesgo)}
+                  >
+                    {opt.title}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>   
+        </div>
+        {/*EPPS*/}
+        <div className='relative'>
+          <div className='flex flex-col items-center justify-center'>
+            <label htmlFor="">Protección</label>
+              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchProt} name='proteccion'
+            onChange={(e) => {handleSearch(e,setSearchProt,handleRowChange,setFilteredProt,proteccionOptions)}}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && filteredProt.length > 0) {
+                e.preventDefault();
+                handleSelect(e,e.target.name,filteredProt[0].mensaje,setSearchProt,handleRowChange,setFilteredProt);
+              }
+            }}
+            onBlur={() => setTimeout(() => setFilteredProt([]), 100)}/>
+            {searchProt && filteredProt.length > 0 && (
+              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                {filteredProt.map((opt) => (
+                  <li
+                    key={opt.id}
+                    name="proteccion"
+                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
+                    onMouseDown={(e) => handleSelect(e,'proteccion',opt.mensaje,setSearchProt,handleRowChange,setFilteredProt)}
+                  >
+                    {opt.mensaje}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>   
+        </div>
+        <button
+          type="button"
+          style={{ height: 32, marginLeft: 'auto', background: '#233245', color: '#fff', border: 'none', borderRadius: 4, padding: '0 16px', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}
+          onClick={handleRegistrar}
+        >
+          <i className="fas fa-plus"></i> Registrar
+        </button>
+      </div>
       {/* Preview de registros vacío */}
       {registros.length === 0 && (
         <div style={{
@@ -236,116 +435,6 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
           Aquí se mostrarán los registros
         </div>
       )}
-
-      {/* Buscadores debajo de la tabla */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2em', marginTop: 24, alignItems: 'flex-end' }}>
-        {/*EMPRESA*/}
-        <div className='relative'>
-            <input type="text" autoComplete='off' className={styles.inputLarge} value={searchEmpresa} name='empresa'
-            onChange={(e) => {handleSearch(e,setSearchEmpresa,handleRowChange,setFilteredEmpresa,EmpresasMulti)}}
-            onKeyUp={(e) => {
-              if (e.key === "Enter" && filteredEmpresa.length > 0) {
-                e.preventDefault();
-                handleSelect(e,e.target.name,filteredEmpresa[0].mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa);
-              }
-            }}
-            onBlur={() => setTimeout(() => setFilteredEmpresa([]), 100)}/>
-          {searchEmpresa && filteredEmpresa.length > 0 && (
-            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-              {filteredEmpresa.map((opt) => (
-                <li
-                  key={opt.id}
-                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                  onMouseDown={(e) => handleSelect(e,'empresa',opt.mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa)}
-                >
-                  {opt.mensaje}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        {/*ALTITUD*/}
-        <div className='relative'>
-          <input type="text" autoComplete='off' className={styles.inputLarge} value={searchAltitud} name='altitud'
-            onChange={(e) => {handleSearch(e,setSearchAltitud,handleRowChange,setFilteredAltitud,AlturaMulti)}}
-            onKeyUp={(e) => {
-              if (e.key === "Enter" && filteredAltitud.length > 0) {
-                e.preventDefault();
-                handleSelect(e,e.target.name,filteredAltitud[0].mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud);
-              }
-            }}
-            onBlur={() => setTimeout(() => setFilteredAltitud([]), 100)}/>
-            {searchAltitud && filteredAltitud.length > 0 && (
-              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                {filteredAltitud.map((opt) => (
-                  <li
-                    key={opt.id}
-                    name="altitud"
-                    className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                    onMouseDown={(e) => handleSelect(e,'altitud',opt.mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud)}
-                  >
-                    {opt.mensaje}
-                  </li>
-                ))}
-              </ul>
-            )}
-        </div>
-        {/*AREAS*/}
-        <div className='relative'>
-            <input type="text" autoComplete='off' className={styles.inputLarge} value={searchArea} name='areaEmpresa'
-            onChange={(e) => {handleSearch(e,setSearchArea,handleRowChange,setFilteredArea,AreaMulti)}}
-            onKeyUp={(e) => {
-              if (e.key === "Enter" && filteredArea.length > 0) {
-                e.preventDefault();
-                handleSelect(e,e.target.name,filteredArea[0].mensaje,setSearchArea,handleRowChange,setFilteredArea);
-              }
-            }}
-            onBlur={() => setTimeout(() => setFilteredArea([]), 100)}/>
-          {searchArea && filteredArea.length > 0 && (
-            <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-              {filteredArea.map((opt) => (
-                <li
-                  key={opt.id}
-                  name="areaEmpresa"
-                  className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                  onMouseDown={(e) => handleSelect(e,'areaEmpresa',opt.mensaje,setSearchArea,handleRowChange,setFilteredArea)}
-                >
-                  {opt.mensaje}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-        <select
-          className={styles.inputLarge}
-          value={rowData.riesgo}
-          onChange={e => handleRowChange('riesgo', e.target.value)}
-          style={{ minWidth: 180, fontSize: 13, color: '#000' }}
-        >
-          {riesgosOptions.map(opt => (
-            <option key={opt} value={opt}>{opt === '' ? 'Riesgos...' : opt}</option>
-          ))}
-        </select>
-        <select
-          className={styles.inputLarge}
-          value={rowData.proteccion}
-          onChange={e => handleRowChange('proteccion', e.target.value)}
-          style={{ minWidth: 180, fontSize: 13, color: '#000' }}
-        >
-          <option value="">Protección...</option>
-          {proteccionOptions.map(opt => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
-        <button
-          type="button"
-          style={{ height: 32, marginLeft: 'auto', background: '#233245', color: '#fff', border: 'none', borderRadius: 4, padding: '0 16px', cursor: 'pointer', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}
-          onClick={handleRegistrar}
-        >
-          <i className="fas fa-plus"></i> Registrar
-        </button>
-      </div>
-
       {/* Tabla de registros */}
       {registros.length > 0 && (
         <div style={{ marginTop: 32 }}>
