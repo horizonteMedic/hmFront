@@ -50,14 +50,17 @@ const ModalContrata = ({
       .then((res) => {
         if (res.id == 1) {
           setExisteRUC(true);
+          setPuedeHabilitar(false);
           Swal.fire("Error", "El RUC ya existe", "error");
         } else {
           setExisteRUC(false);
+          setPuedeHabilitar(true);
         }
       })
       .catch((error) => {
         console.error("Error checking RUC existence:", error);
         setExisteRUC(false);
+        setPuedeHabilitar(true);
         // Swal.fire("Error", "Error al verificar el RUC", "error");
       });
   };
@@ -158,6 +161,10 @@ const ModalContrata = ({
     });
     setSearchTerm("");
     setFilteredList(List);
+    setExisteRUC(true);
+    setHabilitar(false);
+    setPuedeHabilitar(false);
+
   };
 
   // Add ESC key handler
@@ -316,6 +323,7 @@ const ModalContrata = ({
               setHabilitar(!habilitar);
               setExisteRUC(false);
             }}
+            disabled={!puedeHabilitar}
             className="px-3 py-1 bg-green-500 text-white rounded  flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faUnlock} /> Habilitar

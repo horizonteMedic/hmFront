@@ -54,14 +54,17 @@ const ModalEmpresa = ({
       .then((res) => {
         if (res.id == 1) {
           setExisteRUC(true);
+          setPuedeHabilitar(false);
           Swal.fire("Error", "El RUC ya existe", "error");
         } else {
           setExisteRUC(false);
+          setPuedeHabilitar(true);
         }
       })
       .catch((error) => {
         console.error("Error checking RUC existence:", error);
         setExisteRUC(false);
+        setPuedeHabilitar(true);
         // Swal.fire("Error", "Error al verificar el RUC", "error");
       });
   };
@@ -162,6 +165,9 @@ const ModalEmpresa = ({
     });
     setSearchTerm("");
     setFilteredList(List);
+    setExisteRUC(true);
+    setHabilitar(false);
+    setPuedeHabilitar(false);
   };
 
   useEffect(() => {
@@ -391,9 +397,9 @@ const ModalEmpresa = ({
                           responsable: item.responsableEmpresa || "",
                           email: item.emailEmpresa || "",
                         }),
-                          setHabilitar(true);
-                          setPuedeHabilitar(true);
-                          setExisteRUC(false);
+                        setHabilitar(true);
+                        setPuedeHabilitar(true);
+                        setExisteRUC(false);
                       }}
                       onContextMenu={(e) => {
                         e.preventDefault(), ReturnRS(item.razonEmpresa);
