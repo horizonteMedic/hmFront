@@ -8,14 +8,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
+
 import {
   SubmitDataService,
   VerifyTR,
   PrintHojaR,
-} from "../Audiometria/controllerAudiometria";
+  getInfoTabla,
+  Loading,
+  GetInfoServicio,
+} from "./controllerAudiometriaOhla";
 
 export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
-  const tabla = "audiometria_2023";
+  const tabla = "audiometria_po";
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
@@ -23,6 +27,7 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
   )}-${String(date.getDate()).padStart(2, "0")}`;
 
   const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
+  const [dataTabla, setDataTabla] = useState([]);
 
   const initialFormState = {
     codAu: "",
@@ -32,6 +37,8 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     nombres: "",
     edad: "",
     dni: "",
+    empresa: "",
+    contrata: "",
     nomExam: "",
     no_paso_Examen: false,
     activar_grafico: false,
@@ -76,73 +83,7 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     nombres_search: "",
     codigo_search: "",
     diagnostico: "",
-
-    //antiguos
-    sordera: "NO",
-    acufenos: "NO",
-    vertigo: "NO",
-    otalgia: "NO",
-    secrecion_otica: "NO",
-    otros_sintomas_orl: "",
-
-    rinitis: "NO",
-    sinusitis: "NO",
-    otitis_media_cronica: "NO",
-    medicamentos_ototoxicos: "NO",
-    meningitis: "NO",
-    tec: "NO",
-    sordera_am: "NO",
-    parotiditis: "NO",
-    sarampion: "NO",
-    tbc: "NO",
-    cuales_antecedentes: "",
-
-    exposicion_ruido: "NO",
-    protectores_auditivos: "NO",
-    exposicion_quimicos: "NO",
-
-    promedio_horas: "",
-    anios_exposicion: "",
-    meses_exposicion: "",
-
-    // tipo_protectores: [],
-    tapones: false,
-    orejeras: false,
-
-    plomo_hrs: "", // New fields
-    mercurio_hrs: "",
-    tolueno_hrs: "",
-    xileno_hrs: "",
-    plaguicidas_hrs: "",
-    organofosforados_hrs: "",
-
-    plomo_anios: "",
-    mercurio_anios: "",
-    tolueno_anios: "",
-    xileno_anios: "",
-    plaguicidas_anios: "",
-    organofosforados_anios: "",
-    otros_quimicos: "",
-
-    practica_tiro: "NO",
-    uso_walkman: "NO",
-    otros_antecedentes: "NO",
-    cuales_antecedentes_extralaborales: "",
-    otoscopia_odiocho: "Normal",
-    otoscopia_odilzquierdo: "Normal",
-
-    diagnostico_od: "",
-    diagnostico_oi: "",
-    comentarios_audiometria: "",
-
-    proteccion_simpleODoble: "",
-    control_semestralOAnual: "",
-    recomendaciones_otras: "",
-
-    empresa: "",
-    contrata: "",
   };
-  const [exams, setExams] = useState([]);
   const [form, setForm] = useState(initialFormState);
   const [status, setStatus] = useState("");
 
@@ -157,6 +98,14 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
       ...f,
       [name]: !f[name],
     }));
+  };
+
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
 
   const handleChange = (e) => {
@@ -406,8 +355,46 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                 type="checkbox"
                 name="no_paso_Examen"
                 checked={form.no_paso_Examen}
-                onChange={() => {
-                  toggleCheckBox("no_paso_Examen");
+                onChange={(e) => {
+                  setForm((prevForm) => {
+                    const { name } = e.target;
+                    const newValue = !prevForm[name];
+                    return {
+                      ...prevForm,
+                      [name]: newValue,
+                      od_500: newValue ? "-" : "",
+                      od_1000: newValue ? "-" : "",
+                      od_2000: newValue ? "-" : "",
+                      od_3000: newValue ? "-" : "",
+                      od_4000: newValue ? "-" : "",
+                      od_6000: newValue ? "-" : "",
+                      od_8000: newValue ? "-" : "",
+
+                      oi_500: newValue ? "-" : "",
+                      oi_1000: newValue ? "-" : "",
+                      oi_2000: newValue ? "-" : "",
+                      oi_3000: newValue ? "-" : "",
+                      oi_4000: newValue ? "-" : "",
+                      oi_6000: newValue ? "-" : "",
+                      oi_8000: newValue ? "-" : "",
+
+                      od_o_500: newValue ? "-" : "",
+                      od_o_1000: newValue ? "-" : "",
+                      od_o_2000: newValue ? "-" : "",
+                      od_o_3000: newValue ? "-" : "",
+                      od_o_4000: newValue ? "-" : "",
+                      od_o_6000: newValue ? "-" : "",
+                      od_o_8000: newValue ? "-" : "",
+
+                      oi_o_500: newValue ? "-" : "",
+                      oi_o_1000: newValue ? "-" : "",
+                      oi_o_2000: newValue ? "-" : "",
+                      oi_o_3000: newValue ? "-" : "",
+                      oi_o_4000: newValue ? "-" : "",
+                      oi_o_6000: newValue ? "-" : "",
+                      oi_o_8000: newValue ? "-" : "",
+                    };
+                  });
                 }}
               />
               No Paso Examen
@@ -642,10 +629,13 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                 value={form.nombres_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    //search
+                    obtenerInfoTabla();
                   }
                 }}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
+                }}
                 className="border rounded px-2 py-1 text-base flex-1"
               />
             </div>
@@ -658,17 +648,20 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                 value={form.codigo_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    //search
+                    obtenerInfoTabla();
                   }
                 }}
-                onChange={handleChange}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setForm((f) => ({ ...f, [name]: value, nombres_search: "" }));
+                }}
                 className="border rounded px-2 py-1 text-base flex-1"
               />
             </div>
           </div>
           <div className="flex-1">
             <Table
-              data={exams}
+              data={dataTabla}
               tabla={tabla}
               set={setForm}
               token={token}
@@ -762,7 +755,7 @@ function Table({ data, tabla, set, token, clean }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, tabla, token);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
@@ -770,12 +763,12 @@ function Table({ data, tabla, set, token, clean }) {
   function clicktable(nro) {
     clean();
     Loading("Importando Datos");
-    // GetInfoPacAnalisisBio(nro, tabla, set, token, setMed);
+    GetInfoServicio(nro, tabla, set, token);
   }
 
   return (
-    <div className="overflow-y-auto" style={{ maxHeight: "calc(12 * 4rem)" }}>
-      <table className="w-full table-auto border-collapse">
+    <div className="overflow-y-auto " style={{ maxHeight: "650px" }}>
+      <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">
             <th className="border px-2 py-1 text-left text-lg">Cod.</th>
@@ -789,23 +782,17 @@ function Table({ data, tabla, set, token, clean }) {
             data.map((row, i) => (
               <tr
                 key={i}
-                className={`hover:bg-gray-50 cursor-pointer text-lg ${
-                  row.color === "AMARILLO"
-                    ? "bg-[#ffff00]"
-                    : row.color === "VERDE"
-                    ? "bg-[#00ff00]"
-                    : "bg-[#ff6767]"
-                }`}
-                onClick={() => clicktable(row.n_orden)}
+                className={`hover:bg-gray-50 cursor-pointer text-lg `}
+                onClick={() => clicktable(row.norden)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  handlePrintConfirm(row.n_orden);
+                  handlePrintConfirm(row.norden);
                 }}
               >
-                <td className="border px-2 py-1 font-bold">{row.codigo}</td>
-                <td className="border px-2 py-1">{row.n_orden}</td>
+                <td className="border px-2 py-1 font-bold">{row.codAu}</td>
+                <td className="border px-2 py-1">{row.norden}</td>
                 <td className="border px-2 py-1">{row.nombres}</td>
-                <td className="border px-2 py-1">{row.fecha}</td>
+                <td className="border px-2 py-1">{row.fechaAu}</td>
               </tr>
             ))
           ) : (
