@@ -6,7 +6,7 @@ export function SubmitHistoriaOcupacional(data,registros,user,token) {
         "norden": data.norden,
         "areaO": data.areaO,
         "fechaHo": data.fecha,
-        "dniUser": 76574022,
+        "dniUser": data.dniUser,
         "dniPa": data.dni,
         "userRegistro": user,
         "detalles": registros.map(reg => ({

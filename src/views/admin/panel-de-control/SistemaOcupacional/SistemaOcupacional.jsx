@@ -911,6 +911,7 @@ const TabComponent = () => {
                   userlogued={userlogued.sub}
                   selectedSede={selectSede}
                   listas={listasCombos}
+                  userDatos={userlogued}
                 />
                 <div></div>
               </div>

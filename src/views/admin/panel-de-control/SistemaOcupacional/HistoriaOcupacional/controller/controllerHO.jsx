@@ -65,18 +65,25 @@ export const GetInfoPac = (nro,set,token,sede) => {
     })
 }
 
+const getAñoInicial = (fecha) => {
+  const match = fecha?.match(/\d{4}/);
+  return match ? parseInt(match[0], 10) : Infinity;
+};
 
 export const GetInfoHistoriaOcupacinal = (nro,tabla,set,token,setTable) => {
   getFetch(`/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional?nOrden=${nro}&nameService=${tabla}`,token)
   .then((res) => {
     if (res.norden) {
         console.log(res)
+      const detallesOrdenados = [...res.detalles].sort(
+        (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+      );
       set(prev => ({
         ...prev,
         ...res,
         fecha: res.fechaHo,
       }));
-      setTable(res.detalles)
+      setTable(detallesOrdenados)
     } else {
       Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
     }
@@ -115,16 +122,18 @@ export const PrintHojaR = (nro,token,tabla) => {
   Loading('Cargando Formato a Imprimir')
   getFetch(`/api/v01/ct/historiaOcupacional/obtenerReporteHistoriaOcupacional?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
-    console.log('a')
     if (res.norden) {
       console.log(res)
       const nombre = res.nameJasper;
+      const detallesOrdenados = [...res.detalles].sort(
+        (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+      );
       console.log(nombre)
       const jasperModules = import.meta.glob('../../../../../jaspers/HistoriaOcupacional/*.jsx');
       const modulo = await jasperModules[`../../../../../jaspers/HistoriaOcupacional/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
-        modulo.default(res);
+        modulo.default(res,detallesOrdenados);
       } else {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }

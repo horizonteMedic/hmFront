@@ -28,7 +28,7 @@ import AutoResizeInput from './Inputs';
     {id: 6, mensaje:'NINGUNO'}
   ];
 
-const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
+const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) => {
   const [nroOrden, setNroOrden] = useState('');
   // Simulación: nombre se llena automáticamente al ingresar nroOrden
   const nombreCompleto = nroOrden ? 'Juan Pérez Gómez' : '';
@@ -38,7 +38,9 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
     fecha: today,
     //Area de trabajo
     areaO: "",
-    dni: ""
+    dni: "",
+    dniUser: userDatos.datos.dni_user,
+    nombreUser: userDatos.datos.nombres_user
   })
   const [rowData, setRowData] = useState({
     fecha: '',
@@ -98,13 +100,20 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
     setRowData(prev => ({ ...prev, [field]: value }));
   };
 
+  const getAñoInicial = (fecha) => {
+    const match = fecha.match(/\d{4}/); // Busca el primer año (4 dígitos)
+    return match ? parseInt(match[0], 10) : Infinity;
+  };
+
   const handleRegistrar = async () => {
     // Validar que al menos año y empresa estén llenos (puedes ajustar la validación)
     if (!rowData.fecha || !rowData.empresa){
       await Swal.fire("Error","Faltan datos","error")
       return
     } 
-    setRegistros(prev => [...prev, rowData]);
+    const nuevaLista = [...registros, rowData];
+     nuevaLista.sort((a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha));
+    setRegistros(nuevaLista);
     setRowData({
       fecha: '',
       empresa: '',
@@ -117,6 +126,11 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
       riesgo: '',
       proteccion: '',
     });
+    setSearchEmpresa("")
+    setSearchAltitud("")
+    setSearchArea("")
+    setSearchRiesgo("")
+    setSearchProt("")
   };
 
   const handleClean = () => {
@@ -157,6 +171,14 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
 
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+  };
+
+ const handleEditChange = (index, field, value) => {
+    setRegistros(prev =>
+      prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      )
+    );
   };
 
   
@@ -229,17 +251,17 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
       </fieldset>
       <div className={styles.tableWrapper}>
         <table className={styles.historiaTable} style={{ fontSize: 13, color: '#000' }}>
-          <thead className='w-auto'>
-            <tr className='w-auto'>
-              <th className='w-auto' rowSpan={2}>Año</th>
-              <th className='w-auto' rowSpan={2}>Empresa - Lugar Geográfico</th>
-              <th className='w-auto' rowSpan={2}>Altitud</th>
-              <th className='w-auto' rowSpan={2}>Actividad</th>
-              <th className='w-auto' rowSpan={2}>Área Empresa</th>
-              <th className='w-auto' rowSpan={2}>Ocupación</th>
-              <th className='w-auto' colSpan={2} style={{textAlign: 'center'}}>Tiempo de Labor</th>
-              <th className='w-auto' rowSpan={2}>Riesgos</th>
-              <th className='w-auto' rowSpan={2}>Protección</th>
+          <thead >
+            <tr >
+              <th rowSpan={2}>Año</th>
+              <th rowSpan={2}>Empresa - Lugar Geográfico</th>
+              <th rowSpan={2}>Altitud</th>
+              <th rowSpan={2}>Actividad</th>
+              <th rowSpan={2}>Área Empresa</th>
+              <th rowSpan={2}>Ocupación</th>
+              <th colSpan={2} style={{textAlign: 'center'}}>Tiempo de Labor</th>
+              <th rowSpan={2}>Riesgos</th>
+              <th rowSpan={2}>Protección</th>
             </tr>
             <tr>
               <th>Socavon</th>
@@ -249,16 +271,15 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
           <tbody>
             <tr>
               <td> <AutoResizeInput value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.altitud} onChange={e => handleRowChange('altitud', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)}/></td>
+              <td><AutoResizeInput value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)} /></td>
+              <td><AutoResizeInput value={rowData.altitud} onChange={e => handleRowChange('altitud', e.target.value)} /></td>
+              <td><AutoResizeInput value={rowData.actividad} onChange={e => handleRowChange('actividad', e.target.value)} /></td>
               <td><AutoResizeInput value={rowData.areaEmpresa} onChange={e => handleRowChange('areaEmpresa', e.target.value)}/></td>
               <td><AutoResizeInput value={rowData.ocupacion} onChange={e => handleRowChange('ocupacion', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.riesgo} onChange={e => handleRowChange('riesgo', e.target.value)}/></td>
-              <td><AutoResizeInput value={rowData.proteccion} onChange={e => handleRowChange('proteccion', e.target.value)}/></td>
-              
+              <td><AutoResizeInput value={rowData.socavon} onChange={e => handleRowChange('socavon', e.target.value)} /></td>
+              <td><AutoResizeInput value={rowData.superficie} onChange={e => handleRowChange('superficie', e.target.value)} /></td>
+              <td><AutoResizeInput value={rowData.riesgo} onChange={e => handleRowChange('riesgo', e.target.value)} /></td>
+              <td><AutoResizeInput value={rowData.proteccion} onChange={e => handleRowChange('proteccion', e.target.value)}/></td>   
             </tr>
           </tbody>
         </table>
@@ -458,16 +479,16 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
               <tbody>
                 {registros.map((reg, idx) => (
                   <tr key={idx}>
-                    <td>{reg.fecha}</td>
-                    <td>{reg.empresa}</td>
-                    <td>{reg.altitud}</td>
-                    <td>{reg.actividad}</td>
-                    <td>{reg.areaEmpresa}</td>
-                    <td>{reg.ocupacion}</td>
-                    <td>{reg.superficie}</td>
-                    <td>{reg.socavon}</td>
-                    <td>{reg.riesgo}</td>
-                    <td>{reg.proteccion}</td>
+                    <td><AutoResizeInput value={reg.fecha}  onChange={e => handleEditChange(idx, 'fecha', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.empresa}  onChange={e => handleEditChange(idx, 'empresa', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.altitud}  onChange={e => handleEditChange(idx, 'altitud', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.actividad}  onChange={e => handleEditChange(idx, 'actividad', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.areaEmpresa}  onChange={e => handleEditChange(idx, 'areaEmpresa', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.ocupacion}  onChange={e => handleEditChange(idx, 'ocupacion', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.superficie}  onChange={e => handleEditChange(idx, 'superficie', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.socavon}  onChange={e => handleEditChange(idx, 'socavon', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.riesgo}  onChange={e => handleEditChange(idx, 'riesgo', e.target.value)}/></td>
+                    <td><AutoResizeInput value={reg.proteccion}  onChange={e => handleEditChange(idx, 'proteccion', e.target.value)}/></td>
                   </tr>
                 ))}
               </tbody>
@@ -509,10 +530,10 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas}) => {
         </fieldset>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginLeft: 16 }}>
           <div>
-            DNI Responsable : <input type="text" style={{ width: 100, marginLeft: 4, fontSize: 13, color: '#000' ,  border: '1px solid #ccc', borderRadius:'5px'}} />
+            DNI Responsable : <input type="text" disabled value={form.dniUser} className='p-2' style={{ width: 100, marginLeft: 4, fontSize: 13, color: '#000' ,  border: '1px solid #ccc', borderRadius:'5px'}} />
           </div>
-          <div>
-            Nombres: <input type="text" style={{ width: 180, marginLeft: 4, fontSize: 13, color: '#000', border: '1px solid #ccc', borderRadius:'5px' }} />
+          <div className='flex justify-center items-center w-auto'>
+            Nombres: <input type="text" disabled value={form.nombreUser} className='p-2 w-full' style={{  marginLeft: 4, fontSize: 13, color: '#000', border: '1px solid #ccc', borderRadius:'5px' }} />
           </div>
         </div>
       </div>

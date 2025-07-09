@@ -97,17 +97,18 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   doc.setFontSize(8).setFont('helvetica', 'bold');
   //DATOS DEBAJO DE NORDEN
   doc.text("Sede: ", nroOrdenX - 40, nroOrdenY +10)
-  doc.text("Sexo: ", nroOrdenX + 20, nroOrdenY +10)
+  doc.text("Sexo: ", nroOrdenX + 35, nroOrdenY +18)
 
   doc.text("Fecha de Nacimiento: ", nroOrdenX - 60, nroOrdenY + 18)
-  doc.text("Lugar de Procedencia: ", nroOrdenX - 78, nroOrdenY + 24)
+  doc.text("Lugar de Procedencia: ", nroOrdenX - 80, nroOrdenY + 24)
 
-  doc.setFontSize(12).setFont('helvetica', 'normal');
+  doc.setFontSize(10).setFont('helvetica', 'normal');
 
   const sedeText = (datos.sede || '').toUpperCase();
   const sedeWidth = doc.getTextWidth(sedeText);
-  doc.text(sedeText, rightMargin - sedeWidth, nroOrdenY + 10, { align: 'left' });
+  doc.text(sedeText, rightMargin - sedeWidth- 4, nroOrdenY + 10, { align: 'left' });
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12).setFont('helvetica', 'normal');
   doc.text("HISTORIA OCUPACIONAL", 100, nroOrdenY + 10)
   doc.setFont('helvetica', 'normal');
   // --- Datos del paciente ---
@@ -127,7 +128,7 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   };
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
   drawPatientDataRow("Lugar de Nacimiento :", datos.nombres || '');
-  drawPatientDataRow("Profesion :", datos.nombres || '');
+  drawPatientDataRow("Profesion :", datos.areaO || '');
   drawPatientDataRow("Telefono :", datos.nombres || '');
   doc.setFontSize(11).setFont('helvetica', 'bold');
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);

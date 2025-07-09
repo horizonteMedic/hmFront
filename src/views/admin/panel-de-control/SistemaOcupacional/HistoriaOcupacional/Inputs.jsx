@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 
-const AutoGrowingTextarea = ({ value, onChange, maxWidth = 'max-w-xs', className = '', style = {} }) => {
+const AutoGrowingTextarea = ({ value, onChange = null, maxWidth = 'max-w-xs', className = '', style = {} }) => {
   const textareaRef = useRef(null);
 
   useEffect(() => {

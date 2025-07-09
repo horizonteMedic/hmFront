@@ -19,7 +19,7 @@ const config = {
 
 // --- Componente Principal ---
 
-export default function HistoriaOcupacional_Digitalizado(datos = {}) {
+export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = []) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
   console.log('wasa')
@@ -139,7 +139,7 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}) {
           { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' } },
         ]
       ],
-      body: datos.detalles?.map(d => [
+      body: tabla?.map(d => [
         d.fecha || '',
         d.empresa || '',
         d.altitud || '',
