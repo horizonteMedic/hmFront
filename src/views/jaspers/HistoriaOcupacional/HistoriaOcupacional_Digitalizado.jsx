@@ -117,7 +117,6 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
     isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
   ]).then(([s1, s2]) => {
 
-
     // === CUERPO ===
     let y = 53;
     autoTable(doc, {
