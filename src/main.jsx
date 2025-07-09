@@ -36,7 +36,7 @@ import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Ofta
 
 
 //SIMULADOR DE jaspers
-import Ficha from './views/jaspers/Audiometria/Audiometria2021-_Digitalizado.jsx'
+import Ficha from './views/jaspers/Covid/pcualitativaantigeno.jsx'
 
 const App = () => {
   return (
