@@ -4,7 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
-import { VerifyTR } from "./controllerAudiometriaCuestionario";
+import {
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerAudiometriaCuestionario";
 
 export default function AudiometriaCuestionario({
   token,
@@ -17,9 +20,10 @@ export default function AudiometriaCuestionario({
     2,
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
-  
+
   const initialFormState = {
     norden: "",
+    codCuestionario: null,
     fecha: today,
     nombres: "",
     edad: "",
@@ -129,9 +133,9 @@ export default function AudiometriaCuestionario({
         CUESTIONARIO DE AUDIOMETRÍA
       </h2>
       <div className="space-y-6">
-        <div className="flex flex-col gap-2 mb-2">
-          <div className="flex flex-row gap-8 items-center w-full">
-            <div className="flex items-center gap-2 min-w-[200px]">
+        <div className="flex flex-col space-y-6 mb-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2 ">
               <label
                 className="font-bold min-w-[90px]"
                 style={{ fontSize: "13px" }}
@@ -148,12 +152,15 @@ export default function AudiometriaCuestionario({
                     VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                   }
                 }}
-                className="border rounded px-2 py-1"
-                style={{ fontSize: "11px", width: "90px" }}
+                className="border rounded px-2 py-1 w-full"
+                style={{ fontSize: "11px" }}
               />
             </div>
-            <div className="flex items-center gap-2 min-w-[200px]">
-              <label className="font-bold" style={{ fontSize: "13px" }}>
+            <div className="flex items-center gap-2 ">
+              <label
+                className="font-bold min-w-[90px]"
+                style={{ fontSize: "13px" }}
+              >
                 Fecha :
               </label>
               <input
@@ -161,13 +168,18 @@ export default function AudiometriaCuestionario({
                 name="fecha"
                 value={form.fecha}
                 onChange={handleChange}
-                className="border rounded px-2 py-1"
-                style={{ fontSize: "11px", width: "120px" }}
+                className="border rounded px-2 py-1 w-full"
+                style={{ fontSize: "11px" }}
               />
             </div>
-            <div className="flex items-center gap-2 min-w-[300px] flex-1">
-              <label className="font-bold" style={{ fontSize: "13px" }}>
-                Nombre Completo:
+          </div>
+          <div className="flex flex-row gap-8 items-center w-full">
+            <div className="flex items-center gap-2 flex-1">
+              <label
+                className="font-bold min-w-[90px]"
+                style={{ fontSize: "13px" }}
+              >
+                Nombres:
               </label>
               <input
                 name="nombres"
@@ -178,8 +190,8 @@ export default function AudiometriaCuestionario({
               />
             </div>
           </div>
-          <div className="flex flex-row gap-8 items-center w-full">
-            <div className="flex items-center gap-2 min-w-[200px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center gap-2 ">
               <label
                 className="font-bold min-w-[90px]"
                 style={{ fontSize: "13px" }}
@@ -190,12 +202,15 @@ export default function AudiometriaCuestionario({
                 name="edad"
                 value={form.edad}
                 disabled
-                className="border rounded px-2 py-1 bg-gray-100"
-                style={{ fontSize: "11px", width: "70px" }}
+                className="border rounded px-2 py-1 bg-gray-100 w-full"
+                style={{ fontSize: "11px" }}
               />
             </div>
-            <div className="flex items-center gap-2 min-w-[300px]">
-              <label className="font-bold mr-2" style={{ fontSize: "13px" }}>
+            <div className="flex items-center gap-2 ">
+              <label
+                className="font-bold  min-w-[90px]"
+                style={{ fontSize: "13px" }}
+              >
                 Género :
               </label>
               <div className="flex items-center gap-6">
@@ -208,8 +223,8 @@ export default function AudiometriaCuestionario({
                     name="genero"
                     value="Masculino"
                     checked={form.genero === "Masculino"}
-                    onChange={handleChange}
-                  />{" "}
+                    onChange={() => {}}
+                  />
                   Masculino
                 </label>
                 <label
@@ -221,8 +236,8 @@ export default function AudiometriaCuestionario({
                     name="genero"
                     value="Femenino"
                     checked={form.genero === "Femenino"}
-                    onChange={handleChange}
-                  />{" "}
+                    onChange={() => {}}
+                  />
                   Femenino
                 </label>
               </div>
@@ -1022,7 +1037,6 @@ export default function AudiometriaCuestionario({
         className="flex flex-row justify-between mt-8 gap-8"
         style={{ fontSize: "12px" }}
       >
-        {" "}
         {/* Cuestionario Terminado */}
         <fieldset className="border rounded p-3 min-w-[340px]">
           <div className="flex items-center gap-2">
@@ -1030,7 +1044,9 @@ export default function AudiometriaCuestionario({
               type="button"
               className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition"
               style={{ minWidth: "160px", fontSize: "12px" }}
-              // onClick={handleSave} // Debes definir esta función para guardar
+              onClick={() => {
+                SubmitDataService(form, token, userlogued, handleClear, tabla);
+              }}
             >
               <FontAwesomeIcon
                 icon={faSave}
