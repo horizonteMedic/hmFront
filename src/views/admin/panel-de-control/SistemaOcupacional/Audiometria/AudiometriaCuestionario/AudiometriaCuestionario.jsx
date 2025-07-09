@@ -5,6 +5,7 @@ import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 
 import Swal from "sweetalert2";
 import {
+  PrintHojaR,
   SubmitDataService,
   VerifyTR,
 } from "./controllerAudiometriaCuestionario";
@@ -263,63 +264,70 @@ export default function AudiometriaCuestionario({
               adormecimiento de hemicoro, tumores del sistema nerviosos central.
             </b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p1"
-                value="SI"
-                checked={form.p1 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuál?</span>
-              <input
-                name="p1_cual"
-                value={form.p1_cual || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p1_cual: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p1 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4 ">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p1"
+                    value="SI"
+                    checked={form.p1 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p1"
+                  value="NO"
+                  checked={form.p1 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Cuándo?</span>
-              <input
-                name="p1_cuando"
-                value={form.p1_cuando || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p1_cuando: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p1 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Qué Hizo?</span>
-              <input
-                name="p1_quehizo"
-                value={form.p1_quehizo || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p1_quehizo: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p1 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p1"
-                value="NO"
-                checked={form.p1 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p1 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[70px]">¿Cuál?</span>
+                <input
+                  name="p1_cual"
+                  value={form.p1_cual || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p1 !== "SI"}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="min-w-[70px]">¿Cuándo?</span>
+                <input
+                  name="p1_cuando"
+                  value={form.p1_cuando || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p1 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 w-full">
+                <span className="min-w-[70px]">¿Qué Hizo?</span>
+                <input
+                  name="p1_quehizo"
+                  value={form.p1_quehizo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p1 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -527,63 +535,72 @@ export default function AudiometriaCuestionario({
               mastoidectomía, estopediectomía)?
             </b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p9"
-                value="SI"
-                checked={form.p9 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuál?</span>
-              <input
-                name="p9_cual"
-                value={form.p9_cual || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p9_cual: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p9 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p9"
+                    value="SI"
+                    checked={form.p9 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p9"
+                  value="NO"
+                  checked={form.p9 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Dónde lo diagnosticaron?</span>
-              <input
-                name="p9_donde"
-                value={form.p9_donde || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p9_donde: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p9 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Qué Hizo?</span>
-              <input
-                name="p9_quehizo"
-                value={form.p9_quehizo || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p9_quehizo: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p9 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p9"
-                value="NO"
-                checked={form.p9 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p9 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[150px]">¿Cuál?</span>
+                <input
+                  name="p9_cual"
+                  value={form.p9_cual || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p9 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[150px]">¿Dónde lo diagnosticaron?</span>
+                <input
+                  name="p9_donde"
+                  value={form.p9_donde || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p9 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 w-full">
+                <span className="min-w-[150px]">¿Qué Hizo?</span>
+                <input
+                  name="p9_quehizo"
+                  value={form.p9_quehizo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p9 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -595,63 +612,72 @@ export default function AudiometriaCuestionario({
               oído?
             </b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p10"
-                value="SI"
-                checked={form.p10 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuál?</span>
-              <input
-                name="p10_cual"
-                value={form.p10_cual || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p10_cual: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p10 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p10"
+                    value="SI"
+                    checked={form.p10 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p10"
+                  value="NO"
+                  checked={form.p10 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Dónde?</span>
-              <input
-                name="p10_donde"
-                value={form.p10_donde || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p10_donde: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p10 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Qué Hizo?</span>
-              <input
-                name="p10_quehizo"
-                value={form.p10_quehizo || ""}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, p10_quehizo: e.target.value }))
-                }
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p10 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p10"
-                value="NO"
-                checked={form.p10 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p10 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[70px]">¿Cuál?</span>
+                <input
+                  name="p10_cual"
+                  value={form.p10_cual || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p10 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[70px]">¿Dónde?</span>
+                <input
+                  name="p10_donde"
+                  value={form.p10_donde || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p10 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2 w-full">
+                <span className="min-w-[70px]">¿Qué Hizo?</span>
+                <input
+                  name="p10_quehizo"
+                  value={form.p10_quehizo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p10 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -664,46 +690,60 @@ export default function AudiometriaCuestionario({
               antituberculosos?
             </b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p11"
-                value="SI"
-                checked={form.p11 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuál?</span>
-              <input
-                name="p11_cual"
-                value={form.p11_cual || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p11 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p11"
+                    value="SI"
+                    checked={form.p11 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p11"
+                  value="NO"
+                  checked={form.p11 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Por cuanto tiempo?</span>
-              <input
-                name="p11_tiempo"
-                value={form.p11_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p11 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p11"
-                value="NO"
-                checked={form.p11 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p11 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[150px]">¿Cuál?</span>
+                <input
+                  name="p11_cual"
+                  value={form.p11_cual || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p11 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[150px]">¿Por cuanto tiempo?</span>
+                <input
+                  name="p11_tiempo"
+                  value={form.p11_tiempo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p11 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -716,46 +756,60 @@ export default function AudiometriaCuestionario({
               plaguicidas, organofosforados y piretroides?
             </b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p12"
-                value="SI"
-                checked={form.p12 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuál?</span>
-              <input
-                name="p12_cual"
-                value={form.p12_cual || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p12 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p12"
+                    value="SI"
+                    checked={form.p12 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p12"
+                  value="NO"
+                  checked={form.p12 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Por cuanto tiempo?</span>
-              <input
-                name="p12_tiempo"
-                value={form.p12_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p12 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p12"
-                value="NO"
-                checked={form.p12 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p12 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[70px]">¿Cuál?</span>
+                <input
+                  name="p12_cual"
+                  value={form.p12_cual || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p12 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[70px]">¿Tiempo?</span>
+                <input
+                  name="p12_tiempo"
+                  value={form.p12_tiempo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p12 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -764,57 +818,72 @@ export default function AudiometriaCuestionario({
           <div className="mb-1" style={{ fontSize: "12px" }}>
             <b>13.- ¿Ha estado expuesto a vibraciones continuas?</b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p13"
-                value="SI"
-                checked={form.p13 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p13_tiempo"
-                value={form.p13_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p13 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p13"
+                    value="SI"
+                    checked={form.p13 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p13"
+                  value="NO"
+                  checked={form.p13 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Cuándo?</span>
-              <input
-                name="p13_cuando"
-                value={form.p13_cuando || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p13 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Dónde?</span>
-              <input
-                name="p13_donde"
-                value={form.p13_donde || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p13 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p13"
-                value="NO"
-                checked={form.p13 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p13 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Cuánto tiempo?</span>
+                <input
+                  name="p13_tiempo"
+                  value={form.p13_tiempo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p13 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Cuándo?</span>
+                <input
+                  name="p13_cuando"
+                  value={form.p13_cuando || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p13 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Dónde?</span>
+                <input
+                  name="p13_donde"
+                  value={form.p13_donde || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p13 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -827,57 +896,72 @@ export default function AudiometriaCuestionario({
               autoinmunes?
             </b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="p14"
-                value="SI"
-                checked={form.p14 === "SI"}
-                onChange={handleChange}
-              />
-              <span>SI</span>
-              <span className="ml-2">¿Cuál?</span>
-              <input
-                name="p14_cual"
-                value={form.p14_cual || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p14 !== "SI"}
-              />
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p14"
+                    value="SI"
+                    checked={form.p14 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p14"
+                  value="NO"
+                  checked={form.p14 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Dónde lo diagnosticaron?</span>
-              <input
-                name="p14_donde"
-                value={form.p14_donde || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p14 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="ml-7">¿Qué hizo?</span>
-              <input
-                name="p14_quehizo"
-                value={form.p14_quehizo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={form.p14 !== "SI"}
-              />
-            </div>
-            <div className="flex items-center gap-2 mt-1">
-              <input
-                type="radio"
-                name="p14"
-                value="NO"
-                checked={form.p14 === "NO"}
-                onChange={handleChange}
-              />
-              <span>NO</span>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p14 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Cuál?</span>
+                <input
+                  name="p14_cual"
+                  value={form.p14_cual || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p14 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Dónde?</span>
+                <input
+                  name="p14_donde"
+                  value={form.p14_donde || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p14 !== "SI"}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Qué hizo?</span>
+                <input
+                  name="p14_quehizo"
+                  value={form.p14_quehizo || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p14 !== "SI"}
+                />
+              </div>
             </div>
           </div>
         </div>
