@@ -61,6 +61,12 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
+  const handleNextEnter = (e, nextName) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      document.getElementsByName(nextName)?.[0]?.focus();
+    }
+  };
 
   return (
     <div className="mx-auto bg-white rounded shadow p-6 max-w-[90%] md:max-w-[70%] xl:max-w-[50%]">
@@ -141,6 +147,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
           name="fvc"
           value={form.fvc}
           onChange={handleChange}
+          onKeyDown={(e) => handleNextEnter(e, "fev1")}
         />
         <Field
           label="Peso"
@@ -155,12 +162,14 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
           name="fvcTeorico"
           value={form.fvcTeorico}
           onChange={handleChange}
+          onKeyDown={(e) => handleNextEnter(e, "fev1Teorico")}
         />
         <Field
           label="FEV1 %"
           name="fev1"
           value={form.fev1}
           onChange={handleChange}
+          onKeyDown={(e) => handleNextEnter(e, "fev1_fvc")}
         />
         <Field
           label="Talla"
@@ -175,12 +184,14 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
           name="fev1Teorico"
           value={form.fev1Teorico}
           onChange={handleChange}
+          onKeyDown={(e) => handleNextEnter(e, "interpretacion")}
         />
         <Field
           label="FEV1/FVC %"
           name="fev1_fvc"
           value={form.fev1_fvc}
           onChange={handleChange}
+          onKeyDown={(e) => handleNextEnter(e, "fef")}
         />
         <div></div>
         <div></div>
@@ -189,6 +200,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
           name="fef"
           value={form.fef}
           onChange={handleChange}
+          onKeyDown={(e) => handleNextEnter(e, "fvcTeorico")}
         />
       </div>
       {/* Interpretación */}

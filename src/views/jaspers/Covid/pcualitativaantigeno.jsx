@@ -90,7 +90,9 @@ export default function pcualitativaantigeno(datos = {}) {
   doc.text(textoResultado, config.col2X, y);
 
   const refLines = doc.splitTextToSize(
-    datos.txtvrigm || "",
+      "Método: Inmunocromatografia \n" +
+      "Sensibilidad: 94.55% \n" +
+      "Especificidad: 100%",
     pageW - config.col3X - config.margin
   );
   doc.text(refLines, config.col3X, y);
