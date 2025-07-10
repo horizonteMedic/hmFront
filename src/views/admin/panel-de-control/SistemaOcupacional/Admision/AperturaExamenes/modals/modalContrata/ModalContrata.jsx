@@ -127,6 +127,7 @@ const ModalContrata = ({
       if (res.rucContrata) {
         Swal.fire("Exito!", `Se Registro/Actualizo con exito`, "success");
         setRefresh(refresh + 1);
+        handleClear();
       }
     });
   };
@@ -164,7 +165,6 @@ const ModalContrata = ({
     setExisteRUC(true);
     setHabilitar(false);
     setPuedeHabilitar(false);
-
   };
 
   // Add ESC key handler

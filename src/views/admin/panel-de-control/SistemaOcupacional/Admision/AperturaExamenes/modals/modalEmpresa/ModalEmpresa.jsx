@@ -131,6 +131,7 @@ const ModalEmpresa = ({
       if (res.rucEmpresa) {
         Swal.fire("Exito!", `Se Registro/Actualizo con exito`, "success");
         setRefresh(refresh + 1);
+        handleClear();
       }
     });
   };

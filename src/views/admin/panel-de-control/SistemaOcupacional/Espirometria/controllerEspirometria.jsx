@@ -135,6 +135,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     if (res.id === 0) {
       //No tiene registro previo
       GetInfoPac(nro, set, token, sede);
+    } else if (res.id == 2) {
+      Swal.fire("Error", "Falta llenar triaje", "error");
     } else {
       GetInfoServicio(nro, tabla, set, token);
     }
