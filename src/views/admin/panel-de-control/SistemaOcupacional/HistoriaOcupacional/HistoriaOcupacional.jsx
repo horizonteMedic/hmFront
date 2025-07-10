@@ -202,6 +202,21 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
       }
     });
   }
+
+  const deleteRow = async (indexToRemove) => {
+    const confirm = await Swal.fire({
+      title: '¿Eliminar fila?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (confirm.isConfirmed) {
+      setRegistros(prev => prev.filter((_, index) => index !== indexToRemove));
+    }
+  };
   
   return (
     <div className={styles.historiaOcupacionalContainer} style={{ fontSize: 13, color: '#000' }}>
@@ -241,7 +256,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Área de Trabajo :</label>
-            <input type="text" value={form.areaO} name='areaO' onChange={handleInputChange} className={styles.inputXLarge} style={{ fontSize: 13, color: '#000' }} />
+            <input type="text" value={form.areaO} name='areaO' autoComplete='off' onChange={handleInputChange} className={styles.inputXLarge} style={{ fontSize: 13, color: '#000' }} />
           </div>
           <div className={styles.campoGrupo}>
             <label style={{ color: '#000' }}>Fecha :</label>
@@ -269,7 +284,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr >
               <td> <AutoResizeInput value={rowData.fecha} onChange={e => handleRowChange('fecha', e.target.value)}/></td>
               <td><AutoResizeInput value={rowData.empresa} onChange={e => handleRowChange('empresa', e.target.value)} /></td>
               <td><AutoResizeInput value={rowData.altitud} onChange={e => handleRowChange('altitud', e.target.value)} /></td>
@@ -463,7 +478,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
           <div className={styles.tableWrapper}>
             <table className={styles.historiaTable} style={{ fontSize: 13, color: '#000' }}>
               <thead>
-                <tr>
+                <tr >
                   <th>Año</th>
                   <th>Empresa - Lugar Geográfico</th>
                   <th>Altitud</th>
@@ -478,7 +493,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
               </thead>
               <tbody>
                 {registros.map((reg, idx) => (
-                  <tr key={idx}>
+                  <tr key={idx} className='hover:bg-gray-50 cursor-pointer' onContextMenu={(e) => { e.preventDefault(); deleteRow(idx); }}>
                     <td><AutoResizeInput value={reg.fecha}  onChange={e => handleEditChange(idx, 'fecha', e.target.value)}/></td>
                     <td><AutoResizeInput value={reg.empresa}  onChange={e => handleEditChange(idx, 'empresa', e.target.value)}/></td>
                     <td><AutoResizeInput value={reg.altitud}  onChange={e => handleEditChange(idx, 'altitud', e.target.value)}/></td>

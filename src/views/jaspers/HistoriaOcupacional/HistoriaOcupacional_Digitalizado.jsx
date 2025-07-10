@@ -101,8 +101,9 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
   }
   // === HEADER ===
   header_HistoriaOcupacional(doc, datos);
-  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-  const sello2 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMADOCASIG");
+  const firmap = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
+  const huellap = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
+  const sellofirma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const isValidUrl = url => url && url !== "Sin registro";
   const loadImg = src =>
     new Promise((res, rej) => {
@@ -113,9 +114,10 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
       img.onerror = () => rej(`No se pudo cargar ${src}`);
     });
   Promise.all([
-    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    isValidUrl(sello2?.url) ? loadImg(sello2.url) : Promise.resolve(null),
-  ]).then(([s1, s2]) => {
+    isValidUrl(firmap?.url) ? loadImg(firmap.url) : Promise.resolve(null),
+    isValidUrl(huellap?.url) ? loadImg(huellap.url) : Promise.resolve(null),
+    isValidUrl(sellofirma?.url) ? loadImg(sellofirma.url) : Promise.resolve(null),
+  ]).then(([s1, s2, s3]) => {
 
     // === CUERPO ===
     let y = 53;
@@ -129,7 +131,7 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
           { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
           { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
           { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } }, // Agrupa
+          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
           { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
           { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
         ],
@@ -145,16 +147,16 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
         d.actividad || '',
         d.areaEmpresa || '',
         d.ocupacion || '',
-        d.socavon || '',   // Subsuelo
-        d.superficie || '',// Superficie
+        d.socavon || '',
+        d.superficie || '',
         d.riesgo || '',
         d.proteccion || ''
       ]),
       theme: "grid",
       styles: {
-        fontSize: 7,
+        fontSize: 6,
         textColor: [0, 0, 0],
-        cellPadding: 2,
+        cellPadding: 1,
       },
       headStyles: {
         fillColor: [255, 255, 255],
@@ -167,6 +169,60 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
         lineColor: [0, 0, 0],
       },
     });
+
+    const finalY = doc.lastAutoTable.finalY;
+    const minRequiredSpace = 50; // 35 firmas + 8 + margen
+    const pageHeight = doc.internal.pageSize.getHeight();
+    if ((pageHeight - finalY) < minRequiredSpace) {
+      doc.addPage();
+    }
+    const signatureTop = finalY + 5; // margen de separación mínima de 5 px
+
+    doc.text(`Fecha: ${datos.fechaHo}`,15, signatureTop + 35)
+    //FIRMA
+    const lineY = signatureTop + 35; // 5px debajo de la imagen
+    const lineX1 = 70;           // inicio de la línea
+    const lineX2 = 150;    // fin de la línea
+
+    // Dibujar línea
+    doc.setLineWidth(0.2);
+    doc.line(lineX1, lineY, lineX2, lineY);
+
+    // Texto centrado debajo de la línea
+    const label = 'Firma del Trabajador';
+    const fontSize = 9;
+    doc.setFontSize(fontSize);
+
+    const textWidth = doc.getTextWidth(label);
+    const textX = (lineX1 + lineX2) / 2 - textWidth / 2;
+    const textY = lineY + 4.5; // Ajusta según altura visual
+    const midX = (lineX1 + lineX2) / 2;
+    const sigW = (lineX2 - lineX1) / 2; // 40 px
+    const sigH = 35;
+    const sigY = 110; // altura vertical para ambas
+    doc.text(label, textX, textY);
+
+    //SELLO
+    const lineYS = lineY; // 5px debajo de la imagen
+    const lineX1S = 190;           // inicio de la línea
+    const lineX2S = 270;    // fin de la línea
+
+    // Dibujar línea
+    doc.setLineWidth(0.2);
+    doc.line(lineX1S, lineYS, lineX2S, lineYS);
+
+    // Texto centrado debajo de la línea
+    const labelS = 'Firma y Sello';
+    const fontSizeS = 9;
+    doc.setFontSize(fontSizeS);
+
+    const textWidthS = doc.getTextWidth(labelS);
+    const textXS = (lineX1S + lineX2S) / 2 - textWidthS / 2;
+    const textYS = lineYS + 4.5; // Ajusta según altura visual
+    const selloW = lineX2S - lineX1S; // 80 px
+    const selloH = 35;                // Alto reservado
+    const selloY = 110;    
+    doc.text(labelS, textXS, textYS);
     if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;
@@ -175,13 +231,6 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
       ctx.drawImage(s1, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = 190; // Más arriba
-
-      // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
       const maxImgH = sigH - 10;
 
@@ -190,21 +239,16 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
 
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
+      const sigX1 = lineX1; // zona izquierda
+      const imgX = sigX1 + (sigW - imgW) / 2;
+      const imgY = signatureTop + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-
-      // Actualiza Y si después quieres seguir dibujando debajo
     }
 
     if (s2) {
@@ -215,13 +259,6 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
       ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
-      // Dimensiones del área del sello
-      const sigW = 70;
-      const sigH = 35;
-      const sigX = (pageW - sigW) / 2; // Centrado horizontal
-      const sigY = 190; // Más arriba
-
-      // Tamaño máximo dentro del área
       const maxImgW = sigW - 10;
       const maxImgH = sigH - 10;
 
@@ -230,25 +267,47 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
 
       const scaleW = maxImgW / imgW;
       const scaleH = maxImgH / imgH;
-      const scale = Math.min(scaleW, scaleH, 1); // para no escalar de más
+      const scale = Math.min(scaleW, scaleH, 1);
 
       imgW *= scale;
       imgH *= scale;
 
-      // Centramos dentro del rectángulo
-      const imgX = sigX + (sigW - imgW) / 2;
-      const imgY = sigY + (sigH - imgH) / 2;
+      const sigX2 = midX; // zona derecha
+      const imgX = sigX2 + (sigW - imgW) / 2;
+      const imgY = signatureTop + (sigH - imgH) / 2;
 
-      // Dibujar el borde si quieres
-
-      // Insertar la imagen del sello
       doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    }
 
-      // Actualiza Y si después quieres seguir dibujando debajo
+    if (s3) {
+      const canvas = document.createElement('canvas');
+      canvas.width = s3.width;
+      canvas.height = s3.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(s3, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+
+      const maxImgW = selloW - 10; // margen interno
+      const maxImgH = selloH - 10;
+
+      let imgW = s3.width;
+      let imgH = s3.height;
+
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1); // evitar que crezca
+
+      imgW *= scale;
+      imgH *= scale;
+
+      // Centrado dentro del área del sello (horizontal)
+      const imgX = lineX1S + (selloW - imgW) / 2;
+      const imgY = signatureTop + (selloH - imgH) / 2;
+
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
     }
 
     // === FOOTER ===
-    footer(doc, datos);
 
     // === IMPRIMIR ===
     const blob = doc.output("blob");

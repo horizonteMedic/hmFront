@@ -16,7 +16,7 @@ const AutoGrowingTextarea = ({ value, onChange = null, maxWidth = 'max-w-xs', cl
       value={value}
       onChange={onChange}
       rows={1}
-      className={`resize-none overflow-hidden bg-transparent outline-none text-[13px] text-black w-full ${maxWidth} ${className}`}
+      className={`resize-none overflow-hidden bg-transparent outline-none text-[13px] text-black w-full ${maxWidth} ${className} `}
       style={style}
     />
   );

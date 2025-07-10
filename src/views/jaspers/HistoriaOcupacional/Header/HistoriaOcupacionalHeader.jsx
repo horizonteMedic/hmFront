@@ -51,7 +51,7 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
-  let boxY = y - 8;
+  let boxY = y - 3;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();
@@ -87,20 +87,24 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   let nroOrdenX = rightMargin - nroOrdenLabelWidth - nroOrdenValueWidth - 2;
   let nroOrdenY = y + 8;
   // Primera línea: label y número
-  doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY, { align: 'left' });
+  doc.text(nroOrdenLabel, nroOrdenX - 10, nroOrdenY, { align: 'left' });
   doc.setFont('helvetica', 'bold').setFontSize(18);
-  doc.text(nroOrdenValue, rightMargin - nroOrdenValueWidth, nroOrdenY, { align: 'left' });
+  doc.text(nroOrdenValue, rightMargin - nroOrdenValueWidth - 10, nroOrdenY, { align: 'left' });
   doc.setLineWidth(0.5);
-  doc.line(rightMargin - nroOrdenValueWidth, nroOrdenY + 1.5, rightMargin, nroOrdenY + 1.5);
+  doc.line(rightMargin - nroOrdenValueWidth - 10, nroOrdenY + 1.5, rightMargin, nroOrdenY + 1.5);
   
   // Segunda línea: sede alineada con el número
   doc.setFontSize(8).setFont('helvetica', 'bold');
   //DATOS DEBAJO DE NORDEN
   doc.text("Sede: ", nroOrdenX - 40, nroOrdenY +10)
-  doc.text("Sexo: ", nroOrdenX + 35, nroOrdenY +18)
+  doc.text("Sexo: ", nroOrdenX + 25, nroOrdenY +18)
+  doc.text(`${datos.sexo === 'F' ? 'FEMENINO' : datos.sexo === 'M' ? 'MASCULINO' : ''}`, nroOrdenX + 35, nroOrdenY +18)
 
   doc.text("Fecha de Nacimiento: ", nroOrdenX - 60, nroOrdenY + 18)
+  doc.text(datos.fechaNac, nroOrdenX - 30, nroOrdenY + 18)
+
   doc.text("Lugar de Procedencia: ", nroOrdenX - 80, nroOrdenY + 24)
+  doc.text(datos.lugarNac, nroOrdenX - 44, nroOrdenY + 24)
 
   doc.setFontSize(10).setFont('helvetica', 'normal');
 
@@ -127,9 +131,9 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
     yDatos += lineHeight;
   };
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
-  drawPatientDataRow("Lugar de Nacimiento :", datos.nombres || '');
+  drawPatientDataRow("Lugar de Nacimiento :", datos.lugarNac || '');
   drawPatientDataRow("Profesion :", datos.areaO || '');
-  drawPatientDataRow("Telefono :", datos.nombres || '');
+  drawPatientDataRow("Telefono :", datos.celularPaciente || '');
   doc.setFontSize(11).setFont('helvetica', 'bold');
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
