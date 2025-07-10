@@ -1083,7 +1083,7 @@ export default function AudiometriaCuestionario({
       </div>
       {/* Acciones al pie, dentro del mismo formulario */}
       <div
-        className="flex flex-row justify-between mt-8 gap-8"
+        className="flex flex-col justify-between lg:flex-row mt-8 gap-8"
         style={{ fontSize: "12px" }}
       >
         {/* Cuestionario Terminado */}
@@ -1127,7 +1127,7 @@ export default function AudiometriaCuestionario({
               Nro Orden :
             </label>
             <input
-              name="norden_print"
+              name="norden"
               value={form.norden}
               onChange={handleChange}
               className="border rounded-lg px-3 py-2"
