@@ -33,7 +33,7 @@ const formatDateToShort = (dateString) => {
  * @param {jsPDF} doc - La instancia del documento jsPDF.
  * @param {object} datos - Los datos a imprimir.
  */
-const header_HistoriaOcupacional = (doc, datos = {}) => {
+const header_HistoriaOcupacional_Boro = (doc, datos = {}) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 5;
@@ -96,7 +96,7 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   // Segunda línea: sede alineada con el número
   doc.setFontSize(8).setFont('helvetica', 'bold');
   //DATOS DEBAJO DE NORDEN
-  doc.text("Sede: ", nroOrdenX - 40, nroOrdenY +10)
+ 
   doc.text("Sexo: ", nroOrdenX + 25, nroOrdenY +18)
   doc.text(`${datos.sexo === 'F' ? 'FEMENINO' : datos.sexo === 'M' ? 'MASCULINO' : ''}`, nroOrdenX + 35, nroOrdenY +18)
 
@@ -108,9 +108,6 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
 
   doc.setFontSize(10).setFont('helvetica', 'normal');
 
-  const sedeText = (datos.sede || '').toUpperCase();
-  const sedeWidth = doc.getTextWidth(sedeText);
-  doc.text(sedeText, rightMargin - sedeWidth- 4, nroOrdenY + 10, { align: 'left' });
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12).setFont('helvetica', 'bold');
   doc.text("HISTORIA OCUPACIONAL", 100, nroOrdenY + 10)
@@ -133,9 +130,8 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
   drawPatientDataRow("Lugar de Nacimiento :", datos.lugarNac || '');
   drawPatientDataRow("Profesion :", datos.areaO || '');
-  drawPatientDataRow("Telefono :", datos.celularPaciente || '');
   doc.setFontSize(11).setFont('helvetica', 'bold');
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
 };
 
-export default header_HistoriaOcupacional; 
+export default header_HistoriaOcupacional_Boro; 

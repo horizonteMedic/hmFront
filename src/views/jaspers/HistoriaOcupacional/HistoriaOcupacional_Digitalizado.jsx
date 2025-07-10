@@ -170,14 +170,21 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
       },
     });
 
-    const finalY = doc.lastAutoTable.finalY;
-    const minRequiredSpace = 50; // 35 firmas + 8 + margen
-    const pageHeight = doc.internal.pageSize.getHeight();
-    if ((pageHeight - finalY) < minRequiredSpace) {
-      doc.addPage();
-    }
-    const signatureTop = finalY + 5; // margen de separación mínima de 5 px
+    let finalY = doc.lastAutoTable.finalY; // ✅ usar let en vez de const
+const signatureBlockHeight = 40; // espacio estimado total (firma + texto + margen)
+const spacingAfterTable = 5;
+const totalRequired = spacingAfterTable + signatureBlockHeight;
 
+const pageHeight = doc.internal.pageSize.getHeight();
+
+// Si no cabe el bloque de firmas, agrega página antes de imprimirlas
+if ((pageHeight - finalY) < totalRequired) {
+  doc.addPage();
+  const newY = 20;  // o el valor que uses para nuevo contenido
+  finalY = newY;    // ✅ se puede reasignar porque es let
+}
+
+const signatureTop = finalY + spacingAfterTable;
     doc.text(`Fecha: ${datos.fechaHo}`,15, signatureTop + 35)
     //FIRMA
     const lineY = signatureTop + 35; // 5px debajo de la imagen
@@ -223,6 +230,7 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
     const selloH = 35;                // Alto reservado
     const selloY = 110;    
     doc.text(labelS, textXS, textYS);
+    doc.text(`Medico: ${datos.medicoAsignado}`, textXS, textYS+2);
     if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;

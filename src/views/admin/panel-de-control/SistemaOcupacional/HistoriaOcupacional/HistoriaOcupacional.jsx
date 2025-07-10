@@ -138,6 +138,8 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
       norden: "",
     nombres: "",
     fecha: today,
+    areaO: "",
+    dni: ""
     })
     setRowData({
       fecha: '',
@@ -312,6 +314,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
                   if (e.key === "Enter" && filteredEmpresa.length > 0) {
                     e.preventDefault();
                     handleSelect(e,e.target.name,filteredEmpresa[0].mensaje,setSearchEmpresa,handleRowChange,setFilteredEmpresa);
+                    document.getElementById('altitud').focus();
                   }
                 }}
                 onBlur={() => setTimeout(() => setFilteredEmpresa([]), 100)}/>
@@ -335,12 +338,13 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
         <div className='relative'>
           <div className='flex flex-col items-center justify-center'>
               <label htmlFor="">Altitud</label>
-              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchAltitud} name='altitud'
+              <input type="text" id='altitud' autoComplete='off' className={styles.inputLarge} value={searchAltitud} name='altitud'
               onChange={(e) => {handleSearch(e,setSearchAltitud,handleRowChange,setFilteredAltitud,AlturaMulti)}}
               onKeyUp={(e) => {
                 if (e.key === "Enter" && filteredAltitud.length > 0) {
                   e.preventDefault();
                   handleSelect(e,e.target.name,filteredAltitud[0].mensaje,setSearchAltitud,handleRowChange,setFilteredAltitud);
+                  document.getElementById('areaEmpresa').focus();
                 }
               }}
               onBlur={() => setTimeout(() => setFilteredAltitud([]), 100)}/>
@@ -364,12 +368,13 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
         <div className='relative'>
           <div className='flex flex-col items-center justify-center'>
             <label htmlFor="">Areas</label>
-              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchArea} name='areaEmpresa'
+              <input type="text" id='areaEmpresa' autoComplete='off' className={styles.inputLarge} value={searchArea} name='areaEmpresa'
             onChange={(e) => {handleSearch(e,setSearchArea,handleRowChange,setFilteredArea,AreaMulti)}}
             onKeyUp={(e) => {
               if (e.key === "Enter" && filteredArea.length > 0) {
                 e.preventDefault();
                 handleSelect(e,e.target.name,filteredArea[0].mensaje,setSearchArea,handleRowChange,setFilteredArea);
+                document.getElementById('riesgo').focus();
               }
             }}
             onBlur={() => setTimeout(() => setFilteredArea([]), 100)}/>
@@ -394,12 +399,13 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
         <div className='relative'>
           <div className='flex flex-col items-center justify-center'>
             <label htmlFor="">Riesgos</label>
-              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchRiesgo} name='riesgo'
+              <input type="text" id='riesgo' autoComplete='off' className={styles.inputLarge} value={searchRiesgo} name='riesgo'
             onChange={(e) => {handleSearch(e,setSearchRiesgo,handleRowChange,setFilteredRiesgo,riesgosOptions)}}
             onKeyUp={(e) => {
               if (e.key === "Enter" && filteredRiesgo.length > 0) {
                 e.preventDefault();
                 handleSelect(e,e.target.name,filteredRiesgo[0].mensaje,setSearchRiesgo,handleRowChange,setFilteredRiesgo);
+                document.getElementById('proteccion').focus();
               }
             }}
             onBlur={() => setTimeout(() => setFilteredRiesgo([]), 100)}/>
@@ -423,7 +429,7 @@ const HistoriaOcupacional = ({token,userlogued,selectedSede,listas,userDatos}) =
         <div className='relative'>
           <div className='flex flex-col items-center justify-center'>
             <label htmlFor="">Protección</label>
-              <input type="text" autoComplete='off' className={styles.inputLarge} value={searchProt} name='proteccion'
+              <input type="text" id='proteccion' autoComplete='off' className={styles.inputLarge} value={searchProt} name='proteccion'
             onChange={(e) => {handleSearch(e,setSearchProt,handleRowChange,setFilteredProt,proteccionOptions)}}
             onKeyUp={(e) => {
               if (e.key === "Enter" && filteredProt.length > 0) {
