@@ -1,117 +1,94 @@
 /**
- * Header maqueta para FICHA AUDIOLÓGICA (logo izq, título centrado, ficha/sede derecha)
- * Sólo muestra layout estático con espacios en blanco para valores
+ * Header para FICHA AUDIOLOGICA (solo texto, sin líneas ni cuadros, alineado como en CuestionarioAudiometria_Digitalizado.jsx)
  * @param {jsPDF} doc - Instancia de jsPDF
+ * @param {object} datos - Datos del paciente y ficha
  */
-const header_FichaAudiologica_Maqueta = (doc) => {
+const header_FichaAudiologica_Digitalizado = (doc, datos = {}) => {
   const margin = 18;
   const pageW  = doc.internal.pageSize.getWidth();
-  let   y      = 12;
+  let   y      = 16;
 
   // 1) Logo a la izquierda
   const logoW = 28, logoH = 13;
   try {
     doc.addImage("./img/logo-color.png", "PNG", margin, y, logoW, logoH);
   } catch {
-    doc.setFont("helvetica", "normal")
-       .setFontSize(9)
+    doc.setFont("helvetica", "normal").setFontSize(10)
        .text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2) BLOQUE "No Ficha" / "Sede" (ajustado a la derecha)
-  const fichaBlockX = pageW - margin + 1;
-  const fichaBlockY = y + 2;
+  // 2) N° Ficha y Sede (arriba derecha)
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.text(String(datos.nroficha || "95877"), pageW - margin, y + 6, { align: "right" });
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.sede || "Trujillo-Pierola"), pageW - margin, y + 12, { align: "right" });
 
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("No Ficha :", fichaBlockX - 30, fichaBlockY);
-  doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text("__________", fichaBlockX + 6, fichaBlockY, { align: "right" });
+  // 3) TÍTULO centrado
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.text("FICHA AUDIOLOGICA", pageW / 2, y + 22, { align: "center" });
 
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede     :", fichaBlockX - 30, fichaBlockY + 8);
-  doc.text("______________", fichaBlockX + 6, fichaBlockY + 8, { align: "right" });
+  y += 30;
+  // 4) Datos principales en filas, alineados
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Fecha del Examen:", margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.fecha || "01/07/2025"), margin + 45, y);
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Ficha Audiológica:", pageW/2, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.nroficha || "95877"), pageW/2 + 38, y);
 
-  // 3) TÍTULO perfectamente centrado
-  doc.setFont("helvetica", "bold").setFontSize(13);
-  const titulo  = "FICHA AUDIOLÓGICA";
-  const tituloY = y + 10;
-  doc.text(titulo, pageW / 2, tituloY, { align: "center" });
-  // subrayado
-  const w = doc.getTextWidth(titulo);
-  doc.setLineWidth(0.7)
-     .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
-     .setLineWidth(0.2);
+  y += 7;
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Apellidos y Nombres:", margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.nombres || "ROJAS SIGUENZA JOSUE SPENCER"), margin + 55, y);
 
-  // 4) Layout de datos del paciente en filas (etiquetas + líneas en blanco)
-  let datosY = y + 22;
-  const labelW = 34;
-  const sep    = 3;
-  const col2X  = pageW / 2 - 10;
-  const col3X  = pageW - margin - 60;
-  const rowH   = 5.2;
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  y += 7;
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Edad:", margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.edad || "29 AÑOS"), margin + 18, y);
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Sexo:", margin + 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.sexo || "M"), margin + 60, y);
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Ocupación:", margin + 75, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.ocupacion || "ADMINISTRADOR"), margin + 105, y);
 
-  // Fila 1
-  doc.text("Apellidos y Nombres :", margin, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("__________________________", margin + labelW + sep, datosY, {
-    maxWidth: col2X - (margin + labelW + sep) - 2
-  });
+  y += 7;
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Empresa Contratista:", margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.empresaContratista || "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L."), margin + 48, y);
 
-  doc.setFont("helvetica", "bold");
-  doc.text("Edad :", col2X, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("____", col2X + 19, datosY);
+  y += 7;
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Empresa:", margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.empresa || "OBRASCON HUARTE LAIN S.A"), margin + 25, y);
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Años de Trabajo:", pageW/2, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.aniosTrabajo || "2"), pageW/2 + 35, y);
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Tiempo de exposición:", pageW/2 + 50, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(String(datos.tiempoExposicion || "5 H/D"), pageW/2 + 90, y);
 
-  doc.setFont("helvetica", "bold");
-  doc.text("Fecha :", col3X, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("__________", col3X + 19, datosY);
-
-  // Fila 2
-  datosY += rowH;
-  doc.setFont("helvetica", "bold");
-  doc.text("DNI :", margin, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("__________", margin + labelW + sep, datosY, {
-    maxWidth: col2X - (margin + labelW + sep) - 2
-  });
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Cargo :", col2X, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("________________", col2X + 19, datosY);
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Sexo :", col3X, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("__", col3X + 19, datosY);
-
-  // Fila 3
-  datosY += rowH;
-  doc.setFont("helvetica", "bold");
-  doc.text("Área de Trabajo :", margin, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("__________________________", margin + labelW + sep, datosY, {
-    maxWidth: col2X - (margin + labelW + sep) - 2
-  });
-
-  doc.setFont("helvetica", "bold");
-  doc.text("Contrata :", col2X, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("________________", col2X + 19, datosY);
-
-  // Fila 4
-  datosY += rowH;
-  doc.setFont("helvetica", "bold");
-  doc.text("Empresa :", margin, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text("__________________________", margin + labelW + sep, datosY, {
-    maxWidth: col2X - (margin + labelW + sep) - 2
-  });
+  // Audiómetro y datos técnicos
+  y += 7;
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text("Audiómetro:", margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Marca: AMPLIVOX", margin + 30, y);
+  doc.text("Modelo: BELL PLUS", margin + 70, y);
+  doc.text("Calibración: 01/07/2025", margin + 120, y);
 
   // Restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default header_FichaAudiologica_Maqueta;
+export default header_FichaAudiologica_Digitalizado;
