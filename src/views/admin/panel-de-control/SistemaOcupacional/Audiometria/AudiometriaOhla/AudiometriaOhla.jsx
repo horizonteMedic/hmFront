@@ -172,58 +172,59 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     return textoPromedio;
   };
   const calcularOidos = () => {
-    try {
-      const odValues = [
-        form.od_500,
-        form.od_1000,
-        form.od_2000,
-        form.od_3000,
-        form.od_4000,
-        form.od_6000,
-        form.od_8000,
-      ]
-        .map((v) => parseFloat(v) || 0)
-        .filter((v) => v >= 25);
+    console.log("Calculando promedios de oídos...");
+    // try {
+    //   const odValues = [
+    //     form.od_500,
+    //     form.od_1000,
+    //     form.od_2000,
+    //     form.od_3000,
+    //     form.od_4000,
+    //     form.od_6000,
+    //     form.od_8000,
+    //   ]
+    //     .map((v) => parseFloat(v) || 0)
+    //     .filter((v) => v >= 25);
 
-      let odPromedio = (
-        odValues.reduce((acc, val) => acc + val, 0) / odValues.length
-      ).toFixed(2);
+    //   let odPromedio = (
+    //     odValues.reduce((acc, val) => acc + val, 0) / odValues.length
+    //   ).toFixed(2);
 
-      odPromedio = isNaN(odPromedio) ? 0 : odPromedio;
+    //   odPromedio = isNaN(odPromedio) ? 0 : odPromedio;
 
-      console.log("Oído Derecho - Promedio:", odPromedio);
+    //   console.log("Oído Derecho - Promedio:", odPromedio);
 
-      setForm((f) => ({
-        ...f,
-        diagnostico_od: tipoHipoacusia(odPromedio),
-      }));
+    //   setForm((f) => ({
+    //     ...f,
+    //     diagnostico_od: tipoHipoacusia(odPromedio),
+    //   }));
 
-      const oiValues = [
-        form.oi_500,
-        form.oi_1000,
-        form.oi_2000,
-        form.oi_3000,
-        form.oi_4000,
-        form.oi_6000,
-        form.oi_8000,
-      ]
-        .map((v) => parseFloat(v) || 0)
-        .filter((v) => v > 25);
-      let oiPromedio = (
-        oiValues.reduce((acc, val) => acc + val, 0) / oiValues.length
-      ).toFixed(2);
-      oiPromedio = isNaN(oiPromedio) ? 0 : oiPromedio;
+    //   const oiValues = [
+    //     form.oi_500,
+    //     form.oi_1000,
+    //     form.oi_2000,
+    //     form.oi_3000,
+    //     form.oi_4000,
+    //     form.oi_6000,
+    //     form.oi_8000,
+    //   ]
+    //     .map((v) => parseFloat(v) || 0)
+    //     .filter((v) => v > 25);
+    //   let oiPromedio = (
+    //     oiValues.reduce((acc, val) => acc + val, 0) / oiValues.length
+    //   ).toFixed(2);
+    //   oiPromedio = isNaN(oiPromedio) ? 0 : oiPromedio;
 
-      console.log("Oído Izquierdo - Promedio:", oiPromedio);
+    //   console.log("Oído Izquierdo - Promedio:", oiPromedio);
 
-      setForm((f) => ({
-        ...f,
-        diagnostico_oi: tipoHipoacusia(oiPromedio) + "",
-      }));
-    } catch (error) {
-      console.error("Error al calcular el oído derecho:", error);
-      Swal.fire("Error", "No se pudo calcular el oído derecho", "error");
-    }
+    //   setForm((f) => ({
+    //     ...f,
+    //     diagnostico_oi: tipoHipoacusia(oiPromedio) + "",
+    //   }));
+    // } catch (error) {
+    //   console.error("Error al calcular el oído derecho:", error);
+    //   Swal.fire("Error", "No se pudo calcular el oído derecho", "error");
+    // }
   };
 
   return (
@@ -362,37 +363,21 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                     return {
                       ...prevForm,
                       [name]: newValue,
-                      od_500: newValue ? "-" : "",
-                      od_1000: newValue ? "-" : "",
-                      od_2000: newValue ? "-" : "",
-                      od_3000: newValue ? "-" : "",
-                      od_4000: newValue ? "-" : "",
-                      od_6000: newValue ? "-" : "",
-                      od_8000: newValue ? "-" : "",
+                      od_500: newValue ? "N/A" : "",
+                      od_1000: newValue ? "N/A" : "",
+                      od_2000: newValue ? "N/A" : "",
+                      od_3000: newValue ? "N/A" : "",
+                      od_4000: newValue ? "N/A" : "",
+                      od_6000: newValue ? "N/A" : "",
+                      od_8000: newValue ? "N/A" : "",
 
-                      oi_500: newValue ? "-" : "",
-                      oi_1000: newValue ? "-" : "",
-                      oi_2000: newValue ? "-" : "",
-                      oi_3000: newValue ? "-" : "",
-                      oi_4000: newValue ? "-" : "",
-                      oi_6000: newValue ? "-" : "",
-                      oi_8000: newValue ? "-" : "",
-
-                      od_o_500: newValue ? "-" : "",
-                      od_o_1000: newValue ? "-" : "",
-                      od_o_2000: newValue ? "-" : "",
-                      od_o_3000: newValue ? "-" : "",
-                      od_o_4000: newValue ? "-" : "",
-                      od_o_6000: newValue ? "-" : "",
-                      od_o_8000: newValue ? "-" : "",
-
-                      oi_o_500: newValue ? "-" : "",
-                      oi_o_1000: newValue ? "-" : "",
-                      oi_o_2000: newValue ? "-" : "",
-                      oi_o_3000: newValue ? "-" : "",
-                      oi_o_4000: newValue ? "-" : "",
-                      oi_o_6000: newValue ? "-" : "",
-                      oi_o_8000: newValue ? "-" : "",
+                      oi_500: newValue ? "N/A" : "",
+                      oi_1000: newValue ? "N/A" : "",
+                      oi_2000: newValue ? "N/A" : "",
+                      oi_3000: newValue ? "N/A" : "",
+                      oi_4000: newValue ? "N/A" : "",
+                      oi_6000: newValue ? "N/A" : "",
+                      oi_8000: newValue ? "N/A" : "",
                     };
                   });
                 }}
@@ -413,7 +398,7 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
           </div>
           {/* Audiometría  Área  */}
           <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
-            <h4 className="font-semibold text-lg ">Audiometría Área:</h4>
+            <h4 className="font-semibold text-lg ">Audiometría Aérea:</h4>
             {/* Oído Derecho */}
             <div className="flex flex-col p-4 border rounded items-center justify-center">
               <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
@@ -475,6 +460,10 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
                           e.preventDefault();
+                          if (hz === "8000") {
+                            calcularOidos();
+                            return;
+                          }
                           document
                             .getElementsByName(
                               `${getNextArrayItem(
@@ -503,8 +492,32 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
                   type="checkbox"
                   name="llenar_osea"
                   checked={form.llenar_osea}
-                  onChange={() => {
-                    toggleCheckBox("llenar_osea");
+                  onChange={(e) => {
+                    // toggleCheckBox("llenar_osea");
+                    setForm((prevForm) => {
+                      const { name } = e.target;
+                      const newValue = !prevForm[name];
+                      return {
+                        ...prevForm,
+                        [name]: newValue,
+
+                        od_o_500: newValue ? "-" : "",
+                        od_o_1000: newValue ? "-" : "",
+                        od_o_2000: newValue ? "-" : "",
+                        od_o_3000: newValue ? "-" : "",
+                        od_o_4000: newValue ? "-" : "",
+                        od_o_6000: newValue ? "-" : "",
+                        od_o_8000: newValue ? "-" : "",
+
+                        oi_o_500: newValue ? "-" : "",
+                        oi_o_1000: newValue ? "-" : "",
+                        oi_o_2000: newValue ? "-" : "",
+                        oi_o_3000: newValue ? "-" : "",
+                        oi_o_4000: newValue ? "-" : "",
+                        oi_o_6000: newValue ? "-" : "",
+                        oi_o_8000: newValue ? "-" : "",
+                      };
+                    });
                   }}
                 />
                 Llenar
@@ -673,7 +686,7 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
               <button
                 type="button"
                 onClick={() => {
-                  // calcularOidos();
+                  calcularOidos();
                 }}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2 w-full  max-w-[120px]"
               >
@@ -714,25 +727,6 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
           >
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 text-base w-24"
-            />
-
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
         </div>
       </div>
 

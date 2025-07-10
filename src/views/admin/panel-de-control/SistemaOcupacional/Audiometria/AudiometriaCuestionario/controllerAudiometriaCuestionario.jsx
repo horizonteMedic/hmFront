@@ -21,7 +21,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           edad: res.edad,
           norden: res.norden,
           dni: res.dni,
-          genero: res.genero === "M" ? "Masculino" : "Femenino",
+          genero: res.sexo === "M" ? "Masculino" : "Femenino",
           codCuestionario: res.codCuestionario,
           fecha: res.fechaCuestionario,
           p1: res.chksi1 ? "SI" : "NO",

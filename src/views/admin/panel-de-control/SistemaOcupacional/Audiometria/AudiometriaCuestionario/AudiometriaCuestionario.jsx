@@ -800,7 +800,7 @@ export default function AudiometriaCuestionario({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="min-w-[70px]">¿Tiempo?</span>
+                <span className="min-w-[70px]">¿Por cuanto tiempo?</span>
                 <input
                   name="p12_tiempo"
                   value={form.p12_tiempo || ""}
@@ -940,7 +940,7 @@ export default function AudiometriaCuestionario({
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="min-w-[110px]">¿Dónde?</span>
+                <span className="min-w-[110px]">¿Dónde lo diagnosticaron?</span>
                 <input
                   name="p14_donde"
                   value={form.p14_donde || ""}
@@ -966,37 +966,54 @@ export default function AudiometriaCuestionario({
           </div>
         </div>
         {/* Pregunta 15 */}
-        <div className="mb-2 flex items-center" style={{ fontSize: "11px" }}>
-          <span className="mr-2">
+        <div className="mb-2" style={{ fontSize: "11px" }}>
+          <div className="mb-1" style={{ fontSize: "12px" }}>
             <b>15.- ¿Consume cigarrillos?</b>
-          </span>
-          <div className="flex items-center gap-2 ml-auto">
-            <input
-              type="radio"
-              name="p15"
-              value="SI"
-              checked={form.p15 === "SI"}
-              onChange={handleChange}
-            />
-            <span>SI</span>
-            <span className="ml-2">¿Cuántos por mes?</span>
-            <input
-              name="p15_cuantos"
-              value={form.p15_cuantos || ""}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 flex-1"
-              style={{ fontSize: "11px" }}
-              disabled={form.p15 !== "SI"}
-            />
-            <input
-              type="radio"
-              name="p15"
-              value="NO"
-              checked={form.p15 === "NO"}
-              onChange={handleChange}
-              className="ml-4"
-            />
-            <span>NO</span>
+          </div>
+
+          <div className="flex flex-col gap-4 px-4 py-4">
+            <div className="flex flex-row gap-4">
+              <div className="flex items-start gap-4">
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="radio"
+                    name="p15"
+                    value="SI"
+                    checked={form.p15 === "SI"}
+                    onChange={handleChange}
+                  />
+                  <span>SI</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <input
+                  type="radio"
+                  name="p15"
+                  value="NO"
+                  checked={form.p15 === "NO"}
+                  onChange={handleChange}
+                />
+                <span>NO</span>
+              </div>
+            </div>
+
+            <div
+              className={`flex-1 flex flex-col gap-2 ${
+                form.p15 === "SI" ? "opacity-100" : "opacity-50"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                <span className="min-w-[110px]">¿Cuántos por mes?</span>
+                <input
+                  name="p15_cuantos"
+                  value={form.p15_cuantos || ""}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 flex-1"
+                  style={{ fontSize: "11px" }}
+                  disabled={form.p15 !== "SI"}
+                />
+              </div>
+            </div>
           </div>
         </div>
         {/* Pregunta 16 */}
@@ -1004,115 +1021,63 @@ export default function AudiometriaCuestionario({
           <div className="mb-1" style={{ fontSize: "12px" }}>
             <b>16.- ¿Ha realizado actividades de?</b>
           </div>
-          <div className="flex flex-col gap-1 ml-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="p16_caza"
-                checked={form.p16_caza}
-                onChange={toggleCheckBox}
-              />
-              <span>Caza</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p16_caza_tiempo"
-                value={form.p16_caza_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={!form.p16_caza}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="p16_tiro"
-                checked={form.p16_tiro}
-                onChange={toggleCheckBox}
-              />
-              <span>Tiro al blanco</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p16_tiro_tiempo"
-                value={form.p16_tiro_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={!form.p16_tiro}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="p16_discoteca"
-                checked={form.p16_discoteca}
-                onChange={toggleCheckBox}
-              />
-              <span>Concurrencia frecuente a discotecas y/o bares</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p16_discoteca_tiempo"
-                value={form.p16_discoteca_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={!form.p16_discoteca}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="p16_auriculares"
-                checked={form.p16_auriculares}
-                onChange={toggleCheckBox}
-              />
-              <span>Uso de auriculares</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p16_auriculares_tiempo"
-                value={form.p16_auriculares_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={!form.p16_auriculares}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="p16_servicio"
-                checked={form.p16_servicio}
-                onChange={toggleCheckBox}
-              />
-              <span>Servicio militar</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p16_servicio_tiempo"
-                value={form.p16_servicio_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={!form.p16_servicio}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="p16_boxeo"
-                checked={form.p16_boxeo}
-                onChange={toggleCheckBox}
-              />
-              <span>Boxeo</span>
-              <span className="ml-2">¿Cuánto tiempo?</span>
-              <input
-                name="p16_boxeo_tiempo"
-                value={form.p16_boxeo_tiempo || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 flex-1"
-                style={{ fontSize: "11px" }}
-                disabled={!form.p16_boxeo}
-              />
-            </div>
+
+          <div className="flex flex-col gap-4 px-4 py-4">
+            {[
+              { name: "p16_caza", label: "Caza", tiempo: "p16_caza_tiempo" },
+              {
+                name: "p16_tiro",
+                label: "Tiro al blanco",
+                tiempo: "p16_tiro_tiempo",
+              },
+              {
+                name: "p16_discoteca",
+                label: "Concurrencia frecuente a discotecas y/o bares",
+                tiempo: "p16_discoteca_tiempo",
+              },
+              {
+                name: "p16_auriculares",
+                label: "Uso de auriculares",
+                tiempo: "p16_auriculares_tiempo",
+              },
+              {
+                name: "p16_servicio",
+                label: "Servicio militar",
+                tiempo: "p16_servicio_tiempo",
+              },
+              { name: "p16_boxeo", label: "Boxeo", tiempo: "p16_boxeo_tiempo" },
+            ].map((item) => (
+              <div
+                key={item.name}
+                className="flex flex-col  gap-1"
+              >
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    name={item.name}
+                    checked={form[item.name]}
+                    onChange={toggleCheckBox}
+                  />
+                  <span>{item.label}</span>
+                </div>
+
+                <div
+                  className={`flex items-center gap-2 sm:ml-4 ${
+                    form[item.name] ? "opacity-100" : "opacity-50"
+                  }`}
+                >
+                  <span>¿Cuánto tiempo?</span>
+                  <input
+                    name={item.tiempo}
+                    value={form[item.tiempo] || ""}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1 flex-1 min-w-[150px]"
+                    style={{ fontSize: "11px" }}
+                    disabled={!form[item.name]}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

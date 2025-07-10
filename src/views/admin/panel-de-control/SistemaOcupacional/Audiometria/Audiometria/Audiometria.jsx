@@ -1015,7 +1015,7 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 ">
             {/* Audiometría  Área  */}
             <div className="grid grid-cols-1 gap-8 border rounded p-4 ">
-              <h4 className="font-semibold text-lg ">Audiometría Área:</h4>
+              <h4 className="font-semibold text-lg ">Audiometría Aérea:</h4>
               {/* Oído Derecho */}
               <div className="flex flex-col p-4 border rounded items-center justify-center">
                 <h4 className="font-medium mb-2 w-full">Oído Derecho</h4>
