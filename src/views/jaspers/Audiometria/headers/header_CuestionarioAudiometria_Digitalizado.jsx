@@ -33,7 +33,7 @@ const header_FichaAudiologica_Maqueta = (doc) => {
 
   // 3) TÍTULO perfectamente centrado
   doc.setFont("helvetica", "bold").setFontSize(13);
-  const titulo  = "FICHA AUDIOLÓGICA";
+  const titulo  = "CUESTIONARIO AUDIOMETRÍA";
   const tituloY = y + 10;
   doc.text(titulo, pageW / 2, tituloY, { align: "center" });
   // subrayado
