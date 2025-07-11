@@ -932,6 +932,7 @@ const TabComponent = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onNavigate={(idx) => {
+          console.log("Navigating to tab:", idx);
           setDrawerOpen(false);
           if (idx === 7) {
             setActiveTab(null);
@@ -942,14 +943,15 @@ const TabComponent = () => {
           } else if (idx === 2) {
             setActiveTab(2);
           } else if (idx === 3) {
-            setActiveTab(3);
+            setActiveTab(14);//Espirometria
           } else if (idx === 4) {
             setActiveTab(4);
           } else if (idx === 5) {
             setActiveTab(5);
           } else if (idx === 6) {
             setActiveTab(6);
-          }
+          } 
+          
         }}
         activeIndex={activeTab}
         tieneVista={tieneVista}
