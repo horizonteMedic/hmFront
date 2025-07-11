@@ -230,7 +230,9 @@ const signatureTop = finalY + spacingAfterTable;
     const selloH = 35;                // Alto reservado
     const selloY = 110;    
     doc.text(labelS, textXS, textYS);
-    doc.text(`Medico: ${datos.medicoAsignado}`, textXS, textYS+2);
+    doc.text(`Medico: ${datos.medicoAsignado}`, textXS-30, textYS+8, {
+      maxWidth: 80
+    });
     if (s1) {
       const canvas = document.createElement('canvas');
       canvas.width = s1.width;

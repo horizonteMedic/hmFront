@@ -103,8 +103,17 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   doc.text("Fecha de Nacimiento: ", nroOrdenX - 60, nroOrdenY + 18)
   doc.text(datos.fechaNac, nroOrdenX - 30, nroOrdenY + 18)
 
-  doc.text("Lugar de Procedencia: ", nroOrdenX - 80, nroOrdenY + 24)
-  doc.text(datos.lugarProcedimiento, nroOrdenX - 44, nroOrdenY + 24)
+  const lugarLabel = "Lugar de Procedencia: ";
+  const lugarTexto = datos.lugarProcedimiento || "";
+  const maxWidth = 90; // ajusta según tu diseño
+
+  // Imprimir etiqueta (fija)
+  doc.text(lugarLabel, nroOrdenX - 80, nroOrdenY + 24);
+
+  // Imprimir contenido (ajustado al ancho)
+  doc.text(lugarTexto, nroOrdenX - 44, nroOrdenY + 24, {
+    maxWidth: maxWidth,
+  });
 
   doc.setFontSize(10).setFont('helvetica', 'normal');
 
