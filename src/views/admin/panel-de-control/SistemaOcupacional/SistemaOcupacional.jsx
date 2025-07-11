@@ -795,7 +795,7 @@ const TabComponent = () => {
               </div>
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">
-                  Espirometria
+                  Espirometría
                 </h2>
               </div>
               <div>
@@ -807,7 +807,7 @@ const TabComponent = () => {
                     }`}
                     onClick={() => setSubTab(0)}
                   >
-                    Espirometria
+                    Espirometría
                   </button>
                 </div>
                 <div>

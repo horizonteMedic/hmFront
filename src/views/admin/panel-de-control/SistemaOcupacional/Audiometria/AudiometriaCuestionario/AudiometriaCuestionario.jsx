@@ -284,7 +284,15 @@ export default function AudiometriaCuestionario({
                   name="p1"
                   value="NO"
                   checked={form.p1 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p1_cual: "",
+                      p1_cuando: "",
+                      p1_quehizo: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -555,7 +563,15 @@ export default function AudiometriaCuestionario({
                   name="p9"
                   value="NO"
                   checked={form.p9 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p9_cual: "",
+                      p9_donde: "",
+                      p9_quehizo: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -632,7 +648,15 @@ export default function AudiometriaCuestionario({
                   name="p10"
                   value="NO"
                   checked={form.p10 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p10_cual: "",
+                      p10_donde: "",
+                      p10_quehizo: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -710,7 +734,14 @@ export default function AudiometriaCuestionario({
                   name="p11"
                   value="NO"
                   checked={form.p11 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p11_cual: "",
+                      p11_tiempo: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -776,7 +807,14 @@ export default function AudiometriaCuestionario({
                   name="p12"
                   value="NO"
                   checked={form.p12 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p12_cual: "",
+                      p12_tiempo: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -838,7 +876,15 @@ export default function AudiometriaCuestionario({
                   name="p13"
                   value="NO"
                   checked={form.p13 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p13_tiempo: "",
+                      p13_cuando: "",
+                      p13_donde: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -916,7 +962,15 @@ export default function AudiometriaCuestionario({
                   name="p14"
                   value="NO"
                   checked={form.p14 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p14_cual: "",
+                      p14_donde: "",
+                      p14_quehizo: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -991,7 +1045,13 @@ export default function AudiometriaCuestionario({
                   name="p15"
                   value="NO"
                   checked={form.p15 === "NO"}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      p15_cuantos: "",
+                    }));
+                  }}
                 />
                 <span>NO</span>
               </div>
@@ -1047,16 +1107,19 @@ export default function AudiometriaCuestionario({
               },
               { name: "p16_boxeo", label: "Boxeo", tiempo: "p16_boxeo_tiempo" },
             ].map((item) => (
-              <div
-                key={item.name}
-                className="flex flex-col  gap-1"
-              >
+              <div key={item.name} className="flex flex-col  gap-1">
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     name={item.name}
                     checked={form[item.name]}
-                    onChange={toggleCheckBox}
+                    onChange={(e) => {
+                      toggleCheckBox(e);
+                      setForm((prev) => ({
+                        ...prev,
+                        [item.tiempo]: "",
+                      }));
+                    }}
                   />
                   <span>{item.label}</span>
                 </div>

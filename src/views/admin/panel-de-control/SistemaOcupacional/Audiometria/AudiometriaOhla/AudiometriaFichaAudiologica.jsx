@@ -1,32 +1,60 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
+import Swal from "sweetalert2";
 
 const AudiometriaFichaAudiologica = () => {
   // Estado para los datos del formulario (antes era data fijo)
   const [form, setForm] = useState({
-    norden: '12345',
-    fecha: '2024-06-01',
-    tipoExamen: 'Preocupacional',
-    apellidosNombres: 'Juan Pérez García',
-    edad: '35',
-    sexo: 'Masculino',
-    ocupacion: 'Operario',
-    aniosTrabajo: '5',
-    mesesTrabajo: '3',
-    empresaContratista: 'Contratista SAC',
-    empresa: 'Empresa Principal S.A.',
-    otoscopia: 'Normal',
-    audiometroMarca: 'AMPLIVOX',
-    audiometroModelo: 'AMPLIVOX 270',
-    audiometroCalibracion: '2024-01-15',
-    tiempoExposicion: '',
+    norden: "12345",
+    fecha: "2024-06-01",
+    tipoExamen: "Preocupacional",
+    noExamen: false,
+
+    nombres: "Juan Pérez García",
+    edad: "35",
+    bellPlus: false,
+
+    sexo: "Masculino",
+    ocupacion: "Operario",
+    aniosTrabajo: "5",
+    mesesTrabajo: "3",
+
+    empresaContratista: "Contratista SAC",
+    otoscopia: "Normal",
+
+    empresa: "Empresa Principal S.A.",
+
+    audiometroMarca: "AMPLIVOX",
+    audiometroModelo: "AMPLIVOX 270",
+    audiometroCalibracion: "2024-01-15",
+    tiempoExposicion: "",
     h_d: false,
     min_d: false,
-    noExamen: false,
-    bellPlus: false,
   });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+
+    // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
+    if (/^\d*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+
+  const toggleCheckBox = (e) => {
+    const { name } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: !f[name],
+    }));
+  };
+  //===================================0
 
   // Helpers para parsear y actualizar el input inteligentemente
   const parseExposicion = (input) => {
@@ -34,8 +62,8 @@ const AudiometriaFichaAudiologica = () => {
     const hdMatch = input.match(/(\d+)\s*H\/D/i);
     const minMatch = input.match(/(\d+)\s*MIN\/D/i);
     return {
-      hd: hdMatch ? hdMatch[1] : '',
-      min: minMatch ? minMatch[1] : '',
+      hd: hdMatch ? hdMatch[1] : "",
+      min: minMatch ? minMatch[1] : "",
     };
   };
 
@@ -43,19 +71,19 @@ const AudiometriaFichaAudiologica = () => {
     let parts = [];
     if (h_d && hd) parts.push(`${hd} H/D`);
     if (min_d && min) parts.push(`${min} MIN/D`);
-    return parts.join(' ');
+    return parts.join(" ");
   };
 
   // Cuando el usuario edita el input manualmente
   const handleExposicionInput = (e) => {
     const value = e.target.value;
     const parsed = parseExposicion(value);
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       tiempoExposicion: value,
       // Si el usuario borra el sufijo, deschequea el checkbox
-      h_d: value.toUpperCase().includes('H/D'),
-      min_d: value.toUpperCase().includes('MIN/D'),
+      h_d: value.toUpperCase().includes("H/D"),
+      min_d: value.toUpperCase().includes("MIN/D"),
     }));
   };
 
@@ -66,12 +94,17 @@ const AudiometriaFichaAudiologica = () => {
     // Si no hay número para H/D, intenta tomar el primer número
     if (checked && !hd) {
       const firstNum = form.tiempoExposicion.match(/\d+/);
-      newHd = firstNum ? firstNum[0] : '';
+      newHd = firstNum ? firstNum[0] : "";
     }
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       h_d: checked,
-      tiempoExposicion: buildExposicion(checked ? newHd : '', min, checked, f.min_d),
+      tiempoExposicion: buildExposicion(
+        checked ? newHd : "",
+        min,
+        checked,
+        f.min_d
+      ),
     }));
   };
 
@@ -83,12 +116,17 @@ const AudiometriaFichaAudiologica = () => {
     if (checked && !min) {
       // Busca el segundo número
       const nums = form.tiempoExposicion.match(/\d+/g);
-      newMin = nums && nums.length > 1 ? nums[1] : '';
+      newMin = nums && nums.length > 1 ? nums[1] : "";
     }
-    setForm(f => ({
+    setForm((f) => ({
       ...f,
       min_d: checked,
-      tiempoExposicion: buildExposicion(hd, checked ? newMin : '', f.h_d, checked),
+      tiempoExposicion: buildExposicion(
+        hd,
+        checked ? newMin : "",
+        f.h_d,
+        checked
+      ),
     }));
   };
 
@@ -96,9 +134,9 @@ const AudiometriaFichaAudiologica = () => {
   const handleSave = () => {
     // Aquí iría la lógica real de guardado
     Swal.fire({
-      icon: 'success',
-      title: 'Guardado',
-      text: 'Los datos han sido guardados/actualizados correctamente.',
+      icon: "success",
+      title: "Guardado",
+      text: "Los datos han sido guardados/actualizados correctamente.",
       timer: 1500,
       showConfirmButton: false,
     });
@@ -107,27 +145,27 @@ const AudiometriaFichaAudiologica = () => {
   // Función para imprimir (placeholder)
   const handlePrint = () => {
     if (!form.norden) {
-      Swal.fire('Error', 'Debe colocar un N° Orden', 'error');
+      Swal.fire("Error", "Debe colocar un N° Orden", "error");
       return;
     }
     Swal.fire({
-      title: '¿Desea Imprimir Ficha Audiológica?',
+      title: "¿Desea Imprimir Ficha Audiológica?",
       html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: 'question',
+      icon: "question",
       showCancelButton: true,
-      confirmButtonText: 'Sí, Imprimir',
-      cancelButtonText: 'Cancelar',
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
       customClass: {
-        title: 'swal2-title',
-        confirmButton: 'swal2-confirm',
-        cancelButton: 'swal2-cancel',
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
       },
     }).then((result) => {
       if (result.isConfirmed) {
         // Aquí iría la función real de impresión, por ahora solo un mensaje
         Swal.fire({
-          icon: 'info',
-          title: 'Imprimiendo...',
+          icon: "info",
+          title: "Imprimiendo...",
           text: `Se imprimiría la ficha N° Orden: ${form.norden}`,
           timer: 1500,
           showConfirmButton: false,
@@ -140,9 +178,9 @@ const AudiometriaFichaAudiologica = () => {
   const handleClear = () => {
     // Si tienes campos editables, aquí los puedes limpiar
     Swal.fire({
-      icon: 'info',
-      title: 'Limpiar',
-      text: 'Función de limpiar implementada (placeholder).',
+      icon: "info",
+      title: "Limpiar",
+      text: "Función de limpiar implementada (placeholder).",
       timer: 1000,
       showConfirmButton: false,
     });
@@ -150,74 +188,209 @@ const AudiometriaFichaAudiologica = () => {
 
   return (
     <div className="w-full bg-white rounded shadow p-4 border border-gray-200 mb-4">
-      <div className="w-full flex flex-row flex-nowrap gap-4" style={{fontSize:'12px'}}>
+      <div className="w-full flex flex-row flex-nowrap gap-4 text-[12px]">
         {/* Columna 1 */}
-        <div className="basis-[65%] min-w-0 " style={{fontSize:'12px'}}>
+        <div className="basis-[65%] min-w-0 text-[12px] flex flex-col gap-3">
           {/* Fila 1 */}
-          <div className="flex flex-row gap-4 items-center flex-wrap min-w-0 mb-2">
-            <label className="font-bold min-w-[80px]">Nro Orden :</label>
-            <input value={form.norden} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'90px'}} />
-            <label className="font-bold ml-2">Fecha de Examen :</label>
-            <input value={form.fecha} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'120px'}} />
-            <label className="font-bold ml-2">Tipo de Examen :</label>
-            <input value={form.tipoExamen} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'120px'}} />
-            <input
-              type="checkbox"
-              checked={form.noExamen}
-              onChange={e => setForm(f => ({ ...f, noExamen: e.target.checked }))}
-              className="ml-2"
-            />
-            <span className="text-red-600 font-bold" style={{fontSize:'12px'}}>No Examen</span>
+          <div className="grid grid-cols-4 w-full gap-4">
+            <div className="flex items-center gap-2">
+              <label className="font-bold min-w-[80px] text-[13px]">
+                Nro Orden :
+              </label>
+              <input
+                name="norden"
+                value={form.norden}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    // handleClearnotO();
+                    // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                  }
+                }}
+                className="border border-gray-400 rounded px-2 py-1  text-[12px] w-full"
+              />
+            </div>
+            <div className="flex items-center gap-2 ">
+              <label className="font-bold min-w-[50px] text-[13px]">
+                Fecha :
+              </label>
+              <input
+                type="date"
+                name="fecha"
+                value={form.fecha}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 w-full text-[11px]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-bold min-w-[80px] text-[13px]">
+                Tip. Exam. :
+              </label>
+              <input
+                name="tipoExamen"
+                value={form.tipoExamen}
+                onChange={handleChange}
+                disabled
+                className="border rounded px-2 py-1  text-[12px] w-full min-w-[120px]"
+              />
+            </div>
+            <div className="flex items-center gap-2 pl-8">
+              <input
+                type="checkbox"
+                name="noExamen"
+                checked={form.noExamen}
+                onChange={toggleCheckBox}
+              />
+              <span className="text-red-500 font-bold"> No Examen</span>
+            </div>
           </div>
           {/* Fila 2 */}
-          <div className="flex flex-row gap-4 items-center flex-wrap min-w-0 mb-2">
-            <label className="font-bold min-w-[130px]">Apellidos y Nombres :</label>
-            <input value={form.apellidosNombres} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100 w-full max-w-[250px]" style={{fontSize:'12px'}} />
-            <label className="font-bold ml-2">Edad :</label>
-            <input value={form.edad} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'50px'}} />
-            <span style={{fontSize:'11px'}}>años</span>
-            <input
-              type="checkbox"
-              checked={form.bellPlus}
-              onChange={e => setForm(f => ({ ...f, bellPlus: e.target.checked }))}
-              className="ml-2"
-            />
-            <span style={{fontSize:'11px'}}>BELL PLUS</span>
+          <div className="grid grid-cols-4 w-full gap-4 ">
+            <div className="flex items-center gap-2 col-span-2">
+              <label className="font-bold min-w-[80px] text-[13px]">
+                Nombres:
+              </label>
+              <input
+                value={form.nombres}
+                disabled
+                className="border border-gray-400 rounded px-2 py-1 bg-gray-100 w-full text-[12px] "
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Edad :
+              </label>
+              <input
+                value={form.edad}
+                disabled
+                className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-[50px]"
+              />
+              <span className="text-[11px]">años</span>
+            </div>
+
+            <div className="flex items-center gap-2 pl-8">
+              <input
+                name="bellPlus"
+                type="checkbox"
+                checked={form.bellPlus}
+                onChange={toggleCheckBox}
+              />
+              <span className=" font-bold">BELL PLUS</span>
+            </div>
           </div>
+
           {/* Fila 3 */}
-          <div className="flex flex-row gap-4 items-center flex-wrap min-w-0 mb-2">
-            <label className="font-bold">Sexo :</label>
-            <input value={form.sexo} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'80px'}} />
-            <label className="font-bold ml-2">Ocupación :</label>
-            <input value={form.ocupacion} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'140px'}} />
-            <label className="font-bold ml-2">Años Trabajo. :</label>
-            <input value={form.aniosTrabajo} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'50px'}} />
-            <label className="font-bold ml-2">y Meses :</label>
-            <input value={form.mesesTrabajo} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100" style={{fontSize:'12px', width:'50px'}} />
+          <div className="grid grid-cols-4 w-full gap-4 ">
+            {/* Sexo */}
+            <div className="flex items-center gap-2 col-span-2">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Sexo :
+              </label>
+              <input
+                value={form.sexo}
+                disabled
+                className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
+              />
+            </div>
+
+            {/* Años de trabajo */}
+            <div className="flex items-center gap-2">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Años Trab. :
+              </label>
+              <input
+                name="aniosTrabajo"
+                value={form.aniosTrabajo}
+                onChange={handleChangeNumber}
+                maxLength={3}
+                className="border rounded px-2 py-1  text-[12px] w-[50px]"
+              />
+            </div>
+
+            {/* Meses de trabajo */}
+            <div className="flex items-center gap-2 pl-8">
+              <label className="font-bold text-[13px]">y Meses :</label>
+              <input
+                name="mesesTrabajo"
+                value={form.mesesTrabajo}
+                onChange={handleChangeNumber}
+                maxLength={2}
+                className="border border-gray-400 rounded px-2 py-1 text-[12px] w-[50px]"
+              />
+            </div>
           </div>
+
           {/* Fila 4 */}
-          <div className="flex flex-row gap-4 items-center flex-wrap min-w-0 mb-2">
-            <label className="font-bold min-w-[130px]">Empresa Contratista :</label>
-            <input value={form.empresaContratista} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100 flex-1 max-w-[250px]" style={{fontSize:'12px'}} />
-            <label className="font-bold ml-2 min-w-[80px]">Otoscopia :</label>
-            <input value={form.otoscopia} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100 flex-1 max-w-[250px]" style={{fontSize:'12px'}} />
+          <div className="grid grid-cols-2 w-full gap-4 ">
+            {/* Ocupación */}
+            <div className="flex items-center gap-2 ">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Ocupación :
+              </label>
+              <input
+                value={form.ocupacion}
+                disabled
+                className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full "
+              />
+            </div>
+
+            {/* Otoscopia: ocupará 2 columnas para más espacio */}
+            <div className="flex items-center gap-2 ">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Otoscopia:
+              </label>
+              <input
+                name="otoscopia"
+                value={form.otoscopia}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-[12px] w-full "
+              />
+            </div>
           </div>
+
           {/* Fila 5 */}
-          <div className="flex flex-row gap-4 items-center flex-wrap min-w-0 mb-2">
-            <label className="font-bold ml-2 min-w-[70px]">Empresa :</label>
-            <input value={form.empresa} disabled className="border border-gray-400 rounded px-2 py-1 bg-gray-100 flex-1 max-w-[250px]" style={{fontSize:'12px'}} />
+          <div className="grid grid-cols-2 w-full gap-4 ">
+            {/* Empresa */}
+            <div className="flex items-center gap-2">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Empresa :
+              </label>
+              <input
+                value={form.empresa}
+                disabled
+                className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
+              />
+            </div>
+
+            {/* Contrata */}
+            <div className="flex items-center gap-2">
+              <label className="font-bold text-[13px] min-w-[80px]">
+                Contrata :
+              </label>
+              <input
+                value={form.empresaContratista}
+                disabled
+                className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
+              />
+            </div>
           </div>
         </div>
         {/* Columna 2 */}
-        <div className="basis-[35%] min-w-0 flex flex-col gap-4" style={{fontSize:'12px'}}>
+        <div
+          className="basis-[35%] min-w-0 flex flex-col gap-4"
+          style={{ fontSize: "12px" }}
+        >
           <div className="flex flex-col gap-1 items-start">
-            <label className="font-bold min-w-[220px] mb-1">Tiempo de exposición total ponderado:</label>
+            <label className="font-bold min-w-[220px] mb-1">
+              Tiempo de exposición total ponderado:
+            </label>
             <input
               type="text"
               value={form.tiempoExposicion}
               onChange={handleExposicionInput}
               className="border border-gray-400 rounded px-2 py-1 bg-white"
-              style={{fontSize:'12px', width:'160px'}}
+              style={{ fontSize: "12px", width: "160px" }}
               placeholder="Ej: 8 H/D 30 MIN/D"
             />
             <div className="flex flex-row gap-4 mt-1">
@@ -225,34 +398,51 @@ const AudiometriaFichaAudiologica = () => {
                 <input
                   type="checkbox"
                   checked={form.h_d}
-                  onChange={e => handleCheckHD(e.target.checked)}
+                  onChange={(e) => handleCheckHD(e.target.checked)}
                 />
-                <span style={{fontSize:'11px'}}>H/D</span>
+                <span style={{ fontSize: "11px" }}>H/D</span>
               </label>
               <label className="flex items-center gap-1">
                 <input
                   type="checkbox"
                   checked={form.min_d}
-                  onChange={e => handleCheckMinD(e.target.checked)}
+                  onChange={(e) => handleCheckMinD(e.target.checked)}
                 />
-                <span style={{fontSize:'11px'}}>MIN/D</span>
+                <span style={{ fontSize: "11px" }}>MIN/D</span>
               </label>
             </div>
           </div>
-          <fieldset className="border rounded p-2 min-w-[220px]" style={{fontSize:'12px'}}>
-            <legend className="font-bold" style={{fontSize:'12px'}}>Audiómetro</legend>
+          <fieldset
+            className="border rounded p-2 min-w-[220px]"
+            style={{ fontSize: "12px" }}
+          >
+            <legend className="font-bold" style={{ fontSize: "12px" }}>
+              Audiómetro
+            </legend>
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <label className="font-bold min-w-[60px]">Marca :</label>
-                <input value={form.audiometroMarca} className="border border-gray-400 rounded px-2 py-1 bg-white" style={{fontSize:'12px', width:'110px'}} />
+                <input
+                  value={form.audiometroMarca}
+                  className="border border-gray-400 rounded px-2 py-1 bg-white"
+                  style={{ fontSize: "12px", width: "110px" }}
+                />
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-bold min-w-[60px]">Modelo :</label>
-                <input value={form.audiometroModelo} className="border border-gray-400 rounded px-2 py-1 bg-white" style={{fontSize:'12px', width:'110px'}} />
+                <input
+                  value={form.audiometroModelo}
+                  className="border border-gray-400 rounded px-2 py-1 bg-white"
+                  style={{ fontSize: "12px", width: "110px" }}
+                />
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-bold min-w-[60px]">Calibración :</label>
-                <input value={form.audiometroCalibracion} className="border border-gray-400 rounded px-2 py-1 bg-white" style={{fontSize:'12px', width:'110px'}} />
+                <input
+                  value={form.audiometroCalibracion}
+                  className="border border-gray-400 rounded px-2 py-1 bg-white"
+                  style={{ fontSize: "12px", width: "110px" }}
+                />
               </div>
             </div>
           </fieldset>
@@ -261,158 +451,300 @@ const AudiometriaFichaAudiologica = () => {
       {/* --- NUEVO BLOQUE EN DOS COLUMNAS --- */}
       <div className="w-full flex flex-row flex-nowrap gap-4">
         {/* Columna Izquierda */}
-        <div className="flex-1 min-w-0 bg-white rounded shadow p-4 border border-gray-200" style={{fontSize:'12px'}}>
+        <div
+          className="flex-1 min-w-0 bg-white rounded shadow p-4 border border-gray-200"
+          style={{ fontSize: "12px" }}
+        >
           {/* Uso de protectores auditivos y apreciación del ruido */}
           <div className="flex flex-wrap gap-4 mb-2 items-center">
-            <fieldset className="border rounded p-2 min-w-[220px] flex-1" style={{fontSize:'12px'}}>
-              <legend className="font-bold" style={{fontSize:'12px'}}>Uso de protectores Auditivos</legend>
+            <fieldset
+              className="border rounded p-2 min-w-[220px] flex-1"
+              style={{ fontSize: "12px" }}
+            >
+              <legend className="font-bold" style={{ fontSize: "12px" }}>
+                Uso de protectores Auditivos
+              </legend>
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-1"><input type="checkbox" checked /> Tapones</label>
-                <label className="flex items-center gap-1"><input type="checkbox" /> Grajeras</label>
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" checked /> Tapones
+                </label>
+                <label className="flex items-center gap-1">
+                  <input type="checkbox" /> Grajeras
+                </label>
               </div>
             </fieldset>
-            <fieldset className="border rounded p-2 min-w-[220px] flex-1" style={{fontSize:'12px'}}>
-              <legend className="font-bold" style={{fontSize:'12px'}}>Apreciación del Ruido</legend>
+            <fieldset
+              className="border rounded p-2 min-w-[220px] flex-1"
+              style={{ fontSize: "12px" }}
+            >
+              <legend className="font-bold" style={{ fontSize: "12px" }}>
+                Apreciación del Ruido
+              </legend>
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-1"><input type="radio" /> Ruido muy intenso</label>
-                <label className="flex items-center gap-1"><input type="radio" checked /> Ruido moderado</label>
-                <label className="flex items-center gap-1"><input type="radio" /> Ruido no molesto</label>
+                <label className="flex items-center gap-1">
+                  <input type="radio" /> Ruido muy intenso
+                </label>
+                <label className="flex items-center gap-1">
+                  <input type="radio" checked /> Ruido moderado
+                </label>
+                <label className="flex items-center gap-1">
+                  <input type="radio" /> Ruido no molesto
+                </label>
               </div>
             </fieldset>
           </div>
           {/* Antecedentes y Síntomas */}
           <div className="flex flex-row gap-4 mb-2">
             {/* Antecedentes */}
-            <fieldset className="border rounded p-2 flex-1" style={{fontSize:'12px'}}>
-              <legend className="font-bold" style={{fontSize:'12px'}}>ANTECEDENTES relacionados</legend>
+            <fieldset
+              className="border rounded p-2 flex-1"
+              style={{ fontSize: "12px" }}
+            >
+              <legend className="font-bold" style={{ fontSize: "12px" }}>
+                ANTECEDENTES relacionados
+              </legend>
               <table className="w-full">
                 <tbody>
                   {[
-                    'Consumo de tabaco',
-                    'Servicio Militar',
-                    'Hobbies con exposición a ruido',
-                    'Exposición laboral a químicos',
-                    'Infección al Oído',
-                    'Uso de Ototoxicos',
+                    "Consumo de tabaco",
+                    "Servicio Militar",
+                    "Hobbies con exposición a ruido",
+                    "Exposición laboral a químicos",
+                    "Infección al Oído",
+                    "Uso de Ototoxicos",
                   ].map((item, idx) => (
-                    <tr key={idx} style={{fontSize:'12px'}}>
-                      <td className="pr-2" style={{fontSize:'12px'}}>{item}</td>
-                      <td><input type="checkbox" /> </td>
-                      <td><input type="checkbox" checked /> </td>
+                    <tr key={idx} style={{ fontSize: "12px" }}>
+                      <td className="pr-2" style={{ fontSize: "12px" }}>
+                        {item}
+                      </td>
+                      <td>
+                        <input type="checkbox" />{" "}
+                      </td>
+                      <td>
+                        <input type="checkbox" checked />{" "}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <div className="flex justify-end mt-1" style={{fontSize:'12px'}}><span className="mr-8">SI</span>NO</div>
+              <div
+                className="flex justify-end mt-1"
+                style={{ fontSize: "12px" }}
+              >
+                <span className="mr-8">SI</span>NO
+              </div>
             </fieldset>
             {/* Síntomas */}
-            <fieldset className="border rounded p-2 flex-1" style={{fontSize:'12px'}}>
-              <legend className="font-bold" style={{fontSize:'12px'}}>SÍNTOMAS actuales</legend>
+            <fieldset
+              className="border rounded p-2 flex-1"
+              style={{ fontSize: "12px" }}
+            >
+              <legend className="font-bold" style={{ fontSize: "12px" }}>
+                SÍNTOMAS actuales
+              </legend>
               <table className="w-full">
                 <tbody>
                   {[
-                    'Disminución de la audición',
-                    'Dolor de Oídos',
-                    'Zumbido',
-                    'Mareos',
-                    'Infección al Oído',
-                    'Otra',
+                    "Disminución de la audición",
+                    "Dolor de Oídos",
+                    "Zumbido",
+                    "Mareos",
+                    "Infección al Oído",
+                    "Otra",
                   ].map((item, idx) => (
-                    <tr key={idx} style={{fontSize:'12px'}}>
-                      <td className="pr-2" style={{fontSize:'12px'}}>{item}</td>
-                      <td><input type="checkbox" /> </td>
-                      <td><input type="checkbox" checked /> </td>
+                    <tr key={idx} style={{ fontSize: "12px" }}>
+                      <td className="pr-2" style={{ fontSize: "12px" }}>
+                        {item}
+                      </td>
+                      <td>
+                        <input type="checkbox" />{" "}
+                      </td>
+                      <td>
+                        <input type="checkbox" checked />{" "}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <div className="flex justify-end mt-1" style={{fontSize:'12px'}}><span className="mr-8">SI</span>NO</div>
+              <div
+                className="flex justify-end mt-1"
+                style={{ fontSize: "12px" }}
+              >
+                <span className="mr-8">SI</span>NO
+              </div>
             </fieldset>
           </div>
           {/* Datos de profesional y botones */}
           <div className="mb-2">
             <div className="flex items-center gap-2 mb-1">
-              <label className="min-w-[270px]" style={{fontSize:'12px'}}>Nombre del profesional que realiza la audiometría :</label>
-              <input  value="" className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1" style={{fontSize:'12px'}} />
+              <label className="min-w-[270px]" style={{ fontSize: "12px" }}>
+                Nombre del profesional que realiza la audiometría :
+              </label>
+              <input
+                value=""
+                className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1"
+                style={{ fontSize: "12px" }}
+              />
             </div>
             <div className="flex items-center gap-2 mb-1">
-              <label className="min-w-[100px]" style={{fontSize:'12px'}}>Conclusiones :</label>
-              <input  value="" className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1" style={{fontSize:'12px'}} />
+              <label className="min-w-[100px]" style={{ fontSize: "12px" }}>
+                Conclusiones :
+              </label>
+              <input
+                value=""
+                className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1"
+                style={{ fontSize: "12px" }}
+              />
             </div>
             <div className="flex items-center gap-2 mb-1">
-              <label className="min-w-[120px]" style={{fontSize:'12px'}}>Nombre del Médico :</label>
-              <input  value="" className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1" style={{fontSize:'12px'}} />
+              <label className="min-w-[120px]" style={{ fontSize: "12px" }}>
+                Nombre del Médico :
+              </label>
+              <input
+                value=""
+                className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1"
+                style={{ fontSize: "12px" }}
+              />
             </div>
           </div>
-          <div className="flex gap-2 mt-4" style={{fontSize:'12px'}}>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition" style={{minWidth:'140px'}} onClick={handleSave}>
-              <FontAwesomeIcon icon={faSave} style={{ color: '#fff', fontSize: '12px' }} /> Guardar/Actualizar
+          <div className="flex gap-2 mt-4" style={{ fontSize: "12px" }}>
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition"
+              style={{ minWidth: "140px" }}
+              onClick={handleSave}
+            >
+              <FontAwesomeIcon
+                icon={faSave}
+                style={{ color: "#fff", fontSize: "12px" }}
+              />{" "}
+              Guardar/Actualizar
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition" style={{minWidth:'120px'}} onClick={handleClear}>
-              <FontAwesomeIcon icon={faBroom} style={{ color: 'white', fontSize: '12px' }} /> Limpiar
+            <button
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#facc14] text-[#FFFFFF] transition"
+              style={{ minWidth: "120px" }}
+              onClick={handleClear}
+            >
+              <FontAwesomeIcon
+                icon={faBroom}
+                style={{ color: "white", fontSize: "12px" }}
+              />{" "}
+              Limpiar
             </button>
           </div>
         </div>
         {/* Columna Derecha */}
-        <div className="flex-1 min-w-0 bg-white rounded shadow p-4 border border-gray-200 flex flex-col gap-4" style={{fontSize:'12px'}}>
+        <div
+          className="flex-1 min-w-0 bg-white rounded shadow p-4 border border-gray-200 flex flex-col gap-4"
+          style={{ fontSize: "12px" }}
+        >
           {/* Diapasones */}
           <fieldset className="border rounded p-3 flex-1">
-            <legend className="font-bold" style ={{fontSize:'12px'}}>DIAPASONES RINNE Y WEBER</legend>
+            <legend className="font-bold" style={{ fontSize: "12px" }}>
+              DIAPASONES RINNE Y WEBER
+            </legend>
             <div className="grid grid-cols-3 gap-2 items-center mb-1">
               <div></div>
-              <div className="text-center font-bold" style={{width:'150px'}}>O.D</div>
-              <div className="text-center font-bold" style={{width:'150px'}}>O.I</div>
+              <div className="text-center font-bold" style={{ width: "150px" }}>
+                O.D
+              </div>
+              <div className="text-center font-bold" style={{ width: "150px" }}>
+                O.I
+              </div>
             </div>
             {[
-              { label: '250 Hz.', key: '250' },
-              { label: '500 Hz.', key: '500' },
-              { label: '1000 Hz.', key: '1000' },
+              { label: "250 Hz.", key: "250" },
+              { label: "500 Hz.", key: "500" },
+              { label: "1000 Hz.", key: "1000" },
             ].map((hz, idx) => (
-              <div className="grid grid-cols-3 gap-2 items-center mb-1" key={hz.key}>
-                <div className="text-left" style={{width:'90px'}}>{hz.label}</div>
-                <input className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]" style={{fontSize:'12px'}} />
-                <input className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]" style={{fontSize:'12px'}} />
+              <div
+                className="grid grid-cols-3 gap-2 items-center mb-1"
+                key={hz.key}
+              >
+                <div className="text-left" style={{ width: "90px" }}>
+                  {hz.label}
+                </div>
+                <input
+                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]"
+                  style={{ fontSize: "12px" }}
+                />
+                <input
+                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]"
+                  style={{ fontSize: "12px" }}
+                />
               </div>
             ))}
           </fieldset>
           {/* Logoaudiometría */}
           <fieldset className="border rounded p-3 flex-1">
-            <legend className="font-bold" style={{fontSize:'12px'}}>LOGOAUDIOMETRIA</legend>
+            <legend className="font-bold" style={{ fontSize: "12px" }}>
+              LOGOAUDIOMETRIA
+            </legend>
             <div className="grid grid-cols-3 gap-2 items-center mb-1">
               <div></div>
-              <div className="text-center font-bold" style={{width:'150px'}}>Derecha</div>
-              <div className="text-center font-bold" style={{width:'150px'}}>Izquierda</div>
+              <div className="text-center font-bold" style={{ width: "150px" }}>
+                Derecha
+              </div>
+              <div className="text-center font-bold" style={{ width: "150px" }}>
+                Izquierda
+              </div>
             </div>
             {[
-              'Umbral de discriminación',
-              '% de discriminación',
-              'Umbral de Confort MCL',
-              'Umbral de Disconfort UCL',
+              "Umbral de discriminación",
+              "% de discriminación",
+              "Umbral de Confort MCL",
+              "Umbral de Disconfort UCL",
             ].map((label, idx) => (
-              <div className="grid grid-cols-3 gap-2 items-center mb-1" key={label}>
-                <div className="text-left" style={{width:'120px'}}>{label}</div>
-                <input className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]" style={{fontSize:'12px'}} />
-                <input className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]" style={{fontSize:'12px'}} />
+              <div
+                className="grid grid-cols-3 gap-2 items-center mb-1"
+                key={label}
+              >
+                <div className="text-left" style={{ width: "120px" }}>
+                  {label}
+                </div>
+                <input
+                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]"
+                  style={{ fontSize: "12px" }}
+                />
+                <input
+                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white w-full max-w-[150px]"
+                  style={{ fontSize: "12px" }}
+                />
               </div>
             ))}
           </fieldset>
           {/* Imprimir Audiológica */}
           <fieldset className="border rounded p-3 min-w-0">
-            <legend className="font-bold" style={{fontSize:'12px'}}>Imprimir Audiologica</legend>
+            <legend className="font-bold" style={{ fontSize: "12px" }}>
+              Imprimir Audiologica
+            </legend>
             <div className="flex items-center gap-2">
-              <label className="font-bold min-w-[90px]" style={{ fontSize: '12px' }}>N° :</label>
+              <label
+                className="font-bold min-w-[90px]"
+                style={{ fontSize: "12px" }}
+              >
+                N° :
+              </label>
               <input
                 className="border rounded-lg px-3 py-2 bg-gray-100"
-                style={{ fontSize: '12px', width: '100px', color: '#222', fontWeight: 'bold', outline: 'none' }}
+                style={{
+                  fontSize: "12px",
+                  width: "100px",
+                  color: "#222",
+                  fontWeight: "bold",
+                  outline: "none",
+                }}
               />
               <button
                 type="button"
                 className="ml-2 px-4 py-2.5 rounded-lg border-none bg-[#2664eb] transition text-white flex items-center justify-center"
                 title="Imprimir Audiológica"
                 onClick={handlePrint}
-                style={{ fontSize: '12px' }}
+                style={{ fontSize: "12px" }}
               >
-                <FontAwesomeIcon icon={faPrint} style={{ color: '#fff', fontSize: '12px' }} />
+                <FontAwesomeIcon
+                  icon={faPrint}
+                  style={{ color: "#fff", fontSize: "12px" }}
+                />
               </button>
             </div>
           </fieldset>
@@ -422,4 +754,4 @@ const AudiometriaFichaAudiologica = () => {
   );
 };
 
-export default AudiometriaFichaAudiologica; 
+export default AudiometriaFichaAudiologica;
