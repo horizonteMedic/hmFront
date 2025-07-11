@@ -208,26 +208,28 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
 
     const colW = blockW / 3;
     // Línea horizontal debajo de la declaración SOLO hasta la división de la última columna
-    doc.line(blockX, blockY + blockH1, blockX + 2 * colW, blockY + blockH1);
+    doc.line(blockX, blockY + blockH1-5, blockX + 2 * colW, blockY + blockH1-5);
     // Línea horizontal bajo firmas (toda la tabla)
     doc.line(blockX, blockY + blockH1 + blockH2, blockX + blockW, blockY + blockH1 + blockH2);
     // Línea vertical de la última columna (desde el borde superior del recuadro exterior)
-    doc.line(blockX + 2 * colW, y, blockX + 2 * colW, blockY + blockH1 + blockH2 + blockH3);
+    doc.line(blockX + 2 * colW, blockY-2, blockX + 2 * colW, blockY + blockH1 + blockH2 + blockH3); 
+    //linea vertical parte firmas
+    doc.line(blockX + 2 * colW-60, blockY+5, blockX + 2 * colW-60, blockY + blockH1 + blockH2 + blockH3);  
 
     // Declaración: columna 1, alineado a la izquierda
     doc.setFontSize(8).setFont('helvetica', 'normal');
-    doc.text('Declaro que las respuestas son ciertas según mi leal saber y entender', blockX + 5, blockY + blockH1 / 2 + 2);
+    doc.text('Declaro que las respuestas son ciertas según mi leal saber y entender', blockX + 5, blockY + blockH1 / 2 -2.7);
 
     // Fila 2: Firma trabajador (columna 1), columna 2 vacía
-    doc.text('Firma del trabajador o postulante', blockX + 5, blockY + blockH1 + blockH2 / 2 + 2);
+    doc.text('Firma del trabajador o postulante', blockX + 14, blockY + blockH1 + blockH2 / 2 + 4);
 
     // Fila 3: tres columnas, alineaciones distintas
     const dni = datos.dni || '70101010';
     doc.setFont('helvetica', 'bold');
-    doc.text(`DNI ${dni}`, blockX + 5, blockY + blockH1 + blockH2 + blockH3 / 2 + 2, { align: 'left' });
+    doc.text(`DNI ${dni}`, blockX + 25, blockY + blockH1 + blockH2 + blockH3 / 2 +1, { align: 'left' });
     doc.setFont('helvetica', 'normal');
-    doc.text('Índice Derecho', blockX + colW + colW / 2, blockY + blockH1 + blockH2 + blockH3 / 2 + 2, { align: 'center' });
-    doc.text('Firma Responsable', blockX + 2 * colW + colW / 2, blockY + blockH1 + blockH2 + blockH3 / 2 + 2, { align: 'center' });
+    doc.text('Índice Derecho', blockX + colW + colW / 2, blockY + blockH1 + blockH2 + blockH3 / 2 + 1, { align: 'center' });
+    doc.text('Firma Responsable', blockX + 2 * colW + colW / 2, blockY + blockH1 + blockH2 + blockH3 / 2 + 1, { align: 'center' });
     // --- FIN BLOQUE ---
 
     // 5) Inserción de imágenes de firma/huella/sello
