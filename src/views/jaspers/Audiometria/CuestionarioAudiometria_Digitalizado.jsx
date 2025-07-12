@@ -129,6 +129,56 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       lines.forEach((ln, i) => {
         doc.text(ln, tableX + 2, tableY + paddingTop + lineHTable - 1.2 + i * lineHTable);
       });
+      let nuevoYParaTexto=tableY + paddingTop + lineHTable - 1.2;
+      switch(p.numero){
+        case 1:
+          nuevoYParaTexto += 25; // Ajuste para la pregunta 1
+          doc.text(datos?.txtrcual1||"", tableX + 2, nuevoYParaTexto) 
+          doc.text(datos?.txtrcuando1||"", tableX + 67, nuevoYParaTexto) 
+          doc.text(datos?.txtrque1||"", tableX + 132, nuevoYParaTexto) 
+          break;
+        case 9:  
+          nuevoYParaTexto += 5; // Ajuste para la pregunta 9 
+          doc.text(datos?.txtrcual9||"", tableX + 2, nuevoYParaTexto) 
+          doc.text(datos?.txtrdonde9||"", tableX + 67, nuevoYParaTexto) 
+          doc.text(datos?.txtrque9||"", tableX + 132, nuevoYParaTexto) 
+          break;
+        case 10: 
+          nuevoYParaTexto += 5; // Ajuste para la pregunta 10
+          doc.text(datos?.txtrcual10||"", tableX + 2, nuevoYParaTexto) 
+          doc.text(datos?.txtrdonde10||"", tableX + 67, nuevoYParaTexto) 
+          doc.text(datos?.txtrque10||"", tableX + 132, nuevoYParaTexto) 
+          break;
+        case 11:    
+          nuevoYParaTexto += 10; // Ajuste para la pregunta 11
+          doc.text(datos?.txtrcual11||"", tableX + 2, nuevoYParaTexto)
+          doc.text(datos?.txtrcuanto11||"", tableX + 97, nuevoYParaTexto)
+          break;
+        case 12: 
+          nuevoYParaTexto += 10; // Ajuste para la pregunta 12
+          doc.text(datos?.txtrcual12||"", tableX + 2, nuevoYParaTexto)
+          doc.text(datos?.txtrcuanto12||"", tableX + 97, nuevoYParaTexto)
+          break;
+        case 13: 
+          nuevoYParaTexto += 5; // Ajuste para la pregunta 13
+          doc.text(datos?.txtrcuanto13||"", tableX + 2, nuevoYParaTexto) 
+          doc.text(datos?.txtrcuando13||"", tableX + 67, nuevoYParaTexto) 
+          doc.text(datos?.txtrdonde13||"", tableX + 132, nuevoYParaTexto) 
+          break;
+        case 14: 
+          nuevoYParaTexto += 10; // Ajuste para la pregunta 14
+          doc.text(datos?.txtrcual14||"", tableX + 2, nuevoYParaTexto) 
+          doc.text(datos?.txtrdonde14||"", tableX + 67, nuevoYParaTexto) 
+          doc.text(datos?.txtrque14||"", tableX + 132, nuevoYParaTexto) 
+          break;
+        case 15: 
+          nuevoYParaTexto += 5; // Ajuste para la pregunta 15
+          doc.text(datos?.txtrcuantos15||"", tableX + 2, nuevoYParaTexto) 
+          break;
+      }
+
+
+      
 
       // casillas
       const siX = tableX + colPreguntaW + (colSiW - boxSize) / 2;
@@ -136,8 +186,8 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       const boxY = tableY + paddingTop + contentH / 2 - boxSize / 2;
       doc.rect(siX, boxY, boxSize, boxSize);
       doc.rect(noX, boxY, boxSize, boxSize);
-      if (resp === "SI") doc.text("X", siX + boxSize / 2, boxY + boxSize / 2 + 1.2, { align: "center" });
-      else if (resp === "NO") doc.text("X", noX + boxSize / 2, boxY + boxSize / 2 + 1.2, { align: "center" });
+      if (datos[`chksi${p.numero}`]) doc.text("X", siX + boxSize / 2, boxY + boxSize / 2 + 1.2, { align: "center" });
+      else doc.text("X", noX + boxSize / 2, boxY + boxSize / 2 + 1.2, { align: "center" });
 
       tableY += rowH;
       doc.line(tableX, tableY, tableX + colPreguntaW + colSiW + colNoW, tableY);
@@ -148,8 +198,8 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     const lbl16 = "16.- ¿Ha realizado actividades de?";
     doc.text(lbl16, tableX + 2, tableY + lineHTable - 1.2);
-    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW / 2, tableY + lineHTable - 1.2, { align: "center" });
-    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW + colSiW + colNoW - 2, tableY + lineHTable - 1.2, { align: "right" });
+    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW / 2-12, tableY + lineHTable - 1.2, { align: "center" });
+    doc.text("¿Cuánto tiempo?", tableX + colPreguntaW + colSiW + colNoW - 2-20, tableY + lineHTable - 1.2, { align: "right" });
     tableY += lineHTable;
     // Quitar la línea horizontal debajo del encabezado de la 16
     // doc.line(tableX, tableY, tableX + colPreguntaW + colSiW + colNoW, tableY);
@@ -187,13 +237,13 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       } else {
         doc.text(left16[i].label, tableX + 2 + boxSize + 4, rowY + 2 + 3.5);
       }
-      doc.text(datos[left16[i].tiempo] || "", tableX + colPreguntaW / 2, rowY + 2 + 3.5, { align: "center" });
+      doc.text(datos[left16[i].tiempo] || "", tableX + colPreguntaW / 2-18, rowY + 2 + 3.5, { align: "center" });
       // derecha alineada verticalmente con la izquierda
       const rightY = (i === 2) ? rowY + 2 + lineHTable / 2 : rowY + 2;
       doc.rect(tableX + colPreguntaW / 2 + colSiW + 10, rightY, boxSize, boxSize);
       doc.text(datos[right16[i].key] ? "X" : "", tableX + colPreguntaW / 2 + colSiW + 11.5, rightY + 3.5);
       doc.text(right16[i].label, tableX + colPreguntaW / 2 + colSiW + 10 + boxSize + 4, rightY + 3.5, { maxWidth: colPreguntaW / 2 - boxSize - 10 });
-      doc.text(datos[right16[i].tiempo] || "", tableX + colPreguntaW + colSiW + colNoW / 2, rightY + 3.5, { align: "center" });
+      doc.text(datos[right16[i].tiempo] || "", tableX + colPreguntaW + colSiW + colNoW / 2-40, rightY + 3.5, { align: "center" });
       rowY += rowH16sContent[i];
     }
     tableY = rowY;
@@ -233,11 +283,11 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     // --- FIN BLOQUE ---
 
     // 5) Inserción de imágenes de firma/huella/sello
-    const placeImage = (img, xOffset) => {
-      const sigW = xOffset === 0 ? 60 : 100;
+    const placeImage = (img, xOffset, yOffset) => {
+      const sigW = 100;
       const sigH = 35;
       const baseX = (pageW - 160) / 2 + xOffset;
-      const baseY = y + 40;
+      const baseY = y + 40 + yOffset;
       const maxW = sigW - 10;
       const maxH = sigH - 10;
       let imgW = img.width;
@@ -256,9 +306,9 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       doc.addImage(data, "PNG", imgX, imgY, imgW, imgH);
     };
 
-    if (s1) placeImage(s1, 0);
-    if (s2) placeImage(s2, 20);
-    if (s3) placeImage(s3, 80);
+    if (s1) placeImage(s1, -32, 158);
+    if (s2) placeImage(s2, 31, 158);
+    if (s3) placeImage(s3, 98, 158);
 
     // 6) Footer e impresión
    
