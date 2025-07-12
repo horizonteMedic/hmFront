@@ -123,6 +123,19 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
     let y = 53;
     autoTable(doc, {
       startY: y,
+        margin: { top: y, left: 3, right: 3 }, // MÁRGENES PERSONALIZADOS
+        columnStyles: {
+          0: { cellWidth: 15 }, // Fecha
+          1: { cellWidth: 35 }, // Empresa
+          2: { cellWidth: 15 }, // Altitud
+          3: { cellWidth: 25 }, // Actividad
+          4: { cellWidth: 30 }, // Área de Trabajo
+          5: { cellWidth: 25 }, // Ocupación
+          6: { cellWidth: 15 }, // Subsuelo
+          7: { cellWidth: 15 }, // Superficie
+          8: { cellWidth: 49 }, // Peligros
+          9: { cellWidth: 49 }, // EPP
+        },
       head: [
         [
           { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
@@ -141,16 +154,16 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
         ]
       ],
       body: tabla?.map(d => [
-        d.fecha || '',
-        d.empresa || '',
-        d.altitud || '',
-        d.actividad || '',
-        d.areaEmpresa || '',
-        d.ocupacion || '',
-        d.socavon || '',
-        d.superficie || '',
-        d.riesgo || '',
-        d.proteccion || ''
+        d.fecha.toUpperCase() || '',
+        d.empresa.toUpperCase() || '',
+        d.altitud.toUpperCase() || '',
+        d.actividad.toUpperCase() || '',
+        d.areaEmpresa.toUpperCase() || '',
+        d.ocupacion.toUpperCase() || '',
+        d.socavon.toUpperCase() || '',
+        d.superficie.toUpperCase() || '',
+        d.riesgo.toUpperCase() || '',
+        d.proteccion.toUpperCase() || ''
       ]),
       theme: "grid",
       styles: {
@@ -168,20 +181,32 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
         lineWidth: 0.1,
         lineColor: [0, 0, 0],
       },
+      didDrawPage: (data) => {
+    // Agrega el header personalizado en cada página
+    header_HistoriaOcupacional(doc, datos);
+
+    // Modifica el startY si estás en una nueva página
+    if (data.pageNumber > 1) {
+      data.settings.margin.top = 53;
+    }
+  },
     });
 
     let finalY = doc.lastAutoTable.finalY; // ✅ usar let en vez de const
-const signatureBlockHeight = 40; // espacio estimado total (firma + texto + margen)
-const spacingAfterTable = 5;
+const signatureBlockHeight = 50; // espacio estimado total (firma + texto + margen)
+const spacingAfterTable = 1;
 const totalRequired = spacingAfterTable + signatureBlockHeight;
 
 const pageHeight = doc.internal.pageSize.getHeight();
 
 // Si no cabe el bloque de firmas, agrega página antes de imprimirlas
 if ((pageHeight - finalY) < totalRequired) {
-  doc.addPage();
-  const newY = 20;  // o el valor que uses para nuevo contenido
-  finalY = newY;    // ✅ se puede reasignar porque es let
+  doc.addPage(); // 🟡 CREA LA NUEVA HOJA
+
+  header_HistoriaOcupacional(doc, datos); // 🔵 REDIBUJA EL HEADER EN LA NUEVA HOJA
+
+  const newY = 53; // 👈 Usa 53 para mantener consistencia con el resto del documento
+  finalY = newY;   // ✅ Ajusta para que la firma comience debajo del header
 }
 
 const signatureTop = finalY + spacingAfterTable;
