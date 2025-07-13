@@ -101,7 +101,8 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
 ]
   }
   // === HEADER ===
-  header_HistoriaOcupacional_Boro(doc, datos);
+  // header_HistoriaOcupacional_Boro(doc, datos);
+  header_HistoriaOcupacional(doc, datos);
   const firmap = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
   const huellap = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
   const sellofirma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
@@ -139,19 +140,19 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         },
       head: [
         [
-          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220],} },
+          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
         ],
         [
-          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
         ]
       ],
       body: tabla?.map(d => [

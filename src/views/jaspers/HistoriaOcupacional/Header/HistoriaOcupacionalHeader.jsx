@@ -1,3 +1,4 @@
+import footerEnHeader from "../footerEnHeader";
 
 /**
  * Formatea una fecha en formato "13 diciembre 2024".
@@ -98,24 +99,28 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   //DATOS DEBAJO DE NORDEN
   doc.text("Sede: ", nroOrdenX - 40, nroOrdenY +10)
   doc.text("Sexo: ", nroOrdenX + 25, nroOrdenY +18)
+  doc.setFont('helvetica', 'normal');
   doc.text(`${datos.sexo === 'F' ? 'FEMENINO' : datos.sexo === 'M' ? 'MASCULINO' : ''}`, nroOrdenX + 35, nroOrdenY +18)
-
+  doc.setFont('helvetica', 'bold');
   doc.text("Fecha de Nacimiento: ", nroOrdenX - 60, nroOrdenY + 18)
+  doc.setFont('helvetica', 'normal');
   doc.text(datos.fechaNac, nroOrdenX - 30, nroOrdenY + 18)
-
+  doc.setFont('helvetica', 'bold');
   const lugarLabel = "Lugar de Procedencia: ";
   const lugarTexto = datos.lugarProcedimiento || "";
   const maxWidth = 90; // ajusta según tu diseño
 
   // Imprimir etiqueta (fija)
+  
   doc.text(lugarLabel, nroOrdenX - 80, nroOrdenY + 24);
 
   // Imprimir contenido (ajustado al ancho)
+    doc.setFont('helvetica', 'normal');
   doc.text(lugarTexto, nroOrdenX - 44, nroOrdenY + 24, {
     maxWidth: maxWidth,
   });
 
-  doc.setFontSize(10).setFont('helvetica', 'normal');
+
 
   const sedeText = (datos.sede || '').toUpperCase();
   const sedeWidth = doc.getTextWidth(sedeText);
@@ -145,6 +150,8 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   drawPatientDataRow("Telefono :", datos.celularPaciente || '');
   doc.setFontSize(11).setFont('helvetica', 'bold');
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
+
+  footerEnHeader(doc, datos);
 };
 
 export default header_HistoriaOcupacional; 

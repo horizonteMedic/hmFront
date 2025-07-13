@@ -1,7 +1,7 @@
 // src/views/jaspers/Microbiologia/InmunologiaAglutinacion_Digitalizado.jsx
 import jsPDF from "jspdf";
 import header_HistoriaOcupacional from "./Header/HistoriaOcupacionalHeader";
-import footer from "../components/footer";
+import footerEnHeader from "./footerEnHeader";
 import autoTable from "jspdf-autotable";
 // --- Configuración Centralizada (Estándar) ---
 const config = {
@@ -138,19 +138,19 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
         },
       head: [
         [
-          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Fecha', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Empresa', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Altitud', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Actividad', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Área de Trabajo', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Ocupación', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
+          { content: 'Tiempo de labor', colSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Peligros/Agentes Ocupacionales', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Uso EPP Tipo EPP', rowSpan: 2, styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
         ],
         [
-          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold' } },
-          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' } },
+          { content: 'Subsuelo', styles: { halign: 'center', fontStyle: 'bold',fillColor: [220, 220, 220], } },
+          { content: 'Superficie', styles: { halign: 'center', fontStyle: 'bold' ,fillColor: [220, 220, 220],} },
         ]
       ],
       body: tabla?.map(d => [
@@ -343,6 +343,7 @@ const signatureTop = finalY + spacingAfterTable;
     }
 
     // === FOOTER ===
+    // footerEnHeader(doc, datos);
 
     // === IMPRIMIR ===
     const blob = doc.output("blob");
