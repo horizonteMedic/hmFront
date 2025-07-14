@@ -3,35 +3,83 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 
+const tabla = "ficha_audiologica";
+
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
+const initialFormState = {
+  norden: "",
+  fecha: today,
+  tipoExamen: "",
+  noExamen: false,
+
+  nombres: "",
+  edad: "",
+  bellPlus: false,
+
+  sexo: "",
+  aniosTrabajo: "",
+  mesesTrabajo: "",
+
+  ocupacion: "",
+  otoscopia: "",
+
+  empresa: "",
+  contrata: "",
+
+  marca: "AMPLIVOX",
+  modelo: "AMPLIVOX 270",
+  calibracion: today,
+  tiempoExposicion: "",
+  // h_d: false,
+  // min_d: false,
+  tapones: false,
+  orejeras: false,
+  apreciacion_ruido: "RUIDO NO MOLESTO",
+
+  consumo_tabaco: "NO",
+  servicio_militar: "NO",
+  hobbies_ruido: "NO",
+  exposicion_quimicos: "NO",
+  infeccion_oido: "NO",
+  uso_ototoxicos: "NO",
+
+  disminucion_audicion: "NO",
+  dolor_oidos: "NO",
+  zumbido: "NO",
+  mareos: "NO",
+  infeccion_oido_actual: "NO",
+  otro: "NO",
+
+  nombre_profecional: "",
+  conclusiones: "",
+  nombre_medico: "",
+
+  od_250: "",
+  od_500: "",
+  od_1000: "",
+
+  oi_250: "",
+  oi_500: "",
+  oi_1000: "",
+
+  d_umbral_discriminacion: "",
+  d_porcentaje: "",
+  d_umbral_confort: "",
+  d_umbral_disconfort: "",
+
+  i_umbral_discriminacion: "",
+  i_porcentaje: "",
+  i_umbral_confort: "",
+  i_umbral_disconfort: "",
+};
+
 const AudiometriaFichaAudiologica = () => {
-  // Estado para los datos del formulario (antes era data fijo)
-  const [form, setForm] = useState({
-    norden: "12345",
-    fecha: "2024-06-01",
-    tipoExamen: "Preocupacional",
-    noExamen: false,
-
-    nombres: "Juan Pérez García",
-    edad: "35",
-    bellPlus: false,
-
-    sexo: "Masculino",
-    ocupacion: "Operario",
-    aniosTrabajo: "5",
-    mesesTrabajo: "3",
-
-    empresaContratista: "Contratista SAC",
-    otoscopia: "Normal",
-
-    empresa: "Empresa Principal S.A.",
-
-    audiometroMarca: "AMPLIVOX",
-    audiometroModelo: "AMPLIVOX 270",
-    audiometroCalibracion: "2024-01-15",
-    tiempoExposicion: "",
-    h_d: false,
-    min_d: false,
-  });
+  const [form, setForm] = useState(initialFormState);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,68 +102,27 @@ const AudiometriaFichaAudiologica = () => {
       [name]: !f[name],
     }));
   };
-  //===================================0
-
-  // Helpers para parsear y actualizar el input inteligentemente
-  const parseExposicion = (input) => {
-    // Devuelve { hd: '', min: '' }
-    const hdMatch = input.match(/(\d+)\s*H\/D/i);
-    const minMatch = input.match(/(\d+)\s*MIN\/D/i);
-    return {
-      hd: hdMatch ? hdMatch[1] : "",
-      min: minMatch ? minMatch[1] : "",
-    };
-  };
-
-  const buildExposicion = (hd, min, h_d, min_d) => {
-    let parts = [];
-    if (h_d && hd) parts.push(`${hd} H/D`);
-    if (min_d && min) parts.push(`${min} MIN/D`);
-    return parts.join(" ");
-  };
-
-  // Cuando el usuario marca/desmarca H/D
-  const handleCheckHD = (checked) => {
-    const { hd, min } = parseExposicion(form.tiempoExposicion);
-    let newHd = hd;
-    // Si no hay número para H/D, intenta tomar el primer número
-    if (checked && !hd) {
-      const firstNum = form.tiempoExposicion.match(/\d+/);
-      newHd = firstNum ? firstNum[0] : "";
-    }
+  const handleCheckRadio = (e, value) => {
+    const { name } = e.target;
+    console.log(name, value);
     setForm((f) => ({
       ...f,
-      h_d: checked,
-      tiempoExposicion: buildExposicion(
-        checked ? newHd : "",
-        min,
-        checked,
-        f.min_d
-      ),
+      [name]: f[name] === value.toUpperCase() ? "" : value.toUpperCase(),
     }));
   };
 
-  // Cuando el usuario marca/desmarca MIN/D
-  const handleCheckMinD = (checked) => {
-    const { hd, min } = parseExposicion(form.tiempoExposicion);
-    let newMin = min;
-    // Si no hay número para MIN/D, intenta tomar el segundo número
-    if (checked && !min) {
-      // Busca el segundo número
-      const nums = form.tiempoExposicion.match(/\d+/g);
-      newMin = nums && nums.length > 1 ? nums[1] : "";
-    }
+  const handleCheckRadioExposicion = (e, objetivo) => {
+    const { name } = e.target;
     setForm((f) => ({
       ...f,
-      min_d: checked,
-      tiempoExposicion: buildExposicion(
-        hd,
-        checked ? newMin : "",
-        f.h_d,
-        checked
-      ),
+      [name]: f[name].toUpperCase().includes(objetivo)
+        ? ""
+        : /\d/.test(f[name])
+        ? f[name] + " " + objetivo
+        : " " + objetivo,
     }));
   };
+  //===================================  Ficha Audiologica
 
   // Función para guardar (placeholder)
   const handleSave = () => {
@@ -216,7 +223,6 @@ const AudiometriaFichaAudiologica = () => {
               <input
                 name="tipoExamen"
                 value={form.tipoExamen}
-                onChange={handleChange}
                 disabled
                 className="border rounded px-2 py-1  text-[12px] w-full min-w-[120px]"
               />
@@ -226,7 +232,29 @@ const AudiometriaFichaAudiologica = () => {
                 type="checkbox"
                 name="noExamen"
                 checked={form.noExamen}
-                onChange={toggleCheckBox}
+                onChange={(e) => {
+                  const nuevoValor = !form.noExamen;
+                  if (nuevoValor) {
+                    setForm((prev) => ({
+                      ...prev,
+                      noExamen: nuevoValor,
+                      marca: "-",
+                      modelo: "-",
+                      calibracion: today,
+                      bellPlus: false,
+                    }));
+                  } else {
+                    console.log("fa");
+                    setForm((prev) => ({
+                      ...prev,
+                      noExamen: nuevoValor,
+                      marca: "AMPLIVOX",
+                      modelo: "AMPLIVOX 270",
+                      calibracion: today,
+                      bellPlus: false,
+                    }));
+                  }
+                }}
               />
               <span className="text-red-500 font-bold"> No Examen</span>
             </div>
@@ -261,7 +289,28 @@ const AudiometriaFichaAudiologica = () => {
                 name="bellPlus"
                 type="checkbox"
                 checked={form.bellPlus}
-                onChange={toggleCheckBox}
+                onChange={(e) => {
+                  const nuevoValor = !form.bellPlus;
+                  if (nuevoValor) {
+                    setForm((prev) => ({
+                      ...prev,
+                      bellPlus: nuevoValor,
+                      marca: "BELL INVENTS",
+                      modelo: "BELL PLUS",
+                      calibracion: today,
+                      noExamen: false,
+                    }));
+                  } else {
+                    setForm((prev) => ({
+                      ...prev,
+                      bellPlus: nuevoValor,
+                      marca: "AMPLIVOX",
+                      modelo: "AMPLIVOX 270",
+                      calibracion: today,
+                      noExamen: false,
+                    }));
+                  }
+                }}
               />
               <span className=" font-bold">BELL PLUS</span>
             </div>
@@ -369,36 +418,37 @@ const AudiometriaFichaAudiologica = () => {
             <legend className="font-bold text-[14px]">AUDIÓMETRO</legend>
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
-                <label className="font-bold text-[13px] min-w-[80px]">
+                <label className="font-bold text-[13px] min-w-[85px]">
                   Marca :
                 </label>
                 <input
-                  name="audiometroMarca"
-                  value={form.audiometroMarca}
+                  name="marca"
+                  value={form.marca}
                   disabled
                   className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label className="font-bold text-[13px] min-w-[80px]">
+                <label className="font-bold text-[13px] min-w-[85px]">
                   Modelo :
                 </label>
                 <input
-                  name="audiometroModelo"
-                  value={form.audiometroModelo}
+                  name="modelo"
+                  value={form.modelo}
                   disabled
                   className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label className="font-bold text-[13px] min-w-[80px]">
-                  Modelo :
+                <label className="font-bold text-[13px] min-w-[85px]">
+                  Calibración :
                 </label>
                 <input
-                  name="audiometroCalibracion"
-                  value={form.audiometroCalibracion}
-                  disabled
-                  className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
+                  type="date"
+                  name="calibracion"
+                  value={form.calibracion}
+                  onChange={handleChange}
+                  className="border  rounded px-2 py-1  text-[12px] w-full"
                 />
               </div>
             </div>
@@ -418,18 +468,24 @@ const AudiometriaFichaAudiologica = () => {
                 <label className="flex items-center gap-1">
                   <input
                     type="checkbox"
-                    checked={form.h_d}
-                    onChange={(e) => handleCheckHD(e.target.checked)}
+                    name="tiempoExposicion"
+                    checked={form.tiempoExposicion.includes("H/D")}
+                    onChange={(e) => {
+                      handleCheckRadioExposicion(e, "H/D");
+                    }}
                   />
-                  <span style={{ fontSize: "11px" }}>H/D</span>
+                  <span className="text-[11px]">H/D</span>
                 </label>
                 <label className="flex items-center gap-1">
                   <input
                     type="checkbox"
-                    checked={form.min_d}
-                    onChange={(e) => handleCheckMinD(e.target.checked)}
+                    name="tiempoExposicion"
+                    checked={form.tiempoExposicion.includes("MIN/D")}
+                    onChange={(e) => {
+                      handleCheckRadioExposicion(e, "MIN/D");
+                    }}
                   />
-                  <span style={{ fontSize: "11px" }}>MIN/D</span>
+                  <span className="text-[11px]">MIN/D</span>
                 </label>
               </div>
             </div>
@@ -449,10 +505,20 @@ const AudiometriaFichaAudiologica = () => {
                 </legend>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-1">
-                    <input type="checkbox" checked /> Tapones
+                    <input
+                      type="checkbox"
+                      name="tapones"
+                      onChange={toggleCheckBox}
+                    />
+                    Tapones
                   </label>
                   <label className="flex items-center gap-1">
-                    <input type="checkbox" /> Orejeras
+                    <input
+                      type="checkbox"
+                      name="orejeras"
+                      onChange={toggleCheckBox}
+                    />
+                    Orejeras
                   </label>
                 </div>
               </fieldset>
@@ -462,13 +528,31 @@ const AudiometriaFichaAudiologica = () => {
                 </legend>
                 <div className="flex items-center gap-4">
                   <label className="flex items-center gap-1">
-                    <input type="radio" /> Ruido muy intenso
+                    <input
+                      type="radio"
+                      name="apreciacion_ruido"
+                      checked={form.apreciacion_ruido === "RUIDO MUY INTENSO"}
+                      onChange={(e) => handleCheckRadio(e, "RUIDO MUY INTENSO")}
+                    />
+                    Ruido muy intenso
                   </label>
                   <label className="flex items-center gap-1">
-                    <input type="radio" checked /> Ruido moderado
+                    <input
+                      type="radio"
+                      name="apreciacion_ruido"
+                      checked={form.apreciacion_ruido === "RUIDO MODERADO"}
+                      onChange={(e) => handleCheckRadio(e, "RUIDO MODERADO")}
+                    />
+                    Ruido moderado
                   </label>
                   <label className="flex items-center gap-1">
-                    <input type="radio" /> Ruido no molesto
+                    <input
+                      type="radio"
+                      name="apreciacion_ruido"
+                      checked={form.apreciacion_ruido === "RUIDO NO MOLESTO"}
+                      onChange={(e) => handleCheckRadio(e, "RUIDO NO MOLESTO")}
+                    />
+                    Ruido no molesto
                   </label>
                 </div>
               </fieldset>
@@ -487,25 +571,38 @@ const AudiometriaFichaAudiologica = () => {
                   </thead>
                   <tbody>
                     {[
-                      "Consumo de tabaco",
-                      "Servicio Militar",
-                      "Hobbies con exposición a ruido",
-                      "Exposición laboral a químicos",
-                      "Infección al Oído",
-                      "Uso de Ototoxicos",
+                      { label: "Consumo de tabaco", name: "consumo_tabaco" },
+                      {
+                        label: "Servicio Militar",
+                        name: "servicio_militar",
+                      },
+                      {
+                        label: "Hobbies con exposición a ruido",
+                        name: "hobbies_ruido",
+                      },
+                      {
+                        label: "Exposición laboral a químicos",
+                        name: "exposicion_quimicos",
+                      },
+                      { label: "Infección al Oído", name: "infeccion_oido" },
+                      { label: "Uso de Ototoxicos", name: "uso_ototoxicos" },
                     ].map((item, idx) => (
                       <tr key={idx}>
-                        <td className="py-1 pr-2">{item}</td>
+                        <td className="py-1 pr-2">{item.label}</td>
                         <td className="text-center">
                           <input
-                            type="checkbox"
-                            name={`antecedente_si_${idx}`}
+                            type="radio"
+                            name={item.name}
+                            checked={form[item.name] === "SI"}
+                            onChange={(e) => handleCheckRadio(e, "SI")}
                           />
                         </td>
                         <td className="text-center">
                           <input
-                            type="checkbox"
-                            name={`antecedente_no_${idx}`}
+                            type="radio"
+                            name={item.name}
+                            checked={form[item.name] === "NO"}
+                            onChange={(e) => handleCheckRadio(e, "NO")}
                           />
                         </td>
                       </tr>
@@ -526,20 +623,36 @@ const AudiometriaFichaAudiologica = () => {
                   </thead>
                   <tbody>
                     {[
-                      "Disminución de la audición",
-                      "Dolor de Oídos",
-                      "Zumbido",
-                      "Mareos",
-                      "Infección al Oído",
-                      "Otra",
+                      {
+                        label: "Disminución de la audición",
+                        name: "disminucion_audicion",
+                      },
+                      { label: "Dolor de Oídos", name: "dolor_oidos" },
+                      { label: "Zumbido", name: "zumbido" },
+                      { label: "Mareos", name: "mareos" },
+                      {
+                        label: "Infección al Oído",
+                        name: "infeccion_oido_actual",
+                      },
+                      { label: "Otra", name: "otro" },
                     ].map((item, idx) => (
                       <tr key={idx}>
-                        <td className="py-1 pr-2">{item}</td>
+                        <td className="py-1 pr-2">{item.label}</td>
                         <td className="text-center">
-                          <input type="checkbox" name={`sintoma_si_${idx}`} />
+                          <input
+                            type="radio"
+                            name={item.name}
+                            checked={form[item.name] === "SI"}
+                            onChange={(e) => handleCheckRadio(e, "SI")}
+                          />
                         </td>
                         <td className="text-center">
-                          <input type="checkbox" name={`sintoma_no_${idx}`} />
+                          <input
+                            type="radio"
+                            name={item.name}
+                            checked={form[item.name] === "NO"}
+                            onChange={(e) => handleCheckRadio(e, "NO")}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -554,14 +667,18 @@ const AudiometriaFichaAudiologica = () => {
                   Nombre del profesional que realiza la audiometría :
                 </label>
                 <input
-                  value=""
+                  name="nombre_profecional"
+                  value={form.nombre_profecional}
+                  onChange={handleChange}
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
               <div className="flex items-center gap-2 mb-1">
                 <label className="w-[200px] text-[12px]">Conclusiones :</label>
                 <input
-                  value=""
+                  name="conclusiones"
+                  value={form.conclusiones}
+                  onChange={handleChange}
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
@@ -570,7 +687,9 @@ const AudiometriaFichaAudiologica = () => {
                   Nombre del Médico :
                 </label>
                 <input
-                  value=""
+                  name="nombre_medico"
+                  value={form.nombre_medico}
+                  onChange={handleChange}
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
@@ -625,7 +744,8 @@ const AudiometriaFichaAudiologica = () => {
                       <td className="text-center">
                         <input
                           type="text"
-                          name={`rinne_weber_od_${hz.key}`}
+                          name={`od_${hz.key}`}
+                          onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
                       </td>
@@ -633,7 +753,8 @@ const AudiometriaFichaAudiologica = () => {
                       <td className="text-center">
                         <input
                           type="text"
-                          name={`rinne_weber_oi_${hz.key}`}
+                          name={`oi_${hz.key}`}
+                          onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
                       </td>
@@ -656,24 +777,38 @@ const AudiometriaFichaAudiologica = () => {
                 </thead>
                 <tbody>
                   {[
-                    "Umbral de discriminación",
-                    "% de discriminación",
-                    "Umbral de Confort MCL",
-                    "Umbral de Disconfort UCL",
-                  ].map((label, idx) => (
+                    {
+                      label: "Umbral de discriminación",
+                      key: "umbral_discriminacion",
+                    },
+                    {
+                      label: "% de discriminación",
+                      key: "porcentaje",
+                    },
+                    {
+                      label: "Umbral de Confort MCL",
+                      key: "umbral_confort",
+                    },
+                    {
+                      label: "Umbral de Disconfort UCL",
+                      key: "umbral_disconfort",
+                    },
+                  ].map((item, idx) => (
                     <tr key={idx}>
-                      <td className="py-3 pr-2 pl-1">{label}</td>
+                      <td className="py-3 pr-2 pl-1">{item.label}</td>
                       <td className="text-center">
                         <input
                           type="text"
-                          name={`logoaudiometria_der_${idx}`}
+                          name={`d_${item.key}`}
+                          onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
                       </td>
                       <td className="text-center">
                         <input
                           type="text"
-                          name={`logoaudiometria_izq_${idx}`}
+                          name={`i_${item.key}`}
+                          onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
                       </td>
@@ -696,6 +831,9 @@ const AudiometriaFichaAudiologica = () => {
                 Nro Orden :
               </label>
               <input
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
                 className="border rounded-lg px-3 py-2 "
                 style={{
                   fontSize: "12px",

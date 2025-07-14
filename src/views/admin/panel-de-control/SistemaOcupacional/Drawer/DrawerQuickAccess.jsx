@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
@@ -11,10 +11,12 @@ const accesos = [
   { icon: faUserMd, label: 'Medicina General', key : "Medicina General" },
   { icon: faXRay, label: 'Rayos X', key : "Rayos X" },
   { icon: faHeartbeat, label: 'EKG', key : "EKG" },
+  { icon: faFileWaveform, label:"Historia Ocupacional", key:"Historia Ocupacional"},
   { icon: faLungs, label: 'Espirometría', key : "Espirometria" },
   { icon: faDeaf, label: 'Audiometría', key : "Audiometria" },
   { icon: faTooth, label: 'Odontología', key : "Odontologia" },
   { icon: faEye, label: 'Oftalmología', key : "Oftalmologia" },
+
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
