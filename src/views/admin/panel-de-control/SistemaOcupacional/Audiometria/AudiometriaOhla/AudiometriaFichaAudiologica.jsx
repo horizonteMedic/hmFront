@@ -11,75 +11,79 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialFormState = {
-  norden: "",
-  fecha: today,
-  tipoExamen: "",
-  noExamen: false,
+const AudiometriaFichaAudiologica = ({
+  token,
+  selectedSede,
+  userloguedCompleto,
+}) => {
+  const initialFormState = {
+    norden: "",
+    fecha: today,
+    tipoExamen: "",
+    noExamen: false,
 
-  nombres: "",
-  edad: "",
-  bellPlus: false,
+    nombres: "",
+    edad: "",
+    bellPlus: false,
 
-  sexo: "",
-  aniosTrabajo: "",
-  mesesTrabajo: "",
+    sexo: "",
+    aniosTrabajo: "",
+    mesesTrabajo: "",
 
-  ocupacion: "",
-  otoscopia: "",
+    ocupacion: "",
+    otoscopia: "",
 
-  empresa: "",
-  contrata: "",
+    empresa: "",
+    contrata: "",
 
-  marca: "AMPLIVOX",
-  modelo: "AMPLIVOX 270",
-  calibracion: today,
-  tiempoExposicion: "",
-  // h_d: false,
-  // min_d: false,
-  tapones: false,
-  orejeras: false,
-  apreciacion_ruido: "RUIDO NO MOLESTO",
+    marca: "AMPLIVOX",
+    modelo: "AMPLIVOX 270",
+    calibracion: today,
+    tiempoExposicion: "",
+    // h_d: false,
+    // min_d: false,
+    tapones: false,
+    orejeras: false,
+    apreciacion_ruido: "RUIDO NO MOLESTO",
 
-  consumo_tabaco: "NO",
-  servicio_militar: "NO",
-  hobbies_ruido: "NO",
-  exposicion_quimicos: "NO",
-  infeccion_oido: "NO",
-  uso_ototoxicos: "NO",
+    consumo_tabaco: "NO",
+    servicio_militar: "NO",
+    hobbies_ruido: "NO",
+    exposicion_quimicos: "NO",
+    infeccion_oido: "NO",
+    uso_ototoxicos: "NO",
 
-  disminucion_audicion: "NO",
-  dolor_oidos: "NO",
-  zumbido: "NO",
-  mareos: "NO",
-  infeccion_oido_actual: "NO",
-  otro: "NO",
+    disminucion_audicion: "NO",
+    dolor_oidos: "NO",
+    zumbido: "NO",
+    mareos: "NO",
+    infeccion_oido_actual: "NO",
+    otro: "NO",
 
-  nombre_profecional: "",
-  conclusiones: "",
-  nombre_medico: "",
+    nombre_profecional: userloguedCompleto?.datos?.nombres_user || "",
+    conclusiones: "",
+    nombre_medico: "",
 
-  od_250: "",
-  od_500: "",
-  od_1000: "",
+    od_250: "",
+    od_500: "",
+    od_1000: "",
 
-  oi_250: "",
-  oi_500: "",
-  oi_1000: "",
+    oi_250: "",
+    oi_500: "",
+    oi_1000: "",
 
-  d_umbral_discriminacion: "",
-  d_porcentaje: "",
-  d_umbral_confort: "",
-  d_umbral_disconfort: "",
+    d_umbral_discriminacion: "",
+    d_porcentaje: "",
+    d_umbral_confort: "",
+    d_umbral_disconfort: "",
 
-  i_umbral_discriminacion: "",
-  i_porcentaje: "",
-  i_umbral_confort: "",
-  i_umbral_disconfort: "",
-};
-
-const AudiometriaFichaAudiologica = () => {
+    i_umbral_discriminacion: "",
+    i_porcentaje: "",
+    i_umbral_confort: "",
+    i_umbral_disconfort: "",
+  };
   const [form, setForm] = useState(initialFormState);
+  console.log("userLogued completo", userloguedCompleto);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -669,7 +673,7 @@ const AudiometriaFichaAudiologica = () => {
                 <input
                   name="nombre_profecional"
                   value={form.nombre_profecional}
-                  onChange={handleChange}
+                  disabled
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>

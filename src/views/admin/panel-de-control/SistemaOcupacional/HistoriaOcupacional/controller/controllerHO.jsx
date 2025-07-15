@@ -158,8 +158,8 @@ export const handleSearch = (e,setSearch,change,setFiltered,list) => {
 };
 
 export const handleSelect = (e,name,value,setSearch,change,setFiltered) => {
-  console.log(value)
-  setSearch(value);
-  change(name, value);
+  console.log(value.toUpperCase())
+  setSearch(value.toUpperCase());
+  change(name, value.toUpperCase());
   setFiltered([]);
 };

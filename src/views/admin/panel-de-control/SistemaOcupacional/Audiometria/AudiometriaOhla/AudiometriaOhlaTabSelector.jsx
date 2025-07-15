@@ -9,8 +9,8 @@ const AudiometriaOhlaTabSelector = ({ token, selectedSede, userlogued }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { label: 'Audiometría Ohla', icon: faHeadphones, component: <AudiometriaOhla token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Ficha Audiológica', icon: faFileAlt, component: <AudiometriaFichaAudiologica /> },
+    { label: 'Audiometría Ohla', icon: faHeadphones, component: <AudiometriaOhla token={token} selectedSede={selectedSede} userlogued={userlogued.sub} /> },
+    { label: 'Ficha Audiológica', icon: faFileAlt, component: <AudiometriaFichaAudiologica token={token} selectedSede={selectedSede} userloguedCompleto={userlogued}/> },
    ];
 
   return (

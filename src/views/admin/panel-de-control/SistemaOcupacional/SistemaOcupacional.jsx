@@ -880,7 +880,7 @@ const TabComponent = () => {
                   {subTab === 1 && (
                     <AudiometriaOhlaTabSelector
                       token={token}
-                      userlogued={userlogued.sub}
+                      userlogued={userlogued}
                       selectedSede={selectSede}
                     />
                   )}

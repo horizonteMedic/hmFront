@@ -89,6 +89,11 @@ const riesgosOptions = [
     mensaje:
       "MOV. Y POSICIONES DISERGONOMICAS,QUEMADURAS,CORTES,DESCARGAS ELECTRICAS,RUIDO",
   },
+  {
+    id: 13,
+    title: "RIESGO ADMINISTRATIVO",
+    mensaje: "MOV. Y POSICIONES DISERGONOMICAS",
+  },
 ];
 const proteccionOptions = [
   {
@@ -101,12 +106,12 @@ const proteccionOptions = [
   {
     id: 4,
     mensaje:
-      'EPPS BASICOS : CASCO, LENTES, GUANTES,OVERAL,ZAPATOS DE SEGURIDAD',
+      "EPPS BASICOS : CASCO, LENTES, GUANTES,OVERAL,ZAPATOS DE SEGURIDAD",
   },
   {
     id: 5,
     mensaje:
-      'EPPS COMPLETO : CASCO, LENTES, GUANTES,TAPONES AUDITIVOS,RESPIRADOR, OREJERAS,ZAPATOS DE SEGURIDAD',
+      "EPPS COMPLETO : CASCO, LENTES, GUANTES,TAPONES AUDITIVOS,RESPIRADOR, OREJERAS,ZAPATOS DE SEGURIDAD",
   },
   { id: 6, mensaje: "NINGUNO" },
 ];
@@ -247,6 +252,8 @@ const HistoriaOcupacional = ({
     setSearchEmpresa("");
     setSearchCargoOcupacion("");
     setSearchAltitud("");
+    setSearchRiesgo("");
+    setSearchProt("");
     setSearchArea("");
   };
 
@@ -254,6 +261,7 @@ const HistoriaOcupacional = ({
     setForm((f) => ({
       ...f,
       nombres: "",
+      areaO: "",
       fecha: today,
     }));
     setRegistros([]);
@@ -372,7 +380,8 @@ const HistoriaOcupacional = ({
               value={form.areaO}
               name="areaO"
               autoComplete="off"
-              onChange={handleInputChange}
+              // onChange={handleInputChange}
+              disabled
               className={styles.inputXLarge}
               style={{ fontSize: 13, color: "#000" }}
             />
@@ -420,7 +429,9 @@ const HistoriaOcupacional = ({
               <td>
                 <AutoResizeInput
                   value={rowData.fecha}
-                  onChange={(e) => handleRowChange("fecha", e.target.value)}
+                  onChange={(e) =>
+                    handleRowChange("fecha", e.target.value.toUpperCase())
+                  }
                 />
               </td>
               <td>
@@ -432,7 +443,7 @@ const HistoriaOcupacional = ({
                   <div className="flex flex-col items-center justify-center">
                     <textarea
                       autoComplete="off"
-                      rows={1}
+                      rows={5}
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchEmpresa}
                       name="empresa"
@@ -473,7 +484,7 @@ const HistoriaOcupacional = ({
                           <li
                             key={opt.id}
                             className="cursor-pointer px-3 py-2 hover:bg-gray-100 text-lg font-bold"
-                            onMouseDown={(e) =>
+                            onMouseDown={(e) => {
                               handleSelect(
                                 e,
                                 "empresa",
@@ -481,8 +492,9 @@ const HistoriaOcupacional = ({
                                 setSearchEmpresa,
                                 handleRowChange,
                                 setFilteredEmpresa
-                              )
-                            }
+                              );
+                              document.getElementById("altitud")?.focus();
+                            }}
                           >
                             {opt.mensaje}
                           </li>
@@ -502,7 +514,7 @@ const HistoriaOcupacional = ({
                     <textarea
                       type="text"
                       id="altitud"
-                      rows={1}
+                      rows={5}
                       autoComplete="off"
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchAltitud}
@@ -584,7 +596,7 @@ const HistoriaOcupacional = ({
                       type="text"
                       id="areaEmpresa"
                       autoComplete="off"
-                      rows={1}
+                      rows={5}
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchArea}
                       name="areaEmpresa"
@@ -650,7 +662,7 @@ const HistoriaOcupacional = ({
                   <div className="flex flex-col items-center justify-center">
                     <textarea
                       autoComplete="off"
-                      rows={1}
+                      rows={5}
                       className={`resize-none overflow-hidden w-full bg-transparent outline-none `}
                       value={searchCargoOcupacion}
                       name="ocupacion"
@@ -717,14 +729,16 @@ const HistoriaOcupacional = ({
               <td>
                 <AutoResizeInput
                   value={rowData.socavon}
-                  onChange={(e) => handleRowChange("socavon", e.target.value)}
+                  onChange={(e) =>
+                    handleRowChange("socavon", e.target.value.toUpperCase())
+                  }
                 />
               </td>
               <td>
                 <AutoResizeInput
                   value={rowData.superficie}
                   onChange={(e) =>
-                    handleRowChange("superficie", e.target.value)
+                    handleRowChange("superficie", e.target.value.toUpperCase())
                   }
                 />
               </td>
@@ -733,7 +747,7 @@ const HistoriaOcupacional = ({
                   value={rowData.riesgo}
                   onChange={(e) => {
                     setSearchRiesgo(e.target.value);
-                    handleRowChange("riesgo", e.target.value);
+                    handleRowChange("riesgo", e.target.value.toUpperCase());
                   }}
                 />
               </td>
@@ -742,7 +756,7 @@ const HistoriaOcupacional = ({
                   value={rowData.proteccion}
                   onChange={(e) => {
                     setSearchProt(e.target.value);
-                    handleRowChange("proteccion", e.target.value);
+                    handleRowChange("proteccion", e.target.value.toUpperCase());
                   }}
                 />
               </td>
@@ -914,14 +928,15 @@ const HistoriaOcupacional = ({
           </div>
         </div> */}
         {/*RIESGOS */}
-        <div className="relative">
+        <div className="relative flex-1">
           <div className="flex flex-col items-center justify-center">
             <label htmlFor="">Riesgos</label>
             <input
               type="text"
               id="riesgo"
               autoComplete="off"
-              className={styles.inputLarge}
+              // className={styles.inputLarge}
+              className={`${styles.inputLarge} min-w-[100%]`}
               value={searchRiesgo}
               name="riesgo"
               onFocus={() => {
@@ -978,14 +993,14 @@ const HistoriaOcupacional = ({
           </div>
         </div>
         {/*EPPS*/}
-        <div className="relative">
+        <div className="relative flex-1 ">
           <div className="flex flex-col items-center justify-center">
             <label htmlFor="">Protección</label>
             <input
               type="text"
               id="proteccion"
               autoComplete="off"
-              className={styles.inputLarge}
+              className={`${styles.inputLarge} min-w-[100%]`}
               value={searchProt}
               name="proteccion"
               onFocus={() => {
@@ -1117,7 +1132,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.fecha}
                         onChange={(e) =>
-                          handleEditChange(idx, "fecha", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "fecha",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1125,7 +1144,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.empresa}
                         onChange={(e) =>
-                          handleEditChange(idx, "empresa", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "empresa",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1133,7 +1156,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.altitud}
                         onChange={(e) =>
-                          handleEditChange(idx, "altitud", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "altitud",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1141,7 +1168,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.actividad}
                         onChange={(e) =>
-                          handleEditChange(idx, "actividad", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "actividad",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1149,7 +1180,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.areaEmpresa}
                         onChange={(e) =>
-                          handleEditChange(idx, "areaEmpresa", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "areaEmpresa",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1157,7 +1192,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.ocupacion}
                         onChange={(e) =>
-                          handleEditChange(idx, "ocupacion", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "ocupacion",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1165,7 +1204,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.superficie}
                         onChange={(e) =>
-                          handleEditChange(idx, "superficie", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "superficie",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1173,7 +1216,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.socavon}
                         onChange={(e) =>
-                          handleEditChange(idx, "socavon", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "socavon",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1181,7 +1228,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.riesgo}
                         onChange={(e) =>
-                          handleEditChange(idx, "riesgo", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "riesgo",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
@@ -1189,7 +1240,11 @@ const HistoriaOcupacional = ({
                       <AutoResizeInput
                         value={reg.proteccion}
                         onChange={(e) =>
-                          handleEditChange(idx, "proteccion", e.target.value)
+                          handleEditChange(
+                            idx,
+                            "proteccion",
+                            e.target.value.toUpperCase()
+                          )
                         }
                       />
                     </td>
