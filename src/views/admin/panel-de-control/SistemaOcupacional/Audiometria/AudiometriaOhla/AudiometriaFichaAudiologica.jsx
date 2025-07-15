@@ -15,6 +15,7 @@ const AudiometriaFichaAudiologica = ({
   token,
   selectedSede,
   userloguedCompleto,
+  listas,
 }) => {
   const initialFormState = {
     norden: "",
@@ -81,6 +82,8 @@ const AudiometriaFichaAudiologica = ({
     i_porcentaje: "",
     i_umbral_confort: "",
     i_umbral_disconfort: "",
+
+    razonEmpresa: "",
   };
   const [form, setForm] = useState(initialFormState);
   console.log("userLogued completo", userloguedCompleto);
@@ -126,6 +129,36 @@ const AudiometriaFichaAudiologica = ({
         : " " + objetivo,
     }));
   };
+
+  const [searchEmpresa, setSearchEmpresa] = useState(form.razonEmpresa);
+  const [filteredEmpresas, setFilteredEmpresas] = useState([]);
+
+  const { EmpresasMulti } = listas;
+
+  const handleEmpresaSearch = (e) => {
+    const v = e.target.value.toUpperCase();
+    if (v === "") {
+      setForm((d) => ({ ...d, razonEmpresa: "" }));
+    }
+    setForm((d) => ({ ...d, razonEmpresa: v }));
+    setSearchEmpresa(v);
+    setFilteredEmpresas(
+      v
+        ? EmpresasMulti.filter((emp) =>
+            emp.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectEmpresa = (emp) => {
+    setSearchEmpresa(emp.mensaje);
+    setForm((d) => ({ ...d, razonEmpresa: emp.mensaje }));
+    setFilteredEmpresas([]);
+    // mueve el foco al siguiente campo Contrata
+    document.getElementById("razonContrata")?.focus();
+  };
+
   //===================================  Ficha Audiologica
 
   // Función para guardar (placeholder)
@@ -686,7 +719,7 @@ const AudiometriaFichaAudiologica = ({
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
-              <div className="flex items-center gap-2 mb-1">
+              {/* <div className="flex items-center gap-2 mb-1">
                 <label className="w-[200px] text-[12px]">
                   Nombre del Médico :
                 </label>
@@ -696,6 +729,57 @@ const AudiometriaFichaAudiologica = ({
                   onChange={handleChange}
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
+              </div> */}
+              <div className="flex items-center space-x-2 mb-1">
+                <label htmlFor="razonEmpresa" className="block w-32">
+                  Empresa:
+                </label>
+                <div className="relative flex-grow flex items-center">
+                  <input
+                    autoComplete="off"
+                    id="razonEmpresa"
+                    name="razonEmpresa"
+                    type="text"
+                    value={searchEmpresa}
+                    placeholder="Escribe para buscar empresa..."
+                    // disabled={habilitar}
+                    onChange={handleEmpresaSearch}
+                    className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && filteredEmpresas.length > 0) {
+                        e.preventDefault();
+                        handleSelectEmpresa(filteredEmpresas[0]);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchEmpresa) {
+                        setFilteredEmpresas(
+                          EmpresasMulti.filter((emp) =>
+                            emp.mensaje
+                              .toLowerCase()
+                              .includes(searchEmpresa.toLowerCase())
+                          )
+                        );
+                      }
+                    }}
+                    onBlur={() =>
+                      setTimeout(() => setFilteredEmpresas([]), 100)
+                    }
+                  />
+                  {searchEmpresa && filteredEmpresas.length > 0 && (
+                    <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                      {filteredEmpresas.map((emp) => (
+                        <li
+                          key={emp.id}
+                          className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                          onMouseDown={() => handleSelectEmpresa(emp)}
+                        >
+                          {emp.mensaje}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
             </div>
           </div>

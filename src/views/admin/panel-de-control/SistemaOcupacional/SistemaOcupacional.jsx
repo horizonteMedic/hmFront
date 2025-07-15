@@ -884,6 +884,7 @@ const TabComponent = () => {
                       token={token}
                       userlogued={userlogued}
                       selectedSede={selectSede}
+                      listas={listasCombos}
                     />
                   )}
                   {subTab === 2 && (
