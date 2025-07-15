@@ -30,7 +30,7 @@ const Dashboard = ({TotalView}) => {
     { to: "/matriz-postulante", name: "Matriz Postulante", icon: faBusinessTime, title: "Matriz Postulante" },
     { to: "/configuracion", name: "Configuracion", icon: faGears, title: "Configuración" },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", icon: faNotesMedical, title: "Sistema Ocupacional" },
-    { to: "/HistoriaOcupacional", name: "Historia Ocupacional", icon: faNotesMedical, title: "Historia Ocupacional" },
+    // { to: "/HistoriaOcupacional", name: "Historia Ocupacional", icon: faNotesMedical, title: "Historia Ocupacional" },
     { to: "/Espirometria", name: "Espirometría", icon: faNotesMedical, title: "Espirometría" },
     { to: "/Oftalmologia", name: "Oftalmología", icon: faNotesMedical, title: "Oftalmología" }
   ].filter(card => listView.includes(card.name));

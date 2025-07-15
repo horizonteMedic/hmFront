@@ -72,9 +72,10 @@ import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
 import Audiometria from "./Audiometria/Audiometria/Audiometria.jsx";
 import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/AudiometriaCuestionario.jsx";
-import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
+
 import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
 import Espirometria from "./Espirometria/Espirometria.jsx";
+import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -263,10 +264,10 @@ const TabComponent = () => {
                   <span className={styles.title}>Laboratorio</span>
                 </div>
               )}
-              {tieneVista("Coproparasitologico") && (
+              {tieneVista("Historia Ocupacional") && (
                 <div
                   className={`${styles.gridItem} ${
-                    activeTab === 3 ? styles.active : ""
+                    activeTab === 16 ? styles.active : ""
                   }`}
                   onClick={() => setActiveTab(16)}
                 >
@@ -943,9 +944,9 @@ const TabComponent = () => {
           } else if (idx === 2) {
             setActiveTab(2);
           } else if (idx === 3) {
-            setActiveTab(14);//Espirometria
+            setActiveTab(16);//Historia Ocupacional
           } else if (idx === 4) {
-            setActiveTab(4);
+            setActiveTab(14);//Espirometria
           } else if (idx === 5) {
             setActiveTab(5);
           } else if (idx === 6) {
