@@ -36,7 +36,7 @@ import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Ofta
 
 
 //SIMULADOR DE jaspers
-import Ficha from './views/jaspers/Audiometria/CuestionarioAudiometria_Digitalizado.jsx'
+import Ficha from './views/jaspers/Audiometria/FichaAudiologica_Digitalizado.jsx'
 const App = () => {
   return (
     <React.StrictMode>
