@@ -70,8 +70,8 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
     GlucosaQ: 'NEGATIVO',
     Sangre: 'NEGATIVO',
     // Sedimento
-    LeucocitosS: '',
-    Hematies: '',
+    LeucocitosS: '0-0',
+    Hematies: '0-1',
     CelEpiteliales: 'ESCASAS',
     Cristales: 'NO SE OBSERVAN',
     Cilindros: 'NO SE OBSERVAN',
@@ -155,8 +155,8 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       GlucosaQ: 'NEGATIVO',
       Sangre: 'NEGATIVO',
       // Sedimento
-      LeucocitosS: '',
-      Hematies: '',
+      LeucocitosS: '0-0',
+      Hematies: '0-1',
       CelEpiteliales: 'ESCASAS',
       Cristales: 'NO SE OBSERVAN',
       Cilindros: 'NO SE OBSERVAN',
