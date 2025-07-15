@@ -76,6 +76,7 @@ import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/Audio
 import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
 import Espirometria from "./Espirometria/Espirometria.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
+import Oftalmologia from "./Oftalmologia/Oftalmologia.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -929,13 +930,7 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Oftalmología
-                </h2>
-              </div>
-              {/* Aquí puedes renderizar el componente Oftalmologia si lo tienes */}
-              {/* <Oftalmologia token={token} userlogued={userlogued.sub} selectedSede={selectSede} /> */}
+              <Oftalmologia />
             </div>
           )}
         </div>
