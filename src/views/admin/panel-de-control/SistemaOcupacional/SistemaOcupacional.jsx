@@ -935,23 +935,52 @@ const TabComponent = () => {
         onNavigate={(idx) => {
           console.log("Navigating to tab:", idx);
           setDrawerOpen(false);
-          if (idx === 7) {
-            setActiveTab(null);
-          } else if (idx === 0) {
-            setActiveTab(0);
-          } else if (idx === 1) {
-            setActiveTab(1);
-          } else if (idx === 2) {
-            setActiveTab(2);
-          } else if (idx === 3) {
-            setActiveTab(16);//Historia Ocupacional
-          } else if (idx === 4) {
-            setActiveTab(14);//Espirometria
-          } else if (idx === 5) {
-            setActiveTab(5);
-          } else if (idx === 6) {
-            setActiveTab(6);
-          } 
+          // if (idx === 7) {
+          //   setActiveTab(null);
+          // } else if (idx === 0) {
+          //   setActiveTab(0);
+          // } else if (idx === 1) {
+          //   setActiveTab(1);
+          // } else if (idx === 2) {
+          //   setActiveTab(2);
+          // } else if (idx === 3) {
+          //   setActiveTab(16);//Historia Ocupacional
+          // } else if (idx === 4) {
+          //   setActiveTab(14);//Espirometria
+          //   setSubTab(0);
+          // } else if (idx === 5) {
+          //   setActiveTab(5);
+          // } else if (idx === 6) {
+          //   setActiveTab(6);
+          // } 
+          switch(idx){
+            case "Inicio":
+              setActiveTab(null);
+              break;
+            case "Admision":
+              setActiveTab(0);
+              setSubTab(0);
+              break;
+            case "Triaje":
+              setActiveTab(1);
+              setSubTab(0);
+              break;
+            case "Laboratorio Clinico":
+              setActiveTab(2);
+              break;          
+            case "Espirometria":
+              setActiveTab(14);
+              setSubTab(0);
+              break;
+            case "Audiometria":
+              setActiveTab(15);
+              setSubTab(0);
+              break;
+            case "Historia Ocupacional":
+              setActiveTab(16);
+              setSubTab(0);
+              break;
+          }
           
         }}
         activeIndex={activeTab}

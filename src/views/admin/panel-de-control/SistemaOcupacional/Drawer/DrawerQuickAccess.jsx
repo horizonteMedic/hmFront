@@ -35,7 +35,7 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista 
       <div className="flex flex-col gap-2 px-4 py-6 overflow-y-auto max-h-[calc(100vh-80px)]">
         <button
           className="flex items-center gap-4 bg-gray-100 hover:bg-[#1a2536] rounded-xl px-4 py-4 transition-all duration-200 group text-left mb-2"
-          onClick={() => onNavigate(7)}
+          onClick={() => onNavigate("Inicio")}
         >
           <span className="text-blue-600 text-2xl group-hover:text-white transition-all duration-200">
             <FontAwesomeIcon icon={faHome} />
@@ -48,7 +48,7 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista 
           <button
             key={item.label}
             className={`flex items-center gap-4 bg-gray-100 hover:bg-[#1a2536] rounded-xl px-4 py-4 transition-all duration-200 group text-left ${activeIndex === idx ? 'ring-2 ring-[#1a2536]' : ''}`}
-            onClick={() => onNavigate(idx)}
+            onClick={() => onNavigate(item.key)}
           >
             <span className="text-orange-500 text-2xl group-hover:text-white transition-all duration-200">
               <FontAwesomeIcon icon={item.icon} />
