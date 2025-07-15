@@ -82,11 +82,39 @@ const AudiometriaFichaAudiologica = ({
     i_porcentaje: "",
     i_umbral_confort: "",
     i_umbral_disconfort: "",
-
-    razonEmpresa: "",
   };
   const [form, setForm] = useState(initialFormState);
-  console.log("userLogued completo", userloguedCompleto);
+
+  const [searchNombreMedico, setSearchNombreMedico] = useState(
+    form.nombre_medico
+  );
+  const [filteredNombresMedicos, setFilteredNombresMedicos] = useState([]);
+
+  const { MedicosMulti } = listas;
+
+  const handleNombreMedicoSearch = (e) => {
+    const v = e.target.value.toUpperCase();
+    if (v === "") {
+      setForm((d) => ({ ...d, nombre_medico: "" }));
+    }
+    setForm((d) => ({ ...d, nombre_medico: v }));
+    setSearchNombreMedico(v);
+    setFilteredNombresMedicos(
+      v
+        ? MedicosMulti.filter((medico) =>
+            medico.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectNombreMedico = (medico) => {
+    setSearchNombreMedico(medico.mensaje);
+    setForm((d) => ({ ...d, nombre_medico: medico.mensaje }));
+    setFilteredNombresMedicos([]);
+  };
+
+  //===================================  Ficha Audiologica
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -129,37 +157,6 @@ const AudiometriaFichaAudiologica = ({
         : " " + objetivo,
     }));
   };
-
-  const [searchEmpresa, setSearchEmpresa] = useState(form.razonEmpresa);
-  const [filteredEmpresas, setFilteredEmpresas] = useState([]);
-
-  const { EmpresasMulti } = listas;
-
-  const handleEmpresaSearch = (e) => {
-    const v = e.target.value.toUpperCase();
-    if (v === "") {
-      setForm((d) => ({ ...d, razonEmpresa: "" }));
-    }
-    setForm((d) => ({ ...d, razonEmpresa: v }));
-    setSearchEmpresa(v);
-    setFilteredEmpresas(
-      v
-        ? EmpresasMulti.filter((emp) =>
-            emp.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
-        : []
-    );
-  };
-
-  const handleSelectEmpresa = (emp) => {
-    setSearchEmpresa(emp.mensaje);
-    setForm((d) => ({ ...d, razonEmpresa: emp.mensaje }));
-    setFilteredEmpresas([]);
-    // mueve el foco al siguiente campo Contrata
-    document.getElementById("razonContrata")?.focus();
-  };
-
-  //===================================  Ficha Audiologica
 
   // Función para guardar (placeholder)
   const handleSave = () => {
@@ -698,7 +695,7 @@ const AudiometriaFichaAudiologica = ({
               </fieldset>
             </div>
             {/* Datos de profesional y botones */}
-            <div className="flex flex-col gap-2 ml-4">
+            <div className="flex flex-col gap-3 ml-4">
               <div className="flex items-center gap-2 mb-1">
                 <label className="w-[200px] text-[12px]">
                   Nombre del profesional que realiza la audiometría :
@@ -719,62 +716,53 @@ const AudiometriaFichaAudiologica = ({
                   className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
                 />
               </div>
-              {/* <div className="flex items-center gap-2 mb-1">
-                <label className="w-[200px] text-[12px]">
+              <div className="flex items-center gap-2">
+                <label htmlFor="nombre_medico" className="block w-[200px]">
                   Nombre del Médico :
-                </label>
-                <input
-                  name="nombre_medico"
-                  value={form.nombre_medico}
-                  onChange={handleChange}
-                  className="border border-gray-400 rounded-lg px-3 py-1 bg-white flex-1 text-[12px]"
-                />
-              </div> */}
-              <div className="flex items-center space-x-2 mb-1">
-                <label htmlFor="razonEmpresa" className="block w-32">
-                  Empresa:
                 </label>
                 <div className="relative flex-grow flex items-center">
                   <input
                     autoComplete="off"
-                    id="razonEmpresa"
-                    name="razonEmpresa"
+                    id="nombre_medico"
+                    name="nombre_medico"
                     type="text"
-                    value={searchEmpresa}
-                    placeholder="Escribe para buscar empresa..."
-                    // disabled={habilitar}
-                    onChange={handleEmpresaSearch}
+                    value={searchNombreMedico}
+                    placeholder="Escribe para buscar médico..."
+                    onChange={handleNombreMedicoSearch}
                     className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" && filteredEmpresas.length > 0) {
+                      if (
+                        e.key === "Enter" &&
+                        filteredNombresMedicos.length > 0
+                      ) {
                         e.preventDefault();
-                        handleSelectEmpresa(filteredEmpresas[0]);
+                        handleSelectNombreMedico(filteredNombresMedicos[0]);
                       }
                     }}
                     onFocus={() => {
-                      if (searchEmpresa) {
-                        setFilteredEmpresas(
-                          EmpresasMulti.filter((emp) =>
+                      if (searchNombreMedico) {
+                        setFilteredNombresMedicos(
+                          MedicosMulti.filter((emp) =>
                             emp.mensaje
                               .toLowerCase()
-                              .includes(searchEmpresa.toLowerCase())
+                              .includes(searchNombreMedico.toLowerCase())
                           )
                         );
                       }
                     }}
                     onBlur={() =>
-                      setTimeout(() => setFilteredEmpresas([]), 100)
+                      setTimeout(() => setFilteredNombresMedicos([]), 100)
                     }
                   />
-                  {searchEmpresa && filteredEmpresas.length > 0 && (
+                  {searchNombreMedico && filteredNombresMedicos.length > 0 && (
                     <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
-                      {filteredEmpresas.map((emp) => (
+                      {filteredNombresMedicos.map((medico) => (
                         <li
-                          key={emp.id}
+                          key={medico.id}
                           className="cursor-pointer px-3 py-2 hover:bg-gray-100"
-                          onMouseDown={() => handleSelectEmpresa(emp)}
+                          onMouseDown={() => handleSelectNombreMedico(medico)}
                         >
-                          {emp.mensaje}
+                          {medico.mensaje}
                         </li>
                       ))}
                     </ul>
