@@ -1,4 +1,3 @@
-import footerEnHeader from "../footerEnHeader";
 
 /**
  * Formatea una fecha en formato "13 diciembre 2024".
@@ -34,7 +33,7 @@ const formatDateToShort = (dateString) => {
  * @param {jsPDF} doc - La instancia del documento jsPDF.
  * @param {object} datos - Los datos a imprimir.
  */
-const header_HistoriaOcupacional = (doc, datos = {}) => {
+const header_HistoriaOcupacional_Boro = (doc, datos = {}) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 5;
@@ -97,65 +96,51 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   // Segunda línea: sede alineada con el número
   doc.setFontSize(8).setFont('helvetica', 'bold');
   //DATOS DEBAJO DE NORDEN
-  doc.setFont('helvetica', 'normal');
-  doc.text(datos.sede || '', nroOrdenX - 40, nroOrdenY +10);
+ 
+  doc.text("Sexo: ", nroOrdenX + 25, nroOrdenY +18)
+  doc.text(`${datos.sexo === 'F' ? 'FEMENINO' : datos.sexo === 'M' ? 'MASCULINO' : ''}`, nroOrdenX + 35, nroOrdenY +18)
+
+  doc.text("Fecha de Nacimiento: ", nroOrdenX - 60, nroOrdenY + 18)
+  doc.text(datos.fechaNac, nroOrdenX - 30, nroOrdenY + 18)
+
+  const lugarLabel = "Lugar de Procedencia: ";
+  const lugarTexto = datos.lugarProcedimiento || "";
+  const maxWidth = 90; // ajusta según tu diseño
+
+  // Imprimir etiqueta (fija)
+  doc.text(lugarLabel, nroOrdenX - 80, nroOrdenY + 24);
+
+  // Imprimir contenido (ajustado al ancho)
+  doc.text(lugarTexto, nroOrdenX - 44, nroOrdenY + 24, {
+    maxWidth: maxWidth,
+  });
+
+  doc.setFontSize(10).setFont('helvetica', 'normal');
+
   doc.setFont('helvetica', 'bold');
+  doc.setFontSize(12).setFont('helvetica', 'bold');
   doc.text("HISTORIA OCUPACIONAL", 100, nroOrdenY + 10)
   doc.setFont('helvetica', 'normal');
-  // --- Datos del paciente en dos columnas alineadas ---
+  // --- Datos del paciente ---
   let yDatos = nroOrdenY + 18;
-  const patientDataX1 = margin;
-  const patientDataX2 = Math.floor(pageW / 2) - 20;
+  const patientDataX = margin;
   const lineHeight = 5;
-  // Pares de label/dato para cada columna
-  const patientRows = [
-    [
-      { label: "Apellidos y Nombres :", value: datos.nombres || '' },
-      { label: "Sede :", value: (datos.sede || '') },
-    ],
-    [
-      { label: "Lugar de Nacimiento :", value: datos.lugarNac || '' },
-      { label: "Fecha de Nacimiento :", value: datos.fechaNac || '' },
-    ],
-    [
-      { label: "Profesion :", value: datos.areaO || '' },
-      { label: "Sexo :", value: datos.sexo === 'F' ? 'FEMENINO' : datos.sexo === 'M' ? 'MASCULINO' : '' },
-    ],
-    [
-      { label: "Telefono :", value: datos.celularPaciente || '' },
-      { label: "Lugar de Procedencia :", value: datos.lugarProcedimiento || '' },
-    ],
-  ];
-  for (const row of patientRows) {
-    // Columna 1
-    if (row[0]) {
-      doc.setFontSize(8).setFont('helvetica', 'bold');
-      doc.text(row[0].label.toUpperCase(), patientDataX1, yDatos);
-      const labelW = doc.getTextWidth(row[0].label.toUpperCase());
-      doc.setFont('helvetica', 'normal');
-      doc.text(String(row[0].value).toUpperCase(), patientDataX1 + labelW + 2, yDatos);
+  const drawPatientDataRow = (label, value) => {
+    doc.setFontSize(8).setFont('helvetica', 'bold');
+    doc.text(label, patientDataX, yDatos);
+    let valueX = patientDataX + doc.getTextWidth(label) + 4;
+    if (label.toLowerCase().includes('apellidos y nombres')) {
+      if (doc.getTextWidth(label) < 23) valueX = patientDataX + 23;
     }
-    // Columna 2
-    if (row[1]) {
-      doc.setFontSize(8).setFont('helvetica', 'bold');
-      doc.text(row[1].label.toUpperCase(), patientDataX2, yDatos);
-      const labelW2 = doc.getTextWidth(row[1].label.toUpperCase());
-      doc.setFont('helvetica', 'normal');
-      // Si es LUGAR DE PROCEDENCIA, aplicar maxWidth y salto de línea
-      if (row[1].label.toUpperCase().includes('LUGAR DE PROCEDENCIA')) {
-        doc.text(String(row[1].value).toUpperCase(), patientDataX2 + labelW2 + 2, yDatos, {
-          maxWidth: pageW - (patientDataX2 + labelW2 + 10)
-        });
-      } else {
-        doc.text(String(row[1].value).toUpperCase(), patientDataX2 + labelW2 + 2, yDatos);
-      }
-    }
+    doc.setFont('helvetica', 'normal');
+    doc.text(String(value).toUpperCase(), valueX, yDatos);
     yDatos += lineHeight;
-  }
+  };
+  drawPatientDataRow("Apellidos y Nombres :", datos.nombres || '');
+  drawPatientDataRow("Lugar de Nacimiento :", datos.lugarNac || '');
+  drawPatientDataRow("Profesion :", datos.areaO || '');
   doc.setFontSize(11).setFont('helvetica', 'bold');
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
-
-  footerEnHeader(doc, datos);
 };
 
-export default header_HistoriaOcupacional; 
+export default header_HistoriaOcupacional_Boro; 

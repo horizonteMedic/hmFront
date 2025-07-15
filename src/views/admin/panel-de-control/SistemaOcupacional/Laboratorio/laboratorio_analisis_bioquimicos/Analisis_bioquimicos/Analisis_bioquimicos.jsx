@@ -133,6 +133,14 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
     const { name, value } = e.target
     setForm(f => ({ ...f, [name]: value }))
   }
+   const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+
+    // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
+    if (/^\d*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
 
   const handleClear = () => {
     setForm({
@@ -258,7 +266,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
                 value={form.norden}
                 autoComplete='off'
                 onKeyUp={(event) => {if(event.key === 'Enter') VerifyTR(form.norden, tabla, token, setForm, selectedSede, setSearchMedico)}}
-                onChange={handleFormChange}
+                onChange={handleChangeNumber}
                 className="border rounded px-2 py-1 w-24 ml-1 text-xl font-bold"
               />
             </label>
@@ -394,7 +402,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
             value={searchParams.code}
               onChange={(e) => {
                 const value = e.target.value;
-                if (/^\\d{0,7}$/.test(value)) {
+                if (/^\d*$/.test(value)) {
                   setSearchParams(prev => ({...prev, code: value, nombre: ""}))
                 }
               }}

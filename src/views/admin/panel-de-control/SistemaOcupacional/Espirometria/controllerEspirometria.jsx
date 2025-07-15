@@ -67,20 +67,15 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     console.log(res);
     if (res.id === 1 || res.id === 0) {
       Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
+        title: "Éxito",
+        text: res.mensaje,
         icon: "success",
-        showCancelButton: true,
         confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
+      }).then(() => {
         limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
-        }
       });
     } else {
-      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
+      Swal.fire("Error", "Ocurrió un error al registrar", "error");
     }
   });
 };
@@ -140,6 +135,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     if (res.id === 0) {
       //No tiene registro previo
       GetInfoPac(nro, set, token, sede);
+    } else if (res.id == 2) {
+      Swal.fire("Error", "Falta llenar triaje", "error");
     } else {
       GetInfoServicio(nro, tabla, set, token);
     }

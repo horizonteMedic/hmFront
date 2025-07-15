@@ -5,10 +5,11 @@ import footer from "../components/footer";
 const config = {
   margin: 15,
   col1X: 15,
-  col2X: 80,
+  col2X: 85,
   col3X: 140,
   fontSize: {
-    title: 14,
+    title: 13,
+    subtitle: 12,
     header: 11,
     body: 11,
   },
@@ -44,10 +45,18 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
   ]).then(([s1, s2]) => {
 
       // === CUERPO ===
-  let y = 75;
+  let y = 90;
   // Título
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.title);
-  doc.text("MARCA: RAPID RESPONSE COVID-19 IGM/IGG", config.margin, y);
+  // Bajo el título y MARCA un poco más
+  y = 80;
+  doc.text("PRUEBA CUALITATIVA DE ANTIGENOS", config.margin, y);
+  y += config.lineHeight + 2;
+
+  // MARCA
+  const marca = datos.marca || "Test";
+  doc.setFont(config.font, "bold").setFontSize(config.fontSize.subtitle);
+  doc.text(`MARCA: ${marca}`, config.margin, y);
   y += config.lineHeight * 2;
 
   // Encabezados de tabla
@@ -74,6 +83,9 @@ export default function pcualitativaantigenoMarsa(datos = {}) {
     doc.text(line, config.col3X, y + i * config.lineHeight);
   });
   y += Math.max(refLines.length, 1) * config.lineHeight + config.lineHeight;
+
+  // Subo la sección de comentarios y lo que sigue
+  y -= 15;
 
   // Comentarios
   doc.setFont(config.font, "bold").setFontSize(config.fontSize.body);

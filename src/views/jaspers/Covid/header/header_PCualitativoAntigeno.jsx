@@ -1,5 +1,7 @@
+import jsPDF from "jspdf";
+
 /**
- * Formatea una fecha en formato "dd/mm/yyyy" (ej. "04/11/2024").
+ * Fecha"dd/mm/yyyy" (ej. "04/11/2024").
  * @param {string} dateString - La fecha en formato YYYY-MM-DD.
  * @returns {string} - La fecha formateada.
  */
@@ -13,9 +15,9 @@ const formatDateToShort = (dateString) => {
 };
 
 /**
- * Dibuja el encabezado para el reporte de Prueba Cualitativa de Antígenos, estilo profesional.
+ * Dibuja el encabezado para el reporte de Prueba Cualitativa de Antígenos (igual Marsa).
  * @param {jsPDF} doc - La instancia del documento jsPDF.
- * @param {object} datos - Los datos a imprimir (numero, nombre, edad, fecha_examen, etc).
+ * @param {object} datos - Los datos a imprimir (numero, nombre, edad, dni, fecha_examen, etc).
  */
 const header_PCualitativoAntigeno = (doc, datos = {}) => {
   const margin = 15;
@@ -25,53 +27,50 @@ const header_PCualitativoAntigeno = (doc, datos = {}) => {
   // 1. Logo a la izquierda
   const img = "./img/logo-color.png";
   try {
-    doc.addImage(img, "PNG", margin, y, 50, 16);
+    doc.addImage(img, "PNG", margin, y, 60, 20);
   } catch (error) {
     console.error("No se pudo cargar el logo.", error);
-    doc.text("Policlinico Horizonte Medic", margin, y + 8);
+    doc.setFont("helvetica", "bold").text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2. Número de orden a la derecha
+  // 2. Nro Orden a la derecha, grande y subrayado
+  const nroOrdenValue = String(datos.numero || datos.norden || '');
+  doc.setFontSize(10).setFont('helvetica', 'bold');
   const nroOrdenLabel = "Nro Orden :";
-  const nroOrdenValue = String(datos.norden || '');
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'bold');
   const nroOrdenLabelWidth = doc.getTextWidth(nroOrdenLabel);
   const nroOrdenValueWidth = doc.getTextWidth(nroOrdenValue);
-  let extraMargin = 20;
-  let nroOrdenX = pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth - extraMargin;
-  let nroOrdenY = y + 8;
+  let nroOrdenX = pageW - margin - nroOrdenValueWidth - nroOrdenLabelWidth - 10;
+  let nroOrdenY = y + 10;
   doc.text(nroOrdenLabel, nroOrdenX, nroOrdenY);
   doc.setFont('helvetica', 'bold').setFontSize(18);
   doc.text(nroOrdenValue, nroOrdenX + nroOrdenLabelWidth + 2, nroOrdenY);
   doc.setLineWidth(0.5);
   doc.line(nroOrdenX + nroOrdenLabelWidth + 2, nroOrdenY + 1.5, nroOrdenX + nroOrdenLabelWidth + 2 + nroOrdenValueWidth, nroOrdenY + 1.5);
 
-  // 3. Datos del paciente (debajo)
-  let patientDataY = y + 35;
-  const patientDataX = margin;
-  doc.setFontSize(10);
+  // 3. Datos del paciente (PACIENTE, EDAD, DNI, FECHA)
+  let dataY = y + 30;
+  const labelX = margin;
+  const valueX = labelX + 35;
+  doc.setFontSize(11).setFont('helvetica', 'bold');
+  doc.text("PACIENTE:", labelX, dataY);
+  doc.setFont('helvetica', 'normal');
+  doc.text(String(datos.nombre || datos.nombres || ''), valueX, dataY);
+  dataY += 8;
   doc.setFont('helvetica', 'bold');
-  doc.text("Paciente :", patientDataX, patientDataY);
-  const labelWidthNombres = doc.getTextWidth("Paciente :");
-  let valueXNombres = patientDataX + labelWidthNombres + 4;
+  doc.text("EDAD :", labelX, dataY);
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.nombres || '').toUpperCase(), valueXNombres, patientDataY);
-  patientDataY += 8;
+  doc.text(datos.edad ? `${datos.edad} años` : '', valueX, dataY);
+  dataY += 8;
   doc.setFont('helvetica', 'bold');
-  doc.text("Edad :", patientDataX, patientDataY);
-  const labelWidthEdad = doc.getTextWidth("Edad :");
+  doc.text("DNI:", labelX, dataY);
   doc.setFont('helvetica', 'normal');
-  doc.text(String(datos.edad ? `${datos.edad} años` : ''), patientDataX + labelWidthEdad + 4, patientDataY);
-  patientDataY += 8;
+  doc.text(String(datos.dni || datos.cod_pa || ''), valueX, dataY);
+  dataY += 8;
   doc.setFont('helvetica', 'bold');
-  doc.text("Fecha :", patientDataX, patientDataY);
-  const labelWidthFecha = doc.getTextWidth("Fecha :");
+  doc.text("FECHA :", labelX, dataY);
   doc.setFont('helvetica', 'normal');
-  doc.text(formatDateToShort(datos.fechaExamen), patientDataX + labelWidthFecha + 4, patientDataY);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setLineWidth(0.2);
+  doc.text(formatDateToShort(datos.fecha_examen || datos.fechaExamen), valueX, dataY);
+  doc.setFont('helvetica', 'normal').setFontSize(10);
 };
 
 export default header_PCualitativoAntigeno;

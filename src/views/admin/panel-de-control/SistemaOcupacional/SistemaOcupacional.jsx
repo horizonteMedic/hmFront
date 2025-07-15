@@ -72,9 +72,10 @@ import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
 import Audiometria from "./Audiometria/Audiometria/Audiometria.jsx";
 import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/AudiometriaCuestionario.jsx";
-import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
+
 import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
 import Espirometria from "./Espirometria/Espirometria.jsx";
+import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -263,10 +264,10 @@ const TabComponent = () => {
                   <span className={styles.title}>Laboratorio</span>
                 </div>
               )}
-              {tieneVista("Coproparasitologico") && (
+              {tieneVista("Historia Ocupacional") && (
                 <div
                   className={`${styles.gridItem} ${
-                    activeTab === 3 ? styles.active : ""
+                    activeTab === 16 ? styles.active : ""
                   }`}
                   onClick={() => setActiveTab(16)}
                 >
@@ -795,7 +796,7 @@ const TabComponent = () => {
               </div>
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">
-                  Espirometria
+                  Espirometría
                 </h2>
               </div>
               <div>
@@ -807,7 +808,7 @@ const TabComponent = () => {
                     }`}
                     onClick={() => setSubTab(0)}
                   >
-                    Espirometria
+                    Espirometría
                   </button>
                 </div>
                 <div>
@@ -879,7 +880,7 @@ const TabComponent = () => {
                   {subTab === 1 && (
                     <AudiometriaOhlaTabSelector
                       token={token}
-                      userlogued={userlogued.sub}
+                      userlogued={userlogued}
                       selectedSede={selectSede}
                     />
                   )}
@@ -911,6 +912,7 @@ const TabComponent = () => {
                   userlogued={userlogued.sub}
                   selectedSede={selectSede}
                   listas={listasCombos}
+                  userDatos={userlogued}
                 />
                 <div></div>
               </div>
@@ -931,24 +933,55 @@ const TabComponent = () => {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onNavigate={(idx) => {
+          console.log("Navigating to tab:", idx);
           setDrawerOpen(false);
-          if (idx === 7) {
-            setActiveTab(null);
-          } else if (idx === 0) {
-            setActiveTab(0);
-          } else if (idx === 1) {
-            setActiveTab(1);
-          } else if (idx === 2) {
-            setActiveTab(2);
-          } else if (idx === 3) {
-            setActiveTab(3);
-          } else if (idx === 4) {
-            setActiveTab(4);
-          } else if (idx === 5) {
-            setActiveTab(5);
-          } else if (idx === 6) {
-            setActiveTab(6);
+          // if (idx === 7) {
+          //   setActiveTab(null);
+          // } else if (idx === 0) {
+          //   setActiveTab(0);
+          // } else if (idx === 1) {
+          //   setActiveTab(1);
+          // } else if (idx === 2) {
+          //   setActiveTab(2);
+          // } else if (idx === 3) {
+          //   setActiveTab(16);//Historia Ocupacional
+          // } else if (idx === 4) {
+          //   setActiveTab(14);//Espirometria
+          //   setSubTab(0);
+          // } else if (idx === 5) {
+          //   setActiveTab(5);
+          // } else if (idx === 6) {
+          //   setActiveTab(6);
+          // } 
+          switch(idx){
+            case "Inicio":
+              setActiveTab(null);
+              break;
+            case "Admision":
+              setActiveTab(0);
+              setSubTab(0);
+              break;
+            case "Triaje":
+              setActiveTab(1);
+              setSubTab(0);
+              break;
+            case "Laboratorio Clinico":
+              setActiveTab(2);
+              break;          
+            case "Espirometria":
+              setActiveTab(14);
+              setSubTab(0);
+              break;
+            case "Audiometria":
+              setActiveTab(15);
+              setSubTab(0);
+              break;
+            case "Historia Ocupacional":
+              setActiveTab(16);
+              setSubTab(0);
+              break;
           }
+          
         }}
         activeIndex={activeTab}
         tieneVista={tieneVista}
