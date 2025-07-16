@@ -5,12 +5,12 @@ import { faHeadphones, faFileAlt, } from '@fortawesome/free-solid-svg-icons';
 import AudiometriaOhla from './AudiometriaOhla';
 import AudiometriaFichaAudiologica from './AudiometriaFichaAudiologica';
 
-const AudiometriaOhlaTabSelector = ({ token, selectedSede, userlogued }) => {
+const AudiometriaOhlaTabSelector = ({ token, selectedSede, userlogued,listas }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
     { label: 'Audiometría Ohla', icon: faHeadphones, component: <AudiometriaOhla token={token} selectedSede={selectedSede} userlogued={userlogued.sub} /> },
-    { label: 'Ficha Audiológica', icon: faFileAlt, component: <AudiometriaFichaAudiologica token={token} selectedSede={selectedSede} userloguedCompleto={userlogued}/> },
+    { label: 'Ficha Audiológica', icon: faFileAlt, component: <AudiometriaFichaAudiologica token={token} selectedSede={selectedSede} userloguedCompleto={userlogued} listas={listas}/> },
    ];
 
   return (
