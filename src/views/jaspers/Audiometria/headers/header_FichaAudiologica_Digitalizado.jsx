@@ -10,7 +10,7 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   let y = 12;
 
   // Logo izquierda
-  const logoW = 60, logoH = 28;
+  const logoW = 48, logoH = 20; // Más pequeño y ancho
   try {
     doc.addImage('./img/logo-color.png', 'PNG', margin, y, logoW, logoH);
   } catch {
@@ -21,9 +21,9 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   const fichaX = pageW - margin - 2;
   const fichaY = y + 8;
   doc.setFont('helvetica', 'bold').setFontSize(22);
-  doc.text(`${datos.norden || ''}`, fichaX, fichaY, { align: 'right' });
+  doc.text(`${datos.norden || '97800'}`, fichaX, fichaY, { align: 'right' });
   // Subrayado
-  const fichaWidth = doc.getTextWidth(`${datos.norden || ''}`);
+  const fichaWidth = doc.getTextWidth(`${datos.norden || '97800'}`);
   doc.setLineWidth(1.2);
   doc.line(fichaX - fichaWidth, fichaY + 2, fichaX, fichaY + 2);
   doc.setLineWidth(0.2);
