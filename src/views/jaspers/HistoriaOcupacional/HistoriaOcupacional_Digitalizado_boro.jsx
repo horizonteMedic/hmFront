@@ -102,7 +102,7 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
   }
   // === HEADER ===
   // header_HistoriaOcupacional_Boro(doc, datos);
-  header_HistoriaOcupacional(doc, datos);
+  header_HistoriaOcupacional_Boro(doc, datos);
   const firmap = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "FIRMAP");
   const huellap = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "HUELLA");
   const sellofirma = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
@@ -185,7 +185,7 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
       },
       didDrawPage: (data) => {
     // Agrega el header personalizado en cada página
-    header_HistoriaOcupacional(doc, datos);
+    header_HistoriaOcupacional_Boro(doc, datos);
 
     // Modifica el startY si estás en una nueva página
     if (data.pageNumber > 1) {
@@ -205,7 +205,7 @@ const pageHeight = doc.internal.pageSize.getHeight();
 if ((pageHeight - finalY) < totalRequired) {
   doc.addPage(); // 🟡 CREA LA NUEVA HOJA
 
-  header_HistoriaOcupacional(doc, datos); // 🔵 REDIBUJA EL HEADER EN LA NUEVA HOJA
+  header_HistoriaOcupacional_Boro(doc, datos); // 🔵 REDIBUJA EL HEADER EN LA NUEVA HOJA
 
   const newY = 53; // 👈 Usa 53 para mantener consistencia con el resto del documento
   finalY = newY;   // ✅ Ajusta para que la firma comience debajo del header
