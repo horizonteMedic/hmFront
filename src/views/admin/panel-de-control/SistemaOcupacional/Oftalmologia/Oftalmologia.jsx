@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import styles from './Oftalmologia.module.css';
 import OftalmologiaForm from './OftalmologiaForm';
+import OftalmologiaOhla from './OftalmologiaOhla';
 
 const Oftalmologia = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -30,10 +31,7 @@ const Oftalmologia = () => {
             <OftalmologiaForm />
           )}
           {activeTab === 1 && (
-            <div>
-              <h2 className="text-xl font-bold mb-2">Oftalmología Ohla</h2>
-              <p>Aquí irá el contenido del módulo Oftalmología Ohla.</p>
-            </div>
+            <OftalmologiaOhla />
           )}
         </div>
       </div>

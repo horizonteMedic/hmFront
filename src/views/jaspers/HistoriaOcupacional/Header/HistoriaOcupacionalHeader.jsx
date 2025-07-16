@@ -97,8 +97,8 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
   // Segunda línea: sede alineada con el número
   doc.setFontSize(8).setFont('helvetica', 'bold');
   //DATOS DEBAJO DE NORDEN
-  doc.setFont('helvetica', 'normal');
-  doc.text(datos.sede || '', nroOrdenX - 40, nroOrdenY +10);
+  // doc.setFont('helvetica', 'normal');
+  // doc.text(datos.sede || '', nroOrdenX - 40, nroOrdenY +10);
   doc.setFont('helvetica', 'bold');
   doc.text("HISTORIA OCUPACIONAL", 100, nroOrdenY + 10)
   doc.setFont('helvetica', 'normal');
@@ -123,6 +123,7 @@ const header_HistoriaOcupacional = (doc, datos = {}) => {
     ],
     [
       { label: "Telefono :", value: datos.celularPaciente || '' },
+      // { label: "", value: "" },
       { label: "Lugar de Procedencia :", value: datos.lugarProcedimiento || '' },
     ],
   ];
