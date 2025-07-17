@@ -83,6 +83,100 @@ const AudiometriaOhlaTabSelector = ({
     setFormOhla((prev) => ({ ...initialFormStateOhla, norden: prev.norden }));
   };
 
+  //FICHA AUDIOLOGICA
+  //============================================
+  const initialFormStateFicha = {
+    norden: "",
+    codFa: "",
+    fecha: today,
+    nomExam: "",
+    noExamen: false,
+
+    nombres: "",
+    edad: "",
+    bellPlus: false,
+
+    genero: "",
+    aniosTrabajo: "",
+    mesesTrabajo: "",
+
+    areaO: "",
+    otoscopia: "",
+
+    empresa: "",
+    contrata: "",
+
+    marca: "AMPLIVOX",
+    modelo: "AMPLIVOX 270",
+    calibracion: today,
+    tiempoExposicion: "",
+    // h_d: false,
+    // min_d: false,
+    tapones: false,
+    orejeras: false,
+    apreciacion_ruido: "RUIDO NO MOLESTO",
+
+    consumo_tabaco: "NO",
+    servicio_militar: "NO",
+    hobbies_ruido: "NO",
+    exposicion_quimicos: "NO",
+    infeccion_oido: "NO",
+    uso_ototoxicos: "NO",
+
+    disminucion_audicion: "NO",
+    dolor_oidos: "NO",
+    zumbido: "NO",
+    mareos: "NO",
+    infeccion_oido_actual: "NO",
+    otro: "NO",
+
+    nombre_profecional: fixEncodingModern(
+      userlogued?.datos?.nombres_user || ""
+    ),
+    conclusiones: "",
+    nombre_medico: "",
+
+    od_250: "",
+    od_500: "",
+    od_1000: "",
+
+    oi_250: "",
+    oi_500: "",
+    oi_1000: "",
+
+    d_umbral_discriminacion: "",
+    d_porcentaje: "",
+    d_umbral_confort: "",
+    d_umbral_disconfort: "",
+
+    i_umbral_discriminacion: "",
+    i_porcentaje: "",
+    i_umbral_confort: "",
+    i_umbral_disconfort: "",
+  };
+
+  const [formFicha, setFormFicha] = useState(initialFormStateFicha);
+
+  const [searchNombreMedico, setSearchNombreMedico] = useState(
+    formFicha.nombre_medico
+  );
+  const [filteredNombresMedicos, setFilteredNombresMedicos] = useState([]);
+
+  const handleClearFicha = () => {
+    setFormFicha(initialFormStateFicha);
+    setSearchNombreMedico("");
+  };
+
+  const handleClearnotOFicha = () => {
+    setFormFicha((prev) => ({ ...initialFormStateFicha, norden: prev.norden }));
+    setSearchNombreMedico("");
+  };
+
+  function fixEncodingModern(str) {
+    const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+
   const tabs = [
     {
       label: "Audiometría Ohla",
@@ -96,6 +190,12 @@ const AudiometriaOhlaTabSelector = ({
           setForm={setFormOhla}
           handleClear={handleClearOhla}
           handleClearnotO={handleClearnotOOhla}
+
+          handleClearnotOFicha={handleClearnotOFicha}
+          tablaFicha={"ficha_audiologica"}
+          setFormFicha={setFormFicha}
+          setSearchNombreMedico={setSearchNombreMedico}          
+          handleClearFicha={handleClearFicha}
         />
       ),
     },
@@ -108,6 +208,15 @@ const AudiometriaOhlaTabSelector = ({
           selectedSede={selectedSede}
           userloguedCompleto={userlogued}
           listas={listas}
+          form={formFicha}
+          setForm={setFormFicha}
+          searchNombreMedico={searchNombreMedico}
+          setSearchNombreMedico={setSearchNombreMedico}
+          filteredNombresMedicos={filteredNombresMedicos}
+          setFilteredNombresMedicos={setFilteredNombresMedicos}
+          handleClear={handleClearFicha}
+          handleClearnotO={handleClearnotOFicha}
+          handleClearOhla={handleClearOhla}
         />
       ),
     },

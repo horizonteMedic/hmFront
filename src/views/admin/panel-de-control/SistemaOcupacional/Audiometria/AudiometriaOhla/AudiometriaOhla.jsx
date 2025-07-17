@@ -16,6 +16,8 @@ import {
   getInfoTabla,
   Loading,
   GetInfoServicio,
+  VerifyTRFicha,
+  GetInfoServicioFicha,
 } from "./controllerAudiometriaOhla";
 
 const tabla = "audiometria_po";
@@ -28,6 +30,12 @@ export default function AudiometriaOhla({
   setForm,
   handleClear,
   handleClearnotO,
+
+  handleClearnotOFicha,
+  tablaFicha,
+  setFormFicha,
+  setSearchNombreMedico,
+  handleClearFicha,
 }) {
   const [dataTabla, setDataTabla] = useState([]);
 
@@ -681,6 +689,16 @@ export default function AudiometriaOhla({
                   if (e.key === "Enter") {
                     handleClearnotO();
                     VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+
+                    handleClearnotOFicha(); //enviar
+                    VerifyTRFicha(
+                      form.norden,
+                      tablaFicha, //enviar
+                      token,
+                      setFormFicha, //enviar
+                      selectedSede,
+                      setSearchNombreMedico //enviar
+                    );
                   }
                 }}
                 onChange={handleChange}
@@ -1113,6 +1131,10 @@ export default function AudiometriaOhla({
               set={setForm}
               token={token}
               clean={handleClear}
+              tablaFicha={tablaFicha}
+              setFicha={setFormFicha}
+              setSearchNombreMedico={setSearchNombreMedico}
+              cleanFicha={handleClearFicha}
             />
           </div>
           <div className="grid grid-cols-1  gap-4 border rounded p-4">
@@ -1156,7 +1178,10 @@ export default function AudiometriaOhla({
           </button>
           <button
             type="button"
-            onClick={handleClear}
+            onClick={() => {
+              handleClear();
+              handleClearFicha();
+            }}
             className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -1167,7 +1192,17 @@ export default function AudiometriaOhla({
   );
 }
 
-function Table({ data, tabla, set, token, clean }) {
+function Table({
+  data,
+  tabla,
+  set,
+  token,
+  clean,
+  tablaFicha,
+  setFicha,
+  setSearchNombreMedico,
+  cleanFicha,
+}) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -1188,6 +1223,14 @@ function Table({ data, tabla, set, token, clean }) {
     clean();
     Loading("Importando Datos");
     GetInfoServicio(nro, tabla, set, token);
+    cleanFicha();
+    GetInfoServicioFicha(
+      nro,
+      tablaFicha,
+      setFicha,
+      token,
+      setSearchNombreMedico
+    );
   }
 
   return (
