@@ -100,6 +100,34 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     doc.text(datos[key] || "", xDato + 4, y);
     y += 7;
   });
+   if (s1) {
+    const canvas = document.createElement('canvas');
+    canvas.width = s1.width;
+    canvas.height = s1.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(s1, 0, 0);
+    const selloBase64 = canvas.toDataURL('image/png');
+    // Dimensiones del área del sello
+    const sigW = 70;
+    const sigH = 35;
+    const sigX = (pageW - sigW) / 2;
+    const sigY = y + 5;
+    // Tamaño máximo dentro del área
+    const maxImgW = sigW - 10;
+    const maxImgH = sigH - 10;
+    let imgW = s1.width;
+    let imgH = s1.height;
+    const scaleW = maxImgW / imgW;
+    const scaleH = maxImgH / imgH;
+    const scale = Math.min(scaleW, scaleH, 1);
+    imgW *= scale;
+    imgH *= scale;
+    // Centramos dentro del rectángulo
+    const imgX = sigX + (sigW - imgW) / 2;
+    const imgY = sigY + (sigH - imgH) / 2;
+    doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    y = imgY + imgH + 5;
+  }
 
 
   // === SEGUNDA PÁGINA (SIN header) ===

@@ -44,10 +44,30 @@ export const VerifyTR = async (nro,tabla,token,set,sede,setTable) => {
         console.log(res)
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
+            GetInfoAnterior(nro,token,setTable)
         } else {
             GetInfoHistoriaOcupacinal(nro,tabla,set,token,setTable)
         }
     })
+}
+
+export const GetInfoAnterior = (nro,token,setTable) => {
+  getFetch(`/api/v01/ct/historiaOcupacional/obtenerHistoriaOcupacionalDetallesPorNorden?nOrden=${nro}`,token)
+  .then((res) => {
+    if (res&&res.length > 0) {
+        console.log(res)
+      const detallesOrdenados = res.sort(
+        (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+      );
+    
+      setTable(detallesOrdenados)
+    } else {
+      Swal.fire('Error', 'Ocurrio un error al traer los datos','error')
+    }
+  })
+  .finally(() => {
+    Swal.close()
+  })
 }
 
 export const GetInfoPac = (nro,set,token,sede) => {
