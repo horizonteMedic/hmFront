@@ -192,24 +192,54 @@ export default function FichaAudiologica_Digitalizado(datos = {}) {
     doc.line(graphX, yLine, graphX + graphW, yLine);
   }
   // Líneas verticales (frecuencias)
-  for (let i = 0; i <= 9; i++) {
-    const xLine = graphX + i * (graphW / 9);
+  for (let i = 0; i < 9; i++) {
+    const xLine = graphX + i * (graphW / 8);
     doc.line(xLine, graphY, xLine, graphY + graphH);
   }
-  // Ejes y etiquetas
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  // Etiquetas de frecuencia (Hz) - SOLO UNA FILA
   const freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
+  doc.setFont("helvetica", "normal").setFontSize(7);
   for (let i = 0; i < freqs.length; i++) {
-    const xTick = graphX + (i + 0.5) * (graphW / 9);
+    const xTick = graphX + i * (graphW / 8);
     doc.text(String(freqs[i]), xTick, graphY - 2, { align: "center" });
   }
-  doc.text("Hz", graphX + graphW, graphY - 2, { align: "left" });
+  // Mover 'Hz' más a la derecha del último valor
+  doc.text("Hz", graphX + graphW + 4, graphY - 2, { align: "left" });
+  // Etiquetas dB
   for (let i = 0; i <= 12; i++) {
     const dB = -10 + i * 10;
     const yTick = graphY + i * (graphH / 12) + 2;
     doc.text(String(dB), graphX - 7, yTick, { align: "right" });
   }
   doc.text("dB", graphX - 10, graphY + graphH / 2, { align: "right" });
+
+  // Graficar puntos de audiometría (solo borde rojo, delgado, sin relleno, sin trazo negro)
+  const puntos = [
+    { freq: 500, db: 100, color: 'red' },
+    { freq: 1000, db: 100, color: 'red' },
+    { freq: 2000, db: 100, color: 'red' },
+    { freq: 3000, db: 100, color: 'red' },
+    { freq: 4000, db: 100, color: 'red' },
+    { freq: 6000, db: 100, color: 'red' },
+    { freq: 8000, db: 100, color: 'red' }
+  ];
+  const prevLineWidth = doc.getLineWidth();
+  for (const punto of puntos) {
+    const freqIdx = freqs.indexOf(punto.freq);
+    if (freqIdx === -1) continue;
+    const x = graphX + freqIdx * (graphW / 8);
+    const yP = graphY + ((punto.db + 10) / 120) * graphH;
+    // Guardar color de trazo actual (por defecto negro)
+    // Cambiar a rojo solo para el círculo
+    if (punto.color === 'red') doc.setDrawColor(255, 0, 0);
+    else if (punto.color === 'blue') doc.setDrawColor(0, 0, 255);
+    else doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.4);
+    doc.circle(x, yP, 1.1);
+    // Restaurar color de trazo a negro para el resto del gráfico
+    doc.setDrawColor(0, 0, 0);
+  }
+  doc.setLineWidth(prevLineWidth);
 
   // Derecha: tablas
   const tableX = graphX + graphW + colGap;
