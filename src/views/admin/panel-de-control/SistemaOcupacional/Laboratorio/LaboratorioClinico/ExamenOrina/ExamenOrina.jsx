@@ -229,7 +229,7 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {chemicalLabels.map((lbl, idx, arr) => (
               <div key={lbl} className="grid grid-cols-2 items-center gap-2">
-                <label className="font-medium">{lbl.replace('Q','').replace('S','')}:</label>
+                <label className="font-medium">{lbl=="Sangre"?"Sangre":lbl.replace('Q','').replace('S','')}:</label>
                 <input
                   className="border rounded p-1 w-full"
                   name={lbl}
