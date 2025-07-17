@@ -47,7 +47,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
       { label: "Hematocrito",     key: "txtHematocrito",    suffix: " %" },
       { label: "Hemoglobina",     key: "txtHemoglobina",    suffix: " g/dl" },
       { label: "Hematíes",        key: "txtHematiesHematologia",       suffix: "" },
-      { label: "V.S.G",           key: "txtVsg",            suffix: "" },
+      { label: "V.S.G",           key: "txtVsg",            suffix: " mm/HORA" },
       { label: "Plaquetas",       key: "txtPlaquetas",      suffix: " mm³" },
     ];
     const rightItems = [
@@ -306,7 +306,12 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         doc.text(label, bioqMargin + sedLabelW, y, { align: "right" });
         doc.text(":", bioqMargin + sedLabelW + 2, y, { align: "left" });
         doc.setFont("helvetica", "bold");
-        doc.text(v, bioqMargin + sedLabelW + 8, y, { align: "left" });
+        if (label === "Cristales") {
+          const lineasCristales = doc.splitTextToSize(v, 38);
+          doc.text(lineasCristales, bioqMargin + sedLabelW + 8, y);
+        } else {
+          doc.text(v, bioqMargin + sedLabelW + 8, y, { align: "left" });
+        }
       }
       // Lado derecho
       if (sedR[i]) {
@@ -316,7 +321,12 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         doc.text(label, bioqRight - sedLabelW, y, { align: "right" });
         doc.text(":", bioqRight - sedLabelW + 2, y, { align: "left" });
         doc.setFont("helvetica", "bold");
-        doc.text(v, bioqRight - sedLabelW + 8, y, { align: "left" });
+        if (label === "Otros") {
+          const lineasOtros = doc.splitTextToSize(v, 38);
+          doc.text(lineasOtros, bioqRight - sedLabelW + 8, y);
+        } else {
+          doc.text(v, bioqRight - sedLabelW + 8, y, { align: "left" });
+        }
       }
     }
 
