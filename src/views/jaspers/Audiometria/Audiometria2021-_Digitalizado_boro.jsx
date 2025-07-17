@@ -16,10 +16,12 @@ const body_Audiometria2021_Digitalizado = (doc) => {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 16;
   const usableW = pageW - margin * 2;
+  const imgW = usableW;   // Menos ancho, deja márgenes
+  const imgH = 120;      // Más alto
   let y = 40;
   try {
-    doc.addImage('public/img/cuerpo2-8.png', 'PNG', margin, y, usableW, 40);
-    y += 45;
+    doc.addImage('public/img/cuerpo2-8.png', 'PNG', margin, y, imgW, imgH);
+    y += imgH + 5; // Deja un pequeño espacio después de la imagen
   } catch (e) {
     doc.text('Imagen no disponible', margin, y + 10);
     y += 20;
@@ -57,21 +59,22 @@ const body_Audiometria2021_Digitalizado = (doc) => {
   // Fondo azul 20-40 dB
   doc.setFillColor(180, 235, 255);
   doc.rect(graphX, graphY + 30, graphW, 20, 'F');
+  // Declarar freqs antes de cualquier uso
+  const freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
   // Líneas horizontales (cada 10 dB)
   for (let i = 0; i <= 12; i++) {
     const yLine = graphY + i * (graphH / 12);
     doc.line(graphX, yLine, graphX + graphW, yLine);
   }
   // Líneas verticales (frecuencias)
-  for (let i = 0; i <= 9; i++) {
-    const xLine = graphX + i * (graphW / 9);
+  for (let i = 0; i < freqs.length; i++) {
+    const xLine = graphX + i * (graphW / (freqs.length - 1));
     doc.line(xLine, graphY, xLine, graphY + graphH);
   }
   // Ejes y etiquetas
   doc.setFont('helvetica', 'normal').setFontSize(7);
-  const freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
   for (let i = 0; i < freqs.length; i++) {
-    const xTick = graphX + (i + 0.5) * (graphW / 9);
+    const xTick = graphX + i * (graphW / (freqs.length - 1));
     doc.text(String(freqs[i]), xTick, graphY - 2, { align: 'center' });
   }
   doc.text('Hz', graphX + graphW, graphY - 2, { align: 'left' });
@@ -82,6 +85,28 @@ const body_Audiometria2021_Digitalizado = (doc) => {
   }
   doc.text('dB', graphX - 10, graphY + graphH / 2, { align: 'right' });
 
+  // INTEGRACIÓN: aquí debes pasar tu array de puntos dinámicos
+  // Ejemplo: const puntos = datos.puntosAudiometria || [];
+  const puntos = [
+    { freq: 500, db: 100, color: 'red' },
+    { freq: 1000, db: 40, color: 'blue' }
+    // ...más puntos
+  ];
+  const prevLineWidth = doc.getLineWidth();
+  for (const punto of puntos) {
+    const freqIdx = freqs.indexOf(punto.freq);
+    if (freqIdx === -1) continue;
+    const x = graphX + (freqIdx + 0.5) * (graphW / 9);
+    const yP = graphY + ((punto.db + 10) / 120) * graphH;
+    if (punto.color === 'red') doc.setDrawColor(255, 0, 0);
+    else if (punto.color === 'blue') doc.setDrawColor(0, 0, 255);
+    else doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.4);
+    doc.circle(x, yP, 1.1);
+    doc.setDrawColor(0, 0, 0);
+  }
+  doc.setLineWidth(prevLineWidth);
+
   y += legendH + 5;
 
   // =====================
@@ -91,7 +116,7 @@ const body_Audiometria2021_Digitalizado = (doc) => {
   doc.text('8.- Interpretación – Conclusiones:', margin, y);
   y += 6;
 
-  
+   
  
 };
 

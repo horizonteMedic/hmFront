@@ -44,10 +44,31 @@ export const VerifyTR = async (nro,tabla,token,set,sede,setTable) => {
         console.log(res)
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
+          
+            GetInfoAnterior(nro,token,setTable)
         } else {
             GetInfoHistoriaOcupacinal(nro,tabla,set,token,setTable)
         }
     })
+}
+
+export const GetInfoAnterior = (nro,token,setTable) => {
+  getFetch(`/api/v01/ct/historiaOcupacional/obtenerHistoriaOcupacionalDetallesPorNorden?nOrden=${nro}`,token)
+  .then((res) => {
+    if (res&&res.length > 0) {
+       Swal.fire('Info', 'Este norden no cuenta con historia ocupacional','info')
+        console.log(res)
+      const detallesOrdenados = res.sort(
+        (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
+      );
+      
+      setTable(detallesOrdenados)
+     
+    } else {
+      Swal.fire('Info', 'Este norden no tiene registros de historia ocupacional previos','info')
+
+    }
+  })
 }
 
 export const GetInfoPac = (nro,set,token,sede) => {
@@ -60,9 +81,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
         nombres: res.nombresApellidos,
         }));
     })
-    .finally(() => {
-      Swal.close()
-    })
+    
 }
 
 const getAñoInicial = (fecha) => {

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
+import { VerifyTRFicha } from "./controllerAudiometriaOhla";
 
 const tabla = "ficha_audiologica";
 
@@ -10,6 +11,10 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
+function fixEncodingModern(str) {
+  const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
+  return new TextDecoder("utf-8").decode(bytes);
+}
 
 const AudiometriaFichaAudiologica = ({
   token,
@@ -19,19 +24,20 @@ const AudiometriaFichaAudiologica = ({
 }) => {
   const initialFormState = {
     norden: "",
+    codFa:"",
     fecha: today,
-    tipoExamen: "",
+    nomExam: "",
     noExamen: false,
 
     nombres: "",
     edad: "",
     bellPlus: false,
 
-    sexo: "",
+    genero: "",
     aniosTrabajo: "",
     mesesTrabajo: "",
 
-    ocupacion: "",
+    areaO: "",
     otoscopia: "",
 
     empresa: "",
@@ -61,7 +67,9 @@ const AudiometriaFichaAudiologica = ({
     infeccion_oido_actual: "NO",
     otro: "NO",
 
-    nombre_profecional: userloguedCompleto?.datos?.nombres_user || "",
+    nombre_profecional: fixEncodingModern(
+      userloguedCompleto?.datos?.nombres_user || ""
+    ),
     conclusiones: "",
     nombre_medico: "",
 
@@ -83,6 +91,7 @@ const AudiometriaFichaAudiologica = ({
     i_umbral_confort: "",
     i_umbral_disconfort: "",
   };
+
   const [form, setForm] = useState(initialFormState);
 
   const [searchNombreMedico, setSearchNombreMedico] = useState(
@@ -91,6 +100,14 @@ const AudiometriaFichaAudiologica = ({
   const [filteredNombresMedicos, setFilteredNombresMedicos] = useState([]);
 
   const { MedicosMulti } = listas;
+
+  const handleClear = () => {
+    setForm(initialFormState);
+  };
+
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  };
 
   const handleNombreMedicoSearch = (e) => {
     const v = e.target.value.toUpperCase();
@@ -158,18 +175,6 @@ const AudiometriaFichaAudiologica = ({
     }));
   };
 
-  // Función para guardar (placeholder)
-  const handleSave = () => {
-    // Aquí iría la lógica real de guardado
-    Swal.fire({
-      icon: "success",
-      title: "Guardado",
-      text: "Los datos han sido guardados/actualizados correctamente.",
-      timer: 1500,
-      showConfirmButton: false,
-    });
-  };
-
   // Función para imprimir (placeholder)
   const handlePrint = () => {
     if (!form.norden) {
@@ -202,18 +207,6 @@ const AudiometriaFichaAudiologica = ({
     });
   };
 
-  // Función para limpiar (opcional, solo resetea los campos editables)
-  const handleClear = () => {
-    // Si tienes campos editables, aquí los puedes limpiar
-    Swal.fire({
-      icon: "info",
-      title: "Limpiar",
-      text: "Función de limpiar implementada (placeholder).",
-      timer: 1000,
-      showConfirmButton: false,
-    });
-  };
-
   return (
     <div className="w-full bg-white rounded shadow p-4 border border-gray-200 mb-4">
       <div className="w-full flex flex-row flex-nowrap gap-4 text-[12px] pb-4">
@@ -231,8 +224,15 @@ const AudiometriaFichaAudiologica = ({
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    // handleClearnotO();
-                    // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                    handleClearnotO();
+                    VerifyTRFicha(
+                      form.norden,
+                      tabla,
+                      token,
+                      setForm,
+                      selectedSede,
+                      setSearchNombreMedico
+                    );
                   }
                 }}
                 className="border border-gray-400 rounded px-2 py-1  text-[12px] w-full"
@@ -255,8 +255,8 @@ const AudiometriaFichaAudiologica = ({
                 Tip. Exam. :
               </label>
               <input
-                name="tipoExamen"
-                value={form.tipoExamen}
+                name="nomExam"
+                value={form.nomExam}
                 disabled
                 className="border rounded px-2 py-1  text-[12px] w-full min-w-[120px]"
               />
@@ -358,7 +358,7 @@ const AudiometriaFichaAudiologica = ({
                 Sexo :
               </label>
               <input
-                value={form.sexo}
+                value={form.genero}
                 disabled
                 className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
               />
@@ -399,7 +399,7 @@ const AudiometriaFichaAudiologica = ({
                 Ocupación :
               </label>
               <input
-                value={form.ocupacion}
+                value={form.areaO}
                 disabled
                 className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full "
               />
@@ -439,7 +439,7 @@ const AudiometriaFichaAudiologica = ({
                 Contrata :
               </label>
               <input
-                value={form.empresaContratista}
+                value={form.contrata}
                 disabled
                 className="border border-gray-400 rounded px-2 py-1 bg-gray-100 text-[12px] w-full"
               />
@@ -542,6 +542,7 @@ const AudiometriaFichaAudiologica = ({
                     <input
                       type="checkbox"
                       name="tapones"
+                      checked={form.tapones}
                       onChange={toggleCheckBox}
                     />
                     Tapones
@@ -550,6 +551,7 @@ const AudiometriaFichaAudiologica = ({
                     <input
                       type="checkbox"
                       name="orejeras"
+                      checked={form.orejeras}
                       onChange={toggleCheckBox}
                     />
                     Orejeras
@@ -775,7 +777,9 @@ const AudiometriaFichaAudiologica = ({
             <button
               className="flex items-center gap-2 px-4 py-2 rounded-lg border-none font-semibold bg-[#059669] text-white transition"
               style={{ minWidth: "140px" }}
-              onClick={handleSave}
+              onClick={() => {
+                SubmitDataServiceFicha(form, token, userlogued, handleClear, tabla);
+              }}
             >
               <FontAwesomeIcon
                 icon={faSave}
@@ -821,6 +825,7 @@ const AudiometriaFichaAudiologica = ({
                         <input
                           type="text"
                           name={`od_${hz.key}`}
+                          value={form[`od_${hz.key}`]}
                           onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
@@ -830,6 +835,7 @@ const AudiometriaFichaAudiologica = ({
                         <input
                           type="text"
                           name={`oi_${hz.key}`}
+                          value={form[`oi_${hz.key}`]}
                           onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
@@ -876,6 +882,7 @@ const AudiometriaFichaAudiologica = ({
                         <input
                           type="text"
                           name={`d_${item.key}`}
+                          value={form[`d_${item.key}`]}
                           onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />
@@ -884,6 +891,7 @@ const AudiometriaFichaAudiologica = ({
                         <input
                           type="text"
                           name={`i_${item.key}`}
+                          value={form[`i_${item.key}`]}
                           onChange={handleChange}
                           className="border border-gray-400 rounded px-2 py-1 text-[12px] w-full max-w-[150px]"
                         />

@@ -12,93 +12,24 @@ import Swal from "sweetalert2";
 import {
   SubmitDataService,
   VerifyTR,
-  PrintHojaR,
+  // PrintHojaR,
   getInfoTabla,
   Loading,
   GetInfoServicio,
 } from "./controllerAudiometriaOhla";
 
-export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
-  const tabla = "audiometria_po";
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(date.getDate()).padStart(2, "0")}`;
-
-  const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
+const tabla = "audiometria_po";
+const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
+export default function AudiometriaOhla({
+  token,
+  selectedSede,
+  userlogued,
+  form,
+  setForm,
+  handleClear,
+  handleClearnotO,
+}) {
   const [dataTabla, setDataTabla] = useState([]);
-
-  const initialFormState = {
-    codAu: "",
-    norden: "",
-    fecha: today,
-    fechaNac: "",
-    nombres: "",
-    edad: "",
-    dni: "",
-    empresa: "",
-    contrata: "",
-    nomExam: "",
-    no_paso_Examen: false,
-    activar_grafico: false,
-
-    od_500: "",
-    od_1000: "",
-    od_2000: "",
-    od_3000: "",
-    od_4000: "",
-    od_6000: "",
-    od_8000: "",
-
-    oi_500: "",
-    oi_1000: "",
-    oi_2000: "",
-    oi_3000: "",
-    oi_4000: "",
-    oi_6000: "",
-    oi_8000: "",
-
-    od_o_500: "",
-    od_o_1000: "",
-    od_o_2000: "",
-    od_o_3000: "",
-    od_o_4000: "",
-    od_o_6000: "",
-    od_o_8000: "",
-
-    llenar_osea: false,
-    oi_o_500: "",
-    oi_o_1000: "",
-    oi_o_2000: "",
-    oi_o_3000: "",
-    oi_o_4000: "",
-    oi_o_6000: "",
-    oi_o_8000: "",
-
-    perdida_global: "",
-    asignar_especialista: false,
-
-    //derecha
-    nombres_search: "",
-    codigo_search: "",
-    diagnostico: "",
-  };
-  const [form, setForm] = useState(initialFormState);
-  const [status, setStatus] = useState("");
-
-  const handleCheckRadio = (name, value) => {
-    setForm((f) => ({
-      ...f,
-      [name]: f[name] === value.toUpperCase() ? "" : value.toUpperCase(),
-    }));
-  };
-  const toggleCheckBox = (name) => {
-    setForm((f) => ({
-      ...f,
-      [name]: !f[name],
-    }));
-  };
 
   useEffect(() => {
     obtenerInfoTabla();
@@ -112,51 +43,28 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value }));
   };
+
+  const toggleCheckBox = (name) => {
+    setForm((f) => ({
+      ...f,
+      [name]: !f[name],
+    }));
+  };
+
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
-
     // Solo permitir números (opcionalmente incluyendo vacío para poder borrar)
     if (/^\d*$/.test(value)) {
       setForm((f) => ({ ...f, [name]: value }));
     }
   };
 
-  const handleClear = () => {
-    setForm(initialFormState);
-    setStatus("Formulario limpiado");
-  };
-
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
   const getNextArrayItem = (pre = "", current, post = "", array, next = "") => {
     const index = array.indexOf(current);
     if (index === -1 || index === array.length - 1) {
       return next; // No existe o ya es el último
     }
     return `${pre}${array[index + 1]}${post}`;
-  };
-
-  const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Audiometría?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
-    });
   };
 
   const realizarCalculoDiagnostico = (prom, prom1, cont, cont1) => {
@@ -465,6 +373,7 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     }
     return textoDiagnostico;
   };
+
   const calcularPerdidaGlobal = () => {
     console.log("Calculando perdida global...");
 
@@ -731,6 +640,7 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
     ]
       .map((v) => parseFloat(v) || 0)
       .filter((v) => v > 25);
+
     let oiPromedio = (
       oiValues.reduce((acc, val) => acc + val, 0) /
       (oiValues.length === 0 ? 1 : oiValues.length)
@@ -1253,10 +1163,6 @@ export default function AudiometriaOhla({ token, selectedSede, userlogued }) {
           </button>
         </div>
       </div>
-
-      {status && (
-        <p className="mt-4 text-center text-green-600 text-base">{status}</p>
-      )}
     </div>
   );
 }
@@ -1273,7 +1179,7 @@ function Table({ data, tabla, set, token, clean }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, token, tabla);
+        // PrintHojaR(nro, token, tabla);
       }
     });
   };

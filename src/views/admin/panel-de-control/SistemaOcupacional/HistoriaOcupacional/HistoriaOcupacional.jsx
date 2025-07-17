@@ -123,9 +123,11 @@ const HistoriaOcupacional = ({
   listas,
   userDatos,
 }) => {
-  const [nroOrden, setNroOrden] = useState("");
-  // Simulación: nombre se llena automáticamente al ingresar nroOrden
-  const nombreCompleto = nroOrden ? "Juan Pérez Gómez" : "";
+  function fixEncodingModern(str) {
+  const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
   const [form, setForm] = useState({
     norden: "",
     nombres: "",
@@ -134,7 +136,7 @@ const HistoriaOcupacional = ({
     areaO: "",
     dni: "",
     dniUser: userDatos.datos.dni_user,
-    nombreUser: userDatos.datos.nombres_user,
+    nombreUser: fixEncodingModern(userDatos.datos.nombres_user),
   });
   const [rowData, setRowData] = useState({
     fecha: "",

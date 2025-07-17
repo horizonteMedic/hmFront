@@ -265,7 +265,7 @@ const header_HistoriaOcupacional_Boro = (doc, datos = {}) => {
       { label: "Fecha de Nacimiento :", value: datos.fechaNac || '' },
     ],
     [
-      { label: "Profesion :", value: datos.areaO || '' },
+      { label: "Profesion :", value: datos.profesion || '' },
       { label: "Sexo :", value: datos.sexo === 'F' ? 'FEMENINO' : datos.sexo === 'M' ? 'MASCULINO' : '' },
     ],
     [

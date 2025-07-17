@@ -141,7 +141,7 @@ export default function ReporteExamen1 (datos){
 
         doc.setFontSize(8);
         doc.setFont("helvetica", "bold");
-        doc.text(`Registrado por : ${datos.userRegistro || ""}`, 17, headspace+185);
+        doc.text(`Registrado por : ${obtenerPrimeraPalabra(datos.userRegistro || "")}`, 17, headspace+185);
         footer(doc,datos);
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -156,4 +156,10 @@ export default function ReporteExamen1 (datos){
         iframe.contentWindow.focus();
         iframe.contentWindow.print();
     }
+}
+function obtenerPrimeraPalabra(nombreCompleto) {
+  if (typeof nombreCompleto !== "string") return "";
+  const limpio = nombreCompleto.trim();      // Elimina espacios
+  if (limpio === "") return "";              // Si está vacío, devuelve ""
+  return limpio.split(/\s+/)[0];             // Si no, devuelve la primera palabra
 }

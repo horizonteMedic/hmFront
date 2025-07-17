@@ -7,6 +7,11 @@ const obtenerReporteUrl =
   "/api/v01/ct/audiometria/obtenerInformacionAudiometriaPo";
 const registrarUrl = "/api/v01/ct/audiometria/registrarActualizarAudiometriaPo";
 
+const obtenerReporteFicha =
+  "/api/v01/ct/audiometria/obtenerInformacionFichaAudiologica";
+const registrarUrlFicha =
+  "/api/v01/ct/audiometria/registrarActualizarFichaAudiologica";
+
 export const GetInfoServicio = (nro, tabla, set, token) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -112,17 +117,12 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     console.log(res);
     if (res.id === 1 || res.id === 0) {
       Swal.fire({
-        title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
+        title: "Éxito",
+        text: res.mensaje,
         icon: "success",
-        showCancelButton: true,
         confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      }).then((result) => {
+      }).then(() => {
         limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
-        }
       });
     } else {
       Swal.fire("Error", "Ocurrio un error al Registrar", "error");
@@ -135,37 +135,6 @@ function convertirFecha(fecha) {
   return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
 }
 
-export const PrintHojaR = (nro, token, tabla) => {
-  Loading("Cargando Formato a Imprimir");
-
-  getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
-    .then(async (res) => {
-      if (res.norden) {
-        console.log(res);
-        const nombre = res.nameJasper;
-        console.log(nombre);
-        const jasperModules = import.meta.glob(
-          `../../../../../../jaspers/Audiometria/*.jsx`
-        );
-        const modulo = await jasperModules[
-          `../../../../../../jaspers/Audiometria/${nombre}.jsx`
-        ]();
-        // Ejecuta la función exportada por default con los datos
-        if (typeof modulo.default === "function") {
-          modulo.default(res);
-        } else {
-          console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
-          );
-        }
-      }
-    })
-    .finally(() => {
-      Swal.close();
-    });
-};
-
-//===============Fin Zona Modificación===============
 export const Loading = (text) => {
   Swal.fire({
     title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -231,6 +200,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...prev,
         ...res,
         fechaNac: convertirFecha(res.fechaNac),
+        genero: res.genero == "M" ? "Masculino" : "Femenino",
         nombres: res.nombresApellidos,
       }));
     })
@@ -258,4 +228,237 @@ export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
       "error"
     );
   }
+};
+
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+//=================================================Diferent
+export const VerifyTRFicha = async (
+  nro,
+  tabla,
+  token,
+  set,
+  sede,
+  setSearchNombreMedico
+) => {
+  if (!nro) {
+    await Swal.fire(
+      "Error",
+      "Debe Introducir un Nro de Historia Clinica válido",
+      "error"
+    );
+    return;
+  }
+  Loading("Validando datos");
+  getFetch(
+    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+    token
+  ).then((res) => {
+    console.log(res);
+    if (res.id === 0) {
+      //No tiene registro previo
+      GetInfoPac(nro, set, token, sede);
+    } else {
+      GetInfoServicioFicha(nro, tabla, set, token, setSearchNombreMedico);
+    }
+  });
+};
+
+export const GetInfoServicioFicha = (
+  nro,
+  tabla,
+  set,
+  token,
+  setSearchNombreMedico
+) => {
+  getFetch(`${obtenerReporteFicha}?nOrden=${nro}&nameService=${tabla}`, token)
+    .then((res) => {
+      if (res.norden) {
+        console.log(res);
+        set((prev) => ({
+          ...prev,
+          ...res,
+
+          fecha: res.fechaExamen,
+          nomExam: res.nomExam,
+          codFa: res.codFa,
+          noExamen:
+            res.txtMarca == "AMPLIVOX" && res.txtModelo == "AMPLIVOX 270",
+
+          bellPlus:
+            res.txtMarca == "BELL INVENTS" && res.txtModelo == "BELL PLUS",
+
+          genero: res.genero == "M" ? "Masculino" : "Femenino",
+          aniosTrabajo: res.tiempoTrabajo,
+          mesesTrabajo: res.txtMesesTrabajo,
+
+          areaO: res?.areaO || "",
+          otoscopia: res.txtOtoscopia,
+
+          empresa: res.empresa,
+          contrata: res.contrata,
+
+          marca: res.txtMarca,
+          modelo: res.txtModelo,
+          calibracion: res.fechaCalibracion,
+          tiempoExposicion: res.tiempoExposicionTotalPonderado,
+
+          tapones: res.chkTapones,
+          orejeras: res.chkgrajeras,
+          apreciacion_ruido: res.chkIntenso
+            ? "RUIDO MUY INTENSO"
+            : res.chkModerado
+            ? "RUIDO MODERADO"
+            : res.chkNoMolesto
+            ? "RUIDO NO MOLESTO"
+            : "",
+
+          consumo_tabaco: res.chk1Si ? "SI" : "NO",
+          servicio_militar: res.chk2Si ? "SI" : "NO",
+          hobbies_ruido: res.chk3Si ? "SI" : "NO",
+          exposicion_quimicos: res.chk4Si ? "SI" : "NO",
+          infeccion_oido: res.chk5Si ? "SI" : "NO",
+          uso_ototoxicos: res.chk6Si ? "SI" : "NO",
+
+          disminucion_audicion: res.chk7Si ? "SI" : "NO",
+          dolor_oidos: res.chk8Si ? "SI" : "NO",
+          zumbido: res.chk9Si ? "SI" : "NO",
+          mareos: res.chk10Si ? "SI" : "NO",
+          infeccion_oido_actual: res.chk11Si ? "SI" : "NO",
+          otro: res.chk12Si ? "SI" : "NO",
+
+          nombre_profecional: res.txtResponsable,
+          conclusiones: res.txtConclusiones,
+          // nombre_medico: res.txtMedico,
+
+          od_250: res.txtDod250,
+          od_500: res.txtDod500,
+          od_1000: res.txtDod1000,
+
+          oi_250: res.txtDoi250,
+          oi_500: res.txtDoi500,
+          oi_1000: res.txtDoi1000,
+
+          d_umbral_discriminacion: res.txtLDUmbralDiscriminacion,
+          d_porcentaje: res.txtLDPorcentajeDiscriminacion,
+          d_umbral_confort: res.txtLDConfort,
+          d_umbral_disconfort: res.txtLDDisconfort,
+
+          i_umbral_discriminacion: res.txtLIUmbralDiscriminacion,
+          i_porcentaje: res.txtLIPorcentajeDiscriminacion,
+          i_umbral_confort: res.txtLIConfort,
+          i_umbral_disconfort: res.txtLIDisconfort,
+        }));
+        setSearchNombreMedico(res.txtMedico);
+      } else {
+        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+      }
+    })
+    .finally(() => {
+      Swal.close();
+    });
+};
+
+export const SubmitDataServiceFicha = async (
+  form,
+  token,
+  user,
+  limpiar,
+  tabla
+) => {
+  if (!form.norden) {
+    await Swal.fire("Error", "Datos Incompletos", "error");
+    return;
+  }
+  Loading("Registrando Datos");
+  const body = {
+    codFa: form.codFa == "" ? null : form.codFa,
+    norden: form.norden,
+    fechaExamen: form.fecha,
+    tiempoTrabajo: form.aniosTrabajo,
+    tiempoExposicionTotalPonderado: form.tiempoExposicion,
+    edadFa: form.edad, //Que es esto??????????????????????????????????
+    chkTapones: form.tapones,
+    chkgrajeras: form.orejeras,
+    chkIntenso: form.apreciacion_ruido=="RUIDO MUY INTENSO",
+    chkModerado: form.apreciacion_ruido=="RUIDO MODERADO",
+    chkNoMolesto: form.apreciacion_ruido=="RUIDO NO MOLESTO",
+    txtMarca: form.marca,
+    txtModelo: form.modelo,
+    fechaCalibracion: form.calibracion,
+
+    chk1Si: form.consumo_tabaco=="SI",
+    chk2Si: form.servicio_militar=="SI",
+    chk3Si: form.hobbies_ruido=="SI",
+    chk4Si: form.exposicion_quimicos=="SI",
+    chk5Si: form.infeccion_oido=="SI",
+    chk6Si: form.uso_ototoxicos=="SI",
+    chk7Si: form.disminucion_audicion=="SI",
+    chk8Si: form.dolor_oidos=="SI",
+    chk9Si: form.zumbido=="SI",
+    chk10Si: form.mareos=="SI",
+    chk11Si: form.infeccion_oido_actual=="SI",
+    chk12Si: form.otro=="SI",
+
+    chk1No: form.consumo_tabaco=="NO",
+    chk2No: form.servicio_militar=="NO",
+    chk3No: form.hobbies_ruido=="NO",
+    chk4No: form.exposicion_quimicos=="NO",
+    chk5No: form.infeccion_oido=="NO",
+    chk6No: form.uso_ototoxicos=="NO",
+    chk7No: form.disminucion_audicion=="NO",
+    chk8No: form.dolor_oidos=="NO",
+    chk9No: form.zumbido=="NO",
+    chk10No: form.mareos=="NO",
+    chk11No: form.infeccion_oido_actual=="NO",
+    chk12No: form.otro=="NO",
+
+    txtDod250: form.od_250,
+    txtDod500: form.od_500,
+    txtDod1000: form.od_1000,
+    txtDoi250: form.oi_250,
+    txtDoi500: form.oi_500,
+    txtDoi1000: form.oi_1000,
+    txtLDUmbralDiscriminacion: form.d_umbral_discriminacion,
+    txtLIUmbralDiscriminacion: form.i_umbral_discriminacion,
+    txtLDPorcentajeDiscriminacion: form.d_porcentaje,
+    txtLIPorcentajeDiscriminacion: form.i_porcentaje,
+    txtLDConfort: form.d_umbral_confort,
+    txtLIConfort: form.i_umbral_confort,
+    txtLDDisconfort: form.d_umbral_disconfort,
+    txtLIDisconfort: form.i_umbral_disconfort,
+    txtResponsable: form.nombre_profecional,
+    txtConclusiones: form.conclusiones,
+    txtMedico: form.nombre_medico,
+    txtOtoscopia: form.otoscopia,
+    txtMesesTrabajo: form.mesesTrabajo,
+    userRegistro: user,
+    userMedicoOcup: form.nombre_profecional,//Que es esto??????????????????????????????????
+  };
+  SubmitData(body, registrarUrlFicha, token).then((res) => {
+    console.log(res);
+    if (res.id === 1 || res.id === 0) {
+      Swal.fire({
+        title: "Exito",
+        text: `${res.mensaje},\n¿Desea imprimir?`,
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        limpiar();
+        if (result.isConfirmed) {
+          PrintHojaR(form.norden, token, tabla);
+        }
+      });
+    } else {
+      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
+    }
+  });
 };
