@@ -56,18 +56,21 @@ export const GetInfoAnterior = (nro,token,setTable) => {
   getFetch(`/api/v01/ct/historiaOcupacional/obtenerHistoriaOcupacionalDetallesPorNorden?nOrden=${nro}`,token)
   .then((res) => {
     if (res&&res.length > 0) {
-       Swal.fire('Info', 'Este norden no cuenta con historia ocupacional','info')
-        console.log(res)
+      Swal.fire('Info', 'Este norden no cuenta con historia ocupacional','info')
+      console.log(res)
       const detallesOrdenados = res.sort(
         (a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha)
       );
       
-      setTable(detallesOrdenados)
-     
+      setTable(detallesOrdenados);
     } else {
+      Swal.close()
       Swal.fire('Info', 'Este norden no tiene registros de historia ocupacional previos','info')
 
     }
+  }).catch((err) => {
+    console.error(err)
+    Swal.close()
   })
 }
 
