@@ -47,7 +47,9 @@ import { useLocation,Outlet, Navigate} from "react-router-dom"
     '/administrar-contratas': "Administrar Contratas",
     '/protocolos': "Servicios",
     '/RegistroP': 602,
-    '/SistemaOcupacional': "Modulo Ocupacional"
+    '/SistemaOcupacional': "Modulo Ocupacional",
+    '/odontologia': "Odontología",
+    '/rayosx': "Rayos X",
   };
 
 export function ProtectedRoute() {
@@ -60,7 +62,7 @@ export function ProtectedRoute() {
     }
 
     const isRouteAllowed = (route) => {
-      if (route === "/HistoriaOcupacional") return true;
+      if (route === "/HistoriaOcupacional" || route === "/odontologia" || route === "/rayosx") return true;
       const routeName = protectedRoutes[route];
       return listView.includes(routeName);
     };
