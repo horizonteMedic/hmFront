@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
-import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
+import headerFicha from "./headers/header_FichaAudiologica1_Digitalizado.jsx";
 
 export default function FichaAudiologica_Digitalizado(datos = {}) {
   const doc = new jsPDF();
-  const margin = 10;
+  const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 32;
 
@@ -75,41 +75,65 @@ export default function FichaAudiologica_Digitalizado(datos = {}) {
   let yDatos = y + rowH1 + rowH2;
   const rowH3 = 8, rowH4 = 8;
   // Fila 3
+  // Proporciones para fila 3 (Apellidos, Edad, Sexo, Ocupación, Años de trabajo)
+  const colW3 = [0.32, 0.10, 0.08, 0.32, 0.18].map(f => f * wTotal);
+  let xCol3 = x0;
   doc.rect(x0, yDatos, wTotal, rowH3);
-  doc.line(x0 + 38, yDatos, x0 + 38, yDatos + rowH3); // Apellidos
-  doc.line(x0 + 38 + 22, yDatos, x0 + 38 + 22, yDatos + rowH3); // Edad
-  doc.line(x0 + 38 + 22 + 12, yDatos, x0 + 38 + 22 + 12, yDatos + rowH3); // Sexo
-  doc.line(x0 + 38 + 22 + 12 + 38, yDatos, x0 + 38 + 22 + 12 + 38, yDatos + rowH3); // Ocupación
-  doc.line(x0 + 38 + 22 + 12 + 38 + 22, yDatos, x0 + 38 + 22 + 12 + 38 + 22, yDatos + rowH3); // Años trabajo
+  for (let i = 0; i < colW3.length - 1; i++) {
+    xCol3 += colW3[i];
+    doc.line(xCol3, yDatos, xCol3, yDatos + rowH3);
+  }
   // Etiquetas fila 3
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Apellidos y Nombres", x0 + 2, yDatos + 5);
+  let xText = x0 + 2;
+  doc.text("Apellidos y Nombres", xText, yDatos + 5);
   doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("ROJAS SIGUENZA JOSUE SPENCER", x0 + 40, yDatos + 5);
+  doc.text("ROJAS SIGUENZA JOSUE SPENCER", x0 + colW3[0] / 2 + x0, yDatos + 5, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Edad", x0 + 38 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("29 AÑOS", x0 + 38 + 10, yDatos + 5);
-  doc.text("Sexo", x0 + 38 + 22 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("M", x0 + 38 + 22 + 8, yDatos + 5);
-  doc.setFont("helvetica", "normal").text("Ocupación", x0 + 38 + 22 + 12 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("ADMINISTRADOR", x0 + 38 + 22 + 12 + 18, yDatos + 5);
-  doc.setFont("helvetica", "normal").text("Años de Trabajo", x0 + 38 + 22 + 12 + 38 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("2", x0 + 38 + 22 + 12 + 38 + 12, yDatos + 5);
+  xText += colW3[0];
+  doc.text("Edad", xText + 2, yDatos + 5);
+  doc.setFont("helvetica", "bold").text("29 AÑOS", xText + colW3[1] / 2, yDatos + 5, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  xText += colW3[1];
+  doc.text("Sexo", xText + 2, yDatos + 5);
+  doc.setFont("helvetica", "bold").text("M", xText + colW3[2] / 2, yDatos + 5, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  xText += colW3[2];
+  doc.text("Ocupación", xText + 2, yDatos + 5);
+  doc.setFont("helvetica", "bold").text("ADMINISTRADOR", xText + colW3[3] / 2, yDatos + 5, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  xText += colW3[3];
+  doc.text("Años de Trabajo", xText + 2, yDatos + 5);
+  doc.setFont("helvetica", "bold").text("2", xText + colW3[4] / 2, yDatos + 5, { align: "center" });
 
   // Fila 4
   yDatos += rowH3;
+  // Proporciones para fila 4 (Empresa Contratista, Empresa, Tiempo exposición)
+  const colW4 = [0.38, 0.38, 0.24].map(f => f * wTotal);
+  let xCol4 = x0;
   doc.rect(x0, yDatos, wTotal, rowH4);
-  doc.line(x0 + 38, yDatos, x0 + 38, yDatos + rowH4); // Empresa Contratista
-  doc.line(x0 + 38 + 70, yDatos, x0 + 38 + 70, yDatos + rowH4); // Empresa
-  doc.line(x0 + 38 + 70 + 54, yDatos, x0 + 38 + 70 + 54, yDatos + rowH4); // Tiempo exposición
+  for (let i = 0; i < colW4.length - 1; i++) {
+    xCol4 += colW4[i];
+    doc.line(xCol4, yDatos, xCol4, yDatos + rowH4);
+  }
   // Etiquetas fila 4
+  xText = x0 + 2;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Empresa Contratista", x0 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.", x0 + 40, yDatos + 5);
-  doc.setFont("helvetica", "normal").text("Empresa", x0 + 38 + 70 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("OBRASCON HUARTE LAIN S.A", x0 + 38 + 70 + 14, yDatos + 5);
-  doc.setFont("helvetica", "normal").text("Tiempo de exposición", x0 + 38 + 70 + 54 + 2, yDatos + 5);
-  doc.setFont("helvetica", "bold").text("5 H/D", x0 + 38 + 70 + 54 + 24, yDatos + 5);
+  doc.text("Empresa Contratista", xText, yDatos + 5);
+  doc.setFont("helvetica", "bold").text("CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.", xText + colW4[0] / 2, yDatos + 5, { align: "center" });
+  xText += colW4[0];
+  doc.setFont("helvetica", "normal").text("Empresa", xText + 2, yDatos + 5);
+  doc.setFont("helvetica", "bold").text("OBRASCON HUARTE LAIN S.A", xText + colW4[1] / 2, yDatos + 5, { align: "center" });
+  xText += colW4[1];
+  // Tiempo de exposición en dos líneas y dato centrado debajo
+  const tiempoExpoLabel1 = "Tiempo de";
+  const tiempoExpoLabel2 = "exposición";
+  const tiempoExpoDato = "5 H/D";
+  // Label en dos líneas
+  doc.setFont("helvetica", "normal").text(tiempoExpoLabel1, xText + colW4[2] / 2, yDatos + 3, { align: "center" });
+  doc.text(tiempoExpoLabel2, xText + colW4[2] / 2, yDatos + 6, { align: "center" });
+  // Dato centrado debajo
+  doc.setFont("helvetica", "bold").text(tiempoExpoDato, xText + colW4[2] / 2, yDatos + 10, { align: "center" });
 
   // --- Uso de Protectores Auditivos y Apreciación del Ruido ---
   let yProtec = yDatos + rowH4;
@@ -127,8 +151,9 @@ export default function FichaAudiologica_Digitalizado(datos = {}) {
 
   // --- Tabla de antecedentes ---
   let yAnte = yProtec + 7;
-  const colWAnte = [60, 10, 10, 60, 10, 10];
-  const tableWAnte = colWAnte.reduce((a, b) => a + b, 0);
+  // Calcular columnas proporcionales al ancho total
+  const colWAnte = [0.23, 0.07, 0.07, 0.23, 0.07, 0.07].map(f => f * wTotal);
+  const tableWAnte = wTotal;
   const tableH = 7 * 6; // 6 filas + encabezado
   doc.rect(x0, yAnte, tableWAnte, tableH);
   let xCol = x0;
@@ -172,23 +197,32 @@ export default function FichaAudiologica_Digitalizado(datos = {}) {
   // --- NUEVO: Sección de dos columnas ---
   // Márgenes laterales más amplios
   const colGap = 8;
-  const marginInterno = 18; // margen solo para la sección de gráfico y tablas
-  const colH = 90;
+  const colH = 75; // más bajo para que las líneas estén más juntas
   const colY = yOto + 8;
-  // Izquierda: gráfico audiométrico
-  const graphX = marginInterno;
-  const graphY = colY;
-  const graphW = 100; // reducir ancho
+  // Espacio para etiquetas dB
+  const dbLabelW = 12;
+  // Área útil total para el bloque inferior (gráfico + tablas)
+  const usableW = pageW - 2 * margin - dbLabelW;
+  // El ancho del gráfico será la mitad del área útil menos la separación
+  const graphW = (usableW - colGap) / 2;
   const graphH = colH;
+  const graphX = margin + dbLabelW;
+  const graphY = colY;
+  // La tabla empieza después del gráfico y el gap
+  const tableX = graphX + graphW + colGap;
+  const tableWRight = usableW - graphW - colGap;
   // Cuadrícula
   doc.setDrawColor(0);
-  doc.setLineWidth(0.3);
-  // Fondo azul 20-40 dB
+  doc.setLineWidth(0.2); // líneas más delgadas
+  // Fondo azul de 20 a 40 dB (ajustado a nueva escala)
+  // Asegura el color azul claro justo antes de dibujar
   doc.setFillColor(180, 235, 255);
-  doc.rect(graphX, graphY + 30, graphW, 20, 'F');
-  // Líneas horizontales (cada 10 dB)
-  for (let i = 0; i <= 12; i++) {
-    const yLine = graphY + i * (graphH / 12);
+  const y20 = graphY + ((20 + 10) / 130) * graphH;
+  const y40 = graphY + ((40 + 10) / 130) * graphH;
+  doc.rect(graphX, y20, graphW, y40 - y20, 'F');
+  // Líneas horizontales (cada 10 dB, de -10 a 120)
+  for (let i = 0; i <= 13; i++) {
+    const yLine = graphY + i * (graphH / 13);
     doc.line(graphX, yLine, graphX + graphW, yLine);
   }
   // Líneas verticales (frecuencias)
@@ -206,94 +240,146 @@ export default function FichaAudiologica_Digitalizado(datos = {}) {
   // Mover 'Hz' más a la derecha del último valor
   doc.text("Hz", graphX + graphW + 4, graphY - 2, { align: "left" });
   // Etiquetas dB
-  for (let i = 0; i <= 12; i++) {
+  for (let i = 0; i <= 13; i++) {
     const dB = -10 + i * 10;
-    const yTick = graphY + i * (graphH / 12) + 2;
+    const yTick = graphY + i * (graphH / 13) + 2;
     doc.text(String(dB), graphX - 7, yTick, { align: "right" });
   }
   doc.text("dB", graphX - 10, graphY + graphH / 2, { align: "right" });
 
-  // Graficar puntos de audiometría (solo borde rojo, delgado, sin relleno, sin trazo negro)
+  // Graficar puntos de audiometría (ahora con círculos y X, y líneas conectando cada tipo)
+  // Ejemplo de datos:
   const puntos = [
-    { freq: 500, db: 100, color: 'red' },
-    { freq: 1000, db: 100, color: 'red' },
-    { freq: 2000, db: 100, color: 'red' },
-    { freq: 3000, db: 100, color: 'red' },
-    { freq: 4000, db: 100, color: 'red' },
-    { freq: 6000, db: 100, color: 'red' },
-    { freq: 8000, db: 100, color: 'red' }
+    { freq: 500, db: 40, color: 'red', tipo: 'circle' },
+    { freq: 1000, db: 30, color: 'red', tipo: 'circle' },
+    { freq: 2000, db: 60, color: 'red', tipo: 'circle' },
+    { freq: 3000, db: 40, color: 'red', tipo: 'circle' },
+    { freq: 4000, db: 50, color: 'red', tipo: 'circle' },
+    { freq: 6000, db: 30, color: 'red', tipo: 'circle' },
+    { freq: 8000, db: 40, color: 'red', tipo: 'circle' },
+    { freq: 500, db: 30, color: 'blue', tipo: 'x' },
+    { freq: 1000, db: 40, color: 'blue', tipo: 'x' },
+    { freq: 2000, db: 35, color: 'blue', tipo: 'x' },
+    { freq: 3000, db: 30, color: 'blue', tipo: 'x' },
+    { freq: 4000, db: 40, color: 'blue', tipo: 'x' },
+    { freq: 6000, db: 45, color: 'blue', tipo: 'x' },
+    { freq: 8000, db: 35, color: 'blue', tipo: 'x' },
+  ];
+  // Agrupar por tipo y color
+  const tipos = [
+    { tipo: 'circle', color: 'red' },
+    { tipo: 'x', color: 'blue' }
   ];
   const prevLineWidth = doc.getLineWidth();
-  for (const punto of puntos) {
+  tipos.forEach(({ tipo, color }) => {
+    // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia
+    const pts = puntos.filter(p => p.tipo === tipo && p.color === color)
+      .sort((a, b) => a.freq - b.freq);
+    if (pts.length < 2) return;
+    // Dibujar línea conectando los puntos
+    doc.setLineWidth(0.4);
+    if (color === 'red') doc.setDrawColor(255, 0, 0);
+    else if (color === 'blue') doc.setDrawColor(0, 0, 255);
+    else doc.setDrawColor(0, 0, 0);
+    doc.setLineCap(1);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const freqIdx1 = freqs.indexOf(pts[i].freq);
+      const freqIdx2 = freqs.indexOf(pts[i + 1].freq);
+      if (freqIdx1 === -1 || freqIdx2 === -1) continue;
+      const x1 = graphX + freqIdx1 * (graphW / 8);
+      const y1 = graphY + ((pts[i].db + 10) / 120) * graphH;
+      const x2 = graphX + freqIdx2 * (graphW / 8);
+      const y2 = graphY + ((pts[i + 1].db + 10) / 120) * graphH;
+      doc.line(x1, y1, x2, y2);
+    }
+  });
+  // Dibujar los puntos (círculo o X)
+  puntos.forEach(punto => {
     const freqIdx = freqs.indexOf(punto.freq);
-    if (freqIdx === -1) continue;
+    if (freqIdx === -1) return;
     const x = graphX + freqIdx * (graphW / 8);
     const yP = graphY + ((punto.db + 10) / 120) * graphH;
-    // Guardar color de trazo actual (por defecto negro)
-    // Cambiar a rojo solo para el círculo
     if (punto.color === 'red') doc.setDrawColor(255, 0, 0);
     else if (punto.color === 'blue') doc.setDrawColor(0, 0, 255);
     else doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.4);
-    doc.circle(x, yP, 1.1);
-    // Restaurar color de trazo a negro para el resto del gráfico
+    if (punto.tipo === 'circle') {
+      doc.circle(x, yP, 1.0);
+    } else if (punto.tipo === 'x') {
+      // Dibujar una X centrada en (x, yP)
+      const size = 1.5;
+      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP + size / 2);
+      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP - size / 2);
+    }
     doc.setDrawColor(0, 0, 0);
-  }
+  });
   doc.setLineWidth(prevLineWidth);
 
   // Derecha: tablas
-  const tableX = graphX + graphW + colGap;
-  const tableWRight = pageW - tableX - marginInterno;
+  // const tableX = graphX + graphW + colGap;
+  // const tableWRight = pageW - margin - tableX;
   
   // --- Tabla DIAPASONES ---
   let tY = graphY;
   const tH = 28;
+  const tRows = 5;
+  const tCols = 3;
+  const tRowH = tH / tRows;
+  const tColW = tableWRight / tCols;
   doc.setLineWidth(0.4);
   doc.rect(tableX, tY, tableWRight, tH);
   // Filas
-  for (let i = 1; i < 5; i++) {
-    doc.line(tableX, tY + i * (tH / 5), tableX + tableWRight, tY + i * (tH / 5));
+  for (let i = 1; i < tRows; i++) {
+    doc.line(tableX, tY + i * tRowH, tableX + tableWRight, tY + i * tRowH);
   }
-  // Columnas
-  doc.line(tableX + tableWRight / 3, tY, tableX + tableWRight / 3, tY + tH);
-  doc.line(tableX + 2 * tableWRight / 3, tY, tableX + 2 * tableWRight / 3, tY + tH);
-  // Encabezados
+  // Primera fila: solo una celda, sin líneas internas
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("DIAPASONES", tableX + tableWRight / 2, tY + 5, { align: "center" });
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("OD", tableX + tableWRight / 6, tY + 10, { align: "center" });
-  doc.text("RINNE Y WEBER", tableX + tableWRight / 2, tY + 10, { align: "center" });
-  doc.text("OI", tableX + 5 * tableWRight / 6, tY + 10, { align: "center" });
+  doc.text("DIAPASONES", tableX + tableWRight / 2, tY + tRowH / 2 + 1, { align: "center", baseline: "middle" });
+  // Columnas SOLO desde la segunda fila
+  for (let i = 1; i < tCols; i++) {
+    doc.line(tableX + i * tColW, tY + tRowH, tableX + i * tColW, tY + tH);
+  }
+  // Encabezados de columna (segunda fila)
+  doc.setFontSize(7);
+  doc.text("OD", tableX + tColW / 2, tY + tRowH + tRowH / 2, { align: "center", baseline: "middle" });
+  doc.text("RINNE Y WEBER", tableX + tColW + tColW / 2, tY + tRowH + tRowH / 2, { align: "center", baseline: "middle" });
+  doc.text("OI", tableX + 2 * tColW + tColW / 2, tY + tRowH + tRowH / 2, { align: "center", baseline: "middle" });
+  // Filas de frecuencias
   doc.setFont("helvetica", "normal").setFontSize(7);
-  // Ajustar textos de filas a la izquierda de su celda
-  const diapasonRows = [
-    { text: "250 Hz.", row: 2 },
-    { text: "500 Hz.", row: 3 },
-    { text: "1000 Hz.", row: 4 }
-  ];
+  const diapasonRows = ["250 Hz.", "500 Hz.", "1000 Hz."];
   for (let i = 0; i < diapasonRows.length; i++) {
-    doc.text(diapasonRows[i].text, tableX + tableWRight / 3 + 2, tY + 10 + (i + 1) * (tH / 5), { align: "left" });
+    doc.text(diapasonRows[i], tableX + tColW + 3, tY + (i + 2) * tRowH + tRowH / 2, { align: "left", baseline: "middle" });
   }
 
   // --- Tabla LOGOAUDIOMETRIA ---
   tY += tH + 8;
-  const t2H = 32;
+  const t2Rows = 5;
+  const t2Cols = 3;
+  const t2RowH = 9;
+  const t2ColWArr = [tableWRight * 0.6, tableWRight * 0.2, tableWRight * 0.2];
+  const t2H = t2Rows * t2RowH;
+  // Dibujar marco exterior
   doc.rect(tableX, tY, tableWRight, t2H);
   // Filas
-  for (let i = 1; i < 5; i++) {
-    doc.line(tableX, tY + i * (t2H / 5), tableX + tableWRight, tY + i * (t2H / 5));
+  for (let i = 1; i < t2Rows; i++) {
+    doc.line(tableX, tY + i * t2RowH, tableX + tableWRight, tY + i * t2RowH);
   }
-  // Columnas
-  doc.line(tableX + tableWRight / 3, tY, tableX + tableWRight / 3, tY + t2H);
-  doc.line(tableX + 2 * tableWRight / 3, tY, tableX + 2 * tableWRight / 3, tY + t2H);
-  // Encabezados
+  // Primera fila: solo una celda, sin líneas internas
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("LOGOAUDIOMETRIA", tableX + tableWRight / 2, tY + 5, { align: "center" });
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("DERECHA", tableX + tableWRight / 3 + tableWRight / 6, tY + 10, { align: "center" });
-  doc.text("IZQUIERDA", tableX + 5 * tableWRight / 6, tY + 10, { align: "center" });
+  doc.text("LOGOAUDIOMETRIA", tableX + tableWRight / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
+  // Columnas con anchos personalizados SOLO desde la segunda fila
+  let t2X = tableX;
+  for (let i = 0; i < t2Cols - 1; i++) {
+    t2X += t2ColWArr[i];
+    // Solo dibujar líneas verticales desde la segunda fila hacia abajo
+    doc.line(t2X, tY + t2RowH, t2X, tY + t2H);
+  }
+  // Encabezados de columna (segunda fila)
+  doc.setFontSize(7);
+  doc.text("DERECHA", tableX + t2ColWArr[0] + t2ColWArr[1] / 2, tY + t2RowH + t2RowH / 2, { align: "center", baseline: "middle" });
+  doc.text("IZQUIERDA", tableX + t2ColWArr[0] + t2ColWArr[1] + t2ColWArr[2] / 2, tY + t2RowH + t2RowH / 2, { align: "center", baseline: "middle" });
+  // Filas de etiquetas centradas
   doc.setFont("helvetica", "normal").setFontSize(7);
-  // Ajustar textos de filas a la izquierda de su celda
   const logoRows = [
     "Umbral de discriminación",
     "% de discriminación",
@@ -301,7 +387,7 @@ export default function FichaAudiologica_Digitalizado(datos = {}) {
     "Umbral de disconfort UCL"
   ];
   for (let i = 0; i < logoRows.length; i++) {
-    doc.text(logoRows[i], tableX + 2, tY + 15 + i * (t2H / 5), { align: "left" });
+    doc.text(logoRows[i], tableX + t2ColWArr[0] / 2, tY + (i + 2) * t2RowH - t2RowH / 2, { align: "center", baseline: "middle" });
   }
 
   // --- Tabla de conclusiones y firmas (a todo el ancho) ---
