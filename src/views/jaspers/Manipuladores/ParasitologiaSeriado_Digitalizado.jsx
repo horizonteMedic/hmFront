@@ -125,7 +125,7 @@ export default function ParasitologiaSeriado_Digitalizado(datos = {}) {
     // Centramos dentro del rectángulo
     const imgX = sigX + (sigW - imgW) / 2;
     const imgY = sigY + (sigH - imgH) / 2;
-    doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    doc.addImage(selloBase64, 'PNG', imgX, imgY-10, imgW, imgH);
     y = imgY + imgH + 5;
   }
 

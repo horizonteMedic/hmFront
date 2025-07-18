@@ -289,7 +289,7 @@ export const GetInfoServicioFicha = (
           nomExam: res.nomExam,
           codFa: res.codFa,
           noExamen:
-            res.txtMarca == "AMPLIVOX" && res.txtModelo == "AMPLIVOX 270",
+            res.txtMarca == "-" && res.txtModelo == "-",
 
           bellPlus:
             res.txtMarca == "BELL INVENTS" && res.txtModelo == "BELL PLUS",
@@ -357,7 +357,7 @@ export const GetInfoServicioFicha = (
         }));
         setSearchNombreMedico(res.txtMedico);
       } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        Swal.fire("Error", "Ocurrio un error al traer los datos de ficha audiometría", "error");
       }
     })
     .finally(() => {
