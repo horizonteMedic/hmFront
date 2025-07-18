@@ -289,7 +289,7 @@ export const GetInfoServicioFicha = (
           nomExam: res.nomExam,
           codFa: res.codFa,
           noExamen:
-            res.txtMarca == "AMPLIVOX" && res.txtModelo == "AMPLIVOX 270",
+            res.txtMarca == "-" && res.txtModelo == "-",
 
           bellPlus:
             res.txtMarca == "BELL INVENTS" && res.txtModelo == "BELL PLUS",
@@ -357,7 +357,7 @@ export const GetInfoServicioFicha = (
         }));
         setSearchNombreMedico(res.txtMedico);
       } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        Swal.fire("Error", "Ocurrio un error al traer los datos de ficha audiometría", "error");
       }
     })
     .finally(() => {
@@ -383,7 +383,7 @@ export const SubmitDataServiceFicha = async (
     fechaExamen: form.fecha,
     tiempoTrabajo: form.aniosTrabajo,
     tiempoExposicionTotalPonderado: form.tiempoExposicion,
-    // edadFa: "string", //Que es esto??????????????????????????????????
+    edadFa: form.edad, //Que es esto??????????????????????????????????
     chkTapones: form.tapones,
     chkgrajeras: form.orejeras,
     chkIntenso: form.apreciacion_ruido=="RUIDO MUY INTENSO",
@@ -439,7 +439,7 @@ export const SubmitDataServiceFicha = async (
     txtOtoscopia: form.otoscopia,
     txtMesesTrabajo: form.mesesTrabajo,
     userRegistro: user,
-    //userMedicoOcup: "string",//Que es esto??????????????????????????????????
+    userMedicoOcup: form.nombre_profecional,//Que es esto??????????????????????????????????
   };
   SubmitData(body, registrarUrlFicha, token).then((res) => {
     console.log(res);
