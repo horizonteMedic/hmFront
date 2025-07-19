@@ -78,7 +78,7 @@ export default function LaboratorioClinico_Digitalizado(datos = {}) {
         const { label, key, value, suffix } = leftItems[i];
         const val = value != null
           ? value + suffix
-          : (key && datos[key] != null ? datos[key] + suffix : "N/A");
+          : (key && datos[key] != null ? key=="txtVsg" && datos[key]=="N/A"? datos[key] : datos[key] + suffix : "N/A");
         doc.setFont("helvetica", "normal");
         doc.text(label, leftX + labelW, yTable + rowH * (i + 0.7), { align: "right" });
         doc.text(":", leftX + labelW + 2, yTable + rowH * (i + 0.7), { align: "left" });

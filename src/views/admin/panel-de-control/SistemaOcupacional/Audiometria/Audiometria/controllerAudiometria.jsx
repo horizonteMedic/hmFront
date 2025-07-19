@@ -15,7 +15,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
-          
+
           codAu: res.codAu,
           fecha: res.fechaAu,
           fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
@@ -64,6 +64,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
 
           tapones: res.chktapones,
           orejeras: res.chkorejeras,
+
           plomo_hrs: res.txthplomo,
           mercurio_hrs: res.txthmercurio,
           tolueno_hrs: res.txthtolueno,
@@ -229,7 +230,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     rbaeotrosSi: form.otros_antecedentes == "SI",
     rbaeotrosNo: form.otros_antecedentes == "NO",
     txtaecuales: form.cuales_antecedentes_extralaborales || "",
-    txtood: form.otoscopia_odiochos || "",
+    txtood: form.otoscopia_odiocho || "",
     txtooi: form.otoscopia_odilzquierdo || "",
 
     od500: form.od_500 || "",
@@ -314,10 +315,10 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          `../../../../../../jaspers/Audiometria/*.jsx`
+          `../../../../../jaspers/Audiometria/*.jsx`
         );
         const modulo = await jasperModules[
-          `../../../../../../jaspers/Audiometria/${nombre}.jsx`
+          `../../../../../jaspers/Audiometria/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
