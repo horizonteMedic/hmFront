@@ -1098,8 +1098,8 @@ const HistoriaOcupacional = ({
       {/* Tabla de registros */}
       {registros.length > 0 && (
         <div style={{ marginTop: 32 }}>
-          <h3 style={{ fontSize: 15, color: "#000", fontWeight: "bold" }}>
-            Registros
+          <h3 style={{ fontSize: 15, color: "#000", fontWeight: "bold" , marginBottom:"1em"}}>
+            Lista de Registros
           </h3>
           <div className={styles.tableWrapper}>
             <table

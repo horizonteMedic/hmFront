@@ -10,7 +10,7 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   let y = 12;
 
   // Logo izquierda
-  const logoW = 48, logoH = 20; // Más pequeño y ancho
+  const logoW = 48, logoH = 15; // Más pequeño y ancho
   try {
     doc.addImage('./img/logo-color.png', 'PNG', margin, y, logoW, logoH);
   } catch {

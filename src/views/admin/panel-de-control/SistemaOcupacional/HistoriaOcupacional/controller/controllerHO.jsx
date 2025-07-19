@@ -47,6 +47,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede,setTable) => {
           
             GetInfoAnterior(nro,token,setTable)
         } else {
+            Swal.fire('Alerta', 'Este paciente ya cuenta con registros de Historia Ocupacional.', 'warning');
             GetInfoHistoriaOcupacinal(nro,tabla,set,token,setTable)
         }
     })

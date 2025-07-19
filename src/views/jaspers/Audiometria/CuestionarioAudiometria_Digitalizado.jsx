@@ -23,7 +23,7 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
   const paddingTop = 0.5;
   const paddingBottom = 1;
   const lineH = 4;
-  const startY = 55;
+  const startY = 50;
   let y = startY;
 
   // 1) Header maqueta

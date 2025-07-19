@@ -10,16 +10,16 @@ export function SubmitHistoriaOcupacional(data,registros,user,token) {
         "dniPa": data.dni,
         "userRegistro": user,
         "detalles": registros.map(reg => ({
-            fecha: reg.fecha || 'xd',
-            empresa: reg.empresa || 'xd',
-            altitud: reg.altitud || 'xd',
-            actividad: reg.actividad || 'xd',
-            areaEmpresa: reg.areaEmpresa || 'xd',
-            ocupacion: reg.ocupacion || 'xd',
-            superficie: reg.superficie || 'xd',
-            socavon: reg.socavon || 'xd',
-            riesgo: reg.riesgo || 'xd',
-            proteccion: reg.proteccion || 'xd'
+            fecha: reg.fecha || '',
+            empresa: reg.empresa || '',
+            altitud: reg.altitud || '',
+            actividad: reg.actividad || '',
+            areaEmpresa: reg.areaEmpresa || '',
+            ocupacion: reg.ocupacion || '',
+            superficie: reg.superficie || '',
+            socavon: reg.socavon || '',
+            riesgo: reg.riesgo || '',
+            proteccion: reg.proteccion || ''
         }))
     };    
 

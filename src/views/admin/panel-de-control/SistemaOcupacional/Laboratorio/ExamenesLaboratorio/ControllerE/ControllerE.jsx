@@ -42,7 +42,7 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            console.log('aun no xd')
+            console.log('aun no ')
         }
     })
 }

@@ -33,10 +33,12 @@ import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupaciona
 import HistoriaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/HistoriaOcupacional/HistoriaOcupacional.jsx';
 import Espirometria from './views/admin/panel-de-control/SistemaOcupacional/Espirometria/Espirometria.jsx';
 import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/Oftalmologia.jsx';
+import Odontologia from './views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx';
+import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx';
 
 
 //SIMULADOR DE jaspers
-import Ficha from './views/jaspers/Audiometria/Audiometria2021-_Digitalizado_boro.jsx'
+import Ficha from './views/jaspers/Audiometria/Audiometria2021-_Digitalizado.jsx'
 const App = () => {
   return (
     <React.StrictMode>
@@ -116,6 +118,8 @@ const AppContent = () => {
           <Route path="/protocolos" element={<Protocolos />} />
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
           <Route path="/HistoriaOcupacional" element={<HistoriaOcupacional />} />
+          <Route path="/odontologia" element={<Odontologia />} />
+          <Route path="/rayosx" element={<RayosX />} />
         </Route>
         <Route path="/Espirometria" element={<Espirometria />} />
         <Route path="/Oftalmologia" element={<Oftalmologia />} />

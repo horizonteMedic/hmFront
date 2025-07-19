@@ -76,7 +76,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <Field
           label="Nro Orden"
           name="norden"
-          value={form.norden}
+          value={form.norden || ""}
           onKeyUp={handleSearch}
           onChange={handleChange}
         />
@@ -84,7 +84,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
           label="Fecha"
           name="fecha"
           type="date"
-          value={form.fecha}
+          value={form.fecha || today}
           onChange={handleChange}
         />
         {/* <Field
@@ -97,7 +97,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <Field
           label="Nombres"
           name="nombres"
-          value={form.nombres}
+          value={form.nombres || ""}
           onChange={handleChange}
           className="col-span-2"
           disabled
@@ -108,7 +108,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
             <input
               type="text"
               name="edad"
-              value={form.edad}
+              value={form.edad || ""}
               onChange={handleChange}
               className="border rounded px-2 py-1 w-32 bg-gray-50"
               disabled
@@ -118,7 +118,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
               <input
                 type="checkbox"
                 name="pasoExamen"
-                checked={form.pasoExamen}
+                checked={form.pasoExamen || false}
                 onChange={(e) => {
                   setForm((prev) => ({
                     ...prev,
@@ -145,14 +145,14 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <Field
           label="FVC %"
           name="fvc"
-          value={form.fvc}
+          value={form.fvc || ""}
           onChange={handleChange}
           onKeyDown={(e) => handleNextEnter(e, "fev1")}
         />
         <Field
           label="Peso"
           name="peso"
-          value={form.peso}
+          value={form.peso || ""}
           onChange={handleChange}
           disabled
           inputClass="bg-blue-200"
@@ -160,21 +160,21 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <Field
           label="FVC Teórico"
           name="fvcTeorico"
-          value={form.fvcTeorico}
+          value={form.fvcTeorico || ""}
           onChange={handleChange}
           onKeyDown={(e) => handleNextEnter(e, "fev1Teorico")}
         />
         <Field
           label="FEV1 %"
           name="fev1"
-          value={form.fev1}
+          value={form.fev1 || ""}
           onChange={handleChange}
           onKeyDown={(e) => handleNextEnter(e, "fev1_fvc")}
         />
         <Field
           label="Talla"
           name="talla"
-          value={form.talla}
+          value={form.talla || ""}
           onChange={handleChange}
           disabled
           inputClass="bg-blue-200"
@@ -182,14 +182,14 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <Field
           label="FEV1 Teórico"
           name="fev1Teorico"
-          value={form.fev1Teorico}
+          value={form.fev1Teorico || ""}
           onChange={handleChange}
           onKeyDown={(e) => handleNextEnter(e, "interpretacion")}
         />
         <Field
           label="FEV1/FVC %"
           name="fev1_fvc"
-          value={form.fev1_fvc}
+          value={form.fev1_fvc || ""}
           onChange={handleChange}
           onKeyDown={(e) => handleNextEnter(e, "fef")}
         />
@@ -198,7 +198,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <Field
           label="FEF 25-75 %"
           name="fef"
-          value={form.fef}
+          value={form.fef || ""}
           onChange={handleChange}
           onKeyDown={(e) => handleNextEnter(e, "fvcTeorico")}
         />
@@ -208,7 +208,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
         <label className="font-semibold block mb-1">Interpretación</label>
         <textarea
           name="interpretacion"
-          value={form.interpretacion}
+          value={form.interpretacion || ""}
           onChange={handleChange}
           className="border rounded px-2 py-1 w-full min-h-[60px]"
         />
