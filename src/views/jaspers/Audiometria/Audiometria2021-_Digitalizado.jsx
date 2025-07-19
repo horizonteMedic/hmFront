@@ -23,10 +23,10 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   const margin = 16;
   const usableW = pageW - margin * 2;
   const imgW = usableW; // Menos ancho, deja márgenes
-  const imgH = 120; // Más alto
+  const imgH = 90; // Más alto
   let y = 45;
   try {
-    doc.addImage("public/img/cuerpo2-8.png", "PNG", margin, y, imgW, imgH);
+    doc.addImage("public/img/frame.png", "PNG", margin, y, imgW, imgH);
     y += imgH + 5; // Deja un pequeño espacio después de la imagen
   } catch (e) {
     doc.text("Imagen no disponible", margin, y + 10);
@@ -249,13 +249,13 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     oi16000: data.oi16000 || 0,
     oi18000: data.oi18000 || 0,
   };
-  let newY = 50.7;
+  let newY = 47.5;
   newY += 6;
   // =====================
   // 2.- Síntomas Actuales
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`X`, margin + (datos.sorderaActual ? 23 : 27.5), newY);
-  doc.text(`X`, margin + (datos.vertigoActual ? 67 : 71.5), newY);
+  doc.text(`X`, margin + (datos.sorderaActual ? 16 : 27.5), newY);
+  doc.text(`X`, margin + (datos.vertigoActual ? 50 : 71.5), newY);
   doc.text(`X`, margin + (datos.secrecionOticaActual ? 111 : 115.5), newY);
   doc.text(datos.otrosSintomasActuales, margin + 159, newY, {
     maxWidth: 30,
@@ -267,7 +267,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   // 3.- Antecedentes Médicos de importancia
   // =====================
-  newY += 15.2;
+  newY += 10.5;
   doc.text(`X`, margin + 51.7 + (datos.rinitis ? 0 : 4.5), newY);
   doc.text(`X`, margin + 94.7 + (datos.meningitis ? 0 : 4.5), newY + 0.3);
   doc.text(`X`, margin + 138.8 + (datos.parotiditis ? 0 : 4.5), newY + 0.3);
@@ -293,16 +293,16 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   // 4.- Exposición Ocupacional
   // =====================
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`X`, margin + 55 + (datos.explosicionAlRuido ? 0 : 6), newY + 18);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(`X`, margin + 54.5 + (datos.explosicionAlRuido ? 0 : 6), newY + 11.5);
 
   doc.text(
     `X`,
-    margin + 55 + (datos.usoProtectorAuditivo ? 0 : 6),
-    newY + 26.5
+    margin + 54.5 + (datos.usoProtectorAuditivo ? 0 : 6),
+    newY + 19.5
   );
 
-  doc.text(`X`, margin + 55 + (datos.exposicionQuimicos ? 0 : 6), newY + 34.3);
+  doc.text(`X`, margin + 54.5 + (datos.exposicionQuimicos ? 0 : 6), newY + 27);
 
   doc.text(`${datos.exposicion0a2 ? "X" : ""}`, margin + 120, newY + 14.5);
   doc.text(`${datos.exposicion2a4 ? "X" : ""}`, margin + 135.5, newY + 14.5);
@@ -344,7 +344,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   // 4.- Exposición Ocupacional
   // =====================
-  newY += 62.4;
+  newY += 44.3;
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(`X`, margin + 42.5 + (datos.practicaTiro ? 0 : 4.5), newY);
   doc.text(`X`, margin + 96.2 + (datos.walkman ? 0 : 4.5), newY + 0.6);
@@ -485,6 +485,98 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("8.- Interpretación – Conclusiones:", margin, y);
   y += 6;
+
+  // =====================
+  // 9.- Interpretación Clínica
+  // =====================
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("• Interpretación Clínica: Dx Auditivo + (Incluir detalle: Severidad (Promedio Frec. 500/1000/2000/4000) + (Unilateral/bilateral))", margin, y);
+  y += 4;
+  
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Oido Derecho: - ", margin + 5, y);
+  
+  // Texto subrayado para el diagnóstico del oído derecho
+  const diagOdText = String(datos.txtdiagOd || "HIPOACUSIA PROFUNDA");
+  const diagOdWidth = doc.getTextWidth(diagOdText);
+  doc.text(diagOdText, margin + 25, y);
+  doc.line(margin + 25, y + 1, margin + 25 + diagOdWidth, y + 1);
+  
+  y += 4;
+  doc.text("Oido Izquierdo: - ", margin + 5, y);
+  
+  // Texto subrayado para el diagnóstico del oído izquierdo
+  const diagOiText = String(datos.txtdiagOi || "HIPOACUSIA PROFUNDA");
+  const diagOiWidth = doc.getTextWidth(diagOiText);
+  doc.text(diagOiText, margin + 25, y);
+  doc.line(margin + 25, y + 1, margin + 25 + diagOiWidth, y + 1);
+  
+  y += 6;
+
+  // =====================
+  // 10.- Comentarios
+  // =====================
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("COMENTARIOS:", margin, y);
+  y += 4;
+  
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const comentariosText = String(datos.txtcomentarios || "");
+  const comentariosLines = doc.splitTextToSize(comentariosText, pageW - margin * 2 - 10);
+  doc.text(comentariosLines, margin + 5, y, { maxWidth: pageW - margin * 2 - 10 });
+  y += comentariosLines.length * 3 + 6;
+
+  // =====================
+  // 11.- Recomendaciones
+  // =====================
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("11.- Recomendaciones:", margin, y);
+  y += 4;
+  
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Uso adecuado de Protección Auditiva", margin, y);
+  doc.text("Simple", margin + 80, y);
+  doc.text("Doble", margin + 100, y);
+  doc.text(`${datos.chkrpasimple ? "X" : ""}`, margin + 75, y);
+  doc.text(`${datos.chkrpadoble ? "X" : ""}`, margin + 95, y);
+  y += 4;
+  
+  doc.text("Control audiométrico", margin, y);
+  doc.text("Semestral", margin + 80, y);
+  doc.text("Anual", margin + 100, y);
+  doc.text(`${datos.chkcasemestral ? "X" : ""}`, margin + 75, y);
+  doc.text(`${datos.chkcaanual ? "X" : ""}`, margin + 95, y);
+  y += 4;
+  
+  doc.text("Otras", margin, y);
+  const otrasRecomendacionesText = String(datos.txtotrasrecomendaciones || "");
+  const otrasLines = doc.splitTextToSize(otrasRecomendacionesText, pageW - margin * 2 - 50);
+  doc.text(otrasLines, margin + 20, y, { maxWidth: pageW - margin * 2 - 50 });
+  y += Math.max(otrasLines.length * 3, 4) + 8;
+
+  // =====================
+  // Firmas y Sellos
+  // =====================
+  const signatureY = y;
+  const signatureW = (pageW - margin * 2 - 20) / 3;
+  
+  // Firma del Trabajador (izquierda)
+  doc.line(margin, signatureY, margin + signatureW, signatureY);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text("Firma del Trabajador", margin + signatureW/2, signatureY + 4, { align: "center" });
+  
+  // Huella digital y Personal (centro)
+  const centerX = margin + signatureW + 10;
+  doc.rect(centerX, signatureY - 8, 15, 12);
+  doc.text("Huella digital", centerX + 7.5, signatureY + 8, { align: "center" });
+  
+  doc.line(centerX + 20, signatureY, centerX + 20 + signatureW, signatureY);
+  doc.text("Personal que realiza la Audiometría", centerX + 20 + signatureW/2, signatureY + 4, { align: "center" });
+  
+  // Firma y Sello del Médico (derecha)
+  const rightX = margin + signatureW * 2 + 20;
+  doc.line(rightX, signatureY, rightX + signatureW, signatureY);
+  doc.text("Firma y Sello del Médico Evaluador", rightX + signatureW/2, signatureY + 4, { align: "center" });
 };
 
 export default function Audiometria2021_Digitalizado(data = {}) {

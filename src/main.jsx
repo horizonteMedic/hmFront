@@ -38,7 +38,7 @@ import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/Ray
 
 
 //SIMULADOR DE jaspers
-import Ficha from './views/jaspers/Audiometria/FichaAudiologica_Digitalizado.jsx'
+import Ficha from './views/jaspers/Audiometria/Audiometria2021-_Digitalizado.jsx'
 const App = () => {
   return (
     <React.StrictMode>
