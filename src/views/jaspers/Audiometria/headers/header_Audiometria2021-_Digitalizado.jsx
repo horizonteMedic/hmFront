@@ -5,20 +5,20 @@
  */
 const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   // Valores de ejemplo por defecto
-  datos = {
-    norden: datos.norden || '95899',
-    sede: datos.sede || 'SEDE CENTRAL',
-    nombres: datos.nombres || 'ROJAS SIGUENZA JOSUE SPENCER',
-    edad: datos.edad || '29',
-    fechaAu: datos.fechaAu || '24/10/2025',
-    dni: datos.dni || '12345678',
-    cargo: datos.cargo || 'ADMINISTRADOR ESPECIALISTA',
-    sexo: datos.sexo || 'M',
-    areaTrabajo: datos.areaTrabajo || 'ALMACÉN',
-    contrata: datos.contrata || 'CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.',
-    empresa: datos.empresa || 'EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.',
-    ...datos
-  };
+  // datos = {
+  //   norden: datos.norden || '95899',
+  //   sede: datos.sede || 'SEDE CENTRAL',
+  //   nombres: datos.nombres || 'ROJAS SIGUENZA JOSUE SPENCER',
+  //   edad: datos.edad || '29',
+  //   fechaAu: datos.fechaAu || '24/10/2025',
+  //   dni: datos.dni || '12345678',
+  //   cargo: datos.cargo || 'ADMINISTRADOR ESPECIALISTA',
+  //   sexo: datos.sexo || 'M',
+  //   areaTrabajo: datos.areaTrabajo || 'ALMACÉN',
+  //   contrata: datos.contrata || 'CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.',
+  //   empresa: datos.empresa || 'EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.',
+  //   ...datos
+  // };
   const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -45,13 +45,13 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
 
   // No Ficha
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(fichaLabel, fichaBlockX - 30, fichaBlockY);
+  doc.text(fichaLabel, fichaBlockX - 30, fichaBlockY+4);
   doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text(fichaValue, fichaBlockX + 6, fichaBlockY, { align: "right" });
+  doc.text(fichaValue, fichaBlockX + 6, fichaBlockY+4, { align: "right" });
 
   // Sede
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(sedeLabel, fichaBlockX - 30, fichaBlockY + 8);
+  // doc.text(sedeLabel, fichaBlockX - 30, fichaBlockY + 8);
   doc.setFont("helvetica", "normal").setFontSize(8.5);
   doc.text(sedeValue, fichaBlockX + 6, fichaBlockY + 8, { align: "right" });
 
@@ -117,8 +117,8 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   doc.text(labelCargo, cargoX, datosY);
   doc.text(":", cargoX + 15, datosY);
   doc.setFont("helvetica", "normal");
-  const cargoW = doc.getTextWidth(String(datos.cargo || ""));
-  doc.text(String(datos.cargo || ""), cargoX + 19, datosY);
+  const cargoW = doc.getTextWidth(String(datos.ocupacion || ""));
+  doc.text(String(datos.ocupacion || ""), cargoX + 19, datosY);
 
   doc.setFont("helvetica", "bold");
   const labelSexo = "Sexo";

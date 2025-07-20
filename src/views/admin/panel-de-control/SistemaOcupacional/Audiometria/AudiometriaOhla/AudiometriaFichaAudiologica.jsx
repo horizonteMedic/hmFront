@@ -116,7 +116,7 @@ const AudiometriaFichaAudiologica = ({
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, "audiometriaM");
+        PrintHojaR(form.norden, token, "audiometria_po");
       }
     });
   };

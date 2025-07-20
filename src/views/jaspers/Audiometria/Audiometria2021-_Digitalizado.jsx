@@ -26,6 +26,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   const imgH = 90; // Más alto
   let y = 45;
   try {
+    console.log(margin, y);
     doc.addImage("public/img/frame.png", "PNG", margin, y, imgW, imgH);
     y += imgH + 5; // Deja un pequeño espacio después de la imagen
   } catch (e) {
@@ -61,20 +62,20 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   //   explosicionAlRuido: false,
   //   usoProtectorAuditivo: false,
   //   exposicionQuimicos: false,
-  //   exposicion0a2: true,
-  //   exposicion2a4: true,
-  //   exposicion4a6: true,
-  //   exposicion6a8: true,
-  //   exposicion8a10: true,
-  //   exposicion10a12: true,
-  //   exposicionMas12: true,
-  //   exposicionEventual: true,
+  //   exposicion0a2: false,
+  //   exposicion2a4: false,
+  //   exposicion4a6: false,
+  //   exposicion6a8: false,
+  //   exposicion8a10: false,
+  //   exposicion10a12: false,
+  //   exposicionMas12: false,
+  //   exposicionEventual: false,
 
   //   aniosExposicion: "5",
   //   mesesExposicion: "6",
 
-  //   tapones: true,
-  //   orejeras: true,
+  //   tapones: false,
+  //   orejeras: false,
 
   //   txthplomo: "plomoh",
   //   txttplomo: "plomot",
@@ -115,16 +116,15 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   //   oi6000: 70,
   //   oi8000: 80,
 
-  //   txtdiagOd: "diagnosticoOd",
-  //   txtdiagOi: "diagnosticoOi",
-  //   txtcomentarios: "comentarios",
+  //   txtdiagOd: "diagnosticoOd22",
+  //   txtdiagOi: "diagnosticoOi33",
+  //   txtcomentarios: "comentarios 3434 fasfas",
   //   chkrpasimple: true,
   //   chkrpadoble: true,
   //   chkcasemestral: true,
   //   chkcaanual: true,
-  //   txtotrasrecomendaciones: "txtotrasrecomendaciones",
+  //   txtotrasrecomendaciones: "txtotrasrecomendaciones fsfs",
 
-    
   //   od1500: 20,
   //   od11000: 10,
   //   od12000: 20,
@@ -254,10 +254,10 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   // 2.- Síntomas Actuales
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`X`, margin + (datos.sorderaActual ? 16 : 27.5), newY);
-  doc.text(`X`, margin + (datos.vertigoActual ? 50 : 71.5), newY);
+  doc.text(`X`, margin + (datos.sorderaActual ? 23 : 27.5), newY);
+  doc.text(`X`, margin + (datos.vertigoActual ? 67 : 71.5), newY);
   doc.text(`X`, margin + (datos.secrecionOticaActual ? 111 : 115.5), newY);
-  doc.text(datos.otrosSintomasActuales, margin + 159, newY, {
+  doc.text(datos.otrosSintomasActuales, margin + 153, newY, {
     maxWidth: 30,
   });
   newY += 3;
@@ -286,7 +286,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   newY += 3;
   doc.text(`X`, margin + 51.7 + (datos.medicamentosOtotoxicos ? 0 : 4.5), newY);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datos.cualesAntecedentes, margin + 80, newY + 1, {
+  doc.text(datos.cualesAntecedentes, margin + 75, newY + 0.5, {
     maxWidth: 50,
   });
 
@@ -294,7 +294,11 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // 4.- Exposición Ocupacional
   // =====================
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(`X`, margin + 54.5 + (datos.explosicionAlRuido ? 0 : 6), newY + 11.5);
+  doc.text(
+    `X`,
+    margin + 54.5 + (datos.explosicionAlRuido ? 0 : 6),
+    newY + 11.5
+  );
 
   doc.text(
     `X`,
@@ -304,6 +308,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
 
   doc.text(`X`, margin + 54.5 + (datos.exposicionQuimicos ? 0 : 6), newY + 27);
 
+  newY -= 6.4;
   doc.text(`${datos.exposicion0a2 ? "X" : ""}`, margin + 120, newY + 14.5);
   doc.text(`${datos.exposicion2a4 ? "X" : ""}`, margin + 135.5, newY + 14.5);
   doc.text(`${datos.exposicion4a6 ? "X" : ""}`, margin + 152, newY + 14.5);
@@ -314,6 +319,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.text(`${datos.exposicionMas12 ? "X" : ""}`, margin + 152, newY + 18);
   doc.text(`${datos.exposicionEventual ? "X" : ""}`, margin + 168.5, newY + 18);
 
+  newY -= 0.5;
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(`${datos.aniosExposicion}`, margin + 120, newY + 21.5);
   doc.text(`${datos.mesesExposicion}`, margin + 152, newY + 21.5);
@@ -323,7 +329,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.text(`${datos.orejeras ? "X" : ""}`, margin + 168.5, newY + 26);
 
   doc.setFont("helvetica", "normal").setFontSize(7);
-
+  newY -= 1.2;
   drawCenteredText(`${datos.txthplomo}`, margin + 89.5, newY + 34.7);
   drawCenteredText(`${datos.txthmercurio}`, margin + 105, newY + 34.7);
   drawCenteredText(`${datos.txthtolueno}`, margin + 121, newY + 34.7);
@@ -338,9 +344,10 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   drawCenteredText(`${datos.txttplaguic}`, margin + 153, newY + 38.2);
   drawCenteredText(`${datos.txttorganofos}`, margin + 168.5, newY + 38.2);
 
+  newY -= 1;
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(`${datos.txteootros}`, margin + 35, newY + 43.5, { maxWidth: 50 });
-
+  newY += 9.1;
   // =====================
   // 4.- Exposición Ocupacional
   // =====================
@@ -353,14 +360,16 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     margin + 138.7 + (datos.otrosExtraLaborales ? 0 : 4.5),
     newY + 0.6
   );
-  doc.text(`${datos.txtaecuales}`, margin + 41.2, newY + 4.6, { maxWidth: 60 });
+  doc.text(`${datos.txtaecuales}`, margin + 41.2, newY + 4.6, {
+    maxWidth: 60,
+  });
 
   // =====================
   // 5.- Exposición Ocupacional
   // =====================
   newY += 10.5;
-  doc.text(`${datos.txtood}`, margin + 65, newY, { maxWidth: 30 });
-  doc.text(`${datos.txtooi}`, margin + 127, newY, { maxWidth: 30 });
+  doc.text(`${datos.txtood}`, margin + 55, newY - 0.7, { maxWidth: 20 });
+  doc.text(`${datos.txtooi}`, margin + 107, newY - 0.7, { maxWidth: 30 });
   // =====================
   // 7.- Audiometría
   // =====================
@@ -490,27 +499,31 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // 9.- Interpretación Clínica
   // =====================
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("• Interpretación Clínica: Dx Auditivo + (Incluir detalle: Severidad (Promedio Frec. 500/1000/2000/4000) + (Unilateral/bilateral))", margin, y);
+  doc.text(
+    "• Interpretación Clínica: Dx Auditivo + (Incluir detalle: Severidad (Promedio Frec. 500/1000/2000/4000) + (Unilateral/bilateral))",
+    margin,
+    y
+  );
   y += 4;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Oido Derecho: - ", margin + 5, y);
-  
+  doc.text("Oido Derecho:  ", margin + 5, y);
+
   // Texto subrayado para el diagnóstico del oído derecho
-  const diagOdText = String(datos.txtdiagOd || "HIPOACUSIA PROFUNDA");
+  const diagOdText = String(datos.txtdiagOd || "");
   const diagOdWidth = doc.getTextWidth(diagOdText);
   doc.text(diagOdText, margin + 25, y);
-  doc.line(margin + 25, y + 1, margin + 25 + diagOdWidth, y + 1);
-  
+  // doc.line(margin + 25, y + 1, margin + 25 + diagOdWidth, y + 1);
+
   y += 4;
-  doc.text("Oido Izquierdo: - ", margin + 5, y);
-  
+  doc.text("Oido Izquierdo:  ", margin + 5, y);
+
   // Texto subrayado para el diagnóstico del oído izquierdo
-  const diagOiText = String(datos.txtdiagOi || "HIPOACUSIA PROFUNDA");
+  const diagOiText = String(datos.txtdiagOi || "");
   const diagOiWidth = doc.getTextWidth(diagOiText);
   doc.text(diagOiText, margin + 25, y);
-  doc.line(margin + 25, y + 1, margin + 25 + diagOiWidth, y + 1);
-  
+  // doc.line(margin + 25, y + 1, margin + 25 + diagOiWidth, y + 1);
+
   y += 6;
 
   // =====================
@@ -519,11 +532,16 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("COMENTARIOS:", margin, y);
   y += 4;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   const comentariosText = String(datos.txtcomentarios || "");
-  const comentariosLines = doc.splitTextToSize(comentariosText, pageW - margin * 2 - 10);
-  doc.text(comentariosLines, margin + 5, y, { maxWidth: pageW - margin * 2 - 10 });
+  const comentariosLines = doc.splitTextToSize(
+    comentariosText,
+    pageW - margin * 2 - 10
+  );
+  doc.text(comentariosLines, margin + 5, y, {
+    maxWidth: pageW - margin * 2 - 10,
+  });
   y += comentariosLines.length * 3 + 6;
 
   // =====================
@@ -532,25 +550,51 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("11.- Recomendaciones:", margin, y);
   y += 4;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Uso adecuado de Protección Auditiva", margin, y);
+  doc.text(
+    "Uso adecuado de Protección Auditiva.................................",
+    margin,
+    y
+  );
   doc.text("Simple", margin + 80, y);
   doc.text("Doble", margin + 100, y);
+
+  // doc.text(`${datos.chkrpasimple ? "X" : ""}`, margin + 75, y);
+  // doc.text(`${datos.chkrpadoble ? "X" : ""}`, margin + 95, y);
+  // y += 4;
+
+  // Caja para "Simple"
+  doc.rect(margin + 74, y - 3, 4, 4); // x, y, width, height
   doc.text(`${datos.chkrpasimple ? "X" : ""}`, margin + 75, y);
+
+  // Caja para "Doble"
+  doc.rect(margin + 94, y - 3, 4, 4);
   doc.text(`${datos.chkrpadoble ? "X" : ""}`, margin + 95, y);
   y += 4;
-  
-  doc.text("Control audiométrico", margin, y);
+
+  doc.text(
+    "Control audiométrico............................................................",
+    margin,
+    y
+  );
   doc.text("Semestral", margin + 80, y);
   doc.text("Anual", margin + 100, y);
+  // Caja para "Semestral"
+  doc.rect(margin + 74, y - 3, 4, 4);
   doc.text(`${datos.chkcasemestral ? "X" : ""}`, margin + 75, y);
+
+  // Caja para "Anual"
+  doc.rect(margin + 94, y - 3, 4, 4);
   doc.text(`${datos.chkcaanual ? "X" : ""}`, margin + 95, y);
   y += 4;
-  
+
   doc.text("Otras", margin, y);
   const otrasRecomendacionesText = String(datos.txtotrasrecomendaciones || "");
-  const otrasLines = doc.splitTextToSize(otrasRecomendacionesText, pageW - margin * 2 - 50);
+  const otrasLines = doc.splitTextToSize(
+    otrasRecomendacionesText,
+    pageW - margin * 2 - 50
+  );
   doc.text(otrasLines, margin + 20, y, { maxWidth: pageW - margin * 2 - 50 });
   y += Math.max(otrasLines.length * 3, 4) + 8;
 
@@ -559,37 +603,107 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   const signatureY = y;
   const signatureW = (pageW - margin * 2 - 20) / 3;
-  
+
   // Firma del Trabajador (izquierda)
   doc.line(margin, signatureY, margin + signatureW, signatureY);
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma del Trabajador", margin + signatureW/2, signatureY + 4, { align: "center" });
-  
+  doc.text("Firma del Trabajador", margin + signatureW / 2, signatureY + 4, {
+    align: "center",
+  });
+
   // Huella digital y Personal (centro)
   const centerX = margin + signatureW + 10;
   doc.rect(centerX, signatureY - 8, 15, 12);
-  doc.text("Huella digital", centerX + 7.5, signatureY + 8, { align: "center" });
-  
+  doc.text("Huella digital", centerX + 7.5, signatureY + 8, {
+    align: "center",
+  });
+
   doc.line(centerX + 20, signatureY, centerX + 20 + signatureW, signatureY);
-  doc.text("Personal que realiza la Audiometría", centerX + 20 + signatureW/2, signatureY + 4, { align: "center" });
-  
+  doc.text(
+    "Personal que realiza la Audiometría",
+    centerX + 20 + signatureW / 2,
+    signatureY + 4,
+    { align: "center" }
+  );
+
   // Firma y Sello del Médico (derecha)
   const rightX = margin + signatureW * 2 + 20;
   doc.line(rightX, signatureY, rightX + signatureW, signatureY);
-  doc.text("Firma y Sello del Médico Evaluador", rightX + signatureW/2, signatureY + 4, { align: "center" });
+  doc.text(
+    "Firma y Sello del Médico Evaluador",
+    rightX + signatureW / 2,
+    signatureY + 4,
+    { align: "center" }
+  );
 };
 
 export default function Audiometria2021_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   body_Audiometria2021_Digitalizado(doc, data);
-  const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = url;
-  document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+
+  // Función para agregar la firma y esperar a que cargue o falle
+  const addSello = (imagenUrl, x, y) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // importante si es una URL externa
+      img.src = imagenUrl;
+
+      img.onload = () => {
+        const sigW = 100;
+        const sigH = 35;
+        const baseX = x;
+        const baseY = y;
+        const maxW = sigW - 10;
+        const maxH = sigH - 10;
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve(); // se resuelve al cargar
+      };
+
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve(); // también resolvemos si falla (para no bloquear)
+      };
+    });
   };
+
+  const firmas = (data.digitalizacion || []).reduce(
+    (acc, d) => ({
+      ...acc,
+      [d.nombreDigitalizacion]: d.url,
+    }),
+    {}
+  );
+
+  // Arreglo de firmas que quieres cargar
+  const firmasAPintar = [
+    { nombre: "FIRMAP", x: -8, y: 255 },
+    { nombre: "HUELLA", x: 36, y: 255 },
+    { nombre: "SELLOFIRMA", x: 80, y: 255 },
+    { nombre: "SELLOFIRMADOCASIG", x: 130, y: 255 },
+  ];
+
+  // Crear promesas para todas las firmas existentes
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y));
+
+  Promise.all(promesasFirmas).then(() => {
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
+  });
 }
