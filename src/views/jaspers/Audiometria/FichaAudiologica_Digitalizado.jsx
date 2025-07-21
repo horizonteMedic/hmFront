@@ -5,6 +5,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
+  const usableW = pageW - 2 * margin;
   let y = 32;
 
   // 1) Header
@@ -16,7 +17,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     modelo: "BELL PLUS",
     calibracion: "01/07/2025",
     fechaExamen: "24/10/2025",
-    tipoExamen: "Anual",
+    tipoExamen: "PreOcupacional",
     nombres: "ROJAS SIGUENZA JOSUE SPENCER",
     edad: "29",
     sexo: "M",
@@ -28,23 +29,23 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
 
     tapones: true,
     orejeras: true,
-    ruidoMuyIntenso: false,
+    ruidoMuyIntenso: true,
     ruidoModerado: true,
-    ruidoNoMolesto: false,
+    ruidoNoMolesto: true,
 
-    consumoTabaco: true,
-    servicioMilitar: false,
-    hobbiesRuido: true,
-    exposicionQuimicos: false,
-    infeccionOidoAntecente: true,
-    ototoxicos: false,
+    consumoTabaco: false,
+    servicioMilitar: true,
+    hobbiesRuido: false,
+    exposicionQuimicos: true,
+    infeccionOidoAntecente: false,
+    ototoxicos: true,
 
     disminucionAudicion: true,
     dolorOidos: false,
     zumbido: true,
     mareos: false,
     infeccionOidoActual: true,
-    otros: true,
+    otros: false,
 
     txtDod250: "40",
     txtDod500: "20",
@@ -209,404 +210,244 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   doc.text("FICHA AUDIOLOGICA", pageW / 2, y, { align: "center" });
   y += 6;
 
-  // --- Bloque superior rediseñado con Audiómetro ---
-  const x0 = margin;
-  const wTotal = pageW - 2 * margin;
-  // Definir anchos de columnas principales
-  const colW = [38, 60, 30, wTotal - 38 - 60 - 30 - 45, 45]; // última columna: Audiómetro
-  const rowH1 = 10;
-  const rowH2 = 12;
-  const rowH3Sup = 10;
-  // Fila 1: 4 columnas + Audiómetro
-  doc.setLineWidth(0.4);
-  doc.rect(x0, y, wTotal, rowH1);
-  let x = x0;
-  for (let i = 0; i < colW.length - 1; i++) {
-    x += colW[i];
-    doc.line(x, y, x, y + rowH1);
+  // === NUEVO: Usar imagen de fondo para la cabecera ===
+  const fondoImg = "/img/frame_ficha.png";
+  const fondoH =95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
+  let yHeader = 40;
+  try {
+    doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
+  } catch (e) {
+    doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
   }
-  // Audiómetro: solo texto centrado en la celda superior
-  let audX = x0 + colW[0] + colW[1] + colW[2] + colW[3];
-  let audY = y;
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text("Audiómetro", audX + colW[4] / 2, audY + rowH1 / 2 + 2, { align: "center", baseline: "middle" });
-  // Fila 2: Fecha del Examen, Fecha, Examen, Tipos de Examen, Audiómetro subdividido
-  const y2 = y + rowH1;
-  doc.rect(x0, y2, wTotal, rowH2);
-  x = x0;
-  for (let i = 0; i < colW.length - 1; i++) {
-    x += colW[i];
-    doc.line(x, y2, x, y2 + rowH2);
+  
+  // === 2) Datos de cabecera (cada uno con su propia posición para moverlos individualmente) ===
+  // Puedes ajustar cada x/y a tu gusto
+  doc.setFont("helvetica", "normal").setFontSize(9);
+
+  // N° Orden
+  const xNorden = margin + 104; // más a la derecha
+  const yNorden = margin + 39;  // un poco más abajo
+  doc.setFont("helvetica", "bold").setFontSize(15);
+  doc.text(String(datos.norden || "95899"), xNorden, yNorden);
+  doc.setFont("helvetica", "normal").setFontSize(9); // restaurar tamaño para los demás
+  
+  // Fecha Examen
+  const xFechaExamen = margin + 25;
+  const yFechaExamen = margin + 49;
+  doc.text(String(datos.fechaExamen || "24/10/2025"), xFechaExamen, yFechaExamen);
+
+  // Marca
+  const xMarca = margin + 160;
+  const yMarca = margin + 38.5;
+  doc.text(String(datos.marca || "AMPLIVOX"), xMarca, yMarca);
+
+  // Modelo
+  const xModelo = margin + 160;
+  const yModelo = margin + 46;
+  doc.text(String(datos.modelo || "BELL PLUS"), xModelo, yModelo);
+
+  // Calibración
+  const xCalibracion = margin + 160;
+  const yCalibracion = margin + 53;
+  doc.text(String(datos.calibracion || "01/07/2025"), xCalibracion, yCalibracion);
+
+  // === Tipo de Examen: Marcar "X" alineada con el número de orden ===
+  const xPreOcupacional = margin + 91.5;
+  const yPreOcupacional = margin + 46.4;
+
+  const xPeriodica = margin + 115;
+  const yPeriodica = margin + 46.4;
+
+  const xRetiro = margin + 91.5;
+  const yRetiro = margin + 51.2;
+
+  const xAnual = margin + 115;
+  const yAnual = margin + 51.2;
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  if ((datos.tipoExamen || "").toLowerCase().includes("pre")) {
+    doc.text("X", xPreOcupacional, yPreOcupacional);
   }
-  // Audiómetro subdivisión interna (3 filas)
-  audY = y2;
-  const audRowH = rowH2 / 3;
-  for (let i = 1; i < 3; i++) {
-    doc.line(audX, audY + i * audRowH, audX + colW[4], audY + i * audRowH);
+  if ((datos.tipoExamen || "").toLowerCase().includes("perio")) {
+    doc.text("X", xPeriodica, yPeriodica);
   }
-  // Textos Fila 2 (resto de columnas igual que antes)
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Fecha del Examen", x0 + colW[0] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`${datos.fechaExamen}`, x0 + colW[0] + colW[1] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
+  if ((datos.tipoExamen || "").toLowerCase().includes("retiro")) {
+    doc.text("X", xRetiro, yRetiro);
+  }
+  if ((datos.tipoExamen || "").toLowerCase().includes("anual")) {
+    doc.text("X", xAnual, yAnual);
+  }
+  doc.setFont("helvetica", "normal").setFontSize(9);
+
+  // === Datos personales y laborales ===
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("dd / mm / aa", x0 + colW[0] + colW[1] / 2, y2 + rowH2 / 2 + 6, { align: "center" });
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.text("EXAMEN", x0 + colW[0] + colW[1] + colW[2] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`Pre - Ocupacional (${datos.tipoExamen == "Pre-ocupacional" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 - 2, { align: "left" });
-  doc.text(`Periódica (${datos.tipoExamen == "Periodica" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 + 2, { align: "left" });
-  doc.text(`Retiro (${datos.tipoExamen == "Retiro" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 + 6, { align: "left" });
-  doc.text(`Anual (${datos.tipoExamen == "Anual" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 2, y2 + rowH2 / 2 + 6, { align: "left" });
-  // Audiómetro datos (3 filas)
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Marca", audX + 2, audY + audRowH / 2 + 1, { align: "left", baseline: "middle" });
+
+  // Apellidos y Nombres
+  const xNombres = margin + 35;
+  const yNombres = margin + 58.5;
+  doc.text(String(datos.nombres || "ROJAS SIGUENZA JOSUE SPENCER"), xNombres, yNombres, { maxWidth: 70 });
+
+  // Edad
+  const xEdad = margin + 37;
+  const yEdad = margin + 64.5;
+  doc.text(String(datos.edad || "29"), xEdad, yEdad);
+
+ 
+  // Sexo
+  const xSexo = margin + 69.5;
+  const ySexo = margin + 64.5;
+  doc.text(String(datos.sexo || "M"), xSexo, ySexo);
+
+  // Ocupación
+  const xOcupacion = margin + 94;
+  const yOcupacion = margin + 64.5;
+  doc.text(String(datos.ocupacion || "ADMINISTRADOR ESPECIALISTA"), xOcupacion, yOcupacion, { maxWidth: 60 });
+
+   // Años de trabajo
+   const xAniosTrabajo = margin + 188;
+   const yAniosTrabajo = margin + 64.5;
+   doc.text(String(datos.aniosTrabajo || "5"), xAniosTrabajo, yAniosTrabajo);
+
+   
+  // Empresa Contrata
+  const xContrata = margin + 35;
+  const yContrata = margin + 70;
+  doc.text(String(datos.contrata || "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L."), xContrata, yContrata, { maxWidth: 50});
+
+  // Empresa
+  const xEmpresa = margin + 105;
+  const yEmpresa = margin +  70;
+  doc.text(String(datos.empresa || "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C."), xEmpresa, yEmpresa, { maxWidth: 55 });
+
+  // Tiempo de Exposición
+  const xTiempoExposicion = margin + 185;
+  const yTiempoExposicion = margin + 72;
+  doc.text(String(datos.tiempoExposicion || "5 H/D"), xTiempoExposicion, yTiempoExposicion);
+
+  
+  // === Uso de Protectores Auditivos y Apreciación del Ruido ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(`${datos.marca}`, audX + colW[4] - 2, audY + audRowH / 2 + 1, { align: "right", baseline: "middle" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Modelo", audX + 2, audY + audRowH + audRowH / 2 + 1, { align: "left", baseline: "middle" });
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(`${datos.modelo}`, audX + colW[4] - 2, audY + audRowH + audRowH / 2 + 1, { align: "right", baseline: "middle" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Calibración", audX + 2, audY + 2 * audRowH + audRowH / 2 + 1, { align: "left", baseline: "middle" });
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(`${datos.calibracion}`, audX + colW[4] - 2, audY + 2 * audRowH + audRowH / 2 + 1, { align: "right", baseline: "middle" });
-  // Fila 3: Apellidos y Nombres (celdas combinadas) + Audiómetro subdividido
-  const y3 = y2 + rowH2;
-  doc.rect(x0, y3, wTotal, rowH3Sup);
-  // Línea vertical para audiómetro
-  doc.line(audX, y3, audX, y3 + rowH3Sup);
-  // Audiómetro subdivisión interna (3 filas)
-  doc.line(audX, y3 + rowH3Sup / 3, audX + colW[4], y3 + rowH3Sup / 3);
-  doc.line(audX, y3 + 2 * rowH3Sup / 3, audX + colW[4], y3 + 2 * rowH3Sup / 3);
-  // Texto Apellidos y Nombres
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Apellidos y Nombres", x0 + 2, y3 + rowH3Sup / 2 + 2, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`${datos.nombres}`, x0 + 60, y3 + rowH3Sup / 2 + 2, { align: "left" });
-  y += rowH1 + rowH2 + rowH3Sup;
 
-  // --- Bloque de datos personales (2 filas) ---
-  let yDatos = y + rowH1 + rowH2;
-  const rowH3 = 8,
-    rowH4 = 8;
-  // Fila 3
-  // Proporciones para fila 3 (Apellidos, Edad, Sexo, Ocupación, Años de trabajo)
-  const colW3 = [0.32, 0.1, 0.08, 0.32, 0.18].map((f) => f * wTotal);
-  let xCol3 = x0;
-  doc.rect(x0, yDatos, wTotal, rowH3);
-  for (let i = 0; i < colW3.length - 1; i++) {
-    xCol3 += colW3[i];
-    doc.line(xCol3, yDatos, xCol3, yDatos + rowH3);
-  }
-  // Agregar línea vertical extra para separar el valor de 'Años de Trabajo'
-  const xAniosTrabajo = x0 + colW3[0] + colW3[1] + colW3[2] + colW3[3];
-  const xAniosTrabajoValor = xAniosTrabajo + colW3[4] * 0.6;
-  doc.line(xAniosTrabajoValor, yDatos, xAniosTrabajoValor, yDatos + rowH3);
+  // Tampones
+  const xTampones = margin + 48.5;
+  const yTampones = margin + 80.4;
+  if (datos.tapones) doc.text("X", xTampones, yTampones);
 
-  // Etiquetas fila 3
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  let xText = x0 + 2;
-  doc.text("Apellidos y Nombres", xText, yDatos + 5);
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`${datos.nombres}`, x0 + colW3[0] / 2 + x0, yDatos + 5, {
-    align: "center",
-  });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  xText += colW3[0];
-  doc.text("Edad", xText + 2, yDatos + 5);
-  doc
-    .setFont("helvetica", "bold")
-    .text(`${datos.edad} años`, xText + colW3[1] / 2, yDatos + 5, {
-      align: "center",
-    });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  xText += colW3[1];
-  doc.text("Sexo", xText + 2, yDatos + 5);
-  doc
-    .setFont("helvetica", "bold")
-    .text(`${datos.sexo}`, xText + colW3[2] / 2, yDatos + 5, {
-      align: "center",
-    });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  xText += colW3[2];
-  doc.text("Ocupación", xText + 2, yDatos + 5);
-  doc
-    .setFont("helvetica", "bold")
-    .text(`${datos.ocupacion}`, xText + colW3[3] / 2, yDatos + 5, {
-      align: "center",
-    });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  xText += colW3[3];
-  // Centrar verticalmente y alinear más a la izquierda el texto 'Años de Trabajo'
-  doc.text("Años de Trabajo", xText -62, yDatos + rowH3 / 2 + 1, {
-    align: "left",
-    // aling
-     
-    baseline: "middle"
-  });
+  // Orejeras
+  const xOrejeras = margin + 69.5;
+  const yOrejeras = margin + 80.4;
+  if (datos.orejeras) doc.text("X", xOrejeras, yOrejeras);
 
-  // Fila 4
-  yDatos += rowH3;
-  // Proporciones para fila 4 (Empresa Contratista, Empresa, Tiempo exposición)
-  const colW4 = [0.38, 0.38, 0.24].map((f) => f * wTotal);
-  let xCol4 = x0;
-  doc.rect(x0, yDatos, wTotal, rowH4);
-  for (let i = 0; i < colW4.length - 1; i++) {
-    xCol4 += colW4[i];
-    doc.line(xCol4, yDatos, xCol4, yDatos + rowH4);
-  }
-  // Etiquetas fila 4
-  xText = x0 + 2;
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Empresa Contratista", xText, yDatos + 5);
-  doc
-    .setFont("helvetica", "bold")
-    .text(`${datos.contrata}`, xText + colW4[0] / 2, yDatos + 5, {
-      align: "center",
-    });
-  xText += colW4[0];
-  doc.setFont("helvetica", "normal").text("Empresa", xText + 2, yDatos + 5);
-  doc
-    .setFont("helvetica", "bold")
-    .text(`${datos.empresa}`, xText + colW4[1] / 2, yDatos + 5, {
-      align: "center",
-    });
-  xText += colW4[1];
-  // Label en dos líneas
-  doc
-    .setFont("helvetica", "normal")
-    .text("Tiempo de", xText + colW4[2] / 2, yDatos + 3, {
-      align: "center",
-    });
-  doc.text("exposición", xText + colW4[2] / 2, yDatos + 6, {
-    align: "center",
-  });
-  // Dato centrado debajo
-  doc
-    .setFont("helvetica", "bold")
-    .text(`${datos.tiempoExposicion}`, xText + colW4[2] / 2, yDatos + 10, {
-      align: "center",
-    });
+  // Ruido muy intenso
+  const xRuidoIntenso = margin + 126.5;
+  const yRuidoIntenso = margin + 80.4;
+  if (datos.ruidoMuyIntenso) doc.text("X", xRuidoIntenso, yRuidoIntenso);
 
-  // --- Uso de Protectores Auditivos y Apreciación del Ruido ---
-  let yProtec = yDatos + rowH4;
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.rect(x0, yProtec, 70, 8);
-  doc.rect(x0 + 70, yProtec, wTotal - 70, 8);
-  doc.text("Uso de Protectores Auditivos", x0 + 35, yProtec + 5, {
-    align: "center",
-  });
-  doc.text("Apreciación del Ruido", x0 + 70 + (wTotal - 70) / 2, yProtec + 5, {
-    align: "center",
-  });
-  yProtec += 8;
+  // Ruido moderado
+  const xRuidoModerado = margin + 156.5;
+  const yRuidoModerado = margin + 80.4;
+  if (datos.ruidoModerado) doc.text("X", xRuidoModerado, yRuidoModerado);
+
+  // Ruido no molesto
+  const xRuidoNoMolesto = margin + 187.5;
+  const yRuidoNoMolesto = margin + 80.4;
+  if (datos.ruidoNoMolesto) doc.text("X", xRuidoNoMolesto, yRuidoNoMolesto);
+
+  // === Antecedentes Relacionados (SI/NO) ===
+  // Consumo de Tabaco
+  const xTabacoSI = margin + 74.8;
+  const xTabacoNO = margin + 86.5;
+  let yAnt = margin + 95;
+  if (datos.consumoTabaco) doc.text("X", xTabacoSI, yAnt);
+  else doc.text("X", xTabacoNO, yAnt);
+
+  // Servicio Militar
+  yAnt += 4.4;
+  if (datos.servicioMilitar) doc.text("X", xTabacoSI, yAnt);
+  else doc.text("X", xTabacoNO, yAnt);
+
+  // Hobbies con exposición a ruido
+  yAnt += 4.5;
+  if (datos.hobbiesRuido) doc.text("X", xTabacoSI, yAnt);
+  else doc.text("X", xTabacoNO, yAnt);
+
+  // Exposición laboral a químicos
+  yAnt += 4.6;
+  if (datos.exposicionQuimicos) doc.text("X", xTabacoSI, yAnt);
+  else doc.text("X", xTabacoNO, yAnt);
+
+  // Infección al Oído (antecedente)
+  yAnt += 4.5;
+  if (datos.infeccionOidoAntecente) doc.text("X", xTabacoSI, yAnt);
+  else doc.text("X", xTabacoNO, yAnt);
+
+  // Uso de Ototóxicos
+  yAnt += 4.5;
+  if (datos.ototoxicos) doc.text("X", xTabacoSI, yAnt);
+  else doc.text("X", xTabacoNO, yAnt);
+
+  // === Síntomas Actuales (SI/NO) ===
+  // Disminución de la audición
+  const xSintSI = margin + 175;
+  const xSintNO = margin + 186.5;
+  let ySint = margin + 95;
+  if (datos.disminucionAudicion) doc.text("X", xSintSI, ySint);
+  else doc.text("X", xSintNO, ySint);
+
+  // Dolor de oídos
+  ySint += 4.4;
+  if (datos.dolorOidos) doc.text("X", xSintSI, ySint);
+  else doc.text("X", xSintNO, ySint);
+
+  // Zumbido
+  ySint += 4.5;
+  if (datos.zumbido) doc.text("X", xSintSI, ySint);
+  else doc.text("X", xSintNO, ySint);
+
+  // Mareos
+  ySint += 4.6;
+  if (datos.mareos) doc.text("X", xSintSI, ySint);
+  else doc.text("X", xSintNO, ySint);
+
+  // Infección al oído (actual)
+  ySint += 4.5;
+  if (datos.infeccionOidoActual) doc.text("X", xSintSI, ySint);
+  else doc.text("X", xSintNO, ySint);
+
+  // Otros
+  ySint += 4.5;
+  if (datos.otros) doc.text("X", xSintSI, ySint);
+  else doc.text("X", xSintNO, ySint);
+
+  // === OTOSCOPIA ===
+  const xOtoscopia = margin + 23;
+  const yOtoscopia = margin + 122.5;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.rect(x0, yProtec, 70, 7);
-  doc.rect(x0 + 70, yProtec, wTotal - 70, 7);
   doc.text(
-    `Tapones (${datos.tapones ? "X" : " "})    Orejeras (${
-      datos.orejeras ? "X" : " "
-    })`,
-    x0 + 35,
-    yProtec + 5,
-    {
-      align: "center",
-    }
-  );
-  doc.text(
-    `Ruido muy Intenso (${
-      datos.ruidoMuyIntenso ? "X" : " "
-    })    Ruido moderado (${
-      datos.ruidoModerado ? "X" : " "
-    })    Ruido no molesto (${datos.ruidoNoMolesto ? "X" : " "})`,
-    x0 + 70 + (wTotal - 70) / 2,
-    yProtec + 5,
-    { align: "center" }
+    String(
+      datos.otoscopia ||
+        "Membrana timpánica integra, conducto auditivo externo sin alteraciones, sin presencia de cuerpos extraños ni secreciones. Se observa leve enrojecimiento en la región superior, sin signos de perforación ni exudado."
+    ),
+    xOtoscopia,
+    yOtoscopia,
+    { maxWidth: 171 }
   );
 
-  // --- Tabla de antecedentes ---
-  let yAnte = yProtec + 7;
-  // Calcular columnas proporcionales al ancho total
-  const colWAnte = [0.23, 0.07, 0.07, 0.23, 0.07, 0.07].map((f) => f * wTotal);
-  const tableWAnte = wTotal;
-  const tableH = 7 * 6; // 6 filas + encabezado
-  doc.rect(x0, yAnte, tableWAnte, tableH);
-  let xCol = x0;
-  for (let i = 0; i < colWAnte.length - 1; i++) {
-    xCol += colWAnte[i];
-    doc.line(xCol, yAnte, xCol, yAnte + tableH);
-  }
-  for (let i = 1; i < 7; i++) {
-    doc.line(x0, yAnte + i * 6, x0 + tableWAnte, yAnte + i * 6);
-  }
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("ANTECEDENTES relacionados", x0 + 2, yAnte + 4);
-  doc.text("SI", x0 + colWAnte[0] + colWAnte[1] / 2, yAnte + 4, {
-    align: "center",
-  });
-  doc.text("NO", x0 + colWAnte[0] + colWAnte[1] + colWAnte[2] / 2, yAnte + 4, {
-    align: "center",
-  });
-  // Agregar 'SÍNTOMAS ACTUALES' centrado en la celda vacía
-  doc.text(
-    "SÍNTOMAS ACTUALES",
-    x0 + colWAnte[0] + colWAnte[1] + colWAnte[2] + colWAnte[3] / 2,
-    yAnte + 4,
-    { align: "center" }
-  );
-  doc.text(
-    "SI",
-    x0 +
-      colWAnte[0] +
-      colWAnte[1] +
-      colWAnte[2] +
-      colWAnte[3] +
-      colWAnte[4] / 2,
-    yAnte + 4,
-    { align: "center" }
-  );
-  doc.text(
-    "NO",
-    x0 +
-      colWAnte[0] +
-      colWAnte[1] +
-      colWAnte[2] +
-      colWAnte[3] +
-      colWAnte[4] +
-      colWAnte[5] / 2,
-    yAnte + 4,
-    { align: "center" }
-  );
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const antecedentes = [
-    [
-      "Consumo de Tabaco",
-      `${datos.consumoTabaco ? "X" : ""}`,
-      `${datos.consumoTabaco ? "" : "X"}`,
 
-      "Disminución de la audición",
-      `${datos.disminucionAudicion ? "X" : ""}`,
-      `${datos.disminucionAudicion ? "" : "X"}`,
-    ],
-    [
-      "Servicio Militar",
-      `${datos.servicioMilitar ? "X" : ""}`,
-      `${datos.servicioMilitar ? "" : "X"}`,
-
-      "Dolor de oídos",
-      `${datos.dolorOidos ? "X" : ""}`,
-      `${datos.dolorOidos ? "" : "X"}`,
-    ],
-    [
-      "Hobbies con exposición a ruido",
-      `${datos.hobbiesRuido ? "X" : ""}`,
-      `${datos.hobbiesRuido ? "" : "X"}`,
-
-      "Zumbido",
-      `${datos.zumbido ? "X" : ""}`,
-      `${datos.zumbido ? "" : "X"}`,
-    ],
-    [
-      "Exposición laboral a químicos",
-      `${datos.exposicionQuimicos ? "X" : ""}`,
-      `${datos.exposicionQuimicos ? "" : "X"}`,
-
-      "Mareos",
-      `${datos.mareos ? "X" : ""}`,
-      `${datos.mareos ? "" : "X"}`,
-    ],
-    [
-      "Infección al Oído",
-      `${datos.infeccionOidoAntecente ? "X" : ""}`,
-      `${datos.infeccionOidoAntecente ? "" : "X"}`,
-
-      "Infección al oído",
-      `${datos.infeccionOidoActual ? "X" : ""}`,
-      `${datos.infeccionOidoActual ? "" : "X"}`,
-    ],
-    [
-      "Uso de Ototóxicos",
-      `${datos.ototoxicos ? "X" : ""}`,
-      `${datos.ototoxicos ? "" : "X"}`,
-
-      "Otros",
-      `${datos.otros ? "X" : ""}`,
-      `${datos.otros ? "" : "X"}`,
-    ],
-  ];
-  for (let i = 0; i < antecedentes.length; i++) {
-    const row = antecedentes[i];
-    doc.text(row[0], x0 + 2, yAnte + 10 + i * 6);
-    doc
-      .setFont("helvetica", "bold")
-      .text(row[1], x0 + colWAnte[0] + colWAnte[1] / 2, yAnte + 10 + i * 6, {
-        align: "center",
-      });
-    doc
-      .setFont("helvetica", "normal")
-      .text(
-        row[2],
-        x0 + colWAnte[0] + colWAnte[1] + colWAnte[2] / 2,
-        yAnte + 10 + i * 6,
-        { align: "center" }
-      );
-    doc.text(
-      row[3],
-      x0 + colWAnte[0] + colWAnte[1] + colWAnte[2] + 2,
-      yAnte + 10 + i * 6
-    );
-    doc
-      .setFont("helvetica", "bold")
-      .text(
-        row[5],
-        x0 +
-          colWAnte[0] +
-          colWAnte[1] +
-          colWAnte[2] +
-          colWAnte[3] +
-          colWAnte[4] +
-          colWAnte[5] / 2,
-        yAnte + 10 + i * 6,
-        { align: "center" }
-      );
-    doc
-      .setFont("helvetica", "normal")
-      .text(
-        row[4],
-        x0 +
-          colWAnte[0] +
-          colWAnte[1] +
-          colWAnte[2] +
-          colWAnte[3] +
-          colWAnte[4] / 2,
-        yAnte + 10 + i * 6,
-        { align: "center" }
-      );
-  }
-
-  // --- Otoscopia ---
-  let yOto = yAnte + tableH + 7;
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("OTOSCOPIA:", x0, yOto);
-
-  // --- NUEVO: Sección de dos columnas ---
-  // Márgenes laterales más amplios
+  y += fondoH + 2;
   const colGap = 8;
-  const colH = 75; // más bajo para que las líneas estén más juntas
-  const colY = yOto + 8;
-  // Espacio para etiquetas dB
+  const colH = 75;
+  const colY = y + 8;
+
   const dbLabelW = 12;
-  // Área útil total para el bloque inferior (gráfico + tablas)
-  const usableW = pageW - 2 * margin - dbLabelW;
-  // El ancho del gráfico será la mitad del área útil menos la separación
   const graphW = (usableW - colGap) / 2;
   const graphH = colH;
   const graphX = margin + dbLabelW;
   const graphY = colY;
   // La tabla empieza después del gráfico y el gap
   const tableX = graphX + graphW + colGap;
-  const tableWRight = usableW - graphW - colGap;
+  // Reducir el ancho de la tabla para que no se salga del margen
+  const tableWRight = 81; // antes: usableW - graphW - colGap; ajusta según necesidad
   // Cuadrícula
   doc.setDrawColor(0);
   doc.setLineWidth(0.2); // líneas más delgadas
@@ -837,7 +678,8 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const t2Rows = 5;
   const t2Cols = 3;
   const t2RowH = 9;
-  const t2ColWArr = [tableWRight * 0.6, tableWRight * 0.2, tableWRight * 0.2];
+  // Ajustar proporciones para que las columnas no sean tan anchas
+  const t2ColWArr = [tableWRight * 0.5, tableWRight * 0.25, tableWRight * 0.25];
   const t2H = t2Rows * t2RowH;
   // Dibujar marco exterior
   doc.rect(tableX, tY, tableWRight, t2H);
@@ -893,6 +735,7 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
       { align: "center", baseline: "middle" }
     );
   }
+
 
   // --- Tabla de conclusiones y firmas según requerimiento ---
   // Subir la sección un poco
@@ -962,6 +805,10 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   });
 
   // 4) Imprimir automáticamente
+  // Dibujar el footer
+  if (typeof footerFichaAudiologica === 'function') {
+    footerFichaAudiologica(doc);
+  }
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");

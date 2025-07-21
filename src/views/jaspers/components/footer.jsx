@@ -17,30 +17,30 @@ function footer(doc, datos) {
   doc.setFontSize(7);
   doc.setTextColor(0, 0, 0);
 
-  // Definir las filas principales
+  // Definir las filas principales con datos de prueba si no hay datos
   const filas = [
     {
-      direccion: datos?.dirTruPierola || "",
-      celular: datos?.celTrujilloPie || "",
-      email: datos?.emailTruPierola || "",
-      telefono: datos?.telfTruPierola || ""
+      direccion: datos?.dirTruPierola || 'TRUJILLO: Nicolás de Piérola 123',
+      celular: datos?.celTrujilloPie || '999 888 777',
+      email: datos?.emailTruPierola || 'trujillo@horizontemedic.com',
+      telefono: datos?.telfTruPierola || '044-123456'
     },
     {
-      direccion: datos?.dirHuamachuco || "",
-      celular: datos?.celHuamachuco || "",
-      email: datos?.emailHuamachuco || "",
-      telefono: datos?.telfHuamachuco || ""
+      direccion: datos?.dirHuamachuco || 'HUAMACHUCO: Jr. Libertad 456',
+      celular: datos?.celHuamachuco || '988 777 666',
+      email: datos?.emailHuamachuco || 'huamachuco@horizontemedic.com',
+      telefono: datos?.telfHuamachuco || '044-654321'
     },
     {
-      direccion: datos?.dirHuancayo || "",
-      celular: datos?.celHuancayo || "",
-      email: datos?.emailHuancayo || "",
-      telefono: datos?.telfHuancayo || ""
+      direccion: datos?.dirHuancayo || 'HUANCAYO: Av. Central 789',
+      celular: datos?.celHuancayo || '977 666 555',
+      email: datos?.emailHuancayo || 'huancayo@horizontemedic.com',
+      telefono: datos?.telfHuancayo || '064-123456'
     }
   ];
 
   // Fila opcional para Prescott
-  const prescott = datos?.dirTrujillo || "";
+  const prescott = datos?.dirTrujillo || 'PRESCOTT: Calle Falsa 123';
 
   // Renderizar filas principales
   let y = baseY;

@@ -24,8 +24,8 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   let y = 12;
 
   // 1) Logo a la izquierda
-  const logoW = 28,
-    logoH = 10;
+  const logoW = 35,
+    logoH = 15;
   try {
     doc.addImage("./img/logo-color.png", "PNG", margin, y - 4, logoW, logoH);
   } catch {
@@ -34,26 +34,44 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
       .setFontSize(9)
       .text("Policlinico Horizonte Medic", margin, y + 8);
   }
+  // === BLOQUE CÓDIGO DE COLOR ===
+  // Prueba: si no hay datos.color, usar uno de ejemplo
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const color = datos.codigoColor || "#008f39";
+  const boxText = (datos.textoColor || "F").toUpperCase();
+  let boxSize = 15;
+  let boxX = pageW - margin - boxSize;
+  let boxY = y - 5;
+  if (colorValido || true) { // Forzar a mostrar para prueba visual
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+    // Solo renderiza si color es válido o para prueba
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { align: "center", baseline: "middle", maxWidth: boxSize - 1 });
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2);
+  }
   y -= 7;
-  // 2) BLOQUE "No Ficha" / "Sede" (ajustado a la derecha)
-  const fichaBlockX = pageW - margin + 1;
-  const fichaBlockY = y + 2;
-  const fichaLabel = "No Ficha :";
-  const fichaValue = String(datos.norden || "");
-  const sedeLabel = "Sede     :";
-  const sedeValue = String(datos.sede || "");
-
-  // No Ficha
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(fichaLabel, fichaBlockX - 30, fichaBlockY+4);
-  doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text(fichaValue, fichaBlockX + 6, fichaBlockY+4, { align: "right" });
-
-  // Sede
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  // doc.text(sedeLabel, fichaBlockX - 30, fichaBlockY + 8);
-  doc.setFont("helvetica", "normal").setFontSize(8.5);
-  doc.text(sedeValue, fichaBlockX + 6, fichaBlockY + 8, { align: "right" });
+  // 2) Número de ficha grande y sede debajo, alineados a la derecha
+  const fichaX = pageW - margin - 18;
+  const bloqueY = y + 5; // subir el bloque 3 puntos más arriba
+  const sedeValue = String(datos.sede || 'TRUJILLO - NICOLAS DE PIEROLA');
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(sedeValue, fichaX, bloqueY, { align: "right" });
+  // Número de orden debajo
+  const fichaValue = String(datos.norden || '97800');
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(fichaValue, fichaX, bloqueY + 7, { align: "right" });
 
   // 3) TÍTULO perfectamente centrado
   doc.setFont("helvetica", "bold").setFontSize(13);

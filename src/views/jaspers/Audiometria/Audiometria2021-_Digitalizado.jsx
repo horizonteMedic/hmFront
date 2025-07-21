@@ -27,7 +27,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   let y = 45;
   try {
     console.log(margin, y);
-    doc.addImage("public/img/frame.png", "PNG", margin, y, imgW, imgH);
+    doc.addImage("/img/frame.png", "PNG", margin, y, imgW, imgH);
     y += imgH + 5; // Deja un pequeño espacio después de la imagen
   } catch (e) {
     doc.text("Imagen no disponible", margin, y + 10);
@@ -161,7 +161,8 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   //   oi18000: 60,
   // };
   function limpiarNumero(valor) {
-    const v = valor.trim();
+    if (valor === undefined || valor === null) return null;
+    const v = String(valor).trim();
 
     if (v === "" || v === "N/A" || v === "-") {
       return null;
@@ -422,7 +423,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // Leyenda (mitad izquierda)
   try {
     doc.addImage(
-      "public/img/leyenda_grafico.png",
+      "/img/leyenda_grafico.png",
       "PNG",
       margin,
       y + 2,

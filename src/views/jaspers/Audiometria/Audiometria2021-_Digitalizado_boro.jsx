@@ -27,7 +27,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   let y = 45;
   try {
     console.log(margin, y);
-    doc.addImage("public/img/frame.png", "PNG", margin, y, imgW, imgH);
+    doc.addImage("/img/frame.png", "PNG", margin, y, imgW, imgH);
     y += imgH + 5; // Deja un pequeño espacio después de la imagen
   } catch (e) {
     doc.text("Imagen no disponible", margin, y + 10);
