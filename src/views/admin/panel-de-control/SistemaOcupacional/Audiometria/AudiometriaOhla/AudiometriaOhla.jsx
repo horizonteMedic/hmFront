@@ -12,7 +12,6 @@ import Swal from "sweetalert2";
 import {
   SubmitDataService,
   VerifyTR,
-  // PrintHojaR,
   getInfoTabla,
   Loading,
   GetInfoServicio,
@@ -1136,6 +1135,8 @@ export default function AudiometriaOhla({
               setFicha={setFormFicha}
               setSearchNombreMedico={setSearchNombreMedico}
               cleanFicha={handleClearFicha}
+              mostrarGrafico={form.activar_grafico}
+              firmaExtra={form.asignar_especialista}
             />
           </div>
           <div className="grid grid-cols-1  gap-4 border rounded p-4">
@@ -1203,6 +1204,8 @@ function Table({
   setFicha,
   setSearchNombreMedico,
   cleanFicha,
+  mostrarGrafico,
+  firmaExtra
 }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
@@ -1215,7 +1218,7 @@ function Table({
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla, mostrarGrafico,firmaExtra);
       }
     });
   };
