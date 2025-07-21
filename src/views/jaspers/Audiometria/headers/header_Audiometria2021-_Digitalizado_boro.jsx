@@ -21,8 +21,8 @@ const header_Audiometria2021_Digitalizado_boro = (doc, datos = {}) => {
   // 2) BLOQUE "No Ficha" / "Sede" (alineados uno debajo del otro, a la derecha)
   const fichaBlockX = pageW - margin;
   const fichaBlockY = y + 2;
-  const fichaValue   = String(datos.nroficha || "96639");
-  const sedeValue    = String(datos.sede     || "Trujillo-Pierola");
+  const fichaValue   = String(datos.norden || "");
+  const sedeValue    = String(datos.sede     || "");
 
   // No Ficha (solo el valor, alineado a la derecha)
   doc.setFont("helvetica", "bold").setFontSize(16);
@@ -62,25 +62,25 @@ const header_Audiometria2021_Digitalizado_boro = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text(labelNombre, xNombre, datosY);
   doc.setFont("helvetica", "normal");
-  const nombreValor = String(datos.nombres || "CASTILLO PLASENCIA HADY KATHERINE").toUpperCase();
+  const nombreValor = String(datos.nombres || "").toUpperCase();
   doc.text(nombreValor, xNombre + doc.getTextWidth(labelNombre) + 2, datosY);
 
   doc.setFont("helvetica", "bold");
   doc.text(labelEdad, xEdad, datosY);
   doc.setFont("helvetica", "normal");
-  const edadValor = String(datos.edad || "30 AÑOS").toUpperCase();
+  const edadValor = String(`${datos.edad} años`|| "").toUpperCase();
   doc.text(edadValor, xEdad + doc.getTextWidth(labelEdad) + 2, datosY);
 
   doc.setFont("helvetica", "bold");
   doc.text(labelSexo, xSexo, datosY);
   doc.setFont("helvetica", "normal");
-  const sexoValor = String(datos.sexo || "F").toUpperCase();
+  const sexoValor = String(datos.sexo || "").toUpperCase();
   doc.text(sexoValor, xSexo + doc.getTextWidth(labelSexo) + 2, datosY);
 
   // Fila 2: Empresa | Puesto de Trabajo | Fecha
   datosY += rowH;
   const labelEmpresa = "EMPRESA:";
-  const labelCargo = "PUESTO DE TRABAJO:";
+  const labelCargo = "CARGO:";
   const labelFecha = "FECHA:";
   let xEmpresa = margin;
   let xCargo = margin + 95;
@@ -88,20 +88,20 @@ const header_Audiometria2021_Digitalizado_boro = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text(labelEmpresa, xEmpresa, datosY);
   doc.setFont("helvetica", "normal");
-  const empresaValor = String(datos.empresa || "MINERA BOROO MISQUICHILCA S.A.").toUpperCase();
+  const empresaValor = String(datos.empresa || "").toUpperCase();
   doc.text(empresaValor, xEmpresa + doc.getTextWidth(labelEmpresa) + 2, datosY);
 
   doc.setFont("helvetica", "bold");
   doc.text(labelCargo, xCargo, datosY);
   doc.setFont("helvetica", "normal");
-  const cargoValor = String(datos.cargo || "OPERACIONES").toUpperCase();
+  const cargoValor = String(datos.ocupacion || "").toUpperCase();
   doc.text(cargoValor, xCargo + doc.getTextWidth(labelCargo) + 2, datosY);
 
   doc.setFont("helvetica", "bold");
   doc.text(labelFecha, xFecha, datosY);
   doc.setFont("helvetica", "normal");
   // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
-  let fechaStr = String(datos.fecha || "");
+  let fechaStr = String(datos.fechaAu || "");
   if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
     const [y, m, d] = fechaStr.split('-');
     fechaStr = `${d}/${m}/${y}`;
