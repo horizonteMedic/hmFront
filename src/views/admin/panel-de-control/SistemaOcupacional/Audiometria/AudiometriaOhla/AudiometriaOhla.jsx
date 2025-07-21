@@ -18,6 +18,7 @@ import {
   GetInfoServicio,
   VerifyTRFicha,
   GetInfoServicioFicha,
+  PrintHojaR,
 } from "./controllerAudiometriaOhla";
 
 const tabla = "audiometria_po";
@@ -1214,7 +1215,7 @@ function Table({
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
