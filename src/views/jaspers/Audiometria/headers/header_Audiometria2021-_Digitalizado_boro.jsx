@@ -100,8 +100,13 @@ const header_Audiometria2021_Digitalizado_boro = (doc, datos = {}) => {
   doc.setFont("helvetica", "bold");
   doc.text(labelFecha, xFecha, datosY);
   doc.setFont("helvetica", "normal");
-  const fechaValor = String(datos.fecha || "04/11/2024").toUpperCase();
-  doc.text(fechaValor, xFecha + doc.getTextWidth(labelFecha) + 2, datosY);
+  // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
+  let fechaStr = String(datos.fecha || "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+    const [y, m, d] = fechaStr.split('-');
+    fechaStr = `${d}/${m}/${y}`;
+  }
+  doc.text(fechaStr, xFecha + doc.getTextWidth(labelFecha) + 2, datosY);
 
   // restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);

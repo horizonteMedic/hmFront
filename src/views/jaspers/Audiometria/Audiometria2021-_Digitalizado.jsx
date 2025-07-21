@@ -33,222 +33,242 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     doc.text("Imagen no disponible", margin, y + 10);
     y += 20;
   }
-  // const datos = {
-  //   sorderaActual: false,
-  //   vertigoActual: false,
-  //   secrecionOticaActual: false,
-
-  //   acufenosActual: false,
-  //   otalgiaActual: false,
-  //   otrosSintomasActuales: "Ninguno",
-
-  //   // Antecedentes Médicos de importancia
-  //   rinitis: false,
-  //   meningitis: false,
-  //   parotiditis: false,
-
-  //   sinusitis: false,
-  //   tec: false,
-  //   sarampion: false,
-
-  //   otitisMediaCronica: false,
-  //   sorderaAntecedentes: false,
-  //   tbc: false,
-
-  //   medicamentosOtotoxicos: false,
-  //   cualesAntecedentes: "Ninguno2",
-
-  //   // Exposición Ocupacional
-  //   explosicionAlRuido: false,
-  //   usoProtectorAuditivo: false,
-  //   exposicionQuimicos: false,
-  //   exposicion0a2: false,
-  //   exposicion2a4: false,
-  //   exposicion4a6: false,
-  //   exposicion6a8: false,
-  //   exposicion8a10: false,
-  //   exposicion10a12: false,
-  //   exposicionMas12: false,
-  //   exposicionEventual: false,
-
-  //   aniosExposicion: "5",
-  //   mesesExposicion: "6",
-
-  //   tapones: false,
-  //   orejeras: false,
-
-  //   txthplomo: "plomoh",
-  //   txttplomo: "plomot",
-  //   txthmercurio: "mercurioh",
-  //   txttmercurio: "mercuriot",
-  //   txthtolueno: "toluenoh",
-  //   txtttolueno: "toluenot",
-  //   txthxileno: "xilenoh",
-  //   txttxileno: "xilenot",
-  //   txthplaguic: "plaguicidah",
-  //   txttplaguic: "plaguicidat",
-  //   txthorganofos: "organofosh",
-  //   txttorganofos: "organofost",
-
-  //   txteootros: "Otros",
-
-  //   practicaTiro: false,
-  //   walkman: false,
-  //   otrosExtraLaborales: false,
-  //   txtaecuales: "Ningunooo",
-
-  //   txtood: "Normal",
-  //   txtooi: "Anormal",
-
-  //   od500: 100,
-  //   od1000: 40,
-  //   od2000: 30,
-  //   od3000: 20,
-  //   od4000: 10,
-  //   od6000: 5,
-  //   od8000: 0,
-
-  //   oi500: 20,
-  //   oi1000: 30,
-  //   oi2000: 40,
-  //   oi3000: 50,
-  //   oi4000: 60,
-  //   oi6000: 70,
-  //   oi8000: 80,
-
-  //   txtdiagOd: "diagnosticoOd22",
-  //   txtdiagOi: "diagnosticoOi33",
-  //   txtcomentarios: "comentarios 3434 fasfas",
-  //   chkrpasimple: true,
-  //   chkrpadoble: true,
-  //   chkcasemestral: true,
-  //   chkcaanual: true,
-  //   txtotrasrecomendaciones: "txtotrasrecomendaciones fsfs",
-
-  //   od1500: 20,
-  //   od11000: 10,
-  //   od12000: 20,
-  //   od13000: 30,
-  //   od14000: 40,
-  //   od18000: 50,
-
-  //   oi1500: 20,
-  //   oi11000: 10,
-  //   oi12000: 20,
-  //   oi13000: 30,
-  //   oi14000: 40,
-  //   oi16000: 50,
-  //   oi18000: 60,
-  // };
-  // console.log(data);
   const datos = {
-    sorderaActual: data.rbsasorderaSi,
-    vertigoActual: data.rbsavertigoSi,
-    secrecionOticaActual: data.rbsasecrecionSi,
+    sorderaActual: false,
+    vertigoActual: false,
+    secrecionOticaActual: false,
 
-    acufenosActual: data.rbsaacufenosSi,
-    otalgiaActual: data.rbsaotalgiaSi,
-    otrosSintomasActuales: data.txtsaotrossintomas || "",
+    acufenosActual: false,
+    otalgiaActual: false,
+    otrosSintomasActuales: "Ninguno",
 
     // Antecedentes Médicos de importancia
-    rinitis: data.rbamrenitisSi,
-    meningitis: data.rbammeningitisSi,
-    parotiditis: data.rbamparotiditisSi,
+    rinitis: false,
+    meningitis: false,
+    parotiditis: false,
 
-    sinusitis: data.rbamsinusitisSi,
-    tec: data.rbamtecSi,
-    sarampion: data.rbamsarampionSi,
+    sinusitis: false,
+    tec: false,
+    sarampion: false,
 
-    otitisMediaCronica: data.rbamotitisSi,
-    sorderaAntecedentes: data.rbamsorderaSi,
-    tbc: data.rbamtbcSi,
+    otitisMediaCronica: false,
+    sorderaAntecedentes: false,
+    tbc: false,
 
-    medicamentosOtotoxicos: data.rbamototoxicosSi,
-    cualesAntecedentes: data.txtamcuales || "",
+    medicamentosOtotoxicos: false,
+    cualesAntecedentes: "Ninguno2",
 
     // Exposición Ocupacional
-    explosicionAlRuido: data.rbeoexposicionSi,
-    usoProtectorAuditivo: data.rbeoprotectoresSi,
-    exposicionQuimicos: data.rbeosustanciasSi,
-    exposicion0a2: data.rbte0a2,
-    exposicion2a4: data.rbte2a4,
-    exposicion4a6: data.rbte4a6,
-    exposicion6a8: data.rbte6a8,
-    exposicion8a10: data.rbte8a10,
-    exposicion10a12: data.rbte10a12,
-    exposicionMas12: data.rbtem12,
-    exposicionEventual: data.rbteeventual,
+    explosicionAlRuido: false,
+    usoProtectorAuditivo: false,
+    exposicionQuimicos: false,
+    exposicion0a2: false,
+    exposicion2a4: false,
+    exposicion4a6: false,
+    exposicion6a8: false,
+    exposicion8a10: false,
+    exposicion10a12: false,
+    exposicionMas12: false,
+    exposicionEventual: false,
 
-    aniosExposicion: data.txtanios,
-    mesesExposicion: data.txtmeses,
+    aniosExposicion: "5",
+    mesesExposicion: "6",
 
-    tapones: data.chktapones,
-    orejeras: data.chkorejeras,
+    tapones: false,
+    orejeras: false,
 
-    txthplomo: data.txthplomo || "",
-    txttplomo: data.txttplomo || "",
-    txthmercurio: data.txthmercurio || "",
-    txttmercurio: data.txttmercurio || "",
-    txthtolueno: data.txthtolueno || "",
-    txtttolueno: data.txtttolueno || "",
-    txthxileno: data.txthxileno || "",
-    txttxileno: data.txttxileno || "",
-    txthplaguic: data.txthplaguic || "",
-    txttplaguic: data.txttplaguic || "",
-    txthorganofos: data.txthorganofos || "",
-    txttorganofos: data.txttorganofos || "",
+    txthplomo: "plomoh",
+    txttplomo: "plomot",
+    txthmercurio: "mercurioh",
+    txttmercurio: "mercuriot",
+    txthtolueno: "toluenoh",
+    txtttolueno: "toluenot",
+    txthxileno: "xilenoh",
+    txttxileno: "xilenot",
+    txthplaguic: "plaguicidah",
+    txttplaguic: "plaguicidat",
+    txthorganofos: "organofosh",
+    txttorganofos: "organofost",
 
-    txteootros: data.txteootros || "",
+    txteootros: "Otros",
 
-    practicaTiro: data.rbaepraticaSi,
-    walkman: data.rbaeusoSi,
-    otrosExtraLaborales: data.rbaeotrosSi,
-    txtaecuales: data.txtaecuales || "",
+    practicaTiro: false,
+    walkman: false,
+    otrosExtraLaborales: false,
+    txtaecuales: "Ningunooo",
 
-    txtood: data.txtood || "",
-    txtooi: data.txtooi || "",
+    txtood: "Normal",
+    txtooi: "Anormal",
 
-    od500: data.od500 || 0,
-    od1000: data.od1000 || 0,
-    od2000: data.od2000 || 0,
-    od3000: data.od3000 || 0,
-    od4000: data.od4000 || 0,
-    od6000: data.od6000 || 0,
-    od8000: data.od8000 || 0,
+  // O
+    od500: 30,
+    od1000: null,
+    od2000: 60,
+    od3000: null,
+    od4000: 10,
+    od6000: null,
+    od8000: 0,
+  // X 
 
-    oi500: data.oi500 || 0,
-    oi1000: data.oi1000 || 0,
-    oi2000: data.oi2000 || 0,
-    oi3000: data.oi3000 || 0,
-    oi4000: data.oi4000 || 0,
-    oi6000: data.oi6000 || 0,
-    oi8000: data.oi8000 || 0,
+    oi500: 20,
+    oi1000: 30,
+    oi2000: null,
+    oi3000: 50,
+    oi4000: null,
+    oi6000: 70,
+    oi8000: 80,
 
-    //nuevo
-    txtdiagOd: data.txtdiagOd || "",
-    txtdiagOi: data.txtdiagOi || "",
-    txtcomentarios: data.txtcomentarios || "",
-    chkrpasimple: data.chkrpasimple,
-    chkrpadoble: data.chkrpadoble,
-    chkcasemestral: data.chkcasemestral,
-    chkcaanual: data.chkcaanual,
-    txtotrasrecomendaciones: data.txtotrasrecomendaciones || "",
+    // Vía ósea OD (corchete izquierdo)
+    od1_500: 40,
+    od1_1000: 60, // valor visible para depuración
+    od1_2000: 70,
+    od1_3000: null,
+    od1_4000: 90,
+    od1_6000: null,
+    od1_8000: 100,
 
-    od1500: data.od1500 || 0,
-    od11000: data.od11000 || 0,
-    od12000: data.od12000 || 0,
-    od13000: data.od13000 || 0,
-    od14000: data.od14000 || 0,
-    od18000: data.od18000 || 0,
+    // Vía ósea OI (corchete derecho)
+    oi1_500: 35,
+    oi1_1000: null,
+    oi1_2000: 80, // valor visible para depuración
+    oi1_3000: null,
+    oi1_4000: 95,
+    oi1_6000: null,
+    oi1_8000: 105,
 
-    oi1500: data.oi1500 || 0,
-    oi11000: data.oi11000 || 0,
-    oi12000: data.oi12000 || 0,
-    oi13000: data.oi13000 || 0,
-    oi14000: data.oi14000 || 0,
-    oi16000: data.oi16000 || 0,
-    oi18000: data.oi18000 || 0,
+    txtdiagOd: "diagnosticoOd22",
+    txtdiagOi: "diagnosticoOi33",
+    txtcomentarios: "comentarios 3434 fasfas",
+    chkrpasimple: true,
+    chkrpadoble: true,
+    chkcasemestral: true,
+    chkcaanual: true,
+    txtotrasrecomendaciones: "txtotrasrecomendaciones fsfs",
+
+    od1500: 20,
+    od11000: 10,
+    od12000: 20,
+    od13000: 30,
+    od14000: 40,
+    od18000: 50,
+
+    oi1500: 20,
+    oi11000: 10,
+    oi12000: 20,
+    oi13000: 30,
+    oi14000: 40,
+    oi16000: 50,
+    oi18000: 60,
   };
+  console.log(data);
+  // const datos = {
+  //   sorderaActual: data.rbsasorderaSi,
+  //   vertigoActual: data.rbsavertigoSi,
+  //   secrecionOticaActual: data.rbsasecrecionSi,
+
+  //   acufenosActual: data.rbsaacufenosSi,
+  //   otalgiaActual: data.rbsaotalgiaSi,
+  //   otrosSintomasActuales: data.txtsaotrossintomas || "",
+
+  //   // Antecedentes Médicos de importancia
+  //   rinitis: data.rbamrenitisSi,
+  //   meningitis: data.rbammeningitisSi,
+  //   parotiditis: data.rbamparotiditisSi,
+
+  //   sinusitis: data.rbamsinusitisSi,
+  //   tec: data.rbamtecSi,
+  //   sarampion: data.rbamsarampionSi,
+
+  //   otitisMediaCronica: data.rbamotitisSi,
+  //   sorderaAntecedentes: data.rbamsorderaSi,
+  //   tbc: data.rbamtbcSi,
+
+  //   medicamentosOtotoxicos: data.rbamototoxicosSi,
+  //   cualesAntecedentes: data.txtamcuales || "",
+
+  //   // Exposición Ocupacional
+  //   explosicionAlRuido: data.rbeoexposicionSi,
+  //   usoProtectorAuditivo: data.rbeoprotectoresSi,
+  //   exposicionQuimicos: data.rbeosustanciasSi,
+  //   exposicion0a2: data.rbte0a2,
+  //   exposicion2a4: data.rbte2a4,
+  //   exposicion4a6: data.rbte4a6,
+  //   exposicion6a8: data.rbte6a8,
+  //   exposicion8a10: data.rbte8a10,
+  //   exposicion10a12: data.rbte10a12,
+  //   exposicionMas12: data.rbtem12,
+  //   exposicionEventual: data.rbteeventual,
+
+  //   aniosExposicion: data.txtanios,
+  //   mesesExposicion: data.txtmeses,
+
+  //   tapones: data.chktapones,
+  //   orejeras: data.chkorejeras,
+
+  //   txthplomo: data.txthplomo || "",
+  //   txttplomo: data.txttplomo || "",
+  //   txthmercurio: data.txthmercurio || "",
+  //   txttmercurio: data.txttmercurio || "",
+  //   txthtolueno: data.txthtolueno || "",
+  //   txtttolueno: data.txtttolueno || "",
+  //   txthxileno: data.txthxileno || "",
+  //   txttxileno: data.txttxileno || "",
+  //   txthplaguic: data.txthplaguic || "",
+  //   txttplaguic: data.txttplaguic || "",
+  //   txthorganofos: data.txthorganofos || "",
+  //   txttorganofos: data.txttorganofos || "",
+
+  //   txteootros: data.txteootros || "",
+
+  //   practicaTiro: data.rbaepraticaSi,
+  //   walkman: data.rbaeusoSi,
+  //   otrosExtraLaborales: data.rbaeotrosSi,
+  //   txtaecuales: data.txtaecuales || "",
+
+  //   txtood: data.txtood || "",
+  //   txtooi: data.txtooi || "",
+
+  //   od500: data.od500 || 0,
+  //   od1000: data.od1000 || 0,
+  //   od2000: data.od2000 || 0,
+  //   od3000: data.od3000 || 0,
+  //   od4000: data.od4000 || 0,
+  //   od6000: data.od6000 || 0,
+  //   od8000: data.od8000 || 0,
+
+  //   oi500: data.oi500 || 0,
+  //   oi1000: data.oi1000 || 0,
+  //   oi2000: data.oi2000 || 0,
+  //   oi3000: data.oi3000 || 0,
+  //   oi4000: data.oi4000 || 0,
+  //   oi6000: data.oi6000 || 0,
+  //   oi8000: data.oi8000 || 0,
+
+  //   //nuevo
+  //   txtdiagOd: data.txtdiagOd || "",
+  //   txtdiagOi: data.txtdiagOi || "",
+  //   txtcomentarios: data.txtcomentarios || "",
+  //   chkrpasimple: data.chkrpasimple,
+  //   chkrpadoble: data.chkrpadoble,
+  //   chkcasemestral: data.chkcasemestral,
+  //   chkcaanual: data.chkcaanual,
+  //   txtotrasrecomendaciones: data.txtotrasrecomendaciones || "",
+
+  //   od1500: data.od1500 || 0,
+  //   od11000: data.od11000 || 0,
+  //   od12000: data.od12000 || 0,
+  //   od13000: data.od13000 || 0,
+  //   od14000: data.od14000 || 0,
+  //   od18000: data.od18000 || 0,
+
+  //   oi1500: data.oi1500 || 0,
+  //   oi11000: data.oi11000 || 0,
+  //   oi12000: data.oi12000 || 0,
+  //   oi13000: data.oi13000 || 0,
+  //   oi14000: data.oi14000 || 0,
+  //   oi16000: data.oi16000 || 0,
+  //   oi18000: data.oi18000 || 0,
+  // };
   let newY = 47.5;
   newY += 6;
   // =====================
@@ -375,10 +395,10 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   y += 6;
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("7.- Audiometría:", margin, y);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(OD: Rojo, OI: Azul)", margin + 40, y);
-  y += 4;
+  // doc.text("7.- Audiometría:", margin, y);
+  // doc.setFont("helvetica", "normal").setFontSize(8);
+  // doc.text("(OD: Rojo, OI: Azul)", margin + 40, y);
+  // y += 4;
 
   // Calcular mitad del ancho útil
   const halfW = (pageW - margin * 2) / 2;
@@ -394,8 +414,8 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
       "PNG",
       margin,
       y + 2,
-      legendW,
-      legendH
+      legendW * 0.8,
+      legendH * 0.8
     );
   } catch (e) {
     doc.text("Leyenda no disponible", margin, y + 10);
@@ -411,9 +431,9 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.rect(graphX, graphY + 30, graphW, 20, "F");
   // Declarar freqs antes de cualquier uso
   const freqs = [125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000];
-  // Líneas horizontales (cada 10 dB)
-  for (let i = 0; i <= 12; i++) {
-    const yLine = graphY + i * (graphH / 12);
+  // Líneas horizontales (cada 10 dB, de -10 a 120)
+  for (let i = 0; i <= 13; i++) {
+    const yLine = graphY + i * (graphH / 13);
     doc.line(graphX, yLine, graphX + graphW, yLine);
   }
   // Líneas verticales (frecuencias)
@@ -427,63 +447,117 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     const xTick = graphX + i * (graphW / (freqs.length - 1));
     doc.text(String(freqs[i]), xTick, graphY - 2, { align: "center" });
   }
-  doc.text("Hz", graphX + graphW, graphY - 2, { align: "left" });
-  for (let i = 0; i <= 12; i++) {
+  doc.text("Hz", graphX + graphW + 4, graphY - 2, { align: "left" });
+  for (let i = 0; i <= 13; i++) {
     const dB = -10 + i * 10;
-    const yTick = graphY + i * (graphH / 12) + 2;
-    doc.text(String(dB), graphX - 7, yTick, { align: "right" });
+    const yTick = graphY + i * (graphH / 13) + 0.5;
+    doc.text(String(dB), graphX - 3, yTick, { align: "right" });
   }
-  doc.text("dB", graphX - 10, graphY + graphH / 2, { align: "right" });
+  doc.text("dB", graphX - 10, graphY + graphH / 2 - 2, { align: "right" });
 
   // INTEGRACIÓN: aquí debes pasar tu array de puntos dinámicos
   // Ejemplo: const puntos = datos.puntosAudiometria || [];
   const puntos = [
-    { freq: 500, db: datos.od500, color: "red" },
-    { freq: 1000, db: datos.od1000, color: "red" },
-    { freq: 2000, db: datos.od2000, color: "red" },
-    { freq: 3000, db: datos.od3000, color: "red" },
-    { freq: 4000, db: datos.od4000, color: "red" },
-    { freq: 6000, db: datos.od6000, color: "red" },
-    { freq: 8000, db: datos.od8000, color: "red" },
-
-    { freq: 500, db: datos.oi500, color: "blue" },
-    { freq: 1000, db: datos.oi1000, color: "blue" },
-    { freq: 2000, db: datos.oi2000, color: "blue" },
-    { freq: 3000, db: datos.oi3000, color: "blue" },
-    { freq: 4000, db: datos.oi4000, color: "blue" },
-    { freq: 6000, db: datos.oi6000, color: "blue" },
-    { freq: 8000, db: datos.oi8000, color: "blue" },
-
-    //esto es lo nuevo que debe tener [    ]
-    // { freq: 500, db: datos.od1500, color: "red" },
-    // { freq: 1000, db: datos.od11000, color: "red" },
-    // { freq: 2000, db: datos.od12000, color: "red" },
-    // { freq: 3000, db: datos.od13000, color: "red" },
-    // { freq: 4000, db: datos.od14000, color: "red" },
-    // { freq: 6000, db: datos.od16000, color: "red" },
-    // { freq: 8000, db: datos.od18000, color: "red" },
-
-    // { freq: 500, db: datos.oi1500, color: "blue" },
-    // { freq: 1000, db: datos.oi11000, color: "blue" },
-    // { freq: 2000, db: datos.oi12000, color: "blue" },
-    // { freq: 3000, db: datos.oi13000, color: "blue" },
-    // { freq: 4000, db: datos.oi14000, color: "blue" },
-    // { freq: 6000, db: datos.oi16000, color: "blue" },
-    // { freq: 8000, db: datos.oi18000, color: "blue" },
+    //aerea
+    //rojo circulo
+    { freq: 500, db: datos.od500, color: "red", tipo: "circle" },
+    { freq: 1000, db: datos.od1000, color: "red", tipo: "circle" },
+    { freq: 2000, db: datos.od2000, color: "red", tipo: "circle" },
+    { freq: 3000, db: datos.od3000, color: "red", tipo: "circle" },
+    { freq: 4000, db: datos.od4000, color: "red", tipo: "circle" },
+    { freq: 6000, db: datos.od6000, color: "red", tipo: "circle" },
+    { freq: 8000, db: datos.od8000, color: "red", tipo: "circle" },
+    //azul x
+    { freq: 500, db: datos.oi500, color: "blue", tipo: "x" },
+    { freq: 1000, db: datos.oi1000, color: "blue", tipo: "x" },
+    { freq: 2000, db: datos.oi2000, color: "blue", tipo: "x" },
+    { freq: 3000, db: datos.oi3000, color: "blue", tipo: "x" },
+    { freq: 4000, db: datos.oi4000, color: "blue", tipo: "x" },
+    { freq: 6000, db: datos.oi6000, color: "blue", tipo: "x" },
+    { freq: 8000, db: datos.oi8000, color: "blue", tipo: "x" },
+    //Osea
+    //rojo [
+    { freq: 500, db: datos.od1_500, color: "red", tipo: "bracketLeft" },
+    { freq: 1000, db: datos.od1_1000, color: "red", tipo: "bracketLeft" },
+    { freq: 2000, db: datos.od1_2000, color: "red", tipo: "bracketLeft" },
+    { freq: 3000, db: datos.od1_3000, color: "red", tipo: "bracketLeft" },
+    { freq: 4000, db: datos.od1_4000, color: "red", tipo: "bracketLeft" },
+    { freq: 6000, db: datos.od1_6000, color: "red", tipo: "bracketLeft" },
+    { freq: 8000, db: datos.od1_8000, color: "red", tipo: "bracketLeft" },
+    //azul ]
+    { freq: 500, db: datos.oi1_500, color: "blue", tipo: "bracketRight" },
+    { freq: 1000, db: datos.oi1_1000, color: "blue", tipo: "bracketRight" },
+    { freq: 2000, db: datos.oi1_2000, color: "blue", tipo: "bracketRight" },
+    { freq: 3000, db: datos.oi1_3000, color: "blue", tipo: "bracketRight" },
+    { freq: 4000, db: datos.oi1_4000, color: "blue", tipo: "bracketRight" },
+    { freq: 6000, db: datos.oi1_6000, color: "blue", tipo: "bracketRight" },
+    { freq: 8000, db: datos.oi1_8000, color: "blue", tipo: "bracketRight" },
+  ];
+  const tipos = [
+    { tipo: "circle", color: "red" },
+    { tipo: "x", color: "blue" },
+    { tipo: "bracketLeft", color: "red" },
+    { tipo: "bracketRight", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
-  for (const punto of puntos) {
+  tipos.forEach(({ tipo, color }) => {
+    // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia y solo válidos
+    const pts = puntos
+      .filter((p) => p.tipo === tipo && p.color === color && p.db !== null && p.db !== undefined)
+      .sort((a, b) => a.freq - b.freq);
+    if (pts.length < 2) return;
+    doc.setLineWidth(0.4);
+    if (color === "red") doc.setDrawColor(255, 0, 0);
+    else if (color === "blue") doc.setDrawColor(0, 0, 255);
+    else doc.setDrawColor(0, 0, 0);
+    doc.setLineCap(1);
+    let prev = null;
+    for (let i = 0; i < pts.length; i++) {
+      const freqIdx = freqs.indexOf(pts[i].freq);
+      if (freqIdx === -1) continue;
+      const x = graphX + (freqIdx) * (graphW / (freqs.length - 1));
+      const y = graphY + ((pts[i].db + 10) / 130) * graphH;
+      if (prev) {
+        doc.line(prev.x, prev.y, x, y);
+      }
+      prev = { x, y };
+    }
+  });
+  // Dibujar los puntos (círculo, X, [, ])
+  puntos.forEach((punto) => {
+    if (punto.db === null || punto.db === undefined) return;
     const freqIdx = freqs.indexOf(punto.freq);
-    if (freqIdx === -1) continue;
-    const x = graphX + (freqIdx + 0.5) * (graphW / 9);
-    const yP = graphY + ((punto.db + 10) / 120) * graphH;
-    if (punto.color === "red") doc.setDrawColor(255, 0, 0);
+    if (freqIdx === -1) return;
+    const x = graphX + (freqIdx) * (graphW / (freqs.length - 1));
+    const yP = graphY + ((punto.db + 10) / 130) * graphH;
+    // Color correcto para corchetes
+    if (punto.tipo === "bracketLeft") {
+      doc.setDrawColor(255, 0, 0); // rojo
+    } else if (punto.tipo === "bracketRight") {
+      doc.setDrawColor(0, 0, 255); // azul
+    } else if (punto.color === "red") doc.setDrawColor(255, 0, 0);
     else if (punto.color === "blue") doc.setDrawColor(0, 0, 255);
     else doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.4);
-    doc.circle(x, yP, 1.1);
+    if (punto.tipo === "circle") {
+      doc.circle(x, yP, 1.0);
+    } else if (punto.tipo === "x") {
+      const size = 2;
+      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP + size / 2);
+      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP - size / 2);
+    } else if (punto.tipo === "bracketLeft") {
+      const size = 2;
+      doc.line(x - size / 2, yP - size / 2, x - size / 2, yP + size / 2);
+      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
+      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+    } else if (punto.tipo === "bracketRight") {
+      const size = 2;
+      doc.line(x + size / 2, yP - size / 2, x + size / 2, yP + size / 2);
+      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
+      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+    }
     doc.setDrawColor(0, 0, 0);
-  }
+  });
   doc.setLineWidth(prevLineWidth);
 
   y += legendH + 5;

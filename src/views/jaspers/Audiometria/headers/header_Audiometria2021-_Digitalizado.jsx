@@ -25,7 +25,7 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
 
   // 1) Logo a la izquierda
   const logoW = 28,
-    logoH = 13;
+    logoH = 10;
   try {
     doc.addImage("./img/logo-color.png", "PNG", margin, y - 4, logoW, logoH);
   } catch {
@@ -99,7 +99,13 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   doc.text(labelFecha, fechaX, datosY);
   doc.text(":", fechaX + 15, datosY);
   doc.setFont("helvetica", "normal");
-  doc.text(String(datos.fechaAu || ""), fechaX + 19, datosY);
+  // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
+  let fechaStr = String(datos.fechaAu || "");
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+    const [y, m, d] = fechaStr.split('-');
+    fechaStr = `${d}/${m}/${y}`;
+  }
+  doc.text(fechaStr, fechaX + 19, datosY);
 
   // Fila 2: DNI | Cargo | Sexo
   datosY += rowH;

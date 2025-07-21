@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import headerFicha from "./headers/header_FichaAudiologica1_Digitalizado.jsx";
+import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
 
 export default function FichaAudiologica_Digitalizado(data = {}) {
   const doc = new jsPDF();
@@ -10,99 +10,99 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   // 1) Header
   headerFicha(doc, data);
 
-  // const datos = {
-  //   norden: "95899",
-  //   marca: "AMPLIVOX",
-  //   modelo: "BELL PLUS",
-  //   calibracion: "01/07/2025",
-  //   fechaExamen: "24/10/2025",
-  //   tipoExamen: "Anual",
-  //   nombres: "ROJAS SIGUENZA JOSUE SPENCER",
-  //   edad: "29",
-  //   sexo: "M",
-  //   ocupacion: "ADMINISTRADOR ESPECIALISTA",
-  //   aniosTrabajo: "5",
-  //   contrata: "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.",
-  //   empresa: "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.",
-  //   tiempoExposicion: "5 H/D",
+  const datos = {
+    norden: "95899",
+    marca: "AMPLIVOX",
+    modelo: "BELL PLUS",
+    calibracion: "01/07/2025",
+    fechaExamen: "24/10/2025",
+    tipoExamen: "Anual",
+    nombres: "ROJAS SIGUENZA JOSUE SPENCER",
+    edad: "29",
+    sexo: "M",
+    ocupacion: "ADMINISTRADOR ESPECIALISTA",
+    aniosTrabajo: "5",
+    contrata: "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.",
+    empresa: "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.",
+    tiempoExposicion: "5 H/D",
 
-  //   tapones: true,
-  //   orejeras: true,
-  //   ruidoMuyIntenso: false,
-  //   ruidoModerado: true,
-  //   ruidoNoMolesto: false,
+    tapones: true,
+    orejeras: true,
+    ruidoMuyIntenso: false,
+    ruidoModerado: true,
+    ruidoNoMolesto: false,
 
-  //   consumoTabaco: true,
-  //   servicioMilitar: false,
-  //   hobbiesRuido: true,
-  //   exposicionQuimicos: false,
-  //   infeccionOidoAntecente: true,
-  //   ototoxicos: false,
+    consumoTabaco: true,
+    servicioMilitar: false,
+    hobbiesRuido: true,
+    exposicionQuimicos: false,
+    infeccionOidoAntecente: true,
+    ototoxicos: false,
 
-  //   disminucionAudicion: true,
-  //   dolorOidos: false,
-  //   zumbido: true,
-  //   mareos: false,
-  //   infeccionOidoActual: true,
-  //   otros: true,
+    disminucionAudicion: true,
+    dolorOidos: false,
+    zumbido: true,
+    mareos: false,
+    infeccionOidoActual: true,
+    otros: true,
 
-  //   txtDod250: "40",
-  //   txtDod500: "20",
-  //   txtDod1000: "30",
+    txtDod250: "40",
+    txtDod500: "20",
+    txtDod1000: "30",
 
-  //   txtDoi250: "10",
-  //   txtDoi500: "15",
-  //   txtDoi1000: "60",
+    txtDoi250: "10",
+    txtDoi500: "15",
+    txtDoi1000: "60",
 
-  //   txtLDUmbralDiscriminacion: "20",
-  //   txtLIUmbralDiscriminacion: "10",
+    txtLDUmbralDiscriminacion: "20",
+    txtLIUmbralDiscriminacion: "10",
 
-  //   txtLDPorcentajeDiscriminacion: "80",
-  //   txtLIPorcentajeDiscriminacion: "50",
+    txtLDPorcentajeDiscriminacion: "80",
+    txtLIPorcentajeDiscriminacion: "50",
 
-  //   txtLDConfort: "70",
-  //   txtLIConfort: "60",
+    txtLDConfort: "70",
+    txtLIConfort: "60",
 
-  //   txtLDDisconfort: "90",
-  //   txtLIDisconfort: "100",
+    txtLDDisconfort: "90",
+    txtLIDisconfort: "100",
 
-  //   txtConclusiones:
-  //     "El paciente presenta una pérdida auditiva leve en el oído derecho y una pérdida auditiva moderada en el oído izquierdo.",
-  //   txtResponsable: "SHIRLEY KATHERINE GUTIERREZ ARTEAGA",
-  //   txtMedico: "DR. JUAN PEREZ GARCIA",
+    txtConclusiones:
+      "El paciente presenta una pérdida auditiva leve en el oído derecho y una pérdida auditiva moderada en el oído izquierdo.",
+    txtResponsable: "SHIRLEY KATHERINE GUTIERREZ ARTEAGA",
+    txtMedico: "DR. JUAN PEREZ GARCIA",
 
-  //   od500: 10,
-  //   od1000: null,
-  //   od2000: null,
-  //   od3000: null,
-  //   od4000: null,
-  //   od6000: null,
-  //   od8000: null,
+    od500: null,
+    od1000: null,
+    od2000: null,
+    od3000: null,
+    od4000: null,
+    od6000: null,
+    od8000: null,
 
-  //   oi500: 10,
-  //   oi1000: null,
-  //   oi2000: null,
-  //   oi3000: null,
-  //   oi4000: null,
-  //   oi6000: null,
-  //   oi8000: null,
+    oi500: 20,
+    oi1000: null,
+    oi2000: null,
+    oi3000: null,
+    oi4000: null,
+    oi6000: null,
+    oi8000: null,
 
-  //   od1_500: null,
-  //   od1_1000: null,
-  //   od1_2000: null,
-  //   od1_3000: null,
-  //   od1_4000: null,
-  //   od1_6000: null,
-  //   od1_8000: null,
+    od1_500: 30,
+    od1_1000: null,
+    od1_2000: null,
+    od1_3000: null,
+    od1_4000: null,
+    od1_6000: null,
+    od1_8000: 90,
 
-  //   oi1_500: null,
-  //   oi1_1000: null,
-  //   oi1_2000: null,
-  //   oi1_3000: null,
-  //   oi1_4000: null,
-  //   oi1_6000: null,
-  //   oi1_8000: null,
-  // };
+    oi1_500: null,
+    oi1_1000: null,
+    oi1_2000: null,
+    oi1_3000: 65,
+    oi1_4000: null,
+    oi1_6000: null,
+    oi1_8000: 95,
+  };
 
   const obtener = (name) => {
     return data[name] || "";
@@ -111,196 +111,186 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     return data[name] || 0;
   };
 
-  const datos = {
-    norden: obtener("norden"),
-    marca: obtener("txtMarca"),
-    modelo: obtener("txtModelo"),
-    calibracion: data.fechaCalibracion,
-    fechaExamen: data.fechaExamen,
-    tipoExamen: obtener("nomExam"),
-    nombres: obtener("nombres"),
-    edad: obtener("edad"),
-    sexo: obtener("genero"),
-    ocupacion: obtener("ocupacion"),
-    aniosTrabajo: obtener("tiempoTrabajo"),
-    contrata: obtener("contrata"),
-    empresa: obtener("empresa"),
-    tiempoExposicion: obtener("tiempoExposicionTotalPonderado"),
+  // const datos = {
+  //   norden: obtener("norden"),
+  //   marca: obtener("txtMarca"),
+  //   modelo: obtener("txtModelo"),
+  //   calibracion: data.fechaCalibracion,
+  //   fechaExamen: data.fechaExamen,
+  //   tipoExamen: obtener("nomExam"),
+  //   nombres: obtener("nombres"),
+  //   edad: obtener("edad"),
+  //   sexo: obtener("genero"),
+  //   ocupacion: obtener("ocupacion"),
+  //   aniosTrabajo: obtener("tiempoTrabajo"),
+  //   contrata: obtener("contrata"),
+  //   empresa: obtener("empresa"),
+  //   tiempoExposicion: obtener("tiempoExposicionTotalPonderado"),
 
-    tapones: data.chkTapones,
-    orejeras: data.chkgrajeras,
-    ruidoMuyIntenso: data.chkIntenso,
-    ruidoModerado: data.chkModerado,
-    ruidoNoMolesto: data.chkNoMolesto,
+  //   tapones: data.chkTapones,
+  //   orejeras: data.chkgrajeras,
+  //   ruidoMuyIntenso: data.chkIntenso,
+  //   ruidoModerado: data.chkModerado,
+  //   ruidoNoMolesto: data.chkNoMolesto,
 
-    consumoTabaco: data.chk1Si,
-    servicioMilitar: data.chk2Si,
-    hobbiesRuido: data.chk3Si,
-    exposicionQuimicos: data.chk4Si,
-    infeccionOidoAntecente: data.chk5Si,
-    ototoxicos: data.chk6Si,
+  //   consumoTabaco: data.chk1Si,
+  //   servicioMilitar: data.chk2Si,
+  //   hobbiesRuido: data.chk3Si,
+  //   exposicionQuimicos: data.chk4Si,
+  //   infeccionOidoAntecente: data.chk5Si,
+  //   ototoxicos: data.chk6Si,
 
-    disminucionAudicion: data.chk7Si,
-    dolorOidos: data.chk8Si,
-    zumbido: data.chk9Si,
-    mareos: data.chk10Si,
-    infeccionOidoActual: data.chk11Si,
-    otros: data.chk12Si,
+  //   disminucionAudicion: data.chk7Si,
+  //   dolorOidos: data.chk8Si,
+  //   zumbido: data.chk9Si,
+  //   mareos: data.chk10Si,
+  //   infeccionOidoActual: data.chk11Si,
+  //   otros: data.chk12Si,
 
-    txtDod250: obtener("txtDod250"),
-    txtDod500: obtener("txtDod500"),
-    txtDod1000: obtener("txtDod1000"),
+  //   txtDod250: obtener("txtDod250"),
+  //   txtDod500: obtener("txtDod500"),
+  //   txtDod1000: obtener("txtDod1000"),
 
-    txtDoi250: obtener("txtDoi250"),
-    txtDoi500: obtener("txtDoi500"),
-    txtDoi1000: obtener("txtDoi1000"),
+  //   txtDoi250: obtener("txtDoi250"),
+  //   txtDoi500: obtener("txtDoi500"),
+  //   txtDoi1000: obtener("txtDoi1000"),
 
-    txtLDUmbralDiscriminacion: obtener("txtLDUmbralDiscriminacion"),
-    txtLIUmbralDiscriminacion: obtener("txtLIUmbralDiscriminacion"),
+  //   txtLDUmbralDiscriminacion: obtener("txtLDUmbralDiscriminacion"),
+  //   txtLIUmbralDiscriminacion: obtener("txtLIUmbralDiscriminacion"),
 
-    txtLDPorcentajeDiscriminacion: obtener("txtLDPorcentajeDiscriminacion"),
-    txtLIPorcentajeDiscriminacion: obtener("txtLIPorcentajeDiscriminacion"),
+  //   txtLDPorcentajeDiscriminacion: obtener("txtLDPorcentajeDiscriminacion"),
+  //   txtLIPorcentajeDiscriminacion: obtener("txtLIPorcentajeDiscriminacion"),
 
-    txtLDConfort: obtener("txtLDConfort"),
-    txtLIConfort: obtener("txtLIConfort"),
+  //   txtLDConfort: obtener("txtLDConfort"),
+  //   txtLIConfort: obtener("txtLIConfort"),
 
-    txtLDDisconfort: obtener("txtLDDisconfort"),
-    txtLIDisconfort: obtener("txtLIDisconfort"),
+  //   txtLDDisconfort: obtener("txtLDDisconfort"),
+  //   txtLIDisconfort: obtener("txtLIDisconfort"),
 
-    txtConclusiones: obtener("txtConclusiones"),
-    txtResponsable: obtener("txtResponsable"),
-    txtMedico: obtener("txtMedico"),
+  //   txtConclusiones: obtener("txtConclusiones"),
+  //   txtResponsable: obtener("txtResponsable"),
+  //   txtMedico: obtener("txtMedico"),
 
-    od500: obtenerNumero("od500"),
-    od1000: obtenerNumero("od1000"),
-    od2000: obtenerNumero("od2000"),
-    od3000: obtenerNumero("od3000"),
-    od4000: obtenerNumero("od4000"),
-    od6000: obtenerNumero("od6000"),
-    od8000: obtenerNumero("od8000"),
+  //   od500: obtenerNumero("od500"),
+  //   od1000: obtenerNumero("od1000"),
+  //   od2000: obtenerNumero("od2000"),
+  //   od3000: obtenerNumero("od3000"),
+  //   od4000: obtenerNumero("od4000"),
+  //   od6000: obtenerNumero("od6000"),
+  //   od8000: obtenerNumero("od8000"),
 
-    oi500: obtenerNumero("oi500"),
-    oi1000: obtenerNumero("oi1000"),
-    oi2000: obtenerNumero("oi2000"),
-    oi3000: obtenerNumero("oi3000"),
-    oi4000: obtenerNumero("oi4000"),
-    oi6000: obtenerNumero("oi6000"),
-    oi8000: obtenerNumero("oi8000"),
+  //   oi500: obtenerNumero("oi500"),
+  //   oi1000: obtenerNumero("oi1000"),
+  //   oi2000: obtenerNumero("oi2000"),
+  //   oi3000: obtenerNumero("oi3000"),
+  //   oi4000: obtenerNumero("oi4000"),
+  //   oi6000: obtenerNumero("oi6000"),
+  //   oi8000: obtenerNumero("oi8000"),
 
-    od1_500: obtenerNumero("od1_500"),
-    od1_1000: obtenerNumero("od1_1000"),
-    od1_2000: obtenerNumero("od1_2000"),
-    od1_3000: obtenerNumero("od1_3000"),
-    od1_4000: obtenerNumero("od1_4000"),
-    od1_6000: obtenerNumero("od1_6000"),
-    od1_8000: obtenerNumero("od1_8000"),
+  //   od1_500: obtenerNumero("od1_500"),
+  //   od1_1000: obtenerNumero("od1_1000"),
+  //   od1_2000: obtenerNumero("od1_2000"),
+  //   od1_3000: obtenerNumero("od1_3000"),
+  //   od1_4000: obtenerNumero("od1_4000"),
+  //   od1_6000: obtenerNumero("od1_6000"),
+  //   od1_8000: obtenerNumero("od1_8000"),
 
-    oi1_500: obtenerNumero("oi1_500"),
-    oi1_1000: obtenerNumero("oi1_1000"),
-    oi1_2000: obtenerNumero("oi1_2000"),
-    oi1_3000: obtenerNumero("oi1_3000"),
-    oi1_4000: obtenerNumero("oi1_4000"),
-    oi1_6000: obtenerNumero("oi1_6000"),
-    oi1_8000: obtenerNumero("oi1_8000"),
-  };
+  //   oi1_500: obtenerNumero("oi1_500"),
+  //   oi1_1000: obtenerNumero("oi1_1000"),
+  //   oi1_2000: obtenerNumero("oi1_2000"),
+  //   oi1_3000: obtenerNumero("oi1_3000"),
+  //   oi1_4000: obtenerNumero("oi1_4000"),
+  //   oi1_6000: obtenerNumero("oi1_6000"),
+  //   oi1_8000: obtenerNumero("oi1_8000"),
+  // };
 
   // 2) Título
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text("FICHA AUDIOLOGICA", pageW / 2, y, { align: "center" });
   y += 6;
 
-  // --- Bloque superior (2 filas, 4 columnas) ---
+  // --- Bloque superior rediseñado con Audiómetro ---
   const x0 = margin;
   const wTotal = pageW - 2 * margin;
-  const colW = [38, 38, 38, wTotal - 38 * 3]; // 4 columnas
-  const rowH1 = 10,
-    rowH2 = 13;
-  // Fila 1
+  // Definir anchos de columnas principales
+  const colW = [38, 60, 30, wTotal - 38 - 60 - 30 - 45, 45]; // última columna: Audiómetro
+  const rowH1 = 10;
+  const rowH2 = 12;
+  const rowH3Sup = 10;
+  // Fila 1: 4 columnas + Audiómetro
   doc.setLineWidth(0.4);
   doc.rect(x0, y, wTotal, rowH1);
   let x = x0;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < colW.length - 1; i++) {
     x += colW[i];
     doc.line(x, y, x, y + rowH1);
   }
-  // Fila 2
-  doc.rect(x0, y + rowH1, wTotal, rowH2);
-  //  doc.rect(x0, y + rowH1, wTotal, rowH2);
-  x = x0;
-  for (let i = 0; i < 3; i++) {
-    x += colW[i];
-    doc.line(x, y + rowH1, x, y + rowH1 + rowH2);
-  }
-  // Subdividir última celda derecha en 4 filas internas (Audiómetro)
-  const audX = x0 + colW[0] + colW[1] + colW[2];
-  const audW = colW[3];
-  const audRowH = rowH1 / 4;
-  // for (let i = 1; i < 4; i++) {
-  //   doc.line(audX, y + i * audRowH, audX + audW, y + i * audRowH);
-  // }
-  // Etiquetas fila 1
+  // Audiómetro subdivisión interna (3 filas)
+  let audX = x0 + colW[0] + colW[1] + colW[2] + colW[3];
+  let audY = y;
+  doc.line(audX, audY + rowH1 / 3, audX + colW[4], audY + rowH1 / 3);
+  doc.line(audX, audY + 2 * rowH1 / 3, audX + colW[4], audY + 2 * rowH1 / 3);
+  // Textos Fila 1
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Historia Clínica", x0 + 2, y + 5.5);
-  doc.text("Ficha Audiológica", x0 + colW[0] + 2, y + 5.5);
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(`${datos.norden}`, x0 + colW[0] + colW[1] + 2, y + 5.5);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  // Audiómetro subdividido
-  doc.setFont("helvetica", "bold").text("Marca", audX + 2, y + audRowH + 3);
-  doc
-    .setFont("helvetica", "normal")
-    .text(`${datos.marca}`, audX + 22, y + audRowH + 3);
-  doc
-    .setFont("helvetica", "bold")
-    .text("Modelo", audX + 2, y + audRowH * 2 + 3);
-  doc
-    .setFont("helvetica", "normal")
-    .text(`${datos.modelo}`, audX + 22, y + audRowH * 2 + 3);
-  doc
-    .setFont("helvetica", "bold")
-    .text("Calibración", audX + 2, y + audRowH * 3 + 3);
-  doc
-    .setFont("helvetica", "normal")
-    .text(`${datos.calibracion}`, audX + 22, y + audRowH * 3 + 3);
-
-  // Etiquetas fila 2
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Fecha del Examen", x0 + 2, y + rowH1 + 5);
+  doc.text("Historia Clínica", x0 + colW[0] / 2, y + rowH1 / 2 + 2, { align: "center" });
+  doc.text("Ficha Audiológica", x0 + colW[0] + colW[1] / 2, y + rowH1 / 2 + 2, { align: "center" });
   doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`${datos.fechaExamen}`, x0 + colW[0] / 2, y + rowH1 + 9, {
-    align: "center",
-  });
+  doc.text(`${datos.norden}`, x0 + colW[0] + colW[1] + colW[2] / 2, y + rowH1 / 2 + 2, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Audiómetro", audX + colW[4] / 2, y + rowH1 / 2 + 2, { align: "center" });
+  // Fila 2: Fecha del Examen, Fecha, Examen, Tipos de Examen, Audiómetro subdividido
+  const y2 = y + rowH1;
+  doc.rect(x0, y2, wTotal, rowH2);
+  x = x0;
+  for (let i = 0; i < colW.length - 1; i++) {
+    x += colW[i];
+    doc.line(x, y2, x, y2 + rowH2);
+  }
+  // Audiómetro subdivisión interna (3 filas)
+  audY = y2;
+  doc.line(audX, audY + rowH2 / 3, audX + colW[4], audY + rowH2 / 3);
+  doc.line(audX, audY + 2 * rowH2 / 3, audX + colW[4], audY + 2 * rowH2 / 3);
+  // Textos Fila 2
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Fecha del Examen", x0 + colW[0] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text(`${datos.fechaExamen}`, x0 + colW[0] + colW[1] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("dd / mm / aa", x0 + colW[0] / 2, y + rowH1 + 12, {
-    align: "center",
-  });
+  doc.text("dd / mm / aa", x0 + colW[0] + colW[1] / 2, y2 + rowH2 / 2 + 6, { align: "center" });
   doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.text("EXAMEN", x0 + colW[0] + colW[1] / 2, y + rowH1 + 8, {
-    align: "center",
-  });
-  doc.setFont("helvetica", "normal").setFontSize(7);
-
-  doc.text(
-    `Pre - Ocupacional (${datos.tipoExamen == "Pre-ocupacional" ? "X" : " "})`,
-    x0 + colW[0] + colW[1] + 2,
-    y + rowH1 + 3
-  );
-
-  doc.text(
-    `Periódica (${datos.tipoExamen == "Periodica" ? "X" : " "})`,
-    x0 + colW[0] + colW[1] + 2,
-    y + rowH1 + 6
-  );
-  doc.text(
-    `Retiro (${datos.tipoExamen == "Retiro" ? "X" : " "})`,
-    x0 + colW[0] + colW[1] + 2,
-    y + rowH1 + 9
-  );
-  doc.text(
-    `Anual (${datos.tipoExamen == "Anual" ? "X" : " "})`,
-    x0 + colW[0] + colW[1] + 2,
-    y + rowH1 + 12
-  );
+  doc.text("EXAMEN", x0 + colW[0] + colW[1] + colW[2] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(`Pre - Ocupacional (${datos.tipoExamen == "Pre-ocupacional" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 - 2, { align: "left" });
+  doc.text(`Periódica (${datos.tipoExamen == "Periodica" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 + 2, { align: "left" });
+  doc.text(`Retiro (${datos.tipoExamen == "Retiro" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 + 6, { align: "left" });
+  doc.text(`Anual (${datos.tipoExamen == "Anual" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 2, y2 + rowH2 / 2 + 6, { align: "left" });
+  // Audiómetro datos
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Marca", audX + 8, y2 + rowH2 / 3 - 2, { align: "left" });
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(`${datos.marca}`, audX + colW[4] / 2, y2 + rowH2 / 3 - 2, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Modelo", audX + 8, y2 + 2 * rowH2 / 3 - 2, { align: "left" });
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(`${datos.modelo}`, audX + colW[4] / 2, y2 + 2 * rowH2 / 3 - 2, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Calibración", audX + 8, y2 + rowH2 - 2, { align: "left" });
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(`${datos.calibracion}`, audX + colW[4] / 2, y2 + rowH2 - 2, { align: "center" });
+  // Fila 3: Apellidos y Nombres (celdas combinadas) + Audiómetro subdividido
+  const y3 = y2 + rowH2;
+  doc.rect(x0, y3, wTotal, rowH3Sup);
+  // Línea vertical para audiómetro
+  doc.line(audX, y3, audX, y3 + rowH3Sup);
+  // Audiómetro subdivisión interna (3 filas)
+  doc.line(audX, y3 + rowH3Sup / 3, audX + colW[4], y3 + rowH3Sup / 3);
+  doc.line(audX, y3 + 2 * rowH3Sup / 3, audX + colW[4], y3 + 2 * rowH3Sup / 3);
+  // Texto Apellidos y Nombres
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Apellidos y Nombres", x0 + 2, y3 + rowH3Sup / 2 + 2, { align: "left" });
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text(`${datos.nombres}`, x0 + 60, y3 + rowH3Sup / 2 + 2, { align: "left" });
+  y += rowH1 + rowH2 + rowH3Sup;
 
   // --- Bloque de datos personales (2 filas) ---
   let yDatos = y + rowH1 + rowH2;
@@ -654,10 +644,10 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   // Etiquetas dB
   for (let i = 0; i <= 13; i++) {
     const dB = -10 + i * 10;
-    const yTick = graphY + i * (graphH / 13) + 2;
-    doc.text(String(dB), graphX - 7, yTick, { align: "right" });
+    const yTick = graphY + i * (graphH / 13) + 0.5;
+    doc.text(String(dB), graphX - 2, yTick, { align: "right" });
   }
-  doc.text("dB", graphX - 10, graphY + graphH / 2, { align: "right" });
+  doc.text("dB", graphX - 7, graphY + graphH / 2 - 2, { align: "right" });
 
   // Graficar puntos de audiometría (ahora con círculos y X, y líneas conectando cada tipo)
   // Ejemplo de datos:
@@ -681,53 +671,57 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     { freq: 8000, db: datos.oi8000, color: "blue", tipo: "x" },
     //Osea
     //rojo [
-    { freq: 500, db: datos.od1_500, color: "red", tipo: "circle" },
-    { freq: 1000, db: datos.od1_1000, color: "red", tipo: "circle" },
-    { freq: 2000, db: datos.od1_2000, color: "red", tipo: "circle" },
-    { freq: 3000, db: datos.od1_3000, color: "red", tipo: "circle" },
-    { freq: 4000, db: datos.od1_4000, color: "red", tipo: "circle" },
-    { freq: 6000, db: datos.od1_6000, color: "red", tipo: "circle" },
-    { freq: 8000, db: datos.od1_8000, color: "red", tipo: "circle" },
+    { freq: 500, db: datos.od1_500, color: "red", tipo: "bracketLeft" },
+    { freq: 1000, db: datos.od1_1000, color: "red", tipo: "bracketLeft" },
+    { freq: 2000, db: datos.od1_2000, color: "red", tipo: "bracketLeft" },
+    { freq: 3000, db: datos.od1_3000, color: "red", tipo: "bracketLeft" },
+    { freq: 4000, db: datos.od1_4000, color: "red", tipo: "bracketLeft" },
+    { freq: 6000, db: datos.od1_6000, color: "red", tipo: "bracketLeft" },
+    { freq: 8000, db: datos.od1_8000, color: "red", tipo: "bracketLeft" },
     //azul ]
-    { freq: 500, db: datos.oi1_500, color: "blue", tipo: "x" },
-    { freq: 1000, db: datos.oi1_1000, color: "blue", tipo: "x" },
-    { freq: 2000, db: datos.oi1_2000, color: "blue", tipo: "x" },
-    { freq: 3000, db: datos.oi1_3000, color: "blue", tipo: "x" },
-    { freq: 4000, db: datos.oi1_4000, color: "blue", tipo: "x" },
-    { freq: 6000, db: datos.oi1_6000, color: "blue", tipo: "x" },
-    { freq: 8000, db: datos.oi1_8000, color: "blue", tipo: "x" },
+    { freq: 500, db: datos.oi1_500, color: "blue", tipo: "bracketRight" },
+    { freq: 1000, db: datos.oi1_1000, color: "blue", tipo: "bracketRight" },
+    { freq: 2000, db: datos.oi1_2000, color: "blue", tipo: "bracketRight" },
+    { freq: 3000, db: datos.oi1_3000, color: "blue", tipo: "bracketRight" },
+    { freq: 4000, db: datos.oi1_4000, color: "blue", tipo: "bracketRight" },
+    { freq: 6000, db: datos.oi1_6000, color: "blue", tipo: "bracketRight" },
+    { freq: 8000, db: datos.oi1_8000, color: "blue", tipo: "bracketRight" },
   ];
   // Agrupar por tipo y color
   const tipos = [
     { tipo: "circle", color: "red" },
     { tipo: "x", color: "blue" },
+    { tipo: "bracketLeft", color: "red" },
+    { tipo: "bracketRight", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
   tipos.forEach(({ tipo, color }) => {
     // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia
     const pts = puntos
-      .filter((p) => p.tipo === tipo && p.color === color)
+      .filter((p) => p.tipo === tipo && p.color === color && p.db !== null && p.db !== undefined)
       .sort((a, b) => a.freq - b.freq);
     if (pts.length < 2) return;
-    // Dibujar línea conectando los puntos
+    // Dibujar línea conectando solo puntos válidos
     doc.setLineWidth(0.4);
     if (color === "red") doc.setDrawColor(255, 0, 0);
     else if (color === "blue") doc.setDrawColor(0, 0, 255);
     else doc.setDrawColor(0, 0, 0);
     doc.setLineCap(1);
-    for (let i = 0; i < pts.length - 1; i++) {
-      const freqIdx1 = freqs.indexOf(pts[i].freq);
-      const freqIdx2 = freqs.indexOf(pts[i + 1].freq);
-      if (freqIdx1 === -1 || freqIdx2 === -1) continue;
-      const x1 = graphX + freqIdx1 * (graphW / 8);
-      const y1 = graphY + ((pts[i].db + 10) / 120) * graphH;
-      const x2 = graphX + freqIdx2 * (graphW / 8);
-      const y2 = graphY + ((pts[i + 1].db + 10) / 120) * graphH;
-      doc.line(x1, y1, x2, y2);
+    let prev = null;
+    for (let i = 0; i < pts.length; i++) {
+      const freqIdx = freqs.indexOf(pts[i].freq);
+      if (freqIdx === -1) continue;
+      const x = graphX + freqIdx * (graphW / 8);
+      const y = graphY + ((pts[i].db + 10) / 130) * graphH;
+      if (prev) {
+        doc.line(prev.x, prev.y, x, y);
+      }
+      prev = { x, y };
     }
   });
-  // Dibujar los puntos (círculo o X)
+  // Dibujar los puntos (círculo, X, [, ])
   puntos.forEach((punto) => {
+    if (punto.db === null || punto.db === undefined) return;
     const freqIdx = freqs.indexOf(punto.freq);
     if (freqIdx === -1) return;
     const x = graphX + freqIdx * (graphW / 8);
@@ -741,9 +735,24 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
       doc.circle(x, yP, 1.0);
     } else if (punto.tipo === "x") {
       // Dibujar una X centrada en (x, yP)
-      const size = 1.5;
+      const size = 2;
       doc.line(x - size / 2, yP - size / 2, x + size / 2, yP + size / 2);
       doc.line(x - size / 2, yP + size / 2, x + size / 2, yP - size / 2);
+    } else if (punto.tipo === "bracketLeft") {
+      // Dibujar un '[' centrado en (x, yP)
+      const size = 2;
+      doc.line(x - size / 2, yP - size / 2, x - size / 2, yP + size / 2);
+      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
+      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+    } else if (punto.tipo === "bracketRight") {
+      // Dibujar un ']' centrado en (x, yP)
+      const size = 2;
+      // Línea vertical derecha
+      doc.line(x + size / 2, yP - size / 2, x + size / 2, yP + size / 2);
+      // Línea base superior
+      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
+      // Línea base inferior
+      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
     }
     doc.setDrawColor(0, 0, 0);
   });
@@ -842,34 +851,18 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   for (let i = 1; i < t2Rows; i++) {
     doc.line(tableX, tY + i * t2RowH, tableX + tableWRight, tY + i * t2RowH);
   }
-  // Primera fila: solo una celda, sin líneas internas
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("LOGOAUDIOMETRIA", tableX + tableWRight / 2, tY + t2RowH / 2, {
-    align: "center",
-    baseline: "middle",
-  });
-  // Columnas con anchos personalizados SOLO desde la segunda fila
+  // Columnas
   let t2X = tableX;
-  for (let i = 0; i < t2Cols - 1; i++) {
-    t2X += t2ColWArr[i];
-    // Solo dibujar líneas verticales desde la segunda fila hacia abajo
-    doc.line(t2X, tY + t2RowH, t2X, tY + t2H);
+  for (let i = 1; i < t2Cols; i++) {
+    t2X += t2ColWArr[i - 1];
+    doc.line(t2X, tY, t2X, tY + t2H);
   }
-  // Encabezados de columna (segunda fila)
-  doc.setFontSize(7);
-  doc.text(
-    "DERECHA",
-    tableX + t2ColWArr[0] + t2ColWArr[1] / 2,
-    tY + t2RowH + t2RowH / 2,
-    { align: "center", baseline: "middle" }
-  );
-  doc.text(
-    "IZQUIERDA",
-    tableX + t2ColWArr[0] + t2ColWArr[1] + t2ColWArr[2] / 2,
-    tY + t2RowH + t2RowH / 2,
-    { align: "center", baseline: "middle" }
-  );
-  // Filas de etiquetas centradas
+  // Primera fila: LOGOAUDIOMETRIA, DERECHA, IZQUIERDA
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("LOGOAUDIOMETRIA", tableX + t2ColWArr[0] / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
+  doc.text("DERECHA", tableX + t2ColWArr[0] + t2ColWArr[1] / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
+  doc.text("IZQUIERDA", tableX + t2ColWArr[0] + t2ColWArr[1] + t2ColWArr[2] / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
+  // Filas de etiquetas y datos
   doc.setFont("helvetica", "normal").setFontSize(7);
   const logoRows = [
     "Umbral de discriminación",
@@ -877,34 +870,30 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     "Umbral de Confort MCL",
     "Umbral de disconfort UCL",
   ];
+  const datosLogoAudiometria = [
+    { derecha: "40 dB", izquierda: "45 dB" },
+    { derecha: "92%", izquierda: "88%" },
+    { derecha: "75 dB", izquierda: "70 dB" },
+    { derecha: "95 dB", izquierda: "90 dB" },
+  ];
   for (let i = 0; i < logoRows.length; i++) {
+    // Etiqueta
     doc.text(
       logoRows[i],
       tableX + t2ColWArr[0] / 2,
       tY + (i + 2) * t2RowH - t2RowH / 2,
       { align: "center", baseline: "middle" }
     );
-  }
-  const datosLogoAudiometria = [
-    { derecha: "40 dB", izquierda: "45 dB" }, // Umbral de discriminación
-    { derecha: "92%", izquierda: "88%" }, // % de discriminación
-    { derecha: "75 dB", izquierda: "70 dB" }, // Umbral de Confort MCL
-    { derecha: "95 dB", izquierda: "90 dB" }, // Umbral de disconfort UCL
-  ];
-  for (let i = 0; i < datosLogoAudiometria.length; i++) {
-    const fila = datosLogoAudiometria[i];
-
-    // Columna DERECHA
+    // Derecha
     doc.text(
-      fila.derecha || "",
+      datosLogoAudiometria[i].derecha || "",
       tableX + t2ColWArr[0] + t2ColWArr[1] / 2,
       tY + (i + 2) * t2RowH - t2RowH / 2,
       { align: "center", baseline: "middle" }
     );
-
-    // Columna IZQUIERDA
+    // Izquierda
     doc.text(
-      fila.izquierda || "",
+      datosLogoAudiometria[i].izquierda || "",
       tableX + t2ColWArr[0] + t2ColWArr[1] + t2ColWArr[2] / 2,
       tY + (i + 2) * t2RowH - t2RowH / 2,
       { align: "center", baseline: "middle" }

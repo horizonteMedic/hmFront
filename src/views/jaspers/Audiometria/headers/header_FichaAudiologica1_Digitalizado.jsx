@@ -30,6 +30,20 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   // Sede debajo
   doc.setFont('helvetica', 'normal').setFontSize(11);
   doc.text(`${datos.sede || ''}`, fichaX, fichaY + 10, { align: 'right' });
+  // Fecha debajo de la sede
+  if (datos.fecha) {
+    // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
+    let fechaStr = datos.fecha;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
+      const [y, m, d] = fechaStr.split('-');
+      fechaStr = `${d}/${m}/${y}`;
+    }
+    doc.setFont('helvetica', 'normal').setFontSize(10);
+    const label = 'Fecha :';
+    const labelW = doc.getTextWidth(label);
+    doc.setFont('helvetica', 'bold').text(label, fichaX - labelW - 2, fichaY + 20, { align: 'right' });
+    doc.setFont('helvetica', 'normal').text(fechaStr, fichaX, fichaY + 20, { align: 'right' });
+  }
 };
 
 export default header_FichaAudiologica;
