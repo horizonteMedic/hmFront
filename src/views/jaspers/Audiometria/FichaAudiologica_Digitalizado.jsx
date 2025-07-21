@@ -225,19 +225,11 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     x += colW[i];
     doc.line(x, y, x, y + rowH1);
   }
-  // Audiómetro subdivisión interna (3 filas)
+  // Audiómetro: solo texto centrado en la celda superior
   let audX = x0 + colW[0] + colW[1] + colW[2] + colW[3];
   let audY = y;
-  doc.line(audX, audY + rowH1 / 3, audX + colW[4], audY + rowH1 / 3);
-  doc.line(audX, audY + 2 * rowH1 / 3, audX + colW[4], audY + 2 * rowH1 / 3);
-  // Textos Fila 1
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Historia Clínica", x0 + colW[0] / 2, y + rowH1 / 2 + 2, { align: "center" });
-  doc.text("Ficha Audiológica", x0 + colW[0] + colW[1] / 2, y + rowH1 / 2 + 2, { align: "center" });
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`${datos.norden}`, x0 + colW[0] + colW[1] + colW[2] / 2, y + rowH1 / 2 + 2, { align: "center" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Audiómetro", audX + colW[4] / 2, y + rowH1 / 2 + 2, { align: "center" });
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Audiómetro", audX + colW[4] / 2, audY + rowH1 / 2 + 2, { align: "center", baseline: "middle" });
   // Fila 2: Fecha del Examen, Fecha, Examen, Tipos de Examen, Audiómetro subdividido
   const y2 = y + rowH1;
   doc.rect(x0, y2, wTotal, rowH2);
@@ -248,9 +240,11 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   }
   // Audiómetro subdivisión interna (3 filas)
   audY = y2;
-  doc.line(audX, audY + rowH2 / 3, audX + colW[4], audY + rowH2 / 3);
-  doc.line(audX, audY + 2 * rowH2 / 3, audX + colW[4], audY + 2 * rowH2 / 3);
-  // Textos Fila 2
+  const audRowH = rowH2 / 3;
+  for (let i = 1; i < 3; i++) {
+    doc.line(audX, audY + i * audRowH, audX + colW[4], audY + i * audRowH);
+  }
+  // Textos Fila 2 (resto de columnas igual que antes)
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Fecha del Examen", x0 + colW[0] / 2, y2 + rowH2 / 2 + 2, { align: "center" });
   doc.setFont("helvetica", "bold").setFontSize(10);
@@ -264,19 +258,19 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   doc.text(`Periódica (${datos.tipoExamen == "Periodica" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 + 2, { align: "left" });
   doc.text(`Retiro (${datos.tipoExamen == "Retiro" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 4, y2 + rowH2 / 2 + 6, { align: "left" });
   doc.text(`Anual (${datos.tipoExamen == "Anual" ? "X" : " "})`, x0 + colW[0] + colW[1] + colW[2] + colW[3] / 2, y2 + rowH2 / 2 + 6, { align: "left" });
-  // Audiómetro datos
+  // Audiómetro datos (3 filas)
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Marca", audX + 8, y2 + rowH2 / 3 - 2, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(`${datos.marca}`, audX + colW[4] / 2, y2 + rowH2 / 3 - 2, { align: "center" });
+  doc.text("Marca", audX + 2, audY + audRowH / 2 + 1, { align: "left", baseline: "middle" });
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text(`${datos.marca}`, audX + colW[4] - 2, audY + audRowH / 2 + 1, { align: "right", baseline: "middle" });
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Modelo", audX + 8, y2 + 2 * rowH2 / 3 - 2, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(`${datos.modelo}`, audX + colW[4] / 2, y2 + 2 * rowH2 / 3 - 2, { align: "center" });
+  doc.text("Modelo", audX + 2, audY + audRowH + audRowH / 2 + 1, { align: "left", baseline: "middle" });
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text(`${datos.modelo}`, audX + colW[4] - 2, audY + audRowH + audRowH / 2 + 1, { align: "right", baseline: "middle" });
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Calibración", audX + 8, y2 + rowH2 - 2, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(`${datos.calibracion}`, audX + colW[4] / 2, y2 + rowH2 - 2, { align: "center" });
+  doc.text("Calibración", audX + 2, audY + 2 * audRowH + audRowH / 2 + 1, { align: "left", baseline: "middle" });
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text(`${datos.calibracion}`, audX + colW[4] - 2, audY + 2 * audRowH + audRowH / 2 + 1, { align: "right", baseline: "middle" });
   // Fila 3: Apellidos y Nombres (celdas combinadas) + Audiómetro subdividido
   const y3 = y2 + rowH2;
   doc.rect(x0, y3, wTotal, rowH3Sup);
