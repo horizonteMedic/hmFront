@@ -161,7 +161,8 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   //   oi18000: 60,
   // };
   function limpiarNumero(valor) {
-    const v = valor.trim();
+    if (valor === undefined || valor === null) return null;
+    const v = String(valor).trim();
 
     if (v === "" || v === "N/A" || v === "-") {
       return null;
@@ -422,7 +423,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // Leyenda (mitad izquierda)
   try {
     doc.addImage(
-      "public/img/leyenda_grafico.png",
+      "/img/leyenda_grafico.png",
       "PNG",
       margin,
       y + 2,

@@ -337,7 +337,7 @@ export const GetInfoServicioFicha = (
 
           nombre_profecional: res.txtResponsable,
           conclusiones: res.txtConclusiones,
-          // nombre_medico: res.txtMedico,
+          nombre_medico: res.txtMedico,
 
           od_250: res.txtDod250,
           od_500: res.txtDod500,

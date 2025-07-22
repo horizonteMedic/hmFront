@@ -36,7 +36,7 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;
-  if (colorValido || true) {
+  if (colorValido ) {
     // Forzar a mostrar para prueba visual
     // Draw box outline in black
     doc.setDrawColor(0);
