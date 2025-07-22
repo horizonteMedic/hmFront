@@ -27,7 +27,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   let y = 45;
   try {
     console.log(margin, y);
-    doc.addImage("/img/frame.png", "PNG", margin, y, imgW, imgH);
+    doc.addImage("/img/Cuerpo_Audiometria2021_digitalizado.png", "PNG", margin, y, imgW, imgH);
     y += imgH + 5; // Deja un pequeño espacio después de la imagen
   } catch (e) {
     doc.text("Imagen no disponible", margin, y + 10);
@@ -384,10 +384,10 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // =====================
   // 4.- Exposición Ocupacional
   // =====================
-  newY += 44.3;
+  newY +=  44.7;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`X`, margin + 42.5 + (datos.practicaTiro ? 0 : 4.5), newY);
-  doc.text(`X`, margin + 96.2 + (datos.walkman ? 0 : 4.5), newY + 0.6);
+  doc.text(`X`, margin + 42.6 + (datos.practicaTiro ? 0 : 4.5), newY);
+  doc.text(`X`, margin + 96.3 + (datos.walkman ? 0 : 4.5), newY + 0.6);
   doc.text(
     `X`,
     margin + 138.7 + (datos.otrosExtraLaborales ? 0 : 4.5),

@@ -107,9 +107,9 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     doc.rect(tableX, y, colPreguntaW + colSiW + colNoW, totalTableH + blockFirmasH);
 
     // encabezado de tabla
-    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.line(tableX, tableY, tableX + colPreguntaW + colSiW + colNoW, tableY);
-    doc.text("PREGUNTAS", tableX + 2, tableY + lineHTable - 1.2);
+    doc.text("II. PREGUNTAS", tableX + 2, tableY + lineHTable - 1.2);
     doc.text("SI", tableX + colPreguntaW + colSiW / 2, tableY + lineHTable - 1.2, { align: "center" });
     doc.text("NO", tableX + colPreguntaW + colSiW + colNoW / 2, tableY + lineHTable - 1.2, { align: "center" });
     tableY += lineHTable;

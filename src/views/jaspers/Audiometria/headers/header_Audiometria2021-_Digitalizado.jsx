@@ -21,6 +21,7 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   // };
   const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
+  const usableW = pageW - 2 * margin;
   let y = 12;
 
   // 1) Logo a la izquierda
@@ -34,6 +35,17 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
       .setFontSize(9)
       .text("Policlinico Horizonte Medic", margin, y + 8);
   }
+
+  // === NUEVO: Usar imagen de fondo para la cabecera de audiometría 2021 ===
+  const fondoImg = "/img/Header_Audiometria2021Digitalizado.png";
+  const fondoH = 22; // altura aproximada de la cabecera en mm (ajusta si es necesario)
+  let yHeader = 22;
+  try {
+    doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
+  } catch (e) {
+    doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
+  }
+
   // === BLOQUE CÓDIGO DE COLOR ===
   // Prueba: si no hay datos.color, usar uno de ejemplo
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
@@ -85,100 +97,71 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
     .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
     .setLineWidth(0.2);
 
-  // 4) Datos del paciente en filas
-  let datosY = y + 22;
-  const labelW = 34;
-  const sep = 3;
-  const col2X = pageW / 2 - 10;
-  const col3X = pageW - margin - 60;
-  const rowH = 5.2;
-  doc.setFontSize(9);
+  // === NUEVO: Datos del paciente con posicionamiento libre ===
+  doc.setFont("helvetica", "normal").setFontSize(8);
 
-  // Fila 1: Apellidos y Nombres | Edad | Fecha
-  doc.setFont("helvetica", "bold");
-  const labelNombres = "Apellidos y Nombres";
-  doc.text(labelNombres, margin, datosY);
-  doc.text(":", margin + labelW, datosY);
-  doc.setFont("helvetica", "normal");
-  const nombresW = doc.getTextWidth(String(datos.nombres || ""));
-  doc.text(String(datos.nombres || ""), margin + labelW + sep, datosY);
+  // Apellidos y Nombres
+  const xNombres = margin + 30;
+  const yNombres = margin + 7.3;
+  doc.text(String(datos.nombres || ""), xNombres, yNombres, { maxWidth: 70 });
 
-  doc.setFont("helvetica", "bold");
-  const labelEdad = "Edad";
-  const edadX = margin + labelW + sep + nombresW + 20;
-  doc.text(labelEdad, edadX, datosY);
-  doc.text(":", edadX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(String(datos.edad || ""), edadX + 19, datosY);
-
-  doc.setFont("helvetica", "bold");
-  const labelFecha = "Fecha";
-  const fechaX = edadX + 30;
-  doc.text(labelFecha, fechaX, datosY);
-  doc.text(":", fechaX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
+  // Fecha
+  const xFecha = margin + 140;
+  const yFecha = margin + 7.3;
   let fechaStr = String(datos.fechaAu || "");
+  // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
   if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
     const [y, m, d] = fechaStr.split('-');
     fechaStr = `${d}/${m}/${y}`;
   }
-  doc.text(fechaStr, fechaX + 19, datosY);
+  doc.text(fechaStr, xFecha, yFecha);
 
-  // Fila 2: DNI | Cargo | Sexo
-  datosY += rowH;
-  doc.setFont("helvetica", "bold");
-  const labelDni = "DNI";
-  doc.text(labelDni, margin, datosY);
-  doc.text(":", margin + labelW, datosY);
-  doc.setFont("helvetica", "normal");
-  const dniW = doc.getTextWidth(String(datos.dni || ""));
-  doc.text(String(datos.dni || ""), margin + labelW + sep, datosY);
+  // DNI
+  const xDni = margin + 30;
+  const yDni = margin + 12.1;
+  doc.text(String(datos.dni || ""), xDni, yDni);
 
-  doc.setFont("helvetica", "bold");
-  const labelCargo = "Cargo";
-  const cargoX = margin + labelW + sep + dniW + 20;
-  doc.text(labelCargo, cargoX, datosY);
-  doc.text(":", cargoX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  const cargoW = doc.getTextWidth(String(datos.ocupacion || ""));
-  doc.text(String(datos.ocupacion || ""), cargoX + 19, datosY);
+  // Edad
+  const xEdad = margin + 95;
+  const yEdad = margin + 12.1;
+  doc.text(String(datos.edad || ""), xEdad, yEdad);
 
-  doc.setFont("helvetica", "bold");
-  const labelSexo = "Sexo";
-  const sexoX = cargoX + 30 + cargoW;
-  doc.text(labelSexo, sexoX, datosY);
-  doc.text(":", sexoX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(String(datos.sexo || ""), sexoX + 19, datosY);
+  // Sexo - Marcar "X" según el valor
+  const xSexoM = margin + 150.2; // Posición para Masculino
+  const xSexoF = margin + 168.2; // Posición para Femenino
+  const ySexo = margin + 12.3;
+  
+  const sexo = String(datos.sexo || "").toUpperCase().trim();
+  if (sexo === "M") {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("X", xSexoM, ySexo);
+  } else if (sexo === "F") {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("X", xSexoF, ySexo);
+  }
+  doc.setFont("helvetica", "normal").setFontSize(8);
 
-  // Fila 3: Área de Trabajo | Contrata
-  datosY += rowH;
-  doc.setFont("helvetica", "bold");
-  const labelArea = "Área de Trabajo";
-  doc.text(labelArea, margin, datosY);
-  doc.text(":", margin + labelW, datosY);
-  doc.setFont("helvetica", "normal");
-  const areaW = doc.getTextWidth(String(datos.areaTrabajo || ""));
-  doc.text(String(datos.areaTrabajo || ""), margin + labelW + sep, datosY);
+  // Área de Trabajo
+  const xAreaTrabajo = margin + 30;
+  const yAreaTrabajo = margin + 17;
+  doc.text(String(datos.areaTrabajo || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 60 });
 
-  doc.setFont("helvetica", "bold");
-  const labelContrata = "Contrata";
-  const contrataX = margin + labelW + sep + areaW + 30;
-  doc.text(labelContrata, contrataX, datosY);
-  doc.text(":", contrataX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(String(datos.contrata || ""), contrataX + 19, datosY);
+  // Cargo
+  const xCargo = margin + 104;
+  const yCargo = margin + 17;
+  doc.text(String(datos.ocupacion || ""), xCargo, yCargo, { maxWidth: 50 });
 
-  // Fila 4: Empresa
-  datosY += rowH;
-  doc.setFont("helvetica", "bold");
-  const labelEmp = "Empresa";
-  doc.text(labelEmp, margin, datosY);
-  doc.text(":", margin + labelW, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(String(datos.empresa || ""), margin + labelW + sep, datosY);
+  // Empresa
+  const xEmpresa = margin + 30;
+  const yEmpresa = margin + 21.8;
+  doc.text(String(datos.empresa || ""), xEmpresa, yEmpresa, { maxWidth: 70 });
 
+  // Contrata
+  const xContrata = margin + 119;
+  const yContrata = margin + 21.8;
+  doc.text(String(datos.contrata || ""), xContrata, yContrata, { maxWidth: 50 });
+
+  
   // restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
