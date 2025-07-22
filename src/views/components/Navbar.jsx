@@ -42,8 +42,8 @@ const Navbar = () => {
     { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
-    { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },
-    { to: "/rayosx", name: "Rayos X", label: "Rayos X", icon: faXRay },
+    // { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },
+    // { to: "/rayosx", name: "Rayos X", label: "Rayos X", icon: faXRay },
     // { to: "/HistoriaOcupacional", name: "Historia Ocupacional", label: "Historia Ocupacional", icon: faNotesMedical },
     // { to: "/Espirometria", name: "Espirometría", label: "Espirometría", icon: faNotesMedical },
     // { to: "/Oftalmologia", name: "Oftalmología", label: "Oftalmología", icon: faNotesMedical }
