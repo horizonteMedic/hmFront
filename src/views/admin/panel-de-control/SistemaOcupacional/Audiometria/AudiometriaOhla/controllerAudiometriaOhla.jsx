@@ -296,7 +296,7 @@ export const GetInfoServicioFicha = (
           bellPlus:
             res.txtMarca == "BELL INVENTS" && res.txtModelo == "BELL PLUS",
 
-          genero: res.genero == "M" ? "Masculino" : "Femenino",
+          genero: res.sexo == "M" ? "Masculino" : "Femenino",
           aniosTrabajo: res.tiempoTrabajo,
           mesesTrabajo: res.txtMesesTrabajo,
 
@@ -337,7 +337,7 @@ export const GetInfoServicioFicha = (
 
           nombre_profecional: res.txtResponsable,
           conclusiones: res.txtConclusiones,
-          // nombre_medico: res.txtMedico,
+          nombre_medico: res.txtMedico,
 
           od_250: res.txtDod250,
           od_500: res.txtDod500,
@@ -376,7 +376,9 @@ export const SubmitDataServiceFicha = async (
   token,
   user,
   limpiar,
-  tabla
+  tabla,
+  mostrarGrafico,
+  firmaExtra
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -389,7 +391,7 @@ export const SubmitDataServiceFicha = async (
     fechaExamen: form.fecha,
     tiempoTrabajo: form.aniosTrabajo,
     tiempoExposicionTotalPonderado: form.tiempoExposicion,
-    edadFa: form.edad, 
+    edadFa: form.edad,
     chkTapones: form.tapones,
     chkgrajeras: form.orejeras,
     chkIntenso: form.apreciacion_ruido == "RUIDO MUY INTENSO",
@@ -460,7 +462,13 @@ export const SubmitDataServiceFicha = async (
       }).then((result) => {
         limpiar();
         if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
+          PrintHojaR(
+            form.norden,
+            token,
+            "audiometria_po",
+            mostrarGrafico,
+            firmaExtra
+          );
         }
       });
     } else {
@@ -469,7 +477,7 @@ export const SubmitDataServiceFicha = async (
   });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
+export const PrintHojaR = (nro, token, tabla, mostrarGrafico, firmaExtra) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(
@@ -489,7 +497,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res);
+          modulo.default(res, mostrarGrafico, firmaExtra);
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`

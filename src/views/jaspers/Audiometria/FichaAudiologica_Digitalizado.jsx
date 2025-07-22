@@ -1,7 +1,11 @@
 import jsPDF from "jspdf";
 import headerFicha from "./headers/header_FichaAudiologica_Digitalizado.jsx";
 
-export default function FichaAudiologica_Digitalizado(data = {}) {
+export default function FichaAudiologica_Digitalizado(
+  data = {},
+  mostrarGrafico = true,
+  firmaExtra = true
+) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -11,199 +15,211 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   // 1) Header
   headerFicha(doc, data);
 
-  const datos = {
-    norden: "95899",
-    marca: "AMPLIVOX",
-    modelo: "BELL PLUS",
-    calibracion: "01/07/2025",
-    fechaExamen: "24/10/2025",
-    tipoExamen: "PreOcupacional",
-    nombres: "ROJAS SIGUENZA JOSUE SPENCER",
-    edad: "29",
-    sexo: "M",
-    ocupacion: "ADMINISTRADOR ESPECIALISTA",
-    aniosTrabajo: "5",
-    contrata: "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.",
-    empresa: "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.",
-    tiempoExposicion: "5 H/D",
+  // const datos = {
+  //   norden: "95899",
+  //   marca: "AMPLIVOX",
+  //   modelo: "BELL PLUS",
+  //   calibracion: "01/07/2025",
+  //   fechaExamen: "24/10/2025",
+  //   tipoExamen: "PreOcupacional",
+  //   nombres: "ROJAS SIGUENZA JOSUE SPENCER",
+  //   edad: "29",
+  //   sexo: "M",
+  //   ocupacion: "ADMINISTRADOR ESPECIALISTA",
+  //   aniosTrabajo: "5",
+  //   contrata: "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.",
+  //   empresa: "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.",
+  //   tiempoExposicion: "5 H/D",
 
-    tapones: true,
-    orejeras: true,
-    ruidoMuyIntenso: true,
-    ruidoModerado: true,
-    ruidoNoMolesto: true,
+  //   tapones: true,
+  //   orejeras: true,
+  //   ruidoMuyIntenso: true,
+  //   ruidoModerado: true,
+  //   ruidoNoMolesto: true,
 
-    consumoTabaco: false,
-    servicioMilitar: true,
-    hobbiesRuido: false,
-    exposicionQuimicos: true,
-    infeccionOidoAntecente: false,
-    ototoxicos: true,
+  //   consumoTabaco: false,
+  //   servicioMilitar: true,
+  //   hobbiesRuido: false,
+  //   exposicionQuimicos: true,
+  //   infeccionOidoAntecente: false,
+  //   ototoxicos: true,
 
-    disminucionAudicion: true,
-    dolorOidos: false,
-    zumbido: true,
-    mareos: false,
-    infeccionOidoActual: true,
-    otros: false,
+  //   disminucionAudicion: true,
+  //   dolorOidos: false,
+  //   zumbido: true,
+  //   mareos: false,
+  //   infeccionOidoActual: true,
+  //   otros: false,
 
-    txtDod250: "40",
-    txtDod500: "20",
-    txtDod1000: "30",
+  //   txtDod250: "40",
+  //   txtDod500: "20",
+  //   txtDod1000: "30",
 
-    txtDoi250: "10",
-    txtDoi500: "15",
-    txtDoi1000: "60",
+  //   txtDoi250: "10",
+  //   txtDoi500: "15",
+  //   txtDoi1000: "60",
 
-    txtLDUmbralDiscriminacion: "20",
-    txtLIUmbralDiscriminacion: "10",
+  //   txtLDUmbralDiscriminacion: "20",
+  //   txtLIUmbralDiscriminacion: "10",
 
-    txtLDPorcentajeDiscriminacion: "80",
-    txtLIPorcentajeDiscriminacion: "50",
+  //   txtLDPorcentajeDiscriminacion: "80",
+  //   txtLIPorcentajeDiscriminacion: "50",
 
-    txtLDConfort: "70",
-    txtLIConfort: "60",
+  //   txtLDConfort: "70",
+  //   txtLIConfort: "60",
 
-    txtLDDisconfort: "90",
-    txtLIDisconfort: "100",
+  //   txtLDDisconfort: "90",
+  //   txtLIDisconfort: "100",
 
-    txtConclusiones:
-      "El paciente presenta una pérdida auditiva leve en el oído derecho y una pérdida auditiva moderada en el oído izquierdo.",
-    txtResponsable: "SHIRLEY KATHERINE GUTIERREZ ARTEAGA",
-    txtMedico: "DR. JUAN PEREZ GARCIA",
+  //   txtConclusiones:
+  //     "El paciente presenta una pérdida auditiva leve en el oído derecho y una pérdida auditiva moderada en el oído izquierdo.",
+  //   txtResponsable: "SHIRLEY KATHERINE GUTIERREZ ARTEAGA",
+  //   txtMedico: "DR. JUAN PEREZ GARCIA",
 
-    od500: null,
-    od1000: null,
-    od2000: null,
-    od3000: null,
-    od4000: null,
-    od6000: null,
-    od8000: null,
+  //   od500: null,
+  //   od1000: null,
+  //   od2000: null,
+  //   od3000: null,
+  //   od4000: null,
+  //   od6000: null,
+  //   od8000: null,
 
-    oi500: 20,
-    oi1000: null,
-    oi2000: null,
-    oi3000: null,
-    oi4000: null,
-    oi6000: null,
-    oi8000: null,
+  //   oi500: 20,
+  //   oi1000: null,
+  //   oi2000: null,
+  //   oi3000: null,
+  //   oi4000: null,
+  //   oi6000: null,
+  //   oi8000: null,
 
-    od1_500: 30,
-    od1_1000: null,
-    od1_2000: null,
-    od1_3000: null,
-    od1_4000: null,
-    od1_6000: null,
-    od1_8000: 90,
+  //   od1_500: 30,
+  //   od1_1000: null,
+  //   od1_2000: null,
+  //   od1_3000: null,
+  //   od1_4000: null,
+  //   od1_6000: null,
+  //   od1_8000: 90,
 
-    oi1_500: null,
-    oi1_1000: null,
-    oi1_2000: null,
-    oi1_3000: 65,
-    oi1_4000: null,
-    oi1_6000: null,
-    oi1_8000: 95,
-  };
+  //   oi1_500: null,
+  //   oi1_1000: null,
+  //   oi1_2000: null,
+  //   oi1_3000: 65,
+  //   oi1_4000: null,
+  //   oi1_6000: null,
+  //   oi1_8000: 95,
+  // };
 
   const obtener = (name) => {
     return data[name] || "";
   };
-  const obtenerNumero = (name) => {
-    return data[name] || 0;
+  function limpiarNumero(valor) {
+    if (valor === undefined || valor === null || !mostrarGrafico) return null;
+    const v = String(valor).trim();
+
+    if (v === "" || v === "N/A" || v === "-") {
+      return null;
+    }
+
+    // Verifica si el string representa un número válido
+    const esNumeroValido = /^-?\d+(\.\d+)?$/.test(v);
+
+    return esNumeroValido ? Number(v) : null;
+  }
+
+  const datos = {
+    norden: obtener("norden"),
+    marca: obtener("txtMarca"),
+    modelo: obtener("txtModelo"),
+    calibracion: data.fechaCalibracion,
+    fechaExamen: data.fechaExamen,
+    tipoExamen: obtener("nomExam"),
+    nombres: obtener("nombres"),
+    edad: obtener("edad"),
+    sexo: obtener("genero"),
+    ocupacion: obtener("ocupacion"),
+    aniosTrabajo: obtener("tiempoTrabajo"),
+    contrata: obtener("contrata"),
+    empresa: obtener("empresa"),
+    tiempoExposicion: obtener("tiempoExposicionTotalPonderado"),
+
+    tapones: data.chkTapones,
+    orejeras: data.chkgrajeras,
+    ruidoMuyIntenso: data.chkIntenso,
+    ruidoModerado: data.chkModerado,
+    ruidoNoMolesto: data.chkNoMolesto,
+
+    consumoTabaco: data.chk1Si,
+    servicioMilitar: data.chk2Si,
+    hobbiesRuido: data.chk3Si,
+    exposicionQuimicos: data.chk4Si,
+    infeccionOidoAntecente: data.chk5Si,
+    ototoxicos: data.chk6Si,
+
+    disminucionAudicion: data.chk7Si,
+    dolorOidos: data.chk8Si,
+    zumbido: data.chk9Si,
+    mareos: data.chk10Si,
+    infeccionOidoActual: data.chk11Si,
+    otros: data.chk12Si,
+
+    txtOtoscopia: obtener("txtOtoscopia"),
+
+    txtDod250: obtener("txtDod250"),
+    txtDod500: obtener("txtDod500"),
+    txtDod1000: obtener("txtDod1000"),
+
+    txtDoi250: obtener("txtDoi250"),
+    txtDoi500: obtener("txtDoi500"),
+    txtDoi1000: obtener("txtDoi1000"),
+
+    txtLDUmbralDiscriminacion: obtener("txtLDUmbralDiscriminacion"),
+    txtLIUmbralDiscriminacion: obtener("txtLIUmbralDiscriminacion"),
+
+    txtLDPorcentajeDiscriminacion: obtener("txtLDPorcentajeDiscriminacion"),
+    txtLIPorcentajeDiscriminacion: obtener("txtLIPorcentajeDiscriminacion"),
+
+    txtLDConfort: obtener("txtLDConfort"),
+    txtLIConfort: obtener("txtLIConfort"),
+
+    txtLDDisconfort: obtener("txtLDDisconfort"),
+    txtLIDisconfort: obtener("txtLIDisconfort"),
+
+    txtConclusiones: obtener("txtConclusiones"),
+    txtResponsable: obtener("txtResponsable"),
+    txtMedico: obtener("txtMedico"),
+
+    od500: limpiarNumero(data.od500),
+    od1000: limpiarNumero(data.od1000),
+    od2000: limpiarNumero(data.od2000),
+    od3000: limpiarNumero(data.od3000),
+    od4000: limpiarNumero(data.od4000),
+    od6000: limpiarNumero(data.od6000),
+    od8000: limpiarNumero(data.od8000),
+
+    oi500: limpiarNumero(data.oi500),
+    oi1000: limpiarNumero(data.oi1000),
+    oi2000: limpiarNumero(data.oi2000),
+    oi3000: limpiarNumero(data.oi3000),
+    oi4000: limpiarNumero(data.oi4000),
+    oi6000: limpiarNumero(data.oi6000),
+    oi8000: limpiarNumero(data.oi8000),
+
+    od1_500: limpiarNumero(data.od1_500),
+    od1_1000: limpiarNumero(data.od1_1000),
+    od1_2000: limpiarNumero(data.od1_2000),
+    od1_3000: limpiarNumero(data.od1_3000),
+    od1_4000: limpiarNumero(data.od1_4000),
+    od1_6000: limpiarNumero(data.od1_6000),
+    od1_8000: limpiarNumero(data.od1_8000),
+
+    oi1_500: limpiarNumero(data.oi1_500),
+    oi1_1000: limpiarNumero(data.oi1_1000),
+    oi1_2000: limpiarNumero(data.oi1_2000),
+    oi1_3000: limpiarNumero(data.oi1_3000),
+    oi1_4000: limpiarNumero(data.oi1_4000),
+    oi1_6000: limpiarNumero(data.oi1_6000),
+    oi1_8000: limpiarNumero(data.oi1_8000),
   };
-
-  // const datos = {
-  //   norden: obtener("norden"),
-  //   marca: obtener("txtMarca"),
-  //   modelo: obtener("txtModelo"),
-  //   calibracion: data.fechaCalibracion,
-  //   fechaExamen: data.fechaExamen,
-  //   tipoExamen: obtener("nomExam"),
-  //   nombres: obtener("nombres"),
-  //   edad: obtener("edad"),
-  //   sexo: obtener("genero"),
-  //   ocupacion: obtener("ocupacion"),
-  //   aniosTrabajo: obtener("tiempoTrabajo"),
-  //   contrata: obtener("contrata"),
-  //   empresa: obtener("empresa"),
-  //   tiempoExposicion: obtener("tiempoExposicionTotalPonderado"),
-
-  //   tapones: data.chkTapones,
-  //   orejeras: data.chkgrajeras,
-  //   ruidoMuyIntenso: data.chkIntenso,
-  //   ruidoModerado: data.chkModerado,
-  //   ruidoNoMolesto: data.chkNoMolesto,
-
-  //   consumoTabaco: data.chk1Si,
-  //   servicioMilitar: data.chk2Si,
-  //   hobbiesRuido: data.chk3Si,
-  //   exposicionQuimicos: data.chk4Si,
-  //   infeccionOidoAntecente: data.chk5Si,
-  //   ototoxicos: data.chk6Si,
-
-  //   disminucionAudicion: data.chk7Si,
-  //   dolorOidos: data.chk8Si,
-  //   zumbido: data.chk9Si,
-  //   mareos: data.chk10Si,
-  //   infeccionOidoActual: data.chk11Si,
-  //   otros: data.chk12Si,
-
-  //   txtDod250: obtener("txtDod250"),
-  //   txtDod500: obtener("txtDod500"),
-  //   txtDod1000: obtener("txtDod1000"),
-
-  //   txtDoi250: obtener("txtDoi250"),
-  //   txtDoi500: obtener("txtDoi500"),
-  //   txtDoi1000: obtener("txtDoi1000"),
-
-  //   txtLDUmbralDiscriminacion: obtener("txtLDUmbralDiscriminacion"),
-  //   txtLIUmbralDiscriminacion: obtener("txtLIUmbralDiscriminacion"),
-
-  //   txtLDPorcentajeDiscriminacion: obtener("txtLDPorcentajeDiscriminacion"),
-  //   txtLIPorcentajeDiscriminacion: obtener("txtLIPorcentajeDiscriminacion"),
-
-  //   txtLDConfort: obtener("txtLDConfort"),
-  //   txtLIConfort: obtener("txtLIConfort"),
-
-  //   txtLDDisconfort: obtener("txtLDDisconfort"),
-  //   txtLIDisconfort: obtener("txtLIDisconfort"),
-
-  //   txtConclusiones: obtener("txtConclusiones"),
-  //   txtResponsable: obtener("txtResponsable"),
-  //   txtMedico: obtener("txtMedico"),
-
-  //   od500: obtenerNumero("od500"),
-  //   od1000: obtenerNumero("od1000"),
-  //   od2000: obtenerNumero("od2000"),
-  //   od3000: obtenerNumero("od3000"),
-  //   od4000: obtenerNumero("od4000"),
-  //   od6000: obtenerNumero("od6000"),
-  //   od8000: obtenerNumero("od8000"),
-
-  //   oi500: obtenerNumero("oi500"),
-  //   oi1000: obtenerNumero("oi1000"),
-  //   oi2000: obtenerNumero("oi2000"),
-  //   oi3000: obtenerNumero("oi3000"),
-  //   oi4000: obtenerNumero("oi4000"),
-  //   oi6000: obtenerNumero("oi6000"),
-  //   oi8000: obtenerNumero("oi8000"),
-
-  //   od1_500: obtenerNumero("od1_500"),
-  //   od1_1000: obtenerNumero("od1_1000"),
-  //   od1_2000: obtenerNumero("od1_2000"),
-  //   od1_3000: obtenerNumero("od1_3000"),
-  //   od1_4000: obtenerNumero("od1_4000"),
-  //   od1_6000: obtenerNumero("od1_6000"),
-  //   od1_8000: obtenerNumero("od1_8000"),
-
-  //   oi1_500: obtenerNumero("oi1_500"),
-  //   oi1_1000: obtenerNumero("oi1_1000"),
-  //   oi1_2000: obtenerNumero("oi1_2000"),
-  //   oi1_3000: obtenerNumero("oi1_3000"),
-  //   oi1_4000: obtenerNumero("oi1_4000"),
-  //   oi1_6000: obtenerNumero("oi1_6000"),
-  //   oi1_8000: obtenerNumero("oi1_8000"),
-  // };
 
   // 2) Título
   doc.setFont("helvetica", "bold").setFontSize(14);
@@ -212,44 +228,44 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   const fondoImg = "/img/frame_ficha.png";
-  const fondoH =95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
+  const fondoH = 95; // altura aproximada de la cabecera en mm (ajusta si es necesario)
   let yHeader = 40;
   try {
     doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
   } catch (e) {
     doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
   }
-  
+
   // === 2) Datos de cabecera (cada uno con su propia posición para moverlos individualmente) ===
   // Puedes ajustar cada x/y a tu gusto
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // N° Orden
   const xNorden = margin + 104; // más a la derecha
-  const yNorden = margin + 39;  // un poco más abajo
+  const yNorden = margin + 39; // un poco más abajo
   doc.setFont("helvetica", "bold").setFontSize(15);
-  doc.text(String(datos.norden || "95899"), xNorden, yNorden);
+  doc.text(String(datos.norden || ""), xNorden, yNorden);
   doc.setFont("helvetica", "normal").setFontSize(9); // restaurar tamaño para los demás
-  
+
   // Fecha Examen
   const xFechaExamen = margin + 25;
   const yFechaExamen = margin + 49;
-  doc.text(String(datos.fechaExamen || "24/10/2025"), xFechaExamen, yFechaExamen);
+  doc.text(String(datos.fechaExamen || ""), xFechaExamen, yFechaExamen);
 
   // Marca
   const xMarca = margin + 160;
   const yMarca = margin + 38.5;
-  doc.text(String(datos.marca || "AMPLIVOX"), xMarca, yMarca);
+  doc.text(String(datos.marca || ""), xMarca, yMarca);
 
   // Modelo
   const xModelo = margin + 160;
   const yModelo = margin + 46;
-  doc.text(String(datos.modelo || "BELL PLUS"), xModelo, yModelo);
+  doc.text(String(datos.modelo || ""), xModelo, yModelo);
 
   // Calibración
   const xCalibracion = margin + 160;
   const yCalibracion = margin + 53;
-  doc.text(String(datos.calibracion || "01/07/2025"), xCalibracion, yCalibracion);
+  doc.text(String(datos.calibracion || ""), xCalibracion, yCalibracion);
 
   // === Tipo de Examen: Marcar "X" alineada con el número de orden ===
   const xPreOcupacional = margin + 91.5;
@@ -285,46 +301,52 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   // Apellidos y Nombres
   const xNombres = margin + 35;
   const yNombres = margin + 58.5;
-  doc.text(String(datos.nombres || "ROJAS SIGUENZA JOSUE SPENCER"), xNombres, yNombres, { maxWidth: 70 });
+  doc.text(String(datos.nombres || ""), xNombres, yNombres, { maxWidth: 70 });
 
   // Edad
   const xEdad = margin + 37;
   const yEdad = margin + 64.5;
-  doc.text(String(datos.edad || "29"), xEdad, yEdad);
+  doc.text(String(datos.edad || ""), xEdad, yEdad);
 
- 
   // Sexo
   const xSexo = margin + 69.5;
   const ySexo = margin + 64.5;
-  doc.text(String(datos.sexo || "M"), xSexo, ySexo);
+  doc.text(String(datos.sexo || ""), xSexo, ySexo);
 
   // Ocupación
   const xOcupacion = margin + 94;
   const yOcupacion = margin + 64.5;
-  doc.text(String(datos.ocupacion || "ADMINISTRADOR ESPECIALISTA"), xOcupacion, yOcupacion, { maxWidth: 60 });
+  doc.text(String(datos.ocupacion || ""), xOcupacion, yOcupacion, {
+    maxWidth: 60,
+  });
 
-   // Años de trabajo
-   const xAniosTrabajo = margin + 188;
-   const yAniosTrabajo = margin + 64.5;
-   doc.text(String(datos.aniosTrabajo || "5"), xAniosTrabajo, yAniosTrabajo);
+  // Años de trabajo
+  const xAniosTrabajo = margin + 188;
+  const yAniosTrabajo = margin + 64.5;
+  doc.text(String(datos.aniosTrabajo || ""), xAniosTrabajo, yAniosTrabajo);
 
-   
   // Empresa Contrata
   const xContrata = margin + 35;
   const yContrata = margin + 70;
-  doc.text(String(datos.contrata || "CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L."), xContrata, yContrata, { maxWidth: 50});
+  doc.text(String(datos.contrata || ""), xContrata, yContrata, {
+    maxWidth: 50,
+  });
 
   // Empresa
   const xEmpresa = margin + 105;
-  const yEmpresa = margin +  70;
-  doc.text(String(datos.empresa || "EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C."), xEmpresa, yEmpresa, { maxWidth: 55 });
+  const yEmpresa = margin + 70;
+  doc.text(String(datos.empresa || ""), xEmpresa, yEmpresa, { maxWidth: 55 });
 
   // Tiempo de Exposición
   const xTiempoExposicion = margin + 185;
   const yTiempoExposicion = margin + 72;
-  doc.text(String(datos.tiempoExposicion || "5 H/D"), xTiempoExposicion, yTiempoExposicion);
+  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.text(
+    String(datos.tiempoExposicion || ""),
+    xTiempoExposicion - 1,
+    yTiempoExposicion
+  );
 
-  
   // === Uso de Protectores Auditivos y Apreciación del Ruido ===
   doc.setFont("helvetica", "bold").setFontSize(9);
 
@@ -423,16 +445,9 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const xOtoscopia = margin + 23;
   const yOtoscopia = margin + 122.5;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(
-    String(
-      datos.otoscopia ||
-        "Membrana timpánica integra, conducto auditivo externo sin alteraciones, sin presencia de cuerpos extraños ni secreciones. Se observa leve enrojecimiento en la región superior, sin signos de perforación ni exudado."
-    ),
-    xOtoscopia,
-    yOtoscopia,
-    { maxWidth: 171 }
-  );
-
+  doc.text(String(datos.txtOtoscopia || ""), xOtoscopia, yOtoscopia, {
+    maxWidth: 171,
+  });
 
   y += fondoH + 2;
   const colGap = 8;
@@ -533,7 +548,13 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   tipos.forEach(({ tipo, color }) => {
     // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia
     const pts = puntos
-      .filter((p) => p.tipo === tipo && p.color === color && p.db !== null && p.db !== undefined)
+      .filter(
+        (p) =>
+          p.tipo === tipo &&
+          p.color === color &&
+          p.db !== null &&
+          p.db !== undefined
+      )
       .sort((a, b) => a.freq - b.freq);
     if (pts.length < 2) return;
     // Dibujar línea conectando solo puntos válidos
@@ -695,9 +716,22 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   }
   // Primera fila: LOGOAUDIOMETRIA, DERECHA, IZQUIERDA
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("LOGOAUDIOMETRIA", tableX + t2ColWArr[0] / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
-  doc.text("DERECHA", tableX + t2ColWArr[0] + t2ColWArr[1] / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
-  doc.text("IZQUIERDA", tableX + t2ColWArr[0] + t2ColWArr[1] + t2ColWArr[2] / 2, tY + t2RowH / 2, { align: "center", baseline: "middle" });
+  doc.text("LOGOAUDIOMETRIA", tableX + t2ColWArr[0] / 2, tY + t2RowH / 2, {
+    align: "center",
+    baseline: "middle",
+  });
+  doc.text(
+    "DERECHA",
+    tableX + t2ColWArr[0] + t2ColWArr[1] / 2,
+    tY + t2RowH / 2,
+    { align: "center", baseline: "middle" }
+  );
+  doc.text(
+    "IZQUIERDA",
+    tableX + t2ColWArr[0] + t2ColWArr[1] + t2ColWArr[2] / 2,
+    tY + t2RowH / 2,
+    { align: "center", baseline: "middle" }
+  );
   // Filas de etiquetas y datos
   doc.setFont("helvetica", "normal").setFontSize(7);
   const logoRows = [
@@ -707,10 +741,16 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     "Umbral de disconfort UCL",
   ];
   const datosLogoAudiometria = [
-    { derecha: "40 dB", izquierda: "45 dB" },
-    { derecha: "92%", izquierda: "88%" },
-    { derecha: "75 dB", izquierda: "70 dB" },
-    { derecha: "95 dB", izquierda: "90 dB" },
+    {
+      derecha: datos.txtLDUmbralDiscriminacion,
+      izquierda: datos.txtLIUmbralDiscriminacion,
+    },
+    {
+      derecha: datos.txtLDPorcentajeDiscriminacion,
+      izquierda: datos.txtLIPorcentajeDiscriminacion,
+    },
+    { derecha: datos.txtLDConfort, izquierda: datos.txtLIConfort },
+    { derecha: datos.txtLDDisconfort, izquierda: datos.txtLIDisconfort },
   ];
   for (let i = 0; i < logoRows.length; i++) {
     // Etiqueta
@@ -736,7 +776,6 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     );
   }
 
-
   // --- Tabla de conclusiones y firmas según requerimiento ---
   // Subir la sección un poco
   const conclY = Math.max(graphY + graphH, tY + t2H) + 6;
@@ -758,22 +797,39 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   });
   // Texto dinámico, máximo dos líneas, justificado a la izquierda
   const conclusionesTexto = datos.txtConclusiones || "";
-  const conclusionesLines = doc.splitTextToSize(conclusionesTexto, conclW - conclCol1W - 8).slice(0, 2);
+  const conclusionesLines = doc
+    .splitTextToSize(conclusionesTexto, conclW - conclCol1W - 8)
+    .slice(0, 2);
   let conclusionesY = conclY + 6;
   for (let i = 0; i < conclusionesLines.length; i++) {
-    doc.text(conclusionesLines[i], conclX + conclCol1W + 3, conclusionesY + i * 6, {
-      align: "left"
-    });
+    doc.text(
+      conclusionesLines[i],
+      conclX + conclCol1W + 3,
+      conclusionesY + i * 6,
+      {
+        align: "left",
+      }
+    );
   }
-  doc.text("Sello y Firma", conclX + conclCol1W + conclCol2W + conclCol3W / 2, conclY + conclH1 + conclH2 / 2 + 2, {
-    align: "center",
-    baseline: "middle",
-  });
+  doc.text(
+    "Sello y Firma",
+    conclX + conclCol1W + conclCol2W + conclCol3W / 2,
+    conclY + conclH1 + conclH2 / 2 + 2,
+    {
+      align: "center",
+      baseline: "middle",
+    }
+  );
 
   // Fila 2: tres columnas perfectamente alineadas
   doc.rect(conclX, conclY + conclH1, conclCol1W, conclH2);
   doc.rect(conclX + conclCol1W, conclY + conclH1, conclCol2W, conclH2);
-  doc.rect(conclX + conclCol1W + conclCol2W, conclY + conclH1, conclCol3W, conclH2);
+  doc.rect(
+    conclX + conclCol1W + conclCol2W,
+    conclY + conclH1,
+    conclCol3W,
+    conclH2
+  );
   // Texto partido en dos líneas si es necesario
   const label2 = "Nombre del profesional que realiza la audiometría";
   const label2Lines = doc.splitTextToSize(label2, conclCol1W - 6);
@@ -786,37 +842,132 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     align: "left",
     baseline: "middle",
   });
-  doc.text("Sello y Firma", conclX + conclCol1W + conclCol2W + conclCol3W / 2, conclY + conclH1 + conclH2 / 2 + 2, {
-    align: "center",
-    baseline: "middle",
+  doc.setFont("helvetica", "normal");
+  doc.text(
+    "Sello y Firma",
+    conclX + conclCol1W + conclCol2W + conclCol3W / 2,
+    conclY + conclH1 + conclH2 / 2 + 2,
+    {
+      align: "center",
+      baseline: "middle",
+    }
+  );
+  doc.text(`${datos.txtResponsable}`, conclX + conclCol1W + 3, label2Y, {
+    maxWidth: 80,
   });
 
   // Fila 3: tres columnas perfectamente alineadas
   doc.rect(conclX, conclY + conclH1 + conclH2, conclCol1W, conclH2);
-  doc.rect(conclX + conclCol1W, conclY + conclH1 + conclH2, conclCol2W, conclH2);
-  doc.rect(conclX + conclCol1W + conclCol2W, conclY + conclH1 + conclH2, conclCol3W, conclH2);
-  doc.text("Nombre del Medico", conclX + 3, conclY + conclH1 + conclH2 + conclH2 / 2 + 2, {
-    align: "left",
-    baseline: "middle",
-  });
-  doc.text("Sello y Firma", conclX + conclCol1W + conclCol2W + conclCol3W / 2, conclY + conclH1 + conclH2 + conclH2 / 2 + 2, {
-    align: "center",
-    baseline: "middle",
-  });
+  doc.rect(
+    conclX + conclCol1W,
+    conclY + conclH1 + conclH2,
+    conclCol2W,
+    conclH2
+  );
+  doc.rect(
+    conclX + conclCol1W + conclCol2W,
+    conclY + conclH1 + conclH2,
+    conclCol3W,
+    conclH2
+  );
+  doc.text(
+    "Nombre del Medico",
+    conclX + 3,
+    conclY + conclH1 + conclH2 + conclH2 / 2 + 2,
+    {
+      align: "left",
+      baseline: "middle",
+    }
+  );
 
-  // 4) Imprimir automáticamente
-  // Dibujar el footer
-  if (typeof footerFichaAudiologica === 'function') {
-    footerFichaAudiologica(doc);
-  }
-  const blob = doc.output("blob");
-  const url = URL.createObjectURL(blob);
-  const iframe = document.createElement("iframe");
-  iframe.style.display = "none";
-  iframe.src = url;
-  document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+  doc.text(
+    `${datos.txtMedico}`,
+    conclX + conclCol1W + 3,
+    conclY + conclH1 + conclH2 + conclH2 / 2 + 2,
+    {
+      maxWidth: 80,
+    }
+  );
+  doc.text(
+    "Sello y Firma",
+    conclX + conclCol1W + conclCol2W + conclCol3W / 2,
+    conclY + conclH1 + conclH2 + conclH2 / 2 + 2,
+    {
+      align: "center",
+      baseline: "middle",
+    }
+  );
+
+  // Función para agregar la firma y esperar a que cargue o falle
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous"; // importante si es una URL externa
+      img.src = imagenUrl;
+
+      img.onload = () => {
+        let sigW = maxw;
+        const sigH = 35;
+        const baseX = x;
+        const baseY = y;
+        const maxW = sigW - 10;
+        const maxH = sigH - 10;
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve(); // se resuelve al cargar
+      };
+
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve(); // también resolvemos si falla (para no bloquear)
+      };
+    });
   };
+
+  const firmas = (data.digitalizacion || []).reduce(
+    (acc, d) => ({
+      ...acc,
+      [d.nombreDigitalizacion]: d.url,
+    }),
+    {}
+  );
+
+  // Arreglo de firmas que quieres cargar
+  const firmasAPintar = [
+    { nombre: "FIRMAP", x: -8, y: 255, maxw: 100 },
+    { nombre: "HUELLA", x: 36, y: 255, maxw: 100 },
+    { nombre: "SELLOFIRMA", x: 150, y: 225, maxw: 50 },
+    { nombre: "SELLOFIRMADOCASIG", x: 112, y: 242, maxw: 120 },
+    { nombre: "DOCTOREXTRA", x: 100, y: 255, maxw: 120 },
+  ];
+
+  // Crear promesas para todas las firmas existentes
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmaExtra || f.nombre !== "DOCTOREXTRA")
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  Promise.all(promesasFirmas).then(() => {
+    // 4) Imprimir automáticamente
+    // Dibujar el footer
+    if (typeof footerFichaAudiologica === "function") {
+      footerFichaAudiologica(doc);
+    }
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    };
+  });
 }

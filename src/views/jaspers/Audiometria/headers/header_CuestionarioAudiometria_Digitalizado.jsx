@@ -105,7 +105,7 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;
-  if (colorValido || true) { // Forzar a mostrar para prueba visual
+  if (colorValido) { // Forzar a mostrar para prueba visual
     // Draw box outline in black
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);

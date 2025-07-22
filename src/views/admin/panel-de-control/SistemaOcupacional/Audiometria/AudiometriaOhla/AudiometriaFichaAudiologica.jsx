@@ -30,6 +30,7 @@ const AudiometriaFichaAudiologica = ({
   handleClear,
   handleClearnotO,
   handleClearOhla,
+  formOhla,
 }) => {
   const { MedicosMulti } = listas;
 
@@ -116,7 +117,13 @@ const AudiometriaFichaAudiologica = ({
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, "audiometria_po");
+        PrintHojaR(
+          form.norden,
+          token,
+          "audiometria_po",
+          formOhla.activar_grafico,
+          formOhla.asignar_especialista
+        );
       }
     });
   };
@@ -697,7 +704,9 @@ const AudiometriaFichaAudiologica = ({
                   token,
                   userloguedCompleto.sub,
                   handleClear,
-                  tabla
+                  tabla,
+                  formOhla.activar_grafico,
+                  formOhla.asignar_especialista
                 );
               }}
             >
