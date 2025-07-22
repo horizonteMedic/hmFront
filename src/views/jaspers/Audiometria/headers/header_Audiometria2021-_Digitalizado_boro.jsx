@@ -1,110 +1,161 @@
 /**
- * Header para FICHA DE EVALUACIÓN AUDIOMÉTRICA (logo izq, título centrado, ficha/sede derecha)
+ * Header para FICHA DE EVALUACIÓN AUDIOMETRÍA (logo izq, título centrado, ficha/sede derecha)
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {object} datos - Datos del paciente y ficha
  */
-const header_Audiometria2021_Digitalizado_boro = (doc, datos = {}) => {
-  const margin = 10;
-  const pageW  = doc.internal.pageSize.getWidth();
-  let   y      = 12;
+const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
+  // Valores de ejemplo por defecto actualizados con datos de la imagen
+  datos = {
+    norden: datos.norden || '97800',
+    sede: datos.sede || 'TRUJILLO - NICOLAS DE PIEROLA',
+    nombres: datos.nombres || 'CASTILLO PLASENCIA HADY KATHERINE',
+    edad: datos.edad || '30',
+    fechaAu: datos.fechaAu || '04/11/2024',
+    ocupacion: datos.ocupacion || 'OPERACIONES',
+    sexo: datos.sexo || 'F',
+    empresa: datos.empresa || 'MINERA BOROO MISQUICHILCA S.A.',
+    ...datos
+  };
+
+  const margin = 18;
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = 12;
 
   // 1) Logo a la izquierda
-  const logoW = 38, logoH = 13;
+  const logoW = 35,
+    logoH = 15;
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, y, logoW, logoH);
+    doc.addImage("./img/logo-color.png", "PNG", margin, y - 4, logoW, logoH);
   } catch {
-    doc.setFont("helvetica", "normal")
-       .setFontSize(9)
-       .text("Policlinico Horizonte Medic", margin, y + 8);
+    doc
+      .setFont("helvetica", "normal")
+      .setFontSize(9)
+      .text("Policlinico Horizonte Medic", margin, y + 8);
   }
 
-  // 2) BLOQUE "No Ficha" / "Sede" (alineados uno debajo del otro, a la derecha)
-  const fichaBlockX = pageW - margin;
-  const fichaBlockY = y + 2;
-  const fichaValue   = String(datos.nroficha || "96639");
-  const sedeValue    = String(datos.sede     || "Trujillo-Pierola");
+  // === BLOQUE CÓDIGO DE COLOR ===
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const color = datos.codigoColor || "#008f39";
+  const boxText = (datos.textoColor || "F").toUpperCase();
+  let boxSize = 15;
+  let boxX = pageW - margin - boxSize;
+  let boxY = y - 5;
+  if (colorValido) {
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap('round');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap('butt');
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize/2, boxY + boxSize/2, { align: "center", baseline: "middle", maxWidth: boxSize - 1 });
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2);
+  }
+  y -= 7;
 
-  // No Ficha (solo el valor, alineado a la derecha)
-  doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text(fichaValue, fichaBlockX, fichaBlockY, { align: "right" });
-
-  // Sede (solo el valor, alineado a la derecha, justo debajo, más cerca)
+  // 2) Número de ficha grande y sede debajo, alineados a la derecha
+  const fichaX = pageW - margin - 18;
+  const bloqueY = y + 5;
+  const sedeValue = String(datos.sede);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(sedeValue, fichaBlockX, fichaBlockY + 5, { align: "right" });
+  doc.text(sedeValue, fichaX, bloqueY, { align: "right" });
+  
+  const fichaValue = String(datos.norden);
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(fichaValue, fichaX, bloqueY + 7, { align: "right" });
 
   // 3) TÍTULO perfectamente centrado
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  const titulo  = "FICHA DE EVALUACIÓN AUDIOMÉTRICA";
+  doc.setFont("helvetica", "bold").setFontSize(13);
+  const titulo = "FICHA DE EVALUACIÓN AUDIOMETRÍA";
   const tituloY = y + 10;
   doc.text(titulo, pageW / 2, tituloY, { align: "center" });
-  // subrayado
+  
   const w = doc.getTextWidth(titulo);
-  doc.setLineWidth(0.7)
-     .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
-     .setLineWidth(0.2);
+  doc
+    .setLineWidth(0.7)
+    .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
+    .setLineWidth(0.2);
 
   // 4) Datos del paciente en filas
   let datosY = y + 22;
   const labelW = 34;
-  const sep    = 3;
-  const col2X  = pageW / 2 - 10;
-  const col3X  = pageW - margin - 60;
-  const rowH   = 5.2;
-  doc.setFontSize(8);
+  const sep = 3;
+  const rowH = 5.2;
+  doc.setFontSize(9);
 
-  // Fila 1: Apellidos y Nombres | Edad | Sexo
-  const labelNombre = "APELLIDOS Y NOMBRES:";
-  const labelEdad = "EDAD:";
-  const labelSexo = "SEXO:";
-  let xNombre = margin;
-  let xEdad = margin + 95;
-  let xSexo = margin + 160;
+  // Fila 1: Apellidos y Nombres | Edad | Fecha
   doc.setFont("helvetica", "bold");
-  doc.text(labelNombre, xNombre, datosY);
+  const labelNombres = "Apellidos y Nombres";
+  doc.text(labelNombres, margin, datosY);
+  doc.text(":", margin + labelW, datosY);
   doc.setFont("helvetica", "normal");
-  const nombreValor = String(datos.nombres || "CASTILLO PLASENCIA HADY KATHERINE").toUpperCase();
-  doc.text(nombreValor, xNombre + doc.getTextWidth(labelNombre) + 2, datosY);
+  const nombresW = doc.getTextWidth(datos.nombres);
+  doc.text(datos.nombres, margin + labelW + sep, datosY);
 
   doc.setFont("helvetica", "bold");
-  doc.text(labelEdad, xEdad, datosY);
+  const labelEdad = "Edad";
+  const edadX = margin + labelW + sep + nombresW + 20;
+  doc.text(labelEdad, edadX, datosY);
+  doc.text(":", edadX + 15, datosY);
   doc.setFont("helvetica", "normal");
-  const edadValor = String(datos.edad || "30 AÑOS").toUpperCase();
-  doc.text(edadValor, xEdad + doc.getTextWidth(labelEdad) + 2, datosY);
+  doc.text(datos.edad, edadX + 19, datosY);
 
   doc.setFont("helvetica", "bold");
-  doc.text(labelSexo, xSexo, datosY);
+  const labelFecha = "Fecha";
+  const fechaX = edadX + 30;
+  doc.text(labelFecha, fechaX, datosY);
+  doc.text(":", fechaX + 15, datosY);
+  
+  // Formatear fechaAu a DD/MM/YYYY si viene como YYYY-MM-DD
+  let fechaFormateada = datos.fechaAu;
+  if (fechaFormateada && fechaFormateada.includes("-")) {
+    const [yyyy, mm, dd] = fechaFormateada.split("-");
+    fechaFormateada = `${dd}/${mm}/${yyyy}`;
+  }
+  
   doc.setFont("helvetica", "normal");
-  const sexoValor = String(datos.sexo || "F").toUpperCase();
-  doc.text(sexoValor, xSexo + doc.getTextWidth(labelSexo) + 2, datosY);
+  doc.text(fechaFormateada, fechaX + 19, datosY);
+  
 
-  // Fila 2: Empresa | Puesto de Trabajo | Fecha
+  // Fila 2: DNI | Ptrabajo | Sexo
   datosY += rowH;
-  const labelEmpresa = "EMPRESA:";
-  const labelCargo = "PUESTO DE TRABAJO:";
-  const labelFecha = "FECHA:";
-  let xEmpresa = margin;
-  let xCargo = margin + 95;
-  let xFecha = margin + 160;
+  
   doc.setFont("helvetica", "bold");
-  doc.text(labelEmpresa, xEmpresa, datosY);
+  const labelPuestoDeTrabajo = "Puesto de Trabajo";
+  const cargoX = margin + labelW + sep  -37;
+  doc.text(labelPuestoDeTrabajo, cargoX, datosY);
+  doc.text(":", cargoX + 34, datosY);
   doc.setFont("helvetica", "normal");
-  const empresaValor = String(datos.empresa || "MINERA BOROO MISQUICHILCA S.A.").toUpperCase();
-  doc.text(empresaValor, xEmpresa + doc.getTextWidth(labelEmpresa) + 2, datosY);
+  const cargoW = doc.getTextWidth(datos.ocupacion);
+  doc.text(datos.ocupacion, cargoX + 37, datosY);
+  
 
   doc.setFont("helvetica", "bold");
-  doc.text(labelCargo, xCargo, datosY);
+  const labelSexo = "Sexo";
+  const sexoX = cargoX + 95.5 + cargoW;
+  doc.text(labelSexo, sexoX, datosY);
+  doc.text(":", sexoX + 15, datosY);
   doc.setFont("helvetica", "normal");
-  const cargoValor = String(datos.cargo || "OPERACIONES").toUpperCase();
-  doc.text(cargoValor, xCargo + doc.getTextWidth(labelCargo) + 2, datosY);
+  doc.text(datos.sexo, sexoX + 19, datosY);
 
+  datosY += rowH;
   doc.setFont("helvetica", "bold");
-  doc.text(labelFecha, xFecha, datosY);
+  const labelEmp = "Empresa";
+  doc.text(labelEmp, margin, datosY);
+  doc.text(":", margin + labelW, datosY);
   doc.setFont("helvetica", "normal");
-  const fechaValor = String(datos.fecha || "04/11/2024").toUpperCase();
-  doc.text(fechaValor, xFecha + doc.getTextWidth(labelFecha) + 2, datosY);
+  doc.text(datos.empresa, margin + labelW + sep, datosY);
+  // Fila 4: Empresa
+  
 
   // restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default header_Audiometria2021_Digitalizado_boro;
+export default header_Audiometria2021_Digitalizado;

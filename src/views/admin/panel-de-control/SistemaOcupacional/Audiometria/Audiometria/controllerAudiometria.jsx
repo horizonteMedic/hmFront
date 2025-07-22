@@ -84,7 +84,7 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
           uso_walkman: res.rbaeusoSi ? "SI" : "NO",
           otros_antecedentes: res.rbaeotrosSi ? "SI" : "NO",
           cuales_antecedentes_extralaborales: res.txtaecuales,
-          otoscopia_odiochos: res.txtood,
+          otoscopia_odiocho: res.txtood, 
           otoscopia_odilzquierdo: res.txtooi,
 
           od_500: res.od500,

@@ -217,6 +217,7 @@ const AudiometriaOhlaTabSelector = ({
           handleClear={handleClearFicha}
           handleClearnotO={handleClearnotOFicha}
           handleClearOhla={handleClearOhla}
+          formOhla={formOhla}
         />
       ),
     },

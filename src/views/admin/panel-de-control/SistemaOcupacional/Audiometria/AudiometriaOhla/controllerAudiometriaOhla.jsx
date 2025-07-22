@@ -12,6 +12,9 @@ const obtenerReporteFicha =
 const registrarUrlFicha =
   "/api/v01/ct/audiometria/registrarActualizarFichaAudiologica";
 
+const obtenerReporteUrlJasper =
+  "/api/v01/ct/audiometria/obtenerReporteAudiometriaM";
+
 export const GetInfoServicio = (nro, tabla, set, token) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -288,13 +291,12 @@ export const GetInfoServicioFicha = (
           fecha: res.fechaExamen,
           nomExam: res.nomExam,
           codFa: res.codFa,
-          noExamen:
-            res.txtMarca == "-" && res.txtModelo == "-",
+          noExamen: res.txtMarca == "-" && res.txtModelo == "-",
 
           bellPlus:
             res.txtMarca == "BELL INVENTS" && res.txtModelo == "BELL PLUS",
 
-          genero: res.genero == "M" ? "Masculino" : "Femenino",
+          genero: res.sexo == "M" ? "Masculino" : "Femenino",
           aniosTrabajo: res.tiempoTrabajo,
           mesesTrabajo: res.txtMesesTrabajo,
 
@@ -335,7 +337,7 @@ export const GetInfoServicioFicha = (
 
           nombre_profecional: res.txtResponsable,
           conclusiones: res.txtConclusiones,
-          // nombre_medico: res.txtMedico,
+          nombre_medico: res.txtMedico,
 
           od_250: res.txtDod250,
           od_500: res.txtDod500,
@@ -357,7 +359,11 @@ export const GetInfoServicioFicha = (
         }));
         setSearchNombreMedico(res.txtMedico);
       } else {
-        Swal.fire("Error", "Ocurrio un error al traer los datos de ficha audiometría", "error");
+        Swal.fire(
+          "Error",
+          "Ocurrio un error al traer los datos de ficha audiometría",
+          "error"
+        );
       }
     })
     .finally(() => {
@@ -370,7 +376,9 @@ export const SubmitDataServiceFicha = async (
   token,
   user,
   limpiar,
-  tabla
+  tabla,
+  mostrarGrafico,
+  firmaExtra
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -383,41 +391,41 @@ export const SubmitDataServiceFicha = async (
     fechaExamen: form.fecha,
     tiempoTrabajo: form.aniosTrabajo,
     tiempoExposicionTotalPonderado: form.tiempoExposicion,
-    edadFa: form.edad, //Que es esto??????????????????????????????????
+    edadFa: form.edad,
     chkTapones: form.tapones,
     chkgrajeras: form.orejeras,
-    chkIntenso: form.apreciacion_ruido=="RUIDO MUY INTENSO",
-    chkModerado: form.apreciacion_ruido=="RUIDO MODERADO",
-    chkNoMolesto: form.apreciacion_ruido=="RUIDO NO MOLESTO",
+    chkIntenso: form.apreciacion_ruido == "RUIDO MUY INTENSO",
+    chkModerado: form.apreciacion_ruido == "RUIDO MODERADO",
+    chkNoMolesto: form.apreciacion_ruido == "RUIDO NO MOLESTO",
     txtMarca: form.marca,
     txtModelo: form.modelo,
     fechaCalibracion: form.calibracion,
 
-    chk1Si: form.consumo_tabaco=="SI",
-    chk2Si: form.servicio_militar=="SI",
-    chk3Si: form.hobbies_ruido=="SI",
-    chk4Si: form.exposicion_quimicos=="SI",
-    chk5Si: form.infeccion_oido=="SI",
-    chk6Si: form.uso_ototoxicos=="SI",
-    chk7Si: form.disminucion_audicion=="SI",
-    chk8Si: form.dolor_oidos=="SI",
-    chk9Si: form.zumbido=="SI",
-    chk10Si: form.mareos=="SI",
-    chk11Si: form.infeccion_oido_actual=="SI",
-    chk12Si: form.otro=="SI",
+    chk1Si: form.consumo_tabaco == "SI",
+    chk2Si: form.servicio_militar == "SI",
+    chk3Si: form.hobbies_ruido == "SI",
+    chk4Si: form.exposicion_quimicos == "SI",
+    chk5Si: form.infeccion_oido == "SI",
+    chk6Si: form.uso_ototoxicos == "SI",
+    chk7Si: form.disminucion_audicion == "SI",
+    chk8Si: form.dolor_oidos == "SI",
+    chk9Si: form.zumbido == "SI",
+    chk10Si: form.mareos == "SI",
+    chk11Si: form.infeccion_oido_actual == "SI",
+    chk12Si: form.otro == "SI",
 
-    chk1No: form.consumo_tabaco=="NO",
-    chk2No: form.servicio_militar=="NO",
-    chk3No: form.hobbies_ruido=="NO",
-    chk4No: form.exposicion_quimicos=="NO",
-    chk5No: form.infeccion_oido=="NO",
-    chk6No: form.uso_ototoxicos=="NO",
-    chk7No: form.disminucion_audicion=="NO",
-    chk8No: form.dolor_oidos=="NO",
-    chk9No: form.zumbido=="NO",
-    chk10No: form.mareos=="NO",
-    chk11No: form.infeccion_oido_actual=="NO",
-    chk12No: form.otro=="NO",
+    chk1No: form.consumo_tabaco == "NO",
+    chk2No: form.servicio_militar == "NO",
+    chk3No: form.hobbies_ruido == "NO",
+    chk4No: form.exposicion_quimicos == "NO",
+    chk5No: form.infeccion_oido == "NO",
+    chk6No: form.uso_ototoxicos == "NO",
+    chk7No: form.disminucion_audicion == "NO",
+    chk8No: form.dolor_oidos == "NO",
+    chk9No: form.zumbido == "NO",
+    chk10No: form.mareos == "NO",
+    chk11No: form.infeccion_oido_actual == "NO",
+    chk12No: form.otro == "NO",
 
     txtDod250: form.od_250,
     txtDod500: form.od_500,
@@ -439,7 +447,7 @@ export const SubmitDataServiceFicha = async (
     txtOtoscopia: form.otoscopia,
     txtMesesTrabajo: form.mesesTrabajo,
     userRegistro: user,
-    userMedicoOcup: form.nombre_profecional,//Que es esto??????????????????????????????????
+    userMedicoOcup: form.nombre_profecional,
   };
   SubmitData(body, registrarUrlFicha, token).then((res) => {
     console.log(res);
@@ -454,11 +462,50 @@ export const SubmitDataServiceFicha = async (
       }).then((result) => {
         limpiar();
         if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
+          PrintHojaR(
+            form.norden,
+            token,
+            "audiometria_po",
+            mostrarGrafico,
+            firmaExtra
+          );
         }
       });
     } else {
       Swal.fire("Error", "Ocurrio un error al Registrar", "error");
     }
   });
+};
+
+export const PrintHojaR = (nro, token, tabla, mostrarGrafico, firmaExtra) => {
+  Loading("Cargando Formato a Imprimir");
+
+  getFetch(
+    `${obtenerReporteUrlJasper}?nOrden=${nro}&nameService=${tabla}`,
+    token
+  )
+    .then(async (res) => {
+      if (res.norden) {
+        console.log(res);
+        const nombre = res.nameJasper;
+        console.log(nombre);
+        const jasperModules = import.meta.glob(
+          `../../../../../jaspers/Audiometria/*.jsx`
+        );
+        const modulo = await jasperModules[
+          `../../../../../jaspers/Audiometria/${nombre}.jsx`
+        ]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === "function") {
+          modulo.default(res, mostrarGrafico, firmaExtra);
+        } else {
+          console.error(
+            `El archivo ${nombre}.jsx no exporta una función por defecto`
+          );
+        }
+      }
+    })
+    .finally(() => {
+      Swal.close();
+    });
 };

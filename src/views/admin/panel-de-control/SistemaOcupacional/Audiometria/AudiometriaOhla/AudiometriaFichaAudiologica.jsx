@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import {
+  PrintHojaR,
   SubmitDataServiceFicha,
   VerifyTRFicha,
 } from "./controllerAudiometriaOhla";
@@ -29,6 +30,7 @@ const AudiometriaFichaAudiologica = ({
   handleClear,
   handleClearnotO,
   handleClearOhla,
+  formOhla,
 }) => {
   const { MedicosMulti } = listas;
 
@@ -98,14 +100,11 @@ const AudiometriaFichaAudiologica = ({
     }));
   };
 
-  // Función para imprimir (placeholder)
   const handlePrint = () => {
-    if (!form.norden) {
-      Swal.fire("Error", "Debe colocar un N° Orden", "error");
-      return;
-    }
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
     Swal.fire({
-      title: "¿Desea Imprimir Ficha Audiológica?",
+      title: "¿Desea Imprimir Ficha Audiometría?",
       html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: "question",
       showCancelButton: true,
@@ -118,14 +117,13 @@ const AudiometriaFichaAudiologica = ({
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // Aquí iría la función real de impresión, por ahora solo un mensaje
-        Swal.fire({
-          icon: "info",
-          title: "Imprimiendo...",
-          text: `Se imprimiría la ficha N° Orden: ${form.norden}`,
-          timer: 1500,
-          showConfirmButton: false,
-        });
+        PrintHojaR(
+          form.norden,
+          token,
+          "audiometria_po",
+          formOhla.activar_grafico,
+          formOhla.asignar_especialista
+        );
       }
     });
   };
@@ -706,7 +704,9 @@ const AudiometriaFichaAudiologica = ({
                   token,
                   userloguedCompleto.sub,
                   handleClear,
-                  tabla
+                  tabla,
+                  formOhla.activar_grafico,
+                  formOhla.asignar_especialista
                 );
               }}
             >
