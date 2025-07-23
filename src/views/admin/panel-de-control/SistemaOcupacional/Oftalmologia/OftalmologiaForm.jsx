@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import ModalLevantarObservacion from "./ModalLevantarObservacion";
 
-const tabla = "funcion_abs";
+const tabla = "oftalmologia";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -22,7 +22,6 @@ const initialForm = {
   fechaNacimiento: "",
   dni: "",
   nombres: "",
-  apellidos: "",
   empresa: "",
   contrata: "",
   visionCercaOD: "",
@@ -36,32 +35,49 @@ const initialForm = {
   visionColores: "",
   visionBinocular: "",
   reflejosPupilares: "",
+  presenciaPterigion: "",
+  opcionPterigion: "",
   normal: false,
   conservado: false,
   ninguna: false,
   enfOculares: "",
-  pterigDerec: false,
-  pterigIzq: false,
-  pterigBilateral: false,
+
   normalGeneral: false,
   agudezaLejos: "",
 };
 
-export default function OftalmologiaForm() {
+export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialForm);
   const [showModal, setShowModal] = useState(false);
 
-  const setField = (field, value) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
+  const [dataTabla, setDataTabla] = useState([]);
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setField(name, type === "checkbox" ? checked : value);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  };
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+    if (/^\d*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: checked,
+    }));
+  };
+  const handleNextFocus = (e, name) => {
+    if (e.key == "Enter") document.getElementsByName(name)[0]?.focus();
   };
 
   const handleClear = () => {
     setForm(initialForm);
+  };
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
 
   const handleSave = () => {
@@ -80,8 +96,14 @@ export default function OftalmologiaForm() {
             <label className="font-semibold">N° Orden :</label>
             <input
               name="norden"
-              value={form.norden}
-              onChange={handleInputChange}
+              value={form.norden || ""}
+              onChange={handleChange}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  handleClearnotO();
+                  // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                }
+              }}
               className="border rounded px-2 py-1 w-32 "
             />
             <label className="font-semibold ml-4">Fecha de Examen :</label>
@@ -89,7 +111,7 @@ export default function OftalmologiaForm() {
               name="fechaExamen"
               type="date"
               value={form.fechaExamen}
-              onChange={handleInputChange}
+              onChange={handleChange}
               className="border rounded px-2 py-1 w-40"
             />
             <div className="flex gap-4  flex-1 justify-center items-center ">
@@ -112,8 +134,8 @@ export default function OftalmologiaForm() {
               <label className="font-semibold">Examen Médico :</label>
               <input
                 name="examenMedico"
-                value={form.examenMedico}
-                onChange={handleInputChange}
+                value={form.examenMedico || ""}
+                disabled
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
@@ -121,9 +143,17 @@ export default function OftalmologiaForm() {
               <label className="font-semibold">Fecha Nacimiento :</label>
               <input
                 name="fechaNacimiento"
-                type="date"
                 value={form.fechaNacimiento}
-                onChange={handleInputChange}
+                disabled
+                className="border rounded px-2 py-1 w-full"
+              />
+            </div>
+            <div>
+              <label className="font-semibold">Nombres :</label>
+              <input
+                name="nombres"
+                value={form.nombres || ""}
+                disabled
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
@@ -131,27 +161,8 @@ export default function OftalmologiaForm() {
               <label className="font-semibold">DNI :</label>
               <input
                 name="dni"
-                value={form.dni}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
-              />
-            </div>
-            <div></div>
-            <div>
-              <label className="font-semibold">Nombres :</label>
-              <input
-                name="nombres"
-                value={form.nombres}
-                onChange={handleInputChange}
-                className="border rounded px-2 py-1 w-full"
-              />
-            </div>
-            <div>
-              <label className="font-semibold">Apellidos :</label>
-              <input
-                name="apellidos"
-                value={form.apellidos}
-                onChange={handleInputChange}
+                value={form.dni || ""}
+                disabled
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
@@ -159,8 +170,8 @@ export default function OftalmologiaForm() {
               <label className="font-semibold">Empresa :</label>
               <input
                 name="empresa"
-                value={form.empresa}
-                onChange={handleInputChange}
+                value={form.empresa || ""}
+                disabled
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
@@ -168,8 +179,8 @@ export default function OftalmologiaForm() {
               <label className="font-semibold">Contrata :</label>
               <input
                 name="contrata"
-                value={form.contrata}
-                onChange={handleInputChange}
+                value={form.contrata || ""}
+                disabled
                 className="border rounded px-2 py-1 w-full"
               />
             </div>
@@ -178,8 +189,8 @@ export default function OftalmologiaForm() {
           <div className="border rounded p-4 bg-gray-50 mb-2">
             <div className="grid grid-cols-5 gap-2 mb-2 text-center font-semibold">
               <div></div>
-              <div colSpan={2}>Sin Corregir</div>
-              <div colSpan={2}>Corregida</div>
+              <div className="col-span-2">Sin Corregir</div>
+              <div className="col-span-2">Corregida</div>
             </div>
             <div className="grid grid-cols-5 gap-2 mb-2 text-center">
               <div></div>
@@ -193,26 +204,30 @@ export default function OftalmologiaForm() {
               <label className="text-right pr-2">Visión de Cerca :</label>
               <input
                 name="visionCercaOD"
-                value={form.visionCercaOD}
-                onChange={handleInputChange}
+                value={form.visionCercaOD || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionCercaOI")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionCercaOI"
-                value={form.visionCercaOI}
-                onChange={handleInputChange}
+                value={form.visionCercaOI || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionLejosOD")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionCercaODC"
-                value={form.visionCercaODC}
-                onChange={handleInputChange}
+                value={form.visionCercaODC || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionCercaOIC")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionCercaOIC"
-                value={form.visionCercaOIC}
-                onChange={handleInputChange}
+                value={form.visionCercaOIC || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionLejosODC")}
                 className="border rounded px-2 py-1"
               />
             </div>
@@ -221,36 +236,41 @@ export default function OftalmologiaForm() {
               <label className="text-right pr-2">Visión de Lejos :</label>
               <input
                 name="visionLejosOD"
-                value={form.visionLejosOD}
-                onChange={handleInputChange}
+                value={form.visionLejosOD || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionLejosOI")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionLejosOI"
-                value={form.visionLejosOI}
-                onChange={handleInputChange}
+                value={form.visionLejosOI || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionCercaODC")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionLejosODC"
-                value={form.visionLejosODC}
-                onChange={handleInputChange}
+                value={form.visionLejosODC || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionLejosOIC")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionLejosOIC"
-                value={form.visionLejosOIC}
-                onChange={handleInputChange}
+                value={form.visionLejosOIC || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "visionColores")}
                 className="border rounded px-2 py-1"
               />
             </div>
             {/* Visión de Colores */}
-            <div className="grid grid-cols-5 gap-2 mb-1 items-center">
+            <div className="grid grid-cols-5 gap-2 mb-1 pt-4 items-center">
               <label className="text-right pr-2">Visión de Colores :</label>
               <input
                 name="visionColores"
-                value={form.visionColores}
-                onChange={handleInputChange}
+                value={form.visionColores || ""}
+                onChange={handleChange}
+                onKeyUp={(e) => handleNextFocus(e, "visionBinocular")}
                 className="border rounded px-2 py-1 col-span-2"
               />
               <div className="col-span-2 flex items-center gap-2">
@@ -258,7 +278,13 @@ export default function OftalmologiaForm() {
                   type="checkbox"
                   name="normal"
                   checked={form.normal}
-                  onChange={handleInputChange}
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      visionColores: e.target.checked ? "NORMAL" : "",
+                    }));
+                  }}
                   className="mr-1"
                 />{" "}
                 Normal
@@ -269,20 +295,12 @@ export default function OftalmologiaForm() {
               <label className="text-right pr-2">Visión Binocular :</label>
               <input
                 name="visionBinocular"
-                value={form.visionBinocular}
-                onChange={handleInputChange}
+                value={form.visionBinocular || ""}
+                onChange={handleChangeNumber}
+                onKeyUp={(e) => handleNextFocus(e, "reflejosPupilares")}
                 className="border rounded px-2 py-1 col-span-2"
               />
-              <div className="col-span-2 flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="conservado"
-                  checked={form.conservado}
-                  onChange={handleInputChange}
-                  className="mr-1"
-                />{" "}
-                Conservado
-              </div>
+              <div></div>
             </div>
             {/* Reflejos Pupilares */}
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
@@ -290,18 +308,25 @@ export default function OftalmologiaForm() {
               <input
                 name="reflejosPupilares"
                 value={form.reflejosPupilares}
-                onChange={handleInputChange}
+                onKeyUp={(e) => handleNextFocus(e, "enfOculares")}
+                onChange={handleChange}
                 className="border rounded px-2 py-1 col-span-2"
               />
               <div className="col-span-2 flex items-center gap-2">
                 <input
                   type="checkbox"
-                  name="ninguna"
-                  checked={form.ninguna}
-                  onChange={handleInputChange}
+                  name="conservado"
+                  checked={form.conservado}
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      reflejosPupilares: e.target.checked ? "CONSERVADO" : "",
+                    }));
+                  }}
                   className="mr-1"
                 />{" "}
-                Ninguna
+                Conservado
               </div>
             </div>
             {/* Enfermedades Oculares */}
@@ -309,61 +334,122 @@ export default function OftalmologiaForm() {
               <label className="text-right pr-2">Enferm.Oculares :</label>
               <input
                 name="enfOculares"
-                value={form.enfOculares}
-                onChange={handleInputChange}
+                value={form.enfOculares || ""}
+                onChange={handleChange}
+                onKeyUp={(e) => handleNextFocus(e, "presenciaPterigion")}
                 className="border rounded px-2 py-1 col-span-2"
               />
-              <div className="col-span-2 flex flex-row items-center gap-6 text-black">
-                <label className="flex items-center gap-1">
+              <div className="col-span-2 flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="ninguna"
+                  checked={form.ninguna}
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    setForm((prev) => ({
+                      ...prev,
+                      enfOculares: e.target.checked ? "NINGUNA" : "",
+                    }));
+                  }}
+                  className="mr-1"
+                />{" "}
+                Ninguna
+              </div>
+            </div>
+            <div className="grid grid-cols-5 gap-2 mb-1 items-center">
+              <label className="text-right pr-2"></label>
+              <input
+                name="presenciaPterigion"
+                value={form.presenciaPterigion || ""}
+                onKeyUp={(e) => handleNextFocus(e, "agudezaLejos")}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 col-span-4"
+              />
+              <div className="col-span-5 grid grid-cols-4 text-black">
+                <div></div>
+                <label className="flex items-center gap-1 font-normal text-black">
                   <input
                     type="checkbox"
-                    name="pterigDerec"
-                    checked={form.pterigDerec}
-                    onChange={handleInputChange}
+                    name="opcionPterigion"
+                    checked={form.presenciaPterigion == "PTERIGIÓN OJO DERECHO"}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        presenciaPterigion: e.target.checked
+                          ? "PTERIGIÓN OJO DERECHO"
+                          : "",
+                      }))
+                    }
                   />{" "}
                   PTERIG.OJO DEREC
                 </label>
-                <label className="flex items-center gap-1">
+                <label className="flex items-center gap-1 font-normal text-black">
                   <input
                     type="checkbox"
-                    name="pterigIzq"
-                    checked={form.pterigIzq}
-                    onChange={handleInputChange}
+                    name="opcionPterigion"
+                    checked={
+                      form.presenciaPterigion == "PTERIGIÓN OJO IZQUIERDO"
+                    }
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        presenciaPterigion: e.target.checked
+                          ? "PTERIGIÓN OJO IZQUIERDO"
+                          : "",
+                      }))
+                    }
                   />{" "}
                   PTERIG. OJO IZQ
                 </label>
-                <label className="flex items-center gap-1">
+                <label className="flex items-center gap-1 font-normal text-black">
                   <input
                     type="checkbox"
-                    name="pterigBilateral"
-                    checked={form.pterigBilateral}
-                    onChange={handleInputChange}
+                    name="opcionPterigion"
+                    checked={form.presenciaPterigion == "PTERIGIÓN BILATERAL"}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        presenciaPterigion: e.target.checked
+                          ? "PTERIGIÓN BILATERAL"
+                          : "",
+                      }))
+                    }
                   />{" "}
                   PTERIG. BILATERAL
                 </label>
               </div>
             </div>
           </div>
-          {/* Normal y Agudeza visual de lejos */}
-          <div className="flex items-center gap-2 mb-2">
-            <input
-              type="checkbox"
-              name="normalGeneral"
-              checked={form.normalGeneral}
-              onChange={handleInputChange}
-              className="mr-1"
-            />{" "}
-            Normal
+          <div className="flex gap-2">
+            <div className="mb-2 flex-1">
+              <label className="font-semibold">Agudeza visual de lejos:</label>
+              <textarea
+                name="agudezaLejos"
+                rows={2}
+                value={form.agudezaLejos || ""}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 w-full"
+              />
+            </div>
+            {/* Normal y Agudeza visual de lejos */}
+            <div className="flex items-center gap-2 mb-2">
+              <input
+                type="checkbox"
+                name="normalGeneral"
+                checked={form.normalGeneral}
+                onChange={(e) => {
+                  handleCheckBoxChange(e);
+                  setForm((prev) => ({
+                    ...prev,
+                    agudezaLejos: e.target.checked ? "NORMAL" : "",
+                  }));
+                }}
+                className="mr-1"
+              />
+              Normal
+            </div>
           </div>
-          <div className="mb-2">
-            <label className="font-semibold">Agudeza visual de lejos:</label>
-            <input
-              name="agudezaLejos"
-              value={form.agudezaLejos}
-              onChange={handleInputChange}
-              className="border rounded px-2 py-1 w-full"
-            />
-          </div>
+
           {/* Botones */}
           <div className="flex gap-4 justify-center mt-4">
             <Button onClick={handleSave} color="green" icon={faSave}>
@@ -381,19 +467,33 @@ export default function OftalmologiaForm() {
         style={{ flexBasis: "50%", maxWidth: "100%" }}
       >
         <div className="mb-2 font-semibold">Buscar - Imprimir Reportes</div>
-        <div className="flex gap-2 mb-2">
-          <label className="font-semibold">Nombre :</label>
-          <input className="border rounded px-2 py-1 flex-1" />
-          <label className="font-semibold ml-2">Codigo:</label>
-          <input className="border rounded px-2 py-1 w-20" />
+        <div className="grid grid-cols-2 gap-2 mb-2 items-center justify-center w-full">
+          <div>
+            <label className="font-semibold">Nombre :</label>
+            <input className="border rounded px-2 py-1 w-full" />
+          </div>
+          <div>
+            <label className="font-semibold ml-2">Codigo:</label>
+            <input className="border rounded px-2 py-1  w-full" />
+          </div>
         </div>
         <div className="mb-2">
-          <div className="font-semibold border-b">Agregados Recientemente</div>
-          <div className="border rounded bg-white min-h-[120px] h-32 mt-1 mb-2"></div>
+          <div className="font-semibold ">Agregados Recientemente</div>
         </div>
-        <button className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300 mt-auto">
-          VER HISTORIAL
-        </button>
+        <div className="flex-1">
+          <Table
+            data={dataTabla}
+            tabla={tabla}
+            set={setForm}
+            token={token}
+            clean={handleClear}
+          />
+        </div>
+        <div className="flex justify-center mt-auto">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow border  max-w-[450px] ">
+            VER HISTORIAL
+          </button>
+        </div>
       </div>
       {/* Modal para levantar observación */}
       {showModal && (
@@ -420,5 +520,75 @@ function Button({ onClick, color, icon, children }) {
       <FontAwesomeIcon icon={icon} />
       {children}
     </button>
+  );
+}
+
+function Table({ data, tabla, set, token, clean }) {
+  // confirmación antes de imprimir
+  const handlePrintConfirm = (nro) => {
+    Swal.fire({
+      title: "Confirmar impresión",
+      text: `¿Deseas imprimir la ficha Nº ${nro}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, imprimir",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(nro, token, tabla);
+      }
+    });
+  };
+
+  function clicktable(nro) {
+    clean();
+    Loading("Importando Datos");
+    GetInfoServicio(nro, tabla, set, token);
+  }
+
+  return (
+    <div className="overflow-y-auto " style={{ maxHeight: "650px" }}>
+      <table className="w-full table-auto border-collapse ">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border px-2 py-1 text-left text-lg">N° Orden</th>
+            <th className="border px-2 py-1 text-left text-lg">Nombres</th>
+            <th className="border px-2 py-1 text-left text-lg">Fecha</th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Fecha Actualización
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.length > 0 ? (
+            data.map((row, i) => (
+              <tr
+                key={i}
+                className={`hover:bg-gray-50 cursor-pointer text-lg `}
+                onClick={() => clicktable(row.norden)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  handlePrintConfirm(row.norden);
+                }}
+              >
+                <td className="border px-2 py-1 font-bold">{row.norden}</td>
+                <td className="border px-2 py-1">{row.nombres}</td>
+                <td className="border px-2 py-1">{row.fechaAu}</td>
+                <td className="border px-2 py-1">{row.fechaActualizacion}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={5}
+                className="text-center py-4 text-gray-500 text-lg"
+              >
+                No hay datos
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
