@@ -931,7 +931,11 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <Oftalmologia />
+              <Oftalmologia
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+              />
             </div>
           )}
         </div>
@@ -968,8 +972,8 @@ const TabComponent = () => {
           //   setActiveTab(5);
           // } else if (idx === 6) {
           //   setActiveTab(6);
-          // } 
-          switch(idx){
+          // }
+          switch (idx) {
             case "Inicio":
               setActiveTab(null);
               break;
@@ -983,7 +987,7 @@ const TabComponent = () => {
               break;
             case "Laboratorio Clinico":
               setActiveTab(2);
-              break;          
+              break;
             case "Espirometria":
               setActiveTab(14);
               setSubTab(0);
@@ -997,7 +1001,6 @@ const TabComponent = () => {
               setSubTab(0);
               break;
           }
-          
         }}
         activeIndex={activeTab}
         tieneVista={tieneVista}

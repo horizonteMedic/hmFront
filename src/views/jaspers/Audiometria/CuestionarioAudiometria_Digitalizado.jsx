@@ -107,9 +107,9 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
     doc.rect(tableX, y, colPreguntaW + colSiW + colNoW, totalTableH + blockFirmasH);
 
     // encabezado de tabla
-    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.line(tableX, tableY, tableX + colPreguntaW + colSiW + colNoW, tableY);
-    doc.text("PREGUNTAS", tableX + 2, tableY + lineHTable - 1.2);
+    doc.text("II. PREGUNTAS", tableX + 2, tableY + lineHTable - 1.2);
     doc.text("SI", tableX + colPreguntaW + colSiW / 2, tableY + lineHTable - 1.2, { align: "center" });
     doc.text("NO", tableX + colPreguntaW + colSiW + colNoW / 2, tableY + lineHTable - 1.2, { align: "center" });
     tableY += lineHTable;
@@ -237,13 +237,13 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       } else {
         doc.text(left16[i].label, tableX + 2 + boxSize + 4, rowY + 2 + 3.5);
       }
-      doc.text(datos[left16[i].tiempo] || "", tableX + colPreguntaW / 2-18, rowY + 2 + 3.5, { align: "center" });
+      doc.text(datos[left16[i].tiempo] || "", tableX + colPreguntaW / 2-40, rowY + 2 + 3.5, { align: "left" });
       // derecha alineada verticalmente con la izquierda
       const rightY = (i === 2) ? rowY + 2 + lineHTable / 2 : rowY + 2;
       doc.rect(tableX + colPreguntaW / 2 + colSiW + 10, rightY, boxSize, boxSize);
       doc.text(datos[right16[i].key] ? "X" : "", tableX + colPreguntaW / 2 + colSiW + 11.5, rightY + 3.5);
       doc.text(right16[i].label, tableX + colPreguntaW / 2 + colSiW + 10 + boxSize + 4, rightY + 3.5, { maxWidth: colPreguntaW / 2 - boxSize - 10 });
-      doc.text(datos[right16[i].tiempo] || "", tableX + colPreguntaW + colSiW + colNoW / 2-40, rightY + 3.5, { align: "center" });
+      doc.text(datos[right16[i].tiempo] || "", tableX + colPreguntaW + colSiW + colNoW / 2-40, rightY + 3.5, { align: "left" });
       rowY += rowH16sContent[i];
     }
     tableY = rowY;

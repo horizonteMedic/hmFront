@@ -71,7 +71,7 @@ export default function FichaAudiologica_Digitalizado(
   //   txtLDDisconfort: "90",
   //   txtLIDisconfort: "100",
 
-  //   txtConclusiones:
+  //   diagnostico:
   //     "El paciente presenta una pérdida auditiva leve en el oído derecho y una pérdida auditiva moderada en el oído izquierdo.",
   //   txtResponsable: "SHIRLEY KATHERINE GUTIERREZ ARTEAGA",
   //   txtMedico: "DR. JUAN PEREZ GARCIA",
@@ -184,7 +184,7 @@ export default function FichaAudiologica_Digitalizado(
     txtLDDisconfort: obtener("txtLDDisconfort"),
     txtLIDisconfort: obtener("txtLIDisconfort"),
 
-    txtConclusiones: obtener("txtConclusiones"),
+    diagnostico: obtener("diagnostico"),
     txtResponsable: obtener("txtResponsable"),
     txtMedico: obtener("txtMedico"),
 
@@ -250,7 +250,25 @@ export default function FichaAudiologica_Digitalizado(
   // Fecha Examen
   const xFechaExamen = margin + 25;
   const yFechaExamen = margin + 49;
-  doc.text(String(datos.fechaExamen || ""), xFechaExamen, yFechaExamen);
+  let fechaExamenFormateada = datos.fechaExamen || "";
+  // Formatear fecha de examen a DD/MM/YYYY
+  if (fechaExamenFormateada && fechaExamenFormateada.includes("-")) {
+    // Formato yyyy-mm-dd del backend
+    const [yyyy, mm, dd] = fechaExamenFormateada.split("-");
+    fechaExamenFormateada = `${dd}/${mm}/${yyyy}`;
+  } else if (fechaExamenFormateada && fechaExamenFormateada.includes("/")) {
+    // Si ya viene con /, verificar el formato
+    const partes = fechaExamenFormateada.split("/");
+    if (partes.length === 3) {
+      if (partes[0].length === 4) {
+        // Formato yyyy/mm/dd
+        const [yyyy, mm, dd] = partes;
+        fechaExamenFormateada = `${dd}/${mm}/${yyyy}`;
+      }
+      // Si ya está en dd/mm/yyyy, se mantiene igual
+    }
+  }
+  doc.text(fechaExamenFormateada, xFechaExamen, yFechaExamen);
 
   // Marca
   const xMarca = margin + 160;
@@ -265,7 +283,25 @@ export default function FichaAudiologica_Digitalizado(
   // Calibración
   const xCalibracion = margin + 160;
   const yCalibracion = margin + 53;
-  doc.text(String(datos.calibracion || ""), xCalibracion, yCalibracion);
+  let calibracionFormateada = datos.calibracion || "";
+  // Formatear fecha de calibración a DD/MM/YYYY
+  if (calibracionFormateada && calibracionFormateada.includes("-")) {
+    // Formato yyyy-mm-dd del backend
+    const [yyyy, mm, dd] = calibracionFormateada.split("-");
+    calibracionFormateada = `${dd}/${mm}/${yyyy}`;
+  } else if (calibracionFormateada && calibracionFormateada.includes("/")) {
+    // Si ya viene con /, verificar el formato
+    const partes = calibracionFormateada.split("/");
+    if (partes.length === 3) {
+      if (partes[0].length === 4) {
+        // Formato yyyy/mm/dd
+        const [yyyy, mm, dd] = partes;
+        calibracionFormateada = `${dd}/${mm}/${yyyy}`;
+      }
+      // Si ya está en dd/mm/yyyy, se mantiene igual
+    }
+  }
+  doc.text(calibracionFormateada, xCalibracion, yCalibracion);
 
   // === Tipo de Examen: Marcar "X" alineada con el número de orden ===
   const xPreOcupacional = margin + 91.5;
@@ -796,7 +832,7 @@ export default function FichaAudiologica_Digitalizado(
     baseline: "middle",
   });
   // Texto dinámico, máximo dos líneas, justificado a la izquierda
-  const conclusionesTexto = datos.txtConclusiones || "";
+  const conclusionesTexto = datos.diagnostico || "";
   const conclusionesLines = doc
     .splitTextToSize(conclusionesTexto, conclW - conclCol1W - 8)
     .slice(0, 2);
