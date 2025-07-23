@@ -4,21 +4,6 @@
  * @param {object} datos - Datos del paciente y ficha
  */
 const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
-  // Valores de ejemplo por defecto
-  // datos = {
-  //   norden: datos.norden || '95899',
-  //   sede: datos.sede || 'SEDE CENTRAL',
-  //   nombres: datos.nombres || 'ROJAS SIGUENZA JOSUE SPENCER',
-  //   edad: datos.edad || '29',
-  //   fechaAu: datos.fechaAu || '24/10/2025',
-  //   dni: datos.dni || '12345678',
-  //   cargo: datos.cargo || 'ADMINISTRADOR ESPECIALISTA',
-  //   sexo: datos.sexo || 'M',
-  //   areaTrabajo: datos.areaTrabajo || 'ALMACÉN',
-  //   contrata: datos.contrata || 'CONSTRUCTORA E INMOBILIARIA JAMELY E.I. R.L.',
-  //   empresa: datos.empresa || 'EMPRESA DEL AREA PRINCIPAL DE GRANDES ZONAS XYZ S.A.C.',
-  //   ...datos
-  // };
   const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
   const usableW = pageW - 2 * margin;
@@ -47,7 +32,6 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   }
 
   // === BLOQUE CÓDIGO DE COLOR ===
-  // Prueba: si no hay datos.color, usar uno de ejemplo
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
@@ -77,11 +61,11 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   // 2) Número de ficha grande y sede debajo, alineados a la derecha
   const fichaX = pageW - margin - 18;
   const bloqueY = y + 5; // subir el bloque 3 puntos más arriba
-  const sedeValue = String(datos.sede || 'TRUJILLO - NICOLAS DE PIEROLA');
+  const sedeValue = String(datos.sede || '');
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(sedeValue, fichaX, bloqueY, { align: "right" });
   // Número de orden debajo
-  const fichaValue = String(datos.norden || '97800');
+  const fichaValue = String(datos.norden || '');
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(fichaValue, fichaX, bloqueY + 7, { align: "right" });
 

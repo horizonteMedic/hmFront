@@ -706,8 +706,8 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
 
   // Huella digital y Personal (centro)
   const centerX = margin + signatureW + 10;
-  doc.rect(centerX, signatureY - 8, 15, 12);
-  doc.text("Huella digital", centerX + 7.5, signatureY + 8, {
+  doc.rect(centerX, signatureY - 12, 15, 20);
+  doc.text("Huella digital", centerX + 7.5, signatureY + 12, {
     align: "center",
   });
 

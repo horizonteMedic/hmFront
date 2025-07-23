@@ -234,7 +234,25 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   // Fecha Examen
   const xFechaExamen = margin + 25;
   const yFechaExamen = margin + 49;
-  doc.text(String(datos.fechaExamen || "24/10/2025"), xFechaExamen, yFechaExamen);
+  let fechaExamenFormateada = datos.fechaExamen || "";
+  // Formatear fecha de examen a DD/MM/YYYY
+  if (fechaExamenFormateada && fechaExamenFormateada.includes("-")) {
+    // Formato yyyy-mm-dd del backend
+    const [yyyy, mm, dd] = fechaExamenFormateada.split("-");
+    fechaExamenFormateada = `${dd}/${mm}/${yyyy}`;
+  } else if (fechaExamenFormateada && fechaExamenFormateada.includes("/")) {
+    // Si ya viene con /, verificar el formato
+    const partes = fechaExamenFormateada.split("/");
+    if (partes.length === 3) {
+      if (partes[0].length === 4) {
+        // Formato yyyy/mm/dd
+        const [yyyy, mm, dd] = partes;
+        fechaExamenFormateada = `${dd}/${mm}/${yyyy}`;
+      }
+      // Si ya está en dd/mm/yyyy, se mantiene igual
+    }
+  }
+  doc.text(fechaExamenFormateada, xFechaExamen, yFechaExamen);
 
   // Marca
   const xMarca = margin + 160;
@@ -249,7 +267,25 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   // Calibración
   const xCalibracion = margin + 160;
   const yCalibracion = margin + 53;
-  doc.text(String(datos.calibracion || "01/07/2025"), xCalibracion, yCalibracion);
+  let calibracionFormateada = datos.calibracion || "";
+  // Formatear fecha de calibración a DD/MM/YYYY
+  if (calibracionFormateada && calibracionFormateada.includes("-")) {
+    // Formato yyyy-mm-dd del backend
+    const [yyyy, mm, dd] = calibracionFormateada.split("-");
+    calibracionFormateada = `${dd}/${mm}/${yyyy}`;
+  } else if (calibracionFormateada && calibracionFormateada.includes("/")) {
+    // Si ya viene con /, verificar el formato
+    const partes = calibracionFormateada.split("/");
+    if (partes.length === 3) {
+      if (partes[0].length === 4) {
+        // Formato yyyy/mm/dd
+        const [yyyy, mm, dd] = partes;
+        calibracionFormateada = `${dd}/${mm}/${yyyy}`;
+      }
+      // Si ya está en dd/mm/yyyy, se mantiene igual
+    }
+  }
+  doc.text(calibracionFormateada, xCalibracion, yCalibracion);
 
   // === Tipo de Examen: Marcar "X" alineada con el número de orden ===
   const xPreOcupacional = margin + 91.5;

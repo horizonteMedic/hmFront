@@ -3,8 +3,8 @@
  * Sólo muestra layout estático con espacios en blanco para valores
  * @param {jsPDF} doc - Instancia de jsPDF
  */
-// === FOOTER FICHA AUDIOLOGICA (código copiado y adaptado para cabecera) ===
-function footerFichaAudiologicaCabecera(doc, opts = {}) {
+// === FOOTER FICHA AUDIOLOGICA CABECERA ===
+function footerFichaAudiologicaCabecera(doc, opts = {}, datos = {}) {
   const margin = 8;
   const logoW = 38;
   const y = 12;
@@ -18,22 +18,22 @@ function footerFichaAudiologicaCabecera(doc, opts = {}) {
   doc.setTextColor(0, 0, 0);
   const filas = [
     {
-      direccion: 'TRUJILLO: Nicolás de Piérola 123',
-      celular: '999 888 777',
-      email: 'trujillo@horizontemedic.com',
-      telefono: '044-123456'
+      direccion: datos?.dirTruPierola || "",
+      celular: datos?.celTrujilloPie || "",
+      email: datos?.emailTruPierola || "",
+      telefono: datos?.telfTruPierola || ""
     },
     {
-      direccion: 'HUAMACHUCO: Jr. Libertad 456',
-      celular: '988 777 666',
-      email: 'huamachuco@horizontemedic.com',
-      telefono: '044-654321'
+      direccion: datos?.dirHuamachuco || "",
+      celular: datos?.celHuamachuco || "",
+      email: datos?.emailHuamachuco || "",
+      telefono: datos?.telfHuamachuco || ""
     },
     {
-      direccion: 'HUANCAYO: Av. Central 789',
-      celular: '977 666 555',
-      email: 'huancayo@horizontemedic.com',
-      telefono: '064-123456'
+      direccion: datos?.dirHuancayo || "",
+      celular: datos?.celHuancayo || "",
+      email: datos?.emailHuancayo || "",
+      telefono: datos?.telfHuancayo || ""
     }
   ];
   filas.forEach((fila, idx) => {
@@ -108,10 +108,9 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   }
 
   // Footer horizontal de cabecera (datos de contacto)
-  footerFichaAudiologicaCabecera(doc, { xOffset: 25, fontSize: 6, yOffset: -8 });
+  footerFichaAudiologicaCabecera(doc, { xOffset: 25, fontSize: 6, yOffset: -8 }, datos);
   
   // === BLOQUE CÓDIGO DE COLOR ===
-  // Prueba: si no hay datos.color, usar uno de ejemplo
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
@@ -146,13 +145,13 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Sede a la derecha, alineado a la derecha
-  const sedeValue = `${datos.sede || 'TRUJILLO - NICOLAS DE PIEROLA'}`;
+  const sedeValue = `${datos.sede || ''}`;
   const sedeX = pageW - margin - 20;
   const sedeY = y + 6;
   doc.text(sedeValue, sedeX, sedeY, { align: "right" });
 
   // N° de Ficha debajo de la sede, alineado a la derecha, solo el número
-  const fichaDato = `${datos.norden || '97800'}`;
+  const fichaDato = `${datos.norden || ''}`;
   const fichaY = sedeY + 5.4;
   const fichaX = pageW - margin - 20;
   doc.setFont("helvetica", "bold").setFontSize(18);
@@ -167,29 +166,29 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   doc.text(String(datos.nombres || ""), xNombres, yNombres, { maxWidth: 90 });
 
   // Fecha de Encuesta
-  const xFechaEncuesta = margin + 167;
-  const yFechaEncuesta = margin + 23;
-  let fechaEncuestaFormateada = datos.fechaEncuesta || "";
+  const xfechaCuestionario = margin + 167;
+  const yfechaCuestionario = margin + 23;
+  let fechaCuestionarioFormateada = datos.fechaCuestionario || "";
   
   // Formatear fecha de encuesta a DD/MM/YYYY
-  if (fechaEncuestaFormateada && fechaEncuestaFormateada.includes("-")) {
+  if (fechaCuestionarioFormateada && fechaCuestionarioFormateada.includes("-")) {
     // Formato yyyy-mm-dd del backend
-    const [yyyy, mm, dd] = fechaEncuestaFormateada.split("-");
-    fechaEncuestaFormateada = `${dd}/${mm}/${yyyy}`;
-  } else if (fechaEncuestaFormateada && fechaEncuestaFormateada.includes("/")) {
+    const [yyyy, mm, dd] = fechaCuestionarioFormateada.split("-");
+    fechaCuestionarioFormateada = `${dd}/${mm}/${yyyy}`;
+  } else if (fechaCuestionarioFormateada && fechaCuestionarioFormateada.includes("/")) {
     // Si ya viene con /, verificar el formato
-    const partes = fechaEncuestaFormateada.split("/");
+    const partes = fechaCuestionarioFormateada.split("/");
     if (partes.length === 3) {
       if (partes[0].length === 4) {
         // Formato yyyy/mm/dd
         const [yyyy, mm, dd] = partes;
-        fechaEncuestaFormateada = `${dd}/${mm}/${yyyy}`;
+        fechaCuestionarioFormateada = `${dd}/${mm}/${yyyy}`;
       }
       // Si ya está en dd/mm/yyyy, se mantiene igual
     }
   }
   
-  doc.text(fechaEncuestaFormateada, xFechaEncuesta, yFechaEncuesta);
+  doc.text(fechaCuestionarioFormateada, xfechaCuestionario, yfechaCuestionario);
 
   // Fecha de Nacimiento
   const xFechaNac = margin + 167;

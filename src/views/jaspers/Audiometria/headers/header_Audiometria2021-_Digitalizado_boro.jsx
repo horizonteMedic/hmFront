@@ -4,19 +4,6 @@
  * @param {object} datos - Datos del paciente y ficha
  */
 const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
-  // Valores de ejemplo por defecto actualizados con datos de la imagen
-  datos = {
-    norden: datos.norden || '97800',
-    sede: datos.sede || 'TRUJILLO - NICOLAS DE PIEROLA',
-    nombres: datos.nombres || 'CASTILLO PLASENCIA HADY KATHERINE',
-    edad: datos.edad || '30',
-    fechaAu: datos.fechaAu || '04/11/2024',
-    ocupacion: datos.ocupacion || 'OPERACIONES',
-    sexo: datos.sexo || 'F',
-    empresa: datos.empresa || 'MINERA BOROO MISQUICHILCA S.A.',
-    ...datos
-  };
-
   const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -62,11 +49,11 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   // 2) Número de ficha grande y sede debajo, alineados a la derecha
   const fichaX = pageW - margin - 18;
   const bloqueY = y + 5;
-  const sedeValue = String(datos.sede);
+  const sedeValue = String(datos.sede || '');
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(sedeValue, fichaX, bloqueY, { align: "right" });
   
-  const fichaValue = String(datos.norden);
+  const fichaValue = String(datos.norden || '');
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(fichaValue, fichaX, bloqueY + 7, { align: "right" });
 
@@ -87,70 +74,76 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   const labelW = 34;
   const sep = 3;
   const rowH = 5.2;
-  doc.setFontSize(9);
+  doc.setFontSize(8);
+
+  // Título de la sección
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("1.- Datos Personales", margin, datosY);
+  datosY += 4;
 
   // Fila 1: Apellidos y Nombres | Edad | Fecha
-  doc.setFont("helvetica", "bold");
+  doc.setFont("helvetica", "bold").setFontSize(8);
   const labelNombres = "Apellidos y Nombres";
   doc.text(labelNombres, margin, datosY);
   doc.text(":", margin + labelW, datosY);
-  doc.setFont("helvetica", "normal");
-  const nombresW = doc.getTextWidth(datos.nombres);
-  doc.text(datos.nombres, margin + labelW + sep, datosY);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const nombresW = doc.getTextWidth(datos.nombres || '');
+  doc.text(datos.nombres || '', margin + labelW + sep, datosY);
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont("helvetica", "bold").setFontSize(8);
   const labelEdad = "Edad";
-  const edadX = margin + labelW + sep + nombresW + 20;
+  const edadX = margin + labelW + sep + nombresW + 18;
   doc.text(labelEdad, edadX, datosY);
-  doc.text(":", edadX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.edad, edadX + 19, datosY);
+  doc.text(":", edadX + 8, datosY);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datos.edad || '', edadX + 12, datosY);
+  doc.text(" AÑOS", edadX + 13.5 + doc.getTextWidth(datos.edad || ''), datosY);
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont("helvetica", "bold").setFontSize(8);
   const labelFecha = "Fecha";
   const fechaX = edadX + 30;
   doc.text(labelFecha, fechaX, datosY);
   doc.text(":", fechaX + 15, datosY);
   
   // Formatear fechaAu a DD/MM/YYYY si viene como YYYY-MM-DD
-  let fechaFormateada = datos.fechaAu;
+  let fechaFormateada = datos.fechaAu || '';
   if (fechaFormateada && fechaFormateada.includes("-")) {
     const [yyyy, mm, dd] = fechaFormateada.split("-");
     fechaFormateada = `${dd}/${mm}/${yyyy}`;
   }
   
-  doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(fechaFormateada, fechaX + 19, datosY);
   
 
   // Fila 2: DNI | Ptrabajo | Sexo
   datosY += rowH;
   
-  doc.setFont("helvetica", "bold");
+  doc.setFont("helvetica", "bold").setFontSize(8);
   const labelPuestoDeTrabajo = "Puesto de Trabajo";
   const cargoX = margin + labelW + sep  -37;
   doc.text(labelPuestoDeTrabajo, cargoX, datosY);
   doc.text(":", cargoX + 34, datosY);
-  doc.setFont("helvetica", "normal");
-  const cargoW = doc.getTextWidth(datos.ocupacion);
-  doc.text(datos.ocupacion, cargoX + 37, datosY);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const cargoW = doc.getTextWidth(datos.ocupacion || '');
+  doc.text(datos.ocupacion || '', cargoX + 37, datosY);
   
 
-  doc.setFont("helvetica", "bold");
+  doc.setFont("helvetica", "bold").setFontSize(8);
   const labelSexo = "Sexo";
   const sexoX = cargoX + 95.5 + cargoW;
   doc.text(labelSexo, sexoX, datosY);
   doc.text(":", sexoX + 15, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.sexo, sexoX + 19, datosY);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datos.sexo || '', sexoX + 19, datosY);
 
   datosY += rowH;
-  doc.setFont("helvetica", "bold");
+  doc.setFont("helvetica", "bold").setFontSize(8);
   const labelEmp = "Empresa";
   doc.text(labelEmp, margin, datosY);
   doc.text(":", margin + labelW, datosY);
-  doc.setFont("helvetica", "normal");
-  doc.text(datos.empresa, margin + labelW + sep, datosY);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datos.empresa || '', margin + labelW + sep, datosY);
   // Fila 4: Empresa
   
 
