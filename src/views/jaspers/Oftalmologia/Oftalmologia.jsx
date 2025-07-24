@@ -1,15 +1,28 @@
 import jsPDF from "jspdf";
 import header_Oftalmologia from "./headers/header_Oftalmologia.jsx";
 
-function drawOftalmoBody(doc, datos = {}) {
+export default function Oftalmologia(datos = {}) {
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  header_Oftalmologia(doc, datos);
   const margin = 10;
   let y = 60;
   const pageW = doc.internal.pageSize.getWidth();
   // Datos personales
   doc.setFont("helvetica", "normal").setFontSize(11);
-  doc.text(`Nombres :  ${datos.nombres || 'JOSUE SPENCER ROJAS SIGUENZA'}`, margin, y);
-  doc.text(`Edad:  ${datos.edad || 'EEE'}  años`, pageW / 2, y, { align: "center" });
-  doc.text(`Fecha :  ${datos.fecha || 'martes 01 julio 2025'}`, pageW - margin, y, { align: "right" });
+  doc.text(`Nombres :  ${datos.nombres || ""}`, margin, y);
+  doc.text(`Edad:  ${datos.edad || ""}  años`, pageW / 2, y, {
+    align: "center",
+  });
+  doc.text(`Fecha :  ${datos.fechaOf || ""}`, pageW - margin, y, {
+    align: "right",
+  });
+  y += 8;
+
+  doc.text(`Examen :  ${datos.nomExam || ""}`, margin, y);
+  y += 8;
+  doc.text(`Contrata :  ${datos.contrata || ""}`, margin, y);
+  y += 8;
+  doc.text(`Empresa :  ${datos.empresa || ""}`, margin, y);
   y += 8;
   // Caja principal
   const boxH = 70;
@@ -28,43 +41,60 @@ function drawOftalmoBody(doc, datos = {}) {
   // Visión de cerca
   doc.text("Visión de Cerca :", margin + 5, y + 28);
   doc.rect(margin + 40, y + 22, 18, 12);
-  doc.text(`${datos.cercaOD || '10'}`, margin + 49, y + 30, { align: "center" });
+  doc.text(`${datos.vcercaSOd || ""}`, margin + 49, y + 30, {
+    align: "center",
+  });
   doc.rect(margin + 70, y + 22, 18, 12);
-  doc.text(`${datos.cercaOI || '10'}`, margin + 79, y + 30, { align: "center" });
+  doc.text(`${datos.vcercaSOi || ""}`, margin + 79, y + 30, {
+    align: "center",
+  });
   doc.rect(margin + 120, y + 22, 18, 12);
-  doc.text(`${datos.cercaODCorregida || '10'}`, margin + 129, y + 30, { align: "center" });
+  doc.text(`${datos.vcercaCOd || ""}`, margin + 129, y + 30, {
+    align: "center",
+  });
   doc.rect(margin + 150, y + 22, 18, 12);
-  doc.text(`${datos.cercaOICorregida || '10'}`, margin + 159, y + 30, { align: "center" });
+  doc.text(`${datos.vcercaCOi || ""}`, margin + 159, y + 30, {
+    align: "center",
+  });
   // Visión de lejos
   doc.text("Visión de Lejos :", margin + 5, y + 48);
   doc.rect(margin + 40, y + 42, 18, 12);
-  doc.text(`${datos.lejosOD || '10'}`, margin + 49, y + 50, { align: "center" });
+  doc.text(`${datos.vlejosSOd || ""}`, margin + 49, y + 50, {
+    align: "center",
+  });
   doc.rect(margin + 70, y + 42, 18, 12);
-  doc.text(`${datos.lejosOI || '10'}`, margin + 79, y + 50, { align: "center" });
+  doc.text(`${datos.vlejosSOi || ""}`, margin + 79, y + 50, {
+    align: "center",
+  });
   doc.rect(margin + 120, y + 42, 18, 12);
-  doc.text(`${datos.lejosODCorregida || '10'}`, margin + 129, y + 50, { align: "center" });
+  doc.text(`${datos.vlejosCOd || ""}`, margin + 129, y + 50, {
+    align: "center",
+  });
   doc.rect(margin + 150, y + 42, 18, 12);
-  doc.text(`${datos.lejosOICorregida || '10'}`, margin + 159, y + 50, { align: "center" });
+  doc.text(`${datos.vlejosCOi || ""}`, margin + 159, y + 50, {
+    align: "center",
+  });
   // Visión de colores
   doc.text("Visión de Colores :", margin + 5, y + 65);
-  doc.text(`${datos.colores || 'NORMAL'}`, margin + 49, y + 65);
+  doc.text(`${datos.vcolores || ""}`, margin + 49, y + 65);
   // Visión binocular
   doc.text("Visión Binocular :", margin + 5, y + 75);
-  doc.text(`${datos.binocular || '10'}`, margin + 49, y + 75);
+  doc.text(`${datos.vbinocular || ""}`, margin + 49, y + 75);
   // Reflejos pupilares
   doc.text("Reflejos Pupilares :", margin + 80, y + 65);
-  doc.text(`${datos.reflejos || 'CONSERVADO'}`, margin + 130, y + 65);
+  doc.text(`${datos.rpupilares || ""}`, margin + 130, y + 65);
   // Enfermedades oculares
   doc.text("Enfermedades Oculares :", margin + 80, y + 75);
-  doc.text(`${datos.enfermedades || 'NINGUNA'}`, margin + 130, y + 75);
+  doc.text(`${datos.eoculares || ""}`, margin + 130, y + 75);
   // Observación extra
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`${datos.observacion || 'PTERIGIÓN OJO IZQUIERDO.'}`, margin + 80, y + 85);
+  doc.text(`${datos.eoculares1 || ""}`, margin + 80, y + 85);
+  // === IMPRIMIR ===
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
 }
-
-export default function Oftalmologia(datos = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  header_Oftalmologia(doc, datos);
-  drawOftalmoBody(doc, datos);
-  return doc;
-} 

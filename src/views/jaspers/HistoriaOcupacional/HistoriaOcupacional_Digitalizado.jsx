@@ -22,7 +22,7 @@ const config = {
 export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = []) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
-  console.log('wasa')
+  
   const datoss = {
     detalles: [
     {
@@ -154,16 +154,16 @@ export default function HistoriaOcupacional_Digitalizado(datos = {}, tabla = [])
         ]
       ],
       body: tabla?.map(d => [
-        d.fecha.toUpperCase() || '',
-        d.empresa.toUpperCase() || '',
-        d.altitud.toUpperCase() || '',
-        d.actividad.toUpperCase() || '',
-        d.areaEmpresa.toUpperCase() || '',
-        d.ocupacion.toUpperCase() || '',
-        d.socavon.toUpperCase() || '',
-        d.superficie.toUpperCase() || '',
-        d.riesgo.toUpperCase() || '',
-        d.proteccion.toUpperCase() || ''
+        d.fecha?.toUpperCase() ?? 'SIN REGISTRO',
+        d.empresa?.toUpperCase() ?? 'SIN REGISTRO',
+        d.altitud?.toUpperCase() ?? 'SIN REGISTRO',
+        d.actividad?.toUpperCase() ?? 'SIN REGISTRO',
+        d.areaEmpresa?.toUpperCase() ?? 'SIN REGISTRO',
+        d.ocupacion?.toUpperCase() ?? 'SIN REGISTRO',
+        d.socavon?.toUpperCase() ?? 'SIN REGISTRO',
+        d.superficie?.toUpperCase() ?? 'SIN REGISTRO',
+        d.riesgo?.toUpperCase() ?? 'SIN REGISTRO',
+        d.proteccion?.toUpperCase() ?? 'SIN REGISTRO'
       ]),
       theme: "grid",
       styles: {
