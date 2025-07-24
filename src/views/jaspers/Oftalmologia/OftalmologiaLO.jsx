@@ -82,7 +82,17 @@ export default function OftalmologiaLO(datos = {}) {
   // Observación extra
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(`${datos.eoculares1 || ""}`, margin + 80, y + 85);
-  // === IMPRIMIR ===
+
+  // Arreglo de firmas que quieres cargar
+  const firmasAPintar = [
+    { nombre: "SELLOFIRMADOCASIG", x: 80, y: 180, maxw: 120 },
+  ];
+  agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
+}
+
+function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
@@ -90,4 +100,48 @@ export default function OftalmologiaLO(datos = {}) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
-} 
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+
+      img.onload = () => {
+        let sigW = maxw;
+        const sigH = 35;
+        const baseX = x;
+        const baseY = y;
+        const maxW = sigW - 10;
+        const maxH = sigH - 10;
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
+  };
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
+}
