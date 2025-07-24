@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSave,
@@ -7,6 +7,14 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import ModalLevantarObservacion from "./ModalLevantarObservacion";
+import {
+  GetInfoServicio,
+  getInfoTabla,
+  Loading,
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerOftalmologiaForm";
 
 const tabla = "oftalmologia";
 const date = new Date();
@@ -15,11 +23,12 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialForm = {
+const initialFormState = {
   norden: "",
+  codOf: null,
   fechaExamen: today,
-  examenMedico: "",
-  fechaNacimiento: "",
+  nomExam: "",
+  fechaNac: "",
   dni: "",
   nombres: "",
   empresa: "",
@@ -44,10 +53,14 @@ const initialForm = {
 
   normalGeneral: false,
   agudezaLejos: "",
+
+  nombres_search: "",
+  codigo_search: "",
 };
 
 export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(initialFormState);
+  const [form2, setForm2] = useState(initialFormState);
   const [showModal, setShowModal] = useState(false);
 
   const [dataTabla, setDataTabla] = useState([]);
@@ -74,14 +87,22 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
   };
 
   const handleClear = () => {
-    setForm(initialForm);
+    setForm(initialFormState);
   };
   const handleClearnotO = () => {
     setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
 
   const handleSave = () => {
-    // Aquí se integrará con la API en el futuro
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
+  };
+
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
 
   return (
@@ -101,7 +122,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
                   handleClearnotO();
-                  // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+                  VerifyTR(form.norden, tabla, token, setForm, selectedSede);
                 }
               }}
               className="border rounded px-2 py-1 w-32 "
@@ -133,8 +154,8 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
             <div>
               <label className="font-semibold">Examen Médico :</label>
               <input
-                name="examenMedico"
-                value={form.examenMedico || ""}
+                name="nomExam"
+                value={form.nomExam || ""}
                 disabled
                 className="border rounded px-2 py-1 w-full"
               />
@@ -142,8 +163,8 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
             <div>
               <label className="font-semibold">Fecha Nacimiento :</label>
               <input
-                name="fechaNacimiento"
-                value={form.fechaNacimiento}
+                name="fechaNac"
+                value={form.fechaNac}
                 disabled
                 className="border rounded px-2 py-1 w-full"
               />
@@ -277,7 +298,10 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 <input
                   type="checkbox"
                   name="normal"
-                  checked={form.normal}
+                  checked={
+                    form.visionColores != null &&
+                    form.visionColores.toUpperCase().includes("NORMAL")
+                  }
                   onChange={(e) => {
                     handleCheckBoxChange(e);
                     setForm((prev) => ({
@@ -316,7 +340,10 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 <input
                   type="checkbox"
                   name="conservado"
-                  checked={form.conservado}
+                  checked={
+                    form.reflejosPupilares != null &&
+                    form.reflejosPupilares.toUpperCase().includes("CONSERVADO")
+                  }
                   onChange={(e) => {
                     handleCheckBoxChange(e);
                     setForm((prev) => ({
@@ -343,7 +370,10 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 <input
                   type="checkbox"
                   name="ninguna"
-                  checked={form.ninguna}
+                  checked={
+                    form.enfOculares != null &&
+                    form.enfOculares.toUpperCase().includes("NINGUNA")
+                  }
                   onChange={(e) => {
                     handleCheckBoxChange(e);
                     setForm((prev) => ({
@@ -436,7 +466,10 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
               <input
                 type="checkbox"
                 name="normalGeneral"
-                checked={form.normalGeneral}
+                checked={
+                  form.agudezaLejos != null &&
+                  form.agudezaLejos.toUpperCase().includes("NORMAL")
+                }
                 onChange={(e) => {
                   handleCheckBoxChange(e);
                   setForm((prev) => ({
@@ -451,7 +484,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
           </div>
 
           {/* Botones */}
-          <div className="flex gap-4 justify-center mt-4">
+          <div className="flex gap-4 justify-center pt-4 mt-auto">
             <Button onClick={handleSave} color="green" icon={faSave}>
               Guardar/Actualizar
             </Button>
@@ -470,11 +503,39 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
         <div className="grid grid-cols-2 gap-2 mb-2 items-center justify-center w-full">
           <div>
             <label className="font-semibold">Nombre :</label>
-            <input className="border rounded px-2 py-1 w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="nombres_search"
+              value={form.nombres_search}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  obtenerInfoTabla();
+                }
+              }}
+              onChange={(e) => {
+                const { name, value } = e.target;
+                setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
+              }}
+            />
           </div>
           <div>
             <label className="font-semibold ml-2">Codigo:</label>
-            <input className="border rounded px-2 py-1  w-full" />
+            <input
+              className="border rounded px-2 py-1  w-full"
+              name="codigo_search"
+              value={form.codigo_search}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  obtenerInfoTabla();
+                }
+              }}
+              onChange={(e) => {
+                const { name, value } = e.target;
+                if (/^\d*$/.test(value)) {
+                  setForm((f) => ({ ...f, [name]: value, nombres_search: "" }));
+                }
+              }}
+            />
           </div>
         </div>
         <div className="mb-2">
@@ -489,7 +550,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
             clean={handleClear}
           />
         </div>
-        <div className="flex justify-center mt-auto">
+        <div className="flex justify-center mt-auto pt-4">
           <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow border  max-w-[450px] ">
             VER HISTORIAL
           </button>
@@ -499,14 +560,15 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
       {showModal && (
         <ModalLevantarObservacion
           onClose={() => setShowModal(false)}
-          datos={form}
+          form={form2}
+          setForm={setForm2}
         />
       )}
     </div>
   );
 }
 
-function Button({ onClick, color, icon, children }) {
+export function Button({ onClick, color, icon, children }) {
   const bg =
     color === "green"
       ? "bg-green-600 hover:bg-green-700"
@@ -515,7 +577,7 @@ function Button({ onClick, color, icon, children }) {
     <button
       type="button"
       onClick={onClick}
-      className={`${bg} text-white px-3 py-1 rounded inline-flex items-center gap-2 text-sm`}
+      className={`${bg} text-white font-semibold px-4 py-2 rounded shadow border  max-w-[450px] flex gap-2 justify-center items-center`}
     >
       <FontAwesomeIcon icon={icon} />
       {children}
@@ -545,9 +607,14 @@ function Table({ data, tabla, set, token, clean }) {
     Loading("Importando Datos");
     GetInfoServicio(nro, tabla, set, token);
   }
+  function convertirFecha(fecha) {
+    if (fecha == null || fecha === "") return "";
+    const [dia, mes, anio] = fecha.split("-");
+    return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
+  }
 
   return (
-    <div className="overflow-y-auto " style={{ maxHeight: "650px" }}>
+    <div className="overflow-y-auto " style={{ maxHeight: "450px" }}>
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">
@@ -571,10 +638,16 @@ function Table({ data, tabla, set, token, clean }) {
                   handlePrintConfirm(row.norden);
                 }}
               >
-                <td className="border px-2 py-1 font-bold">{row.norden}</td>
-                <td className="border px-2 py-1">{row.nombres}</td>
-                <td className="border px-2 py-1">{row.fechaAu}</td>
-                <td className="border px-2 py-1">{row.fechaActualizacion}</td>
+                <td className="border px-2 py-1 font-bold">
+                  {row.norden || ""}
+                </td>
+                <td className="border px-2 py-1">{row.nombres || ""}</td>
+                <td className="border px-2 py-1">
+                  {convertirFecha(row.fechaOf)}
+                </td>
+                <td className="border px-2 py-1">
+                  {convertirFecha(row.fechaActualizacion)}
+                </td>
               </tr>
             ))
           ) : (

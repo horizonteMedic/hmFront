@@ -980,12 +980,12 @@ export default function FichaAudiologica_Digitalizado(
     { nombre: "HUELLA", x: 36, y: 255, maxw: 100 },
     { nombre: "SELLOFIRMA", x: 150, y: 225, maxw: 50 },
     { nombre: "SELLOFIRMADOCASIG", x: 112, y: 242, maxw: 120 },
-    { nombre: "DOCTOREXTRA", x: 100, y: 255, maxw: 120 },
+    { nombre: "SELLOFIRMADOCASIG-EXTRA", x: 70, y: 255, maxw: 120 },
   ];
 
   // Crear promesas para todas las firmas existentes
   const promesasFirmas = firmasAPintar
-    .filter((f) => firmaExtra || f.nombre !== "DOCTOREXTRA")
+    .filter((f) => firmaExtra || f.nombre !== "SELLOFIRMADOCASIG-EXTRA")
     .filter((f) => firmas[f.nombre])
     .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
 
