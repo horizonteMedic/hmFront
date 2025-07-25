@@ -48,7 +48,13 @@ const Oftalmologia = ({ token, selectedSede, userlogued }) => {
               selectedSede={selectedSede}
             />
           )}
-          {activeTab === 1 && <OftalmologiaOhla />}
+          {activeTab === 1 && (
+            <OftalmologiaOhla
+              token={token}
+              userlogued={userlogued.sub}
+              selectedSede={selectedSede}
+            />
+          )}
         </div>
       </div>
     </div>
