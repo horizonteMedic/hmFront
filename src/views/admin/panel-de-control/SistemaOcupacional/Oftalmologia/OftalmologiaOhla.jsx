@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faL } from "@fortawesome/free-solid-svg-icons";
 
 const tabla = "oftalmologia2021";
 const date = new Date();
@@ -24,6 +24,25 @@ const initialFormState = {
   otrosHallazgos: "NINGUNO",
   conjuntivas: "NORMAL",
   cristalino: "TRANSPARENTE",
+
+  fondoNormalOD: false,
+  fondoNormalOI: false,
+  fondoAnormalOD: false,
+  fondoAnormalOI: false,
+  fondoHallazgos: "N/A",
+
+  pioOd: "-",
+  pioOi: "-",
+  noAplica: "X",
+
+  correctorOcular: "NO",
+  correctorCerca: false,
+  correctorLejos: false,
+  noTrajocorrectorCerca: false,
+  noTrajocorrectorLejos: false,
+
+  antecedentesPersonales: "NO REFIERE",
+  antecedentesFamiliares: "NO REFIERE",
 };
 export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialFormState);
@@ -44,6 +63,14 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
     setForm((f) => ({
       ...f,
       [name]: checked,
+    }));
+  };
+
+  const handleRadioButton = (e, value) => {
+    const { name } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: value.toUpperCase(),
     }));
   };
   const handleNextFocus = (e, name) => {
@@ -198,7 +225,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               {/* Evaluación Oftalmológica */}
               <div className="border rounded p-4">
                 <div className="text-blue-700 font-semibold text-center mb-2">
-                  Evaluación Oftalmologica
+                  EVALUACIÓN OFTALMOLÓGICA
                 </div>
                 <div className="grid grid-cols-1 gap-y-3 gap-x-4  items-center">
                   <EditableSelect
@@ -243,114 +270,192 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 <div className="text-blue-700 font-semibold text-center mb-2">
                   FONDO DE OJO
                 </div>
-                <div className="flex items-center gap-4 mb-2">
-                  <span>Normal</span>
-                  <input
-                    type="radio"
-                    name="fondo_normal"
-                    className="ml-2 text-[11px]"
-                  />{" "}
-                  <span className="ml-1 text-[11px]">OD</span>
-                  <input
-                    type="radio"
-                    name="fondo_normal"
-                    className="ml-4 text-[11px]"
-                  />{" "}
-                  <span className="ml-1 text-[11px]">OI</span>
-                  <span className="ml-8 text-[11px]">Hallazgos:</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span>Anormal</span>
-                  <input
-                    type="radio"
-                    name="fondo_anormal"
-                    className="ml-2 text-[11px]"
-                  />{" "}
-                  <span className="ml-1 text-[11px]">OD</span>
-                  <input
-                    type="radio"
-                    name="fondo_anormal"
-                    className="ml-4 text-[11px]"
-                  />{" "}
-                  <span className="ml-1 text-[11px]">OI</span>
-                  <input
-                    className="border rounded px-2 py-1 ml-8 flex-1 min-w-[180px] text-[11px]"
-                    value="N/A"
-                    readOnly
-                  />
+                <div className="grid grid-cols-2">
+                  <div className="flex gap-2 flex-col">
+                    <div className="flex items-center gap-2 ">
+                      <span className="min-w-[70px] font-semibold">Normal</span>
+                      <input
+                        type="checkbox"
+                        name="fondoNormalOD"
+                        className="ml-2 text-[11px]"
+                        checked={form.fondoNormalOD}
+                        onChange={handleCheckBoxChange}
+                      />
+                      <span className="ml-1 text-[11px]">OD</span>
+                      <input
+                        type="checkbox"
+                        name="fondoNormalOI"
+                        className="ml-4 text-[11px]"
+                        checked={form.fondoNormalOI}
+                        onChange={handleCheckBoxChange}
+                      />
+                      <span className="ml-1 text-[11px]">OI</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="min-w-[70px] font-semibold">
+                        Anormal
+                      </span>
+                      <input
+                        type="checkbox"
+                        name="fondoAnormalOD"
+                        checked={form.fondoAnormalOD}
+                        onChange={handleCheckBoxChange}
+                        className="ml-2 text-[11px]"
+                      />
+                      <span className="ml-1 text-[11px]">OD</span>
+                      <input
+                        type="checkbox"
+                        name="fondoAnormalOI"
+                        checked={form.fondoAnormalOI}
+                        onChange={handleCheckBoxChange}
+                        className="ml-4 text-[11px]"
+                      />
+                      <span className="ml-1 text-[11px]">OI</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    <span className="font-semibold">Hallazgos</span>
+                    <input
+                      className="border rounded px-2 py-1  flex-1 min-w-[180px] text-[11px]"
+                      name="fondoHallazgos"
+                      value={form.fondoHallazgos}
+                      onChange={handleChange}
+                    />
+                  </div>
                 </div>
               </div>
               {/* PIO y Correctores Oculares */}
               <div className="flex gap-4">
                 {/* PIO */}
-                <div
-                  className="border rounded p-3 bg-[#f5f5f5] flex flex-col justify-between min-w-[180px] max-w-[220px] w-full"
-                  style={{ flex: "0 0 200px" }}
-                >
+                <div className="border rounded p-4  flex flex-col justify-between min-w-[180px] max-w-[220px] w-full">
                   <div className="text-blue-700 font-semibold text-center mb-2">
-                    PIO:
+                    PIO
                   </div>
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-14 text-[11px]">OD</span>
-                      <input className="border rounded px-2 py-1 w-16 text-[11px]" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-14 text-[11px]">OI</span>
-                      <input className="border rounded px-2 py-1 w-16 text-[11px]" />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-14 text-[11px]">No Aplica</span>
+                    <div className="flex items-center gap-4">
+                      <label className="font-semibold min-w-[60px]">OD</label>
                       <input
-                        className="border rounded px-2 py-1 w-16 text-[11px]"
-                        value="X"
-                        readOnly
+                        className="border rounded px-2 py-1 w-full"
+                        name="pioOd"
+                        value={form.pioOd || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="font-semibold min-w-[60px]">OI</label>
+                      <input
+                        className="border rounded px-2 py-1 w-full"
+                        name="pioOi"
+                        value={form.pioOi || ""}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <label className="font-semibold min-w-[60px]">
+                        No Aplica
+                      </label>
+                      <input
+                        className="border rounded px-2 py-1 w-full"
+                        name="noAplica"
+                        value={form.noAplica || ""}
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
                 </div>
                 {/* Correctores Oculares */}
-                <div className="border rounded p-3 bg-[#f5f5f5] flex-1 min-w-[320px]">
+                <div className="border rounded p-4  flex-1 min-w-[320px]">
                   <div className="text-blue-700 font-semibold text-center mb-2">
-                    Correctores Oculares
+                    CORRECTORES OCULARES
                   </div>
-                  <div className="flex items-center gap-6 mb-2">
+                  <div className="flex items-center gap-6 mb-2 pl-4">
                     <label className="flex items-center gap-1 font-semibold text-[11px]">
                       <input
                         type="radio"
-                        name="corrector"
+                        name={"correctorOcular"}
+                        checked={form.correctorOcular === "SI"}
+                        onChange={(e) => handleRadioButton(e, "SI")}
                         className="text-[11px]"
-                      />{" "}
+                      />
                       SI
                     </label>
                     <label className="flex items-center gap-1 font-semibold text-[11px]">
                       <input
                         type="radio"
-                        name="corrector"
+                        name={"correctorOcular"}
+                        checked={form.correctorOcular === "NO"}
+                        onChange={(e) => {
+                          handleRadioButton(e, "NO");
+                          setForm((f) => ({
+                            ...f,
+                            correctorCerca: false,
+                            correctorLejos: false,
+                            noTrajocorrectorCerca: false,
+                            noTrajocorrectorLejos: false,
+                          }));
+                        }}
                         className="text-[11px]"
-                      />{" "}
+                      />
                       NO
                     </label>
                   </div>
-                  <div className="flex items-center gap-4 mb-2">
-                    <label className="flex items-center gap-1 text-[11px]">
-                      <input type="checkbox" className="text-[11px]" /> Cerca
-                    </label>
-                    <span className="text-[11px] ml-2">
-                      Si tiene lentes y no los trajo
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <label className="flex items-center gap-1 text-[11px]">
-                      <input type="checkbox" className="text-[11px]" /> Lejos
-                    </label>
-                    <div className="border rounded px-2 py-1 flex items-center gap-4 ml-2 bg-white">
-                      <label className="flex items-center gap-1 text-[11px]">
-                        <input type="checkbox" className="text-[11px]" /> NTCC
+                  <div
+                    className={`flex gap-16 border rounded p-3 ${
+                      form.correctorOcular === "NO"
+                        ? "opacity-50 pointer-events-none"
+                        : ""
+                    }`}
+                  >
+                    <div className="flex items-start gap-2 flex-col justify-start">
+                      <label className="flex justify-center items-center gap-2">
+                        <input
+                          type="checkbox"
+                          name="correctorCerca"
+                          className=" text-[11px]"
+                          checked={form.correctorCerca}
+                          disabled={form.correctorOcular === "NO"}
+                          onChange={handleCheckBoxChange}
+                        />
+                        Cerca
                       </label>
-                      <label className="flex items-center gap-1 text-[11px]">
-                        <input type="checkbox" className="text-[11px]" /> NTCL
+                      <label className="flex justify-center items-center gap-2">
+                        <input
+                          type="checkbox"
+                          name="correctorLejos"
+                          className=" text-[11px]"
+                          checked={form.correctorLejos}
+                          onChange={handleCheckBoxChange}
+                          disabled={form.correctorOcular === "NO"}
+                        />
+                        Lejos
                       </label>
+                    </div>
+                    <div className="flex items-start gap-2 flex-col justify-start">
+                      <label>Si tiene lentes y no los trajo</label>
+                      <div className="flex border p-3 gap-4 rounded">
+                        <label className="flex justify-center items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="noTrajocorrectorCerca"
+                            className=" text-[11px] "
+                            checked={form.noTrajocorrectorCerca}
+                            onChange={handleCheckBoxChange}
+                            disabled={form.correctorOcular === "NO"}
+                          />
+                          No trajo corrector Cerca
+                        </label>
+                        <label className="flex justify-center items-center gap-2">
+                          <input
+                            type="checkbox"
+                            name="noTrajocorrectorLejos"
+                            className=" text-[11px] "
+                            checked={form.noTrajocorrectorLejos}
+                            onChange={handleCheckBoxChange}
+                            disabled={form.correctorOcular === "NO"}
+                          />
+                          No trajo corrector Lejos
+                        </label>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -359,21 +464,29 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             {/* Columna 2: Antecedentes, test, refracción */}
             <div className="space-y-6">
               <div className="border rounded p-4 mb-2">
-                <div className="oftalmo-title mb-2">Antecedentes</div>
-                <div className="mb-2">
-                  <label>Antecedentes personales importantes:</label>
+                <div className="text-blue-700 font-semibold text-center mb-2">
+                  ANTECEDENTES
+                </div>
+                <div className="flex flex-col gap-2 mb-3">
+                  <span className="font-semibold">
+                    Antecedentes personales importantes:
+                  </span>
                   <input
-                    className="border rounded px-2 py-1 w-full mt-1"
-                    value="NO REFIERE"
-                    readOnly
+                    className="border rounded px-3 py-1  flex-1 min-w-[180px] text-[11px]"
+                    name="antecedentesPersonales"
+                    value={form.antecedentesPersonales}
+                    onChange={handleChange}
                   />
                 </div>
-                <div>
-                  <label>Antecedentes familiares importantes:</label>
+                <div className="flex flex-col gap-2">
+                  <span className="font-semibold">
+                    Antecedentes familiares importantes:
+                  </span>
                   <input
-                    className="border rounded px-2 py-1 w-full mt-1"
-                    value="NO REFIERE"
-                    readOnly
+                    className="border rounded px-3 py-1  flex-1 min-w-[180px] text-[11px]"
+                    name="antecedentesFamiliares"
+                    value={form.antecedentesFamiliares}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -652,67 +765,69 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             </div>
           </div>
         )}
-        <div className="border rounded p-4 bg-white w-full">
-          <div className="text-[11px]">
-            {/* Encabezados */}
-            <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
-              <div></div>
-              <div className="col-span-2 text-center font-semibold">
-                Sin Correctores
+        {tab == 2 && (
+          <div className="border rounded p-4 bg-white w-full">
+            <div className="text-[11px]">
+              {/* Encabezados */}
+              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
+                <div></div>
+                <div className="col-span-2 text-center font-semibold">
+                  Sin Correctores
+                </div>
+                <div className="col-span-2 text-center font-semibold">
+                  Con Correctores
+                </div>
+                <div className="col-span-2 text-center font-semibold">
+                  Con Agujero Estenopeico
+                </div>
               </div>
-              <div className="col-span-2 text-center font-semibold">
-                Con Correctores
+              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-2">
+                <div></div>
+                <div className="text-center">O.D</div>
+                <div className="text-center">O.I</div>
+                <div className="text-center">O.D</div>
+                <div className="text-center">O.I</div>
+                <div className="text-center">O.D</div>
+                <div className="text-center">O.I</div>
               </div>
-              <div className="col-span-2 text-center font-semibold">
-                Con Agujero Estenopeico
-              </div>
-            </div>
-            <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-2">
-              <div></div>
-              <div className="text-center">O.D</div>
-              <div className="text-center">O.I</div>
-              <div className="text-center">O.D</div>
-              <div className="text-center">O.I</div>
-              <div className="text-center">O.D</div>
-              <div className="text-center">O.I</div>
-            </div>
 
-            {/* Visión de Cerca */}
-            <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
-              <div className="whitespace-nowrap">Visión de Cerca :</div>
-              {[...Array(6)].map((_, i) => (
-                <input
-                  key={`vc-${i}`}
-                  className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center"
-                />
-              ))}
-            </div>
-
-            {/* Visión de Lejos */}
-            <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
-              <div className="whitespace-nowrap">Visión de Lejos :</div>
-              {[...Array(6)].map((_, i) => (
-                <input
-                  key={`vl-${i}`}
-                  className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center"
-                />
-              ))}
-            </div>
-
-            {/* Binocular + Reflejos Pupilares */}
-            <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center">
-              <div className="whitespace-nowrap">Binocular (Reev.)</div>
-              <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center" />
-              <div></div>
-              <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center" />
-              <div></div>
-              <div className="text-right font-semibold whitespace-nowrap col-span-1">
-                Reflejos Pupilares :
+              {/* Visión de Cerca */}
+              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
+                <div className="whitespace-nowrap">Visión de Cerca :</div>
+                {[...Array(6)].map((_, i) => (
+                  <input
+                    key={`vc-${i}`}
+                    className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center"
+                  />
+                ))}
               </div>
-              <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] w-full" />
+
+              {/* Visión de Lejos */}
+              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
+                <div className="whitespace-nowrap">Visión de Lejos :</div>
+                {[...Array(6)].map((_, i) => (
+                  <input
+                    key={`vl-${i}`}
+                    className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center"
+                  />
+                ))}
+              </div>
+
+              {/* Binocular + Reflejos Pupilares */}
+              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center">
+                <div className="whitespace-nowrap">Binocular (Reev.)</div>
+                <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center" />
+                <div></div>
+                <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center" />
+                <div></div>
+                <div className="text-right font-semibold whitespace-nowrap col-span-1">
+                  Reflejos Pupilares :
+                </div>
+                <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] w-full" />
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

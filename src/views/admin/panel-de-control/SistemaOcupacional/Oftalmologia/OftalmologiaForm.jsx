@@ -78,6 +78,12 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
       setForm((f) => ({ ...f, [name]: value }));
     }
   };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value == "" ? "00" : value }));
+  };
+
   const handleCheckBoxChange = (e) => {
     const { name, checked } = e.target;
     setForm((f) => ({
@@ -264,6 +270,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionCercaOD || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionCercaOI")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
               <input
@@ -271,6 +278,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionCercaOI || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosOD")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
               <input
@@ -278,6 +286,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionCercaODC || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionCercaOIC")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
               <input
@@ -285,6 +294,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionCercaOIC || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosODC")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
             </div>
@@ -296,6 +306,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionLejosOD || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosOI")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
               <input
@@ -303,6 +314,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionLejosOI || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionCercaODC")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
               <input
@@ -310,6 +322,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionLejosODC || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosOIC")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
               <input
@@ -317,6 +330,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
                 value={form.visionLejosOIC || ""}
                 onChange={handleChangeNumber}
                 onKeyUp={(e) => handleNextFocus(e, "visionColores")}
+                onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
             </div>
@@ -584,7 +598,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
             set={setForm}
             token={token}
             clean={handleClear}
-          />  
+          />
         </div>
         <div className="flex justify-center mt-auto pt-4">
           <button
