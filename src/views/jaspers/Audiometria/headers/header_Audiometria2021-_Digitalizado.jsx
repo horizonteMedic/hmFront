@@ -37,7 +37,7 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   const boxText = (datos.textoColor || "F").toUpperCase();
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
-  let boxY = y - 5;
+  let boxY = y - 6.5;
   if (colorValido ) { // Forzar a mostrar para prueba visual
     // Draw box outline in black
     doc.setDrawColor(0);
@@ -58,16 +58,35 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
     doc.setLineWidth(0.2);
   }
   y -= 7;
-  // 2) Número de ficha grande y sede debajo, alineados a la derecha
+  // 2) Número de ficha arriba y sede debajo, alineados a la derecha
   const fichaX = pageW - margin - 18;
   const bloqueY = y + 5; // subir el bloque 3 puntos más arriba
-  const sedeValue = String(datos.sede || '');
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(sedeValue, fichaX, bloqueY, { align: "right" });
-  // Número de orden debajo
+  
+  // Número de orden arriba
   const fichaValue = String(datos.norden || '');
+  
+  // Calcular el ancho del label "N° Ficha:" para posicionarlo correctamente
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const fichaLabelWidth = doc.getTextWidth("N° Ficha:");
+  const fichaLabelX = fichaX - fichaLabelWidth - 25; // 25 unidades de separación hacia la izquierda
+  
+  // Agregar label "N° Ficha:" antes del valor
+  doc.text("N° Ficha:", fichaLabelX, bloqueY, { align: "left" });
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(fichaValue, fichaX, bloqueY + 7, { align: "right" });
+  doc.text(fichaValue, fichaX, bloqueY, { align: "right" });
+  
+  // Sede debajo
+  const sedeValue = String(datos.sede || '');
+  
+  // Calcular el ancho del label "Sede:" para posicionarlo correctamente
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const sedeLabelWidth = doc.getTextWidth("Sede:");
+  const sedeLabelX = fichaX - sedeLabelWidth - 48; // 25 unidades de separación hacia la izquierda
+  
+  // Agregar label "Sede:" antes del valor
+  doc.text("Sede:", sedeLabelX, bloqueY + 10, { align: "left" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(sedeValue, fichaX, bloqueY + 10, { align: "right" });
 
   // 3) TÍTULO perfectamente centrado
   doc.setFont("helvetica", "bold").setFontSize(13);

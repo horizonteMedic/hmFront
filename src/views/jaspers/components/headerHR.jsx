@@ -116,7 +116,7 @@ const headerHR = (doc, datos) => {
   doc.setFontSize(9);
 
   // Fila 2: Nombres y Apellidos y Edad
-  let y2 = y1 + lineHeight+ 2;
+  let y2 = y1 + lineHeight+ 0.5;
   doc.setFont("helvetica", "bold");
   doc.text("NOMBRES Y APELLIDOS:", margin, y2);
   const value = datos.nombres || "";
@@ -146,7 +146,7 @@ const headerHR = (doc, datos) => {
   doc.text(edadText, xedad, yedad);
 
   // Fila 3: Cargo / DNI / G. Sanguíneo
-  const y3 = y2 + lineHeight+ 2;
+  const y3 = y2 + lineHeight+ 0.5;
   doc.setFont("helvetica", "bold");
   doc.text("CARGO:", margin, y3);
   doc.setFont("helvetica", "normal");
@@ -176,18 +176,18 @@ const headerHR = (doc, datos) => {
   doc.text(`${datos.gruposan || "-"}`, margin + 175, y3);
 
   // Fila 4: Empresa (SEDE eliminada)
-  const y4 = y3 + lineHeight +2;
+  const y4 = y3 + lineHeight +0.5;
   doc.setFont("helvetica", "bold");
   doc.text("EMPRESA:", margin, y4);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.empresa || ""}`, margin + 25, y4);
+  doc.text(`${datos.empresa || ""}`, margin + 25, y4, { maxWidth: 170 });
 
   // Fila 5: Empresa Contratista
-  const y5 = y4 + lineHeight +1;
+  const y5 = y4 + lineHeight +2;
   doc.setFont("helvetica", "bold");
   doc.text("EMP. CONTRATISTA:", margin, y5);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.contrata || ""}`, margin + 40, y5);
+  doc.text(`${datos.contrata || ""}`, margin + 40, y5, { maxWidth: 170 });
 
   if (Array.isArray(datos.subReporte) && datos.subReporte.length > 0) {
   doc.setFontSize(10)

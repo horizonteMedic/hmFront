@@ -562,8 +562,6 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   const tipos = [
     { tipo: "circle", color: "red" },
     { tipo: "x", color: "blue" },
-    { tipo: "bracketLeft", color: "red" },
-    { tipo: "bracketRight", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
   tipos.forEach(({ tipo, color }) => {
@@ -611,13 +609,13 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
       doc.line(x - size / 2, yP + size / 2, x + size / 2, yP - size / 2);
     } else if (punto.tipo === "bracketLeft") {
       // Dibujar un '[' centrado en (x, yP)
-      const size = 2;
+      const size = 1.5;
       doc.line(x - size / 2, yP - size / 2, x - size / 2, yP + size / 2);
       doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
       doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
     } else if (punto.tipo === "bracketRight") {
       // Dibujar un ']' centrado en (x, yP)
-      const size = 2;
+      const size = 1.5;
       // Línea vertical derecha
       doc.line(x + size / 2, yP - size / 2, x + size / 2, yP + size / 2);
       // Línea base superior
