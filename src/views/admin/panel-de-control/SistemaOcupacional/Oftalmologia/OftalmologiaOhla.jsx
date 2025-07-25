@@ -1,47 +1,164 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 
-export default function OftalmologiaOhla() {
+const tabla = "oftalmologia2021";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
+const initialFormState = {
+  norden: "",
+  fechaExam: today,
+  nomExam: "",
+  fechaNac: "",
+  nombres: "",
+  dni: "",
+  empresa: "",
+  contrata: "",
+
+  parpadosYAnexos: "NORMAL",
+  corneas: "NORMAL",
+  otrosHallazgos: "NINGUNO",
+  conjuntivas: "NORMAL",
+  cristalino: "TRANSPARENTE",
+};
+export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
+  const [form, setForm] = useState(initialFormState);
   const [tab, setTab] = useState(0);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  };
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+    if (/^[\d/]*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: checked,
+    }));
+  };
+  const handleNextFocus = (e, name) => {
+    if (e.key == "Enter") document.getElementsByName(name)[0]?.focus();
+  };
+  const handleClear = () => {
+    setForm(initialFormState);
+  };
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  };
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
+  };
+  const handlePrint = () => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Reporte?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden, token, tabla);
+      }
+    });
+  };
+
   return (
     <div className="w-full text-[11px]">
       <form className=" p-4 rounded w-full border mb-4">
-        <div className="grid grid-cols-4 items-center gap-3 w-full">
+        <div className="grid grid-cols-4  items-center gap-3 w-full">
           {/* Primera fila: solo los 4 campos principales */}
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[65px]">N° Orden :</label>
-            <input className="border rounded px-2 py-1 w-full" />
-          </div>
-          <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[65px]">Ex. Médico :</label>
-            <input className="border rounded px-2 py-1  w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="norden"
+              value={form.norden || ""}
+              onChange={handleChange}
+            />
           </div>
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[65px]">Fecha Ex :</label>
-            <input type="date" className="border rounded px-2 py-1 w-full" />
+            <input
+              type="date"
+              className="border rounded px-2 py-1 w-full"
+              name="fechaExam"
+              value={form.fechaExam || ""}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="font-semibold min-w-[65px]">Ex. Médico :</label>
+            <input
+              className="border rounded px-2 py-1  w-full"
+              name="nomExam"
+              value={form.nomExam || ""}
+              disabled
+            />
           </div>
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[65px]">Fecha Nac :</label>
-            <input type="date" className="border rounded px-2 py-1 w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="fechaNac"
+              value={form.fechaNac || ""}
+              disabled
+            />
           </div>
           {/* Segunda fila: Nombres, DNI */}
           <div className="flex items-center gap-4 col-span-3">
             <label className="font-semibold min-w-[65px]">Nombres :</label>
-            <input className="border rounded px-2 py-1 w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="nombres"
+              value={form.nombres || ""}
+              disabled
+            />
           </div>
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[65px]">DNI :</label>
-            <input className="border rounded px-2 py-1 w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="dni"
+              value={form.dni || ""}
+              disabled
+            />
           </div>
           {/* Tercera fila: Empresa, Contrata */}
           <div className="flex items-center gap-4 col-span-2">
             <label className="font-semibold min-w-[65px]">Empresa :</label>
-            <input className="border rounded px-2 py-1 w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="empresa"
+              value={form.empresa || ""}
+              disabled
+            />
           </div>
           <div className="flex items-center gap-4 col-span-2">
             <label className="font-semibold min-w-[65px]">Contrata :</label>
-            <input className="border rounded px-2 py-1 w-full" />
+            <input
+              className="border rounded px-2 py-1 w-full"
+              name="contrata"
+              value={form.contrata || ""}
+              disabled
+            />
           </div>
         </div>
       </form>
@@ -83,27 +200,42 @@ export default function OftalmologiaOhla() {
                 <div className="text-blue-700 font-semibold text-center mb-2">
                   Evaluación Oftalmologica
                 </div>
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2 items-center">
-                  <label>Párpados y Anexos:</label>
-                  <select className="border rounded px-2 py-1">
-                    <option>NORMAL</option>
-                  </select>
-                  <label>Corneas:</label>
-                  <select className="border rounded px-2 py-1">
-                    <option>NORMAL</option>
-                  </select>
-                  <label>Otros Hallazgos:</label>
-                  <select className="border rounded px-2 py-1">
-                    <option>NINGUNO</option>
-                  </select>
-                  <label>Conjuntivas:</label>
-                  <select className="border rounded px-2 py-1">
-                    <option>NORMAL</option>
-                  </select>
-                  <label>Cristalino:</label>
-                  <select className="border rounded px-2 py-1">
-                    <option>TRANSPARENTE</option>
-                  </select>
+                <div className="grid grid-cols-1 gap-y-3 gap-x-4  items-center">
+                  <EditableSelect
+                    label="Párpados y Anexos:"
+                    name="parpadosYAnexos"
+                    value={form.parpadosYAnexos}
+                    onChange={handleChange}
+                    options={["NORMAL", "ANORMAL"]}
+                  />
+                  <EditableSelect
+                    label="Corneas:"
+                    name="corneas"
+                    value={form.corneas}
+                    onChange={handleChange}
+                    options={["NORMAL", "ANORMAL"]}
+                  />
+                  <EditableSelect
+                    label="Otros Hallazgos:"
+                    name="otrosHallazgos"
+                    value={form.otrosHallazgos}
+                    onChange={handleChange}
+                    options={["NINGUNO"]}
+                  />
+                  <EditableSelect
+                    label="Conjuntivas:"
+                    name="conjuntivas"
+                    value={form.conjuntivas}
+                    onChange={handleChange}
+                    options={["NORMAL", "ANORMAL"]}
+                  />
+                  <EditableSelect
+                    label="Cristalino:"
+                    name="cristalino"
+                    value={form.cristalino}
+                    onChange={handleChange}
+                    options={["TRANSPARENTE", "CATARATA", "LENTE"]}
+                  />
                 </div>
               </div>
               {/* Fondo de Ojo */}
@@ -585,3 +717,57 @@ export default function OftalmologiaOhla() {
     </div>
   );
 }
+
+const EditableSelect = ({ label, name, value, onChange, options = [] }) => {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef(null);
+
+  const handleSelect = (val) => {
+    onChange({ target: { name, value: val } });
+    setOpen(false);
+  };
+
+  const handleClickOutside = (event) => {
+    if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+      setOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div ref={wrapperRef} className="flex">
+      {label && <label className="block mb-1 w-[180px]">{label}</label>}
+      <div className="relative w-full">
+        <input
+          name={name}
+          value={value || ""}
+          onChange={onChange}
+          onFocus={() => setOpen(true)}
+          className="appearance-none border rounded px-3 py-1 w-full"
+          autoComplete="off"
+        />
+        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
+          <FontAwesomeIcon icon={faChevronDown} />
+        </div>
+
+        {open && (
+          <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded shadow max-h-48 overflow-y-auto">
+            {options.map((opt, idx) => (
+              <li
+                key={idx}
+                className="px-3 py-1 hover:bg-blue-100 cursor-pointer"
+                onMouseDown={() => handleSelect(opt)} // usar onMouseDown para evitar blur antes del click
+              >
+                {opt}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+};

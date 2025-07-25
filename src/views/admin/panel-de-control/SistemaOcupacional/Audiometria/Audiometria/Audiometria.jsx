@@ -568,9 +568,15 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                         type="radio"
                         name={"exposicion_ruido"}
                         checked={form.exposicion_ruido === "NO"}
-                        onChange={() =>
-                          handleCheckRadio("exposicion_ruido", "NO")
-                        }
+                        onChange={() => {
+                          handleCheckRadio("exposicion_ruido", "NO");
+                          setForm((f) => ({
+                            ...f,
+                            promedio_horas: "",
+                            anios_exposicion: "",
+                            meses_exposicion: "",
+                          }));
+                        }}
                       />
                       NO
                     </label>
@@ -683,9 +689,14 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                         type="radio"
                         name={"protectores_auditivos"}
                         checked={form.protectores_auditivos === "NO"}
-                        onChange={() =>
-                          handleCheckRadio("protectores_auditivos", "NO")
-                        }
+                        onChange={() => {
+                          handleCheckRadio("protectores_auditivos", "NO");
+                          setForm((f) => ({
+                            ...f,
+                            tapones: false,
+                            orejeras: false,
+                          }));
+                        }}
                       />
                       NO
                     </label>
@@ -747,9 +758,26 @@ export default function Audiometria({ token, selectedSede, userlogued }) {
                         type="radio"
                         name={"exposicion_quimicos"}
                         checked={form.exposicion_quimicos === "NO"}
-                        onChange={() =>
-                          handleCheckRadio("exposicion_quimicos", "NO")
-                        }
+                        onChange={() => {
+                          handleCheckRadio("exposicion_quimicos", "NO");
+                          setForm((f) => ({
+                            ...f,
+                            plomo_hrs: "",
+                            mercurio_hrs: "",
+                            tolueno_hrs: "",
+                            xileno_hrs: "",
+                            plaguicidas_hrs: "",
+                            organofosforados_hrs: "",
+
+                            plomo_anios: "",
+                            mercurio_anios: "",
+                            tolueno_anios: "",
+                            xileno_anios: "",
+                            plaguicidas_anios: "",
+                            organofosforados_anios: "",
+                            otros_quimicos: "",
+                          }));
+                        }}
                       />
                       NO
                     </label>
