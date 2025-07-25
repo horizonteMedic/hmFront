@@ -1,0 +1,360 @@
+.odontograma-container {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  margin: 1rem 0;
+}
+
+.odontograma-title {
+  text-align: center;
+  color: #1e40af;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.odontograma-container {
+  font-size: 13px;
+  color: #000000;
+}
+
+.dientes-grid {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.diente-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  border: 2px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  background: white;
+  min-width: 60px;
+  min-height: 80px;
+}
+
+.diente-item:hover {
+  border-color: #3b82f6;
+}
+
+.diente-imagen {
+  width: 35px;
+  height: 35px;
+  margin-bottom: 0.25rem;
+}
+
+
+
+.diente-numero {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  margin-top: 0.25rem;
+}
+
+.indicador-diente {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.leyenda-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.leyenda-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  color: #000000;
+}
+
+.leyenda-item:hover {
+  background: #f3f4f6;
+  transform: translateY(-1px);
+}
+
+.contador-container {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 1rem;
+}
+
+.contador-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.contador-label {
+  font-weight: 600;
+  color: #000000;
+  font-size: 13px;
+}
+
+.contador-input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 0.5rem;
+  font-weight: 600;
+  background: white;
+  font-size: 13px;
+  color: #000000;
+}
+
+.context-menu {
+  position: fixed;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  z-index: 1000;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.context-menu-item:last-child {
+  border-bottom: none;
+}
+
+.context-menu-item:hover {
+  background: #f3f4f6;
+}
+
+.context-menu-item:active {
+  background: #e5e7eb;
+}
+
+.seccion-titulo {
+  font-size: 13px;
+  font-weight: 600;
+  color: #000000;
+  margin: 1.5rem 0 1rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.seccion-titulo::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
+}
+
+.observaciones-container {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.observaciones-section {
+  margin-bottom: 1rem;
+}
+
+.observaciones-label {
+  display: block;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0.5rem;
+  font-size: 13px;
+}
+
+.observaciones-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  color: #000000;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.observaciones-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.checkbox-section {
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #000000;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.checkbox-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #3b82f6;
+}
+
+.botones-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn-agregar,
+.btn-limpiar,
+.btn-historial {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  justify-content: center;
+}
+
+.btn-agregar {
+  background: #239e10;
+  color: white;
+}
+
+.btn-agregar:hover {
+  background: #1f8a0e;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(35, 158, 16, 0.3);
+}
+
+.btn-limpiar {
+  background: #f5e722;
+  color: #374151;
+}
+
+.btn-limpiar:hover {
+  background: #e6d91f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 231, 34, 0.3);
+}
+
+.btn-historial {
+  background: #2664eb;
+  color: white;
+}
+
+.btn-historial:hover {
+  background: #1e4fd8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(38, 100, 235, 0.3);
+}
+
+.btn-icon {
+  font-size: 1.1rem;
+}
+
+@media (max-width: 1200px) {
+  .contador-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .odontograma-container {
+    padding: 1rem;
+  }
+  
+  .dientes-grid {
+    gap: 0.25rem;
+  }
+  
+  .diente-item {
+    min-width: 50px;
+    min-height: 70px;
+    padding: 0.5rem;
+  }
+  
+  .diente-imagen {
+    width: 25px;
+    height: 25px;
+  }
+  
+  .leyenda-container {
+    gap: 0.5rem;
+  }
+  
+  .contador-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .botones-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn-agregar,
+  .btn-limpiar,
+  .btn-historial {
+    width: 100%;
+    max-width: 300px;
+  }
+}

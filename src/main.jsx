@@ -117,8 +117,9 @@ const AppContent = () => {
           <Route path="/administrar-contratas" element={<AdministrarContratas />} />
           <Route path="/protocolos" element={<Protocolos />} />
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
-          <Route path="/HistoriaOcupacional" element={<HistoriaOcupacional />} />
           <Route path="/odontologia" element={<Odontologia />} />
+          <Route path="/SistemaOcupacional/odontologia" element={<Odontologia />} />
+          <Route path="/HistoriaOcupacional" element={<HistoriaOcupacional />} />
           <Route path="/rayosx" element={<RayosX />} />
         </Route>
         <Route path="/Espirometria" element={<Espirometria />} />

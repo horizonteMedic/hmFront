@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faFileAlt, faBroom, faHistory } from '@fortawesome/free-solid-svg-icons';
+import './OdontogramaAdultos.css';
 
 const OdontogramaAdultos = () => {
   const dientesSuperioresArray = [
-    18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
   ];
 
   const dientesInferioresArray = [
-    48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38,
+    17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
   ];
 
   const initialDientesOptions = Object.fromEntries(
     [...dientesSuperioresArray, ...dientesInferioresArray].map((diente) => [diente, "Normal"])
   );
 
-  const [selectedDientes, setSelectedDientes] = useState([]);
+
   const [contextMenu, setContextMenu] = useState(null);
   const [dienteOptions, setDienteOptions] = useState(initialDientesOptions);
   const [contadorOptions, setContadorOptions] = useState({
@@ -31,19 +34,79 @@ const OdontogramaAdultos = () => {
     'Dientes en mal estado': 0,
   });
 
-  const handleSelect = (numero) => {
-    setSelectedDientes((prevSelectedDientes) =>
-      prevSelectedDientes.includes(numero)
-        ? prevSelectedDientes.filter((d) => d !== numero)
-        : [...prevSelectedDientes, numero]
-    );
-  };
+  const [observaciones, setObservaciones] = useState('NO PASO EXAMEN ODONTOLOGICO');
+  const [noPasoExamen, setNoPasoExamen] = useState(false);
+
+  // Cerrar menú contextual con ESC o click fuera
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setContextMenu(null);
+      }
+    };
+
+    const handleClickOutside = (event) => {
+      if (contextMenu && !event.target.closest('.context-menu')) {
+        setContextMenu(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [contextMenu]);
+
+
 
   const handleContextMenu = (event, diente) => {
     event.preventDefault();
+    event.stopPropagation();
+    
+    // Calcular posición del menú
+    const menuHeight = 400; // Altura del menú
+    const windowHeight = window.innerHeight;
+    const mouseY = event.clientY;
+    const mouseX = event.clientX;
+    
+    // Determinar si es un diente inferior (dientes 17-32)
+    const isDienteInferior = diente >= 17 && diente <= 32;
+    
+    let menuY;
+    let menuX = mouseX - 2;
+    
+    // Para dientes inferiores, siempre mostrar arriba
+    if (isDienteInferior) {
+      menuY = mouseY - menuHeight - 10;
+    } else {
+      // Para dientes superiores, verificar espacio disponible
+      if (mouseY + menuHeight > windowHeight) {
+        menuY = mouseY - menuHeight - 10;
+      } else {
+        menuY = mouseY - 4;
+      }
+    }
+    
+    // Asegurar que el menú no se salga por arriba
+    if (menuY < 10) {
+      menuY = 10;
+    }
+    
+    // Asegurar que el menú no se salga por los lados
+    const menuWidth = 200;
+    if (menuX + menuWidth > window.innerWidth) {
+      menuX = window.innerWidth - menuWidth - 10;
+    }
+    if (menuX < 10) {
+      menuX = 10;
+    }
+    
     setContextMenu({
-      mouseX: event.clientX - 2,
-      mouseY: event.clientY - 4,
+      mouseX: menuX,
+      mouseY: menuY,
       diente,
     });
   };
@@ -57,32 +120,22 @@ const OdontogramaAdultos = () => {
       return;
     }
 
-    if (prevOption) {
-      setContadorOptions((prevContadores) => ({
-        ...prevContadores,
-        [prevOption]: prevContadores[prevOption] - 1,
-      }));
-    }
+    // Actualizar contadores
+    setContadorOptions((prevContadores) => {
+      const newContadores = { ...prevContadores };
+      
+      // Si había una opción previa, restar 1 de esa opción
+      if (prevOption) {
+        newContadores[prevOption] = newContadores[prevOption] - 1;
+      }
+      
+      // Sumar 1 a la nueva opción
+      newContadores[option] = newContadores[option] + 1;
+      
+      return newContadores;
+    });
 
-    if (prevOption === "Normal" && option !== "Normal") {
-      setContadorOptions((prevContadores) => ({
-        ...prevContadores,
-        Normal: prevContadores.Normal - 1,
-      }));
-    }
-
-    if (option === "Normal" && prevOption !== "Normal") {
-      setContadorOptions((prevContadores) => ({
-        ...prevContadores,
-        Normal: prevContadores.Normal + 1,
-      }));
-    }
-
-    setContadorOptions((prevContadores) => ({
-      ...prevContadores,
-      [option]: prevContadores[option] + 1,
-    }));
-
+    // Actualizar la opción del diente
     setDienteOptions((prevOptions) => ({
       ...prevOptions,
       [diente]: option,
@@ -91,36 +144,66 @@ const OdontogramaAdultos = () => {
     setContextMenu(null);
   };
 
+  const handleAgregarActualizar = () => {
+    // Aquí iría la lógica para guardar/actualizar los datos
+    console.log('Agregar/Actualizar:', {
+      dienteOptions,
+      contadorOptions,
+      observaciones,
+      noPasoExamen
+    });
+  };
+
+  const handleLimpiar = () => {
+    setDienteOptions(initialDientesOptions);
+    setContadorOptions({
+      'Ausente': 0,
+      'Cariada por opturar': 0,
+      'Por extraer': 0,
+      'Fracturada': 0,
+      'Corona': 0,
+      'ObturacionEfectuada': 0,
+      'Puente': 0,
+      'P.P.R Metalica': 0,
+      'P.P.R Acrilica': 0,
+      'P.Total': 0,
+      'Normal': 32,
+      'Dientes en mal estado': 0,
+    });
+    setObservaciones('NO PASO EXAMEN ODONTOLOGICO');
+    setNoPasoExamen(false);
+  };
+
+  const handleVerHistorial = () => {
+    // Aquí iría la lógica para ver el historial
+    console.log('Ver historial');
+  };
+
   const renderInput = (label) => (
-    <div className="flex justify-between items-center w-full sm:w-1/5 ml-4 mb-2">
-      <label htmlFor={label}>{label}:</label>
+    <div className="contador-item">
+      <label className="contador-label">{label}:</label>
       <input
         type="text"
-        id={label}
         value={contadorOptions[label]}
         readOnly
-        className="border text-center border-gray-300 rounded-md focus:outline-none bg-white w-10"
+        className="contador-input"
       />
     </div>
   );
 
   const renderDiente = (diente, imgUrl, rotate = false) => (
     <div
-      key={diente}
-      className={`relative flex flex-col items-center p-2 border ${
-        selectedDientes.includes(diente) ? 'border-blue-500' : 'border-gray-300'
-      } rounded-md cursor-pointer`}
-      onClick={() => handleSelect(diente)}
+      className="diente-item"
       onContextMenu={(e) => handleContextMenu(e, diente)}
     >
       <img
         src={imgUrl}
         alt={`Diente ${diente}`}
-        className={`w-[30px] h-[30px] mt-1 ${rotate ? 'rotate-180' : ''}`}
+        className={`diente-imagen ${rotate ? 'rotate-180' : ''}`}
       />
-      <span className="text-xs">{diente}</span>
+      <span className="diente-numero">{diente}</span>
       {dienteOptions[diente] && (
-        <div className="absolute inset-0 flex justify-center items-center">
+        <div className="indicador-diente">
           {renderIndicator(dienteOptions[diente])}
         </div>
       )}
@@ -174,62 +257,133 @@ const OdontogramaAdultos = () => {
   ];
 
   return (
-    <div className="p-4 mt-4">
-      <form className="flex flex-col gap-4">
-        <div className="border border-gray-300 p-4">
-          <div className="flex justify-center items-center gap-1">
-            <div className="flex flex-full justify-center gap-2">
-              {dientesSuperioresArray.map((diente) =>
-                renderDiente(
-                  diente,
-                  diente === 13 || diente === 23 || diente === 33 || diente === 43
-                    ? 'https://cdn-icons-png.flaticon.com/512/91/91154.png'
-                    : diente === 18 || diente === 17 || diente === 16 || diente === 26 || diente === 27 || diente === 28
-                    ? 'https://cdn-icons-png.flaticon.com/512/91/91159.png'
-                    : 'https://cdn-icons-png.flaticon.com/512/91/91162.png',
-                  true
-                )
-              )}
-            </div>
+    <div className="odontograma-container">
+      <h2 className="odontograma-title">Odontograma Adultos</h2>
+      
+      <div className="seccion-titulo">Dientes Superiores</div>
+      <div className="dientes-grid">
+                      {dientesSuperioresArray.map((diente) => (
+                <div key={diente}>
+                  {renderDiente(
+                    diente,
+                    diente === 6 || diente === 11
+                      ? 'https://cdn-icons-png.flaticon.com/512/91/91154.png'
+                      : diente === 1 || diente === 2 || diente === 3 || diente === 14 || diente === 15 || diente === 16
+                      ? 'https://cdn-icons-png.flaticon.com/512/91/91159.png'
+                      : 'https://cdn-icons-png.flaticon.com/512/91/91162.png',
+                    true
+                  )}
+                </div>
+              ))}
+      </div>
+
+      <div className="seccion-titulo">Dientes Inferiores</div>
+      <div className="dientes-grid">
+                      {dientesInferioresArray.map((diente) => (
+                <div key={diente}>
+                  {renderDiente(
+                    diente,
+                    diente === 22 || diente === 27
+                      ? 'https://cdn-icons-png.flaticon.com/512/91/91154.png'
+                      : diente === 17 || diente === 18 || diente === 19 || diente === 30 || diente === 31 || diente === 32
+                      ? 'https://cdn-icons-png.flaticon.com/512/91/91159.png'
+                      : 'https://cdn-icons-png.flaticon.com/512/91/91162.png',
+                    false
+                  )}
+                </div>
+              ))}
+      </div>
+
+      <div className="leyenda-container">
+        {menuOptions.map((option) => (
+          <div key={option.label} className="leyenda-item">
+            <span className={`${option.color} text-xl`}>{option.icon}</span>
+            <span>{option.label}</span>
           </div>
-          <div className="flex justify-center items-center gap-1 mt-4">
-            <div className="flex flex-full justify-center gap-2">
-              {dientesInferioresArray.map((diente) =>
-                renderDiente(
-                  diente,
-                  diente === 13 || diente === 23 || diente === 33 || diente === 43
-                    ? 'https://cdn-icons-png.flaticon.com/512/91/91154.png'
-                    : diente === 48 || diente === 47 || diente === 46 || diente === 36 || diente === 37 || diente === 38
-                    ? 'https://cdn-icons-png.flaticon.com/512/91/91159.png'
-                    : 'https://cdn-icons-png.flaticon.com/512/91/91162.png',
-                  true
-                )
-              )}
-            </div>
+        ))}
+      </div>
+
+      <div className="contador-container">
+        {[
+          'Ausente',
+          'Cariada por opturar', 
+          'Por extraer',
+          'Fracturada',
+          'Corona',
+          'ObturacionEfectuada',
+          'Puente',
+          'P.P.R Metalica',
+          'P.P.R Acrilica',
+          'P.Total',
+          'Normal',
+          'Dientes en mal estado'
+        ].map((key) => (
+          <div key={key}>
+            {renderInput(key)}
           </div>
+        ))}
+      </div>
+
+      <div className="observaciones-container">
+        <div className="observaciones-section">
+          <label className="observaciones-label">Observaciones:</label>
+          <textarea
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            className="observaciones-textarea"
+            rows="3"
+          />
         </div>
-        <div className="flex flex-wrap justify-center gap-4">
-          {menuOptions.map((option) => (
-            <div key={option.label} className="flex items-center gap-2">
-              <span className={`${option.color} text-xl`}>{option.icon}</span>
-              <span>{option.label}</span>
-            </div>
-          ))}
+        
+        <div className="checkbox-section">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={noPasoExamen}
+              onChange={(e) => setNoPasoExamen(e.target.checked)}
+              className="checkbox-input"
+            />
+            NO PASO EXAMEN ODONTOLOGICO
+          </label>
         </div>
 
-        <div className="border border-gray-300 p-4 mt-4 flex flex-wrap">
-          {Object.keys(contadorOptions).map((key) => renderInput(key))}
+        <div className="botones-container">
+          <button
+            onClick={handleAgregarActualizar}
+            className="btn-agregar"
+          >
+            <FontAwesomeIcon icon={faPlus} className="btn-icon" />
+            <FontAwesomeIcon icon={faFileAlt} className="btn-icon" />
+            Agregar/Actualizar
+          </button>
+          
+          <button
+            onClick={handleLimpiar}
+            className="btn-limpiar"
+          >
+            <FontAwesomeIcon icon={faBroom} className="btn-icon" />
+            Limpiar
+          </button>
+          
+          <button
+            onClick={handleVerHistorial}
+            className="btn-historial"
+          >
+            <FontAwesomeIcon icon={faHistory} className="btn-icon" />
+            Ver Historial
+          </button>
         </div>
-      </form>
+      </div>
+
       {contextMenu && (
         <div
-          className="fixed z-10 bg-white shadow-md rounded-md"
+          className="context-menu"
           style={{ top: contextMenu.mouseY, left: contextMenu.mouseX }}
         >
           {menuOptions.map((option) => (
             <div
               key={option.label}
-              className="flex items-center gap-2 p-2 hover:bg-gray-100 cursor-pointer"
+              className="context-menu-item"
               onClick={() => handleOptionClick(option.label)}
             >
               <span className={`${option.color} text-xl`}>{option.icon}</span>
