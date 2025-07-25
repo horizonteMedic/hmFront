@@ -23,7 +23,6 @@ const config = {
 export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla = []) {
   const doc = new jsPDF({ unit: "mm", format: "letter", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
-  console.log('wasa')
   const datoss = {
     detalles: [
     {
@@ -156,16 +155,16 @@ export default function HistoriaOcupacional_Digitalizado_boro(datos = {}, tabla 
         ]
       ],
       body: tabla?.map(d => [
-        d.fecha.toUpperCase() || '',
-        d.empresa.toUpperCase() || '',
-        d.altitud.toUpperCase() || '',
-        d.actividad.toUpperCase() || '',
-        d.areaEmpresa.toUpperCase() || '',
-        d.ocupacion.toUpperCase() || '',
-        d.socavon.toUpperCase() || '',
-        d.superficie.toUpperCase() || '',
-        d.riesgo.toUpperCase() || '',
-        d.proteccion.toUpperCase() || ''
+            d.fecha?.toUpperCase() ?? '',
+            d.empresa?.toUpperCase() ?? '',
+            d.altitud?.toUpperCase() ?? '',
+            d.actividad?.toUpperCase() ?? '',
+            d.areaEmpresa?.toUpperCase() ?? '',
+            d.ocupacion?.toUpperCase() ?? '',
+            d.socavon?.toUpperCase() ?? '',
+            d.superficie?.toUpperCase() ?? '',
+            d.riesgo?.toUpperCase() ?? '',
+            d.proteccion?.toUpperCase() ?? ''
       ]),
       theme: "grid",
       styles: {
