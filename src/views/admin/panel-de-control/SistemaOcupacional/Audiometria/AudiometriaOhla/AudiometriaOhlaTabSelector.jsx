@@ -30,7 +30,7 @@ const AudiometriaOhlaTabSelector = ({
     contrata: "",
     nomExam: "",
     no_paso_Examen: false,
-    activar_grafico: false,
+    activar_grafico: true,
 
     od_500: "",
     od_1000: "",
