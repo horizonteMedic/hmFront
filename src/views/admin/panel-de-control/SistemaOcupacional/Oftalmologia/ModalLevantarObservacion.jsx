@@ -1,6 +1,8 @@
-import React from "react";
-import { SubmitDataService } from "./controllerOftalmologiaForm";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerModalLevantarObservacion";
+
 import {
   faSave,
   faBroom,
@@ -9,14 +11,23 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./OftalmologiaForm";
 
-export default function ModalLevantarObservacion({ onClose, form, form2 }) {
+const tabla = "oftalmologia_lo";
+export default function ModalLevantarObservacion({
+  onClose,
+  form,
+  setForm,
+  initialFormState,
+  token,
+  userlogued,
+  selectedSede,
+}) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
   };
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
-    if (/^\d*$/.test(value)) {
+    if (/^[\d/]*$/.test(value)) {
       setForm((f) => ({ ...f, [name]: value }));
     }
   };
@@ -39,14 +50,17 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, onClose);
   };
 
   return (
     <div className="fixed inset-0 bg-white/60 backdrop-blur-sm flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 min-w-[850px] relative max-w-lg w-full">
         <button
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            handleClear();
+          }}
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-4xl"
         >
           &times;
@@ -55,7 +69,7 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
         <form className="space-y-4">
           <div className="grid grid-cols-2 gap-4 items-center mb-2 w-full ">
             <div>
-              <label className="font-semibold">Fecha de Examen :</label>
+              <label className="font-semibold">N° Orden :</label>
               <input
                 name="norden"
                 value={form.norden}
@@ -157,15 +171,13 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
               <input
                 name="visionCercaOD"
                 value={form.visionCercaOD || ""}
-                onChange={handleChangeNumber}
-                onKeyUp={(e) => handleNextFocus(e, "visionCercaOI")}
+                disabled
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionCercaOI"
                 value={form.visionCercaOI || ""}
-                onChange={handleChangeNumber}
-                onKeyUp={(e) => handleNextFocus(e, "visionLejosOD")}
+                disabled
                 className="border rounded px-2 py-1"
               />
               <input
@@ -189,15 +201,13 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
               <input
                 name="visionLejosOD"
                 value={form.visionLejosOD || ""}
-                onChange={handleChangeNumber}
-                onKeyUp={(e) => handleNextFocus(e, "visionLejosOI")}
+                disabled
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionLejosOI"
                 value={form.visionLejosOI || ""}
-                onChange={handleChangeNumber}
-                onKeyUp={(e) => handleNextFocus(e, "visionCercaODC")}
+                disabled
                 className="border rounded px-2 py-1"
               />
               <input
@@ -293,8 +303,7 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
               <input
                 name="enfOculares"
                 value={form.enfOculares || ""}
-                onChange={handleChange}
-                onKeyUp={(e) => handleNextFocus(e, "presenciaPterigion")}
+                disabled
                 className="border rounded px-2 py-1 col-span-2"
               />
               <div className="col-span-2 flex items-center gap-2">
@@ -305,13 +314,7 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
                     form.enfOculares != null &&
                     form.enfOculares.toUpperCase().includes("NINGUNA")
                   }
-                  onChange={(e) => {
-                    handleCheckBoxChange(e);
-                    setForm((prev) => ({
-                      ...prev,
-                      enfOculares: e.target.checked ? "NINGUNA" : "",
-                    }));
-                  }}
+                  disabled
                   className="mr-1"
                 />{" "}
                 Ninguna
@@ -322,8 +325,7 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
               <input
                 name="presenciaPterigion"
                 value={form.presenciaPterigion || ""}
-                onKeyUp={(e) => handleNextFocus(e, "agudezaLejos")}
-                onChange={handleChange}
+                disabled
                 className="border rounded px-2 py-1 col-span-4"
               />
               <div className="col-span-5 grid grid-cols-4 text-black">
@@ -333,14 +335,7 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
                     type="checkbox"
                     name="opcionPterigion"
                     checked={form.presenciaPterigion == "PTERIGIÓN OJO DERECHO"}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        presenciaPterigion: e.target.checked
-                          ? "PTERIGIÓN OJO DERECHO"
-                          : "",
-                      }))
-                    }
+                    disabled
                   />{" "}
                   PTERIG.OJO DEREC
                 </label>
@@ -351,14 +346,7 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
                     checked={
                       form.presenciaPterigion == "PTERIGIÓN OJO IZQUIERDO"
                     }
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        presenciaPterigion: e.target.checked
-                          ? "PTERIGIÓN OJO IZQUIERDO"
-                          : "",
-                      }))
-                    }
+                    disabled
                   />{" "}
                   PTERIG. OJO IZQ
                 </label>
@@ -367,50 +355,11 @@ export default function ModalLevantarObservacion({ onClose, form, form2 }) {
                     type="checkbox"
                     name="opcionPterigion"
                     checked={form.presenciaPterigion == "PTERIGIÓN BILATERAL"}
-                    onChange={(e) =>
-                      setForm((f) => ({
-                        ...f,
-                        presenciaPterigion: e.target.checked
-                          ? "PTERIGIÓN BILATERAL"
-                          : "",
-                      }))
-                    }
+                    disabled
                   />{" "}
                   PTERIG. BILATERAL
                 </label>
               </div>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <div className="mb-2 flex-1">
-              <label className="font-semibold">Agudeza visual de lejos:</label>
-              <textarea
-                name="agudezaLejos"
-                rows={2}
-                value={form.agudezaLejos || ""}
-                onChange={handleChange}
-                className="border rounded px-2 py-1 w-full"
-              />
-            </div>
-            {/* Normal y Agudeza visual de lejos */}
-            <div className="flex items-center gap-2 mb-2">
-              <input
-                type="checkbox"
-                name="normalGeneral"
-                checked={
-                  form.agudezaLejos != null &&
-                  form.agudezaLejos.toUpperCase().includes("NORMAL")
-                }
-                onChange={(e) => {
-                  handleCheckBoxChange(e);
-                  setForm((prev) => ({
-                    ...prev,
-                    agudezaLejos: e.target.checked ? "NORMAL" : "",
-                  }));
-                }}
-                className="mr-1"
-              />
-              Normal
             </div>
           </div>
 

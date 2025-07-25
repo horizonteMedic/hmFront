@@ -9,12 +9,15 @@ import {
 import ModalLevantarObservacion from "./ModalLevantarObservacion";
 import {
   GetInfoServicio,
+  GetInfoServicioTabla,
   getInfoTabla,
   Loading,
+  PrintHojaCompleto,
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
 } from "./controllerOftalmologiaForm";
+import Swal from "sweetalert2";
 
 const tabla = "oftalmologia";
 const date = new Date();
@@ -71,7 +74,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
   };
   const handleChangeNumber = (e) => {
     const { name, value } = e.target;
-    if (/^\d*$/.test(value)) {
+    if (/^[\d/]*$/.test(value)) {
       setForm((f) => ({ ...f, [name]: value }));
     }
   };
@@ -105,6 +108,28 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
     getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
 
+  const handlePrint = () => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Reporte?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaCompleto(form.norden, token, "oftalmologia_reporte");
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col md:flex-row gap-6">
       {/* Columna izquierda: Formulario */}
@@ -135,15 +160,26 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
               onChange={handleChange}
               className="border rounded px-2 py-1 w-40"
             />
-            <div className="flex gap-4  flex-1 justify-center items-center ">
+            <div className="flex gap-4 flex-1 justify-center items-center">
               <button
                 type="button"
-                onClick={() => setShowModal(true)}
-                className="px-3 h-[22px] bg-green-200 hover:bg-green-300 rounded flex items-center w-full  justify-center "
+                disabled={form.codOf == null}
+                onClick={() => {
+                  setShowModal(true);
+                  setForm2((prev) => ({ ...prev, norden: form.norden }));
+                }}
+                className={`px-3 h-[22px] rounded flex items-center w-full justify-center transition-colors duration-200
+                  ${
+                    form.codOf == null
+                      ? "bg-gray-300 text-gray-500 "
+                      : "bg-green-200 hover:bg-green-300 text-green-800 cursor-pointer"
+                  }`}
               >
                 <FontAwesomeIcon
                   icon={faCheckCircle}
-                  className="mr-2 text-green-800"
+                  className={`mr-2 ${
+                    form.codOf == null ? "text-gray-500" : "text-green-800"
+                  }`}
                 />
                 <p className="">LEVANTAR OBSERVACION</p>
               </button>
@@ -531,7 +567,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
               }}
               onChange={(e) => {
                 const { name, value } = e.target;
-                if (/^\d*$/.test(value)) {
+                if (/^[\d/]*$/.test(value)) {
                   setForm((f) => ({ ...f, [name]: value, nombres_search: "" }));
                 }
               }}
@@ -548,10 +584,18 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
             set={setForm}
             token={token}
             clean={handleClear}
-          />
+          />  
         </div>
         <div className="flex justify-center mt-auto pt-4">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow border  max-w-[450px] ">
+          <button
+            className={`font-semibold px-4 py-2 rounded shadow border max-w-[450px] transition-colors duration-200 ${
+              form.norden == ""
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+            }`}
+            disabled={form.norden == ""}
+            onClick={handlePrint}
+          >
             VER HISTORIAL
           </button>
         </div>
@@ -562,6 +606,10 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
           onClose={() => setShowModal(false)}
           form={form2}
           setForm={setForm2}
+          initialFormState={initialFormState}
+          token={token}
+          userlogued={userlogued}
+          selectedSede={selectedSede}
         />
       )}
     </div>
@@ -605,7 +653,7 @@ function Table({ data, tabla, set, token, clean }) {
   function clicktable(nro) {
     clean();
     Loading("Importando Datos");
-    GetInfoServicio(nro, tabla, set, token);
+    GetInfoServicioTabla(nro, tabla, set, token);
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
