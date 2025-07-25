@@ -61,19 +61,39 @@ const header_FichaAudiologica = (doc, datos = {}) => {
     doc.setLineWidth(0.2);
   }
 
-  // Número de ficha grande, negrita, subrayado, derecha
-  const fichaX = pageW - margin - 17; // más a la izquierda
-  const fichaY = y + 8;
+  // Sede arriba
+  const sedeX = pageW - margin - 17; // más a la izquierda
+  const sedeY = y + 8;
+  
+  // Calcular el ancho del label "Sede:" para posicionarlo correctamente
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const sedeLabelWidth = doc.getTextWidth("Sede:");
+  const sedeLabelX = sedeX - sedeLabelWidth - 50; // 25 unidades de separación hacia la izquierda
+  
+  // Agregar label "Sede:" antes del valor
+  doc.text("Sede:", sedeLabelX, sedeY, { align: "left" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(`${datos.sede || ""}`, sedeX, sedeY, { align: "right" });
+  
+  // Número de ficha grande, negrita, subrayado, abajo
+  const fichaX = sedeX; // misma posición X
+  const fichaY = sedeY + 6;
+  
+  // Calcular el ancho del label "N° Ficha:" para posicionarlo correctamente
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const fichaLabelWidth = doc.getTextWidth("N° Ficha:");
+  const fichaLabelX = fichaX - fichaLabelWidth - 25; // 25 unidades de separación hacia la izquierda
+  
+  // Agregar label "N° Ficha:" antes del valor
+  doc.text("N° Ficha:", fichaLabelX, fichaY, { align: "left" });
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(`${datos.norden || ""}`, fichaX, fichaY, { align: "right" });
+  
   // Subrayado
   const fichaWidth = doc.getTextWidth(`${datos.norden || ""}`);
   doc.setLineWidth(1.2);
   doc.line(fichaX - fichaWidth, fichaY + 2, fichaX, fichaY + 2);
   doc.setLineWidth(0.2);
-  // Sede debajo
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${datos.sede || ""}`, fichaX, fichaY + 6, { align: "right" });
   // Fecha debajo de la sede
   if (datos.fecha) {
     // Formatear fecha yyyy-mm-dd a dd/mm/yyyy

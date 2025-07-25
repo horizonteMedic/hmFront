@@ -148,12 +148,29 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   const sedeValue = `${datos.sede || ''}`;
   const sedeX = pageW - margin - 20;
   const sedeY = y + 6;
+  
+  // Calcular el ancho del label "Sede:" para posicionarlo correctamente
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const sedeLabelWidth = doc.getTextWidth("Sede:");
+  const sedeLabelX = sedeX - sedeLabelWidth - 51.5; // 25 unidades de separación hacia la izquierda
+  
+  // Agregar label "Sede:" antes del valor
+  doc.text("Sede:", sedeLabelX, sedeY, { align: "left" });
+  doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(sedeValue, sedeX, sedeY, { align: "right" });
 
   // N° de Ficha debajo de la sede, alineado a la derecha, solo el número
   const fichaDato = `${datos.norden || ''}`;
   const fichaY = sedeY + 5.4;
   const fichaX = pageW - margin - 20;
+  
+  // Calcular el ancho del label "N° Ficha:" para posicionarlo correctamente
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const fichaLabelWidth = doc.getTextWidth("N° Ficha:");
+  const fichaLabelX = fichaX - fichaLabelWidth - 22; // 25 unidades de separación hacia la izquierda
+  
+  // Agregar label "N° Ficha:" antes del valor
+  doc.text("N° Ficha:", fichaLabelX, fichaY + 1, { align: "left" });
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(fichaDato, fichaX, fichaY + 1, { align: "right" });
 

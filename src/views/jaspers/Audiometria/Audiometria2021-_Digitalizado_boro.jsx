@@ -641,7 +641,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   // 11.- Recomendaciones
   // =====================
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("11.- Recomendaciones:", margin, y);
+  doc.text("9.- Recomendaciones:", margin, y);
   y += 4;
 
   doc.setFont("helvetica", "normal").setFontSize(8);
