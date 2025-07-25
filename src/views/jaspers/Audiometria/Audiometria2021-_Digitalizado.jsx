@@ -509,8 +509,6 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   const tipos = [
     { tipo: "circle", color: "red" },
     { tipo: "x", color: "blue" },
-    { tipo: "bracketLeft", color: "red" },
-    { tipo: "bracketRight", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
   tipos.forEach(({ tipo, color }) => {
