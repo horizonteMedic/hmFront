@@ -88,6 +88,43 @@ const initialFormState = {
   restriccionCorrectorCerca: true,
   noTrabajosCableElectrico: true,
   noConduccion: true,
+
+  vc_sinc_od: "",
+  vc_sinc_oi: "",
+  vc_conc_od: "",
+  vc_conc_oi: "",
+  vc_agujero_od: "",
+  vc_agujero_oi: "",
+  vl_sinc_od: "",
+  vl_sinc_oi: "",
+  vl_conc_od: "",
+  vl_conc_oi: "",
+  vl_agujero_od: "",
+  vl_agujero_oi: "",
+  bino_sinc: "",
+  bino_conc: "",
+  reflejos_pupilares: "",
+
+  ptosisPalpebralOd: true,
+  ptosisPalpebralOi: true,
+  pterigionGradoOd: true,
+  pterigionGradoOi: true,
+
+  estrabismoOd: true,
+  estrabismoOi: true,
+  pingueculaOd: true,
+  pingueculaOi: true,
+
+  conjuntivitisOd: true,
+  conjuntivitisOi: true,
+  chalazionOd: true,
+  chalazionOi: true,
+
+  cataratasOd: true,
+  cataratasOi: true,
+  otrosOd: true,
+  otrosOi: true,
+  examenClinicoHallazgos:""
 };
 export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialFormState);
@@ -1017,64 +1054,207 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
           </div>
         )}
         {tab == 2 && (
-          <div className="border rounded p-4 bg-white w-full">
-            <div className="text-[11px]">
-              {/* Encabezados */}
-              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
-                <div></div>
-                <div className="col-span-2 text-center font-semibold">
+          <div className="space-y-4">
+            <div className="border rounded p-4 space-y-4  w-full">
+              <div className="text-blue-700 font-semibold text-center mb-4">
+                EXPOSICIÓN OCUPACIONAL
+              </div>
+              <div className="grid grid-cols-7 gap-4 items-center mb-1 ">
+                <div className=""></div>
+                <span className="text-center font-semibold col-span-2">
                   Sin Correctores
-                </div>
-                <div className="col-span-2 text-center font-semibold">
+                </span>
+                <span className="text-center font-semibold col-span-2">
                   Con Correctores
-                </div>
-                <div className="col-span-2 text-center font-semibold">
+                </span>
+                <span className="text-center font-semibold col-span-2">
                   Con Agujero Estenopeico
-                </div>
+                </span>
               </div>
-              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-2">
-                <div></div>
-                <div className="text-center">O.D</div>
-                <div className="text-center">O.I</div>
-                <div className="text-center">O.D</div>
-                <div className="text-center">O.I</div>
-                <div className="text-center">O.D</div>
-                <div className="text-center">O.I</div>
+              <div className="grid grid-cols-7 gap-4 items-center mb-1">
+                <div className=""></div>
+                <span className="text-center font-semibold">O.D.</span>
+                <span className="text-center font-semibold">O.I.</span>
+                <span className="text-center font-semibold">O.D.</span>
+                <span className="text-center font-semibold">O.I.</span>
+                <span className="text-center font-semibold">O.D.</span>
+                <span className="text-center font-semibold">O.I.</span>
               </div>
-
-              {/* Visión de Cerca */}
-              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
-                <div className="whitespace-nowrap">Visión de Cerca :</div>
-                {[...Array(6)].map((_, i) => (
-                  <input
-                    key={`vc-${i}`}
-                    className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center"
-                  />
-                ))}
+              <div className="grid grid-cols-7 gap-4 items-center mb-1">
+                <span className="font-semibold">Visión de Cerca:</span>
+                <input
+                  name="vc_sinc_od"
+                  value={form.vc_sinc_od}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1"
+                />
+                <input
+                  name="vc_sinc_oi"
+                  value={form.vc_sinc_oi}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1"
+                />
+                <input
+                  name="vc_conc_od"
+                  value={form.vc_conc_od}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+                <input
+                  name="vc_conc_oi"
+                  value={form.vc_conc_oi}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+                <input
+                  name="vc_agujero_od"
+                  value={form.vc_agujero_od}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+                <input
+                  name="vc_agujero_oi"
+                  value={form.vc_agujero_oi}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
               </div>
-
-              {/* Visión de Lejos */}
-              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center mb-1">
-                <div className="whitespace-nowrap">Visión de Lejos :</div>
-                {[...Array(6)].map((_, i) => (
-                  <input
-                    key={`vl-${i}`}
-                    className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center"
-                  />
-                ))}
+              <div className="grid grid-cols-7 gap-4 items-center mb-1">
+                <span className="font-semibold">Visión de Lejos:</span>
+                <input
+                  name="vl_sinc_od"
+                  value={form.vl_sinc_od}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1"
+                />
+                <input
+                  name="vl_sinc_oi"
+                  value={form.vl_sinc_oi}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1"
+                />
+                <input
+                  name="vl_conc_od"
+                  value={form.vl_conc_od}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+                <input
+                  name="vl_conc_oi"
+                  value={form.vl_conc_oi}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+                <input
+                  name="vl_agujero_od"
+                  value={form.vl_agujero_od}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+                <input
+                  name="vl_agujero_oi"
+                  value={form.vl_agujero_oi}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
               </div>
-
-              {/* Binocular + Reflejos Pupilares */}
-              <div className="grid grid-cols-[180px_repeat(6,_80px)] gap-1 items-center">
-                <div className="whitespace-nowrap">Binocular (Reev.)</div>
-                <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center" />
-                <div></div>
-                <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] text-center" />
-                <div></div>
-                <div className="text-right font-semibold whitespace-nowrap col-span-1">
-                  Reflejos Pupilares :
-                </div>
-                <input className="border border-gray-300 rounded px-2 py-1 text-[11px] bg-[#f5f5f5] w-full" />
+              <div className="grid grid-cols-7 gap-4 items-center">
+                <span className="font-semibold">Binocular (Reev.):</span>
+                <input
+                  name="bino_sinc"
+                  value={form.bino_sinc}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 col-span-2"
+                />
+                <input
+                  name="bino_conc"
+                  value={form.bino_conc}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 col-span-2"
+                />
+                <span className="font-semibold text-center">
+                  Reflejos Pupilares:
+                </span>
+                <input
+                  name="reflejos_pupilares"
+                  value={form.reflejos_pupilares}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 "
+                />
+              </div>
+            </div>
+            <div className="border rounded p-4 space-y-4  w-full">
+              <div className="text-blue-700 font-semibold text-center mb-4">
+                EXAMEN CLÍNICO EXTERNO
+              </div>
+              <di className="grid grid-cols-2 gap-3 px-4">
+                <CheckDualLabel
+                  label="Ptosis Palpebral"
+                  nameOd="ptosisPalpebralOd"
+                  nameOi="ptosisPalpebralOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Pterigion (Grado)"
+                  nameOd="pterigionGradoOd"
+                  nameOi="pterigionGradoOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Estrabismo"
+                  nameOd="estrabismoOd"
+                  nameOi="estrabismoOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Pinguécula"
+                  nameOd="pingueculaOd"
+                  nameOi="pingueculaOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Conjuntivitis"
+                  nameOd="conjuntivitisOd"
+                  nameOi="conjuntivitisOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Chalazion"
+                  nameOd="chalazionOd"
+                  nameOi="chalazionOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Cataratas"
+                  nameOd="cataratasOd"
+                  nameOi="cataratasOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+                <CheckDualLabel
+                  label="Otros"
+                  nameOd="otrosOd"
+                  nameOi="otrosOi"
+                  form={form}
+                  onChange={handleCheckBoxChange}
+                />
+              </di>
+              <div className="ml-6">
+                <label className="font-semibold min-w-[65px] mb-1">
+                  Hallazgos (describir):
+                </label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  name="examenClinicoHallazgos"
+                  value={form.examenClinicoHallazgos || ""}
+                  onChange={handleChange}
+                />
               </div>
             </div>
           </div>
@@ -1083,6 +1263,33 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
     </div>
   );
 }
+const CheckDualLabel = ({ label, nameOd, nameOi, form, onChange }) => {
+  return (
+    <div className="flex items-center ">
+      <span className="min-w-[120px] font-semibold">{label}</span>
+      <input
+        type="checkbox"
+        id={nameOd}
+        name={nameOd}
+        checked={form[nameOd]}
+        onChange={onChange}
+      />
+      <label className="ml-2 mr-4" htmlFor={nameOd}>
+        OD
+      </label>
+      <input
+        type="checkbox"
+        name={nameOi}
+        id={nameOi}
+        checked={form[nameOi]}
+        onChange={onChange}
+      />
+      <label className="ml-2" htmlFor={nameOi}>
+        OI
+      </label>
+    </div>
+  );
+};
 
 const EditableSelect = ({ label, name, value, onChange, options = [] }) => {
   const [open, setOpen] = useState(false);
