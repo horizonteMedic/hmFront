@@ -43,6 +43,51 @@ const initialFormState = {
 
   antecedentesPersonales: "NO REFIERE",
   antecedentesFamiliares: "NO REFIERE",
+
+  ishihara: "",
+  coloresPuros: "",
+  estereopsia: "",
+  estereopsiaText: "",
+
+  aplicaRefraccion: "NO",
+  odsfL: "",
+  odcilL: "",
+  odejeL: "",
+
+  oisfL: "",
+  oicilL: "",
+  oiejeL: "",
+  dipL: "",
+
+  odsfC: "",
+  odcilC: "",
+  odejeC: "",
+
+  oisfC: "",
+  oicilC: "",
+  oiejeC: "",
+  dipC: "",
+
+  agudezaOdLejos: "",
+  agudezaOiLejos: "",
+  agudezaOdCerca: "",
+  agudezaOiCerca: "",
+  diagnostico: "",
+
+  ninguna: true,
+  usoCorrectoresCerca: true,
+  usoCorrectoresLejos: true,
+  lentesCorrectoresCerca: true,
+  lentesCorrectoresLejos: true,
+  lentesCambioLunas: true,
+  indicacionPterigion: true,
+  indicacionOtras: true,
+
+  noRestringeActividades: true,
+  restriccionCorrectorLejos: true,
+  restriccionCorrectorCerca: true,
+  noTrabajosCableElectrico: true,
+  noConduccion: true,
 };
 export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialFormState);
@@ -221,9 +266,9 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
         {tab === 0 && (
           <div className="grid grid-cols-2 gap-8">
             {/* Columna 1: Todo el bloque oftalmológico */}
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Evaluación Oftalmológica */}
-              <div className="border rounded p-4">
+              <div className="border rounded p-4 ">
                 <div className="text-blue-700 font-semibold text-center mb-2">
                   EVALUACIÓN OFTALMOLÓGICA
                 </div>
@@ -325,7 +370,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 </div>
               </div>
               {/* PIO y Correctores Oculares */}
-              <div className="flex gap-4">
+              <div className="flex gap-4 ">
                 {/* PIO */}
                 <div className="border rounded p-4  flex flex-col justify-between min-w-[180px] max-w-[220px] w-full">
                   <div className="text-blue-700 font-semibold text-center mb-2">
@@ -364,7 +409,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   </div>
                 </div>
                 {/* Correctores Oculares */}
-                <div className="border rounded p-4  flex-1 min-w-[320px]">
+                <div className="border rounded p-4  flex-1 min-w-[320px] ">
                   <div className="text-blue-700 font-semibold text-center mb-2">
                     CORRECTORES OCULARES
                   </div>
@@ -372,7 +417,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                     <label className="flex items-center gap-1 font-semibold text-[11px]">
                       <input
                         type="radio"
-                        name={"correctorOcular"}
+                        name="correctorOcular"
                         checked={form.correctorOcular === "SI"}
                         onChange={(e) => handleRadioButton(e, "SI")}
                         className="text-[11px]"
@@ -382,7 +427,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                     <label className="flex items-center gap-1 font-semibold text-[11px]">
                       <input
                         type="radio"
-                        name={"correctorOcular"}
+                        name="correctorOcular"
                         checked={form.correctorOcular === "NO"}
                         onChange={(e) => {
                           handleRadioButton(e, "NO");
@@ -497,81 +542,118 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 </div>
                 <div className="grid grid-cols-[260px_1fr] gap-x-2 gap-y-1">
                   {/* Fila 1 */}
-                  <span className="flex items-center h-8 text-[11px]">
+                  <span className="flex items-center h-8 text-[11px] font-semibold">
                     Test de Ishihara (Colores)
                   </span>
                   <div className="flex gap-6 items-center h-8">
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                    <div className="w-32" />
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
                       <input
                         type="radio"
                         name="ishihara"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.ishihara === "NORMAL"}
+                        onChange={(e) => handleRadioButton(e, "NORMAL")}
+                      />
                       Normal
                     </label>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
                       <input
                         type="radio"
                         name="ishihara"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.ishihara === "ANORMAL"}
+                        onChange={(e) => handleRadioButton(e, "ANORMAL")}
+                      />
                       Anormal
                     </label>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
                       <input
                         type="radio"
                         name="ishihara"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.ishihara === "N.C."}
+                        onChange={(e) => handleRadioButton(e, "N.C.")}
+                      />
                       N.C.
                     </label>
                   </div>
                   {/* Fila 2 */}
-                  <span className="flex items-center h-8 text-[11px]">
+                  <span className="flex items-center h-8 text-[11px] font-semibold">
                     Test de Colores Puros (Rojo-Amarillo-Verde)
                   </span>
                   <div className="flex gap-6 items-center h-8">
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                    <div className="w-32" />
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
                       <input
                         type="radio"
-                        name="colores_puros"
+                        name="coloresPuros"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.coloresPuros === "NORMAL"}
+                        onChange={(e) => handleRadioButton(e, "NORMAL")}
+                      />
                       Normal
                     </label>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]" />{" "}
-                    <span className="ml-1 text-[11px]">Anormal</span>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
                       <input
                         type="radio"
-                        name="colores_puros"
+                        name="coloresPuros"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.coloresPuros === "ANORMAL"}
+                        onChange={(e) => handleRadioButton(e, "ANORMAL")}
+                      />
+                      Anormal
+                    </label>
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
+                      <input
+                        type="radio"
+                        name="coloresPuros"
+                        className="text-[11px]"
+                        checked={form.coloresPuros === "N.C."}
+                        onChange={(e) => handleRadioButton(e, "N.C.")}
+                      />
                       N.C.
                     </label>
                   </div>
                   {/* Fila 3 */}
-                  <span className="flex items-center h-8 text-[11px]">
+                  <span className="flex items-center h-8 text-[11px] font-semibold">
                     Estereopsia (Test Profundidad)
                   </span>
-                  <div className="flex gap-2 items-center h-8">
-                    <input className="border rounded px-2 py-1 text-[11px] w-16 mr-2" />
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                  <div className="flex  gap-6 items-center h-8">
+                    <input
+                      name="estereopsiaText"
+                      value={form.estereopsiaText}
+                      onChange={handleChange}
+                      className="border rounded px-2 py-1 text-[11px] w-32"
+                    />
+                    <label className="flex items-center gap-1 font-normal text-[11px] ">
                       <input
                         type="radio"
                         name="estereopsia"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.estereopsia === "NORMAL"}
+                        onChange={(e) => handleRadioButton(e, "NORMAL")}
+                      />
                       Normal
                     </label>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]" />{" "}
-                    <span className="ml-1 text-[11px]">Anormal</span>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
                       <input
                         type="radio"
                         name="estereopsia"
                         className="text-[11px]"
-                      />{" "}
+                        checked={form.estereopsia === "ANORMAL"}
+                        onChange={(e) => handleRadioButton(e, "ANORMAL")}
+                      />
+                      Anormal
+                    </label>
+                    <label className="flex items-center gap-1 font-normal text-[11px]">
+                      <input
+                        type="radio"
+                        name="estereopsia"
+                        className="text-[11px]"
+                        checked={form.estereopsia === "N.C."}
+                        onChange={(e) => handleRadioButton(e, "N.C.")}
+                      />
                       N.C.
                     </label>
                   </div>
@@ -579,73 +661,152 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               </div>
               {/* Refracción */}
               <div className="border rounded p-4">
-                <div className="oftalmo-title mb-2">REFRACCIÓN</div>
+                <div className="text-blue-700 font-semibold text-center mb-2">
+                  REFRACCIÓN
+                </div>
                 <div className="flex items-center gap-8 mb-2">
-                  <div className="flex items-center gap-2">
-                    <input type="checkbox" className="oftalmo-input" />{" "}
-                    <span className="oftalmo-label">Aplica</span>
-                    <input
-                      type="checkbox"
-                      checked
-                      readOnly
-                      className="oftalmo-input"
-                    />{" "}
-                    <span className="oftalmo-label font-semibold">
+                  <div className="flex items-center gap-6 ml-4 mb-2">
+                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                      <input
+                        type="radio"
+                        name="aplicaRefraccion"
+                        checked={form.aplicaRefraccion === "SI"}
+                        onChange={(e) => handleRadioButton(e, "SI")}
+                      />
+                      Aplica
+                    </label>
+                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                      <input
+                        type="radio"
+                        name="aplicaRefraccion"
+                        checked={form.aplicaRefraccion === "NO"}
+                        onChange={(e) => handleRadioButton(e, "NO")}
+                      />
                       No Aplica
-                    </span>
+                    </label>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   {/* De Lejos */}
-                  <div className="border rounded p-2">
-                    <div className="oftalmo-title mb-1">DE LEJOS</div>
+                  <div className="border rounded p-4">
+                    <div className="mb-4 font-bold">REFRACCIÓN DE LEJOS</div>
                     <div className="grid grid-cols-4 gap-2 items-center mb-1">
                       <div></div>
-                      <span>SF</span>
-                      <span>CIL.</span>
-                      <span>EJE</span>
+                      <span className="text-center font-semibold">SF</span>
+                      <span className="text-center font-semibold">CIL</span>
+                      <span className="text-center font-semibold">EJE</span>
                     </div>
                     <div className="grid grid-cols-4 gap-2 items-center mb-1">
-                      <span className="oftalmo-label">OD</span>
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
+                      <span className=" font-semibold">OD</span>
+                      <input
+                        name="odsfL"
+                        value={form.odsfL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1"
+                      />
+                      <input
+                        name="odcilL"
+                        value={form.odcilL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
+                      <input
+                        name="odejeL"
+                        value={form.odejeL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
                     </div>
                     <div className="grid grid-cols-4 gap-2 items-center mb-1">
-                      <span className="oftalmo-label">OI</span>
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
+                      <span className="font-semibold">OI</span>
+                      <input
+                        name="oisfL"
+                        value={form.oisfL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1"
+                      />
+                      <input
+                        name="oicilL"
+                        value={form.oicilL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
+                      <input
+                        name="oiejeL"
+                        value={form.oiejeL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
                     </div>
                     <div className="grid grid-cols-4 gap-2 items-center">
-                      <span className="oftalmo-label">DIP</span>
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
+                      <span className=" font-semibold">DIP</span>
+                      <input
+                        name="dipL"
+                        value={form.dipL}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1  col-span-2 "
+                      />
                     </div>
                   </div>
                   {/* De Cerca */}
-                  <div className="border rounded p-2">
-                    <div className="oftalmo-title mb-1">DE CERCA</div>
+                  <div className="border rounded p-4">
+                    <div className="font-bold mb-4">REFRACCIÓN DE CERCA</div>
                     <div className="grid grid-cols-4 gap-2 items-center mb-1">
                       <div></div>
-                      <span>SF</span>
-                      <span>CIL.</span>
-                      <span>EJE</span>
+                      <span className="text-center font-semibold">SF</span>
+                      <span className="text-center font-semibold">CIL.</span>
+                      <span className="text-center font-semibold">EJE</span>
                     </div>
                     <div className="grid grid-cols-4 gap-2 items-center mb-1">
-                      <span className="oftalmo-label">OD</span>
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
+                      <span className=" font-semibold">OD</span>
+                      <input
+                        name="odsfC"
+                        value={form.odsfC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1"
+                      />
+                      <input
+                        name="odcilC"
+                        value={form.odcilC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
+                      <input
+                        name="odejeC"
+                        value={form.odejeC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
                     </div>
                     <div className="grid grid-cols-4 gap-2 items-center mb-1">
-                      <span className="oftalmo-label">OI</span>
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
+                      <span className="font-semibold">OI</span>
+                      <input
+                        name="oisfC"
+                        value={form.oisfC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1"
+                      />
+                      <input
+                        name="oicilC"
+                        value={form.oicilC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
+                      <input
+                        name="oiejeC"
+                        value={form.oiejeC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1 "
+                      />
                     </div>
                     <div className="grid grid-cols-4 gap-2 items-center">
-                      <span className="oftalmo-label">DIP</span>
-                      <input className="border rounded px-2 py-1 oftalmo-input w-12" />
+                      <span className=" font-semibold">DIP</span>
+                      <input
+                        name="dipC"
+                        value={form.dipC}
+                        onChange={handleChange}
+                        className="border rounded px-2 py-1  col-span-2 "
+                      />
                     </div>
                   </div>
                 </div>
@@ -658,27 +819,48 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             {/* Columna izquierda: Agudeza Visual y Diagnóstico */}
             <div>
               {/* Agudeza Visual Final */}
-              <div>
-                <div className="text-blue-700 font-semibold text-[11px] mb-1">
-                  AGUDEZA <span className="text-red-600">VISUAL FINAL</span>{" "}
-                  <span className="text-blue-700">(CON REFRACCIÓN)</span>
+              <div className="border rounded p-4 ">
+                <div className="text-blue-700 font-semibold text-center mb-4">
+                  AGUDEZA VISUAL FINAL (CON REFRACCIÓN)
                 </div>
-                <div className="border rounded p-2 mb-4 w-[340px]">
-                  <div className="grid grid-cols-3 gap-2 items-center mb-2">
-                    <div></div>
-                    <span className="text-center">OD</span>
-                    <span className="text-center">OI</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 items-center mb-1">
-                    <span>De Lejos</span>
-                    <input className="border rounded px-2 py-1 w-20 text-[11px]" />
-                    <input className="border rounded px-2 py-1 w-20 text-[11px]" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 items-center">
-                    <span>De Cerca</span>
-                    <input className="border rounded px-2 py-1 w-20 text-[11px]" />
-                    <input className="border rounded px-2 py-1 w-20 text-[11px]" />
-                  </div>
+                <div className="grid grid-cols-5 gap-3 items-center mb-3">
+                  <div></div>
+                  <span className="text-center font-semibold col-span-2">
+                    OD
+                  </span>
+                  <span className="text-center font-semibold col-span-2">
+                    OI
+                  </span>
+                </div>
+                <div className="grid grid-cols-5 gap-3 items-center mb-3">
+                  <span className="font-semibold">De Lejos</span>
+                  <input
+                    name="agudezaOdLejos"
+                    value={form.agudezaOdLejos}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1  col-span-2"
+                  />
+                  <input
+                    name="agudezaOiLejos"
+                    value={form.agudezaOiLejos}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1  col-span-2"
+                  />
+                </div>
+                <div className="grid grid-cols-5 gap-3 items-center mb-3">
+                  <span className="font-semibold">De Cerca</span>
+                  <input
+                    name="agudezaOdCerca"
+                    value={form.agudezaOdCerca}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1 col-span-2"
+                  />
+                  <input
+                    name="agudezaOiCerca"
+                    value={form.agudezaOiCerca}
+                    onChange={handleChange}
+                    className="border rounded px-2 py-1 col-span-2"
+                  />
                 </div>
               </div>
               {/* Diagnóstico */}
@@ -686,79 +868,148 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 <div className="font-semibold text-[11px] mb-1">
                   DIAGNÓSTICO
                 </div>
-                <div className="border rounded p-2">
-                  <textarea className="w-full h-24 border rounded p-2 text-[11px] resize-none bg-[#f5f5f5]" />
-                </div>
+                <textarea
+                  name="diagnostico"
+                  value={form.diagnostico}
+                  onChange={handleChange}
+                  className="w-full h-24 border rounded p-2 text-[11px] resize-none"
+                />
               </div>
             </div>
             {/* Columna derecha: Indicaciones y Restricciones */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 ">
               {/* Indicaciones */}
-              <div className="border rounded p-2 bg-[#f5f5f5]">
-                <div className="text-blue-700 font-semibold text-[11px] mb-1">
+              <div className="border rounded p-4 ">
+                <div className="text-blue-700 font-semibold text-center mb-4">
                   INDICACIONES
                 </div>
-                <div className="flex flex-col gap-1">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Ninguna
+                <div className="flex flex-col gap-1 items-start">
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="ninguna"
+                      checked={form.ninguna}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Ninguna
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Uso de
-                    Correctores Oculares Cerca
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="usoCorrectoresCerca"
+                      checked={form.usoCorrectoresCerca}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Uso de Correctores Oculares Cerca
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Uso de
-                    Correctores Oculares Lejos (Trabajos de Oficina)
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="usoCorrectoresLejos"
+                      checked={form.usoCorrectoresLejos}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Uso de Correctores Oculares Lejos (Trabajos de Oficina)
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Control
-                    complementario por Oftalmología : Lentes correctores - Cerca
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="lentesCorrectoresCerca"
+                      checked={form.lentesCorrectoresCerca}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Control complementario por Oftalmología : Lentes correctores
+                    - Cerca
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Control
-                    complementario por Oftalmología : Lentes correctores - Lejos
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="lentesCorrectoresLejos"
+                      checked={form.lentesCorrectoresLejos}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Control complementario por Oftalmología : Lentes correctores
+                    - Lejos
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Lentes:
-                    Cambio de Lunas
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="lentesCambioLunas"
+                      checked={form.lentesCambioLunas}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Lentes: Cambio de Lunas
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Pterigion
-                    III° - IV°
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="indicacionPterigion"
+                      checked={form.indicacionPterigion}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Pterigion III° - IV°
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Otras
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="indicacionOtras"
+                      checked={form.indicacionOtras}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Otras
                   </label>
                 </div>
               </div>
               {/* Restricciones */}
-              <div className="border rounded p-2 bg-[#f5f5f5]">
-                <div className="font-semibold text-[11px] mb-1">
-                  <span className="text-blue-700">RESTRICCIONES</span>{" "}
-                  <span className="text-red-600">
-                    (Aplican al entorno laboral)
-                  </span>
+              <div className="border rounded p-4">
+                <div className="text-blue-700 font-semibold text-center mb-4">
+                  RESTRICCIONES (Aplican al entorno laboral)
                 </div>
                 <div className="flex flex-col gap-1">
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> No
-                    restringe actividades labores en el puesto de trabajo
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="noRestringeActividades"
+                      checked={form.noRestringeActividades}
+                      onChange={handleCheckBoxChange}
+                    />
+                    No restringe actividades labores en el puesto de trabajo
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Uso de
-                    Correctores Oculares - Lejos
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="restriccionCorrectorLejos"
+                      checked={form.restriccionCorrectorLejos}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Uso de Correctores Oculares - Lejos
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> Uso de
-                    Correctores Oculares - Cerca (Trabajos de Oficina)
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="restriccionCorrectorCerca"
+                      checked={form.restriccionCorrectorCerca}
+                      onChange={handleCheckBoxChange}
+                    />
+                    Uso de Correctores Oculares - Cerca (Trabajos de Oficina)
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> No
-                    trabajos con cables eléctricos ni fibra óptica
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="noTrabajosCableElectrico"
+                      checked={form.noTrabajosCableElectrico}
+                      onChange={handleCheckBoxChange}
+                    />
+                    No trabajos con cables eléctricos ni fibra óptica
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="checkbox" className="text-[11px]" /> No
-                    conducción vehicular
+                  <label className="flex gap-2 font-normal">
+                    <input
+                      type="checkbox"
+                      name="noConduccion"
+                      checked={form.noConduccion}
+                      onChange={handleCheckBoxChange}
+                    />
+                    No conducción vehicular
                   </label>
                 </div>
               </div>
