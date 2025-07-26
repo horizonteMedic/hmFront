@@ -140,7 +140,8 @@ export default function Oftalmologia(datos = {}) {
 
   // Arreglo de firmas que quieres cargar
   const firmasAPintar = [
-    { nombre: "SELLOFIRMADOCASIG", x: 80, y: 180, maxw: 120 },
+    { nombre: "SELLOFIRMADOCASIG", x: 20, y: 220, maxw: 120 },
+    { nombre: "SELLOFIRMA", x: 80, y: 220, maxw: 100 },
   ];
   agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);

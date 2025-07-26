@@ -29,7 +29,7 @@ const Oftalmologia = ({ token, selectedSede, userlogued }) => {
             }`}
             onClick={() => setActiveTab(0)}
           >
-            <FontAwesomeIcon icon={faEye} className="mr-2" /> Oftalmología
+            <FontAwesomeIcon icon={faEye} className="mr-2" />Ficha Oftalmológica
           </button>
           <button
             className={`${styles.labNavButton}${
@@ -37,21 +37,21 @@ const Oftalmologia = ({ token, selectedSede, userlogued }) => {
             }`}
             onClick={() => setActiveTab(1)}
           >
-            <FontAwesomeIcon icon={faEye} className="mr-2" /> Oftalmología Ohla
+            <FontAwesomeIcon icon={faEye} className="mr-2" />Oftalmología
           </button>
         </nav>
         <div className={styles.labContent}>
           {activeTab === 0 && (
             <OftalmologiaForm
               token={token}
-              userlogued={userlogued.sub}
+              userlogued={userlogued}
               selectedSede={selectedSede}
             />
           )}
           {activeTab === 1 && (
             <OftalmologiaOhla
               token={token}
-              userlogued={userlogued.sub}
+              userlogued={userlogued}
               selectedSede={selectedSede}
             />
           )}
