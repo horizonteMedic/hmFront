@@ -292,7 +292,7 @@ const AudiometriaFichaAudiologica = ({
               </label>
               <input
                 name="aniosTrabajo"
-                value={form.aniosTrabajo || ""}
+                value={form.aniosTrabajo ?? ""}
                 onChange={handleChangeNumber}
                 maxLength={3}
                 className="border rounded px-2 py-1  text-[12px] w-[50px]"
@@ -304,7 +304,7 @@ const AudiometriaFichaAudiologica = ({
               <label className="font-bold text-[13px]">y Meses :</label>
               <input
                 name="mesesTrabajo"
-                value={form.mesesTrabajo || ""}
+                value={form.mesesTrabajo ?? ""}
                 onChange={handleChangeNumber}
                 maxLength={2}
                 className="border border-gray-400 rounded px-2 py-1 text-[12px] w-[50px]"
