@@ -328,7 +328,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   doc.text(`X`, margin + 51.7 + (datos.medicamentosOtotoxicos ? 0 : 4.5), newY);
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(datos.cualesAntecedentes, margin + 75, newY + 0.5, {
-    maxWidth: 50,
+    maxWidth: 120,
   });
 
   // =====================
@@ -387,7 +387,7 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
 
   newY -= 1;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(`${datos.txteootros}`, margin + 35, newY + 43.5, { maxWidth: 50 });
+  doc.text(`${datos.txteootros}`, margin + 35, newY + 43.5, { maxWidth: 120 });
   newY += 9.1;
   // =====================
   // 4.- Exposición Ocupacional
@@ -401,16 +401,16 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     margin + 138.7 + (datos.otrosExtraLaborales ? 0 : 4.5),
     newY + 0.6
   );
-  doc.text(`${datos.txtaecuales}`, margin + 41.2, newY + 4.6, {
-    maxWidth: 60,
+  doc.text(`${datos.txtaecuales}`, margin + 30, newY + 4.6, {
+    maxWidth: 120,
   });
 
   // =====================
   // 5.- Exposición Ocupacional
   // =====================
   newY += 10.5;
-  doc.text(`${datos.txtood}`, margin + 55, newY - 0.7, { maxWidth: 20 });
-  doc.text(`${datos.txtooi}`, margin + 107, newY - 0.7, { maxWidth: 30 });
+  doc.text(`${datos.txtood}`, margin + 48, newY - 0.7, { maxWidth: 50 });
+  doc.text(`${datos.txtooi}`, margin + 128, newY - 0.7, { maxWidth: 50 });
   // =====================
   // 7.- Audiometría
   // =====================
@@ -612,7 +612,6 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
 
   // Texto subrayado para el diagnóstico del oído derecho
   const diagOdText = String(datos.txtdiagOd || "");
-  const diagOdWidth = doc.getTextWidth(diagOdText);
   doc.text(diagOdText, margin + 25, y);
   // doc.line(margin + 25, y + 1, margin + 25 + diagOdWidth, y + 1);
 
@@ -621,7 +620,6 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
 
   // Texto subrayado para el diagnóstico del oído izquierdo
   const diagOiText = String(datos.txtdiagOi || "");
-  const diagOiWidth = doc.getTextWidth(diagOiText);
   doc.text(diagOiText, margin + 25, y);
   // doc.line(margin + 25, y + 1, margin + 25 + diagOiWidth, y + 1);
 
