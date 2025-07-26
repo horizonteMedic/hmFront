@@ -137,7 +137,8 @@ export default function FichaAudiologica_Digitalizado(
     edad: obtener("edad"),
     sexo: obtener("genero"),
     ocupacion: obtener("ocupacion"),
-    aniosTrabajo: obtener("tiempoTrabajo"),
+    aniosTrabajo: data.tiempoTrabajo ?? "",
+    txtMesesTrabajo: data.txtMesesTrabajo ?? "",
     contrata: obtener("contrata"),
     empresa: obtener("empresa"),
     tiempoExposicion: obtener("tiempoExposicionTotalPonderado"),
@@ -355,12 +356,17 @@ export default function FichaAudiologica_Digitalizado(
   doc.text(String(datos.ocupacion || ""), xOcupacion, yOcupacion, {
     maxWidth: 60,
   });
-
+  doc.setFont("helvetica", "normal").setFontSize(6);
   // Años de trabajo
-  const xAniosTrabajo = margin + 188;
-  const yAniosTrabajo = margin + 64.5;
-  doc.text(String(datos.aniosTrabajo || ""), xAniosTrabajo, yAniosTrabajo);
-
+  const xAniosTrabajo = margin + 183;
+  const yAniosTrabajo = margin + 63.5;
+  doc.text(
+    `${datos.aniosTrabajo ?? "0"} Años, ${datos.txtMesesTrabajo ?? "0"} Meses`,
+    xAniosTrabajo,
+    yAniosTrabajo,
+    {maxWidth:12}
+  );
+  doc.setFont("helvetica", "normal").setFontSize(7);
   // Empresa Contrata
   const xContrata = margin + 35;
   const yContrata = margin + 70;

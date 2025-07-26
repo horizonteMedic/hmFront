@@ -81,301 +81,301 @@ export default function AudiometriaOhla({
       // txtDiagnostico la caja de texto donde mandara el resultado.
       if (prom1 > 90) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO  LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO PROFUNDA";
         }
       } else if (prom1 > 70 && prom1 <= 90) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO  LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO SEVERA";
         }
       } else if (prom1 > 55 && prom1 <= 70) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO  LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO  MODERADA-SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  MODERADA-SEVERA";
         }
       } else if (prom1 > 40 && prom1 <= 55) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO  LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA IZQUIERDO  MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  MODERADA";
         }
       } else if (prom1 > 25 && prom1 <= 40) {
-        textoDiagnostico = "- HIPOACUSIA IZQUIERDO  LEVE";
+        textoDiagnostico = "- HIPOACUSIA OIDO IZQUIERDO  LEVE";
       } else if (prom1 >= -10 && prom1 <= 25) {
         textoDiagnostico = "NORMAL";
       }
     } else if (prom >= 26 && prom <= 40) {
       if (prom1 >= 90) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO PROFUNDA";
         }
       } else if (prom1 >= 71 && prom1 <= 90) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO SEVERA";
         }
       } else if (prom1 >= 56 && prom1 <= 70) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA-SEVERA";
         }
       } else if (prom1 >= 41 && prom1 <= 55) {
         if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         }
       } else if (prom1 >= 26 && prom1 <= 40) {
         textoDiagnostico = "- HIPOACUSIA BILATERAL LEVE";
       } else if (prom1 >= -10 && prom1 <= 25) {
-        textoDiagnostico = "- HIPOACUSIA DERECHO LEVE";
+        textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE";
       }
     } else if (prom >= 41 && prom <= 55) {
       if (prom1 >= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO PROFUNDA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO PROFUNDA";
+            "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO PROFUNDA";
         }
       } else if (prom1 >= 71 && prom1 <= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO SEVERA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO SEVERA";
         }
       } else if (prom1 >= 56 && prom1 <= 70) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA-SEVERA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO MODERADA-SEVERA";
         }
       } else if (prom1 >= 41 && prom1 <= 55) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico = "- HIPOACUSIA BILATERAL MODERADA";
         }
       } else if (prom1 >= 26 && prom1 <= 40) {
         if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA Y OIDO IZQUIERDO LEVE";
         }
       } else if (prom1 >= -10 && prom1 <= 25) {
         if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHOLEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHOLEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA";
         }
       }
     } else if (prom >= 56 && prom <= 70) {
       if (prom1 >= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO PROFUNDA";
         } else if (cont1 == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO LEVE";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO PROFUNDA";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO PROFUNDA";
         }
       } else if (prom1 >= 71 && prom1 <= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO SEVERA";
         } else if (cont1 == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO LEVE";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO SEVERA";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO SEVERA";
         }
       } else if (prom1 >= 56 && prom1 <= 70) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA-SEVERA";
         } else if (cont1 == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO LEVE";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico = "- HIPOACUSIA BILATERAL MODERADA-SEVERA";
         }
       } else if (prom1 >= 41 && prom1 <= 55) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         } else if (cont1 == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO LEVE";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO MODERADA";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO MODERADA";
         }
       } else if (prom1 >= 26 && prom1 <= 40) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO MODERADA-SEVERA Y IZQUIERDO LEVE";
+            "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA Y OIDO IZQUIERDO LEVE";
         }
       } else if (prom1 >= -10 && prom1 <= 25) {
         if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO MODERADA-SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO MODERADA-SEVERA";
         }
       }
     } else if (prom >= 71 && prom <= 90) {
       if (prom1 >= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO PROFUNDA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO PROFUNDA";
         }
       } else if (prom1 >= 71 && prom1 <= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO SEVERA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico = "- HIPOACUSIA BILATERAL SEVERA";
         }
       } else if (prom1 >= 56 && prom1 <= 70) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA-SEVERA ";
+            "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA-SEVERA ";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO MODERADA-SEVERA";
         }
       } else if (prom1 >= 41 && prom1 <= 55) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO MODERADA";
         }
       } else if (prom1 >= 26 && prom1 <= 40) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA Y OIDO IZQUIERDO LEVE ";
         }
       } else if (prom1 >= -10 && prom1 <= 25) {
         if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO SEVERA";
         }
       }
     } else if (prom >= 90) {
       if (prom1 >= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO PROFUNDA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO PROFUNDA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico = "- HIPOACUSIA BILATERAL PROFUNDA";
         }
       } else if (prom1 >= 71 && prom1 <= 90) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO SEVERA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO PROFUNDA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA Y OIDO IZQUIERDO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHA PROFUNDA Y IZQUIERDA SEVERA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA Y IZQUIERDA SEVERA";
         }
       } else if (prom1 >= 56 && prom1 <= 70) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA-SEVERA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO PROFUNDA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHA PROFUNDA Y IZQUIERDA MODERADA-SEVERA";
+            "- HIPOACUSIA OIDO DERECHO PROFUNDA Y IZQUIERDA MODERADA-SEVERA";
         }
       } else if (prom1 >= 41 && prom1 <= 55) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         } else if (cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO PROFUNDA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA Y OIDO IZQUIERDO LEVE";
         } else {
           textoDiagnostico =
-            "- HIPOACUSIA DERECHA PROFUNDA Y IZQUIERDA MODERADA";
+            "- HIPOACUSIA OIDO DERECHO PROFUNDA Y IZQUIERDA MODERADA";
         }
       } else if (prom1 >= 26 && prom1 <= 40) {
         if (cont == 1 && cont1 == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO Y IZQUIERDO LEVE ";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO Y OIDO IZQUIERDO LEVE ";
         } else if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE Y IZQUIERDO MODERADA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE Y OIDO IZQUIERDO MODERADA";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO PROFUNDA Y IZQUIERDO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA Y OIDO IZQUIERDO LEVE";
         }
       } else if (prom1 >= -10 && prom1 <= 25) {
         if (cont == 1) {
-          textoDiagnostico = "- HIPOACUSIA DERECHO LEVE";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO LEVE";
         } else {
-          textoDiagnostico = "- HIPOACUSIA DERECHO PROFUNDA";
+          textoDiagnostico = "- HIPOACUSIA OIDO DERECHO PROFUNDA";
         }
       }
     }

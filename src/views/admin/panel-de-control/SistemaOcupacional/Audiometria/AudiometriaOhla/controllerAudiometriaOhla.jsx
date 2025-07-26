@@ -120,12 +120,23 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     console.log(res);
     if (res.id === 1 || res.id === 0) {
       Swal.fire({
-        title: "Éxito",
-        text: res.mensaje,
+        title: "Exito",
+        text: `${res.mensaje},\n¿Desea imprimir?`,
         icon: "success",
+        showCancelButton: true,
         confirmButtonColor: "#3085d6",
-      }).then(() => {
+        cancelButtonColor: "#d33",
+      }).then((result) => {
         limpiar();
+        if (result.isConfirmed) {
+          PrintHojaR(
+            form.norden,
+            token,
+            tabla,
+            form.activar_grafico,
+            form.asignar_especialista
+          );
+        }
       });
     } else {
       Swal.fire("Error", "Ocurrio un error al Registrar", "error");
