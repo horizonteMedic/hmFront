@@ -7,25 +7,56 @@ export default function Oftalmologia(datos = {}) {
   const margin = 10;
   let y = 60;
   const pageW = doc.internal.pageSize.getWidth();
+  
+  // Función para formatear fecha a DD/MM/YYYY
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "";
+    
+    if (fecha.includes("-")) {
+      // Formato yyyy-mm-dd del backend
+      const [yyyy, mm, dd] = fecha.split("-");
+      return `${dd}/${mm}/${yyyy}`;
+    } else if (fecha.includes("/")) {
+      // Si ya viene con /, verificar el formato
+      const partes = fecha.split("/");
+      if (partes.length === 3) {
+        if (partes[0].length === 4) {
+          // Formato yyyy/mm/dd
+          const [yyyy, mm, dd] = partes;
+          return `${dd}/${mm}/${yyyy}`;
+        }
+        // Si ya está en dd/mm/yyyy, se mantiene igual
+        return fecha;
+      }
+    }
+    return fecha;
+  };
+  
   // Datos personales
   doc.setFont("helvetica", "normal").setFontSize(11);
   doc.text(`Nombres :  ${datos.nombres || ""}`, margin, y);
-  doc.text(`Edad:  ${datos.edad || ""}  años`, pageW / 2, y, {
-    align: "center",
+  
+  // Calcular posición dinámica para la edad basada en el ancho del nombre
+  const nombreCompleto = `Nombres :  ${datos.nombres || ""}`;
+  const nombreWidth = doc.getTextWidth(nombreCompleto);
+  const edadX = Math.max(margin + nombreWidth + 10, pageW / 2); // Mínimo 10 unidades de separación
+  doc.text(`Edad:  ${datos.edad || ""}  años`, edadX, y, {
+    align: "left",
   });
-  doc.text(`Fecha :  ${datos.fechaOf || ""}`, pageW - margin, y, {
+  
+  doc.text(`Fecha :  ${formatearFecha(datos.fechaOf)}`, pageW - margin, y, {
     align: "right",
   });
   y += 8;
 
   doc.text(`Examen :  ${datos.nomExam || ""}`, margin, y);
   y += 8;
-  doc.text(`Contrata :  ${datos.contrata || ""}`, margin, y);
+  doc.text(`Contrata :  ${datos.contrata || ""}`, margin, y, { maxWidth: 150 });
   y += 8;
-  doc.text(`Empresa :  ${datos.empresa || ""}`, margin, y);
+  doc.text(`Empresa :  ${datos.empresa || ""}`, margin, y, { maxWidth: 150 });
   y += 8;
   // Caja principal
-  const boxH = 70;
+  const boxH = 120; // Aumentado de 100 a 120 para que contenga todo el contenido
   doc.setLineWidth(0.7);
   doc.rect(margin, y, pageW - 2 * margin, boxH);
   doc.setLineWidth(0.2);
@@ -40,55 +71,72 @@ export default function Oftalmologia(datos = {}) {
   doc.text("O.I", margin + 155, y + 18, { align: "center" });
   // Visión de cerca
   doc.text("Visión de Cerca :", margin + 5, y + 28);
-  doc.rect(margin + 40, y + 22, 18, 12);
-  doc.text(`${datos.vcercaSOd || ""}`, margin + 49, y + 30, {
+  doc.rect(margin + 40, y + 22, 18, 8);
+  doc.text(`${datos.vcercaSOd || ""}`, margin + 49, y + 26, {
     align: "center",
   });
-  doc.rect(margin + 70, y + 22, 18, 12);
-  doc.text(`${datos.vcercaSOi || ""}`, margin + 79, y + 30, {
+  doc.rect(margin + 70, y + 22, 18, 8);
+  doc.text(`${datos.vcercaSOi || ""}`, margin + 79, y + 26, {
     align: "center",
   });
-  doc.rect(margin + 120, y + 22, 18, 12);
-  doc.text(`${datos.vcercaCOd || ""}`, margin + 129, y + 30, {
+  doc.rect(margin + 120, y + 22, 18, 8);
+  doc.text(`${datos.vcercaCOd || ""}`, margin + 129, y + 26, {
     align: "center",
   });
-  doc.rect(margin + 150, y + 22, 18, 12);
-  doc.text(`${datos.vcercaCOi || ""}`, margin + 159, y + 30, {
+  doc.rect(margin + 150, y + 22, 18, 8);
+  doc.text(`${datos.vcercaCOi || ""}`, margin + 159, y + 26, {
     align: "center",
   });
   // Visión de lejos
   doc.text("Visión de Lejos :", margin + 5, y + 48);
-  doc.rect(margin + 40, y + 42, 18, 12);
-  doc.text(`${datos.vlejosSOd || ""}`, margin + 49, y + 50, {
+  doc.rect(margin + 40, y + 42, 18, 8);
+  doc.text(`${datos.vlejosSOd || ""}`, margin + 49, y + 46, {
     align: "center",
   });
-  doc.rect(margin + 70, y + 42, 18, 12);
-  doc.text(`${datos.vlejosSOi || ""}`, margin + 79, y + 50, {
+  doc.rect(margin + 70, y + 42, 18, 8);
+  doc.text(`${datos.vlejosSOi || ""}`, margin + 79, y + 46, {
     align: "center",
   });
-  doc.rect(margin + 120, y + 42, 18, 12);
-  doc.text(`${datos.vlejosCOd || ""}`, margin + 129, y + 50, {
+  doc.rect(margin + 120, y + 42, 18, 8);
+  doc.text(`${datos.vlejosCOd || ""}`, margin + 129, y + 46, {
     align: "center",
   });
-  doc.rect(margin + 150, y + 42, 18, 12);
-  doc.text(`${datos.vlejosCOi || ""}`, margin + 159, y + 50, {
+  doc.rect(margin + 150, y + 42, 18, 8);
+  doc.text(`${datos.vlejosCOi || ""}`, margin + 159, y + 46, {
     align: "center",
   });
+  
+  // Sección de observaciones con formato de dos columnas
+  const labelX = margin + 45; // Movido más a la derecha para que no se corte
+  const dataX = margin + 55; // Movido muy cerca del label para eliminar espacio vacío
+  const startY = y + 65;
+  const lineHeight = 8;
+  
   // Visión de colores
-  doc.text("Visión de Colores :", margin + 5, y + 65);
-  doc.text(`${datos.vcolores || ""}`, margin + 49, y + 65);
+  doc.text("Visión de Colores", labelX, startY, { align: "right" });
+  doc.text(":", labelX + 2, startY);
+  doc.text(`${(datos.vcolores || "").toUpperCase()}`, dataX, startY);
+  
   // Visión binocular
-  doc.text("Visión Binocular :", margin + 5, y + 75);
-  doc.text(`${datos.vbinocular || ""}`, margin + 49, y + 75);
+  doc.text("Visión Binocular", labelX, startY + lineHeight, { align: "right" });
+  doc.text(":", labelX + 2, startY + lineHeight);
+  doc.text(`${(datos.vbinocular || "").toUpperCase()}`, dataX, startY + lineHeight);
+  
   // Reflejos pupilares
-  doc.text("Reflejos Pupilares :", margin + 80, y + 65);
-  doc.text(`${datos.rpupilares || ""}`, margin + 130, y + 65);
+  doc.text("Reflejos Pupilares", labelX, startY + lineHeight * 2, { align: "right" });
+  doc.text(":", labelX + 2, startY + lineHeight * 2);
+  doc.text(`${(datos.rpupilares || "").toUpperCase()}`, dataX, startY + lineHeight * 2);
+  
   // Enfermedades oculares
-  doc.text("Enfermedades Oculares :", margin + 80, y + 75);
-  doc.text(`${datos.eoculares || ""}`, margin + 130, y + 75);
-  // Observación extra
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`${datos.eoculares1 || ""}`, margin + 80, y + 85);
+  doc.text("Enfermedades Oculares", labelX, startY + lineHeight * 3, { align: "right" });
+  doc.text(":", labelX + 2, startY + lineHeight * 3);
+  doc.text(`${(datos.eoculares || "").toUpperCase()}`, dataX, startY + lineHeight * 3);
+  
+  // Observación extra - alineada con el primer dato, no con la etiqueta
+  if (datos.eoculares1) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(`${(datos.eoculares1 || "").toUpperCase()}`, dataX, startY + lineHeight * 4);
+  }
 
   // Arreglo de firmas que quieres cargar
   const firmasAPintar = [
