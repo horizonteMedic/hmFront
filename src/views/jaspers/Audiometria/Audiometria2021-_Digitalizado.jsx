@@ -549,9 +549,9 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
     const yP = graphY + ((punto.db + 10) / 130) * graphH;
     // Color correcto para corchetes
     if (punto.tipo === "bracketLeft") {
-      doc.setDrawColor(255, 0, 0); // rojo
+      doc.setDrawColor(224, 7, 7); // rojo #e00707
     } else if (punto.tipo === "bracketRight") {
-      doc.setDrawColor(0, 0, 255); // azul
+      doc.setDrawColor(18, 18, 222); // azul #1212de
     } else if (punto.color === "red") doc.setDrawColor(255, 0, 0);
     else if (punto.color === "blue") doc.setDrawColor(0, 0, 255);
     else doc.setDrawColor(0, 0, 0);
@@ -564,14 +564,16 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
       doc.line(x - size / 2, yP + size / 2, x + size / 2, yP - size / 2);
     } else if (punto.tipo === "bracketLeft") {
       const size = 2;
-      doc.line(x - size / 2, yP - size / 2, x - size / 2, yP + size / 2);
-      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
-      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+      const height = 3.5; // 1.5 puntos más alto (2 + 1.5 = 3.5)
+      doc.line(x - size / 2, yP - height / 2, x - size / 2, yP + height / 2);
+      doc.line(x - size / 2, yP - height / 2, x + size / 2, yP - height / 2);
+      doc.line(x - size / 2, yP + height / 2, x + size / 2, yP + height / 2);
     } else if (punto.tipo === "bracketRight") {
       const size = 2;
-      doc.line(x + size / 2, yP - size / 2, x + size / 2, yP + size / 2);
-      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
-      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+      const height = 3.5; // 1.5 puntos más alto (2 + 1.5 = 3.5)
+      doc.line(x + size / 2, yP - height / 2, x + size / 2, yP + height / 2);
+      doc.line(x - size / 2, yP - height / 2, x + size / 2, yP - height / 2);
+      doc.line(x - size / 2, yP + height / 2, x + size / 2, yP + height / 2);
     }
     doc.setDrawColor(0, 0, 0);
   });

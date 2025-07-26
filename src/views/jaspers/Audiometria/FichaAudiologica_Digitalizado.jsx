@@ -617,7 +617,12 @@ export default function FichaAudiologica_Digitalizado(
     const x = graphX + freqIdx * (graphW / 8);
     // Ajuste: usar rango 130 dB (-10 a 120)
     const yP = graphY + ((punto.db + 10) / 130) * graphH;
-    if (punto.color === "red") doc.setDrawColor(255, 0, 0);
+    // Color correcto para corchetes
+    if (punto.tipo === "bracketLeft") {
+      doc.setDrawColor(224, 7, 7); // rojo #e00707
+    } else if (punto.tipo === "bracketRight") {
+      doc.setDrawColor(18, 18, 222); // azul #1212de
+    } else if (punto.color === "red") doc.setDrawColor(255, 0, 0);
     else if (punto.color === "blue") doc.setDrawColor(0, 0, 255);
     else doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.4);
@@ -630,19 +635,21 @@ export default function FichaAudiologica_Digitalizado(
       doc.line(x - size / 2, yP + size / 2, x + size / 2, yP - size / 2);
     } else if (punto.tipo === "bracketLeft") {
       // Dibujar un '[' centrado en (x, yP)
-      const size = 1.5;
-      doc.line(x - size / 2, yP - size / 2, x - size / 2, yP + size / 2);
-      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
-      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+      const size = 2;
+      const height = 3.5; // 1.5 puntos más alto (2 + 1.5 = 3.5)
+      doc.line(x - size / 2, yP - height / 2, x - size / 2, yP + height / 2);
+      doc.line(x - size / 2, yP - height / 2, x + size / 2, yP - height / 2);
+      doc.line(x - size / 2, yP + height / 2, x + size / 2, yP + height / 2);
     } else if (punto.tipo === "bracketRight") {
       // Dibujar un ']' centrado en (x, yP)
-      const size = 1.5;
+      const size = 2;
+      const height = 3.5; // 1.5 puntos más alto (2 + 1.5 = 3.5)
       // Línea vertical derecha
-      doc.line(x + size / 2, yP - size / 2, x + size / 2, yP + size / 2);
+      doc.line(x + size / 2, yP - height / 2, x + size / 2, yP + height / 2);
       // Línea base superior
-      doc.line(x - size / 2, yP - size / 2, x + size / 2, yP - size / 2);
+      doc.line(x - size / 2, yP - height / 2, x + size / 2, yP - height / 2);
       // Línea base inferior
-      doc.line(x - size / 2, yP + size / 2, x + size / 2, yP + size / 2);
+      doc.line(x - size / 2, yP + height / 2, x + size / 2, yP + height / 2);
     }
     doc.setDrawColor(0, 0, 0);
   });
