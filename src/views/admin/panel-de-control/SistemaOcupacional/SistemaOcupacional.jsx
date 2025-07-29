@@ -77,6 +77,7 @@ import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/Audiometri
 import Espirometria from "./Espirometria/Espirometria.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
 import Oftalmologia from "./Oftalmologia/Oftalmologia.jsx";
+import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -872,7 +873,7 @@ const TabComponent = () => {
                   </button>
                 </div>
                 <div>
-                  {subTab === 0 && (
+                  {/* {subTab === 0 && (
                     <Audiometria
                       token={token}
                       userlogued={userlogued.sub}
@@ -893,7 +894,14 @@ const TabComponent = () => {
                       userlogued={userlogued.sub}
                       selectedSede={selectSede}
                     />
-                  )}
+                  )} */}
+                  <AudiometriaTabSelector 
+                    token={token}
+                    userlogued={userlogued}
+                    selectedSede={selectSede}
+                    listas={listasCombos}
+                    subTab={subTab}
+                  />
                 </div>
               </div>
             </div>

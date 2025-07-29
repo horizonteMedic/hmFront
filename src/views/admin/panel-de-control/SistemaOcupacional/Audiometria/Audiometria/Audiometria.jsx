@@ -1,5 +1,4 @@
-// src/views/admin/panel-de-control/SistemaOcupacional/Laboratorio/Manipuladores/Coprocultivo/Coprocultivo.jsx
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSave,
@@ -16,11 +15,7 @@ import {
 } from "./controllerAudiometria";
 
 const tabla = "audiometria_2023";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+
 const chemicals = [
   "plomo",
   "mercurio",
@@ -30,113 +25,15 @@ const chemicals = [
   "organofosforados",
 ];
 const frecuencias = ["500", "1000", "2000", "3000", "4000", "6000", "8000"];
-const initialFormState = {
-  codAu: "",
-  norden: "",
-  fecha: today,
-  dni: "",
-  fechaNac: "",
-  nombres: "",
-  edad: "",
-  nomExam: "",
 
-  sordera: "NO",
-  acufenos: "NO",
-  vertigo: "NO",
-  otalgia: "NO",
-  secrecion_otica: "NO",
-  otros_sintomas_orl: "",
-
-  rinitis: "NO",
-  sinusitis: "NO",
-  otitis_media_cronica: "NO",
-  medicamentos_ototoxicos: "NO",
-  meningitis: "NO",
-  tec: "NO",
-  sordera_am: "NO",
-  parotiditis: "NO",
-  sarampion: "NO",
-  tbc: "NO",
-  cuales_antecedentes: "",
-
-  exposicion_ruido: "NO",
-  protectores_auditivos: "NO",
-  exposicion_quimicos: "NO",
-
-  promedio_horas: "",
-  anios_exposicion: "",
-  meses_exposicion: "",
-
-  // tipo_protectores: [],
-  tapones: false,
-  orejeras: false,
-
-  plomo_hrs: "", // New fields
-  mercurio_hrs: "",
-  tolueno_hrs: "",
-  xileno_hrs: "",
-  plaguicidas_hrs: "",
-  organofosforados_hrs: "",
-
-  plomo_anios: "",
-  mercurio_anios: "",
-  tolueno_anios: "",
-  xileno_anios: "",
-  plaguicidas_anios: "",
-  organofosforados_anios: "",
-  otros_quimicos: "",
-
-  practica_tiro: "NO",
-  uso_walkman: "NO",
-  otros_antecedentes: "NO",
-  cuales_antecedentes_extralaborales: "",
-  otoscopia_odiocho: "Normal",
-  otoscopia_odilzquierdo: "Normal",
-
-  od_500: "",
-  od_1000: "",
-  od_2000: "",
-  od_3000: "",
-  od_4000: "",
-  od_6000: "",
-  od_8000: "",
-
-  oi_500: "",
-  oi_1000: "",
-  oi_2000: "",
-  oi_3000: "",
-  oi_4000: "",
-  oi_6000: "",
-  oi_8000: "",
-
-  diagnostico_od: "",
-  diagnostico_oi: "",
-  comentarios_audiometria: "",
-
-  proteccion_simpleODoble: "",
-  control_semestralOAnual: "",
-  recomendaciones_otras: "",
-
-  od_o_500: "",
-  od_o_1000: "",
-  od_o_2000: "",
-  od_o_3000: "",
-  od_o_4000: "",
-  od_o_6000: "",
-  od_o_8000: "",
-  oi_o_500: "",
-  oi_o_1000: "",
-  oi_o_2000: "",
-  oi_o_3000: "",
-  oi_o_4000: "",
-  oi_o_6000: "",
-  oi_o_8000: "",
-
-  empresa: "",
-  contrata: "",
-};
-export default function Audiometria({ token, selectedSede, userlogued }) {
-  const [form, setForm] = useState(initialFormState);
+export default function Audiometria({
+  token,
+  selectedSede,
+  userlogued,
+  initialFormState,
+  form,
+  setForm,
+}) {
   const [status, setStatus] = useState("");
 
   const handleCheckRadio = (name, value) => {
