@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSave,
   faBroom,
-  faEdit,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import ModalLevantarObservacion from "./ModalLevantarObservacion";
 import {
-  GetInfoServicio,
   GetInfoServicioTabla,
   getInfoTabla,
   Loading,
@@ -16,7 +14,7 @@ import {
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
-} from "./controllerOftalmologiaForm";
+} from "./controllerFichaOftalmologica";
 import Swal from "sweetalert2";
 
 const tabla = "oftalmologia";
@@ -61,7 +59,11 @@ const initialFormState = {
   codigo_search: "",
 };
 
-export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
+export default function FichaOftalmologica({
+  token,
+  selectedSede,
+  userlogued,
+}) {
   const [form, setForm] = useState(initialFormState);
   const [form2, setForm2] = useState(initialFormState);
   const [showModal, setShowModal] = useState(false);
@@ -137,14 +139,11 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row gap-6">
+    <div className="flex flex-col xl:flex-row gap-6">
       {/* Columna izquierda: Formulario */}
-      <div
-        className="min-w-[320px] w-full md:w-1/2 text-black"
-        style={{ flexBasis: "50%" }}
-      >
+      <div className="flex-1">
         <form className="space-y-4">
-          <div className="flex gap-4 items-center mb-2">
+          <div className="flex gap-4 items-center mb-2 flex-col md:flex-row">
             <label className="font-semibold">N° Orden :</label>
             <input
               name="norden"
@@ -545,10 +544,7 @@ export default function OftalmologiaForm({ token, selectedSede, userlogued }) {
         </form>
       </div>
       {/* Columna derecha: Panel de historial/búsqueda */}
-      <div
-        className="bg-gray-50 border rounded p-4 flex flex-col min-w-[320px] w-full md:w-1/2 text-black"
-        style={{ flexBasis: "50%", maxWidth: "100%" }}
-      >
+      <div className="border rounded p-4 flex flex-col flex-1">
         <div className="mb-2 font-semibold">Buscar - Imprimir Reportes</div>
         <div className="grid grid-cols-2 gap-2 mb-2 items-center justify-center w-full">
           <div>
