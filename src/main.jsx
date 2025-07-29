@@ -38,7 +38,7 @@ import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/Ray
 
 
 //SIMULADOR DE jaspers
-import Ficha from './views/jaspers/Oftalmologia/Oftalmologia.jsx'
+import Ficha from './views/jaspers/Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla.jsx'
 const App = () => {
   return (
     <React.StrictMode>
