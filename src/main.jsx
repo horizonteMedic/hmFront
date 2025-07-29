@@ -32,7 +32,7 @@ import Formulario from './views/admin/RegistroUnico/Formulario.jsx'
 import SistemaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx';
 import HistoriaOcupacional from './views/admin/panel-de-control/SistemaOcupacional/HistoriaOcupacional/HistoriaOcupacional.jsx';
 import Espirometria from './views/admin/panel-de-control/SistemaOcupacional/Espirometria/Espirometria.jsx';
-import Oftalmologia from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/Oftalmologia.jsx';
+import OftalmologiaTabSelector from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/OftalmologiaTabSelector.jsx';
 import Odontologia from './views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx';
 import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx';
 
@@ -123,7 +123,7 @@ const AppContent = () => {
           <Route path="/rayosx" element={<RayosX />} />
         </Route>
         <Route path="/Espirometria" element={<Espirometria />} />
-        <Route path="/Oftalmologia" element={<Oftalmologia />} />
+        <Route path="/Oftalmologia" element={<OftalmologiaTabSelector />} />
         <Route path='/RegistroP' element={<Formulario/>}/>
         <Route path='/libro-de-reclamaciones' element={<LibroDeReclamaciones/>}/>
         <Route path="*" element={<Navigate to="/" />} />

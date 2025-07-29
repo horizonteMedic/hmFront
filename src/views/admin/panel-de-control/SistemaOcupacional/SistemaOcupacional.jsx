@@ -70,13 +70,10 @@ import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
 import { Loading } from "../../../components/Loading";
 import DrawerQuickAccess from "./Drawer/DrawerQuickAccess";
-import Audiometria from "./Audiometria/Audiometria/Audiometria.jsx";
-import AudiometriaCuestionario from "./Audiometria/AudiometriaCuestionario/AudiometriaCuestionario.jsx";
-
-import AudiometriaOhlaTabSelector from "./Audiometria/AudiometriaOhla/AudiometriaOhlaTabSelector.jsx";
 import Espirometria from "./Espirometria/Espirometria.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
-import Oftalmologia from "./Oftalmologia/Oftalmologia.jsx";
+import OftalmologiaTabSelector from "./Oftalmologia/OftalmologiaTabSelector.jsx";
+import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -872,7 +869,7 @@ const TabComponent = () => {
                   </button>
                 </div>
                 <div>
-                  {subTab === 0 && (
+                  {/* {subTab === 0 && (
                     <Audiometria
                       token={token}
                       userlogued={userlogued.sub}
@@ -893,7 +890,14 @@ const TabComponent = () => {
                       userlogued={userlogued.sub}
                       selectedSede={selectSede}
                     />
-                  )}
+                  )} */}
+                  <AudiometriaTabSelector 
+                    token={token}
+                    userlogued={userlogued}
+                    selectedSede={selectSede}
+                    listas={listasCombos}
+                    subTab={subTab}
+                  />
                 </div>
               </div>
             </div>
@@ -931,7 +935,7 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <Oftalmologia
+              <OftalmologiaTabSelector
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}
