@@ -1,11 +1,14 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../../getFetch/getFetch";
-import { SubmitData } from "../model";
+import { getFetch } from "../../getFetch/getFetch";
+import { SubmitData } from "./model";
 
 //===============Zona Modificación===============
-const obtenerReporteUrl = "/api/v01/ct/manipuladores/obtenerReporteAudiometria";
+const obtenerReporteUrl =
+  "/api/v01/ct/agudezaVisual/obtenerReporteEvaluacionOftalmologica";
 const registrarUrl =
-  "/api/v01/ct/manipuladores/registrarActualizarManipuladoresAudiometria";
+  "/api/v01/ct/agudezaVisual/registrarActualizarEvaluacionOftalmologica";
+const obtenerDataRegistrada =
+  "/api/v01/ct/agudezaVisual/obtenerInformacionOftalmologiaConSusObservaciones";
 
 export const GetInfoServicio = (nro, tabla, set, token) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
@@ -15,124 +18,139 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
         set((prev) => ({
           ...prev,
           ...res,
-
-          codAu: res.codAu,
-          fecha: res.fechaAu,
+          codOf: res.codOf,
+          nomExam: res.nomExam,
+          fechaExam: res.fechaOf,
           fechaNac: res.fechaNac ? convertirFecha(res.fechaNac) : "",
-          sordera: res.rbsasorderaSi ? "SI" : "NO",
-          acufenos: res.rbsaacufenosSi ? "SI" : "NO",
-          vertigo: res.rbsavertigoSi ? "SI" : "NO",
-          otalgia: res.rbsaotalgiaSi ? "SI" : "NO",
-          secrecion_otica: res.rbsasecrecionSi ? "SI" : "NO",
-          otros_sintomas_orl: res.txtsaotrossintomas,
+          nombres: res.nombre + " " + res.apellido,
+          dni: res.dni,
+          empresa: res.empresa,
+          contrata: res.contrata,
 
-          rinitis: res.rbamrenitisSi ? "SI" : "NO",
-          sinusitis: res.rbamsinusitisSi ? "SI" : "NO",
-          otitis_media_cronica: res.rbamotitisSi ? "SI" : "NO",
-          medicamentos_ototoxicos: res.rbamototoxicosSi ? "SI" : "NO",
-          meningitis: res.rbammeningitisSi ? "SI" : "NO",
-          tec: res.rbamtecSi ? "SI" : "NO",
-          sordera_am: res.rbamsorderaSi ? "SI" : "NO",
-          parotiditis: res.rbamparotiditisSi ? "SI" : "NO",
-          sarampion: res.rbamsarampionSi ? "SI" : "NO",
-          tbc: res.rbamtbcSi ? "SI" : "NO",
-          cuales_antecedentes: res.txtamcuales,
+          parpadosYAnexos: res.txtParpaAnex ?? "",
+          corneas: res.txtCorneas ?? "",
+          otrosHallazgos: res.txtOtrosHallaz ?? "",
+          conjuntivas: res.txtConjuntivas ?? "",
+          cristalino: res.txtCristalino ?? "",
 
-          exposicion_ruido: res.rbeoexposicionSi ? "SI" : "NO",
-          protectores_auditivos: res.rbeoprotectoresSi ? "SI" : "NO",
-          exposicion_quimicos: res.rbeosustanciasSi ? "SI" : "NO",
+          fondoNormalOD: res.rbfONormalOd,
+          fondoNormalOI: res.rbfONormalOi,
+          fondoAnormalOD: res.rbfOAnormalOd,
+          fondoAnormalOI: res.rbfOAnormalOi,
+          fondoHallazgos: res.txtFoHallazgos,
 
-          promedio_horas: res.rbte0a2
-            ? "0-2"
-            : res.rbte2a4
-            ? "2-4"
-            : res.rbte4a6
-            ? "4-6"
-            : res.rbte6a8
-            ? "6-8"
-            : res.rbte8a10
-            ? "8-10"
-            : res.rbte10a12
-            ? "10-12"
-            : res.rbtem12
-            ? ">12"
-            : res.rbteeventual
-            ? "eventual"
+          pioOd: res.txtPioOd ?? "",
+          pioOi: res.txtPioOi ?? "",
+          noAplica: res.txtPioNa ?? "",
+
+          correctorOcular: res.rbcOsi ? "SI" : "NO",
+          correctorCerca: res.rbcOcerca,
+          correctorLejos: res.rbcOlejos,
+          noTrajocorrectorCerca: res.chkNtcc,
+          noTrajocorrectorLejos: res.chkNtcl,
+
+          antecedentesPersonales: res.txtAntPersImp ?? "",
+          antecedentesFamiliares: res.txtFamImp ?? "",
+
+          ishihara: res.rbtEcIshiharaNormal
+            ? "NORMAL"
+            : res.rbtEcIshiharaAnormal
+            ? "ANORMAL"
+            : res.rbtEcIshiharaNc
+            ? "N.C."
             : "",
-          anios_exposicion: res.txtanios,
-          meses_exposicion: res.txtmeses,
-
-          tapones: res.chktapones,
-          orejeras: res.chkorejeras,
-
-          plomo_hrs: res.txthplomo,
-          mercurio_hrs: res.txthmercurio,
-          tolueno_hrs: res.txthtolueno,
-          xileno_hrs: res.txthxileno,
-          plaguicidas_hrs: res.txthplaguic,
-          organofosforados_hrs: res.txthorganofos,
-
-          plomo_anios: res.txttplomo,
-          mercurio_anios: res.txttmercurio,
-          tolueno_anios: res.txtttolueno,
-          xileno_anios: res.txttxileno,
-          plaguicidas_anios: res.txttplaguic,
-          organofosforados_anios: res.txttorganofos,
-          otros_quimicos: res.txteootros,
-
-          practica_tiro: res.rbaepraticaSi ? "SI" : "NO",
-          uso_walkman: res.rbaeusoSi ? "SI" : "NO",
-          otros_antecedentes: res.rbaeotrosSi ? "SI" : "NO",
-          cuales_antecedentes_extralaborales: res.txtaecuales,
-          otoscopia_odiocho: res.txtood,
-          otoscopia_odilzquierdo: res.txtooi,
-
-          od_500: res.od500,
-          od_1000: res.od1000,
-          od_2000: res.od2000,
-          od_3000: res.od3000,
-          od_4000: res.od4000,
-          od_6000: res.od6000,
-          od_8000: res.od8000,
-
-          oi_500: res.oi500,
-          oi_1000: res.oi1000,
-          oi_2000: res.oi2000,
-          oi_3000: res.oi3000,
-          oi_4000: res.oi4000,
-          oi_6000: res.oi6000,
-          oi_8000: res.oi8000,
-
-          diagnostico_od: res.txtdiagOd,
-          diagnostico_oi: res.txtdiagOi,
-          comentarios_audiometria: res.txtcomentarios,
-          proteccion_simpleODoble: res.chkrpasimple
-            ? "simple"
-            : res.chkrpadoble
-            ? "doble"
+          coloresPuros: res.rbtEcColeresNormal
+            ? "NORMAL"
+            : res.rbtEcColeresAnormal
+            ? "ANORMAL"
+            : res.rbtEcColeresNc
+            ? "N.C."
             : "",
-          control_semestralOAnual: res.chkcasemestral
-            ? "semestral"
-            : res.chkcaanual
-            ? "anual"
+          estereopsia: res.rbtEcEstereopsiaNormal
+            ? "NORMAL"
+            : res.rbtEcEstereopsiaAnormal
+            ? "ANORMAL"
+            : res.rbtEcEstereopsiaNc
+            ? "N.C."
             : "",
-          recomendaciones_otras: res.txtotrasrecomendaciones,
+          estereopsiaText: res.txtTecEstereopsia ?? "",
 
-          od_o_500: res.od1500,
-          od_o_1000: res.od11000,
-          od_o_2000: res.od12000,
-          od_o_3000: res.od13000,
-          od_o_4000: res.od14000,
-          od_o_6000: res.od16000,
-          od_o_8000: res.od18000,
+          aplicaRefraccion: res.chkRefraccionAplica ? "SI" : "NO",
+          odsfL: res.txtLejosOdSf ?? "",
+          odcilL: res.txtLejosOdCil ?? "",
+          odejeL: res.txtLejosOdEje ?? "",
 
-          oi_o_500: res.oi1500,
-          oi_o_1000: res.oi11000,
-          oi_o_2000: res.oi12000,
-          oi_o_3000: res.oi13000,
-          oi_o_4000: res.oi14000,
-          oi_o_6000: res.oi16000,
-          oi_o_8000: res.oi18000,
+          oisfL: res.txtLejosOiSf ?? "",
+          oicilL: res.txtLejosOiCil ?? "",
+          oiejeL: res.txtLejosOiEje ?? "",
+          dipL: res.txtLejosOdDip ?? "",
+
+          odsfC: res.txtCercaOdSf ?? "",
+          odcilC: res.txtCercaOdCil ?? "",
+          odejeC: res.txtCercaOdEje ?? "",
+
+          oisfC: res.txtCercaOiSf ?? "",
+          oicilC: res.txtCercaOiCil ?? "",
+          oiejeC: res.txtCercaOiEje ?? "",
+          dipC: res.txtCercaOdDip ?? "",
+
+          agudezaOdLejos: res.txtAvConRefraccionLejosOd ?? "",
+          agudezaOiLejos: res.txtAvConRefraccionLejosOi ?? "",
+          agudezaOdCerca: res.txtAvConRefraccionCercaOd ?? "",
+          agudezaOiCerca: res.txtAvConRefraccionCercaOi ?? "",
+          diagnostico: res.txtDiagnostico ?? "",
+
+          ninguna: res.chkInNinguna,
+          usoCorrectoresCerca: res.chkI2,
+          usoCorrectoresLejos: res.chkI3,
+          lentesCorrectoresCerca: res.chkI4Cerca,
+          lentesCorrectoresLejos: res.chkI4Lejos,
+          lentesCambioLunas: res.chkI5,
+          indicacionPterigion: res.chkI6,
+          indicacionOtras: res.chkI7,
+
+          noRestringeActividades: res.chkR1,
+          restriccionCorrectorLejos: res.chkR2Lejos,
+          restriccionCorrectorCerca: res.chkR2Cerca,
+          noTrabajosCableElectrico: res.chkR3,
+          noConduccion: res.chkR4,
+
+          vc_sinc_od: res.txtCercaSinCorregirOd ?? "",
+          vc_sinc_oi: res.txtCercaSinCorregirOi ?? "",
+          vc_conc_od: res.txtCercaCorregidaOd ?? "",
+          vc_conc_oi: res.txtCercaCorregidaOi ?? "",
+          vc_agujero_od: res.txtCercaAgujeroOd ?? "",
+          vc_agujero_oi: res.txtCercaAgujeroOi ?? "",
+          vl_sinc_od: res.txtLejosSinCorregirOd ?? "",
+          vl_sinc_oi: res.txtLejosSinCorregirOi ?? "",
+          vl_conc_od: res.txtLejosCorregidaOd ?? "",
+          vl_conc_oi: res.txtLejosCorregidaOi ?? "",
+          vl_agujero_od: res.txtLejosAgujeroOd ?? "",
+          vl_agujero_oi: res.txtLejosAgujeroOi ?? "",
+          bino_sinc: res.txtBinocularSinCorregir ?? "",
+          bino_conc: res.txtBinocularCorregida ?? "",
+          reflejos_pupilares: res.txtRp ?? "",
+
+          ptosisPalpebralOd: res.rbecPtosisOd,
+          ptosisPalpebralOi: res.rbecPtosisOi,
+          pterigionGradoOd: res.rbecPterigionOd,
+          pterigionGradoOi: res.rbecPterigionOi,
+
+          estrabismoOd: res.rbecEstrabismoOd,
+          estrabismoOi: res.rbecEstrabismoOi,
+          pingueculaOd: res.rbecPingueculaOd,
+          pingueculaOi: res.rbecPingueculaOi,
+
+          conjuntivitisOd: res.rbecConjuntivitisOd,
+          conjuntivitisOi: res.rbecConjuntivitisOi,
+          chalazionOd: res.rbecClalacionOd,
+          chalazionOi: res.rbecClalacionOi,
+
+          cataratasOd: res.rbecCataratasOd,
+          cataratasOi: res.rbecCataratasOi,
+          otrosOd: res.rbecOtrosOd,
+          otrosOi: res.rbecOtrosOi,
+          examenClinicoHallazgos: res.txtecHallazgos ?? "",
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -143,6 +161,29 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
     });
 };
 
+export const GetInfoDataOftalmoConObservaciones = (nro, set, token) => {
+  getFetch(`${obtenerDataRegistrada}?nOrden=${nro}`, token).then((res) => {
+    if (res.norden) {
+      console.log(res);
+      set((prev) => ({
+        ...prev,
+        diagnostico: (res.eoculares ?? "") + "/n" + (res.eoculares1 ?? ""),
+        vc_sinc_od: res.vcercaSOd ?? "",
+        vc_sinc_oi: res.vcercaSOi ?? "",
+        vc_conc_od: res.vcercaCOd ?? "",
+        vc_conc_oi: res.vcercaCOi ?? "",
+        vl_sinc_od: res.vlejosSOd ?? "",
+        vl_sinc_oi: res.vlejosSOi ?? "",
+        vl_conc_od: res.vlejosCOd ?? "",
+        vl_conc_oi: res.vlejosCOi ?? "",
+        bino_sinc: res.vbinocular ?? "",
+        bino_conc: res.vbinocularLo ?? "",
+        reflejos_pupilares: res.rpupilares ?? "",
+      }));
+    }
+  });
+};
+
 export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -150,133 +191,109 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
   }
   Loading("Registrando Datos");
   const body = {
-    codAu: form.codAu,
+    codOf: form.codOf,
     norden: form.norden,
-    fechaAu: form.fecha,
-
-    rbsasorderaSi: form.sordera == "SI",
-    rbsasorderaNo: form.sordera == "NO",
-    rbsaacufenosSi: form.acufenos == "SI",
-    rbsaacufenosNo: form.acufenos == "NO",
-    rbsavertigoSi: form.vertigo == "SI",
-    rbsavertigoNo: form.vertigo == "NO",
-    rbsaotalgiaSi: form.otalgia == "SI",
-    rbsaotalgiaNo: form.otalgia == "NO",
-    rbsasecrecionSi: form.secrecion_otica == "SI",
-    rbsasecrecionNo: form.secrecion_otica == "NO",
-    txtsaotrossintomas: form.otros_sintomas_orl || "",
-
-    rbamrenitisSi: form.rinitis == "SI",
-    rbamrenitisNo: form.rinitis == "NO",
-    rbamsinusitisSi: form.sinusitis == "SI",
-    rbamsinusitisNo: form.sinusitis == "NO",
-    rbamotitisSi: form.otitis_media_cronica == "SI",
-    rbamotitisNo: form.otitis_media_cronica == "NO",
-    rbamototoxicosSi: form.medicamentos_ototoxicos == "SI",
-    rbamototoxicosNo: form.medicamentos_ototoxicos == "NO",
-    rbammeningitisSi: form.meningitis == "SI",
-    rbammeningitisNo: form.meningitis == "NO",
-    rbamtecSi: form.tec == "SI",
-    rbamtecNo: form.tec == "NO",
-    rbamsorderaSi: form.sordera_am == "SI",
-    rbamsorderaNo: form.sordera_am == "NO",
-    rbamparotiditisSi: form.parotiditis == "SI",
-    rbamparotiditisNo: form.parotiditis == "NO",
-    rbamsarampionSi: form.sarampion == "SI",
-    rbamsarampionNo: form.sarampion == "NO",
-    rbamtbcSi: form.tbc == "SI",
-    rbamtbcNo: form.tbc == "NO",
-    txtamcuales: form.cuales_antecedentes || "",
-
-    rbeoexposicionSi: form.exposicion_ruido == "SI",
-    rbeoexposicionNo: form.exposicion_ruido == "NO",
-    rbeoprotectoresSi: form.protectores_auditivos == "SI",
-    rbeoprotectoresNo: form.protectores_auditivos == "NO",
-    rbeosustanciasSi: form.exposicion_quimicos == "SI",
-    rbeosustanciasNo: form.exposicion_quimicos == "NO",
-
-    rbte0a2: form.promedio_horas == "0-2",
-    rbte2a4: form.promedio_horas == "2-4",
-    rbte4a6: form.promedio_horas == "4-6",
-    rbte6a8: form.promedio_horas == "6-8",
-    rbte8a10: form.promedio_horas == "8-10",
-    rbte10a12: form.promedio_horas == "10-12",
-    rbtem12: form.promedio_horas == ">12",
-    rbteeventual: form.promedio_horas == "eventual",
-    txtanios: form.anios_exposicion || "",
-    txtmeses: form.meses_exposicion || "",
-
-    chktapones: form.tapones,
-    chkorejeras: form.orejeras,
-    txthplomo: form.plomo_hrs || "",
-    txthmercurio: form.mercurio_hrs || "",
-    txthtolueno: form.tolueno_hrs || "",
-    txthxileno: form.xileno_hrs || "",
-    txthplaguic: form.plaguicidas_hrs || "",
-    txthorganofos: form.organofosforados_hrs || "",
-
-    txttplomo: form.plomo_anios || "",
-    txttmercurio: form.mercurio_anios || "",
-    txtttolueno: form.tolueno_anios || "",
-    txttxileno: form.xileno_anios || "",
-    txttplaguic: form.plaguicidas_anios || "",
-    txttorganofos: form.organofosforados_anios || "",
-    txteootros: form.otros_quimicos || "",
-
-    rbaepraticaSi: form.practica_tiro == "SI",
-    rbaepraticaNo: form.practica_tiro == "NO",
-    rbaeusoSi: form.uso_walkman == "SI",
-    rbaeusoNo: form.uso_walkman == "NO",
-    rbaeotrosSi: form.otros_antecedentes == "SI",
-    rbaeotrosNo: form.otros_antecedentes == "NO",
-    txtaecuales: form.cuales_antecedentes_extralaborales || "",
-    txtood: form.otoscopia_odiocho || "",
-    txtooi: form.otoscopia_odilzquierdo || "",
-
-    od500: form.od_500 || "",
-    od1000: form.od_1000 || "",
-    od2000: form.od_2000 || "",
-    od3000: form.od_3000 || "",
-    od4000: form.od_4000 || "",
-    od6000: form.od_6000 || "",
-    od8000: form.od_8000 || "",
-
-    oi500: form.oi_500 || "",
-    oi1000: form.oi_1000 || "",
-    oi2000: form.oi_2000 || "",
-    oi3000: form.oi_3000 || "",
-    oi4000: form.oi_4000 || "",
-    oi6000: form.oi_6000 || "",
-    oi8000: form.oi_8000 || "",
-
-    txtdiagOd: form.diagnostico_od || "",
-    txtdiagOi: form.diagnostico_oi || "",
-    txtcomentarios: form.comentarios_audiometria || "",
-    chkrpasimple: form.proteccion_simpleODoble == "simple",
-    chkrpadoble: form.proteccion_simpleODoble == "doble",
-    chkcasemestral: form.control_semestralOAnual == "semestral",
-    chkcaanual: form.control_semestralOAnual == "anual",
-    txtotrasrecomendaciones: form.recomendaciones_otras || "",
-
-    od1500: form.od_o_500 || "",
-    od11000: form.od_o_1000 || "",
-    od12000: form.od_o_2000 || "",
-    od13000: form.od_o_3000 || "",
-    od14000: form.od_o_4000 || "",
-    od16000: form.od_o_6000 || "",
-    od18000: form.od_o_8000 || "",
-
-    oi1500: form.oi_o_500 || "",
-    oi11000: form.oi_o_1000 || "",
-    oi12000: form.oi_o_2000 || "",
-    oi13000: form.oi_o_3000 || "",
-    oi14000: form.oi_o_4000 || "",
-    oi16000: form.oi_o_6000 || "",
-    oi18000: form.oi_o_8000 || "",
-
+    fechaOf: form.fechaExam,
+    rbecPtosisOd: form.ptosisPalpebralOd,
+    rbecPtosisOi: form.ptosisPalpebralOi,
+    rbecEstrabismoOd: form.estrabismoOd,
+    rbecEstrabismoOi: form.estrabismoOi,
+    rbecConjuntivitisOd: form.conjuntivitisOd,
+    rbecConjuntivitisOi: form.conjuntivitisOi,
+    rbecCataratasOd: form.cataratasOd,
+    rbecCataratasOi: form.cataratasOi,
+    rbecPterigionOd: form.pterigionGradoOd,
+    rbecPterigionOi: form.pterigionGradoOi,
+    rbecPingueculaOd: form.pingueculaOd,
+    rbecPingueculaOi: form.pingueculaOi,
+    rbecClalacionOd: form.chalazionOd,
+    rbecClalacionOi: form.chalazionOi,
+    rbecOtrosOd: form.otrosOd,
+    rbecOtrosOi: form.otrosOi,
+    txtecHallazgos: form.examenClinicoHallazgos,
+    rbfONormalOd: form.fondoNormalOD,
+    rbfONormalOi: form.fondoNormalOI,
+    rbfOAnormalOd: form.fondoAnormalOD,
+    rbfOAnormalOi: form.fondoAnormalOI,
+    txtFoHallazgos: form.fondoHallazgos,
+    txtPioOd: form.pioOd,
+    txtPioOi: form.pioOi,
+    txtPioNa: form.noAplica,
+    rbcOsi: form.correctorOcular == "SI",
+    rbcOno: form.correctorOcular == "NO",
+    rbcOcerca: form.correctorCerca,
+    rbcOlejos: form.correctorLejos,
+    chkNtcc: form.noTrajocorrectorCerca,
+    chkNtcl: form.noTrajocorrectorLejos,
+    txtCercaSinCorregirOd: form.vc_sinc_od,
+    txtCercaSinCorregirOi: form.vc_sinc_oi,
+    txtLejosSinCorregirOd: form.vl_sinc_od,
+    txtLejosSinCorregirOi: form.vl_sinc_oi,
+    txtCercaCorregidaOd: form.vc_conc_od,
+    txtCercaCorregidaOi: form.vc_conc_oi,
+    txtLejosCorregidaOd: form.vl_conc_od,
+    txtLejosCorregidaOi: form.vl_conc_oi,
+    txtCercaAgujeroOd: form.vc_agujero_od,
+    txtCercaAgujeroOi: form.vc_agujero_oi,
+    txtLejosAgujeroOd: form.vl_agujero_od,
+    txtLejosAgujeroOi: form.vl_agujero_oi,
+    txtBinocularSinCorregir: form.bino_sinc,
+    txtBinocularCorregida: form.bino_conc,
+    rbtEcIshiharaNormal: form.ishihara == "NORMAL",
+    rbtEcIshiharaAnormal: form.ishihara == "ANORMAL",
+    rbtEcIshiharaNc: form.ishihara == "N.C.",
+    rbtEcColeresNormal: form.coloresPuros == "NORMAL",
+    rbtEcColeresAnormal: form.coloresPuros == "ANORMAL",
+    rbtEcColeresNc: form.coloresPuros == "N.C.",
+    txtTecEstereopsia: form.estereopsiaText,
+    rbtEcEstereopsiaNormal: form.estereopsia == "NORMAL",
+    rbtEcEstereopsiaAnormal: form.estereopsia == "ANORMAL",
+    rbtEcEstereopsiaNc: form.estereopsia == "N.C.",
+    chkRefraccionAplica: form.aplicaRefraccion == "SI",
+    chkRefraccionNoAplica: form.aplicaRefraccion == "NO",
+    txtLejosOdSf: form.odsfL,
+    txtLejosOdCil: form.odcilL,
+    txtLejosOdEje: form.odejeL,
+    txtLejosOiSf: form.oisfL,
+    txtLejosOiCil: form.oicilL,
+    txtLejosOiEje: form.oiejeL,
+    txtLejosOdDip: form.dipL,
+    txtCercaOdSf: form.odsfC,
+    txtCercaOdCil: form.odcilC,
+    txtCercaOdEje: form.odejeC,
+    txtCercaOiSf: form.oisfC,
+    txtCercaOiCil: form.oicilC,
+    txtCercaOiEje: form.oiejeC,
+    txtCercaOdDip: form.dipC,
+    txtAvConRefraccionLejosOd: form.agudezaOdLejos,
+    txtAvConRefraccionLejosOi: form.agudezaOiLejos,
+    txtAvConRefraccionCercaOd: form.agudezaOdCerca,
+    txtAvConRefraccionCercaOi: form.agudezaOiCerca,
+    txtDiagnostico: form.diagnostico,
+    chkInNinguna: form.ninguna,
+    chkI2: form.usoCorrectoresCerca,
+    chkI3: form.usoCorrectoresLejos,
+    chkI4Cerca: form.lentesCorrectoresCerca,
+    chkI4Lejos: form.lentesCorrectoresLejos,
+    chkI5: form.lentesCambioLunas,
+    chkI6: form.indicacionPterigion,
+    chkI7: form.indicacionOtras,
+    chkR1: form.noRestringeActividades,
+    chkR2Lejos: form.restriccionCorrectorLejos,
+    chkR2Cerca: form.restriccionCorrectorCerca,
+    chkR3: form.noTrabajosCableElectrico,
+    chkR4: form.noConduccion,
+    txtRp: form.reflejos_pupilares,
     userRegistro: user,
     userMedicoOcup: "",
-    formato: "",
+
+    txtParpaAnex: form.parpadosYAnexos,
+    txtCorneas: form.corneas,
+    txtOtrosHallaz: form.otrosHallazgos,
+    txtConjuntivas: form.conjuntivas,
+    txtCristalino: form.cristalino,
+    txtAntPersImp: form.antecedentesPersonales,
+    txtFamImp: form.antecedentesFamiliares,
   };
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
@@ -314,7 +331,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         console.log(res);
         const nombre = res.nameJasper;
         console.log(nombre);
-          const jasperModules = import.meta.glob(
+        const jasperModules = import.meta.glob(
           "../../../../jaspers/Oftalmologia/*.jsx"
         );
         const modulo = await jasperModules[
@@ -384,6 +401,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     if (res.id === 0) {
       //No tiene registro previo
       GetInfoPac(nro, set, token, sede);
+      GetInfoDataOftalmoConObservaciones(nro, set, token);
     } else {
       GetInfoServicio(nro, tabla, set, token);
     }

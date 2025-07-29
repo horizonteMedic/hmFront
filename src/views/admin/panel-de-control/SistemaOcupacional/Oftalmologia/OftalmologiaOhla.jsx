@@ -3,10 +3,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
   faChevronDown,
-  faL,
   faPrint,
   faSave,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerOftalmologiaOhla";
 
 const tabla = "oftalmologia2021";
 const date = new Date();
@@ -17,6 +21,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 const initialFormState = {
   norden: "",
+  codOf: null,
   fechaExam: today,
   nomExam: "",
   fechaNac: "",
@@ -56,23 +61,23 @@ const initialFormState = {
   estereopsiaText: "",
 
   aplicaRefraccion: "NO",
-  odsfL: "",
-  odcilL: "",
-  odejeL: "",
+  odsfL: "-",
+  odcilL: "-",
+  odejeL: "-",
 
-  oisfL: "",
-  oicilL: "",
-  oiejeL: "",
-  dipL: "",
+  oisfL: "-",
+  oicilL: "-",
+  oiejeL: "-",
+  dipL: "-",
 
-  odsfC: "",
-  odcilC: "",
-  odejeC: "",
+  odsfC: "-",
+  odcilC: "-",
+  odejeC: "-",
 
-  oisfC: "",
-  oicilC: "",
-  oiejeC: "",
-  dipC: "",
+  oisfC: "-",
+  oicilC: "-",
+  oiejeC: "-",
+  dipC: "-",
 
   agudezaOdLejos: "",
   agudezaOiLejos: "",
@@ -163,20 +168,24 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
   const handleNextFocus = (e, name) => {
     if (e.key == "Enter") document.getElementsByName(name)[0]?.focus();
   };
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value == "" ? "00" : value }));
+  };
   const handleClear = () => {
     setForm(initialFormState);
   };
   const handleClearnotO = () => {
     setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
-  const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
-  };
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
+  };
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
   const handlePrint = () => {
     if (!form.norden)
@@ -202,7 +211,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
 
   return (
     <div className="w-full text-[11px]">
-      <form className=" p-4 rounded w-full border mb-4">
+      <form className=" p-4 rounded w-full border mb-4 bg-white">
         <div className="grid grid-cols-4  items-center gap-3 w-full">
           {/* Primera fila: solo los 4 campos principales */}
           <div className="flex items-center gap-4">
@@ -284,27 +293,33 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
         </div>
       </form>
       {/* Tabs */}
-      <div className="flex">
+      <div className="flex gap-1">
         <button
           onClick={() => setTab(0)}
-          className={`px-4 py-2 font-semibold border-t border-l border-r rounded-t ${
-            tab === 0 ? "bg-white" : "bg-gray-100"
+          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
+            tab === 0
+              ? "bg-[#233245] text-white font-bold"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           } ${tab === 0 ? "border-b-0" : "border-b"}`}
         >
           PARTE I
         </button>
         <button
           onClick={() => setTab(1)}
-          className={`px-4 py-2 font-semibold border-t border-l border-r rounded-t ml-1 ${
-            tab === 1 ? "bg-white" : "bg-gray-100"
+          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
+            tab === 1
+              ? "bg-[#233245] text-white font-bold"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           } ${tab === 1 ? "border-b-0" : "border-b"}`}
         >
           PARTE II
         </button>
         <button
           onClick={() => setTab(2)}
-          className={`px-4 py-2 font-semibold border-t border-l border-r rounded-t ml-1 ${
-            tab === 2 ? "bg-white" : "bg-gray-100"
+          className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
+            tab === 2
+              ? "bg-[#233245] text-white font-bold"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           } ${tab === 2 ? "border-b-0" : "border-b"}`}
         >
           PARTE III
@@ -589,7 +604,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 <div className="text-blue-700 font-semibold text-center mb-2">
                   TEST DE EVALUACIÓN COMPLEMENTARIA
                 </div>
-                <div className="grid grid-cols-[260px_1fr] gap-x-2 gap-y-1">
+                <div className="grid grid-cols-[180px_1fr] 2xl:grid-cols-[260px_1fr] gap-x-2 gap-y-1">
                   {/* Fila 1 */}
                   <span className="flex items-center h-8 text-[11px] font-semibold">
                     Test de Ishihara (Colores)
@@ -739,17 +754,8 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         type="radio"
                         name="aplicaRefraccion"
                         checked={form.aplicaRefraccion === "SI"}
-                        onChange={(e) => handleRadioButton(e, "SI")}
-                      />
-                      Aplica
-                    </label>
-                    <label className="flex items-center gap-1 font-semibold text-[11px]">
-                      <input
-                        type="radio"
-                        name="aplicaRefraccion"
-                        checked={form.aplicaRefraccion === "NO"}
                         onChange={(e) => {
-                          handleRadioButton(e, "NO");
+                          handleRadioButton(e, "SI");
                           setForm((prev) => ({
                             ...prev,
                             odsfL: "",
@@ -769,6 +775,37 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                             oicilC: "",
                             oiejeC: "",
                             dipC: "",
+                          }));
+                        }}
+                      />
+                      Aplica
+                    </label>
+                    <label className="flex items-center gap-1 font-semibold text-[11px]">
+                      <input
+                        type="radio"
+                        name="aplicaRefraccion"
+                        checked={form.aplicaRefraccion === "NO"}
+                        onChange={(e) => {
+                          handleRadioButton(e, "NO");
+                          setForm((prev) => ({
+                            ...prev,
+                            odsfL: "-",
+                            odcilL: "-",
+                            odejeL: "-",
+
+                            oisfL: "-",
+                            oicilL: "-",
+                            oiejeL: "-",
+                            dipL: "-",
+
+                            odsfC: "-",
+                            odcilC: "-",
+                            odejeC: "-",
+
+                            oisfC: "-",
+                            oicilC: "-",
+                            oiejeC: "-",
+                            dipC: "-",
                           }));
                         }}
                       />
@@ -799,6 +836,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.odsfL}
                         disabled={form.aplicaRefraccion == "NO"}
                         onChange={handleChange}
+                        onKeyUp={(e) => handleNextFocus(e, "odcilL")}
                         className="border rounded px-2 py-1"
                       />
                       <input
@@ -806,6 +844,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.odcilL}
                         disabled={form.aplicaRefraccion == "NO"}
                         onChange={handleChange}
+                        onKeyUp={(e) => handleNextFocus(e, "odejeL")}
                         className="border rounded px-2 py-1 "
                       />
                       <input
@@ -813,6 +852,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.odejeL}
                         disabled={form.aplicaRefraccion == "NO"}
                         onChange={handleChange}
+                        onKeyUp={(e) => handleNextFocus(e, "oisfL")}
                         className="border rounded px-2 py-1 "
                       />
                     </div>
@@ -822,6 +862,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         name="oisfL"
                         value={form.oisfL}
                         onChange={handleChange}
+                        onKeyUp={(e) => handleNextFocus(e, "oicilL")}
                         className="border rounded px-2 py-1"
                       />
                       <input
@@ -829,6 +870,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.oicilL}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "oiejeL")}
                         className="border rounded px-2 py-1 "
                       />
                       <input
@@ -836,6 +878,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.oiejeL}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "dipL")}
                         className="border rounded px-2 py-1 "
                       />
                     </div>
@@ -846,6 +889,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.dipL}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "odsfC")}
                         className="border rounded px-2 py-1  col-span-2 "
                       />
                     </div>
@@ -866,6 +910,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.odsfC}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "odcilC")}
                         className="border rounded px-2 py-1"
                       />
                       <input
@@ -873,6 +918,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.odcilC}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "odejeC")}
                         className="border rounded px-2 py-1 "
                       />
                       <input
@@ -880,6 +926,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.odejeC}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "oisfC")}
                         className="border rounded px-2 py-1 "
                       />
                     </div>
@@ -890,6 +937,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.oisfC}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "oicilC")}
                         className="border rounded px-2 py-1"
                       />
                       <input
@@ -897,6 +945,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.oicilC}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "oiejeC")}
                         className="border rounded px-2 py-1 "
                       />
                       <input
@@ -904,6 +953,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                         value={form.oiejeC}
                         onChange={handleChange}
                         disabled={form.aplicaRefraccion == "NO"}
+                        onKeyUp={(e) => handleNextFocus(e, "dipC")}
                         className="border rounded px-2 py-1 "
                       />
                     </div>
@@ -947,12 +997,14 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                     name="agudezaOdLejos"
                     value={form.agudezaOdLejos}
                     onChange={handleChange}
+                    onKeyUp={(e) => handleNextFocus(e, "agudezaOiLejos")}
                     className="border rounded px-2 py-1  col-span-2"
                   />
                   <input
                     name="agudezaOiLejos"
                     value={form.agudezaOiLejos}
                     onChange={handleChange}
+                    onKeyUp={(e) => handleNextFocus(e, "agudezaOdCerca")}
                     className="border rounded px-2 py-1  col-span-2"
                   />
                 </div>
@@ -962,12 +1014,14 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                     name="agudezaOdCerca"
                     value={form.agudezaOdCerca}
                     onChange={handleChange}
+                    onKeyUp={(e) => handleNextFocus(e, "agudezaOiCerca")}
                     className="border rounded px-2 py-1 col-span-2"
                   />
                   <input
                     name="agudezaOiCerca"
                     value={form.agudezaOiCerca}
                     onChange={handleChange}
+                    onKeyUp={(e) => handleNextFocus(e, "diagnostico")}
                     className="border rounded px-2 py-1 col-span-2"
                   />
                 </div>
@@ -1212,36 +1266,48 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   name="vc_sinc_od"
                   value={form.vc_sinc_od}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vc_sinc_oi")}
                   className="border rounded px-2 py-1"
                 />
                 <input
                   name="vc_sinc_oi"
                   value={form.vc_sinc_oi}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vl_sinc_od")}
                   className="border rounded px-2 py-1"
                 />
                 <input
                   name="vc_conc_od"
                   value={form.vc_conc_od}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vc_conc_oi")}
                   className="border rounded px-2 py-1 "
                 />
                 <input
                   name="vc_conc_oi"
                   value={form.vc_conc_oi}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vl_conc_od")}
                   className="border rounded px-2 py-1 "
                 />
                 <input
                   name="vc_agujero_od"
                   value={form.vc_agujero_od}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vc_agujero_oi")}
                   className="border rounded px-2 py-1 "
                 />
                 <input
                   name="vc_agujero_oi"
                   value={form.vc_agujero_oi}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vl_agujero_od")}
                   className="border rounded px-2 py-1 "
                 />
               </div>
@@ -1251,36 +1317,48 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   name="vl_sinc_od"
                   value={form.vl_sinc_od}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vl_sinc_oi")}
                   className="border rounded px-2 py-1"
                 />
                 <input
                   name="vl_sinc_oi"
                   value={form.vl_sinc_oi}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vc_conc_od")}
                   className="border rounded px-2 py-1"
                 />
                 <input
                   name="vl_conc_od"
                   value={form.vl_conc_od}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vl_conc_oi")}
                   className="border rounded px-2 py-1 "
                 />
                 <input
                   name="vl_conc_oi"
                   value={form.vl_conc_oi}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vc_agujero_od")}
                   className="border rounded px-2 py-1 "
                 />
                 <input
                   name="vl_agujero_od"
                   value={form.vl_agujero_od}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "vl_agujero_oi")}
                   className="border rounded px-2 py-1 "
                 />
                 <input
                   name="vl_agujero_oi"
                   value={form.vl_agujero_oi}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "bino_sinc")}
                   className="border rounded px-2 py-1 "
                 />
               </div>
@@ -1290,12 +1368,16 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   name="bino_sinc"
                   value={form.bino_sinc}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "bino_conc")}
                   className="border rounded px-2 py-1 col-span-2"
                 />
                 <input
                   name="bino_conc"
                   value={form.bino_conc}
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  onKeyUp={(e) => handleNextFocus(e, "reflejos_pupilares")}
                   className="border rounded px-2 py-1 col-span-2"
                 />
                 <span className="font-semibold text-center">
@@ -1313,7 +1395,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               <div className="text-blue-700 font-semibold text-center mb-4">
                 EXAMEN CLÍNICO EXTERNO
               </div>
-              <di className="grid grid-cols-2 gap-3 px-4">
+              <div className="grid grid-cols-2 gap-3 px-4">
                 <CheckDualLabel
                   label="Ptosis Palpebral"
                   nameOd="ptosisPalpebralOd"
@@ -1370,7 +1452,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   form={form}
                   onChange={handleCheckBoxChange}
                 />
-              </di>
+              </div>
               <div className="ml-6">
                 <label className="font-semibold min-w-[65px] mb-1">
                   Hallazgos (describir):
