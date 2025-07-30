@@ -11,6 +11,7 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerOftalmologia";
+import Swal from "sweetalert2";
 
 const tabla = "oftalmologia2021";
 const date = new Date();
