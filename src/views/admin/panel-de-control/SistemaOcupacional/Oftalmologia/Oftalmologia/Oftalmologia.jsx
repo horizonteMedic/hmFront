@@ -1188,7 +1188,16 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                       type="checkbox"
                       name="noRestringeActividades"
                       checked={form.noRestringeActividades}
-                      onChange={handleCheckBoxChange}
+                      onChange={(e) => {
+                        handleCheckBoxChange(e);
+                        setForm((prev) => ({
+                          ...prev,
+                          restriccionCorrectorLejos: false,
+                          restriccionCorrectorCerca: false,
+                          noTrabajosCableElectrico: false,
+                          noConduccion: false,
+                        }));
+                      }}
                     />
                     No restringe actividades labores en el puesto de trabajo
                   </label>
@@ -1197,7 +1206,13 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                       type="checkbox"
                       name="restriccionCorrectorLejos"
                       checked={form.restriccionCorrectorLejos}
-                      onChange={handleCheckBoxChange}
+                      onChange={(e) => {
+                        handleCheckBoxChange(e);
+                        setForm((prev) => ({
+                          ...prev,
+                          noRestringeActividades: false,
+                        }));
+                      }}
                     />
                     Uso de Correctores Oculares - Lejos
                   </label>
@@ -1206,7 +1221,13 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                       type="checkbox"
                       name="restriccionCorrectorCerca"
                       checked={form.restriccionCorrectorCerca}
-                      onChange={handleCheckBoxChange}
+                      onChange={(e) => {
+                        handleCheckBoxChange(e);
+                        setForm((prev) => ({
+                          ...prev,
+                          noRestringeActividades: false,
+                        }));
+                      }}
                     />
                     Uso de Correctores Oculares - Cerca (Trabajos de Oficina)
                   </label>
@@ -1215,7 +1236,13 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                       type="checkbox"
                       name="noTrabajosCableElectrico"
                       checked={form.noTrabajosCableElectrico}
-                      onChange={handleCheckBoxChange}
+                      onChange={(e) => {
+                        handleCheckBoxChange(e);
+                        setForm((prev) => ({
+                          ...prev,
+                          noRestringeActividades: false,
+                        }));
+                      }}
                     />
                     No trabajos con cables eléctricos ni fibra óptica
                   </label>
@@ -1224,7 +1251,13 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                       type="checkbox"
                       name="noConduccion"
                       checked={form.noConduccion}
-                      onChange={handleCheckBoxChange}
+                      onChange={(e) => {
+                        handleCheckBoxChange(e);
+                        setForm((prev) => ({
+                          ...prev,
+                          noRestringeActividades: false,
+                        }));
+                      }}
                     />
                     No conducción vehicular
                   </label>
