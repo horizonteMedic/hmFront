@@ -65,6 +65,7 @@ import {
   faVialVirus,
   faNotesMedical,
   faFileWaveform,
+  faAnchor,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -74,6 +75,7 @@ import Espirometria from "./Espirometria/Espirometria.jsx";
 import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
 import OftalmologiaTabSelector from "./Oftalmologia/OftalmologiaTabSelector.jsx";
 import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
+import OIT from "./OIT/OIT.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -387,6 +389,18 @@ const TabComponent = () => {
                   <span className={styles.title}>Oftalmología</span>
                 </div>
               )}
+                <div
+                  onClick={() => setActiveTab(19)}
+                  className={`${styles.gridItem} ${
+                    activeTab === 19 ? styles.active : ""
+                  }`}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faAnchor} />
+                  </span>
+                  <span className={styles.title}>OIT</span>
+                </div>
+              
             </div>
           </>
         )}
@@ -936,6 +950,23 @@ const TabComponent = () => {
                 </button>
               </div>
               <OftalmologiaTabSelector
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+              />
+            </div>
+          )}
+          {activeTab === 19 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <OIT
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}

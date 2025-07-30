@@ -32,6 +32,7 @@ const AudiometriaFichaAudiologica = ({
   handleClearOhla,
   formOhla,
 }) => {
+  console.log(listas)
   const { MedicosMulti } = listas;
 
   const handleNombreMedicoSearch = (e) => {
