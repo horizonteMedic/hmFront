@@ -179,7 +179,7 @@ const initialFormStateCuestionarioAudio = {
 export default function AudiometriaTabSelector({
   token,
   userlogued,
-  selectSede,
+  selectedSede,
   listas,
   subTab,
 }) {
@@ -196,7 +196,7 @@ export default function AudiometriaTabSelector({
         <Audiometria
           token={token}
           userlogued={userlogued.sub}
-          selectedSede={selectSede}
+          selectedSede={selectedSede}   
           initialFormState={initialFormStateAudiometria}
           form={formAudiometria}
           setForm={setFormAudiometria}
@@ -206,7 +206,7 @@ export default function AudiometriaTabSelector({
         <AudiometriaOhlaTabSelector
           token={token}
           userlogued={userlogued}
-          selectedSede={selectSede}
+          selectedSede={selectedSede}
           listas={listas}
         />
       )}
@@ -214,7 +214,7 @@ export default function AudiometriaTabSelector({
         <AudiometriaCuestionario
           token={token}
           userlogued={userlogued.sub}
-          selectedSede={selectSede}
+          selectedSede={selectedSede}
           initialFormState={initialFormStateCuestionarioAudio}
           form={formCuestionarioAudio}
           setForm={setFormCuestionarioAudio}
