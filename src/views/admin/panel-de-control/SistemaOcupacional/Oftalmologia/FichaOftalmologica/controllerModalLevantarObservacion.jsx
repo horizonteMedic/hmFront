@@ -1,23 +1,18 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../getFetch/getFetch";
-import { SubmitData } from "./model";
+import { getFetch } from "../../../getFetch/getFetch";
+import { SubmitData } from "../model";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
   "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologia";
-const obtenerReporteCompletoUrl =
-  "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologiaCompleto";
+const obtenerReporteUrlLO =
+  "/api/v01/ct/agudezaVisual/obtenerReporteOftalmologiaLo";
 const registrarUrl =
-  "/api/v01/ct/agudezaVisual/registrarActualizarOftalmologia";
+  "/api/v01/ct/agudezaVisual/registrarActualizarOftalmologiaLo";
 
-export const GetInfoServicio = (
-  nro,
-  tabla,
-  set,
-  token,
-  onFinish = () => {}
-) => {
-  getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
+export const GetInfoServicio = (nro, tabla, set, token, esLO) => {
+  const link = esLO ? obtenerReporteUrlLO : obtenerReporteUrl;
+  getFetch(`${link}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
       if (res.norden) {
         console.log(res);
@@ -28,7 +23,7 @@ export const GetInfoServicio = (
           empresa: res.empresa,
           contrata: res.contrata,
           nomExam: res.nomExam,
-          codOf: res.codOf,
+          //   codOf: res.codOf,
           visionCercaOD: res.vcercaSOd,
           visionCercaOI: res.vcercaSOi,
           visionCercaODC: res.vcercaCOd,
@@ -43,31 +38,30 @@ export const GetInfoServicio = (
           enfOculares: res.eoculares,
           fechaExamen: res.fechaOf,
           presenciaPterigion: res.eoculares1,
-          agudezaLejos: res.agudezaVisualLejor,
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
       }
     })
     .finally(() => {
-      onFinish();
+      Swal.close();
     });
 };
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-  GetInfoServicio(nro, tabla, set, token, () => {
-    Swal.close();
-  });
-};
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+export const SubmitDataService = async (
+  form,
+  token,
+  user,
+  limpiar,
+  tabla,
+  onclose
+) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
   Loading("Registrando Datos");
-  const esActualizacion = form.codOf != null;
   const body = {
-    codOf: form.codOf,
     norden: form.norden,
     fechaOf: form.fechaExamen,
     numTicket: null,
@@ -85,9 +79,6 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     eoculares: form.enfOculares,
 
     eoculares1: form.presenciaPterigion,
-    eoculVisionLejos: "",
-    factualizacion: esActualizacion ? form.fechaExamen : "",
-    agudezaVisualLejor: form.agudezaLejos,
     userRegistro: user,
     userMedicoOcup: "",
   };
@@ -103,6 +94,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
         cancelButtonColor: "#d33",
       }).then((result) => {
         limpiar();
+        onclose();
         if (result.isConfirmed) {
           PrintHojaR(form.norden, token, tabla);
         }
@@ -166,16 +158,25 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   ).then((res) => {
     console.log(res);
     if (res.id === 0) {
+      VerifySecond(nro, "oftalmologia", token, set, sede);
+    } else {
+      GetInfoServicio(nro, tabla, set, token, true);
+    }
+  });
+};
+
+export const VerifySecond = async (nro, tabla, token, set, sede) => {
+  Loading("Validando datos");
+  getFetch(
+    `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+    token
+  ).then((res) => {
+    console.log(res);
+    if (res.id === 0) {
       //No tiene registro previo
       GetInfoPac(nro, set, token, sede);
     } else {
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Oftalmología.",
-          "warning"
-        );
-      });
+      GetInfoServicio(nro, tabla, set, token, false);
     }
   });
 };
@@ -203,7 +204,7 @@ export const PrintHojaR = (nro, token, tabla) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, //revisar
+    `${obtenerReporteUrlLO}?nOrden=${nro}&nameService=${tabla}`, //revisar
     token
   )
     .then(async (res) => {
@@ -212,10 +213,10 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/Oftalmologia/*.jsx"
+          "../../../../../jaspers/Oftalmologia/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../jaspers/Oftalmologia/${nombre}.jsx`
+          `../../../../../jaspers/Oftalmologia/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
@@ -230,58 +231,4 @@ export const PrintHojaR = (nro, token, tabla) => {
     .finally(() => {
       Swal.close();
     });
-};
-
-export const PrintHojaCompleto = (nro, token, tabla) => {
-  Loading("Cargando Formato a Imprimir");
-
-  getFetch(
-    `${obtenerReporteCompletoUrl}?nOrden=${nro}&nameService=${tabla}`, //revisar
-    token
-  )
-    .then(async (res) => {
-      if (res.norden) {
-        console.log(res);
-        const nombre = res.nameJasper;
-        console.log(nombre);
-        const jasperModules = import.meta.glob(
-          "../../../../jaspers/Oftalmologia/*.jsx"
-        );
-        const modulo = await jasperModules[
-          `../../../../jaspers/Oftalmologia/${nombre}.jsx`
-        ]();
-        // Ejecuta la función exportada por default con los datos
-        if (typeof modulo.default === "function") {
-          modulo.default(res);
-        } else {
-          console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
-          );
-        }
-      }
-    })
-    .finally(() => {
-      Swal.close();
-    });
-};
-export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
-  try {
-    getFetch(
-      `/api/v01/ct/agudezaVisual/obtenerOftalmologiaPorFiltros?${
-        codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
-      }
-    ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
-      token
-    ).then((res) => {
-      console.log("pros", res);
-      setData(res);
-    });
-  } catch (error) {
-    console.error("Error en getInfoTabla:", error);
-    Swal.fire(
-      "Error",
-      "Ocurrió un error al obtener los datos de la tabla",
-      "error"
-    );
-  }
 };

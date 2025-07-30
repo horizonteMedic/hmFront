@@ -10,7 +10,7 @@ import {
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
-} from "./controllerOftalmologiaOhla";
+} from "./controllerOftalmologia";
 
 const tabla = "oftalmologia2021";
 const date = new Date();
@@ -211,8 +211,8 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
 
   return (
     <div className="w-full text-[11px]">
-      <form className=" p-4 rounded w-full border mb-4 bg-white">
-        <div className="grid grid-cols-4  items-center gap-3 w-full">
+      <form className=" p-4 rounded w-full border mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-center gap-3 w-full">
           {/* Primera fila: solo los 4 campos principales */}
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[65px]">N° Orden :</label>
@@ -253,7 +253,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             />
           </div>
           {/* Segunda fila: Nombres, DNI */}
-          <div className="flex items-center gap-4 col-span-3">
+          <div className="flex items-center gap-4 xl:col-span-3">
             <label className="font-semibold min-w-[65px]">Nombres :</label>
             <input
               className="border rounded px-2 py-1 w-full"
@@ -272,7 +272,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             />
           </div>
           {/* Tercera fila: Empresa, Contrata */}
-          <div className="flex items-center gap-4 col-span-2">
+          <div className="flex items-center gap-4 xl:col-span-2">
             <label className="font-semibold min-w-[65px]">Empresa :</label>
             <input
               className="border rounded px-2 py-1 w-full"
@@ -281,7 +281,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               disabled
             />
           </div>
-          <div className="flex items-center gap-4 col-span-2">
+          <div className="flex items-center gap-4 xl:col-span-2">
             <label className="font-semibold min-w-[65px]">Contrata :</label>
             <input
               className="border rounded px-2 py-1 w-full"
@@ -328,7 +328,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
       {/* Contenido de los tabs */}
       <div className="bg-white border  rounded-b-lg p-6 ">
         {tab === 0 && (
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
             {/* Columna 1: Todo el bloque oftalmológico */}
             <div className="space-y-6 flex flex-col">
               {/* Evaluación Oftalmológica */}
@@ -434,9 +434,9 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 </div>
               </div>
               {/* PIO y Correctores Oculares */}
-              <div className="flex gap-4 flex-1">
+              <div className="flex gap-4 flex-1 flex-col md:flex-row">
                 {/* PIO */}
-                <div className="border rounded p-4 flex flex-col min-w-[180px] max-w-[220px] w-full">
+                <div className="border rounded p-4 flex flex-col md:max-w-[220px] w-full">
                   <div className="text-blue-700 font-semibold text-center mb-2">
                     PIO
                   </div>
@@ -473,7 +473,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   </div>
                 </div>
                 {/* Correctores Oculares */}
-                <div className="border rounded p-4  flex-1 min-w-[320px] ">
+                <div className="border rounded p-4  flex-1 ">
                   <div className="text-blue-700 font-semibold text-center mb-2">
                     CORRECTORES OCULARES
                   </div>
@@ -604,7 +604,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                 <div className="text-blue-700 font-semibold text-center mb-2">
                   TEST DE EVALUACIÓN COMPLEMENTARIA
                 </div>
-                <div className="grid grid-cols-[180px_1fr] 2xl:grid-cols-[260px_1fr] gap-x-2 gap-y-1">
+                <div className="grid md:grid-cols-[260px_1fr] gap-x-2 gap-y-1">
                   {/* Fila 1 */}
                   <span className="flex items-center h-8 text-[11px] font-semibold">
                     Test de Ishihara (Colores)
@@ -814,7 +814,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   </div>
                 </div>
                 <div
-                  className={`grid grid-cols-2 gap-4 ${
+                  className={`grid md:grid-cols-2 gap-4 ${
                     form.aplicaRefraccion === "NO"
                       ? "opacity-50 pointer-events-none"
                       : ""
@@ -974,7 +974,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
           </div>
         )}
         {tab === 1 && (
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Columna izquierda: Agudeza Visual y Diagnóstico */}
             <div>
               {/* Agudeza Visual Final */}
@@ -1233,7 +1233,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
             </div>
           </div>
         )}
-        {tab == 2 && (
+        {tab === 2 && (
           <div className="space-y-4">
             <div className="border rounded p-4 space-y-4  w-full">
               <div className="text-blue-700 font-semibold text-center mb-4">
@@ -1395,7 +1395,7 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
               <div className="text-blue-700 font-semibold text-center mb-4">
                 EXAMEN CLÍNICO EXTERNO
               </div>
-              <div className="grid grid-cols-2 gap-3 px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-4">
                 <CheckDualLabel
                   label="Ptosis Palpebral"
                   nameOd="ptosisPalpebralOd"

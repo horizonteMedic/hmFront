@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../getFetch/getFetch";
-import { SubmitData } from "./model";
+import { getFetch } from "../../../getFetch/getFetch";
+import { SubmitData } from "../model";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl =
@@ -332,10 +332,10 @@ export const PrintHojaR = (nro, token, tabla) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/Oftalmologia/*.jsx"
+          "../../../../../jaspers/Oftalmologia/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../jaspers/Oftalmologia/${nombre}.jsx`
+          `../../../../../jaspers/Oftalmologia/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {

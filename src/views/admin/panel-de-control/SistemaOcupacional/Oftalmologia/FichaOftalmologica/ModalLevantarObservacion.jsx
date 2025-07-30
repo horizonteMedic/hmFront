@@ -6,10 +6,8 @@ import {
 import {
   faSave,
   faBroom,
-  faEdit,
-  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import { Button } from "./OftalmologiaForm";
+import { Button } from "./FichaOftalmologica";
 
 const tabla = "oftalmologia_lo";
 export default function ModalLevantarObservacion({
