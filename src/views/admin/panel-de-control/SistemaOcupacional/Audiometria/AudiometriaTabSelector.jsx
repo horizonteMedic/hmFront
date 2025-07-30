@@ -180,9 +180,10 @@ export default function AudiometriaTabSelector({
   token,
   userlogued,
   selectSede,
-  listasCombos,
+  listas,
   subTab,
 }) {
+  
   const [formAudiometria, setFormAudiometria] = useState(
     initialFormStateAudiometria
   );
@@ -206,7 +207,7 @@ export default function AudiometriaTabSelector({
           token={token}
           userlogued={userlogued}
           selectedSede={selectSede}
-          listas={listasCombos}
+          listas={listas}
         />
       )}
       {subTab === 2 && (
