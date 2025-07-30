@@ -1,30 +1,13 @@
 import jsPDF from "jspdf";
-import header_EvaluacionOftalmologica2021_Digitalizado_ohla from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_ohla.jsx";
+import header_EvaluacionOftalmologica2021_Digitalizado from "./headers/header_EvaluacionOftalmologica2021_Digitalizado.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {}) {
+export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 
   // 1) Header
-  header_EvaluacionOftalmologica2021_Digitalizado_ohla(doc, data);
-
-  // const datos = {
-  //   // Evaluación Oftalmológica
-  //   parpadosAnexos: "NORMAL",
-  //   cornea: "NORMAL", 
-  //   otrosHallazgos: "NINGUNO",
-  //   conjuntivas: "NORMAL",
-  //   cristalino: "TRANSPARENTE",
-  //   
-  //   // Antecedentes
-  //   antecedentesPersonales: "NO REFIERE",
-  //   antecedentesFamiliares: "NO REFIERE",
-  //   ptirigionOD: false, // false = no marcado, true = marcado con X
-  //   ptirigionOI: true,  // true = marcado con X
-  //   ptirigionNO: false, // false = no marcado, true = marcado con X
-  //   hallazgos: "NINGUNO"
-  // };
+  header_EvaluacionOftalmologica2021_Digitalizado(doc, data);
 
   const obtener = (name) => {
     return data[name] || "";
@@ -32,20 +15,39 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {})
 
   // Datos de prueba (solo para desarrollo)
   const datosPrueba = {
-    // Evaluación Oftalmológica
-    parpadosAnexos: "NORMAL",
-    cornea: "NORMAL", 
-    otrosHallazgos: "NINGUNO",
-    conjuntivas: "NORMAL",
-    cristalino: "TRANSPARENTE",
+    // EXAMEN CLÍNICO EXTERNO (8 'X's IZQ)
+    ptosisPalpebralOD: true,
+    ptosisPalpebralOI: true,
+    estrabismoOD: true,
+    estrabismoOI: true,
+    conjuntivitisOD: true,
+    conjuntivitisOI: true,
+    cataratasOD: true,
+    cataratasOI: true,
+    pterigionOD: true,
+    pterigionOI: true,
+    pingueculaOD: true,
+    pingueculaOI: true,
+    chalazionOD: true,
+    chalazionOI: true,
+    otrosOD: true,
+    otrosOI: true,
+    hallazgosExternos: "GRADO 3",
     
-    // Antecedentes
-    antecedentesPersonales: "NO REFIERE",
-    antecedentesFamiliares: "NO REFIERE",
-    ptirigionOD: false,
-    ptirigionOI: false,
-    ptirigionNO: false,
-    hallazgos: "",
+    // FONDO DE OJO (4 'X's DER)
+    fondoNormalOD: false,
+    fondoNormalOI: false,
+    fondoAnormalOD: false,
+    fondoAnormalOI: false,
+    hallazgosFondo: "N/A",
+    
+    // PIO (Presión Intraocular) (4 'X's DER)
+    pioOD: false,
+    pioOI: false,
+    pioNoAplica: false,
+    pioNormal: false,
+    
+
     
     // AGUDEZA VISUAL
     correctoresOcularesSI: false,
@@ -141,28 +143,11 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {})
     indicadoresCercaLaboral: false
   };
 
-  // const datos = {
-  //   // Evaluación Oftalmológica
-  //   parpadosAnexos: obtener("parpadosAnexos"),
-  //   cornea: obtener("cornea"), 
-  //   otrosHallazgos: obtener("otrosHallazgos"),
-  //   conjuntivas: obtener("conjuntivas"),
-  //   cristalino: obtener("cristalino"),
-  //   
-  //   // Antecedentes
-  //   antecedentesPersonales: obtener("antecedentesPersonales"),
-  //   antecedentesFamiliares: obtener("antecedentesFamiliares"),
-  //   ptirigionOD: data.ptirigionOD,
-  //   ptirigionOI: data.ptirigionOI,
-  //   ptirigionNO: data.ptirigionNO, // Campo "NO" para ptirigion
-  //   hallazgos: obtener("hallazgos")
-  // };
-
   // Usar datos reales o datos de prueba
   const datosFinales = data && Object.keys(data).length > 0 ? data : datosPrueba;
 
   // === NUEVO: Usar imagen de fondo para la evaluación oftalmológica ===
-  const fondoImg = "/img/Frame_EvaluacionOft_digi_ohla.png";
+  const fondoImg = "/img/FRAME_DIGITALIZADO.png";
   const fondoH = 210; // altura aproximada del frame en mm (ajusta si es necesario)
   let yHeader = 60;
   try {
@@ -269,51 +254,173 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {})
   const xBinocularConAgujero = margin + 152; // Posición central
   doc.text(String(datosFinales.conAgujeroBinocularOD || ""), xBinocularConAgujero, yBinocular);
 
-  // === EVALUACIÓN OFTALMOLÓGICA (sección izquierda) ===
-  const xEvaluacion = margin + 15;
-  let yEvaluacion = margin + 62.5;
-
-  doc.text(String(datosFinales.parpadosAnexos || ""), xEvaluacion + 30, yEvaluacion);
-  yEvaluacion += 4.8;
-  doc.text(String(datosFinales.cornea || ""), xEvaluacion + 30, yEvaluacion);
-  yEvaluacion += 4.8;
-  doc.text(String(datosFinales.otrosHallazgos || ""), xEvaluacion + 30, yEvaluacion);
-  yEvaluacion += 4.7;
-  doc.text(String(datosFinales.conjuntivas || ""), xEvaluacion + 30, yEvaluacion);
-  yEvaluacion += 5.65;
-  doc.text(String(datosFinales.cristalino || ""), xEvaluacion + 30, yEvaluacion);
-
-  // === ANTECEDENTES (sección derecha) ===
-  const xAntecedentes = margin + 55;
-  let yAntecedentes = margin +  63;
-
-  doc.text(String(datosFinales.antecedentesPersonales || ""), xAntecedentes + 45, yAntecedentes);
-  yAntecedentes += 7;
-  doc.text(String(datosFinales.antecedentesFamiliares || ""), xAntecedentes + 45, yAntecedentes);
-  yAntecedentes += 7;
-
-  // Ptirigion (marcar X en casillas)
-  const xPtirigionOD = margin + 129.5;
-  const xPtirigionOI = margin + 135.5;
-  const xPtirigionNO = margin + 166; // Campo "NO" para ptirigion
-  const yPtirigion = margin + 79.2;
+  // === EXAMEN CLÍNICO EXTERNO ===
+  const xExamenExterno = margin + 15;
   
+  // Variables independientes para cada 'X' - IZQUIERDA (8 'X's)
+  // Ptosis Palpebral
+  const xPtosisOD = margin + 44; // AJUSTAR POSICIÓN X DE PTOSIS OD AQUÍ
+  const yPtosisOD = margin + 66; // AJUSTAR ALTURA DE PTOSIS OD AQUÍ
+  const xPtosisOI = margin + 52; // AJUSTAR POSICIÓN X DE PTOSIS OI AQUÍ
+  const yPtosisOI = margin + 66; // AJUSTAR ALTURA DE PTOSIS OI AQUÍ
+  
+  // Estrabismo
+  const xEstrabismoOD = margin + 44; // AJUSTAR POSICIÓN X DE ESTRABISMO OD AQUÍ
+  const yEstrabismoOD = margin + 70; // AJUSTAR ALTURA DE ESTRABISMO OD AQUÍ
+  const xEstrabismoOI = margin + 52; // AJUSTAR POSICIÓN X DE ESTRABISMO OI AQUÍ
+  const yEstrabismoOI = margin + 70; // AJUSTAR ALTURA DE ESTRABISMO OI AQUÍ
+  
+  // Conjuntivitis
+  const xConjuntivitisOD = margin + 44; // AJUSTAR POSICIÓN X DE CONJUNTIVITIS OD AQUÍ
+  const yConjuntivitisOD = margin + 74; // AJUSTAR ALTURA DE CONJUNTIVITIS OD AQUÍ
+  const xConjuntivitisOI = margin + 52; // AJUSTAR POSICIÓN X DE CONJUNTIVITIS OI AQUÍ
+  const yConjuntivitisOI = margin + 74; // AJUSTAR ALTURA DE CONJUNTIVITIS OI AQUÍ
+  
+  // Cataratas
+  const xCataratasOD = margin + 44; // AJUSTAR POSICIÓN X DE CATARATAS OD AQUÍ
+  const yCataratasOD = margin + 77; // AJUSTAR ALTURA DE CATARATAS OD AQUÍ
+  const xCataratasOI = margin + 52; // AJUSTAR POSICIÓN X DE CATARATAS OI AQUÍ
+  const yCataratasOI = margin + 77; // AJUSTAR ALTURA DE CATARATAS OI AQUÍ
+  
+  // Pterigion
+  const xPterigionOD = margin + 96; // AJUSTAR POSICIÓN X DE PTERIGION OD AQUÍ
+  const yPterigionOD = margin + 66.5; // AJUSTAR ALTURA DE PTERIGION OD AQUÍ
+  const xPterigionOI = margin + 104 ; // AJUSTAR POSICIÓN X DE PTERIGION OI AQUÍ
+  const yPterigionOI = margin + 66.5; // AJUSTAR ALTURA DE PTERIGION OI AQUÍ
+  
+  // Pinguécula
+  const xPingueculaOD = margin + 96; // AJUSTAR POSICIÓN X DE PINGUECULA OD AQUÍ
+  const yPingueculaOD = margin + 70; // AJUSTAR ALTURA DE PINGUECULA OD AQUÍ
+  const xPingueculaOI = margin + 104; // AJUSTAR POSICIÓN X DE PINGUECULA OI AQUÍ
+  const yPingueculaOI = margin + 70; // AJUSTAR ALTURA DE PINGUECULA OI AQUÍ
+  
+  // Chalazion
+  const xChalazionOD = margin + 96; // AJUSTAR POSICIÓN X DE CHALAZION OD AQUÍ
+  const yChalazionOD = margin + 74.5; // AJUSTAR ALTURA DE CHALAZION OD AQUÍ
+  const xChalazionOI = margin + 104; // AJUSTAR POSICIÓN X DE CHALAZION OI AQUÍ
+  const yChalazionOI = margin + 74.5; // AJUSTAR ALTURA DE CHALAZION OI AQUÍ
+  
+  // Otros
+  const xOtrosOD = margin + 96; // AJUSTAR POSICIÓN X DE OTROS OD AQUÍ
+  const yOtrosOD = margin + 77.5; // AJUSTAR ALTURA DE OTROS OD AQUÍ
+  const xOtrosOI = margin + 104; // AJUSTAR POSICIÓN X DE OTROS OI AQUÍ
+  const yOtrosOI = margin + 77.5; // AJUSTAR ALTURA DE OTROS OI AQUÍ
+  
+  // Renderizar 'X's de la IZQUIERDA
   doc.setFont("helvetica", "bold").setFontSize(9);
-  if (datosFinales.ptirigionOD) {
-    doc.text("X", xPtirigionOD, yPtirigion);
+  if (datosFinales.ptosisPalpebralOD) {
+    doc.text("X", xPtosisOD, yPtosisOD);
   }
-  if (datosFinales.ptirigionOI) {
-    doc.text("X", xPtirigionOI, yPtirigion);
+  if (datosFinales.ptosisPalpebralOI) {
+    doc.text("X", xPtosisOI, yPtosisOI);
   }
-  if (datosFinales.ptirigionNO) {
-    doc.text("X", xPtirigionNO, yPtirigion);
+  if (datosFinales.estrabismoOD) {
+    doc.text("X", xEstrabismoOD, yEstrabismoOD);
   }
-  doc.setFont("helvetica", "normal").setFontSize(9);
-
-  yAntecedentes += 7;
+  if (datosFinales.estrabismoOI) {
+    doc.text("X", xEstrabismoOI, yEstrabismoOI);
+  }
+  if (datosFinales.conjuntivitisOD) {
+    doc.text("X", xConjuntivitisOD, yConjuntivitisOD);
+  }
+  if (datosFinales.conjuntivitisOI) {
+    doc.text("X", xConjuntivitisOI, yConjuntivitisOI);
+  }
+  if (datosFinales.cataratasOD) {
+    doc.text("X", xCataratasOD, yCataratasOD);
+  }
+  if (datosFinales.cataratasOI) {
+    doc.text("X", xCataratasOI, yCataratasOI);
+  }
+  if (datosFinales.pterigionOD) {
+    doc.text("X", xPterigionOD, yPterigionOD);
+  }
+  if (datosFinales.pterigionOI) {
+    doc.text("X", xPterigionOI, yPterigionOI);
+  }
+  if (datosFinales.pingueculaOD) {
+    doc.text("X", xPingueculaOD, yPingueculaOD);
+  }
+  if (datosFinales.pingueculaOI) {
+    doc.text("X", xPingueculaOI, yPingueculaOI);
+  }
+  if (datosFinales.chalazionOD) {
+    doc.text("X", xChalazionOD, yChalazionOD);
+  }
+  if (datosFinales.chalazionOI) {
+    doc.text("X", xChalazionOI, yChalazionOI);
+  }
+  if (datosFinales.otrosOD) {
+    doc.text("X", xOtrosOD, yOtrosOD);
+  }
+  if (datosFinales.otrosOI) {
+    doc.text("X", xOtrosOI, yOtrosOI);
+  }
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(String(datosFinales.hallazgos || ""), xAntecedentes + 72, yAntecedentes, { maxWidth: 60 });
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  
+  // Hallazgos Externos
+  const yHallazgosExternos = margin + 85.4;
+  doc.text(String(datosFinales.hallazgosExternos || ""), xExamenExterno + 28, yHallazgosExternos);
+
+  // === FONDO DE OJO Y PIO ===
+  // Variables independientes para cada 'X' - DERECHA (8 'X's)
+  
+  // FONDO DE OJO
+  // Normal
+  const xFondoNormalOD = margin + 85; // AJUSTAR POSICIÓN X DE FONDO NORMAL OD AQUÍ
+  const yFondoNormalOD = margin + 62.5; // AJUSTAR ALTURA DE FONDO NORMAL OD AQUÍ
+  const xFondoNormalOI = margin + 95; // AJUSTAR POSICIÓN X DE FONDO NORMAL OI AQUÍ
+  const yFondoNormalOI = margin + 62.5; // AJUSTAR ALTURA DE FONDO NORMAL OI AQUÍ
+  
+  // Anormal
+  const xFondoAnormalOD = margin + 85; // AJUSTAR POSICIÓN X DE FONDO ANORMAL OD AQUÍ
+  const yFondoAnormalOD = margin + 67.3; // AJUSTAR ALTURA DE FONDO ANORMAL OD AQUÍ
+  const xFondoAnormalOI = margin + 95; // AJUSTAR POSICIÓN X DE FONDO ANORMAL OI AQUÍ
+  const yFondoAnormalOI = margin + 67.3; // AJUSTAR ALTURA DE FONDO ANORMAL OI AQUÍ
+  
+  // PIO (Presión Intraocular)
+  const xPioOD = margin + 85; // AJUSTAR POSICIÓN X DE PIO OD AQUÍ
+  const yPioOD = margin + 72.1; // AJUSTAR ALTURA DE PIO OD AQUÍ
+  const xPioOI = margin + 95; // AJUSTAR POSICIÓN X DE PIO OI AQUÍ
+  const yPioOI = margin + 72.1; // AJUSTAR ALTURA DE PIO OI AQUÍ
+  const xPioNoAplica = margin + 105; // AJUSTAR POSICIÓN X DE PIO NO APLICA AQUÍ
+  const yPioNoAplica = margin + 72.1; // AJUSTAR ALTURA DE PIO NO APLICA AQUÍ
+  const xPioNormal = margin + 115; // AJUSTAR POSICIÓN X DE PIO NORMAL AQUÍ
+  const yPioNormal = margin + 72.1; // AJUSTAR ALTURA DE PIO NORMAL AQUÍ
+  
+  // Renderizar 'X's de la DERECHA
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  if (datosFinales.fondoNormalOD) {
+    doc.text("X", xFondoNormalOD, yFondoNormalOD);
+  }
+  if (datosFinales.fondoNormalOI) {
+    doc.text("X", xFondoNormalOI, yFondoNormalOI);
+  }
+  if (datosFinales.fondoAnormalOD) {
+    doc.text("X", xFondoAnormalOD, yFondoAnormalOD);
+  }
+  if (datosFinales.fondoAnormalOI) {
+    doc.text("X", xFondoAnormalOI, yFondoAnormalOI);
+  }
+  if (datosFinales.pioOD) {
+    doc.text("X", xPioOD, yPioOD);
+  }
+  if (datosFinales.pioOI) {
+    doc.text("X", xPioOI, yPioOI);
+  }
+  if (datosFinales.pioNoAplica) {
+    doc.text("X", xPioNoAplica, yPioNoAplica);
+  }
+  if (datosFinales.pioNormal) {
+    doc.text("X", xPioNormal, yPioNormal);
+  }
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  
+  // Hallazgos Fondo
+  const yHallazgosFondo = margin + 73.5;
+  doc.text(String(datosFinales.hallazgosFondo || ""), margin + 160, yHallazgosFondo );
+
+  // === TEST DE EVALUACIÓN COMPLEMENTARIA ===
 
   // === TEST DE EVALUACIÓN COMPLEMENTARIA ===
   // Test de Ishihara
@@ -323,9 +430,15 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {})
   const yTestIshihara = margin + 125.3;
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("A", xTestIshiharaNormal, yTestIshihara);
-  doc.text("A", xTestIshiharaAnormal, yTestIshihara);
-  doc.text("A", xTestIshiharaNC, yTestIshihara);
+  if (datosFinales.testIshiharaNormal) {
+    doc.text("X", xTestIshiharaNormal, yTestIshihara);
+  }
+  if (datosFinales.testIshiharaAnormal) {
+    doc.text("X", xTestIshiharaAnormal, yTestIshihara);
+  }
+  if (datosFinales.testIshiharaNC) {
+    doc.text("X", xTestIshiharaNC, yTestIshihara);
+  }
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Test de Colores Puros (coordenadas independientes)
@@ -335,9 +448,15 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {})
   const yTestColores = margin + 130;
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("B", xTestColoresNormal, yTestColores);
-  doc.text("B", xTestColoresAnormal, yTestColores);
-  doc.text("B", xTestColoresNC, yTestColores);
+  if (datosFinales.testColoresNormal) {
+    doc.text("X", xTestColoresNormal, yTestColores);
+  }
+  if (datosFinales.testColoresAnormal) {
+    doc.text("X", xTestColoresAnormal, yTestColores);
+  }
+  if (datosFinales.testColoresNC) {
+    doc.text("X", xTestColoresNC, yTestColores);
+  }
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Estereopsia (coordenadas independientes)
@@ -347,9 +466,15 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(data = {})
   const yEstereopsia = margin + 134.5;
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("C", xEstereopsiaNormal, yEstereopsia);
-  doc.text("C", xEstereopsiaAnormal, yEstereopsia);
-  doc.text("C", xEstereopsiaNC, yEstereopsia);
+  if (datosFinales.estereopsiaNormal) {
+    doc.text("X", xEstereopsiaNormal, yEstereopsia);
+  }
+  if (datosFinales.estereopsiaAnormal) {
+    doc.text("X", xEstereopsiaAnormal, yEstereopsia);
+  }
+  if (datosFinales.estereopsiaNC) {
+    doc.text("X", xEstereopsiaNC, yEstereopsia);
+  }
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Valor de Estereopsia en segundos
