@@ -1,5 +1,5 @@
 /**
- * Header para Evaluación Oftalmológica 2021 Digitalizado OHLA
+ * Header para Evaluación Oftalmológica 2021 Digitalizado
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {object} datos - Datos del paciente y ficha
  */
@@ -60,7 +60,7 @@ function footerFichaOftalmoCabecera(doc, datos = {}) {
   });
 }
 
-const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (doc, datos = {}) => {
+const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
   const margin = 15; // Aumentado el margen lateral
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -164,4 +164,4 @@ const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (doc, datos = {}) =
   doc.text(`${datos.sede || ""}`, fichaX, fichaY + fichaSpacing, { align: "right" });
 };
 
-export default header_EvaluacionOftalmologica2021_Digitalizado_ohla; 
+export default header_EvaluacionOftalmologica2021_Digitalizado; 
