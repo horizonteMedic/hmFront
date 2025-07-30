@@ -147,7 +147,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   const datosFinales = data && Object.keys(data).length > 0 ? data : datosPrueba;
 
   // === NUEVO: Usar imagen de fondo para la evaluación oftalmológica ===
-  const fondoImg = "/img/FRAME_DIGITALIZADO.png";
+  const fondoImg = "/img/Oftamo_digitalizado.png";
   const fondoH = 210; // altura aproximada del frame en mm (ajusta si es necesario)
   let yHeader = 60;
   try {
