@@ -36,9 +36,9 @@ import OftalmologiaTabSelector from './views/admin/panel-de-control/SistemaOcupa
 import Odontologia from './views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx';
 import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx';
 
-
 //SIMULADOR DE jaspers
 import Ficha from './views/jaspers/Oftalmologia/EvaluacionOftalmologica2021_Digitalizado_ohla.jsx'
+
 const App = () => {
   return (
     <React.StrictMode>
@@ -135,4 +135,4 @@ const AppContent = () => {
   );
 }
 
-createRoot(document.getElementById('root')).render(<App />);
+createRoot(document.getElementById('root')).render(<App />);
