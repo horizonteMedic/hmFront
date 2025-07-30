@@ -134,27 +134,27 @@ const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Nombres y Apellidos
-  doc.text("Apellidos y Nombres:", margin, infoY);
+  doc.text("Nombre:", margin, infoY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.nombre || ""} ${datos.apellido || ""}`, margin + 50, infoY);
+  doc.text(`${datos.nombre || ""} ${datos.apellido || ""}`, margin + 15, infoY);
 
   // Fecha
   doc.setFont("helvetica", "normal");
   doc.text("Fecha:", pageW - margin - 80, infoY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.fechaOf || ""}`, pageW - margin - 30, infoY);
+  doc.text(`${datos.fechaOf || ""}`, pageW - margin - 65, infoY);
 
   // Empresa y Contrata
   const infoY2 = infoY + 6;
   doc.setFont("helvetica", "normal");
   doc.text("Empresa:", margin, infoY2);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.empresa || ""}`, margin + 25, infoY2);
+  doc.text(`${datos.empresa || ""}`, margin + 15, infoY2);
 
   doc.setFont("helvetica", "normal");
-  doc.text("Contrata:", pageW - margin - 80, infoY2);
+  doc.text("Puesto de Trabajo:", pageW - margin - 70, infoY2);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.contrata || ""}`, pageW - margin - 30, infoY2);
+  doc.text(`${datos.areaO || ""}`, pageW - margin - 65, infoY2);
 
   // Nro Orden y Sede a la derecha (alineados y más juntos)
   const fichaX = pageW - margin - 25;
@@ -167,7 +167,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (
   doc.text(`${datos.norden || ""}`, fichaX, fichaY, { align: "right" });
 
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text("Sede:", fichaX - 35, fichaY + fichaSpacing, { align: "right" });
+  doc.text("Sede:", fichaX - 60, fichaY + fichaSpacing, { align: "right" });
   doc.setFont("helvetica", "bold").setFontSize(10);
   doc.text(`${datos.sede || ""}`, fichaX, fichaY + fichaSpacing, {
     align: "right",

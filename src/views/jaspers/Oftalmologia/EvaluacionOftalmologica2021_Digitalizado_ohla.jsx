@@ -542,9 +542,17 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const yTestIshihara = margin + 125.3;
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("A", xTestIshiharaNormal, yTestIshihara);
-  doc.text("A", xTestIshiharaAnormal, yTestIshihara);
-  doc.text("A", xTestIshiharaNC, yTestIshihara);
+  doc.text(
+    datosFinales.testIshiharaNormal ? "X" : "",
+    xTestIshiharaNormal,
+    yTestIshihara
+  );
+  doc.text(
+    datosFinales.testIshiharaAnormal ? "X" : "",
+    xTestIshiharaAnormal,
+    yTestIshihara
+  );
+  doc.text(datosFinales.testIshiharaNC ? "X" : "", xTestIshiharaNC, yTestIshihara);
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Test de Colores Puros (coordenadas independientes)
@@ -554,9 +562,13 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const yTestColores = margin + 130;
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("B", xTestColoresNormal, yTestColores);
-  doc.text("B", xTestColoresAnormal, yTestColores);
-  doc.text("B", xTestColoresNC, yTestColores);
+  doc.text(datosFinales.testColoresNormal ? "X" : "", xTestColoresNormal, yTestColores);
+  doc.text(
+    datosFinales.testColoresAnormal ? "X" : "",
+    xTestColoresAnormal,
+    yTestColores
+  );
+  doc.text(datosFinales.testColoresNC ? "X" : "", xTestColoresNC, yTestColores);
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Estereopsia (coordenadas independientes)
@@ -566,9 +578,13 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const yEstereopsia = margin + 134.5;
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("C", xEstereopsiaNormal, yEstereopsia);
-  doc.text("C", xEstereopsiaAnormal, yEstereopsia);
-  doc.text("C", xEstereopsiaNC, yEstereopsia);
+  doc.text(datosFinales.estereopsiaNormal ? "X" : "", xEstereopsiaNormal, yEstereopsia);
+  doc.text(
+    datosFinales.estereopsiaAnormal ? "X" : "",
+    xEstereopsiaAnormal,
+    yEstereopsia
+  );
+  doc.text(datosFinales.estereopsiaNC ? "X" : "", xEstereopsiaNC, yEstereopsia);
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Valor de Estereopsia en segundos
@@ -882,7 +898,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     { nombre: "FIRMAP", x: -23, y: 240, maxw: 120 },
     { nombre: "HUELLA", x: 10, y: 240, maxw: 100 },
     { nombre: "SELLOFIRMA", x: 50, y: 240, maxw: 120 },
-    { nombre: "SELLOFIRMADOCASIG", x: 120, y: 240, maxw: 100 },
+    { nombre: "SELLOFIRMADOCASIG", x: 110, y: 240, maxw: 120 },
   ];
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
