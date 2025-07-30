@@ -194,8 +194,7 @@ const LaboratorioClinico = ({token, selectedSede, userlogued, permiso}) => {
       })
       .catch(() => {});
   },[])
-  console.log(searchMedico)
-  console.log('formulario',form.responsable)
+
   const tabs = [
     {
       label: 'Hematología - Bioquímica SI-EO',
