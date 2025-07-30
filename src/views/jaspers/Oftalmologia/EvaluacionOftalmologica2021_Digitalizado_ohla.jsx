@@ -4,7 +4,7 @@ import header_EvaluacionOftalmologica2021_Digitalizado_ohla from "./headers/head
 export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   data = {}
 ) {
-  const doc = new jsPDF();
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 

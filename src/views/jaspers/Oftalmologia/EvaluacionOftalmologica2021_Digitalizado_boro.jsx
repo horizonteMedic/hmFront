@@ -1,17 +1,13 @@
 import jsPDF from "jspdf";
-import header_EvaluacionOftalmologica2021_Digitalizado from "./headers/header_EvaluacionOftalmologica2021_Digitalizado.jsx";
+import header_EvaluacionOftalmologica2021_Digitalizado_boro from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_boro.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
+export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
 
-  // 1) Header
-  header_EvaluacionOftalmologica2021_Digitalizado(doc, data);
-
-  const obtener = (name) => {
-    return data[name] || "";
-  };
+  // 1) Header específico para Boro
+  header_EvaluacionOftalmologica2021_Digitalizado_boro(doc, data);
 
   // Datos de prueba (solo para desarrollo)
   const datosPrueba = {
