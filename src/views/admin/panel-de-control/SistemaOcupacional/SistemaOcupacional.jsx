@@ -389,7 +389,7 @@ const TabComponent = () => {
                   <span className={styles.title}>Oftalmología</span>
                 </div>
               )}
-                <div
+                {/* <div
                   onClick={() => setActiveTab(19)}
                   className={`${styles.gridItem} ${
                     activeTab === 19 ? styles.active : ""
@@ -399,7 +399,7 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faAnchor} />
                   </span>
                   <span className={styles.title}>OIT</span>
-                </div>
+                </div> */}
               
             </div>
           </>
