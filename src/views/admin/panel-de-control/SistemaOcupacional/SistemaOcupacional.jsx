@@ -76,6 +76,7 @@ import HistoriaOcupacional from "./HistoriaOcupacional/HistoriaOcupacional.jsx";
 import OftalmologiaTabSelector from "./Oftalmologia/OftalmologiaTabSelector.jsx";
 import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
+import Odontologia from "./Odontologia/Odontologia.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -366,8 +367,9 @@ const TabComponent = () => {
               )}
               {tieneVista("Odontologia") && (
                 <div
+                  onClick={() => setActiveTab(18)}
                   className={`${styles.gridItem} ${
-                    activeTab === 16 ? styles.active : ""
+                    activeTab === 18 ? styles.active : ""
                   }`}
                 >
                   <span className={styles.icon}>
@@ -389,7 +391,7 @@ const TabComponent = () => {
                   <span className={styles.title}>Oftalmología</span>
                 </div>
               )}
-                {/* <div
+              {/* <div
                   onClick={() => setActiveTab(19)}
                   className={`${styles.gridItem} ${
                     activeTab === 19 ? styles.active : ""
@@ -400,7 +402,6 @@ const TabComponent = () => {
                   </span>
                   <span className={styles.title}>OIT</span>
                 </div> */}
-              
             </div>
           </>
         )}
@@ -905,7 +906,7 @@ const TabComponent = () => {
                       selectedSede={selectSede}
                     />
                   )} */}
-                  <AudiometriaTabSelector 
+                  <AudiometriaTabSelector
                     token={token}
                     userlogued={userlogued}
                     selectedSede={selectSede}
@@ -950,6 +951,23 @@ const TabComponent = () => {
                 </button>
               </div>
               <OftalmologiaTabSelector
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+              />
+            </div>
+          )}
+          {activeTab === 18 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <Odontologia
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}
