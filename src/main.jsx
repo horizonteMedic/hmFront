@@ -37,7 +37,7 @@ import Odontologia from './views/admin/panel-de-control/SistemaOcupacional/Odont
 import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx';
 
 //SIMULADOR DE jaspers
-import Ficha from './views/jaspers/Odontologia/OdontogramaFechas.jsx'
+import Ficha from './views/jaspers/Audiometria/FichaAudiologica_Digitalizado.jsx'
 
 const App = () => {
   return (
