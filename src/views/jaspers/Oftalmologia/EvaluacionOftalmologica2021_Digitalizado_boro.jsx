@@ -138,9 +138,144 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     indicadoresLejosLaboral: false,
     indicadoresCercaLaboral: false
   };
+  const obtenerString = (nombre) => {
+    return data[nombre] ?? "";
+  };
+
+  const datosReales = {
+    ptosisPalpebralOD: data.rbecPtosisOd,
+    ptosisPalpebralOI: data.rbecPtosisOi,
+    estrabismoOD: data.rbecEstrabismoOd,
+    estrabismoOI: data.rbecEstrabismoOi,
+    conjuntivitisOD: data.rbecConjuntivitisOd,
+    conjuntivitisOI: data.rbecConjuntivitisOi,
+    cataratasOD: data.rbecCataratasOd,
+    cataratasOI: data.rbecCataratasOi,
+    pterigionOD: data.rbecPterigionOd,
+    pterigionOI: data.rbecPterigionOi,
+    pingueculaOD: data.rbecPingueculaOd,
+    pingueculaOI: data.rbecPingueculaOi,
+    chalazionOD: data.rbecClalacionOd,
+    chalazionOI: data.rbecClalacionOi,
+    otrosOD: data.rbecOtrosOd,
+    otrosOI: data.rbecOtrosOi,
+    hallazgosExternos: obtenerString("txtecHallazgos"),
+
+    // FONDO DE OJO (4 'X's DER)
+    fondoNormalOD: data.rbfONormalOd,
+    fondoNormalOI: data.rbfONormalOi,
+    fondoAnormalOD: data.rbfOAnormalOd,
+    fondoAnormalOI: data.rbfOAnormalOi,
+    hallazgosFondo: data.txtFoHallazgos,
+
+    // PIO (Presión Intraocular) (4 'X's DER)
+    pioOD: obtenerString("txtPioOd"),
+    pioOI: obtenerString("txtPioOi"),
+    pioNoAplica: obtenerString("txtPioNa"),
+    pioNormal: false,
+
+    // AGUDEZA VISUAL
+    correctoresOcularesSI: data.rbcOsi,
+    correctoresOcularesNO: data.rbcOno,
+    ntxcCerca: data.rbcOcerca,
+    ntxcLejos: data.rbcOlejos,
+    ntcc: data.chkNtcc,
+    nctl: data.chkNtcl,
+
+    // Agudeza Visual Sin Correctores
+    sinCorrectoresCercaOD: obtenerString("txtCercaSinCorregirOd"),
+    sinCorrectoresCercaOI: obtenerString("txtCercaSinCorregirOi"),
+    sinCorrectoresLejosOD: obtenerString("txtLejosSinCorregirOd"),
+    sinCorrectoresLejosOI: obtenerString("txtLejosSinCorregirOi"),
+    sinCorrectoresBinocular: obtenerString("txtBinocularSinCorregir"),
+
+    // Agudeza Visual Con Correctores
+    conCorrectoresCercaOD: obtenerString("txtCercaCorregidaOd"),
+    conCorrectoresCercaOI: obtenerString("txtCercaCorregidaOi"),
+    conCorrectoresLejosOD: obtenerString("txtLejosCorregidaOd"),
+    conCorrectoresLejosOI: obtenerString("txtLejosCorregidaOi"),
+    conCorrectoresBinocular: obtenerString("txtBinocularCorregida"),
+
+    // Agudeza Visual Con Agujero Estenopeico
+    conAgujeroCercaOD: obtenerString("txtCercaAgujeroOd"),
+    conAgujeroCercaOI: obtenerString("txtCercaAgujeroOi"),
+    conAgujeroLejosOD: obtenerString("txtLejosAgujeroOd"),
+    conAgujeroLejosOI: obtenerString("txtLejosAgujeroOi"),
+    conAgujeroBinocularOD: "",
+    conAgujeroBinocularOI: "",
+
+    // TEST DE EVALUACIÓN COMPLEMENTARIA
+    testIshiharaNormal: data.rbtEcIshiharaNormal,
+    testIshiharaAnormal: data.rbtEcIshiharaAnormal,
+    testIshiharaNC: data.rbtEcIshiharaNc,
+
+    testColoresNormal: data.rbtEcColeresNormal,
+    testColoresAnormal: data.rbtEcColeresAnormal,
+    testColoresNC: data.rbtEcColeresNc,
+
+    estereopsiaNormal: data.rbtEcEstereopsiaNormal,
+    estereopsiaAnormal: data.rbtEcEstereopsiaAnormal,
+    estereopsiaNC: data.rbtEcEstereopsiaNc,
+    estereopsiaSegundos: obtenerString("txtTecEstereopsia"),
+
+    // REFRACCIÓN
+    refraccionAplica: data.chkRefraccionAplica,
+    refraccionNoAplica: data.chkRefraccionNoAplica,
+
+    // REFRACCIÓN DE LEJOS
+    refraccionLejosODSF: obtenerString("txtLejosOdSf"),
+    refraccionLejosODCIL: obtenerString("txtLejosOdCil"),
+    refraccionLejosODEJE: obtenerString("txtLejosOdEje"),
+    refraccionLejosODDIP: obtenerString("txtLejosOdDip"),
+    refraccionLejosOISF: obtenerString("txtLejosOiSf"),
+    refraccionLejosOICIL: obtenerString("txtLejosOiCil"),
+    refraccionLejosOIEJE: obtenerString("txtLejosOiEje"),
+    refraccionLejosOIDIP: "",
+
+    // REFRACCIÓN DE CERCA
+    refraccionCercaODSF: obtenerString("txtCercaOdSf"),
+    refraccionCercaODCIL: obtenerString("txtCercaOdCil"),
+    refraccionCercaODEJE: obtenerString("txtCercaOdEje"),
+    refraccionCercaODDIP: obtenerString("txtCercaOdDip"),
+    refraccionCercaOISF: obtenerString("txtCercaOiSf"),
+    refraccionCercaOICIL: obtenerString("txtCercaOiCil"),
+    refraccionCercaOIEJE: obtenerString("txtCercaOiEje"),
+    refraccionCercaOIDIP: "",
+
+    // DIAGNÓSTICO
+    txtAvConRefraccionLejosOd: obtenerString("txtAvConRefraccionLejosOd"),
+    txtAvConRefraccionLejosOi: obtenerString("txtAvConRefraccionLejosOi"),
+    txtAvConRefraccionCercaOd: obtenerString("txtAvConRefraccionCercaOd"),
+    txtAvConRefraccionCercaOi: obtenerString("txtAvConRefraccionCercaOi"),
+    diagnostico: obtenerString("txtDiagnostico"),
+
+    // INDICADORES
+    // Indicadores Generales
+    indicadoresNinguna: data.chkInNinguna,
+    indicadoresUsoCorrectores: data.chkI2 || data.chkI3,
+    indicadoresControlOftalmologia: data.chkI4Cerca || data.chkI4Lejos,
+    indicadoresLejos: data.chkI3,
+    indicadoresCerca: data.chkI2,
+    indicadoresLentesCorrectores: data.chkI4Cerca || data.chkI4Lejos,
+    indicadoresLentesCorrectoresCerca: data.chkI4Cerca,
+    indicadoresLentesCorrectoresLejos: data.chkI4Lejos,
+    indicadoresCambioLunas: data.chkI5,
+    indicadoresPterigion: data.chkI6,
+    indicadoresOtras: data.chkI7,
+
+    // Indicadores Entorno Laboral
+    indicadoresNoRestringe: data.chkR1,
+    indicadoresUsoCorrectoresLaboral: data.chkR2Lejos || data.chkR2Cerca,
+    indicadoresNoCablesElectricos: data.chkR3,
+    indicadoresNoConduccion: data.chkR4,
+    indicadoresLejosLaboral: data.chkR2Lejos,
+    indicadoresCercaLaboral: data.chkR2Cerca,
+  };
+
 
   // Usar datos reales o datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? data : datosPrueba;
+ const datosFinales =
+    data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
   // === NUEVO: Usar imagen de fondo para la evaluación oftalmológica ===
   const fondoImg = "/img/Oftamo_digitalizado.png";
@@ -680,14 +815,78 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Generar blob y abrir en iframe para imprimir automáticamente
+  // const blob = doc.output("blob");
+  // const url = URL.createObjectURL(blob);
+  // const iframe = document.createElement("iframe");
+  // iframe.style.display = "none";
+  // iframe.src = url;
+  // document.body.appendChild(iframe);
+  // iframe.onload = () => {
+  //   iframe.contentWindow.focus();
+  //   iframe.contentWindow.print();
+  // };
+  const firmasAPintar = [
+    { nombre: "FIRMAP", x: -23, y: 238, maxw: 120 },
+    { nombre: "HUELLA", x: 10, y: 238, maxw: 100 },
+    { nombre: "SELLOFIRMA", x: 40, y: 238, maxw: 120 },
+    { nombre: "SELLOFIRMADOCASIG", x: 110, y: 238, maxw: 120 },
+  ];
+  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
+} 
+
+
+function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+
+      img.onload = () => {
+        let sigW = maxw;
+        const sigH = 35;
+        const baseX = x;
+        const baseY = y;
+        const maxW = sigW - 10;
+        const maxH = sigH - 10;
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
   };
-} 
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
+}
