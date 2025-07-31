@@ -102,14 +102,16 @@ export default function Audiometria({
   const tipoHipoacusia = (promedio) => {
     let textoPromedio = "";
     if (promedio >= -10 && promedio <= 25) textoPromedio = "Normal";
-    else if (promedio > 25 && promedio <= 40) textoPromedio = "Hipoacusia leve";
+    else if (promedio > 25 && promedio <= 40)
+      textoPromedio = "Hipoacusia neurosensorial leve";
     else if (promedio > 40 && promedio <= 55)
-      textoPromedio = "Hipoacusia moderada";
+      textoPromedio = "Hipoacusia neurosensorial moderada";
     else if (promedio > 55 && promedio <= 70)
-      textoPromedio = "Hipoacusia moderada-severa";
+      textoPromedio = "Hipoacusia neurosensorial moderada-severa";
     else if (promedio > 70 && promedio <= 90)
-      textoPromedio = "Hipoacusia severa";
-    else if (promedio > 90) textoPromedio = "Hipoacusia profunda";
+      textoPromedio = "Hipoacusia neurosensorial severa";
+    else if (promedio > 90)
+      textoPromedio = "Hipoacusia neurosensorial profunda";
     return textoPromedio;
   };
   const calcularOidos = () => {
