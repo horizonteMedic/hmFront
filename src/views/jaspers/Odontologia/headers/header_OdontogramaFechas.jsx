@@ -1,0 +1,143 @@
+/**
+ * Header maqueta para FICHA ODONTOGRAFICA DE PERSONAL - REPORTE POR FECHAS
+ * @param {jsPDF} doc - Instancia de jsPDF
+ */
+// === FOOTER FICHA ODONTOLÓGICA CABECERA ===
+function footerFichaOdontologicaCabecera(doc, opts = {}, datos = {}) {
+  const margin = 8;
+  const logoW = 38;
+  const y = 12;
+  const xOffset = opts.xOffset !== undefined ? opts.xOffset : 25;
+  const fontSize = opts.fontSize !== undefined ? opts.fontSize : 6;
+  const yOffset = opts.yOffset !== undefined ? opts.yOffset : -8;
+  const baseX = margin + logoW + 8 - xOffset;
+  let yFila = y + 2 + yOffset;
+  const rowH = 3.2;
+  doc.setFontSize(fontSize);
+  doc.setTextColor(0, 0, 0);
+  const filas = [
+    {
+      direccion: datos?.dirTruPierola || "Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando Cel. 964385075",
+      celular: datos?.celTrujilloPie || "",
+      email: datos?.emailTruPierola || "",
+      telefono: datos?.telfTruPierola || "Cl. Guillermo Prescott N°127 Urb. Sto. Dominguito Telf. 044-767608"
+    },
+    {
+      direccion: datos?.dirHuamachuco || "Sede Huamachuco: Jr. Leoncio Prado N°786",
+      celular: datos?.celHuamachuco || "Cel. 990094744-969603777",
+      email: datos?.emailHuamachuco || "",
+      telefono: datos?.telfHuamachuco || "Telf. 044-348070"
+    },
+    {
+      direccion: datos?.dirHuancayo || "Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
+      celular: datos?.celHuancayo || "",
+      email: datos?.emailHuancayo || "",
+      telefono: datos?.telfHuancayo || "Telf. 064-659554"
+    }
+  ];
+  filas.forEach((fila) => {
+    let x = baseX;
+    if (fila.direccion) {
+      const idx2 = fila.direccion.indexOf(":");
+      if (idx2 !== -1) {
+        const sedeNombre = fila.direccion.substring(0, idx2 + 1);
+        const sedeResto = fila.direccion.substring(idx2 + 1);
+        doc.setFont('helvetica', 'bold');
+        doc.text(sedeNombre, x, yFila, { baseline: 'top' });
+        x += doc.getTextWidth(sedeNombre) + 2;
+        doc.setFont('helvetica', 'normal');
+        doc.text(sedeResto, x, yFila, { baseline: 'top' });
+        x += doc.getTextWidth(sedeResto) + 6;
+      } else {
+        doc.setFont('helvetica', 'normal');
+        doc.text(fila.direccion, x, yFila, { baseline: 'top' });
+        x += doc.getTextWidth(fila.direccion) + 6;
+      }
+    }
+    if (fila.celular) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Cel.', x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth('Cel.');
+      doc.setFont('helvetica', 'normal');
+      doc.text(` ${fila.celular}`, x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth(` ${fila.celular}`) + 6;
+    }
+    if (fila.email) {
+      doc.setFont('helvetica', 'normal');
+      doc.text(fila.email, x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth(fila.email) + 6;
+    }
+    if (fila.telefono) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Telf.', x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth('Telf.');
+      doc.setFont('helvetica', 'normal');
+      doc.text(` ${fila.telefono}`, x, yFila, { baseline: 'top' });
+    }
+    yFila += rowH;
+  });
+  
+  // Agregar website
+  doc.setFont('helvetica', 'normal').setFontSize(6);
+  doc.text("Web : www.horizontemedic.com", baseX, yFila + 2);
+}
+
+const header_OdontogramaFechas = (doc, datos) => {
+  const margin = 8;
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = 12;
+
+  // 1) Logo a la izquierda
+  const logoW = 38,
+    logoH = 13;
+  const logoY = y - 1;
+  try {
+    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
+  } catch {
+    doc
+      .setFont("helvetica", "normal")
+      .setFontSize(9)
+      .text("Policlinico Horizonte Medic", margin, logoY + 8);
+  }
+
+  // Footer horizontal de cabecera (datos de contacto)
+  footerFichaOdontologicaCabecera(doc, { xOffset: 25, fontSize: 6, yOffset: -8 }, datos);
+
+  // 2) TÍTULO centrado - FICHA ODONTOGRAFICA DE PERSONAL
+  const titulo1 = "FICHA ODONTOGRAFICA DE PERSONAL";
+  const titulo2 = "REPORTE POR FECHAS";
+  const tituloY = y + 20; // Bajado de 12 a 20
+  doc.setFont("helvetica", "bold").setFontSize(13);
+  doc.text(titulo1, pageW / 2, tituloY, { align: "center" });
+  doc.text(titulo2, pageW / 2, tituloY + 6, { align: "center" });
+
+  // 3) Información de sede y fecha de impresión a la derecha
+  const sedeValue = `${datos.sede || 'Trujillo-Pierola'}`;
+  const sedeX = pageW - margin - 20;
+  const sedeY = y + 6; // Mantenido en posición original
+  
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(`Sede : ${sedeValue}`, sedeX, sedeY, { align: "right" });
+  
+  // Fecha de impresión del reporte
+  const fechaImpresion = datos.fechaImpresion || new Date().toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  doc.text(`Fecha Impresión Reporte ${fechaImpresion}`, sedeX, sedeY + 6, { align: "right" });
+
+  // 4) Rango de fechas centrado en la parte inferior
+  const desdeFecha = datos.desdeFecha || "01/07/2025";
+  const hastaFecha = datos.hastaFecha || "15/07/2025";
+  const fechaRangoY = y + 35; // Bajado de 25 a 35
+  
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(`Desde : ${desdeFecha} Hasta : ${hastaFecha}`, pageW / 2, fechaRangoY, { align: "center" });
+
+  // Restaurar fuente normal
+  doc.setFont("helvetica", "normal").setFontSize(10);
+};
+
+export default header_OdontogramaFechas; 

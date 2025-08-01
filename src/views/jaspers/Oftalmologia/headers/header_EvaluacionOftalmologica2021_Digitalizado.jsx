@@ -4,7 +4,7 @@
  * @param {object} datos - Datos del paciente y ficha
  */
 function footerFichaOftalmoCabecera(doc, datos = {}) {
-  const pageW = doc.internal.pageSize.getWidth();
+   const pageW = doc.internal.pageSize.getWidth();
   const y = 12;
   const fontSize = 6;
   const yOffset = -8;
@@ -64,7 +64,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
   const margin = 15; // Aumentado el margen lateral
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
-  
+
   // Logo a la izquierda
   const logoW = 60,
     logoH = 20;
@@ -77,12 +77,13 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
       .setFontSize(9)
       .text("Policlinico Horizonte Medic", margin, logoY + 8);
   }
-  
+
   // Footer horizontal de cabecera (datos de contacto)
   footerFichaOftalmoCabecera(doc, datos);
-  
+
   // === BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido =
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
   let boxSize = 15;
@@ -96,18 +97,22 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
     // Solo renderiza si color es válido o para prueba
     doc.setDrawColor(color);
     doc.setLineWidth(2);
-    doc.setLineCap('round');
+    doc.setLineCap("round");
     doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-    doc.setLineCap('butt');
+    doc.setLineCap("butt");
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(color);
-    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { align: "center", baseline: "middle", maxWidth: boxSize - 1 });
+    doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1,
+    });
     doc.setDrawColor(0);
     doc.setTextColor(0);
     doc.setLineWidth(0.2);
   }
-  
+
   // Título centrado con subrayado (más pequeño)
   doc.setFont("helvetica", "bold").setFontSize(14); // Reducido de 18 a 14
   const titulo = "FICHA DE EVALUACIÓN OFTALMOLÓGICA";
@@ -115,53 +120,55 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
   const tituloWidth = doc.getTextWidth(titulo);
   const tituloX = (pageW - tituloWidth) / 2;
   doc.text(titulo, tituloX, tituloY);
-  
+
   // Subrayado del título
   doc.setDrawColor(0);
   doc.setLineWidth(0.5);
   doc.line(tituloX, tituloY + 2, tituloX + tituloWidth, tituloY + 2);
-  
+
   // Información del paciente (izquierda)
   const infoY = tituloY + 8;
   doc.setFont("helvetica", "normal").setFontSize(9);
-  
+
   // Nombres y Apellidos
-  doc.text("Apellidos y Nombres:", margin, infoY);
+  doc.text("Nombre:", margin, infoY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.nombres || ""}`, margin + 50, infoY);
-  
+  doc.text(`${datos.nombre || ""} ${datos.apellido || ""}`, margin + 15, infoY);
+
   // Fecha
   doc.setFont("helvetica", "normal");
   doc.text("Fecha:", pageW - margin - 80, infoY);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.fecha || ""}`, pageW - margin - 30, infoY);
-  
+  doc.text(`${datos.fechaOf || ""}`, pageW - margin - 65, infoY);
+
   // Empresa y Contrata
   const infoY2 = infoY + 6;
   doc.setFont("helvetica", "normal");
   doc.text("Empresa:", margin, infoY2);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.empresa || ""}`, margin + 25, infoY2);
-  
+  doc.text(`${datos.empresa || ""}`, margin + 15, infoY2,{maxWidth:60});
+
   doc.setFont("helvetica", "normal");
-  doc.text("Contrata:", pageW - margin - 80, infoY2);
+  doc.text("Puesto de Trabajo:", pageW - margin -100, infoY2);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.contrata || ""}`, pageW - margin - 30, infoY2);
-  
+  doc.text(`${datos.areaO || ""}`, pageW - margin - 65, infoY2);
+
   // Nro Orden y Sede a la derecha (alineados y más juntos)
   const fichaX = pageW - margin - 25;
   const fichaY = logoY + 8;
   const fichaSpacing = 3; // Espaciado entre Nro Orden y Sede
-  
+
   doc.setFont("helvetica", "normal").setFontSize(10);
   doc.text("Nro Orden:", fichaX - 35, fichaY, { align: "right" });
   doc.setFont("helvetica", "bold").setFontSize(18); // Reducido de 22 a 18
   doc.text(`${datos.norden || ""}`, fichaX, fichaY, { align: "right" });
-  
+
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text("Sede:", fichaX - 35, fichaY + fichaSpacing, { align: "right" });
+  doc.text("Sede:", fichaX - 60, fichaY + fichaSpacing, { align: "right" });
   doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text(`${datos.sede || ""}`, fichaX, fichaY + fichaSpacing, { align: "right" });
+  doc.text(`${datos.sede || ""}`, fichaX, fichaY + fichaSpacing, {
+    align: "right",
+  });
 };
 
 export default header_EvaluacionOftalmologica2021_Digitalizado; 

@@ -77,9 +77,6 @@
   gap: 1rem;
   margin: 1.5rem 0;
   padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .leyenda-item {
@@ -95,10 +92,7 @@
   color: #000000;
 }
 
-.leyenda-item:hover {
-  background: #f3f4f6;
-  transform: translateY(-1px);
-}
+
 
 .contador-container {
   display: grid;

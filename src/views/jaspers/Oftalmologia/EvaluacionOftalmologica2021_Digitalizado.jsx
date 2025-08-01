@@ -640,8 +640,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   // Indicadores del Entorno Laboral
   const yIndicadoresLaboral = margin + 220;
   
+  // Variables para ajustar posición X de los indicadores
+  const xIndicadoresLaboralNinguna = margin + 41; // AJUSTAR POSICIÓN X AQUÍ
+  const xIndicadoresLaboralLejos = margin + 120; // AJUSTAR POSICIÓN X DE LEJOS AQUÍ
+  const xIndicadoresLaboralCerca = margin + 120; // AJUSTAR POSICIÓN X DE CERCA AQUÍ
+  
   // No restringe actividades laborales en el puesto de trabajo
-  const xIndicadoresLaboralNinguna = margin + 41;
   if (datosFinales.indicadoresNoRestringe) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboral);
   }
@@ -666,17 +670,15 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   
   // Indicadores del lado derecho (Lejos y Cerca)
   // Variables para ajustar solo Lejos y Cerca
-  const yLejos = margin + 220; // AJUSTAR ALTURA DE LEJOS AQUÍ
-  const yCerca = margin + 224; // AJUSTAR ALTURA DE CERCA AQUÍ
+  const yLejos = margin + 240; // AJUSTAR ALTURA DE LEJOS AQUÍ
+  const yCerca = margin + 234; // AJUSTAR ALTURA DE CERCA AQUÍ
   
   // Lejos
-  const xIndicadoresLaboralLejos = margin + 120;
   if (datosFinales.indicadoresLejosLaboral) {
     doc.text("X", xIndicadoresLaboralLejos, yLejos);
   }
   
   // Cerca (Trabajos de Oficina)
-  const xIndicadoresLaboralCerca = margin + 120;
   if (datosFinales.indicadoresCercaLaboral) {
     doc.text("X", xIndicadoresLaboralCerca, yCerca);
   }
@@ -684,14 +686,78 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Generar blob y abrir en iframe para imprimir automáticamente
+  // const blob = doc.output("blob");
+  // const url = URL.createObjectURL(blob);
+  // const iframe = document.createElement("iframe");
+  // iframe.style.display = "none";
+  // iframe.src = url;
+  // document.body.appendChild(iframe);
+  // iframe.onload = () => {
+  //   iframe.contentWindow.focus();
+  //   iframe.contentWindow.print();
+  // };
+  const firmasAPintar = [
+    { nombre: "FIRMAP", x: -23, y: 238, maxw: 120 },
+    { nombre: "HUELLA", x: 10, y: 238, maxw: 100 },
+    { nombre: "SELLOFIRMA", x: 40, y: 238, maxw: 120 },
+    { nombre: "SELLOFIRMADOCASIG", x: 110, y: 238, maxw: 120 },
+  ];
+  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
+} 
+
+
+function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+
+      img.onload = () => {
+        let sigW = maxw;
+        const sigH = 35;
+        const baseX = x;
+        const baseY = y;
+        const maxW = sigW - 10;
+        const maxH = sigH - 10;
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
   };
-} 
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
+}

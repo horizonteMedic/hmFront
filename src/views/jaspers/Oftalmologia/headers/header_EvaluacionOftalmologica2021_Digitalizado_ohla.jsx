@@ -152,7 +152,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (
   doc.text(`${datos.empresa || ""}`, margin + 15, infoY2);
 
   doc.setFont("helvetica", "normal");
-  doc.text("Puesto de Trabajo:", pageW - margin - 70, infoY2);
+  doc.text("Puesto de Trabajo:", pageW - margin -100, infoY2);
   doc.setFont("helvetica", "bold");
   doc.text(`${datos.areaO || ""}`, pageW - margin - 65, infoY2);
 

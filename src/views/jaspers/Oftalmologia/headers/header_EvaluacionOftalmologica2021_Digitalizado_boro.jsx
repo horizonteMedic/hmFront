@@ -106,12 +106,12 @@ const header_EvaluacionOftalmologica2021_Digitalizado_boro = (doc, datos = {}) =
   // Apellidos y Nombres
   const xNombres = margin + 30;
   const yNombres = margin + 7.3;
-  doc.text(String(datos.nombres || ""), xNombres, yNombres, { maxWidth: 70 });
+  doc.text(`${datos.nombre || ""} ${datos.apellido || ""}`, xNombres, yNombres, { maxWidth: 70 });
 
   // Fecha
   const xFecha = margin + 140;
   const yFecha = margin + 7.3;
-  let fechaStr = String(datos.fechaAu || "");
+  let fechaStr = String(datos.fechaOf || "");
   // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
   if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
     const [y, m, d] = fechaStr.split('-');
@@ -147,7 +147,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado_boro = (doc, datos = {}) =
   // Área de Trabajo
   const xAreaTrabajo = margin + 30;
   const yAreaTrabajo = margin + 17;
-  doc.text(String(datos.areaTrabajo || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 60 });
+  doc.text(String(datos.areaO || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 60 });
 
   // Cargo
   const xCargo = margin + 104;
