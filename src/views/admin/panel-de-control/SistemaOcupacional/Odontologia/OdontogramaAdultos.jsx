@@ -34,7 +34,7 @@ export default function OdontogramaAdultos() {
     "Por extraer": 0,
     Fracturada: 0,
     Corona: 0,
-    ObturacionEfectuada: 0,
+    "Obturacion Efectuada": 0,
     Puente: 0,
     "P.P.R Metalica": 0,
     "P.P.R Acrilica": 0,
@@ -42,11 +42,72 @@ export default function OdontogramaAdultos() {
     Normal: 32,
     "Dientes en mal estado": 0,
   });
+  //NUEVOOOOOOOO================================================
 
-  const [observaciones, setObservaciones] = useState(
-    "NO PASO EXAMEN ODONTOLOGICO"
-  );
-  const [noPasoExamen, setNoPasoExamen] = useState(false);
+  const tabla = "odontograma";
+  const date = new Date();
+  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")}`;
+
+  const initialFormState = {
+    norden: "",
+    fechaExam: today,
+    nombres: "",
+    sexo: "",
+    edad: "",
+    empresa: "",
+    contrata: "",
+
+    d1: "NORMAL",
+    d2: "NORMAL",
+    d3: "NORMAL",
+    d4: "NORMAL",
+    d5: "NORMAL",
+    d6: "NORMAL",
+    d7: "NORMAL",
+    d8: "NORMAL",
+    d9: "NORMAL",
+    d10: "NORMAL",
+    d11: "NORMAL",
+    d12: "NORMAL",
+    d13: "NORMAL",
+    d14: "NORMAL",
+    d15: "NORMAL",
+    d16: "NORMAL",
+    d17: "NORMAL",
+    d18: "NORMAL",
+    d19: "NORMAL",
+    d20: "NORMAL",
+    d21: "NORMAL",
+    d22: "NORMAL",
+    d23: "NORMAL",
+    d24: "NORMAL",
+    d25: "NORMAL",
+    d26: "NORMAL",
+    d27: "NORMAL",
+    d28: "NORMAL",
+    d29: "NORMAL",
+    d30: "NORMAL",
+    d31: "NORMAL",
+    d32: "NORMAL",
+    observaciones: "",
+    noPasoExamen: false,
+  };
+  const [form, setForm] = useState(initialFormState);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  };
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: checked,
+    }));
+  };
+  //FIN NUEVOOOOOOOO================================================
 
   // Cerrar menú contextual con ESC o click fuera
   useEffect(() => {
@@ -120,8 +181,11 @@ export default function OdontogramaAdultos() {
     });
   };
 
+  //#Registrar cambio
+
   const handleOptionClick = (option) => {
     const diente = contextMenu.diente;
+    console.log(diente,"  ",option)
     const prevOption = dienteOptions[diente];
 
     if (prevOption === option) {
@@ -153,48 +217,33 @@ export default function OdontogramaAdultos() {
     setContextMenu(null);
   };
 
-  const handleAgregarActualizar = () => {
-    // Aquí iría la lógica para guardar/actualizar los datos
-    console.log("Agregar/Actualizar:", {
-      dienteOptions,
-      contadorOptions,
-      observaciones,
-      noPasoExamen,
-    });
-  };
-
-  const handleLimpiar = () => {
-    setDienteOptions(initialDientesOptions);
-    setContadorOptions({
-      Ausente: 0,
-      "Cariada por opturar": 0,
-      "Por extraer": 0,
-      Fracturada: 0,
-      Corona: 0,
-      ObturacionEfectuada: 0,
-      Puente: 0,
-      "P.P.R Metalica": 0,
-      "P.P.R Acrilica": 0,
-      "P.Total": 0,
-      Normal: 32,
-      "Dientes en mal estado": 0,
-    });
-    setObservaciones("NO PASO EXAMEN ODONTOLOGICO");
-    setNoPasoExamen(false);
-  };
-
-  const handleVerHistorial = () => {
-    // Aquí iría la lógica para ver el historial
-    console.log("Ver historial");
-  };
+  // const handleLimpiar = () => {
+  //   setDienteOptions(initialDientesOptions);
+  //   setContadorOptions({
+  //     Ausente: 0,
+  //     "Cariada por opturar": 0,
+  //     "Por extraer": 0,
+  //     Fracturada: 0,
+  //     Corona: 0,
+  //     "Obturacion Efectuada": 0,
+  //     Puente: 0,
+  //     "P.P.R Metalica": 0,
+  //     "P.P.R Acrilica": 0,
+  //     "P.Total": 0,
+  //     Normal: 32,
+  //     "Dientes en mal estado": 0,
+  //   });
+  //   setObservaciones("NO PASO EXAMEN ODONTOLOGICO");
+  //   setNoPasoExamen(false);
+  // };
 
   const renderInput = (label) => (
-    <div className="contador-item">
+    <div className="contador-item bg-gray-50">
       <label className="contador-label">{label}:</label>
       <input
         type="text"
         value={contadorOptions[label]}
-        readOnly
+        disabled
         className="contador-input"
       />
     </div>
@@ -210,7 +259,7 @@ export default function OdontogramaAdultos() {
         alt={`Diente ${diente}`}
         className={`diente-imagen ${rotate ? "rotate-180" : ""}`}
       />
-      <span className="diente-numero">{diente}</span>
+      <span className="diente-numero ">{diente}</span>
       {dienteOptions[diente] && (
         <div className="indicador-diente">
           {renderIndicator(dienteOptions[diente])}
@@ -231,7 +280,7 @@ export default function OdontogramaAdultos() {
         return <span className="text-black text-6xl">╱</span>;
       case "Corona":
         return <span className="text-blue-500 text-6xl">▲</span>;
-      case "ObturacionEfectuada":
+      case "Obturacion Efectuada":
         return <span className="text-blue-500 text-7xl">●</span>;
       case "Puente":
         return <span className="text-black text-6xl">▭</span>;
@@ -256,7 +305,7 @@ export default function OdontogramaAdultos() {
     { label: "Por extraer", icon: "⊗", color: "text-red-500" },
     { label: "Fracturada", icon: "╱", color: "text-black" },
     { label: "Corona", icon: "▲", color: "text-blue-500" },
-    { label: "ObturacionEfectuada", icon: "●", color: "text-blue-500" },
+    { label: "Obturacion Efectuada", icon: "●", color: "text-blue-500" },
     { label: "Puente", icon: "▭", color: "text-black" },
     { label: "P.P.R Metalica", icon: "―", color: "text-black" },
     { label: "P.P.R Acrilica", icon: "=", color: "text-black" },
@@ -267,11 +316,27 @@ export default function OdontogramaAdultos() {
 
   return (
     <div className="odontograma-container">
-      <h2 className="odontograma-title">Odontograma Adultos</h2>
+      <h2 className="text-blue-700 mx-auto font-bold text-center text-2xl">
+        Odontograma Adultos
+      </h2>
 
       <div className="seccion-titulo">Dientes Superiores</div>
       <div className="dientes-grid">
-        {dientesSuperioresArray.map((diente) => (
+        {dientesSuperioresArray.slice(0, 8).map((diente) => (
+          <div key={diente}>
+            {renderDiente(
+              diente,
+              [6, 11].includes(diente)
+                ? "https://cdn-icons-png.flaticon.com/512/91/91154.png"
+                : [1, 2, 3, 14, 15, 16].includes(diente)
+                ? "https://cdn-icons-png.flaticon.com/512/91/91159.png"
+                : "https://cdn-icons-png.flaticon.com/512/91/91162.png",
+              true
+            )}
+          </div>
+        ))}
+        <div className="w-4" />
+        {dientesSuperioresArray.slice(8, 16).map((diente) => (
           <div key={diente}>
             {renderDiente(
               diente,
@@ -288,7 +353,21 @@ export default function OdontogramaAdultos() {
 
       <div className="seccion-titulo">Dientes Inferiores</div>
       <div className="dientes-grid">
-        {dientesInferioresArray.map((diente) => (
+        {dientesInferioresArray.slice(0, 8).map((diente) => (
+          <div key={diente}>
+            {renderDiente(
+              diente,
+              [22, 27].includes(diente)
+                ? "https://cdn-icons-png.flaticon.com/512/91/91154.png"
+                : [17, 18, 19, 30, 31, 32].includes(diente)
+                ? "https://cdn-icons-png.flaticon.com/512/91/91159.png"
+                : "https://cdn-icons-png.flaticon.com/512/91/91162.png",
+              false
+            )}
+          </div>
+        ))}
+        <div className="w-4" />
+        {dientesInferioresArray.slice(8, 16).map((diente) => (
           <div key={diente}>
             {renderDiente(
               diente,
@@ -307,8 +386,8 @@ export default function OdontogramaAdultos() {
         <div className="leyenda-container mx-auto max-w-[800px]">
           {menuOptions.map((option) => (
             <div key={option.label} className="leyenda-item">
-              <span className={`${option.color} text-xl`}>{option.icon}</span>
-              <span>{option.label}</span>
+              <span className={`${option.color} `}>{option.icon}</span>
+              <span className="text-[12px]">{option.label}</span>
             </div>
           ))}
         </div>
@@ -321,7 +400,7 @@ export default function OdontogramaAdultos() {
           "Por extraer",
           "Fracturada",
           "Corona",
-          "ObturacionEfectuada",
+          "Obturacion Efectuada",
           "Puente",
           "P.P.R Metalica",
           "P.P.R Acrilica",
@@ -333,30 +412,34 @@ export default function OdontogramaAdultos() {
         ))}
       </div>
 
-      <div className="observaciones-container">
+      <div className="mt-4 px-6 text-[11px]">
         <div className="observaciones-section">
-          <label className="observaciones-label">Observaciones:</label>
+          <label className="observaciones-label text-[11px]">
+            Observaciones:
+          </label>
           <textarea
-            value={observaciones}
-            onChange={(e) => setObservaciones(e.target.value)}
-            className="observaciones-textarea"
+            name="observaciones"
+            value={form.observaciones || ""}
+            onChange={handleChange}
+            className="resize-none w-full border text-[11px] rounded px-2 py-1 "
             rows="3"
           />
         </div>
 
         <div className="checkbox-section">
-          <label className="checkbox-label">
+          <label className="checkbox-label pl-2">
             <input
               type="checkbox"
-              checked={noPasoExamen}
-              onChange={(e) => setNoPasoExamen(e.target.checked)}
+              name="noPasoExamen"
+              checked={form.noPasoExamen}
+              onChange={handleCheckBoxChange}
               className="checkbox-input"
             />
-            NO PASO EXAMEN ODONTOLOGICO
+            No pasó examen odontológico
           </label>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-2">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-2 ">
           <div className=" flex gap-4">
             <button
               type="button"
