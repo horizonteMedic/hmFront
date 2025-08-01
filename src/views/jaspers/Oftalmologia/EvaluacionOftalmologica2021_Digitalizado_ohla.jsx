@@ -588,11 +588,11 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Valor de Estereopsia en segundos
-  const xEstereopsiaSegundos = margin + 65;
+  const xEstereopsiaSegundos = margin + 63;
   doc.text(
     String(datosFinales.estereopsiaSegundos || ""),
     xEstereopsiaSegundos,
-    yEstereopsia
+    yEstereopsia-1
   );
 
   // === REFRACCIÓN ===
@@ -837,7 +837,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
 
   // === INDICADORES DEL ENTORNO LABORAL ===
   // Indicadores del Entorno Laboral
-  const yIndicadoresLaboral = margin + 220;
+  const yIndicadoresLaboral = margin + 221;
 
   // No restringe actividades laborales en el puesto de trabajo
   const xIndicadoresLaboralNinguna = margin + 41;
@@ -846,27 +846,27 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   }
 
   // Uso de Correctores Oculares
-  const yIndicadoresLaboralCorrectores = margin + 228;
+  const yIndicadoresLaboralCorrectores = margin + 226;
   if (datosFinales.indicadoresUsoCorrectoresLaboral) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboralCorrectores);
   }
 
   // No trabajos con cables eléctricos, ni fibra óptica
-  const yIndicadoresLaboralCables = margin + 232.5;
+  const yIndicadoresLaboralCables = margin + 234.5;
   if (datosFinales.indicadoresNoCablesElectricos) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboralCables);
   }
 
   // No conducción Vehicular
-  const yIndicadoresLaboralConduccion = margin + 236.5;
+  const yIndicadoresLaboralConduccion = margin + 238.5;
   if (datosFinales.indicadoresNoConduccion) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboralConduccion);
   }
 
   // Indicadores del lado derecho (Lejos y Cerca)
   // Variables para ajustar solo Lejos y Cerca
-  const yLejos = margin + 220; // AJUSTAR ALTURA DE LEJOS AQUÍ
-  const yCerca = margin + 224; // AJUSTAR ALTURA DE CERCA AQUÍ
+  const yLejos = margin + 226; // AJUSTAR ALTURA DE LEJOS AQUÍ
+  const yCerca = margin + 231; // AJUSTAR ALTURA DE CERCA AQUÍ
 
   // Lejos
   const xIndicadoresLaboralLejos = margin + 120;
