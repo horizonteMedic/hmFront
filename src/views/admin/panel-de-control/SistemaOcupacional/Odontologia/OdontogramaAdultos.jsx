@@ -45,6 +45,9 @@ export default function OdontogramaAdultos() {
   //NUEVOOOOOOOO================================================
 
   const tabla = "odontograma";
+  const imagenInicivo = "https://cdn-icons-png.flaticon.com/512/91/91162.png";
+  const imagenCanino = "https://cdn-icons-png.flaticon.com/512/91/91154.png";
+  const imagenMolar = "https://cdn-icons-png.flaticon.com/512/91/91159.png";
   const date = new Date();
   const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
@@ -185,7 +188,7 @@ export default function OdontogramaAdultos() {
 
   const handleOptionClick = (option) => {
     const diente = contextMenu.diente;
-    console.log(diente,"  ",option)
+    console.log(diente, "  ", option);
     const prevOption = dienteOptions[diente];
 
     if (prevOption === option) {
@@ -319,7 +322,7 @@ export default function OdontogramaAdultos() {
       <h2 className="text-blue-700 mx-auto font-bold text-center text-2xl">
         Odontograma Adultos
       </h2>
-
+      {/*DIENTES IMAGENES*/}
       <div className="seccion-titulo">Dientes Superiores</div>
       <div className="dientes-grid">
         {dientesSuperioresArray.slice(0, 8).map((diente) => (
@@ -327,10 +330,10 @@ export default function OdontogramaAdultos() {
             {renderDiente(
               diente,
               [6, 11].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91154.png"
+                ? imagenCanino
                 : [1, 2, 3, 14, 15, 16].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91159.png"
-                : "https://cdn-icons-png.flaticon.com/512/91/91162.png",
+                ? imagenMolar
+                : imagenInicivo,
               true
             )}
           </div>
@@ -341,10 +344,10 @@ export default function OdontogramaAdultos() {
             {renderDiente(
               diente,
               [6, 11].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91154.png"
+                ? imagenCanino
                 : [1, 2, 3, 14, 15, 16].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91159.png"
-                : "https://cdn-icons-png.flaticon.com/512/91/91162.png",
+                ? imagenMolar
+                : imagenInicivo,
               true
             )}
           </div>
@@ -358,10 +361,10 @@ export default function OdontogramaAdultos() {
             {renderDiente(
               diente,
               [22, 27].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91154.png"
+                ? imagenCanino
                 : [17, 18, 19, 30, 31, 32].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91159.png"
-                : "https://cdn-icons-png.flaticon.com/512/91/91162.png",
+                ? imagenMolar
+                : imagenInicivo,
               false
             )}
           </div>
@@ -372,16 +375,16 @@ export default function OdontogramaAdultos() {
             {renderDiente(
               diente,
               [22, 27].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91154.png"
+                ? imagenCanino
                 : [17, 18, 19, 30, 31, 32].includes(diente)
-                ? "https://cdn-icons-png.flaticon.com/512/91/91159.png"
-                : "https://cdn-icons-png.flaticon.com/512/91/91162.png",
+                ? imagenMolar
+                : imagenInicivo,
               false
             )}
           </div>
         ))}
       </div>
-
+      {/*LEYENDA*/}
       <div className="bg-white border rounded">
         <div className="leyenda-container mx-auto max-w-[800px]">
           {menuOptions.map((option) => (
@@ -392,7 +395,7 @@ export default function OdontogramaAdultos() {
           ))}
         </div>
       </div>
-
+      {/*CONTADORES*/}
       <div className="contador-container">
         {[
           "Ausente",
@@ -411,7 +414,7 @@ export default function OdontogramaAdultos() {
           <div key={key}>{renderInput(key)}</div>
         ))}
       </div>
-
+      {/*OBSERVACIONES & NO PASO EXAMEN*/}
       <div className="mt-4 px-6 text-[11px]">
         <div className="observaciones-section">
           <label className="observaciones-label text-[11px]">
@@ -438,7 +441,7 @@ export default function OdontogramaAdultos() {
             No pasó examen odontológico
           </label>
         </div>
-
+        {/*BOTONES ACCIONES*/}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-2 ">
           <div className=" flex gap-4">
             <button
