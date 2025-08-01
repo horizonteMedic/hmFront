@@ -640,8 +640,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   // Indicadores del Entorno Laboral
   const yIndicadoresLaboral = margin + 220;
   
+  // Variables para ajustar posición X de los indicadores
+  const xIndicadoresLaboralNinguna = margin + 41; // AJUSTAR POSICIÓN X AQUÍ
+  const xIndicadoresLaboralLejos = margin + 120; // AJUSTAR POSICIÓN X DE LEJOS AQUÍ
+  const xIndicadoresLaboralCerca = margin + 120; // AJUSTAR POSICIÓN X DE CERCA AQUÍ
+  
   // No restringe actividades laborales en el puesto de trabajo
-  const xIndicadoresLaboralNinguna = margin + 41;
   if (datosFinales.indicadoresNoRestringe) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboral);
   }
@@ -666,17 +670,15 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   
   // Indicadores del lado derecho (Lejos y Cerca)
   // Variables para ajustar solo Lejos y Cerca
-  const yLejos = margin + 220; // AJUSTAR ALTURA DE LEJOS AQUÍ
-  const yCerca = margin + 224; // AJUSTAR ALTURA DE CERCA AQUÍ
+  const yLejos = margin + 240; // AJUSTAR ALTURA DE LEJOS AQUÍ
+  const yCerca = margin + 234; // AJUSTAR ALTURA DE CERCA AQUÍ
   
   // Lejos
-  const xIndicadoresLaboralLejos = margin + 120;
   if (datosFinales.indicadoresLejosLaboral) {
     doc.text("X", xIndicadoresLaboralLejos, yLejos);
   }
   
   // Cerca (Trabajos de Oficina)
-  const xIndicadoresLaboralCerca = margin + 120;
   if (datosFinales.indicadoresCercaLaboral) {
     doc.text("X", xIndicadoresLaboralCerca, yCerca);
   }
