@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMicroscope, faTint, faHeartbeat } from '@fortawesome/free-solid-svg-icons';
+import { faMicroscope, faTint, faHeartbeat, faSave, faBroom, faPrint } from '@fortawesome/free-solid-svg-icons';
 import { getFetch } from '../../getFetch/getFetch';
 import Parenquimatosas from './Parenquimatosas/Parenquimatosas';
 import Pleurales from './Pleurales/Pleurales';
@@ -86,6 +86,23 @@ const OIT = ({token, selectedSede, userlogued}) => {
             {/* Active Content */}
             <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
             {tabs[activeTab].component}
+            </div>
+            <div className='flex justify-between mt-6 mx-12'>
+                <div className='gap-1 flex'>
+                    <button type="button"  className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors">
+                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                    </button>
+                    <button type="button" className="bg-yellow-400 hover:bg-yellow-500 text-white px-6 py-2 rounded flex items-center gap-2 font-semibold shadow-md transition-colors" >
+                    <FontAwesomeIcon icon={faBroom} /> Limpiar
+                    </button>
+                </div>
+                <div className='flex gap-1 items-center'>
+                    <label htmlFor="">Imprimir: </label>
+                    <input className="border rounded px-2 py-1 w-24"  name="norden"   />
+                    <button type="button" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded border border-blue-700 flex items-center shadow-md transition-colors" >
+                        <FontAwesomeIcon icon={faPrint} />
+                    </button>
+                </div>
             </div>
         </div>
     </div>
