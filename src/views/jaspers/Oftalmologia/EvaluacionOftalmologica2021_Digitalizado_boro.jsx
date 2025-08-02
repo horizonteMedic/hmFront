@@ -1,7 +1,9 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado_boro from "./headers/header_EvaluacionOftalmologica2021_Digitalizado_boro.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {}) {
+export default function EvaluacionOftalmologica2021_Digitalizado_boro(
+  data = {}
+) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -29,22 +31,20 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     otrosOD: true,
     otrosOI: true,
     hallazgosExternos: "PTERIGION GRADO 2 OD, CATARATA INICIAL OI",
-    
+
     // FONDO DE OJO (4 'X's DER)
     fondoNormalOD: true,
     fondoNormalOI: true,
     fondoAnormalOD: true,
     fondoAnormalOI: true,
     hallazgosFondo: "RETINOPATÍA DIABÉTICA LEVE OI",
-    
-    // PIO (Presión Intraocular) (4 'X's DER)
-    pioOD: true,
-    pioOI: true,
-    pioNoAplica: true,
-    pioNormal: true,
-    
 
-    
+    // PIO (Presión Intraocular) (4 'X's DER)
+    pioOD: "",
+    pioOI: "",
+    pioNoAplica: "",
+    pioNormal: false,
+
     // AGUDEZA VISUAL
     correctoresOcularesSI: true,
     correctoresOcularesNO: true,
@@ -52,21 +52,21 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     ntxcLejos: true,
     ntcc: true,
     nctl: true,
-    
+
     // Agudeza Visual Sin Correctores
     sinCorrectoresCercaOD: "20/40",
     sinCorrectoresCercaOI: "20/30",
     sinCorrectoresLejosOD: "20/50",
     sinCorrectoresLejosOI: "20/40",
     sinCorrectoresBinocular: "20/30",
-    
+
     // Agudeza Visual Con Correctores
     conCorrectoresCercaOD: "20/20",
     conCorrectoresCercaOI: "20/20",
     conCorrectoresLejosOD: "20/25",
     conCorrectoresLejosOI: "20/25",
     conCorrectoresBinocular: "20/20",
-    
+
     // Agudeza Visual Con Agujero Estenopeico
     conAgujeroCercaOD: "20/25",
     conAgujeroCercaOI: "20/25",
@@ -74,25 +74,25 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     conAgujeroLejosOI: "20/30",
     conAgujeroBinocularOD: "20/25",
     conAgujeroBinocularOI: "20/25",
-    
+
     // TEST DE EVALUACIÓN COMPLEMENTARIA
     testIshiharaNormal: true,
     testIshiharaAnormal: true,
     testIshiharaNC: true,
-    
+
     testColoresNormal: true,
     testColoresAnormal: true,
     testColoresNC: true,
-    
+
     estereopsiaNormal: true,
     estereopsiaAnormal: true,
     estereopsiaNC: true,
     estereopsiaSegundos: "40",
-    
+
     // REFRACCIÓN
     refraccionAplica: true,
     refraccionNoAplica: true,
-    
+
     // REFRACCIÓN DE LEJOS
     refraccionLejosODSF: "-1.50",
     refraccionLejosODCIL: "-0.75",
@@ -102,7 +102,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     refraccionLejosOICIL: "-0.50",
     refraccionLejosOIEJE: "85",
     refraccionLejosOIDIP: "1.25",
-    
+
     // REFRACCIÓN DE CERCA
     refraccionCercaODSF: "+1.00",
     refraccionCercaODCIL: "-0.25",
@@ -112,10 +112,11 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     refraccionCercaOICIL: "-0.25",
     refraccionCercaOIEJE: "85",
     refraccionCercaOIDIP: "0.75",
-    
+
     // DIAGNÓSTICO
-    diagnostico: "MIOPÍA LEVE BILATERAL, PTERIGION GRADO 2 OD, CATARATA INICIAL OI",
-    
+    diagnostico:
+      "MIOPÍA LEVE BILATERAL, PTERIGION GRADO 2 OD, CATARATA INICIAL OI",
+
     // INDICADORES
     // Indicadores Generales
     indicadoresNinguna: true,
@@ -129,14 +130,14 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     indicadoresCambioLunas: true,
     indicadoresPterigion: true,
     indicadoresOtras: true,
-    
+
     // Indicadores Entorno Laboral
     indicadoresNoRestringe: true,
     indicadoresUsoCorrectoresLaboral: true,
     indicadoresNoCablesElectricos: true,
     indicadoresNoConduccion: true,
     indicadoresLejosLaboral: true,
-    indicadoresCercaLaboral: true
+    indicadoresCercaLaboral: true,
   };
   const obtenerString = (nombre) => {
     return data[nombre] ?? "";
@@ -172,7 +173,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     pioOD: obtenerString("txtPioOd"),
     pioOI: obtenerString("txtPioOi"),
     pioNoAplica: obtenerString("txtPioNa"),
-    pioNormal: true,
+    pioNormal: false,
 
     // AGUDEZA VISUAL
     correctoresOcularesSI: data.rbcOsi,
@@ -272,9 +273,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     indicadoresCercaLaboral: data.chkR2Cerca,
   };
 
-
   // Usar datos reales o datos de prueba
- const datosFinales =
+  const datosFinales =
     data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
   // === NUEVO: Usar imagen de fondo para la evaluación oftalmológica ===
@@ -284,7 +284,11 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   try {
     doc.addImage(fondoImg, "PNG", 0, yHeader, pageW, fondoH);
   } catch (e) {
-    doc.text("Imagen de evaluación oftalmológica no disponible", margin, yHeader + 10);
+    doc.text(
+      "Imagen de evaluación oftalmológica no disponible",
+      margin,
+      yHeader + 10
+    );
   }
 
   // === 2) Datos de evaluación (cada uno con su propia posición para moverlos individualmente) ===
@@ -296,7 +300,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   const xCorrectoresSI = margin + 77;
   const xCorrectoresNO = margin + 178;
   const yCorrectores = margin + 102; // BAJADO 7.5 PUNTOS
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.correctoresOcularesSI) {
     doc.text("X", xCorrectoresSI, yCorrectores);
@@ -310,7 +314,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   const xNTXCCerca = margin + 95;
   const xNTXCLlejos = margin + 110;
   const yNTXC = margin + 102; // BAJADO 7.5 PUNTOS
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.ntxcCerca) {
     doc.text("X", xNTXCCerca, yNTXC);
@@ -324,7 +328,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   const xNTCC = margin + 131;
   const xNCTL = margin + 145.5;
   const yNTCC = margin + 102; // BAJADO 7.5 PUNTOS
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.ntcc) {
     doc.text("X", xNTCC, yNTCC);
@@ -336,107 +340,167 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
 
   // Agudeza Visual - De Cerca (todos alineados horizontalmente)
   const yDeCerca = margin + 114; // BAJADO 7.5 PUNTOS
-  
+
   // Sin Correctores
   const xSinCorrectoresCercaOD = margin + 55;
   const xSinCorrectoresCercaOI = margin + 75;
-  doc.text(String(datosFinales.sinCorrectoresCercaOD || ""), xSinCorrectoresCercaOD, yDeCerca);
-  doc.text(String(datosFinales.sinCorrectoresCercaOI || ""), xSinCorrectoresCercaOI, yDeCerca);
+  doc.text(
+    String(datosFinales.sinCorrectoresCercaOD || ""),
+    xSinCorrectoresCercaOD,
+    yDeCerca
+  );
+  doc.text(
+    String(datosFinales.sinCorrectoresCercaOI || ""),
+    xSinCorrectoresCercaOI,
+    yDeCerca
+  );
 
   // Con Correctores
   const xConCorrectoresCercaOD = margin + 98;
   const xConCorrectoresCercaOI = margin + 120;
-  doc.text(String(datosFinales.conCorrectoresCercaOD || ""), xConCorrectoresCercaOD, yDeCerca);
-  doc.text(String(datosFinales.conCorrectoresCercaOI || ""), xConCorrectoresCercaOI, yDeCerca);
+  doc.text(
+    String(datosFinales.conCorrectoresCercaOD || ""),
+    xConCorrectoresCercaOD,
+    yDeCerca
+  );
+  doc.text(
+    String(datosFinales.conCorrectoresCercaOI || ""),
+    xConCorrectoresCercaOI,
+    yDeCerca
+  );
 
   // Con Agujero Estenopeico
   const xConAgujeroCercaOD = margin + 142;
   const xConAgujeroCercaOI = margin + 162;
-  doc.text(String(datosFinales.conAgujeroCercaOD || ""), xConAgujeroCercaOD, yDeCerca);
-  doc.text(String(datosFinales.conAgujeroCercaOI || ""), xConAgujeroCercaOI, yDeCerca);
+  doc.text(
+    String(datosFinales.conAgujeroCercaOD || ""),
+    xConAgujeroCercaOD,
+    yDeCerca
+  );
+  doc.text(
+    String(datosFinales.conAgujeroCercaOI || ""),
+    xConAgujeroCercaOI,
+    yDeCerca
+  );
 
   // Agudeza Visual - De Lejos (todos alineados horizontalmente)
   const yDeLejos = margin + 118; // BAJADO 7.5 PUNTOS
-  
+
   // Sin Correctores
-  doc.text(String(datosFinales.sinCorrectoresLejosOD || ""), xSinCorrectoresCercaOD, yDeLejos);
-  doc.text(String(datosFinales.sinCorrectoresLejosOI || ""), xSinCorrectoresCercaOI, yDeLejos);
+  doc.text(
+    String(datosFinales.sinCorrectoresLejosOD || ""),
+    xSinCorrectoresCercaOD,
+    yDeLejos
+  );
+  doc.text(
+    String(datosFinales.sinCorrectoresLejosOI || ""),
+    xSinCorrectoresCercaOI,
+    yDeLejos
+  );
 
   // Con Correctores
-  doc.text(String(datosFinales.conCorrectoresLejosOD || ""), xConCorrectoresCercaOD, yDeLejos);
-  doc.text(String(datosFinales.conCorrectoresLejosOI || ""), xConCorrectoresCercaOI, yDeLejos);
+  doc.text(
+    String(datosFinales.conCorrectoresLejosOD || ""),
+    xConCorrectoresCercaOD,
+    yDeLejos
+  );
+  doc.text(
+    String(datosFinales.conCorrectoresLejosOI || ""),
+    xConCorrectoresCercaOI,
+    yDeLejos
+  );
 
   // Con Agujero Estenopeico
-  doc.text(String(datosFinales.conAgujeroLejosOD || ""), xConAgujeroCercaOD, yDeLejos);
-  doc.text(String(datosFinales.conAgujeroLejosOI || ""), xConAgujeroCercaOI, yDeLejos);
+  doc.text(
+    String(datosFinales.conAgujeroLejosOD || ""),
+    xConAgujeroCercaOD,
+    yDeLejos
+  );
+  doc.text(
+    String(datosFinales.conAgujeroLejosOI || ""),
+    xConAgujeroCercaOI,
+    yDeLejos
+  );
 
   // Agudeza Visual - Binocular (Reev.) (solo un valor por sección)
   const yBinocular = margin + 121.5; // BAJADO 7.5 PUNTOS
-  
+
   // Sin Correctores
   const xBinocularSinCorrectores = margin + 65.5; // Posición central
-  doc.text(String(datosFinales.sinCorrectoresBinocular || ""), xBinocularSinCorrectores, yBinocular);
+  doc.text(
+    String(datosFinales.sinCorrectoresBinocular || ""),
+    xBinocularSinCorrectores,
+    yBinocular
+  );
 
   // Con Correctores
   const xBinocularConCorrectores = margin + 108.5; // Posición central
-  doc.text(String(datosFinales.conCorrectoresBinocular || ""), xBinocularConCorrectores, yBinocular);
+  doc.text(
+    String(datosFinales.conCorrectoresBinocular || ""),
+    xBinocularConCorrectores,
+    yBinocular
+  );
 
   // Con Agujero Estenopeico (vacío)
   const xBinocularConAgujero = margin + 152; // Posición central
-  doc.text(String(datosFinales.conAgujeroBinocularOD || ""), xBinocularConAgujero, yBinocular);
+  doc.text(
+    String(datosFinales.conAgujeroBinocularOD || ""),
+    xBinocularConAgujero,
+    yBinocular
+  );
 
   // === EXAMEN CLÍNICO EXTERNO ===
   const xExamenExterno = margin + 15;
-  
+
   // Variables independientes para cada 'X' - IZQUIERDA (8 'X's)
   // Ptosis Palpebral
   const xPtosisOD = margin + 44; // AJUSTAR POSICIÓN X DE PTOSIS OD AQUÍ
   const yPtosisOD = margin + 66; // AJUSTAR ALTURA DE PTOSIS OD AQUÍ
   const xPtosisOI = margin + 52; // AJUSTAR POSICIÓN X DE PTOSIS OI AQUÍ
   const yPtosisOI = margin + 66; // AJUSTAR ALTURA DE PTOSIS OI AQUÍ
-  
+
   // Estrabismo
   const xEstrabismoOD = margin + 44; // AJUSTAR POSICIÓN X DE ESTRABISMO OD AQUÍ
   const yEstrabismoOD = margin + 70; // AJUSTAR ALTURA DE ESTRABISMO OD AQUÍ
   const xEstrabismoOI = margin + 52; // AJUSTAR POSICIÓN X DE ESTRABISMO OI AQUÍ
   const yEstrabismoOI = margin + 70; // AJUSTAR ALTURA DE ESTRABISMO OI AQUÍ
-  
+
   // Conjuntivitis
   const xConjuntivitisOD = margin + 44; // AJUSTAR POSICIÓN X DE CONJUNTIVITIS OD AQUÍ
   const yConjuntivitisOD = margin + 74; // AJUSTAR ALTURA DE CONJUNTIVITIS OD AQUÍ
   const xConjuntivitisOI = margin + 52; // AJUSTAR POSICIÓN X DE CONJUNTIVITIS OI AQUÍ
   const yConjuntivitisOI = margin + 74; // AJUSTAR ALTURA DE CONJUNTIVITIS OI AQUÍ
-  
+
   // Cataratas
   const xCataratasOD = margin + 44; // AJUSTAR POSICIÓN X DE CATARATAS OD AQUÍ
   const yCataratasOD = margin + 77; // AJUSTAR ALTURA DE CATARATAS OD AQUÍ
   const xCataratasOI = margin + 52; // AJUSTAR POSICIÓN X DE CATARATAS OI AQUÍ
   const yCataratasOI = margin + 77; // AJUSTAR ALTURA DE CATARATAS OI AQUÍ
-  
+
   // Pterigion
   const xPterigionOD = margin + 96; // AJUSTAR POSICIÓN X DE PTERIGION OD AQUÍ
   const yPterigionOD = margin + 66.5; // AJUSTAR ALTURA DE PTERIGION OD AQUÍ
-  const xPterigionOI = margin + 104 ; // AJUSTAR POSICIÓN X DE PTERIGION OI AQUÍ
+  const xPterigionOI = margin + 104; // AJUSTAR POSICIÓN X DE PTERIGION OI AQUÍ
   const yPterigionOI = margin + 66.5; // AJUSTAR ALTURA DE PTERIGION OI AQUÍ
-  
+
   // Pinguécula
   const xPingueculaOD = margin + 96; // AJUSTAR POSICIÓN X DE PINGUECULA OD AQUÍ
   const yPingueculaOD = margin + 70; // AJUSTAR ALTURA DE PINGUECULA OD AQUÍ
   const xPingueculaOI = margin + 104; // AJUSTAR POSICIÓN X DE PINGUECULA OI AQUÍ
   const yPingueculaOI = margin + 70; // AJUSTAR ALTURA DE PINGUECULA OI AQUÍ
-  
+
   // Chalazion
   const xChalazionOD = margin + 96; // AJUSTAR POSICIÓN X DE CHALAZION OD AQUÍ
   const yChalazionOD = margin + 74.5; // AJUSTAR ALTURA DE CHALAZION OD AQUÍ
   const xChalazionOI = margin + 104; // AJUSTAR POSICIÓN X DE CHALAZION OI AQUÍ
   const yChalazionOI = margin + 74.5; // AJUSTAR ALTURA DE CHALAZION OI AQUÍ
-  
+
   // Otros
   const xOtrosOD = margin + 96; // AJUSTAR POSICIÓN X DE OTROS OD AQUÍ
   const yOtrosOD = margin + 77.5; // AJUSTAR ALTURA DE OTROS OD AQUÍ
   const xOtrosOI = margin + 104; // AJUSTAR POSICIÓN X DE OTROS OI AQUÍ
   const yOtrosOI = margin + 77.5; // AJUSTAR ALTURA DE OTROS OI AQUÍ
-  
+
   // Renderizar 'X's de la IZQUIERDA
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.ptosisPalpebralOD) {
@@ -488,27 +552,31 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
     doc.text("X", xOtrosOI, yOtrosOI);
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Hallazgos Externos
   const yHallazgosExternos = margin + 85.4;
-  doc.text(String(datosFinales.hallazgosExternos || ""), xExamenExterno + 28, yHallazgosExternos);
+  doc.text(
+    String(datosFinales.hallazgosExternos || ""),
+    xExamenExterno + 28,
+    yHallazgosExternos
+  );
 
   // === FONDO DE OJO Y PIO ===
   // Variables independientes para cada 'X' - DERECHA (8 'X's)
-  
+
   // FONDO DE OJO
   // Normal
   const xFondoNormalOD = margin + 173; // AJUSTAR POSICIÓN X DE FONDO NORMAL OD AQUÍ
   const yFondoNormalOD = margin + 65.8; // AJUSTAR ALTURA DE FONDO NORMAL OD AQUÍ
   const xFondoNormalOI = margin + 180; // AJUSTAR POSICIÓN X DE FONDO NORMAL OI AQUÍ
   const yFondoNormalOI = margin + 65.8; // AJUSTAR ALTURA DE FONDO NORMAL OI AQUÍ
-  
+
   // Anormal
   const xFondoAnormalOD = margin + 173; // AJUSTAR POSICIÓN X DE FONDO ANORMAL OD AQUÍ
   const yFondoAnormalOD = margin + 70; // AJUSTAR ALTURA DE FONDO ANORMAL OD AQUÍ
   const xFondoAnormalOI = margin + 180; // AJUSTAR POSICIÓN X DE FONDO ANORMAL OI AQUÍ
   const yFondoAnormalOI = margin + 70; // AJUSTAR ALTURA DE FONDO ANORMAL OI AQUÍ
-  
+
   // PIO (Presión Intraocular)
   const xPioOD = margin + 150; // AJUSTAR POSICIÓN X DE PIO OD AQUÍ
   const yPioOD = margin + 90; // AJUSTAR ALTURA DE PIO OD AQUÍ
@@ -518,15 +586,13 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   const yPioNoAplica = margin + 90; // AJUSTAR ALTURA DE PIO NO APLICA AQUÍ
   const xPioNormal = margin + 115; // AJUSTAR POSICIÓN X DE PIO NORMAL AQUÍ
   const yPioNormal = margin + 90; // AJUSTAR ALTURA DE PIO NORMAL AQUÍ
-  
+
   // Agregar texto OD, OI, APLICA en la primera fila
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("OD", xPioOD, yPioOD - 6);
   doc.text("OI", xPioOI, yPioOI - 6);
   doc.text("No Aplica", xPioNoAplica, yPioNoAplica - 6);
-  
-  
-  
+
   // Renderizar 'X's de la DERECHA
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.fondoNormalOD) {
@@ -541,31 +607,29 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   if (datosFinales.fondoAnormalOI) {
     doc.text("X", xFondoAnormalOI, yFondoAnormalOI);
   }
-  if (datosFinales.pioOD) {
-    doc.text("X", xPioOD, yPioOD);
-  }
-  if (datosFinales.pioOI) {
-    doc.text("X", xPioOI, yPioOI);
-  }
-  if (datosFinales.pioNoAplica) {
-    doc.text("X", xPioNoAplica, yPioNoAplica);
-  }
-  if (datosFinales.pioNormal) {
-    doc.text("X", xPioNormal, yPioNormal);
-  }
+
+  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.text(`${datosFinales.pioOD || ""}`, xPioOD, yPioOD);
+  doc.text(`${datosFinales.pioOI || ""}`, xPioOI, yPioOI);
+  doc.text(`${datosFinales.pioNoAplica || ""}`, xPioNoAplica, yPioNoAplica);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Hallazgos Fondo
   const yHallazgosFondo = margin + 73.4;
-  doc.text(String(datosFinales.hallazgosFondo || ""), margin + 155, yHallazgosFondo, { maxWidth: 30});
+  doc.text(
+    String(datosFinales.hallazgosFondo || ""),
+    margin + 155,
+    yHallazgosFondo,
+    { maxWidth: 30 }
+  );
 
-      // === TEST DE EVALUACIÓN COMPLEMENTARIA ===
-    // Test de Ishihara (Colores)
-    const xTestIshiharaNormal = margin + 106;
-    const xTestIshiharaAnormal = margin + 136;
-    const xTestIshiharaNC = margin + 166;
-    const yTestIshihara = margin + 130.3;
-  
+  // === TEST DE EVALUACIÓN COMPLEMENTARIA ===
+  // Test de Ishihara (Colores)
+  const xTestIshiharaNormal = margin + 106;
+  const xTestIshiharaAnormal = margin + 136;
+  const xTestIshiharaNC = margin + 166;
+  const yTestIshihara = margin + 130.3;
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.testIshiharaNormal) {
     doc.text("X", xTestIshiharaNormal, yTestIshihara);
@@ -578,12 +642,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
 
-      // Test de Colores Puros (Rojo-Amarillo-Verde)
-    const xTestColoresNormal = margin + 106;
-    const xTestColoresAnormal = margin + 136;
-    const xTestColoresNC = margin + 166;
-    const yTestColores = margin + 135;
-  
+  // Test de Colores Puros (Rojo-Amarillo-Verde)
+  const xTestColoresNormal = margin + 106;
+  const xTestColoresAnormal = margin + 136;
+  const xTestColoresNC = margin + 166;
+  const yTestColores = margin + 135;
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.testColoresNormal) {
     doc.text("X", xTestColoresNormal, yTestColores);
@@ -596,12 +660,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
 
-      // Estereopsia (Test Profundidad)
-    const xEstereopsiaNormal = margin + 106;
-    const xEstereopsiaAnormal = margin + 136;
-    const xEstereopsiaNC = margin + 166;
-    const yEstereopsia = margin + 139.5;
-  
+  // Estereopsia (Test Profundidad)
+  const xEstereopsiaNormal = margin + 106;
+  const xEstereopsiaAnormal = margin + 136;
+  const xEstereopsiaNC = margin + 166;
+  const yEstereopsia = margin + 139.5;
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.estereopsiaNormal) {
     doc.text("X", xEstereopsiaNormal, yEstereopsia);
@@ -614,15 +678,19 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
 
-      // Valor de Estereopsia en segundos
-    const xEstereopsiaSegundos = margin + 64.5;
-  doc.text(String(datosFinales.estereopsiaSegundos || ""), xEstereopsiaSegundos, yEstereopsia);
+  // Valor de Estereopsia en segundos
+  const xEstereopsiaSegundos = margin + 63;
+  doc.text(
+    String(datosFinales.estereopsiaSegundos || ""),
+    xEstereopsiaSegundos,
+    yEstereopsia - 1
+  );
 
   // === REFRACCIÓN ===
   const xRefraccionAplica = margin + 55.5;
   const xRefraccionNoAplica = margin + 91.5;
   const yRefraccion = margin + 144.35;
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.refraccionAplica) {
     doc.text("X", xRefraccionAplica, yRefraccion);
@@ -634,83 +702,169 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
 
   // === REFRACCIÓN DE LEJOS ===
   const yRefraccionLejos = margin + 155;
-  
+
   // OD (Ojo Derecho)
   const xRefraccionLejosODSF = margin + 33;
   const xRefraccionLejosODCIL = margin + 48.3;
   const xRefraccionLejosODEJE = margin + 65;
   const xRefraccionLejosODDIP = margin + 80;
-  
-  doc.text(String(datosFinales.refraccionLejosODSF || ""), xRefraccionLejosODSF, yRefraccionLejos);
-  doc.text(String(datosFinales.refraccionLejosODCIL || ""), xRefraccionLejosODCIL, yRefraccionLejos);
-  doc.text(String(datosFinales.refraccionLejosODEJE || ""), xRefraccionLejosODEJE, yRefraccionLejos);
-  doc.text(String(datosFinales.refraccionLejosODDIP || ""), xRefraccionLejosODDIP, yRefraccionLejos);
-  
+
+  doc.text(
+    String(datosFinales.refraccionLejosODSF || ""),
+    xRefraccionLejosODSF,
+    yRefraccionLejos
+  );
+  doc.text(
+    String(datosFinales.refraccionLejosODCIL || ""),
+    xRefraccionLejosODCIL,
+    yRefraccionLejos
+  );
+  doc.text(
+    String(datosFinales.refraccionLejosODEJE || ""),
+    xRefraccionLejosODEJE,
+    yRefraccionLejos
+  );
+  doc.text(
+    String(datosFinales.refraccionLejosODDIP || ""),
+    xRefraccionLejosODDIP,
+    yRefraccionLejos
+  );
+
   // OI (Ojo Izquierdo)
   const yRefraccionLejosOI = margin + 159;
-  doc.text(String(datosFinales.refraccionLejosOISF || ""), xRefraccionLejosODSF, yRefraccionLejosOI);
-  doc.text(String(datosFinales.refraccionLejosOICIL || ""), xRefraccionLejosODCIL, yRefraccionLejosOI);
-  doc.text(String(datosFinales.refraccionLejosOIEJE || ""), xRefraccionLejosODEJE, yRefraccionLejosOI);
-  doc.text(String(datosFinales.refraccionLejosOIDIP || ""), xRefraccionLejosODDIP, yRefraccionLejosOI);
+  doc.text(
+    String(datosFinales.refraccionLejosOISF || ""),
+    xRefraccionLejosODSF,
+    yRefraccionLejosOI
+  );
+  doc.text(
+    String(datosFinales.refraccionLejosOICIL || ""),
+    xRefraccionLejosODCIL,
+    yRefraccionLejosOI
+  );
+  doc.text(
+    String(datosFinales.refraccionLejosOIEJE || ""),
+    xRefraccionLejosODEJE,
+    yRefraccionLejosOI
+  );
+  doc.text(
+    String(datosFinales.refraccionLejosOIDIP || ""),
+    xRefraccionLejosODDIP,
+    yRefraccionLejosOI
+  );
 
   // === REFRACCIÓN DE CERCA ===
   const yRefraccionCerca = margin + 155;
-  
+
   // OD (Ojo Derecho)
   const xRefraccionCercaODSF = margin + 120;
   const xRefraccionCercaODCIL = margin + 137;
   const xRefraccionCercaODEJE = margin + 149;
   const xRefraccionCercaODDIP = margin + 163;
-  
-  doc.text(String(datosFinales.refraccionCercaODSF || ""), xRefraccionCercaODSF, yRefraccionCerca);
-  doc.text(String(datosFinales.refraccionCercaODCIL || ""), xRefraccionCercaODCIL, yRefraccionCerca);
-  doc.text(String(datosFinales.refraccionCercaODEJE || ""), xRefraccionCercaODEJE, yRefraccionCerca);
-  doc.text(String(datosFinales.refraccionCercaODDIP || ""), xRefraccionCercaODDIP, yRefraccionCerca);
-  
+
+  doc.text(
+    String(datosFinales.refraccionCercaODSF || ""),
+    xRefraccionCercaODSF,
+    yRefraccionCerca
+  );
+  doc.text(
+    String(datosFinales.refraccionCercaODCIL || ""),
+    xRefraccionCercaODCIL,
+    yRefraccionCerca
+  );
+  doc.text(
+    String(datosFinales.refraccionCercaODEJE || ""),
+    xRefraccionCercaODEJE,
+    yRefraccionCerca
+  );
+  doc.text(
+    String(datosFinales.refraccionCercaODDIP || ""),
+    xRefraccionCercaODDIP,
+    yRefraccionCerca
+  );
+
   // OI (Ojo Izquierdo)
   const yRefraccionCercaOI = margin + 159;
-  doc.text(String(datosFinales.refraccionCercaOISF || ""), xRefraccionCercaODSF, yRefraccionCercaOI);
-  doc.text(String(datosFinales.refraccionCercaOICIL || ""), xRefraccionCercaODCIL, yRefraccionCercaOI);
-  doc.text(String(datosFinales.refraccionCercaOIEJE || ""), xRefraccionCercaODEJE, yRefraccionCercaOI);
-  doc.text(String(datosFinales.refraccionCercaOIDIP || ""), xRefraccionCercaODDIP, yRefraccionCercaOI);
+  doc.text(
+    String(datosFinales.refraccionCercaOISF || ""),
+    xRefraccionCercaODSF,
+    yRefraccionCercaOI
+  );
+  doc.text(
+    String(datosFinales.refraccionCercaOICIL || ""),
+    xRefraccionCercaODCIL,
+    yRefraccionCercaOI
+  );
+  doc.text(
+    String(datosFinales.refraccionCercaOIEJE || ""),
+    xRefraccionCercaODEJE,
+    yRefraccionCercaOI
+  );
+  doc.text(
+    String(datosFinales.refraccionCercaOIDIP || ""),
+    xRefraccionCercaODDIP,
+    yRefraccionCercaOI
+  );
 
   // === DIAGNÓSTICO ===
   const xDiagnostico = margin + 34.5;
   const yDiagnostico = margin + 179;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(String(datosFinales.diagnostico || ""), xDiagnostico, yDiagnostico, { maxWidth: 50 });
+
+  doc.text(
+    String(datosFinales.txtAvConRefraccionLejosOd ?? ""),
+    xDiagnostico + 21,
+    yDiagnostico - 7
+  );
+  doc.text(
+    String(datosFinales.txtAvConRefraccionLejosOi ?? ""),
+    xDiagnostico + 43,
+    yDiagnostico - 7
+  );
+  doc.text(
+    String(datosFinales.txtAvConRefraccionCercaOd ?? ""),
+    xDiagnostico + 105,
+    yDiagnostico - 7
+  );
+  doc.text(
+    String(datosFinales.txtAvConRefraccionCercaOi ?? ""),
+    xDiagnostico + 128,
+    yDiagnostico - 7
+  );
+  doc.text(String(datosFinales.diagnostico || ""), xDiagnostico, yDiagnostico, {
+    maxWidth: 50,
+  });
 
   // === INDICADORES ===
   // Indicadores Generales
   const yIndicadoresGenerales = margin + 190;
-  
+
   // Ninguna
   const xIndicadoresNinguna = margin + 41;
   doc.setFont("helvetica", "bold").setFontSize(9);
   if (datosFinales.indicadoresNinguna) {
     doc.text("X", xIndicadoresNinguna, yIndicadoresGenerales);
   }
-  
+
   // Uso de Correctores Oculares
   const yIndicadoresUsoCorrectores = margin + 194.5;
   if (datosFinales.indicadoresUsoCorrectores) {
     doc.text("X", xIndicadoresNinguna, yIndicadoresUsoCorrectores);
   }
-  
+
   // Control complementario por Oftalmología
   const yIndicadoresControl = margin + 199;
   if (datosFinales.indicadoresControlOftalmologia) {
     doc.text("X", xIndicadoresNinguna, yIndicadoresControl);
   }
-  
+
   // Indicadores del lado derecho (Lejos y Cerca)
   // Variables para ajustar posición X e Y de cada indicador
   const xLejosGeneral = margin + 111.5; // AJUSTAR POSICIÓN X DE LEJOS AQUÍ
   const yLejosGeneral = margin + 194; // AJUSTAR ALTURA DE LEJOS AQUÍ
   const xCercaGeneral = margin + 141; // AJUSTAR POSICIÓN X DE CERCA AQUÍ
   const yCercaGeneral = margin + 194; // AJUSTAR ALTURA DE CERCA AQUÍ
-
 
   const xLentesCorrectores = margin + 120; // AJUSTAR POSICIÓN X DE LENTES CORRECTORES AQUÍ
   const yLentesCorrectores = margin + 199; // AJUSTAR ALTURA DE LENTES CORRECTORES AQUÍ
@@ -721,7 +875,6 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   const xLentesLejos = margin + 178.5; // AJUSTAR POSICIÓN X DE LENTES LEJOS AQUÍ
   const yLentesLejos = margin + 199; // AJUSTAR ALTURA DE LENTES LEJOS AQUÍ
 
-
   const xCambioLunas = margin + 120; // AJUSTAR POSICIÓN X DE CAMBIO LUNAS AQUÍ
   const yCambioLunas = margin + 203.4; // AJUSTAR ALTURA DE CAMBIO LUNAS AQUÍ
 
@@ -730,94 +883,94 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
 
   const xOtras = margin + 120; // AJUSTAR POSICIÓN X DE OTRAS AQUÍ
   const yOtras = margin + 212; // AJUSTAR ALTURA DE OTRAS AQUÍ
-  
+
   // Lejos
   if (datosFinales.indicadoresLejos) {
     doc.text("X", xLejosGeneral, yLejosGeneral);
   }
-  
+
   // Cerca (Trabajo de Oficina)
   if (datosFinales.indicadoresCerca) {
     doc.text("X", xCercaGeneral, yCercaGeneral);
   }
-  
+
   // Lentes Correctores
   if (datosFinales.indicadoresLentesCorrectores) {
     doc.text("X", xLentesCorrectores, yLentesCorrectores);
   }
-  
+
   // Lentes Correctores - Cerca
   if (datosFinales.indicadoresLentesCorrectoresCerca) {
     doc.text("X", xLentesCerca, yLentesCerca);
   }
-  
+
   // Lentes Correctores - Lejos
   if (datosFinales.indicadoresLentesCorrectoresLejos) {
     doc.text("X", xLentesLejos, yLentesLejos);
   }
-  
+
   // Lentes: Cambio de Lunas
   if (datosFinales.indicadoresCambioLunas) {
     doc.text("X", xCambioLunas, yCambioLunas);
   }
-  
+
   // Pterigion III° - IV°
   if (datosFinales.indicadoresPterigion) {
     doc.text("X", xPterigion, yPterigion);
   }
-  
+
   // Otras
   if (datosFinales.indicadoresOtras) {
     doc.text("X", xOtras, yOtras);
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // === INDICADORES DEL ENTORNO LABORAL ===
   // Indicadores del Entorno Laboral
   const yIndicadoresLaboral = margin + 220.5;
-  
+
   // No restringe actividades laborales en el puesto de trabajo
   const xIndicadoresLaboralNinguna = margin + 41;
   if (datosFinales.indicadoresNoRestringe) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboral);
   }
-  
+
   // Uso de Correctores Oculares
   const yIndicadoresLaboralCorrectores = margin + 226;
   if (datosFinales.indicadoresUsoCorrectoresLaboral) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboralCorrectores);
   }
-  
+
   // No trabajos con cables eléctricos, ni fibra óptica
   const yIndicadoresLaboralCables = margin + 234.5;
   if (datosFinales.indicadoresNoCablesElectricos) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboralCables);
   }
-  
+
   // No conducción Vehicular
   const yIndicadoresLaboralConduccion = margin + 238.5;
   if (datosFinales.indicadoresNoConduccion) {
     doc.text("X", xIndicadoresLaboralNinguna, yIndicadoresLaboralConduccion);
   }
-  
+
   // Indicadores del lado derecho (Lejos y Cerca)
   // Variables para ajustar solo Lejos y Cerca
   const yLejos = margin + 226; // AJUSTAR ALTURA DE LEJOS AQUÍ
   const yCerca = margin + 230; // AJUSTAR ALTURA DE CERCA AQUÍ
-  
+
   // Lejos
   const xIndicadoresLaboralLejos = margin + 120;
   if (datosFinales.indicadoresLejosLaboral) {
     doc.text("X", xIndicadoresLaboralLejos, yLejos);
   }
-  
+
   // Cerca (Trabajos de Oficina)
   const xIndicadoresLaboralCerca = margin + 120;
   if (datosFinales.indicadoresCercaLaboral) {
     doc.text("X", xIndicadoresLaboralCerca, yCerca);
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(9);
 
   // Generar blob y abrir en iframe para imprimir automáticamente
@@ -840,8 +993,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(data = {})
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
   });
-} 
-
+}
 
 function imprimir(doc) {
   const blob = doc.output("blob");

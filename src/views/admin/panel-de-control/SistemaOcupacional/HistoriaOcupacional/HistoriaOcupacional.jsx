@@ -208,7 +208,17 @@ const HistoriaOcupacional = ({
       return;
     }
     const nuevaLista = [...registros, rowData];
-    nuevaLista.sort((a, b) => getAñoInicial(a.fecha) - getAñoInicial(b.fecha));
+    nuevaLista.sort((a, b) => {
+      const añoA = getAñoInicial(a.fecha);
+      const añoB = getAñoInicial(b.fecha);
+
+      if (añoA !== añoB) {
+        return añoA - añoB;
+      }
+
+      // Si tienen el mismo año, ordenar por longitud de fecha (más corta primero)
+      return a.fecha.length - b.fecha.length;
+    });
     setRegistros(nuevaLista);
     setRowData({
       fecha: "",

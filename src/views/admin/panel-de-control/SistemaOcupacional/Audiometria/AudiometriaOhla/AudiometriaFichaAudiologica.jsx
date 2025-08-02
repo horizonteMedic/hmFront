@@ -251,7 +251,7 @@ const AudiometriaFichaAudiologica = ({
                     setForm((prev) => ({
                       ...prev,
                       bellPlus: nuevoValor,
-                      marca: "BELL INVENTS",
+                      marca: "BELL INVENTIS",
                       modelo: "BELL PLUS",
                       calibracion: today,
                       noExamen: false,

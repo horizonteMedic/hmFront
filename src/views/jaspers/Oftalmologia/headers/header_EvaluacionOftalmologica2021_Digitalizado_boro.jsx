@@ -3,42 +3,39 @@
  * @param {jsPDF} doc - Instancia de jsPDF
  * @param {object} datos - Datos del paciente y ficha
  */
-const header_EvaluacionOftalmologica2021_Digitalizado_boro = (doc, datos = {}) => {
-  const margin = 18;
+const header_EvaluacionOftalmologica2021_Digitalizado_boro = (
+  doc,
+  datos = {}
+) => {
+  const margin = 15; // Aumentado el margen lateral
   const pageW = doc.internal.pageSize.getWidth();
-  const usableW = pageW - 2 * margin;
   let y = 12;
 
-  // 1) Logo a la izquierda
-  const logoW = 35,
-    logoH = 15;
+  // Logo a la izquierda
+  const logoW = 60,
+    logoH = 20;
+  const logoY = y + 2;
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, y - 4, logoW, logoH);
+    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "normal")
       .setFontSize(9)
-      .text("Policlinico Horizonte Medic", margin, y + 8);
+      .text("Policlinico Horizonte Medic", margin, logoY + 8);
   }
 
-  // === NUEVO: Usar imagen de fondo para la cabecera de audiometría 2021 ===
-  const fondoImg = "/img/header_EvaluacionOftalmologica2021_Digitalizado_boro.png";
-  const fondoH = 25; // altura aproximada de la cabecera en mm (ajusta si es necesario)
-  let yHeader = 30;
-  try {
-    doc.addImage(fondoImg, "PNG", margin, yHeader, usableW, fondoH);
-  } catch (e) {
-    doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
-  }
+  // Footer horizontal de cabecera (datos de contacto)
+  footerFichaOftalmoCabecera(doc, datos);
 
   // === BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido =
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
-  let boxY = y - 6.5;
-  if (colorValido ) { // Forzar a mostrar para prueba visual
+  let boxY = y + 2;
+  if (colorValido) {
     // Draw box outline in black
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
@@ -46,127 +43,141 @@ const header_EvaluacionOftalmologica2021_Digitalizado_boro = (doc, datos = {}) =
     // Solo renderiza si color es válido o para prueba
     doc.setDrawColor(color);
     doc.setLineWidth(2);
-    doc.setLineCap('round');
+    doc.setLineCap("round");
     doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-    doc.setLineCap('butt');
+    doc.setLineCap("butt");
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(color);
-    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { align: "center", baseline: "middle", maxWidth: boxSize - 1 });
+    doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1,
+    });
     doc.setDrawColor(0);
     doc.setTextColor(0);
     doc.setLineWidth(0.2);
   }
-  y -= 7;
-  // 2) Número de ficha arriba y sede debajo, alineados a la derecha
-  const fichaX = pageW - margin - 18;
-  const bloqueY = y + 5; // subir el bloque 3 puntos más arriba
-  
-  // Número de orden arriba
-  const fichaValue = String(datos.norden || '');
-  
-  // Calcular el ancho del label "N° Ficha:" para posicionarlo correctamente
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  const fichaLabelWidth = doc.getTextWidth("N° Ficha:");
-  const fichaLabelX = fichaX - fichaLabelWidth - 25; // 25 unidades de separación hacia la izquierda
-  
-  // Agregar label "N° Ficha:" antes del valor
-  doc.text("N° Ficha:", fichaLabelX, bloqueY, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(fichaValue, fichaX, bloqueY, { align: "right" });
-  
-  // Sede debajo
-  const sedeValue = String(datos.sede || '');
-  
-  // Calcular el ancho del label "Sede:" para posicionarlo correctamente
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  const sedeLabelWidth = doc.getTextWidth("Sede:");
-  const sedeLabelX = fichaX - sedeLabelWidth - 48; // 25 unidades de separación hacia la izquierda
-  
-  // Agregar label "Sede:" antes del valor
-  doc.text("Sede:", sedeLabelX, bloqueY + 10, { align: "left" });
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(sedeValue, fichaX, bloqueY + 10, { align: "right" });
 
-  // 3) TÍTULO perfectamente centrado
-  doc.setFont("helvetica", "bold").setFontSize(13);
-  const titulo = "FICHA DE EVALUACIÓN AUDIOMETRÍA";
-  const tituloY = y + 10;
-  doc.text(titulo, pageW / 2, tituloY, { align: "center" });
-  // subrayado
-  const w = doc.getTextWidth(titulo);
-  doc
-    .setLineWidth(0.7)
-    .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
-    .setLineWidth(0.2);
+  // Título centrado con subrayado (más pequeño)
+  doc.setFont("helvetica", "bold").setFontSize(14); // Reducido de 18 a 14
+  const titulo = "FICHA DE EVALUACIÓN OFTALMOLÓGICA";
+  const tituloY = y + 25;
+  const tituloWidth = doc.getTextWidth(titulo);
+  const tituloX = (pageW - tituloWidth) / 2;
+  doc.text(titulo, tituloX, tituloY);
 
-  // === NUEVO: Datos del paciente con posicionamiento libre ===
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Subrayado del título
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.line(tituloX, tituloY + 2, tituloX + tituloWidth, tituloY + 2);
 
-  // Apellidos y Nombres
-  const xNombres = margin + 30;
-  const yNombres = margin + 7.3;
-  doc.text(`${datos.nombre || ""} ${datos.apellido || ""}`, xNombres, yNombres, { maxWidth: 70 });
+  // Información del paciente (izquierda)
+  const infoY = tituloY + 8;
+  doc.setFont("helvetica", "normal").setFontSize(9);
+
+  // Nombres y Apellidos
+  doc.text("Nombre:", margin, infoY);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${datos.nombre || ""} ${datos.apellido || ""}`, margin + 15, infoY);
 
   // Fecha
-  const xFecha = margin + 140;
-  const yFecha = margin + 7.3;
+  doc.setFont("helvetica", "normal");
+  doc.text("Fecha:", pageW - margin - 80, infoY);
+  doc.setFont("helvetica", "bold");
   let fechaStr = String(datos.fechaOf || "");
   // Formatear fecha yyyy-mm-dd a dd/mm/yyyy
   if (/^\d{4}-\d{2}-\d{2}$/.test(fechaStr)) {
-    const [y, m, d] = fechaStr.split('-');
-    fechaStr = `${d}/${m}/${y}`;
+    const [y, m, d] = fechaStr.split("-");
+    fechaStr = `${d}/${m}/${y}`;  
   }
-  doc.text(fechaStr, xFecha, yFecha);
+  doc.text(fechaStr, pageW - margin - 65, infoY);
 
-  // DNI
-  const xDni = margin + 30;
-  const yDni = margin + 12.1;
-  doc.text(String(datos.dni || ""), xDni, yDni);
+  // Empresa y Contrata
+  const infoY2 = infoY + 6;
+  doc.setFont("helvetica", "normal");
+  doc.text("Empresa:", margin, infoY2);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${datos.empresa || ""}`, margin + 15, infoY2, { maxWidth: 60 });
 
-  // Edad
-  const xEdad = margin + 95;
-  const yEdad = margin + 12.1;
-  doc.text(String(datos.edad || ""), xEdad, yEdad);
+  doc.setFont("helvetica", "normal");
+  doc.text("Puesto de Trabajo:", pageW - margin - 100, infoY2);
+  doc.setFont("helvetica", "bold");
+  doc.text(`${datos.areaO || ""}`, pageW - margin - 65, infoY2);
 
-  // Sexo - Marcar "X" según el valor
-  const xSexoM = margin + 150.2; // Posición para Masculino
-  const xSexoF = margin + 168.2; // Posición para Femenino
-  const ySexo = margin + 12.3;
-  
-  const sexo = String(datos.sexo || "").toUpperCase().trim();
-  if (sexo === "M") {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("X", xSexoM, ySexo);
-  } else if (sexo === "F") {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("X", xSexoF, ySexo);
-  }
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Nro Orden y Sede a la derecha (alineados y más juntos)
+  const fichaX = pageW - margin - 25;
+  const fichaY = logoY + 8;
+  const fichaSpacing = 3; // Espaciado entre Nro Orden y Sede
 
-  // Área de Trabajo
-  const xAreaTrabajo = margin + 30;
-  const yAreaTrabajo = margin + 17;
-  doc.text(String(datos.areaO || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 60 });
-
-  // Cargo
-  const xCargo = margin + 104;
-  const yCargo = margin + 17;
-  doc.text(String(datos.ocupacion || ""), xCargo, yCargo, { maxWidth: 50 });
-
-  // Empresa
-  const xEmpresa = margin + 30;
-  const yEmpresa = margin + 21.8;
-  doc.text(String(datos.empresa || ""), xEmpresa, yEmpresa, { maxWidth: 70 });
-
-  // Contrata
-  const xContrata = margin + 119;
-  const yContrata = margin + 21.8;
-  doc.text(String(datos.contrata || ""), xContrata, yContrata, { maxWidth: 50 });
-
-  
-  // restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Nro Orden:", fichaX - 35, fichaY, { align: "right" });
+  doc.setFont("helvetica", "bold").setFontSize(18); // Reducido de 22 a 18
+  doc.text(`${datos.norden || ""}`, fichaX, fichaY, { align: "right" });
+
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text("Sede:", fichaX - 60, fichaY + fichaSpacing, { align: "right" });
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text(`${datos.sede || ""}`, fichaX, fichaY + fichaSpacing, {
+    align: "right",
+  });
 };
 
 export default header_EvaluacionOftalmologica2021_Digitalizado_boro;
+
+function footerFichaOftalmoCabecera(doc, datos = {}) {
+  const pageW = doc.internal.pageSize.getWidth();
+  const y = 12;
+  const fontSize = 6;
+  const yOffset = -8;
+  const totalFooterW = 140;
+  const baseX = (pageW - totalFooterW) / 2;
+  let yFila = y + 2 + yOffset;
+  const rowH = 3.2;
+  doc.setFontSize(fontSize);
+  doc.setTextColor(0, 0, 0);
+  const filas = [
+    {
+      direccion: datos?.dirTruPierola || "",
+      celular: datos?.celTrujilloPie || "",
+      email: datos?.emailTruPierola || "",
+      telefono: datos?.telfTruPierola || "",
+    },
+    {
+      direccion: datos?.dirHuamachuco || "",
+      celular: datos?.celHuamachuco || "",
+      email: datos?.emailHuamachuco || "",
+      telefono: datos?.telfHuamachuco || "",
+    },
+    {
+      direccion: datos?.dirHuancayo || "",
+      celular: datos?.celHuancayo || "",
+      email: datos?.emailHuancayo || "",
+      telefono: datos?.telfHuancayo || "",
+    },
+  ];
+  filas.forEach((fila) => {
+    let x = baseX;
+    if (fila.direccion) {
+      doc.setFont("helvetica", "normal");
+      doc.text(fila.direccion, x, yFila, { baseline: "top" });
+      x += doc.getTextWidth(fila.direccion) + 6;
+    }
+    if (fila.celular) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Cel.", x, yFila, { baseline: "top" });
+      x += doc.getTextWidth("Cel.");
+      doc.setFont("helvetica", "normal");
+      doc.text(` ${fila.celular}`, x, yFila, { baseline: "top" });
+      x += doc.getTextWidth(` ${fila.celular}`) + 6;
+    }
+    if (fila.telefono) {
+      doc.setFont("helvetica", "bold");
+      doc.text("Telf.", x, yFila, { baseline: "top" });
+      x += doc.getTextWidth("Telf.");
+      doc.setFont("helvetica", "normal");
+      doc.text(` ${fila.telefono}`, x, yFila, { baseline: "top" });
+    }
+    yFila += rowH;
+  });
+}
