@@ -305,7 +305,7 @@ export const GetInfoServicioFicha = (
           noExamen: res.txtMarca == "-" && res.txtModelo == "-",
 
           bellPlus:
-            res.txtMarca == "BELL INVENTS" && res.txtModelo == "BELL PLUS",
+            res.txtMarca == "BELL INVENTIS" && res.txtModelo == "BELL PLUS",
 
           genero: res.sexo == "M" ? "Masculino" : "Femenino",
           aniosTrabajo: res.tiempoTrabajo,

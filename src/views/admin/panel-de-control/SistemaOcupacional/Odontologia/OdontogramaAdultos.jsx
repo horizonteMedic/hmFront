@@ -10,6 +10,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "./OdontogramaAdultos.css";
 
+const tabla = "odontograma";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
 export default function OdontogramaAdultos() {
   const dientesSuperioresArray = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -18,41 +25,6 @@ export default function OdontogramaAdultos() {
   const dientesInferioresArray = [
     17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
   ];
-
-  const initialDientesOptions = Object.fromEntries(
-    [...dientesSuperioresArray, ...dientesInferioresArray].map((diente) => [
-      diente,
-      "Normal",
-    ])
-  );
-
-  const [contextMenu, setContextMenu] = useState(null);
-  const [dienteOptions, setDienteOptions] = useState(initialDientesOptions);
-  const [contadorOptions, setContadorOptions] = useState({
-    Ausente: 0,
-    "Cariada por opturar": 0,
-    "Por extraer": 0,
-    Fracturada: 0,
-    Corona: 0,
-    "Obturacion Efectuada": 0,
-    Puente: 0,
-    "P.P.R Metalica": 0,
-    "P.P.R Acrilica": 0,
-    "P.Total": 0,
-    Normal: 32,
-    "Dientes en mal estado": 0,
-  });
-  //NUEVOOOOOOOO================================================
-
-  const tabla = "odontograma";
-  const imagenInicivo = "https://cdn-icons-png.flaticon.com/512/91/91162.png";
-  const imagenCanino = "https://cdn-icons-png.flaticon.com/512/91/91154.png";
-  const imagenMolar = "https://cdn-icons-png.flaticon.com/512/91/91159.png";
-  const date = new Date();
-  const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(date.getDate()).padStart(2, "0")}`;
 
   const initialFormState = {
     norden: "",
@@ -63,42 +35,66 @@ export default function OdontogramaAdultos() {
     empresa: "",
     contrata: "",
 
-    d1: "NORMAL",
-    d2: "NORMAL",
-    d3: "NORMAL",
-    d4: "NORMAL",
-    d5: "NORMAL",
-    d6: "NORMAL",
-    d7: "NORMAL",
-    d8: "NORMAL",
-    d9: "NORMAL",
-    d10: "NORMAL",
-    d11: "NORMAL",
-    d12: "NORMAL",
-    d13: "NORMAL",
-    d14: "NORMAL",
-    d15: "NORMAL",
-    d16: "NORMAL",
-    d17: "NORMAL",
-    d18: "NORMAL",
-    d19: "NORMAL",
-    d20: "NORMAL",
-    d21: "NORMAL",
-    d22: "NORMAL",
-    d23: "NORMAL",
-    d24: "NORMAL",
-    d25: "NORMAL",
-    d26: "NORMAL",
-    d27: "NORMAL",
-    d28: "NORMAL",
-    d29: "NORMAL",
-    d30: "NORMAL",
-    d31: "NORMAL",
-    d32: "NORMAL",
+    d1: "Normal",
+    d2: "Normal",
+    d3: "Normal",
+    d4: "Normal",
+    d5: "Normal",
+    d6: "Normal",
+    d7: "Normal",
+    d8: "Normal",
+    d9: "Normal",
+    d10: "Normal",
+    d11: "Normal",
+    d12: "Normal",
+    d13: "Normal",
+    d14: "Normal",
+    d15: "Normal",
+    d16: "Normal",
+    d17: "Normal",
+    d18: "Normal",
+    d19: "Normal",
+    d20: "Normal",
+    d21: "Normal",
+    d22: "Normal",
+    d23: "Normal",
+    d24: "Normal",
+    d25: "Normal",
+    d26: "Normal",
+    d27: "Normal",
+    d28: "Normal",
+    d29: "Normal",
+    d30: "Normal",
+    d31: "Normal",
+    d32: "Normal",
+
+    ausente: 0,
+    cariada: 0,
+    porExtraer: 0,
+    fracturada: 0,
+    corona: 0,
+    obturacion: 0,
+    puente: 0,
+    pprMetalica: 0,
+    pprAcrilica: 0,
+    pTotal: 0,
+    normal: 32,
+    malEstado: 0,
+
     observaciones: "",
     noPasoExamen: false,
   };
   const [form, setForm] = useState(initialFormState);
+  const [contextMenu, setContextMenu] = useState(null);
+  //NUEVOOOOOOOO================================================
+
+  const imagenInicivo = "https://cdn-icons-png.flaticon.com/512/91/91162.png";
+  const imagenCanino = "https://cdn-icons-png.flaticon.com/512/91/91154.png";
+  const imagenMolar = "https://cdn-icons-png.flaticon.com/512/91/91159.png";
+
+  const handleClear = () => {
+    setForm(initialFormState);
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
@@ -184,68 +180,90 @@ export default function OdontogramaAdultos() {
     });
   };
 
-  //#Registrar cambio
-
+  //Registrar cambio
   const handleOptionClick = (option) => {
     const diente = contextMenu.diente;
     console.log(diente, "  ", option);
-    const prevOption = dienteOptions[diente];
+    const prevOption = form[`d${diente}`];
 
     if (prevOption === option) {
       setContextMenu(null);
       return;
     }
 
-    // Actualizar contadores
-    setContadorOptions((prevContadores) => {
-      const newContadores = { ...prevContadores };
+    if (option === "P.Total") {
+      const nuevosDientes = {};
+      const inicio = diente <= 16 ? 1 : 17;
+      const fin = diente <= 16 ? 16 : 32;
 
-      // Si había una opción previa, restar 1 de esa opción
-      if (prevOption) {
-        newContadores[prevOption] = newContadores[prevOption] - 1;
+      for (let i = inicio; i <= fin; i++) {
+        nuevosDientes[`d${i}`] = option;
       }
 
-      // Sumar 1 a la nueva opción
-      newContadores[option] = newContadores[option] + 1;
-
-      return newContadores;
-    });
-
-    // Actualizar la opción del diente
-    setDienteOptions((prevOptions) => ({
-      ...prevOptions,
-      [diente]: option,
-    }));
+      setForm((prev) => ({
+        ...prev,
+        ...nuevosDientes,
+      }));
+    } else {
+      // Actualizar la opción del diente
+      setForm((prev) => ({
+        ...prev,
+        [`d${diente}`]: option,
+      }));
+    }
 
     setContextMenu(null);
   };
 
-  // const handleLimpiar = () => {
-  //   setDienteOptions(initialDientesOptions);
-  //   setContadorOptions({
-  //     Ausente: 0,
-  //     "Cariada por opturar": 0,
-  //     "Por extraer": 0,
-  //     Fracturada: 0,
-  //     Corona: 0,
-  //     "Obturacion Efectuada": 0,
-  //     Puente: 0,
-  //     "P.P.R Metalica": 0,
-  //     "P.P.R Acrilica": 0,
-  //     "P.Total": 0,
-  //     Normal: 32,
-  //     "Dientes en mal estado": 0,
-  //   });
-  //   setObservaciones("NO PASO EXAMEN ODONTOLOGICO");
-  //   setNoPasoExamen(false);
-  // };
+  useEffect(() => {
+    const estadosContados = {
+      Ausente: 0,
+      "Cariada por opturar": 0,
+      "Por extraer": 0,
+      Fracturada: 0,
+      Corona: 0,
+      "Obturacion Efectuada": 0,
+      Puente: 0,
+      "P.P.R Metalica": 0,
+      "P.P.R Acrilica": 0,
+      "P.Total": 0,
+      Normal: 0,
+      "Dientes en mal estado": 0,
+    };
 
-  const renderInput = (label) => (
+    for (let i = 1; i <= 32; i++) {
+      const estado = form[`d${i}`];
+      if (estadosContados.hasOwnProperty(estado)) {
+        estadosContados[estado]++;
+      }
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      ausente: estadosContados["Ausente"],
+      cariada: estadosContados["Cariada por opturar"],
+      porExtraer: estadosContados["Por extraer"],
+      fracturada: estadosContados["Fracturada"],
+      corona: estadosContados["Corona"],
+      obturacion: estadosContados["Obturacion Efectuada"],
+      puente: estadosContados["Puente"],
+      pprMetalica: estadosContados["P.P.R Metalica"],
+      pprAcrilica: estadosContados["P.P.R Acrilica"],
+      pTotal: Math.floor(estadosContados["P.Total"] / 16),
+      normal: estadosContados["Normal"],
+      malEstado: estadosContados["Dientes en mal estado"],
+    }));
+  }, [
+    // Se puede hacer dinámicamente si tienes todos los nombres como "d1" a "d32"
+    ...Array.from({ length: 32 }, (_, i) => form[`d${i + 1}`]),
+  ]);
+
+  const renderInput = (label, key) => (
     <div className="contador-item bg-gray-50">
       <label className="contador-label">{label}:</label>
       <input
         type="text"
-        value={contadorOptions[label]}
+        value={form[key]}
         disabled
         className="contador-input"
       />
@@ -263,9 +281,9 @@ export default function OdontogramaAdultos() {
         className={`diente-imagen ${rotate ? "rotate-180" : ""}`}
       />
       <span className="diente-numero ">{diente}</span>
-      {dienteOptions[diente] && (
+      {form[`d${diente}`] && (
         <div className="indicador-diente">
-          {renderIndicator(dienteOptions[diente])}
+          {renderIndicator(form[`d${diente}`])}
         </div>
       )}
     </div>
@@ -303,18 +321,48 @@ export default function OdontogramaAdultos() {
   };
 
   const menuOptions = [
-    { label: "Ausente", icon: "✕", color: "text-blue-500" },
-    { label: "Cariada por opturar", icon: "●", color: "text-red-500" },
-    { label: "Por extraer", icon: "⊗", color: "text-red-500" },
-    { label: "Fracturada", icon: "╱", color: "text-black" },
-    { label: "Corona", icon: "▲", color: "text-blue-500" },
-    { label: "Obturacion Efectuada", icon: "●", color: "text-blue-500" },
-    { label: "Puente", icon: "▭", color: "text-black" },
-    { label: "P.P.R Metalica", icon: "―", color: "text-black" },
-    { label: "P.P.R Acrilica", icon: "=", color: "text-black" },
-    { label: "P.Total", icon: "≈", color: "text-black" },
-    { label: "Normal", icon: "☑", color: "text-green-500" },
-    { label: "Dientes en mal estado", icon: "●", color: "text-yellow-500" },
+    { label: "Ausente", key: "ausente", icon: "✕", color: "text-blue-500" },
+    {
+      label: "Cariada por opturar",
+      key: "cariada",
+      icon: "●",
+      color: "text-red-500",
+    },
+    {
+      label: "Por extraer",
+      key: "porExtraer",
+      icon: "⊗",
+      color: "text-red-500",
+    },
+    { label: "Fracturada", key: "fracturada", icon: "╱", color: "text-black" },
+    { label: "Corona", key: "corona", icon: "▲", color: "text-blue-500" },
+    {
+      label: "Obturacion Efectuada",
+      key: "obturacion",
+      icon: "●",
+      color: "text-blue-500",
+    },
+    { label: "Puente", key: "puente", icon: "▭", color: "text-black" },
+    {
+      label: "P.P.R Metalica",
+      key: "pprMetalica",
+      icon: "―",
+      color: "text-black",
+    },
+    {
+      label: "P.P.R Acrilica",
+      key: "pprAcrilica",
+      icon: "=",
+      color: "text-black",
+    },
+    { label: "P.Total", key: "pTotal", icon: "≈", color: "text-black" },
+    { label: "Normal", key: "normal", icon: "☑", color: "text-green-500" },
+    {
+      label: "Dientes en mal estado",
+      key: "malEstado",
+      icon: "●",
+      color: "text-yellow-500",
+    },
   ];
 
   return (
@@ -398,20 +446,20 @@ export default function OdontogramaAdultos() {
       {/*CONTADORES*/}
       <div className="contador-container">
         {[
-          "Ausente",
-          "Cariada por opturar",
-          "Por extraer",
-          "Fracturada",
-          "Corona",
-          "Obturacion Efectuada",
-          "Puente",
-          "P.P.R Metalica",
-          "P.P.R Acrilica",
-          "P.Total",
-          "Normal",
-          "Dientes en mal estado",
-        ].map((key) => (
-          <div key={key}>{renderInput(key)}</div>
+          { label: "Ausente", key: "ausente" },
+          { label: "Cariada por opturar", key: "cariada" },
+          { label: "Por extraer", key: "porExtraer" },
+          { label: "Fracturada", key: "fracturada" },
+          { label: "Corona", key: "corona" },
+          { label: "Obturacion Efectuada", key: "obturacion" },
+          { label: "Puente", key: "puente" },
+          { label: "P.P.R Metalica", key: "pprMetalica" },
+          { label: "P.P.R Acrilica", key: "pprAcrilica" },
+          { label: "P.Total", key: "pTotal" },
+          { label: "Normal", key: "normal" },
+          { label: "Dientes en mal estado", key: "malEstado" },
+        ].map((opcion) => (
+          <div key={opcion.key}>{renderInput(opcion.label, opcion.key)}</div>
         ))}
       </div>
       {/*OBSERVACIONES & NO PASO EXAMEN*/}
@@ -453,7 +501,7 @@ export default function OdontogramaAdultos() {
             </button>
             <button
               type="button"
-              // onClick={handleClear}
+              onClick={handleClear}
               className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faBroom} /> Limpiar
