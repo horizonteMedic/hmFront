@@ -311,7 +311,7 @@ function drawOftalmoTable(doc, datos = {}) {
   // --- Fila extra ---
   y += rowH; // mover a la siguiente fila
   const fila2 = [
-    String(datos.norden ?? ""),
+    datos.fechaOfLo == null ? "" : `${datos.norden}`,
     String(datos.fechaOfLo ?? ""),
     String(datos.vcsodLo ?? ""),
     String(datos.vcsoiLo ?? ""),

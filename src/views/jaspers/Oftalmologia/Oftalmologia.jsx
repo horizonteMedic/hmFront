@@ -7,53 +7,60 @@ export default function Oftalmologia(datos = {}) {
   const margin = 10;
   let y = 60;
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   // Función para formatear fecha a DD/MM/YYYY
   const formatearFecha = (fecha) => {
     if (!fecha) return "";
-    
+
+    let partes;
+    let dateObj;
+
     if (fecha.includes("-")) {
-      // Formato yyyy-mm-dd del backend
-      const [yyyy, mm, dd] = fecha.split("-");
-      return `${dd}/${mm}/${yyyy}`;
+      // Formato yyyy-mm-dd
+      partes = fecha.split("-");
+      dateObj = new Date(`${partes[0]}-${partes[1]}-${partes[2]}`);
     } else if (fecha.includes("/")) {
-      // Si ya viene con /, verificar el formato
-      const partes = fecha.split("/");
+      partes = fecha.split("/");
       if (partes.length === 3) {
         if (partes[0].length === 4) {
-          // Formato yyyy/mm/dd
-          const [yyyy, mm, dd] = partes;
-          return `${dd}/${mm}/${yyyy}`;
+          // yyyy/mm/dd
+          dateObj = new Date(`${partes[0]}-${partes[1]}-${partes[2]}`);
+        } else {
+          // dd/mm/yyyy
+          dateObj = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
         }
-        // Si ya está en dd/mm/yyyy, se mantiene igual
-        return fecha;
       }
+    } else {
+      return fecha;
     }
-    return fecha;
+
+    if (isNaN(dateObj)) return "";
+
+    const opciones = {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    };
+
+    return new Intl.DateTimeFormat("es-ES", opciones).format(dateObj);
   };
-  
+
   // Datos personales
   doc.setFont("helvetica", "normal").setFontSize(11);
   doc.text(`Nombres :  ${datos.nombres || ""}`, margin, y);
-  
-  // Calcular posición dinámica para la edad basada en el ancho del nombre
-  const nombreCompleto = `Nombres :  ${datos.nombres || ""}`;
-  const nombreWidth = doc.getTextWidth(nombreCompleto);
-  const edadX = Math.max(margin + nombreWidth + 10, pageW / 2); // Mínimo 10 unidades de separación
-  doc.text(`Edad:  ${datos.edad || ""}  años`, edadX, y, {
-    align: "left",
-  });
-  
-  doc.text(`Fecha :  ${formatearFecha(datos.fechaOf)}`, pageW - margin, y, {
-    align: "right",
-  });
+
+  doc.text(`Fecha :  ${formatearFecha(datos.fechaOf)}`, pageW - 80, y);
   y += 8;
 
   doc.text(`Examen :  ${datos.nomExam || ""}`, margin, y);
-  y += 8;
-  doc.text(`Contrata :  ${datos.contrata || ""}`, margin, y, { maxWidth: 150 });
+  doc.text(`Edad:  ${datos.edad || ""}  años`, pageW - 80, y, {
+    align: "left",
+  });
   y += 8;
   doc.text(`Empresa :  ${datos.empresa || ""}`, margin, y, { maxWidth: 150 });
+  y += 8;
+  doc.text(`Contrata :  ${datos.contrata || ""}`, margin, y, { maxWidth: 150 });
   y += 8;
   // Caja principal
   const boxH = 120; // Aumentado de 100 a 120 para que contenga todo el contenido
@@ -62,25 +69,25 @@ export default function Oftalmologia(datos = {}) {
   doc.setLineWidth(0.2);
   // Encabezados de la caja
   doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.text("SIN CORREGIR", margin + 60, y + 10, { align: "center" });
-  doc.text("CORREGIDA", margin + 140, y + 10, { align: "center" });
+  doc.text("SIN CORREGIR", margin + 83, y + 10, { align: "center" });
+  doc.text("CORREGIDA", margin + 148, y + 10, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text("O.D", margin + 45, y + 18, { align: "center" });
-  doc.text("O.I", margin + 75, y + 18, { align: "center" });
-  doc.text("O.D", margin + 125, y + 18, { align: "center" });
-  doc.text("O.I", margin + 155, y + 18, { align: "center" });
+  doc.text("O.D", margin + 69, y + 18, { align: "center" });
+  doc.text("O.I", margin + 94, y + 18, { align: "center" });
+  doc.text("O.D", margin + 134, y + 18, { align: "center" });
+  doc.text("O.I", margin + 159, y + 18, { align: "center" });
   // Visión de cerca
-  doc.text("Visión de Cerca :", margin + 5, y + 28);
-  doc.rect(margin + 40, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOd || ""}`, margin + 49, y + 26, {
+
+  doc.rect(margin + 60, y + 22, 18, 8);
+  doc.text(`${datos.vcercaSOd || ""}`, margin + 69, y + 26, {
     align: "center",
   });
-  doc.rect(margin + 70, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOi || ""}`, margin + 79, y + 26, {
+  doc.rect(margin + 85, y + 22, 18, 8);
+  doc.text(`${datos.vcercaSOi || ""}`, margin + 94, y + 26, {
     align: "center",
   });
-  doc.rect(margin + 120, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOd || ""}`, margin + 129, y + 26, {
+  doc.rect(margin + 125, y + 22, 18, 8);
+  doc.text(`${datos.vcercaCOd || ""}`, margin + 134, y + 26, {
     align: "center",
   });
   doc.rect(margin + 150, y + 22, 18, 8);
@@ -88,54 +95,79 @@ export default function Oftalmologia(datos = {}) {
     align: "center",
   });
   // Visión de lejos
-  doc.text("Visión de Lejos :", margin + 5, y + 48);
-  doc.rect(margin + 40, y + 42, 18, 8);
-  doc.text(`${datos.vlejosSOd || ""}`, margin + 49, y + 46, {
+
+  doc.rect(margin + 60, y + 42, 18, 8);
+  doc.text(`${datos.vlejosSOd || ""}`, margin + 69, y + 46, {
     align: "center",
   });
-  doc.rect(margin + 70, y + 42, 18, 8);
-  doc.text(`${datos.vlejosSOi || ""}`, margin + 79, y + 46, {
+  doc.rect(margin + 85, y + 42, 18, 8);
+  doc.text(`${datos.vlejosSOi || ""}`, margin + 94, y + 46, {
     align: "center",
   });
-  doc.rect(margin + 120, y + 42, 18, 8);
-  doc.text(`${datos.vlejosCOd || ""}`, margin + 129, y + 46, {
+  doc.rect(margin + 125, y + 42, 18, 8);
+  doc.text(`${datos.vlejosCOd || ""}`, margin + 134, y + 46, {
     align: "center",
   });
   doc.rect(margin + 150, y + 42, 18, 8);
   doc.text(`${datos.vlejosCOi || ""}`, margin + 159, y + 46, {
     align: "center",
   });
-  
+
   // Sección de observaciones con formato de dos columnas
   const labelX = margin + 45; // Movido más a la derecha para que no se corte
   const dataX = margin + 55; // Movido muy cerca del label para eliminar espacio vacío
   const startY = y + 65;
   const lineHeight = 8;
-  
+
+  doc.text("Visión de Cerca", labelX, y + 28, { align: "right" });
+  doc.text(":", labelX + 2, y + 28);
+  doc.text("Visión de Lejos", labelX, y + 48, { align: "right" });
+  doc.text(":", labelX + 2, y + 48);
+
   // Visión de colores
   doc.text("Visión de Colores", labelX, startY, { align: "right" });
   doc.text(":", labelX + 2, startY);
-  doc.text(`${(datos.vcolores || "").toUpperCase()}`, dataX, startY);
-  
+  doc.text(`${(datos.vcolores || "").toUpperCase()}`, margin + 60, startY);
+
   // Visión binocular
   doc.text("Visión Binocular", labelX, startY + lineHeight, { align: "right" });
   doc.text(":", labelX + 2, startY + lineHeight);
-  doc.text(`${(datos.vbinocular || "").toUpperCase()}`, dataX, startY + lineHeight);
-  
+  doc.text(
+    `${(datos.vbinocular || "").toUpperCase()}`,
+    margin + 60,
+    startY + lineHeight
+  );
+
   // Reflejos pupilares
-  doc.text("Reflejos Pupilares", labelX, startY + lineHeight * 2, { align: "right" });
+  doc.text("Reflejos Pupilares", labelX, startY + lineHeight * 2, {
+    align: "right",
+  });
   doc.text(":", labelX + 2, startY + lineHeight * 2);
-  doc.text(`${(datos.rpupilares || "").toUpperCase()}`, dataX, startY + lineHeight * 2);
-  
+  doc.text(
+    `${(datos.rpupilares || "").toUpperCase()}`,
+    margin + 60,
+    startY + lineHeight * 2
+  );
+
   // Enfermedades oculares
-  doc.text("Enfermedades Oculares", labelX, startY + lineHeight * 3, { align: "right" });
+  doc.text("Enfermedades Oculares", labelX, startY + lineHeight * 3, {
+    align: "right",
+  });
   doc.text(":", labelX + 2, startY + lineHeight * 3);
-  doc.text(`${(datos.eoculares || "").toUpperCase()}`, dataX, startY + lineHeight * 3);
-  
+  doc.text(
+    `${(datos.eoculares || "").toUpperCase()}`,
+    margin + 60,
+    startY + lineHeight * 3
+  );
+
   // Observación extra - alineada con el primer dato, no con la etiqueta
   if (datos.eoculares1) {
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(`${(datos.eoculares1 || "").toUpperCase()}`, dataX, startY + lineHeight * 4);
+    doc.text(
+      `${(datos.eoculares1 || "").toUpperCase()}`,
+      margin + 60,
+      startY + lineHeight * 4
+    );
   }
 
   // Arreglo de firmas que quieres cargar
