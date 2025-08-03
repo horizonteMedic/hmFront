@@ -1,6 +1,6 @@
 .odontograma-container {
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-  border-radius: 12px;
+  
+  border-radius: 0.25rem /* 4px */;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 2rem;
   margin: 1rem 0;
@@ -55,7 +55,7 @@
 
 
 .diente-numero {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: #000000;
   margin-top: 0.25rem;
@@ -110,7 +110,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem;
-  background: #f9fafb;
+  
   border-radius: 6px;
   border: 1px solid #e5e7eb;
 }
@@ -118,7 +118,7 @@
 .contador-label {
   font-weight: 600;
   color: #000000;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .contador-input {
@@ -129,7 +129,7 @@
   padding: 0.5rem;
   font-weight: 600;
   background: white;
-  font-size: 13px;
+  font-size: 11px;
   color: #000000;
 }
 
@@ -204,16 +204,16 @@
   font-weight: 600;
   color: #000000;
   margin-bottom: 0.5rem;
-  font-size: 13px;
+ 
 }
 
 .observaciones-textarea {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #d1d5db;
-  border-radius: 6px;
+  border-radius: 4px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 11px;
   color: #000000;
   resize: vertical;
   min-height: 80px;
@@ -236,7 +236,7 @@
   font-weight: 500;
   color: #000000;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 11px;
 }
 
 .checkbox-input {
