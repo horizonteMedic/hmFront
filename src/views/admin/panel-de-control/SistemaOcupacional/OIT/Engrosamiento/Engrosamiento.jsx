@@ -159,8 +159,33 @@ const Engrosamiento = () => {
                     </div>
                 </div>
                 <p>(Rodee con un circulo la respuesta adecuada; si rodea od, escriba a continuación un COMENTARIO)</p>
-                <div className="my-4">
-                                    aqui van los checkbox
+                <div className="flex flex-wrap gap-2 my-4">
+                    {[
+                        ['aa', 'fr'],
+                        ['at', 'hi'],
+                        ['ax', 'ho'],
+                        ['bu', 'id'],
+                        ['ca', 'ih'],
+                        ['cg', 'kl'],
+                        ['cn', 'me'],
+                        ['co', 'pa'],
+                        ['cp', 'pb'],
+                        ['cv', 'pi'],
+                        ['di', 'px'],
+                        ['ef', 'ra'],
+                        ['em', 'rp'],
+                        ['es', 'tb'],
+                        ['OD']
+                    ].map((group, idx) => (
+                        <div key={idx} className="flex flex-col w-16">
+                        {group.map((item, subIdx) => (
+                            <label key={subIdx} className="flex items-center gap-1">
+                            <input type="checkbox" className="shrink-0" />
+                            <span className="text-xs">{item}</span>
+                            </label>
+                        ))}
+                        </div>
+                    ))}
                 </div>
                 <div className="flex w-full p-2 mx-2 gap-1 justify-center items-start">
                     <label htmlFor="">COMENTARIOS</label>
