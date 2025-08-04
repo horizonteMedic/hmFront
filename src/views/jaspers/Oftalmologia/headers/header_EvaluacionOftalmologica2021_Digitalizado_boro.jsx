@@ -103,7 +103,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado_boro = (
   doc.setFont("helvetica", "normal");
   doc.text("Puesto de Trabajo:", pageW - margin - 100, infoY2);
   doc.setFont("helvetica", "bold");
-  doc.text(`${datos.areaO || ""}`, pageW - margin - 65, infoY2);
+  doc.text(`${datos.ocupacion || ""}`, pageW - margin - 65, infoY2);
 
   // Nro Orden y Sede a la derecha (alineados y más juntos)
   const fichaX = pageW - margin - 25;
