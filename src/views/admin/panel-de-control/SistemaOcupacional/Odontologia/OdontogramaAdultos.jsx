@@ -398,8 +398,14 @@ export default function OdontogramaAdultos({
             <input
               type="checkbox"
               name="noPasoExamen"
-              checked={form.noPasoExamen}
-              onChange={handleCheckBoxChange}
+              checked={form.observaciones.includes("NO PASO EXAMEN")}
+              onChange={(e) => {
+                setForm((prev) => ({
+                  ...prev,
+                  observaciones: e.target.checked ? "NO PASO EXAMEN" : "",
+                }));
+                handleCheckBoxChange(e);
+              }}
             />
             No pasó examen odontológico
           </label>

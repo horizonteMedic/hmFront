@@ -10,6 +10,7 @@ import {
   faExclamationTriangle,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import { VerifyTR } from "./controllerOdontologia";
 
 const tabla = "odontograma";
 const date = new Date();
@@ -20,6 +21,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 const initialFormState = {
   norden: "",
+  codOd: null,
   fechaExam: today,
   nombres: "",
   sexo: "",
@@ -84,7 +86,7 @@ const initialFormState = {
   filtroClientesConsulta: false,
 };
 
-const Odontologia = () => {
+const Odontologia = ({ token, userlogued, selectedSede }) => {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [observacionText, setObservacionText] = useState("");
@@ -149,13 +151,13 @@ const Odontologia = () => {
                     onKeyUp={(e) => {
                       if (e.key === "Enter") {
                         handleClearnotO();
-                        // VerifyTR(
-                        //   form.norden,
-                        //   tabla,
-                        //   token,
-                        //   setForm,
-                        //   selectedSede
-                        // );
+                        VerifyTR(
+                          form.norden,
+                          tabla,
+                          token,
+                          setForm,
+                          selectedSede
+                        );
                       }
                     }}
                     className="border rounded px-2 py-1 w-full"
