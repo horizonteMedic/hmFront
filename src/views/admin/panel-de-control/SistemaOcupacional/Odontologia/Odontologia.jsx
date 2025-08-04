@@ -1,21 +1,95 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import OdontogramaAdultos from "./OdontogramaAdultos";
 import OdontologiaReportes from "./OdontologiaReportes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
   faClipboardList,
-  faExpand,
   faCheck,
   faTimes,
   faExclamationTriangle,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
+const tabla = "odontograma";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
+const initialFormState = {
+  norden: "",
+  fechaExam: today,
+  nombres: "",
+  sexo: "",
+  edad: "",
+  empresa: "",
+  contrata: "",
+
+  d1: "Normal",
+  d2: "Normal",
+  d3: "Normal",
+  d4: "Normal",
+  d5: "Normal",
+  d6: "Normal",
+  d7: "Normal",
+  d8: "Normal",
+  d9: "Normal",
+  d10: "Normal",
+  d11: "Normal",
+  d12: "Normal",
+  d13: "Normal",
+  d14: "Normal",
+  d15: "Normal",
+  d16: "Normal",
+  d17: "Normal",
+  d18: "Normal",
+  d19: "Normal",
+  d20: "Normal",
+  d21: "Normal",
+  d22: "Normal",
+  d23: "Normal",
+  d24: "Normal",
+  d25: "Normal",
+  d26: "Normal",
+  d27: "Normal",
+  d28: "Normal",
+  d29: "Normal",
+  d30: "Normal",
+  d31: "Normal",
+  d32: "Normal",
+
+  ausente: 0,
+  cariada: 0,
+  porExtraer: 0,
+  fracturada: 0,
+  corona: 0,
+  obturacion: 0,
+  puente: 0,
+  pprMetalica: 0,
+  pprAcrilica: 0,
+  pTotal: 0,
+  normal: 32,
+  malEstado: 0,
+
+  observaciones: "",
+  noPasoExamen: false,
+
+  nombres_search: "",
+  codigo_search: "",
+  fechaDesde: today,
+  fechaHasta: today,
+  filtroOcupacional: true,
+  filtroClientesConsulta: false,
+};
+
 const Odontologia = () => {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [observacionText, setObservacionText] = useState("");
+
+  const [form, setForm] = useState(initialFormState);
 
   const changeTab = (tabIndex) => {
     setActiveTab(tabIndex);
@@ -30,24 +104,30 @@ const Odontologia = () => {
     setObservacionText("");
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  };
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: checked,
+    }));
+  };
+
+  const handleClear = () => {
+    setForm(initialFormState);
+  };
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  };
+
   const handleLevantarObservacion = () => {
     if (observacionText.trim()) {
       console.log("Levantando observación:", observacionText);
       // Aquí puedes agregar la lógica para guardar la observación
       closeModal();
-    }
-  };
-
-  const toggleFullScreen = () => {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-      elem.requestFullscreen().catch((err) => {
-        console.log(
-          `Error attempting to enable full-screen mode: ${err.message} (${err.name})`
-        );
-      });
-    } else {
-      document.exitFullscreen();
     }
   };
 
@@ -64,11 +144,11 @@ const Odontologia = () => {
                   <label className="font-semibold">N° Orden :</label>
                   <input
                     name="norden"
-                    // value={form.norden || ""}
-                    // onChange={handleChange}
+                    value={form.norden || ""}
+                    onChange={handleChange}
                     onKeyUp={(e) => {
                       if (e.key === "Enter") {
-                        // handleClearnotO();
+                        handleClearnotO();
                         // VerifyTR(
                         //   form.norden,
                         //   tabla,
@@ -85,10 +165,10 @@ const Odontologia = () => {
                   <div>
                     <label className="font-semibold">Fecha de Examen :</label>
                     <input
-                      name="fechaExamen"
+                      name="fechaExam"
                       type="date"
-                      // value={form.fechaExamen}
-                      // onChange={handleChange}
+                      value={form.fechaExam}
+                      onChange={handleChange}
                       className="border rounded px-2 py-1 w-full"
                     />
                   </div>
@@ -124,7 +204,7 @@ const Odontologia = () => {
                   <label className="font-semibold">Nombres :</label>
                   <input
                     name="nombres"
-                    // value={form.nombres || ""}
+                    value={form.nombres || ""}
                     disabled
                     className="border rounded px-2 py-1 w-full"
                   />
@@ -134,7 +214,7 @@ const Odontologia = () => {
                     <label className="font-semibold">Sexo :</label>
                     <input
                       name="sexo"
-                      // value={form.sexo}
+                      value={form.sexo}
                       disabled
                       className="border rounded px-2 py-1 w-full"
                     />
@@ -143,7 +223,7 @@ const Odontologia = () => {
                     <label className="font-semibold">Edad :</label>
                     <input
                       name="edad"
-                      // value={form.edad}
+                      value={form.edad}
                       disabled
                       className="border rounded px-2 py-1 w-full"
                     />
@@ -154,7 +234,7 @@ const Odontologia = () => {
                   <label className="font-semibold">Empresa :</label>
                   <input
                     name="empresa"
-                    // value={form.empresa || ""}
+                    value={form.empresa || ""}
                     disabled
                     className="border rounded px-2 py-1 w-full"
                   />
@@ -163,7 +243,7 @@ const Odontologia = () => {
                   <label className="font-semibold">Contrata :</label>
                   <input
                     name="contrata"
-                    // value={form.contrata || ""}
+                    value={form.contrata || ""}
                     disabled
                     className="border rounded px-2 py-1 w-full"
                   />
@@ -198,8 +278,23 @@ const Odontologia = () => {
             </div>
 
             {/* Contenido de los tabs */}
-            {activeTab === 1 && <OdontogramaAdultos />}
-            {activeTab === 2 && <OdontologiaReportes />}
+            {activeTab === 1 && (
+              <OdontogramaAdultos
+                form={form}
+                setForm={setForm}
+                handleChange={handleChange}
+                handleCheckBoxChange={handleCheckBoxChange}
+                handleClear={handleClear}
+              />
+            )}
+            {activeTab === 2 && (
+              <OdontologiaReportes
+                form={form}
+                setForm={setForm}
+                handleChange={handleChange}
+                handleCheckBoxChange={handleCheckBoxChange}
+              />
+            )}
           </div>
         </div>
 
