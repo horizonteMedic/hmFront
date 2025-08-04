@@ -1,23 +1,15 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faFileAlt,
-  faBroom,
-  faHistory,
-  faSave,
-  faPrint,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import "./OdontogramaAdultos.css";
 
-const tabla = "odontograma";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
-
-export default function OdontogramaAdultos() {
+export default function OdontogramaAdultos({
+  form,
+  setForm,
+  handleChange,
+  handleCheckBoxChange,
+  handleClear,
+}) {
   const dientesSuperioresArray = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
   ];
@@ -26,87 +18,11 @@ export default function OdontogramaAdultos() {
     17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
   ];
 
-  const initialFormState = {
-    norden: "",
-    fechaExam: today,
-    nombres: "",
-    sexo: "",
-    edad: "",
-    empresa: "",
-    contrata: "",
-
-    d1: "Normal",
-    d2: "Normal",
-    d3: "Normal",
-    d4: "Normal",
-    d5: "Normal",
-    d6: "Normal",
-    d7: "Normal",
-    d8: "Normal",
-    d9: "Normal",
-    d10: "Normal",
-    d11: "Normal",
-    d12: "Normal",
-    d13: "Normal",
-    d14: "Normal",
-    d15: "Normal",
-    d16: "Normal",
-    d17: "Normal",
-    d18: "Normal",
-    d19: "Normal",
-    d20: "Normal",
-    d21: "Normal",
-    d22: "Normal",
-    d23: "Normal",
-    d24: "Normal",
-    d25: "Normal",
-    d26: "Normal",
-    d27: "Normal",
-    d28: "Normal",
-    d29: "Normal",
-    d30: "Normal",
-    d31: "Normal",
-    d32: "Normal",
-
-    ausente: 0,
-    cariada: 0,
-    porExtraer: 0,
-    fracturada: 0,
-    corona: 0,
-    obturacion: 0,
-    puente: 0,
-    pprMetalica: 0,
-    pprAcrilica: 0,
-    pTotal: 0,
-    normal: 32,
-    malEstado: 0,
-
-    observaciones: "",
-    noPasoExamen: false,
-  };
-  const [form, setForm] = useState(initialFormState);
   const [contextMenu, setContextMenu] = useState(null);
-  //NUEVOOOOOOOO================================================
 
   const imagenInicivo = "https://cdn-icons-png.flaticon.com/512/91/91162.png";
   const imagenCanino = "https://cdn-icons-png.flaticon.com/512/91/91154.png";
   const imagenMolar = "https://cdn-icons-png.flaticon.com/512/91/91159.png";
-
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-  const handleCheckBoxChange = (e) => {
-    const { name, checked } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: checked,
-    }));
-  };
-  //FIN NUEVOOOOOOOO================================================
 
   // Cerrar menú contextual con ESC o click fuera
   useEffect(() => {
@@ -478,13 +394,12 @@ export default function OdontogramaAdultos() {
         </div>
 
         <div className="checkbox-section">
-          <label className="checkbox-label pl-2">
+          <label className="flex items-center gap-2 font-medium cursor-pointer pl-2 text-[10px]">
             <input
               type="checkbox"
               name="noPasoExamen"
               checked={form.noPasoExamen}
               onChange={handleCheckBoxChange}
-              className="checkbox-input"
             />
             No pasó examen odontológico
           </label>
@@ -513,8 +428,8 @@ export default function OdontogramaAdultos() {
             <div className="flex items-center gap-2">
               <input
                 name="norden"
-                // value={form.norden}
-                // onChange={handleChange}
+                value={form.norden}
+                onChange={handleChange}
                 className="border rounded px-2 py-1 text-base w-24"
               />
 

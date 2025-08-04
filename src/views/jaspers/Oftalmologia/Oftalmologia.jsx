@@ -16,18 +16,30 @@ export default function Oftalmologia(datos = {}) {
     let dateObj;
 
     if (fecha.includes("-")) {
-      // Formato yyyy-mm-dd
       partes = fecha.split("-");
-      dateObj = new Date(`${partes[0]}-${partes[1]}-${partes[2]}`);
+      // yyyy-mm-dd
+      dateObj = new Date(
+        parseInt(partes[0]),
+        parseInt(partes[1]) - 1, // mes inicia en 0
+        parseInt(partes[2])
+      );
     } else if (fecha.includes("/")) {
       partes = fecha.split("/");
       if (partes.length === 3) {
         if (partes[0].length === 4) {
           // yyyy/mm/dd
-          dateObj = new Date(`${partes[0]}-${partes[1]}-${partes[2]}`);
+          dateObj = new Date(
+            parseInt(partes[0]),
+            parseInt(partes[1]) - 1,
+            parseInt(partes[2])
+          );
         } else {
           // dd/mm/yyyy
-          dateObj = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+          dateObj = new Date(
+            parseInt(partes[2]),
+            parseInt(partes[1]) - 1,
+            parseInt(partes[0])
+          );
         }
       }
     } else {
