@@ -10,6 +10,9 @@ const registrarUrl = "/api/v01/ct/odontograma/registrarActualizarOdontograma";
 const registrarUrlLo =
   "/api/v01/ct/odontograma/registrarActualizarOdontogramaLo";
 
+const reporteConsultaUrl =
+  "/api/v01/ct/odontograma/obtenerReporteOdontogramaFechas";
+
 const labelsToImgs = {
   Ausente: "imgAusente",
   "Cariada por opturar": "imgPorOturar",
@@ -477,6 +480,38 @@ export const PrintHojaR = (nro, token, tabla) => {
   )
     .then(async (res) => {
       if (res.norden) {
+        console.log(res);
+        const nombre = res.nameJasper;
+        console.log(nombre);
+        const jasperModules = import.meta.glob(
+          "../../../../jaspers/Odontologia/*.jsx"
+        );
+        const modulo = await jasperModules[
+          `../../../../jaspers/Odontologia/${nombre}.jsx`
+        ]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === "function") {
+          modulo.default(res);
+        } else {
+          console.error(
+            `El archivo ${nombre}.jsx no exporta una función por defecto`
+          );
+        }
+      }
+    })
+    .finally(() => {
+      Swal.close();
+    });
+};
+
+export const PrintConsultaEjecutada = (inicio, fin, token) => {
+  Loading("Cargando Formato a Imprimir");
+  getFetch(
+    `${reporteConsultaUrl}?inicio=${inicio}&fin=${fin}`, //revisar
+    token
+  )
+    .then(async (res) => {
+      if (res.nameJasper) {
         console.log(res);
         const nombre = res.nameJasper;
         console.log(nombre);

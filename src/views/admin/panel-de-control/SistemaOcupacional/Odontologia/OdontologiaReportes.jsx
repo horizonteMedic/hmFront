@@ -6,7 +6,7 @@ const OdontologiaReportes = ({
   form,
   setForm,
   handleChange,
-  handleCheckBoxChange,
+  handleEjecutarConsulta,
 }) => {
   const [dataTabla, setDataTabla] = useState([]);
 
@@ -20,7 +20,7 @@ const OdontologiaReportes = ({
               <p className="mb-2 font-semibold">Buscar por fechas</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                  <label className="font-semibold">Fecha de Examen :</label>
+                  <label className="font-semibold">Fecha desde :</label>
                   <input
                     name="fechaDesde"
                     type="date"
@@ -30,7 +30,7 @@ const OdontologiaReportes = ({
                   />
                 </div>
                 <div>
-                  <label className="font-semibold">Fecha de Examen :</label>
+                  <label className="font-semibold">Fecha hasta :</label>
                   <input
                     name="fechaHasta"
                     type="date"
@@ -42,34 +42,10 @@ const OdontologiaReportes = ({
               </div>
             </div>
 
-            <div>
-              <p className="mb-2 font-semibold"> Filtrar por:</p>
-              <div className="flex items-center gap-6">
-                <label className=" flex items-center gap-2 font-medium cursor-pointer pl-2 text-[10px]">
-                  <input
-                    type="checkbox"
-                    name="filtroOcupacional"
-                    checked={form.filtroOcupacional}
-                    onChange={handleCheckBoxChange}
-                  />
-                  Ocupacionales
-                </label>
-                <label className="flex items-center gap-2 font-medium cursor-pointer pl-2 text-[10px]">
-                  <input
-                    type="checkbox"
-                    name="filtroClientesConsulta"
-                    checked={form.filtroClientesConsulta}
-                    onChange={handleCheckBoxChange}
-                  />
-                  Clientes Consulta
-                </label>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2">
               <button
                 type="button"
-                // onClick={handleClear}
+                onClick={handleEjecutarConsulta}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
@@ -215,38 +191,6 @@ function Table({ data, set }) {
         </tbody>
       </table>
     </div>
-  );
-}
-
-// Componente Section
-function Section({ title, children }) {
-  return (
-    <div className="space-y-2">
-      {title && (
-        <h3 className="font-semibold text-blue-700 text-xl">{title}</h3>
-      )}
-      {children}
-    </div>
-  );
-}
-
-// Componente ActionButton con colores del ejemplo
-function ActionButton({ color, icon, onClick, children }) {
-  const bg = {
-    green: "bg-green-600 hover:bg-green-700",
-    yellow: "bg-yellow-400 hover:bg-yellow-500",
-    blue: "bg-blue-600 hover:bg-blue-700",
-    red: "bg-red-500 hover:bg-red-600",
-  }[color];
-
-  return (
-    <button
-      onClick={onClick}
-      className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2 text-lg transition-colors`}
-    >
-      <FontAwesomeIcon icon={icon} />
-      {children}
-    </button>
   );
 }
 

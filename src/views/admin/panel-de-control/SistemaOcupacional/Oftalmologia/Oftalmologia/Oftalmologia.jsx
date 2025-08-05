@@ -1036,7 +1036,8 @@ export default function OftalmologiaOhla({ token, selectedSede, userlogued }) {
                   name="diagnostico"
                   value={form.diagnostico}
                   onChange={handleChange}
-                  className="w-full h-24 border rounded p-2 text-[11px] resize-none"
+                  rows={8}
+                  className="w-full  border rounded p-2 text-[11px] resize-none"
                 />
               </div>
             </div>

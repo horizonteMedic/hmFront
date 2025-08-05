@@ -8,6 +8,7 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import {
+  PrintConsultaEjecutada,
   PrintHojaR,
   SubmitDataService,
   SubmitDataServiceLO,
@@ -212,6 +213,25 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
     });
   };
 
+  const handleEjecutarConsulta = () => {
+    Swal.fire({
+      title: "¿Desea Imprimir Consulta?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintConsultaEjecutada(form.fechaDesde, form.fechaHasta, token);
+      }
+    });
+  };
+
   const handleChangeLO = (e) => {
     const { name, value } = e.target;
     setFormLO((f) => ({ ...f, [name]: value.toUpperCase() }));
@@ -391,7 +411,7 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                 form={form}
                 setForm={setForm}
                 handleChange={handleChange}
-                handleCheckBoxChange={handleCheckBoxChange}
+                handleEjecutarConsulta={handleEjecutarConsulta}
               />
             )}
           </div>
