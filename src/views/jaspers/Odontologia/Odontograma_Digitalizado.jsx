@@ -1,5 +1,30 @@
 import jsPDF from "jspdf";
 
+const labelsToImgs = {
+  Ausente: "imgAusente",
+  "Cariada por opturar": "imgPorOturar",
+  "Por extraer": "imgExtraer",
+  Fracturada: "imgFracturada",
+  Corona: "imgCorona",
+  "Obturacion Efectuada": "imgObturacionEfectuada",
+  Puente: "imgPuente",
+  "P.P.R Metalica": "imgPPRMetalica",
+  "P.P.R Acrilica": "imgPPRAcrilica",
+  "P.Total": "imgPTotal",
+};
+
+// Invertimos el objeto automáticamente
+const imgsToLabels = Object.fromEntries(
+  Object.entries(labelsToImgs).map(([label, img]) => [img, label])
+);
+
+const interpretarUrlParaLeer = (url) => {
+  if (url == null) return "Normal";
+  const match = url.match(/([^/\\]+)(?=\.png$)/);
+  const nombreArchivo = match?.[1];
+  return nombreArchivo ? imgsToLabels[nombreArchivo] ?? "" : "";
+};
+
 export default function Odontograma_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
@@ -10,8 +35,10 @@ export default function Odontograma_Digitalizado(data = {}) {
     norden: "96639",
     sede: "trujillo-pierola",
     nombres: "hady katherine castillo plasencia",
-    empresa: "servicios industriales mmj empresa individual de responsabilidad limitada- servicios industriales mm",
-    contratista: "asociacion de transportistas mineria y construccion huamachuco - asmychuamachuco",
+    empresa:
+      "servicios industriales mmj empresa individual de responsabilidad limitada- servicios industriales mm",
+    contratista:
+      "asociacion de transportistas mineria y construccion huamachuco - asmychuamachuco",
     sexo: "femenino",
     edad: "39",
     fecha: "lunes 04 noviembre 2024",
@@ -29,18 +56,19 @@ export default function Odontograma_Digitalizado(data = {}) {
     cariadasPorOturar: "2",
     fracturadas: "1",
     // Observaciones y lugar fecha
-    observaciones: "paciente presenta buena higiene bucal. se recomienda control cada 6 meses. se observa ligera acumulación de sarro en molares inferiores. necesita limpieza profesional.",
-    lugarFecha: "trujillo, 04 de noviembre de 2024"
+    observaciones:
+      "paciente presenta buena higiene bucal. se recomienda control cada 6 meses. se observa ligera acumulación de sarro en molares inferiores. necesita limpieza profesional.",
+    lugarFecha: "trujillo, 04 de noviembre de 2024",
   };
 
   // Función para obtener string de datos
   const obtenerString = (nombre) => {
-    return data[nombre] ?? "";
+    return data[nombre] != null ? `${data[nombre]}` : "";
   };
 
   // Función para convertir a mayúsculas los campos específicos
   const obtenerStringMayus = (nombre) => {
-    const valor = data[nombre] ?? "";
+    const valor = data[nombre] != null ? `${data[nombre]}` : "";
     return valor.toUpperCase();
   };
 
@@ -50,72 +78,108 @@ export default function Odontograma_Digitalizado(data = {}) {
     sede: obtenerStringMayus("sede"),
     nombres: obtenerStringMayus("nombres"),
     empresa: obtenerStringMayus("empresa"),
-    contratista: obtenerStringMayus("contratista"),
+    contratista: obtenerStringMayus("contrata"),
     sexo: obtenerStringMayus("sexo"),
     edad: obtenerString("edad"),
-    fecha: obtenerStringMayus("fecha"),
-    piezasMalEstado: obtenerString("piezasMalEstado"),
-    pprMetalicas: obtenerString("pprMetalicas"),
-    pprAcrilicas: obtenerString("pprAcrilicas"),
-    ausentes: obtenerString("ausentes"),
-    puentes: obtenerString("puentes"),
-    coronas: obtenerString("coronas"),
-    porExtraer: obtenerString("porExtraer"),
-    pTotales: obtenerString("pTotales"),
-    normales: obtenerString("normales"),
-    obturacionesEfectuadas: obtenerString("obturacionesEfectuadas"),
-    cariadasPorOturar: obtenerString("cariadasPorOturar"),
-    fracturadas: obtenerString("fracturadas"),
-    observaciones: obtenerStringMayus("observaciones"),
-    lugarFecha: obtenerStringMayus("lugarFecha")
+    fecha: obtenerStringMayus("fechaOd"),
+    piezasMalEstado: obtenerString("txtPiezasMalEstado"),
+    pprMetalicas: obtenerString("txtPprMetalicas"),
+    pprAcrilicas: obtenerString("txtPprAcrilicas"),
+    ausentes: obtenerString("txtAusentes"),
+    puentes: obtenerString("txtPuentes"),
+    coronas: obtenerString("txtCoronas"),
+    porExtraer: obtenerString("txtPorExtraer"),
+    pTotales: obtenerString("txtPTotal"),
+    normales: obtenerString("txtNormales"),
+    obturacionesEfectuadas: obtenerString("txtObturacionesEfectuadas"),
+    cariadasPorOturar: obtenerString("txtCariadasOturar"),
+    fracturadas: obtenerString("txtFracturada"),
+    observaciones: obtenerStringMayus("txtObservaciones"),
+    lugarFecha:
+      obtenerStringMayus("lugar") + " - " + obtenerStringMayus("fechaOd"),
+
+    d1: interpretarUrlParaLeer(data.lbl18),
+    d2: interpretarUrlParaLeer(data.lbl17),
+    d3: interpretarUrlParaLeer(data.lbl16),
+    d4: interpretarUrlParaLeer(data.lbl15),
+    d5: interpretarUrlParaLeer(data.lbl14),
+    d6: interpretarUrlParaLeer(data.lbl13),
+    d7: interpretarUrlParaLeer(data.lbl12),
+    d8: interpretarUrlParaLeer(data.lbl11),
+
+    d9: interpretarUrlParaLeer(data.lbl21),
+    d10: interpretarUrlParaLeer(data.lbl22),
+    d11: interpretarUrlParaLeer(data.lbl23),
+    d12: interpretarUrlParaLeer(data.lbl24),
+    d13: interpretarUrlParaLeer(data.lbl25),
+    d14: interpretarUrlParaLeer(data.lbl26),
+    d15: interpretarUrlParaLeer(data.lbl27),
+    d16: interpretarUrlParaLeer(data.lbl28),
+
+    d17: interpretarUrlParaLeer(data.lbl48),
+    d18: interpretarUrlParaLeer(data.lbl47),
+    d19: interpretarUrlParaLeer(data.lbl46),
+    d20: interpretarUrlParaLeer(data.lbl45),
+    d21: interpretarUrlParaLeer(data.lbl44),
+    d22: interpretarUrlParaLeer(data.lbl43),
+    d23: interpretarUrlParaLeer(data.lbl42),
+    d24: interpretarUrlParaLeer(data.lbl41),
+
+    d25: interpretarUrlParaLeer(data.lbl31),
+    d26: interpretarUrlParaLeer(data.lbl32),
+    d27: interpretarUrlParaLeer(data.lbl33),
+    d28: interpretarUrlParaLeer(data.lbl34),
+    d29: interpretarUrlParaLeer(data.lbl35),
+    d30: interpretarUrlParaLeer(data.lbl36),
+    d31: interpretarUrlParaLeer(data.lbl37),
+    d32: interpretarUrlParaLeer(data.lbl38),
   };
 
   // Usar datos reales o datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? datosReales : {
-    norden: datosPrueba.norden,
-    sede: datosPrueba.sede.toUpperCase(),
-    nombres: datosPrueba.nombres.toUpperCase(),
-    empresa: datosPrueba.empresa.toUpperCase(),
-    contratista: datosPrueba.contratista.toUpperCase(),
-    sexo: datosPrueba.sexo.toUpperCase(),
-    edad: datosPrueba.edad,
-    fecha: datosPrueba.fecha.toUpperCase(),
-    piezasMalEstado: datosPrueba.piezasMalEstado,
-    pprMetalicas: datosPrueba.pprMetalicas,
-    pprAcrilicas: datosPrueba.pprAcrilicas,
-    ausentes: datosPrueba.ausentes,
-    puentes: datosPrueba.puentes,
-    coronas: datosPrueba.coronas,
-    porExtraer: datosPrueba.porExtraer,
-    pTotales: datosPrueba.pTotales,
-    normales: datosPrueba.normales,
-    obturacionesEfectuadas: datosPrueba.obturacionesEfectuadas,
-    cariadasPorOturar: datosPrueba.cariadasPorOturar,
-    fracturadas: datosPrueba.fracturadas,
-    observaciones: datosPrueba.observaciones.toUpperCase(),
-    lugarFecha: datosPrueba.lugarFecha.toUpperCase()
-  };
+  const datosFinales =
+    data && Object.keys(data).length > 0
+      ? datosReales
+      : {
+          norden: datosPrueba.norden,
+          sede: datosPrueba.sede.toUpperCase(),
+          nombres: datosPrueba.nombres.toUpperCase(),
+          empresa: datosPrueba.empresa.toUpperCase(),
+          contratista: datosPrueba.contratista.toUpperCase(),
+          sexo: datosPrueba.sexo.toUpperCase(),
+          edad: datosPrueba.edad,
+          fecha: datosPrueba.fecha.toUpperCase(),
+          piezasMalEstado: datosPrueba.piezasMalEstado,
+          pprMetalicas: datosPrueba.pprMetalicas,
+          pprAcrilicas: datosPrueba.pprAcrilicas,
+          ausentes: datosPrueba.ausentes,
+          puentes: datosPrueba.puentes,
+          coronas: datosPrueba.coronas,
+          porExtraer: datosPrueba.porExtraer,
+          pTotales: datosPrueba.pTotales,
+          normales: datosPrueba.normales,
+          obturacionesEfectuadas: datosPrueba.obturacionesEfectuadas,
+          cariadasPorOturar: datosPrueba.cariadasPorOturar,
+          fracturadas: datosPrueba.fracturadas,
+          observaciones: datosPrueba.observaciones.toUpperCase(),
+          lugarFecha: datosPrueba.lugarFecha.toUpperCase(),
+        };
 
   // === 1) Imagen de fondo para el odontograma ===
   const fondoImg = "/img/Odontograma_Digitalizado.png";
   const pageH = doc.internal.pageSize.getHeight();
-  
+
   // Usar todo el ancho del documento horizontal
   const imgWidth = pageW; // Todo el ancho disponible
   const imgHeight = pageH; // Todo el alto disponible
-  
+
   // Empezar desde el borde superior izquierdo
   const xOffset = 0;
   const yOffset = 0;
-  
+
   try {
     doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
-    doc.text(
-      "Imagen de odontograma no disponible",
-      margin,
-      yOffset + 10
-    );
+    doc.text("Imagen de odontograma no disponible", margin, yOffset + 10);
   }
 
   // === 2) Datos posicionados individualmente ===
@@ -125,11 +189,18 @@ export default function Odontograma_Digitalizado(data = {}) {
   const colocarIconoDental = (tipo, cantidad, posiciones) => {
     if (cantidad > 0 && posiciones && posiciones.length > 0) {
       const iconPath = `/src/views/jaspers/Odontologia/iconos_odonto/Icon_${tipo}.png`;
-      
+
       // Colocar iconos en las posiciones especificadas
       posiciones.slice(0, cantidad).forEach((pos) => {
         try {
-          doc.addImage(iconPath, "PNG", pos.x, pos.y, pos.width || 8, pos.height || 8);
+          doc.addImage(
+            iconPath,
+            "PNG",
+            pos.x,
+            pos.y,
+            pos.width || 8,
+            pos.height || 8
+          );
         } catch (e) {
           console.log(`Error al cargar icono ${tipo}:`, e);
         }
@@ -157,7 +228,7 @@ export default function Odontograma_Digitalizado(data = {}) {
     14: { x: margin + 150, y: margin + 80, width: 8, height: 8 },
     15: { x: margin + 160, y: margin + 80, width: 8, height: 8 },
     16: { x: margin + 170, y: margin + 80, width: 8, height: 8 },
-    
+
     // Dientes inferiores (17-32)
     17: { x: margin + 20, y: margin + 100, width: 8, height: 8 },
     18: { x: margin + 30, y: margin + 100, width: 8, height: 8 },
@@ -174,7 +245,7 @@ export default function Odontograma_Digitalizado(data = {}) {
     29: { x: margin + 140, y: margin + 100, width: 8, height: 8 },
     30: { x: margin + 150, y: margin + 100, width: 8, height: 8 },
     31: { x: margin + 160, y: margin + 100, width: 8, height: 8 },
-    32: { x: margin + 170, y: margin + 100, width: 8, height: 8 }
+    32: { x: margin + 170, y: margin + 100, width: 8, height: 8 },
   };
 
   // === TOP RIGHT BLOCK - N° Ficha y Sede ===
@@ -183,7 +254,7 @@ export default function Odontograma_Digitalizado(data = {}) {
   const yNorden = margin + 35; // AJUSTAR POSICIÓN Y DE N° FICHA AQUÍ
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(datosFinales.norden, xNorden, yNorden, { align: "right" });
-  
+
   // Subrayado para el N° Ficha
   const textWidth = doc.getTextWidth(datosFinales.norden);
   const underlineY = yNorden + 1; // Posición Y del subrayado
@@ -226,7 +297,9 @@ export default function Odontograma_Digitalizado(data = {}) {
   const xContratista = pageW - margin - 155; // AJUSTAR POSICIÓN X DE CONTRATISTA AQUÍ (más a la izquierda)
   const yContratista = margin + 63.5; // AJUSTAR POSICIÓN Y DE CONTRATISTA AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.contratista, xContratista, yContratista, { maxWidth: 82 });
+  doc.text(datosFinales.contratista, xContratista, yContratista, {
+    maxWidth: 82,
+  });
 
   // Fecha - Coordenadas individuales
   const xFecha = pageW - margin - 60; // AJUSTAR POSICIÓN X DE FECHA AQUÍ
@@ -235,21 +308,27 @@ export default function Odontograma_Digitalizado(data = {}) {
 
   // === SUMMARY OF DENTAL STATUS ===
   doc.setFont("helvetica", "normal").setFontSize(10);
-  
+
   // Piezas en mal estado - Coordenadas individuales
   const xPiezasMalEstado = pageW - margin - 131; // AJUSTAR POSICIÓN X DE PIEZAS MAL ESTADO AQUÍ
   const yPiezasMalEstado = margin + 125; // AJUSTAR POSICIÓN Y DE PIEZAS MAL ESTADO AQUÍ
-  doc.text(datosFinales.piezasMalEstado, xPiezasMalEstado, yPiezasMalEstado, { align: "right" });
+  doc.text(datosFinales.piezasMalEstado, xPiezasMalEstado, yPiezasMalEstado, {
+    align: "right",
+  });
 
   // P.P.R. Metalicas - Coordenadas individuales
   const xPprMetalicas = pageW - margin - 131; // AJUSTAR POSICIÓN X DE PPR METALICAS AQUÍ
   const yPprMetalicas = margin + 130.5; // AJUSTAR POSICIÓN Y DE PPR METALICAS AQUÍ
-  doc.text(datosFinales.pprMetalicas, xPprMetalicas, yPprMetalicas, { align: "right" });
+  doc.text(datosFinales.pprMetalicas, xPprMetalicas, yPprMetalicas, {
+    align: "right",
+  });
 
   // P.P.R. Acrilicas - Coordenadas individuales
   const xPprAcrilicas = pageW - margin - 131; // AJUSTAR POSICIÓN X DE PPR ACRILICAS AQUÍ
   const yPprAcrilicas = margin + 136; // AJUSTAR POSICIÓN Y DE PPR ACRILICAS AQUÍ
-  doc.text(datosFinales.pprAcrilicas, xPprAcrilicas, yPprAcrilicas, { align: "right" });
+  doc.text(datosFinales.pprAcrilicas, xPprAcrilicas, yPprAcrilicas, {
+    align: "right",
+  });
 
   // Ausentes - Coordenadas individuales
   const xAusentes = pageW - margin - 101; // AJUSTAR POSICIÓN X DE AUSENTES AQUÍ
@@ -269,7 +348,9 @@ export default function Odontograma_Digitalizado(data = {}) {
   // Por Extraer - Coordenadas individuales
   const xPorExtraer = pageW - margin - 70; // AJUSTAR POSICIÓN X DE POR EXTRAER AQUÍ
   const yPorExtraer = margin + 125; // AJUSTAR POSICIÓN Y DE POR EXTRAER AQUÍ
-  doc.text(datosFinales.porExtraer, xPorExtraer, yPorExtraer, { align: "right" });
+  doc.text(datosFinales.porExtraer, xPorExtraer, yPorExtraer, {
+    align: "right",
+  });
 
   // P. Totales - Coordenadas individuales
   const xPTotales = pageW - margin - 70; // AJUSTAR POSICIÓN X DE P TOTALES AQUÍ
@@ -284,24 +365,38 @@ export default function Odontograma_Digitalizado(data = {}) {
   // Obturaciones Efectuadas - Coordenadas individuales
   const xObturacionesEfectuadas = pageW - margin - 14; // AJUSTAR POSICIÓN X DE OBTURACIONES EFECTUADAS AQUÍ
   const yObturacionesEfectuadas = margin + 126; // AJUSTAR POSICIÓN Y DE OBTURACIONES EFECTUADAS AQUÍ
-  doc.text(datosFinales.obturacionesEfectuadas, xObturacionesEfectuadas, yObturacionesEfectuadas, { align: "right" });
+  doc.text(
+    datosFinales.obturacionesEfectuadas,
+    xObturacionesEfectuadas,
+    yObturacionesEfectuadas,
+    { align: "right" }
+  );
 
   // Cariadas por Oturar - Coordenadas individuales
   const xCariadasPorOturar = pageW - margin - 14; // AJUSTAR POSICIÓN X DE CARIADAS POR OTURAR AQUÍ
   const yCariadasPorOturar = margin + 131; // AJUSTAR POSICIÓN Y DE CARIADAS POR OTURAR AQUÍ
-  doc.text(datosFinales.cariadasPorOturar, xCariadasPorOturar, yCariadasPorOturar, { align: "right" });
+  doc.text(
+    datosFinales.cariadasPorOturar,
+    xCariadasPorOturar,
+    yCariadasPorOturar,
+    { align: "right" }
+  );
 
   // Fracturadas - Coordenadas individuales
   const xFracturadas = pageW - margin - 14; // AJUSTAR POSICIÓN X DE FRACTURADAS AQUÍ
   const yFracturadas = margin + 136.5; // AJUSTAR POSICIÓN Y DE FRACTURADAS AQUÍ
-  doc.text(datosFinales.fracturadas, xFracturadas, yFracturadas, { align: "right" });
+  doc.text(datosFinales.fracturadas, xFracturadas, yFracturadas, {
+    align: "right",
+  });
 
   // === OBSERVACIONES Y LUGAR FECHA ===
   // Observaciones - Coordenadas individuales
   const xObservaciones = margin + 148; // AJUSTAR POSICIÓN X DE OBSERVACIONES AQUÍ
   const yObservaciones = margin + 142; // AJUSTAR POSICIÓN Y DE OBSERVACIONES AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.observaciones, xObservaciones, yObservaciones, { maxWidth: 120 });
+  doc.text(datosFinales.observaciones, xObservaciones, yObservaciones, {
+    maxWidth: 120,
+  });
 
   // Lugar y Fecha - Coordenadas individuales
   const xLugarFecha = margin + 132.5; // AJUSTAR POSICIÓN X DE LUGAR Y FECHA AQUÍ
@@ -331,23 +426,62 @@ export default function Odontograma_Digitalizado(data = {}) {
 
   // Función para obtener las siguientes posiciones disponibles
   const obtenerPosicionesDisponibles = (cantidad) => {
-    const posiciones = posicionesArray.slice(posicionActual, posicionActual + cantidad);
+    const posiciones = posicionesArray.slice(
+      posicionActual,
+      posicionActual + cantidad
+    );
     posicionActual += cantidad;
     return posiciones;
   };
 
   // Colocar iconos según los datos de manera secuencial
-  colocarIconoDental("ausente", ausentes, obtenerPosicionesDisponibles(ausentes));
-  colocarIconoDental("cariada", cariadas, obtenerPosicionesDisponibles(cariadas));
+  colocarIconoDental(
+    "ausente",
+    ausentes,
+    obtenerPosicionesDisponibles(ausentes)
+  );
+  colocarIconoDental(
+    "cariada",
+    cariadas,
+    obtenerPosicionesDisponibles(cariadas)
+  );
   colocarIconoDental("corona", coronas, obtenerPosicionesDisponibles(coronas));
-  colocarIconoDental("fracturada", fracturadas, obtenerPosicionesDisponibles(fracturadas));
-  colocarIconoDental("normal", normales, obtenerPosicionesDisponibles(normales));
-  colocarIconoDental("obturacion", obturaciones, obtenerPosicionesDisponibles(obturaciones));
-  colocarIconoDental("por_extraer", porExtraer, obtenerPosicionesDisponibles(porExtraer));
-  colocarIconoDental("ppr_metalica", pprMetalicas, obtenerPosicionesDisponibles(pprMetalicas));
-  colocarIconoDental("ppr_acrilica", pprAcrilicas, obtenerPosicionesDisponibles(pprAcrilicas));
+  colocarIconoDental(
+    "fracturada",
+    fracturadas,
+    obtenerPosicionesDisponibles(fracturadas)
+  );
+  colocarIconoDental(
+    "normal",
+    normales,
+    obtenerPosicionesDisponibles(normales)
+  );
+  colocarIconoDental(
+    "obturacion",
+    obturaciones,
+    obtenerPosicionesDisponibles(obturaciones)
+  );
+  colocarIconoDental(
+    "por_extraer",
+    porExtraer,
+    obtenerPosicionesDisponibles(porExtraer)
+  );
+  colocarIconoDental(
+    "ppr_metalica",
+    pprMetalicas,
+    obtenerPosicionesDisponibles(pprMetalicas)
+  );
+  colocarIconoDental(
+    "ppr_acrilica",
+    pprAcrilicas,
+    obtenerPosicionesDisponibles(pprAcrilicas)
+  );
   colocarIconoDental("puente", puentes, obtenerPosicionesDisponibles(puentes));
-  colocarIconoDental("p_total", pTotales, obtenerPosicionesDisponibles(pTotales));
+  colocarIconoDental(
+    "p_total",
+    pTotales,
+    obtenerPosicionesDisponibles(pTotales)
+  );
 
   // === 4) Generar blob y abrir en iframe para imprimir automáticamente ===
   const blob = doc.output("blob");

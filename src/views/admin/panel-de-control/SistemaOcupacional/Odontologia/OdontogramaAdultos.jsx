@@ -10,6 +10,7 @@ export default function OdontogramaAdultos({
   handleCheckBoxChange,
   handleClear,
   handleSave,
+  handlePrint,
 }) {
   const dientesSuperioresArray = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -444,7 +445,7 @@ export default function OdontogramaAdultos({
 
               <button
                 type="button"
-                // onClick={handlePrint}
+                onClick={handlePrint}
                 className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faPrint} />

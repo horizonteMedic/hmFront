@@ -8,11 +8,13 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import {
+  PrintHojaR,
   SubmitDataService,
   SubmitDataServiceLO,
   VerifyTR,
 } from "./controllerOdontologia";
 import OdontogramaLevantarObservacion from "./OdontogramaLevantarObservacion";
+import Swal from "sweetalert2";
 
 const tabla = "odontograma";
 const tablaLO = "odontograma_lo";
@@ -188,6 +190,28 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
     SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
 
+  const handlePrint = () => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Reporte?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden, token, tabla);
+      }
+    });
+  };
+
   const handleChangeLO = (e) => {
     const { name, value } = e.target;
     setFormLO((f) => ({ ...f, [name]: value.toUpperCase() }));
@@ -359,6 +383,7 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                 handleCheckBoxChange={handleCheckBoxChange}
                 handleClear={handleClear}
                 handleSave={handleSave}
+                handlePrint={handlePrint}
               />
             )}
             {activeTab === 2 && (
