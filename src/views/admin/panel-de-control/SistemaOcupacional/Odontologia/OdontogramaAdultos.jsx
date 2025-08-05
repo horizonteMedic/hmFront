@@ -9,6 +9,7 @@ export default function OdontogramaAdultos({
   handleChange,
   handleCheckBoxChange,
   handleClear,
+  handleSave,
 }) {
   const dientesSuperioresArray = [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
@@ -167,7 +168,10 @@ export default function OdontogramaAdultos({
       pprAcrilica: estadosContados["P.P.R Acrilica"],
       pTotal: Math.floor(estadosContados["P.Total"] / 16),
       normal: estadosContados["Normal"],
-      malEstado: estadosContados["Dientes en mal estado"],
+      malEstado:
+        estadosContados["Cariada por opturar"] +
+        estadosContados["Por extraer"] +
+        estadosContados["Fracturada"],
     }));
   }, [
     // Se puede hacer dinámicamente si tienes todos los nombres como "d1" a "d32"
@@ -229,8 +233,7 @@ export default function OdontogramaAdultos({
         return <span className="text-black text-6xl">≈</span>;
       case "Normal":
         return <span className="text-green-500 text-6xl">☑</span>;
-      case "Dientes en mal estado":
-        return <span className="text-yellow-500 text-3xl">🟡</span>;
+
       default:
         return null;
     }
@@ -273,12 +276,12 @@ export default function OdontogramaAdultos({
     },
     { label: "P.Total", key: "pTotal", icon: "≈", color: "text-black" },
     { label: "Normal", key: "normal", icon: "☑", color: "text-green-500" },
-    {
-      label: "Dientes en mal estado",
-      key: "malEstado",
-      icon: "●",
-      color: "text-yellow-500",
-    },
+    // {
+    //   label: "Dientes en mal estado",
+    //   key: "malEstado",
+    //   icon: "●",
+    //   color: "text-yellow-500",
+    // },
   ];
 
   return (
@@ -415,7 +418,7 @@ export default function OdontogramaAdultos({
           <div className=" flex gap-4">
             <button
               type="button"
-              // onClick={handleSave}
+              onClick={handleSave}
               className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
