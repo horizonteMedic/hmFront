@@ -302,10 +302,22 @@ function drawOftalmoTable(doc, datos = {}) {
   let dataX = margin;
   let dataY = y;
   for (let i = 0; i < fila.length; i++) {
-    doc.rect(dataX, dataY, colWScaled[i], rowH);
-    doc.text(fila[i], dataX + colWScaled[i] / 2, dataY + rowH / 2 + 1, {
-      align: "center",
-    });
+    if (i == fila.length - 1 || i == fila.length - 2) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.rect(dataX, dataY, colWScaled[i], rowH);
+      doc.text(fila[i], dataX + colWScaled[i] / 2, dataY + rowH / 2 - 1, {
+        align: "center",
+        maxWidth: colWScaled[i],
+      });
+      doc.setFont("helvetica", "normal").setFontSize(8);
+    } else {
+      doc.rect(dataX, dataY, colWScaled[i], rowH);
+      doc.text(fila[i], dataX + colWScaled[i] / 2, dataY + rowH / 2 + 1, {
+        align: "center",
+        maxWidth: colWScaled[i],
+      });
+    }
+
     dataX += colWScaled[i];
   }
   // --- Fila extra ---
@@ -329,11 +341,21 @@ function drawOftalmoTable(doc, datos = {}) {
 
   dataX = margin;
   dataY = y;
+
   for (let i = 0; i < fila2.length; i++) {
     doc.rect(dataX, dataY, colWScaled[i], rowH);
-    doc.text(fila2[i], dataX + colWScaled[i] / 2, dataY + rowH / 2 + 1, {
-      align: "center",
-    });
+    if (i == fila2.length - 1 || i == fila2.length - 2) {
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(fila2[i], dataX + colWScaled[i] / 2, dataY + rowH / 2 - 1, {
+        align: "center",
+      });
+      doc.setFont("helvetica", "normal").setFontSize(8);
+    } else {
+      doc.text(fila2[i], dataX + colWScaled[i] / 2, dataY + rowH / 2 + 1, {
+        align: "center",
+      });
+    }
+
     dataX += colWScaled[i];
   }
 }

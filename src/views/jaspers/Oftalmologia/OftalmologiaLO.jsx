@@ -16,18 +16,30 @@ export default function OftalmologiaLO(datos = {}) {
     let dateObj;
 
     if (fecha.includes("-")) {
-      // Formato yyyy-mm-dd
       partes = fecha.split("-");
-      dateObj = new Date(`${partes[0]}-${partes[1]}-${partes[2]}`);
+      // yyyy-mm-dd
+      dateObj = new Date(
+        parseInt(partes[0]),
+        parseInt(partes[1]) - 1, // mes inicia en 0
+        parseInt(partes[2])
+      );
     } else if (fecha.includes("/")) {
       partes = fecha.split("/");
       if (partes.length === 3) {
         if (partes[0].length === 4) {
           // yyyy/mm/dd
-          dateObj = new Date(`${partes[0]}-${partes[1]}-${partes[2]}`);
+          dateObj = new Date(
+            parseInt(partes[0]),
+            parseInt(partes[1]) - 1,
+            parseInt(partes[2])
+          );
         } else {
           // dd/mm/yyyy
-          dateObj = new Date(`${partes[2]}-${partes[1]}-${partes[0]}`);
+          dateObj = new Date(
+            parseInt(partes[2]),
+            parseInt(partes[1]) - 1,
+            parseInt(partes[0])
+          );
         }
       }
     } else {
@@ -53,7 +65,7 @@ export default function OftalmologiaLO(datos = {}) {
   // Calcular posición dinámica para la edad basada en el ancho del nombre
   const nombreCompleto = `Nombres: ${datos.nombres || ""}`;
   const nombreWidth = doc.getTextWidth(nombreCompleto);
-  const edadX = Math.max(margin + nombreWidth , pageW / 2); // Mínimo 10 unidades de separación
+  const edadX = Math.max(margin + nombreWidth, pageW / 2); // Mínimo 10 unidades de separación
   doc.text(`Edad: ${datos.edad || ""} años`, edadX, y, {
     align: "left",
   });
@@ -115,7 +127,7 @@ export default function OftalmologiaLO(datos = {}) {
 
   // Sección de observaciones con formato de dos columnas
   const labelX = margin + 45; // Movido más a la derecha para que no se corte
-  const dataX = margin +  60; // Movido muy cerca del label para eliminar espacio vacío
+  const dataX = margin + 60; // Movido muy cerca del label para eliminar espacio vacío
   const startY = y + 65;
   const lineHeight = 8;
 

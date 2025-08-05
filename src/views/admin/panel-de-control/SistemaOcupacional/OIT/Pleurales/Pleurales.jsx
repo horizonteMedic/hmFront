@@ -1,4 +1,17 @@
-const Pleurales = () => {
+const Pleurales = ({form,setForm}) => {
+
+    const handleInputChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+    };
+
+    const handleInputChangeChecked = (e) => {
+        const { name, checked } = e.target;
+        setForm(prev => ({
+            ...prev,
+            [name]: checked
+        }));
+    };
+
     return(
             <>
                 <div className="w-auto">
@@ -12,6 +25,7 @@ const Pleurales = () => {
                             <label htmlFor="">NO</label>
                         </div>
                     </div>
+                    <h3>3.1 Placas Pleurales (0 = Ninguna, D = Hemitórax derecho, I = Hemitórax izquierda)</h3>
                     <div className="flex flex-row w-auto mt-4">
                         {/*Cuadros */}
                         <div className="flex flex-col w-auto items-start justify-center border rounded-md p-3">
@@ -31,15 +45,15 @@ const Pleurales = () => {
                             {/* Opciones */}
                             <div className="flex flex-col gap-y-2 gap-x-4 pl-2">
                                 <div className="flex flex-row">
-                                    <input type="checkbox" name="" id="" />
+                                    <input type="checkbox" name="chkE1" id="chkE1" checked={form.chkE1} onChange={handleInputChangeChecked} />
                                     <span>{" < 1/4 de la pared lateral de tórax"}</span>
                                 </div>
                                 <div className="flex flex-row">
-                                    <input type="checkbox" name="" id="" />
+                                    <input type="checkbox" name="chkE2" id="chkE2" checked={form.chkE2} onChange={handleInputChangeChecked} />
                                     <span>{" Entre 1/4 y 1/2 de la pared lateral de tórax"}</span>
                                 </div>
                                 <div className="flex flex-row">
-                                    <input type="checkbox" name="" id="" />
+                                    <input type="checkbox" name="chkE3" id="chkE3" checked={form.chkE3} onChange={handleInputChangeChecked} />
                                     <span>{" > 1/2 de la pared lateral de tórax"}</span>
                                 </div>
                             </div>
@@ -52,15 +66,15 @@ const Pleurales = () => {
                             {/* Opciones */}
                             <div className="flex flex-col gap-y-2 gap-x-4 pl-2">
                                 <div className="flex flex-row">
-                                    <input type="checkbox" name="" id="" />
+                                    <input type="checkbox" name="chkE4" id="chkE4" checked={form.chkE4} onChange={handleInputChangeChecked} />
                                     <span>{" De 3 a 5 mm"}</span>
                                 </div>
                                 <div className="flex flex-row">
-                                    <input type="checkbox" name="" id="" />
+                                    <input type="checkbox" name="chkE5" id="chkE5" checked={form.chkE5} onChange={handleInputChangeChecked} />
                                     <span>{" De 5 a 10 mm"}</span>
                                 </div>
                                 <div className="flex flex-row">
-                                    <input type="checkbox" name="" id="" />
+                                    <input type="checkbox" name="chkE6" id="chkE6" checked={form.chkE6} onChange={handleInputChangeChecked} />
                                     <span>{" Mayor a 10 mm"}</span>
                                 </div>
                             </div>
@@ -80,19 +94,26 @@ const Pleurales = () => {
                             </div>
 
                             {/* Filas con checkboxes */}
-                            {["De Frente", "Diafragma", "Otro(s) Sitio(s)", "Obliteración del Ángulo Costofrénico"].map((label, idx) => (
+                            {[{ label:"De Frente", codeO: "chk2_1", codeD: "chk2_4", codeI: "chk2_7"}, 
+                            {label:"Diafragma", codeO: "chk2_2", codeD: "chk2_5", codeI: "chk2_8"}, 
+                            {label:"Otro(s) Sitio(s)", codeO: "chk2_3", codeD: "chk2_6", codeI: "chk2_9"}, 
+                            {label:"Obliteración del Ángulo Costofrénico", codeO:"chk2_37", codeD: "chk2_38", codeI: "chk2_39"}]
+                            .map((item, idx) => (
                             <div key={idx} className="flex flex-row items-center gap-2 mb-1">
-                                <span className="w-[170px] text-sm">{label}</span>
+                                <span className="w-[170px] text-sm">{item.label}</span>
 
                                 {/* Checkboxes sin letras al costado */}
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" /> <span className="ml-1">O</span>
+                                <input type="checkbox" name={item.codeO} id={item.codeO} checked={form[item.codeO]} onChange={handleInputChangeChecked} /> 
+                                <span className="ml-1">O</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" /> <span className="ml-1">D</span>
+                                <input type="checkbox" name={item.codeD} id={item.codeD} checked={form[item.codeD]} onChange={handleInputChangeChecked}/> 
+                                <span className="ml-1">D</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" /> <span className="ml-1">I</span>
+                                <input type="checkbox" name={item.codeI} id={item.codeI} checked={form[item.codeI]} onChange={handleInputChangeChecked} /> 
+                                <span className="ml-1">I</span>
                                 </div>
                             </div>
                             ))}
@@ -105,19 +126,22 @@ const Pleurales = () => {
                                 <span className="w-[25px] text-sm font-bold text-center">I</span>
                             </div>
                             {/* Filas con checkboxes */}
-                            {["", "", ""].map((label, idx) => (
+                            {[{label:"", codeO:"chk2_10", codeD: "chk2_13", codeI: "chk2_16"}
+                            ,{label:"", codeO:"chk2_11", codeD: "chk2_14", codeI: "chk2_17"},
+                            {label:"", codeO:"chk2_12", codeD: "chk2_15", codeI: "chk2_18"}]
+                            .map((item, idx) => (
                             <div key={idx} className="flex flex-row items-center gap-2 mb-1 ">
-                                <span className="ml-4 text-sm">{label}</span>
+                                <span className="ml-4 text-sm">{item.label}</span>
 
                                 {/* Checkboxes sin letras al costado */}
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" /> <span className="ml-1">O</span>
+                                <input type="checkbox" name={item.codeO} id={item.codeO} checked={form[item.codeO]} onChange={handleInputChangeChecked}/> <span className="ml-1">O</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" /> <span className="ml-1">D</span>
+                                <input type="checkbox" name={item.codeD} id={item.codeD} checked={form[item.codeD]} onChange={handleInputChangeChecked}/> <span className="ml-1">D</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" /> <span className="ml-1">I</span>
+                                <input type="checkbox" name={item.codeI} id={item.codeI} checked={form[item.codeI]} onChange={handleInputChangeChecked}/> <span className="ml-1">I</span>
                                 </div>
                             </div>
                             ))}
