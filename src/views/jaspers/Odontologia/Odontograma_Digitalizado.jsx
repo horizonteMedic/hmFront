@@ -185,67 +185,49 @@ export default function Odontograma_Digitalizado(data = {}) {
   // === 2) Datos posicionados individualmente ===
   doc.setFont("helvetica", "normal").setFontSize(10);
 
-  // === FUNCIÓN PARA COLOCAR ICONOS DENTALES ===
-  const colocarIconoDental = (tipo, cantidad, posiciones) => {
-    if (cantidad > 0 && posiciones && posiciones.length > 0) {
-      const iconPath = `/src/views/jaspers/Odontologia/iconos_odonto/Icon_${tipo}.png`;
 
-      // Colocar iconos en las posiciones especificadas
-      posiciones.slice(0, cantidad).forEach((pos) => {
-        try {
-          doc.addImage(
-            iconPath,
-            "PNG",
-            pos.x,
-            pos.y,
-            pos.width || 8,
-            pos.height || 8
-          );
-        } catch (e) {
-          console.log(`Error al cargar icono ${tipo}:`, e);
-        }
-      });
-    }
-  };
 
   // === POSICIONES DE LOS DIENTES EN EL ODONTOGRAMA ===
-  // Definir las posiciones de los dientes (ejemplo para algunos dientes)
+  // Definir las posiciones de los dientes según la disposición del odontograma
   const posicionesDientes = {
-    // Dientes superiores (1-16)
-    1: { x: margin + 20, y: margin + 80, width: 8, height: 8 },
-    2: { x: margin + 30, y: margin + 80, width: 8, height: 8 },
-    3: { x: margin + 40, y: margin + 80, width: 8, height: 8 },
-    4: { x: margin + 50, y: margin + 80, width: 8, height: 8 },
-    5: { x: margin + 60, y: margin + 80, width: 8, height: 8 },
-    6: { x: margin + 70, y: margin + 80, width: 8, height: 8 },
-    7: { x: margin + 80, y: margin + 80, width: 8, height: 8 },
-    8: { x: margin + 90, y: margin + 80, width: 8, height: 8 },
-    9: { x: margin + 100, y: margin + 80, width: 8, height: 8 },
-    10: { x: margin + 110, y: margin + 80, width: 8, height: 8 },
-    11: { x: margin + 120, y: margin + 80, width: 8, height: 8 },
-    12: { x: margin + 130, y: margin + 80, width: 8, height: 8 },
-    13: { x: margin + 140, y: margin + 80, width: 8, height: 8 },
-    14: { x: margin + 150, y: margin + 80, width: 8, height: 8 },
-    15: { x: margin + 160, y: margin + 80, width: 8, height: 8 },
-    16: { x: margin + 170, y: margin + 80, width: 8, height: 8 },
+     // Dientes superiores (1-16) - Fila superior
+    1: { x: margin + 7, y: margin + 96, width: 8, height: 8 },
+    2: { x: margin + 8, y: margin + 84, width: 8, height: 8 },
+    3: { x: margin + 10, y: margin + 72, width: 8, height: 8 },
+    4: { x: margin + 14, y: margin + 61, width: 7, height: 7 },
+    5: { x: margin + 17, y: margin + 52, width: 7, height: 7 },
+    6: { x: margin + 23, y: margin + 44, width: 6.5, height: 6.5 },
+    7: { x: margin + 30, y: margin + 37.5, width: 6.5, height: 6.5 },
+    8: { x: margin + 41.5, y: margin + 35, width: 6.5, height: 6.5 },
 
-    // Dientes inferiores (17-32)
-    17: { x: margin + 20, y: margin + 100, width: 8, height: 8 },
-    18: { x: margin + 30, y: margin + 100, width: 8, height: 8 },
-    19: { x: margin + 40, y: margin + 100, width: 8, height: 8 },
-    20: { x: margin + 50, y: margin + 100, width: 8, height: 8 },
-    21: { x: margin + 60, y: margin + 100, width: 8, height: 8 },
-    22: { x: margin + 70, y: margin + 100, width: 8, height: 8 },
-    23: { x: margin + 80, y: margin + 100, width: 8, height: 8 },
-    24: { x: margin + 90, y: margin + 100, width: 8, height: 8 },
-    25: { x: margin + 100, y: margin + 100, width: 8, height: 8 },
-    26: { x: margin + 110, y: margin + 100, width: 8, height: 8 },
-    27: { x: margin + 120, y: margin + 100, width: 8, height: 8 },
-    28: { x: margin + 130, y: margin + 100, width: 8, height: 8 },
-    29: { x: margin + 140, y: margin + 100, width: 8, height: 8 },
-    30: { x: margin + 150, y: margin + 100, width: 8, height: 8 },
-    31: { x: margin + 160, y: margin + 100, width: 8, height: 8 },
-    32: { x: margin + 170, y: margin + 100, width: 8, height: 8 },
+    // Dientes superiores (9-16) - Espejo de 1-8
+    9: { x: margin + 53, y: margin + 35, width: 6.5, height: 6.5 },
+    10: { x: margin + 63.5, y: margin + 37.5, width: 6.5, height: 6.5 },
+    11: { x: margin + 72, y: margin + 44, width: 6.5, height: 6.5 },
+    12: { x: margin + 75, y: margin + 52, width: 7, height: 7 },
+    13: { x: margin + 79, y: margin + 61, width: 7, height: 7 },
+    14: { x: margin + 82, y: margin + 72, width: 8, height: 8 },
+    15: { x: margin + 84, y: margin + 84, width: 8, height: 8 },
+    16: { x: margin + 85, y: margin + 96, width: 8, height: 8 },
+
+    // Dientes inferiores (17-32) - Espejo hacia abajo de 1-16
+    17: { x: margin + 8, y: margin + 122, width: 8, height: 8 },
+    18: { x: margin + 9, y: margin + 134, width: 8, height: 8 },
+    19: { x: margin + 11, y: margin + 145, width: 8, height: 8 },
+    20: { x: margin + 15, y: margin + 156, width: 7, height: 7 },
+    21: { x: margin + 17, y: margin + 164, width: 7, height: 7 },
+    22: { x: margin + 23, y: margin + 172, width: 6.5, height: 6.5 },
+    23: { x: margin + 30, y: margin + 178.5, width: 6.5, height: 6.5 },
+    24: { x: margin + 41.5, y: margin + 181, width: 6.5, height: 6.5 },
+    
+    25: { x: margin + 53, y: margin + 183, width: 6.5, height: 6.5 },
+    26: { x: margin + 63.5, y: margin + 180, width: 6.5, height: 6.5 },
+    27: { x: margin + 72, y: margin + 173, width: 6.5, height: 6.5 },
+    28: { x: margin + 75, y: margin + 164, width: 7, height: 7 },
+    29: { x: margin + 79, y: margin + 155, width: 7, height: 7 },
+    30: { x: margin + 82, y: margin + 144, width: 8, height: 8 },
+    31: { x: margin + 84, y: margin + 132, width: 8, height: 8 },
+    32: { x: margin + 85, y: margin + 120, width: 8, height: 8 },
   };
 
   // === TOP RIGHT BLOCK - N° Ficha y Sede ===
@@ -264,9 +246,9 @@ export default function Odontograma_Digitalizado(data = {}) {
   doc.line(underlineX, underlineY, xNorden, underlineY);
 
   // Sede - Coordenadas individuales
-  const xSede = pageW - margin - 12; // AJUSTAR POSICIÓN X DE SEDE AQUÍ
+  const xSede = pageW - margin + 0.5; // AJUSTAR POSICIÓN X DE SEDE AQUÍ
   const ySede = margin + 41.5; // AJUSTAR POSICIÓN Y DE SEDE AQUÍ
-  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.sede, xSede, ySede, { align: "right" });
 
   // === PATIENT INFORMATION BLOCK ===
@@ -404,84 +386,53 @@ export default function Odontograma_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.lugarFecha, xLugarFecha, yLugarFecha);
 
-  // === 3) COLOCAR ICONOS DENTALES BASADOS EN LOS DATOS ===
-  // Convertir los datos de texto a números para comparar
-  const ausentes = parseInt(datosFinales.ausentes) || 0;
-  const cariadas = parseInt(datosFinales.cariadasPorOturar) || 0;
-  const coronas = parseInt(datosFinales.coronas) || 0;
-  const fracturadas = parseInt(datosFinales.fracturadas) || 0;
-  const normales = parseInt(datosFinales.normales) || 0;
-  const obturaciones = parseInt(datosFinales.obturacionesEfectuadas) || 0;
-  const porExtraer = parseInt(datosFinales.porExtraer) || 0;
-  const pprMetalicas = parseInt(datosFinales.pprMetalicas) || 0;
-  const pprAcrilicas = parseInt(datosFinales.pprAcrilicas) || 0;
-  const puentes = parseInt(datosFinales.puentes) || 0;
-  const pTotales = parseInt(datosFinales.pTotales) || 0;
-
-  // Obtener las posiciones de los dientes como array
-  const posicionesArray = Object.values(posicionesDientes);
-
-  // Crear un array de posiciones disponibles para evitar superposición
-  let posicionActual = 0;
-
-  // Función para obtener las siguientes posiciones disponibles
-  const obtenerPosicionesDisponibles = (cantidad) => {
-    const posiciones = posicionesArray.slice(
-      posicionActual,
-      posicionActual + cantidad
-    );
-    posicionActual += cantidad;
-    return posiciones;
+  // === 3) COLOCAR ICONOS DENTALES BASADOS EN LOS DATOS INDIVIDUALES ===
+  // Mapeo de tipos de dientes a nombres de archivos de iconos
+  const mapeoTiposIconos = {
+    "Ausente": "ausente",
+    "Cariada por opturar": "cariada",
+    "Por extraer": "por_extraer",
+    "Fracturada": "fracturada",
+    "Corona": "corona",
+    "Obturacion Efectuada": "obturacion",
+    "Puente": "puente",
+    "P.P.R Metalica": "ppr_metalica",
+    "P.P.R Acrilica": "ppr_acrilica",
+    "P.Total": "p_total",
+    "Normal": "normal"
   };
 
-  // Colocar iconos según los datos de manera secuencial
-  colocarIconoDental(
-    "ausente",
-    ausentes,
-    obtenerPosicionesDisponibles(ausentes)
-  );
-  colocarIconoDental(
-    "cariada",
-    cariadas,
-    obtenerPosicionesDisponibles(cariadas)
-  );
-  colocarIconoDental("corona", coronas, obtenerPosicionesDisponibles(coronas));
-  colocarIconoDental(
-    "fracturada",
-    fracturadas,
-    obtenerPosicionesDisponibles(fracturadas)
-  );
-  colocarIconoDental(
-    "normal",
-    normales,
-    obtenerPosicionesDisponibles(normales)
-  );
-  colocarIconoDental(
-    "obturacion",
-    obturaciones,
-    obtenerPosicionesDisponibles(obturaciones)
-  );
-  colocarIconoDental(
-    "por_extraer",
-    porExtraer,
-    obtenerPosicionesDisponibles(porExtraer)
-  );
-  colocarIconoDental(
-    "ppr_metalica",
-    pprMetalicas,
-    obtenerPosicionesDisponibles(pprMetalicas)
-  );
-  colocarIconoDental(
-    "ppr_acrilica",
-    pprAcrilicas,
-    obtenerPosicionesDisponibles(pprAcrilicas)
-  );
-  colocarIconoDental("puente", puentes, obtenerPosicionesDisponibles(puentes));
-  colocarIconoDental(
-    "p_total",
-    pTotales,
-    obtenerPosicionesDisponibles(pTotales)
-  );
+  // Función para colocar icono en un diente específico
+  const colocarIconoEnDiente = (numeroDiente, tipoDiente) => {
+    if (tipoDiente && tipoDiente !== "Normal" && posicionesDientes[numeroDiente]) {
+      const nombreIcono = mapeoTiposIconos[tipoDiente];
+      if (nombreIcono) {
+        const iconPath = `/src/views/jaspers/Odontologia/iconos_odonto/Icon_${nombreIcono}.png`;
+        const posicion = posicionesDientes[numeroDiente];
+        
+        try {
+          doc.addImage(
+            iconPath,
+            "PNG",
+            posicion.x,
+            posicion.y,
+            posicion.width || 8,
+            posicion.height || 8
+          );
+        } catch (e) {
+          console.log(`Error al cargar icono ${nombreIcono} para diente ${numeroDiente}:`, e);
+        }
+      }
+    }
+  };
+
+  // Colocar iconos para cada diente según sus datos individuales
+  for (let i = 1; i <= 32; i++) {
+    const tipoDiente = datosFinales[`d${i}`];
+    if (tipoDiente) {
+      colocarIconoEnDiente(i, tipoDiente);
+    }
+  }
 
   // === 4) Generar blob y abrir en iframe para imprimir automáticamente ===
   const blob = doc.output("blob");
