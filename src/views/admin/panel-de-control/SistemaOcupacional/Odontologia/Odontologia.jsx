@@ -5,14 +5,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
   faClipboardList,
-  faCheck,
-  faTimes,
-  faExclamationTriangle,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
-import { VerifyTR } from "./controllerOdontologia";
+import {
+  PrintHojaR,
+  SubmitDataService,
+  SubmitDataServiceLO,
+  VerifyTR,
+} from "./controllerOdontologia";
+import OdontogramaLevantarObservacion from "./OdontogramaLevantarObservacion";
+import Swal from "sweetalert2";
 
 const tabla = "odontograma";
+const tablaLO = "odontograma_lo";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -86,12 +91,70 @@ const initialFormState = {
   filtroClientesConsulta: false,
 };
 
+const initialFormStateLO = {
+  norden: "",
+  fechaExam: today,
+  nombres: "",
+  sexo: "",
+  edad: "",
+  empresa: "",
+  contrata: "",
+
+  d1: "Normal",
+  d2: "Normal",
+  d3: "Normal",
+  d4: "Normal",
+  d5: "Normal",
+  d6: "Normal",
+  d7: "Normal",
+  d8: "Normal",
+  d9: "Normal",
+  d10: "Normal",
+  d11: "Normal",
+  d12: "Normal",
+  d13: "Normal",
+  d14: "Normal",
+  d15: "Normal",
+  d16: "Normal",
+  d17: "Normal",
+  d18: "Normal",
+  d19: "Normal",
+  d20: "Normal",
+  d21: "Normal",
+  d22: "Normal",
+  d23: "Normal",
+  d24: "Normal",
+  d25: "Normal",
+  d26: "Normal",
+  d27: "Normal",
+  d28: "Normal",
+  d29: "Normal",
+  d30: "Normal",
+  d31: "Normal",
+  d32: "Normal",
+
+  ausente: 0,
+  cariada: 0,
+  porExtraer: 0,
+  fracturada: 0,
+  corona: 0,
+  obturacion: 0,
+  puente: 0,
+  pprMetalica: 0,
+  pprAcrilica: 0,
+  pTotal: 0,
+  normal: 32,
+  malEstado: 0,
+
+  observaciones: "",
+};
+
 const Odontologia = ({ token, userlogued, selectedSede }) => {
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [observacionText, setObservacionText] = useState("");
 
   const [form, setForm] = useState(initialFormState);
+  const [formLO, setFormLO] = useState(initialFormStateLO);
 
   const changeTab = (tabIndex) => {
     setActiveTab(tabIndex);
@@ -103,7 +166,6 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setObservacionText("");
   };
 
   const handleChange = (e) => {
@@ -124,13 +186,44 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
   const handleClearnotO = () => {
     setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
+  };
 
-  const handleLevantarObservacion = () => {
-    if (observacionText.trim()) {
-      console.log("Levantando observación:", observacionText);
-      // Aquí puedes agregar la lógica para guardar la observación
-      closeModal();
-    }
+  const handlePrint = () => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Reporte?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden, token, tabla);
+      }
+    });
+  };
+
+  const handleChangeLO = (e) => {
+    const { name, value } = e.target;
+    setFormLO((f) => ({ ...f, [name]: value.toUpperCase() }));
+  };
+  const handleClearLO = () => {
+    setFormLO(initialFormStateLO);
+  };
+  const handleClearnotOLO = () => {
+    setFormLO((prev) => ({ ...initialFormStateLO, norden: prev.norden }));
+  };
+  const handleSaveLO = () => {
+    SubmitDataServiceLO(formLO, token, userlogued, handleClearLO, tablaLO);
   };
 
   return (
@@ -177,14 +270,14 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                   <div className="flex flex-1 mt-auto">
                     <button
                       type="button"
-                      // disabled={form.codOf == null}
-                      // onClick={() => {
-                      //   setShowModal(true);
-                      //   setForm2((prev) => ({ ...prev, norden: form.norden }));
-                      // }}
+                      disabled={form.codOd == null}
+                      onClick={() => {
+                        openModal();
+                        // setForm2((prev) => ({ ...prev, norden: form.norden }));
+                      }}
                       className={`px-3 h-[22px] rounded flex items-center w-full justify-center transition-colors duration-200 my-auto
                                 ${
-                                  true
+                                  form.codOd == null
                                     ? "bg-gray-300 text-gray-500 "
                                     : "bg-green-200 hover:bg-green-300 text-green-800 cursor-pointer"
                                 }`}
@@ -192,7 +285,9 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                       <FontAwesomeIcon
                         icon={faCheckCircle}
                         className={`mr-2 ${
-                          true ? "text-gray-500" : "text-green-800"
+                          form.codOd == null
+                            ? "text-gray-500"
+                            : "text-green-800"
                         }`}
                       />
                       <p className="">LEVANTAR OBSERVACION</p>
@@ -287,6 +382,8 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                 handleChange={handleChange}
                 handleCheckBoxChange={handleCheckBoxChange}
                 handleClear={handleClear}
+                handleSave={handleSave}
+                handlePrint={handlePrint}
               />
             )}
             {activeTab === 2 && (
@@ -303,57 +400,18 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
         {/* Modal Levantar Observación */}
         {isModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <FontAwesomeIcon
-                    icon={faExclamationTriangle}
-                    className="mr-2 text-yellow-500"
-                  />
-                  Levantar Observación
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <FontAwesomeIcon icon={faTimes} size="lg" />
-                </button>
-              </div>
-
-              <div className="mb-4">
-                <label
-                  className="block text-gray-700 font-semibold mb-2"
-                  style={{ fontSize: "13px" }}
-                >
-                  Observación:
-                </label>
-                <textarea
-                  value={observacionText}
-                  onChange={(e) => setObservacionText(e.target.value)}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
-                  rows="4"
-                  placeholder="Ingrese la observación..."
-                  style={{ fontSize: "13px" }}
-                />
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={closeModal}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded transition-colors"
-                  style={{ fontSize: "13px" }}
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleLevantarObservacion}
-                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center transition-colors"
-                  style={{ fontSize: "13px" }}
-                >
-                  <FontAwesomeIcon icon={faCheck} className="mr-2" />
-                  Confirmar
-                </button>
-              </div>
+            <div className="bg-white rounded-lg px-2 w-full max-h-[95%] mx-4 ">
+              <OdontogramaLevantarObservacion
+                form={formLO}
+                setForm={setFormLO}
+                handleChange={handleChangeLO}
+                closeModal={closeModal}
+                token={token}
+                selectedSede={selectedSede}
+                handleClear={handleClearLO}
+                handleClearnotO={handleClearnotOLO}
+                handleSave={handleSaveLO}
+              />
             </div>
           </div>
         )}
