@@ -408,14 +408,15 @@ export default function FichaOftalmologica({
             {/* Enfermedades Oculares */}
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
               <label className="text-right pr-2">Enferm.Oculares :</label>
-              <input
+              <textarea
                 name="enfOculares"
-                value={form.enfOculares || ""}
+                rows={3}
+                value={form.enfOculares || ""}  
                 onChange={handleChange}
-                onKeyUp={(e) => handleNextFocus(e, "presenciaPterigion")}
-                className="border rounded px-2 py-1 col-span-2"
+                // onKeyUp={(e) => handleNextFocus(e, "presenciaPterigion")}
+                className="border rounded px-2 py-1 col-span-3 resize-none"
               />
-              <div className="col-span-2 flex items-center gap-2">
+              <div className="col-span-1 flex items-center gap-2">
                 <input
                   type="checkbox"
                   name="ninguna"
@@ -437,12 +438,13 @@ export default function FichaOftalmologica({
             </div>
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
               <label className="text-right pr-2"></label>
-              <input
+              <textarea
                 name="presenciaPterigion"
+                rows={2}
                 value={form.presenciaPterigion || ""}
-                onKeyUp={(e) => handleNextFocus(e, "agudezaLejos")}
+                // onKeyUp={(e) => handleNextFocus(e, "agudezaLejos")}
                 onChange={handleChange}
-                className="border rounded px-2 py-1 col-span-4"
+                className="border rounded px-2 py-1 col-span-4 resize-none"
               />
               <div className="col-span-5 grid grid-cols-4 text-black">
                 <div></div>
@@ -507,7 +509,7 @@ export default function FichaOftalmologica({
                 rows={2}
                 value={form.agudezaLejos || ""}
                 onChange={handleChange}
-                className="border rounded px-2 py-1 w-full"
+                className="border rounded px-2 py-1 w-full resize-none"
               />
             </div>
             {/* Normal y Agudeza visual de lejos */}

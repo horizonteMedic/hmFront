@@ -298,11 +298,12 @@ export default function ModalLevantarObservacion({
             {/* Enfermedades Oculares */}
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
               <label className="text-right pr-2">Enferm.Oculares :</label>
-              <input
+              <textarea
                 name="enfOculares"
                 value={form.enfOculares || ""}
+                rows={3}
                 disabled
-                className="border rounded px-2 py-1 col-span-2"
+                className="border rounded px-2 py-1 col-span-2 resize-none"
               />
               <div className="col-span-2 flex items-center gap-2">
                 <input
@@ -320,11 +321,12 @@ export default function ModalLevantarObservacion({
             </div>
             <div className="grid grid-cols-5 gap-2 mb-1 items-center">
               <label className="text-right pr-2"></label>
-              <input
+              <textarea
                 name="presenciaPterigion"
                 value={form.presenciaPterigion || ""}
+                rows={2}
                 disabled
-                className="border rounded px-2 py-1 col-span-4"
+                className="border rounded px-2 py-1 col-span-4 resize-none"
               />
               <div className="col-span-5 grid grid-cols-4 text-black">
                 <div></div>
@@ -362,7 +364,7 @@ export default function ModalLevantarObservacion({
           </div>
 
           {/* Botones */}
-          <div className="flex gap-4 justify-center pt-4 mt-auto">
+          <div className="flex gap-4 justify-center mt-auto">
             <Button onClick={handleSave} color="green" icon={faSave}>
               Guardar/Actualizar
             </Button>
