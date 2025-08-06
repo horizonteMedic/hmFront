@@ -7,7 +7,7 @@ export default function OIT(datos = {}) {
     const doc = new jsPDF({ unit: "mm", format: "a4" });
     const margin = 8;
     const pageW = doc.internal.pageSize.getWidth();
-    let y = 44;
+    let y = 26;
 
     // 2) Encabezado (logo, campos, título)
     header_OIT(doc, datos);
@@ -102,19 +102,15 @@ export default function OIT(datos = {}) {
     startY: doc.lastAutoTable.finalY,
     body: [
       [
-        { content: "COMENTARIO SOBRE DEFECTOS TÉCNICOS", styles: { halign: "left" } },
+        { content: "COMENTARIO SOBRE DEFECTOS TÉCNICOS", styles: { halign: "left", cellWidth: 70 } },
         { content: "$F{txt_defectostecnicos}" }
       ],
       [
         { content: "II. ANORMALIDADES PARENQUIMATOSAS (si NO hay anormalidades pase a III. A. Pleurales)", colSpan: 2}
       ]
     ],
-    columnStyles: {
-      0: { cellWidth: 80 },
-      1: { cellWidth: 'auto' }
-    },
     theme: "grid",
-    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 10 },
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0]},
     margin: { left: 10, right: 10 }
   });
 
@@ -199,9 +195,9 @@ export default function OIT(datos = {}) {
     startY: doc.lastAutoTable.finalY,
     body: [
       [
-        { content: "SITIO (Marque las casillas adecuadas)", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
-        { content: "CALCIFICACION (Marque)", rowSpan: 4, styles: { halign: 'center', valign: 'middle' }},
-        { content: "EXTENSIón (Pared torácica combinada para placas de perfil y de frente)", colSpan: 2},
+        { content: "SITIO (Marque las casillas adecuadas)", rowSpan: 4, styles: { halign: 'center', valign: 'middle', cellWidth: 40 } },
+        { content: "CALCIFICACION (Marque)", rowSpan: 4, styles: { halign: 'center', valign: 'middle', cellWidth: 40  }},
+        { content: "EXTENSIón (Pared torácica combinada\n para placas de perfil y de frente)", colSpan: 2},
         { content: "ANCHO (opcional) (Ancho mínimo exigido 3mm)", colSpan: 2}
       ],
       [
@@ -229,6 +225,216 @@ export default function OIT(datos = {}) {
     margin: { left: 10, right: 10 }
   });
 
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY,
+    body: [
+      [
+        { content: "Pared Torácica de perfil", rowSpan: 2, styles: {cellWidth: 20}},
+        { content: "O", styles: {halign: 'center', valign: 'middle'}},
+        { content: "D", styles: {halign: 'center', valign: 'middle'}},
+        { content: "I", styles: {halign: 'center', valign: 'middle'}},
+        { content: "O", styles: {halign: 'center', valign: 'middle'}},
+        { content: "D", styles: {halign: 'center', valign: 'middle'}},
+        { content: "I", styles: {halign: 'center', valign: 'middle'}},
+        { content: "", rowSpan: 2},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "", colSpan: 1, styles: { lineWidth: 0, cellWidth: 0 } },
+        { content: "$F"},
+        { content: "$F"},
+        { content: "", colSpan: 1, styles: { lineWidth: 0 } },
+        { content: "", rowSpan: 2},
+        { content: "$F", colSpan: 3, styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", colSpan: 3, styles: {halign: 'center', valign: 'middle'}}
+      ],
+      [
+        { content: ""},
+        { content: ""},
+        { content: ""},
+        { content: ""},
+        { content: ""},
+        { content: ""},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+        { content: "$F"},
+      ],
+      [
+        { content: "De Frente"},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: ""},
+        { content: "", colSpan: 14, styles: { lineWidth: 0}},
+      ],
+      [
+        { content: "Diafragma"},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: ""},
+        { content: "", colSpan: 14, styles: { lineWidth: 0}},
+      ],
+      [
+        { content: "Otro (S) Sitio (S)"},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: ""},
+        { content: "", colSpan: 14, styles: { lineWidth: 0}},
+      ],
+      [
+        { content: "Obliteración del Ángulo Castofrénico", colSpan:4},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: ""},
+        { content: "", colSpan: 14, styles: { lineWidth: 0}},
+      ],
+      [
+        { content: "               3.2 ENGROSAMIENTO DIFUSO DE LA PLEURA (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 21}
+      ]
+    ],
+    theme: "grid",
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    margin: { left: 10, right: 10 }
+  });
+
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY,
+    body: [
+      [
+        { content: "Pared Torácica", colSpan: 4, styles: {halign: 'center', valign: 'middle'}},
+        { content: "Calcificación", colSpan: 3, styles: {halign: 'center', valign: 'middle'}},
+        { content: "", styles: {lineWidth: 0}},
+        { content: "Extensión", colSpan: 6, styles: {halign: 'center', valign: 'middle'}},
+        { content: "Ancho", colSpan: 6, styles: {halign: 'center', valign: 'middle'}},
+      ],
+      [
+        { content: "De Perfil", styles: {cellWidth: 15}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "", styles: {lineWidth: 0}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "", styles: {lineWidth: 0}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "", styles: {lineWidth: 0}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}, colSpan: 3},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}, colSpan: 3},
+      ],
+      [
+        { content: "", },
+        { content: "", colSpan: 6},
+        { content: "", styles: {lineWidth: 0}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}}
+      ],
+      [
+        { content: "De Frente", styles: {cellWidth: 15}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "", styles: {lineWidth: 0}, colSpan:13},
+      ],
+      [
+        { content: "IV SIMBOLOS *", colSpan: 16, styles: {valign: 'middle'}},
+        { content: "SI",styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "NO", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}}
+      ]
+    ],
+    theme: "grid",
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    margin: { left: 10, right: 10 }
+  });
+
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY,
+    body: [
+      [
+        { content: "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)", colSpan: 15, styles: {valign: 'middle'}},
+      ],
+      [
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}, rowSpan: 2},
+      ],
+      [
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+        { content: "$F", styles: {halign: 'center', valign: 'middle'}},
+      ],
+      [
+        { content: "Comentarios:", colSpan: 15, styles: { minCellHeight: 15}}
+      ],
+      [
+        { content: "Firma y Sello de Médico", colSpan: 15}
+      ]
+    ],
+    theme: "grid",
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    margin: { left: 10, right: 10 }
+  });
 
 
     const blob = doc.output("blob");

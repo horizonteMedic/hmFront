@@ -8,14 +8,14 @@
 const header_OIT = (doc, datos = {}) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 12;
+  let y = 0;
 
   // Logo izquierda
   const logoW = 37,
     logoH = 15; // Más pequeño y ancho
   const logoY = y + 10; // bajar un poco el logo
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
+    doc.addImage("./img/logo-color.png", "PNG", margin - 6, logoY, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "bold")
