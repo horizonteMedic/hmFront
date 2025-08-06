@@ -988,6 +988,7 @@ const TabComponent = () => {
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}
+                userDatos={userlogued}
               />
             </div>
           )}

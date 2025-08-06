@@ -1,5 +1,6 @@
 import { getFetch } from "../../../getFetch/getFetch";
 import Swal from "sweetalert2";
+import { SubmitOITModel } from "./model";
 
 const Loading = (text) => {
     Swal.fire({
@@ -77,4 +78,52 @@ export const GetInfoPacLaboratorioFil = (nro,tabla,set,token) => {
     .finally(() => {
       Swal.close()
     })
+}
+
+export const SubmitOIT = async (form,token,user,limpiar,tabla) => {
+    if (!form.norden) {
+        await Swal.fire('Error', 'Datos Incompletos','error')
+        return
+    }
+    Loading('Registrando Datos')
+    SubmitOITModel(form,user,token)
+    .then((res) => {
+        console.log(res)
+        if (res.id === 1 || res.id === 0) {
+        Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+        }).then((result) => {
+            limpiar()
+            if (result.isConfirmed) {
+                PrintHojaR(form.norden,token,tabla)
+            }
+        })
+        } else {
+            Swal.fire('Error','Ocurrio un error al Registrar','error')
+        }
+    })
+}
+
+export const PrintHojaR = (nro,token,tabla) => {
+  Loading('Cargando Formato a Imprimir')
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`,token)
+  .then(async (res) => {
+    if (res.norden) {
+      console.log(res)
+      const nombre = res.nameJasper;
+      console.log(nombre)
+      const jasperModules = import.meta.glob('../../../../../jaspers/HistoriaOcupacional/*.jsx');
+      const modulo = await jasperModules[`../../../../../jaspers/HistoriaOcupacional/${nombre}.jsx`]();
+      // Ejecuta la función exportada por default con los datos
+      if (typeof modulo.default === 'function') {
+        modulo.default(res);
+      } else {
+        console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+      }
+      Swal.close()
+    } else {
+      Swal.close()
+    }
+  })
 }

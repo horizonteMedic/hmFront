@@ -178,10 +178,54 @@ export default function OIT(datos = {}) {
         { content: "$F"},
         { content: "$F"},
         { content: "$F"},
+      ],
+      [
+        { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9},
+        { content: "SI"},
+        { content: ""},
+        { content: "NO"},
+        { content: ""}
+      ],
+      [
+        { content: "               3.1 PLACAS PLEURALES (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 13}
       ]
     ],
     theme: "grid",
-    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 10 },
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    margin: { left: 10, right: 10 }
+  });
+
+  autoTable(doc, {
+    startY: doc.lastAutoTable.finalY,
+    body: [
+      [
+        { content: "SITIO (Marque las casillas adecuadas)", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
+        { content: "CALCIFICACION (Marque)", rowSpan: 4, styles: { halign: 'center', valign: 'middle' }},
+        { content: "EXTENSIón (Pared torácica combinada para placas de perfil y de frente)", colSpan: 2},
+        { content: "ANCHO (opcional) (Ancho mínimo exigido 3mm)", colSpan: 2}
+      ],
+      [
+        { content: "$F"},
+        { content: "< 1/4 de la pared lateral de tórax"},
+        { content: "$F"},
+        { content: "De 3 a 5 mm"}
+      ],
+      [
+        { content: "$F"},
+        { content: "Entre 1/4 y 1/2 de la pared lateral de tórax"},
+        { content: "$F"},
+        { content: "De 5 a 10 mm"}
+      ],
+      [
+        { content: "$F"},
+        { content: "> 1/2 de la pared lateral de tórax"},
+        { content: "$F"},
+        { content: "Mayor a 10 mm"}
+      ]
+      
+    ],
+    theme: "grid",
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
     margin: { left: 10, right: 10 }
   });
 

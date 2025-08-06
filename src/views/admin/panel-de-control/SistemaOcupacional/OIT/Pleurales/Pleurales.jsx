@@ -150,18 +150,23 @@ const Pleurales = ({form,setForm}) => {
                             {/* Grupo 1 */}
                             <div className="flex flex-col items-center gap-1">
                                 <div className="flex gap-2 ">
-                                {["O", "D"].map((letter, idx) => (
+                                {[{label:"O", code: "chk2_20"}, 
+                                {label:"D", code: "chk2_22"}]
+                                .map((item, idx) => (
                                     <label key={idx} className="flex flex-row items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-lg ml-1 font-normal">{letter}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-lg ml-1 font-normal">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
                                 <div className="flex gap-2">
-                                {["1", "2", "3"].map((label, idx) => (
+                                {[{label:"1", code: "chk2_19"}
+                                , {label:"2", code: "chk2_21"}
+                                , {label:"3", code: "chk2_23"}]
+                                .map((item, idx) => (
                                     <label key={idx} className="flex items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-lg ml-1 font-normal">{label}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-lg ml-1 font-normal">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
@@ -170,18 +175,23 @@ const Pleurales = ({form,setForm}) => {
                             {/* Grupo 2 */}
                             <div className="flex flex-col items-center gap-1">
                                 <div className="flex gap-2">
-                                {["O", "I"].map((letter, idx) => (
+                                {[{label:"O", code: "chk2_25"}
+                                , {label:"I", code: "chk2_27"}]
+                                .map((item, idx) => (
                                     <label key={idx} className="flex flex-row items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-lg ml-1 font-normal">{letter}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-lg ml-1 font-normal">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
                                 <div className="flex gap-2">
-                                {["1", "2", "3"].map((label, idx) => (
+                                {[{label:"1", code: "chk2_24"}
+                                , {label:"2", code: "chk2_26"}
+                                , {label:"3", code: "chk2_28"}]
+                                .map((item, idx) => (
                                     <label key={idx} className="flex flex-col items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-xs">{label}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-xs">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
@@ -190,18 +200,21 @@ const Pleurales = ({form,setForm}) => {
                             {/* Grupo 3 */}
                             <div className="flex flex-col items-center gap-1">
                                 <div className="flex gap-2">
-                                {["D"].map((letter, idx) => (
+                                {[{label:"D", code: "chk2_30"}].map((item, idx) => (
                                     <label key={idx} className="flex flex-row items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-lg ml-1 font-normal">{letter}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-lg ml-1 font-normal">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
                                 <div className="flex gap-2">
-                                {["A", "B", "C"].map((label, idx) => (
+                                {[{label:"A", code: "chk2_29"}
+                                , {label:"B", code: "chk2_31"}
+                                , {label:"C", code: "chk2_32"}]
+                                .map((item, idx) => (
                                     <label key={idx} className="flex flex-col items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-xs">{label}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-xs">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
@@ -210,18 +223,20 @@ const Pleurales = ({form,setForm}) => {
                             {/* Grupo 4 */}
                             <div className="flex flex-col items-center gap-1">
                                 <div className="flex gap-2">
-                                {["I"].map((letter, idx) => (
+                                {[{label:"I", code: "chk2_34"}].map((item, idx) => (
                                     <label key={idx} className="flex flex-row items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-lg ml-1 font-normal">{letter}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked} />
+                                    <span className="text-lg ml-1 font-normal">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
                                 <div className="flex gap-2">
-                                {["A", "B", "C"].map((label, idx) => (
+                                {[{label:"A", code: "chk2_33"}
+                                , {label:"B", code: "chk2_35"}
+                                , {label:"C", code: "chk2_36"}].map((item, idx) => (
                                     <label key={idx} className="flex flex-col items-center w-[25px]">
-                                    <input type="checkbox" />
-                                    <span className="text-xs">{label}</span>
+                                    <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                    <span className="text-xs">{item.label}</span>
                                     </label>
                                 ))}
                                 </div>
