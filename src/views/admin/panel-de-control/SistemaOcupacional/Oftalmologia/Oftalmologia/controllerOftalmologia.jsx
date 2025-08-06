@@ -167,7 +167,7 @@ export const GetInfoDataOftalmoConObservaciones = (nro, set, token) => {
       console.log(res);
       set((prev) => ({
         ...prev,
-        diagnostico: (res.eoculares ?? "") + "/n" + (res.eoculares1 ?? ""),
+        diagnostico: (res.eoculares ?? "") + "\n" + (res.eoculares1 ?? ""),
         vc_sinc_od: res.vcercaSOd ?? "",
         vc_sinc_oi: res.vcercaSOi ?? "",
         vc_conc_od: res.vcercaCOd ?? "",

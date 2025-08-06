@@ -1,152 +1,440 @@
 import jsPDF from "jspdf";
 
+const labelsToImgs = {
+  Ausente: "imgAusente",
+  "Cariada por opturar": "imgPorOturar",
+  "Por extraer": "imgExtraer",
+  Fracturada: "imgFracturada",
+  Corona: "imgCorona",
+  "Obturacion Efectuada": "imgObturacionEfectuada",
+  Puente: "imgPuente",
+  "P.P.R Metalica": "imgPPRMetalica",
+  "P.P.R Acrilica": "imgPPRAcrilica",
+  "P.Total": "imgPTotal",
+};
+
+// Invertimos el objeto automáticamente
+const imgsToLabels = Object.fromEntries(
+  Object.entries(labelsToImgs).map(([label, img]) => [img, label])
+);
+
+const interpretarUrlParaLeer = (url) => {
+  if (url == null) return "Normal";
+  const match = url.match(/([^/\\]+)(?=\.png$)/);
+  const nombreArchivo = match?.[1];
+  return nombreArchivo ? imgsToLabels[nombreArchivo] ?? "" : "";
+};
+
 export default function Odontograma_Digitalizado(data = {}) {
-  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
+
+  // Datos de prueba basados en la imagen
+  const datosPrueba = {
+    norden: "96639",
+    sede: "trujillo-pierola",
+    nombres: "hady katherine castillo plasencia",
+    empresa:
+      "servicios industriales mmj empresa individual de responsabilidad limitada- servicios industriales mm",
+    contratista:
+      "asociacion de transportistas mineria y construccion huamachuco - asmychuamachuco",
+    sexo: "femenino",
+    edad: "39",
+    fecha: "lunes 04 noviembre 2024",
+    // Dental status counts - Datos de prueba con diferentes condiciones
+    piezasMalEstado: "5",
+    pprMetalicas: "2",
+    pprAcrilicas: "1",
+    ausentes: "3",
+    puentes: "2",
+    coronas: "4",
+    porExtraer: "1",
+    pTotales: "1",
+    normales: "18",
+    obturacionesEfectuadas: "6",
+    cariadasPorOturar: "2",
+    fracturadas: "1",
+    // Observaciones y lugar fecha
+    observaciones:
+      "paciente presenta buena higiene bucal. se recomienda control cada 6 meses. se observa ligera acumulación de sarro en molares inferiores. necesita limpieza profesional.",
+    lugarFecha: "trujillo, 04 de noviembre de 2024",
+  };
+
+  // Función para obtener string de datos
+  const obtenerString = (nombre) => {
+    return data[nombre] != null ? `${data[nombre]}` : "";
+  };
+
+  // Función para convertir a mayúsculas los campos específicos
+  const obtenerStringMayus = (nombre) => {
+    const valor = data[nombre] != null ? `${data[nombre]}` : "";
+    return valor.toUpperCase();
+  };
+
+  // Datos reales
+  const datosReales = {
+    norden: obtenerString("norden"),
+    sede: obtenerStringMayus("sede"),
+    nombres: obtenerStringMayus("nombres"),
+    empresa: obtenerStringMayus("empresa"),
+    contratista: obtenerStringMayus("contrata"),
+    sexo: obtenerStringMayus("sexo"),
+    edad: obtenerString("edad"),
+    fecha: obtenerStringMayus("fechaOd"),
+    piezasMalEstado: obtenerString("txtPiezasMalEstado"),
+    pprMetalicas: obtenerString("txtPprMetalicas"),
+    pprAcrilicas: obtenerString("txtPprAcrilicas"),
+    ausentes: obtenerString("txtAusentes"),
+    puentes: obtenerString("txtPuentes"),
+    coronas: obtenerString("txtCoronas"),
+    porExtraer: obtenerString("txtPorExtraer"),
+    pTotales: obtenerString("txtPTotal"),
+    normales: obtenerString("txtNormales"),
+    obturacionesEfectuadas: obtenerString("txtObturacionesEfectuadas"),
+    cariadasPorOturar: obtenerString("txtCariadasOturar"),
+    fracturadas: obtenerString("txtFracturada"),
+    observaciones: obtenerStringMayus("txtObservaciones"),
+    lugarFecha:
+      obtenerStringMayus("lugar") + " - " + obtenerStringMayus("fechaOd"),
+
+    d1: interpretarUrlParaLeer(data.lbl18),
+    d2: interpretarUrlParaLeer(data.lbl17),
+    d3: interpretarUrlParaLeer(data.lbl16),
+    d4: interpretarUrlParaLeer(data.lbl15),
+    d5: interpretarUrlParaLeer(data.lbl14),
+    d6: interpretarUrlParaLeer(data.lbl13),
+    d7: interpretarUrlParaLeer(data.lbl12),
+    d8: interpretarUrlParaLeer(data.lbl11),
+
+    d9: interpretarUrlParaLeer(data.lbl21),
+    d10: interpretarUrlParaLeer(data.lbl22),
+    d11: interpretarUrlParaLeer(data.lbl23),
+    d12: interpretarUrlParaLeer(data.lbl24),
+    d13: interpretarUrlParaLeer(data.lbl25),
+    d14: interpretarUrlParaLeer(data.lbl26),
+    d15: interpretarUrlParaLeer(data.lbl27),
+    d16: interpretarUrlParaLeer(data.lbl28),
+
+    d17: interpretarUrlParaLeer(data.lbl48),
+    d18: interpretarUrlParaLeer(data.lbl47),
+    d19: interpretarUrlParaLeer(data.lbl46),
+    d20: interpretarUrlParaLeer(data.lbl45),
+    d21: interpretarUrlParaLeer(data.lbl44),
+    d22: interpretarUrlParaLeer(data.lbl43),
+    d23: interpretarUrlParaLeer(data.lbl42),
+    d24: interpretarUrlParaLeer(data.lbl41),
+
+    d25: interpretarUrlParaLeer(data.lbl31),
+    d26: interpretarUrlParaLeer(data.lbl32),
+    d27: interpretarUrlParaLeer(data.lbl33),
+    d28: interpretarUrlParaLeer(data.lbl34),
+    d29: interpretarUrlParaLeer(data.lbl35),
+    d30: interpretarUrlParaLeer(data.lbl36),
+    d31: interpretarUrlParaLeer(data.lbl37),
+    d32: interpretarUrlParaLeer(data.lbl38),
+  };
+
+  // Usar datos reales o datos de prueba
+  const datosFinales =
+    data && Object.keys(data).length > 0
+      ? datosReales
+      : {
+          norden: datosPrueba.norden,
+          sede: datosPrueba.sede.toUpperCase(),
+          nombres: datosPrueba.nombres.toUpperCase(),
+          empresa: datosPrueba.empresa.toUpperCase(),
+          contratista: datosPrueba.contratista.toUpperCase(),
+          sexo: datosPrueba.sexo.toUpperCase(),
+          edad: datosPrueba.edad,
+          fecha: datosPrueba.fecha.toUpperCase(),
+          piezasMalEstado: datosPrueba.piezasMalEstado,
+          pprMetalicas: datosPrueba.pprMetalicas,
+          pprAcrilicas: datosPrueba.pprAcrilicas,
+          ausentes: datosPrueba.ausentes,
+          puentes: datosPrueba.puentes,
+          coronas: datosPrueba.coronas,
+          porExtraer: datosPrueba.porExtraer,
+          pTotales: datosPrueba.pTotales,
+          normales: datosPrueba.normales,
+          obturacionesEfectuadas: datosPrueba.obturacionesEfectuadas,
+          cariadasPorOturar: datosPrueba.cariadasPorOturar,
+          fracturadas: datosPrueba.fracturadas,
+          observaciones: datosPrueba.observaciones.toUpperCase(),
+          lugarFecha: datosPrueba.lugarFecha.toUpperCase(),
+        };
+
+  // === 1) Imagen de fondo para el odontograma ===
+  const fondoImg = "/img/Odontograma_Digitalizado.png";
   const pageH = doc.internal.pageSize.getHeight();
 
-  // 1) Header básico
-  const y = 12;
-  
-  // Logo a la izquierda
-  const logoW = 38, logoH = 13;
-  const logoY = y - 1;
+  // Usar todo el ancho del documento horizontal
+  const imgWidth = pageW; // Todo el ancho disponible
+  const imgHeight = pageH; // Todo el alto disponible
+
+  // Empezar desde el borde superior izquierdo
+  const xOffset = 0;
+  const yOffset = 0;
+
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
-  } catch {
-    doc
-      .setFont("helvetica", "normal")
-      .setFontSize(9)
-      .text("Policlinico Horizonte Medic", margin, logoY + 8);
+    doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
+  } catch (e) {
+    doc.text("Imagen de odontograma no disponible", margin, yOffset + 10);
   }
 
-  // Título centrado
-  const titulo = "ODONTOGRAMA";
-  const tituloY = y + 12;
-  doc.setFont("helvetica", "bold").setFontSize(16);
-  doc.text(titulo, pageW / 2, tituloY, { align: "center" });
-
-  // Sede y N° Ficha a la derecha
-  const sedeValue = `${data.sede || ''}`;
-  const fichaValue = `${data.norden || ''}`;
-  const sedeX = pageW - margin - 20;
-  const sedeY = y + 6;
-  const fichaY = sedeY + 6;
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Sede:", sedeX - 30, sedeY, { align: "left" });
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(sedeValue, sedeX, sedeY, { align: "right" });
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("N° Ficha:", sedeX - 40, fichaY, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text(fichaValue, sedeX, fichaY, { align: "right" });
-
-  // 2) Datos del paciente
+  // === 2) Datos posicionados individualmente ===
   doc.setFont("helvetica", "normal").setFontSize(10);
-  const datosY = y + 25;
 
-  // Nombre
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("Paciente:", margin + 10, datosY);
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(String(data.nombres || ""), margin + 30, datosY, { maxWidth: 80 });
 
-  // DNI
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("DNI:", margin + 120, datosY);
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(String(data.dni || ""), margin + 135, datosY);
 
-  // Edad
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("Edad:", margin + 170, datosY);
-  doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text(String(data.edad || ""), margin + 185, datosY);
+  // === POSICIONES DE LOS DIENTES EN EL ODONTOGRAMA ===
+  // Definir las posiciones de los dientes según la disposición del odontograma
+  const posicionesDientes = {
+     // Dientes superiores (1-16) - Fila superior
+    1: { x: margin + 7, y: margin + 96, width: 8, height: 8 },
+    2: { x: margin + 8, y: margin + 84, width: 8, height: 8 },
+    3: { x: margin + 10, y: margin + 72, width: 8, height: 8 },
+    4: { x: margin + 14, y: margin + 61, width: 7, height: 7 },
+    5: { x: margin + 17, y: margin + 52, width: 7, height: 7 },
+    6: { x: margin + 23, y: margin + 44, width: 6.5, height: 6.5 },
+    7: { x: margin + 30, y: margin + 37.5, width: 6.5, height: 6.5 },
+    8: { x: margin + 41.5, y: margin + 35, width: 6.5, height: 6.5 },
 
-  // 3) Odontograma
-  const odontogramaY = datosY + 15;
-  
-  // Dibujar cuadrícula del odontograma
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.2);
-  
-  // Dientes superiores (1-16)
-  const dienteSize = 8;
-  const startX = margin + 20;
-  const startY = odontogramaY;
-  
-  // Fila superior (dientes 1-8)
-  for (let i = 0; i < 8; i++) {
-    const x = startX + (i * dienteSize);
-    doc.rect(x, startY, dienteSize, dienteSize);
-    doc.setFont("helvetica", "bold").setFontSize(6);
-    doc.text((i + 1).toString(), x + dienteSize/2, startY + dienteSize/2, { align: "center", baseline: "middle" });
-  }
-  
-  // Fila superior (dientes 9-16)
-  for (let i = 0; i < 8; i++) {
-    const x = startX + ((i + 8) * dienteSize);
-    doc.rect(x, startY, dienteSize, dienteSize);
-    doc.setFont("helvetica", "bold").setFontSize(6);
-    doc.text((i + 9).toString(), x + dienteSize/2, startY + dienteSize/2, { align: "center", baseline: "middle" });
-  }
-  
-  // Dientes inferiores (17-32)
-  const startYInferior = startY + dienteSize + 10;
-  
-  // Fila inferior (dientes 17-24)
-  for (let i = 0; i < 8; i++) {
-    const x = startX + (i * dienteSize);
-    doc.rect(x, startYInferior, dienteSize, dienteSize);
-    doc.setFont("helvetica", "bold").setFontSize(6);
-    doc.text((i + 17).toString(), x + dienteSize/2, startYInferior + dienteSize/2, { align: "center", baseline: "middle" });
-  }
-  
-  // Fila inferior (dientes 25-32)
-  for (let i = 0; i < 8; i++) {
-    const x = startX + ((i + 8) * dienteSize);
-    doc.rect(x, startYInferior, dienteSize, dienteSize);
-    doc.setFont("helvetica", "bold").setFontSize(6);
-    doc.text((i + 25).toString(), x + dienteSize/2, startYInferior + dienteSize/2, { align: "center", baseline: "middle" });
-  }
+    // Dientes superiores (9-16) - Espejo de 1-8
+    9: { x: margin + 53, y: margin + 35, width: 6.5, height: 6.5 },
+    10: { x: margin + 63.5, y: margin + 37.5, width: 6.5, height: 6.5 },
+    11: { x: margin + 72, y: margin + 44, width: 6.5, height: 6.5 },
+    12: { x: margin + 75, y: margin + 52, width: 7, height: 7 },
+    13: { x: margin + 79, y: margin + 61, width: 7, height: 7 },
+    14: { x: margin + 82, y: margin + 72, width: 8, height: 8 },
+    15: { x: margin + 84, y: margin + 84, width: 8, height: 8 },
+    16: { x: margin + 85, y: margin + 96, width: 8, height: 8 },
 
-  // 4) Leyenda
-  const leyendaY = startYInferior + dienteSize + 15;
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("Leyenda:", margin + 10, leyendaY);
-  
+    // Dientes inferiores (17-32) - Espejo hacia abajo de 1-16
+    17: { x: margin + 8, y: margin + 122, width: 8, height: 8 },
+    18: { x: margin + 9, y: margin + 134, width: 8, height: 8 },
+    19: { x: margin + 11, y: margin + 145, width: 8, height: 8 },
+    20: { x: margin + 15, y: margin + 156, width: 7, height: 7 },
+    21: { x: margin + 17, y: margin + 164, width: 7, height: 7 },
+    22: { x: margin + 23, y: margin + 172, width: 6.5, height: 6.5 },
+    23: { x: margin + 30, y: margin + 178.5, width: 6.5, height: 6.5 },
+    24: { x: margin + 41.5, y: margin + 181, width: 6.5, height: 6.5 },
+    
+    25: { x: margin + 53, y: margin + 183, width: 6.5, height: 6.5 },
+    26: { x: margin + 63.5, y: margin + 180, width: 6.5, height: 6.5 },
+    27: { x: margin + 72, y: margin + 173, width: 6.5, height: 6.5 },
+    28: { x: margin + 75, y: margin + 164, width: 7, height: 7 },
+    29: { x: margin + 79, y: margin + 155, width: 7, height: 7 },
+    30: { x: margin + 82, y: margin + 144, width: 8, height: 8 },
+    31: { x: margin + 84, y: margin + 132, width: 8, height: 8 },
+    32: { x: margin + 85, y: margin + 120, width: 8, height: 8 },
+  };
+
+  // === TOP RIGHT BLOCK - N° Ficha y Sede ===
+  // N° Ficha - Coordenadas individuales
+  const xNorden = pageW - margin - 25; // AJUSTAR POSICIÓN X DE N° FICHA AQUÍ
+  const yNorden = margin + 35; // AJUSTAR POSICIÓN Y DE N° FICHA AQUÍ
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(datosFinales.norden, xNorden, yNorden, { align: "right" });
+
+  // Subrayado para el N° Ficha
+  const textWidth = doc.getTextWidth(datosFinales.norden);
+  const underlineY = yNorden + 1; // Posición Y del subrayado
+  const underlineX = xNorden - textWidth; // Posición X del subrayado (alineado a la derecha)
+  doc.setDrawColor(0, 0, 0); // Color negro
+  doc.setLineWidth(0.5); // Grosor de la línea
+  doc.line(underlineX, underlineY, xNorden, underlineY);
+
+  // Sede - Coordenadas individuales
+  const xSede = pageW - margin + 0.5; // AJUSTAR POSICIÓN X DE SEDE AQUÍ
+  const ySede = margin + 41.5; // AJUSTAR POSICIÓN Y DE SEDE AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const leyendas = [
-    "N - Normal",
-    "C - Caries",
-    "O - Obturación",
-    "E - Extraído",
-    "P - Prótesis"
-  ];
-  
-  leyendas.forEach((leyenda, index) => {
-    const x = margin + 10 + (index * 35);
-    doc.text(leyenda, x, leyendaY + 8);
+  doc.text(datosFinales.sede, xSede, ySede, { align: "right" });
+
+  // === PATIENT INFORMATION BLOCK ===
+  // Nombres - Coordenadas individuales
+  const xNombres = pageW - margin - 158; // AJUSTAR POSICIÓN X DE NOMBRES AQUÍ (más a la izquierda)
+  const yNombres = margin + 47.5; // AJUSTAR POSICIÓN Y DE NOMBRES AQUÍ
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.nombres, xNombres, yNombres, { maxWidth: 85 });
+
+  // Sexo - Coordenadas individuales
+  const xSexo = pageW - margin - 61; // AJUSTAR POSICIÓN X DE SEXO AQUÍ
+  const ySexo = margin + 47; // AJUSTAR POSICIÓN Y DE SEXO AQUÍ
+  doc.text(datosFinales.sexo, xSexo, ySexo);
+
+  // Empresa - Coordenadas individuales
+  const xEmpresa = pageW - margin - 158; // AJUSTAR POSICIÓN X DE EMPRESA AQUÍ (más a la izquierda)
+  const yEmpresa = margin + 53; // AJUSTAR POSICIÓN Y DE EMPRESA AQUÍ
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.empresa, xEmpresa, yEmpresa, { maxWidth: 82 });
+
+  // Edad - Coordenadas individuales
+  const xEdad = pageW - margin - 61; // AJUSTAR POSICIÓN X DE EDAD AQUÍ
+  const yEdad = margin + 53; // AJUSTAR POSICIÓN Y DE EDAD AQUÍ
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.text(datosFinales.edad, xEdad, yEdad);
+
+  // Contratista - Coordenadas individuales
+  const xContratista = pageW - margin - 155; // AJUSTAR POSICIÓN X DE CONTRATISTA AQUÍ (más a la izquierda)
+  const yContratista = margin + 63.5; // AJUSTAR POSICIÓN Y DE CONTRATISTA AQUÍ
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.contratista, xContratista, yContratista, {
+    maxWidth: 82,
   });
 
-  // 5) Observaciones
-  const observacionesY = leyendaY + 20;
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("Observaciones:", margin + 10, observacionesY);
-  
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(String(data.observaciones || ""), margin + 10, observacionesY + 8, { maxWidth: pageW - 2 * margin - 20 });
+  // Fecha - Coordenadas individuales
+  const xFecha = pageW - margin - 60; // AJUSTAR POSICIÓN X DE FECHA AQUÍ
+  const yFecha = margin + 61; // AJUSTAR POSICIÓN Y DE FECHA AQUÍ
+  doc.text(datosFinales.fecha, xFecha, yFecha);
 
-  // 6) Fecha
-  const fechaY = pageH - 20;
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  const fecha = new Date().toLocaleDateString('es-ES');
-  doc.text(`Fecha: ${fecha}`, pageW - margin - 30, fechaY);
+  // === SUMMARY OF DENTAL STATUS ===
+  doc.setFont("helvetica", "normal").setFontSize(10);
 
-  // Generar blob y abrir en iframe para imprimir automáticamente
+  // Piezas en mal estado - Coordenadas individuales
+  const xPiezasMalEstado = pageW - margin - 131; // AJUSTAR POSICIÓN X DE PIEZAS MAL ESTADO AQUÍ
+  const yPiezasMalEstado = margin + 125; // AJUSTAR POSICIÓN Y DE PIEZAS MAL ESTADO AQUÍ
+  doc.text(datosFinales.piezasMalEstado, xPiezasMalEstado, yPiezasMalEstado, {
+    align: "right",
+  });
+
+  // P.P.R. Metalicas - Coordenadas individuales
+  const xPprMetalicas = pageW - margin - 131; // AJUSTAR POSICIÓN X DE PPR METALICAS AQUÍ
+  const yPprMetalicas = margin + 130.5; // AJUSTAR POSICIÓN Y DE PPR METALICAS AQUÍ
+  doc.text(datosFinales.pprMetalicas, xPprMetalicas, yPprMetalicas, {
+    align: "right",
+  });
+
+  // P.P.R. Acrilicas - Coordenadas individuales
+  const xPprAcrilicas = pageW - margin - 131; // AJUSTAR POSICIÓN X DE PPR ACRILICAS AQUÍ
+  const yPprAcrilicas = margin + 136; // AJUSTAR POSICIÓN Y DE PPR ACRILICAS AQUÍ
+  doc.text(datosFinales.pprAcrilicas, xPprAcrilicas, yPprAcrilicas, {
+    align: "right",
+  });
+
+  // Ausentes - Coordenadas individuales
+  const xAusentes = pageW - margin - 101; // AJUSTAR POSICIÓN X DE AUSENTES AQUÍ
+  const yAusentes = margin + 125; // AJUSTAR POSICIÓN Y DE AUSENTES AQUÍ
+  doc.text(datosFinales.ausentes, xAusentes, yAusentes, { align: "right" });
+
+  // Puentes - Coordenadas individuales
+  const xPuentes = pageW - margin - 101; // AJUSTAR POSICIÓN X DE PUENTES AQUÍ
+  const yPuentes = margin + 130.5; // AJUSTAR POSICIÓN Y DE PUENTES AQUÍ
+  doc.text(datosFinales.puentes, xPuentes, yPuentes, { align: "right" });
+
+  // Coronas - Coordenadas individuales
+  const xCoronas = pageW - margin - 101; // AJUSTAR POSICIÓN X DE CORONAS AQUÍ
+  const yCoronas = margin + 136; // AJUSTAR POSICIÓN Y DE CORONAS AQUÍ
+  doc.text(datosFinales.coronas, xCoronas, yCoronas, { align: "right" });
+
+  // Por Extraer - Coordenadas individuales
+  const xPorExtraer = pageW - margin - 70; // AJUSTAR POSICIÓN X DE POR EXTRAER AQUÍ
+  const yPorExtraer = margin + 125; // AJUSTAR POSICIÓN Y DE POR EXTRAER AQUÍ
+  doc.text(datosFinales.porExtraer, xPorExtraer, yPorExtraer, {
+    align: "right",
+  });
+
+  // P. Totales - Coordenadas individuales
+  const xPTotales = pageW - margin - 70; // AJUSTAR POSICIÓN X DE P TOTALES AQUÍ
+  const yPTotales = margin + 130.5; // AJUSTAR POSICIÓN Y DE P TOTALES AQUÍ
+  doc.text(datosFinales.pTotales, xPTotales, yPTotales, { align: "right" });
+
+  // Normales - Coordenadas individuales
+  const xNormales = pageW - margin - 70; // AJUSTAR POSICIÓN X DE NORMALES AQUÍ
+  const yNormales = margin + 136; // AJUSTAR POSICIÓN Y DE NORMALES AQUÍ
+  doc.text(datosFinales.normales, xNormales, yNormales, { align: "right" });
+
+  // Obturaciones Efectuadas - Coordenadas individuales
+  const xObturacionesEfectuadas = pageW - margin - 14; // AJUSTAR POSICIÓN X DE OBTURACIONES EFECTUADAS AQUÍ
+  const yObturacionesEfectuadas = margin + 126; // AJUSTAR POSICIÓN Y DE OBTURACIONES EFECTUADAS AQUÍ
+  doc.text(
+    datosFinales.obturacionesEfectuadas,
+    xObturacionesEfectuadas,
+    yObturacionesEfectuadas,
+    { align: "right" }
+  );
+
+  // Cariadas por Oturar - Coordenadas individuales
+  const xCariadasPorOturar = pageW - margin - 14; // AJUSTAR POSICIÓN X DE CARIADAS POR OTURAR AQUÍ
+  const yCariadasPorOturar = margin + 131; // AJUSTAR POSICIÓN Y DE CARIADAS POR OTURAR AQUÍ
+  doc.text(
+    datosFinales.cariadasPorOturar,
+    xCariadasPorOturar,
+    yCariadasPorOturar,
+    { align: "right" }
+  );
+
+  // Fracturadas - Coordenadas individuales
+  const xFracturadas = pageW - margin - 14; // AJUSTAR POSICIÓN X DE FRACTURADAS AQUÍ
+  const yFracturadas = margin + 136.5; // AJUSTAR POSICIÓN Y DE FRACTURADAS AQUÍ
+  doc.text(datosFinales.fracturadas, xFracturadas, yFracturadas, {
+    align: "right",
+  });
+
+  // === OBSERVACIONES Y LUGAR FECHA ===
+  // Observaciones - Coordenadas individuales
+  const xObservaciones = margin + 148; // AJUSTAR POSICIÓN X DE OBSERVACIONES AQUÍ
+  const yObservaciones = margin + 142; // AJUSTAR POSICIÓN Y DE OBSERVACIONES AQUÍ
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.observaciones, xObservaciones, yObservaciones, {
+    maxWidth: 120,
+  });
+
+  // Lugar y Fecha - Coordenadas individuales
+  const xLugarFecha = margin + 132.5; // AJUSTAR POSICIÓN X DE LUGAR Y FECHA AQUÍ
+  const yLugarFecha = margin + 153.6; // AJUSTAR POSICIÓN Y DE LUGAR Y FECHA AQUÍ
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.lugarFecha, xLugarFecha, yLugarFecha);
+
+  // === 3) COLOCAR ICONOS DENTALES BASADOS EN LOS DATOS INDIVIDUALES ===
+  // Mapeo de tipos de dientes a nombres de archivos de iconos
+  const mapeoTiposIconos = {
+    "Ausente": "ausente",
+    "Cariada por opturar": "cariada",
+    "Por extraer": "por_extraer",
+    "Fracturada": "fracturada",
+    "Corona": "corona",
+    "Obturacion Efectuada": "obturacion",
+    "Puente": "puente",
+    "P.P.R Metalica": "ppr_metalica",
+    "P.P.R Acrilica": "ppr_acrilica",
+    "P.Total": "p_total",
+    "Normal": "normal"
+  };
+
+  // Función para colocar icono en un diente específico
+  const colocarIconoEnDiente = (numeroDiente, tipoDiente) => {
+    if (tipoDiente && tipoDiente !== "Normal" && posicionesDientes[numeroDiente]) {
+      const nombreIcono = mapeoTiposIconos[tipoDiente];
+      if (nombreIcono) {
+        const iconPath = `/src/views/jaspers/Odontologia/iconos_odonto/Icon_${nombreIcono}.png`;
+        const posicion = posicionesDientes[numeroDiente];
+        
+        try {
+          doc.addImage(
+            iconPath,
+            "PNG",
+            posicion.x,
+            posicion.y,
+            posicion.width || 8,
+            posicion.height || 8
+          );
+        } catch (e) {
+          console.log(`Error al cargar icono ${nombreIcono} para diente ${numeroDiente}:`, e);
+        }
+      }
+    }
+  };
+
+  // Colocar iconos para cada diente según sus datos individuales
+  for (let i = 1; i <= 32; i++) {
+    const tipoDiente = datosFinales[`d${i}`];
+    if (tipoDiente) {
+      colocarIconoEnDiente(i, tipoDiente);
+    }
+  }
+
+  // === 4) Generar blob y abrir en iframe para imprimir automáticamente ===
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
@@ -157,4 +445,4 @@ export default function Odontograma_Digitalizado(data = {}) {
     iframe.contentWindow.focus();
     iframe.contentWindow.print();
   };
-} 
+}
