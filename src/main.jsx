@@ -37,11 +37,7 @@ import Odontologia from './views/admin/panel-de-control/SistemaOcupacional/Odont
 import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx';
 
 //SIMULADOR DE jaspers
-<<<<<<< HEAD
 import Ficha from './views/jaspers/OIT/OIT_Digitalizado.jsx'
-=======
-import Ficha from './views/jaspers/MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx'
->>>>>>> 726523929c2cababc531a8e96b11e59d558b6741
 
 const App = () => {
   return (

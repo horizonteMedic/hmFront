@@ -10,8 +10,6 @@ export default function OIT(datos = {}) {
   let y = 26;
 
   // 2) Encabezado (logo, campos, título)
-
-  // 2) Encabezado (logo, campos, título)
   const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
   const isValidUrl = url => url && url !== "Sin registro";
   const loadImg = src =>
@@ -70,34 +68,34 @@ export default function OIT(datos = {}) {
         [
           { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
           { content: "1 BUENA" },
-          { content: `${datos.rbBuena ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "CAUSAS", rowSpan: 7, styles: { halign: 'center', valign: 'middle' } },
           { content: "1 SOBRE EXPOSICIÓN" },
-          { content: `${datos.rbSobreexposicion ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "5 ESCÁPULAS" },
-          { content: `${datos.rbEscapulas ? 'X' : ""}`, styles: { cellWidth: 5, halign: 'center', valign: 'middle' } }
+          { content: "", styles: { cellWidth: 5 } }
         ],
         [
           { content: "2 ACEPTABLE" },
-          { content: `${datos.rbAceptable ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "2 SUBEXPOSICIÓN" },
-          { content: `${datos.rbSubexposicion ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "6 ARTEFACTOS" },
-          { content: `${datos.rbArtefactos ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } }
+          { content: "" }
         ],
         [
           { content: "3 BAJA CALIDAD" },
-          { content: `${datos.rbBajacalidad ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "3 POSICIÓN CENTRADO" },
-          { content: `${datos.rbPosicioncentrado ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "7 OTROS" },
-          { content: `${datos.rbOtros ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } }
+          { content: "" }
         ],
         [
           { content: "4 INACEPTABLE" },
-          { content: `${datos.rbInaceptable ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "4 INSPIRACIÓN" },
-          { content: `${datos.rbInspiracionInsuficiente ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } }
+          { content: "" }
         ],
 
       ],
@@ -132,51 +130,16 @@ export default function OIT(datos = {}) {
       body: [
         [
           { content: "II. ANORMALIDADES PARENQUIMATOSAS (si NO hay anormalidades pase a III. A. Pleurales)", styles: {minCellWidth: 100} },
-          { content: "SI", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.anormalidades_parenquimatosas_si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
-          { content: "NO", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.anormalidades_parenquimatosas_no ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } }
+          { content: "SI" },
+          { content: "" },
+          { content: "NO" },
+          { content: "" }
         ]
       ],
       theme: "grid",
       styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
       margin: { left: 10, right: 10 }
     });
-
-    const validacionesCeldas = [
-      { row: 1, col: 3, key: "chk1" }, // fila 0, columna 1, se evalúa datos.chkA
-      { row: 1, col: 4, key: "chk5" },
-      { row: 1, col: 5, key: "chk9" },
-      { row: 1, col: 11, key: "chko" },
-      //
-      { row: 2, col: 3, key: "chk2" },
-      { row: 2, col: 4, key: "chk6" },
-      { row: 2, col: 5, key: "chk10" },
-      { row: 2, col: 6, key: "chkP1" },
-      { row: 2, col: 7, key: "chkP4" },
-      { row: 2, col: 8, key: "chkS1" },
-      { row: 2, col: 9, key: "chkS4" },
-      { row: 2, col: 11, key: "chka" },
-      //
-      { row: 3, col: 3, key: "chk3" },
-      { row: 3, col: 4, key: "chk7" },
-      { row: 3, col: 5, key: "chk11" },
-      { row: 3, col: 6, key: "chkP2" },
-      { row: 3, col: 7, key: "chkP5" },
-      { row: 3, col: 8, key: "chkS2" },
-      { row: 3, col: 9, key: "chkS5" },
-      { row: 3, col: 11, key: "chkb" },
-      //
-      { row: 4, col: 3, key: "chk4" },
-      { row: 4, col: 4, key: "chk8" },
-      { row: 4, col: 5, key: "chk12" },
-      { row: 4, col: 6, key: "chkP3" },
-      { row: 4, col: 7, key: "chkP6" },
-      { row: 4, col: 8, key: "chkS3" },
-      { row: 4, col: 9, key: "chkS6" },
-      { row: 4, col: 11, key: "chkc" },
-      // Añade más según sea necesario
-    ];
 
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY,
@@ -191,9 +154,9 @@ export default function OIT(datos = {}) {
           { content: "", },
           { content: "DER." },
           { content: "IZQ." },
-          { content: "0/-", styles: { halign: 'center', valign: 'middle' } },
-          { content: "0/0", styles: { halign: 'center', valign: 'middle' } },
-          { content: "0/1", styles: { halign: 'center', valign: 'middle' } },
+          { content: "0/-" },
+          { content: "0/0" },
+          { content: "0/1" },
           { content: "PRIMARIA", colSpan: 2 },
           { content: "SECUNDARIA", colSpan: 2 },
           { content: "", rowSpan: 4 },
@@ -202,8 +165,8 @@ export default function OIT(datos = {}) {
         ],
         [
           { content: "SUPERIOR", styles: { cellWidth: 30 } },
-          { content: `${datos.chk1D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk1I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
+          { content: "" },
           { content: "1/0", styles: { halign: 'center', valign: 'middle' } },
           { content: "1/1", styles: { halign: 'center', valign: 'middle' } },
           { content: "1/2", styles: { halign: 'center', valign: 'middle' } },
@@ -215,8 +178,8 @@ export default function OIT(datos = {}) {
         ],
         [
           { content: "MEDIO" },
-          { content: `${datos.chk2D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk2I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
+          { content: "" },
           { content: "2/1", styles: { halign: 'center', valign: 'middle' } },
           { content: "2/2", styles: { halign: 'center', valign: 'middle' } },
           { content: "2/3", styles: { halign: 'center', valign: 'middle' } },
@@ -228,8 +191,8 @@ export default function OIT(datos = {}) {
         ],
         [
           { content: "INFERIOR" },
-          { content: `${datos.chk3D ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk3I ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
+          { content: "" },
           { content: "3/2", styles: { halign: 'center', valign: 'middle' } },
           { content: "3/3", styles: { halign: 'center', valign: 'middle' } },
           { content: "3/+", styles: { halign: 'center', valign: 'middle' } },
@@ -242,9 +205,9 @@ export default function OIT(datos = {}) {
         [
           { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9 },
           { content: "SI" },
-          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } },
+          { content: "" },
           { content: "NO" },
-          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle' } }
+          { content: "" }
         ],
         [
           { content: "               3.1 PLACAS PLEURALES (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 13 }
@@ -252,40 +215,8 @@ export default function OIT(datos = {}) {
       ],
       theme: "grid",
       styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
-      margin: { left: 10, right: 10 },
-      didDrawCell: function (data) {
-        const { cell, row, column, doc } = data;
-
-        // Buscar si la celda actual tiene una validación
-        const validacion = validacionesCeldas.find(v => v.row === row.index && v.col === column.index);
-
-        if (validacion && datos[validacion.key]) {
-          // Coordenadas para centrar la X
-          const x = cell.x + cell.width / 2;
-          const y = cell.y + cell.height / 2;
-
-          // Dibujar la X azul
-          doc.setTextColor(0, 0, 255);
-          doc.setFontSize(10);
-          doc.text("X", x, y, { align: "center", baseline: "middle" });
-
-          // Restaurar color original
-          doc.setTextColor(0, 0, 0);
-        }
-      }
+      margin: { left: 10, right: 10 }
     });
-
-    const validacionesCeldasPleurales = [
-      { row: 1, col: 2, key: "chkE1" }, // fila 0, columna 1, se evalúa datos.chkA
-      { row: 1, col: 4, key: "chkE4" },
-      //
-      { row: 2, col: 2, key: "chkE2" },
-      { row: 2, col: 4, key: "chkE5" },
-      //
-      { row: 3, col: 2, key: "chkE3" },
-      { row: 3, col: 4, key: "chkE6" },
-      
-    ];
 
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY,
@@ -318,27 +249,7 @@ export default function OIT(datos = {}) {
       ],
       theme: "grid",
       styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
-      margin: { left: 10, right: 10 },
-      didDrawCell: function (data) {
-        const { cell, row, column, doc } = data;
-
-        // Buscar si la celda actual tiene una validación
-        const validacion = validacionesCeldasPleurales.find(v => v.row === row.index && v.col === column.index);
-
-        if (validacion && datos[validacion.key]) {
-          // Coordenadas para centrar la X
-          const x = cell.x + cell.width / 2;
-          const y = cell.y + cell.height / 2;
-
-          // Dibujar la X azul
-          doc.setTextColor(0, 0, 255);
-          doc.setFontSize(10);
-          doc.text("X", x, y, { align: "center", baseline: "middle" });
-
-          // Restaurar color original
-          doc.setTextColor(0, 0, 0);
-        }
-      }
+      margin: { left: 10, right: 10 }
     });
 
     autoTable(doc, {

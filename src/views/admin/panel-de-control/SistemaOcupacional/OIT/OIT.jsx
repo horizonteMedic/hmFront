@@ -78,6 +78,8 @@ const OIT = ({token, selectedSede, userlogued,userDatos}) => {
         chkb: false,
         chkc: false,
         //Pleurales
+        chk2Si: true,
+        chk2No: false,
         chkE1: false,
         chkE2: false,
         chkE3: false,
@@ -155,6 +157,8 @@ const OIT = ({token, selectedSede, userlogued,userDatos}) => {
         chk2_68: false,
         chk2_69: false,
         //
+        chk3Si: true,
+        chk3No: false,
         chk_01: false,
         chk_02: false,
         chk_03: false,
