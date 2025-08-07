@@ -68,18 +68,58 @@ export default function OdontogramaFechas(data = {}) {
   ];
   
   // Dibujar filas de datos
-  const filaH = 6;
   let filaY = tablaY + 8; // Comenzar después del header
   let paginaActual = 1; // Contador de página actual
   let filasEnPagina = 0; // Contador de filas en la página actual
   
   // Calcular total de páginas basado en el espacio disponible
   const espacioDisponible = pageH - 60 - 30; // Altura total - header - margen inferior
-  const filasPorPagina = Math.floor(espacioDisponible / filaH);
+  const filaHBase = 6; // Altura base de fila
+  const filasPorPagina = Math.floor(espacioDisponible / filaHBase);
   const totalPaginas = Math.ceil(datosTabla.length / filasPorPagina);
   
   datosTabla.forEach((fila, index) => {
     currentX = startX;
+    
+    // === Calcular altura dinámica para todas las columnas de texto ===
+    const nombresCol = columnas[2]; // NOMBRES está en el índice 2
+    const empresaCol = columnas[3]; // EMPRESA está en el índice 3
+    const contratistaCol = columnas[4]; // CONTRATISTA está en el índice 4
+    
+    // Función para calcular líneas de texto
+    const calcularLineas = (texto, maxWidth) => {
+      const palabras = texto.split(" ");
+      const lineas = [];
+      let linea = "";
+      
+      palabras.forEach((palabra) => {
+        const testLinea = (linea + " " + palabra).trim();
+        const textWidth = doc.getTextWidth(testLinea);
+        if (textWidth <= maxWidth) {
+          linea = testLinea;
+        } else {
+          if (linea) lineas.push(linea);
+          linea = palabra;
+        }
+      });
+      if (linea) lineas.push(linea);
+      
+      return lineas.slice(0, 2); // Máximo 2 líneas
+    };
+    
+    // Calcular líneas para cada columna
+    const lineasNombres = calcularLineas(fila.nombres, nombresCol.ancho - 4);
+    const lineasEmpresa = calcularLineas(fila.empresa, empresaCol.ancho - 4);
+    const lineasContratista = calcularLineas(fila.contratista, contratistaCol.ancho - 4);
+    
+    // Encontrar la máxima cantidad de líneas para determinar altura de fila
+    const maxLineas = Math.max(
+      lineasNombres.length,
+      lineasEmpresa.length,
+      lineasContratista.length
+    );
+    
+    const filaH = filaHBase + (maxLineas - 1) * 3; // Altura dinámica
     
     columnas.forEach((columna, colIndex) => {
       const colX = currentX;
@@ -100,12 +140,34 @@ export default function OdontogramaFechas(data = {}) {
         case 4: texto = fila.contratista; break;
       }
       
-      // Ajustar texto si es muy largo
-      if (texto.length > 20) {
-        texto = texto.substring(0, 17) + "...";
+      if (colIndex === 2) {
+        // NOMBRES con salto de línea
+        lineasNombres.forEach((l, i) => {
+          doc.text(l, colX + 2, filaY + 3 + i * 3, {
+            align: "left"
+          });
+        });
+      } else if (colIndex === 3) {
+        // EMPRESA con salto de línea
+        lineasEmpresa.forEach((l, i) => {
+          doc.text(l, colX + 2, filaY + 3 + i * 3, {
+            align: "left"
+          });
+        });
+      } else if (colIndex === 4) {
+        // CONTRATISTA con salto de línea
+        lineasContratista.forEach((l, i) => {
+          doc.text(l, colX + 2, filaY + 3 + i * 3, {
+            align: "left"
+          });
+        });
+      } else {
+        // Centrado en ambas direcciones para otras columnas (Nro Orden, Fecha)
+        doc.text(texto, colX + colW / 2, filaY + filaH / 2, {
+          align: "center",
+          baseline: "middle"
+        });
       }
-      
-      doc.text(texto, colX + 2, filaY + filaH/2, { align: "left", baseline: "middle" });
       
       currentX += colW;
     });
