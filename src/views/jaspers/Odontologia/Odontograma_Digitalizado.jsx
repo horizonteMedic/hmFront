@@ -25,6 +25,127 @@ const interpretarUrlParaLeer = (url) => {
   return nombreArchivo ? imgsToLabels[nombreArchivo] ?? "" : "";
 };
 
+// === FOOTER FICHA ODONTOLÓGICA CABECERA ===
+function footerFichaOdontologicaCabecera(doc, opts = {}, datos = {}) {
+  const margin = 8;
+  const logoW = 38;
+  const y = 12;
+  const xOffset = opts.xOffset !== undefined ? opts.xOffset : 25;
+  const fontSize = opts.fontSize !== undefined ? opts.fontSize : 6;
+  const yOffset = opts.yOffset !== undefined ? opts.yOffset : -8;
+  const baseX = margin + logoW + 8 - xOffset;
+  let yFila = y + 2 + yOffset;
+  const rowH = 3.2;
+  doc.setFontSize(fontSize);
+  doc.setTextColor(0, 0, 0);
+  const filas = [
+    {
+      direccion: datos?.dirTruPierola || "Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando Cel. 964385075",
+      celular: datos?.celTrujilloPie || "",
+      email: datos?.emailTruPierola || "",
+      telefono: datos?.telfTruPierola || "Cl. Guillermo Prescott N°127 Urb. Sto. Dominguito Telf. 044-767608"
+    },
+    {
+      direccion: datos?.dirHuamachuco || "Sede Huamachuco: Jr. Leoncio Prado N°786",
+      celular: datos?.celHuamachuco || "Cel. 990094744-969603777",
+      email: datos?.emailHuamachuco || "",
+      telefono: datos?.telfHuamachuco || "Telf. 044-348070"
+    },
+    {
+      direccion: datos?.dirHuancayo || "Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
+      celular: datos?.celHuancayo || "",
+      email: datos?.emailHuancayo || "",
+      telefono: datos?.telfHuancayo || "Telf. 064-659554"
+    }
+  ];
+  filas.forEach((fila) => {
+    let x = baseX;
+    if (fila.direccion) {
+      const idx2 = fila.direccion.indexOf(":");
+      if (idx2 !== -1) {
+        const sedeNombre = fila.direccion.substring(0, idx2 + 1);
+        const sedeResto = fila.direccion.substring(idx2 + 1);
+        doc.setFont('helvetica', 'bold');
+        doc.text(sedeNombre, x, yFila, { baseline: 'top' });
+        x += doc.getTextWidth(sedeNombre) + 2;
+        doc.setFont('helvetica', 'normal');
+        doc.text(sedeResto, x, yFila, { baseline: 'top' });
+        x += doc.getTextWidth(sedeResto) + 6;
+      } else {
+        doc.setFont('helvetica', 'normal');
+        doc.text(fila.direccion, x, yFila, { baseline: 'top' });
+        x += doc.getTextWidth(fila.direccion) + 6;
+      }
+    }
+    if (fila.celular) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Cel.', x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth('Cel.');
+      doc.setFont('helvetica', 'normal');
+      doc.text(` ${fila.celular}`, x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth(` ${fila.celular}`) + 6;
+    }
+    if (fila.email) {
+      doc.setFont('helvetica', 'normal');
+      doc.text(fila.email, x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth(fila.email) + 6;
+    }
+    if (fila.telefono) {
+      doc.setFont('helvetica', 'bold');
+      doc.text('Telf.', x, yFila, { baseline: 'top' });
+      x += doc.getTextWidth('Telf.');
+      doc.setFont('helvetica', 'normal');
+      doc.text(` ${fila.telefono}`, x, yFila, { baseline: 'top' });
+    }
+    yFila += rowH;
+  });
+  
+  // Agregar website
+  doc.setFont('helvetica', 'normal').setFontSize(6);
+  doc.text("Web : www.horizontemedic.com", baseX, yFila + 2);
+}
+
+const headerOdontograma = (doc, datos) => {
+  const margin = 8;
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = 12;
+
+  // Footer horizontal de cabecera (datos de contacto)
+  footerFichaOdontologicaCabecera(doc, { xOffset: -42, fontSize: 7.5, yOffset: -8 }, datos);
+
+  // === BLOQUE CÓDIGO DE COLOR ===
+  const color = datos.codigoColor || "#008f39";
+  const boxText = (datos.textoColor || "F").toUpperCase();
+  let boxSize = 15;
+  let boxX = pageW - margin - boxSize;
+  let boxY = y + 2;
+  
+  // Draw box outline in black
+  doc.setDrawColor(0);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+  // Solo renderiza si color es válido o para prueba
+  doc.setDrawColor(color);
+  doc.setLineWidth(2);
+  doc.setLineCap("round");
+  doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+  doc.setLineCap("butt");
+  doc.setFontSize(22);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(color);
+  doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+    align: "center",
+    baseline: "middle",
+    maxWidth: boxSize - 1,
+  });
+  doc.setDrawColor(0);
+  doc.setTextColor(0);
+  doc.setLineWidth(0.2);
+
+  // Restaurar fuente normal
+  doc.setFont("helvetica", "normal").setFontSize(10);
+};
+
 export default function Odontograma_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
@@ -164,6 +285,9 @@ export default function Odontograma_Digitalizado(data = {}) {
           lugarFecha: datosPrueba.lugarFecha.toUpperCase(),
         };
 
+  // === 0) HEADER CON LOGO, DATOS DE CONTACTO Y BLOQUE DE COLOR ===
+  headerOdontograma(doc, data);
+
   // === 1) Imagen de fondo para el odontograma ===
   const fondoImg = "/img/Odontograma_Digitalizado.png";
   const pageH = doc.internal.pageSize.getHeight();
@@ -214,31 +338,31 @@ export default function Odontograma_Digitalizado(data = {}) {
     17: { x: margin + 8, y: margin + 122, width: 8, height: 8 },
     18: { x: margin + 9, y: margin + 134, width: 8, height: 8 },
     19: { x: margin + 11, y: margin + 145, width: 8, height: 8 },
-    20: { x: margin + 15, y: margin + 156, width: 7, height: 7 },
-    21: { x: margin + 17, y: margin + 164, width: 7, height: 7 },
-    22: { x: margin + 23, y: margin + 172, width: 6.5, height: 6.5 },
-    23: { x: margin + 30, y: margin + 178.5, width: 6.5, height: 6.5 },
-    24: { x: margin + 41.5, y: margin + 181, width: 6.5, height: 6.5 },
+    20: { x: margin + 16.5, y: margin + 156.5, width: 7, height: 7 },
+    21: { x: margin + 20, y: margin + 165.5, width: 7, height: 7 },
+    22: { x: margin + 26, y: margin + 173.5, width: 6.5, height: 6.5 },
+    23: { x: margin + 34, y: margin + 178.5, width: 6.5, height: 6.5 },
+    24: { x: margin + 42.4, y: margin + 181, width: 6.5, height: 6.5 },
     
-    25: { x: margin + 53, y: margin + 183, width: 6.5, height: 6.5 },
-    26: { x: margin + 63.5, y: margin + 180, width: 6.5, height: 6.5 },
-    27: { x: margin + 72, y: margin + 173, width: 6.5, height: 6.5 },
-    28: { x: margin + 75, y: margin + 164, width: 7, height: 7 },
-    29: { x: margin + 79, y: margin + 155, width: 7, height: 7 },
-    30: { x: margin + 82, y: margin + 144, width: 8, height: 8 },
-    31: { x: margin + 84, y: margin + 132, width: 8, height: 8 },
-    32: { x: margin + 85, y: margin + 120, width: 8, height: 8 },
+    25: { x: margin + 52, y: margin + 181, width: 6.5, height: 6.5 },
+    26: { x: margin + 60, y: margin + 178.5, width: 6.5, height: 6.5 },
+    27: { x: margin + 68, y: margin + 173.5, width: 6.5, height: 6.5 },
+    28: { x: margin + 73, y: margin + 165.5, width: 7, height: 7 },
+    29: { x: margin + 78, y: margin + 156.5, width: 7, height: 7 },
+    30: { x: margin + 81.2, y: margin + 145, width: 8, height: 8 },
+    31: { x: margin + 84, y: margin + 134, width: 8, height: 8 },
+    32: { x: margin + 85, y: margin + 122, width: 8, height: 8 },
   };
 
   // === TOP RIGHT BLOCK - N° Ficha y Sede ===
   // N° Ficha - Coordenadas individuales
-  const xNorden = pageW - margin - 25; // AJUSTAR POSICIÓN X DE N° FICHA AQUÍ
+  const xNorden = pageW - margin - 18; // AJUSTAR POSICIÓN X DE N° FICHA AQUÍ (2 puntos a la derecha)
   const yNorden = margin + 35; // AJUSTAR POSICIÓN Y DE N° FICHA AQUÍ
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.norden, xNorden, yNorden, { align: "right" });
+  doc.setFont("helvetica", "bold").setFontSize(22);
+  doc.text(String(datosFinales.norden), xNorden, yNorden, { align: "right" });
 
   // Subrayado para el N° Ficha
-  const textWidth = doc.getTextWidth(datosFinales.norden);
+  const textWidth = doc.getTextWidth(String(datosFinales.norden));
   const underlineY = yNorden + 1; // Posición Y del subrayado
   const underlineX = xNorden - textWidth; // Posición X del subrayado (alineado a la derecha)
   doc.setDrawColor(0, 0, 0); // Color negro
