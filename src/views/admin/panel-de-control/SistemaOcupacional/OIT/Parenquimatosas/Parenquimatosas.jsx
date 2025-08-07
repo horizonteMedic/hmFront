@@ -153,17 +153,17 @@ const Parenquimatosas = ({form,setForm}) => {
                             {/* Fila Superior */}
                             <label className="text-sm">Superior</label>
                             <input type="checkbox" className="mx-auto" name="chk1D" id="chk1D" checked={form.chk1D} onChange={handleInputChangeChecked} />
-                            <input type="checkbox" className="mx-auto" name="chk1I" id="chk1I" checked={form.chk1D} onChange={handleInputChangeChecked}/>
+                            <input type="checkbox" className="mx-auto" name="chk1I" id="chk1I" checked={form.chk1I} onChange={handleInputChangeChecked}/>
 
                             {/* Fila Medio */}
                             <label className="text-sm">Medio</label>
-                            <input type="checkbox" className="mx-auto" name="chk2D" id="chk2D" checked={form.chk1D} onChange={handleInputChangeChecked}/>
-                            <input type="checkbox" className="mx-auto" name="chk2I" id="chk2I" checked={form.chk1D} onChange={handleInputChangeChecked}/>
+                            <input type="checkbox" className="mx-auto" name="chk2D" id="chk2D" checked={form.chk2D} onChange={handleInputChangeChecked}/>
+                            <input type="checkbox" className="mx-auto" name="chk2I" id="chk2I" checked={form.chk2I} onChange={handleInputChangeChecked}/>
 
                             {/* Fila Inferior */}
                             <label className="text-sm">Inferior</label>
-                            <input type="checkbox" className="mx-auto" name="chk3D" id="chk3D" checked={form.chk1D} onChange={handleInputChangeChecked}/>
-                            <input type="checkbox" className="mx-auto" name="chk3I" id="chk3I" checked={form.chk1D} onChange={handleInputChangeChecked}/>
+                            <input type="checkbox" className="mx-auto" name="chk3D" id="chk3D" checked={form.chk3D} onChange={handleInputChangeChecked}/>
+                            <input type="checkbox" className="mx-auto" name="chk3I" id="chk3I" checked={form.chk3I} onChange={handleInputChangeChecked}/>
                         </div>
                     </div>
 
