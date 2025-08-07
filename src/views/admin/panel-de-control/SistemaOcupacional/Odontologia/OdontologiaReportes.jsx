@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComments } from "@fortawesome/free-solid-svg-icons";
+import { GetInfoServicio, Loading, PrintHojaR } from "./controllerOdontologia";
+import Swal from "sweetalert2";
 
 const OdontologiaReportes = ({
   form,
   setForm,
   handleChange,
   handleEjecutarConsulta,
+  tabla,
+  token,
+  handleClear,
+  dataTabla,
+  setActiveTab,
+  obtenerInfoTabla,
 }) => {
-  const [dataTabla, setDataTabla] = useState([]);
-
   return (
     <div className="w-full  ">
       <div className="flex gap-2 w-full ">
@@ -66,7 +72,7 @@ const OdontologiaReportes = ({
                 value={form.nombres_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    // obtenerInfoTabla();
+                    obtenerInfoTabla();
                   }
                 }}
                 onChange={(e) => {
@@ -83,7 +89,7 @@ const OdontologiaReportes = ({
                 value={form.codigo_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    // obtenerInfoTabla();
+                    obtenerInfoTabla();
                   }
                 }}
                 onChange={(e) => {
@@ -105,10 +111,11 @@ const OdontologiaReportes = ({
           <div className="flex-1">
             <Table
               data={dataTabla}
-              // tabla={tabla}
+              tabla={tabla}
               set={setForm}
-              // token={token}
-              // clean={handleClear}
+              token={token}
+              clean={handleClear}
+              setActiveTab={setActiveTab}
             />
           </div>
         </div>
@@ -118,8 +125,7 @@ const OdontologiaReportes = ({
 };
 
 // Co
-function Table({ data, set }) {
-  // data, tabla, set, token, clean
+function Table({ data, tabla, set, token, clean, setActiveTab }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -131,15 +137,18 @@ function Table({ data, set }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
 
   function clicktable(nro) {
-    // clean();
+    clean();
     Loading("Importando Datos");
-    // GetInfoServicioTabla(nro, tabla, set, token);
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.close();
+      setActiveTab(1);
+    });
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
@@ -166,7 +175,7 @@ function Table({ data, set }) {
                 onClick={() => clicktable(row.norden)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  // handlePrintConfirm(row.norden);
+                  handlePrintConfirm(row.norden);
                 }}
               >
                 <td className="border px-2 py-1 font-bold">
@@ -174,7 +183,7 @@ function Table({ data, set }) {
                 </td>
                 <td className="border px-2 py-1">{row.nombres || ""}</td>
                 <td className="border px-2 py-1">
-                  {convertirFecha(row.fechaOf)}
+                  {convertirFecha(row.fechaOd)}
                 </td>
               </tr>
             ))
