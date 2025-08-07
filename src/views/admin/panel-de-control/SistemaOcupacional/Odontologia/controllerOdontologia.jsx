@@ -101,7 +101,7 @@ export const GetInfoServicio = (
           d32: interpretarUrlParaLeer(res.lbl38),
 
           observaciones: res.txtObservaciones || "",
-          noPasoExamen: res?.txtObservaciones?.includes("NO PASO EXAMEN"),
+          noPasoExamen: res?.txtObservaciones?.includes("NO PASO EXAMEN ODONTOLOGICO"),
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");

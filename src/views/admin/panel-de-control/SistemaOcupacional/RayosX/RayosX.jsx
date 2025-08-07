@@ -9,16 +9,7 @@ const RayosX = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div
-      style={{
-        maxWidth: "95%",
-        margin: "0 auto",
-        background: "white",
-        borderRadius: "0.5rem",
-        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-        overflow: "hidden", 
-      }}
-    >
+    <div className="w-full mx-auto bg-white overflow-hidden">
       <div className="w-full">
         <nav className={styles.labNav}>
           <button
@@ -40,7 +31,7 @@ const RayosX = () => {
             Columna
           </button>
         </nav>
-        <div className={styles.labContent}>
+        <div className="p-6  max-w-[95%] mx-auto">
           {activeTab === 0 && <RayosXToraxPA />}
           {activeTab === 1 && <RayosXColumna />}
         </div>
