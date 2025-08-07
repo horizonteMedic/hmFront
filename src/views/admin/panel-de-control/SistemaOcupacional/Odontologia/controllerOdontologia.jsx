@@ -206,7 +206,8 @@ export const SubmitDataServiceLO = async (
   token,
   user,
   limpiar,
-  tabla
+  tabla,
+  closeModal
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -280,8 +281,9 @@ export const SubmitDataServiceLO = async (
         cancelButtonColor: "#d33",
       }).then((result) => {
         limpiar();
+        closeModal();
         if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
+          PrintHojaRLO(form.norden, token, tabla);
         }
       });
     } else {
@@ -374,12 +376,13 @@ export const VerifyTRLO = async (nro, tabla, token, set, sede) => {
     console.log(res);
     if (res.id === 0) {
       //No tiene registro previo
-      GetInfoPac(nro, set, token, sede);
+      // GetInfoPac(nro, set, token, sede);
+      VerifyTR(nro, "odontograma", token, set, sede);
     } else {
       GetInfoServicioLO(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
-          "Este paciente ya cuenta con registros de OdontogramaLO.",
+          "Este paciente ya cuenta con registros de Levantamiento de Observación.",
           "warning"
         );
       });
@@ -504,6 +507,39 @@ export const PrintHojaR = (nro, token, tabla) => {
     });
 };
 
+export const PrintHojaRLO = (nro, token, tabla) => {
+  Loading("Cargando Formato a Imprimir");
+
+  getFetch(
+    `${obtenerReporteUrlLo}?nOrden=${nro}&nameService=${tabla}`, //revisar
+    token
+  )
+    .then(async (res) => {
+      if (res.norden) {
+        console.log(res);
+        const nombre = res.nameJasper;
+        console.log(nombre);
+        const jasperModules = import.meta.glob(
+          "../../../../jaspers/Odontologia/*.jsx"
+        );
+        const modulo = await jasperModules[
+          `../../../../jaspers/Odontologia/${nombre}.jsx`
+        ]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === "function") {
+          modulo.default(res);
+        } else {
+          console.error(
+            `El archivo ${nombre}.jsx no exporta una función por defecto`
+          );
+        }
+      }
+    })
+    .finally(() => {
+      Swal.close();
+    });
+};
+
 export const PrintConsultaEjecutada = (inicio, fin, token) => {
   Loading("Cargando Formato a Imprimir");
   getFetch(
@@ -539,7 +575,7 @@ export const PrintConsultaEjecutada = (inicio, fin, token) => {
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
   try {
     getFetch(
-      `/api/v01/ct/agudezaVisual/obtenerOftalmologiaPorFiltros?${
+      `/api/v01/ct/odontograma/obtenerOdontogramaPorFiltros?${
         codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
       }
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,

@@ -38,13 +38,13 @@ const Engrosamiento = ({form,setForm}) => {
 
                                 {/* Checkboxes sin letras al costado */}
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" name={item.codeO} id={item.codeO} checked={form[item.codeO]} onChange={handleInputChangeChecked}/> <span className="ml-1">O</span>
+                                <input disabled={form.chk2No} type="checkbox" name={item.codeO} id={item.codeO} checked={form[item.codeO]} onChange={handleInputChangeChecked}/> <span className="ml-1">O</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" name={item.codeD} id={item.codeD} checked={form[item.codeD]} onChange={handleInputChangeChecked}/> <span className="ml-1">D</span>
+                                <input disabled={form.chk2No} type="checkbox" name={item.codeD} id={item.codeD} checked={form[item.codeD]} onChange={handleInputChangeChecked}/> <span className="ml-1">D</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" name={item.codeI} id={item.codeI} checked={form[item.codeI]} onChange={handleInputChangeChecked}/> <span className="ml-1">I</span>
+                                <input disabled={form.chk2No} type="checkbox" name={item.codeI} id={item.codeI} checked={form[item.codeI]} onChange={handleInputChangeChecked}/> <span className="ml-1">I</span>
                                 </div>
                             </div>
                             ))}
@@ -64,13 +64,13 @@ const Engrosamiento = ({form,setForm}) => {
 
                                 {/* Checkboxes sin letras al costado */}
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" name={item.codeO} id={item.codeO} checked={form[item.codeO]} onChange={handleInputChangeChecked}/> <span className="ml-1">O</span>
+                                <input disabled={form.chk2No} type="checkbox" name={item.codeO} id={item.codeO} checked={form[item.codeO]} onChange={handleInputChangeChecked}/> <span className="ml-1">O</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" name={item.codeD} id={item.codeD} checked={form[item.codeD]} onChange={handleInputChangeChecked}/> <span className="ml-1">D</span>
+                                <input disabled={form.chk2No} type="checkbox" name={item.codeD} id={item.codeD} checked={form[item.codeD]} onChange={handleInputChangeChecked}/> <span className="ml-1">D</span>
                                 </div>
                                 <div className="w-[25px] flex justify-center">
-                                <input type="checkbox" name={item.codeI} id={item.codeI} checked={form[item.codeI]} onChange={handleInputChangeChecked}/> <span className="ml-1">I</span>
+                                <input disabled={form.chk2No} type="checkbox" name={item.codeI} id={item.codeI} checked={form[item.codeI]} onChange={handleInputChangeChecked}/> <span className="ml-1">I</span>
                                 </div>
                             </div>
                             ))}
@@ -88,7 +88,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     {[{label:"O", code: "chk2_53"}, {label:"D", code: "chk2_55"}]
                                     .map((item, idx) => (
                                         <label key={idx} className="flex flex-row items-center w-[25px]">
-                                        <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                        <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                         <span className="text-lg ml-1 font-normal">{item.label}</span>
                                         </label>
                                     ))}
@@ -97,7 +97,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     {[{label:"1", code: "chk2_52"}, {label:"2", code: "chk2_54"}, {label:"3", code: "chk2_56"}]
                                     .map((item, idx) => (
                                         <label key={idx} className="flex items-center w-[25px]">
-                                        <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                        <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                         <span className="text-lg ml-1 font-normal">{item.label}</span>
                                         </label>
                                     ))}
@@ -108,7 +108,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     {[{label: "O", code: "chk2_58"}, {label:"I", code: "chk2_60"}]
                                     .map((item, idx) => (
                                         <label key={idx} className="flex  items-center w-[25px]">
-                                        <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                        <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                         <span className="text-lg ml-1 font-normal">{item.label}</span>
                                         </label>
                                     ))}
@@ -119,7 +119,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     , {label:"3", code: "chk2_61"}]
                                     .map((item, idx) => (
                                         <label key={idx} className="flex  items-center w-[25px]">
-                                        <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                        <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                         <span className="text-lg ml-1 font-normal">{item.label}</span>
                                         </label>
                                     ))}
@@ -135,7 +135,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     <div className="flex gap-2">
                                         {[{label:"D", code: "chk2_63"}].map((item, idx) => (
                                             <label key={idx} className="flex flex-row items-center w-[25px]">
-                                            <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                            <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                             <span className="text-lg ml-1 font-normal">{item.label}</span>
                                             </label>
                                         ))}
@@ -146,7 +146,7 @@ const Engrosamiento = ({form,setForm}) => {
                                         , {label:"C", code: "chk2_65"}]
                                         .map((item, idx) => (
                                             <label key={idx} className="flex items-center w-[25px]">
-                                            <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                            <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                             <span className="text-lg ml-1 font-normal">{item.label}</span>
                                             </label>
                                         ))}
@@ -157,7 +157,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     {[{label:"I", code: "chk2_67"}]
                                     .map((item, idx) => (
                                         <label key={idx} className="flex flex-row items-center w-[25px]">
-                                        <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                        <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                         <span className="text-lg ml-1 font-normal">{item.label}</span>
                                         </label>
                                     ))}
@@ -168,7 +168,7 @@ const Engrosamiento = ({form,setForm}) => {
                                     , {label:"C", code: "chk2_69"}]
                                     .map((item, idx) => (
                                         <label key={idx} className="flex items-center w-[25px]">
-                                        <input type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                                        <input disabled={form.chk2No} type="checkbox" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                                         <span className="text-lg ml-1 font-normal">{item.label}</span>
                                         </label>
                                     ))}
@@ -181,10 +181,10 @@ const Engrosamiento = ({form,setForm}) => {
                 <div className="flex justify-between items-center">
                     <h2 className="font-bold">IV. SIMBOLOS*</h2>
                     <div className="flex">
-                        <input type="checkbox" name="" id="" />
+                        <input type="radio" checked={form.chk3Si} onChange={() => {setForm(prev => ({...prev, chk3Si:true, chk3No:false}))}} name="chk3Radio" id="chk3Si" />
                         <label htmlFor="">SI</label>
 
-                        <input type="checkbox" name="" id="" />
+                        <input type="radio" checked={form.chk3No} onChange={() => {setForm(prev => ({...prev, chk3Si:false, chk3No:true}))}} name="chk3Radio" id="chk3No" />
                         <label htmlFor="">NO</label>
                     </div>
                 </div>
@@ -210,7 +210,7 @@ const Engrosamiento = ({form,setForm}) => {
                         <div key={idx} className="flex flex-col w-16">
                         {group.map((item, subIdx) => (
                             <label key={subIdx} className="flex items-center gap-1">
-                            <input type="checkbox" className="shrink-0" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
+                            <input disabled={form.chk3No} type="checkbox" className="shrink-0" name={item.code} id={item.code} checked={form[item.code]} onChange={handleInputChangeChecked}/>
                             <span className="text-xs">{item.label}</span>
                             </label>
                         ))}

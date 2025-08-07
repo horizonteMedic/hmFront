@@ -40,23 +40,30 @@ function footerFichaOdontologicaCabecera(doc, opts = {}, datos = {}) {
   doc.setTextColor(0, 0, 0);
   const filas = [
     {
-      direccion: datos?.dirTruPierola || "Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando Cel. 964385075",
+      direccion:
+        datos?.dirTruPierola ||
+        "Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando Cel. 964385075",
       celular: datos?.celTrujilloPie || "",
       email: datos?.emailTruPierola || "",
-      telefono: datos?.telfTruPierola || "Cl. Guillermo Prescott N°127 Urb. Sto. Dominguito Telf. 044-767608"
+      telefono:
+        datos?.telfTruPierola ||
+        "Cl. Guillermo Prescott N°127 Urb. Sto. Dominguito Telf. 044-767608",
     },
     {
-      direccion: datos?.dirHuamachuco || "Sede Huamachuco: Jr. Leoncio Prado N°786",
+      direccion:
+        datos?.dirHuamachuco || "Sede Huamachuco: Jr. Leoncio Prado N°786",
       celular: datos?.celHuamachuco || "Cel. 990094744-969603777",
       email: datos?.emailHuamachuco || "",
-      telefono: datos?.telfHuamachuco || "Telf. 044-348070"
+      telefono: datos?.telfHuamachuco || "Telf. 044-348070",
     },
     {
-      direccion: datos?.dirHuancayo || "Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
+      direccion:
+        datos?.dirHuancayo ||
+        "Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
       celular: datos?.celHuancayo || "",
       email: datos?.emailHuancayo || "",
-      telefono: datos?.telfHuancayo || "Telf. 064-659554"
-    }
+      telefono: datos?.telfHuancayo || "Telf. 064-659554",
+    },
   ];
   filas.forEach((fila) => {
     let x = baseX;
@@ -65,43 +72,43 @@ function footerFichaOdontologicaCabecera(doc, opts = {}, datos = {}) {
       if (idx2 !== -1) {
         const sedeNombre = fila.direccion.substring(0, idx2 + 1);
         const sedeResto = fila.direccion.substring(idx2 + 1);
-        doc.setFont('helvetica', 'bold');
-        doc.text(sedeNombre, x, yFila, { baseline: 'top' });
+        doc.setFont("helvetica", "bold");
+        doc.text(sedeNombre, x, yFila, { baseline: "top" });
         x += doc.getTextWidth(sedeNombre) + 2;
-        doc.setFont('helvetica', 'normal');
-        doc.text(sedeResto, x, yFila, { baseline: 'top' });
+        doc.setFont("helvetica", "normal");
+        doc.text(sedeResto, x, yFila, { baseline: "top" });
         x += doc.getTextWidth(sedeResto) + 6;
       } else {
-        doc.setFont('helvetica', 'normal');
-        doc.text(fila.direccion, x, yFila, { baseline: 'top' });
+        doc.setFont("helvetica", "normal");
+        doc.text(fila.direccion, x, yFila, { baseline: "top" });
         x += doc.getTextWidth(fila.direccion) + 6;
       }
     }
     if (fila.celular) {
-      doc.setFont('helvetica', 'bold');
-      doc.text('Cel.', x, yFila, { baseline: 'top' });
-      x += doc.getTextWidth('Cel.');
-      doc.setFont('helvetica', 'normal');
-      doc.text(` ${fila.celular}`, x, yFila, { baseline: 'top' });
+      doc.setFont("helvetica", "bold");
+      doc.text("Cel.", x, yFila, { baseline: "top" });
+      x += doc.getTextWidth("Cel.");
+      doc.setFont("helvetica", "normal");
+      doc.text(` ${fila.celular}`, x, yFila, { baseline: "top" });
       x += doc.getTextWidth(` ${fila.celular}`) + 6;
     }
     if (fila.email) {
-      doc.setFont('helvetica', 'normal');
-      doc.text(fila.email, x, yFila, { baseline: 'top' });
+      doc.setFont("helvetica", "normal");
+      doc.text(fila.email, x, yFila, { baseline: "top" });
       x += doc.getTextWidth(fila.email) + 6;
     }
     if (fila.telefono) {
-      doc.setFont('helvetica', 'bold');
-      doc.text('Telf.', x, yFila, { baseline: 'top' });
-      x += doc.getTextWidth('Telf.');
-      doc.setFont('helvetica', 'normal');
-      doc.text(` ${fila.telefono}`, x, yFila, { baseline: 'top' });
+      doc.setFont("helvetica", "bold");
+      doc.text("Telf.", x, yFila, { baseline: "top" });
+      x += doc.getTextWidth("Telf.");
+      doc.setFont("helvetica", "normal");
+      doc.text(` ${fila.telefono}`, x, yFila, { baseline: "top" });
     }
     yFila += rowH;
   });
-  
+
   // Agregar website
-  doc.setFont('helvetica', 'normal').setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(6);
   doc.text("Web : www.horizontemedic.com", baseX, yFila + 2);
 }
 
@@ -111,7 +118,11 @@ const headerOdontograma = (doc, datos) => {
   let y = 12;
 
   // Footer horizontal de cabecera (datos de contacto)
-  footerFichaOdontologicaCabecera(doc, { xOffset: -42, fontSize: 7.5, yOffset: -8 }, datos);
+  footerFichaOdontologicaCabecera(
+    doc,
+    { xOffset: -42, fontSize: 7.5, yOffset: -8 },
+    datos
+  );
 
   // === BLOQUE CÓDIGO DE COLOR ===
   const color = datos.codigoColor || "#008f39";
@@ -119,7 +130,7 @@ const headerOdontograma = (doc, datos) => {
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;
-  
+
   // Draw box outline in black
   doc.setDrawColor(0);
   doc.setLineWidth(0.5);
@@ -146,7 +157,7 @@ const headerOdontograma = (doc, datos) => {
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default function Odontograma_Digitalizado(data = {}) {
+export default function Odontograma_lo_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "landscape" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -309,12 +320,10 @@ export default function Odontograma_Digitalizado(data = {}) {
   // === 2) Datos posicionados individualmente ===
   doc.setFont("helvetica", "normal").setFontSize(10);
 
-
-
   // === POSICIONES DE LOS DIENTES EN EL ODONTOGRAMA ===
   // Definir las posiciones de los dientes según la disposición del odontograma
   const posicionesDientes = {
-     // Dientes superiores (1-16) - Fila superior
+    // Dientes superiores (1-16) - Fila superior
     1: { x: margin + 7, y: margin + 96, width: 8, height: 8 },
     2: { x: margin + 8, y: margin + 84, width: 8, height: 8 },
     3: { x: margin + 10, y: margin + 72, width: 8, height: 8 },
@@ -343,7 +352,7 @@ export default function Odontograma_Digitalizado(data = {}) {
     22: { x: margin + 26, y: margin + 173.5, width: 6.5, height: 6.5 },
     23: { x: margin + 34, y: margin + 178.5, width: 6.5, height: 6.5 },
     24: { x: margin + 42.4, y: margin + 181, width: 6.5, height: 6.5 },
-    
+
     25: { x: margin + 52, y: margin + 181, width: 6.5, height: 6.5 },
     26: { x: margin + 60, y: margin + 178.5, width: 6.5, height: 6.5 },
     27: { x: margin + 68, y: margin + 173.5, width: 6.5, height: 6.5 },
@@ -513,27 +522,31 @@ export default function Odontograma_Digitalizado(data = {}) {
   // === 3) COLOCAR ICONOS DENTALES BASADOS EN LOS DATOS INDIVIDUALES ===
   // Mapeo de tipos de dientes a nombres de archivos de iconos
   const mapeoTiposIconos = {
-    "Ausente": "ausente",
+    Ausente: "ausente",
     "Cariada por opturar": "cariada",
     "Por extraer": "por_extraer",
-    "Fracturada": "fracturada",
-    "Corona": "corona",
+    Fracturada: "fracturada",
+    Corona: "corona",
     "Obturacion Efectuada": "obturacion",
-    "Puente": "puente",
+    Puente: "puente",
     "P.P.R Metalica": "ppr_metalica",
     "P.P.R Acrilica": "ppr_acrilica",
     "P.Total": "p_total",
-    "Normal": "normal"
+    Normal: "normal",
   };
 
   // Función para colocar icono en un diente específico
   const colocarIconoEnDiente = (numeroDiente, tipoDiente) => {
-    if (tipoDiente && tipoDiente !== "Normal" && posicionesDientes[numeroDiente]) {
+    if (
+      tipoDiente &&
+      tipoDiente !== "Normal" &&
+      posicionesDientes[numeroDiente]
+    ) {
       const nombreIcono = mapeoTiposIconos[tipoDiente];
       if (nombreIcono) {
         const iconPath = `/img/iconos_odonto/Icon_${nombreIcono}.png`;
         const posicion = posicionesDientes[numeroDiente];
-        
+
         try {
           doc.addImage(
             iconPath,
@@ -544,7 +557,10 @@ export default function Odontograma_Digitalizado(data = {}) {
             posicion.height || 8
           );
         } catch (e) {
-          console.log(`Error al cargar icono ${nombreIcono} para diente ${numeroDiente}:`, e);
+          console.log(
+            `Error al cargar icono ${nombreIcono} para diente ${numeroDiente}:`,
+            e
+          );
         }
       }
     }
@@ -559,14 +575,76 @@ export default function Odontograma_Digitalizado(data = {}) {
   }
 
   // === 4) Generar blob y abrir en iframe para imprimir automáticamente ===
+  // const blob = doc.output("blob");
+  // const url = URL.createObjectURL(blob);
+  // const iframe = document.createElement("iframe");
+  // iframe.style.display = "none";
+  // iframe.src = url;
+  // document.body.appendChild(iframe);
+  // iframe.onload = () => {
+  //   iframe.contentWindow.focus();
+  //   iframe.contentWindow.print();
+  // };
+  const firmasAPintar = [
+    { nombre: "FIRMAP", x: 50, y: 160, maxw: 200 },
+    { nombre: "HUELLA", x: 120, y: 160, maxw: 130 },
+    { nombre: "SELLOFIRMA", x: 180, y: 160, maxw: 120 },
+  ];
+  agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
+}
+
+function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+
+      img.onload = () => {
+        let sigW = maxw;
+        const sigH = 35;
+        const baseX = x;
+        const baseY = y;
+        const maxW = sigW - 10;
+        const maxH = sigH - 10;
+        let imgW = img.width;
+        let imgH = img.height;
+        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
   };
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
 }
