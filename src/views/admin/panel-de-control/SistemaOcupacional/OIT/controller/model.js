@@ -137,10 +137,12 @@ export function SubmitOITModel(data,user,token) {
         chk2_68: data.chk2_68,
         chk2_69: data.chk2_69,
         //
-        "chk3Si": false,
-        "chk3No": false,
-        "chk2Si": false,
-        "chk2No": false,
+        "chk3Si": data.chk3Si,
+        "chk3No": data.chk3No,
+        "chk2Si": data.chk2Si,
+        "chk2No": data.chk2No,
+        anormalidades_parenquimatosas_si: data.anormalidades_parenquimatosas_si,
+        anormalidades_parenquimatosas_no: data.anormalidades_parenquimatosas_no,
         //
         chk_01: data.chk_01,
         chk_02: data.chk_02,
@@ -173,6 +175,31 @@ export function SubmitOITModel(data,user,token) {
         chk_29: data.chk_29,
         "txtSComentarios": data.txtSComentarios,
         "userRegistro": user
+    };    
+
+    const url = `${URLAzure}/api/v01/ct/oit/registrarActualizarOit`
+        const options = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+    }
+    return fetch(url,options).then(res =>  {
+        if (!res.ok) {
+            return res
+        } return res.json()}).then(response => response) 
+}
+
+export function SubmitOITModelSinDatos(data,user,token) {
+    const body = {
+        "norden": data.norden,
+        "edad": data.edad,
+        "dniUser": data.dniUser,
+        "userRegistro": user,
+        "flectura": data.flectura,
+        "fradiografia": data.fradiografia,
     };    
 
     const url = `${URLAzure}/api/v01/ct/oit/registrarActualizarOit`

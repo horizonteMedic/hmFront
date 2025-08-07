@@ -2,68 +2,71 @@ import jsPDF from "jspdf";
 import header_OIT from "./HeaderOIT";
 import autoTable from "jspdf-autotable";
 
-export default function OIT_B_Digitalizado(datos = {}) {
+export default function OIT_B_Digitalizado_boro(datos = {}) {
 
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    const margin = 8;
-    const pageW = doc.internal.pageSize.getWidth();
-    let y = 26;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const margin = 8;
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = 26;
 
-    const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
-    const isValidUrl = url => url && url !== "Sin registro";
-    const loadImg = src =>
-        new Promise((res, rej) => {
-        const img = new Image();
-        img.src = src;
-        img.crossOrigin = 'anonymous';
-        img.onload = () => res(img);
-        img.onerror = () => rej(`No se pudo cargar ${src}`);
-        });
-    Promise.all([
-        isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
-    ]).then(([s1]) => {
-        // 2) Encabezado (logo, campos, título)
-      header_OIT(doc, datos);
-      doc.setFont("helvetica", "bold").setFontSize(11);
-      doc.text("FORMULARIO DE INFORME RADIOGRAFICO CON METODOLOGIA OIT",pageW / 2, y, { align: "center" })
+  // 2) Encabezado (logo, campos, título)
 
-      autoTable(doc, {
-        startY: y+ 3,
-        body: [
-          [
-            { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 } },
-            { content: `${datos.nplaca}` },
-            { content: "HCL:" },
-            { content: `${datos.norden}` },
-            { content: "LECTOR:", styles: { cellWidth: 25} },
-            { content: `${datos.doctor}` }
-          ],
-          [
-            { content: "NOMBRE:" },
-            { content: `${datos.nombres}`, colSpan: 3 },
-            { content: "EDAD:" },
-            { content: `${datos.edad}` }
-          ],
-          [
-            { content: "FECHA DE LECTURA", rowSpan: 2 },
-            { content: `${datos.flectura.split('-').reverse().join('-')}`, colSpan: 2 },
-            { content: "", rowSpan: 2 },
-            { content: "FECHA DE RADIOGRAFÍA", rowSpan: 2 },
-            { content: `${datos.fradiografia.split('-').reverse().join('-')}` }
-          ],
-          [
-            { content: "Día - Mes - Año", colSpan: 2 },
-            { content: "Día - Mes - Año" }
-          ]
+  // 2) Encabezado (logo, campos, título)
+  const sello1 = datos.digitalizacion?.find(d => d.nombreDigitalizacion === "SELLOFIRMA");
+  const isValidUrl = url => url && url !== "Sin registro";
+  const loadImg = src =>
+    new Promise((res, rej) => {
+      const img = new Image();
+      img.src = src;
+      img.crossOrigin = 'anonymous';
+      img.onload = () => res(img);
+      img.onerror = () => rej(`No se pudo cargar ${src}`);
+    });
+  Promise.all([
+    isValidUrl(sello1?.url) ? loadImg(sello1.url) : Promise.resolve(null),
+  ]).then(([s1]) => {
+    // 2) Encabezado (logo, campos, título)
+    header_OIT(doc, datos);
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    doc.text("FORMULARIO DE INFORME RADIOGRAFICO CON METODOLOGIA OIT-2000", pageW / 2, y, { align: "center" })
+
+    autoTable(doc, {
+      startY: y + 3,
+      body: [
+        [
+          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 } },
+          { content: `${datos.nplaca ? datos.nplaca  : ""}` },
+          { content: "HCL:" },
+          { content: `${datos.norden ? datos.norden : ""}` },
+          { content: "LECTOR:", styles: { cellWidth: 25 } },
+          { content: `${datos.doctor ? datos.doctor : ""}` }
         ],
-        theme: "grid",
-        styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
-        margin: { left: 10, right: 10 }
-      });
+        [
+          { content: "NOMBRE:" },
+          { content: `${datos.nombres ? datos.nombres : ""}`, colSpan: 3 },
+          { content: "EDAD:" },
+          { content: `${datos.edad ? datos.edad : ""}` }
+        ],
+        [
+          { content: "FECHA DE LECTURA", rowSpan: 2 },
+          { content: `${datos.flectura.split('-').reverse().join('-')}`, colSpan: 2 },
+          { content: "", rowSpan: 2 },
+          { content: "FECHA DE RADIOGRAFÍA", rowSpan: 2 },
+          { content: `${datos.fradiografia.split('-').reverse().join('-')}` }
+        ],
+        [
+          { content: "Día - Mes - Año", colSpan: 2 },
+          { content: "Día - Mes - Año" }
+        ]
+      ],
+      theme: "grid",
+      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
+      margin: { left: 10, right: 10 }
+    });
 
-      autoTable(doc, {
-        startY: doc.lastAutoTable.finalY+2,
-        body: [
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY,
+      body: [
           [
             { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
             { content: "1", styles: {valign:"middle"}},
@@ -123,10 +126,10 @@ export default function OIT_B_Digitalizado(datos = {}) {
           9: { cellWidth: 28 }, // Texto causa extra
           10: { cellWidth: 8 }  // X causa extra
         },
-        margin: { left: 10, right: 10 }
-        });
-      
-      autoTable(doc, {
+      margin: { left: 10, right: 10 }
+    });
+
+    autoTable(doc, {
       startY: doc.lastAutoTable.finalY,
       body: [
         [
@@ -477,55 +480,53 @@ export default function OIT_B_Digitalizado(datos = {}) {
         margin: { left: 10, right: 10 }
       });
 
-      if (s1) {
-  const canvas = document.createElement('canvas');
-  canvas.width = s1.width;
-  canvas.height = s1.height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(s1, 0, 0);
-  const selloBase64 = canvas.toDataURL('image/png');
+    if (s1) {
+      const canvas = document.createElement('canvas');
+      canvas.width = s1.width;
+      canvas.height = s1.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(s1, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
 
-  // Dimensiones deseadas del sello
-  const sigW = 40; // ancho del sello
-  const sigH = 40; // alto del sello
+      // Dimensiones deseadas del sello
+      const sigW = 40; // ancho del sello
+      const sigH = 40; // alto del sello
 
-  const pageW = doc.internal.pageSize.getWidth();
-  const marginRight = 18;
+      const pageW = doc.internal.pageSize.getWidth();
+      const marginRight = 18;
 
-  // Posición del sello: derecha del cuadro de comentarios
-  const sigX = pageW - marginRight - sigW;
-  const sigY = doc.lastAutoTable.finalY - 30; // ajusta según se vea
+      // Posición del sello: derecha del cuadro de comentarios
+      const sigX = pageW - marginRight - sigW;
+      const sigY = doc.lastAutoTable.finalY - 30; // ajusta según se vea
 
-  // Escalado proporcional
-  const maxImgW = sigW - 5;
-  const maxImgH = sigH - 5;
+      // Escalado proporcional
+      const maxImgW = sigW - 5;
+      const maxImgH = sigH - 5;
 
-  let imgW = s1.width;
-  let imgH = s1.height;
+      let imgW = s1.width;
+      let imgH = s1.height;
 
-  const scaleW = maxImgW / imgW;
-  const scaleH = maxImgH / imgH;
-  const scale = Math.min(scaleW, scaleH, 1);
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
 
-  imgW *= scale;
-  imgH *= scale;
+      imgW *= scale;
+      imgH *= scale;
 
-  const imgX = sigX + (sigW - imgW) / 2;
-  const imgY = sigY + (sigH - imgH) / 2;
+      const imgX = sigX + (sigW - imgW) / 2;
+      const imgY = sigY + (sigH - imgH) / 2;
 
-  doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
-}
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    }
 
 
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.onload = () => iframe.contentWindow.print();
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = url;
+    document.body.appendChild(iframe);
+    iframe.onload = () => iframe.contentWindow.print();
 
-    })
-
-    
+  })
 }

@@ -12,6 +12,22 @@ const Engrosamiento = ({form,setForm}) => {
         setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
     };
 
+    const handleCheckboxChange = (e) => {
+        const { checked, value } = e.target;
+
+        setForm((prev) => {
+            let nuevoTexto = prev.txtSComentarios || "";
+
+            if (checked) {
+            // Agrega con separador " + " si ya hay algo escrito
+            nuevoTexto = nuevoTexto
+                ? `${nuevoTexto} ${value}`
+                : value;
+            }
+            return { ...prev, txtSComentarios: nuevoTexto };
+        });
+    };
+
     return(
         <>
             <div className="w-auto">
@@ -181,10 +197,10 @@ const Engrosamiento = ({form,setForm}) => {
                 <div className="flex justify-between items-center">
                     <h2 className="font-bold">IV. SIMBOLOS*</h2>
                     <div className="flex">
-                        <input type="radio" checked={form.chk3Si} onChange={() => {setForm(prev => ({...prev, chk3Si:true, chk3No:false}))}} name="chk3Radio" id="chk3Si" />
+                        <input type="checkbox" checked={form.chk3Si} onChange={() =>setForm(prev => ({...prev,chk3Si: true,chk3No: false,}))} name="chk3Radio" id="chk3Si" />
                         <label htmlFor="">SI</label>
 
-                        <input type="radio" checked={form.chk3No} onChange={() => {setForm(prev => ({...prev, chk3Si:false, chk3No:true}))}} name="chk3Radio" id="chk3No" />
+                        <input type="checkbox" checked={form.chk3No} onChange={() =>setForm(prev => ({...prev,chk3Si: false,chk3No: true,}))} name="chk3Radio" id="chk3No" />
                         <label htmlFor="">NO</label>
                     </div>
                 </div>
@@ -222,9 +238,9 @@ const Engrosamiento = ({form,setForm}) => {
                     <div className="flex flex-col w-full">
                         <input type="text" className="w-full border rounded px-2 py-1 mx-4" name="txtSComentarios" id="txtSComentarios" value={form.txtSComentarios} onChange={handleInputChange} />
                         <div className="flex justify-start items-center px-2 py-1 mx-4 mt-2 gap-2">
-                            <input type="checkbox" name="" id=""  />
+                            <input type="checkbox" name="" onChange={handleCheckboxChange} value="TRAMA BRONCOVASCULAR ACENTUADA EN ACP" id=""  />
                             <label htmlFor="">TRAMA BRONCOVASCULAR ACENTUADA EN ACP</label>
-                            <input type="checkbox" name="" className="ml-8" id="" />
+                            <input type="checkbox" name=""  value="EVALUACION ANUAL" onChange={handleCheckboxChange} className="ml-8" id="" />
                             <label htmlFor="">EVALUACION ANUAL</label>
                         </div>
                     </div>

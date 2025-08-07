@@ -18,10 +18,10 @@ const Pleurales = ({form,setForm}) => {
                     <div className="flex justify-between items-center">
                         <h2 className="font-bold">III. ANORMALIDADES PLEURALES (SI NO HAY ANORMALIDADES PASE A SIMBOLOS)</h2>
                         <div className="flex">
-                            <input type="radio" name="chk2radio" checked={form.chk2Si} onChange={() => {setForm(prev => ({...prev, chk2Si:true, chk2No:false}))}} id="chk2Si" />
+                            <input type="checkbox" name="chk2radio" checked={form.chk2Si} onChange={() =>setForm(prev => ({...prev,chk2Si: true,chk2No: false,}))} id="chk2Si" />
                             <label htmlFor="">SI</label>
 
-                            <input type="radio" name="chk2radio" checked={form.chk2No} onChange={() => {setForm(prev => ({...prev, chk2Si:false, chk2No:true}))}} id="chk2No" />
+                            <input type="checkbox" name="chk2radio" checked={form.chk2No} onChange={() =>setForm(prev => ({...prev,chk2Si: false,chk2No: true,}))} id="chk2No" />
                             <label htmlFor="">NO</label>
                         </div>
                     </div>

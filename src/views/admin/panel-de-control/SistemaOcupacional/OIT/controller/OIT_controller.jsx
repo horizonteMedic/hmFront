@@ -1,7 +1,8 @@
 import { getFetch } from "../../../getFetch/getFetch";
 import Swal from "sweetalert2";
-import { SubmitOITModel } from "./model";
-
+import { SubmitOITModel, SubmitOITModelSinDatos } from "./model";
+import OIT_B_Digitalizado from "../../../../../jaspers/OIT/OIT_B_Digitalizado";
+import OIT_B_Digitalizado_boro from "../../../../../jaspers/OIT/OIT_B_Digitalizado_boro";
 const Loading = (text) => {
     Swal.fire({
       title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
@@ -86,23 +87,45 @@ export const SubmitOIT = async (form,token,user,limpiar,tabla) => {
         return
     }
     Loading('Registrando Datos')
-    SubmitOITModel(form,user,token)
-    .then((res) => {
+    if (form.SinDatos) {
+      SubmitOITModelSinDatos(form,user,token)
+      .then((res) => {
         console.log(res)
         if (res.id === 1 || res.id === 0) {
-        Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-        }).then((result) => {
-            limpiar()
-            if (result.isConfirmed) {
-                PrintHojaR(form.norden,token,tabla)
-            }
-        })
-        } else {
-            Swal.fire('Error','Ocurrio un error al Registrar','error')
+          Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+          }).then((result) => {
+              limpiar()
+              if (result.isConfirmed) {
+                  PrintHojaSinDatos(form.norden,token,tabla)
+              }
+          })
+          } else {
+              Swal.fire('Error','Ocurrio un error al Registrar','error')
         }
-    })
+      })
+        
+    } else {
+    SubmitOITModel(form,user,token)
+      .then((res) => {
+          console.log(res)
+          if (res.id === 1 || res.id === 0) {
+          Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+              confirmButtonColor: "#3085d6",
+              cancelButtonColor: "#d33",
+          }).then((result) => {
+              limpiar()
+              if (result.isConfirmed) {
+
+                  PrintHojaR(form.norden,token,tabla)
+              }
+          })
+          } else {
+              Swal.fire('Error','Ocurrio un error al Registrar','error')
+          }
+        })
+    }
 }
 
 export const PrintHojaR = (nro,token,tabla) => {
@@ -122,6 +145,27 @@ export const PrintHojaR = (nro,token,tabla) => {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }
       Swal.close()
+    } else {
+      Swal.close()
+    }
+  })
+}
+
+export const PrintHojaSinDatos = (nro,token,tabla) => {
+  Loading('Cargando Formato a Imprimir')
+  getFetch(`/api/v01/ct/oit/obtenerReporteOit?nOrden=${nro}&nameService=${tabla}`,token)
+  .then(async (res) => {
+    if (res.norden) {
+      console.log(res)
+      const nombre = res.nameJasper;
+      console.log(nombre)
+      if (nombre === 'OIT_Digitalizado_boro') {
+        OIT_B_Digitalizado_boro(res)
+        Swal.close()
+      } else {
+        OIT_B_Digitalizado(res)
+        Swal.close()
+      }
     } else {
       Swal.close()
     }

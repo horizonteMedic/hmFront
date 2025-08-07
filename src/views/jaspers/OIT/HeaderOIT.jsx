@@ -112,17 +112,6 @@ const header_OIT = (doc, datos = {}) => {
   const datosPacienteY = y + 45; // Bajado de 35 a 45
   const datosPacienteX = margin + 25;
   
-  // Título "EXAMEN" centrado y con fuente más grande
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  const examTitle = "EXAMEN : RADIOGRAFIA DE TORAX P.A";
-  const examTitleX = pageW / 2;
-  doc.text(examTitle, examTitleX, datosPacienteY, { align: "center" });
-  
-  // Subrayar el texto del examen
-  const examWidth = doc.getTextWidth(examTitle);
-  const examX = examTitleX - examWidth / 2;
-  doc.setLineWidth(0.2);
-  doc.line(examX, datosPacienteY + 1, examX + examWidth, datosPacienteY + 1);
   
   // Datos del paciente - todos en mayúsculas y labels en negrita
   
