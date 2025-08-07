@@ -100,6 +100,7 @@ const TabComponent = () => {
   const token = useAuthStore((state) => state.token);
   const userlogued = useAuthStore((state) => state.userlogued);
   const Vista = useAuthStore((state) => state.listView);
+  console.log(Vista);
   const Acceso = useAuthStore((state) => state.listAccesos);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
@@ -391,7 +392,21 @@ const TabComponent = () => {
                   <span className={styles.title}>Oftalmología</span>
                 </div>
               )}
-              { <div
+              {tieneVista("RAYOS X") && (
+                <div
+                  onClick={() => setActiveTab(20)}
+                  className={`${styles.gridItem} ${
+                    activeTab === 20 ? styles.active : ""
+                  }`}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faEye} />
+                  </span>
+                  <span className={styles.title}>RAYOS X</span>
+                </div>
+              )}
+              {
+                <div
                   onClick={() => setActiveTab(19)}
                   className={`${styles.gridItem} ${
                     activeTab === 19 ? styles.active : ""
@@ -401,7 +416,8 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faAnchor} />
                   </span>
                   <span className={styles.title}>OIT</span>
-                </div> }
+                </div>
+              }
             </div>
           </>
         )}
@@ -1009,24 +1025,6 @@ const TabComponent = () => {
         onNavigate={(idx) => {
           console.log("Navigating to tab:", idx);
           setDrawerOpen(false);
-          // if (idx === 7) {
-          //   setActiveTab(null);
-          // } else if (idx === 0) {
-          //   setActiveTab(0);
-          // } else if (idx === 1) {
-          //   setActiveTab(1);
-          // } else if (idx === 2) {
-          //   setActiveTab(2);
-          // } else if (idx === 3) {
-          //   setActiveTab(16);//Historia Ocupacional
-          // } else if (idx === 4) {
-          //   setActiveTab(14);//Espirometria
-          //   setSubTab(0);
-          // } else if (idx === 5) {
-          //   setActiveTab(5);
-          // } else if (idx === 6) {
-          //   setActiveTab(6);
-          // }
           switch (idx) {
             case "Inicio":
               setActiveTab(null);
