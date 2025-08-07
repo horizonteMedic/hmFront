@@ -35,6 +35,7 @@ import Espirometria from './views/admin/panel-de-control/SistemaOcupacional/Espi
 import OftalmologiaTabSelector from './views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/OftalmologiaTabSelector.jsx';
 import Odontologia from './views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx';
 import RayosX from './views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx';
+import ConsentimientoInformadoOcupacional from './views/admin/panel-de-control/SistemaOcupacional/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx';
 
 //SIMULADOR DE jaspers
 import Ficha from './views/jaspers/MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx'
@@ -121,6 +122,7 @@ const AppContent = () => {
           <Route path="/SistemaOcupacional/odontologia" element={<Odontologia />} />
           <Route path="/HistoriaOcupacional" element={<HistoriaOcupacional />} />
           <Route path="/rayosx" element={<RayosX />} />
+          <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} />
         </Route>
         <Route path="/Espirometria" element={<Espirometria />} />
         <Route path="/Oftalmologia" element={<OftalmologiaTabSelector />} />

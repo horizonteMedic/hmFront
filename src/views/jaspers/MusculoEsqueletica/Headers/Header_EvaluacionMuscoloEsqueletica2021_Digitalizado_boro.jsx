@@ -1,16 +1,32 @@
-const headerEvaluacionMuscoloEsqueletica = (doc, datos) => {
+const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
 
+  // Datos de prueba
+  const datosPrueba = {
+    nombres: "JUAN CARLOS PÉREZ GONZÁLEZ CAPORALES",
+    edad: "38",
+    sexo: "M",
+    fecha: "15/12/2024",
+    empresa: "ESTE ES UNA EMPRESA MUY LARGO PARA VER COMO SE VE EN LA HOJA",
+    areaTrabajo: "ESTE ES UN AREA DE TRABAJO MUY LARGO PARA VER COMO SE VE EN LA HOJ",
+    cargo: "ESTE ES UN CARGO MUY LARGO PARA VER COMO SE VE EN LA HOJA"
+  };
+
+  // Usar datos reales o datos de prueba
+  const datosFinales = datos && Object.keys(datos).length > 0 ? datos : datosPrueba;
+
   // === NUEVO: Usar imagen de fondo para la cabecera ===
-  const fondoImg = "/img/header_EvaluacionMusculoEsqueletica_boro.png";
-  const fondoH = 47; // altura aproximada de la cabecera en mm (ajusta si es necesario)
-  let yHeader = 0; // Pegado a la parte superior
-  try {
-    doc.addImage(fondoImg, "PNG", 0, yHeader, pageW, fondoH); // Todo el ancho de la hoja
-  } catch (e) {
-    doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
+  if (mostrarFrame) {
+    const fondoImg = "/img/header_EvaluacionMusculoEsqueletica_boro.png";
+    const fondoH = 47; // altura aproximada de la cabecera en mm (ajusta si es necesario)
+    let yHeader = 0; // Pegado a la parte superior
+    try {
+      doc.addImage(fondoImg, "PNG", 0, yHeader, pageW, fondoH); // Todo el ancho de la hoja
+    } catch (e) {
+      doc.text("Imagen de cabecera no disponible", margin, yHeader + 10);
+    }
   }
 
   // 2) TÍTULO centrado - FICHA DE EVALUACIÓN MÚSCULO ESQUELÉTICA
@@ -20,14 +36,22 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos) => {
   doc.setFont("helvetica", "bold").setFontSize(13);
   doc.text(titulo1, pageW / 2, tituloY, { align: "center" });
   doc.text(titulo2, pageW / 2, tituloY + 6, { align: "center" });
+  
+  // Subrayado para los títulos
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.5);
+  const titulo1Width = doc.getTextWidth(titulo1);
+  const titulo2Width = doc.getTextWidth(titulo2);
+  doc.line((pageW - titulo1Width) / 2, tituloY + 1, (pageW + titulo1Width) / 2, tituloY + 1);
+  doc.line((pageW - titulo2Width) / 2, tituloY + 7, (pageW + titulo2Width) / 2, tituloY + 7);
 
   // 3) Información de sede y número de ficha a la derecha
-  const sedeValue = datos.sede || 'Trujillo-Pierola';
+  const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
   const sedeX = pageW - margin - 25;
   const sedeY = y + 1; // Subido de y + 6 a y + 2
   
   // Número de ficha primero
-  const fichaNum = datos.norden || datos.numeroFicha || datos.nroFicha || "96639";
+  const fichaNum = datosFinales.norden || datosFinales.numeroFicha || datosFinales.nroFicha || "96639";
   const fichaY = sedeY;
   
   // Texto "N° Ficha :" delante del número
@@ -52,7 +76,55 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos) => {
 
   // 4) NÚMERO DE PÁGINA
   doc.setFont("helvetica", "normal").setFontSize(10);
-  doc.text("Pag. 1", pageW - margin, margin + 5, { align: "right" });
+  doc.text(`Pag. ${numeroPagina}`, pageW - margin, margin + 5, { align: "right" });
+
+  // === 5) DATOS DEL PACIENTE ===
+  doc.setFont("helvetica", "normal").setFontSize(8);
+
+  // Nombre completo
+  const xNombres = margin + 20.5;
+  const yNombres = margin + 18;
+  doc.text(String(datosFinales.nombres || ""), xNombres, yNombres, { maxWidth: 90 });
+
+  // Edad
+  const xEdad = margin + 122.5;
+  const yEdad = margin + 18;
+  const edadTexto = datosFinales.edad ? `${datosFinales.edad} años` : "";
+  doc.text(edadTexto, xEdad, yEdad);
+
+  // Sexo
+  const xSexo = margin + 148.5;
+  const ySexo = margin + 18;
+  doc.text(String(datosFinales.sexo || ""), xSexo, ySexo);
+
+  // Fecha
+  const xFecha = margin + 167;
+  const yFecha = margin + 18;
+  let fechaFormateada = datosFinales.fecha || "";
+  
+  // Formatear fecha a DD/MM/YYYY si viene en formato YYYY-MM-DD
+  if (fechaFormateada && fechaFormateada.includes("-")) {
+    const [yyyy, mm, dd] = fechaFormateada.split("-");
+    fechaFormateada = `${dd}/${mm}/${yyyy}`;
+  }
+  
+  doc.text(fechaFormateada, xFecha, yFecha);
+
+  // Empresa
+  const xEmpresa = margin + 20.5;
+  const yEmpresa = margin + 25;
+  doc.text(String(datosFinales.empresa || ""), xEmpresa, yEmpresa, { maxWidth: 170 });
+
+  // Área de Trabajo
+  const xAreaTrabajo = margin + 28;
+  const yAreaTrabajo = margin + 31.5;
+  doc.setFontSize(8);
+  doc.text(String(datosFinales.areaTrabajo || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 75 });
+
+  // Cargo
+  const xCargo = margin + 116;
+  const yCargo = margin + 31.5;
+  doc.text(String(datosFinales.cargo || ""), xCargo, yCargo, { maxWidth: 80 });
 
   // Restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);

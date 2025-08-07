@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature } from '@fortawesome/free-solid-svg-icons';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -44,6 +44,7 @@ const Navbar = () => {
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
     // { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },
     { to: "/rayosx", name: "Rayos X", label: "Rayos X", icon: faXRay },
+    { to: "/consentimiento-informado", name: "Consentimiento Informado", label: "Consentimiento", icon: faFileSignature },
     // { to: "/HistoriaOcupacional", name: "Historia Ocupacional", label: "Historia Ocupacional", icon: faNotesMedical },
     // { to: "/Espirometria", name: "Espirometría", label: "Espirometría", icon: faNotesMedical },
     // { to: "/Oftalmologia", name: "Oftalmología", label: "Oftalmología", icon: faNotesMedical }

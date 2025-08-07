@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import footerTR from "../components/footerTR.jsx";
 import headerConInformadoOcupacional from "./Header/header_conInformadoOcupacional_Digitalizado.jsx";
 
-export default function conInformadoOcupacional_Digitalizado(data = {}) {
+export default function Consentimiento_informado_digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 20;
   const pageW = doc.internal.pageSize.getWidth();

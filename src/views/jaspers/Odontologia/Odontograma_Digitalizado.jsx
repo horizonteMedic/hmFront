@@ -531,7 +531,7 @@ export default function Odontograma_Digitalizado(data = {}) {
     if (tipoDiente && tipoDiente !== "Normal" && posicionesDientes[numeroDiente]) {
       const nombreIcono = mapeoTiposIconos[tipoDiente];
       if (nombreIcono) {
-        const iconPath = `/src/views/jaspers/Odontologia/iconos_odonto/Icon_${nombreIcono}.png`;
+        const iconPath = `/img/iconos_odonto/Icon_${nombreIcono}.png`;
         const posicion = posicionesDientes[numeroDiente];
         
         try {
