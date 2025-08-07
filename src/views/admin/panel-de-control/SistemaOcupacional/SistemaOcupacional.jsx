@@ -77,6 +77,7 @@ import OftalmologiaTabSelector from "./Oftalmologia/OftalmologiaTabSelector.jsx"
 import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
+import RayosX from "./RayosX/RayosX.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -100,7 +101,6 @@ const TabComponent = () => {
   const token = useAuthStore((state) => state.token);
   const userlogued = useAuthStore((state) => state.userlogued);
   const Vista = useAuthStore((state) => state.listView);
-  console.log(Vista);
   const Acceso = useAuthStore((state) => state.listAccesos);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
@@ -318,6 +318,7 @@ const TabComponent = () => {
               )}
               {tieneVista("Rayos X") && (
                 <div
+                  onClick={() => setActiveTab(12)}
                   className={`${styles.gridItem} ${
                     activeTab === 12 ? styles.active : ""
                   }`}
@@ -390,19 +391,6 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faEye} />
                   </span>
                   <span className={styles.title}>Oftalmología</span>
-                </div>
-              )}
-              {tieneVista("RAYOS X") && (
-                <div
-                  onClick={() => setActiveTab(20)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 20 ? styles.active : ""
-                  }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faEye} />
-                  </span>
-                  <span className={styles.title}>RAYOS X</span>
                 </div>
               )}
               {
@@ -851,6 +839,22 @@ const TabComponent = () => {
                   )}
                 </div>
               </div>
+            </div>
+          )}
+          {activeTab === 12 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
+              </div>
+              <RayosX />
             </div>
           )}
           {activeTab === 15 && (
