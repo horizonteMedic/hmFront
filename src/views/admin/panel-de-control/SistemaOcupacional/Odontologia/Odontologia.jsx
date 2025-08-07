@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import OdontogramaAdultos from "./OdontogramaAdultos";
 import OdontologiaReportes from "./OdontologiaReportes";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,6 +8,7 @@ import {
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import {
+  getInfoTabla,
   PrintConsultaEjecutada,
   PrintHojaR,
   SubmitDataService,
@@ -157,6 +158,8 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
   const [form, setForm] = useState(initialFormState);
   const [formLO, setFormLO] = useState(initialFormStateLO);
 
+  const [dataTabla, setDataTabla] = useState([]);
+
   const changeTab = (tabIndex) => {
     setActiveTab(tabIndex);
   };
@@ -167,6 +170,7 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    handleClearLO();
   };
 
   const handleChange = (e) => {
@@ -243,7 +247,21 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
     setFormLO((prev) => ({ ...initialFormStateLO, norden: prev.norden }));
   };
   const handleSaveLO = () => {
-    SubmitDataServiceLO(formLO, token, userlogued, handleClearLO, tablaLO);
+    SubmitDataServiceLO(
+      formLO,
+      token,
+      userlogued,
+      handleClearLO,
+      tablaLO,
+      closeModal
+    );
+  };
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
 
   return (
@@ -293,7 +311,7 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                       disabled={form.codOd == null}
                       onClick={() => {
                         openModal();
-                        // setForm2((prev) => ({ ...prev, norden: form.norden }));
+                        setFormLO((prev) => ({ ...prev, norden: form.norden }));
                       }}
                       className={`px-3 h-[22px] rounded flex items-center w-full justify-center transition-colors duration-200 my-auto
                                 ${
@@ -412,6 +430,12 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                 setForm={setForm}
                 handleChange={handleChange}
                 handleEjecutarConsulta={handleEjecutarConsulta}
+                tabla={tabla}
+                token={token}
+                handleClear={handleClear}
+                dataTabla={dataTabla}
+                setActiveTab={setActiveTab}
+                obtenerInfoTabla={obtenerInfoTabla}
               />
             )}
           </div>
