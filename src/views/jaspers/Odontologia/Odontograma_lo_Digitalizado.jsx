@@ -25,6 +25,110 @@ const interpretarUrlParaLeer = (url) => {
   return nombreArchivo ? imgsToLabels[nombreArchivo] ?? "" : "";
 };
 
+// Función para formatear fechas de YYYY-MM-DD, YYYY/MM/DD, DD/MM/YYYY o texto como "lunes 04 noviembre 2024" a "LUNES DD DE MES DEL YYYY"
+const formatearFecha = (fecha) => {
+  if (!fecha || fecha.trim() === "") return "";
+  
+  const meses = {
+    "01": "ENERO", "02": "FEBRERO", "03": "MARZO", "04": "ABRIL",
+    "05": "MAYO", "06": "JUNIO", "07": "JULIO", "08": "AGOSTO",
+    "09": "SEPTIEMBRE", "10": "OCTUBRE", "11": "NOVIEMBRE", "12": "DICIEMBRE"
+  };
+  
+  const mesesTexto = {
+    "enero": "01", "febrero": "02", "marzo": "03", "abril": "04",
+    "mayo": "05", "junio": "06", "julio": "07", "agosto": "08",
+    "septiembre": "09", "octubre": "10", "noviembre": "11", "diciembre": "12"
+  };
+  
+  const diasSemanaES = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+  
+  // Función para obtener el día de la semana de una fecha
+  const obtenerDiaSemana = (año, mes, dia) => {
+    const fechaObj = new Date(año, mes - 1, dia); // mes - 1 porque Date usa 0-11
+    return diasSemanaES[fechaObj.getDay()];
+  };
+  
+  const fechaLimpia = fecha.trim().toLowerCase();
+  
+  // Verificar si es formato de texto (contiene nombres de meses)
+  const contieneTextoMes = Object.keys(mesesTexto).some(mes => fechaLimpia.includes(mes));
+  
+  if (contieneTextoMes) {
+    // Formato de texto: "lunes 04 noviembre 2024", "martes 5 de agosto del 2025", etc.
+    // INCLUIR el día de la semana en el resultado final
+    const diasSemana = ['lunes', 'martes', 'miércoles', 'miercoles', 'jueves', 'viernes', 'sábado', 'sabado', 'domingo'];
+    const palabrasIgnorar = ['de', 'del']; // Solo ignorar "de" y "del", NO los días de semana
+    const todasLasPalabras = fechaLimpia.split(/\s+/);
+    const palabras = todasLasPalabras.filter(palabra => !palabrasIgnorar.includes(palabra));
+    let dia, mesTexto, año, diaSemana;
+    
+    // Buscar día de la semana
+    diaSemana = todasLasPalabras.find(palabra => diasSemana.includes(palabra));
+    if (diaSemana) diaSemana = diaSemana.toUpperCase();
+    
+    // Buscar día (número de 1-2 dígitos)
+    const diaMatch = palabras.find(palabra => /^\d{1,2}$/.test(palabra));
+    if (diaMatch) dia = diaMatch.padStart(2, "0");
+    
+    // Buscar mes (nombre del mes)
+    mesTexto = palabras.find(palabra => mesesTexto[palabra]);
+    
+    // Buscar año (número de 4 dígitos)
+    const añoMatch = palabras.find(palabra => /^\d{4}$/.test(palabra));
+    if (añoMatch) año = añoMatch;
+    
+    if (dia && mesTexto && año) {
+      const numeroMes = mesesTexto[mesTexto];
+      const nombreMes = meses[numeroMes];
+      // Incluir día de la semana si existe
+      if (diaSemana) {
+        return `${diaSemana} ${parseInt(dia)} DE ${nombreMes} DEL ${año}`;
+      } else {
+        return `${parseInt(dia)} DE ${nombreMes} DEL ${año}`;
+      }
+    }
+  }
+  
+  // Formato numérico: YYYY-MM-DD, YYYY/MM/DD o DD/MM/YYYY
+  let separador = fechaLimpia.includes('-') ? '-' : '/';
+  const partes = fechaLimpia.split(separador);
+  
+  if (partes.length !== 3) return fecha; // Si no tiene formato correcto, devolver original
+  
+  let dia, mes, año;
+  
+  // Detectar formato: si el primer elemento tiene 4 dígitos es YYYY-MM-DD o YYYY/MM/DD
+  if (partes[0].length === 4) {
+    // Formato YYYY-MM-DD o YYYY/MM/DD
+    año = partes[0];
+    mes = partes[1].padStart(2, "0");
+    dia = partes[2].padStart(2, "0");
+  } else {
+    // Formato DD-MM-YYYY o DD/MM/YYYY
+    dia = partes[0].padStart(2, "0");
+    mes = partes[1].padStart(2, "0");
+    año = partes[2];
+  }
+  
+  const nombreMes = meses[mes];
+  if (!nombreMes) return fecha; // Si el mes no es válido, devolver original
+  
+  // CALCULAR el día de la semana para fechas numéricas
+  const diaSemanaCalculado = obtenerDiaSemana(parseInt(año), parseInt(mes), parseInt(dia));
+  
+  return `${diaSemanaCalculado} ${parseInt(dia)} DE ${nombreMes} DEL ${año}`;
+};
+
+// Función para interpretar sexo F/M a FEMENINO/MASCULINO
+const interpretarSexo = (sexo) => {
+  if (!sexo) return "";
+  const sexoLimpio = sexo.toString().trim().toUpperCase();
+  if (sexoLimpio === "F") return "FEMENINO";
+  if (sexoLimpio === "M") return "MASCULINO";
+  return sexoLimpio; // Si ya está en formato completo, devolverlo
+};
+
 // === FOOTER FICHA ODONTOLÓGICA CABECERA ===
 function footerFichaOdontologicaCabecera(doc, opts = {}, datos = {}) {
   const margin = 8;
@@ -190,7 +294,7 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
     // Observaciones y lugar fecha
     observaciones:
       "paciente presenta buena higiene bucal. se recomienda control cada 6 meses. se observa ligera acumulación de sarro en molares inferiores. necesita limpieza profesional.",
-    lugarFecha: "trujillo, 04 de noviembre de 2024",
+    lugarFecha: "trujillo, lunes 04 noviembre 2024",
   };
 
   // Función para obtener string de datos
@@ -211,9 +315,9 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
     nombres: obtenerStringMayus("nombres"),
     empresa: obtenerStringMayus("empresa"),
     contratista: obtenerStringMayus("contrata"),
-    sexo: obtenerStringMayus("sexo"),
+    sexo: interpretarSexo(obtenerString("sexo")),
     edad: obtenerString("edad"),
-    fecha: obtenerStringMayus("fechaOd"),
+    fecha: formatearFecha(obtenerString("fechaOd")),
     piezasMalEstado: obtenerString("txtPiezasMalEstado"),
     pprMetalicas: obtenerString("txtPprMetalicas"),
     pprAcrilicas: obtenerString("txtPprAcrilicas"),
@@ -228,7 +332,7 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
     fracturadas: obtenerString("txtFracturada"),
     observaciones: obtenerStringMayus("txtObservaciones"),
     lugarFecha:
-      obtenerStringMayus("lugar") + " - " + obtenerStringMayus("fechaOd"),
+      obtenerStringMayus("lugar") + " - " + formatearFecha(obtenerString("fechaOd")),
 
     d1: interpretarUrlParaLeer(data.lbl18),
     d2: interpretarUrlParaLeer(data.lbl17),
@@ -277,9 +381,9 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
           nombres: datosPrueba.nombres.toUpperCase(),
           empresa: datosPrueba.empresa.toUpperCase(),
           contratista: datosPrueba.contratista.toUpperCase(),
-          sexo: datosPrueba.sexo.toUpperCase(),
+          sexo: interpretarSexo(datosPrueba.sexo),
           edad: datosPrueba.edad,
-          fecha: datosPrueba.fecha.toUpperCase(),
+          fecha: formatearFecha(datosPrueba.fecha),
           piezasMalEstado: datosPrueba.piezasMalEstado,
           pprMetalicas: datosPrueba.pprMetalicas,
           pprAcrilicas: datosPrueba.pprAcrilicas,
@@ -293,7 +397,7 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
           cariadasPorOturar: datosPrueba.cariadasPorOturar,
           fracturadas: datosPrueba.fracturadas,
           observaciones: datosPrueba.observaciones.toUpperCase(),
-          lugarFecha: datosPrueba.lugarFecha.toUpperCase(),
+          lugarFecha: (datosPrueba.lugarFecha.split(',')[0] + ', ' + formatearFecha(datosPrueba.lugarFecha.split(',')[1]?.trim() || '')).toUpperCase(),
         };
 
   // === 0) HEADER CON LOGO, DATOS DE CONTACTO Y BLOQUE DE COLOR ===
@@ -504,9 +608,9 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
     align: "right",
   });
 
-  // === OBSERVACIONES Y LUGAR FECHA ===
+   // === OBSERVACIONES Y LUGAR FECHA ===
   // Observaciones - Coordenadas individuales
-  const xObservaciones = margin + 148; // AJUSTAR POSICIÓN X DE OBSERVACIONES AQUÍ
+     const xObservaciones = margin + 138; // AJUSTAR POSICIÓN X DE OBSERVACIONES AQUÍ
   const yObservaciones = margin + 142; // AJUSTAR POSICIÓN Y DE OBSERVACIONES AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observaciones, xObservaciones, yObservaciones, {
@@ -514,8 +618,8 @@ export default function Odontograma_lo_Digitalizado(data = {}) {
   });
 
   // Lugar y Fecha - Coordenadas individuales
-  const xLugarFecha = margin + 132.5; // AJUSTAR POSICIÓN X DE LUGAR Y FECHA AQUÍ
-  const yLugarFecha = margin + 153.6; // AJUSTAR POSICIÓN Y DE LUGAR Y FECHA AQUÍ
+  const xLugarFecha = margin + 134; // AJUSTAR POSICIÓN X DE LUGAR Y FECHA AQUÍ
+     const yLugarFecha = margin + 156.5; // AJUSTAR POSICIÓN Y DE LUGAR Y FECHA AQUÍ
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.lugarFecha, xLugarFecha, yLugarFecha);
 

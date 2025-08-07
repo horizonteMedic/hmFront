@@ -24,7 +24,14 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
     puntosRotacionExterna: "1",
     puntosRotacionInterna: "2",
     totalRangosArticulares: "6",
-    dolorContraResistencia: "NO",
+    // dolorContraResistencia ahora será un objeto con múltiples evaluaciones
+    dolorContraResistencia: {
+      evaluacion1: "NO",
+      evaluacion2: "SI", 
+      evaluacion3: "NO",
+      evaluacion4: "SI",
+      evaluacion5: "NO"
+    },
     observacionesRangosArticulares: "Rangos articulares dentro de parámetros normales, sin dolor significativo."
   };
 
@@ -53,76 +60,86 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
   }
 
   // === 2) CAMPOS DE DATOS PARA EVALUACIÓN MÚSCULO ESQUELÉTICA ===
-  doc.setFont("helvetica", "normal").setFontSize(10);
+  doc.setFont("helvetica", "bold").setFontSize(10);
 
   // === SECCIÓN: APTITUD ESPALDA ===
   
   // Puntos para cada ejercicio
-  const xPuntosAptitud = margin + 140; // Ajustar posición X de la columna Puntos
+  const xPuntosAptitud = margin + 106; // Ajustar posición X de la columna Puntos
   
   // ABDOMEN
-  const yPuntosAbdomen = margin + 85;
+  const yPuntosAbdomen = margin + 56.5;
   doc.text(datosFinales.puntosAbdomen || "", xPuntosAptitud, yPuntosAbdomen);
   
   // CADERA  
-  const yPuntosCadera = margin + 95;
+  const yPuntosCadera = margin + 69.5;
   doc.text(datosFinales.puntosCadera || "", xPuntosAptitud, yPuntosCadera);
   
   // MUSLO
-  const yPuntosMuslo = margin + 105;
+  const yPuntosMuslo = margin + 82.5;
   doc.text(datosFinales.puntosMuslo || "", xPuntosAptitud, yPuntosMuslo);
   
   // ABDOMEN LATERAL
-  const yPuntosAbdomenLateral = margin + 115;
+  const yPuntosAbdomenLateral = margin + 95.5;
   doc.text(datosFinales.puntosAbdomenLateral || "", xPuntosAptitud, yPuntosAbdomenLateral);
   
   // TOTAL APTITUD ESPALDA
-  const yTotalAptitud = margin + 125;
+  const yTotalAptitud = margin + 106.8;
   doc.setFont("helvetica", "bold");
   doc.text(datosFinales.totalAptitudEspalda || "", xPuntosAptitud, yTotalAptitud);
   
   // Observaciones APTITUD ESPALDA
-  const xObservacionesAptitud = margin + 155;
-  const yObservacionesAptitud = margin + 105;
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  const xObservacionesAptitud = margin + 115;
+  const yObservacionesAptitud = margin + 56.5;
+  doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.observacionesAptitudEspalda || "", xObservacionesAptitud, yObservacionesAptitud, { maxWidth: 60 });
 
   // === SECCIÓN: RANGOS ARTICULARES ===
   
   // Puntos para cada rango articular
-  const xPuntosRangos = margin + 140; // Ajustar posición X de la columna Puntos
+  const xPuntosRangos = margin + 90; // Ajustar posición X de la columna Puntos
   
   // Abducción de hombro (Normal 0°-180°)
-  const yPuntosAbduccionNormal = margin + 155;
+  const yPuntosAbduccionNormal = margin + 120;
   doc.setFont("helvetica", "normal").setFontSize(10);
   doc.text(datosFinales.puntosAbduccionNormal || "", xPuntosRangos, yPuntosAbduccionNormal);
   
   // Abducción de hombro (0°-60°)
-  const yPuntosAbduccion60 = margin + 165;
+  const yPuntosAbduccion60 = margin + 130;
   doc.text(datosFinales.puntosAbduccion60 || "", xPuntosRangos, yPuntosAbduccion60);
   
   // Rotación externa (0°-90°)
-  const yPuntosRotacionExterna = margin + 175;
+  const yPuntosRotacionExterna = margin + 140;
   doc.text(datosFinales.puntosRotacionExterna || "", xPuntosRangos, yPuntosRotacionExterna);
   
   // Rotación externa de hombro (interna)
-  const yPuntosRotacionInterna = margin + 185;
+  const yPuntosRotacionInterna = margin + 145;
   doc.text(datosFinales.puntosRotacionInterna || "", xPuntosRangos, yPuntosRotacionInterna);
   
   // TOTAL RANGOS ARTICULARES
-  const yTotalRangos = margin + 195;
+  const yTotalRangos = margin + 150;
   doc.setFont("helvetica", "bold");
   doc.text(datosFinales.totalRangosArticulares || "", xPuntosRangos, yTotalRangos);
   
-  // Dolor contra resistencia
-  const xDolorResistencia = margin + 165;
-  const yDolorResistencia = margin + 175;
+  // Dolor contra resistencia - Múltiples evaluaciones
+  const xDolorResistencia = margin + 125;
+  let yDolorResistencia = margin + 130;
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.dolorContraResistencia || "", xDolorResistencia, yDolorResistencia);
+  
+  // Renderizar cada evaluación de dolor contra resistencia
+  if (datosFinales.dolorContraResistencia && typeof datosFinales.dolorContraResistencia === 'object') {
+    Object.entries(datosFinales.dolorContraResistencia).forEach(([, value], index) => {
+      const yPos = yDolorResistencia + (index * 3); // Espaciado entre evaluaciones
+      doc.text(value || "", xDolorResistencia, yPos);
+    });
+  } else {
+    // Fallback para datos antiguos
+    doc.text(datosFinales.dolorContraResistencia || "", xDolorResistencia, yDolorResistencia);
+  }
   
   // Observaciones RANGOS ARTICULARES
-  const xObservacionesRangos = margin + 185;
-  const yObservacionesRangos = margin + 175;
+  const xObservacionesRangos = margin + 125;
+  const yObservacionesRangos = margin + 130;
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observacionesRangosArticulares || "", xObservacionesRangos, yObservacionesRangos, { maxWidth: 60 });
 
