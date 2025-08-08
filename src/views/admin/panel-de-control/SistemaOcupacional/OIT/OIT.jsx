@@ -20,6 +20,7 @@ const OIT = ({token, selectedSede, userlogued,userDatos}) => {
         norden: "",
         nplaca: "",
         nombres: "",
+        doctor: "",
         dni: "",
         dniUser: userDatos.datos.dni_user,
         edad: "",
@@ -202,6 +203,7 @@ const OIT = ({token, selectedSede, userlogued,userDatos}) => {
             norden: "",
             nplaca: "",
         nombres: "",
+        doctor: "",
         dni: "",
         dniUser: userDatos.datos.dni_user,
         edad: "",
@@ -403,6 +405,7 @@ const OIT = ({token, selectedSede, userlogued,userDatos}) => {
         ...prev,
         nplaca: "",
         nombres: "",
+        doctor: "",
         dni: "",
         dniUser: userDatos.datos.dni_user,
         edad: "",
@@ -619,10 +622,10 @@ const OIT = ({token, selectedSede, userlogued,userDatos}) => {
     };
 
     return (
-    <div className="mx-auto bg-white rounded-lg shadow-md overflow-hidden py-8">
-        <div className="w-full">
+    <div className=" bg-white rounded-lg shadow-md overflow-hidden pb-6">
+        <div className="w-auto mx-20 pb-4">
         <h1 className="text-3xl font-bold mb-4 text-center">OIT</h1>
-            <div className='ml-20 border rounded-md p-3 shadow-sm bg-white'>
+            <div className=' border rounded-md p-4 shadow-sm bg-white'>
                 <h2>Datos del Sistema</h2>
                 <div className='m-3 flex flex-col'>
                     <div className='flex flex-row items-center my-2'>
