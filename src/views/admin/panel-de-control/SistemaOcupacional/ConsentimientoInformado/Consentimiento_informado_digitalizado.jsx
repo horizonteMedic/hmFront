@@ -10,8 +10,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { getFetch } from "../../getFetch/getFetch";
+import { SubmitConsentimientoInformado } from "./model";
 
-const tabla = "consentimiento_informado_ocupacional";
+const tabla = "consentimientoInformado";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -23,11 +24,12 @@ const currentTime = date.toLocaleTimeString('en-US', {
   minute: '2-digit', 
   second: '2-digit' 
 });
-
+console.log(today)
 const initialFormState = {
   norden: "",
   codCons: null,
   fechaExam: today,
+  fecha: today,
   nomExam: "",
   fechaNac: "",
   nombres: "",
@@ -40,7 +42,7 @@ const initialFormState = {
   documentoIdentidad: "",
   ocupacionLaboral: "",
   fechaConsentimiento: today,
-  horaConsentimiento: currentTime,
+  hora: currentTime,
   
   // Texto del consentimiento (pre-llenado)
   textoConsentimiento: `certifico que he sido informado/a acerca de la naturaleza y propósito del examen médico ocupacional así como pruebas complementarias determinada por la empresa:`,
@@ -52,7 +54,7 @@ const initialFormState = {
   textoFinalConsentimiento: `De acuerdo a los peligros y riesgos identificados en mi puesto de trabajo. En ese sentido en forma consciente y voluntaria doy mi consentimiento, para que se me realice el examen médico ocupacional de acuerdo a la Resolución ministerial N° 312-2011/MINSA. Y doy fe que la información brindada a HORIZONTE MEDIC es verídica. Así mismo, autorizo a HORIZONTE MEDIC para que brinde mi historia clínica y toda información resultante de mi examen médico ocupacional al Médico Ocupacional de mi empresa para que tenga acceso a mi Historia Clínica de acuerdo a la N.T.N° 022 MINSA/dgsp-V.02 y Ley N° 26842, Ley general de salud.`,
 };
 
-export default function ConsentimientoInformadoOcupacional({ token, selectedSede, userlogued }) {
+export default function ConsentimientoInformadoOcupacional({ token, selectedSede, userlogued, userDatos }) {
   const [form, setForm] = useState(initialFormState);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -86,6 +88,9 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
       showConfirmButton: false,
       allowOutsideClick: false,
       allowEscapeKey: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       customClass: {
         popup: "swal2-border-radius",
         title: "swal2-title-custom",
@@ -128,6 +133,20 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
       });
   };
 
+  const GetInfoPacConsentInfor = (nro,tabla,set,token) => {
+      getFetch(`/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado?nOrden=${nro}&nameService=${tabla}`,token)
+      .then((res) => {
+        console.log(res)
+        set(prev => ({
+          ...prev,
+          ...res,
+        }))
+      })
+      .finally(() => {
+        Swal.close()
+      })
+  }
+
   const VerifyTR = async (nro, tabla, token, set, sede) => {
     if (!nro) {
       await Swal.fire(
@@ -148,11 +167,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
         GetInfoPac(nro, set, token, sede);
       } else {
         // Ya existe registro
-        Swal.fire(
-          "Alerta",
-          "Este paciente ya cuenta con registros de Consentimiento Informado.",
-          "warning"
-        );
+        GetInfoPacConsentInfor(nro, tabla, set, token)
       }
     });
   };
@@ -163,45 +178,47 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
       return;
     }
     Loading("Registrando Datos");
-    
-    const body = {
-      norden: form.norden,
-      fechaConsentimiento: form.fechaConsentimiento,
-      horaConsentimiento: form.horaConsentimiento,
-      nombreCompleto: form.nombreCompleto,
-      documentoIdentidad: form.documentoIdentidad,
-      ocupacionLaboral: form.ocupacionLaboral,
-      informacionAdicional: form.informacionAdicional,
-      userRegistro: user,
-    };
-
-    // Aquí iría la llamada a la API para guardar
-    // Por ahora simulamos el éxito
-    setTimeout(() => {
-      Swal.fire({
-        title: "Éxito",
-        text: "Datos guardados correctamente,\n¿Desea imprimir?",
-        icon: "success",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+    SubmitConsentimientoInformado(form,userlogued,token)
+    .then((res) => {
+      console.log(res)
+      if (res.id === 1 || res.id === 0) {
+      Swal.fire({title: 'Exito', text:`${res.mensaje},\n¿Desea imprimir?`, icon:'success', showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
       }).then((result) => {
-        limpiar();
-        if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
-        }
-      });
-    }, 1000);
+          limpiar()
+          if (result.isConfirmed) {
+
+              PrintHojaR(form.norden,token,tabla)
+          }
+      })
+      } else {
+          Swal.fire('Error','Ocurrio un error al Registrar','error')
+      }
+    })
   };
 
   const PrintHojaR = (nro, token, tabla) => {
     Loading("Cargando Formato a Imprimir");
-    
-    // Simulación de impresión
-    setTimeout(() => {
-      Swal.close();
-      Swal.fire("Info", "Función de impresión en desarrollo", "info");
-    }, 1000);
+    getFetch(`/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoInformado?nOrden=${nro}&nameService=${tabla}`,token)
+      .then(async (res) => {
+        if (res.norden) {
+          console.log(res)
+          const nombre = res.nameJasper;
+          console.log(nombre)
+          const jasperModules = import.meta.glob('../../../../jaspers/ConsentimientoInformado/*.jsx');
+          const modulo = await jasperModules[`../../../../jaspers/ConsentimientoInformado/${nombre}.jsx`]();
+          // Ejecuta la función exportada por default con los datos
+          if (typeof modulo.default === 'function') {
+            modulo.default(res);
+          } else {
+            console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
+          }
+          Swal.close()
+        } else {
+          Swal.close()
+        }
+      })
   };
 
   const handleSearch = (e) => {
@@ -253,7 +270,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
         </p>
       </div>
 
-        <form className="p-3 rounded w-full border mb-4 bg-white shadow-sm">
+        <form onSubmit={(e) => e.preventDefault()} className="p-3 rounded w-full border mb-4 bg-white shadow-sm" >
           <div className="flex items-center gap-3">
             <label className="font-semibold text-md">N° Orden:</label>
             <input
@@ -264,14 +281,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
               onChange={handleChangeNumber}
               placeholder="Ingrese N° Orden"
             />
-            <button
-              type="button"
-              onClick={handleEdit}
-              className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-2 rounded text-md flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faEdit} className="text-xs" />
-              Editar
-            </button>
+            
           </div>
         </form>
 
@@ -284,8 +294,8 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
             <label className="font-semibold min-w-[30px]">Yo:</label>
             <input
               className="border rounded px-2 py-1 flex-1"
-              name="nombreCompleto"
-              value={form.nombreCompleto || ""}
+              name="nombres"
+              value={form.nombres || ""}
               onChange={handleChange}
               disabled={!isEditing}
               placeholder="Nombre completo"
@@ -298,8 +308,8 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
             </label>
             <input
               className="border rounded px-2 py-1 w-48"
-              name="documentoIdentidad"
-              value={form.documentoIdentidad || ""}
+              name="dni"
+              value={form.dni || ""}
               onChange={handleChange}
               disabled={!isEditing}
               placeholder="DNI"
@@ -312,8 +322,8 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
             </label>
             <input
               className="border rounded px-2 py-1 flex-1"
-              name="ocupacionLaboral"
-              value={form.ocupacionLaboral || ""}
+              name="ocupacion"
+              value={form.ocupacion || ""}
               onChange={handleChange}
               disabled={!isEditing}
               placeholder="Ocupación laboral"
@@ -331,8 +341,8 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
             <div className="mb-3">
               <input
                 className="border rounded px-2 py-1 w-full"
-                name="informacionAdicional"
-                value={form.informacionAdicional || ""}
+                name="empresa"
+                value={form.empresa || ""}
                 onChange={handleChange}
                 disabled={!isEditing}
                 placeholder="Información adicional sobre el examen"
@@ -352,24 +362,16 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
             <input
               type="date"
               className="border rounded px-2 py-1"
-              name="fechaConsentimiento"
-              value={form.fechaConsentimiento || ""}
+              name="fecha"
+              value={form.fecha || ""}
               onChange={handleChange}
-              disabled={!isEditing}
             />
-            <button
-              type="button"
-              className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-2 py-1 rounded"
-              disabled={!isEditing}
-            >
-              <FontAwesomeIcon icon={faCalendar} className="text-[10px]" />
-            </button>
           </div>
           
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[50px]">Hora:</label>
             <span className="border rounded px-2 py-1 bg-gray-50">
-              {form.horaConsentimiento}
+              {form.hora}
             </span>
           </div>
         </div>

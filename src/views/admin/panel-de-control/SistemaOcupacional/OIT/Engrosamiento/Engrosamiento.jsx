@@ -249,7 +249,7 @@ const Engrosamiento = ({form,setForm}) => {
                 <div className="w-full h-[1px] bg-gray-300 my-4" />
                 <div className="flex p-2 gap-1 items-center">
                     <label htmlFor="">Medico: </label>
-                    <input type="text" className="border rounded px-2 py-1 mx-4 w-[22%]" />
+                    <input type="text" disabled value={form.doctor} className="border rounded px-2 py-1 mx-4 w-[22%]" />
                 </div>
             </div>   
         </>

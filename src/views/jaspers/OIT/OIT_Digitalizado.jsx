@@ -45,7 +45,7 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "NOMBRE:",styles: { valign: "middle",} },
           { content: `${datos.nombres}`, colSpan: 3,styles: { valign: "middle",} },
           { content: "EDAD:",styles: { valign: "middle",} },
-          { content: `${datos.edad}`,styles: { valign: "middle",} }
+          { content: `${datos.edad} AÑOS`,styles: { valign: "middle",} }
         ],
         [
           { content: "FECHA DE LECTURA", rowSpan: 2,styles: { valign: "middle",} },
@@ -308,25 +308,25 @@ export default function OIT_Digitalizado(datos = {}) {
         [
           { content: "SITIO (Marque las casillas adecuadas)", rowSpan: 4, styles: { halign: 'center', valign: 'middle', cellWidth: 40 } },
           { content: "CALCIFICACION (Marque)", rowSpan: 4, styles: { halign: 'center', valign: 'middle', cellWidth: 40 } },
-          { content: "EXTENSIón (Pared torácica combinada\n para placas de perfil y de frente)", colSpan: 2 },
+          { content: "EXTENSIÓN (Pared torácica combinada\n para placas de perfil y de frente)", colSpan: 2 },
           { content: "ANCHO (opcional) (Ancho mínimo exigido 3mm)", colSpan: 2 }
         ],
         [
           { content: "1", styles: { halign: 'center', valign: 'middle' } },
           { content: "< 1/4 de la pared lateral de tórax" },
-          { content: "4", styles: { halign: 'center', valign: 'middle' } },
+          { content: "a", styles: { halign: 'center', valign: 'middle' } },
           { content: "De 3 a 5 mm" }
         ],
         [
           { content: "2", styles: { halign: 'center', valign: 'middle' } },
           { content: "Entre 1/4 y 1/2 de la pared lateral de tórax" },
-          { content: "5", styles: { halign: 'center', valign: 'middle' } },
+          { content: "b", styles: { halign: 'center', valign: 'middle' } },
           { content: "De 5 a 10 mm" }
         ],
         [
           { content: "3", styles: { halign: 'center', valign: 'middle' } },
           { content: "> 1/2 de la pared lateral de tórax" },
-          { content: "6", styles: { halign: 'center', valign: 'middle' } },
+          { content: "c", styles: { halign: 'center', valign: 'middle' } },
           { content: "Mayor a 10 mm" }
         ]
 
@@ -716,7 +716,7 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "tb", styles: { halign: 'center', valign: 'middle' } },
         ],
         [
-          { content: "Comentarios:", colSpan: 15, styles: { minCellHeight: 11 } }
+          { content: `Comentarios:\n${datos.txtSComentarios}`, colSpan: 15, styles: { minCellHeight: 11 } }
         ],
         [
           { content: "Firma y Sello de Médico", colSpan: 15 }

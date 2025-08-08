@@ -78,6 +78,7 @@ import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
 import RayosX from "./RayosX/RayosX.jsx";
+import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -393,7 +394,7 @@ const TabComponent = () => {
                   <span className={styles.title}>Oftalmología</span>
                 </div>
               )}
-              {
+              {tieneVista("OIT") && (
                 <div
                   onClick={() => setActiveTab(19)}
                   className={`${styles.gridItem} ${
@@ -405,7 +406,20 @@ const TabComponent = () => {
                   </span>
                   <span className={styles.title}>OIT</span>
                 </div>
-              }
+              )}
+              {tieneVista("Consentimientos") && (
+                <div
+                  onClick={() => setActiveTab(20)}
+                  className={`${styles.gridItem} ${
+                    activeTab === 19 ? styles.active : ""
+                  }`}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faAnchor} />
+                  </span>
+                  <span className={styles.title}>Modulo de Consentimientos</span>
+                </div>
+              )}
             </div>
           </>
         )}
@@ -854,7 +868,11 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
               </div>
-              <RayosX />
+              <RayosX
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+              />
             </div>
           )}
           {activeTab === 15 && (
@@ -1005,6 +1023,24 @@ const TabComponent = () => {
                 </button>
               </div>
               <OIT
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+                userDatos={userlogued}
+              />
+            </div>
+          )}
+          {activeTab === 20 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <ConsentimientoInformadoOcupacional
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}
