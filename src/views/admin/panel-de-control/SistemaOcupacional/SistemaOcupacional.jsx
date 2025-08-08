@@ -1056,6 +1056,14 @@ const TabComponent = () => {
               setActiveTab(16);
               setSubTab(0);
               break;
+            case "Oftalmologia":
+              setActiveTab(17);
+              setSubTab(0);
+              break;
+            case "Odontologia":
+              setActiveTab(18);
+              setSubTab(0);
+              break;
           }
         }}
         activeIndex={activeTab}
