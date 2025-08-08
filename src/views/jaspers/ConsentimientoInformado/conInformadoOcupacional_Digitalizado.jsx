@@ -1,5 +1,5 @@
 import jsPDF from "jspdf";
-import footerTR from "../components/footerTR.jsx";
+import footerCons from "./FooterCons.jsx";
 import headerConInformadoOcupacional from "./Header/header_conInformadoOcupacional_Digitalizado.jsx";
 
 export default function conInformadoOcupacional_Digitalizado(data = {}) {
@@ -115,23 +115,27 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
     const footerY = pageH - 80;
     
     // Calcular el ancho total del bloque (huella + espacio + firma)
-    const huellaSize = 25;
+    const huellaSize = 35;
     const espacioEntre = 40;
     const firmaWidth = 60;
     const anchoTotal = huellaSize + espacioEntre + firmaWidth;
     
     // Calcular la posición X para centrar el bloque completo
     const bloqueX = (pageW - anchoTotal) / 2;
-    
+    let horaTexto = datosFinales.hora; // ejemplo "14:25:08"
+    let [hora] = horaTexto.split(':'); // solo la hora
+    hora = parseInt(hora, 10);
+
+    let sufijo = hora >= 12 ? 'PM' : 'AM';
     // Fecha y Hora (centradas con la misma separación que huella y firma, 15 puntos más arriba)
-    const fechaHoraY = footerY - 15;
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    const fechaHoraY = footerY - 30;
+    doc.setFont("helvetica", "normal").setFontSize(12);
     doc.text(`Fecha: ${datosFinales.fecha}`, bloqueX, fechaHoraY);
-    doc.text(`Hora: ${datosFinales.hora}`, bloqueX + huellaSize + espacioEntre + 18, fechaHoraY);
+    doc.text(`Hora: ${datosFinales.hora} ${sufijo}`, bloqueX + huellaSize + espacioEntre + 18, fechaHoraY);
     
     // Cuadro para huella (más grande)
     const huellaX = bloqueX;
-    const huellaY = footerY + 2;
+    const huellaY = footerY - 15;
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.5);
     doc.rect(huellaX, huellaY, huellaSize, huellaSize);
@@ -140,10 +144,10 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
 
     if (s2) {
       const canvas = document.createElement('canvas');
-      canvas.width = s1.width;
-      canvas.height = s1.height;
+      canvas.width = s2.width;
+      canvas.height = s2.height;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(s1, 0, 0);
+      ctx.drawImage(s2, 0, 0);
       const selloBase64 = canvas.toDataURL('image/png');
 
       // Dimensiones máximas permitidas dentro del cuadro de huella
@@ -151,8 +155,8 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
       const maxImgH = huellaSize - 4;
 
       // Tamaño real de la imagen
-      let imgW = s1.width;
-      let imgH = s1.height;
+      let imgW = s2.width;
+      let imgH = s2.height;
 
       // Escalado proporcional para que quepa dentro del cuadro
       const scaleW = maxImgW / imgW;
@@ -171,7 +175,7 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
 
     // Línea para firma (más cerca del cuadro de huella)
     const firmaX = huellaX + huellaSize + espacioEntre;
-    const firmaY = footerY + 9;
+    const firmaY = footerY + 7;
     doc.setLineWidth(0.5);
     doc.line(firmaX, firmaY + 12, firmaX + firmaWidth, firmaY + 12);
     doc.setFont("helvetica", "normal").setFontSize(10);
@@ -185,8 +189,8 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
       const firmaBase64 = canvas.toDataURL('image/png');
 
       // Máximo ancho y alto permitidos para la firma (puedes ajustar)
-      const maxImgW = 60;
-      const maxImgH = 25;
+      const maxImgW = 70;
+      const maxImgH = 35;
 
       let imgW = s1.width;
       let imgH = s1.height;
@@ -220,7 +224,7 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
     doc.setTextColor(0, 0, 0);
     
     // Agregar footer con datos de contacto
-    footerTR(doc, data);
+    footerCons(doc, data);
 
     // === 8) Generar blob y abrir en iframe para imprimir automáticamente ===
     const blob = doc.output("blob");

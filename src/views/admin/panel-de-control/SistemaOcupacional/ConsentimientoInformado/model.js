@@ -4,7 +4,7 @@ export function SubmitConsentimientoInformado(data,user,token) {
     const body = {
         "norden": data.norden,
         "fecha": data.fecha,
-        "hora": data.hora,
+        "hora": data.horaActual.replace(/[^0-9:]/g, ""),
         "userRegistro": user
     };    
 

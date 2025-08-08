@@ -407,7 +407,7 @@ const TabComponent = () => {
                   <span className={styles.title}>OIT</span>
                 </div>
               )}
-              {tieneVista("Consentimientos") && (
+              {tieneVista("Modulo de Consentimientos") && (
                 <div
                   onClick={() => setActiveTab(20)}
                   className={`${styles.gridItem} ${
