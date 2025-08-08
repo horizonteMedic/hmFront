@@ -44,7 +44,7 @@ const Navbar = () => {
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
     // { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },
     // { to: "/rayosx", name: "Rayos X", label: "Rayos X", icon: faXRay },
-    // { to: "/consentimiento-informado", name: "Consentimiento Informado", label: "Consentimiento", icon: faFileSignature },
+    //{ to: "/consentimiento-informado", name: "Consentimiento Informado", label: "Consentimiento", icon: faFileSignature },
     // { to: "/HistoriaOcupacional", name: "Historia Ocupacional", label: "Historia Ocupacional", icon: faNotesMedical },
     // { to: "/Espirometria", name: "Espirometría", label: "Espirometría", icon: faNotesMedical },
     // { to: "/Oftalmologia", name: "Oftalmología", label: "Oftalmología", icon: faNotesMedical }

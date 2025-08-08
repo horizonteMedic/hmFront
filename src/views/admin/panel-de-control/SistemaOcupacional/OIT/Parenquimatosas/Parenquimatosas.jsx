@@ -94,23 +94,24 @@ const Parenquimatosas = ({form,setForm}) => {
                         </div>
 
                         {/* Sección Derecha */}
-                        <div className="pl-4 flex flex-col">
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">1.- Buena</label>
-                                <input className="ml-8" type="checkbox" name="rbBuena" id="rbBuena" checked={form.rbBuena} onChange={() => handleCheck('rbBuena')} />
-                            </div>
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">2.- Aceptable</label>
-                                <input className="ml-2" type="checkbox" name="rbAceptable" id="rbAceptable" checked={form.rbAceptable} onChange={() => handleCheck('rbAceptable')}/>
-                            </div>
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">3.- Baja Calidad</label>
-                                <input className="ml-2" type="checkbox" name="rbBajacalidad" id="rbBajacalidad" checked={form.rbBajacalidad} onChange={() => handleCheck('rbBajacalidad')}/>
-                            </div>
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">4.- Inaceptable</label>
-                                <input className="ml-2" type="checkbox" name="rbInaceptable" id="rbInaceptable" checked={form.rbInaceptable} onChange={() => handleCheck('rbInaceptable')}/>
-                            </div>
+                        <div className="pl-4 flex flex-col gap-2">
+                            {[
+                                { label: "1.- Buena", name: "rbBuena" },
+                                { label: "2.- Aceptable", name: "rbAceptable" },
+                                { label: "3.- Baja Calidad", name: "rbBajacalidad" },
+                                { label: "4.- Inaceptable", name: "rbInaceptable" },
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center">
+                                <label htmlFor={item.name} className="w-40">{item.label}</label>
+                                <input
+                                    type="checkbox"
+                                    id={item.name}
+                                    name={item.name}
+                                    checked={form[item.name]}
+                                    onChange={() => handleCheck(item.name)}
+                                />
+                                </div>
+                            ))}
                         </div>
                     </div>
 
@@ -121,28 +122,47 @@ const Parenquimatosas = ({form,setForm}) => {
                         </div>
 
                         {/* Sección Derecha */}
-                        <div className="pl-4 flex flex-col">
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">Sobre Exposición</label>
-                                <input className="ml-2" type="checkbox" name="rbSobreexposicion" id="rbSobreexposicion" checked={form.rbSobreexposicion} onChange={() => handleCheck2('rbSobreexposicion')}/>
-                                <label className="ml-10" htmlFor="">Escápulas</label>
-                                <input className="ml-2" type="checkbox" name="rbEscapulas" id="rbEscapulas" checked={form.rbEscapulas} onChange={() => handleCheck2('rbEscapulas')}/>
+                        <div className="pl-4 grid grid-cols-2 gap-y-3 gap-x-10">
+                            <div className="flex items-center">
+                                <input type="checkbox" name="rbSobreexposicion" id="rbSobreexposicion"
+                                    checked={form.rbSobreexposicion} onChange={() => handleCheck2('rbSobreexposicion')} />
+                                <label htmlFor="rbSobreexposicion" className="ml-2">Sobre Exposición</label>
                             </div>
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">Subexposición</label>
-                                <input className="ml-2" type="checkbox" name="rbSubexposicion" id="rbSubexposicion" checked={form.rbSubexposicion} onChange={() => handleCheck2('rbSubexposicion')}/>
-                                <label className="ml-16" htmlFor="">Artefactos</label>
-                                <input className="ml-2" type="checkbox" name="rbArtefactos" id="rbArtefactos" checked={form.rbArtefactos} onChange={() => handleCheck2('rbArtefactos')}/>
+
+                            <div className="flex items-center">
+                                <input type="checkbox" name="rbEscapulas" id="rbEscapulas"
+                                    checked={form.rbEscapulas} onChange={() => handleCheck2('rbEscapulas')} />
+                                <label htmlFor="rbEscapulas" className="ml-2">Escápulas</label>
                             </div>
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">Posición centrado</label>
-                                <input className="ml-2" type="checkbox" name="rbPosicioncentrado" id="rbPosicioncentrado" checked={form.rbPosicioncentrado} onChange={() => handleCheck2('rbPosicioncentrado')}/>
-                                <label className="ml-10" htmlFor="">Otros</label>
-                                <input className="ml-2" type="checkbox" name="rbOtros" id="rbOtros" checked={form.rbOtros} onChange={() => handleCheck2('rbOtros')}/>
+
+                            <div className="flex items-center">
+                                <input type="checkbox" name="rbSubexposicion" id="rbSubexposicion"
+                                    checked={form.rbSubexposicion} onChange={() => handleCheck2('rbSubexposicion')} />
+                                <label htmlFor="rbSubexposicion" className="ml-2">Subexposición</label>
                             </div>
-                            <div className="flex flex-row m-2">
-                                <label htmlFor="">Inspiración Insuficiente</label>
-                                <input className="ml-2" type="checkbox" name="rbInspiracionInsuficiente" id="rbInspiracionInsuficiente" checked={form.rbInspiracionInsuficiente} onChange={() => handleCheck2('rbInspiracionInsuficiente')}/>
+
+                            <div className="flex items-center">
+                                <input type="checkbox" name="rbArtefactos" id="rbArtefactos"
+                                    checked={form.rbArtefactos} onChange={() => handleCheck2('rbArtefactos')} />
+                                <label htmlFor="rbArtefactos" className="ml-2">Artefactos</label>
+                            </div>
+
+                            <div className="flex items-center">
+                                <input type="checkbox" name="rbPosicioncentrado" id="rbPosicioncentrado"
+                                    checked={form.rbPosicioncentrado} onChange={() => handleCheck2('rbPosicioncentrado')} />
+                                <label htmlFor="rbPosicioncentrado" className="ml-2">Posición centrado</label>
+                            </div>
+
+                            <div className="flex items-center">
+                                <input type="checkbox" name="rbOtros" id="rbOtros"
+                                    checked={form.rbOtros} onChange={() => handleCheck2('rbOtros')} />
+                                <label htmlFor="rbOtros" className="ml-2">Otros</label>
+                            </div>
+
+                            <div className="flex items-center col-span-2">
+                                <input type="checkbox" name="rbInspiracionInsuficiente" id="rbInspiracionInsuficiente"
+                                    checked={form.rbInspiracionInsuficiente} onChange={() => handleCheck2('rbInspiracionInsuficiente')} />
+                                <label htmlFor="rbInspiracionInsuficiente" className="ml-2">Inspiración Insuficiente</label>
                             </div>
                         </div>
                         
