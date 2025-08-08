@@ -5,7 +5,7 @@ import styles from "./RayosX.module.css";
 import RayosXToraxPA from "./RayosXToraxPA";
 import RayosXColumna from "./RayosXColumna";
 
-const RayosX = () => {
+const RayosX = ({ token, selectedSede, userlogued }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -33,7 +33,13 @@ const RayosX = () => {
         </nav>
         <div className="p-6  max-w-[95%] mx-auto">
           {activeTab === 0 && <RayosXToraxPA />}
-          {activeTab === 1 && <RayosXColumna />}
+          {activeTab === 1 && (
+            <RayosXColumna
+              token={token}
+              selectedSede={selectedSede}
+              userlogued={userlogued}
+            />
+          )}
         </div>
       </div>
     </div>

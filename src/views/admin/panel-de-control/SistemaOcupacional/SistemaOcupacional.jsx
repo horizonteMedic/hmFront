@@ -868,7 +868,11 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
               </div>
-              <RayosX />
+              <RayosX
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+              />
             </div>
           )}
           {activeTab === 15 && (

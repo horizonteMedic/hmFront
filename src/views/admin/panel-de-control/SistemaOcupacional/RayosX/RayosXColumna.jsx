@@ -1,55 +1,81 @@
-import { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faSave, 
-  faEraser, 
-  faTrash, 
-  faEdit,
-  faPrint
-} from '@fortawesome/free-solid-svg-icons';
-import ModalImagenRayosX from './ModalImagenRayosX';
+import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
+import {
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerRayosXColumna";
 import Swal from "sweetalert2";
 
-const initialForm = {
-  nroOrden: '',
-  fechaExamen: '',
-  paciente: '',
-  dni: '',
-  edad: '',
-  lumbar: false,
-  lumbosacro: false,
-  dorsolumbar: false,
-  informe: '',
-  conclusion: '',
+const tabla = "radiografia";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
+const initialFormState = {
+  norden: "",
+  fechaExam: today,
+  nombres: "",
+  dni: "",
+  edad: "",
+  tipoRadiografia: "DORSOLUMBAR",
+  informe:
+    "CUERPOS VERTEBRALES MUESTRAN MORFOLOGÍA NORMAL.\n" +
+    "SACRO NO MUESTRA LESIONES EVIDENTES.\n" +
+    "ESPACIOS INTERVERTEBRALES CONSERVADOS.\n" +
+    "DENSIDAD ÓSEA ADECUADA.\n" +
+    "LORDOSIS LUMBAR NORMAL.\n" +
+    "CANAL RAQUÍDEO CON AMPLITUD NORMAL.",
+  conclusion:
+    "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.",
 };
 
-export default function RayosXColumna() {
-  const [form, setForm] = useState(initialForm);
-  const [showModal, setShowModal] = useState(false);
+export default function RayosXColumna({ token, selectedSede, userlogued }) {
+  const [form, setForm] = useState(initialFormState);
 
-  const setField = (field, value) => {
-    setForm(prev => ({ ...prev, [field]: value }));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
   };
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setField(name, type === 'checkbox' ? checked : value);
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+    if (/^[\d/]*$/.test(value)) {
+      setForm((f) => ({ ...f, [name]: value }));
+    }
+  };
+  const handleRadioButton = (e, value) => {
+    const { name } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: value.toUpperCase(),
+    }));
   };
 
   const handleClear = () => {
-    setForm(initialForm);
+    setForm(initialFormState);
+  };
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+  };
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   const handleSave = () => {
-    // Aquí se integrará con la API en el futuro
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
-
   const handlePrint = () => {
-    if (!form.nroOrden)
+    if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
     Swal.fire({
       title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.nroOrden}</b></div>`,
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Sí, Imprimir",
@@ -61,99 +87,199 @@ export default function RayosXColumna() {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // Aquí se llamará a la función de impresión
-        console.log("Imprimiendo orden:", form.nroOrden);
+        PrintHojaR(form.norden, token, tabla);
       }
     });
   };
 
   return (
-    <div style={{ width: '100%', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', background: '#fafbfc' }}>
-      <div style={{ maxWidth: 900, width: '100%', margin: '2rem 0', background: 'white', borderRadius: '0.75rem', boxShadow: '0 4px 12px rgba(0,0,0,0.07)', padding: '2.5rem 2rem' }}>
-                 <div className="flex flex-col gap-6">
-           <div className="min-w-[420px] w-full text-black">
-                           {/* Header con título y botón imprimir */}
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold text-gray-800">Radiografia Columna</h1>
-                <div className="flex flex-col items-end">
-                  <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      name="nroOrden"
-                      value={form.nroOrden}
-                      onChange={handleInputChange}
-                      className="border rounded px-2 py-1 text-base w-24"
-                    />
-                    <button
-                      type="button"
-                      onClick={handlePrint}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                    >
-                      <FontAwesomeIcon icon={faPrint} />
-                    </button>
-                  </div>
+    <div className="w-full flex justify-center">
+      <div className="w-full max-w-[95%] md:max-w-[80%]">
+        <div className="flex flex-col gap-6">
+          <div className="w-full">
+            {/* Header con título y botón imprimir */}
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-2xl font-bold text-gray-800">
+                Radiografía Columna
+              </h1>
+              <div className="flex flex-col items-end">
+                <span className="font-bold italic text-base mb-1">
+                  IMPRIMIR
+                </span>
+                <div className="flex items-center gap-2">
+                  <input
+                    name="norden"
+                    value={form.norden}
+                    onChange={handleChangeNumber}
+                    className="border rounded px-2 py-1 text-base w-24"
+                  />
+                  <button
+                    type="button"
+                    onClick={handlePrint}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faPrint} />
+                  </button>
                 </div>
               </div>
-             {/* Sección Aptitud */}
-            <div className="border rounded p-4 bg-gray-50 mb-4">
-              <div className="flex gap-4 items-center mb-2">
-                <label className="font-semibold text-gray-700">N° Orden :</label>
-                <input name="nroOrden" value={form.nroOrden} onChange={handleInputChange} className="border rounded px-3 py-2 w-24 bg-yellow-100 text-gray-800 font-medium" />
-                <button className="ml-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md flex items-center gap-2 text-sm font-medium transition-colors duration-200">
-                  <FontAwesomeIcon icon={faEdit} />
-                  Editar/Mostrar
-                </button>
-                <label className="font-semibold ml-4 text-gray-700">Fecha :</label>
-                <input name="fechaExamen" type="date" value={form.fechaExamen} onChange={handleInputChange} className="border rounded px-3 py-2 w-36 bg-gray-100 text-gray-600" />
+            </div>
+            {/* Sección Aptitud */}
+            <div className="border rounded p-4  mb-4 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-3 w-full">
+                <div className="flex items-center gap-4">
+                  <label className="font-semibold min-w-[65px]">
+                    N° Orden :
+                  </label>
+                  <input
+                    className="border rounded px-2 py-1 w-full"
+                    name="norden"
+                    value={form.norden || ""}
+                    onKeyUp={handleSearch}
+                    onChange={handleChangeNumber}
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="font-semibold min-w-[65px]">
+                    Fecha Ex :
+                  </label>
+                  <input
+                    type="date"
+                    className="border rounded px-2 py-1 w-full"
+                    name="fechaExam"
+                    value={form.fechaExam || ""}
+                    onChange={handleChange}
+                  />
+                </div>
               </div>
-              <div className="mb-3">
-                <label className="font-semibold text-gray-700">Nombres y Apellidos :</label>
-                <input name="paciente" value={form.paciente} onChange={handleInputChange} className="border rounded px-3 py-2 w-full bg-gray-100 text-gray-600 mt-1" />
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[65px]">Nombres :</label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  name="nombres"
+                  value={form.nombres || ""}
+                  disabled
+                />
               </div>
-              <div className="flex gap-4 items-center mb-2">
-                <label className="font-semibold text-gray-700">DNI :</label>
-                <input name="dni" value={form.dni} onChange={handleInputChange} className="border rounded px-3 py-2 w-24 bg-gray-100 text-gray-600" />
-                <label className="font-semibold ml-4 text-gray-700">Edad :</label>
-                <input name="edad" value={form.edad} onChange={handleInputChange} className="border rounded px-3 py-2 w-20 bg-gray-100 text-gray-600" />
+              <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-3 w-full">
+                <div className="flex items-center gap-4">
+                  <label className="font-semibold min-w-[65px]">DNI :</label>
+                  <input
+                    className="border rounded px-2 py-1 w-full"
+                    name="dni"
+                    value={form.dni || ""}
+                    disabled
+                  />
+                </div>
+                <div className="flex items-center gap-4">
+                  <label className="font-semibold min-w-[65px]">Edad :</label>
+                  <input
+                    className="border rounded px-2 py-1 w-full"
+                    name="edad"
+                    value={form.edad || ""}
+                    disabled
+                  />
+                </div>
               </div>
             </div>
             {/* Sección Radiografía de Columna */}
-            <div className="border rounded p-4 bg-white mb-4">
+            <div className="border rounded p-4 bg-white mb-4 space-y-3">
               <div className="font-bold mb-2">RADIOGRAFÍA DE COLUMNA</div>
               <div className="flex gap-6 mb-2">
-                <label className="flex items-center gap-1"><input type="checkbox" name="lumbar" checked={form.lumbar} onChange={handleInputChange} />LUMBAR</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="lumbosacro" checked={form.lumbosacro} onChange={handleInputChange} />LUMBOSACRO</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="dorsolumbar" checked={form.dorsolumbar} onChange={handleInputChange} />DORSOLUMBAR</label>
+                <label className="flex gap-2 font-semibold">
+                  <input
+                    type="radio"
+                    name="tipoRadiografia"
+                    checked={form.tipoRadiografia === "LUMBAR"}
+                    onChange={(e) => {
+                      handleRadioButton(e, "LUMBAR");
+                      setForm((prev) => ({
+                        ...prev,
+                        conclusion:
+                          "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
+                      }));
+                    }}
+                  />
+                  Lumbar
+                </label>
+                <label className="flex gap-2 font-semibold">
+                  <input
+                    type="radio"
+                    name="tipoRadiografia"
+                    checked={form.tipoRadiografia === "LUMBOSACRA AP-L"}
+                    onChange={(e) => {
+                      handleRadioButton(e, "LUMBOSACRA AP-L");
+                      setForm((prev) => ({
+                        ...prev,
+                        conclusion:
+                          "RADIOGRAFÍA DE COLUMNA LUMBOSACRA AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
+                      }));
+                    }}
+                  />
+                  Lumbosacro
+                </label>
+                <label className="flex gap-2 font-semibold">
+                  <input
+                    type="radio"
+                    name="tipoRadiografia"
+                    checked={form.tipoRadiografia === "DORSOLUMBAR"}
+                    onChange={(e) => {
+                      handleRadioButton(e, "DORSOLUMBAR");
+                      setForm((prev) => ({
+                        ...prev,
+                        conclusion:
+                          "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.",
+                      }));
+                    }}
+                  />
+                  Dorsolumbar
+                </label>
               </div>
-              <div className="mb-2">
-                <label className="font-semibold">INFORME:</label>
-                <textarea name="informe" value={form.informe} onChange={handleInputChange} className="border rounded px-2 py-1 w-full" rows={5} />
+              <div className="flex items-start flex-col">
+                <label className="font-semibold">Informe :</label>
+                <p className="text-[#233245]">
+                  El estudio Radiografico representado en incidencia frontal y
+                  lateral muestra:
+                </p>
+                <textarea
+                  className="border rounded px-2 py-1 w-full resize-none mt-1"
+                  name="informe"
+                  rows={6}
+                  value={form.informe || ""}
+                  onChange={handleChange}
+                />
               </div>
-              <div className="mb-2">
-                <label className="font-semibold">CONCLUSIÓN :</label>
-                <textarea name="conclusion" value={form.conclusion} onChange={handleInputChange} className="border rounded px-2 py-1 w-full" rows={2} />
+              <div className="flex items-start gap-1 flex-col">
+                <label className="font-semibold ">Conclusión :</label>
+                <textarea
+                  className="border rounded px-2 py-1 w-full resize-none"
+                  name="conclusion"
+                  rows={4}
+                  value={form.conclusion || ""}
+                  onChange={handleChange}
+                />
               </div>
-                         </div>
-             <div className="flex justify-center gap-3 mb-6">
-              <button type="button" onClick={handleSave} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2 font-medium transition-colors duration-200">
-                <FontAwesomeIcon icon={faSave} />
-                Grabar/Actualizar
-              </button>
-              <button type="button" onClick={handleClear} className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-md flex items-center gap-2 font-medium transition-colors duration-200">
-                <FontAwesomeIcon icon={faEraser} />
-                Limpiar
-              </button>
-              <button type="button" className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-2 font-medium transition-colors duration-200">
-                <FontAwesomeIcon icon={faTrash} />
-                Eliminar
-              </button>
             </div>
-            {showModal && (
-              <ModalImagenRayosX onClose={() => setShowModal(false)} datos={form} />
-            )}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-2">
+              <div className=" flex gap-4">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faBroom} /> Limpiar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-} 
+}
