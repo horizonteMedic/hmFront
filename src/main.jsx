@@ -48,7 +48,7 @@ import RayosX from "./views/admin/panel-de-control/SistemaOcupacional/RayosX/Ray
 import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Odontologia/Odontograma_Digitalizado.jsx";
+import Ficha from "./views/jaspers/Odontologia/OdontogramaFechas.jsx";
 
 const App = () => {
   return (
