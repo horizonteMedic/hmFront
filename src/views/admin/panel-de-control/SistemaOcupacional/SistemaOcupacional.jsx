@@ -77,6 +77,7 @@ import OftalmologiaTabSelector from "./Oftalmologia/OftalmologiaTabSelector.jsx"
 import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
+import RayosX from "./RayosX/RayosX.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -317,6 +318,7 @@ const TabComponent = () => {
               )}
               {tieneVista("Rayos X") && (
                 <div
+                  onClick={() => setActiveTab(12)}
                   className={`${styles.gridItem} ${
                     activeTab === 12 ? styles.active : ""
                   }`}
@@ -391,7 +393,8 @@ const TabComponent = () => {
                   <span className={styles.title}>Oftalmología</span>
                 </div>
               )}
-              {/* <div
+              {
+                <div
                   onClick={() => setActiveTab(19)}
                   className={`${styles.gridItem} ${
                     activeTab === 19 ? styles.active : ""
@@ -401,7 +404,8 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faAnchor} />
                   </span>
                   <span className={styles.title}>OIT</span>
-                </div> */}
+                </div>
+              }
             </div>
           </>
         )}
@@ -837,6 +841,22 @@ const TabComponent = () => {
               </div>
             </div>
           )}
+          {activeTab === 12 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
+              </div>
+              <RayosX />
+            </div>
+          )}
           {activeTab === 15 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -988,6 +1008,7 @@ const TabComponent = () => {
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}
+                userDatos={userlogued}
               />
             </div>
           )}
@@ -1008,24 +1029,6 @@ const TabComponent = () => {
         onNavigate={(idx) => {
           console.log("Navigating to tab:", idx);
           setDrawerOpen(false);
-          // if (idx === 7) {
-          //   setActiveTab(null);
-          // } else if (idx === 0) {
-          //   setActiveTab(0);
-          // } else if (idx === 1) {
-          //   setActiveTab(1);
-          // } else if (idx === 2) {
-          //   setActiveTab(2);
-          // } else if (idx === 3) {
-          //   setActiveTab(16);//Historia Ocupacional
-          // } else if (idx === 4) {
-          //   setActiveTab(14);//Espirometria
-          //   setSubTab(0);
-          // } else if (idx === 5) {
-          //   setActiveTab(5);
-          // } else if (idx === 6) {
-          //   setActiveTab(6);
-          // }
           switch (idx) {
             case "Inicio":
               setActiveTab(null);
@@ -1051,6 +1054,14 @@ const TabComponent = () => {
               break;
             case "Historia Ocupacional":
               setActiveTab(16);
+              setSubTab(0);
+              break;
+            case "Oftalmologia":
+              setActiveTab(17);
+              setSubTab(0);
+              break;
+            case "Odontologia":
+              setActiveTab(18);
               setSubTab(0);
               break;
           }

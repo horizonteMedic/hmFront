@@ -66,6 +66,22 @@ const Parenquimatosas = ({form,setForm}) => {
         }));
     };
 
+    const handleParenquimatosasChange = (value) => {
+        if (value === "SI") {
+            setForm(prev => ({
+            ...prev,
+            anormalidades_parenquimatosas_si: true,
+            anormalidades_parenquimatosas_no: false
+            }));
+        } else {
+            setForm(prev => ({
+            ...prev,
+            anormalidades_parenquimatosas_si: false,
+            anormalidades_parenquimatosas_no: true
+            }));
+        }
+        };
+
     return(
         <>
             <div className="w-auto">
@@ -137,7 +153,27 @@ const Parenquimatosas = ({form,setForm}) => {
                     <label htmlFor="">Comentario sobre defectos técnicos: </label>
                     <input type="text" className='border rounded w-full px-2 py-1 mx-4' value={form.txtDefectosTecnicos} />
                 </div>
-                <h2 className="font-bold">II. ANORMALIDADES PARENQUIMATOSAS (SI NO HAY ANORMALIDADES PASE A III. A. PLEURALES</h2>
+                <div className="flex justify-between items-center">
+                    <h2 className="font-bold">II. ANORMALIDADES PARENQUIMATOSAS (SI NO HAY ANORMALIDADES PASE A III. A. PLEURALES)</h2>
+                    <div className="flex">
+                        <input type="checkbox" name="chkParenradio" checked={form.anormalidades_parenquimatosas_si} onChange={() =>
+                        setForm(prev => ({
+                        ...prev,
+                        anormalidades_parenquimatosas_si: true,
+                        anormalidades_parenquimatosas_no: false,
+                        }))} id="chk2Si" />
+                        <label htmlFor="">SI</label>
+
+                        <input type="checkbox" name="chkParenradio" checked={form.anormalidades_parenquimatosas_no} onChange={() =>
+                            setForm(prev => ({
+                            ...prev,
+                            anormalidades_parenquimatosas_si: false,
+                            anormalidades_parenquimatosas_no: true,
+                            }))
+                        } id="chk2No" />
+                        <label htmlFor="">NO</label>
+                    </div>
+                </div>
                 <div className="flex flex-row w-auto mt-4">
                     {/*Cuadros */}
                     <div className="flex flex-col w-auto items-start border rounded-md p-3">
@@ -152,22 +188,22 @@ const Parenquimatosas = ({form,setForm}) => {
 
                             {/* Fila Superior */}
                             <label className="text-sm">Superior</label>
-                            <input type="checkbox" className="mx-auto" name="chk1D" id="chk1D" checked={form.chk1D} onChange={handleInputChangeChecked} />
-                            <input type="checkbox" className="mx-auto" name="chk1I" id="chk1I" checked={form.chk1D} onChange={handleInputChangeChecked}/>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk1D" id="chk1D" checked={form.chk1D} onChange={handleInputChangeChecked} />
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk1I" id="chk1I" checked={form.chk1I} onChange={handleInputChangeChecked}/>
 
                             {/* Fila Medio */}
                             <label className="text-sm">Medio</label>
-                            <input type="checkbox" className="mx-auto" name="chk2D" id="chk2D" checked={form.chk1D} onChange={handleInputChangeChecked}/>
-                            <input type="checkbox" className="mx-auto" name="chk2I" id="chk2I" checked={form.chk1D} onChange={handleInputChangeChecked}/>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk2D" id="chk2D" checked={form.chk2D} onChange={handleInputChangeChecked}/>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk2I" id="chk2I" checked={form.chk2I} onChange={handleInputChangeChecked}/>
 
                             {/* Fila Inferior */}
                             <label className="text-sm">Inferior</label>
-                            <input type="checkbox" className="mx-auto" name="chk3D" id="chk3D" checked={form.chk1D} onChange={handleInputChangeChecked}/>
-                            <input type="checkbox" className="mx-auto" name="chk3I" id="chk3I" checked={form.chk1D} onChange={handleInputChangeChecked}/>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk3D" id="chk3D" checked={form.chk3D} onChange={handleInputChangeChecked}/>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk3I" id="chk3I" checked={form.chk3I} onChange={handleInputChangeChecked}/>
                         </div>
                     </div>
 
-                    <div className="flex flex-col w-auto items-start border rounded-md p-3 ml-2">
+                    <div className="flex flex-col w-auto items-center border rounded-md p-3 ml-2">
                         <p className="text-sm font-semibold">2.2. Profusión (opacidades pequeñas)</p>
                         <p className="text-sm text-gray-600">(escala de 12 puntos)</p>
                         <p className="text-sm mb-2 text-gray-600">(Consulte las radiografias estandar -marque la subcateforia de profusión)</p>
@@ -175,26 +211,26 @@ const Parenquimatosas = ({form,setForm}) => {
                         <div className="grid grid-cols-3 gap-y-2 gap-x-4 pl-4">
 
                             {/* Fila Superior */}
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk1" id="chk1" checked={form.chk1} onChange={handleInputChangeChecked}/> 0/- </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk5" id="chk5" checked={form.chk5} onChange={handleInputChangeChecked}/> 0/0 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk9" id="chk9" checked={form.chk9} onChange={handleInputChangeChecked}/> 0/1 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk1" id="chk1" checked={form.chk1} onChange={handleInputChangeChecked}/> 0/- </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk5" id="chk5" checked={form.chk5} onChange={handleInputChangeChecked}/> 0/0 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk9" id="chk9" checked={form.chk9} onChange={handleInputChangeChecked}/> 0/1 </div>
                             {/* Fila Medio */}
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk2" id="chk2" checked={form.chk2} onChange={handleInputChangeChecked}/> 1/0 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk6" id="chk6" checked={form.chk6} onChange={handleInputChangeChecked}/> 1/1 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk10" id="chk10" checked={form.chk10} onChange={handleInputChangeChecked}/> 1/2 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk2" id="chk2" checked={form.chk2} onChange={handleInputChangeChecked}/> 1/0 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk6" id="chk6" checked={form.chk6} onChange={handleInputChangeChecked}/> 1/1 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk10" id="chk10" checked={form.chk10} onChange={handleInputChangeChecked}/> 1/2 </div>
 
                             {/* Fila Inferior */}
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk3" id="chk3" checked={form.chk3} onChange={handleInputChangeChecked}/> 2/1 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk7" id="chk7" checked={form.chk7} onChange={handleInputChangeChecked}/> 2/2 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk11" id="chk11" checked={form.chk11} onChange={handleInputChangeChecked}/> 2/3 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk3" id="chk3" checked={form.chk3} onChange={handleInputChangeChecked}/> 2/1 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk7" id="chk7" checked={form.chk7} onChange={handleInputChangeChecked}/> 2/2 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk11" id="chk11" checked={form.chk11} onChange={handleInputChangeChecked}/> 2/3 </div>
 
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk4" id="chk4" checked={form.chk4} onChange={handleInputChangeChecked}/> 3/2 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk8" id="chk8" checked={form.chk8} onChange={handleInputChangeChecked}/> 3/3 </div>
-                            <div className="flex items-center"><input type="checkbox" className="mx-auto" name="chk12" id="chk12" checked={form.chk12} onChange={handleInputChangeChecked}/> 3/+ </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk4" id="chk4" checked={form.chk4} onChange={handleInputChangeChecked}/> 3/2 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk8" id="chk8" checked={form.chk8} onChange={handleInputChangeChecked}/> 3/3 </div>
+                            <div className="flex items-center"><input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" className="mx-auto" name="chk12" id="chk12" checked={form.chk12} onChange={handleInputChangeChecked}/> 3/+ </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col w-auto items-start border rounded-md p-3 ml-2">
+                    <div className="flex flex-col w-auto items-center border rounded-md p-3 ml-2">
                         <p className="text-sm font-semibold">2.3. Forma y Tamaño:</p>
                         <p className="text-sm mb-2 text-gray-600">(Consulte las radiografias estandar; se requiere dos símbolos; marque un primario y un secudanrio)</p>
 
@@ -207,49 +243,49 @@ const Parenquimatosas = ({form,setForm}) => {
                         <div className="grid grid-cols-4 gap-y-2 gap-x-4 pl-2">
                             {/* Fila 1 */}
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkP1" id="chkP1" checked={form.chkP1} onChange={handleInputChangeChecked}/> <span className="text-sm">P</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkP1" id="chkP1" checked={form.chkP1} onChange={handleInputChangeChecked}/> <span className="text-sm">P</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkP4" id="chkP4" checked={form.chkP4} onChange={handleInputChangeChecked}/> <span className="text-sm">q</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkP4" id="chkP4" checked={form.chkP4} onChange={handleInputChangeChecked}/> <span className="text-sm">q</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkS1" id="chkS1" checked={form.chkS1} onChange={handleInputChangeChecked}/> <span className="text-sm">p</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkS1" id="chkS1" checked={form.chkS1} onChange={handleInputChangeChecked}/> <span className="text-sm">p</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkS4" id="chkS4" checked={form.chkS4} onChange={handleInputChangeChecked}/> <span className="text-sm">s</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkS4" id="chkS4" checked={form.chkS4} onChange={handleInputChangeChecked}/> <span className="text-sm">s</span>
                             </label>
 
                             {/* Fila 2 */}
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkP2" id="chkP2" checked={form.chkP2} onChange={handleInputChangeChecked}/> <span className="text-sm">q</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkP2" id="chkP2" checked={form.chkP2} onChange={handleInputChangeChecked}/> <span className="text-sm">q</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkP5" id="chkP5" checked={form.chkP5} onChange={handleInputChangeChecked}/> <span className="text-sm">t</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkP5" id="chkP5" checked={form.chkP5} onChange={handleInputChangeChecked}/> <span className="text-sm">t</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkS2" id="chkS2" checked={form.chkS2} onChange={handleInputChangeChecked}/> <span className="text-sm">q</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkS2" id="chkS2" checked={form.chkS2} onChange={handleInputChangeChecked}/> <span className="text-sm">q</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkS5" id="chkS5" checked={form.chkS5} onChange={handleInputChangeChecked}/> <span className="text-sm">t</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkS5" id="chkS5" checked={form.chkS5} onChange={handleInputChangeChecked}/> <span className="text-sm">t</span>
                             </label>
 
                             {/* Fila 3 */}
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkP3" id="chkP3" checked={form.chkP3} onChange={handleInputChangeChecked}/> <span className="text-sm">r</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkP3" id="chkP3" checked={form.chkP3} onChange={handleInputChangeChecked}/> <span className="text-sm">r</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkP6" id="chkP6" checked={form.chkP6} onChange={handleInputChangeChecked}/> <span className="text-sm">u</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkP6" id="chkP6" checked={form.chkP6} onChange={handleInputChangeChecked}/> <span className="text-sm">u</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkS3" id="chkS3" checked={form.chkS3} onChange={handleInputChangeChecked}/> <span className="text-sm">r</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkS3" id="chkS3" checked={form.chkS3} onChange={handleInputChangeChecked}/> <span className="text-sm">r</span>
                             </label>
                             <label className="flex items-center space-x-1">
-                            <input type="checkbox" name="chkS6" id="chkS6" checked={form.chk1D} onChange={handleInputChangeChecked}/> <span className="text-sm">u</span>
+                            <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkS6" id="chkS6" checked={form.chkS6} onChange={handleInputChangeChecked}/> <span className="text-sm">u</span>
                             </label>
                         </div>
                     </div>
 
-                    <div className="flex flex-col w-auto items-start border rounded-md p-3 ml-2">
+                    <div className="flex flex-col w-auto items-center border rounded-md p-3 ml-2">
                         <p className="text-sm font-semibold">2.4. Opacidades Grandes:</p>
                         <p className="text-sm mb-2 text-gray-600">(Marque O si no hay ninguna o marque A, B, o C)</p>
 
@@ -257,19 +293,19 @@ const Parenquimatosas = ({form,setForm}) => {
                         {/* Opciones */}
                         <div className="gap-y-2 gap-x-4 flex flex-col justify-center items-center pl-2">
                             <div className="flex justify-center items-center">
-                                <input type="checkbox" name="chko" id="chko" checked={form.chko} onChange={handleInputChangeChecked} /> 
+                                <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chko" id="chko" checked={form.chko} onChange={handleInputChangeChecked} /> 
                                 <label htmlFor=""> O</label>
                             </div>
                             <div className="flex justify-center items-center">
-                                <input type="checkbox" name="chka" id="chka" checked={form.chka} onChange={handleInputChangeChecked} /> 
+                                <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chka" id="chka" checked={form.chka} onChange={handleInputChangeChecked} /> 
                                 <label htmlFor=""> A</label>
                             </div>
                             <div className="flex justify-center items-center">
-                                <input type="checkbox" name="chkb" id="chkb" checked={form.chkb} onChange={handleInputChangeChecked} /> 
+                                <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkb" id="chkb" checked={form.chkb} onChange={handleInputChangeChecked} /> 
                                 <label htmlFor=""> B</label>
                             </div>
                             <div className="flex justify-center items-center">
-                                <input type="checkbox" name="chkc" id="chkc" checked={form.chkc} onChange={handleInputChangeChecked} /> 
+                                <input disabled={form.anormalidades_parenquimatosas_no} type="checkbox" name="chkc" id="chkc" checked={form.chkc} onChange={handleInputChangeChecked} /> 
                                 <label htmlFor=""> C</label>
                             </div>
                         </div>

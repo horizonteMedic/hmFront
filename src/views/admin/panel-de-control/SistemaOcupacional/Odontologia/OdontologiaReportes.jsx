@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComments } from "@fortawesome/free-solid-svg-icons";
+import { GetInfoServicio, Loading, PrintHojaR } from "./controllerOdontologia";
+import Swal from "sweetalert2";
 
 const OdontologiaReportes = ({
   form,
   setForm,
   handleChange,
-  handleCheckBoxChange,
+  handleEjecutarConsulta,
+  tabla,
+  token,
+  handleClear,
+  dataTabla,
+  setActiveTab,
+  obtenerInfoTabla,
 }) => {
-  const [dataTabla, setDataTabla] = useState([]);
-
   return (
     <div className="w-full  ">
       <div className="flex gap-2 w-full ">
@@ -20,7 +26,7 @@ const OdontologiaReportes = ({
               <p className="mb-2 font-semibold">Buscar por fechas</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                  <label className="font-semibold">Fecha de Examen :</label>
+                  <label className="font-semibold">Fecha desde :</label>
                   <input
                     name="fechaDesde"
                     type="date"
@@ -30,7 +36,7 @@ const OdontologiaReportes = ({
                   />
                 </div>
                 <div>
-                  <label className="font-semibold">Fecha de Examen :</label>
+                  <label className="font-semibold">Fecha hasta :</label>
                   <input
                     name="fechaHasta"
                     type="date"
@@ -42,34 +48,10 @@ const OdontologiaReportes = ({
               </div>
             </div>
 
-            <div>
-              <p className="mb-2 font-semibold"> Filtrar por:</p>
-              <div className="flex items-center gap-6">
-                <label className=" flex items-center gap-2 font-medium cursor-pointer pl-2 text-[10px]">
-                  <input
-                    type="checkbox"
-                    name="filtroOcupacional"
-                    checked={form.filtroOcupacional}
-                    onChange={handleCheckBoxChange}
-                  />
-                  Ocupacionales
-                </label>
-                <label className="flex items-center gap-2 font-medium cursor-pointer pl-2 text-[10px]">
-                  <input
-                    type="checkbox"
-                    name="filtroClientesConsulta"
-                    checked={form.filtroClientesConsulta}
-                    onChange={handleCheckBoxChange}
-                  />
-                  Clientes Consulta
-                </label>
-              </div>
-            </div>
-
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2">
               <button
                 type="button"
-                // onClick={handleClear}
+                onClick={handleEjecutarConsulta}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
@@ -90,7 +72,7 @@ const OdontologiaReportes = ({
                 value={form.nombres_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    // obtenerInfoTabla();
+                    obtenerInfoTabla();
                   }
                 }}
                 onChange={(e) => {
@@ -107,7 +89,7 @@ const OdontologiaReportes = ({
                 value={form.codigo_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    // obtenerInfoTabla();
+                    obtenerInfoTabla();
                   }
                 }}
                 onChange={(e) => {
@@ -129,10 +111,11 @@ const OdontologiaReportes = ({
           <div className="flex-1">
             <Table
               data={dataTabla}
-              // tabla={tabla}
+              tabla={tabla}
               set={setForm}
-              // token={token}
-              // clean={handleClear}
+              token={token}
+              clean={handleClear}
+              setActiveTab={setActiveTab}
             />
           </div>
         </div>
@@ -142,8 +125,7 @@ const OdontologiaReportes = ({
 };
 
 // Co
-function Table({ data, set }) {
-  // data, tabla, set, token, clean
+function Table({ data, tabla, set, token, clean, setActiveTab }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -155,15 +137,18 @@ function Table({ data, set }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
 
   function clicktable(nro) {
-    // clean();
+    clean();
     Loading("Importando Datos");
-    // GetInfoServicioTabla(nro, tabla, set, token);
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.close();
+      setActiveTab(1);
+    });
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
@@ -190,7 +175,7 @@ function Table({ data, set }) {
                 onClick={() => clicktable(row.norden)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  // handlePrintConfirm(row.norden);
+                  handlePrintConfirm(row.norden);
                 }}
               >
                 <td className="border px-2 py-1 font-bold">
@@ -198,7 +183,7 @@ function Table({ data, set }) {
                 </td>
                 <td className="border px-2 py-1">{row.nombres || ""}</td>
                 <td className="border px-2 py-1">
-                  {convertirFecha(row.fechaOf)}
+                  {convertirFecha(row.fechaOd)}
                 </td>
               </tr>
             ))
@@ -215,38 +200,6 @@ function Table({ data, set }) {
         </tbody>
       </table>
     </div>
-  );
-}
-
-// Componente Section
-function Section({ title, children }) {
-  return (
-    <div className="space-y-2">
-      {title && (
-        <h3 className="font-semibold text-blue-700 text-xl">{title}</h3>
-      )}
-      {children}
-    </div>
-  );
-}
-
-// Componente ActionButton con colores del ejemplo
-function ActionButton({ color, icon, onClick, children }) {
-  const bg = {
-    green: "bg-green-600 hover:bg-green-700",
-    yellow: "bg-yellow-400 hover:bg-yellow-500",
-    blue: "bg-blue-600 hover:bg-blue-700",
-    red: "bg-red-500 hover:bg-red-600",
-  }[color];
-
-  return (
-    <button
-      onClick={onClick}
-      className={`${bg} text-white px-4 py-2 rounded flex items-center gap-2 text-lg transition-colors`}
-    >
-      <FontAwesomeIcon icon={icon} />
-      {children}
-    </button>
   );
 }
 
