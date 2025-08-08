@@ -28,17 +28,17 @@ const headerConInformadoOcupacional = (doc, datos) => {
   // Texto "N° Ficha :" delante del número
   const fichaLabelX = sedeX - 40;
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("N° Ficha :", fichaLabelX, fichaY);
+  doc.text("N° Ficha :", fichaLabelX - 4, fichaY);
   
   // Número de ficha grande y subrayado
   const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 5;
   doc.setFont("helvetica", "bold").setFontSize(22);
-  doc.text(fichaNum, fichaNumX, fichaY);
+  doc.text(fichaNum, fichaNumX - 4, fichaY);
   
   // Subrayar el número de ficha
   const fichaWidth = doc.getTextWidth(fichaNum);
   doc.setLineWidth(0.3);
-  doc.line(fichaNumX, fichaY + 1, fichaNumX + fichaWidth, fichaY + 1);
+  doc.line(fichaNumX - 4, fichaY + 1, fichaNumX - 4  + fichaWidth, fichaY + 1);
   
   // Sede debajo del número de ficha
   const sedeY2 = sedeY + 8;
