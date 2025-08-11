@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComments } from "@fortawesome/free-solid-svg-icons";
-import { GetInfoServicio, Loading, PrintHojaR } from "./controllerOdontologia";
+import {
+  GetInfoPac,
+  GetInfoServicio,
+  Loading,
+  PrintHojaR,
+} from "./controllerOdontologia";
 import Swal from "sweetalert2";
 
 const OdontologiaReportes = ({
@@ -15,6 +20,7 @@ const OdontologiaReportes = ({
   dataTabla,
   setActiveTab,
   obtenerInfoTabla,
+  selectedSede,
 }) => {
   return (
     <div className="w-full  ">
@@ -116,6 +122,7 @@ const OdontologiaReportes = ({
               token={token}
               clean={handleClear}
               setActiveTab={setActiveTab}
+              sede={selectedSede}
             />
           </div>
         </div>
@@ -125,7 +132,7 @@ const OdontologiaReportes = ({
 };
 
 // Co
-function Table({ data, tabla, set, token, clean, setActiveTab }) {
+function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -142,13 +149,20 @@ function Table({ data, tabla, set, token, clean, setActiveTab }) {
     });
   };
 
-  function clicktable(nro) {
+  function clicktable(nro, codOD) {
     clean();
     Loading("Importando Datos");
-    GetInfoServicio(nro, tabla, set, token, () => {
-      Swal.close();
-      setActiveTab(1);
-    });
+    if (codOD != null) {
+      GetInfoServicio(nro, tabla, set, token, () => {
+        Swal.close();
+        setActiveTab(1);
+      });
+    } else {
+      GetInfoPac(nro, set, token, sede, () => {
+        Swal.close();
+        setActiveTab(1);
+      });
+    }
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
@@ -171,11 +185,13 @@ function Table({ data, tabla, set, token, clean, setActiveTab }) {
             data.map((row, i) => (
               <tr
                 key={i}
-                className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg `}
-                onClick={() => clicktable(row.norden)}
+                className={`bg-[${row.codigoColor}] hover:brightness-75  cursor-pointer text-lg `}
+                onClick={() => clicktable(row.norden, row.codOD)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  handlePrintConfirm(row.norden);
+                  if (row.codOD != null) {
+                    handlePrintConfirm(row.norden);
+                  }
                 }}
               >
                 <td className="border px-2 py-1 font-bold">
