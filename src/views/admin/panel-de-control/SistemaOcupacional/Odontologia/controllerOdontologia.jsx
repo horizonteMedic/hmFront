@@ -101,7 +101,9 @@ export const GetInfoServicio = (
           d32: interpretarUrlParaLeer(res.lbl38),
 
           observaciones: res.txtObservaciones || "",
-          noPasoExamen: res?.txtObservaciones?.includes("NO PASO EXAMEN ODONTOLOGICO"),
+          noPasoExamen: res?.txtObservaciones?.includes(
+            "NO PASO EXAMEN ODONTOLOGICO"
+          ),
         }));
       } else {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
@@ -376,7 +378,6 @@ export const VerifyTRLO = async (nro, tabla, token, set, sede) => {
     console.log(res);
     if (res.id === 0) {
       //No tiene registro previo
-      // GetInfoPac(nro, set, token, sede);
       VerifyTR(nro, "odontograma", token, set, sede);
     } else {
       GetInfoServicioLO(nro, tabla, set, token, () => {
@@ -454,7 +455,7 @@ export const GetInfoServicioLO = (
     });
 };
 
-export const GetInfoPac = (nro, set, token, sede) => {
+export const GetInfoPac = (nro, set, token, sede, onFinish = () => {Swal.close();}) => {
   getFetch(
     `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
     token
@@ -470,8 +471,11 @@ export const GetInfoPac = (nro, set, token, sede) => {
       }));
     })
     .finally(() => {
-      Swal.close();
+      onFinish();
     });
+  // .finally(() => {
+  //   Swal.close();
+  // });
 };
 
 export const PrintHojaR = (nro, token, tabla) => {
