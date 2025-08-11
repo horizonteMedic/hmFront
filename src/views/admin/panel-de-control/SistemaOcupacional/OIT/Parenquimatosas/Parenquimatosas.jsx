@@ -170,7 +170,8 @@ const Parenquimatosas = ({form,setForm}) => {
                 </div>
                 <div className="flex items-center gap-4 py-3">
                     <label className="font-semibold max-w-[250px] min-w-[250px] ">Comentario sobre defectos técnicos: </label>
-                    <input type="text" className="border rounded px-2 py-1 w-full" value={form.txtDefectosTecnicos} />
+                    <input type="text" className="border rounded px-2 py-1 w-full" value={form.txtDefectosTecnicos} onChange={handleInputChange} name="txtDefectosTecnicos" id="txtDefectosTecnicos" />
+
                 </div>
                 <div className="flex  items-center gap-8">
                     <h2 className="font-bold text-[11px]">II. ANORMALIDADES PARENQUIMATOSAS (SI NO HAY ANORMALIDADES PASE A III. A. PLEURALES)</h2>

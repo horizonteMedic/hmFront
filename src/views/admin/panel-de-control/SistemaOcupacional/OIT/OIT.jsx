@@ -207,6 +207,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
     chk_28: false,
     chk_29: false,
     txtSComentarios: "",
+    opcionSComentario:"",
     //
     SinDatos: false,
   });
@@ -389,6 +390,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       chk_28: false,
       chk_29: false,
       txtSComentarios: "",
+      opcionSComentario:""
     });
   };
   console.log(form);
@@ -615,6 +617,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
       chk_28: false,
       chk_29: false,
       txtSComentarios: "",
+      opcionSComentario:""
     }));
   };
 
@@ -669,7 +672,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
             {/*1ra fila*/}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
               {/*Norden*/}
-              <div className="flex items-center gap-4 lg:col-span-2">
+              <div className="flex items-center gap-4 ">
                 <label className="font-semibold max-w-[65px] min-w-[65px]">
                   N° Orden:
                 </label>
@@ -694,7 +697,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
                 />
               </div>
               {/*Lector*/}
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 lg:col-span-2">
                 <label className="font-semibold max-w-[65px] min-w-[65px]">
                   Lector:
                 </label>
@@ -767,7 +770,7 @@ const OIT = ({ token, selectedSede, userlogued, userDatos }) => {
                 />
               </label>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
               <div className="flex items-center gap-4">
                 <label className="font-semibold max-w-[65px] min-w-[65px] ">
                   Fecha de Lectura:
