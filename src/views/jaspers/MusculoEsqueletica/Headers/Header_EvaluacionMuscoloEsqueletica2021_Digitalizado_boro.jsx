@@ -79,52 +79,55 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
   doc.text(`Pag. ${numeroPagina}`, pageW - margin, margin + 5, { align: "right" });
 
   // === 5) DATOS DEL PACIENTE ===
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Solo mostrar datos del paciente en la página 1
+  if (numeroPagina === 1) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
 
-  // Nombre completo
-  const xNombres = margin + 20.5;
-  const yNombres = margin + 18;
-  doc.text(String(datosFinales.nombres || ""), xNombres, yNombres, { maxWidth: 90 });
+    // Nombre completo
+    const xNombres = margin + 20.5;
+    const yNombres = margin + 18;
+    doc.text(String(datosFinales.nombres || ""), xNombres, yNombres, { maxWidth: 90 });
 
-  // Edad
-  const xEdad = margin + 122.5;
-  const yEdad = margin + 18;
-  const edadTexto = datosFinales.edad ? `${datosFinales.edad} años` : "";
-  doc.text(edadTexto, xEdad, yEdad);
+    // Edad
+    const xEdad = margin + 122.5;
+    const yEdad = margin + 18;
+    const edadTexto = datosFinales.edad ? `${datosFinales.edad} años` : "";
+    doc.text(edadTexto, xEdad, yEdad);
 
-  // Sexo
-  const xSexo = margin + 148.5;
-  const ySexo = margin + 18;
-  doc.text(String(datosFinales.sexo || ""), xSexo, ySexo);
+    // Sexo
+    const xSexo = margin + 148.5;
+    const ySexo = margin + 18;
+    doc.text(String(datosFinales.sexo || ""), xSexo, ySexo);
 
-  // Fecha
-  const xFecha = margin + 167;
-  const yFecha = margin + 18;
-  let fechaFormateada = datosFinales.fecha || "";
-  
-  // Formatear fecha a DD/MM/YYYY si viene en formato YYYY-MM-DD
-  if (fechaFormateada && fechaFormateada.includes("-")) {
-    const [yyyy, mm, dd] = fechaFormateada.split("-");
-    fechaFormateada = `${dd}/${mm}/${yyyy}`;
+    // Fecha
+    const xFecha = margin + 167;
+    const yFecha = margin + 18;
+    let fechaFormateada = datosFinales.fecha || "";
+    
+    // Formatear fecha a DD/MM/YYYY si viene en formato YYYY-MM-DD
+    if (fechaFormateada && fechaFormateada.includes("-")) {
+      const [yyyy, mm, dd] = fechaFormateada.split("-");
+      fechaFormateada = `${dd}/${mm}/${yyyy}`;
+    }
+    
+    doc.text(fechaFormateada, xFecha, yFecha);
+
+    // Empresa
+    const xEmpresa = margin + 20.5;
+    const yEmpresa = margin + 25;
+    doc.text(String(datosFinales.empresa || ""), xEmpresa, yEmpresa, { maxWidth: 170 });
+
+    // Área de Trabajo
+    const xAreaTrabajo = margin + 28;
+    const yAreaTrabajo = margin + 31.5;
+    doc.setFontSize(8);
+    doc.text(String(datosFinales.areaTrabajo || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 75 });
+
+    // Cargo
+    const xCargo = margin + 116;
+    const yCargo = margin + 31.5;
+    doc.text(String(datosFinales.cargo || ""), xCargo, yCargo, { maxWidth: 80 });
   }
-  
-  doc.text(fechaFormateada, xFecha, yFecha);
-
-  // Empresa
-  const xEmpresa = margin + 20.5;
-  const yEmpresa = margin + 25;
-  doc.text(String(datosFinales.empresa || ""), xEmpresa, yEmpresa, { maxWidth: 170 });
-
-  // Área de Trabajo
-  const xAreaTrabajo = margin + 28;
-  const yAreaTrabajo = margin + 31.5;
-  doc.setFontSize(8);
-  doc.text(String(datosFinales.areaTrabajo || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 75 });
-
-  // Cargo
-  const xCargo = margin + 116;
-  const yCargo = margin + 31.5;
-  doc.text(String(datosFinales.cargo || ""), xCargo, yCargo, { maxWidth: 80 });
 
   // Restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);

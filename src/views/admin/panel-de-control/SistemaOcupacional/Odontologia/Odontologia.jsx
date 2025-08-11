@@ -436,6 +436,7 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                 dataTabla={dataTabla}
                 setActiveTab={setActiveTab}
                 obtenerInfoTabla={obtenerInfoTabla}
+                selectedSede={selectedSede}
               />
             )}
           </div>

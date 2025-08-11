@@ -5,7 +5,7 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 50;
+  let y = 60;
 
   // 1) Header
   HeaderRAYOSXXXOFI(doc, data);
@@ -43,7 +43,7 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
     apellidosNombres: obtener("nombres").toUpperCase(),
     empresa: obtener("empresa").toUpperCase(),
     cargo: obtener("cargo").toUpperCase(),
-    edad: obtener("edad")+ " años",
+    edad: obtener("edad")+ " AÑOS",
     examen: "RADIOAGRAFIA DE COLUMNA " + obtener("tipoRadio").toUpperCase(),
     fechaEvaluacion: formatearFecha(obtener("fechaExamen")),
     hallazgos: obtener("informacionGeneral").toUpperCase(),
@@ -56,8 +56,8 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
 
   // 2) Título del informe
   doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.text("INFORME DE RADIOLOGIA", pageW / 2, y, { align: "center" });
-  y += 15;
+  doc.text("INFORME DE RADIOLOGÍA", pageW / 2, y - 10, { align: "center" });
+  y += 5;
 
   // 3) Sección I: DATOS DE AFILIACIÓN
   doc.setFont("helvetica", "bold").setFontSize(12);
@@ -115,18 +115,23 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
   // Hallazgos específicos como lista
   doc.setFont("helvetica", "normal").setFontSize(10);
 
-  // Dividir el texto por puntos y crear lista
+  // Dividir el texto por saltos de línea y crear lista
   const hallazgosItems = datos.hallazgos
-    .split(".")
+    .split("\n")
     .filter((item) => item.trim() !== "");
 
   hallazgosItems.forEach((item) => {
     const trimmedItem = item.trim();
     if (trimmedItem) {
-      // Viñeta y texto
-      doc.text("•", margin + 15, y);
-      doc.text(trimmedItem, margin + 20, y);
-      y += 6;
+      // Verificar si el texto es muy largo y necesita múltiples líneas
+      const maxWidth = pageW - 2 * (margin + 20);
+      const textLines = doc.splitTextToSize(trimmedItem, maxWidth);
+      
+      textLines.forEach((line) => {
+        // Todas las líneas con sangría, sin viñeta
+        doc.text(line, margin + 20, y);
+        y += 6;
+      });
     }
   });
 
@@ -148,28 +153,9 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
     y += 5;
   });
 
-  y += 30;
-
-  // 6) Sección de firma
-  // Línea para firma
-  const firmaY = y;
-  const firmaW = 60;
-  const firmaX = pageW / 2 - firmaW / 2; // Centrar la línea
-
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.2);
-  // doc.line(firmaX, firmaY, firmaX + firmaW, firmaY);
-
-  // Información del médico
-  y += 8; // Reducido de 12 a 8 para acercar más
-  doc.setFont("helvetica", "bold").setFontSize(10); // Cambiado a negrita
-  doc.text(datos.medico, pageW / 2, y, { align: "center" });
-  y += 5;
-  doc.text(datos.titulo, pageW / 2, y, { align: "center" });
-  y += 5;
-  doc.text(datos.licencias, pageW / 2, y, { align: "center" });
-
-  const firmasAPintar = [{ nombre: "SELLOFIRMA", x: 95, y: 200, maxw: 120 }];
+  // Posición de la firma justo 4 puntos debajo de las conclusiones
+  const firmaY = y + 4; // Solo 4 puntos debajo del texto de conclusiones
+  const firmasAPintar = [{ nombre: "SELLOFIRMA", x: 95, y: firmaY, maxw: 120 }];
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
   });

@@ -79,6 +79,7 @@ import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
 import RayosX from "./RayosX/RayosX.jsx";
 import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
+import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -418,6 +419,19 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faAnchor} />
                   </span>
                   <span className={styles.title}>Modulo de Consentimientos</span>
+                </div>
+              )}
+              {tieneVista("Cuestionario Nordico") && (
+                <div
+                  onClick={() => setActiveTab(21)}
+                  className={`${styles.gridItem} ${
+                    activeTab === 19 ? styles.active : ""
+                  }`}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faAnchor} />
+                  </span>
+                  <span className={styles.title}>Cuestionario Nordico</span>
                 </div>
               )}
             </div>
@@ -1041,6 +1055,24 @@ const TabComponent = () => {
                 </button>
               </div>
               <ConsentimientoInformadoOcupacional
+                token={token}
+                userlogued={userlogued.sub}
+                selectedSede={selectSede}
+                userDatos={userlogued}
+              />
+            </div>
+          )}
+          {activeTab === 21 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <Cuestionario_Nordico
                 token={token}
                 userlogued={userlogued.sub}
                 selectedSede={selectSede}

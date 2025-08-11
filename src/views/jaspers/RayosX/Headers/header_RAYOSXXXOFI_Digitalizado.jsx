@@ -2,10 +2,10 @@
 function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
   const margin = 15;
   const logoW = 38;
-  const y = 12;
-  const xOffset = opts.xOffset !== undefined ? opts.xOffset : 25;
-  const fontSize = opts.fontSize !== undefined ? opts.fontSize : 6;
-  const yOffset = opts.yOffset !== undefined ? opts.yOffset : -8;
+  const y = 8;
+  const xOffset = opts.xOffset !== undefined ? opts.xOffset : 35;
+  const fontSize = opts.fontSize !== undefined ? opts.fontSize : 7.3;
+  const yOffset = opts.yOffset !== undefined ? opts.yOffset : -4;
   const baseX = margin + logoW + 8 - xOffset;
   let yFila = y + 2 + yOffset;
   const rowH = 3.2;
@@ -106,26 +106,26 @@ const HeaderRAYOSXXXOFI = (doc, datos) => {
   // Footer horizontal de cabecera (datos de contacto)
   footerFichaRadiografiaCabecera(
     doc,
-    { xOffset: 25, fontSize: 6, yOffset: -8 },
+    { xOffset: 35, fontSize: 7.3, yOffset: -4 },
     datos
   );
 
   // 2) Información de sede y número de ficha a la derecha (al costado del bloque de color)
   const sedeValue = `${datos.sede || ""}`;
-  const sedeX = pageW - margin - 20;
-  const sedeY = y + 6;
+  const sedeX = pageW - margin - 22;
+  const sedeY = y + 14;
 
   // Número de ficha primero
   const fichaNum = `${datos.norden}` || "";
   const fichaY = sedeY;
 
   // Texto "N° Ficha :" delante del número
-  const fichaLabelX = sedeX - 40;
+  const fichaLabelX = sedeX - 42;
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("N° Ficha :", fichaLabelX, fichaY);
 
   // Número de ficha grande y subrayado
-  const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 5;
+  const fichaNumX = fichaLabelX + doc.getTextWidth("N° Ficha :") + 4;
   doc.setFont("helvetica", "bold").setFontSize(22);
   doc.text(fichaNum, fichaNumX, fichaY);
 
@@ -147,7 +147,7 @@ const HeaderRAYOSXXXOFI = (doc, datos) => {
     const boxText = (datos.textoColor || "F").toUpperCase();
     let boxSize = 15;
     let boxX = pageW - margin - boxSize;
-    let boxY = y + 2;
+    let boxY = y + 8;
 
     // Draw box outline in black
     doc.setDrawColor(0);

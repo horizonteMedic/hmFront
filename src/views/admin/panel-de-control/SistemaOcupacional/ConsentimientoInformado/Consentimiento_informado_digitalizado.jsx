@@ -19,7 +19,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 const currentTime = date.toLocaleTimeString('en-US', { 
-  hour12: true, 
+  hour12: false, 
   hour: '2-digit', 
   minute: '2-digit', 
   second: '2-digit' 
@@ -36,13 +36,14 @@ const initialFormState = {
   dni: "",
   empresa: "",
   contrata: "",
-  
+  ocupacion: "",
   // Datos del consentimiento
   nombreCompleto: "",
   documentoIdentidad: "",
   ocupacionLaboral: "",
   fechaConsentimiento: today,
-  hora: currentTime,
+  horaActual: currentTime,
+  
   
   // Texto del consentimiento (pre-llenado)
   textoConsentimiento: `certifico que he sido informado/a acerca de la naturaleza y propósito del examen médico ocupacional así como pruebas complementarias determinada por la empresa:`,
@@ -121,12 +122,16 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
     )
       .then((res) => {
         console.log("pros", res);
-        set((prev) => ({
+        if (res.norden) {
+          set((prev) => ({
           ...prev,
           ...res,
           fechaNac: convertirFecha(res.fechaNac),
           nombres: res.nombresApellidos,
+          ocupacion: res.cargo
         }));
+        }
+        
       })
       .finally(() => {
         Swal.close();
@@ -165,7 +170,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
       if (res.id === 0) {
         //No tiene registro previo
         GetInfoPac(nro, set, token, sede);
-      } else {
+      } else if (res.id === 1) {
         // Ya existe registro
         GetInfoPacConsentInfor(nro, tabla, set, token)
       }
@@ -371,7 +376,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
           <div className="flex items-center gap-4">
             <label className="font-semibold min-w-[50px]">Hora:</label>
             <span className="border rounded px-2 py-1 bg-gray-50">
-              {form.hora}
+              {form.horaActual}
             </span>
           </div>
         </div>

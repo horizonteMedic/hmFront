@@ -32,7 +32,135 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
       evaluacion4: "SI",
       evaluacion5: "NO"
     },
-    observacionesRangosArticulares: "Rangos articulares dentro de parámetros normales, sin dolor significativo."
+    observacionesRangosArticulares: "Rangos articulares dentro de parámetros normales, sin dolor significativo.",
+    
+         // === COLUMNA VERTEBRAL - HALLAZGOS ===
+     desviacionEje: {
+       hallazgo: true, // true = Si, false = No
+       descripcion: "Desviación leve hacia la derecha en nivel L3-L4"
+     },
+     testAdams: {
+       hallazgo: false, // true = (+), false = (-)
+       descripcion: "Test negativo, sin escoliosis aparente"
+     },
+     dandy: {
+       hallazgo: true, // true = (+), false = (-)
+       descripcion: "Positivo en miembro inferior derecho"
+     },
+     lasegue: {
+       hallazgo: false, // true = (+), false = (-)
+       descripcion: "Test negativo, sin radiculopatía"
+     },
+     contracturaMuscular: {
+       hallazgo: true, // true = Si, false = No
+       descripcion: "Contractura en músculos paravertebrales lumbares"
+     },
+     cicatrizPostOperatoria: {
+       hallazgo: false, // true = Si, false = No
+       descripcion: "Sin cicatrices post-operatorias evidentes"
+     },
+     
+           // === TESTS DE MIEMBROS SUPERIORES ===
+      testJobe: {
+        der: true, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: false // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      testPatte: {
+        der: false, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: true // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      testGerber: {
+        der: true, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: true // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      pullUpTest: {
+        der: false, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: false // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      
+      // === TESTS DE PÁGINA 2 ===
+      epicondilitis: {
+        der: false, // true = Si (no hay dolor), false = No (hay dolor)
+        izq: false // true = Si (no hay dolor), false = No (hay dolor)
+      },
+      epitrocleitis: {
+        der: false, // true = Si (no hay dolor), false = No (hay dolor)
+        izq: false // true = Si (no hay dolor), false = No (hay dolor)
+      },
+      phalen: {
+        der: false, // true = Si (no hay parestesias), false = No (hay parestesias)
+        izq: false // true = Si (no hay parestesias), false = No (hay parestesias)
+      },
+      phalenInvertido: {
+        der: false, // true = Si (no hay parestesias), false = No (hay parestesias)
+        izq: false // true = Si (no hay parestesias), false = No (hay parestesias)
+      },
+      tinel: {
+        der: false, // true = Si (no hay parestesias), false = No (hay parestesias)
+        izq: false // true = Si (no hay parestesias), false = No (hay parestesias)
+      },
+      finkelstein: {
+        der: false, // true = Si (no hay dolor), false = No (hay dolor)
+        izq: false // true = Si (no hay dolor), false = No (hay dolor)
+      },
+      
+      // === EVALUACIÓN MÚSCULO ESQUELÉTICA DE CADERA Y MIEMBROS INFERIORES ===
+      caderaDerecha: {
+        abduccion: "45",
+        aduccion: "30",
+        flexion: "120",
+        extension: "15",
+        rotacionInterna: "35",
+        rotacionExterna: "45",
+        irradiacion: "0",
+        altMasaMuscular: "0"
+      },
+      caderaIzquierda: {
+        abduccion: "42",
+        aduccion: "28",
+        flexion: "118",
+        extension: "12",
+        rotacionInterna: "32",
+        rotacionExterna: "42",
+        irradiacion: "0",
+        altMasaMuscular: "0"
+      },
+      rodillaDerecha: {
+        flexion: "135",
+        extension: "0",
+        rotacionInterna: "0",
+        rotacionExterna: "0",
+        irradiacion: "0",
+        altMasaMuscular: "0"
+      },
+      rodillaIzquierda: {
+        flexion: "132",
+        extension: "0",
+        rotacionInterna: "0",
+        rotacionExterna: "0",
+        irradiacion: "0",
+        altMasaMuscular: "0"
+      },
+      tobilloDerecho: {
+        abduccion: "50",
+        aduccion: "20",
+        flexion: "35",
+        extension: "25",
+        rotacionExterna: "15",
+        rotacionInterna: "12",
+        irradiacion: "0",
+        altMasaMuscular: "0"
+      },
+      tobilloIzquierdo: {
+        abduccion: "48",
+        aduccion: "18",
+        flexion: "32",
+        extension: "22",
+        rotacionExterna: "14",
+        rotacionInterna: "10",
+        irradiacion: "0",
+        altMasaMuscular: "0"
+      }
   };
 
   // Usar datos reales o datos de prueba
@@ -147,12 +275,268 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
     const yDolorResistencia5 = margin + 161.5;
     doc.text(datosFinales.dolorContraResistencia.evaluacion5 || "", xDolorResistencia, yDolorResistencia5);
   }
-   
+  
   // Observaciones RANGOS ARTICULARES
   const xObservacionesRangos = margin + 121;
   const yObservacionesRangos = margin + 122.5;
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observacionesRangosArticulares || "", xObservacionesRangos, yObservacionesRangos, { maxWidth: 60 });
+
+  // === SECCIÓN: COLUMNA VERTEBRAL - HALLAZGOS ===
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  
+  // === DESVIACIÓN DEL EJE ===
+  const xDesviacionEje = margin + 65.5; // Posición X editable para Desviación del Eje
+  const yDesviacionEje = margin + 176.4; // Posición Y editable para Desviación del Eje
+  const xDescripcionDesviacion = margin + 95; // Posición X editable para descripción
+  const yDescripcionDesviacion = margin + 176.4; // Posición Y editable para descripción
+  
+     if (datosFinales.desviacionEje && typeof datosFinales.desviacionEje.hallazgo === 'boolean') {
+     doc.setTextColor(0, 0, 255); // Color azul para las X
+     doc.setFont("helvetica", "normal").setFontSize(10);
+     doc.text("X", xDesviacionEje + (datosFinales.desviacionEje.hallazgo ? 0 : 17.3), yDesviacionEje);
+     doc.setTextColor(0, 0, 0); // Resetear a negro para las descripciones
+     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.text(datosFinales.desviacionEje.descripcion || "", xDescripcionDesviacion, yDescripcionDesviacion, { maxWidth: 85 });
+   }
+   
+   // === TEST DE ADAMS ===
+   const xTestAdams = margin + 65.5; // Posición X editable para Test de Adams
+   const yTestAdams = margin + 181; // Posición Y editable para Test de Adams
+   const xDescripcionTestAdams = margin + 95; // Posición X editable para descripción
+   const yDescripcionTestAdams = margin + 181; // Posición Y editable para descripción
+   
+   if (datosFinales.testAdams && typeof datosFinales.testAdams.hallazgo === 'boolean') {
+     doc.setTextColor(0, 0, 255); // Color azul para las X
+     doc.setFont("helvetica", "normal").setFontSize(10);
+     doc.text("X", xTestAdams + (datosFinales.testAdams.hallazgo ? 0 : 17.3), yTestAdams);
+     doc.setTextColor(0, 0, 0); // Resetear a negro para las descripciones
+     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.text(datosFinales.testAdams.descripcion || "", xDescripcionTestAdams, yDescripcionTestAdams, { maxWidth: 85 });
+   }
+   
+   // === DANDY ===
+   const xDandy = margin + 65.5; // Posición X editable para Dandy
+   const yDandy = margin + 185.8; // Posición Y editable para Dandy
+   const xDescripcionDandy = margin + 95; // Posición X editable para descripción
+   const yDescripcionDandy = margin + 185.5; // Posición Y editable para descripción
+   
+   if (datosFinales.dandy && typeof datosFinales.dandy.hallazgo === 'boolean') {
+     doc.setTextColor(0, 0, 255); // Color azul para las X
+     doc.setFont("helvetica", "normal").setFontSize(10);
+     doc.text("X", xDandy + (datosFinales.dandy.hallazgo ? 0 : 17.3), yDandy);
+     doc.setTextColor(0, 0, 0); // Resetear a negro para las descripciones
+     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.text(datosFinales.dandy.descripcion || "", xDescripcionDandy, yDescripcionDandy, { maxWidth: 85 });
+   }
+   
+   // === LASEGUE ===
+   const xLasegue = margin + 65.5; // Posición X editable para Lasegue
+   const yLasegue = margin + 190.4; // Posición Y editable para Lasegue
+   const xDescripcionLasegue = margin + 95; // Posición X editable para descripción
+   const yDescripcionLasegue = margin + 190.4; // Posición Y editable para descripción
+   
+   if (datosFinales.lasegue && typeof datosFinales.lasegue.hallazgo === 'boolean') {
+     doc.setTextColor(0, 0, 255); // Color azul para las X
+     doc.setFont("helvetica", "normal").setFontSize(10);
+     doc.text("X", xLasegue + (datosFinales.lasegue.hallazgo ? 0 : 17.3), yLasegue);
+     doc.setTextColor(0, 0, 0); // Resetear a negro para las descripciones
+     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.text(datosFinales.lasegue.descripcion || "", xDescripcionLasegue, yDescripcionLasegue, { maxWidth: 85 });
+   }
+   
+   // === CONTRACTURA MUSCULAR ===
+   const xContracturaMuscular = margin + 65.5; // Posición X editable para Contractura Muscular
+   const yContracturaMuscular = margin + 195; // Posición Y editable para Contractura Muscular
+   const xDescripcionContractura = margin + 95; // Posición X editable para descripción
+   const yDescripcionContractura = margin + 195; // Posición Y editable para descripción
+   
+   if (datosFinales.contracturaMuscular && typeof datosFinales.contracturaMuscular.hallazgo === 'boolean') {
+     doc.setTextColor(0, 0, 255); // Color azul para las X
+     doc.setFont("helvetica", "normal").setFontSize(10);
+     doc.text("X", xContracturaMuscular + (datosFinales.contracturaMuscular.hallazgo ? 0 : 17.3), yContracturaMuscular);
+     doc.setTextColor(0, 0, 0); // Resetear a negro para las descripciones
+     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.text(datosFinales.contracturaMuscular.descripcion || "", xDescripcionContractura, yDescripcionContractura, { maxWidth: 85 });
+   }
+   
+       // === CICATRIZ POST-OPERATORIA ===
+    const xCicatrizPostOperatoria = margin + 65.5; // Posición X editable para Cicatriz Post-Operatoria
+    const yCicatrizPostOperatoria = margin + 199.5; // Posición Y editable para Cicatriz Post-Operatoria
+    const xDescripcionCicatriz = margin + 95; // Posición X editable para descripción
+    const yDescripcionCicatriz = margin + 199.5; // Posición Y editable para descripción
+    
+         if (datosFinales.cicatrizPostOperatoria && typeof datosFinales.cicatrizPostOperatoria.hallazgo === 'boolean') {
+       doc.setTextColor(0, 0, 255); // Color azul para las X
+       doc.setFont("helvetica", "normal").setFontSize(10);
+       doc.text("X", xCicatrizPostOperatoria + (datosFinales.cicatrizPostOperatoria.hallazgo ? 0 : 17.3), yCicatrizPostOperatoria);
+       doc.setTextColor(0, 0, 0); // Resetear a negro para las descripciones
+       doc.setFont("helvetica", "normal").setFontSize(8);
+       doc.text(datosFinales.cicatrizPostOperatoria.descripcion || "", xDescripcionCicatriz, yDescripcionCicatriz, { maxWidth: 85 });
+     }
+
+   // === SECCIÓN: TESTS DE MIEMBROS SUPERIORES ===
+   doc.setFont("helvetica", "bold").setFontSize(10);
+   
+   // === TEST DE JOBE ===
+   const xJobeDolor = margin + 72; // Posición X para dolor Jobe
+   const yJobeDolor = margin + 227.5; // Posición Y para dolor Jobe
+   const xJobeLimitacion = margin + 72.3; // Posición X para limitación Jobe
+   const yJobeLimitacion = margin + 234; // Posición Y para limitación Jobe
+   
+                               if (datosFinales.testJobe) {
+        // Dolor Jobe - SI/NO (cada lado independiente)
+        if (typeof datosFinales.testJobe.der === 'boolean' && typeof datosFinales.testJobe.izq === 'boolean') {
+          doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // Lado derecho
+          const textoDer = datosFinales.testJobe.der ? "SI" : "NO";
+          doc.text(textoDer, xJobeDolor, yJobeDolor);
+          
+          // Lado izquierdo
+          const textoIzq = datosFinales.testJobe.izq ? "SI" : "NO";
+          doc.text(textoIzq, xJobeDolor + 13, yJobeDolor);
+        }
+        
+        // Limitación Jobe - X en Der/Izq (solo si el lado correspondiente = false)
+        if (typeof datosFinales.testJobe.der === 'boolean' && typeof datosFinales.testJobe.izq === 'boolean') {
+          doc.setTextColor(0, 0, 255); // Color azul para las X
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // X en lado derecho (solo si der = false)
+          if (!datosFinales.testJobe.der) {
+            doc.text("X", xJobeLimitacion, yJobeLimitacion);
+          }
+          
+          // X en lado izquierdo (solo si izq = false)
+          if (!datosFinales.testJobe.izq) {
+            doc.text("X", xJobeLimitacion + 13, yJobeLimitacion);
+          }
+          
+          doc.setTextColor(0, 0, 0); // Resetear a negro
+        }
+      }
+   
+   // === TEST DE PATTE ===
+   const xPatteDolor = margin + 152; // Posición X para dolor Patte
+   const yPatteDolor = margin + 227.5; // Posición Y para dolor Patte
+   const xPatteLimitacion = margin + 153; // Posición X para limitación Patte
+   const yPatteLimitacion = margin + 234; // Posición Y para limitación Patte
+   
+                               if (datosFinales.testPatte) {
+        // Dolor Patte - SI/NO (cada lado independiente)
+        if (typeof datosFinales.testPatte.der === 'boolean' && typeof datosFinales.testPatte.izq === 'boolean') {
+          doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // Lado derecho
+          const textoDer = datosFinales.testPatte.der ? "SI" : "NO";
+          doc.text(textoDer, xPatteDolor, yPatteDolor);
+          
+          // Lado izquierdo
+          const textoIzq = datosFinales.testPatte.izq ? "SI" : "NO";
+          doc.text(textoIzq, xPatteDolor + 13, yPatteDolor);
+        }
+        
+        // Limitación Patte - X en Der/Izq (solo si el lado correspondiente = false)
+        if (typeof datosFinales.testPatte.der === 'boolean' && typeof datosFinales.testPatte.izq === 'boolean') {
+          doc.setTextColor(0, 0, 255); // Color azul para las X
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // X en lado derecho (solo si der = false)
+          if (!datosFinales.testPatte.der) {
+            doc.text("X", xPatteLimitacion, yPatteLimitacion);
+          }
+          
+          // X en lado izquierdo (solo si izq = false)
+          if (!datosFinales.testPatte.izq) {
+            doc.text("X", xPatteLimitacion + 13, yPatteLimitacion);
+          }
+          
+          doc.setTextColor(0, 0, 0); // Resetear a negro
+        }
+      }
+   
+   // === TEST DE GERBER ===
+   const xGerberDolor = margin + 72; // Posición X para dolor Gerber
+   const yGerberDolor = margin + 258.5; // Posición Y para dolor Gerber
+   const xGerberLimitacion = margin + 72.3; // Posición X para limitación Gerber
+   const yGerberLimitacion = margin + 265; // Posición Y para limitación Gerber
+   
+                               if (datosFinales.testGerber) {
+        // Dolor Gerber - SI/NO (cada lado independiente)
+        if (typeof datosFinales.testGerber.der === 'boolean' && typeof datosFinales.testGerber.izq === 'boolean') {
+          doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // Lado derecho
+          const textoDer = datosFinales.testGerber.der ? "SI" : "NO";
+          doc.text(textoDer, xGerberDolor, yGerberDolor);
+          
+          // Lado izquierdo
+          const textoIzq = datosFinales.testGerber.izq ? "SI" : "NO";
+          doc.text(textoIzq, xGerberDolor + 13, yGerberDolor);
+        }
+        
+        // Limitación Gerber - X en Der/Izq (solo si el lado correspondiente = false)
+        if (typeof datosFinales.testGerber.der === 'boolean' && typeof datosFinales.testGerber.izq === 'boolean') {
+          doc.setTextColor(0, 0, 255); // Color azul para las X
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // X en lado derecho (solo si der = false)
+          if (!datosFinales.testGerber.der) {
+            doc.text("X", xGerberLimitacion, yGerberLimitacion);
+          }
+          
+          // X en lado izquierdo (solo si izq = false)
+          if (!datosFinales.testGerber.izq) {
+            doc.text("X", xGerberLimitacion + 13, yGerberLimitacion);
+          }
+          
+          doc.setTextColor(0, 0, 0); // Resetear a negro
+        }
+      }
+   
+   // === PULL UP TEST ===
+   const xPullUpDolor = margin + 152; // Posición X para dolor Pull Up
+   const yPullUpDolor = margin + 258.5; // Posición Y para dolor Pull Up
+   const xPullUpLimitacion = margin + 153; // Posición X para limitación Pull Up
+   const yPullUpLimitacion = margin + 265; // Posición Y para limitación Pull Up
+   
+                               if (datosFinales.pullUpTest) {
+        // Dolor Pull Up - SI/NO (cada lado independiente)
+        if (typeof datosFinales.pullUpTest.der === 'boolean' && typeof datosFinales.pullUpTest.izq === 'boolean') {
+          doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // Lado derecho
+          const textoDer = datosFinales.pullUpTest.der ? "SI" : "NO";
+          doc.text(textoDer, xPullUpDolor, yPullUpDolor);
+          
+          // Lado izquierdo
+          const textoIzq = datosFinales.pullUpTest.izq ? "SI" : "NO";
+          doc.text(textoIzq, xPullUpDolor + 13, yPullUpDolor);
+        }
+        
+        // Limitación Pull Up - X en Der/Izq (solo si el lado correspondiente = false)
+        if (typeof datosFinales.pullUpTest.der === 'boolean' && typeof datosFinales.pullUpTest.izq === 'boolean') {
+          doc.setTextColor(0, 0, 255); // Color azul para las X
+          doc.setFont("helvetica", "bold").setFontSize(10);
+          
+          // X en lado derecho (solo si der = false)
+          if (!datosFinales.pullUpTest.der) {
+            doc.text("X", xPullUpLimitacion, yPullUpLimitacion);
+          }
+          
+          // X en lado izquierdo (solo si izq = false)
+          if (!datosFinales.pullUpTest.izq) {
+            doc.text("X", xPullUpLimitacion + 13, yPullUpLimitacion);
+          }
+          
+          doc.setTextColor(0, 0, 0); // Resetear a negro
+        }
+      }
 
   // === PÁGINA 2 ===
   doc.addPage();
@@ -177,7 +561,596 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
     doc.text("Imagen de página 2 no disponible", margin, margin + 10);
   }
 
-  // === 2) FOOTER EN PÁGINA 2 ===
+    // === 2) TESTS DE PÁGINA 2 ===
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    
+    // === EPICONDILITIS ===
+    const xEpicondilitisDolor = margin + 72.5; // Posición X para dolor Epicondilitis
+    const yEpicondilitisDolor = margin + 32; // Posición Y para dolor Epicondilitis
+    const xEpicondilitisLimitacion = margin + 73; // Posición X para limitación Epicondilitis
+    const yEpicondilitisLimitacion = margin + 38.5; // Posición Y para limitación Epicondilitis
+    
+    if (datosFinales.epicondilitis) {
+      // Dolor Epicondilitis - SI/NO (cada lado independiente)
+      if (typeof datosFinales.epicondilitis.der === 'boolean' && typeof datosFinales.epicondilitis.izq === 'boolean') {
+        doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // Lado derecho
+        const textoDer = datosFinales.epicondilitis.der ? "SI" : "NO";
+        doc.text(textoDer, xEpicondilitisDolor, yEpicondilitisDolor);
+        
+        // Lado izquierdo
+        const textoIzq = datosFinales.epicondilitis.izq ? "SI" : "NO";
+        doc.text(textoIzq, xEpicondilitisDolor + 13, yEpicondilitisDolor);
+      }
+      
+      // Limitación Epicondilitis - X en Der/Izq (solo si el lado correspondiente = false)
+      if (typeof datosFinales.epicondilitis.der === 'boolean' && typeof datosFinales.epicondilitis.izq === 'boolean') {
+        doc.setTextColor(0, 0, 255); // Color azul para las X
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // X en lado derecho (solo si der = false)
+        if (!datosFinales.epicondilitis.der) {
+          doc.text("X", xEpicondilitisLimitacion, yEpicondilitisLimitacion);
+        }
+        
+        // X en lado izquierdo (solo si izq = false)
+        if (!datosFinales.epicondilitis.izq) {
+          doc.text("X", xEpicondilitisLimitacion + 13, yEpicondilitisLimitacion);
+        }
+        
+        doc.setTextColor(0, 0, 0); // Resetear a negro
+      }
+    }
+    
+    // === EPITROCLEITIS ===
+    const xEpitrocleitisDolor = margin + 153; // Posición X para dolor Epitrocleitis
+    const yEpitrocleitisDolor = margin + 32; // Posición Y para dolor Epitrocleitis
+    const xEpitrocleitisLimitacion = margin + 154; // Posición X para limitación Epitrocleitis
+    const yEpitrocleitisLimitacion = margin + 38.5; // Posición Y para limitación Epitrocleitis
+    
+    if (datosFinales.epitrocleitis) {
+      // Dolor Epitrocleitis - SI/NO (cada lado independiente)
+      if (typeof datosFinales.epitrocleitis.der === 'boolean' && typeof datosFinales.epitrocleitis.izq === 'boolean') {
+        doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // Lado derecho
+        const textoDer = datosFinales.epitrocleitis.der ? "SI" : "NO";
+        doc.text(textoDer, xEpitrocleitisDolor, yEpitrocleitisDolor);
+        
+        // Lado izquierdo
+        const textoIzq = datosFinales.epitrocleitis.izq ? "SI" : "NO";
+        doc.text(textoIzq, xEpitrocleitisDolor + 13, yEpitrocleitisDolor);
+      }
+      
+      // Limitación Epitrocleitis - X en Der/Izq (solo si el lado correspondiente = false)
+      if (typeof datosFinales.epitrocleitis.der === 'boolean' && typeof datosFinales.epitrocleitis.izq === 'boolean') {
+        doc.setTextColor(0, 0, 255); // Color azul para las X
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // X en lado derecho (solo si der = false)
+        if (!datosFinales.epitrocleitis.der) {
+          doc.text("X", xEpitrocleitisLimitacion, yEpitrocleitisLimitacion);
+        }
+        
+        // X en lado izquierdo (solo si izq = false)
+        if (!datosFinales.epitrocleitis.izq) {
+          doc.text("X", xEpitrocleitisLimitacion + 13, yEpitrocleitisLimitacion);
+        }
+        
+        doc.setTextColor(0, 0, 0); // Resetear a negro
+      }
+    }
+    
+    // === PHALEN ===
+    const xPhalenDolor = margin + 72; // Posición X para dolor Phalen
+    const yPhalenDolor = margin + 61.6; // Posición Y para dolor Phalen
+    const xPhalenLimitacion = margin + 73; // Posición X para limitación Phalen
+    const yPhalenLimitacion = margin + 68; // Posición Y para limitación Phalen
+    
+    if (datosFinales.phalen) {
+      // Dolor Phalen - SI/NO (cada lado independiente)
+      if (typeof datosFinales.phalen.der === 'boolean' && typeof datosFinales.phalen.izq === 'boolean') {
+        doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // Lado derecho
+        const textoDer = datosFinales.phalen.der ? "SI" : "NO";
+        doc.text(textoDer, xPhalenDolor, yPhalenDolor);
+        
+        // Lado izquierdo
+        const textoIzq = datosFinales.phalen.izq ? "SI" : "NO";
+        doc.text(textoIzq, xPhalenDolor + 13, yPhalenDolor);
+      }
+      
+      // Limitación Phalen - X en Der/Izq (solo si el lado correspondiente = false)
+      if (typeof datosFinales.phalen.der === 'boolean' && typeof datosFinales.phalen.izq === 'boolean') {
+        doc.setTextColor(0, 0, 255); // Color azul para las X
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // X en lado derecho (solo si der = false)
+        if (!datosFinales.phalen.der) {
+          doc.text("X", xPhalenLimitacion, yPhalenLimitacion);
+        }
+        
+        // X en lado izquierdo (solo si izq = false)
+        if (!datosFinales.phalen.izq) {
+          doc.text("X", xPhalenLimitacion + 13, yPhalenLimitacion);
+        }
+        
+        doc.setTextColor(0, 0, 0); // Resetear a negro
+      }
+    }
+    
+    // === PHALEN INVERTIDO ===
+    const xPhalenInvertidoDolor = margin + 153; // Posición X para dolor Phalen Invertido
+    const yPhalenInvertidoDolor = margin + 61.6; // Posición Y para dolor Phalen Invertido
+    const xPhalenInvertidoLimitacion = margin + 154; // Posición X para limitación Phalen Invertido
+    const yPhalenInvertidoLimitacion = margin + 68; // Posición Y para limitación Phalen Invertido
+    
+    if (datosFinales.phalenInvertido) {
+      // Dolor Phalen Invertido - SI/NO (cada lado independiente)
+      if (typeof datosFinales.phalenInvertido.der === 'boolean' && typeof datosFinales.phalenInvertido.izq === 'boolean') {
+        doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // Lado derecho
+        const textoDer = datosFinales.phalenInvertido.der ? "SI" : "NO";
+        doc.text(textoDer, xPhalenInvertidoDolor, yPhalenInvertidoDolor);
+        
+        // Lado izquierdo
+        const textoIzq = datosFinales.phalenInvertido.izq ? "SI" : "NO";
+        doc.text(textoIzq, xPhalenInvertidoDolor + 13, yPhalenInvertidoDolor);
+      }
+      
+      // Limitación Phalen Invertido - X en Der/Izq (solo si el lado correspondiente = false)
+      if (typeof datosFinales.phalenInvertido.der === 'boolean' && typeof datosFinales.phalenInvertido.izq === 'boolean') {
+        doc.setTextColor(0, 0, 255); // Color azul para las X
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // X en lado derecho (solo si der = false)
+        if (!datosFinales.phalenInvertido.der) {
+          doc.text("X", xPhalenInvertidoLimitacion, yPhalenInvertidoLimitacion);
+        }
+        
+        // X en lado izquierdo (solo si izq = false)
+        if (!datosFinales.phalenInvertido.izq) {
+          doc.text("X", xPhalenInvertidoLimitacion + 13, yPhalenInvertidoLimitacion);
+        }
+        
+        doc.setTextColor(0, 0, 0); // Resetear a negro
+      }
+    }
+    
+    // === TINNEL ===
+    const xTinelDolor = margin + 72; // Posición X para dolor Tinel
+    const yTinelDolor = margin + 91.5; // Posición Y para dolor Tinel
+    const xTinelLimitacion = margin + 73; // Posición X para limitación Tinel
+    const yTinelLimitacion = margin + 97.8; // Posición Y para limitación Tinel
+    
+    if (datosFinales.tinel) {
+      // Dolor Tinel - SI/NO (cada lado independiente)
+      if (typeof datosFinales.tinel.der === 'boolean' && typeof datosFinales.tinel.izq === 'boolean') {
+        doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // Lado derecho
+        const textoDer = datosFinales.tinel.der ? "SI" : "NO";
+        doc.text(textoDer, xTinelDolor, yTinelDolor);
+        
+        // Lado izquierdo
+        const textoIzq = datosFinales.tinel.izq ? "SI" : "NO";
+        doc.text(textoIzq, xTinelDolor + 13, yTinelDolor);
+      }
+      
+      // Limitación Tinel - X en Der/Izq (solo si el lado correspondiente = false)
+      if (typeof datosFinales.tinel.der === 'boolean' && typeof datosFinales.tinel.izq === 'boolean') {
+        doc.setTextColor(0, 0, 255); // Color azul para las X
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // X en lado derecho (solo si der = false)
+        if (!datosFinales.tinel.der) {
+          doc.text("X", xTinelLimitacion, yTinelLimitacion);
+        }
+        
+        // X en lado izquierdo (solo si izq = false)
+        if (!datosFinales.tinel.izq) {
+          doc.text("X", xTinelLimitacion + 13, yTinelLimitacion);
+        }
+        
+        doc.setTextColor(0, 0, 0); // Resetear a negro
+      }
+    }
+    
+    // === FINKELS-TEIN ===
+    const xFinkelsteinDolor = margin + 153; // Posición X para dolor Finkelstein
+    const yFinkelsteinDolor = margin + 90; // Posición Y para dolor Finkelstein
+    const xFinkelsteinLimitacion = margin + 154; // Posición X para limitación Finkelstein
+    const yFinkelsteinLimitacion = margin + 96; // Posición Y para limitación Finkelstein
+    
+    if (datosFinales.finkelstein) {
+      // Dolor Finkelstein - SI/NO (cada lado independiente)
+      if (typeof datosFinales.finkelstein.der === 'boolean' && typeof datosFinales.finkelstein.izq === 'boolean') {
+        doc.setTextColor(0, 0, 0); // Color negro para SI/NO
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // Lado derecho
+        const textoDer = datosFinales.finkelstein.der ? "SI" : "NO";
+        doc.text(textoDer, xFinkelsteinDolor, yFinkelsteinDolor);
+        
+        // Lado izquierdo
+        const textoIzq = datosFinales.finkelstein.izq ? "SI" : "NO";
+        doc.text(textoIzq, xFinkelsteinDolor + 13, yFinkelsteinDolor);
+      }
+      
+      // Limitación Finkelstein - X en Der/Izq (solo si el lado correspondiente = false)
+      if (typeof datosFinales.finkelstein.der === 'boolean' && typeof datosFinales.finkelstein.izq === 'boolean') {
+        doc.setTextColor(0, 0, 255); // Color azul para las X
+        doc.setFont("helvetica", "bold").setFontSize(10);
+        
+        // X en lado derecho (solo si der = false)
+        if (!datosFinales.finkelstein.der) {
+          doc.text("X", xFinkelsteinLimitacion, yFinkelsteinLimitacion);
+        }
+        
+        // X en lado izquierdo (solo si izq = false)
+        if (!datosFinales.finkelstein.izq) {
+          doc.text("X", xFinkelsteinLimitacion + 13, yFinkelsteinLimitacion);
+        }
+        
+        doc.setTextColor(0, 0, 0); // Resetear a negro
+      }
+         }
+
+     // === 3) EVALUACIÓN MÚSCULO ESQUELÉTICA DE CADERA Y MIEMBROS INFERIORES ===
+     doc.setFont("helvetica", "bold").setFontSize(10);
+     
+     // Posiciones base para la tabla de evaluación
+     const xBase = margin + 20; // Posición X base para la columna izquierda
+     const yBase = margin + 130; // Posición Y base para empezar la tabla
+     
+     // === CADERA ===
+     const yCadera = yBase + 15;
+     doc.setFont("helvetica", "bold").setFontSize(9);
+     doc.text("Cadera", xBase, yCadera);
+     
+     // Datos de Cadera Derecha horizontalmente con coordenadas individuales
+     const datosCaderaDerecha = [
+       {
+         valor: datosFinales.caderaDerecha?.abduccion || "0",
+         x: xBase + 28,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.aduccion || "0",
+         x: xBase + 47,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.flexion || "0",
+         x: xBase + 65,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.extension || "0",
+         x: xBase + 83.5,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.rotacionExterna || "0",
+         x: xBase + 103,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.rotacionInterna || "0",
+         x: xBase + 124.5,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.irradiacion || "0",
+         x: xBase + 145,
+         y: yCadera - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.caderaDerecha?.altMasaMuscular || "0",
+         x: xBase + 165,
+         y: yCadera - 23,
+         espaciado: 15
+       }
+     ];
+     
+     // Datos de Cadera Izquierda horizontalmente con coordenadas individuales
+     const datosCaderaIzquierda = [
+       {
+         valor: datosFinales.caderaIzquierda?.abduccion || "0",
+         x: xBase + 28,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.aduccion || "0",
+         x: xBase + 47,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.flexion || "0",
+         x: xBase + 65,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.extension || "0",
+         x: xBase + 83.5,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.rotacionExterna || "0",
+         x: xBase + 103,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.rotacionInterna || "0",
+         x: xBase + 124.5,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.irradiacion || "0",
+         x: xBase + 145,
+         y: yCadera - 19.5,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.caderaIzquierda?.altMasaMuscular || "0",
+         x: xBase + 165,
+         y: yCadera - 19.5,
+         espaciado: 5
+       }
+     ];
+     
+     // Mostrar datos de Cadera Derecha horizontalmente
+     datosCaderaDerecha.forEach((dato) => {
+       doc.setFont("helvetica", "bold").setFontSize(9);
+       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+     });
+     
+     // Mostrar datos de Cadera Izquierda horizontalmente
+     datosCaderaIzquierda.forEach((dato) => {
+       doc.setFont("helvetica", "bold").setFontSize(9);
+       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+     });
+     
+     // === RODILLA ===
+     const yRodilla = yBase + 22;
+     doc.setFont("helvetica", "bold").setFontSize(9);
+     doc.text("Rodilla", xBase, yRodilla);
+     
+     // Datos de Rodilla Derecha horizontalmente con coordenadas individuales
+     const datosRodillaDerecha = [
+       {
+         valor: datosFinales.rodillaDerecha?.flexion || "0",
+         x: xBase + 65,
+         y: yRodilla - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.rodillaDerecha?.extension || "0",
+         x: xBase + 83.5,
+         y: yRodilla - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.rodillaDerecha?.rotacionExterna || "0",
+         x: xBase + 103,
+         y: yRodilla - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.rodillaDerecha?.rotacionInterna || "0",
+         x: xBase + 124.5,
+         y: yRodilla - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.rodillaDerecha?.irradiacion || "0",
+         x: xBase + 145,
+         y: yRodilla - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.rodillaDerecha?.altMasaMuscular || "0",
+         x: xBase + 165,
+         y: yRodilla - 23,
+         espaciado: 15
+       }
+     ];
+     
+     // Datos de Rodilla Izquierda horizontalmente con coordenadas individuales
+     const datosRodillaIzquierda = [
+       {
+         valor: datosFinales.rodillaIzquierda?.flexion || "0",
+         x: xBase + 65,
+         y: yRodilla - 19.2,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.rodillaIzquierda?.extension || "0",
+         x: xBase + 83.5,
+         y: yRodilla - 19.2,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.rodillaIzquierda?.rotacionExterna || "0",
+         x: xBase + 103,
+         y: yRodilla - 19.2,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.rodillaIzquierda?.rotacionInterna || "0",
+         x: xBase + 124.5,
+         y: yRodilla - 19.2,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.rodillaIzquierda?.irradiacion || "0",
+         x: xBase + 145,
+         y: yRodilla - 19.2,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.rodillaIzquierda?.altMasaMuscular || "0",
+         x: xBase + 165,
+         y: yRodilla - 19.2,
+         espaciado: 5
+       }
+     ];
+     
+     // Mostrar datos de Rodilla Derecha horizontalmente
+     datosRodillaDerecha.forEach((dato) => {
+       doc.setFont("helvetica", "bold").setFontSize(9);
+       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+     });
+     
+     // Mostrar datos de Rodilla Izquierda horizontalmente
+     datosRodillaIzquierda.forEach((dato) => {
+       doc.setFont("helvetica", "bold").setFontSize(9);
+       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+     });
+     
+     // === TOBILLO ===
+     const yTobillo = yBase + 29;
+     doc.setFont("helvetica", "bold").setFontSize(9);
+     doc.text("Tobillo", xBase, yTobillo);
+     
+     // Datos de Tobillo Derecho horizontalmente con coordenadas individuales
+     const datosTobilloDerecho = [
+       {
+         valor: datosFinales.tobilloDerecho?.abduccion || "0",
+         x: xBase + 28,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.aduccion || "0",
+         x: xBase + 47,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.flexion || "0",
+         x: xBase + 65,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.extension || "0",
+         x: xBase + 83.5,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.rotacionExterna || "0",
+         x: xBase + 103,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.rotacionInterna || "0",
+         x: xBase + 124.5,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.irradiacion || "0",
+         x: xBase + 145,
+         y: yTobillo - 23,
+         espaciado: 15
+       },
+       {
+         valor: datosFinales.tobilloDerecho?.altMasaMuscular || "0",
+         x: xBase + 165,
+         y: yTobillo - 23,
+         espaciado: 15
+       }
+     ];
+     
+     // Datos de Tobillo Izquierdo horizontalmente con coordenadas individuales
+     const datosTobilloIzquierdo = [
+       {
+         valor: datosFinales.tobilloIzquierdo?.abduccion || "0",
+         x: xBase + 28,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.aduccion || "0",
+         x: xBase + 47,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.flexion || "0",
+         x: xBase + 65,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.extension || "0",
+         x: xBase + 83.5,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.rotacionExterna || "0",
+         x: xBase + 103,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.rotacionInterna || "0",
+         x: xBase + 124.5,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.irradiacion || "0",
+         x: xBase + 145,
+         y: yTobillo - 19,
+         espaciado: 5
+       },
+       {
+         valor: datosFinales.tobilloIzquierdo?.altMasaMuscular || "0",
+         x: xBase + 165,
+         y: yTobillo - 19,
+         espaciado: 5
+       }
+     ];
+     
+     // Mostrar datos de Tobillo Derecho horizontalmente
+     datosTobilloDerecho.forEach((dato) => {
+       doc.setFont("helvetica", "bold").setFontSize(9);
+       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+     });
+     
+     // Mostrar datos de Tobillo Izquierdo horizontalmente
+     datosTobilloIzquierdo.forEach((dato) => {
+       doc.setFont("helvetica", "bold").setFontSize(9);
+       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+     });
+
+     // === 4) FOOTER EN PÁGINA 2 ===
   footerTR(doc, data);
 
   // === 2) Generar blob y abrir en iframe para imprimir automáticamente ===

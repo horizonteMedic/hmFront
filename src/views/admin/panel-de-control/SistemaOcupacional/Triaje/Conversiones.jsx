@@ -82,9 +82,36 @@ export const GetCC = async (event,triaje,set) => {
         return
     }
     if (event.key === 'Enter') {
-        if (triaje.temperatura < 35 || triaje.temperatura > 38) {
+        const Temperatura = triaje.temperatura
+        console.log(Temperatura)
+        if (Temperatura <= 16) {
             set(d => ({ ...d, temperatura: '' }))
-            await Swal.fire('Error','No se permite este dato','error')
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
+            return
+        }
+        if (Temperatura >= 17 && Temperatura <= 28) {
+            set(d => ({ ...d, temperatura: '' }))
+            await Swal.fire('HIPOTERMIA PROFUNDA','Ingrese otro dato por favor.','error')
+            return
+        } else if (Temperatura >= 29 && Temperatura <= 35) {
+            set(d => ({ ...d, temperatura: '' }))
+            await Swal.fire('HIPOTERMIA LIGERA','Ingrese otro dato por favor.','error')
+            return
+        } else if (Temperatura >= 36 && Temperatura <= 37.4) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- TEMPERATURA: NORMAL.'+"\n" }))
+        } else if (Temperatura >= 37.5 && Temperatura <= 37.9) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- TEMPERATURA: FEBRICULA.'+"\n" }))
+        } else if (Temperatura >= 38 && Temperatura <= 38.9) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- TEMPERATURA: FIEBRE.'+"\n" }))
+        } else if (Temperatura >= 39 && Temperatura <= 39.9) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- TEMPERATURA: FIEBRE ALTA.'+"\n" }))
+        } else if (Temperatura >= 40 && Temperatura <= 41.5) {
+            set(d => ({ ...d, temperatura: '' }))
+            await Swal.fire('FIEBRE MUY ALTA','Ingrese otro dato por favor.','error')
+            return
+        } else if (Temperatura > 42) {
+            set(d => ({ ...d, temperatura: '' }))
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
         const icc = triaje.icc
@@ -119,18 +146,22 @@ export const GetFC = async (event,triaje,set) => {
         //     await Swal.fire('Error','No se permite este dato','error')
         //     return
         // }
-        if (triaje.fCardiaca < 40) {
+        if (triaje.fCardiaca <= 39) {
             set(d => ({ ...d, fCardiaca: '' }))
-            await Swal.fire('Error','No se permite este dato','error')
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
         const frecuencia = triaje.fCardiaca
-        if (frecuencia > 100) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA CARDIACA: TAQUICARDIA.'+"\n" }))
-        } else if (frecuencia < 60) {
+        if (frecuencia >= 40 && frecuencia <= 59) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA CARDIACA: BRAQUICARDIA.'+"\n" }))
-        } else {
+        } else if (frecuencia >= 60 && frecuencia <= 100) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA CARDIACA: NORMAL.'+"\n" }))
+        } else if (frecuencia >= 101 && frecuencia <= 250 ) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA CARDIACA: TAQUICARDIA.'+"\n" }))
+        } else if (frecuencia > 250) {
+            set(d => ({ ...d, fCardiaca: '' }))
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
+            return
         }
         document.getElementById('sat02')?.focus();
     }
@@ -168,11 +199,33 @@ export const GetCuello = async (event,triaje,set) => {
 
 export const GetSistolica = async (event,triaje,set) => {
     if (event.key === 'Enter') {
-        if (triaje.sistolica < 90) {
+        const Sistolica = triaje.sistolica
+        const Diastolica = triaje.diastolica
+        if (Sistolica == 0) {
             set(d => ({ ...d, sistolica: '' }))
-            await Swal.fire('Error','No se permite este dato','error')
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
+        if (Sistolica < 90) {
+            set(d => ({ ...d, sistolica: '' }))
+            await Swal.fire('HIPOTENSION','Ingrese otro dato por favor.','error')
+            return
+        } else if (Sistolica >= 90 && Sistolica <= 129 && Diastolica >= 60 && Diastolica <= 80) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: NORMAL.'+"\n" }))
+        } else if (Sistolica >= 130 && Sistolica <= 139 && Diastolica >= 85 && Diastolica <= 89) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: NORMAL ALTA.'+"\n" }))
+        } else if (Sistolica >= 140 && Sistolica <= 159 && Diastolica >= 90 && Diastolica <= 99) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HIPERTENSION ARTERIAL GRADO 1.'+"\n" }))
+        } else if (Sistolica >= 160 && Sistolica <= 179 && Diastolica >= 100 && Diastolica <= 109) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HIPERTENSION ARTERIAL GRADO 2.'+"\n" }))
+        } else if (Sistolica >= 180 && Sistolica <= 249 && Diastolica >= 110 && Diastolica <= 149) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HIPERTENSION ARTERIAL GRADO 3.'+"\n" }))
+        } else if (Sistolica >= 250) {
+            set(d => ({ ...d, sistolica: '' }))
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
+            return
+        }
+
         document.getElementById('diastolica')?.focus();
     }
 }
@@ -182,21 +235,31 @@ export const GetPA = async (event,triaje,set) => {
         return
     }
     if (event.key === 'Enter') {
-        if (triaje.diastolica < 60) {
+        const Sistolica = triaje.sistolica
+        const Diastolica = triaje.diastolica
+        if (Diastolica == 0) {
             set(d => ({ ...d, diastolica: '' }))
-            await Swal.fire('Error','No se permite este dato','error')
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
-        const sistolica = triaje.sistolica
-        const diastolica = triaje.diastolica
-        if (sistolica < 120 && diastolica < 80) {
+        if (Diastolica < 60) {
+            set(d => ({ ...d, diastolica: '' }))
+            await Swal.fire('HIPOTENSION','Ingrese otro dato por favor.','error')
+            return
+        } else if (Sistolica >= 90 && Sistolica <= 129 && Diastolica >= 60 && Diastolica <= 80) {
             set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: NORMAL.'+"\n" }))
-        } else if ((sistolica >= 120 && sistolica < 140) && (diastolica >= 80 && diastolica <= 90)) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: PREHIPERTENSION.'+"\n" }))
-        } else if ((sistolica >= 120 && sistolica < 140) && (diastolica >= 80 && diastolica <= 90)) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HTA-1.'+"\n" }))
-        } else if ((sistolica >= 120 && sistolica < 140) && (diastolica >= 80 && diastolica <= 90)) {
-            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HTA-2.'+"\n" }))
+        } else if (Sistolica >= 130 && Sistolica <= 139 && Diastolica >= 85 && Diastolica <= 89) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: NORMAL ALTA.'+"\n" }))
+        } else if (Sistolica >= 140 && Sistolica <= 159 && Diastolica >= 90 && Diastolica <= 99) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HIPERTENSION ARTERIAL GRADO 1.'+"\n" }))
+        } else if (Sistolica >= 160 && Sistolica <= 179 && Diastolica >= 100 && Diastolica <= 109) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HIPERTENSION ARTERIAL GRADO 2.'+"\n" }))
+        } else if (Sistolica >= 180 && Sistolica <= 249 && Diastolica >= 110 && Diastolica <= 149) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- PRESION ARTERIAL: HIPERTENSION ARTERIAL GRADO 3.'+"\n" }))
+        } else if (Diastolica >= 150) {
+            set(d => ({ ...d, sistolica: '' }))
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
+            return
         }
         document.getElementById('fRespiratoria')?.focus();
     }
@@ -207,22 +270,57 @@ export const GetSat = async (event,triaje,set) => {
         return
     }
     if (event.key === 'Enter') {
-        if (triaje.sat02 < 92 || triaje.sat02 > 100) {
+        const Saturacion = triaje.sat02
+        if (Saturacion == 0) {
             set(d => ({ ...d, sat02: '' }))
-            await Swal.fire('Error','No se permite este dato','error')
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
+        if (Saturacion < 85) {
+            set(d => ({ ...d, sat02: '' }))
+            await Swal.fire('HIPOXIA SEVERA','Ingrese otro dato por favor.','error')
+            return
+        } else if (Saturacion >= 85 && Saturacion <= 88) {
+            set(d => ({ ...d, sat02: '' }))
+            await Swal.fire('HIPOXIA MODERADA','Ingrese otro dato por favor.','error')
+            return
+        } else if (Saturacion >= 89 && Saturacion <= 92) {
+            set(d => ({ ...d, sat02: '' }))
+            await Swal.fire('HIPOXIA LEVE','Ingrese otro dato por favor.','error')
+            return
+        } else if (Saturacion >= 93 && Saturacion <= 100) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- SATURACIÓN DE OXIGENO: NORMAL.'+"\n" }))
+        } else if (Saturacion >= 101) {
+            set(d => ({ ...d, sat02: '' }))
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
+            return
+        }
+
         document.getElementById('perimetroCuello')?.focus();
     }
 }
 
 export const GetFRespira = async (event,triaje,set) => {
     if (event.key === 'Enter') {
-        if (triaje.fRespiratoria < 12 || triaje.fRespiratoria > 20) {
+        const Frecuencia = triaje.fRespiratoria
+        if (Frecuencia == 0) {
             set(d => ({ ...d, fRespiratoria: '' }))
-            await Swal.fire('Error','No se permite este dato','error')
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
             return
         }
+        if (Frecuencia <= 13) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA RESPIRATORIA: BRADIPNEA.'+"\n" }))
+        } else if (Frecuencia >= 14 && Frecuencia <= 20) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA RESPIRATORIA: NORMAL.'+"\n" }))
+        } else if (Frecuencia >= 21 && Frecuencia <= 50) {
+            set(d => ({ ...d, diagnostico: (d.diagnostico || '') + '- FRECUENCIA RESPIRATORIA: TAQUIPNEA.'+"\n" }))
+        } else if (Frecuencia > 50) {
+            set(d => ({ ...d, fRespiratoria: '' }))
+            await Swal.fire('Valor Absurdo','Ingrese otro dato por favor.','error')
+            return
+        }
+        
+        
         document.getElementById('registrarTR')?.focus();
     }
 }

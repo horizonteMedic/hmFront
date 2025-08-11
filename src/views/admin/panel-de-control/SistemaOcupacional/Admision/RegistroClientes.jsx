@@ -120,7 +120,12 @@ const RegistroClientes = (props) => {
   e.preventDefault();
   if (!props.datos.codPa) return Swal.fire('Error', 'Coloque el DNI', 'error');
 
-  Swal.fire({ title: 'Buscando datos', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+  Swal.fire({ title: 'Buscando datos',  allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          showCancelButton: true,
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!", didOpen: () => Swal.showLoading() });
 
   SearchPacienteDNI(props.selectedSede, props.datos.codPa, props.token)
   .then(async res => {
@@ -243,6 +248,11 @@ const RegistroClientes = (props) => {
     Swal.fire({
       title: 'Validando Datos',
       allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      showCancelButton: true,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
       didOpen: () => Swal.showLoading()
     });
 
