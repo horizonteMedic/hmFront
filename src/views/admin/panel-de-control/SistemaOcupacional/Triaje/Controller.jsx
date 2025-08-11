@@ -161,10 +161,20 @@ export const handleSubmit = async (datos,edad,nro,fecha,Swal,token,setF,setT,ref
     if (datos.cadera < 70 || datos.cadera > 180){ 
       await Swal.fire('Error','No se permite este dato en Cadera','error') 
       return}
-    if (datos.temperatura < 35 || datos.temperatura > 38){ 
+
+    if (datos.sat02 < 92 || datos.sat02 >= 101){ 
+      await Swal.fire('Error','No se permite este dato en Cadera','error') 
+      return}
+
+    if (datos.temperatura < 35){ 
       await Swal.fire('Error','No se permite este dato en Termperatura','error') 
       return}
-    if (datos.fCardiaca < 60 || datos.fCardiaca > 100){ 
+    if (datos.temperatura >= 40){ 
+      await Swal.fire('Error','No se permite este dato en Termperatura','error') 
+      return}
+
+
+    if (datos.fCardiaca <= 39){ 
       await Swal.fire('Error','No se permite este dato en Frecuencia Cardiaca','error') 
       return}
     if (datos.sat02 < 92 || datos.sat02 > 100){ 
@@ -173,13 +183,22 @@ export const handleSubmit = async (datos,edad,nro,fecha,Swal,token,setF,setT,ref
     if (datos.perimetroCuello < 30 || datos.perimetroCuello > 55){ 
       await Swal.fire('Error','No se permite este dato en Perimetro Cuello','error') 
       return}
+
     if (datos.sistolica < 90){ 
       await Swal.fire('Error','No se permite este dato en Sistolica','error') 
       return}
+    if (datos.sistolica >= 250){ 
+      await Swal.fire('Error','No se permite este dato en Sistolica','error') 
+      return}
+
     if (datos.diastolica < 60){ 
       await Swal.fire('Error','No se permite este dato en Diastolica','error') 
       return}
-    if (datos.fRespiratoria < 12 || datos.fRespiratoria > 20){ 
+    if (datos.diastolica >= 150){ 
+      await Swal.fire('Error','No se permite este dato en Diastolica','error') 
+      return}
+
+    if (datos.fRespiratoria == 0){ 
       await Swal.fire('Error','No se permite este dato en Frecuencia Respiratoria','error') 
       return}
     

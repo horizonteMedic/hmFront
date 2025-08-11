@@ -3,8 +3,12 @@ export const ImportData = (dni,Swal,getFetch,token,set,RendeSet) => {
      Swal.fire({
           title: 'Cargando Datos',
           text: 'Espere por favor...',
-          allowOutsideClick: false,
+           allowOutsideClick: false,
           allowEscapeKey: false,
+          showConfirmButton: false,
+          showCancelButton: true,
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
           didOpen: () => {
             Swal.showLoading();
           }

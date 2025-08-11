@@ -221,93 +221,87 @@ const Triaje = ({token,selectedSede}) => {
                 >
                   Ingresar Información Triaje
                 </button>
-                <button
-                  type="button"
-                  className={`px-3 py-1 font-semibold text-base ${tabTriaje === 'espiro' ? 'border-b-2 border-blue-700 text-blue-700' : 'text-gray-500'}`}
-                  onClick={() => setTabTriaje('espiro')}
-                >
-                  Espirometría
-                </button>
+                
               </div>
               {tabTriaje === 'triaje' && (
                 <div className="space-y-2">
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-lg">
                     <div>
                       {/* Inputs con shimmer si loadingInputs */}
-                      <div className="flex items-center mb-1">
+                      <div className="flex items-center mb-1 ">
                         <label className="w-24 font-medium">Talla:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-20 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" autoComplete='off' id="talla" placeholder="m." name="talla" value={triaje.talla} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" autoComplete='off' id="talla" placeholder="m." name="talla" value={triaje.talla} onChange={handleTriajeChange}
                         onKeyUp={(event) => {Convert(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">Peso:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-20 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" id="peso" autoComplete='off' placeholder="Kg." name="peso" value={triaje.peso} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" id="peso" autoComplete='off' placeholder="Kg." name="peso" value={triaje.peso} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetIMC(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">IMC:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-20 h-8 ml-1" /> :
-                        <input className="border rounded px-1 w-20 text-md ml-1" disabled autoComplete='off' name="imc" value={triaje.imc} onChange={handleTriajeChange}/>}
+                        <input className="border rounded px-1 w-24 h-10 text-md ml-1" disabled autoComplete='off' name="imc" value={triaje.imc} onChange={handleTriajeChange}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">Cintura:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-20 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} maxLength={180} className="border rounded px-1 w-20 text-md ml-1" id="cintura" autoComplete='off' name="cintura" value={triaje.cintura} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} maxLength={180} className="border rounded px-1 w-24 h-10 text-md ml-1" id="cintura" autoComplete='off' name="cintura" value={triaje.cintura} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetCintura(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-24 font-medium">ICC:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-20 h-8 ml-1" /> :
-                        <input className="border rounded px-1 w-20 text-md ml-1" disabled autoComplete='off' name="icc" value={triaje.icc} onChange={handleTriajeChange}/>}
+                        <input className="border rounded px-1 w-24 h-10 text-md ml-1" disabled autoComplete='off' name="icc" value={triaje.icc} onChange={handleTriajeChange}/>}
                       </div>
                     </div>
                     <div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">Cadera:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-24 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-24 text-md ml-1" id="cadera" name="cadera" autoComplete='off' value={triaje.cadera} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" id="cadera" name="cadera" autoComplete='off' value={triaje.cadera} onChange={handleTriajeChange}
                          onKeyUp={(event) => {GetICC(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">Temperatura:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-24 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-24 text-md ml-1" id="temperatura" name="temperatura" autoComplete='off' value={triaje.temperatura} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" id="temperatura" name="temperatura" autoComplete='off' value={triaje.temperatura} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetCC(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">F. Cardiaca:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-24 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-24 text-md ml-1" id="fCardiaca" name="fCardiaca" autoComplete='off' value={triaje.fCardiaca} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" id="fCardiaca" name="fCardiaca" autoComplete='off' value={triaje.fCardiaca} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetFC(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">SAT. 02:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-24 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-24 text-md ml-1" id="sat02" name="sat02" autoComplete='off' value={triaje.sat02} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" id="sat02" name="sat02" autoComplete='off' value={triaje.sat02} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetSat(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                       <div className="flex items-center mb-1">
                         <label className="w-32 font-medium">Perímetro Cuello:</label>
                         {loadingInputs ? <div className="animate-pulse bg-gray-200 rounded w-24 h-8 ml-1" /> :
-                        <input disabled={habilitarTR} className="border rounded px-1 w-24 text-md ml-1" id="perimetroCuello" name="perimetroCuello" autoComplete='off' value={triaje.perimetroCuello} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" id="perimetroCuello" name="perimetroCuello" autoComplete='off' value={triaje.perimetroCuello} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetCuello(event,triaje,setTriaje,Swal)}}/>}
                       </div>
                     </div>
                   </div>
                   <div className="flex gap-3 mt-2 items-end">
-                    <fieldset className="border rounded p-2 flex-1 min-w-[250px]">
+                    <fieldset className="border rounded p-2 flex-1 min-w-[250px] text-lg">
                       <legend className="text-md text-blue-700 font-semibold">Presión Sistémica</legend>
                       <div className="flex flex-wrap gap-2 items-center mb-1">
                         <label className="font-medium w-20">Sistólica:</label>
-                        <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" id="sistolica" name="sistolica" value={triaje.sistolica} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" placeholder="mm Hg" id="sistolica" name="sistolica" value={triaje.sistolica} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetSistolica(event,triaje,setTriaje,Swal)}}/>
                         <label className="font-medium w-20 ml-4">Diastólica:</label>
-                        <input disabled={habilitarTR} className="border rounded px-1 w-20 text-md ml-1" placeholder="mm Hg" id="diastolica" name="diastolica" value={triaje.diastolica} onChange={handleTriajeChange}
+                        <input disabled={habilitarTR} className="border rounded px-1 w-24 h-10 text-md ml-1" placeholder="mm Hg" id="diastolica" name="diastolica" value={triaje.diastolica} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetPA(event,triaje,setTriaje,Swal)}}/>
-                        <label className="font-medium w-32 ml-4">F. Respiratoria:</label>
-                        <input disabled={habilitarTR} className="border rounded px-1 w-32 text-md ml-1 " id="fRespiratoria" name="fRespiratoria" value={triaje.fRespiratoria} onChange={handleTriajeChange}
+                        <label className="font-medium w-36 ml-4">F. Respiratoria:</label>
+                        <input disabled={habilitarTR} className="border rounded px-1 w-32 h-10 text-md ml-1 " id="fRespiratoria" name="fRespiratoria" value={triaje.fRespiratoria} onChange={handleTriajeChange}
                         onKeyUp={(event) => {GetFRespira(event,triaje,setTriaje,Swal)}}/>
                       </div>
                     </fieldset>
@@ -349,9 +343,7 @@ const Triaje = ({token,selectedSede}) => {
                   </div>
                 </div>
               )}
-              {tabTriaje === 'espiro' && (
-                <div className="p-4 text-gray-400 text-md">Espirometría (en desarrollo)</div>
-              )}
+              
             </fieldset>
           </form>
         )}
