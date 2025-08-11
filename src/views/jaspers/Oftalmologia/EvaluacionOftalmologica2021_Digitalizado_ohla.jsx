@@ -28,10 +28,6 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   //   hallazgos: "NINGUNO"
   // };
 
-  const obtener = (name) => {
-    return data[name] || "";
-  };
-
   // Datos de prueba (solo para desarrollo)
   const datosPrueba = {
     // Evaluación Oftalmológica
@@ -616,7 +612,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const xRefraccionLejosODSF = margin + 33;
   const xRefraccionLejosODCIL = margin + 48.3;
   const xRefraccionLejosODEJE = margin + 65;
-  const xRefraccionLejosODDIP = margin + 80;
+  const xRefraccionLejosODDIP = margin + 80; // Movido 2 puntos a la derecha (antes 80, ahora 82)
 
   doc.text(
     String(datosFinales.refraccionLejosODSF || ""),
@@ -636,7 +632,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.refraccionLejosODDIP || ""),
     xRefraccionLejosODDIP,
-    yRefraccionLejos
+    yRefraccionLejos + 2, // Bajado solo 2 puntos
+    { align: "center" } // Centrado horizontalmente
   );
 
   // OI (Ojo Izquierdo)
@@ -659,7 +656,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.refraccionLejosOIDIP || ""),
     xRefraccionLejosODDIP,
-    yRefraccionLejosOI
+    yRefraccionLejosOI + 2, // Bajado solo 2 puntos
+    { align: "center" } // Centrado horizontalmente
   );
 
   // === REFRACCIÓN DE CERCA ===
@@ -669,7 +667,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const xRefraccionCercaODSF = margin + 120;
   const xRefraccionCercaODCIL = margin + 137;
   const xRefraccionCercaODEJE = margin + 149;
-  const xRefraccionCercaODDIP = margin + 163;
+  const xRefraccionCercaODDIP = margin + 166; // Movido 2 puntos a la derecha (antes 163, ahora 165)
 
   doc.text(
     String(datosFinales.refraccionCercaODSF || ""),
@@ -689,7 +687,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.refraccionCercaODDIP || ""),
     xRefraccionCercaODDIP,
-    yRefraccionCerca
+    yRefraccionCerca + 2, // Bajado solo 2 puntos
+    { align: "center" } // Centrado horizontalmente
   );
 
   // OI (Ojo Izquierdo)
@@ -712,7 +711,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.refraccionCercaOIDIP || ""),
     xRefraccionCercaODDIP,
-    yRefraccionCercaOI
+    yRefraccionCercaOI + 2, // Bajado solo 2 puntos
+    { align: "center" } // Centrado horizontalmente
   );
 
   // === DIAGNÓSTICO ===
@@ -895,10 +895,10 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   // };
   // Arreglo de firmas que quieres cargar
   const firmasAPintar = [
-    { nombre: "FIRMAP", x: -23, y: 240, maxw: 120 },
-    { nombre: "HUELLA", x: 10, y: 240, maxw: 100 },
-    { nombre: "SELLOFIRMA", x: 50, y: 240, maxw: 120 },
-    { nombre: "SELLOFIRMADOCASIG", x: 110, y: 240, maxw: 120 },
+    { nombre: "FIRMAP", x: -23, y: 238, maxw: 120 },
+    { nombre: "HUELLA", x: 10, y: 238, maxw: 100 },
+    { nombre: "SELLOFIRMA", x: 40, y: 238, maxw: 120 },
+    { nombre: "SELLOFIRMADOCASIG", x: 90, y: 238, maxw: 150 },
   ];
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);

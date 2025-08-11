@@ -985,10 +985,10 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
   //   iframe.contentWindow.print();
   // };
   const firmasAPintar = [
-    { nombre: "FIRMAP", x: -23, y: 238, maxw: 120 },
-    { nombre: "HUELLA", x: 10, y: 238, maxw: 100 },
-    { nombre: "SELLOFIRMA", x: 40, y: 238, maxw: 120 },
-    { nombre: "SELLOFIRMADOCASIG", x: 110, y: 238, maxw: 120 },
+    { nombre: "FIRMAP", x: -23, y: 235, maxw: 120 },
+    { nombre: "HUELLA", x: 10, y: 235, maxw: 100 },
+    { nombre: "SELLOFIRMA", x: 40, y: 235, maxw: 120 },
+    { nombre: "SELLOFIRMADOCASIG", x: 100, y: 235, maxw: 150 },
   ];
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
