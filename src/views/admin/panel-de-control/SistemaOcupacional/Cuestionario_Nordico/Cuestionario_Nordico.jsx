@@ -3,21 +3,17 @@ import {
   faMicroscope,
   faTint,
   faHeartbeat,
-  faSave,
-  faBroom,
-  faPrint,
 } from "@fortawesome/free-solid-svg-icons";
-import { getFetch } from "../../getFetch/getFetch";
+import PropTypes from "prop-types";
 
 import { useState } from "react";
 
-import Swal from "sweetalert2";
 import Cuestionario from "./Cuestionario/Cuestionario";
 import Responder from "./Responder/Responder";
 import Espalda_Baja from "./Espalda_Baja/Espalda_Baja";
 import Hombros from "./Hombros/Hombros";
 import Cuello from "./Cuello/Cuello";
-const tabla = "oit";
+
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -313,3 +309,14 @@ const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) =>
 };
 
 export default Cuestionario_Nordico;
+
+Cuestionario_Nordico.propTypes = {
+  token: PropTypes.string.isRequired,
+  selectedSede: PropTypes.string.isRequired,
+  userlogued: PropTypes.object.isRequired,
+  userDatos: PropTypes.shape({
+    datos: PropTypes.shape({
+      dni_user: PropTypes.string.isRequired,
+    }).isRequired,
+  }).isRequired,
+};

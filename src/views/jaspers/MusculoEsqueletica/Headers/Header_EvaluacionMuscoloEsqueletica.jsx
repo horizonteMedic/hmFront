@@ -30,64 +30,65 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     }
   }
 
-  // 3) Información de sede y número de ficha a la derecha
-  const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
-  
-  // Número de ficha primero - con posiciones independientes
-  const fichaNum = datosFinales.norden || datosFinales.numeroFicha || datosFinales.nroFicha || "96639";
-  const fichaX = pageW - margin - 20; // Posición X independiente
-  const fichaY = y + 10.5; // Posición Y independiente
-  
-  // Número de ficha grande (sin subrayado) - sin etiqueta
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(fichaNum, fichaX, fichaY);
-  
-  // Subrayado del número de ficha QUITADO
-  
-  // Sede debajo del número de ficha - con posiciones independientes
-  const sedeX2 = pageW - margin - 18; // Posición X independiente
-  const sedeY2 = y + 3; // Posición Y independiente
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
-
-  // === BLOQUE CÓDIGO DE COLOR ===
-  const color = datosFinales.codigoColor || "#008f39";
-  const boxText = (datosFinales.textoColor || "F").toUpperCase();
-  let boxSize = 15;
-  let boxX = pageW - margin - boxSize; // Posición X independiente
-  let boxY = y - 11; // Subido 20 puntos (antes y + 2, ahora y - 18)
-  
-  // Draw box outline in black
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
-  // Solo renderiza si color es válido o para prueba
-  doc.setDrawColor(color);
-  doc.setLineWidth(2);
-  doc.setLineCap("round");
-  doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-  doc.setLineCap("butt");
-  doc.setFontSize(22); // Aumentado de 18 a 22 para letra más grande
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(color);
-  doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
-    align: "center",
-    baseline: "middle",
-    maxWidth: boxSize - 1,
-  });
-  doc.setDrawColor(0);
-  doc.setTextColor(0);
-  doc.setLineWidth(0.2);
-
-  // 4) NÚMERO DE PÁGINA - con posiciones independientes
-  const pagX = sedeX2; // Alineado con la sede
-  const pagY = sedeY2 - 5; // 3 puntos arriba de la sede
-  doc.setFont("helvetica", "normal").setFontSize(12);
-  doc.text(`Pag. ${numeroPagina}`, pagX, pagY, { align: "right" });
-
-  // === 5) DATOS DEL PACIENTE ===
-  // Solo mostrar datos del paciente en la página 1
+  // Solo dibujar elementos del header en la página 1
   if (numeroPagina === 1) {
+    // 3) Información de sede y número de ficha a la derecha
+    const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
+    
+    // Número de ficha primero - con posiciones independientes
+    const fichaNum = datosFinales.norden || datosFinales.numeroFicha || datosFinales.nroFicha || "96639";
+    const fichaX = pageW - margin - 20; // Posición X independiente
+    const fichaY = y + 10.5; // Posición Y independiente
+    
+    // Número de ficha grande (sin subrayado) - sin etiqueta
+    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.text(fichaNum, fichaX, fichaY);
+    
+    // Subrayado del número de ficha QUITADO
+    
+    // Sede debajo del número de ficha - con posiciones independientes
+    const sedeX2 = pageW - margin - 18; // Posición X independiente
+    const sedeY2 = y + 3; // Posición Y independiente
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
+
+    // === BLOQUE CÓDIGO DE COLOR ===
+    const color = datosFinales.codigoColor || "#008f39";
+    const boxText = (datosFinales.textoColor || "F").toUpperCase();
+    let boxSize = 15;
+    let boxX = pageW - margin - boxSize; // Posición X independiente
+    let boxY = y - 11; // Subido 20 puntos (antes y + 2, ahora y - 18)
+    
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+    // Solo renderiza si color es válido o para prueba
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap("round");
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap("butt");
+    doc.setFontSize(22); // Aumentado de 18 a 22 para letra más grande
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1,
+    });
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2);
+
+    // 4) NÚMERO DE PÁGINA - con posiciones independientes
+    const pagX = sedeX2; // Alineado con la sede
+    const pagY = sedeY2 - 5; // 3 puntos arriba de la sede
+    doc.setFont("helvetica", "normal").setFontSize(12);
+    doc.text(`Pag. ${numeroPagina}`, pagX, pagY, { align: "right" });
+
+    // === 5) DATOS DEL PACIENTE ===
+    // Solo mostrar datos del paciente en la página 1
     doc.setFont("helvetica", "normal").setFontSize(8);
 
     // Apellidos y Nombres
@@ -145,6 +146,50 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
       sexoTexto = "FEMENINO";
     }
     doc.text(sexoTexto, xSexo, ySexo);
+  } else {
+    // Para la página 2, mostrar solo: número de página, sede y bloque de color
+    const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
+    
+    // Sede en la esquina superior derecha
+    const sedeX2 = pageW - margin - 18;
+    const sedeY2 = y + 3;
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
+
+    // === BLOQUE CÓDIGO DE COLOR ===
+    const color = datosFinales.codigoColor || "#008f39";
+    const boxText = (datosFinales.textoColor || "F").toUpperCase();
+    let boxSize = 15;
+    let boxX = pageW - margin - boxSize;
+    let boxY = y - 11;
+    
+    // Draw box outline in black
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+    // Solo renderiza si color es válido o para prueba
+    doc.setDrawColor(color);
+    doc.setLineWidth(2);
+    doc.setLineCap("round");
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setLineCap("butt");
+    doc.setFontSize(22);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(color);
+    doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1,
+    });
+    doc.setDrawColor(0);
+    doc.setTextColor(0);
+    doc.setLineWidth(0.2);
+
+    // Número de página debajo de la sede
+    const pagX = sedeX2;
+    const pagY = sedeY2 - 5;
+    doc.setFont("helvetica", "normal").setFontSize(12);
+    doc.text(`Pag. ${numeroPagina}`, pagX, pagY, { align: "right" });
   }
 
   // Restaurar fuente normal

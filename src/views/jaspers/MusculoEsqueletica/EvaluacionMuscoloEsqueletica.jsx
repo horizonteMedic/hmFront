@@ -28,6 +28,29 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
     doc.text("Imagen de evaluación músculo esquelética no disponible", margin, yOffset + 10);
   }
 
+  // === PÁGINA 2 ===
+  doc.addPage();
+  
+  // === 0) HEADER PÁGINA 2 (solo texto, sin imagen) ===
+  headerEvaluacionMuscoloEsqueletica(doc, data, false, 2);
+
+  // === 1) Imagen de fondo para la página 2 ===
+  const fondoImgPag2 = "/img/EvaluacionMusculoEsqueletica_pag2.png";
+  
+  // Página 2 ocupa toda la hoja
+  const imgWidthPag2 = pageW; // Todo el ancho disponible
+  const imgHeightPag2 = pageH; // Toda la altura de la página
+
+  // Posicionar desde arriba para ocupar toda la página
+  const xOffsetPag2 = 0;
+  const yOffsetPag2 = 0; // Desde la parte superior
+
+  try {
+    doc.addImage(fondoImgPag2, "PNG", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
+  } catch (e) {
+    doc.text("Imagen de evaluación músculo esquelética página 2 no disponible", margin, yOffsetPag2 + 10);
+  }
+
   // === GENERAR PDF Y ABRIR PARA IMPRESIÓN ===
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
