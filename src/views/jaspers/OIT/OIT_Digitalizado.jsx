@@ -34,12 +34,12 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: y + 3,
       body: [
         [
-          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 } },
-          { content: `${datos.nplaca}`,styles: { valign: "middle",} },
-          { content: "HCL:",styles: { valign: "middle",} },
-          { content: `${datos.norden}`,styles: { valign: "middle",} },
-          { content: "LECTOR:", styles: { cellWidth: 25, valign: "middle" } },
-          { content: `${datos.doctor}`,styles: { valign: "middle",} }
+          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 ,fillColor:[242, 242, 242] } },
+          { content: `${datos.norden}`,styles: { valign: "middle",fillColor:[242, 242, 242] } },
+          { content: "HCL:",styles: { valign: "middle",fillColor:[242, 242, 242] } },
+          { content: `${datos.norden}`,styles: { valign: "middle",fillColor:[242, 242, 242] } },
+          { content: "LECTOR:", styles: { cellWidth: 25, valign: "middle",fillColor:[242, 242, 242]  } },
+          { content: `${datos.doctor}`,styles: { valign: "middle",fillColor:[242, 242, 242] } }
         ],
         [
           { content: "NOMBRE:",styles: { valign: "middle",} },
@@ -68,7 +68,7 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: doc.lastAutoTable.finalY+2,
       body: [
         [
-          { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
+          { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242]  } },
           { content: "1", styles: {valign:"middle"}},
           { content: "BUENA" },
           { content: `${datos.rbBuena ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
@@ -146,11 +146,11 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       body: [
         [
-          { content: "II. ANORMALIDADES PARENQUIMATOSAS (si NO hay anormalidades pase a III. A. Pleurales)", styles: {minCellWidth: 100} },
-          { content: "SI", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.anormalidades_parenquimatosas_si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "NO", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.anormalidades_parenquimatosas_no ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: "II. ANORMALIDADES PARENQUIMATOSAS (si NO hay anormalidades pase a III. A. Pleurales)", styles: {minCellWidth: 100,fillColor:[242, 242, 242] } },
+          { content: "SI", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242]  } },
+          { content: `${datos.anormalidades_parenquimatosas_si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] ,fillColor:[242, 242, 242] } },
+          { content: "NO", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242]  } },
+          { content: `${datos.anormalidades_parenquimatosas_no ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242]  } }
         ]
       ],
       theme: "grid",
@@ -255,11 +255,11 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "C", styles: { halign: 'center', valign: 'middle' } },
         ],
         [
-          { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9 },
-          { content: "SI" },
-          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "NO" },
-          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9,styles:{fillColor:[242, 242, 242] } },
+          { content: "SI" ,styles:{fillColor:[242, 242, 242] }},
+          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242]  } },
+          { content: "NO" ,styles:{fillColor:[242, 242, 242] }},
+          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242]  } }
         ],
         [
           { content: "               3.1 PLACAS PLEURALES (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 13 }
@@ -611,11 +611,11 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "", styles: { lineWidth: 0 }, colSpan: 13 },
         ],
         [
-          { content: "IV SIMBOLOS *", colSpan: 16, styles: { valign: 'middle' } },
-          { content: "SI", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk3Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "NO", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk3No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: "IV SIMBOLOS *", colSpan: 16, styles: { valign: 'middle',fillColor:[242, 242, 242]  } },
+          { content: "SI", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242]  } },
+          { content: `${datos.chk3Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242]  } },
+          { content: "NO", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242]  } },
+          { content: `${datos.chk3No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] ,fillColor:[242, 242, 242] } }
         ]
       ],
       theme: "grid",
@@ -716,7 +716,7 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "tb", styles: { halign: 'center', valign: 'middle' } },
         ],
         [
-          { content: `Comentarios:\n${datos.txtSComentarios}`, colSpan: 15, styles: { minCellHeight: 11 } }
+          { content: `Comentarios:${datos.txtSComentarios}`, colSpan: 15, styles: { minCellHeight: 13, fontSize: 7  } }
         ],
         [
           { content: "Firma y Sello de Médico", colSpan: 15 }

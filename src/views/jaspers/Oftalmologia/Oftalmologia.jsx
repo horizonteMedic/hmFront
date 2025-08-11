@@ -142,7 +142,9 @@ export default function Oftalmologia(datos = {}) {
   doc.text(`${(datos.vcolores || "").toUpperCase()}`, margin + 60, startY - 13);
 
   // Visión binocular
-  doc.text("Visión Binocular", labelX, startY + lineHeight - 13, { align: "right" });
+  doc.text("Visión Binocular", labelX, startY + lineHeight - 13, {
+    align: "right",
+  });
   doc.text(":", labelX + 2, startY + lineHeight - 13);
   doc.text(
     `${(datos.vbinocular || "").toUpperCase()}`,
@@ -184,8 +186,8 @@ export default function Oftalmologia(datos = {}) {
 
   // Arreglo de firmas que quieres cargar
   const firmasAPintar = [
-    { nombre: "SELLOFIRMADOCASIG", x: 20, y: 220, maxw: 200 },
-    { nombre: "SELLOFIRMA", x: 80, y: 220, maxw: 130 },
+    { nombre: "SELLOFIRMADOCASIG", x: 50, y: 220, maxw: 50 },
+    { nombre: "SELLOFIRMA", x: 120, y: 220, maxw: 50 },
   ];
   agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
@@ -208,24 +210,47 @@ function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
       img.crossOrigin = "anonymous";
       img.src = imagenUrl;
 
+      // img.onload = () => {
+      //   let sigW = maxw;
+      //   const sigH = 35;
+      //   const baseX = x;
+      //   const baseY = y;
+      //   const maxW = sigW - 10;
+      //   const maxH = sigH - 10;
+      //   let imgW = img.width;
+      //   let imgH = img.height;
+      //   const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+      //   imgW *= scale;
+      //   imgH *= scale;
+      //   const imgX = baseX + (sigW - imgW) / 2;
+      //   const imgY = baseY + (sigH - imgH) / 2;
+      //   doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+      //   resolve();
+      // };
       img.onload = () => {
-        let sigW = maxw;
-        const sigH = 35;
+        const sigH = 35; // alto máximo
+        const maxW = maxw; // ancho máximo como parámetro
         const baseX = x;
         const baseY = y;
-        const maxW = sigW - 10;
-        const maxH = sigH - 10;
+
         let imgW = img.width;
         let imgH = img.height;
-        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+
+        // Escala proporcional en base a ancho y alto máximos
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
         imgW *= scale;
         imgH *= scale;
+
+        // Ahora el ancho se adapta
+        const sigW = imgW;
+
+        // Centrar la imagen
         const imgX = baseX + (sigW - imgW) / 2;
         const imgY = baseY + (sigH - imgH) / 2;
+
         doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
         resolve();
       };
-
       img.onerror = (e) => {
         console.error("Error al cargar la imagen:", e);
         resolve();

@@ -154,7 +154,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado = (doc, datos = {}) => {
 
   // 3) TÍTULO perfectamente centrado
   doc.setFont("helvetica", "bold").setFontSize(13);
-  const titulo = "FICHA DE EVALUACIÓN AUDIOMETRÍA";
+  const titulo = "FICHA DE EVALUACIÓN OFTALMOLÓGICA";
   const tituloY = y + 10;
   doc.text(titulo, pageW / 2, tituloY, { align: "center" });
   // subrayado
