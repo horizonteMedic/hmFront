@@ -10,9 +10,24 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
   // 1) Header
   HeaderRAYOSXXXOFI(doc, data);
 
+  // Datos de prueba para demostrar el manejo de texto largo
+  const datosPrueba = {
+    nombres: "JOSUE SPENCER ROJAS SIGUENZA",
+    empresa: "SERVICIOS INDUSTRIALES MMJ EMPRESA INDIVIDUAL DE RESPONSABILIDAD LIMITADA CON RUC 20123456789",
+    cargo: "ADMINISTRADOR GENERAL DE OPERACIONES",
+    edad: "30",
+    tipoRadio: "LUMBAR",
+    fechaExamen: "2025-08-11",
+    informacionGeneral: "Cuerpos vertebrales muestran morfología normal. Sacro no muestra lesiones evidentes. Espacios intervertebrales conservados. Densidad ósea adecuada. Lordosis lumbar normal. Canal raquídeo con amplitud normal. No se observan fracturas ni luxaciones. Los discos intervertebrales mantienen su altura normal.",
+    conclusiones: "Estudio radiográfico de columna lumbar normal. No se evidencian alteraciones patológicas significativas. Se recomienda control clínico según evolución del paciente."
+  };
+
+  // Combinar datos de prueba con los datos reales (los datos reales tienen prioridad)
+  const datosFinales = { ...datosPrueba, ...data };
+
   // Función para obtener datos con valor por defecto
   const obtener = (name) => {
-    return data[name] || "";
+    return datosFinales[name] || "";
   };
   function formatearFecha(fechaStr) {
   if (!fechaStr) return ""; // Si está vacío
@@ -90,10 +105,16 @@ export default function RAYOSXXXOFI_Digitalizado(data = {}) {
     // Dos puntos en posición fija
     doc.text(":", colonX, y);
 
-    // Valor a la derecha, alineado
-    doc.text(item.value, valueX, y);
+    // Valor a la derecha, con manejo de texto largo
+    const maxValueWidth = pageW - valueX - margin - 10; // Ancho máximo disponible para el valor
+    const valueLines = doc.splitTextToSize(item.value, maxValueWidth);
+    
+    valueLines.forEach((line, index) => {
+      doc.text(line, valueX, y + (index * 5));
+    });
 
-    y += 6;
+    // Ajustar el incremento de Y basado en el número de líneas del valor
+    y += Math.max(6, valueLines.length * 5);
   });
 
   y += 8;

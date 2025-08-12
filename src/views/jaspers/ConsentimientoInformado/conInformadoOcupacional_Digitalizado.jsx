@@ -13,7 +13,7 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
     nombre: "VIVIANA AYDE DELGADO VEGA",
     dni: "75461024",
     ocupacion: "CAPATAZ",
-    empresa: "CORPORACION PERUANA DE CENTROS MEDICOS SAC",
+    empresa: "CORPORACION PERUANA DE CENTROS MEDICOS SAC CON RUC 20123456789 Y DENOMINACION COMERCIAL EXTENDIDA",
     fecha: "05 agosto 2025",
     hora: "4.10 PM"
   };
@@ -103,13 +103,29 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
 
     // === 4) NOMBRE DE LA EMPRESA ===
     doc.setFont("helvetica", "bold").setFontSize(12);
-    doc.text(datosFinales.empresa, pageW / 2, margin + 105, { align: "center" });
+    
+    // Calcular el ancho máximo disponible para la empresa
+    const maxEmpresaWidth = pageW - 2 * margin - 20; // 20 puntos de margen adicional
+    const empresaLines = doc.splitTextToSize(datosFinales.empresa, maxEmpresaWidth);
+    
+    // Calcular la posición Y inicial para centrar verticalmente todas las líneas
+    const totalEmpresaHeight = empresaLines.length * 12; // 12 puntos por línea
+    const empresaStartY = margin + 105 - (totalEmpresaHeight / 2) + 6; // Centrar y ajustar
+    
+    empresaLines.forEach((line, index) => {
+      doc.text(line, pageW / 2, empresaStartY + (index * 12), { align: "center" });
+    });
+    
+    // Ajustar la posición Y para la siguiente sección basándose en el número de líneas
+    const empresaEndY = empresaStartY + (empresaLines.length * 12);
 
     // === 5) CUERPO DEL CONSENTIMIENTO ===
     doc.setFont("helvetica", "normal").setFontSize(11);
     const consentimiento = "De acuerdo a los peligros y riesgos identificados en mi puesto de trabajo. En ese sentido en forma consiente y voluntaria doy mi consentimiento, para que se me realice el examen médico ocupacional de acuerdo a la Resolución ministerial N° 312-2011/MINSA . Y doy fe que la información brindada a HORIZONTE MEDIC es verídica. Así mismo, autorizo a HORIZONTE MEDIC para que brinde mi historia clínica y toda información resultante de mi examen medico ocupacional al Medico Ocupacional de mi empresa para que tenga acceso a mi Historia Clínica de acuerdo a la N.T.N° 022 MINSA/dgsp-V.02 y Ley N° 26842, Ley general de salud.";
     
-    doc.text(consentimiento, margin, margin + 120, { maxWidth: pageW - 2 * margin, align: "justify" });
+    // Usar la posición final de la empresa + espaciado para el cuerpo del consentimiento
+    const cuerpoY = empresaEndY + 15; // 15 puntos de separación después de la empresa
+    doc.text(consentimiento, margin, cuerpoY, { maxWidth: pageW - 2 * margin, align: "justify" });
 
     // === 6) FOOTER CON FECHA, HORA Y FIRMAS ===
     const footerY = pageH - 80;
