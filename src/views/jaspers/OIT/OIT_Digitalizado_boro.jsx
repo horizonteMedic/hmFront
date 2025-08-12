@@ -34,12 +34,12 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: y + 3,
       body: [
         [
-          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 } },
-          { content: `${datos.nplaca ? datos.nplaca  : ""}` },
-          { content: "HCL:" },
-          { content: `${datos.norden ? datos.norden : ""}` },
-          { content: "LECTOR:", styles: { cellWidth: 25 } },
-          { content: `${datos.doctor ? datos.doctor : ""}` }
+          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 ,fillColor:[242, 242, 242]} },
+          { content: `${datos.norden ? datos.norden  : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] }  },
+          { content: "HCL:" ,styles: { valign: "middle",fillColor:[242, 242, 242] } },
+          { content: `${datos.norden ? datos.norden : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] }  },
+          { content: "LECTOR:", styles: { cellWidth: 25 ,fillColor:[242, 242, 242]} },
+          { content: `${datos.doctor ? datos.doctor : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] }  }
         ],
         [
           { content: "NOMBRE:" },
@@ -68,7 +68,7 @@ export default function OIT_Digitalizado(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       body: [
         [
-          { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
+          { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242] } },
           { content: "1", styles: {valign:"middle"}},
           { content: "BUENA" },
           { content: `${datos.rbBuena ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
@@ -154,7 +154,7 @@ export default function OIT_Digitalizado(datos = {}) {
         ]
       ],
       theme: "grid",
-      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
+      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0],fillColor:[242, 242, 242] },
       margin: { left: 10, right: 10 }
     });
 
@@ -255,11 +255,11 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "C", styles: { halign: 'center', valign: 'middle' } },
         ],
         [
-          { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9 },
-          { content: "SI" },
-          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "NO" },
-          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9 ,styles:{fillColor:[242, 242, 242]  }},
+          { content: "SI",styles:{fillColor:[242, 242, 242] } },
+          { content: `${datos.chk2Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] ,fillColor:[242, 242, 242] } },
+          { content: "NO" ,styles:{fillColor:[242, 242, 242] }},
+          { content: `${datos.chk2No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242]  } }
         ],
         [
           { content: "               3.1 PLACAS PLEURALES (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 13 }
@@ -611,11 +611,12 @@ export default function OIT_Digitalizado(datos = {}) {
           { content: "", styles: { lineWidth: 0 }, colSpan: 13 },
         ],
         [
-          { content: "IV SIMBOLOS *", colSpan: 16, styles: { valign: 'middle' } },
-          { content: "SI", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk3Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
-          { content: "NO", styles: { halign: 'center', valign: 'middle' } },
-          { content: `${datos.chk3No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } }
+          { content: "IV SIMBOLOS *", colSpan: 16, styles: { valign: 'middle',fillColor:[242, 242, 242] } },
+
+          { content: "SI", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242] } },
+          { content: `${datos.chk3Si ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255],fillColor:[242, 242, 242] } },
+          { content: "NO", styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242] } },
+          { content: `${datos.chk3No ? 'X' : ""}`, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] ,fillColor:[242, 242, 242]} }
         ]
       ],
       theme: "grid",
@@ -676,76 +677,158 @@ export default function OIT_Digitalizado(datos = {}) {
       { row: 2, col: 13, key: "chk_26" },
     ];
 
+    // autoTable(doc, {
+    //   startY: doc.lastAutoTable.finalY,
+    //   body: [
+    //     [
+    //       { content: "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)", colSpan: 15, styles: { valign: 'middle' } },
+    //     ],
+    //     [
+    //       { content: "aa", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "at", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ax", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "bu", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ca", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cg", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cn", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "co", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cp", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cv", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "di", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ef", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "em", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "es", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "OD", styles: { halign: 'center', valign: 'middle' }, rowSpan: 2 },
+    //     ],
+    //     [
+    //       { content: "fr", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "hi", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ho", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "id", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ih", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "kl", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "me", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "pa", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "pb", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "pi", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "px", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ra", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "rp", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "tb", styles: { halign: 'center', valign: 'middle' } },
+    //     ],
+    //     [
+    //       { content: `Comentarios:\n${datos.txtSComentarios}`, colSpan: 15, styles: { minCellHeight: 11 } }
+    //     ],
+    //     [
+    //       { content: "Firma y Sello de Médico", colSpan: 15 }
+    //     ]
+    //   ],
+    //   theme: "grid",
+    //   styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    //   margin: { left: 10, right: 10 },
+    //   didDrawCell: function (data) {
+    //     const { cell, row, column, doc } = data;
+
+    //     // Buscar si la celda actual tiene una validación
+    //     const validacion = validacionesCeldasSimbolos.find(v => v.row === row.index && v.col === column.index);
+
+    //     if (validacion && datos[validacion.key]) {
+    //       // Coordenadas para centrar la X
+    //       const x = cell.x + cell.width / 2;
+    //       const y = cell.y + cell.height / 2;
+
+    //       // Dibujar la X azul
+    //       doc.setTextColor(0, 0, 255);
+    //       doc.setFontSize(10);
+    //       doc.text("X", x, y, { align: "center", baseline: "middle" });
+
+    //       // Restaurar color original
+    //       doc.setTextColor(0, 0, 0);
+    //     }
+    //   }
+    // });
     autoTable(doc, {
-      startY: doc.lastAutoTable.finalY,
-      body: [
-        [
-          { content: "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)", colSpan: 15, styles: { valign: 'middle' } },
-        ],
-        [
-          { content: "aa", styles: { halign: 'center', valign: 'middle' } },
-          { content: "at", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ax", styles: { halign: 'center', valign: 'middle' } },
-          { content: "bu", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ca", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cg", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cn", styles: { halign: 'center', valign: 'middle' } },
-          { content: "co", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cp", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cv", styles: { halign: 'center', valign: 'middle' } },
-          { content: "di", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ef", styles: { halign: 'center', valign: 'middle' } },
-          { content: "em", styles: { halign: 'center', valign: 'middle' } },
-          { content: "es", styles: { halign: 'center', valign: 'middle' } },
-          { content: "OD", styles: { halign: 'center', valign: 'middle' }, rowSpan: 2 },
-        ],
-        [
-          { content: "fr", styles: { halign: 'center', valign: 'middle' } },
-          { content: "hi", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ho", styles: { halign: 'center', valign: 'middle' } },
-          { content: "id", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ih", styles: { halign: 'center', valign: 'middle' } },
-          { content: "kl", styles: { halign: 'center', valign: 'middle' } },
-          { content: "me", styles: { halign: 'center', valign: 'middle' } },
-          { content: "pa", styles: { halign: 'center', valign: 'middle' } },
-          { content: "pb", styles: { halign: 'center', valign: 'middle' } },
-          { content: "pi", styles: { halign: 'center', valign: 'middle' } },
-          { content: "px", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ra", styles: { halign: 'center', valign: 'middle' } },
-          { content: "rp", styles: { halign: 'center', valign: 'middle' } },
-          { content: "tb", styles: { halign: 'center', valign: 'middle' } },
-        ],
-        [
-          { content: `Comentarios:\n${datos.txtSComentarios}`, colSpan: 15, styles: { minCellHeight: 11 } }
-        ],
-        [
-          { content: "Firma y Sello de Médico", colSpan: 15 }
-        ]
+    startY: doc.lastAutoTable.finalY,
+    body: [
+      [
+        {
+          content:
+            "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)",
+          colSpan: 15,
+          styles: { valign: "middle" }
+        },
       ],
-      theme: "grid",
-      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
-      margin: { left: 10, right: 10 },
-      didDrawCell: function (data) {
-        const { cell, row, column, doc } = data;
+      [
+        { content: "aa", styles: { halign: "center", valign: "middle" } },
+        { content: "at", styles: { halign: "center", valign: "middle" } },
+        { content: "ax", styles: { halign: "center", valign: "middle" } },
+        { content: "bu", styles: { halign: "center", valign: "middle" } },
+        { content: "ca", styles: { halign: "center", valign: "middle" } },
+        { content: "cg", styles: { halign: "center", valign: "middle" } },
+        { content: "cn", styles: { halign: "center", valign: "middle" } },
+        { content: "co", styles: { halign: "center", valign: "middle" } },
+        { content: "cp", styles: { halign: "center", valign: "middle" } },
+        { content: "cv", styles: { halign: "center", valign: "middle" } },
+        { content: "di", styles: { halign: "center", valign: "middle" } },
+        { content: "ef", styles: { halign: "center", valign: "middle" } },
+        { content: "em", styles: { halign: "center", valign: "middle" } },
+        { content: "es", styles: { halign: "center", valign: "middle" } },
+        { content: "OD", styles: { halign: "center", valign: "middle" }, rowSpan: 2 },
+      ],
+      [
+        { content: "fr", styles: { halign: "center", valign: "middle" } },
+        { content: "hi", styles: { halign: "center", valign: "middle" } },
+        { content: "ho", styles: { halign: "center", valign: "middle" } },
+        { content: "id", styles: { halign: "center", valign: "middle" } },
+        { content: "ih", styles: { halign: "center", valign: "middle" } },
+        { content: "kl", styles: { halign: "center", valign: "middle" } },
+        { content: "me", styles: { halign: "center", valign: "middle" } },
+        { content: "pa", styles: { halign: "center", valign: "middle" } },
+        { content: "pb", styles: { halign: "center", valign: "middle" } },
+        { content: "pi", styles: { halign: "center", valign: "middle" } },
+        { content: "px", styles: { halign: "center", valign: "middle" } },
+        { content: "ra", styles: { halign: "center", valign: "middle" } },
+        { content: "rp", styles: { halign: "center", valign: "middle" } },
+        { content: "tb", styles: { halign: "center", valign: "middle" } },
+      ],
+      [
+        {
+          content: `Comentarios: ${datos.txtSComentarios}`,
+          colSpan: 12,
+          styles: { fontSize: 6, cellPadding: 1 }
+        },
+        { content: "", colSpan: 13,}
+      ],
+      [
+        { content: "Firma y Sello de Médico", colSpan: 15 }
+      ]
+    ],
+    theme: "grid",
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    margin: { left: 10, right: 10 },
+    didDrawCell: function (data) {
+      const { cell, row, column, doc } = data;
 
-        // Buscar si la celda actual tiene una validación
-        const validacion = validacionesCeldasSimbolos.find(v => v.row === row.index && v.col === column.index);
+      // Buscar si la celda actual tiene una validación
+      const validacion = validacionesCeldasSimbolos.find(
+        (v) => v.row === row.index && v.col === column.index
+      );
 
-        if (validacion && datos[validacion.key]) {
-          // Coordenadas para centrar la X
-          const x = cell.x + cell.width / 2;
-          const y = cell.y + cell.height / 2;
+      if (validacion && datos[validacion.key]) {
+        // Coordenadas para centrar la X
+        const x = cell.x + cell.width / 2;
+        const y = cell.y + cell.height / 2;
 
-          // Dibujar la X azul
-          doc.setTextColor(0, 0, 255);
-          doc.setFontSize(10);
-          doc.text("X", x, y, { align: "center", baseline: "middle" });
+        // Dibujar la X azul
+        doc.setTextColor(0, 0, 255);
+        doc.setFontSize(10);
+        doc.text("X", x, y, { align: "center", baseline: "middle" });
 
-          // Restaurar color original
-          doc.setTextColor(0, 0, 0);
-        }
+        // Restaurar color original
+        doc.setTextColor(0, 0, 0);
       }
-    });
+    }
+  });
 
     if (s1) {
       const canvas = document.createElement('canvas');

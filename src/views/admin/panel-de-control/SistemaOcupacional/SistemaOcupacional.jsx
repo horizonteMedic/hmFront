@@ -419,7 +419,9 @@ const TabComponent = () => {
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faAnchor} />
                   </span>
-                  <span className={styles.title}>Modulo de Consentimientos</span>
+                  <span className={styles.title}>
+                    Modulo de Consentimientos
+                  </span>
                 </div>
               )}
               {tieneVista("Cuestionario Nordico") && (
@@ -1112,6 +1114,10 @@ const TabComponent = () => {
               break;
             case "Laboratorio Clinico":
               setActiveTab(2);
+              break;
+            case "Rayos X":
+              setActiveTab(12);
+              setSubTab(0);
               break;
             case "Espirometria":
               setActiveTab(14);

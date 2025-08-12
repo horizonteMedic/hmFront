@@ -1,6 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faComments } from "@fortawesome/free-solid-svg-icons";
+import {
+  GetInfoServicio,
+  getInfoTabla,
+  Loading,
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerRayoxXToraxPA";
+import Swal from "sweetalert2";
 
 const tabla = "radiografia_torax";
 const date = new Date();
@@ -25,15 +34,11 @@ const initialFormState = {
   osteomuscular: "",
   conclusiones: "",
   observaciones: "",
-  evaluacionAnual: false,
 
   nombres_search: "",
   codigo_search: "",
   fechaDesde: today,
   fechaHasta: today,
-
-  noSeTomoRX: false,
-  evaluadoPorNeumologo: false,
 };
 
 export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
@@ -66,12 +71,12 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
   const handlePrint = () => {
     if (!form.norden)
@@ -90,7 +95,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla);
       }
     });
   };
@@ -113,6 +118,14 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
       }
     });
   };
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
+  };
+
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
 
   return (
     <div className="flex flex-col md:flex-row gap-6">
@@ -283,9 +296,10 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               <label className="font-semibold max-w-[150px] min-w-[150px]">
                 Observaciones :
               </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
+              <textarea
+                className="border rounded px-2 py-1 w-full resize-none"
                 name="observaciones"
+                rows={3}
                 value={form.observaciones || ""}
                 onChange={handleChange}
               />
@@ -293,19 +307,15 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
             <label className="flex gap-2 font-semibold ml-[168px]">
               <input
                 type="checkbox"
-                name="evaluacionAnual"
-                checked={form.observaciones == "Evaluación Anual".toUpperCase()}
+                checked={form.observaciones == "EVALUACIÓN ANUAL"}
                 onChange={(e) => {
-                  handleCheckBoxChange(e);
                   setForm((prev) => ({
                     ...prev,
-                    observaciones: e.target.checked
-                      ? "Evaluación Anual".toUpperCase()
-                      : "",
+                    observaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
                   }));
                 }}
               />
-              Evaluación Anual
+              EVALUACIÓN ANUAL
             </label>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4  pt-2">
               <div className=" flex gap-4">
@@ -341,7 +351,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               value={form.nombres_search}
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
-                  // obtenerInfoTabla();
+                  obtenerInfoTabla();
                 }
               }}
               onChange={(e) => {
@@ -358,7 +368,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               value={form.codigo_search}
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
-                  // obtenerInfoTabla();
+                  obtenerInfoTabla();
                 }
               }}
               onChange={(e) => {
@@ -377,11 +387,10 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
         <div className="flex-1">
           <Table
             data={dataTabla}
-            // tabla={tabla}
-            // set={setForm}
-            // token={token}
-            // clean={handleClear}
-            // setActiveTab={setActiveTab}
+            tabla={tabla}
+            set={setForm}
+            token={token}
+            clean={handleClear}
           />
         </div>
 
@@ -426,14 +435,24 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
           <label className="flex gap-2 font-semibold ">
             <input
               type="checkbox"
-              name="noSeTomoRX"
-              checked={form.noSeTomoRX}
+              checked={form.observaciones == "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
               onChange={(e) => {
-                handleCheckBoxChange(e);
+                // handleCheckBoxChange(e);
+                const texto = e.target.checked
+                  ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
+                  : "";
+
                 setForm((prev) => ({
                   ...prev,
-                  observaciones:
-                    "NO SE TOMO RADIOGRAFIA DE TÓRAX",
+                  vertices: texto,
+                  hilios: texto,
+                  senosCostofrenicos: texto,
+                  camposPulmonares: texto,
+                  mediastinos: texto,
+                  siluetaCardiovascular: texto,
+                  osteomuscular: texto,
+                  conclusiones: texto,
+                  observaciones: texto,
                 }));
               }}
             />
@@ -442,14 +461,14 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
           <label className="flex gap-2 font-semibold ">
             <input
               type="checkbox"
-              name="evaluadoPorNeumologo"
-              checked={form.evaluadoPorNeumologo}
+              checked={form.observaciones == "EVALUACIÓN POR NEUMOLOGÍA"}
               onChange={(e) => {
-                handleCheckBoxChange(e);
+                // handleCheckBoxChange(e);
                 setForm((prev) => ({
                   ...prev,
-                  observaciones:
-                    "EVALUACIÓN POR NEUMOLOGÍA",
+                  observaciones: e.target.checked
+                    ? "EVALUACIÓN POR NEUMOLOGÍA"
+                    : "",
                 }));
               }}
             />
@@ -460,8 +479,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
     </div>
   );
 }
-function Table({ data }) {
-  //, tabla, set, token, clean, setActiveTab
+function Table({ data, tabla, set, token, clean }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -473,18 +491,17 @@ function Table({ data }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
 
   function clicktable(nro) {
-    // clean();
-    // Loading("Importando Datos");
-    // GetInfoServicio(nro, tabla, set, token, () => {
-    //   Swal.close();
-    //   setActiveTab(1);
-    // });
+    clean();
+    Loading("Importando Datos");
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.close();
+    });
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
@@ -493,7 +510,7 @@ function Table({ data }) {
   }
 
   return (
-    <div className="overflow-y-auto " style={{ maxHeight: "450px" }}>
+    <div className="overflow-y-auto mb-4 h-[280px]">
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">
