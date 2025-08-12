@@ -676,76 +676,159 @@ export default function OIT_Digitalizado(datos = {}) {
       { row: 2, col: 13, key: "chk_26" },
     ];
 
+    // autoTable(doc, {
+    //   startY: doc.lastAutoTable.finalY,
+    //   body: [
+    //     [
+    //       { content: "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)", colSpan: 15, styles: { valign: 'middle' } },
+    //     ],
+    //     [
+    //       { content: "aa", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "at", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ax", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "bu", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ca", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cg", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cn", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "co", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cp", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "cv", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "di", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ef", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "em", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "es", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "OD", styles: { halign: 'center', valign: 'middle' }, rowSpan: 2 },
+    //     ],
+    //     [
+    //       { content: "fr", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "hi", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ho", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "id", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ih", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "kl", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "me", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "pa", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "pb", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "pi", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "px", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "ra", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "rp", styles: { halign: 'center', valign: 'middle' } },
+    //       { content: "tb", styles: { halign: 'center', valign: 'middle' } },
+    //     ],
+    //     [
+    //       { content: `Comentarios:${datos.txtSComentarios}`, colSpan: 10, styles: { minCellHeight: 13, fontSize: 7  } }
+    //     ],
+    //     [
+    //       { content: "Firma y Sello de Médico", colSpan: 15 }
+    //     ]
+    //   ],
+    //   theme: "grid",
+    //   styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    //   margin: { left: 10, right: 10 },
+    //   didDrawCell: function (data) {
+    //     const { cell, row, column, doc } = data;
+
+    //     // Buscar si la celda actual tiene una validación
+    //     const validacion = validacionesCeldasSimbolos.find(v => v.row === row.index && v.col === column.index);
+
+    //     if (validacion && datos[validacion.key]) {
+    //       // Coordenadas para centrar la X
+    //       const x = cell.x + cell.width / 2;
+    //       const y = cell.y + cell.height / 2;
+
+    //       // Dibujar la X azul
+    //       doc.setTextColor(0, 0, 255);
+    //       doc.setFontSize(10);
+    //       doc.text("X", x, y, { align: "center", baseline: "middle" });
+
+    //       // Restaurar color original
+    //       doc.setTextColor(0, 0, 0);
+    //     }
+    //   }
+    // });
     autoTable(doc, {
-      startY: doc.lastAutoTable.finalY,
-      body: [
-        [
-          { content: "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)", colSpan: 15, styles: { valign: 'middle' } },
-        ],
-        [
-          { content: "aa", styles: { halign: 'center', valign: 'middle' } },
-          { content: "at", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ax", styles: { halign: 'center', valign: 'middle' } },
-          { content: "bu", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ca", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cg", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cn", styles: { halign: 'center', valign: 'middle' } },
-          { content: "co", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cp", styles: { halign: 'center', valign: 'middle' } },
-          { content: "cv", styles: { halign: 'center', valign: 'middle' } },
-          { content: "di", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ef", styles: { halign: 'center', valign: 'middle' } },
-          { content: "em", styles: { halign: 'center', valign: 'middle' } },
-          { content: "es", styles: { halign: 'center', valign: 'middle' } },
-          { content: "OD", styles: { halign: 'center', valign: 'middle' }, rowSpan: 2 },
-        ],
-        [
-          { content: "fr", styles: { halign: 'center', valign: 'middle' } },
-          { content: "hi", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ho", styles: { halign: 'center', valign: 'middle' } },
-          { content: "id", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ih", styles: { halign: 'center', valign: 'middle' } },
-          { content: "kl", styles: { halign: 'center', valign: 'middle' } },
-          { content: "me", styles: { halign: 'center', valign: 'middle' } },
-          { content: "pa", styles: { halign: 'center', valign: 'middle' } },
-          { content: "pb", styles: { halign: 'center', valign: 'middle' } },
-          { content: "pi", styles: { halign: 'center', valign: 'middle' } },
-          { content: "px", styles: { halign: 'center', valign: 'middle' } },
-          { content: "ra", styles: { halign: 'center', valign: 'middle' } },
-          { content: "rp", styles: { halign: 'center', valign: 'middle' } },
-          { content: "tb", styles: { halign: 'center', valign: 'middle' } },
-        ],
-        [
-          { content: `Comentarios:${datos.txtSComentarios}`, colSpan: 15, styles: { minCellHeight: 13, fontSize: 7  } }
-        ],
-        [
-          { content: "Firma y Sello de Médico", colSpan: 15 }
-        ]
+    startY: doc.lastAutoTable.finalY,
+    body: [
+      [
+        {
+          content:
+            "(Rodee con un circulo la respuesta adecuada, si rodea od, escriba a continuación un COMENTARIO)",
+          colSpan: 15,
+          styles: { valign: "middle" }
+        },
       ],
-      theme: "grid",
-      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
-      margin: { left: 10, right: 10 },
-      didDrawCell: function (data) {
-        const { cell, row, column, doc } = data;
+      [
+        { content: "aa", styles: { halign: "center", valign: "middle" } },
+        { content: "at", styles: { halign: "center", valign: "middle" } },
+        { content: "ax", styles: { halign: "center", valign: "middle" } },
+        { content: "bu", styles: { halign: "center", valign: "middle" } },
+        { content: "ca", styles: { halign: "center", valign: "middle" } },
+        { content: "cg", styles: { halign: "center", valign: "middle" } },
+        { content: "cn", styles: { halign: "center", valign: "middle" } },
+        { content: "co", styles: { halign: "center", valign: "middle" } },
+        { content: "cp", styles: { halign: "center", valign: "middle" } },
+        { content: "cv", styles: { halign: "center", valign: "middle" } },
+        { content: "di", styles: { halign: "center", valign: "middle" } },
+        { content: "ef", styles: { halign: "center", valign: "middle" } },
+        { content: "em", styles: { halign: "center", valign: "middle" } },
+        { content: "es", styles: { halign: "center", valign: "middle" } },
+        { content: "OD", styles: { halign: "center", valign: "middle" }, rowSpan: 2 },
+      ],
+      [
+        { content: "fr", styles: { halign: "center", valign: "middle" } },
+        { content: "hi", styles: { halign: "center", valign: "middle" } },
+        { content: "ho", styles: { halign: "center", valign: "middle" } },
+        { content: "id", styles: { halign: "center", valign: "middle" } },
+        { content: "ih", styles: { halign: "center", valign: "middle" } },
+        { content: "kl", styles: { halign: "center", valign: "middle" } },
+        { content: "me", styles: { halign: "center", valign: "middle" } },
+        { content: "pa", styles: { halign: "center", valign: "middle" } },
+        { content: "pb", styles: { halign: "center", valign: "middle" } },
+        { content: "pi", styles: { halign: "center", valign: "middle" } },
+        { content: "px", styles: { halign: "center", valign: "middle" } },
+        { content: "ra", styles: { halign: "center", valign: "middle" } },
+        { content: "rp", styles: { halign: "center", valign: "middle" } },
+        { content: "tb", styles: { halign: "center", valign: "middle" } },
+      ],
+      [
+        {
+          content: `Comentarios: ${datos.txtSComentarios}`,
+          colSpan: 12,
+          styles: { fontSize: 6, cellPadding: 1 }
+        },
+        { content: "", colSpan: 13,}
+      ],
+      [
+        { content: "Firma y Sello de Médico", colSpan: 15 }
+      ]
+    ],
+    theme: "grid",
+    styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0], minCellHeight: 6 },
+    margin: { left: 10, right: 10 },
+    didDrawCell: function (data) {
+      const { cell, row, column, doc } = data;
 
-        // Buscar si la celda actual tiene una validación
-        const validacion = validacionesCeldasSimbolos.find(v => v.row === row.index && v.col === column.index);
+      // Buscar si la celda actual tiene una validación
+      const validacion = validacionesCeldasSimbolos.find(
+        (v) => v.row === row.index && v.col === column.index
+      );
 
-        if (validacion && datos[validacion.key]) {
-          // Coordenadas para centrar la X
-          const x = cell.x + cell.width / 2;
-          const y = cell.y + cell.height / 2;
+      if (validacion && datos[validacion.key]) {
+        // Coordenadas para centrar la X
+        const x = cell.x + cell.width / 2;
+        const y = cell.y + cell.height / 2;
 
-          // Dibujar la X azul
-          doc.setTextColor(0, 0, 255);
-          doc.setFontSize(10);
-          doc.text("X", x, y, { align: "center", baseline: "middle" });
+        // Dibujar la X azul
+        doc.setTextColor(0, 0, 255);
+        doc.setFontSize(10);
+        doc.text("X", x, y, { align: "center", baseline: "middle" });
 
-          // Restaurar color original
-          doc.setTextColor(0, 0, 0);
-        }
+        // Restaurar color original
+        doc.setTextColor(0, 0, 0);
       }
-    });
+    }
+  });
+
 
     if (s1) {
       const canvas = document.createElement('canvas');
