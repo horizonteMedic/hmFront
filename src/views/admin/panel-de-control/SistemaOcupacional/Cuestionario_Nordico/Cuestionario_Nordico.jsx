@@ -278,8 +278,8 @@ const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) =>
 
   return (
     <div className="">
-      <div className="max-w-[95%] mx-auto">
-        <h1 className="text-3xl font-bold mb-4 text-center">Cuestionario Nordico</h1>
+      <div className="max-w-[70%] mx-auto">
+        <h1 className="text-3xl font-bold mb-4 text-center">Cuestionario Nórdico de Signos y Síntomas Osteomusculares</h1>
         {/* Tabs */}
         <div className="flex space-x-1 overflow-x-auto mt-4">
           {tabs.map((tab, idx) => (

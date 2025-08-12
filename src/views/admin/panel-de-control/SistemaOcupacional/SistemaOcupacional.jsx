@@ -66,6 +66,7 @@ import {
   faNotesMedical,
   faFileWaveform,
   faAnchor,
+  faSkiingNordic,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -429,7 +430,7 @@ const TabComponent = () => {
                   }`}
                 >
                   <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faAnchor} />
+                    <FontAwesomeIcon icon={faSkiingNordic} />
                   </span>
                   <span className={styles.title}>Cuestionario Nordico</span>
                 </div>
