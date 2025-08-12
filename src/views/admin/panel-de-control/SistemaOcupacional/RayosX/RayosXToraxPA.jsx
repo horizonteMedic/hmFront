@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faComments } from "@fortawesome/free-solid-svg-icons";
 import {
+  GetInfoServicio,
   getInfoTabla,
+  Loading,
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
 } from "./controllerRayoxXToraxPA";
+import Swal from "sweetalert2";
 
 const tabla = "radiografia_torax";
 const date = new Date();
@@ -119,6 +122,10 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
   const obtenerInfoTabla = () => {
     getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
+
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
 
   return (
     <div className="flex flex-col md:flex-row gap-6">
@@ -344,7 +351,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               value={form.nombres_search}
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
-                  // obtenerInfoTabla();
+                  obtenerInfoTabla();
                 }
               }}
               onChange={(e) => {
@@ -361,7 +368,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               value={form.codigo_search}
               onKeyUp={(e) => {
                 if (e.key === "Enter") {
-                  // obtenerInfoTabla();
+                  obtenerInfoTabla();
                 }
               }}
               onChange={(e) => {
@@ -380,11 +387,10 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
         <div className="flex-1">
           <Table
             data={dataTabla}
-            // tabla={tabla}
-            // set={setForm}
-            // token={token}
-            // clean={handleClear}
-            // setActiveTab={setActiveTab}
+            tabla={tabla}
+            set={setForm}
+            token={token}
+            clean={handleClear}
           />
         </div>
 
@@ -432,11 +438,21 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               checked={form.observaciones == "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
               onChange={(e) => {
                 // handleCheckBoxChange(e);
+                const texto = e.target.checked
+                  ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
+                  : "";
+
                 setForm((prev) => ({
                   ...prev,
-                  observaciones: e.target.checked
-                    ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
-                    : "",
+                  vertices: texto,
+                  hilios: texto,
+                  senosCostofrenicos: texto,
+                  camposPulmonares: texto,
+                  mediastinos: texto,
+                  siluetaCardiovascular: texto,
+                  osteomuscular: texto,
+                  conclusiones: texto,
+                  observaciones: texto,
                 }));
               }}
             />
@@ -463,8 +479,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
     </div>
   );
 }
-function Table({ data }) {
-  //, tabla, set, token, clean, setActiveTab
+function Table({ data, tabla, set, token, clean }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -482,12 +497,11 @@ function Table({ data }) {
   };
 
   function clicktable(nro) {
-    // clean();
-    // Loading("Importando Datos");
-    // GetInfoServicio(nro, tabla, set, token, () => {
-    //   Swal.close();
-    //   setActiveTab(1);
-    // });
+    clean();
+    Loading("Importando Datos");
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.close();
+    });
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
@@ -496,7 +510,7 @@ function Table({ data }) {
   }
 
   return (
-    <div className="overflow-y-auto " style={{ maxHeight: "450px" }}>
+    <div className="overflow-y-auto mb-4 h-[280px]">
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">

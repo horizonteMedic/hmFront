@@ -217,7 +217,7 @@ export const PrintHojaR = (nro, token, tabla) => {
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
   try {
     getFetch(
-      `/api/v01/ct/agudezaVisual/obtenerOftalmologiaPorFiltros?${
+      `/api/v01/ct/rayosX/obtenerRadiografiaToraxPorFiltros?${
         codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
       }
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
