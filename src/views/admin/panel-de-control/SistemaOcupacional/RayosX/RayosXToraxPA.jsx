@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faBroom, faComments } from "@fortawesome/free-solid-svg-icons";
+import {
+  getInfoTabla,
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerRayoxXToraxPA";
 
 const tabla = "radiografia_torax";
 const date = new Date();
@@ -25,15 +31,11 @@ const initialFormState = {
   osteomuscular: "",
   conclusiones: "",
   observaciones: "",
-  evaluacionAnual: false,
 
   nombres_search: "",
   codigo_search: "",
   fechaDesde: today,
   fechaHasta: today,
-
-  noSeTomoRX: false,
-  evaluadoPorNeumologo: false,
 };
 
 export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
@@ -66,12 +68,12 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
   const handlePrint = () => {
     if (!form.norden)
@@ -90,7 +92,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla);
       }
     });
   };
@@ -112,6 +114,10 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
         // PrintConsultaEjecutada(form.fechaDesde, form.fechaHasta, token);
       }
     });
+  };
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
 
   return (
@@ -283,9 +289,10 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
               <label className="font-semibold max-w-[150px] min-w-[150px]">
                 Observaciones :
               </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
+              <textarea
+                className="border rounded px-2 py-1 w-full resize-none"
                 name="observaciones"
+                rows={3}
                 value={form.observaciones || ""}
                 onChange={handleChange}
               />
@@ -293,19 +300,15 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
             <label className="flex gap-2 font-semibold ml-[168px]">
               <input
                 type="checkbox"
-                name="evaluacionAnual"
-                checked={form.observaciones == "Evaluación Anual".toUpperCase()}
+                checked={form.observaciones == "EVALUACIÓN ANUAL"}
                 onChange={(e) => {
-                  handleCheckBoxChange(e);
                   setForm((prev) => ({
                     ...prev,
-                    observaciones: e.target.checked
-                      ? "Evaluación Anual".toUpperCase()
-                      : "",
+                    observaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
                   }));
                 }}
               />
-              Evaluación Anual
+              EVALUACIÓN ANUAL
             </label>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4  pt-2">
               <div className=" flex gap-4">
@@ -426,14 +429,14 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
           <label className="flex gap-2 font-semibold ">
             <input
               type="checkbox"
-              name="noSeTomoRX"
-              checked={form.noSeTomoRX}
+              checked={form.observaciones == "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
               onChange={(e) => {
-                handleCheckBoxChange(e);
+                // handleCheckBoxChange(e);
                 setForm((prev) => ({
                   ...prev,
-                  observaciones:
-                    "NO SE TOMO RADIOGRAFIA DE TÓRAX",
+                  observaciones: e.target.checked
+                    ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
+                    : "",
                 }));
               }}
             />
@@ -442,14 +445,14 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
           <label className="flex gap-2 font-semibold ">
             <input
               type="checkbox"
-              name="evaluadoPorNeumologo"
-              checked={form.evaluadoPorNeumologo}
+              checked={form.observaciones == "EVALUACIÓN POR NEUMOLOGÍA"}
               onChange={(e) => {
-                handleCheckBoxChange(e);
+                // handleCheckBoxChange(e);
                 setForm((prev) => ({
                   ...prev,
-                  observaciones:
-                    "EVALUACIÓN POR NEUMOLOGÍA",
+                  observaciones: e.target.checked
+                    ? "EVALUACIÓN POR NEUMOLOGÍA"
+                    : "",
                 }));
               }}
             />
@@ -473,7 +476,7 @@ function Table({ data }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };

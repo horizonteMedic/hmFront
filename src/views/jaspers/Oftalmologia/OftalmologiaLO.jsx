@@ -105,37 +105,37 @@ export default function OftalmologiaLO(datos = {}) {
   // Visión de cerca
 
   doc.rect(margin + 60, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOd || ""}`, margin + 69, y + 27.5, {
+  doc.text(`${datos.vcercaSOd ?? ""}`, margin + 69, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 85, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOi || ""}`, margin + 94, y + 27.5, {
+  doc.text(`${datos.vcercaSOi ?? ""}`, margin + 94, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 125, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOd || ""}`, margin + 134, y + 27.5, {
+  doc.text(`${datos.vcercaCOd ?? ""}`, margin + 134, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 150, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOi || ""}`, margin + 159, y + 27.5, {
+  doc.text(`${datos.vcercaCOi ?? ""}`, margin + 159, y + 27.5, {
     align: "center",
   });
   // Visión de lejos
 
   doc.rect(margin + 60, y + 32, 18, 8);
-  doc.text(`${datos.vlejosSOd || ""}`, margin + 69, y + 37.5, {
+  doc.text(`${datos.vlejosSOd ?? ""}`, margin + 69, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 85, y + 32, 18, 8);
-  doc.text(`${datos.vlejosSOi || ""}`, margin + 94, y + 37.5, {
+  doc.text(`${datos.vlejosSOi ?? ""}`, margin + 94, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 125, y + 32, 18, 8);
-  doc.text(`${datos.vlejosCOd || ""}`, margin + 134, y + 37.5, {
+  doc.text(`${datos.vlejosCOd ?? ""}`, margin + 134, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 150, y + 32, 18, 8);
-  doc.text(`${datos.vlejosCOi || ""}`, margin + 159, y + 37.5, {
+  doc.text(`${datos.vlejosCOi ?? ""}`, margin + 159, y + 37.5, {
     align: "center",
   });
 
@@ -152,7 +152,7 @@ export default function OftalmologiaLO(datos = {}) {
   // Visión de colores
   doc.text("Visión de Colores", labelX, startY - 13, { align: "right" });
   doc.text(":", labelX + 2, startY - 13);
-  doc.text(`${(datos.vcolores || "").toUpperCase()}`, dataX, startY - 13);
+  doc.text(`${(datos.vcolores ?? "").toUpperCase()}`, dataX, startY - 13);
 
   // Visión binocular
   doc.text("Visión Binocular", labelX, startY + lineHeight - 13, {
@@ -160,7 +160,7 @@ export default function OftalmologiaLO(datos = {}) {
   });
   doc.text(":", labelX + 2, startY + lineHeight - 13);
   doc.text(
-    `${(datos.vbinocular || "").toUpperCase()}`,
+    `${(datos.vbinocular ?? "").toUpperCase()}`,
     dataX,
     startY + lineHeight - 13
   );
@@ -171,7 +171,7 @@ export default function OftalmologiaLO(datos = {}) {
   });
   doc.text(":", labelX + 2, startY + lineHeight * 2 - 13);
   doc.text(
-    `${(datos.rpupilares || "").toUpperCase()}`,
+    `${(datos.rpupilares ?? "").toUpperCase()}`,
     dataX,
     startY + lineHeight * 2 - 13
   );
@@ -182,7 +182,7 @@ export default function OftalmologiaLO(datos = {}) {
   });
   doc.text(":", labelX + 2, startY + lineHeight * 3 - 13);
   doc.text(
-    `${(datos.eoculares || "").toUpperCase()}`,
+    `${(datos.eoculares ?? "").toUpperCase()}`,
     dataX,
     startY + lineHeight * 3 - 13
   );
@@ -191,7 +191,7 @@ export default function OftalmologiaLO(datos = {}) {
   if (datos.eoculares1) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(
-      `${(datos.eoculares1 || "").toUpperCase()}`,
+      `${(datos.eoculares1 ?? "").toUpperCase()}`,
       dataX,
       startY + lineHeight * 4 - 13
     );

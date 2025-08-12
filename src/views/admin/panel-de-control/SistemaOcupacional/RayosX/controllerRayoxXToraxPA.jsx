@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { getFetch } from "../../getFetch/getFetch";
-import { SubmitData } from "../model";
+import { SubmitData } from "./model";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
@@ -64,7 +64,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
     vertices: form.vertices,
     hilios: form.hilios,
     senosCostofrenicos: form.senosCostofrenicos,
-    mediastinos: forn.mediastinos,
+    mediastinos: form.mediastinos,
     siluetaCardiovascular: form.siluetaCardiovascular,
     osteomuscular: form.osteomuscular,
     conclusionesRadiograficas: form.conclusiones,
