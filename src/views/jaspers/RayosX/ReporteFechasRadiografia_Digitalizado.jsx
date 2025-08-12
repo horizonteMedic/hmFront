@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import HeaderReporteFechasRadiografia from "./Headers/header_ReporteFechasRadiografia.jsx";
 
-export default function ReporteFechasRadiografia(data = {}) {
+export default function ReporteFechasRadiografia_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -9,24 +9,24 @@ export default function ReporteFechasRadiografia(data = {}) {
   // Función para formatear fechas en DD/MM/YYYY
   const formatearFecha = (fecha) => {
     if (!fecha) return "";
-    
+
     // Si ya está en formato DD/MM/YYYY, retornar tal como está
     if (/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
       return fecha;
     }
-    
+
     // Si está en formato YYYY-MM-DD, convertir
     if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
       const [year, month, day] = fecha.split("-");
       return `${day}/${month}/${year}`;
     }
-    
+
     // Si está en formato YYYY/MM/DD, convertir
     if (/^\d{4}\/\d{2}\/\d{2}$/.test(fecha)) {
       const [year, month, day] = fecha.split("/");
       return `${day}/${month}/${year}`;
     }
-    
+
     // Si no coincide con ningún formato conocido, retornar tal como está
     return fecha;
   };
@@ -38,54 +38,28 @@ export default function ReporteFechasRadiografia(data = {}) {
   const columnas = [
     { nombre: "Nro Orden", ancho: 20 },
     { nombre: "APELLIDOS Y NOMBRES", ancho: 55 },
-    { nombre: "FECHA", ancho: 20 }
+    { nombre: "FECHA", ancho: 20 },
   ];
 
   const espacioEntreColumnas = 4;
   const anchoTotal = columnas.reduce((t, c) => t + c.ancho, 0);
-  const margenLateral = (pageW - (2 * anchoTotal) - espacioEntreColumnas) / 2;
+  const margenLateral = (pageW - 2 * anchoTotal - espacioEntreColumnas) / 2;
 
   const tablaIzquierdaX = margenLateral;
   const tablaDerechaX = margenLateral + anchoTotal + espacioEntreColumnas;
-  
-  
-  
+
+  function partirEnDos(arr) {
+    const mitad = Math.ceil(arr.length / 2); // izquierda recibe extra si es impar
+    const izquierda = arr.slice(0, mitad);
+    const derecha = arr.slice(mitad);
+    return [izquierda, derecha];
+  }
+  const [izq, der] = partirEnDos(data.fechas);
+
   // Datos de ejemplo basados en la imagen proporcionada
-  const datosTablaIzquierda = data.datosTablaIzquierda || [
-    { nroOrden: "152943", nombres: "SEGUNDO ANDRES ORTIZ AZAÑERO ORTIZ AZAÑERO", fecha: formatearFecha("08/07/2025") },
-    { nroOrden: "152865", nombres: "JUSTIN DANTE SANTOS MIÑOPE", fecha: formatearFecha("07/07/2025") },
-    { nroOrden: "152954", nombres: "YOBER ARSENIO GIMENEZ VALLES", fecha: formatearFecha("08/07/2025") },
-    { nroOrden: "152947", nombres: "PERCY TORIBIO SANTOS JANAMPA", fecha: formatearFecha("08/07/2025") },
-    { nroOrden: "152950", nombres: "JONATHAN AXEL TURPO MAMANI", fecha: formatearFecha("08/07/2025") },
-    { nroOrden: "152928", nombres: "ROMARIO CASTILLO VEGA", fecha: formatearFecha("07/07/2025") },
-    { nroOrden: "152963", nombres: "VICENTE CHAVEZ FLORES", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152969", nombres: "ARNALDO ELIAQUIN SALVADOR MUÑOZ ORTIZ AZAÑERO", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152967", nombres: "EDHER ANTONIO NEIRA SANCHEZ", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152970", nombres: "ANDRY DANIEL VERONICO LOPEZ", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152971", nombres: "FRANCISCO AMILCAR LEON MENDOZA ORTIZ AZAÑERO", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152961", nombres: "CESAR ALBERTO CABANILLAS MEDINA", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152962", nombres: "JOEL ESCOBEDO CAMPOS", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152964", nombres: "LEONARDO ADAN TAMAYO HERNANDEZ", fecha: formatearFecha("09/07/2025") },
-    { nroOrden: "152965", nombres: "JOSE LUIS TAVARA BORRERO", fecha: formatearFecha("09/07/2025") }
-  ];
-  
-  const datosTablaDerecha = data.datosTablaDerecha || [
-    { nroOrden: "153019", nombres: "YAHIR ALEXANDER PAZ RODRIGUEZ ORTIZ AZAÑERO", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153016", nombres: "ROGER GUILLERMO PAZ RODRIGUEZ", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153023", nombres: "WILLIAM IVAN MENDOZA GIL", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153044", nombres: "VILDER DAUL RODRIGUEZ DONATO", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153034", nombres: "JUAN PABLO SALVADOR AMBULAY", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153029", nombres: "DEYVI ERICK JULIAN CORDOVA", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153041", nombres: "JHONATAN NICOLAS GONZALES ARANDA", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153027", nombres: "BACELIZA VICTORIA ALTAMIRANO ORTIZ AZAÑERO ", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153015", nombres: "LESLIE DONALD VASQUEZ LLAJA", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153047", nombres: "ERICK HUGO SALCEDO QUISPE", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153045", nombres: "FRANZ EDUARDO VALDIVIESO TRUJILLO", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153040", nombres: "JIMMY FRANK TARRILLO VASQUEZ ORTIZ AZAÑERO", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153042", nombres: "ARNULFO LLANOS CHAVEZ", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153043", nombres: "VICTOR HERNAN CRUZADO LOPEZ", fecha: formatearFecha("10/07/2025") },
-    { nroOrden: "153046", nombres: "ROYER MANUEL PAULINO TARAZONA", fecha: formatearFecha("10/07/2025") }
-  ];
+  const datosTablaIzquierda = izq;
+
+  const datosTablaDerecha = der;
   const dibujarTabla = (datos, offsetX) => {
     let currentX = offsetX;
     const headerH = 8;
@@ -100,13 +74,13 @@ export default function ReporteFechasRadiografia(data = {}) {
       const colW = columna.ancho;
 
       doc.setFillColor(240, 240, 240);
-      doc.rect(colX, colY, colW, headerH, 'F');
-      doc.rect(colX, colY, colW, headerH, 'S');
+      doc.rect(colX, colY, colW, headerH, "F");
+      doc.rect(colX, colY, colW, headerH, "S");
       doc.setTextColor(0, 0, 0);
       doc.setFont("helvetica", "bold").setFontSize(7);
       doc.text(columna.nombre, colX + colW / 2, colY + headerH / 2, {
         align: "center",
-        baseline: "middle"
+        baseline: "middle",
       });
 
       currentX += colW;
@@ -146,28 +120,35 @@ export default function ReporteFechasRadiografia(data = {}) {
         const colX = currentX;
         const colW = columna.ancho;
 
-        doc.rect(colX, filaY, colW, filaH, 'S');
+        doc.rect(colX, filaY, colW, filaH, "S");
         doc.setFont("helvetica", "normal").setFontSize(7);
 
         let texto = "";
         switch (colIndex) {
-          case 0: texto = fila.nroOrden; break;
-          case 1: texto = fila.nombres; break;
-          case 2: texto = formatearFecha(fila.fecha); break;
+          case 0:
+            texto = `${fila.norden}`;
+            break;
+          case 1:
+            texto = `${fila.nombres}`;
+
+            break;
+          case 2:
+            texto = String(formatearFecha(fila.fechaExamen));
+            break;
         }
 
         if (colIndex === 1) {
           // NOMBRES con salto de línea
           lineasMostradas.forEach((l, i) => {
             doc.text(l, colX + 2, filaY + 3 + i * 3, {
-              align: "left"
+              align: "left",
             });
           });
         } else {
           // Centrado en ambas direcciones
           doc.text(texto, colX + colW / 2, filaY + filaH / 2, {
             align: "center",
-            baseline: "middle"
+            baseline: "middle",
           });
         }
 
