@@ -23,10 +23,10 @@ const OdontologiaReportes = ({
   selectedSede,
 }) => {
   return (
-    <div className="w-full  ">
-      <div className="flex gap-2 w-full ">
+    <div>
+      <div className="flex flex-col gap-4 w-full ">
         {/* IZQUIERDA 50% */}
-        <div className="w-1/2 bg-white rounded border space-y-6">
+        <div className=" bg-white rounded border space-y-6">
           <div className="rounded-md p-4 space-y-4">
             <div>
               <p className="mb-2 font-semibold">Buscar por fechas</p>
@@ -171,12 +171,18 @@ function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
   }
 
   return (
-    <div className="overflow-y-auto " style={{ maxHeight: "450px" }}>
+    <div className="overflow-y-auto max-w-[1000px] mx-auto" style={{ maxHeight: "450px" }}>
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">
             <th className="border px-2 py-1 text-left text-lg">N° Orden</th>
-            <th className="border px-2 py-1 text-left text-lg">Nombres</th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Nombres y Apellidos
+            </th>
+            <th className="border px-2 py-1 text-left text-lg">Empresa</th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Tipo de Examen
+            </th>
             <th className="border px-2 py-1 text-left text-lg">Fecha</th>
           </tr>
         </thead>
@@ -197,7 +203,10 @@ function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
                 <td className="border px-2 py-1 font-bold">
                   {row.norden || ""}
                 </td>
-                <td className="border px-2 py-1">{row.nombres || ""}</td>
+                <td className="border px-2 py-1 ">{row.nombres || ""}</td>
+                <td className="border px-2 py-1 max-w-[200px]">{row.empresa || ""}</td>
+                <td className="border px-2 py-1">{row.tipoExamen || ""}</td>
+
                 <td className="border px-2 py-1">
                   {convertirFecha(row.fechaOd)}
                 </td>

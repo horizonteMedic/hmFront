@@ -32,7 +32,13 @@ const RayosX = ({ token, selectedSede, userlogued }) => {
           </button>
         </nav>
         <div className="p-6  max-w-[95%] mx-auto">
-          {activeTab === 0 && <RayosXToraxPA />}
+          {activeTab === 0 && (
+            <RayosXToraxPA
+              token={token}
+              selectedSede={selectedSede}
+              userlogued={userlogued}
+            />
+          )}
           {activeTab === 1 && (
             <RayosXColumna
               token={token}

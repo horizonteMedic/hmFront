@@ -1,4 +1,4 @@
-const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
+const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, numeroPagina = 1) => {
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -133,4 +133,4 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
   doc.setFont("helvetica", "normal").setFontSize(10);
 };
 
-export default headerEvaluacionMuscoloEsqueletica;
+export default headerEvaluacionMusculoEsqueletica;

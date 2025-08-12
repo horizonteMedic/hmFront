@@ -34,12 +34,12 @@ export default function OIT_B_Digitalizado_boro(datos = {}) {
       startY: y + 3,
       body: [
         [
-          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30 } },
-          { content: `${datos.nplaca ? datos.nplaca  : ""}` },
-          { content: "HCL:" },
-          { content: `${datos.norden ? datos.norden : ""}` },
-          { content: "LECTOR:", styles: { cellWidth: 25 } },
-          { content: `${datos.doctor ? datos.doctor : ""}` }
+          { content: "PLACA N°:", styles: { valign: "middle", cellWidth: 30,fillColor:[242, 242, 242] } },
+          { content: `${datos.norden ? datos.norden  : ""}` ,styles: { valign: "middle",fillColor:[242, 242, 242] }},
+          { content: "HCL:" ,styles: { valign: "middle",fillColor:[242, 242, 242] }},
+          { content: `${datos.norden ? datos.norden : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] } },
+          { content: "LECTOR:", styles: { cellWidth: 25,fillColor:[242, 242, 242] } },
+          { content: `${datos.doctor ? datos.doctor : ""}`,styles: { valign: "middle",fillColor:[242, 242, 242] } }
         ],
         [
           { content: "NOMBRE:" },
@@ -68,7 +68,7 @@ export default function OIT_B_Digitalizado_boro(datos = {}) {
       startY: doc.lastAutoTable.finalY,
       body: [
           [
-            { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle' } },
+            { content: "I. CALIDAD RADIOGRAFICA", rowSpan: 4, styles: { halign: 'center', valign: 'middle',fillColor:[242, 242, 242]} },
             { content: "1", styles: {valign:"middle"}},
             { content: "BUENA" },
             { content: ``, styles: { halign: 'center', valign: 'middle', textColor: [0,0,255] } },
@@ -154,7 +154,7 @@ export default function OIT_B_Digitalizado_boro(datos = {}) {
         ]
       ],
       theme: "grid",
-      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] },
+      styles: { fontSize: 8, cellPadding: 1, textColor: [0, 0, 0] ,fillColor:[242, 242, 242]},
       margin: { left: 10, right: 10 }
     });
 
@@ -220,11 +220,11 @@ export default function OIT_B_Digitalizado_boro(datos = {}) {
             { content: "C", styles: {halign: 'center', valign: 'middle'}},
           ],
           [
-            { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9},
-            { content: "SI"},
-            { content: ""},
-            { content: "NO"},
-            { content: ""}
+            { content: "III. ANORMALIDADES PLEURALES (si NO hay anormalidades pase a símbolos)", colSpan: 9,styles:{fillColor:[242, 242, 242]  }},
+            { content: "SI",styles:{fillColor:[242, 242, 242]  }},
+            { content: "",styles:{fillColor:[242, 242, 242]  }},
+            { content: "NO",styles:{fillColor:[242, 242, 242]  }},
+            { content: "",styles:{fillColor:[242, 242, 242]  }}
           ],
           [
             { content: "               3.1 PLACAS PLEURALES (0 = NINGUNA, D = HEMITÓRAX DRECHO, I = HEMITÓRAX IZQUIERDO", colSpan: 13}
@@ -417,11 +417,11 @@ export default function OIT_B_Digitalizado_boro(datos = {}) {
             { content: "", styles: {lineWidth: 0}, colSpan:13},
           ],
           [
-            { content: "IV SIMBOLOS *", colSpan: 16, styles: {valign: 'middle'}},
-            { content: "SI",styles: {halign: 'center', valign: 'middle'}},
-            { content: "", styles: {halign: 'center', valign: 'middle'}},
-            { content: "NO", styles: {halign: 'center', valign: 'middle'}},
-            { content: "", styles: {halign: 'center', valign: 'middle'}}
+            { content: "IV SIMBOLOS *", colSpan: 16, styles: {valign: 'middle',fillColor:[242, 242, 242]}},
+            { content: "SI",styles: {halign: 'center', valign: 'middle',fillColor:[242, 242, 242]}},
+            { content: "", styles: {halign: 'center', valign: 'middle',fillColor:[242, 242, 242]}},
+            { content: "NO", styles: {halign: 'center', valign: 'middle',fillColor:[242, 242, 242]}},
+            { content: "", styles: {halign: 'center', valign: 'middle',fillColor:[242, 242, 242]}}
           ]
         ],
         theme: "grid",

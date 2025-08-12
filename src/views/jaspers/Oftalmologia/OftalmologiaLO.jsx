@@ -60,29 +60,29 @@ export default function OftalmologiaLO(datos = {}) {
 
   // Datos personales con formato dinámico
   doc.setFont("helvetica", "normal").setFontSize(11);
-  
+
   // Primera línea: Nombres y Fecha
   const nombreLabel = "Nombres: ";
   const nombreCompleto = `${nombreLabel}${datos.nombres || ""}`;
   const nombreWidth = doc.getTextWidth(nombreCompleto);
-  
+
   // Calcular posición dinámica para la fecha
   const fechaLabel = "Fecha: ";
   const fechaCompleta = `${fechaLabel}${formatearFecha(datos.fechaOf) || ""}`;
   const fechaWidth = doc.getTextWidth(fechaCompleta);
   const espacioDisponible = pageW - margin * 2;
-  
+
   // Si el nombre es muy largo, empujar la fecha
   let fechaX = pageW - margin - fechaWidth;
   if (nombreWidth + fechaWidth + 20 > espacioDisponible) {
     // Si no cabe, ajustar la posición de la fecha
     fechaX = Math.max(margin + nombreWidth + 20, pageW - margin - fechaWidth);
   }
-  
+
   // Primera línea: Nombres y Fecha
   doc.text(nombreCompleto, margin, y);
   doc.text(fechaCompleta, fechaX, y);
-  
+
   // Segunda línea: Edad
   const edadLabel = "Edad: ";
   const edadCompleta = `${edadLabel}${datos.edad || ""} años`;
@@ -105,37 +105,37 @@ export default function OftalmologiaLO(datos = {}) {
   // Visión de cerca
 
   doc.rect(margin + 60, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOd || ""}`, margin + 69, y + 27.5, {
+  doc.text(`${datos.vcercaSOd ?? ""}`, margin + 69, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 85, y + 22, 18, 8);
-  doc.text(`${datos.vcercaSOi || ""}`, margin + 94, y + 27.5, {
+  doc.text(`${datos.vcercaSOi ?? ""}`, margin + 94, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 125, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOd || ""}`, margin + 134, y + 27.5, {
+  doc.text(`${datos.vcercaCOd ?? ""}`, margin + 134, y + 27.5, {
     align: "center",
   });
   doc.rect(margin + 150, y + 22, 18, 8);
-  doc.text(`${datos.vcercaCOi || ""}`, margin + 159, y + 27.5, {
+  doc.text(`${datos.vcercaCOi ?? ""}`, margin + 159, y + 27.5, {
     align: "center",
   });
   // Visión de lejos
 
   doc.rect(margin + 60, y + 32, 18, 8);
-  doc.text(`${datos.vlejosSOd || ""}`, margin + 69, y + 37.5, {
+  doc.text(`${datos.vlejosSOd ?? ""}`, margin + 69, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 85, y + 32, 18, 8);
-  doc.text(`${datos.vlejosSOi || ""}`, margin + 94, y + 37.5, {
+  doc.text(`${datos.vlejosSOi ?? ""}`, margin + 94, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 125, y + 32, 18, 8);
-  doc.text(`${datos.vlejosCOd || ""}`, margin + 134, y + 37.5, {
+  doc.text(`${datos.vlejosCOd ?? ""}`, margin + 134, y + 37.5, {
     align: "center",
   });
   doc.rect(margin + 150, y + 32, 18, 8);
-  doc.text(`${datos.vlejosCOi || ""}`, margin + 159, y + 37.5, {
+  doc.text(`${datos.vlejosCOi ?? ""}`, margin + 159, y + 37.5, {
     align: "center",
   });
 
@@ -152,13 +152,15 @@ export default function OftalmologiaLO(datos = {}) {
   // Visión de colores
   doc.text("Visión de Colores", labelX, startY - 13, { align: "right" });
   doc.text(":", labelX + 2, startY - 13);
-  doc.text(`${(datos.vcolores || "").toUpperCase()}`, dataX, startY - 13);
+  doc.text(`${(datos.vcolores ?? "").toUpperCase()}`, dataX, startY - 13);
 
   // Visión binocular
-  doc.text("Visión Binocular", labelX, startY + lineHeight - 13, { align: "right" });
+  doc.text("Visión Binocular", labelX, startY + lineHeight - 13, {
+    align: "right",
+  });
   doc.text(":", labelX + 2, startY + lineHeight - 13);
   doc.text(
-    `${(datos.vbinocular || "").toUpperCase()}`,
+    `${(datos.vbinocular ?? "").toUpperCase()}`,
     dataX,
     startY + lineHeight - 13
   );
@@ -169,7 +171,7 @@ export default function OftalmologiaLO(datos = {}) {
   });
   doc.text(":", labelX + 2, startY + lineHeight * 2 - 13);
   doc.text(
-    `${(datos.rpupilares || "").toUpperCase()}`,
+    `${(datos.rpupilares ?? "").toUpperCase()}`,
     dataX,
     startY + lineHeight * 2 - 13
   );
@@ -180,7 +182,7 @@ export default function OftalmologiaLO(datos = {}) {
   });
   doc.text(":", labelX + 2, startY + lineHeight * 3 - 13);
   doc.text(
-    `${(datos.eoculares || "").toUpperCase()}`,
+    `${(datos.eoculares ?? "").toUpperCase()}`,
     dataX,
     startY + lineHeight * 3 - 13
   );
@@ -189,7 +191,7 @@ export default function OftalmologiaLO(datos = {}) {
   if (datos.eoculares1) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(
-      `${(datos.eoculares1 || "").toUpperCase()}`,
+      `${(datos.eoculares1 ?? "").toUpperCase()}`,
       dataX,
       startY + lineHeight * 4 - 13
     );
@@ -197,8 +199,8 @@ export default function OftalmologiaLO(datos = {}) {
 
   // Arreglo de firmas que quieres cargar
   const firmasAPintar = [
-    { nombre: "SELLOFIRMADOCASIG", x: 0, y: 210, maxw: 200 },
-    { nombre: "SELLOFIRMA", x: 80, y: 210, maxw: 130 },
+    { nombre: "SELLOFIRMADOCASIG", x: 50, y: 220, maxw: 50 },
+    { nombre: "SELLOFIRMA", x: 120, y: 220, maxw: 50 },
   ];
   agregarFirmas(doc, datos.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
@@ -222,20 +224,44 @@ function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
       img.crossOrigin = "anonymous";
       img.src = imagenUrl;
 
+      // img.onload = () => {
+      //   let sigW = maxw;
+      //   const sigH = 35;
+      //   const baseX = x;
+      //   const baseY = y;
+      //   const maxW = sigW - 10;
+      //   const maxH = sigH - 10;
+      //   let imgW = img.width;
+      //   let imgH = img.height;
+      //   const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+      //   imgW *= scale;
+      //   imgH *= scale;
+      //   const imgX = baseX + (sigW - imgW) / 2;
+      //   const imgY = baseY + (sigH - imgH) / 2;
+      //   doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+      //   resolve();
+      // };
       img.onload = () => {
-        let sigW = maxw;
-        const sigH = 35;
+        const sigH = 35; // alto máximo
+        const maxW = maxw; // ancho máximo como parámetro
         const baseX = x;
         const baseY = y;
-        const maxW = sigW - 10;
-        const maxH = sigH - 10;
+
         let imgW = img.width;
         let imgH = img.height;
-        const scale = Math.min(maxW / imgW, maxH / imgH, 1);
+
+        // Escala proporcional en base a ancho y alto máximos
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
         imgW *= scale;
         imgH *= scale;
+
+        // Ahora el ancho se adapta
+        const sigW = imgW;
+
+        // Centrar la imagen
         const imgX = baseX + (sigW - imgW) / 2;
         const imgY = baseY + (sigH - imgH) / 2;
+
         doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
         resolve();
       };

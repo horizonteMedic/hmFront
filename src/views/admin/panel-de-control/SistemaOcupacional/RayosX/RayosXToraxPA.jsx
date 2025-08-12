@@ -1,20 +1,29 @@
-import { useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSave, faBroom, faComments } from "@fortawesome/free-solid-svg-icons";
 import {
-  faImage,
-  faSave,
-  faEraser,
-  faBroom,
-  faComments,
-} from "@fortawesome/free-solid-svg-icons";
-import ModalImagenRayosX from "./ModalImagenRayosX";
+  GetInfoServicio,
+  getInfoTabla,
+  Loading,
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerRayoxXToraxPA";
+import Swal from "sweetalert2";
 
+const tabla = "radiografia_torax";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
 const initialFormState = {
-  nroOrden: "",
-  nombres: "",
-  apellidos: "",
+  norden: "",
+  codRat: null,
+  fechaExam: today,
   edad: "",
-  fechaExamen: "",
+  nombres: "",
+
   vertices: "",
   hilios: "",
   senosCostofrenicos: "",
@@ -25,12 +34,15 @@ const initialFormState = {
   osteomuscular: "",
   conclusiones: "",
   observaciones: "",
-  evaluacionAnual: false,
+
+  nombres_search: "",
+  codigo_search: "",
+  fechaDesde: today,
+  fechaHasta: today,
 };
 
-export default function RayosXToraxPA() {
+export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
   const [form, setForm] = useState(initialFormState);
-  const [showModal, setShowModal] = useState(false);
   const [dataTabla, setDataTabla] = useState([]);
 
   const handleChange = (e) => {
@@ -42,13 +54,6 @@ export default function RayosXToraxPA() {
     if (/^[\d/]*$/.test(value)) {
       setForm((f) => ({ ...f, [name]: value }));
     }
-  };
-  const handleRadioButton = (e, value) => {
-    const { name } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: value.toUpperCase(),
-    }));
   };
   const handleCheckBoxChange = (e) => {
     const { name, checked } = e.target;
@@ -66,12 +71,12 @@ export default function RayosXToraxPA() {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla);
   };
   const handlePrint = () => {
     if (!form.norden)
@@ -90,7 +95,7 @@ export default function RayosXToraxPA() {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla);
       }
     });
   };
@@ -114,6 +119,14 @@ export default function RayosXToraxPA() {
     });
   };
 
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
+  };
+
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
+
   return (
     <div className="flex flex-col md:flex-row gap-6">
       {/* Columna izquierda: Formulario */}
@@ -127,9 +140,9 @@ export default function RayosXToraxPA() {
               <input
                 className="border rounded px-2 py-1 w-full"
                 name="norden"
-                // value={form.norden || ""}
-                // onKeyUp={handleSearch}
-                // onChange={handleChangeNumber}
+                value={form.norden || ""}
+                onKeyUp={handleSearch}
+                onChange={handleChangeNumber}
               />
             </div>
             <div className="flex gap-3 xl:gap-8 w-full flex-col xl:flex-row">
@@ -141,8 +154,8 @@ export default function RayosXToraxPA() {
                   type="date"
                   className="border rounded px-2 py-1 w-full"
                   name="fechaExam"
-                  // value={form.fechaExam || ""}
-                  // onChange={handleChange}
+                  value={form.fechaExam || ""}
+                  onChange={handleChange}
                 />
               </div>
               <div className="flex items-center gap-4 w-full">
@@ -152,7 +165,7 @@ export default function RayosXToraxPA() {
                 <input
                   className="border rounded px-2 py-1 w-full"
                   name="edad"
-                  // value={form.edad || ""}
+                  value={form.edad || ""}
                   disabled
                 />
               </div>
@@ -164,8 +177,8 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="nombres"
-                // value={form.nombres || ""}
+                name="nombres"
+                value={form.nombres || ""}
                 disabled
               />
             </div>
@@ -177,9 +190,9 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="vertices"
-                // value={form.vertices || ""}
-                // onChange={handleChange}
+                name="vertices"
+                value={form.vertices || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -188,9 +201,9 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="hilios"
-                // value={form.hilios || ""}
-                // onChange={handleChange}
+                name="hilios"
+                value={form.hilios || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -199,9 +212,9 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="senosCostofrenicos"
-                // value={form.senosCostofrenicos || ""}
-                // onChange={handleChange}
+                name="senosCostofrenicos"
+                value={form.senosCostofrenicos || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -210,24 +223,28 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="camposPulmonares"
-                // value={form.camposPulmonares || ""}
-                // onChange={handleChange}
+                name="camposPulmonares"
+                value={form.camposPulmonares || ""}
+                onChange={handleChange}
               />
             </div>
             <label className="flex gap-2 font-semibold ml-[168px]">
               <input
                 type="checkbox"
                 name="tramaBroncovascular"
-                // checked={form.tramaBroncovascular}
-                // onChange={(e) => {
-                //   handleCheckBoxChange(e);
-                //   setForm((prev) => ({
-                //     ...prev,
-                //     conclusion:
-                //       "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
-                //   }));
-                // }}
+                checked={
+                  form.camposPulmonares ==
+                  "Trama Broncovascular Acentuada en ACP".toUpperCase()
+                }
+                onChange={(e) => {
+                  handleCheckBoxChange(e);
+                  setForm((prev) => ({
+                    ...prev,
+                    camposPulmonares: e.target.checked
+                      ? "Trama Broncovascular Acentuada en ACP".toUpperCase()
+                      : "",
+                  }));
+                }}
               />
               Trama Broncovascular Acentuada en ACP
             </label>
@@ -237,9 +254,9 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="mediastinos"
-                // value={form.mediastinos || ""}
-                // onChange={handleChange}
+                name="mediastinos"
+                value={form.mediastinos || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -248,9 +265,9 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="siluetaCardiovascular"
-                // value={form.siluetaCardiovascular || ""}
-                // onChange={handleChange}
+                name="siluetaCardiovascular"
+                value={form.siluetaCardiovascular || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -259,9 +276,9 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="osteomuscular"
-                // value={form.osteomuscular || ""}
-                // onChange={handleChange}
+                name="osteomuscular"
+                value={form.osteomuscular || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
@@ -270,50 +287,48 @@ export default function RayosXToraxPA() {
               </label>
               <input
                 className="border rounded px-2 py-1 w-full"
-                // name="conclusiones"
-                // value={form.conclusiones || ""}
-                // onChange={handleChange}
+                name="conclusiones"
+                value={form.conclusiones || ""}
+                onChange={handleChange}
               />
             </div>
             <div className="flex items-center gap-4">
               <label className="font-semibold max-w-[150px] min-w-[150px]">
                 Observaciones :
               </label>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                // name="observaciones"
-                // value={form.observaciones || ""}
-                // onChange={handleChange}
+              <textarea
+                className="border rounded px-2 py-1 w-full resize-none"
+                name="observaciones"
+                rows={3}
+                value={form.observaciones || ""}
+                onChange={handleChange}
               />
             </div>
             <label className="flex gap-2 font-semibold ml-[168px]">
               <input
                 type="checkbox"
-                name="evaluacionAnual"
-                // checked={form.evaluacionAnual}
-                // onChange={(e) => {
-                //   handleCheckBoxChange(e);
-                //   setForm((prev) => ({
-                //     ...prev,
-                //     conclusion:
-                //       "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
-                //   }));
-                // }}
+                checked={form.observaciones == "EVALUACIÓN ANUAL"}
+                onChange={(e) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    observaciones: e.target.checked ? "EVALUACIÓN ANUAL" : "",
+                  }));
+                }}
               />
-              Evaluación Anual
+              EVALUACIÓN ANUAL
             </label>
             <div className="flex flex-col md:flex-row justify-between items-center gap-4  pt-2">
               <div className=" flex gap-4">
                 <button
                   type="button"
-                  // onClick={handleSave}
+                  onClick={handleSave}
                   className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                 >
                   <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                 </button>
                 <button
                   type="button"
-                  // onClick={handleClear}
+                  onClick={handleClear}
                   className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                 >
                   <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -322,10 +337,6 @@ export default function RayosXToraxPA() {
             </div>
           </div>
         </form>
-
-        {showModal && (
-          <ModalImagenRayosX onClose={() => setShowModal(false)} datos={form} />
-        )}
       </div>
       {/* Columna derecha: Panel de historial/búsqueda */}
 
@@ -337,16 +348,16 @@ export default function RayosXToraxPA() {
             <input
               className="border rounded px-2 py-1 w-full"
               name="nombres_search"
-              // value={form.nombres_search}
-              // onKeyUp={(e) => {
-              //   if (e.key === "Enter") {
-              //     obtenerInfoTabla();
-              //   }
-              // }}
-              // onChange={(e) => {
-              //   const { name, value } = e.target;
-              //   setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
-              // }}
+              value={form.nombres_search}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  obtenerInfoTabla();
+                }
+              }}
+              onChange={(e) => {
+                const { name, value } = e.target;
+                setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
+              }}
             />
           </div>
           <div>
@@ -354,33 +365,32 @@ export default function RayosXToraxPA() {
             <input
               className="border rounded px-2 py-1  w-full"
               name="codigo_search"
-              // value={form.codigo_search}
-              // onKeyUp={(e) => {
-              //   if (e.key === "Enter") {
-              //     obtenerInfoTabla();
-              //   }
-              // }}
-              // onChange={(e) => {
-              //   const { name, value } = e.target;
-              //   if (/^[\d/]*$/.test(value)) {
-              //     setForm((f) => ({
-              //       ...f,
-              //       [name]: value,
-              //       nombres_search: "",
-              //     }));
-              //   }
-              // }}
+              value={form.codigo_search}
+              onKeyUp={(e) => {
+                if (e.key === "Enter") {
+                  obtenerInfoTabla();
+                }
+              }}
+              onChange={(e) => {
+                const { name, value } = e.target;
+                if (/^[\d/]*$/.test(value)) {
+                  setForm((f) => ({
+                    ...f,
+                    [name]: value,
+                    nombres_search: "",
+                  }));
+                }
+              }}
             />
           </div>
         </div>
         <div className="flex-1">
           <Table
             data={dataTabla}
-            // tabla={tabla}
-            // set={setForm}
-            // token={token}
-            // clean={handleClear}
-            // setActiveTab={setActiveTab}
+            tabla={tabla}
+            set={setForm}
+            token={token}
+            clean={handleClear}
           />
         </div>
 
@@ -393,8 +403,8 @@ export default function RayosXToraxPA() {
                 <input
                   name="fechaDesde"
                   type="date"
-                  // value={form.fechaDesde}
-                  // onChange={handleChange}
+                  value={form.fechaDesde}
+                  onChange={handleChange}
                   className="border rounded px-2 py-1 w-full"
                 />
               </div>
@@ -403,8 +413,8 @@ export default function RayosXToraxPA() {
                 <input
                   name="fechaHasta"
                   type="date"
-                  // value={form.fechaHasta}
-                  // onChange={handleChange}
+                  value={form.fechaHasta}
+                  onChange={handleChange}
                   className="border rounded px-2 py-1 w-full"
                 />
               </div>
@@ -425,74 +435,51 @@ export default function RayosXToraxPA() {
           <label className="flex gap-2 font-semibold ">
             <input
               type="checkbox"
-              // name="noSeTomoRX"
-              // checked={form.noSeTomoRX}
-              // onChange={(e) => {
-              //   handleCheckBoxChange(e);
-              //   setForm((prev) => ({
-              //     ...prev,
-              //     conclusion:
-              //       "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
-              //   }));
-              // }}
+              checked={form.observaciones == "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"}
+              onChange={(e) => {
+                // handleCheckBoxChange(e);
+                const texto = e.target.checked
+                  ? "NO SE TOMÓ RADIOGRAFIA DE TÓRAX"
+                  : "";
+
+                setForm((prev) => ({
+                  ...prev,
+                  vertices: texto,
+                  hilios: texto,
+                  senosCostofrenicos: texto,
+                  camposPulmonares: texto,
+                  mediastinos: texto,
+                  siluetaCardiovascular: texto,
+                  osteomuscular: texto,
+                  conclusiones: texto,
+                  observaciones: texto,
+                }));
+              }}
             />
-            NO SE TOMO RX DE TORAX
+            NO SE TOMO RADIOGRAFIA DE TORAX
           </label>
           <label className="flex gap-2 font-semibold ">
             <input
               type="checkbox"
-              // name="colaboradorPasoExamen"
-              // checked={form.colaboradorPasoExamen}
-              // onChange={(e) => {
-              //   handleCheckBoxChange(e);
-              //   setForm((prev) => ({
-              //     ...prev,
-              //     conclusion:
-              //       "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
-              //   }));
-              // }}
+              checked={form.observaciones == "EVALUACIÓN POR NEUMOLOGÍA"}
+              onChange={(e) => {
+                // handleCheckBoxChange(e);
+                setForm((prev) => ({
+                  ...prev,
+                  observaciones: e.target.checked
+                    ? "EVALUACIÓN POR NEUMOLOGÍA"
+                    : "",
+                }));
+              }}
             />
-            NO SE TOMO RADIOGRAFIA DE TORAX PORQUE COLABORADOR PASO EXAMEN…
-          </label>
-          <label className="flex gap-2 font-semibold ">
-            <input
-              type="checkbox"
-              // name="haciendoseResponsable"
-              // checked={form.haciendoseResponsable}
-              // onChange={(e) => {
-              //   handleCheckBoxChange(e);
-              //   setForm((prev) => ({
-              //     ...prev,
-              //     conclusion:
-              //       "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
-              //   }));
-              // }}
-            />
-            HACIENDOSE RESPONSABLE POR NO PASAR ESTE EXAMEN
-          </label>
-          <label className="flex gap-2 font-semibold ">
-            <input
-              type="checkbox"
-              // name="evaluadoPorNeumologo"
-              // checked={form.evaluadoPorNeumologo}
-              // onChange={(e) => {
-              //   handleCheckBoxChange(e);
-              //   setForm((prev) => ({
-              //     ...prev,
-              //     conclusion:
-              //       "RADIOGRAFÍA DE COLUMNA LUMBAR AP-L SIN ALTERACIONES SIGNIFICATIVAS.",
-              //   }));
-              // }}
-            />
-            EVALUADO POR NEUMOLOGO
+            EVALUACIÓN POR NEUMOLOGÍA
           </label>
         </div>
       </div>
     </div>
   );
 }
-function Table({ data }) {
-  //, tabla, set, token, clean, setActiveTab
+function Table({ data, tabla, set, token, clean }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -504,18 +491,17 @@ function Table({ data }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla);
       }
     });
   };
 
   function clicktable(nro) {
-    // clean();
-    // Loading("Importando Datos");
-    // GetInfoServicio(nro, tabla, set, token, () => {
-    //   Swal.close();
-    //   setActiveTab(1);
-    // });
+    clean();
+    Loading("Importando Datos");
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.close();
+    });
   }
   function convertirFecha(fecha) {
     if (fecha == null || fecha === "") return "";
@@ -524,7 +510,7 @@ function Table({ data }) {
   }
 
   return (
-    <div className="overflow-y-auto " style={{ maxHeight: "450px" }}>
+    <div className="overflow-y-auto mb-4 h-[280px]">
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">

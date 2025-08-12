@@ -1,9 +1,7 @@
 import jsPDF from "jspdf";
 import header_EvaluacionOftalmologica2021_Digitalizado from "./headers/header_EvaluacionOftalmologica2021_Digitalizado.jsx";
 
-export default function EvaluacionOftalmologica2021_Digitalizado(
-  data = {}
-) {
+export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
@@ -345,12 +343,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   const xSinCorrectoresCercaOD = margin + 55;
   const xSinCorrectoresCercaOI = margin + 75;
   doc.text(
-    String(datosFinales.sinCorrectoresCercaOD || ""),
+    String(datosFinales.sinCorrectoresCercaOD ?? ""),
     xSinCorrectoresCercaOD,
     yDeCerca
   );
   doc.text(
-    String(datosFinales.sinCorrectoresCercaOI || ""),
+    String(datosFinales.sinCorrectoresCercaOI ?? ""),
     xSinCorrectoresCercaOI,
     yDeCerca
   );
@@ -359,12 +357,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   const xConCorrectoresCercaOD = margin + 98;
   const xConCorrectoresCercaOI = margin + 120;
   doc.text(
-    String(datosFinales.conCorrectoresCercaOD || ""),
+    String(datosFinales.conCorrectoresCercaOD ?? ""),
     xConCorrectoresCercaOD,
     yDeCerca
   );
   doc.text(
-    String(datosFinales.conCorrectoresCercaOI || ""),
+    String(datosFinales.conCorrectoresCercaOI ?? ""),
     xConCorrectoresCercaOI,
     yDeCerca
   );
@@ -373,12 +371,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   const xConAgujeroCercaOD = margin + 142;
   const xConAgujeroCercaOI = margin + 162;
   doc.text(
-    String(datosFinales.conAgujeroCercaOD || ""),
+    String(datosFinales.conAgujeroCercaOD ?? ""),
     xConAgujeroCercaOD,
     yDeCerca
   );
   doc.text(
-    String(datosFinales.conAgujeroCercaOI || ""),
+    String(datosFinales.conAgujeroCercaOI ?? ""),
     xConAgujeroCercaOI,
     yDeCerca
   );
@@ -388,36 +386,36 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
 
   // Sin Correctores
   doc.text(
-    String(datosFinales.sinCorrectoresLejosOD || ""),
+    String(datosFinales.sinCorrectoresLejosOD ?? ""),
     xSinCorrectoresCercaOD,
     yDeLejos
   );
   doc.text(
-    String(datosFinales.sinCorrectoresLejosOI || ""),
+    String(datosFinales.sinCorrectoresLejosOI ?? ""),
     xSinCorrectoresCercaOI,
     yDeLejos
   );
 
   // Con Correctores
   doc.text(
-    String(datosFinales.conCorrectoresLejosOD || ""),
+    String(datosFinales.conCorrectoresLejosOD ?? ""),
     xConCorrectoresCercaOD,
     yDeLejos
   );
   doc.text(
-    String(datosFinales.conCorrectoresLejosOI || ""),
+    String(datosFinales.conCorrectoresLejosOI ?? ""),
     xConCorrectoresCercaOI,
     yDeLejos
   );
 
   // Con Agujero Estenopeico
   doc.text(
-    String(datosFinales.conAgujeroLejosOD || ""),
+    String(datosFinales.conAgujeroLejosOD ?? ""),
     xConAgujeroCercaOD,
     yDeLejos
   );
   doc.text(
-    String(datosFinales.conAgujeroLejosOI || ""),
+    String(datosFinales.conAgujeroLejosOI ?? ""),
     xConAgujeroCercaOI,
     yDeLejos
   );
@@ -428,7 +426,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // Sin Correctores
   const xBinocularSinCorrectores = margin + 65.5; // Posición central
   doc.text(
-    String(datosFinales.sinCorrectoresBinocular || ""),
+    String(datosFinales.sinCorrectoresBinocular ?? ""),
     xBinocularSinCorrectores,
     yBinocular
   );
@@ -436,7 +434,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // Con Correctores
   const xBinocularConCorrectores = margin + 108.5; // Posición central
   doc.text(
-    String(datosFinales.conCorrectoresBinocular || ""),
+    String(datosFinales.conCorrectoresBinocular ?? ""),
     xBinocularConCorrectores,
     yBinocular
   );
@@ -444,7 +442,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // Con Agujero Estenopeico (vacío)
   const xBinocularConAgujero = margin + 152; // Posición central
   doc.text(
-    String(datosFinales.conAgujeroBinocularOD || ""),
+    String(datosFinales.conAgujeroBinocularOD ?? ""),
     xBinocularConAgujero,
     yBinocular
   );
@@ -556,7 +554,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // Hallazgos Externos
   const yHallazgosExternos = margin + 85.4;
   doc.text(
-    String(datosFinales.hallazgosExternos || ""),
+    String(datosFinales.hallazgosExternos ?? ""),
     xExamenExterno + 28,
     yHallazgosExternos
   );
@@ -609,15 +607,15 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   }
 
   doc.setFont("helvetica", "normal").setFontSize(6);
-  doc.text(`${datosFinales.pioOD || ""}`, xPioOD, yPioOD);
-  doc.text(`${datosFinales.pioOI || ""}`, xPioOI, yPioOI);
-  doc.text(`${datosFinales.pioNoAplica || ""}`, xPioNoAplica, yPioNoAplica);
+  doc.text(`${datosFinales.pioOD ?? ""}`, xPioOD, yPioOD);
+  doc.text(`${datosFinales.pioOI ?? ""}`, xPioOI, yPioOI);
+  doc.text(`${datosFinales.pioNoAplica ?? ""}`, xPioNoAplica, yPioNoAplica);
   doc.setFont("helvetica", "normal").setFontSize(8);
 
   // Hallazgos Fondo
   const yHallazgosFondo = margin + 73.4;
   doc.text(
-    String(datosFinales.hallazgosFondo || ""),
+    String(datosFinales.hallazgosFondo ?? ""),
     margin + 155,
     yHallazgosFondo,
     { maxWidth: 30 }
@@ -681,7 +679,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // Valor de Estereopsia en segundos
   const xEstereopsiaSegundos = margin + 63;
   doc.text(
-    String(datosFinales.estereopsiaSegundos || ""),
+    String(datosFinales.estereopsiaSegundos ?? ""),
     xEstereopsiaSegundos,
     yEstereopsia - 1
   );
@@ -710,22 +708,22 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   const xRefraccionLejosODDIP = margin + 80;
 
   doc.text(
-    String(datosFinales.refraccionLejosODSF || ""),
+    String(datosFinales.refraccionLejosODSF ?? ""),
     xRefraccionLejosODSF,
     yRefraccionLejos
   );
   doc.text(
-    String(datosFinales.refraccionLejosODCIL || ""),
+    String(datosFinales.refraccionLejosODCIL ?? ""),
     xRefraccionLejosODCIL,
     yRefraccionLejos
   );
   doc.text(
-    String(datosFinales.refraccionLejosODEJE || ""),
+    String(datosFinales.refraccionLejosODEJE ?? ""),
     xRefraccionLejosODEJE,
     yRefraccionLejos
   );
   doc.text(
-    String(datosFinales.refraccionLejosODDIP || ""),
+    String(datosFinales.refraccionLejosODDIP ?? ""),
     xRefraccionLejosODDIP,
     yRefraccionLejos
   );
@@ -733,22 +731,22 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // OI (Ojo Izquierdo)
   const yRefraccionLejosOI = margin + 159;
   doc.text(
-    String(datosFinales.refraccionLejosOISF || ""),
+    String(datosFinales.refraccionLejosOISF ?? ""),
     xRefraccionLejosODSF,
     yRefraccionLejosOI
   );
   doc.text(
-    String(datosFinales.refraccionLejosOICIL || ""),
+    String(datosFinales.refraccionLejosOICIL ?? ""),
     xRefraccionLejosODCIL,
     yRefraccionLejosOI
   );
   doc.text(
-    String(datosFinales.refraccionLejosOIEJE || ""),
+    String(datosFinales.refraccionLejosOIEJE ?? ""),
     xRefraccionLejosODEJE,
     yRefraccionLejosOI
   );
   doc.text(
-    String(datosFinales.refraccionLejosOIDIP || ""),
+    String(datosFinales.refraccionLejosOIDIP ?? ""),
     xRefraccionLejosODDIP,
     yRefraccionLejosOI
   );
@@ -763,22 +761,22 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   const xRefraccionCercaODDIP = margin + 163;
 
   doc.text(
-    String(datosFinales.refraccionCercaODSF || ""),
+    String(datosFinales.refraccionCercaODSF ?? ""),
     xRefraccionCercaODSF,
     yRefraccionCerca
   );
   doc.text(
-    String(datosFinales.refraccionCercaODCIL || ""),
+    String(datosFinales.refraccionCercaODCIL ?? ""),
     xRefraccionCercaODCIL,
     yRefraccionCerca
   );
   doc.text(
-    String(datosFinales.refraccionCercaODEJE || ""),
+    String(datosFinales.refraccionCercaODEJE ?? ""),
     xRefraccionCercaODEJE,
     yRefraccionCerca
   );
   doc.text(
-    String(datosFinales.refraccionCercaODDIP || ""),
+    String(datosFinales.refraccionCercaODDIP ?? ""),
     xRefraccionCercaODDIP,
     yRefraccionCerca
   );
@@ -786,22 +784,22 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
   // OI (Ojo Izquierdo)
   const yRefraccionCercaOI = margin + 159;
   doc.text(
-    String(datosFinales.refraccionCercaOISF || ""),
+    String(datosFinales.refraccionCercaOISF ?? ""),
     xRefraccionCercaODSF,
     yRefraccionCercaOI
   );
   doc.text(
-    String(datosFinales.refraccionCercaOICIL || ""),
+    String(datosFinales.refraccionCercaOICIL ?? ""),
     xRefraccionCercaODCIL,
     yRefraccionCercaOI
   );
   doc.text(
-    String(datosFinales.refraccionCercaOIEJE || ""),
+    String(datosFinales.refraccionCercaOIEJE ?? ""),
     xRefraccionCercaODEJE,
     yRefraccionCercaOI
   );
   doc.text(
-    String(datosFinales.refraccionCercaOIDIP || ""),
+    String(datosFinales.refraccionCercaOIDIP ?? ""),
     xRefraccionCercaODDIP,
     yRefraccionCercaOI
   );
@@ -832,7 +830,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(
     xDiagnostico + 128,
     yDiagnostico - 7
   );
-  doc.text(String(datosFinales.diagnostico || ""), xDiagnostico, yDiagnostico, {
+  doc.text(String(datosFinales.diagnostico ?? ""), xDiagnostico, yDiagnostico, {
     maxWidth: 50,
   });
 
