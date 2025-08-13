@@ -34,7 +34,7 @@ const MusculoEsqueleticoTabSelector = ({ token, selectedSede, userlogued }) => {
             onClick={() => setActiveTab(1)}
           >
             <FontAwesomeIcon icon={faUserMd} className="mr-2" />
-            Evaluación 2021
+            Evaluacion Musculo Esqueletica 2021
           </button>
         </nav>
 

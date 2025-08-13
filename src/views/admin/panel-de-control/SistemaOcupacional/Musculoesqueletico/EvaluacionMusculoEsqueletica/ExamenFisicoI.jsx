@@ -6,7 +6,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
 
       {/* Cabeza y Cuello */}
       <div className="border rounded p-4">
-        <div className="text-blue-700 font-semibold text-center mb-3">
+        <div className=" text-blue-900 font-semibold text-center mb-3">
           CABEZA Y CUELLO
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -104,7 +104,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Columna 1 - Fila 1: TÓRAX */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS SUPERIORES (TÓRAX)
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -160,7 +160,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
 
         {/* Columna 2 - Fila 1: HOMBRO */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS SUPERIORES (HOMBRO)
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -252,7 +252,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
 
         {/* Columna 1 - Fila 2: BRAZO */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS SUPERIORES (BRAZO)
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -296,7 +296,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
 
         {/* Columna 2 - Fila 2: ANTEBRAZO */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS SUPERIORES (ANTEBRAZO)
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

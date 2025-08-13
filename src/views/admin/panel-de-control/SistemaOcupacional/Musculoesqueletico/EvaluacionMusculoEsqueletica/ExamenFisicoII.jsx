@@ -72,7 +72,7 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Columna 1 - Fila 1: MUÑECA */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS SUPERIORES (MUÑECA)
           </div>
           <div className="space-y-4">
@@ -124,7 +124,7 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
 
         {/* Columna 2 - Fila 1: CADERA */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (CADERA)
           </div>
           <div className="space-y-4">
@@ -169,7 +169,7 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
 
         {/* Columna 1 - Fila 2: PIERNA */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (PIERNA)
           </div>
           <div className="space-y-4">
@@ -190,7 +190,7 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
 
         {/* Columna 2 - Fila 2: RODILLA */}
         <div className="border rounded p-4">
-          <div className="text-blue-700 font-semibold text-center mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (RODILLA)
           </div>
           <div className="space-y-4">
