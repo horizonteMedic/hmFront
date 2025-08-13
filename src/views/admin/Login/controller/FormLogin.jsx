@@ -21,6 +21,7 @@ export function FormLogin() {
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const setlistView = useAuthStore((state) => state.setlistView);
   const setlistAccesos = useAuthStore((state) => state.setlistAccesos);
+  const setdatosFooter = useAuthStore((state) => state.setdatosFooter);
   const [loading, setloadign] = useState(false);
   const [errormess, setErrormess] = useState("");
 
@@ -120,6 +121,9 @@ export function FormLogin() {
       ...UserLogued,
       sedes: ListSedesxUser  // o usa el nombre que desees
     };
+    const datosFooter=await getFetch(`/api/v01/st/registros/obtenerInformacionSedes`,token)
+    // console.log("datosFooter",datosFooter)
+    setdatosFooter(datosFooter)
     setlistView(todasLasVistas);
     setlistAccesos(todosLosPermisos)
     setuserlogued(userConSedes);
