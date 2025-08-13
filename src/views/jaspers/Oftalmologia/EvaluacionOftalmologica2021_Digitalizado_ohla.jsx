@@ -101,7 +101,6 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     refraccionLejosOISF: "-1.25",
     refraccionLejosOICIL: "-0.50",
     refraccionLejosOIEJE: "85",
-    refraccionLejosOIDIP: "1.25",
 
     // REFRACCIÓN DE CERCA
     refraccionCercaODSF: "+1.00",
@@ -111,7 +110,6 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     refraccionCercaOISF: "+0.75",
     refraccionCercaOICIL: "-0.25",
     refraccionCercaOIEJE: "85",
-    refraccionCercaOIDIP: "0.75",
 
     // DIAGNÓSTICO
     txtAvConRefraccionLejosOd: "20/20",
@@ -237,7 +235,6 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     refraccionLejosOISF: obtenerString("txtLejosOiSf"),
     refraccionLejosOICIL: obtenerString("txtLejosOiCil"),
     refraccionLejosOIEJE: obtenerString("txtLejosOiEje"),
-    refraccionLejosOIDIP: "",
 
     // REFRACCIÓN DE CERCA
     refraccionCercaODSF: obtenerString("txtCercaOdSf"),
@@ -247,7 +244,6 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     refraccionCercaOISF: obtenerString("txtCercaOiSf"),
     refraccionCercaOICIL: obtenerString("txtCercaOiCil"),
     refraccionCercaOIEJE: obtenerString("txtCercaOiEje"),
-    refraccionCercaOIDIP: "",
 
     // DIAGNÓSTICO
     txtAvConRefraccionLejosOd: obtenerString("txtAvConRefraccionLejosOd"),
@@ -612,7 +608,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const xRefraccionLejosODSF = margin + 33;
   const xRefraccionLejosODCIL = margin + 48.3;
   const xRefraccionLejosODEJE = margin + 65;
-  const xRefraccionLejosODDIP = margin + 80; // Movido 2 puntos a la derecha (antes 80, ahora 82)
+  const xRefraccionLejosODDIP = margin + 78;
+  const yRefraccionLejosODDIP = margin + 156; // Posición Y específica para DIP
 
   doc.text(
     String(datosFinales.refraccionLejosODSF ?? ""),
@@ -632,8 +629,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.refraccionLejosODDIP ?? ""),
     xRefraccionLejosODDIP,
-    yRefraccionLejos + 2, // Bajado solo 2 puntos
-    { align: "center" } // Centrado horizontalmente
+    yRefraccionLejosODDIP,
+    { textAlign: 'center' }
   );
 
   // OI (Ojo Izquierdo)
@@ -653,12 +650,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     xRefraccionLejosODEJE,
     yRefraccionLejosOI
   );
-  doc.text(
-    String(datosFinales.refraccionLejosOIDIP ?? ""),
-    xRefraccionLejosODDIP,
-    yRefraccionLejosOI + 2, // Bajado solo 2 puntos
-    { align: "center" } // Centrado horizontalmente
-  );
+
 
   // === REFRACCIÓN DE CERCA ===
   const yRefraccionCerca = margin + 151;
@@ -667,7 +659,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   const xRefraccionCercaODSF = margin + 120;
   const xRefraccionCercaODCIL = margin + 137;
   const xRefraccionCercaODEJE = margin + 149;
-  const xRefraccionCercaODDIP = margin + 166; // Movido 2 puntos a la derecha (antes 163, ahora 165)
+  const xRefraccionCercaODDIP = margin + 165;
+  const yRefraccionCercaODDIP = margin + 156; // Posición Y específica para DIP
 
   doc.text(
     String(datosFinales.refraccionCercaODSF ?? ""),
@@ -687,8 +680,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
   doc.text(
     String(datosFinales.refraccionCercaODDIP ?? ""),
     xRefraccionCercaODDIP,
-    yRefraccionCerca + 2, // Bajado solo 2 puntos
-    { align: "center" } // Centrado horizontalmente
+    yRefraccionCercaODDIP,
+    { textAlign: 'center' }
   );
 
   // OI (Ojo Izquierdo)
@@ -708,12 +701,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_ohla(
     xRefraccionCercaODEJE,
     yRefraccionCercaOI
   );
-  doc.text(
-    String(datosFinales.refraccionCercaOIDIP ?? ""),
-    xRefraccionCercaODDIP,
-    yRefraccionCercaOI + 2, // Bajado solo 2 puntos
-    { align: "center" } // Centrado horizontalmente
-  );
+
 
   // === DIAGNÓSTICO ===
   const xDiagnostico = margin + 34.5;
