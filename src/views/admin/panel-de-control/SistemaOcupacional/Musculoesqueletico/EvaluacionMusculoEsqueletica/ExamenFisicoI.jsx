@@ -12,7 +12,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <div className="flex items-center gap-4 mb-3">
-              <label className="font-semibold min-w-[80px]">Extensión:</label>
+              <label className="font-semibold w-[80px]">Extensión:</label>
               <input
                 className="border rounded px-2 py-1 flex-1"
                 name="extensionCabeza"
@@ -21,8 +21,8 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
               />
             </div>
             <div className="flex items-center gap-4">
-              <span className="font-semibold min-w-[80px]">Grado:</span>
-              <div className="flex gap-4">
+              <span className="font-semibold w-[80px]">Grado:</span>
+              <div className="flex gap-4 pl-2">
                 <label className="flex items-center gap-1">
                   <input
                     type="radio"
@@ -66,7 +66,7 @@ const ExamenFisicoI = ({ form, handleRadioButton, handleChange }) => {
             </div>
             <div className="flex items-center gap-4">
               <span className="font-semibold min-w-[80px]">Grado:</span>
-              <div className="flex gap-4">
+              <div className="flex gap-4 pl-2">
                 <label className="flex items-center gap-1">
                   <input
                     type="radio"
