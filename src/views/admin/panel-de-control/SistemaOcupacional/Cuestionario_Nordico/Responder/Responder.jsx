@@ -1,7 +1,7 @@
 const Responder = () => {
     return(
         <>
-            <div className="flex w-full text-xl">
+            <div className="flex w-full text-xl border rounded p-4 mt-6">
                 <div className="flex flex-col">
 
                     <div className="flex w-full border rounded p-3 divide-x">
