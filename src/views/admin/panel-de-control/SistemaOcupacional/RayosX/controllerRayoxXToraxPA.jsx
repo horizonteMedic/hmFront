@@ -5,6 +5,8 @@ import { SubmitData } from "./model";
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
 const registrarUrl = "/api/v01/ct/rayosX/registrarActualizarRadiografiaTorax";
+const reporteConsultaUrl =
+  "/api/v01/ct/rayosX/obtenerReporteFechasRadiografiaTorax";
 
 export const GetInfoServicio = (
   nro,
@@ -234,4 +236,36 @@ export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
       "error"
     );
   }
+};
+
+export const PrintConsultaEjecutada = (inicio, fin, token) => {
+  Loading("Cargando Formato a Imprimir");
+  getFetch(
+    `${reporteConsultaUrl}?inicio=${inicio}&fin=${fin}`, //revisar
+    token
+  )
+    .then(async (res) => {
+      if (res.nameJasper) {
+        console.log(res);
+        const nombre = res.nameJasper;
+        console.log(nombre);
+        const jasperModules = import.meta.glob(
+          "../../../../jaspers/RayosX/*.jsx"
+        );
+        const modulo = await jasperModules[
+          `../../../../jaspers/RayosX/${nombre}.jsx`
+        ]();
+        // Ejecuta la función exportada por default con los datos
+        if (typeof modulo.default === "function") {
+          modulo.default(res);
+        } else {
+          console.error(
+            `El archivo ${nombre}.jsx no exporta una función por defecto`
+          );
+        }
+      }
+    })
+    .finally(() => {
+      Swal.close();
+    });
 };

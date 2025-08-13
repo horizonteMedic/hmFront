@@ -88,9 +88,42 @@ export default function OftalmologiaLO(datos = {}) {
   const edadCompleta = `${edadLabel}${datos.edad || ""} años`;
   doc.text(edadCompleta, margin, y + 6.5);
   y += 8;
-  // Caja principal
-  const boxH = 120; // Aumentado de 100 a 120 para que contenga todo el contenido
-  doc.setLineWidth(0.7);
+  
+  // Calcular altura dinámica del cuadro basada en el contenido
+  const calcularAlturaCuadro = () => {
+    let alturaBase = 65; // altura mínima hasta "Enfermedades Oculares"
+    const lineHeight = 8;
+    
+    // Verificar si hay texto en enfermedades oculares y calcular líneas adicionales
+    if (datos.eoculares) {
+      const texto = datos.eoculares.toString();
+      const maxWidth = pageW - 2 * margin - 60; // ancho disponible para texto
+      const lineas = Math.ceil(doc.getTextWidth(texto) / maxWidth);
+      if (lineas > 1) {
+        alturaBase += (lineas - 1) * lineHeight;
+      }
+      alturaBase += 15; // espacio adicional para el texto
+    } else {
+      alturaBase += 8; // espacio mínimo si no hay texto
+    }
+    
+    // Verificar si hay texto adicional en eoculares1
+    if (datos.eoculares1) {
+      const texto = datos.eoculares1.toString();
+      const maxWidth = pageW - 2 * margin - 60;
+      const lineas = Math.ceil(doc.getTextWidth(texto) / maxWidth);
+      if (lineas > 1) {
+        alturaBase += (lineas - 1) * lineHeight;
+      }
+      alturaBase += 8; // espacio para texto adicional
+    }
+    
+    return Math.max(alturaBase, 80); // altura mínima de 80mm
+  };
+  
+  // Caja principal con altura dinámica
+  const boxH = calcularAlturaCuadro();
+  doc.setLineWidth(0.3); // Línea más delgada (cambiado de 0.7 a 0.3)
   doc.rect(margin, y, pageW - 2 * margin, boxH);
   doc.setLineWidth(0.2);
   // Encabezados de la caja

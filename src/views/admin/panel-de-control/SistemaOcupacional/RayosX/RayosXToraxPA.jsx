@@ -5,6 +5,7 @@ import {
   GetInfoServicio,
   getInfoTabla,
   Loading,
+  PrintConsultaEjecutada,
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
@@ -24,16 +25,16 @@ const initialFormState = {
   edad: "",
   nombres: "",
 
-  vertices: "",
-  hilios: "",
-  senosCostofrenicos: "",
-  camposPulmonares: "",
+  vertices: "LIBRES",
+  hilios: "NORMALES",
+  senosCostofrenicos: "LIBRES",
+  camposPulmonares: "NORMALES",
   tramaBroncovascular: false,
-  mediastinos: "",
-  siluetaCardiovascular: "",
-  osteomuscular: "",
-  conclusiones: "",
-  observaciones: "",
+  mediastinos: "NORMALES",
+  siluetaCardiovascular: "NORMAL",
+  osteomuscular: "NORMAL",
+  conclusiones: "NORMAL",
+  observaciones: "NORMAL",
 
   nombres_search: "",
   codigo_search: "",
@@ -114,7 +115,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintConsultaEjecutada(form.fechaDesde, form.fechaHasta, token);
+        PrintConsultaEjecutada(form.fechaDesde, form.fechaHasta, token);
       }
     });
   };
@@ -424,7 +425,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
           <div className="flex justify-end pt-2">
             <button
               type="button"
-              // onClick={handleEjecutarConsulta}
+              onClick={handleEjecutarConsulta}
               className="bg-blue-500 hover:bg-blue-600 text-white text-base px-6 py-2 rounded flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faComments} /> Ejecutar Consulta
