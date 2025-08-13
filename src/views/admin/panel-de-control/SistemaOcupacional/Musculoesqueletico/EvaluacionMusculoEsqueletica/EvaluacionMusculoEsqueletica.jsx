@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBroom,
-  faPrint,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ExamenFisicoI from "./ExamenFisicoI";
 import ExamenFisicoII from "./ExamenFisicoII";
@@ -26,26 +22,26 @@ const initialFormState = {
   fecha: today,
   empresa: "",
   tiempoServicio: "",
-  
+
   // Síntomas
   sintomas: "NO",
   cualesSintomas: "NINGUNO",
-  
+
   // Uso de Faja Lumbar
   usoFajaLumbar: "NO",
-  
+
   // Técnica de Levantamiento
   tecnicaLevantamiento: "NO",
-  
+
   // Capacitación
   capacitacionLevantamiento: "NO",
-  
+
   // Cabeza y Cuello
   extensionCabeza: "CONSERVADO",
   flexionCabeza: "CONSERVADO",
   gradoExtension: "N",
   gradoFlexion: "N",
-  
+
   // Miembros Superiores - Tórax
   flexionTorax: "N",
   extensionTorax: "N",
@@ -53,7 +49,7 @@ const initialFormState = {
   flexionToraxDerecho: "N",
   extensionToraxDerecho: "N",
   rotacionToraxDerecho: "N",
-  
+
   // Miembros Superiores - Hombro
   flexionHombro: "N",
   extensionHombro: "N",
@@ -67,19 +63,19 @@ const initialFormState = {
   aduccionHombroDerecho: "N",
   rotacionInternaHombroDerecho: "N",
   rotacionExternaHombroDerecho: "N",
-  
+
   // Miembros Superiores - Brazo
   flexionBrazo: "N",
   extensionBrazo: "N",
   flexionBrazoDerecho: "N",
   extensionBrazoDerecho: "N",
-  
+
   // Miembros Superiores - Antebrazo
   pronacionAntebrazo: "N",
   supinacionAntebrazo: "N",
   pronacionAntebrazoDerecho: "N",
   supinacionAntebrazoDerecho: "N",
-  
+
   // Examen Físico II - Muñeca
   flexionMuneca: "N",
   extensionMuneca: "N",
@@ -87,7 +83,7 @@ const initialFormState = {
   desviacionRadialMuneca: "N",
   signoPhallen: "NO",
   signoTinel: "NO",
-  
+
   // Examen Físico II - Cadera
   flexionCadera: "N",
   extensionCadera: "N",
@@ -95,21 +91,21 @@ const initialFormState = {
   aduccionCadera: "N",
   rotacionInternaCadera: "N",
   rotacionExternaCadera: "N",
-  
+
   // Examen Físico II - Pierna
   flexionPierna: "N",
   extensionPierna: "N",
-  
+
   // Examen Físico II - Rodilla
   flexionRodilla: "N",
   extensionRodilla: "N",
   rotacionInternaRodilla: "N",
   rotacionExternaRodilla: "N",
-  
+
   // Examen Físico III - Tobillo
   flexionTobillo: "N",
   extensionTobillo: "N",
-  
+
   // Examen Físico III - Columna Vertebral
   desviacionEjeCervical: "NORMAL",
   desviacionEjeDorsal: "NORMAL",
@@ -124,17 +120,20 @@ const initialFormState = {
   dolorLumbar: "NO",
   signoLesagueDerecho: "NO",
   signoLesagueIzquierdo: "NO",
-  
+
   // Conclusión y Comentarios
   tratamiento: "NO",
   conclusion: "SI",
   diagnostico: "",
   recomendaciones: "",
   nombreMedico: "",
-  numeroColegiatura: "",
 };
 
-export default function EvaluacionMusculoEsqueletica({ token, selectedSede, userlogued }) {
+export default function EvaluacionMusculoEsqueletica({
+  token,
+  selectedSede,
+  userlogued,
+}) {
   const [form, setForm] = useState(initialFormState);
 
   const handleChange = (e) => {
@@ -159,6 +158,9 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
 
   const handleClear = () => {
     setForm(initialFormState);
+  };
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
 
   const handleSave = () => {
@@ -190,6 +192,12 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
       }
     });
   };
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
 
   return (
     <div className="w-full text-[11px]">
@@ -204,42 +212,39 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">N° Orden :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="norden"
                 value={form.norden || ""}
                 onChange={handleChangeNumber}
-                disabled
+                onKeyDown={handleSearch}
               />
             </div>
             <div className="flex items-center gap-4 xl:col-span-2">
               <label className="font-semibold min-w-[65px]">Nombres :</label>
               <input
-                className="border rounded px-2 py-1 w-full bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="nombres"
                 value={form.nombres || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">Edad :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="edad"
-                value={form.edad || ""}
-                onChange={handleChangeNumber}
+                value={form.edad ?? ""}
                 disabled
               />
             </div>
-            
+
             {/* Segunda fila: dni, fecha, sexo, t. servicio */}
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">DNI :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="dni"
-                value={form.dni || ""}
-                onChange={handleChange}
+                value={form.dni ?? ""}
                 disabled
               />
             </div>
@@ -247,52 +252,51 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
               <label className="font-semibold min-w-[65px]">Fecha :</label>
               <input
                 type="date"
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full"
                 name="fecha"
                 value={form.fecha || ""}
                 onChange={handleChange}
-                disabled
               />
             </div>
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">Sexo :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="sexo"
                 value={form.sexo || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
             <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">T. Servicio :</label>
+              <label className="font-semibold min-w-[65px]">
+                T. Servicio :
+              </label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="tiempoServicio"
                 value={form.tiempoServicio || ""}
-                onChange={handleChangeNumber}
                 disabled
               />
             </div>
-            
+
             {/* Tercera fila: área trabajo (largo), empresa (largo) */}
             <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px]">Área Trabajo :</label>
+              <label className="font-semibold min-w-[65px] max-w-[65px]">
+                Área Trabajo :
+              </label>
               <input
-                className="border rounded px-2 py-1 w-full bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="areaTrabajo"
                 value={form.areaTrabajo || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
             <div className="flex items-center gap-4 xl:col-span-2">
               <label className="font-semibold min-w-[65px]">Empresa :</label>
               <input
-                className="border rounded px-2 py-1 w-full bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="empresa"
                 value={form.empresa || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
@@ -329,9 +333,9 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
               </label>
             </div>
             <div className="flex items-center gap-2">
-              <label className="font-semibold text-sm">Cuales:</label>
+              <label className="font-semibold text-[11px]">Cuales:</label>
               <input
-                className="border rounded px-2 py-1 flex-1 text-sm"
+                className="border rounded px-2 py-1 flex-1 text-[11px]"
                 name="cualesSintomas"
                 value={form.cualesSintomas}
                 onChange={handleChange}
@@ -367,11 +371,11 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
           </div>
 
           {/* Columna 3: Técnica de Levantamiento */}
-          <div className="border rounded p-4 bg-blue-50">
+          <div className="border rounded py-4 px-2 bg-blue-50">
             <div className="text-blue-900 font-semibold text-center mb-3">
               ADECUADA TÉCNICA DE LEVANTAMIENTO DE CARGA
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 px-3">
               <label className="flex items-center gap-2 font-semibold">
                 <input
                   type="radio"
@@ -427,7 +431,7 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 1: EXAMEN FÍSICO I
         </h2>
-        <ExamenFisicoI 
+        <ExamenFisicoI
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
@@ -439,7 +443,7 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 2: EXAMEN FÍSICO II
         </h2>
-        <ExamenFisicoII 
+        <ExamenFisicoII
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
@@ -451,7 +455,7 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 3: EXAMEN FÍSICO III
         </h2>
-        <ExamenFisicoIII 
+        <ExamenFisicoIII
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
@@ -467,7 +471,7 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <div className="flex items-center gap-8 mb-3">
-                <span className="font-semibold">Tratamiento:</span>
+                <span className="font-semibold w-[75px]">Tratamiento:</span>
                 <label className="flex items-center gap-2">
                   <input
                     type="radio"
@@ -487,9 +491,9 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
                   NO
                 </label>
               </div>
-              
+
               <div className="flex items-center gap-8 mb-3">
-                <span className="font-semibold">Conclusión:</span>
+                <span className="font-semibold w-[75px]">Conclusión:</span>
                 <label className="flex items-center gap-2">
                   <input
                     type="radio"
@@ -509,41 +513,31 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
                   NO
                 </label>
               </div>
-              
-              <div className="mb-3">
-                <label className="font-semibold block mb-1">Diagnóstico:</label>
-                <input
-                  className="border rounded px-3 py-1 w-full"
-                  name="diagnostico"
-                  value={form.diagnostico}
-                  onChange={handleChange}
-                />
-              </div>
             </div>
-            
+
             <div>
               <div className="mb-3">
-                <label className="font-semibold block mb-1">Nombre y Apellidos del Médico:</label>
+                <label className="font-semibold block mb-1">
+                  Nombre y Apellidos del Médico - N° Colegiatura:
+                </label>
                 <input
                   className="border rounded px-3 py-1 w-full"
                   name="nombreMedico"
-                  value={form.nombreMedico}
-                  onChange={handleChange}
-                />
-              </div>
-              
-              <div>
-                <label className="font-semibold block mb-1">N° de Colegiatura:</label>
-                <input
-                  className="border rounded px-3 py-1 w-full"
-                  name="numeroColegiatura"
-                  value={form.numeroColegiatura}
-                  onChange={handleChange}
+                  value={form.nombreMedico || ""}
                 />
               </div>
             </div>
           </div>
-          
+          <div className="mb-3">
+            <label className="font-semibold block mb-1">Diagnóstico:</label>
+            <textarea
+              className="border rounded px-3 py-1 w-full resize-none"
+              name="diagnostico"
+              rows={3}
+              value={form.diagnostico}
+              onChange={handleChange}
+            />
+          </div>
           <div>
             <label className="font-semibold block mb-1">
               Recomendaciones y plan de acción:
@@ -551,6 +545,7 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
             <textarea
               className="border rounded px-3 py-2 w-full h-24 resize-none"
               name="recomendaciones"
+              rows={3}
               value={form.recomendaciones}
               onChange={handleChange}
             />
@@ -576,7 +571,7 @@ export default function EvaluacionMusculoEsqueletica({ token, selectedSede, user
               <FontAwesomeIcon icon={faBroom} /> Limpiar
             </button>
           </div>
-          
+
           <div className="flex flex-col items-end">
             <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
             <div className="flex items-center gap-2">

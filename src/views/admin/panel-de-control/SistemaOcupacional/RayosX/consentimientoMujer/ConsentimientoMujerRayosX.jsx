@@ -7,6 +7,7 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerConsentimientoMujerRayosX";
+import { useAuthStore } from "../../../../../../store/auth";
 
 const tabla = "consentimiento_rayosx";
 const date = new Date();
@@ -34,6 +35,7 @@ export default function ConsentimientoMujerRayosX({
   userlogued,
 }) {
   const [form, setForm] = useState(initialFormState);
+  const datosFooter = useAuthStore((state) => state.datosFooter);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,7 +65,7 @@ export default function ConsentimientoMujerRayosX({
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla,datosFooter);
   };
 
   const handlePrint = () => {
@@ -83,7 +85,7 @@ export default function ConsentimientoMujerRayosX({
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
       }
     });
   };

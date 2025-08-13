@@ -15,7 +15,7 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
     dni: "75461024",
     ocupacion: "CAPATAZ",
     empresa:
-      "CORPORACION PERUANA DE CENTROS MEDICOS SAC CON RUC 20123456789 Y DENOMINACION COMERCIAL EXTENDIDA",
+      "CORPORACION PERUANA DE CENTROS MEDICOS SAC CON RUC 20123456789 Y DENOMINACION COMERCIAL EXTENDIDA RAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     fecha: "2025-08-01",
   };
   function formatearFechaLarga(fecha) {
@@ -115,60 +115,78 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
       margin + 37
     );
 
-    // === 2) INFORMACIÓN PERSONAL ===
-    doc.setFont("helvetica", "normal").setFontSize(12);
-
-    // "Yo" seguido del nombre
-    doc.text("Yo", margin, margin + 55);
-    doc.setFont("helvetica", "bold");
-    doc.text(datosFinales.nombre, margin + 8, margin + 55);
-
-    // DNI
-    doc.setFont("helvetica", "normal");
-    doc.text("identificado con DNI:", margin, margin + 65);
-    doc.setFont("helvetica", "bold");
-    doc.text(datosFinales.dni, margin + 40, margin + 65);
-
-    doc.setFont("helvetica", "normal");
-    doc.text("de ", margin + 70, margin + 65);
-    doc.setFont("helvetica", "bold");
-    doc.text(`${datosFinales.edad}`, margin + 76, margin + 65);
-    doc.setFont("helvetica", "normal");
-    doc.text(`años de edad,`, margin + 85, margin + 65);
-
-    // Ocupación
-    doc.setFont("helvetica", "normal");
-    doc.text("Con ocupación laboral de:", margin, margin + 75);
-    doc.setFont("helvetica", "bold");
-    doc.text(datosFinales.ocupacion, margin + 50, margin + 75);
-
-    // === 3) CERTIFICACIÓN ===
+    // === 2) PÁRRAFO CON TEXTO EN NEGRITA PARA NOMBRE, DNI Y OCUPACIÓN ===
+    let currentY = margin + 55;
     doc.setFont("helvetica", "normal").setFontSize(11);
 
-    doc.text("De la empresa:", margin, margin + 85);
+    // Texto completo dividido en partes para rayos X
+    const textoPartes = [
+        {text: "Yo ", bold: false},
+        {text: datosFinales.nombre, bold: true},
+        {text: " identificado con DNI: ", bold: false},
+        {text: datosFinales.dni, bold: true},
+        {text: " de ", bold: false},
+        {text: `${datosFinales.edad} años de edad`, bold: true},
+        {text: ", con ocupación laboral de: ", bold: false},
+        {text: datosFinales.ocupacion, bold: true},
+        {text: " de la empresa:", bold: false}
+    ];
+
+    // Configuración de formato
+    const lineHeight = 5;
+    const maxWidth = pageW - 2 * margin;
+    let currentX = margin;
+
+    // Función para agregar una línea completa
+    const agregarLinea = (texto, esNegrita) => {
+        doc.setFont("helvetica", esNegrita ? "bold" : "normal");
+        doc.text(texto, currentX, currentY);
+        currentX += doc.getTextWidth(texto);
+    };
+
+    // Procesar cada parte del texto
+    textoPartes.forEach((parte) => {
+        const palabras = parte.text.split(' ');
+        palabras.forEach((palabra, i) => {
+            const palabraConEspacio = i > 0 ? ' ' + palabra : palabra;
+            const anchoPalabra = doc.getTextWidth(palabraConEspacio);
+            
+            if (currentX + anchoPalabra <= maxWidth + margin) {
+                // Agregar a la línea actual
+                agregarLinea(palabraConEspacio, parte.bold);
+            } else {
+                // Nueva línea
+                currentY += lineHeight;
+                currentX = margin;
+                agregarLinea(palabra, parte.bold);
+            }
+        });
+    });
+
+    // Ajustar posición Y para siguiente sección
+    currentY += lineHeight;
+
+    // === 3) CERTIFICACIÓN ===
+    // doc.setFont("helvetica", "normal").setFontSize(11);
+
+    // doc.text("De la empresa:", margin, margin + 85);
 
     // === 4) NOMBRE DE LA EMPRESA ===
     doc.setFont("helvetica", "bold").setFontSize(12);
-
+    
     // Calcular el ancho máximo disponible para la empresa
-    const maxEmpresaWidth = pageW - 2 * margin - 20; // 20 puntos de margen adicional
-    const empresaLines = doc.splitTextToSize(
-      datosFinales.empresa,
-      maxEmpresaWidth
-    );
-
-    // Calcular la posición Y inicial para centrar verticalmente todas las líneas
-    const totalEmpresaHeight = empresaLines.length * 12; // 12 puntos por línea
-    const empresaStartY = margin + 105 - totalEmpresaHeight / 2; // Centrar y ajustar
-
+    const maxEmpresaWidth = pageW - 2 * margin - 20;
+    const empresaLines = doc.splitTextToSize(datosFinales.empresa, maxEmpresaWidth);
+    
+    // Usar la posición final del párrafo + espaciado
+    const empresaStartY = currentY + 5;
+    
     empresaLines.forEach((line, index) => {
-      doc.text(line, pageW / 2, empresaStartY + index * 12, {
-        align: "center",
-      });
+      doc.text(line, pageW / 2, empresaStartY + (index * 6), { align: "center" });
     });
-
+    
     // Ajustar la posición Y para la siguiente sección basándose en el número de líneas
-    const empresaEndY = empresaStartY + empresaLines.length * 12;
+    const empresaEndY = empresaStartY + (empresaLines.length * 6);
 
     // === 5) CUERPO DEL CONSENTIMIENTO ===
     doc.setFont("helvetica", "normal").setFontSize(11);
@@ -176,21 +194,30 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
       "Declaro que he recibido explicaciones satisfactorias sobre el propósito, naturaleza y riesgos de la toma de RAYOS X, por lo cual doy de conocimiento y declaro que a la fecha no me encuentro en estado de gestación, ya que soy consciente de los eventuales riesgos que se pueden derivar de la realización de dicho examen en caso de encontrarme gestando. Por lo cual AUTORIZO a que se me realice la radiografía, indicada por el protocolo de la empresa contratante.";
 
     // Usar la posición final de la empresa + espaciado para el cuerpo del consentimiento
-    const cuerpoY = empresaEndY + 15; // 15 puntos de separación después de la empresa
-    doc.text(consentimiento, margin, cuerpoY, {
-      maxWidth: pageW - 2 * margin,
-      align: "justify",
+    const cuerpoY = empresaEndY + 5; // 5 puntos de separación después de la empresa
+    
+    // Dividir el texto en líneas para mejor control del espaciado
+    const consentimientoLines = doc.splitTextToSize(consentimiento, pageW - 2 * margin);
+    
+    consentimientoLines.forEach((line, index) => {
+      doc.text(line, margin, cuerpoY + (index * 6), {
+        align: "left",
+      });
     });
+    
+    // Calcular la posición final del cuerpo del consentimiento
+    const cuerpoEndY = cuerpoY + (consentimientoLines.length * 6);
+
     doc.text(
       "Y para que así conste, firmo el presente consentimiento.",
       margin,
-      cuerpoY + 30
+      cuerpoEndY + 30
     );
 
     doc.text(
       `${datosFinales.codigoSede}, ${formatearFechaLarga(datosFinales.fecha)}`,
       margin,
-      cuerpoY + 45
+      cuerpoEndY + 45
     );
 
     // === 6) FOOTER CON FECHA, Y FIRMAS ===
