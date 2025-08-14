@@ -49,7 +49,11 @@ import RayosX from "./views/admin/panel-de-control/SistemaOcupacional/RayosX/Ray
 import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 
 //SIMULADOR DE jaspers
+<<<<<<< HEAD
 import Ficha from "./views/jaspers/RayosX/ReporteFechasRadiografia_Digitalizado.jsx";
+=======
+import Ficha from "./views/jaspers/Cuestionario_Nordico/CuestionarioNordico..jsx";
+>>>>>>> 0de45e36bd9b5908a10fadd8103fee96e10881c4
 
 const App = () => {
   return (
