@@ -121,15 +121,15 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // Texto completo dividido en partes para rayos X
     const textoPartes = [
-        {text: "Yo ", bold: false},
+        {text: "Yo: ", bold: false},
         {text: datosFinales.nombre, bold: true},
-        {text: " identificado con DNI: ", bold: false},
-        {text: datosFinales.dni, bold: true},
         {text: " de ", bold: false},
         {text: `${datosFinales.edad} años de edad`, bold: true},
-        {text: ", con ocupación laboral de: ", bold: false},
+        {text: ", identificado con DNI: ", bold: false},
+        {text: datosFinales.dni, bold: true},
+        {text: " con ocupación laboral de: ", bold: false},
         {text: datosFinales.ocupacion, bold: true},
-        {text: " de la empresa:", bold: false}
+        {text: " de la Empresa:", bold: false}
     ];
 
     // Configuración de formato
@@ -196,17 +196,11 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
     // Usar la posición final de la empresa + espaciado para el cuerpo del consentimiento
     const cuerpoY = empresaEndY + 5; // 5 puntos de separación después de la empresa
     
-    // Dividir el texto en líneas para mejor control del espaciado
-    const consentimientoLines = doc.splitTextToSize(consentimiento, pageW - 2 * margin);
+    // Usar el mismo método simple que en conInformadoOcupacional_Digitalizado.jsx
+    doc.text(consentimiento, margin, cuerpoY, { maxWidth: pageW - 2 * margin, align: "justify" });
     
-    consentimientoLines.forEach((line, index) => {
-      doc.text(line, margin, cuerpoY + (index * 6), {
-        align: "left",
-      });
-    });
-    
-    // Calcular la posición final del cuerpo del consentimiento
-    const cuerpoEndY = cuerpoY + (consentimientoLines.length * 6);
+    // Calcular la posición final del cuerpo del consentimiento (aproximada)
+    const cuerpoEndY = cuerpoY + 60; // Espacio aproximado para el texto del consentimiento
 
     doc.text(
       "Y para que así conste, firmo el presente consentimiento.",
