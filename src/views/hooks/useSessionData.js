@@ -21,7 +21,7 @@ export const useSessionData = () => {
 
     return {
         token,
-        userCompleto:userlogued,
+        userCompleto: userlogued,
         userlogued: userlogued?.sub ?? "",
         selectedSede,
         datosFooter,

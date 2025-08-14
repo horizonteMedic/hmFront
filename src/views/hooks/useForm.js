@@ -1,5 +1,4 @@
-// hooks/useForm.js
-import { useState} from "react";
+import { useState } from "react";
 
 export const useForm = (initialFormState) => {
   const [form, setForm] = useState(initialFormState);
