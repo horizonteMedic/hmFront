@@ -34,23 +34,21 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
   // 2) Título del informe
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text("INFORME", pageW / 2, y, { align: "center" });
-  y += 8;
+  y += 10;
 
   // 3) Subtítulo
   doc.setFont("helvetica", "normal").setFontSize(10);
   const subtitulo =
-    "LA RADIOGRAFÍA DE TÓRAX EN LA INCIDENCIA POSTERO-ANTERIOR MUESTRA";
+    "LA RADIOGRAFÍA DE TÓRAX EN LA INCIDENCIA POSTERIOR-ANTERIOR MUESTRA";
   doc.text(subtitulo, pageW / 2, y, { align: "center" });
-  y += 12;
+  y += 14;
 
   // 4) Tabla de hallazgos
   const tableX = margin + 10;
   const tableW = pageW - 2 * (margin + 10);
   const tableY = y;
   const rowHeight = 8;
-  const totalRows = 9;
-  const tableH = totalRows * rowHeight + rowHeight; // Extra height for observaciones row
-
+  
   // Datos de la tabla
   const tablaDatos = [
     { categoria: "VÉRTICES", hallazgo: datos.vertices },
@@ -70,120 +68,112 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
     { categoria: "OBSERVACIONES", hallazgo: datos.observaciones },
   ];
 
-  // Calcular la altura real de la tabla basada en el contenido de observaciones
-  const observacionesRow = tablaDatos.find(
-    (fila) => fila.categoria === "OBSERVACIONES"
-  );
-  const observacionesLines = observacionesRow
-    ? doc.splitTextToSize(
-        observacionesRow.hallazgo,
-        (pageW - 2 * (margin + 10)) * 0.55 * 0.9
-      )
-    : [];
-  const observacionesExtraHeight = Math.max(
-    0,
-    (observacionesLines.length - 2) * 4
-  ); // Extra height for observaciones
-  const actualTableH = tableH + observacionesExtraHeight;
+  // Calcular la altura real de cada fila basada en el contenido
+  const filasAlturas = [];
+  let alturaTotal = 0;
+  
+  tablaDatos.forEach((fila) => {
+    const hallazgoW = (tableW * 0.55) - 10; // Ancho de la columna derecha
+    const maxWidth = hallazgoW * 0.95; // Aumentado de 0.9 a 0.95 para más ancho
+    
+    // Dividir texto en líneas
+    const hallazgoLines = doc.splitTextToSize(fila.hallazgo, maxWidth);
+    
+    // Calcular altura dinámica para cada fila
+    const lineHeight = 4; // Altura por línea
+    const minHeight = rowHeight; // Altura mínima
+    const dynamicHeight = Math.max(
+      minHeight,
+      hallazgoLines.length * lineHeight + 4
+    );
+    
+    filasAlturas.push({
+      ...fila,
+      lines: hallazgoLines,
+      height: dynamicHeight
+    });
+    
+    alturaTotal += dynamicHeight;
+  });
 
-  // Dibujar borde de la tabla con la altura real
+  // Dibujar borde de la tabla con la altura total calculada
   doc.setDrawColor(0);
   doc.setLineWidth(0.3);
-  doc.roundedRect(tableX, tableY, tableW, actualTableH, 2, 2);
+  doc.roundedRect(tableX, tableY, tableW, alturaTotal, 2, 2);
 
   // Configuración de columnas
   const col1Width = tableW * 0.45; // Columna izquierda (categorías)
-  const col2Width = tableW * 0.55; // Columna derecha (hallazgos)
 
-  // Dibujar línea vertical separadora con la altura real
+  // Dibujar línea vertical separadora
   doc.line(
     tableX + col1Width,
     tableY,
     tableX + col1Width,
-    tableY + actualTableH
+    tableY + alturaTotal
   );
 
-  // Dibujar filas y contenido
-  tablaDatos.forEach((fila, index) => {
-    const rowY = tableY + index * rowHeight;
+  // Dibujar filas y contenido con altura dinámica
+let currentY = tableY;
 
+filasAlturas.forEach((fila, index) => {
     // Dibujar línea horizontal si no es la primera fila
     if (index > 0) {
-      doc.line(tableX, rowY, tableX + tableW, rowY);
+        doc.line(tableX, currentY, tableX + tableW, currentY);
     }
 
-    // Categoría (columna izquierda)
+    // Categoría (columna izquierda) - CENTRADO VERTICAL PERFECTO
     doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(fila.categoria + " :", tableX + 5, rowY + rowHeight / 2 + 2, {
-      align: "left",
-      baseline: "middle",
+    
+    // Calcular posición Y exacta para centrado - SUBIDO 2 PUNTOS
+    const categoriaTextHeight = 4; // Altura aproximada del texto en 9pt
+    const categoriaY = currentY + (fila.height / 2) - (categoriaTextHeight / 2) + 1; // Cambiado de +2 a +0 (subido 2 puntos)
+    
+    doc.text(fila.categoria + " :", tableX + 5, categoriaY, {
+        align: "left",
+        baseline: "top" // Usamos 'top' para mayor control
     });
 
     // Hallazgo (columna derecha)
     doc.setFont("helvetica", "normal").setFontSize(9);
     const hallazgoX = tableX + col1Width + 5;
-    const hallazgoW = col2Width - 10;
 
-    // Dividir texto si es muy largo
-    const maxWidth =
-      fila.categoria === "OBSERVACIONES" ? hallazgoW * 0.9 : hallazgoW; // Max-width para observaciones
-    const hallazgoLines = doc.splitTextToSize(fila.hallazgo, maxWidth);
-
-    // Para OBSERVACIONES, altura dinámica basada en el contenido
-    if (fila.categoria === "OBSERVACIONES") {
-      // Calcular altura dinámica basada en el número de líneas
-      const lineHeight = 4; // Altura por línea
-      const minHeight = rowHeight * 2; // Altura mínima
-      const dynamicHeight = Math.max(
-        minHeight,
-        hallazgoLines.length * lineHeight + 4
-      );
-
-      if (hallazgoLines.length === 1) {
-        // Una sola línea
-        doc.text(hallazgoLines[0], hallazgoX, rowY + dynamicHeight / 2 + 3.5, {
-          align: "left",
-          baseline: "middle",
-        });
-      } else {
-        // Múltiples líneas para observaciones - sin límite de líneas
-        let lineY = rowY + 4; // Bajado 1.5 puntos
-        hallazgoLines.forEach((line) => {
-          doc.text(line, hallazgoX, lineY, {
+    if (fila.lines.length === 1) {
+        // Centrado vertical exacto para hallazgos de una línea - SUBIDO 2 PUNTOS
+        const hallazgoTextHeight = 4;
+        const hallazgoY = currentY + (fila.height / 2) - (hallazgoTextHeight / 2) + 1; // Cambiado de +2 a +0 (subido 2 puntos)
+        doc.text(fila.lines[0], hallazgoX, hallazgoY, {
             align: "left",
-          });
-          lineY += lineHeight;
+            baseline: "top"
         });
-      }
     } else {
-      // Para otras filas, comportamiento normal
-      if (hallazgoLines.length === 1) {
-        // Una sola línea
-        doc.text(hallazgoLines[0], hallazgoX, rowY + rowHeight / 2 + 2, {
-          align: "left",
-          baseline: "middle",
-        });
-      } else {
-        // Múltiples líneas
-        let lineY = rowY + 2;
-        hallazgoLines.forEach((line, lineIndex) => {
-          if (lineIndex < 2) {
-            // Máximo 2 líneas por fila
+        // Múltiples líneas - alineado arriba con espaciado consistente - SUBIDO 2 PUNTOS
+        let lineY = currentY + 2; // Cambiado de +4 a +2 (subido 2 puntos)
+        fila.lines.forEach((line) => {
             doc.text(line, hallazgoX, lineY, {
-              align: "left",
+                align: "left",
+                baseline: "top"
             });
-            lineY += 4;
-          }
+            lineY += 4.5; // Espaciado ligeramente mayor entre líneas
         });
-      }
     }
-  });
 
-  // 5) Sección de firmas (opcional)
-  y = tableY + actualTableH + 28; // Bajado 8 puntos (de 20 a 28)
+    // Actualizar la posición Y para la siguiente fila
+    currentY += fila.height;
+});
 
-  // Línea para firma centrada
-  const firmaY = y;
+  // 5) Sección de firmas (opcional) - BLOQUE COMPLETO QUE SE MUEVE JUNTO
+  y = tableY + alturaTotal + 28; // Bajado 8 puntos (de 20 a 28)
+
+  // Arreglo de firmas con posición Y dinámica - IMAGEN ARRIBA
+  const firmasAPintar = [{ 
+    nombre: "SELLOFIRMA", 
+    x: 80, 
+    y: y - 3, // Subido 2.5 puntos para mejor posicionamiento
+    maxw: 50 
+  }];
+
+  // Línea para firma centrada - DEBAJO DE LA IMAGEN
+  const firmaY = y + 25; // 25 puntos debajo de la imagen para evitar superposición
   const firmaW = 60;
   const firmaX = pageW / 2 - firmaW / 2; // Centrar la línea
 
@@ -191,13 +181,12 @@ export default function RagiografiaToraxPA_Digitalizado(data = {}) {
   doc.setLineWidth(0.2);
   doc.line(firmaX, firmaY, firmaX + firmaW, firmaY);
 
+  // Texto "Firma del Médico" - DEBAJO DE LA LÍNEA
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Firma del Médico", pageW / 2, firmaY + 8, {
+  doc.text("Firma del Médico", pageW / 2, firmaY + 6.5, {
     align: "center",
   });
 
-  // Arreglo de firmas que quieres cargar
-  const firmasAPintar = [{ nombre: "SELLOFIRMA", x: 80, y: 200, maxw: 50 }];
   agregarFirmas(doc, data.digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
   });

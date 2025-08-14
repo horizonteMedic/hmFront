@@ -1,7 +1,7 @@
 const Cuestionario = () => {
     return(
         <>
-            <div className="flex w-full text-xl">
+            <div className="flex w-full text-xl border rounded p-4 mt-6">
                 <div className="w-[60%] flex flex-col">
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-bold">1.- Datos Personales</h2>

@@ -7,9 +7,9 @@ function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
   const margin = 15;
   const logoW = 38;
   const y = 12;
-  const xOffset = opts.xOffset !== undefined ? opts.xOffset : 25;
-  const fontSize = opts.fontSize !== undefined ? opts.fontSize : 6;
-  const yOffset = opts.yOffset !== undefined ? opts.yOffset : -8;
+  const xOffset = opts.xOffset;
+  const fontSize = opts.fontSize;
+  const yOffset = opts.yOffset;
   const baseX = margin + logoW + 8 - xOffset;
   let yFila = y + 2 + yOffset;
   const rowH = 3.2;
@@ -101,22 +101,22 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   }
 
   // Footer horizontal de cabecera (datos de contacto)
-  footerFichaRadiografiaCabecera(doc, { xOffset: 25, fontSize: 6, yOffset: -8 }, datos);
+  footerFichaRadiografiaCabecera(doc, { xOffset: 30, fontSize: 6, yOffset: -13 }, datos);
   // 3) Sección de datos del paciente
-  const datosPacienteY = y + 45; // Bajado de 35 a 45
+  const datosPacienteY = y + 35; // Bajado de 35 a 45
   const datosPacienteX = margin + 25;
   
   // Título "EXAMEN" centrado y con fuente más grande
-  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setFont("helvetica", "normal").setFontSize(15);
   const examTitle = "EXAMEN : RADIOGRAFIA DE TORAX P.A";
   const examTitleX = pageW / 2;
-  doc.text(examTitle, examTitleX, datosPacienteY, { align: "center" });
+  doc.text(examTitle, examTitleX, datosPacienteY + 5, { align: "center" }); // Bajado 5 puntos
   
-  // Subrayar el texto del examen
+  // Subrayar el texto del examen - LÍNEA ARRIBA DEL TEXTO
   const examWidth = doc.getTextWidth(examTitle);
   const examX = examTitleX - examWidth / 2;
-  doc.setLineWidth(0.2);
-  doc.line(examX, datosPacienteY + 1, examX + examWidth, datosPacienteY + 1);
+  doc.setLineWidth(0.3);
+  doc.line(examX, datosPacienteY + 6, examX + examWidth, datosPacienteY + 6); // Línea arriba del texto
   
   // Datos del paciente - todos en mayúsculas y labels en negrita
   const pacienteData = [
@@ -126,16 +126,23 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
     { label: "EDAD", value: datos.edad ? `${datos.edad} AÑOS` : "31 AÑOS" }
   ];
   
+  // Calcular el ancho máximo de los labels para alinearlos
+  const maxLabelWidth = Math.max(...pacienteData.map(item => doc.getTextWidth(item.label)));
+  const labelSpacing = 15; // Espacio entre label y valor
+  
   let pacienteY = datosPacienteY + 20; // Ajustar posición después del título centrado
   pacienteData.forEach(item => {
-    // Label en negrita
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(`${item.label} :`, datosPacienteX, pacienteY);
+    // Label en negrita con fuente más grande (9 + 1.5 = 10.5)
+    doc.setFont("helvetica", "bold").setFontSize(10.5);
+    doc.text(item.label, datosPacienteX, pacienteY);
     
-    // Valor en normal
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    const labelWidth = doc.getTextWidth(`${item.label} :`);
-    doc.text(item.value, datosPacienteX + labelWidth + 2, pacienteY);
+    // Agregar los dos puntos alineados
+    const labelX = datosPacienteX + maxLabelWidth + 5; // 5 puntos de separación
+    doc.text(":", labelX, pacienteY);
+    
+    // Valor en normal con fuente más grande (9 + 1.5 = 10.5)
+    doc.setFont("helvetica", "normal").setFontSize(10.5);
+    doc.text(item.value, labelX + 5 + labelSpacing, pacienteY);
     
     pacienteY += 5;
   });

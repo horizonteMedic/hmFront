@@ -59,6 +59,17 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
   const [form, setForm] = useState(initialFormState);
   const [isEditing, setIsEditing] = useState(false);
 
+  const getCurrentTime = () => {
+    const date = new Date();
+    return date.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+  };
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
@@ -72,11 +83,11 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
   };
   
   const handleClear = () => {
-    setForm(initialFormState);
+    setForm(() => ({ ...initialFormState, horaActual: getCurrentTime() }));
   };
   
   const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden, horaActual: getCurrentTime() }));
   };
   
   const Loading = (text) => {

@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 const Cuello = () => {
     return(
         <>
-            <div className="flex w-full text-xl">
+            <div className="flex w-full text-xl border rounded p-4 mt-6">
                 <div className="flex flex-col w-full">
                     <div className="flex">
                         <div className="flex flex-col w-[80%]">
