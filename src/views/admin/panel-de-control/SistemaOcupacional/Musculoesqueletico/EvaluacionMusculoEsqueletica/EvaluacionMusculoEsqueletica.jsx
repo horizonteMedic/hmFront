@@ -1,11 +1,14 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ExamenFisicoI from "./ExamenFisicoI";
 import ExamenFisicoII from "./ExamenFisicoII";
 import ExamenFisicoIII from "./ExamenFisicoIII";
+import { VerifyTR } from "./controllerEvaluacionMusculoEsqueletica";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
+const tabla = "evaluacion_musculo_esqueletica";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -14,6 +17,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 const initialFormState = {
   norden: "",
+  codEvaluacion: "",
   nombres: "",
   dni: "",
   areaTrabajo: "",
@@ -21,7 +25,7 @@ const initialFormState = {
   sexo: "",
   fecha: today,
   empresa: "",
-  tiempoServicio: "",
+  tiempoServicio: "AÑOS",
 
   // Síntomas
   sintomas: "NO",
@@ -129,44 +133,28 @@ const initialFormState = {
   nombreMedico: "",
 };
 
-export default function EvaluacionMusculoEsqueletica({
-  token,
-  selectedSede,
-  userlogued,
-}) {
-  const [form, setForm] = useState(initialFormState);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-
-  const handleRadioButton = (e, value) => {
-    const { name } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: value.toUpperCase(),
-    }));
-  };
-
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
+export default function EvaluacionMusculoEsqueletica() {
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleClear,
+    handleClearnotO,
+  } = useForm(initialFormState);
 
   const handleSave = () => {
-    // Aquí iría la función de guardado
     // SubmitDataService(form, token, userlogued, handleClear, tabla);
     Swal.fire("Éxito", "Datos guardados correctamente", "success");
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   const handlePrint = () => {
@@ -191,12 +179,6 @@ export default function EvaluacionMusculoEsqueletica({
         Swal.fire("Éxito", "Reporte enviado a impresión", "success");
       }
     });
-  };
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-    }
   };
 
   return (
@@ -275,7 +257,7 @@ export default function EvaluacionMusculoEsqueletica({
                 className="border rounded px-2 py-1 w-full "
                 name="tiempoServicio"
                 value={form.tiempoServicio || ""}
-                disabled
+                onChange={handleChange}
               />
             </div>
 
@@ -524,6 +506,7 @@ export default function EvaluacionMusculoEsqueletica({
                   className="border rounded px-3 py-1 w-full"
                   name="nombreMedico"
                   value={form.nombreMedico || ""}
+                  disabled
                 />
               </div>
             </div>
