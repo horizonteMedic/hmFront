@@ -44,6 +44,32 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
           texto: "30 grados", 
           grado: "M" // N = Normal, R = Reducido, M = Marcado
         }
+      },
+      hombro: {
+        flexion: {
+          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        },
+        abduccion: {
+          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        },
+        aduccion: {
+          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionInterna: {
+          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionExterna: {
+          izquierda: { grado: "M" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        }
       }
     }
   };
@@ -158,56 +184,306 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   }
 
   // === SECCIÓN: EXAMEN FÍSICO - CABEZA Y CUELLO ===
-  const xExamenFisico = margin + 30; // Posición X para examen físico
-  const yExamenFisico = margin + 120; // Posición Y para examen físico
   
-  // Posiciones para la tabla
-  const xGrados = xExamenFisico + 60;
-  const yInicioTabla = yExamenFisico + 10;
+  // Posiciones X individuales para cada elemento
+  const xGradosN = margin + 109.6; // Posición X para grado N (Normal)
+  const xGradosR = margin + 132.4; // Posición X para grado R (Reducido)
+  const xGradosM = margin + 156.4; // Posición X para grado M (Marcado)
+  const xTextoExtension = margin + 22; // Posición X para texto de extensión
+  const xTextoFlexion = margin + 22; // Posición X para texto de flexión
+  
+  // Posiciones Y individuales para las X de cada grado
+  const yExtensionN = margin + 87.8; // Posición Y para X de grado N en extensión
+  const yExtensionR = margin + 87.8; // Posición Y para X de grado R en extensión
+  const yExtensionM = margin + 87.8; // Posición Y para X de grado M en extensión
+  const yFlexionN = margin + 93.5; // Posición Y para X de grado N en flexión
+  const yFlexionR = margin + 93.5; // Posición Y para X de grado R en flexión
+  const yFlexionM = margin + 93.5; // Posición Y para X de grado M en flexión
   
   // Datos de extensión
-  const yExtension = yInicioTabla + 15;
+  const yExtension = margin + 87; // Posición Y para extensión
   
   if (datosFinales.examenFisico?.cabezaCuello?.extension) {
     const extension = datosFinales.examenFisico.cabezaCuello.extension;
     
     // Mostrar texto de extensión
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(extension.texto || "", xGrados + 45, yExtension);
+    doc.text(extension.texto || "", xTextoExtension, yExtension);
     
     // Marcar X en el grado correspondiente
     doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.setFont("helvetica", "bold").setFontSize(11);
     
     if (extension.grado === "N") {
-      doc.text("X", xGrados, yExtension); // X en N (Normal)
+      doc.text("X", xGradosN, yExtensionN); // X en N (Normal)
     } else if (extension.grado === "R") {
-      doc.text("X", xGrados + 15, yExtension); // X en R (Reducido)
+      doc.text("X", xGradosR, yExtensionR); // X en R (Reducido)
     } else if (extension.grado === "M") {
-      doc.text("X", xGrados + 30, yExtension); // X en M (Marcado)
+      doc.text("X", xGradosM, yExtensionM); // X en M (Marcado)
     }
     
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
   
   // Datos de flexión
-  const yFlexion = yInicioTabla + 25;
+  const yFlexion = margin + 92.5; // Posición Y para flexión
   
   if (datosFinales.examenFisico?.cabezaCuello?.flexion) {
     const flexion = datosFinales.examenFisico.cabezaCuello.flexion;
     
     // Mostrar texto de flexión
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(flexion.texto || "", xGrados + 45, yFlexion);
+    doc.text(flexion.texto || "", xTextoFlexion, yFlexion);
     
     // Marcar X en el grado correspondiente
     doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.setFont("helvetica", "bold").setFontSize(11);
     
     if (flexion.grado === "N") {
-      doc.text("X", xGrados, yFlexion); // X en N (Normal)
+      doc.text("X", xGradosN, yFlexionN); // X en N (Normal)
+    } else if (flexion.grado === "R") {
+      doc.text("X", xGradosR, yFlexionR); // X en R (Reducido)
     } else if (flexion.grado === "M") {
-      doc.text("X", xGrados + 30, yFlexion); // X en M (Marcado)
+      doc.text("X", xGradosM, yFlexionM); // X en M (Marcado)
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN: MIEMBROS SUPERIORES - HOMBRO ===
+  
+  // Posiciones X individuales para cada lado del hombro
+  // IZQUIERDA
+  const xHombroIzquierdaN = margin + 109.6; // Posición X para grado N (Normal) - Izquierda
+  const xHombroIzquierdaR = margin + 132.4; // Posición X para grado R (Reducido) - Izquierda
+  const xHombroIzquierdaM = margin + 156.4; // Posición X para grado M (Marcado) - Izquierda
+  
+  // DERECHA
+  const xHombroDerechaN = margin + 180; // Posición X para grado N (Normal) - Derecha
+  const xHombroDerechaR = margin + 203; // Posición X para grado R (Reducido) - Derecha
+  const xHombroDerechaM = margin + 227; // Posición X para grado M (Marcado) - Derecha
+  
+  // Posiciones Y individuales para cada lado del hombro
+  const yHombroFlexionIzquierda = margin + 105; // Posición Y para flexión izquierda del hombro
+  const yHombroFlexionDerecha = margin + 106; // Posición Y para flexión derecha del hombro
+  const yHombroExtensionIzquierda = margin + 110; // Posición Y para extensión izquierda del hombro
+  const yHombroExtensionDerecha = margin + 111; // Posición Y para extensión derecha del hombro
+  const yHombroAbduccionIzquierda = margin + 115; // Posición Y para abducción izquierda del hombro
+  const yHombroAbduccionDerecha = margin + 116; // Posición Y para abducción derecha del hombro
+  const yHombroAduccionIzquierda = margin + 120; // Posición Y para aducción izquierda del hombro
+  const yHombroAduccionDerecha = margin + 121; // Posición Y para aducción derecha del hombro
+  const yHombroRotacionInternaIzquierda = margin + 125; // Posición Y para rotación interna izquierda del hombro
+  const yHombroRotacionInternaDerecha = margin + 126; // Posición Y para rotación interna derecha del hombro
+  const yHombroRotacionExternaIzquierda = margin + 130; // Posición Y para rotación externa izquierda del hombro
+  const yHombroRotacionExternaDerecha = margin + 131; // Posición Y para rotación externa derecha del hombro
+  
+
+  
+  // Datos del hombro - Flexión
+  if (datosFinales.examenFisico?.hombro?.flexion) {
+    const flexionHombro = datosFinales.examenFisico.hombro.flexion;
+    
+    // Marcar X en el grado correspondiente para IZQUIERDA
+    if (flexionHombro.izquierda) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (flexionHombro.izquierda.grado === "N") {
+        doc.text("X", xHombroIzquierdaN, yHombroFlexionIzquierda); // X en N (Normal) - Izquierda
+      } else if (flexionHombro.izquierda.grado === "R") {
+        doc.text("X", xHombroIzquierdaR, yHombroFlexionIzquierda); // X en R (Reducido) - Izquierda
+      } else if (flexionHombro.izquierda.grado === "M") {
+        doc.text("X", xHombroIzquierdaM, yHombroFlexionIzquierda); // X en M (Marcado) - Izquierda
+      }
+    }
+    
+    // Marcar X en el grado correspondiente para DERECHA
+    if (flexionHombro.derecha) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (flexionHombro.derecha.grado === "N") {
+        doc.text("X", xHombroDerechaN, yHombroFlexionDerecha); // X en N (Normal) - Derecha
+      } else if (flexionHombro.derecha.grado === "R") {
+        doc.text("X", xHombroDerechaR, yHombroFlexionDerecha); // X en R (Reducido) - Derecha
+      } else if (flexionHombro.derecha.grado === "M") {
+        doc.text("X", xHombroDerechaM, yHombroFlexionDerecha); // X en M (Marcado) - Derecha
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // Datos del hombro - Extensión
+  if (datosFinales.examenFisico?.hombro?.extension) {
+    const extensionHombro = datosFinales.examenFisico.hombro.extension;
+    
+    // Marcar X en el grado correspondiente para IZQUIERDA
+    if (extensionHombro.izquierda) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (extensionHombro.izquierda.grado === "N") {
+        doc.text("X", xHombroIzquierdaN, yHombroExtensionIzquierda); // X en N (Normal) - Izquierda
+      } else if (extensionHombro.izquierda.grado === "R") {
+        doc.text("X", xHombroIzquierdaR, yHombroExtensionIzquierda); // X en R (Reducido) - Izquierda
+      } else if (extensionHombro.izquierda.grado === "M") {
+        doc.text("X", xHombroIzquierdaM, yHombroExtensionIzquierda); // X en M (Marcado) - Izquierda
+      }
+    }
+    
+    // Marcar X en el grado correspondiente para DERECHA
+    if (extensionHombro.derecha) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (extensionHombro.derecha.grado === "N") {
+        doc.text("X", xHombroDerechaN, yHombroExtensionDerecha); // X en N (Normal) - Derecha
+      } else if (extensionHombro.derecha.grado === "R") {
+        doc.text("X", xHombroDerechaR, yHombroExtensionDerecha); // X en R (Reducido) - Derecha
+      } else if (extensionHombro.derecha.grado === "M") {
+        doc.text("X", xHombroDerechaM, yHombroExtensionDerecha); // X en M (Marcado) - Derecha
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // Datos del hombro - Abducción
+  if (datosFinales.examenFisico?.hombro?.abduccion) {
+    const abduccionHombro = datosFinales.examenFisico.hombro.abduccion;
+    
+    // Marcar X en el grado correspondiente para IZQUIERDA
+    if (abduccionHombro.izquierda) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (abduccionHombro.izquierda.grado === "N") {
+        doc.text("X", xHombroIzquierdaN, yHombroAbduccionIzquierda); // X en N (Normal) - Izquierda
+      } else if (abduccionHombro.izquierda.grado === "R") {
+        doc.text("X", xHombroIzquierdaR, yHombroAbduccionIzquierda); // X en R (Reducido) - Izquierda
+      } else if (abduccionHombro.izquierda.grado === "M") {
+        doc.text("X", xHombroIzquierdaM, yHombroAbduccionIzquierda); // X en M (Marcado) - Izquierda
+      }
+    }
+    
+    // Marcar X en el grado correspondiente para DERECHA
+    if (abduccionHombro.derecha) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (abduccionHombro.derecha.grado === "N") {
+        doc.text("X", xHombroDerechaN, yHombroAbduccionDerecha); // X en N (Normal) - Derecha
+      } else if (abduccionHombro.derecha.grado === "R") {
+        doc.text("X", xHombroDerechaR, yHombroAbduccionDerecha); // X en R (Reducido) - Derecha
+      } else if (abduccionHombro.derecha.grado === "M") {
+        doc.text("X", xHombroDerechaM, yHombroAbduccionDerecha); // X en M (Marcado) - Derecha
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // Datos del hombro - Aducción
+  if (datosFinales.examenFisico?.hombro?.aduccion) {
+    const aduccionHombro = datosFinales.examenFisico.hombro.aduccion;
+    
+    // Marcar X en el grado correspondiente para IZQUIERDA
+    if (aduccionHombro.izquierda) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (aduccionHombro.izquierda.grado === "N") {
+        doc.text("X", xHombroIzquierdaN, yHombroAduccionIzquierda); // X en N (Normal) - Izquierda
+      } else if (aduccionHombro.izquierda.grado === "R") {
+        doc.text("X", xHombroIzquierdaR, yHombroAduccionIzquierda); // X en R (Reducido) - Izquierda
+      } else if (aduccionHombro.izquierda.grado === "M") {
+        doc.text("X", xHombroIzquierdaM, yHombroAduccionIzquierda); // X en M (Marcado) - Izquierda
+      }
+    }
+    
+    // Marcar X en el grado correspondiente para DERECHA
+    if (aduccionHombro.derecha) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (aduccionHombro.derecha.grado === "N") {
+        doc.text("X", xHombroDerechaN, yHombroAduccionDerecha); // X en N (Normal) - Derecha
+      } else if (aduccionHombro.derecha.grado === "R") {
+        doc.text("X", xHombroDerechaR, yHombroAduccionDerecha); // X en R (Reducido) - Derecha
+      } else if (aduccionHombro.derecha.grado === "M") {
+        doc.text("X", xHombroDerechaM, yHombroAduccionDerecha); // X en M (Marcado) - Derecha
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // Datos del hombro - Rotación Interna
+  if (datosFinales.examenFisico?.hombro?.rotacionInterna) {
+    const rotacionInternaHombro = datosFinales.examenFisico.hombro.rotacionInterna;
+    
+    // Marcar X en el grado correspondiente para IZQUIERDA
+    if (rotacionInternaHombro.izquierda) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (rotacionInternaHombro.izquierda.grado === "N") {
+        doc.text("X", xHombroIzquierdaN, yHombroRotacionInternaIzquierda); // X en N (Normal) - Izquierda
+      } else if (rotacionInternaHombro.izquierda.grado === "R") {
+        doc.text("X", xHombroIzquierdaR, yHombroRotacionInternaIzquierda); // X en R (Reducido) - Izquierda
+      } else if (rotacionInternaHombro.izquierda.grado === "M") {
+        doc.text("X", xHombroIzquierdaM, yHombroRotacionInternaIzquierda); // X en M (Marcado) - Izquierda
+      }
+    }
+    
+    // Marcar X en el grado correspondiente para DERECHA
+    if (rotacionInternaHombro.derecha) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (rotacionInternaHombro.derecha.grado === "N") {
+        doc.text("X", xHombroDerechaN, yHombroRotacionInternaDerecha); // X en N (Normal) - Derecha
+      } else if (rotacionInternaHombro.derecha.grado === "R") {
+        doc.text("X", xHombroDerechaR, yHombroRotacionInternaDerecha); // X en R (Reducido) - Derecha
+      } else if (rotacionInternaHombro.derecha.grado === "M") {
+        doc.text("X", xHombroDerechaM, yHombroRotacionInternaDerecha); // X en M (Marcado) - Derecha
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // Datos del hombro - Rotación Externa
+  if (datosFinales.examenFisico?.hombro?.rotacionExterna) {
+    const rotacionExternaHombro = datosFinales.examenFisico.hombro.rotacionExterna;
+    
+    // Marcar X en el grado correspondiente para IZQUIERDA
+    if (rotacionExternaHombro.izquierda) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (rotacionExternaHombro.izquierda.grado === "N") {
+        doc.text("X", xHombroIzquierdaN, yHombroRotacionExternaIzquierda); // X en N (Normal) - Izquierda
+      } else if (rotacionExternaHombro.izquierda.grado === "R") {
+        doc.text("X", xHombroIzquierdaR, yHombroRotacionExternaIzquierda); // X en R (Reducido) - Izquierda
+      } else if (rotacionExternaHombro.izquierda.grado === "M") {
+        doc.text("X", xHombroIzquierdaM, yHombroRotacionExternaIzquierda); // X en M (Marcado) - Izquierda
+      }
+    }
+    
+    // Marcar X en el grado correspondiente para DERECHA
+    if (rotacionExternaHombro.derecha) {
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(11);
+      
+      if (rotacionExternaHombro.derecha.grado === "N") {
+        doc.text("X", xHombroDerechaN, yHombroRotacionExternaDerecha); // X en N (Normal) - Derecha
+      } else if (rotacionExternaHombro.derecha.grado === "R") {
+        doc.text("X", xHombroDerechaR, yHombroRotacionExternaDerecha); // X en R (Reducido) - Derecha
+      } else if (rotacionExternaHombro.derecha.grado === "M") {
+        doc.text("X", xHombroDerechaM, yHombroRotacionExternaDerecha); // X en M (Marcado) - Derecha
+      }
     }
     
     doc.setTextColor(0, 0, 0); // Resetear a negro
