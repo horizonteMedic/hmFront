@@ -130,28 +130,51 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Fila 1 - Columna 1: TOBILLO */}
         <div className="border rounded p-4">
-          <div className=" text-blue-900 font-semibold text-start mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (TOBILLO)
           </div>
-          <div className="space-y-4">
-            <RadioGroup
-              label="Flexión"
-              name="flexionTobillo"
-              value={form.flexionTobillo || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Extensión"
-              name="extensionTobillo"
-              value={form.extensionTobillo || "N"}
-              onChange={handleRadioButton}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="font-semibold mb-2">Lado Izquierdo</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionTobillo"
+                  value={form.flexionTobillo || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionTobillo"
+                  value={form.extensionTobillo || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="font-semibold mb-2">Lado Derecho</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionTobilloDerecho"
+                  value={form.flexionTobilloDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionTobilloDerecho"
+                  value={form.extensionTobilloDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Fila 1 - Columna 2: DESVIACIÓN DE EJE */}
         <div className="border rounded p-4">
-          <div className=" text-blue-900 font-semibold text-start mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             COLUMNA VERTEBRAL (DESVIACIÓN DE EJE)
           </div>
           <div className="space-y-4">
@@ -178,7 +201,7 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
 
         {/* Fila 1 - Columna 3: DESV. DE COLUMNA */}
         <div className="border rounded p-4">
-          <div className=" text-blue-900 font-semibold text-start mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             C. VERTEBRAL (DESV. DE COLUMNA)
           </div>
           <div className="space-y-4">
@@ -211,7 +234,7 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
 
         {/* Fila 2 - Columna 1: FUERZA MUSCULAR */}
         <div className="border rounded p-4">
-          <div className=" text-blue-900 font-semibold text-start mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             FUERZA MUSCULAR (GRADO)
           </div>
           <div>
@@ -226,7 +249,7 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
 
         {/* Fila 2 - Columna 2: PALPACIÓN - DOLOR */}
         <div className="border rounded p-4">
-          <div className=" text-blue-900 font-semibold text-start mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             COLUMNA VERTEBRAL (PALPACIÓN - DOLOR)
           </div>
           <div className="space-y-4">
@@ -253,7 +276,7 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
 
         {/* Fila 2 - Columna 3: EXPLORACIÓN */}
         <div className="border rounded p-4">
-          <div className=" text-blue-900 font-semibold text-start mb-3">
+          <div className=" text-blue-900 font-semibold text-center mb-3">
             COLUMNA VERTEBRAL (EXPLORACIÓN)
           </div>
           <div className="space-y-4">

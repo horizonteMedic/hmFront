@@ -75,49 +75,84 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
           <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS SUPERIORES (MUÑECA)
           </div>
-          <div className="space-y-4">
-            <RadioGroup
-              label="Flexión"
-              name="flexionMuneca"
-              value={form.flexionMuneca || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Extensión"
-              name="extensionMuneca"
-              value={form.extensionMuneca || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Desviación Cubital"
-              name="desviacionCubitalMuneca"
-              value={form.desviacionCubitalMuneca || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Desviación Radial"
-              name="desviacionRadialMuneca"
-              value={form.desviacionRadialMuneca || "N"}
-              onChange={handleRadioButton}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="font-semibold mb-2">Lado Izquierdo</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionMuneca"
+                  value={form.flexionMuneca || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionMuneca"
+                  value={form.extensionMuneca || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Desviación Cubital"
+                  name="desviacionCubitalMuneca"
+                  value={form.desviacionCubitalMuneca || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Desviación Radial"
+                  name="desviacionRadialMuneca"
+                  value={form.desviacionRadialMuneca || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
             
-            <div className="border-t pt-4 mt-4">
-              <div className="mb-3">
-                <RadioGroupSiNo
-                  label="S. de Phallen"
-                  name="signoPhallen"
-                  value={form.signoPhallen || "NO"}
+            <div>
+              <div className="font-semibold mb-2">Lado Derecho</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionMunecaDerecho"
+                  value={form.flexionMunecaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionMunecaDerecho"
+                  value={form.extensionMunecaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Desviación Cubital"
+                  name="desviacionCubitalMunecaDerecho"
+                  value={form.desviacionCubitalMunecaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Desviación Radial"
+                  name="desviacionRadialMunecaDerecho"
+                  value={form.desviacionRadialMunecaDerecho || "N"}
                   onChange={handleRadioButton}
                 />
               </div>
-              <div>
-                <RadioGroupSiNo
-                  label="S. Tinel"
-                  name="signoTinel"
-                  value={form.signoTinel || "NO"}
-                  onChange={handleRadioButton}
-                />
-              </div>
+            </div>
+          </div>
+          
+          <div className="border-t pt-4 mt-4">
+            <div className="mb-3">
+              <RadioGroupSiNo
+                label="S. de Phallen"
+                name="signoPhallen"
+                value={form.signoPhallen || "NO"}
+                onChange={handleRadioButton}
+              />
+            </div>
+            <div>
+              <RadioGroupSiNo
+                label="S. Tinel"
+                name="signoTinel"
+                value={form.signoTinel || "NO"}
+                onChange={handleRadioButton}
+              />
             </div>
           </div>
         </div>
@@ -127,43 +162,90 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
           <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (CADERA)
           </div>
-          <div className="space-y-4">
-            <RadioGroup
-              label="Flexión"
-              name="flexionCadera"
-              value={form.flexionCadera || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Extensión"
-              name="extensionCadera"
-              value={form.extensionCadera || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Abducción"
-              name="abduccionCadera"
-              value={form.abduccionCadera || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Aducción"
-              name="aduccionCadera"
-              value={form.aduccionCadera || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Rotación Interna"
-              name="rotacionInternaCadera"
-              value={form.rotacionInternaCadera || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Rotación Externa"
-              name="rotacionExternaCadera"
-              value={form.rotacionExternaCadera || "N"}
-              onChange={handleRadioButton}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="font-semibold mb-2">Lado Izquierdo</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionCadera"
+                  value={form.flexionCadera || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionCadera"
+                  value={form.extensionCadera || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Abducción"
+                  name="abduccionCadera"
+                  value={form.abduccionCadera || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Aducción"
+                  name="aduccionCadera"
+                  value={form.aduccionCadera || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Rotación Interna"
+                  name="rotacionInternaCadera"
+                  value={form.rotacionInternaCadera || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Rotación Externa"
+                  name="rotacionExternaCadera"
+                  value={form.rotacionExternaCadera || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="font-semibold mb-2">Lado Derecho</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionCaderaDerecho"
+                  value={form.flexionCaderaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionCaderaDerecho"
+                  value={form.extensionCaderaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Abducción"
+                  name="abduccionCaderaDerecho"
+                  value={form.abduccionCaderaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Aducción"
+                  name="aduccionCaderaDerecho"
+                  value={form.aduccionCaderaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Rotación Interna"
+                  name="rotacionInternaCaderaDerecho"
+                  value={form.rotacionInternaCaderaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Rotación Externa"
+                  name="rotacionExternaCaderaDerecho"
+                  value={form.rotacionExternaCaderaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -172,19 +254,42 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
           <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (PIERNA)
           </div>
-          <div className="space-y-4">
-            <RadioGroup
-              label="Flexión"
-              name="flexionPierna"
-              value={form.flexionPierna || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Extensión"
-              name="extensionPierna"
-              value={form.extensionPierna || "N"}
-              onChange={handleRadioButton}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="font-semibold mb-2">Lado Izquierdo</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionPierna"
+                  value={form.flexionPierna || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionPierna"
+                  value={form.extensionPierna || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="font-semibold mb-2">Lado Derecho</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionPiernaDerecho"
+                  value={form.flexionPiernaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionPiernaDerecho"
+                  value={form.extensionPiernaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -193,31 +298,66 @@ export default function ExamenFisicoII({ form, handleRadioButton, handleChange }
           <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (RODILLA)
           </div>
-          <div className="space-y-4">
-            <RadioGroup
-              label="Flexión"
-              name="flexionRodilla"
-              value={form.flexionRodilla || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="Extensión"
-              name="extensionRodilla"
-              value={form.extensionRodilla || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="R. Interna"
-              name="rotacionInternaRodilla"
-              value={form.rotacionInternaRodilla || "N"}
-              onChange={handleRadioButton}
-            />
-            <RadioGroup
-              label="R. Externa"
-              name="rotacionExternaRodilla"
-              value={form.rotacionExternaRodilla || "N"}
-              onChange={handleRadioButton}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="font-semibold mb-2">Lado Izquierdo</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionRodilla"
+                  value={form.flexionRodilla || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionRodilla"
+                  value={form.extensionRodilla || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="R. Interna"
+                  name="rotacionInternaRodilla"
+                  value={form.rotacionInternaRodilla || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="R. Externa"
+                  name="rotacionExternaRodilla"
+                  value={form.rotacionExternaRodilla || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <div className="font-semibold mb-2">Lado Derecho</div>
+              <div className="space-y-2">
+                <RadioGroup
+                  label="Flexión"
+                  name="flexionRodillaDerecho"
+                  value={form.flexionRodillaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="Extensión"
+                  name="extensionRodillaDerecho"
+                  value={form.extensionRodillaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="R. Interna"
+                  name="rotacionInternaRodillaDerecho"
+                  value={form.rotacionInternaRodillaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+                <RadioGroup
+                  label="R. Externa"
+                  name="rotacionExternaRodillaDerecho"
+                  value={form.rotacionExternaRodillaDerecho || "N"}
+                  onChange={handleRadioButton}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
