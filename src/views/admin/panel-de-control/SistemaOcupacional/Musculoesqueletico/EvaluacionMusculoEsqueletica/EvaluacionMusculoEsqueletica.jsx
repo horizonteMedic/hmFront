@@ -85,6 +85,11 @@ const initialFormState = {
   extensionMuneca: "N",
   desviacionCubitalMuneca: "N",
   desviacionRadialMuneca: "N",
+  // Muñeca - Lado Derecho
+  flexionMunecaDerecho: "N",
+  extensionMunecaDerecho: "N",
+  desviacionCubitalMunecaDerecho: "N",
+  desviacionRadialMunecaDerecho: "N",
   signoPhallen: "NO",
   signoTinel: "NO",
 
@@ -95,20 +100,38 @@ const initialFormState = {
   aduccionCadera: "N",
   rotacionInternaCadera: "N",
   rotacionExternaCadera: "N",
+  // Cadera - Lado Derecho
+  flexionCaderaDerecho: "N",
+  extensionCaderaDerecho: "N",
+  abduccionCaderaDerecho: "N",
+  aduccionCaderaDerecho: "N",
+  rotacionInternaCaderaDerecho: "N",
+  rotacionExternaCaderaDerecho: "N",
 
   // Examen Físico II - Pierna
   flexionPierna: "N",
   extensionPierna: "N",
+  // Pierna - Lado Derecho
+  flexionPiernaDerecho: "N",
+  extensionPiernaDerecho: "N",
 
   // Examen Físico II - Rodilla
   flexionRodilla: "N",
   extensionRodilla: "N",
   rotacionInternaRodilla: "N",
   rotacionExternaRodilla: "N",
+  // Rodilla - Lado Derecho
+  flexionRodillaDerecho: "N",
+  extensionRodillaDerecho: "N",
+  rotacionInternaRodillaDerecho: "N",
+  rotacionExternaRodillaDerecho: "N",
 
   // Examen Físico III - Tobillo
   flexionTobillo: "N",
   extensionTobillo: "N",
+  // Tobillo - Lado Derecho
+  flexionTobilloDerecho: "N",
+  extensionTobilloDerecho: "N",
 
   // Examen Físico III - Columna Vertebral
   desviacionEjeCervical: "NORMAL",
