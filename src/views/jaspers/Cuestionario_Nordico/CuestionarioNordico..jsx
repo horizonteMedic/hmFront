@@ -30,10 +30,11 @@ export default function CuestionarioNordico(datos = {}) {
     doc.setFont("helvetica", "bold").setFontSize(11);
       doc.text("CUESTIONARIO NÓRDICO DE SIGNOS Y SÍNTOMAS OSTEOMUSCULARES",pageW / 2, y, { align: "center" })
 
-      autoTable(doc, {
+  autoTable(doc, {
     startY: y + 3,
     theme: "grid",
-    styles: { fontSize: 9, cellPadding: 2 },
+    margin: { left: 2, right: 2 },
+    styles: { fontSize: 9},
     headStyles: { fillColor: [255, 255, 255], textColor: 0, lineWidth: 0.5 },
     tableLineColor: [0, 0, 0],
     tableLineWidth: 0.5,
@@ -47,46 +48,46 @@ export default function CuestionarioNordico(datos = {}) {
       ],
       [
         {
-          content: `
-Nombre: ${datos.nombre || ""}
-Edad en años cumplidos: ${datos.edad || ""}
-Fecha: ${datos.fecha || ""}
-Género:   Masculino [${datos.genero === "M" ? "X" : " "}]   
-Femenino [${datos.genero === "F" ? "X" : " "}]
-Cuantos años y meses ha estado Ud. haciendo el presente tipo de trabajo:
-Años: ${datos.anios || ""}   Meses: ${datos.meses || ""}
-En promedio cuántas horas a la semana trabaja?: ${datos.horasSemana || ""}
-Es Ud.: Diestro [${datos.diesto ? "X" : " "}]   Zurdo [${datos.zurdo ? "X" : " "}]
-          `,
-          styles: { valign: "top", cellWidth: 130 },
-        },
-        {
-          content: " ", // Aquí va la imagen
-          styles: { halign: "center", valign: "middle" },
-          rowSpan: 3
-        },
-      ],
-      [
-        { content: "2.- PROBLEMAS CON LOS ORGANOS DE LA LOCOMOCIÓN", styles: {fontStyle: "bold"}}
-      ],
-      [
-        { content: `¿Cómo responder el cuestionario?\n
-En este dibujo Ud. puede ver la posición aproximada de las partes del cuerpo referidos en el cuestionario.
-Ud. debe decidir cuál parte tiene o ha tenido molestias/problema (si lo ha tenido).
-Por favor responda poniendo una X en el respectivo recuadro para cada pregunta.`, styles: {valign: "middle", halign: "center"}}
-      ]
-    ],
-    didDrawCell: (data) => {
-      // Dibuja imagen en la segunda columna
-      if (data.row.index === 1 && data.column.index === 1) {
-        const imgWidth = 40;
-        const imgHeight = 50;
-        const x = data.cell.x + (data.cell.width - imgWidth) / 2;
-        const y = data.cell.y + (data.cell.height - imgHeight) / 2;
-        doc.addImage("img/Nordico/nordico.png", "PNG", x, y, imgWidth, imgHeight);
-      }
-    },
-  });
+      content: `
+          Nombre: ${datos.nombre || ""}
+          Edad en años cumplidos: ${datos.edad || ""}
+          Fecha: ${datos.fecha || ""}
+          Género:   Masculino [${datos.genero === "M" ? "X" : " "}]   
+          Femenino [${datos.genero === "F" ? "X" : " "}]
+          Cuantos años y meses ha estado Ud. haciendo el presente tipo de trabajo:
+          Años: ${datos.anios || ""}   Meses: ${datos.meses || ""}
+          En promedio cuántas horas a la semana trabaja?: ${datos.horasSemana || ""}
+          Es Ud.: Diestro [${datos.diesto ? "X" : " "}]   Zurdo [${datos.zurdo ? "X" : " "}]
+                    `,
+                    styles: { valign: "top", cellWidth: 130 },
+                  },
+                  {
+                    content: " ", // Aquí va la imagen
+                    styles: { halign: "center", valign: "middle" },
+                    rowSpan: 3
+                  },
+                ],
+                [
+                  { content: "2.- PROBLEMAS CON LOS ORGANOS DE LA LOCOMOCIÓN", styles: {fontStyle: "bold"}}
+                ],
+                [
+                  { content: `¿Cómo responder el cuestionario?\n
+          En este dibujo Ud. puede ver la posición aproximada de las partes del cuerpo referidos en el cuestionario.
+          Ud. debe decidir cuál parte tiene o ha tenido molestias/problema (si lo ha tenido).
+          Por favor responda poniendo una X en el respectivo recuadro para cada pregunta.`, styles: {valign: "middle", halign: "center"}}
+                ]
+              ],
+          didDrawCell: (data) => {
+            // Dibuja imagen en la segunda columna
+            if (data.row.index === 1 && data.column.index === 1) {
+              const imgWidth = 60;
+              const imgHeight = 70;
+              const x = data.cell.x + (data.cell.width - imgWidth) / 2;
+              const y = data.cell.y + (data.cell.height - imgHeight) / 2;
+              doc.addImage("img/Nordico/nordico.png", "PNG", x, y, imgWidth, imgHeight);
+            }
+          },
+        });
 
   // ====== TABLA 2: PROBLEMAS CON ÓRGANOS DE LA LOCOMOCIÓN ======
   

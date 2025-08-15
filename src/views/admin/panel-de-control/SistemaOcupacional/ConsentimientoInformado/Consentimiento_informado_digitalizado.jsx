@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
@@ -24,7 +24,7 @@ const currentTime = date.toLocaleTimeString('en-US', {
   minute: '2-digit', 
   second: '2-digit' 
 });
-console.log(today)
+
 const initialFormState = {
   norden: "",
   codCons: null,
@@ -58,6 +58,10 @@ const initialFormState = {
 export default function ConsentimientoInformadoOcupacional({ token, selectedSede, userlogued, userDatos }) {
   const [form, setForm] = useState(initialFormState);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setForm(() => ({ ...initialFormState, horaActual: getCurrentTime() }));
+  },[])
 
   const getCurrentTime = () => {
     const date = new Date();
