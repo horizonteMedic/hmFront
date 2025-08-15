@@ -158,15 +158,15 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
       },
       pierna: {
         flexion: {
-          izquierda: { grado: "R" }, // N = Normal, R = Reducido, M = Marcado
-          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "R" }    // N = Normal, R = Reducido, M = Marcado
         },
         extension: {
-          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
-          derecha: { grado: "M" }    // N = Normal, R = Reducido, M = Marcado
+          izquierda: { grado: "M" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
         }
       },
-      rodilla: {
+      rodillas: {
         flexion: {
           izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
           derecha: { grado: "R" }    // N = Normal, R = Reducido, M = Marcado
@@ -176,23 +176,62 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
           derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
         },
         rotacionInterna: {
-          izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
-          derecha: { grado: "R" }    // N = Normal, R = Reducido, M = Marcado
+          izquierda: { grado: "R" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "M" }    // N = Normal, R = Reducido, M = Marcado
         },
         rotacionExterna: {
-          izquierda: { grado: "M" }, // N = Normal, R = Reducido, M = Marcado
-          derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
-        }
-      },
-      tobillo: {
-        flexion: {
           izquierda: { grado: "N" }, // N = Normal, R = Reducido, M = Marcado
           derecha: { grado: "R" }    // N = Normal, R = Reducido, M = Marcado
-        },
-        extension: {
+        }
+      },
+      tobillos: {
+        flexion: {
           izquierda: { grado: "M" }, // N = Normal, R = Reducido, M = Marcado
           derecha: { grado: "N" }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: "R" }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: "M" }    // N = Normal, R = Reducido, M = Marcado
         }
+      },
+      // === NUEVA SECCIÓN: FUERZA MUSCULAR ===
+      fuerzaMuscular: {
+        grado: 1 // Grado de fuerza muscular (1, 2, 3, 4, 5)
+      },
+      // === NUEVA SECCIÓN: COLUMNA VERTEBRAL ===
+      columnaVertebral: {
+        // 5.1. Desviación de eje
+        desviacionEje: {
+          cervical: "Normal", // "Normal", "Derecha", "Concavidad Izquierda"
+          dorsal: "Derecha",  // "Normal", "Derecha", "Concavidad Izquierda"
+          lumbar: "Concavidad Izquierda" // "Normal", "Derecha", "Concavidad Izquierda"
+        },
+        // 5.2. Desviación de Columna
+        desviacionColumna: {
+          cifosis: false,     // true = SI, false = NO
+          escoliosis: true,   // true = SI, false = NO
+          lordosis: false,    // true = SI, false = NO
+          mixta: true         // true = SI, false = NO
+        },
+        // 5.3. Palpación - DOLOR
+        palpacionDolor: {
+          cervical: true,     // true = SI, false = NO
+          dorsal: false,      // true = SI, false = NO
+          lumbar: true        // true = SI, false = NO
+        },
+        // 5.4. Exploración - Signo de Lasague
+        signoLasague: {
+          derecho: true,      // true = SI, false = NO
+          izquierdo: false    // true = SI, false = NO
+        },
+        // 5.5. Diagnóstico
+        diagnostico: "Dolor lumbar crónico por sobrecarga muscular y postura inadecuada en el trabajo. Presencia de signos de irritación radicular en miembro inferior derecho.",
+        // 5.6. Recomendaciones y Plan de Acción
+        recomendaciones: "1. Reposo relativo por 48-72 horas\n2. Fisioterapia con ejercicios de fortalecimiento abdominal y lumbar\n3. Corrección postural en el trabajo\n4. Evaluación ergonómica del puesto laboral\n5. Control en 2 semanas",
+        // 5.7. Tratamiento
+        tratamiento: false, // true = SI, false = NO
+        // 5.8. Conclusiones Asintomático
+        conclusionesAsintomatico: false // true = SI, false = NO
       }
     }
   };
@@ -1373,7 +1412,30 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   // === PÁGINA 2 ===
   doc.addPage();
   
-  // === SECCIÓN: PIERNA (MIEMBROS INFERIORES) ===
+  // === 0) HEADER PÁGINA 2 (solo texto, sin imagen) ===
+  headerEvaluacionMuscoloEsqueletica(doc, data, false, 2);
+
+  // === 1) Imagen de fondo para la página 2 ===
+  const fondoImgPag2 = "/img/EvaluacionMusculoEsqueletica_pag2.png";
+  
+  // Página 2 ocupa toda la hoja
+  const imgWidthPag2 = pageW; // Todo el ancho disponible
+  const imgHeightPag2 = pageH; // Toda la altura de la página
+
+  // Posicionar desde arriba para ocupar toda la página
+  const xOffsetPag2 = 0;
+  const yOffsetPag2 = 0; // Desde la parte superior
+
+  try {
+    doc.addImage(fondoImgPag2, "PNG", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
+  } catch (e) {
+    doc.text("Imagen de evaluación músculo esquelética página 2 no disponible", margin, yOffsetPag2 + 10);
+  }
+
+  // === 2) CAMPOS DE DATOS PERSONALIZABLES PÁGINA 2 ===
+  doc.setFont("helvetica", "bold").setFontSize(10);
+
+  // === SECCIÓN: PIERNA ===
   // Posiciones X individuales para cada lado de la pierna
   // IZQUIERDA
   const xPiernaIzquierdaN = margin + 28.4; // Posición X para grado N (Normal) - Izquierda
@@ -1388,10 +1450,10 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   // Posiciones Y individuales para cada lado de la pierna
   const yPiernaFlexionIzquierda = margin + 21; // Posición Y para flexión izquierda de la pierna
   const yPiernaFlexionDerecha = margin + 21; // Posición Y para flexión derecha de la pierna
-  const yPiernaExtensionIzquierda = margin + 26.4; // Posición Y para extensión izquierda de la pierna
-  const yPiernaExtensionDerecha = margin + 26.4; // Posición Y para extensión derecha de la pierna
+  const yPiernaExtensionIzquierda = margin + 26.5; // Posición Y para extensión izquierda de la pierna
+  const yPiernaExtensionDerecha = margin + 26.5; // Posición Y para extensión derecha de la pierna
 
-  // === SECCIÓN: RODILLA (MIEMBROS INFERIORES) ===
+  // === SECCIÓN: RODILLA ===
   // Posiciones X individuales para cada lado de la rodilla
   // IZQUIERDA
   const xRodillaIzquierdaN = margin + 28.4; // Posición X para grado N (Normal) - Izquierda
@@ -1413,7 +1475,7 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   const yRodillaRotacionExternaIzquierda = margin + 54; // Posición Y para rotación externa izquierda de la rodilla
   const yRodillaRotacionExternaDerecha = margin + 54; // Posición Y para rotación externa derecha de la rodilla
 
-  // === SECCIÓN: TOBILLO (MIEMBROS INFERIORES) ===
+  // === SECCIÓN: TOBILLO ===
   // Posiciones X individuales para cada lado del tobillo
   // IZQUIERDA
   const xTobilloIzquierdaN = margin + 28.4; // Posición X para grado N (Normal) - Izquierda
@@ -1426,32 +1488,12 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   const xTobilloDerechaM = margin + 178.5; // Posición X para grado M (Marcado) - Derecha
   
   // Posiciones Y individuales para cada lado del tobillo
-  const yTobilloFlexionIzquierda = margin + 67; // Posición Y para flexión izquierda del tobillo
-  const yTobilloFlexionDerecha = margin + 67; // Posición Y para flexión derecha del tobillo
-  const yTobilloExtensionIzquierda = margin + 72.4; // Posición Y para extensión izquierda del tobillo
-  const yTobilloExtensionDerecha = margin + 72.4; // Posición Y para extensión derecha del tobillo
+  const yTobilloFlexionIzquierda = margin + 66.9; // Posición Y para flexión izquierda del tobillo
+  const yTobilloFlexionDerecha = margin + 66.9; // Posición Y para flexión derecha del tobillo
+  const yTobilloExtensionIzquierda = margin + 72.3; // Posición Y para extensión izquierda del tobillo
+  const yTobilloExtensionDerecha = margin + 72.3; // Posición Y para extensión derecha del tobillo
 
-  // === 0) HEADER PÁGINA 2 (solo texto, sin imagen) ===
-  headerEvaluacionMuscoloEsqueletica(doc, data, false, 2);
-
-  // === 1) Imagen de fondo para la página 2 ===
-  const fondoImgPag2 = "/img/EvaluacionMusculoEsqueletica_pag2.png";
-  
-  // Página 2 ocupa toda la hoja
-  const imgWidthPag2 = pageW; // Todo el ancho disponible
-  const imgHeightPag2 = pageH; // Toda la altura de la página
-
-  // Posicionar desde arriba para ocupar toda la página
-  const xOffsetPag2 = 0;
-  const yOffsetPag2 = 0; // Desde la parte superior
-
-  try {
-    doc.addImage(fondoImgPag2, "PNG", xOffsetPag2, yOffsetPag2, imgWidthPag2, imgHeightPag2);
-  } catch (e) {
-    doc.text("Imagen de evaluación músculo esquelética página 2 no disponible", margin, yOffsetPag2 + 10);
-  }
-
-  // === SECCIÓN: PIERNA (MIEMBROS INFERIORES) ===
+  // === PROCESAMIENTO DE DATOS: PIERNA ===
   
   // Datos de la pierna - Flexión
   if (datosFinales.examenFisico?.pierna?.flexion) {
@@ -1523,11 +1565,11 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
-  // === SECCIÓN: RODILLA (MIEMBROS INFERIORES) ===
+  // === PROCESAMIENTO DE DATOS: RODILLA ===
   
   // Datos de la rodilla - Flexión
-  if (datosFinales.examenFisico?.rodilla?.flexion) {
-    const flexionRodilla = datosFinales.examenFisico.rodilla.flexion;
+  if (datosFinales.examenFisico?.rodillas?.flexion) {
+    const flexionRodilla = datosFinales.examenFisico.rodillas.flexion;
     
     // Marcar X en el grado correspondiente para IZQUIERDA
     if (flexionRodilla.izquierda) {
@@ -1561,8 +1603,8 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   }
   
   // Datos de la rodilla - Extensión
-  if (datosFinales.examenFisico?.rodilla?.extension) {
-    const extensionRodilla = datosFinales.examenFisico.rodilla.extension;
+  if (datosFinales.examenFisico?.rodillas?.extension) {
+    const extensionRodilla = datosFinales.examenFisico.rodillas.extension;
     
     // Marcar X en el grado correspondiente para IZQUIERDA
     if (extensionRodilla.izquierda) {
@@ -1585,6 +1627,8 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
       
       if (extensionRodilla.derecha.grado === "N") {
         doc.text("X", xRodillaDerechaN, yRodillaExtensionDerecha); // X en N (Normal) - Derecha
+      } else if (extensionRodilla.derecha.grado === "R") {
+        doc.text("X", xRodillaDerechaR, yRodillaExtensionDerecha); // X en R (Reducido) - Derecha
       } else if (extensionRodilla.derecha.grado === "M") {
         doc.text("X", xRodillaDerechaM, yRodillaExtensionDerecha); // X en M (Marcado) - Derecha
       }
@@ -1594,8 +1638,8 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   }
   
   // Datos de la rodilla - Rotación Interna
-  if (datosFinales.examenFisico?.rodilla?.rotacionInterna) {
-    const rotacionInternaRodilla = datosFinales.examenFisico.rodilla.rotacionInterna;
+  if (datosFinales.examenFisico?.rodillas?.rotacionInterna) {
+    const rotacionInternaRodilla = datosFinales.examenFisico.rodillas.rotacionInterna;
     
     // Marcar X en el grado correspondiente para IZQUIERDA
     if (rotacionInternaRodilla.izquierda) {
@@ -1629,8 +1673,8 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   }
   
   // Datos de la rodilla - Rotación Externa
-  if (datosFinales.examenFisico?.rodilla?.rotacionExterna) {
-    const rotacionExternaRodilla = datosFinales.examenFisico.rodilla.rotacionExterna;
+  if (datosFinales.examenFisico?.rodillas?.rotacionExterna) {
+    const rotacionExternaRodilla = datosFinales.examenFisico.rodillas.rotacionExterna;
     
     // Marcar X en el grado correspondiente para IZQUIERDA
     if (rotacionExternaRodilla.izquierda) {
@@ -1663,11 +1707,11 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
-  // === SECCIÓN: TOBILLO (MIEMBROS INFERIORES) ===
+  // === PROCESAMIENTO DE DATOS: TOBILLO ===
   
   // Datos del tobillo - Flexión
-  if (datosFinales.examenFisico?.tobillo?.flexion) {
-    const flexionTobillo = datosFinales.examenFisico.tobillo.flexion;
+  if (datosFinales.examenFisico?.tobillos?.flexion) {
+    const flexionTobillo = datosFinales.examenFisico.tobillos.flexion;
     
     // Marcar X en el grado correspondiente para IZQUIERDA
     if (flexionTobillo.izquierda) {
@@ -1701,8 +1745,8 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
   }
   
   // Datos del tobillo - Extensión
-  if (datosFinales.examenFisico?.tobillo?.extension) {
-    const extensionTobillo = datosFinales.examenFisico.tobillo.extension;
+  if (datosFinales.examenFisico?.tobillos?.extension) {
+    const extensionTobillo = datosFinales.examenFisico.tobillos.extension;
     
     // Marcar X en el grado correspondiente para IZQUIERDA
     if (extensionTobillo.izquierda) {
@@ -1724,7 +1768,7 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
       doc.setFont("helvetica", "bold").setFontSize(11);
       
       if (extensionTobillo.derecha.grado === "N") {
-        doc.text("X", xTobilloDerechaM, yTobilloExtensionDerecha); // X en N (Normal) - Derecha
+        doc.text("X", xTobilloDerechaN, yTobilloExtensionDerecha); // X en N (Normal) - Derecha
       } else if (extensionTobillo.derecha.grado === "R") {
         doc.text("X", xTobilloDerechaR, yTobilloExtensionDerecha); // X en R (Reducido) - Derecha
       } else if (extensionTobillo.derecha.grado === "M") {
@@ -1733,6 +1777,364 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
     }
     
     doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN: FUERZA MUSCULAR ===
+  
+  // Posiciones X para cada grado de fuerza muscular (1, 2, 3, 4, 5)
+  const xFuerzaMuscular1 = margin + 85.6; // Posición X para grado 1
+  const xFuerzaMuscular2 = margin + 109.8; // Posición X para grado 2
+  const xFuerzaMuscular3 = margin + 134.8; // Posición X para grado 3
+  const xFuerzaMuscular4 = margin + 159;   // Posición X para grado 4
+  const xFuerzaMuscular5 = margin + 182.6; // Posición X para grado 5
+  
+  // Posición Y para la tabla de fuerza muscular
+  const yFuerzaMuscular = margin + 86.4; // Posición Y para la tabla de fuerza muscular
+  
+  // Datos de fuerza muscular
+  if (datosFinales.examenFisico?.fuerzaMuscular?.grado) {
+    const gradoFuerza = datosFinales.examenFisico.fuerzaMuscular.grado;
+    
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    
+    // Marcar X en el grado correspondiente
+    if (gradoFuerza === 1) {
+      doc.text("X", xFuerzaMuscular1, yFuerzaMuscular); // X en grado 1
+    } else if (gradoFuerza === 2) {
+      doc.text("X", xFuerzaMuscular2, yFuerzaMuscular); // X en grado 2
+    } else if (gradoFuerza === 3) {
+      doc.text("X", xFuerzaMuscular3, yFuerzaMuscular); // X en grado 3
+    } else if (gradoFuerza === 4) {
+      doc.text("X", xFuerzaMuscular4, yFuerzaMuscular); // X en grado 4
+    } else if (gradoFuerza === 5) {
+      doc.text("X", xFuerzaMuscular5, yFuerzaMuscular); // X en grado 5
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN: COLUMNA VERTEBRAL ===
+  
+  // === 5.1. DESVIACIÓN DE EJE ===
+  // Posiciones X para cada opción de desviación de eje
+  const xDesviacionEjeNormal = margin + 28.4;      // Posición X para Normal
+  const xDesviacionEjeDerecha = margin + 45.4;     // Posición X para Derecha
+  const xDesviacionEjeConcavidadIzq = margin + 63.2; // Posición X para Concavidad Izquierda
+  
+  // Posiciones Y para cada región de la columna
+  const yDesviacionEjeCervical = margin + 106.6;      // Posición Y para Cervical
+  const yDesviacionEjeDorsal = margin + 112.4;     // Posición Y para Dorsal
+  const yDesviacionEjeLumbar = margin + 117.9;       // Posición Y para Lumbar
+  
+  // Datos de desviación de eje
+  if (datosFinales.examenFisico?.columnaVertebral?.desviacionEje) {
+    const desviacionEje = datosFinales.examenFisico.columnaVertebral.desviacionEje;
+    
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    
+    // Cervical
+    if (desviacionEje.cervical) {
+      if (desviacionEje.cervical === "Normal") {
+        doc.text("X", xDesviacionEjeNormal, yDesviacionEjeCervical);
+      } else if (desviacionEje.cervical === "Derecha") {
+        doc.text("X", xDesviacionEjeDerecha, yDesviacionEjeCervical);
+      } else if (desviacionEje.cervical === "Concavidad Izquierda") {
+        doc.text("X", xDesviacionEjeConcavidadIzq, yDesviacionEjeCervical);
+      }
+    }
+    
+    // Dorsal
+    if (desviacionEje.dorsal) {
+      if (desviacionEje.dorsal === "Normal") {
+        doc.text("X", xDesviacionEjeNormal, yDesviacionEjeDorsal);
+      } else if (desviacionEje.dorsal === "Derecha") {
+        doc.text("X", xDesviacionEjeDerecha, yDesviacionEjeDorsal);
+      } else if (desviacionEje.dorsal === "Concavidad Izquierda") {
+        doc.text("X", xDesviacionEjeConcavidadIzq, yDesviacionEjeDorsal);
+      }
+    }
+    
+    // Lumbar
+    if (desviacionEje.lumbar) {
+      if (desviacionEje.lumbar === "Normal") {
+        doc.text("X", xDesviacionEjeNormal, yDesviacionEjeLumbar);
+      } else if (desviacionEje.lumbar === "Derecha") {
+        doc.text("X", xDesviacionEjeDerecha, yDesviacionEjeLumbar);
+      } else if (desviacionEje.lumbar === "Concavidad Izquierda") {
+        doc.text("X", xDesviacionEjeConcavidadIzq, yDesviacionEjeLumbar);
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // === 5.2. DESVIACIÓN DE COLUMNA ===
+  // Posiciones X para SI/NO
+  const xDesviacionColumnaSI = margin + 140.8;  // Posición X para SI
+  const xDesviacionColumnaNO = margin + 157.8;  // Posición X para NO
+  
+  // Posiciones Y para cada tipo de desviación
+  const yDesviacionColumnaCifosis = margin + 107.2;      // Posición Y para Cifosis
+  const yDesviacionColumnaEscoliosis = margin + 113; // Posición Y para Escoliosis
+  const yDesviacionColumnaLordosis = margin + 118.6;     // Posición Y para Lordosis
+  const yDesviacionColumnaMixta = margin + 124.4;      // Posición Y para Mixta
+  
+  // Datos de desviación de columna
+  if (datosFinales.examenFisico?.columnaVertebral?.desviacionColumna) {
+    const desviacionColumna = datosFinales.examenFisico.columnaVertebral.desviacionColumna;
+    
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    
+    // Cifosis
+    if (typeof desviacionColumna.cifosis === 'boolean') {
+      if (desviacionColumna.cifosis) {
+        doc.text("X", xDesviacionColumnaSI, yDesviacionColumnaCifosis);
+      } else {
+        doc.text("X", xDesviacionColumnaNO, yDesviacionColumnaCifosis);
+      }
+    }
+    
+    // Escoliosis
+    if (typeof desviacionColumna.escoliosis === 'boolean') {
+      if (desviacionColumna.escoliosis) {
+        doc.text("X", xDesviacionColumnaSI, yDesviacionColumnaEscoliosis);
+      } else {
+        doc.text("X", xDesviacionColumnaNO, yDesviacionColumnaEscoliosis);
+      }
+    }
+    
+    // Lordosis
+    if (typeof desviacionColumna.lordosis === 'boolean') {
+      if (desviacionColumna.lordosis) {
+        doc.text("X", xDesviacionColumnaSI, yDesviacionColumnaLordosis);
+      } else {
+        doc.text("X", xDesviacionColumnaNO, yDesviacionColumnaLordosis);
+      }
+    }
+    
+    // Mixta
+    if (typeof desviacionColumna.mixta === 'boolean') {
+      if (desviacionColumna.mixta) {
+        doc.text("X", xDesviacionColumnaSI, yDesviacionColumnaMixta);
+      } else {
+        doc.text("X", xDesviacionColumnaNO, yDesviacionColumnaMixta);
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // === 5.3. PALPACIÓN - DOLOR ===
+  // Posiciones X para SI/NO (mismas que desviación de columna)
+  const xPalpacionDolorSI = margin + 28.4;  // Posición X para SI
+  const xPalpacionDolorNO = margin + 45.4;  // Posición X para NO
+  
+  // Posiciones Y para cada región
+  const yPalpacionDolorCervical = margin + 141.4;      // Posición Y para Cervical
+  const yPalpacionDolorDorsal = margin + 147;      // Posición Y para Dorsal
+  const yPalpacionDolorLumbar = margin + 152.8;        // Posición Y para Lumbar
+  
+  // Datos de palpación dolor
+  if (datosFinales.examenFisico?.columnaVertebral?.palpacionDolor) {
+    const palpacionDolor = datosFinales.examenFisico.columnaVertebral.palpacionDolor;
+    
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    
+    // Cervical
+    if (typeof palpacionDolor.cervical === 'boolean') {
+      if (palpacionDolor.cervical) {
+        doc.text("X", xPalpacionDolorSI, yPalpacionDolorCervical);
+      } else {
+        doc.text("X", xPalpacionDolorNO, yPalpacionDolorCervical);
+      }
+    }
+    
+    // Dorsal
+    if (typeof palpacionDolor.dorsal === 'boolean') {
+      if (palpacionDolor.dorsal) {
+        doc.text("X", xPalpacionDolorSI, yPalpacionDolorDorsal);
+      } else {
+        doc.text("X", xPalpacionDolorNO, yPalpacionDolorDorsal);
+      }
+    }
+    
+    // Lumbar
+    if (typeof palpacionDolor.lumbar === 'boolean') {
+      if (palpacionDolor.lumbar) {
+        doc.text("X", xPalpacionDolorSI, yPalpacionDolorLumbar);
+      } else {
+        doc.text("X", xPalpacionDolorNO, yPalpacionDolorLumbar);
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+  
+  // === 5.4. EXPLORACIÓN - SIGNO DE LASAGUE ===
+  // Posiciones X para SI/NO (mismas que las anteriores)
+  const xSignoLasagueSI = margin + 140.8;  // Posición X para SI
+  const xSignoLasagueNO = margin + 157.8;  // Posición X para NO
+  
+  // Posiciones Y para cada lado
+  const ySignoLasagueDerecho = margin + 141.4;      // Posición Y para Derecho
+  const ySignoLasagueIzquierdo = margin + 147;  // Posición Y para Izquierdo
+  
+  // Datos de signo de Lasague
+  if (datosFinales.examenFisico?.columnaVertebral?.signoLasague) {
+    const signoLasague = datosFinales.examenFisico.columnaVertebral.signoLasague;
+    
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    
+    // Derecho
+    if (typeof signoLasague.derecho === 'boolean') {
+      if (signoLasague.derecho) {
+        doc.text("X", xSignoLasagueSI, ySignoLasagueDerecho);
+      } else {
+        doc.text("X", xSignoLasagueNO, ySignoLasagueDerecho);
+      }
+    }
+    
+    // Izquierdo
+    if (typeof signoLasague.izquierdo === 'boolean') {
+      if (signoLasague.izquierdo) {
+        doc.text("X", xSignoLasagueSI, ySignoLasagueIzquierdo);
+      } else {
+        doc.text("X", xSignoLasagueNO, ySignoLasagueIzquierdo);
+      }
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === RENDERIZAR SECCIONES VIII Y IX EN EL PDF ===
+  
+  // === SECCIÓN VIII: DIAGNÓSTICO ===
+  // Posiciones para el área de texto del diagnóstico
+  const xDiagnostico = margin + 28.4;  // Posición X para el texto del diagnóstico
+  const yDiagnostico = margin + 159.5;   // Posición Y para el texto del diagnóstico
+  const anchoDiagnostico = 160;        // Ancho máximo del área de texto
+  
+  // Datos del diagnóstico (usar datos reales o datos de prueba)
+  const textoDiagnostico = datosFinales.examenFisico?.columnaVertebral?.diagnostico;
+  
+  if (textoDiagnostico) {
+    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    
+    // Dividir el texto en múltiples líneas si es necesario
+    const lineasDiagnostico = doc.splitTextToSize(textoDiagnostico, anchoDiagnostico);
+    
+    // Mostrar cada línea del diagnóstico
+    lineasDiagnostico.forEach((linea, index) => {
+      doc.text(linea, xDiagnostico, yDiagnostico + (index * 5));
+    });
+  }
+
+  // === SECCIÓN IX: RECOMENDACIONES Y PLAN DE ACCIÓN ===
+  // Posiciones para el área de texto de recomendaciones
+  const xRecomendaciones = margin + 28.4;  // Posición X para el texto de recomendaciones
+  const yRecomendaciones = margin + 185;   // Posición Y para el texto de recomendaciones
+  const anchoRecomendaciones = 160;        // Ancho máximo del área de texto
+  
+  // Datos de recomendaciones (usar datos reales o datos de prueba)
+  const textoRecomendaciones = datosFinales.examenFisico?.columnaVertebral?.recomendaciones;
+  
+  if (textoRecomendaciones) {
+    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setTextColor(0, 0, 0);
+    
+    // Dividir el texto en múltiples líneas si es necesario
+    const lineasRecomendaciones = doc.splitTextToSize(textoRecomendaciones, anchoRecomendaciones);
+  
+    // Mostrar cada línea de las recomendaciones
+    lineasRecomendaciones.forEach((linea, index) => {
+      doc.text(linea, xRecomendaciones, yRecomendaciones + (index * 5));
+    });
+  }
+
+  // === SECCIÓN X: TRATAMIENTO ===
+  // Posiciones X para SI/NO
+  const xTratamientoSI = margin + 61.8;  // Posición X para SI
+  const xTratamientoNO = margin + 81;  // Posición Y para NO
+  
+  // Posición Y para la sección de tratamiento
+  const yTratamiento = margin + 215.8;      // Posición Y para la sección de tratamiento
+  
+  // Datos de tratamiento (usar datos reales o datos de prueba)
+  const tieneTratamiento = datosFinales.examenFisico?.columnaVertebral?.tratamiento;
+  
+  if (typeof tieneTratamiento === 'boolean') {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    
+    if (tieneTratamiento) {
+      doc.text("X", xTratamientoSI, yTratamiento); // X en SI
+    } else {
+      doc.text("X", xTratamientoNO, yTratamiento); // X en NO
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN XI: CONCLUSIONES ASINTOMÁTICO ===
+  // Posiciones X para SI/NO (mismas que tratamiento)
+  const xConclusionesAsintomaticoSI = margin + 61.8;  // Posición X para SI
+  const xConclusionesAsintomaticoNO = margin + 81;  // Posición X para NO
+  
+  // Posición Y para la sección de conclusiones asintomático
+  const yConclusionesAsintomatico = margin + 223.5;      // Posición Y para la sección de conclusiones asintomático
+  
+  // Datos de conclusiones asintomático (usar datos reales o datos de prueba)
+  const esAsintomatico = datosFinales.examenFisico?.columnaVertebral?.conclusionesAsintomatico;
+  
+  if (typeof esAsintomatico === 'boolean') {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(11);
+    
+    if (esAsintomatico) {
+      doc.text("X", xConclusionesAsintomaticoSI, yConclusionesAsintomatico); // X en SI
+    } else {
+      doc.text("X", xConclusionesAsintomaticoNO, yConclusionesAsintomatico); // X en NO
+    }
+    
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN XII: FIRMAS ===
+  
+  // === FIRMA DEL POSTULANTE ===
+  // Posiciones para la firma del postulante
+  const xFirmaPostulante = margin + 21;  // Posición X para la firma del postulante
+  const yFirmaPostulante = margin + 245;   // Posición Y para la firma del postulante
+  const anchoFirmaPostulante = 60;         // Ancho de la imagen de firma
+  const altoFirmaPostulante = 25;          // Alto de la imagen de firma
+  
+  // Imagen de firma del postulante
+  try {
+    const firmaPostulanteImg = "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png";
+    doc.addImage(firmaPostulanteImg, "PNG", xFirmaPostulante, yFirmaPostulante, anchoFirmaPostulante, altoFirmaPostulante);
+  } catch (e) {
+    // Silenciar error si no se puede cargar la imagen
+  }
+
+  // === FIRMA DEL MÉDICO ===
+  // Posiciones para la firma del médico
+  const xFirmaMedico = margin + 122;       // Posición X para la firma del médico
+  const yFirmaMedico = margin + 245;       // Posición Y para la firma del médico
+  const anchoFirmaMedico = 60;             // Ancho de la imagen de firma
+  const altoFirmaMedico = 25;              // Alto de la imagen de firma
+  
+  // Imagen de firma del médico
+  try {
+    const firmaMedicoImg = "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png";
+    doc.addImage(firmaMedicoImg, "PNG", xFirmaMedico, yFirmaMedico, anchoFirmaMedico, altoFirmaMedico);
+  } catch (e) {
+    // Silenciar error si no se puede cargar la imagen
   }
 
   // === GENERAR PDF Y ABRIR PARA IMPRESIÓN ===

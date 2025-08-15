@@ -133,7 +133,7 @@ export default function ExamenFisicoIII({ form, handleRadioButton, handleChange 
           <div className=" text-blue-900 font-semibold text-center mb-3">
             MIEMBROS INFERIORES (TOBILLO)
           </div>
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <div className="font-semibold mb-2">Lado Izquierdo</div>
               <div className="space-y-2">

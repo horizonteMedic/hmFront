@@ -30,14 +30,14 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
     chalazionOI: true,
     otrosOD: true,
     otrosOI: true,
-    hallazgosExternos: "PTERIGION GRADO 2 OD, CATARATA INICIAL OI",
+    hallazgosExternos: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard",
 
     // FONDO DE OJO (4 'X's DER)
     fondoNormalOD: true,
     fondoNormalOI: true,
     fondoAnormalOD: true,
     fondoAnormalOI: true,
-    hallazgosFondo: "RETINOPATÍA DIABÉTICA LEVE OI",
+    hallazgosFondo: "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
 
     // PIO (Presión Intraocular) (4 'X's DER)
     pioOD: "",
@@ -554,7 +554,8 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
   doc.text(
     String(datosFinales.hallazgosExternos ?? ""),
     xExamenExterno + 28,
-    yHallazgosExternos
+    yHallazgosExternos,
+    { maxWidth: 75 }
   );
 
   // === FONDO DE OJO Y PIO ===
@@ -611,12 +612,13 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
   doc.setFont("helvetica", "normal").setFontSize(8);
 
   // Hallazgos Fondo
-  const yHallazgosFondo = margin + 73.4;
+  const yHallazgosFondo = margin + 75.5;
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(
     String(datosFinales.hallazgosFondo ?? ""),
-    margin + 155,
+    margin + 141.8,
     yHallazgosFondo,
-    { maxWidth: 30 }
+    { maxWidth: 42 }
   );
 
   // === TEST DE EVALUACIÓN COMPLEMENTARIA ===
@@ -798,7 +800,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
 
   // === DIAGNÓSTICO ===
   const xDiagnostico = margin + 34.5;
-  const yDiagnostico = margin + 179;
+  const yDiagnostico = margin + 177.5;
 
   doc.setFont("helvetica", "normal").setFontSize(8);
 
@@ -823,7 +825,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado_boro(
     yDiagnostico - 7
   );
   doc.text(String(datosFinales.diagnostico ?? ""), xDiagnostico, yDiagnostico, {
-    maxWidth: 50,
+    maxWidth: 150,
   });
 
   // === INDICADORES ===

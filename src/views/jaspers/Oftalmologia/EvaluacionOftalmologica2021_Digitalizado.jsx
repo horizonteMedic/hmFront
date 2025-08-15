@@ -111,7 +111,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
 
     // DIAGNÓSTICO
     diagnostico:
-      "MIOPÍA LEVE BILATERAL, PTERIGION GRADO 2 OD, CATARATA INICIAL OI",
+      "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
 
     // INDICADORES
     // Indicadores Generales
@@ -548,11 +548,12 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
 
   // Hallazgos Externos
-  const yHallazgosExternos = margin + 85.4;
+  const yHallazgosExternos = margin + 83.5;
   doc.text(
     String(datosFinales.hallazgosExternos ?? ""),
     xExamenExterno + 28,
-    yHallazgosExternos
+    yHallazgosExternos,
+    { maxWidth: 75 }
   );
 
   // === FONDO DE OJO Y PIO ===
@@ -609,12 +610,13 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
 
   // Hallazgos Fondo
-  const yHallazgosFondo = margin + 73.4;
+  const yHallazgosFondo = margin + 75.5;
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text(
     String(datosFinales.hallazgosFondo ?? ""),
-    margin + 155,
+    margin + 141.8,
     yHallazgosFondo,
-    { maxWidth: 30 }
+    { maxWidth: 42 }
   );
 
   // === TEST DE EVALUACIÓN COMPLEMENTARIA ===
@@ -798,7 +800,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
 
   // === DIAGNÓSTICO ===
   const xDiagnostico = margin + 34.5;
-  const yDiagnostico = margin + 179;
+  const yDiagnostico = margin + 177.5;
 
   doc.setFont("helvetica", "normal").setFontSize(8);
 
@@ -823,7 +825,7 @@ export default function EvaluacionOftalmologica2021_Digitalizado(data = {}) {
     yDiagnostico - 7
   );
   doc.text(String(datosFinales.diagnostico ?? ""), xDiagnostico, yDiagnostico, {
-    maxWidth: 50,
+    maxWidth: 150,
   });
 
   // === INDICADORES ===
