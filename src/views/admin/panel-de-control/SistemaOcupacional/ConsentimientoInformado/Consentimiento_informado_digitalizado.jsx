@@ -11,6 +11,7 @@ import {
 import Swal from "sweetalert2";
 import { getFetch } from "../../getFetch/getFetch";
 import { SubmitConsentimientoInformado } from "./model";
+import { useSessionData } from "../../../../hooks/useSessionData";
 
 const tabla = "consentimientoInformado";
 const date = new Date();
@@ -58,6 +59,8 @@ const initialFormState = {
 export default function ConsentimientoInformadoOcupacional({ token, selectedSede, userlogued, userDatos }) {
   const [form, setForm] = useState(initialFormState);
   const [isEditing, setIsEditing] = useState(false);
+  const { datosFooter, userCompleto } =
+    useSessionData();
 
   useEffect(() => {
     setForm(() => ({ ...initialFormState, horaActual: getCurrentTime() }));
@@ -230,7 +233,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
           const modulo = await jasperModules[`../../../../jaspers/ConsentimientoInformado/${nombre}.jsx`]();
           // Ejecuta la función exportada por default con los datos
           if (typeof modulo.default === 'function') {
-            modulo.default(res);
+            modulo.default({ ...res, ...datosFooter });
           } else {
             console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
           }
