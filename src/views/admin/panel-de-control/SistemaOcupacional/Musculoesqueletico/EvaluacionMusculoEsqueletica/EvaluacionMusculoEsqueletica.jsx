@@ -1,172 +1,195 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ExamenFisicoI from "./ExamenFisicoI";
 import ExamenFisicoII from "./ExamenFisicoII";
 import ExamenFisicoIII from "./ExamenFisicoIII";
+import {
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerEvaluacionMusculoEsqueletica";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
+const tabla = "evaluacion_musculo_esqueletica";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialFormState = {
-  norden: "",
-  nombres: "",
-  dni: "",
-  areaTrabajo: "",
-  edad: "",
-  sexo: "",
-  fecha: today,
-  empresa: "",
-  tiempoServicio: "",
+export default function EvaluacionMusculoEsqueletica() {
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
 
-  // Síntomas
-  sintomas: "NO",
-  cualesSintomas: "NINGUNO",
+  const initialFormState = {
+    norden: "",
+    codEvaluacion: "",
+    nombres: "",
+    dni: "",
+    areaTrabajo: "",
+    edad: "",
+    sexo: "",
+    fecha: today,
+    empresa: "",
+    tiempoServicio: "AÑOS",
 
-  // Uso de Faja Lumbar
-  usoFajaLumbar: "NO",
+    // Síntomas
+    sintomas: "NO",
+    cualesSintomas: "NINGUNO",
 
-  // Técnica de Levantamiento
-  tecnicaLevantamiento: "NO",
+    // Uso de Faja Lumbar
+    usoFajaLumbar: "NO",
 
-  // Capacitación
-  capacitacionLevantamiento: "NO",
+    // Técnica de Levantamiento
+    tecnicaLevantamiento: "NO",
 
-  // Cabeza y Cuello
-  extensionCabeza: "CONSERVADO",
-  flexionCabeza: "CONSERVADO",
-  gradoExtension: "N",
-  gradoFlexion: "N",
+    // Capacitación
+    capacitacionLevantamiento: "NO",
 
-  // Miembros Superiores - Tórax
-  flexionTorax: "N",
-  extensionTorax: "N",
-  rotacionTorax: "N",
-  flexionToraxDerecho: "N",
-  extensionToraxDerecho: "N",
-  rotacionToraxDerecho: "N",
+    // Cabeza y Cuello
+    extensionCabeza: "CONSERVADO",
+    flexionCabeza: "CONSERVADO",
+    gradoExtension: "N",
+    gradoFlexion: "N",
 
-  // Miembros Superiores - Hombro
-  flexionHombro: "N",
-  extensionHombro: "N",
-  abduccionHombro: "N",
-  aduccionHombro: "N",
-  rotacionInternaHombro: "N",
-  rotacionExternaHombro: "N",
-  flexionHombroDerecho: "N",
-  extensionHombroDerecho: "N",
-  abduccionHombroDerecho: "N",
-  aduccionHombroDerecho: "N",
-  rotacionInternaHombroDerecho: "N",
-  rotacionExternaHombroDerecho: "N",
+    // Miembros Superiores - Tórax
+    flexionTorax: "N",
+    extensionTorax: "N",
+    rotacionTorax: "N",
+    flexionToraxDerecho: "N",
+    extensionToraxDerecho: "N",
+    rotacionToraxDerecho: "N",
 
-  // Miembros Superiores - Brazo
-  flexionBrazo: "N",
-  extensionBrazo: "N",
-  flexionBrazoDerecho: "N",
-  extensionBrazoDerecho: "N",
+    // Miembros Superiores - Hombro
+    flexionHombro: "N",
+    extensionHombro: "N",
+    abduccionHombro: "N",
+    aduccionHombro: "N",
+    rotacionInternaHombro: "N",
+    rotacionExternaHombro: "N",
+    flexionHombroDerecho: "N",
+    extensionHombroDerecho: "N",
+    abduccionHombroDerecho: "N",
+    aduccionHombroDerecho: "N",
+    rotacionInternaHombroDerecho: "N",
+    rotacionExternaHombroDerecho: "N",
 
-  // Miembros Superiores - Antebrazo
-  pronacionAntebrazo: "N",
-  supinacionAntebrazo: "N",
-  pronacionAntebrazoDerecho: "N",
-  supinacionAntebrazoDerecho: "N",
+    // Miembros Superiores - Brazo
+    flexionBrazo: "N",
+    extensionBrazo: "N",
+    flexionBrazoDerecho: "N",
+    extensionBrazoDerecho: "N",
 
-  // Examen Físico II - Muñeca
-  flexionMuneca: "N",
-  extensionMuneca: "N",
-  desviacionCubitalMuneca: "N",
-  desviacionRadialMuneca: "N",
-  signoPhallen: "NO",
-  signoTinel: "NO",
+    // Miembros Superiores - Antebrazo
+    pronacionAntebrazo: "N",
+    supinacionAntebrazo: "N",
+    pronacionAntebrazoDerecho: "N",
+    supinacionAntebrazoDerecho: "N",
 
-  // Examen Físico II - Cadera
-  flexionCadera: "N",
-  extensionCadera: "N",
-  abduccionCadera: "N",
-  aduccionCadera: "N",
-  rotacionInternaCadera: "N",
-  rotacionExternaCadera: "N",
+    // Examen Físico II - Muñeca
+    flexionMuneca: "N",
+    extensionMuneca: "N",
+    desviacionCubitalMuneca: "N",
+    desviacionRadialMuneca: "N",
+    // Muñeca - Lado Derecho
+    flexionMunecaDerecho: "N",
+    extensionMunecaDerecho: "N",
+    desviacionCubitalMunecaDerecho: "N",
+    desviacionRadialMunecaDerecho: "N",
+    signoPhallen: "NO",
+    signoTinel: "NO",
 
-  // Examen Físico II - Pierna
-  flexionPierna: "N",
-  extensionPierna: "N",
+    // Examen Físico II - Cadera
+    flexionCadera: "N",
+    extensionCadera: "N",
+    abduccionCadera: "N",
+    aduccionCadera: "N",
+    rotacionInternaCadera: "N",
+    rotacionExternaCadera: "N",
+    // Cadera - Lado Derecho
+    flexionCaderaDerecho: "N",
+    extensionCaderaDerecho: "N",
+    abduccionCaderaDerecho: "N",
+    aduccionCaderaDerecho: "N",
+    rotacionInternaCaderaDerecho: "N",
+    rotacionExternaCaderaDerecho: "N",
 
-  // Examen Físico II - Rodilla
-  flexionRodilla: "N",
-  extensionRodilla: "N",
-  rotacionInternaRodilla: "N",
-  rotacionExternaRodilla: "N",
+    // Examen Físico II - Pierna
+    flexionPierna: "N",
+    extensionPierna: "N",
+    // Pierna - Lado Derecho
+    flexionPiernaDerecho: "N",
+    extensionPiernaDerecho: "N",
 
-  // Examen Físico III - Tobillo
-  flexionTobillo: "N",
-  extensionTobillo: "N",
+    // Examen Físico II - Rodilla
+    flexionRodilla: "N",
+    extensionRodilla: "N",
+    rotacionInternaRodilla: "N",
+    rotacionExternaRodilla: "N",
+    // Rodilla - Lado Derecho
+    flexionRodillaDerecho: "N",
+    extensionRodillaDerecho: "N",
+    rotacionInternaRodillaDerecho: "N",
+    rotacionExternaRodillaDerecho: "N",
 
-  // Examen Físico III - Columna Vertebral
-  desviacionEjeCervical: "NORMAL",
-  desviacionEjeDorsal: "NORMAL",
-  desviacionEjeLumbar: "NORMAL",
-  cifosis: "NO",
-  escoliosis: "NO",
-  lordosis: "NO",
-  mixta: "NO",
-  fuerzaMuscular: "1",
-  dolorCervical: "NO",
-  dolorDorsal: "NO",
-  dolorLumbar: "NO",
-  signoLesagueDerecho: "NO",
-  signoLesagueIzquierdo: "NO",
+    // Examen Físico III - Tobillo
+    flexionTobillo: "N",
+    extensionTobillo: "N",
+    // Tobillo - Lado Derecho
+    flexionTobilloDerecho: "N",
+    extensionTobilloDerecho: "N",
 
-  // Conclusión y Comentarios
-  tratamiento: "NO",
-  conclusion: "SI",
-  diagnostico: "",
-  recomendaciones: "",
-  nombreMedico: "",
-};
+    // Examen Físico III - Columna Vertebral
+    desviacionEjeCervical: "NORMAL",
+    desviacionEjeDorsal: "NORMAL",
+    desviacionEjeLumbar: "NORMAL",
+    cifosis: "NO",
+    escoliosis: "NO",
+    lordosis: "NO",
+    mixta: "NO",
+    fuerzaMuscular: "1",
+    dolorCervical: "NO",
+    dolorDorsal: "NO",
+    dolorLumbar: "NO",
+    signoLesagueDerecho: "NO",
+    signoLesagueIzquierdo: "NO",
 
-export default function EvaluacionMusculoEsqueletica({
-  token,
-  selectedSede,
-  userlogued,
-}) {
-  const [form, setForm] = useState(initialFormState);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+    // Conclusión y Comentarios
+    tratamiento: "NO",
+    conclusion: "SI",
+    diagnostico: "",
+    recomendaciones: "",
+    nombreMedico: userCompleto?.datos?.nombres_user,
   };
 
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-
-  const handleRadioButton = (e, value) => {
-    const { name } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: value.toUpperCase(),
-    }));
-  };
-
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleClear,
+    handleClearnotO,
+  } = useForm(initialFormState);
 
   const handleSave = () => {
-    // Aquí iría la función de guardado
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(
+      form,
+      token,
+      userlogued,
+      handleClear,
+      tabla,
+      userCompleto?.datos?.dni_user
+    );
     Swal.fire("Éxito", "Datos guardados correctamente", "success");
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   const handlePrint = () => {
@@ -191,12 +214,6 @@ export default function EvaluacionMusculoEsqueletica({
         Swal.fire("Éxito", "Reporte enviado a impresión", "success");
       }
     });
-  };
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-    }
   };
 
   return (
@@ -275,7 +292,7 @@ export default function EvaluacionMusculoEsqueletica({
                 className="border rounded px-2 py-1 w-full "
                 name="tiempoServicio"
                 value={form.tiempoServicio || ""}
-                disabled
+                onChange={handleChange}
               />
             </div>
 
@@ -521,9 +538,10 @@ export default function EvaluacionMusculoEsqueletica({
                   Nombre y Apellidos del Médico - N° Colegiatura:
                 </label>
                 <input
-                  className="border rounded px-3 py-1 w-full"
+                  className="border rounded px-3 py-1 w-full capitalize"
                   name="nombreMedico"
                   value={form.nombreMedico || ""}
+                  disabled
                 />
               </div>
             </div>
