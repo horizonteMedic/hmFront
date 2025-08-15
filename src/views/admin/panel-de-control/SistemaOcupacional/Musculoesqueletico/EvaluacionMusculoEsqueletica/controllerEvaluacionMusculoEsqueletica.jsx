@@ -549,7 +549,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     .then(async (res) => {
       if (res.norden) {
         console.log(res);
-        const nombre = res.nameJasper;
+        const nombre = res.informacionSede.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
           "../../../../../jaspers/MusculoEsqueletica/*.jsx"

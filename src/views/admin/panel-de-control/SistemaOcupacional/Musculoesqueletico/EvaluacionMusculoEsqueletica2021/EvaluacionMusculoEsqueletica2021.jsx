@@ -1,190 +1,191 @@
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBroom,
-  faPrint,
-  faSave,
-} from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import ExamenFisicoI2021 from "./ExamenFisicoI2021";
 import ExamenFisicoII2021 from "./ExamenFisicoII2021";
 import ExamenFisicoIII2021 from "./ExamenFisicoIII2021";
 import ExamenFisicoIV2021 from "./ExamenFisicoIV2021";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../hooks/useForm";
 
+const tabla = "evaluacion_musculo_esqueletica2021";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialFormState = {
-  norden: "",
-  nombres: "",
-  dni: "",
-  areaTrabajo: "",
-  edad: "",
-  sexo: "",
-  fecha: today,
-  empresa: "",
-  tiempoServicio: "",
-  
-  // Síntomas
-  sintomas: "NO",
-  cualesSintomas: "NINGUNO",
-  
-  // Uso de Faja Lumbar
-  usoFajaLumbar: "NO",
-  
-  // Técnica de Levantamiento
-  tecnicaLevantamiento: "NO",
-  
-  // Capacitación
-  capacitacionLevantamiento: "NO",
-  
-  // PARTE 1: APTITUD ESPALDA
-  flexFuerzaAbdomen: "",
-  cadera: "",
-  muslo: "",
-  abdomenLateralI: "",
-  totalAptitudEspalda: "",
-  observacionesAptitudEspalda: "",
-  
-  // PARTE 1: RANGOS ARTICULARES
-  abduccionHombro180: "",
-  abduccionHombro60: "",
-  rotacionExterna90: "",
-  rotacionExternaHombroInterna: "",
-  totalRangosArticulares: "",
-  observacionesRangosArticulares: "",
-  
-  // Campos de dolor contra resistencia
-  dolorAbduccionHombro180: "NO",
-  dolorAbduccionHombro60: "NO",
-  dolorRotacionExterna90: "NO",
-  dolorRotacionExternaHombroInterna: "NO",
-  
-  // PARTE 2: COLUMNA VERTEBRAL
-  desviacionEje: "",
-  testAdams: "",
-  dandy: "",
-  lasegue: "",
-  contracturaMuscular: "",
-  cicatrizPostOperatoria: "",
-  desviacionEjeDescripcion: "",
-  testAdamsDescripcion: "",
-  dandyDescripcion: "",
-  lasegueDescripcion: "",
-  contracturaMuscularDescripcion: "",
-  cicatrizPostOperatoriaDescripcion: "",
-  
-  // PARTE 2: TESTS
-  testJobeDerecha: "",
-  testJobeIzquierda: "",
-  testPatteDerecha: "",
-  testPatteIzquierda: "",
-  testGerberDerecha: "",
-  testGerberIzquierda: "",
-  palmUpTestDerecha: "",
-  palmUpTestIzquierda: "",
-  epicondilitisDerecha: "",
-  epicondilitisIzquierda: "",
-  epitrocleitisDerecha: "",
-  epitrocleitisIzquierda: "",
-  phalenDerecha: "",
-  phalenIzquierda: "",
-  phalenInvertidoDerecha: "",
-  phalenInvertidoIzquierda: "",
-  
-  // PARTE 3: MANIOBRAS DE DESCARTE
-  tinnelDerecha: "",
-  tinnelIzquierda: "",
-  finkelsTeinDerecha: "",
-  finkelsTeinIzquierda: "",
-  
-  // PARTE 3: EVAL. DINAMICA - CADERA Y RODILLA
-  abduccionCaderaDerecha: "",
-  abduccionCaderaIzquierda: "",
-  abduccionRodillaDerecha: "",
-  abduccionRodillaIzquierda: "",
-  aduccionCaderaDerecha: "",
-  aduccionCaderaIzquierda: "",
-  aduccionRodillaDerecha: "",
-  aduccionRodillaIzquierda: "",
-  flexionCaderaDerecha: "",
-  flexionCaderaIzquierda: "",
-  flexionRodillaDerecha: "",
-  flexionRodillaIzquierda: "",
-  extensionCaderaDerecha: "",
-  extensionCaderaIzquierda: "",
-  extensionRodillaDerecha: "",
-  extensionRodillaIzquierda: "",
-  rotacionExternaCaderaDerecha: "",
-  rotacionExternaCaderaIzquierda: "",
-  rotacionExternaRodillaDerecha: "",
-  rotacionExternaRodillaIzquierda: "",
-  rotacionInternaCaderaDerecha: "",
-  rotacionInternaCaderaIzquierda: "",
-  rotacionInternaRodillaDerecha: "",
-  rotacionInternaRodillaIzquierda: "",
-  irradiacionCaderaDerecha: "",
-  irradiacionCaderaIzquierda: "",
-  irradiacionRodillaDerecha: "",
-  irradiacionRodillaIzquierda: "",
-  altMasaMuscularCaderaDerecha: "",
-  altMasaMuscularCaderaIzquierda: "",
-  altMasaMuscularRodillaDerecha: "",
-  altMasaMuscularRodillaIzquierda: "",
-  
-  // PARTE 4: EVAL. DINAMICA - TOBILLOS
-  abduccionTobilloDerecho: "",
-  abduccionTobilloIzquierdo: "",
-  aduccionTobilloDerecho: "",
-  aduccionTobilloIzquierdo: "",
-  flexionTobilloDerecho: "",
-  flexionTobilloIzquierdo: "",
-  extensionTobilloDerecho: "",
-  extensionTobilloIzquierdo: "",
-  rotacionExternaTobilloDerecho: "",
-  rotacionExternaTobilloIzquierdo: "",
-  rotacionInternaTobilloDerecho: "",
-  rotacionInternaTobilloIzquierdo: "",
-  irradiacionTobilloDerecho: "",
-  irradiacionTobilloIzquierdo: "",
-  altMasaMuscularTobilloDerecho: "",
-  altMasaMuscularTobilloIzquierdo: "",
-};
+const EvaluacionMusculoEsqueletica2021 = () => {
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
+  const initialFormState = {
+    norden: "",
+    nombres: "",
+    dni: "",
+    areaTrabajo: "",
+    edad: "",
+    sexo: "",
+    fecha: today,
+    empresa: "",
+    tiempoServicio: "AÑOS",
 
-const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) => {
-  const [form, setForm] = useState(initialFormState);
+    // Síntomas
+    sintomas: "NO",
+    cualesSintomas: "NINGUNO",
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+    // Uso de Faja Lumbar
+    usoFajaLumbar: "NO",
+
+    // Técnica de Levantamiento
+    tecnicaLevantamiento: "NO",
+
+    // Capacitación
+    capacitacionLevantamiento: "NO",
+
+    // PARTE 1: APTITUD ESPALDA
+    flexFuerzaAbdomen: "",
+    cadera: "",
+    muslo: "",
+    abdomenLateralI: "",
+    totalAptitudEspalda: "",
+    observacionesAptitudEspalda: "",
+
+    // PARTE 1: RANGOS ARTICULARES
+    abduccionHombro180: "",
+    abduccionHombro60: "",
+    rotacionExterna90: "",
+    rotacionExternaHombroInterna: "",
+    totalRangosArticulares: "",
+    observacionesRangosArticulares: "",
+
+    // Campos de dolor contra resistencia
+    dolorAbduccionHombro180: "NO",
+    dolorAbduccionHombro60: "NO",
+    dolorRotacionExterna90: "NO",
+    dolorRotacionExternaHombroInterna: "NO",
+
+    // PARTE 2: COLUMNA VERTEBRAL
+    desviacionEje: "",
+    testAdams: "",
+    dandy: "",
+    lasegue: "",
+    contracturaMuscular: "",
+    cicatrizPostOperatoria: "",
+    desviacionEjeDescripcion: "",
+    testAdamsDescripcion: "",
+    dandyDescripcion: "",
+    lasegueDescripcion: "",
+    contracturaMuscularDescripcion: "",
+    cicatrizPostOperatoriaDescripcion: "",
+
+    // PARTE 2: TESTS
+    testJobeDerecha: "",
+    testJobeIzquierda: "",
+    testPatteDerecha: "",
+    testPatteIzquierda: "",
+    testGerberDerecha: "",
+    testGerberIzquierda: "",
+    palmUpTestDerecha: "",
+    palmUpTestIzquierda: "",
+    epicondilitisDerecha: "",
+    epicondilitisIzquierda: "",
+    epitrocleitisDerecha: "",
+    epitrocleitisIzquierda: "",
+    phalenDerecha: "",
+    phalenIzquierda: "",
+    phalenInvertidoDerecha: "",
+    phalenInvertidoIzquierda: "",
+
+    // PARTE 3: MANIOBRAS DE DESCARTE
+    tinnelDerecha: "",
+    tinnelIzquierda: "",
+    finkelsTeinDerecha: "",
+    finkelsTeinIzquierda: "",
+
+    // PARTE 3: EVAL. DINAMICA - CADERA Y RODILLA
+    abduccionCaderaDerecha: "",
+    abduccionCaderaIzquierda: "",
+    abduccionRodillaDerecha: "",
+    abduccionRodillaIzquierda: "",
+    aduccionCaderaDerecha: "",
+    aduccionCaderaIzquierda: "",
+    aduccionRodillaDerecha: "",
+    aduccionRodillaIzquierda: "",
+    flexionCaderaDerecha: "",
+    flexionCaderaIzquierda: "",
+    flexionRodillaDerecha: "",
+    flexionRodillaIzquierda: "",
+    extensionCaderaDerecha: "",
+    extensionCaderaIzquierda: "",
+    extensionRodillaDerecha: "",
+    extensionRodillaIzquierda: "",
+    rotacionExternaCaderaDerecha: "",
+    rotacionExternaCaderaIzquierda: "",
+    rotacionExternaRodillaDerecha: "",
+    rotacionExternaRodillaIzquierda: "",
+    rotacionInternaCaderaDerecha: "",
+    rotacionInternaCaderaIzquierda: "",
+    rotacionInternaRodillaDerecha: "",
+    rotacionInternaRodillaIzquierda: "",
+    irradiacionCaderaDerecha: "",
+    irradiacionCaderaIzquierda: "",
+    irradiacionRodillaDerecha: "",
+    irradiacionRodillaIzquierda: "",
+    altMasaMuscularCaderaDerecha: "",
+    altMasaMuscularCaderaIzquierda: "",
+    altMasaMuscularRodillaDerecha: "",
+    altMasaMuscularRodillaIzquierda: "",
+
+    // PARTE 4: EVAL. DINAMICA - TOBILLOS
+    abduccionTobilloDerecho: "",
+    abduccionTobilloIzquierdo: "",
+    aduccionTobilloDerecho: "",
+    aduccionTobilloIzquierdo: "",
+    flexionTobilloDerecho: "",
+    flexionTobilloIzquierdo: "",
+    extensionTobilloDerecho: "",
+    extensionTobilloIzquierdo: "",
+    rotacionExternaTobilloDerecho: "",
+    rotacionExternaTobilloIzquierdo: "",
+    rotacionInternaTobilloDerecho: "",
+    rotacionInternaTobilloIzquierdo: "",
+    irradiacionTobilloDerecho: "",
+    irradiacionTobilloIzquierdo: "",
+    altMasaMuscularTobilloDerecho: "",
+    altMasaMuscularTobilloIzquierdo: "",
+
+    cie10: "",
+    nombreMedico: userCompleto?.datos?.nombres_user,
+    conclusiones: "",
+    recomendaciones: "",
   };
-
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-
-  const handleRadioButton = (e, value) => {
-    const { name } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: value.toUpperCase(),
-    }));
-  };
-
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleClear,
+    handleClearnotO,
+  } = useForm(initialFormState);
 
   const handleSave = () => {
-    // Aquí iría la función de guardado
-    // SubmitDataService(form, token, userlogued, handleClear, tabla);
-    Swal.fire("Éxito", "Datos guardados correctamente", "success");
+    // SubmitDataService(
+    //   form,
+    //   token,
+    //   userlogued,
+    //   handleClear,
+    //   tabla,
+    //   datosFooter,
+    //   userCompleto?.datos?.dni_user
+    // );
+  };
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
   };
 
   const handlePrint = () => {
@@ -204,9 +205,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // Aquí iría la función de impresión
-        // PrintHojaR(form.norden, token, tabla);
-        Swal.fire("Éxito", "Reporte enviado a impresión", "success");
+        // PrintHojaR(form.norden, token, tabla, datosFooter);
       }
     });
   };
@@ -224,42 +223,39 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">N° Orden :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="norden"
                 value={form.norden || ""}
                 onChange={handleChangeNumber}
-                disabled
+                onKeyDown={handleSearch}
               />
             </div>
             <div className="flex items-center gap-4 xl:col-span-2">
               <label className="font-semibold min-w-[65px]">Nombres :</label>
               <input
-                className="border rounded px-2 py-1 w-full bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="nombres"
                 value={form.nombres || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">Edad :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="edad"
-                value={form.edad || ""}
-                onChange={handleChangeNumber}
+                value={form.edad ?? ""}
                 disabled
               />
             </div>
-            
+
             {/* Segunda fila: dni, fecha, sexo, t. servicio */}
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">DNI :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="dni"
-                value={form.dni || ""}
-                onChange={handleChange}
+                value={form.dni ?? ""}
                 disabled
               />
             </div>
@@ -267,52 +263,51 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
               <label className="font-semibold min-w-[65px]">Fecha :</label>
               <input
                 type="date"
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full"
                 name="fecha"
                 value={form.fecha || ""}
                 onChange={handleChange}
-                disabled
               />
             </div>
             <div className="flex items-center gap-4">
               <label className="font-semibold min-w-[65px]">Sexo :</label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="sexo"
                 value={form.sexo || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
             <div className="flex items-center gap-4">
-              <label className="font-semibold min-w-[65px]">T. Servicio :</label>
+              <label className="font-semibold min-w-[65px]">
+                T. Servicio :
+              </label>
               <input
-                className="border rounded px-2 py-1 w-100 bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="tiempoServicio"
                 value={form.tiempoServicio || ""}
-                onChange={handleChangeNumber}
-                disabled
+                onChange={handleChange}
               />
             </div>
-            
+
             {/* Tercera fila: área trabajo (largo), empresa (largo) */}
             <div className="flex items-center gap-4 xl:col-span-2">
-              <label className="font-semibold min-w-[65px]">Área Trabajo :</label>
+              <label className="font-semibold min-w-[65px] max-w-[65px]">
+                Área Trabajo :
+              </label>
               <input
-                className="border rounded px-2 py-1 w-full bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="areaTrabajo"
                 value={form.areaTrabajo || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
             <div className="flex items-center gap-4 xl:col-span-2">
               <label className="font-semibold min-w-[65px]">Empresa :</label>
               <input
-                className="border rounded px-2 py-1 w-full bg-gray-100"
+                className="border rounded px-2 py-1 w-full "
                 name="empresa"
                 value={form.empresa || ""}
-                onChange={handleChange}
                 disabled
               />
             </div>
@@ -325,7 +320,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 1: EXAMEN FÍSICO I
         </h2>
-        <ExamenFisicoI2021 
+        <ExamenFisicoI2021
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
@@ -338,7 +333,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 2: EXAMEN FÍSICO II
         </h2>
-        <ExamenFisicoII2021 
+        <ExamenFisicoII2021
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
@@ -351,7 +346,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 3: EXAMEN FÍSICO III
         </h2>
-        <ExamenFisicoIII2021 
+        <ExamenFisicoIII2021
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
@@ -364,14 +359,85 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
         <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
           PARTE 4: EXAMEN FÍSICO IV
         </h2>
-        <ExamenFisicoIV2021 
+        <ExamenFisicoIV2021
           form={form}
           handleRadioButton={handleRadioButton}
           handleChange={handleChange}
           handleChangeNumber={handleChangeNumber}
         />
       </div>
-      
+
+      {/* CONCLUSIONES Y COMENTARIOS */}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-center text-blue-900 mb-4 border-b-2 pb-2">
+          CONCLUSIONES Y COMENTARIOS
+        </h2>
+        <div className="border rounded p-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="mb-3">
+                <label className="font-semibold block mb-1">CIE 10:</label>
+                <input
+                  className="border rounded px-3 py-1 w-full capitalize"
+                  name="cie10"
+                  value={form.cie10 || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="mb-3">
+                <label className="font-semibold block mb-1">
+                  Nombre y Apellidos del Médico - N° Colegiatura:
+                </label>
+                <input
+                  className="border rounded px-3 py-1 w-full capitalize"
+                  name="nombreMedico"
+                  value={form.nombreMedico || ""}
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+          <div className="mb-3">
+            <label className="font-semibold block mb-1">Conclusiones:</label>
+            <textarea
+              className="border rounded px-3 py-1 w-full resize-none"
+              name="conclusiones"
+              rows={3}
+              value={form.conclusiones}
+              onChange={handleChange}
+            />
+            <label className="flex items-center text-[11px] font-semibold gap-2">
+              <input
+                type="checkbox"
+                className="text-[11px]"
+                checked={form.conclusiones == "NORMAL"}
+                onChange={(e) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    conclusiones: e.target.checked ? "NORMAL" : "",
+                  }));
+                }}
+              />
+              Normal
+            </label>
+          </div>
+          <div>
+            <label className="font-semibold block mb-1">
+              Recomendaciones - Restricciones:
+            </label>
+            <textarea
+              className="border rounded px-3 py-2 w-full h-24 resize-none"
+              name="recomendaciones"
+              rows={3}
+              value={form.recomendaciones}
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+      </div>
       <div className="mb-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-6">
           <div className="flex gap-4">
@@ -390,7 +456,7 @@ const EvaluacionMusculoEsqueletica2021 = ({ token, selectedSede, userlogued }) =
               <FontAwesomeIcon icon={faBroom} /> Limpiar
             </button>
           </div>
-          
+
           <div className="flex flex-col items-end">
             <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
             <div className="flex items-center gap-2">
