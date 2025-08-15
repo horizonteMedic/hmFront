@@ -5,6 +5,7 @@ import ExamenFisicoI from "./ExamenFisicoI";
 import ExamenFisicoII from "./ExamenFisicoII";
 import ExamenFisicoIII from "./ExamenFisicoIII";
 import {
+  PrintHojaR,
   SubmitDataService,
   VerifyTR,
 } from "./controllerEvaluacionMusculoEsqueletica";
@@ -36,7 +37,7 @@ export default function EvaluacionMusculoEsqueletica() {
 
     // Síntomas
     sintomas: "NO",
-    cualesSintomas: "NINGUNO",
+    cualesSintomas: "",
 
     // Uso de Faja Lumbar
     usoFajaLumbar: "NO",
@@ -180,9 +181,10 @@ export default function EvaluacionMusculoEsqueletica() {
       userlogued,
       handleClear,
       tabla,
+      datosFooter,
       userCompleto?.datos?.dni_user
     );
-    Swal.fire("Éxito", "Datos guardados correctamente", "success");
+    // Swal.fire("Éxito", "Datos guardados correctamente", "success");
   };
 
   const handleSearch = (e) => {
@@ -209,9 +211,7 @@ export default function EvaluacionMusculoEsqueletica() {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // Aquí iría la función de impresión
-        // PrintHojaR(form.norden, token, tabla);
-        Swal.fire("Éxito", "Reporte enviado a impresión", "success");
+        PrintHojaR(form.norden, token, tabla, datosFooter);
       }
     });
   };
@@ -344,7 +344,13 @@ export default function EvaluacionMusculoEsqueletica() {
                   type="radio"
                   name="sintomas"
                   checked={form.sintomas === "NO"}
-                  onChange={(e) => handleRadioButton(e, "NO")}
+                  onChange={(e) => {
+                    setForm({
+                      ...form,
+                      cualesSintomas: "",
+                    });
+                    handleRadioButton(e, "NO");
+                  }}
                 />
                 NO
               </label>
@@ -356,6 +362,7 @@ export default function EvaluacionMusculoEsqueletica() {
                 name="cualesSintomas"
                 value={form.cualesSintomas}
                 onChange={handleChange}
+                disabled={form.sintomas == "NO"}
               />
             </div>
           </div>
