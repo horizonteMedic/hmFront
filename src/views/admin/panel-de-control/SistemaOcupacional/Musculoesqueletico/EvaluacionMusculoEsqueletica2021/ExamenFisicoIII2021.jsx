@@ -15,7 +15,7 @@ const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChan
               TINNEL Test
             </h3>
             <p className="text-gray-600 text-center mb-4">
-              "Parestesias en recorrido del N.Mediano"
+              Parestesias en recorrido del N.Mediano
             </p>
             
             <div className="grid grid-cols-2 gap-4">
@@ -81,7 +81,7 @@ const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChan
               FINKELS-TEIN Test
             </h3>
             <p className="text-gray-600 text-center mb-4">
-              "Dolor en Abductor Largo del pulgar"
+              Dolor en Abductor Largo del pulgar
             </p>
             
             <div className="grid grid-cols-2 gap-4">

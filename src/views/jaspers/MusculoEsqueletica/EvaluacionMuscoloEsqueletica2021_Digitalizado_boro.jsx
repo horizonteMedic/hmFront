@@ -160,7 +160,12 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
         rotacionInterna: "10",
         irradiacion: "0",
         altMasaMuscular: "0"
-      }
+      },
+      
+      // === CONCLUSIONES Y RECOMENDACIONES ===
+      conclusiones: "Paciente presenta limitaciones moderadas en rangos articulares de hombro derecho, con dolor a la contraresistencia. Aptitud espalda dentro de parámetros normales.",
+      cie10: "M25.51 - Dolor en hombro derecho",
+      recomendaciones: "1. Evitar movimientos repetitivos por encima del hombro\n2. Ejercicios de fortalecimiento progresivo\n3. Control en 4 semanas\n4. Evaluación ergonómica del puesto"
   };
 
   // Usar datos reales o datos de prueba
@@ -1144,11 +1149,69 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
        doc.text(dato.valor, dato.x, dato.y, { align: "center" });
      });
      
-     // Mostrar datos de Tobillo Izquierdo horizontalmente
-     datosTobilloIzquierdo.forEach((dato) => {
-       doc.setFont("helvetica", "bold").setFontSize(9);
-       doc.text(dato.valor, dato.x, dato.y, { align: "center" });
-     });
+           // Mostrar datos de Tobillo Izquierdo horizontalmente
+      datosTobilloIzquierdo.forEach((dato) => {
+        doc.setFont("helvetica", "bold").setFontSize(9);
+        doc.text(dato.valor, dato.x, dato.y, { align: "center" });
+      });
+
+                             // === SECCIÓN XI: CONCLUSIONES Y RECOMENDACIONES ===
+            
+                                 // Coordenadas para las columnas de conclusiones y recomendaciones
+                 const conclusionesX = margin + 16;
+                 const conclusionesY = margin + 180;
+                 const conclusionesMaxWidth = 65;
+                 
+                 const cie10X = margin + 87;
+                 const cie10Y = margin + 180;
+                 const cie10MaxWidth = 20;
+                 
+                 const recomendacionesX = margin + 120;
+                 const recomendacionesY = margin + 180;
+                 const recomendacionesMaxWidth = 65;
+            
+                // Renderizar solo los datos sin tabla ni títulos
+                doc.setFont("helvetica", "normal").setFontSize(8);
+                doc.setTextColor(0, 0, 0);
+                
+                                 // Columna 1: CONCLUSIONES
+                 doc.text(datosFinales.conclusiones || "", conclusionesX, conclusionesY, { maxWidth: conclusionesMaxWidth });
+                 
+                 // Columna 2: CIE 10
+                 doc.text(datosFinales.cie10 || "", cie10X, cie10Y, { maxWidth: cie10MaxWidth });
+                 
+                 // Columna 3: RECOMENDACIONES - RESTRICCIONES
+                 doc.text(datosFinales.recomendaciones || "", recomendacionesX, recomendacionesY, { maxWidth: recomendacionesMaxWidth });
+
+      // === SECCIÓN XII: FIRMAS DE PRUEBA ===
+     
+     // === FIRMA DEL POSTULANTE ===
+     // Posiciones para la firma del postulante
+     const xFirmaPostulante = margin + 22;  // Posición X para la firma del postulante
+     const yFirmaPostulante = margin + 225;   // Posición Y para la firma del postulante
+     const anchoFirmaPostulante = 60;         // Ancho de la imagen de firma
+     const altoFirmaPostulante = 25;          // Alto de la imagen de firma
+     
+     // Agregar imagen de firma del postulante
+     try {
+       doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaPostulante, yFirmaPostulante, anchoFirmaPostulante, altoFirmaPostulante);
+     } catch (e) {
+       console.error("Error al cargar firma del postulante:", e);
+     }
+     
+     // === FIRMA DEL MÉDICO ===
+     // Posiciones para la firma del médico
+     const xFirmaMedico = margin + 118.5;       // Posición X para la firma del médico
+     const yFirmaMedico = margin + 225;       // Posición Y para la firma del médico
+     const anchoFirmaMedico = 60;             // Ancho de la imagen de firma
+     const altoFirmaMedico = 25;              // Alto de la imagen de firma
+     
+     // Agregar imagen de firma del médico
+     try {
+       doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaMedico, yFirmaMedico, anchoFirmaMedico, altoFirmaMedico);
+     } catch (e) {
+       console.error("Error al cargar firma del médico:", e);
+     }
 
      // === 4) FOOTER EN PÁGINA 2 ===
   footerTR(doc, data);

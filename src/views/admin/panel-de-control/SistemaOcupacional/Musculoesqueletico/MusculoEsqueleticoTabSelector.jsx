@@ -4,14 +4,12 @@ import { faBone, faUserMd } from "@fortawesome/free-solid-svg-icons";
 import EvaluacionMusculoEsqueletica from "./EvaluacionMusculoEsqueletica/EvaluacionMusculoEsqueletica";
 import EvaluacionMusculoEsqueletica2021 from "./EvaluacionMusculoEsqueletica2021/EvaluacionMusculoEsqueletica2021";
 
-const MusculoEsqueleticoTabSelector = ({ token, selectedSede, userlogued }) => {
+const MusculoEsqueleticoTabSelector = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
     <div className="mx-auto bg-white rounded-lg shadow-md overflow-hidden py-8">
       <div className="w-full">
-        <h1 className="text-3xl font-bold mb-4 text-center">Evaluación Musculoesquelética</h1>
-
         {/* Tab Navigation */}
         <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
           <button
@@ -40,20 +38,8 @@ const MusculoEsqueleticoTabSelector = ({ token, selectedSede, userlogued }) => {
 
         {/* Tab Content */}
         <div className="p-6 max-w-[95%] mx-auto">
-          {activeTab === 0 && (
-            <EvaluacionMusculoEsqueletica
-              token={token}
-              userlogued={userlogued}
-              selectedSede={selectedSede}
-            />
-          )}
-          {activeTab === 1 && (
-            <EvaluacionMusculoEsqueletica2021
-              token={token}
-              userlogued={userlogued}
-              selectedSede={selectedSede}
-            />
-          )}
+          {activeTab === 0 && <EvaluacionMusculoEsqueletica />}
+          {activeTab === 1 && <EvaluacionMusculoEsqueletica2021 />}
         </div>
       </div>
     </div>

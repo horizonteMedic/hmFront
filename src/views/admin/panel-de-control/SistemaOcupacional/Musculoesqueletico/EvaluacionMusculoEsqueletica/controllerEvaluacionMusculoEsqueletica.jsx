@@ -242,6 +242,7 @@ export const SubmitDataService = async (
   user,
   limpiar,
   tabla,
+  datosFooter,
   dniUser
 ) => {
   if (!form.norden) {
@@ -527,7 +528,7 @@ export const SubmitDataService = async (
       }).then((result) => {
         limpiar();
         if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
+          PrintHojaR(form.norden, token, tabla, datosFooter);
         }
       });
     } else {
@@ -541,24 +542,24 @@ function convertirFecha(fecha) {
   return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
 }
 
-export const PrintHojaR = (nro, token, tabla) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then(async (res) => {
       if (res.norden) {
         console.log(res);
-        const nombre = res.nameJasper;
+        const nombre = res.informacionSede.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../../jaspers/Oftalmologia/*.jsx"
+          "../../../../../jaspers/MusculoEsqueletica/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../../jaspers/Oftalmologia/${nombre}.jsx`
+          `../../../../../jaspers/MusculoEsqueletica/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res);
+          modulo.default({ ...res, ...datosFooter });
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`
@@ -572,19 +573,25 @@ export const PrintHojaR = (nro, token, tabla) => {
 };
 
 //===============Fin Zona Modificación===============
+
 export const Loading = (text) => {
   Swal.fire({
     title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-    html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
+    html: `
+      <div style="font-size:1.1em;overflow:hidden;">
+        <span style="color:#0d9488;font-weight:bold;"></span>
+      </div>
+      <div style="margin-top:10px;overflow:hidden;">Espere por favor...</div>
+      <div style="margin-top:10px;overflow:hidden;">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color:#0d9488;"></i>
+      </div>
+    `,
     icon: "info",
     background: "#f0f6ff",
     color: "#22223b",
     showConfirmButton: false,
-    allowOutsideClick: false,
+    allowOutsideClick: true,
     allowEscapeKey: false,
-    showCancelButton: true,
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Yes, delete it!",
     customClass: {
       popup: "swal2-border-radius",
       title: "swal2-title-custom",
@@ -595,9 +602,6 @@ export const Loading = (text) => {
     },
     hideClass: {
       popup: "animate__animated animate__fadeOutUp",
-    },
-    didOpen: () => {
-      Swal.showLoading();
     },
   });
 };
@@ -642,8 +646,10 @@ export const GetInfoPac = (nro, set, token, sede) => {
       set((prev) => ({
         ...prev,
         ...res,
-        fechaNac: convertirFecha(res.fechaNac),
+        sexo: res.genero,
+        edad: res.edad + " años",
         nombres: res.nombresApellidos,
+        areaTrabajo: res.areaO,
       }));
     })
     .finally(() => {

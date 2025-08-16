@@ -21,11 +21,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
             <tbody>
               {/* Fila 1: Abducción */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Abducción</td>
+                <td className="py-3 px-4 font-medium">Abducción</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="abduccionTobilloDerecho"
                     value={form.abduccionTobilloDerecho || ""}
                     onChange={handleChange}
@@ -35,7 +35,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="abduccionTobilloIzquierdo"
                     value={form.abduccionTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -46,11 +46,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 2: Aducción */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Aducción</td>
+                <td className="py-3 px-4 font-medium">Aducción</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="aduccionTobilloDerecho"
                     value={form.aduccionTobilloDerecho || ""}
                     onChange={handleChange}
@@ -60,7 +60,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="aduccionTobilloIzquierdo"
                     value={form.aduccionTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -71,11 +71,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 3: Flexión */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Flexión</td>
+                <td className="py-3 px-4 font-medium">Flexión</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="flexionTobilloDerecho"
                     value={form.flexionTobilloDerecho || ""}
                     onChange={handleChange}
@@ -85,7 +85,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="flexionTobilloIzquierdo"
                     value={form.flexionTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -96,11 +96,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 4: Extensión */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Extensión</td>
+                <td className="py-3 px-4 font-medium">Extensión</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="extensionTobilloDerecho"
                     value={form.extensionTobilloDerecho || ""}
                     onChange={handleChange}
@@ -110,7 +110,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="extensionTobilloIzquierdo"
                     value={form.extensionTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -121,11 +121,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 5: Rot. Externa */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Rot. Externa</td>
+                <td className="py-3 px-4 font-medium">Rot. Externa</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="rotacionExternaTobilloDerecho"
                     value={form.rotacionExternaTobilloDerecho || ""}
                     onChange={handleChange}
@@ -135,7 +135,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="rotacionExternaTobilloIzquierdo"
                     value={form.rotacionExternaTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -146,11 +146,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 6: Rot. Interna */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Rot. Interna</td>
+                <td className="py-3 px-4 font-medium">Rot. Interna</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="rotacionInternaTobilloDerecho"
                     value={form.rotacionInternaTobilloDerecho || ""}
                     onChange={handleChange}
@@ -160,7 +160,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="rotacionInternaTobilloIzquierdo"
                     value={form.rotacionInternaTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -171,11 +171,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 7: Irradiación */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Irradiación</td>
+                <td className="py-3 px-4 font-medium">Irradiación</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="irradiacionTobilloDerecho"
                     value={form.irradiacionTobilloDerecho || ""}
                     onChange={handleChange}
@@ -185,7 +185,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="irradiacionTobilloIzquierdo"
                     value={form.irradiacionTobilloIzquierdo || ""}
                     onChange={handleChange}
@@ -196,11 +196,11 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
               
               {/* Fila 8: Alt. Masa muscular */}
               <tr className="border-b hover:bg-gray-100">
-                <td className="py-3 px-4 font-medium text-base">Alt. Masa muscular</td>
+                <td className="py-3 px-4 font-medium">Alt. Masa muscular</td>
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="altMasaMuscularTobilloDerecho"
                     value={form.altMasaMuscularTobilloDerecho || ""}
                     onChange={handleChange}
@@ -210,7 +210,7 @@ const ExamenFisicoIV2021 = ({ form, handleRadioButton, handleChange, handleChang
                 <td className="py-3 px-4">
                   <input
                     type="text"
-                    className="w-full border rounded px-3 py-2 text-center text-base focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full border rounded px-3 py-2 text-center focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     name="altMasaMuscularTobilloIzquierdo"
                     value={form.altMasaMuscularTobilloIzquierdo || ""}
                     onChange={handleChange}
