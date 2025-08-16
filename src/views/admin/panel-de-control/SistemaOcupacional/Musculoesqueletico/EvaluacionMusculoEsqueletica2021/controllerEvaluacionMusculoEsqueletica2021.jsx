@@ -8,9 +8,7 @@ const obtenerReporteUrl =
 const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica2021";
 
-const leerBoolSI = (bool) => {
-  return bool ? "SI" : "NO";
-};
+
 const leerBoolSINO = (res, name) => {
   if (res[name + "Si"]) {
     return "SI";
