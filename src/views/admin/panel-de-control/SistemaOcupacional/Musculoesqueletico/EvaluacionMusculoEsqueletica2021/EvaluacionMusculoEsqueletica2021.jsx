@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -8,6 +7,11 @@ import ExamenFisicoIII2021 from "./ExamenFisicoIII2021";
 import ExamenFisicoIV2021 from "./ExamenFisicoIV2021";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
+import {
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerEvaluacionMusculoEsqueletica2021";
 
 const tabla = "evaluacion_musculo_esqueletica2021";
 const date = new Date();
@@ -21,6 +25,7 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     useSessionData();
   const initialFormState = {
     norden: "",
+    codEvaluacion: null,
     nombres: "",
     dni: "",
     areaTrabajo: "",
@@ -29,19 +34,6 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     fecha: today,
     empresa: "",
     tiempoServicio: "AÑOS",
-
-    // Síntomas
-    sintomas: "NO",
-    cualesSintomas: "NINGUNO",
-
-    // Uso de Faja Lumbar
-    usoFajaLumbar: "NO",
-
-    // Técnica de Levantamiento
-    tecnicaLevantamiento: "NO",
-
-    // Capacitación
-    capacitacionLevantamiento: "NO",
 
     // PARTE 1: APTITUD ESPALDA
     flexFuerzaAbdomen: "",
@@ -60,10 +52,10 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     observacionesRangosArticulares: "",
 
     // Campos de dolor contra resistencia
-    dolorAbduccionHombro180: "NO",
-    dolorAbduccionHombro60: "NO",
-    dolorRotacionExterna90: "NO",
-    dolorRotacionExternaHombroInterna: "NO",
+    dolorAbduccionHombro180: "",
+    dolorAbduccionHombro60: "",
+    dolorRotacionExterna90: "",
+    dolorRotacionExternaHombroInterna: "",
 
     // PARTE 2: COLUMNA VERTEBRAL
     desviacionEje: "",
@@ -171,20 +163,20 @@ const EvaluacionMusculoEsqueletica2021 = () => {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(
-    //   form,
-    //   token,
-    //   userlogued,
-    //   handleClear,
-    //   tabla,
-    //   datosFooter,
-    //   userCompleto?.datos?.dni_user
-    // );
+    SubmitDataService(
+      form,
+      token,
+      userlogued,
+      handleClear,
+      tabla,
+      datosFooter,
+      userCompleto?.datos?.dni_user
+    );
   };
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
@@ -205,7 +197,7 @@ const EvaluacionMusculoEsqueletica2021 = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(form.norden, token, tabla, datosFooter);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
       }
     });
   };
