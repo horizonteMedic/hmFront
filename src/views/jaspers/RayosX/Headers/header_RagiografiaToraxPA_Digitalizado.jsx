@@ -118,12 +118,34 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   doc.setLineWidth(0.3);
   doc.line(examX, datosPacienteY + 6, examX + examWidth, datosPacienteY + 6); // Línea arriba del texto
   
+    function formatearFecha(fechaStr) {
+  if (!fechaStr) return ""; // Si está vacío
+  
+  const [anio, mes, dia] = fechaStr.split("-").map(Number);
+  const fecha = new Date(anio, mes - 1, dia); // Fecha local
+  
+  const diasSemana = [
+    "DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", 
+    "JUEVES", "VIERNES", "SÁBADO"
+  ];
+  
+  const meses = [
+    "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", 
+    "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
+  ];
+  
+  const diaSemana = diasSemana[fecha.getDay()];
+  const diaMes = fecha.getDate();
+  const nombreMes = meses[fecha.getMonth()];
+  
+  return `${diaSemana} ${diaMes} DE ${nombreMes} DEL ${anio}`;
+}
   // Datos del paciente - todos en mayúsculas y labels en negrita
   const pacienteData = [
-    { label: "NOMBRES", value: (datos.nombres || "HADY KATHERINE").toUpperCase() },
-    { label: "APELLIDOS", value: (datos.apellidos || "CASTILLO PLASENCIA").toUpperCase() },
-    { label: "FECHA", value: (datos.fecha || "lunes 04 noviembre 2024").toUpperCase() },
-    { label: "EDAD", value: datos.edad ? `${datos.edad} AÑOS` : "31 AÑOS" }
+    { label: "NOMBRES", value: (datos.nombres || "").toUpperCase() },
+    { label: "APELLIDOS", value: (datos.apellidos || "").toUpperCase() },
+    { label: "FECHA", value: formatearFecha(datos.fechaExamen || "") },
+    { label: "EDAD", value: datos.edad ? `${datos.edad} AÑOS` : "" }
   ];
   
   // Calcular el ancho máximo de los labels para alinearlos
@@ -148,12 +170,13 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   });
 
   // 4) Información de sede y número de ficha a la derecha (al costado del bloque de color)
-  const sedeValue = `${datos.sede || 'Trujillo-Pierola'}`;
+  const sedeValue = `${datos.sede || ''}`;
   const sedeX = pageW - margin - 20;
   const sedeY = y + 6;
   
   // Número de ficha primero
-  const fichaNum = datos.numeroFicha || "96639";
+  const fichaNum = `${datos.norden || ""}`;
+
   const fichaY = sedeY;
   
   // Texto "N° Ficha :" delante del número
