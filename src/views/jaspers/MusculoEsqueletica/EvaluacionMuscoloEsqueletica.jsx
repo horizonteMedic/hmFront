@@ -2359,15 +2359,6 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
 
   // === SECCIÓN XII: FIRMAS ===
   
-  // === FIRMA DEL POSTULANTE ===
-  // Posiciones para la firma del postulante
-  const xFirmaPostulante = margin + 21;  // Posición X para la firma del postulante
-  const yFirmaPostulante = margin + 245;   // Posición Y para la firma del postulante
-
-  const xFirmaMedico = margin + 122;       // Posición X para la firma del médico
-  const yFirmaMedico = margin + 245;       // Posición Y para la firma del médico
-  
-
   // // === GENERAR PDF Y ABRIR PARA IMPRESIÓN ===
   // const blob = doc.output("blob");
   // const url = URL.createObjectURL(blob);
@@ -2390,7 +2381,10 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
       nombre: "SELLOFIRMA", x: margin + 120, y:  margin + 235, maxw: 50 
     }
   ];
-  agregarFirmas(doc, data.informacionSede.digitalizacion, firmasAPintar).then(() => {
+  
+  // Validar que data.informacionSede exista antes de acceder a sus propiedades
+  const digitalizacion = data?.informacionSede?.digitalizacion || [];
+  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
     imprimir(doc);
   });
 }
