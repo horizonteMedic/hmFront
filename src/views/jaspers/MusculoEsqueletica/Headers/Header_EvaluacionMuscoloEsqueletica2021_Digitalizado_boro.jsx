@@ -8,12 +8,11 @@ const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, num
     nombres: "JUAN CARLOS PÉREZ GONZÁLEZ CAPORALES",
     edad: "38",
     sexo: "M",
-    fecha: "15/12/2024",
+    fechaExamen: "15/12/2024",
     empresa: "ESTE ES UNA EMPRESA MUY LARGO PARA VER COMO SE VE EN LA HOJA",
     areaTrabajo: "ESTE ES UN AREA DE TRABAJO MUY LARGO PARA VER COMO SE VE EN LA HOJ",
     cargo: "ESTE ES UN CARGO MUY LARGO PARA VER COMO SE VE EN LA HOJA"
   };
-
   // Usar datos reales o datos de prueba
   const datosFinales = datos && Object.keys(datos).length > 0 ? datos : datosPrueba;
 
@@ -46,7 +45,7 @@ const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, num
   doc.line((pageW - titulo2Width) / 2, tituloY + 7, (pageW + titulo2Width) / 2, tituloY + 7);
 
   // 3) Información de sede y número de ficha a la derecha
-  const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
+  const sedeValue = datosFinales.sede || '';
   const sedeX = pageW - margin - 25;
   const sedeY = y + 1; // Subido de y + 6 a y + 2
   
@@ -102,7 +101,7 @@ const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, num
     // Fecha
     const xFecha = margin + 167;
     const yFecha = margin + 18;
-    let fechaFormateada = datosFinales.fecha || "";
+    let fechaFormateada = datosFinales.fechaExamen || "";
     
     // Formatear fecha a DD/MM/YYYY si viene en formato YYYY-MM-DD
     if (fechaFormateada && fechaFormateada.includes("-")) {
@@ -121,7 +120,7 @@ const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, num
     const xAreaTrabajo = margin + 28;
     const yAreaTrabajo = margin + 31.5;
     doc.setFontSize(8);
-    doc.text(String(datosFinales.areaTrabajo || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 75 });
+    doc.text(String(datosFinales.area || ""), xAreaTrabajo, yAreaTrabajo, { maxWidth: 75 });
 
     // Cargo
     const xCargo = margin + 116;

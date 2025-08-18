@@ -1,6 +1,5 @@
 import jsPDF from "jspdf";
 import headerEvaluacionMuscoloEsqueletica from "./Headers/Header_EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx";
-import footerTR from "../components/footerTR.jsx";
 
 export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -208,24 +207,24 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
        descripcion: data.columnaVertebralDesviacionDescripcion??""
      },
      testAdams: {
-       hallazgo: data.columnaVertebralAdamsSi, // true = (+), false = (-)
+       hallazgo: data.columnaVertebralAdamsPositivo, // true = (+), false = (-)
        descripcion: data.columnaVertebralAdamsDescripcion ?? "",
      },
      dandy: {
-       hallazgo: data.columnaVertebralDandySi, // true = (+), false = (-)
+       hallazgo: data.columnaVertebralDandyPositivo, // true = (+), false = (-)
        descripcion: data.columnaVertebralDandyDescripcion??""
      },
      lasegue: {
-       hallazgo: data.columnaVertebralLasegueSi, // true = (+), false = (-)
+       hallazgo: data.columnaVertebralLaseguePositivo, // true = (+), false = (-)
        descripcion: data.columnaVertebralLasegueDescripcion ?? "",
      },
      contracturaMuscular: {
        hallazgo: data.columnaVertebralContracturaSi, // true = Si, false = No
-       descripcion: data.columnaVertebralContracturaDescripcion??""
+       descripcion: data.columnaVertebralContracturaDescripcion ?? ""
      },
      cicatrizPostOperatoria: {
        hallazgo: data.columnaVertebralCicatrizSi, // true = Si, false = No
-       descripcion: data.columnaVertebralCicatrizDescripcion??""
+       descripcion: data.columnaVertebralCicatrizDescripcion ?? ""
      },
      
            // === TESTS DE MIEMBROS SUPERIORES ===
@@ -335,9 +334,9 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
       },
       
       // === CONCLUSIONES Y RECOMENDACIONES ===
-      conclusiones: res.conclusiones||"",
-      cie10: res.cie10||"",
-      recomendaciones: res.recomendaciones||"",
+      conclusiones: data.conclusiones||"",
+      cie10: data.cie10||"",
+      recomendaciones: data.recomendaciones||"",
   };
 
 
@@ -1357,47 +1356,151 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
                  doc.text(datosFinales.recomendaciones || "", recomendacionesX, recomendacionesY, { maxWidth: recomendacionesMaxWidth });
 
       // === SECCIÓN XII: FIRMAS DE PRUEBA ===
-     
+      
      // === FIRMA DEL POSTULANTE ===
      // Posiciones para la firma del postulante
-     const xFirmaPostulante = margin + 22;  // Posición X para la firma del postulante
-     const yFirmaPostulante = margin + 225;   // Posición Y para la firma del postulante
-     const anchoFirmaPostulante = 60;         // Ancho de la imagen de firma
-     const altoFirmaPostulante = 25;          // Alto de la imagen de firma
-     
-     // Agregar imagen de firma del postulante
-     try {
-       doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaPostulante, yFirmaPostulante, anchoFirmaPostulante, altoFirmaPostulante);
-     } catch (e) {
-       console.error("Error al cargar firma del postulante:", e);
-     }
-     
-     // === FIRMA DEL MÉDICO ===
-     // Posiciones para la firma del médico
-     const xFirmaMedico = margin + 118.5;       // Posición X para la firma del médico
-     const yFirmaMedico = margin + 225;       // Posición Y para la firma del médico
-     const anchoFirmaMedico = 60;             // Ancho de la imagen de firma
-     const altoFirmaMedico = 25;              // Alto de la imagen de firma
-     
-     // Agregar imagen de firma del médico
-     try {
-       doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaMedico, yFirmaMedico, anchoFirmaMedico, altoFirmaMedico);
-     } catch (e) {
-       console.error("Error al cargar firma del médico:", e);
-     }
-
+    //  const xFirmaPostulante = margin + 22;  // Posición X para la firma del postulante
+    //  const yFirmaPostulante = margin + 225;   // Posición Y para la firma del postulante
+    
+      
+    //  // === FIRMA DEL MÉDICO ===
+    //  // Posiciones para la firma del médico
+    //  const xFirmaMedico = margin + 118.5;       // Posición X para la firma del médico
+    //  const yFirmaMedico = margin + 225;       // Posición Y para la firma del médico
+    
      // === 4) FOOTER EN PÁGINA 2 ===
   footerTR(doc, data);
 
   // === 2) Generar blob y abrir en iframe para imprimir automáticamente ===
+  // const blob = doc.output("blob");
+  // const url = URL.createObjectURL(blob);
+  // const iframe = document.createElement("iframe");
+  // iframe.style.display = "none";
+  // iframe.src = url;
+  // document.body.appendChild(iframe);
+  // iframe.onload = () => {
+  //   iframe.contentWindow.focus();
+  //   iframe.contentWindow.print();
+  // };
+    const firmasAPintar = [
+    { 
+      nombre: "FIRMAP", x: margin + 25, y:  margin + 215, maxw: 50 
+    },
+    { 
+      nombre: "HUELLA", x: margin + 80, y:  margin + 215, maxw: 15 
+    },
+    { 
+      nombre: "SELLOFIRMA", x: margin + 120, y:  margin + 215, maxw: 50 
+    }
+  ];
+  
+  // Validar que data.informacionSede exista antes de acceder a sus propiedades
+  const digitalizacion = data?.digitalizacion || [];
+  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
+}
+ function footerTR(doc,datos) {
+   const pageHeight = doc.internal.pageSize.getHeight();
+   // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
+   const marginBottom = 25;
+   // Posición base para el footer
+   const baseY = pageHeight - marginBottom;
+   const col1X = 15;
+   const col2X = 70;
+   const col3X = 120;
+   const col4X = 175;
+ 
+   // Ajustamos la fuente a 8 y color a negro
+   doc.setFontSize(7);
+   doc.setTextColor(0, 0, 0);
+ 
+   //       COLUMNA 1
+   let col1Y = baseY;
+   doc.text(`${datos?.dirTruPierola || ""}`, col1X, col1Y);
+   col1Y += 4;
+   doc.text(`${datos?.dirHuamachuco || ""}`, col1X, col1Y);
+   col1Y += 4;
+   doc.text(`${datos?.dirHuancayo || ""}`, col1X, col1Y);
+   col1Y += 4;
+   doc.text(`${datos?.dirTrujillo || ""}`, col1X, col1Y);
+
+   //       COLUMNA 2
+   let col2Y = baseY;
+   doc.text(`Cel. ${datos?.celTrujilloPie || ""}`, col2X+29, col2Y);
+   col2Y += 4;
+   doc.text(`Cel. ${datos?.celHuamachuco || ""}`, col2X+10, col2Y);
+ 
+   //       COLUMNA 3
+   let col3Y = baseY;
+   doc.text(`${datos?.emailTruPierola || ""}`, col3X+7, col3Y);
+   col3Y += 4;
+   doc.text(`${datos?.emailHuancayo || ""}`, col3X, col3Y);
+ 
+   //       COLUMNA 4
+   let col4Y = baseY;
+   doc.text(`Telf. ${datos?.telfTruPierola || ""}`, col4X, col4Y);
+   col4Y += 4;
+   doc.text(`Telf. ${datos?.telfHuamachuco || ""}`, col4X, col4Y);
+   col4Y += 4;
+   doc.text(`Telf. ${datos?.telfHuancayo || ""}`, col4X, col4Y);
+ }
+ 
+function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+      img.onload = () => {
+        const sigH = 35; // alto máximo
+        const maxW = maxw; // ancho máximo como parámetro
+        const baseX = x;
+        const baseY = y;
+
+        let imgW = img.width;
+        let imgH = img.height;
+
+        // Escala proporcional en base a ancho y alto máximos
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        // Ahora el ancho se adapta
+        const sigW = imgW;
+
+        // Centrar la imagen
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
   };
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
 }
