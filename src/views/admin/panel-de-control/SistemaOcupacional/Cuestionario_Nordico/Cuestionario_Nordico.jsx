@@ -13,269 +13,209 @@ import Responder from "./Responder/Responder";
 import Espalda_Baja from "./Espalda_Baja/Espalda_Baja";
 import Hombros from "./Hombros/Hombros";
 import Cuello from "./Cuello/Cuello";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { useForm } from "../../../../hooks/useForm";
+import { VerifyTR, SubmitCuestionarioNordic } from "./controller/ControllerCN"
 
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
+const tabla = "cuestionario_nordico"
 
-const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) => {
-  const [activeTab, setActiveTab] = useState(0);
-  //const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
-  const [form, setForm] = useState({
-    //DATOS PERSONALES
+const Cuestionario_Nordico = () => {
+  const { token, selectedSede, datosFooter, userlogued, userCompleto } =
+    useSessionData();
+  const initialFormState = {
     norden: "",
-    nplaca: "",
+    codigoCuestionario: null,
+    fechaCuestionario: today,
     nombres: "",
-    doctor: "",
-    dni: "",
-    dniUser: userDatos.datos.dni_user,
     edad: "",
-    fradiografia: today,
-    flectura: today,
-    //PARENQUIMATOSAS
-    anormalidades_parenquimatosas_si: true,
-    anormalidades_parenquimatosas_no: false,
-    rbAceptable: true,
-    rbInaceptable: false,
-    rbBajacalidad: false,
-    rbBuena: false,
-    //causas
-    rbSobreexposicion: false,
-    rbSubexposicion: false,
-    rbPosicioncentrado: true,
-    rbInspiracionInsuficiente: false,
-    rbEscapulas: false,
-    rbArtefactos: false,
-    rbOtros: false,
-    //PARENQUIMATOSAS2.0
+    sexo: "",
+    dni: "",
+    anios: "",
+    meses: "",
+    horasTrabajadas: "",
+    esDiestro: false,
+    esZurdo: false,
+    //Responder
+    cuelloNo: false,
+    cuelloSi: false,
+    pregunta1CuelloNo: false,
+    pregunta1CuelloSi: false,
+    pregunta2CuelloNo: false,
+    pregunta2CuelloSi: false,
+      //Hombros
+    hombrosNo: false,
+    hombroDerechoSi: false,
+    hombroIzquierdoSi: false,
+    ambosHombrosSi: false,
+    pregunta1HombrosNo: false,
+    pregunta1HombrosSi: false,
+    pregunta2HombrosNo: false,
+    pregunta2HombrosSi: false,
+      //Codos
+    codosNo: false,
+    codoDerechoSi: false,
+    codoIzquierdoNo: false,
+    ambosCodosSi: false,
+    pregunta1CodosNo: false,
+    pregunta1CodosSi: false,
+    pregunta2CodosNo: false,
+    pregunta2CodosSi: false,
+      //Muñeca
+    munecaNo: false,
+    munecaDerechaSi: false,
+    munecaIzquierdaSi: false,
+    ambasMunecasSi: false,
+    pregunta1MunecasNo: false,
+    pregunta1MunecasSi: false,
+    pregunta2MunecasNo: false,
+    pregunta2MunecasSi: false,
+      //Otros
+      //Espalda Alta
+    espaldaAltaToraxNo: false,
+    espaldaAltaToraxSi: false,
+    pregunta1EspaldaAltaToraxNo: false,
+    pregunta1EspaldaAltaToraxSi: false,
+    pregunta2EspaldaAltaToraxNo: false,
+    pregunta2EspaldaAltaToraxSi: false,
+      //Espalda Baja
+    espaldaBajaLumbarNo: false,
+    espaldaBajaLumbarSi: false,
+    pregunta1EspaldaBajaLumbarNo: false,
+    pregunta1EspaldaBajaLumbarSi: false,
+    pregunta2EspaldaBajaLumbarNo: false,
+    pregunta2EspaldaBajaLumbarSi: false,
+      //Caderas
+    caderasOMuslosNo: false,
+    caderasOMuslosSi: false,
+    pregunta1CaderasOMuslosNo: false,
+    pregunta1CaderasOMuslosSi: false,
+    pregunta2CaderasOMuslosNo: false,
+    pregunta2CaderasOMuslosSi: false,
+      //Rodillas
+    rodillasNo: false,
+    rodillasSi: false,
+    pregunta1RodillasNo: false,
+    pregunta1RodillasSi: false,
+    pregunta2RodillasNo: false,
+    pregunta2RodillasSi: false,
+      //Tobillos
+    tobillosOPiesNo: false,
+    tobillosOPiesSi: false,
+    pregunta1TobillosOPiesNo: false,
+    pregunta1TobillosOPiesSi: false,
+    pregunta2TobillosOPiesNo: false,
+    pregunta2TobillosOPiesSi: false,
+    //Espalda Baja form
+    pregunta1EspaldaBajaNo: false,
+    pregunta1EspaldaBajaSi: false,
+    pregunta2EspaldaBajaNo: false,
+    pregunta2EspaldaBajaSi: false,
+    pregunta3EspaldaBajaNo: false,
+    pregunta3EspaldaBajaSi: false,
+      //Dias 1
+    pregunta4AEspaldaBaja: false,
+    pregunta4BEspaldaBaja: false,
+    pregunta4CEspaldaBaja: false,
+    pregunta4DEspaldaBaja: false,
+    pregunta4EEspaldaBaja: false,
+      //5
+    pregunta5AEspaldaBajaNo: false,
+    pregunta5AEspaldaBajaSi: false,
+    pregunta5BEspaldaBajaNo: false,
+    pregunta5BEspaldaBajaSi: false,
+      //6 Dias 2
+    pregunta6AEspaldaBaja: false,
+    pregunta6BEspaldaBaja: false,
+    pregunta6CEspaldaBaja: false,
+    pregunta6DEspaldaBaja: false,
+      //7
+    pregunta7EspaldaBajaNo: false,
+    pregunta7EspaldaBajaSi: false,
+      //8
+    pregunta8EspaldaBajaNo: false,
+    pregunta8EspaldaBajaSi: false,
+    //Hombros
+    pregunta1ProblemasHombrosNo: false,
+    pregunta1ProblemasHombrosSi: false,
+    //10.
+    pregunta2ProblemasHombrosNo: false,
+    pregunta2ProblemasHombroIzquierdoSi: false,
+    pregunta2ProblemasHombroDerechoSi: false,
+    pregunta2ProblemasAmbosHombros: false,
+    //11
+    pregunta3ProblemasHombrosNo: false,
+    pregunta3ProblemasHombrosSi: false,
+    //12
+    pregunta4ProblemasHombrosNo: false,
+    pregunta4ProblemasHombroIzquierdoSi: false,
+    pregunta4ProblemasHombroDerechoSi: false,
+    pregunta4ProblemasAmbosHombros: false,
+    //13
+    pregunta5AProblemasHombros: false,
+    pregunta5BProblemasHombros: false,
+    pregunta5CProblemasHombros: false,
+    pregunta5DProblemasHombros: false,
+    //14
+    pregunta6AProblemasHombrosNo: false,
+    pregunta6AProblemasHombrosSi: false,
+    
+    pregunta6BProblemasHombrosNo: false,
+    pregunta6BProblemasHombrosSi: false,
+    //15
+    pregunta7AProblemasHombros: false,
+    pregunta7BProblemasHombros: false,
+    pregunta7CProblemasHombros: false,
+    pregunta7DProblemasHombros: false,
+    //16
+    pregunta8ProblemasHombrosNo: false,
+    pregunta8ProblemasHombrosSi: false,
+    //17
+    pregunta9ProblemasHombrosNo: false,
+    pregunta9ProblemasHombroIzquierdoSi: false,
+    pregunta9ProblemasHombroDerechoSi: false,
+    pregunta9ProblemasAmbosHombros: false,
+    //Cuello
+    pregunta1ProblemasCuelloNo: false,
+    pregunta1ProblemasCuelloSi: false,
+    //2
+    pregunta2ProblemasCuelloNo: false,
+    pregunta2ProblemasCuelloSi: false,
+    //3
+    pregunta3ProblemasCuelloNo: false,
+    pregunta3ProblemasCuelloSi: false,
+    //4
+    pregunta4AProblemasCuello: false,
+    pregunta4BProblemasCuello: false,
+    pregunta4CProblemasCuello: false,
+    pregunta4DProblemasCuello: false,
+    pregunta4EProblemasCuello: false,
+    //5
+    pregunta5AProblemasCuelloNo: false,
+    pregunta5AProblemasCuelloSi: false,
+    
+    pregunta5BProblemasCuelloNo: false,
+    pregunta5BProblemasCuelloSi: false,
+    //6
+    pregunta6AProblemasCuello: false,
+    pregunta6BProblemasCuello: false,
+    pregunta6CProblemasCuello: false,
+    pregunta6DProblemasCuello: false,
+    //7
+    pregunta7ProblemasCuelloNo: false,
+    pregunta7ProblemasCuelloSi: false,
+    //8
+    pregunta8ProblemasCuelloNo: false,
+    pregunta8ProblemasCuelloSi: false,
+  };
 
-    txtDefectosTecnicos: "",
-    chk1D: false,
-    chk1I: false,
-    chk2D: false,
-    chk2I: false,
-    chk3D: false,
-    chk3I: false,
-    //a
-    chk1: false,
-    chk2: false,
-    chk3: false,
-    chk4: false,
-    chk5: false,
-    chk6: false,
-    chk7: false,
-    chk8: false,
-    chk9: false,
-    chk10: false,
-    chk11: false,
-    chk12: false,
-    //b
-    chkP1: false,
-    chkP2: false,
-    chkP3: false,
-    chkP4: false,
-    chkP5: false,
-    chkP6: false,
-    chkS1: false,
-    chkS2: false,
-    chkS3: false,
-    chkS4: false,
-    chkS5: false,
-    chkS6: false,
-    //c
-    chko: false,
-    chka: false,
-    chkb: false,
-    chkc: false,
-    //Pleurales
-    chk2Si: true,
-    chk2No: false,
-    chkE1: false,
-    chkE2: false,
-    chkE3: false,
-    chkE4: false,
-    chkE5: false,
-    chkE6: false,
-    //a
-    chk2_1: false,
-    chk2_2: false,
-    chk2_3: false,
-    chk2_4: false,
-    chk2_5: false,
-    chk2_6: false,
-    chk2_7: false,
-    chk2_8: false,
-    chk2_9: false,
-    chk2_10: false,
-    chk2_11: false,
-    chk2_12: false,
-    chk2_13: false,
-    chk2_14: false,
-    chk2_15: false,
-    chk2_16: false,
-    chk2_17: false,
-    chk2_18: false,
-    chk2_19: false,
-    chk2_20: false,
-    chk2_21: false,
-    chk2_22: false,
-    chk2_23: false,
-    chk2_24: false,
-    chk2_25: false,
-    chk2_26: false,
-    chk2_27: false,
-    chk2_28: false,
-    chk2_29: false,
-    chk2_30: false,
-    chk2_31: false,
-    chk2_32: false,
-    chk2_33: false,
-    chk2_34: false,
-    chk2_35: false,
-    chk2_36: false,
-    chk2_37: false,
-    chk2_38: false,
-    chk2_39: false,
-    chk2_40: false,
-    chk2_41: false,
-    chk2_42: false,
-    chk2_43: false,
-    chk2_44: false,
-    chk2_45: false,
-    chk2_46: false,
-    chk2_47: false,
-    chk2_48: false,
-    chk2_49: false,
-    chk2_50: false,
-    chk2_51: false,
-    chk2_52: false,
-    chk2_53: false,
-    chk2_54: false,
-    chk2_55: false,
-    chk2_56: false,
-    chk2_57: false,
-    chk2_58: false,
-    chk2_59: false,
-    chk2_60: false,
-    chk2_61: false,
-    chk2_62: false,
-    chk2_63: false,
-    chk2_64: false,
-    chk2_65: false,
-    chk2_66: false,
-    chk2_67: false,
-    chk2_68: false,
-    chk2_69: false,
-    //
-    chk3Si: true,
-    chk3No: false,
-    chk_01: false,
-    chk_02: false,
-    chk_03: false,
-    chk_04: false,
-    chk_05: false,
-    chk_06: false,
-    chk_07: false,
-    chk_08: false,
-    chk_09: false,
-    chk_10: false,
-    chk_11: false,
-    chk_12: false,
-    chk_13: false,
-    chk_14: false,
-    chk_15: false,
-    chk_16: false,
-    chk_17: false,
-    chk_18: false,
-    chk_19: false,
-    chk_20: false,
-    chk_21: false,
-    chk_22: false,
-    chk_23: false,
-    chk_24: false,
-    chk_25: false,
-    chk_26: false,
-    chk_27: false,
-    chk_28: false,
-    chk_29: false,
-    txtSComentarios: "",
-    //
-    SinDatos: false,
-  });
-
-
-  console.log(form);
-  const tabs = [
-    {
-      label: "Cuestionario",
-      icon: faMicroscope,
-      component: (
-        <Cuestionario
-          token={token}
-          selectedSede={selectedSede}
-          userlogued={userlogued}
-          form={form}
-          setForm={setForm}
-        />
-      ),
-    },
-    {
-      label: "Responder",
-      icon: faTint,
-      component: (
-        <Responder
-          token={token}
-          selectedSede={selectedSede}
-          userlogued={userlogued}
-          form={form}
-          setForm={setForm}
-        />
-      ),
-    },
-    {
-      label: "Espalda Baja",
-      icon: faHeartbeat,
-      component: (
-        <Espalda_Baja
-          token={token}
-          selectedSede={selectedSede}
-          userlogued={userlogued}
-          form={form}
-          setForm={setForm}
-        />
-      ),
-    },
-    {
-      label: "Hombros",
-      icon: faHeartbeat,
-      component: (
-        <Hombros
-          token={token}
-          selectedSede={selectedSede}
-          userlogued={userlogued}
-          form={form}
-          setForm={setForm}
-        />
-      ),
-    },
-    {
-      label: "Cuello",
-      icon: faHeartbeat,
-      component: (
-        <Cuello
-          token={token}
-          selectedSede={selectedSede}
-          userlogued={userlogued}
-          form={form}
-          setForm={setForm}
-        />
-      ),
-    },
-  ];
-
-
+  
+  const { form, setForm, handleChange, handleChangeNumber, handleClear, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
+  
   return (
     <div className="">
       <div className="max-w-[70%] mx-auto">
@@ -288,6 +228,12 @@ const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) =>
               userlogued={userlogued}
               form={form}
               setForm={setForm}
+              handleChange={handleChange}
+              handleChangeNumber={handleChangeNumber}
+              handleClearnotO={handleClearnotO}
+              handleInputChangeChecked={handleInputChangeChecked}
+              tabla={tabla}
+              VerifyTR={VerifyTR}
             />
             <Responder
               token={token}
@@ -295,6 +241,10 @@ const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) =>
               userlogued={userlogued}
               form={form}
               setForm={setForm}
+              handleChange={handleChange}
+              handleChangeNumber={handleChangeNumber}
+              handleClearnotO={handleClearnotO}
+              handleInputChangeChecked={handleInputChangeChecked}
             />
             <Espalda_Baja
               token={token}
@@ -302,6 +252,10 @@ const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) =>
               userlogued={userlogued}
               form={form}
               setForm={setForm}
+              handleChange={handleChange}
+              handleChangeNumber={handleChangeNumber}
+              handleClearnotO={handleClearnotO}
+              handleInputChangeChecked={handleInputChangeChecked}
             />
             <Hombros
               token={token}
@@ -309,13 +263,20 @@ const Cuestionario_Nordico = ({ token, selectedSede, userlogued, userDatos }) =>
               userlogued={userlogued}
               form={form}
               setForm={setForm}
+              handleChange={handleChange}
+              handleChangeNumber={handleChangeNumber}
+              handleClearnotO={handleClearnotO}
+              handleInputChangeChecked={handleInputChangeChecked}
             />
             <Cuello
               token={token}
-              selectedSede={selectedSede}
               userlogued={userlogued}
               form={form}
               setForm={setForm}
+              handleInputChangeChecked={handleInputChangeChecked}
+              SubmitCuestionarioNordic={SubmitCuestionarioNordic}
+              tabla={tabla}
+              handleClear={handleClear}
             />
 
         </div>
