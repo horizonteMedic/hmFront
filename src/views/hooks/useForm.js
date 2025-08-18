@@ -31,6 +31,14 @@ export const useForm = (initialFormState) => {
     setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
   };
 
+  const handleInputChangeChecked = (e) => {
+      const { name, checked } = e.target;
+      setForm(prev => ({
+          ...prev,
+          [name]: checked
+      }));
+  }
+
   return {
     form,
     setForm,
@@ -39,5 +47,6 @@ export const useForm = (initialFormState) => {
     handleRadioButton,
     handleClear,
     handleClearnotO,
+    handleInputChangeChecked
   };
 };
