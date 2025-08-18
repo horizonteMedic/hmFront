@@ -8,13 +8,22 @@ const obtenerReporteUrl =
 const registrarUrl =
   "/api/v01/ct/evaluacionMusculoEsqueletica/registrarActualizarEvaluacionMusculoEsqueletica2021";
 
-
 const leerBoolSINO = (res, name) => {
   if (res[name + "Si"]) {
     return "SI";
   }
   if (res[name + "No"]) {
     return "NO";
+  }
+  return "";
+};
+
+const leerBoolPOSITIVO = (res, name) => {
+  if (res[name + "Positivo"]) {
+    return "+";
+  }
+  if (res[name + "Negativo"]) {
+    return "-";
   }
   return "";
 };
@@ -36,7 +45,7 @@ export const GetInfoServicio = (
           codEvaluacion: res.codEvaluacion ?? "",
           nombres: res.nombres ?? "",
           dni: res.dni ?? "",
-          areaTrabajo: res.areaTrabajo ?? "",
+          areaTrabajo: res.area ?? "",
           edad: res.edad + " años",
           sexo: res.sexo ?? "",
           fecha: res.fechaExamen,
@@ -81,30 +90,12 @@ export const GetInfoServicio = (
           ),
 
           // PARTE 2: COLUMNA VERTEBRAL
-          desviacionEje: leerBoolSINO(
-            res,
-            "columnaVertebralDesviacion"
-          ),
-          testAdams: leerBoolSINO(
-            res,
-            "columnaVertebralAdamsPositivo"
-          ),//ARREGLARRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-          dandy: leerBoolSINO(
-            res,
-            "columnaVertebralDandyPositivo"
-          ),//ARREGLARRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-          lasegue: leerBoolSINO(
-            res,
-            "columnaVertebralLaseguePositivo"
-          ),//ARREGLARRRRRRRRRRRRRRRRRRRRRRRRRRRRRR
-          contracturaMuscular: leerBoolSINO(
-            res,
-            "columnaVertebralContractura"
-          ),
-          cicatrizPostOperatoria: leerBoolSINO(
-            res,
-            "columnaVertebralCicatriz"
-          ),
+          desviacionEje: leerBoolSINO(res, "columnaVertebralDesviacion"),
+          testAdams: leerBoolPOSITIVO(res, "columnaVertebralAdams"), 
+          dandy: leerBoolPOSITIVO(res, "columnaVertebralDandy"),
+          lasegue: leerBoolPOSITIVO(res, "columnaVertebralLasegue"),
+          contracturaMuscular: leerBoolSINO(res, "columnaVertebralContractura"),
+          cicatrizPostOperatoria: leerBoolSINO(res, "columnaVertebralCicatriz"),
           desviacionEjeDescripcion:
             res.columnaVertebralDesviacionDescripcion ?? "",
           testAdamsDescripcion: res.columnaVertebralAdamsDescripcion ?? "",
@@ -116,88 +107,31 @@ export const GetInfoServicio = (
             res.columnaVertebralCicatrizDescripcion ?? "",
 
           // PARTE 2: TESTS
-          testJobeDerecha: leerBoolSINO(
-            res,
-            "testJobederecha"
-          ),
-          testJobeIzquierda: leerBoolSINO(
-            res,
-            "testJobeizquierda"
-          ),
-          testPatteDerecha: leerBoolSINO(
-            res,
-            "testPateDerecha"
-          ),
-          testPatteIzquierda: leerBoolSINO(
-            res,
-            "testPateIzquierda"
-          ),
-          testGerberDerecha: leerBoolSINO(
-            res,
-            "testGerberDerecha"
-          ),
-          testGerberIzquierda: leerBoolSINO(
-            res,
-            "testGerberIzquierda"
-          ),
-          palmUpTestDerecha: leerBoolSINO(
-            res,
-            "testPulmDerecha"
-          ),
-          palmUpTestIzquierda: leerBoolSINO(
-            res,
-            "testPulmIzquierda"
-          ),
-          epicondilitisDerecha: leerBoolSINO(
-            res,
-            "epiconDilitisDerecha"
-          ),
-          epicondilitisIzquierda: leerBoolSINO(
-            res,
-            "epiconDilitisizquierda"
-          ),
-          epitrocleitisDerecha: leerBoolSINO(
-            res,
-            "epitroCleitisDerecha"
-          ),
-          epitrocleitisIzquierda: leerBoolSINO(
-            res,
-            "epitroCleitisIzquierda"
-          ),
-          phalenDerecha: leerBoolSINO(
-            res,
-            "phalenDerecha"
-          ),
-          phalenIzquierda: leerBoolSINO(
-            res,
-            "phalenIzquierda"
-          ),
-          phalenInvertidoDerecha: leerBoolSINO(
-            res,
-            "phalenInvertidoDerecha"
-          ),
+          testJobeDerecha: leerBoolSINO(res, "testJobederecha"),
+          testJobeIzquierda: leerBoolSINO(res, "testJobeizquierda"),
+          testPatteDerecha: leerBoolSINO(res, "testPateDerecha"),
+          testPatteIzquierda: leerBoolSINO(res, "testPateIzquierda"),
+          testGerberDerecha: leerBoolSINO(res, "testGerberDerecha"),
+          testGerberIzquierda: leerBoolSINO(res, "testGerberIzquierda"),
+          palmUpTestDerecha: leerBoolSINO(res, "testPulmDerecha"),
+          palmUpTestIzquierda: leerBoolSINO(res, "testPulmIzquierda"),
+          epicondilitisDerecha: leerBoolSINO(res, "epiconDilitisDerecha"),
+          epicondilitisIzquierda: leerBoolSINO(res, "epiconDilitisizquierda"),
+          epitrocleitisDerecha: leerBoolSINO(res, "epitroCleitisDerecha"),
+          epitrocleitisIzquierda: leerBoolSINO(res, "epitroCleitisIzquierda"),
+          phalenDerecha: leerBoolSINO(res, "phalenDerecha"),
+          phalenIzquierda: leerBoolSINO(res, "phalenIzquierda"),
+          phalenInvertidoDerecha: leerBoolSINO(res, "phalenInvertidoDerecha"),
           phalenInvertidoIzquierda: leerBoolSINO(
             res,
             "phalenInvertidoIzquierda"
           ),
 
           // PARTE 3: MANIOBRAS DE DESCARTE
-          tinnelDerecha: leerBoolSINO(
-            res,
-            "tinnelDerecha"
-          ),
-          tinnelIzquierda: leerBoolSINO(
-            res,
-            "tinnelIzquierda"
-          ),
-          finkelsTeinDerecha: leerBoolSINO(
-            res,
-            "finkelsTeinDerecha"
-          ),
-          finkelsTeinIzquierda: leerBoolSINO(
-            res,
-            "finkelsTeinIzquierda"
-          ),
+          tinnelDerecha: leerBoolSINO(res, "tinnelDerecha"),
+          tinnelIzquierda: leerBoolSINO(res, "tinnelIzquierda"),
+          finkelsTeinDerecha: leerBoolSINO(res, "finkelsTeinDerecha"),
+          finkelsTeinIzquierda: leerBoolSINO(res, "finkelsTeinIzquierda"),
 
           // PARTE 3: EVAL. DINAMICA - CADERA Y RODILLA
           abduccionCaderaDerecha: res.caderaDerechaAbduccion,
@@ -284,7 +218,7 @@ export const SubmitDataService = async (
     norden: form.norden,
     dni: form.dni,
     edad: cortarHastaPrimerEspacio(form.edad + ""),
-    tipoServicio: form.tiempoServicio,
+    tiempoServicio: form.tiempoServicio,
     fechaExamen: form.fecha,
 
     aptitudEspaldaAbdomen: form.flexFuerzaAbdomen,
@@ -313,14 +247,14 @@ export const SubmitDataService = async (
     columnaVertebralDesviacionSi: form.desviacionEje == "SI",
     columnaVertebralDesviacionNo: form.desviacionEje == "NO",
     columnaVertebralDesviacionDescripcion: form.desviacionEjeDescripcion,
-    columnaVertebralAdamsPositivo: form.testAdams == "SI",
-    columnaVertebralAdamsNegativo: form.testAdams == "NO",
+    columnaVertebralAdamsPositivo: form.testAdams == "+",
+    columnaVertebralAdamsNegativo: form.testAdams == "-",
     columnaVertebralAdamsDescripcion: form.testAdamsDescripcion,
-    columnaVertebralDandyPositivo: form.dandy == "SI",
-    columnaVertebralDandyNegativo: form.dandy == "NO",
+    columnaVertebralDandyPositivo: form.dandy == "+",
+    columnaVertebralDandyNegativo: form.dandy == "-",
     columnaVertebralDandyDescripcion: form.dandyDescripcion,
-    columnaVertebralLaseguePositivo: form.lasegue == "SI",
-    columnaVertebralLasegueNegativo: form.lasegue == "NO",
+    columnaVertebralLaseguePositivo: form.lasegue == "+",
+    columnaVertebralLasegueNegativo: form.lasegue == "-",
     columnaVertebralLasegueDescripcion: form.lasegueDescripcion,
     columnaVertebralContracturaSi: form.contracturaMuscular == "SI",
     columnaVertebralContracturaNo: form.contracturaMuscular == "NO",

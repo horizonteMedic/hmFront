@@ -1,28 +1,37 @@
 import React from "react";
 
-const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChangeNumber }) => {
+const ExamenFisicoII2021 = ({
+  form,
+  handleRadioButton,
+  handleChange,
+  handleChangeNumber,
+}) => {
   return (
     <div className="space-y-6">
       {/* Contenido principal - 2 columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
         {/* COLUMNA IZQUIERDA - 2 cards apilados */}
         <div className="space-y-6">
-          
           {/* Card 1: COLUMNA VERTEBRAL */}
           <div className="border rounded-lg p-6 bg-gray-50">
             <h3 className="text-xl font-bold text-blue-900 text-center mb-4">
               COLUMNA VERTEBRAL
             </h3>
-            
+
             <div className="space-y-4">
               {/* Encabezados de columnas */}
               <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="font-semibold text-center text-blue-900">EXPLORACIÓN</div>
-                <div className="font-semibold text-center text-blue-900">HALLAZGO</div>
-                <div className="font-semibold text-center text-blue-900">DESCRIPCIÓN (Nivel, características, otras)</div>
+                <div className="font-semibold text-center text-blue-900">
+                  EXPLORACIÓN
+                </div>
+                <div className="font-semibold text-center text-blue-900">
+                  HALLAZGO
+                </div>
+                <div className="font-semibold text-center text-blue-900">
+                  DESCRIPCIÓN (Nivel, características, otras)
+                </div>
               </div>
-              
+
               {/* Fila 1: Desviación del Eje */}
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium">Desviación del Eje:</span>
@@ -57,7 +66,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                   placeholder="Descripción..."
                 />
               </div>
-              
+
               {/* Fila 2: Test de Adams */}
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium">Test de Adams:</span>
@@ -72,16 +81,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                     />
                     <span>+</span>
                   </label>
-                  <label className="flex items-center gap-1">
-                    <input
-                      type="radio"
-                      name="testAdams"
-                      value="O"
-                      checked={form.testAdams === "O"}
-                      onChange={(e) => handleRadioButton(e, "O")}
-                    />
-                    <span>O</span>
-                  </label>
+
                   <label className="flex items-center gap-1">
                     <input
                       type="radio"
@@ -102,7 +102,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                   placeholder="Descripción..."
                 />
               </div>
-              
+
               {/* Fila 3: Dandy */}
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium">Dandy:</span>
@@ -117,16 +117,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                     />
                     <span>+</span>
                   </label>
-                  <label className="flex items-center gap-1">
-                    <input
-                      type="radio"
-                      name="dandy"
-                      value="O"
-                      checked={form.dandy === "O"}
-                      onChange={(e) => handleRadioButton(e, "O")}
-                    />
-                    <span>O</span>
-                  </label>
+
                   <label className="flex items-center gap-1">
                     <input
                       type="radio"
@@ -147,7 +138,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                   placeholder="Descripción..."
                 />
               </div>
-              
+
               {/* Fila 4: Lasegue */}
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium">Lasegue:</span>
@@ -162,16 +153,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                     />
                     <span>+</span>
                   </label>
-                  <label className="flex items-center gap-1">
-                    <input
-                      type="radio"
-                      name="lasegue"
-                      value="O"
-                      checked={form.lasegue === "O"}
-                      onChange={(e) => handleRadioButton(e, "O")}
-                    />
-                    <span>O</span>
-                  </label>
+                  
                   <label className="flex items-center gap-1">
                     <input
                       type="radio"
@@ -192,7 +174,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                   placeholder="Descripción..."
                 />
               </div>
-              
+
               {/* Fila 5: Contractura Muscular */}
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium">Contractura Muscular:</span>
@@ -227,7 +209,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                   placeholder="Descripción..."
                 />
               </div>
-              
+
               {/* Fila 6: Cicatriz Post-Operatoria */}
               <div className="grid grid-cols-3 gap-4 items-center">
                 <span className="font-medium">Cicatriz Post-Operatoria:</span>
@@ -265,10 +247,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </div>
           </div>
         </div>
-        
+
         {/* COLUMNA DERECHA - Grid 2x3 */}
         <div className="grid grid-cols-2 gap-4">
-          
           {/* Fila 1, Col 1: TEST DE JOBE */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -279,7 +260,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -304,7 +287,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -330,7 +315,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 1, Col 2: TEST DE PATTE */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -341,7 +326,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -366,7 +353,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -392,7 +381,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 2, Col 1: TEST DE GERBER */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -403,7 +392,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -428,7 +419,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -454,7 +447,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 2, Col 2: PALM UP TEST */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -465,7 +458,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -490,7 +485,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -516,7 +513,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 3, Col 1: EPICONDILITIS */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -527,7 +524,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -552,7 +551,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -578,7 +579,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 3, Col 2: EPITROCLEITIS */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -589,7 +590,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -614,7 +617,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -640,7 +645,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 4, Col 1: PHALEN */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -651,7 +656,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -676,7 +683,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -702,7 +711,7 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
               </div>
             </div>
           </div>
-          
+
           {/* Fila 4, Col 2: PHALEN - INVERTIDO */}
           <div className="border rounded-lg p-4 bg-gray-50">
             <h4 className="font-semibold text-blue-900 text-center mb-3">
@@ -713,7 +722,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Derecha</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Derecha
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
@@ -738,7 +749,9 @@ const ExamenFisicoII2021 = ({ form, handleRadioButton, handleChange, handleChang
                 </div>
               </div>
               <div className="text-center">
-                <span className="font-medium text-blue-900 block mb-2">Izquierda</span>
+                <span className="font-medium text-blue-900 block mb-2">
+                  Izquierda
+                </span>
                 <div className="flex gap-2 justify-center">
                   <label className="flex items-center gap-1">
                     <input
