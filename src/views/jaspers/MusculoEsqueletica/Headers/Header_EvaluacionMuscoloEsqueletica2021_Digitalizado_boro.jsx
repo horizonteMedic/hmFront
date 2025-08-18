@@ -51,7 +51,7 @@ const headerEvaluacionMusculoEsqueletica = (doc, datos, mostrarFrame = true, num
   const sedeY = y + 1; // Subido de y + 6 a y + 2
   
   // Número de ficha primero
-  const fichaNum = datosFinales.norden || datosFinales.numeroFicha || datosFinales.nroFicha || "96639";
+  const fichaNum = String(datosFinales.norden??"") ;
   const fichaY = sedeY;
   
   // Texto "N° Ficha :" delante del número

@@ -167,9 +167,182 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
       cie10: "M25.51 - Dolor en hombro derecho",
       recomendaciones: "1. Evitar movimientos repetitivos por encima del hombro\n2. Ejercicios de fortalecimiento progresivo\n3. Control en 4 semanas\n4. Evaluación ergonómica del puesto"
   };
+  const leerBoolSINO = (res, name) => {
+    if (res[name + "Si"]) {
+      return "SI";
+    }
+    if (res[name + "No"]) {
+      return "NO";
+    }
+    return "";
+  };
+
+   const datosReales = {
+    // === APTITUD ESPALDA ===
+    puntosAbdomen: data.aptitudEspaldaAbdomen ?? "",
+    puntosCadera: data.aptitudEspaldaCadera ?? "",
+    puntosMuslo: data.aptitudEspaldaMuslo ?? "",
+    puntosAbdomenLateral: data.aptitudEspaldaAbdomenL ?? "",
+    totalAptitudEspalda: data.totalPuntosAptitudEspalda ?? "",
+    observacionesAptitudEspalda: data.observacionAptitudEspalda ?? "",
+    
+    // === RANGOS ARTICULARES ===
+    puntosAbduccionNormal: data.rangosArticularesAbduccion180 ?? "",
+    puntosAbduccion60: data.rangosArticularesAbduccion60 ?? "", 
+    puntosRotacionExterna: data.rangosArticularesRotacion90 ?? "",
+    puntosRotacionInterna: data.rangosArticularesRotacionInterna ?? "",
+    totalRangosArticulares: data.totalPuntosRangosArticulares ?? "",
+    // dolorContraResistencia ahora será un objeto con múltiples evaluaciones
+    dolorContraResistencia: {
+      evaluacion1: leerBoolSINO(data,"rangosArticularesAbduccion180"),
+      evaluacion2: leerBoolSINO(data,"rangosArticularesAbduccion60"),
+      evaluacion3: leerBoolSINO(data,"rangosArticularesRotacion90"),
+      evaluacion4: leerBoolSINO(data,"rangosArticularesRotacionInterna"),
+      evaluacion5: "",
+    },
+    observacionesRangosArticulares: data.observacionRangosArticulares??"",
+    
+         // === COLUMNA VERTEBRAL - HALLAZGOS ===
+     desviacionEje: {
+       hallazgo: data.columnaVertebralDesviacionSi, // true = Si, false = No
+       descripcion: data.columnaVertebralDesviacionDescripcion??""
+     },
+     testAdams: {
+       hallazgo: data.columnaVertebralAdamsSi, // true = (+), false = (-)
+       descripcion: data.columnaVertebralAdamsDescripcion ?? "",
+     },
+     dandy: {
+       hallazgo: data.columnaVertebralDandySi, // true = (+), false = (-)
+       descripcion: data.columnaVertebralDandyDescripcion??""
+     },
+     lasegue: {
+       hallazgo: data.columnaVertebralLasegueSi, // true = (+), false = (-)
+       descripcion: data.columnaVertebralLasegueDescripcion ?? "",
+     },
+     contracturaMuscular: {
+       hallazgo: data.columnaVertebralContracturaSi, // true = Si, false = No
+       descripcion: data.columnaVertebralContracturaDescripcion??""
+     },
+     cicatrizPostOperatoria: {
+       hallazgo: data.columnaVertebralCicatrizSi, // true = Si, false = No
+       descripcion: data.columnaVertebralCicatrizDescripcion??""
+     },
+     
+           // === TESTS DE MIEMBROS SUPERIORES ===
+      testJobe: {
+        der: data.testJobederechaSi, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: data.testJobeizquierdaSi // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      testPatte: {
+        der: data.testPateDerechaSi, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: data.testPateIzquierdaSi // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      testGerber: {
+        der: data.testGerberDerechaSi, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: data.testGerberIzquierdaSi // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      pullUpTest: {
+        der: data.testPulmDerechaSi, // true = Si (no hay limitación), false = No (hay limitación)
+        izq: data.testPulmIzquierdaSi // true = Si (no hay limitación), false = No (hay limitación)
+      },
+      
+      // === TESTS DE PÁGINA 2 ===
+      epicondilitis: {
+        der: data.epiconDilitisDerechaSi, // true = Si (no hay dolor), false = No (hay dolor)
+        izq: data.epiconDilitisizquierdaSi // true = Si (no hay dolor), false = No (hay dolor)
+      },
+      epitrocleitis: {
+        der: data.epitroCleitisDerechaSi, // true = Si (no hay dolor), false = No (hay dolor)
+        izq: data.epitroCleitisIzquierdaSi // true = Si (no hay dolor), false = No (hay dolor)
+      },
+      phalen: {
+        der: data.phalenDerechaSi, // true = Si (no hay parestesias), false = No (hay parestesias)
+        izq: data.phalenIzquierdaSi // true = Si (no hay parestesias), false = No (hay parestesias)
+      },
+      phalenInvertido: {
+        der: data.phalenInvertidoDerechaSi, // true = Si (no hay parestesias), false = No (hay parestesias)
+        izq: data.phalenInvertidoIzquierdaSi // true = Si (no hay parestesias), false = No (hay parestesias)
+      },
+      tinel: {
+        der: data.tinnelDerechaSi, // true = Si (no hay parestesias), false = No (hay parestesias)
+        izq: data.tinnelIzquierdaSi // true = Si (no hay parestesias), false = No (hay parestesias)
+      },
+      finkelstein: {
+        der: data.finkelsTeinDerechaSi, // true = Si (no hay dolor), false = No (hay dolor)
+        izq: data.finkelsTeinIzquierdaSi // true = Si (no hay dolor), false = No (hay dolor)
+      },
+      
+      // === EVALUACIÓN MÚSCULO ESQUELÉTICA DE CADERA Y MIEMBROS INFERIORES ===
+      caderaDerecha: {
+        abduccion: data.caderaDerechaAbduccion ?? "",
+        aduccion: data.caderaDerechaAduccion ?? "",
+        flexion: data.caderaDerechaFlexion ?? "",
+        extension: data.caderaDerechaExtension ?? "",
+        rotacionInterna: data.caderaDerechaRotInterna ?? "",
+        rotacionExterna: data.caderaDerechaRotExterna ?? "",
+        irradiacion: data.caderaDerechaIrradiacion ?? "",
+        altMasaMuscular: data.caderaDerechaMasaMuscular ?? "",
+      },
+      caderaIzquierda: {
+        abduccion: data.caderaIzquierdaAbduccion ?? "",
+        aduccion: data.caderaIzquierdaAduccion ?? "",
+        flexion: data.caderaIzquierdaFlexion ?? "",
+        extension: data.caderaIzquierdaExtension ?? "",
+        rotacionInterna: data.caderaIzquierdaRotInterna ?? "",
+        rotacionExterna: data.caderaIzquierdaRotExterna ?? "",
+        irradiacion: data.caderaIzquierdaIrradiacion ?? "",
+        altMasaMuscular: data.caderaIzquierdaMasaMuscular ?? "",
+      },
+      rodillaDerecha: {
+        abduccion:  "",
+        aduccion:  "",
+        flexion: data.rodillaDerechaFlexion ?? "",
+        extension: data.rodillaDerechaExtension ?? "",
+        rotacionInterna: data.rodillaDerechaRotInterna ?? "",
+        rotacionExterna: data.rodillaDerechaRotExterna ?? "",
+        irradiacion: data.rodillaDerechaIrradiacion ?? "",
+        altMasaMuscular: data.rodillaDerechaMasaMuscular ?? "",
+      },
+      rodillaIzquierda: {
+        abduccion:  "",
+        aduccion:  "",
+        flexion: data.rodillaIzquierdaFlexion ?? "",
+        extension: data.rodillaIzquierdaExtension ?? "",
+        rotacionInterna: data.rodillaIzquierdaRotInterna ?? "",
+        rotacionExterna: data.rodillaIzquierdaRotExterna ?? "",
+        irradiacion: data.rodillaIzquierdaIrradiacion ?? "",
+        altMasaMuscular: data.rodillaIzquierdaMasaMuscular ?? "",
+      },
+      tobilloDerecho: {
+        abduccion: data.tobilloDerechoAbduccion ?? "",
+        aduccion: data.tobilloDerechoAduccion ?? "",
+        flexion: data.tobilloDerechoFlexion ?? "",
+        extension: data.tobilloDerechoExtension ?? "",
+        rotacionInterna: data.tobilloDerechoRotInterna ?? "",
+        rotacionExterna: data.tobilloDerechoRotExterna ?? "",
+        irradiacion: data.tobilloDerechoIrradiacion ?? "",
+        altMasaMuscular: data.tobilloDerechoMasaMuscular ?? "",
+      },
+      tobilloIzquierdo: {
+        abduccion: data.tobilloIzquierdoAbduccion ?? "",
+        aduccion: data.tobilloIzquierdoAduccion ?? "",
+        flexion: data.tobilloIzquierdoFlexion ?? "",
+        extension: data.tobilloIzquierdoExtension ?? "",
+        rotacionInterna: data.tobilloIzquierdoRotInterna ?? "",
+        rotacionExterna: data.tobilloIzquierdoRotExterna ?? "",
+        irradiacion: data.tobilloIzquierdoIrradiacion ?? "",
+        altMasaMuscular: data.tobilloIzquierdoMasaMuscular ?? "",
+      },
+      
+      // === CONCLUSIONES Y RECOMENDACIONES ===
+      conclusiones: res.conclusiones||"",
+      cie10: res.cie10||"",
+      recomendaciones: res.recomendaciones||"",
+  };
+
 
   // Usar datos reales o datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? data : datosPrueba;
+  const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
