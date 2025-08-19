@@ -22,7 +22,7 @@ export function SubmitCuantAntigenos(data, user, token) {
 
 
     const url = `${URLAzure}/api/v01/ct/pruebasCovid/registrarActualizarExamenInmunologico`
-    console.log("tokensasasass", token);
+    // console.log("tokensasasass", token);
     const options = {
         method: 'POST',
         headers: {
@@ -54,7 +54,7 @@ export function SubmitCualitAntigenos(data, user, token) {
 
 
     const url = `${URLAzure}/api/v01/ct/pruebasCovid/registrarActualizarExamenInmunologico`
-    console.log("tokensasasass", token);
+    // console.log("tokensasasass", token);
     const options = {
         method: 'POST',
         headers: {

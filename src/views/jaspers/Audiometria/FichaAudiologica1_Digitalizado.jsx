@@ -45,7 +45,8 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
     zumbido: true,
     mareos: false,
     infeccionOidoActual: true,
-    otros: false,
+    otros: true,
+    OtrosTexto: "VIVIANA DEJA DE ACEPTARLES COSAS!!!!!!!",
 
     txtDod250: "40",
     txtDod500: "20",
@@ -454,6 +455,19 @@ export default function FichaAudiologica_Digitalizado(data = {}) {
   ySint += 4.5;
   if (datos.otros) doc.text("X", xSintSI, ySint);
   else doc.text("X", xSintNO, ySint);
+  
+  // Mostrar texto descriptivo de "Otros" si está marcado
+  if (datos.otros && datos.OtrosTexto) {
+    const xOtrosTexto = margin + 108;
+    const yOtrosTexto = margin + 117.2;
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(
+      String(datos.OtrosTexto),
+      xOtrosTexto,
+      yOtrosTexto,
+      { maxWidth: 171 }
+    );
+  }
 
   // === OTOSCOPIA ===
   const xOtoscopia = margin + 23;

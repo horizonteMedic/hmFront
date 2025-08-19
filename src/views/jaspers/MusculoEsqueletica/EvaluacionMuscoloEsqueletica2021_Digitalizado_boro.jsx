@@ -396,8 +396,8 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
   // Observaciones APTITUD ESPALDA
   const xObservacionesAptitud = margin + 114;
   const yObservacionesAptitud = margin + 56.5;
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.observacionesAptitudEspalda || "", xObservacionesAptitud, yObservacionesAptitud, { maxWidth: 60 });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.observacionesAptitudEspalda || "", xObservacionesAptitud, yObservacionesAptitud, { maxWidth: 55, align: "justify" });
 
   // === SECCIÓN: RANGOS ARTICULARES ===
   
@@ -457,7 +457,7 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
   const xObservacionesRangos = margin + 121;
   const yObservacionesRangos = margin + 122.5;
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.observacionesRangosArticulares || "", xObservacionesRangos, yObservacionesRangos, { maxWidth: 60 });
+  doc.text(datosFinales.observacionesRangosArticulares || "", xObservacionesRangos, yObservacionesRangos, { maxWidth: 51, align: "justify" });
 
   // === SECCIÓN: COLUMNA VERTEBRAL - HALLAZGOS ===
   doc.setFont("helvetica", "bold").setFontSize(10);
@@ -991,7 +991,6 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
      // === CADERA ===
      const yCadera = yBase + 15;
      doc.setFont("helvetica", "bold").setFontSize(9);
-     doc.text("Cadera", xBase, yCadera);
      
      // Datos de Cadera Derecha horizontalmente con coordenadas individuales
      const datosCaderaDerecha = [
@@ -1112,7 +1111,6 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
      // === RODILLA ===
      const yRodilla = yBase + 22;
      doc.setFont("helvetica", "bold").setFontSize(9);
-     doc.text("Rodilla", xBase, yRodilla);
      
      // Datos de Rodilla Derecha horizontalmente con coordenadas individuales
      const datosRodillaDerecha = [
@@ -1209,7 +1207,6 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
      // === TOBILLO ===
      const yTobillo = yBase + 29;
      doc.setFont("helvetica", "bold").setFontSize(9);
-     doc.text("Tobillo", xBase, yTobillo);
      
      // Datos de Tobillo Derecho horizontalmente con coordenadas individuales
      const datosTobilloDerecho = [
@@ -1334,7 +1331,10 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
                  const conclusionesY = margin + 180;
                  const conclusionesMaxWidth = 65;
                  
-                 const cie10X = margin + 87;
+                 // CIE 10 centrado en su columna (columna 2)
+                 const cie10ColumnaInicio = margin + 87; // Inicio de la columna CIE 10
+                 const cie10ColumnaFin = margin + 107; // Fin de la columna CIE 10
+                 const cie10X = cie10ColumnaInicio + (cie10ColumnaFin - cie10ColumnaInicio) / 2; // Centro de la columna
                  const cie10Y = margin + 180;
                  const cie10MaxWidth = 20;
                  
@@ -1347,13 +1347,13 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
                 doc.setTextColor(0, 0, 0);
                 
                                  // Columna 1: CONCLUSIONES
-                 doc.text(datosFinales.conclusiones || "", conclusionesX, conclusionesY, { maxWidth: conclusionesMaxWidth });
+                 doc.text(datosFinales.conclusiones || "", conclusionesX, conclusionesY, { maxWidth: conclusionesMaxWidth, align: "justify" });
                  
                  // Columna 2: CIE 10
-                 doc.text(datosFinales.cie10 || "", cie10X, cie10Y, { maxWidth: cie10MaxWidth });
+                 doc.text(datosFinales.cie10 || "", cie10X, cie10Y, { maxWidth: cie10MaxWidth, align: "center" });
                  
                  // Columna 3: RECOMENDACIONES - RESTRICCIONES
-                 doc.text(datosFinales.recomendaciones || "", recomendacionesX, recomendacionesY, { maxWidth: recomendacionesMaxWidth });
+                 doc.text(datosFinales.recomendaciones || "", recomendacionesX, recomendacionesY, { maxWidth: recomendacionesMaxWidth, align: "justify" });
 
       // === SECCIÓN XII: FIRMAS DE PRUEBA ===
       
@@ -1410,6 +1410,18 @@ export default function EvaluacionMuscoloEsqueletica2021_Digitalizado_boro(data 
    const col2X = 70;
    const col3X = 120;
    const col4X = 175;
+ 
+   // Línea de color #1e3b8a arriba del footer
+   const lineY = baseY - 5; // 2mm arriba del footer
+   const lineX1 = 10; // Inicio de la línea (margen izquierdo)
+   const lineX2 = 200; // Fin de la línea (margen derecho)
+   
+   // Configurar color y grosor de la línea
+   doc.setDrawColor(30, 59, 138); // #1e3b8a en RGB
+   doc.setLineWidth(0.5);
+   
+   // Dibujar la línea
+   doc.line(lineX1, lineY, lineX2, lineY);
  
    // Ajustamos la fuente a 8 y color a negro
    doc.setFontSize(7);
