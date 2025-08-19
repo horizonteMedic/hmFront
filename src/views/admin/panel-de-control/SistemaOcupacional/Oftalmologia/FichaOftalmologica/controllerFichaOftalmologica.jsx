@@ -29,6 +29,7 @@ export const GetInfoServicio = (
           contrata: res.contrata,
           nomExam: res.nomExam,
           codOf: res.codOf,
+          edad:res.edad,
           visionCercaOD: res.vcercaSOd,
           visionCercaOI: res.vcercaSOi,
           visionCercaODC: res.vcercaCOd,
@@ -192,6 +193,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...res,
         fechaNac: convertirFecha(res.fechaNac),
         nombres: res.nombresApellidos,
+        edad:res.edad
       }));
     })
     .finally(() => {
