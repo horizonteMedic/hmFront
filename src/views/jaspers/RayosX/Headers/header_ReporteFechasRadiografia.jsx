@@ -83,6 +83,74 @@ function footerFichaRadiografiaCabecera(doc, opts = {}, datos = {}) {
 }
 
 const HeaderReporteFechasRadiografia = (doc, datos) => {
+  // Función para formatear fechas en DD/MM/YYYY
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "";
+
+    // Si ya está en formato DD/MM/YYYY, retornar tal como está
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+      return fecha;
+    }
+
+    // Si está en formato YYYY-MM-DD, convertir
+    if (/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+      const [year, month, day] = fecha.split("-");
+      return `${day}/${month}/${year}`;
+    }
+
+    // Si está en formato YYYY/MM/DD, convertir
+    if (/^\d{4}\/\d{2}\/\d{2}$/.test(fecha)) {
+      const [year, month, day] = fecha.split("/");
+      return `${day}/${month}/${year}`;
+    }
+
+    // Si está en formato DD-MM-YYYY, convertir
+    if (/^\d{2}-\d{2}-\d{4}$/.test(fecha)) {
+      const [day, month, year] = fecha.split("-");
+      return `${day}/${month}/${year}`;
+    }
+
+    // Si está en formato MM/DD/YYYY (formato americano), convertir
+    if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(fecha)) {
+      const partes = fecha.split("/");
+      if (partes.length === 3) {
+        const [month, day, year] = partes;
+        // Validar que sea formato americano (mes <= 12)
+        if (parseInt(month) <= 12 && parseInt(day) <= 31) {
+          return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+        }
+      }
+    }
+
+    // Si está en formato DD.MM.YYYY (con puntos), convertir
+    if (/^\d{2}\.\d{2}\.\d{4}$/.test(fecha)) {
+      const [day, month, year] = fecha.split(".");
+      return `${day}/${month}/${year}`;
+    }
+
+    // Si está en formato YYYY.MM.DD (con puntos), convertir
+    if (/^\d{4}\.\d{2}\.\d{2}$/.test(fecha)) {
+      const [year, month, day] = fecha.split(".");
+      return `${day}/${month}/${year}`;
+    }
+
+    // Para cualquier otro formato, intentar parsear como Date y convertir
+    try {
+      const fechaObj = new Date(fecha);
+      if (!isNaN(fechaObj.getTime())) {
+        const day = fechaObj.getDate().toString().padStart(2, '0');
+        const month = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+        const year = fechaObj.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+    } catch (error) {
+      // Si falla el parsing, continuar
+    }
+
+    // Si no coincide con ningún formato conocido, retornar tal como está
+    return fecha;
+  };
+
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
@@ -163,8 +231,8 @@ const HeaderReporteFechasRadiografia = (doc, datos) => {
   }
 
   // 4) Rango de fechas centrado en la parte inferior
-  const desdeFecha = datos.desdeFecha || "";
-  const hastaFecha = datos.hastaFecha || "";
+  const desdeFecha = formatearFecha(datos.desdeFecha) || "";
+  const hastaFecha = formatearFecha(datos.hastaFecha) || "";
   const fechaRangoY = y + 35; // Bajado de 25 a 35
   
   doc.setFont("helvetica", "normal").setFontSize(9);
