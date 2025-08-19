@@ -1322,7 +1322,7 @@ function Table({
             data.map((row, i) => (
               <tr
                 key={i}
-                className={`hover:bg-gray-50 cursor-pointer text-lg `}
+                className={`hover:bg-[#233245] hover:text-white  cursor-pointer text-lg `}
                 onClick={() => clicktable(row.norden)}
                 onContextMenu={(e) => {
                   e.preventDefault();
