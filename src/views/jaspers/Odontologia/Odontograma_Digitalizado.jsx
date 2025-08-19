@@ -227,7 +227,8 @@ const headerOdontograma = (doc, datos) => {
     { xOffset: -42, fontSize: 7.5, yOffset: -8 },
     datos
   );
-
+const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  if (colorValido) {
   // === BLOQUE CÓDIGO DE COLOR ===
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
@@ -256,6 +257,7 @@ const headerOdontograma = (doc, datos) => {
   doc.setDrawColor(0);
   doc.setTextColor(0);
   doc.setLineWidth(0.2);
+}
 
   // Restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
