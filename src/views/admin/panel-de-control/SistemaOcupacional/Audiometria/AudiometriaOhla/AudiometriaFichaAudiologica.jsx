@@ -32,7 +32,7 @@ const AudiometriaFichaAudiologica = ({
   handleClearOhla,
   formOhla,
 }) => {
-  console.log(listas)
+  console.log(listas);
   const { MedicosMulti } = listas;
 
   const handleNombreMedicoSearch = (e) => {
@@ -609,11 +609,30 @@ const AudiometriaFichaAudiologica = ({
                             type="radio"
                             name={item.name}
                             checked={form[item.name] === "NO"}
-                            onChange={(e) => handleCheckRadio(e, "NO")}
+                            onChange={(e) => {
+                              // handleCheckRadio(e, "NO");
+                              if (item.name == "otro")
+                                setForm({
+                                  ...form,
+                                  otro: "NO",
+                                  otroDescripcion: "",
+                                });
+                            }}
                           />
                         </td>
                       </tr>
                     ))}
+                    <tr>
+                      <td colSpan={3}>
+                        <input
+                          name="otroDescripcion"
+                          value={form.otroDescripcion || ""}
+                          onChange={handleChange}
+                          disabled={form.otro !== "SI"}
+                          className="border  rounded-lg px-3 py-1  text-[11px] w-full"
+                        />
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </fieldset>

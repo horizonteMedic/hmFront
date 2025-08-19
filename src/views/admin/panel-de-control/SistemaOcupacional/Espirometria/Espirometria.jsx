@@ -69,7 +69,7 @@ export default function Espirometria({ token, selectedSede, userlogued }) {
   };
 
   return (
-    <div className="mx-auto bg-white rounded shadow p-6 max-w-[90%] md:max-w-[70%] xl:max-w-[50%]">
+    <div className="mx-auto bg-white rounded shadow p-6 max-w-[90%] text-[11px]">
       <h2 className="text-2xl font-bold text-center ">ESPIROMETRÍA</h2>
       {/* Encabezado */}
       <div className="grid grid-cols-2 gap-4 items-center mt-6 mb-4">
@@ -266,7 +266,7 @@ function Button({ onClick, color, icon, children }) {
   return (
     <button
       onClick={onClick}
-      className={`${bg} text-white px-3 py-1 rounded inline-flex items-center gap-2 text-sm`}
+      className={`${bg} text-white px-3 py-1 rounded inline-flex items-center gap-2 text-[11px]`}
     >
       <FontAwesomeIcon icon={icon} />
       {children}
