@@ -5,7 +5,7 @@ import header_Cuestionario from "./Header_CuestionarioN";
 export default function CuestionarioNordico(datos = {}) {
 
   const doc = new jsPDF({ unit: "mm", format: "a4" });
-  const margin = 8;
+  const margin = 5;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 26;
 
@@ -33,7 +33,7 @@ export default function CuestionarioNordico(datos = {}) {
   autoTable(doc, {
     startY: y + 3,
     theme: "grid",
-    margin: { left: 2, right: 2 },
+    margin: { left: margin, right: margin },
     styles: { fontSize: 9, textColor: [0, 0, 0]},
     headStyles: {   lineWidth: 0.5,  lineHeight: 1.5 },
     tableLineColor: [0, 0, 0],
@@ -96,8 +96,8 @@ export default function CuestionarioNordico(datos = {}) {
         //GENERO
         doc.setDrawColor(0); // Negro
         doc.setLineWidth(0.5);
-        doc.rect(textX + 48, textY + 7 , boxSize, boxSize); // Cuadro pequeño
-        doc.rect(textX + 85, textY + 7 , boxSize, boxSize); // Cuadro pequeño
+        doc.rect(textX + 48, textY + 5 , boxSize, boxSize); // Cuadro pequeño
+        doc.rect(textX + 85, textY + 5 , boxSize, boxSize); // Cuadro pequeño
         //Años y Meses
         doc.rect(textX + 48, textY + 17 , boxSize, boxSize); // Cuadro pequeño
         doc.rect(textX + 85, textY + 17 , boxSize, boxSize); // Cuadro pequeño
@@ -113,7 +113,7 @@ export default function CuestionarioNordico(datos = {}) {
   autoTable(doc, {
     startY: doc.lastAutoTable.finalY,
     theme: "grid",
-    margin: { left: 2, right: 2 },
+    margin: { left: margin, right: margin },
     styles: { fontSize: 9, textColor: [0, 0, 0]},
     headStyles: {   lineWidth: 0.5,  lineHeight: 1.5 },
     tableLineColor: [0, 0, 0],
@@ -148,11 +148,11 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 60, valign: "middle", halign: "center" }
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -169,7 +169,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -186,7 +186,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -203,7 +203,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
     ],
@@ -250,7 +250,7 @@ export default function CuestionarioNordico(datos = {}) {
   autoTable(doc, {
     startY: doc.lastAutoTable.finalY,
     theme: "grid",
-    margin: { left: 2, right: 2 },
+    margin: { left: margin, right: margin },
     styles: { fontSize: 9, textColor: [0, 0, 0]},
     headStyles: {   lineWidth: 0.5,  lineHeight: 1.5 },
     tableLineColor: [0, 0, 0],
@@ -268,7 +268,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -282,7 +282,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -296,7 +296,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -310,7 +310,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
       [
@@ -324,7 +324,7 @@ export default function CuestionarioNordico(datos = {}) {
         },
         {
           content: "",
-          styles: { cellWidth: 65, valign: "middle", halign: "center" }
+          styles: { cellWidth: 50, valign: "middle", halign: "center" }
         }
       ],
     ],
@@ -370,7 +370,7 @@ export default function CuestionarioNordico(datos = {}) {
   autoTable(doc, {
     startY: doc.lastAutoTable.finalY,
     theme: "grid",
-    margin: { left: 2, right: 2 },
+    margin: { left: margin, right: margin },
     styles: { fontSize: 9, textColor: [0, 0, 0]},
     headStyles: {   lineWidth: 0.5,  lineHeight: 1.5 },
     tableLineColor: [0, 0, 0],
@@ -408,7 +408,7 @@ export default function CuestionarioNordico(datos = {}) {
     autoTable(doc, {
     startY: doc.lastAutoTable.finalY,
     theme: "grid",
-    margin: { left: 2, right: 2 },
+    margin: { left: margin, right: margin },
     styles: { fontSize: 9, textColor: [0, 0, 0]},
     headStyles: {   lineWidth: 0.5,  lineHeight: 1.5 },
     tableLineColor: [0, 0, 0],

@@ -6,8 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import PropTypes from "prop-types";
 
-import { useState } from "react";
-
+import Swal from "sweetalert2";
 import Cuestionario from "./Cuestionario/Cuestionario";
 import Responder from "./Responder/Responder";
 import Espalda_Baja from "./Espalda_Baja/Espalda_Baja";
@@ -15,7 +14,7 @@ import Hombros from "./Hombros/Hombros";
 import Cuello from "./Cuello/Cuello";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
-import { VerifyTR, SubmitCuestionarioNordic } from "./controller/ControllerCN"
+import { VerifyTR, SubmitCuestionarioNordic, PrintHojaR } from "./controller/ControllerCN"
 
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
@@ -216,6 +215,27 @@ const Cuestionario_Nordico = () => {
   
   const { form, setForm, handleChange, handleChangeNumber, handleClear, handleClearnotO, handleInputChangeChecked } = useForm(initialFormState)
   
+  const handlePrint = () => {
+    if (!form.norden) return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Cuestionario Nordico?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden, token, tabla);
+      }
+    });
+  };
+
   return (
     <div className="">
       <div className="max-w-[70%] mx-auto">
@@ -277,6 +297,8 @@ const Cuestionario_Nordico = () => {
               SubmitCuestionarioNordic={SubmitCuestionarioNordic}
               tabla={tabla}
               handleClear={handleClear}
+              handleChange={handleChange}
+              handlePrint={handlePrint}
             />
 
         </div>

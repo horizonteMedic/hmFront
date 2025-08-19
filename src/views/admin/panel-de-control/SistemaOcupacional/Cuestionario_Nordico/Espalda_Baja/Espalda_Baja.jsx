@@ -41,6 +41,26 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
             return newForm;
         });
     };
+
+    const handleInputChangeCheckedGroup = (e, group) => {
+        const { name } = e.target;
+        setForm(prev => {
+            const newForm = { ...prev };
+
+            if (prev[name]) {
+                // Si ya estaba activo, lo desmarcamos
+                newForm[name] = false;
+            } else {
+                // Desmarcar todos los del grupo recibido
+                group.forEach(code => newForm[code] = false);
+
+                // Activar solo el seleccionado
+                newForm[name] = true;
+            }
+
+            return newForm;
+        });
+    };
    
     return(
         <>
@@ -60,9 +80,9 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
                         <label className=" font-normal" htmlFor="">1.- Ud. ha tenido problemas en la espalda baja (molestias, dolor o disconfort) ?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta1EspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta1EspaldaBajaNo" id="" className=" mx-3"/>
+                            <input checked={form.pregunta1EspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1EspaldaBajaNo","pregunta1EspaldaBajaSi"])}} type="checkbox" name="pregunta1EspaldaBajaNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta1EspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta1EspaldaBajaSi" id="" className=" mx-3"/>
+                            <input checked={form.pregunta1EspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1EspaldaBajaNo","pregunta1EspaldaBajaSi"])}} type="checkbox" name="pregunta1EspaldaBajaSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex justify-between my-2">
@@ -72,18 +92,18 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
                         <label className=" font-normal" htmlFor="">2.- Ud. ha estado hospitalizado por problemas es espalda baja?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta2EspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta2EspaldaBajaNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta2EspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2EspaldaBajaNo","pregunta2EspaldaBajaSi"])}} type="checkbox" name="pregunta2EspaldaBajaNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta2EspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta2EspaldaBajaSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta2EspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta2EspaldaBajaNo","pregunta2EspaldaBajaSi"])}} type="checkbox" name="pregunta2EspaldaBajaSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex justify-between my-2">
                         <label className=" font-normal" htmlFor="">3.- Ud. ha tenido cambios de trabajo o actividad por problemas de espalda baja?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta3EspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta3EspaldaBajaNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta3EspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta3EspaldaBajaNo","pregunta3EspaldaBajaSi"])}} type="checkbox" name="pregunta3EspaldaBajaNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta3EspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta3EspaldaBajaSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta3EspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta3EspaldaBajaNo","pregunta3EspaldaBajaSi"])}} type="checkbox" name="pregunta3EspaldaBajaSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex flex-col justify-between my-2">
@@ -93,7 +113,7 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
                                 {label: "0 Días", code: "pregunta4AEspaldaBaja"},{label: "1-7 Días", code: "pregunta4BEspaldaBaja"},{label: "8-30 Días", code: "pregunta4CEspaldaBaja"},{label: "Más de 30 Días", code: "pregunta4DEspaldaBaja"},{label: "Todos los Días", code: "pregunta4EEspaldaBaja"},
                             ].map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-1">
-                                    <input checked={form[item.code]} type="checkbox" name={item.code} onChange={handleInputChangeCheckedEB} id="" />
+                                    <input checked={form[item.code]} type="checkbox" name={item.code} disabled={form.pregunta1EspaldaBajaNo} onChange={handleInputChangeCheckedEB} id="" />
                                     <label htmlFor="">{item.label}</label>
                                 </div>
                             
@@ -109,18 +129,18 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
                             <label className="ml-20 font-normal"  htmlFor="">a. Actividad de trabajo (en el trabajo o la casa)</label>
                             <div className="flex items-center">
                                 <label htmlFor="">No</label>
-                                <input checked={form.pregunta5AEspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta5AEspaldaBajaNo" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta5AEspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta5AEspaldaBajaNo","pregunta5AEspaldaBajaSi"])}} type="checkbox" name="pregunta5AEspaldaBajaNo" id="" className=" mx-3"/>
                                 <label htmlFor="">Si</label>
-                                <input checked={form.pregunta5AEspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta5AEspaldaBajaSi" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta5AEspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta5AEspaldaBajaNo","pregunta5AEspaldaBajaSi"])}} type="checkbox" name="pregunta5AEspaldaBajaSi" id="" className=" mx-3"/>
                             </div>
                         </div>
                         <div className="flex justify-between items-center mr-10 my-1">
                             <label className="ml-20 font-normal" htmlFor="">b. Actividades recreativas</label>
                             <div className="flex items-center">
                                 <label htmlFor="">No</label>
-                                <input checked={form.pregunta5BEspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta5BEspaldaBajaNo" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta5BEspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta5BEspaldaBajaNo","pregunta5BEspaldaBajaSi"])}} type="checkbox" name="pregunta5BEspaldaBajaNo" id="" className=" mx-3"/>
                                 <label htmlFor="">Si</label>
-                                <input checked={form.pregunta5BEspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta5BEspaldaBajaSi" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta5BEspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta5BEspaldaBajaNo","pregunta5BEspaldaBajaSi"])}} type="checkbox" name="pregunta5BEspaldaBajaSi" id="" className=" mx-3"/>
                             </div>
                         </div>
                     </div>
@@ -131,7 +151,7 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
                                 {label: "0 Días", code: "pregunta6AEspaldaBaja"},{label: "1-7 Días", code: "pregunta6BEspaldaBaja"},{label: "8-30 Días", code: "pregunta6CEspaldaBaja"},{label: "Más de 30 Días", code: "pregunta6DEspaldaBaja"}
                             ].map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-1">
-                                    <input checked={form[item.code]} type="checkbox" name={item.code} onChange={handleInputChangeCheckedEB2} id="" />
+                                    <input checked={form[item.code]} type="checkbox" name={item.code} disabled={form.pregunta1EspaldaBajaNo} onChange={handleInputChangeCheckedEB2} id="" />
                                     <label htmlFor="">{item.label}</label>
                                 </div>
                             
@@ -142,18 +162,18 @@ const Espalda_Baja = ({token, selectedSede, userlogued, form, setForm, handleCha
                         <label className=" font-normal w-[80%]" htmlFor="">7.- Ha sido visto por un médico, fisioterapista, quiropráctico y otra persona de área debido a problemas de espalda durante los ultimos 12 meses?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta7EspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta7EspaldaBajaNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta7EspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta7EspaldaBajaNo","pregunta7EspaldaBajaSi"])}} type="checkbox" name="pregunta7EspaldaBajaNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta7EspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta7EspaldaBajaSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta7EspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta7EspaldaBajaNo","pregunta7EspaldaBajaSi"])}} type="checkbox" name="pregunta7EspaldaBajaSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex justify-between my-2">
                         <label className=" font-normal w-[80%]" htmlFor="">8.- Ha tenido problemas de espalda baja en algún momento durante los últimos 7 días?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta8EspaldaBajaNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta8EspaldaBajaNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta8EspaldaBajaNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta8EspaldaBajaNo","pregunta8EspaldaBajaSi"])}} type="checkbox" name="pregunta8EspaldaBajaNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta8EspaldaBajaSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta8EspaldaBajaSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1EspaldaBajaNo} checked={form.pregunta8EspaldaBajaSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta8EspaldaBajaNo","pregunta8EspaldaBajaSi"])}} type="checkbox" name="pregunta8EspaldaBajaSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                 </div>

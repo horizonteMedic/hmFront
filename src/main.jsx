@@ -50,7 +50,7 @@ import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/S
 import EKG from "./views/admin/panel-de-control/SistemaOcupacional/EKG/ekg.jsx";
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/MusculoEsqueletica/EvaluacionMuscoloEsqueletica.jsx"
+import Ficha from "./views/jaspers/Cuestionario_Nordico/CuestionarioNordico.jsx"
 
 const App = () => {
   return (

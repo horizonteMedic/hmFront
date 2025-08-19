@@ -104,6 +104,26 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
             return newForm;
         });
     };
+
+    const handleInputChangeCheckedGroup = (e, group) => {
+        const { name } = e.target;
+        setForm(prev => {
+            const newForm = { ...prev };
+
+            if (prev[name]) {
+                // Si ya estaba activo, lo desmarcamos
+                newForm[name] = false;
+            } else {
+                // Desmarcar todos los del grupo recibido
+                group.forEach(code => newForm[code] = false);
+
+                // Activar solo el seleccionado
+                newForm[name] = true;
+            }
+
+            return newForm;
+        });
+    };
     
     return(
         <>
@@ -123,9 +143,9 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
                         <label className=" font-normal" htmlFor="">9.- Ud. ha tenido problema de hombros (molestias, dolor o disconfort) ?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta1ProblemasHombrosNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta1ProblemasHombrosNo" id="" className=" mx-3"/>
+                            <input checked={form.pregunta1ProblemasHombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1ProblemasHombrosNo","pregunta1ProblemasHombrosSi"])}} type="checkbox" name="pregunta1ProblemasHombrosNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta1ProblemasHombrosSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta1ProblemasHombrosSi" id="" className=" mx-3"/>
+                            <input checked={form.pregunta1ProblemasHombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta1ProblemasHombrosNo","pregunta1ProblemasHombrosSi"])}} type="checkbox" name="pregunta1ProblemasHombrosSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex justify-between my-2">
@@ -134,40 +154,40 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
                     <div className="flex flex-col justify-between my-2">
                         <label className=" font-normal" htmlFor="">10.- Ud. ha tenido lesiones en sus hombros en un accidente?</label>
                         <div className="flex items-center mr-10 my-1 ml-20">
-                            <input checked={form.pregunta2ProblemasHombrosNo} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasHombrosNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta2ProblemasHombrosNo} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasHombrosNo" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">1 No</label>
-                            <input checked={form.pregunta2ProblemasHombroIzquierdoSi} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasHombroIzquierdoSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta2ProblemasHombroIzquierdoSi} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasHombroIzquierdoSi" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">3 Si, en mi hombro izquierdo</label>
                         </div>
                         <div className="flex items-center mr-10 my-1 ml-20">
-                            <input checked={form.pregunta2ProblemasHombroDerechoSi} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasHombroDerechoSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta2ProblemasHombroDerechoSi} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasHombroDerechoSi" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">2 SI, en mi hombro derecho</label>
-                            <input checked={form.pregunta2ProblemasAmbosHombros} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasAmbosHombros" id="" className=" mx-3"/>
-                            <label className=" font-normal w-[20%]"  htmlFor="">3 Si, en ambos hombros</label>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta2ProblemasAmbosHombros} onChange={handleInputChangeChecked10} type="checkbox" name="pregunta2ProblemasAmbosHombros" id="" className=" mx-3"/>
+                            <label className=" font-normal w-[20%]"  htmlFor="">4 Si, en ambos hombros</label>
                         </div>
                     </div>
                     <div className="flex justify-between my-2">
                         <label className=" font-normal" htmlFor="">11.- Ud. ha tenido un cambio de trabajo o actividad por problemas de hombros?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta3ProblemasHombrosNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta3ProblemasHombrosNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta3ProblemasHombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta3ProblemasHombrosNo","pregunta3ProblemasHombrosSi"])}} type="checkbox" name="pregunta3ProblemasHombrosNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta3ProblemasHombrosSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta3ProblemasHombrosSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta3ProblemasHombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta3ProblemasHombrosNo","pregunta3ProblemasHombrosSi"])}} type="checkbox" name="pregunta3ProblemasHombrosSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex flex-col justify-between my-2">
                         <label className=" font-normal" htmlFor="">12.- Ud. ha tenido problemas en los hombros durante los ultimos 12 meses? <span className="font-bold">Si Ud. Responde NO, no responda las preguntas 13 a 17</span></label>
                         <div className="flex items-center mr-10 my-1 ml-20">
-                            <input checked={form.pregunta4ProblemasHombrosNo} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasHombrosNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta4ProblemasHombrosNo} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasHombrosNo" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">1 No</label>
-                            <input checked={form.pregunta4ProblemasHombroIzquierdoSi} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasHombroIzquierdoSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta4ProblemasHombroIzquierdoSi} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasHombroIzquierdoSi" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">3 Si, en mi hombro izquierdo</label>
                         </div>
                         <div className="flex items-center mr-10 my-1 ml-20">
-                            <input checked={form.pregunta4ProblemasHombroDerechoSi} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasHombroDerechoSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta4ProblemasHombroDerechoSi} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasHombroDerechoSi" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">2 SI, en mi hombro derecho</label>
-                            <input checked={form.pregunta4ProblemasAmbosHombros} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasAmbosHombros" id="" className=" mx-3"/>
-                            <label className=" font-normal w-[20%]"  htmlFor="">3 Si, en ambos hombros</label>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta4ProblemasAmbosHombros} onChange={handleInputChangeChecked12} type="checkbox" name="pregunta4ProblemasAmbosHombros" id="" className=" mx-3"/>
+                            <label className=" font-normal w-[20%]"  htmlFor="">4 Si, en ambos hombros</label>
                         </div>
                     </div>
                     <div className="flex flex-col justify-between my-2">
@@ -177,7 +197,7 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
                                 {label: "0 Días", code: "pregunta5AProblemasHombros"},{label: "1-7 Días", code: "pregunta5BProblemasHombros"},{label: "8-30 Días", code: "pregunta5CProblemasHombros"},{label: "Más de 30 Días", code: "pregunta5DProblemasHombros"}
                             ].map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-1">
-                                    <input checked={form[item.code]} type="checkbox" name={item.code} onChange={handleInputChangeChecked1} id="" />
+                                    <input checked={form[item.code]} type="checkbox" name={item.code} disabled={form.pregunta1ProblemasHombrosNo} onChange={handleInputChangeChecked1} id="" />
                                     <label htmlFor="">{item.label}</label>
                                 </div>
                             
@@ -190,18 +210,18 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
                             <label className="ml-20 font-normal"  htmlFor="">a. Actividad de trabajo (en el trabajo o la casa)</label>
                             <div className="flex items-center">
                                 <label htmlFor="">No</label>
-                                <input checked={form.pregunta6AProblemasHombrosNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta6AProblemasHombrosNo" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta6AProblemasHombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta6AProblemasHombrosNo","pregunta6AProblemasHombrosSi"])}} type="checkbox" name="pregunta6AProblemasHombrosNo" id="" className=" mx-3"/>
                                 <label htmlFor="">Si</label>
-                                <input checked={form.pregunta6AProblemasHombrosSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta6AProblemasHombrosSi" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta6AProblemasHombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta6AProblemasHombrosNo","pregunta6AProblemasHombrosSi"])}} type="checkbox" name="pregunta6AProblemasHombrosSi" id="" className=" mx-3"/>
                             </div>
                         </div>
                         <div className="flex justify-between items-center mr-10 my-1">
                             <label className="ml-20 font-normal" htmlFor="">b. Actividades recreativas</label>
                             <div className="flex items-center">
                                 <label htmlFor="">No</label>
-                                <input checked={form.pregunta6BProblemasHombrosNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta6BProblemasHombrosNo" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta6BProblemasHombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta6BProblemasHombrosNo","pregunta6BProblemasHombrosSi"])}} type="checkbox" name="pregunta6BProblemasHombrosNo" id="" className=" mx-3"/>
                                 <label htmlFor="">Si</label>
-                                <input checked={form.pregunta6BProblemasHombrosSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta6BProblemasHombrosSi" id="" className=" mx-3"/>
+                                <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta6BProblemasHombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta6BProblemasHombrosNo","pregunta6BProblemasHombrosSi"])}} type="checkbox" name="pregunta6BProblemasHombrosSi" id="" className=" mx-3"/>
                             </div>
                         </div>
                     </div>
@@ -212,7 +232,7 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
                                 {label: "0 Días", code: "pregunta7AProblemasHombros"},{label: "1-7 Días", code: "pregunta7BProblemasHombros"},{label: "8-30 Días", code: "pregunta7CProblemasHombros"},{label: "Más de 30 Días", code: "pregunta7DProblemasHombros"}
                             ].map((item, idx) => (
                                 <div key={idx} className="flex items-center gap-1">
-                                    <input checked={form[item.code]} type="checkbox" name={item.code} onChange={handleInputChangeChecked2} id="" />
+                                    <input checked={form[item.code]} type="checkbox" name={item.code} disabled={form.pregunta1ProblemasHombrosNo} onChange={handleInputChangeChecked2} id="" />
                                     <label htmlFor="">{item.label}</label>
                                 </div>
                             
@@ -223,24 +243,24 @@ const Hombros = ({token, selectedSede, userlogued, form, setForm, handleChange, 
                         <label className=" font-normal w-[80%]" htmlFor="">16.- Ha sido visto por un médico, fisioterapista, quiropráctico y otra persona de área debido a problemas en los hombros los ultimos 12 meses?</label>
                         <div className="flex justify-center items-center mr-10">
                             <label htmlFor="">No</label>
-                            <input checked={form.pregunta8ProblemasHombrosNo} onChange={handleInputChangeChecked} type="checkbox" name="pregunta8ProblemasHombrosNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta8ProblemasHombrosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta8ProblemasHombrosNo","pregunta8ProblemasHombrosSi"])}} type="checkbox" name="pregunta8ProblemasHombrosNo" id="" className=" mx-3"/>
                             <label htmlFor="">Si</label>
-                            <input checked={form.pregunta8ProblemasHombrosSi} onChange={handleInputChangeChecked} type="checkbox" name="pregunta8ProblemasHombrosSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta8ProblemasHombrosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["pregunta8ProblemasHombrosNo","pregunta8ProblemasHombrosSi"])}} type="checkbox" name="pregunta8ProblemasHombrosSi" id="" className=" mx-3"/>
                         </div>
                     </div>
                     <div className="flex flex-col justify-between my-2">
                         <label className=" font-normal w-[80%]" htmlFor="">17.- Ha tenido problemas de los hombros en algún momento durante los últimos 7 días?</label>
                         <div className="flex items-center mr-10 my-1 ml-20">
-                            <input checked={form.pregunta9ProblemasHombrosNo} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasHombrosNo" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta9ProblemasHombrosNo} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasHombrosNo" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">1 No</label>
-                            <input checked={form.pregunta9ProblemasHombroIzquierdoSi} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasHombroIzquierdoSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta9ProblemasHombroIzquierdoSi} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasHombroIzquierdoSi" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">3 Si, en mi hombro izquierdo</label>
                         </div>
                         <div className="flex items-center mr-10 my-1 ml-20">
-                            <input checked={form.pregunta9ProblemasHombroDerechoSi} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasHombroDerechoSi" id="" className=" mx-3"/>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta9ProblemasHombroDerechoSi} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasHombroDerechoSi" id="" className=" mx-3"/>
                             <label className=" font-normal w-[20%]"  htmlFor="">2 SI, en mi hombro derecho</label>
-                            <input checked={form.pregunta9ProblemasAmbosHombros} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasAmbosHombros" id="" className=" mx-3"/>
-                            <label className=" font-normal w-[20%]"  htmlFor="">3 Si, en ambos hombros</label>
+                            <input disabled={form.pregunta1ProblemasHombrosNo} checked={form.pregunta9ProblemasAmbosHombros} onChange={handleInputChangeChecked17} type="checkbox" name="pregunta9ProblemasAmbosHombros" id="" className=" mx-3"/>
+                            <label className=" font-normal w-[20%]"  htmlFor="">4 Si, en ambos hombros</label>
                         </div>
                     </div>
                 </div>
