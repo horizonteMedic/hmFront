@@ -223,9 +223,9 @@ const Responder = ({token, selectedSede, userlogued, form, setForm, handleChange
                             <div className="flex items-center">
                                 <label htmlFor="" className="w-[60%] py-2">Una o ambas caderas/muslos: </label>
                                 <label htmlFor="">No</label>
-                                <input checked={form.caderasOMuslosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["espaldaBajaLumbarSi","caderasOMuslosSi"])}} type="checkbox" name="caderasOMuslosNo" id="" className=" mx-3"/>
+                                <input checked={form.caderasOMuslosNo} onChange={(e) => {handleInputChangeCheckedGroup(e, ["caderasOMuslosNo","caderasOMuslosSi"])}} type="checkbox" name="caderasOMuslosNo" id="" className=" mx-3"/>
                                 <label htmlFor="">Si</label>
-                                <input checked={form.caderasOMuslosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["espaldaBajaLumbarSi","caderasOMuslosSi"])}} type="checkbox" name="caderasOMuslosSi" id="" className=" mx-3"/>
+                                <input checked={form.caderasOMuslosSi} onChange={(e) => {handleInputChangeCheckedGroup(e, ["caderasOMuslosNo","caderasOMuslosSi"])}} type="checkbox" name="caderasOMuslosSi" id="" className=" mx-3"/>
                             </div>
                             <div className="flex items-center">
                                 <label htmlFor="" className="w-[60%] py-2">Una o ambas rodillas: </label>

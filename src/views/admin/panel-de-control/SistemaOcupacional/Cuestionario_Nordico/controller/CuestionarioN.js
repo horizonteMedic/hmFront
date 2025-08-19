@@ -146,7 +146,7 @@ export function SubmitCuestionarioNordicoJS(data,user,token) {
         "pregunta6BProblemasCuello": data.pregunta6BProblemasCuello,
         "pregunta6CProblemasCuello": data.pregunta6CProblemasCuello,
         "pregunta6DProblemasCuello": data.pregunta6DProblemasCuello,
-        "fechaCuestionario": data.fecha,
+        "fechaCuestionario": data.fechaCuestionario,
         "userRegistro": user
     };    
 
