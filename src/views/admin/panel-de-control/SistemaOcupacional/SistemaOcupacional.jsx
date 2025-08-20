@@ -84,7 +84,11 @@ import RayosX from "./RayosX/RayosX.jsx";
 import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
+<<<<<<< HEAD
 import ManejoCamara from "./Playground/ManejoCamara.jsx";
+=======
+import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
+>>>>>>> 1b1a81ad976407650ed6f37f88006468f4101089
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -456,6 +460,7 @@ const TabComponent = () => {
                   </span>
                 </div>
               )}
+<<<<<<< HEAD
               {tieneVista("Playground") && (
                 <div
                   className={`${styles.gridItem} ${
@@ -467,6 +472,21 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faGamepad} />
                   </span>
                   <span className={styles.title}>Playground</span>
+=======
+              {tieneVista("Test Fatiga") && (
+                <div
+                  onClick={() => setActiveTab(23)}
+                  className={`${styles.gridItem} ${
+                    activeTab === 23 ? styles.active : ""
+                  }`}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faSkull} />
+                  </span>
+                  <span className={styles.title}>
+                    Test Fatiga y Somnolencia
+                  </span>
+>>>>>>> 1b1a81ad976407650ed6f37f88006468f4101089
                 </div>
               )}
             </div>
@@ -1121,12 +1141,16 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
+<<<<<<< HEAD
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">
                   Playground
                 </h2>
               </div>
               <ManejoCamara />
+=======
+              <Test_fatiga />
+>>>>>>> 1b1a81ad976407650ed6f37f88006468f4101089
             </div>
           )}
         </div>

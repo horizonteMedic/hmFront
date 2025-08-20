@@ -40,14 +40,14 @@ const Cuestionario_Nordico = () => {
     esDiestro: false,
     esZurdo: false,
     //Responder
-    cuelloNo: false,
+    cuelloNo: true,
     cuelloSi: false,
     pregunta1CuelloNo: false,
     pregunta1CuelloSi: false,
     pregunta2CuelloNo: false,
     pregunta2CuelloSi: false,
       //Hombros
-    hombrosNo: false,
+    hombrosNo: true,
     hombroDerechoSi: false,
     hombroIzquierdoSi: false,
     ambosHombrosSi: false,
@@ -56,7 +56,7 @@ const Cuestionario_Nordico = () => {
     pregunta2HombrosNo: false,
     pregunta2HombrosSi: false,
       //Codos
-    codosNo: false,
+    codosNo: true,
     codoDerechoSi: false,
     codoIzquierdoNo: false,
     ambosCodosSi: false,
@@ -65,7 +65,7 @@ const Cuestionario_Nordico = () => {
     pregunta2CodosNo: false,
     pregunta2CodosSi: false,
       //Muñeca
-    munecaNo: false,
+    munecaNo: true,
     munecaDerechaSi: false,
     munecaIzquierdaSi: false,
     ambasMunecasSi: false,
@@ -75,42 +75,42 @@ const Cuestionario_Nordico = () => {
     pregunta2MunecasSi: false,
       //Otros
       //Espalda Alta
-    espaldaAltaToraxNo: false,
+    espaldaAltaToraxNo: true,
     espaldaAltaToraxSi: false,
     pregunta1EspaldaAltaToraxNo: false,
     pregunta1EspaldaAltaToraxSi: false,
     pregunta2EspaldaAltaToraxNo: false,
     pregunta2EspaldaAltaToraxSi: false,
       //Espalda Baja
-    espaldaBajaLumbarNo: false,
+    espaldaBajaLumbarNo: true,
     espaldaBajaLumbarSi: false,
     pregunta1EspaldaBajaLumbarNo: false,
     pregunta1EspaldaBajaLumbarSi: false,
     pregunta2EspaldaBajaLumbarNo: false,
     pregunta2EspaldaBajaLumbarSi: false,
       //Caderas
-    caderasOMuslosNo: false,
+    caderasOMuslosNo: true,
     caderasOMuslosSi: false,
     pregunta1CaderasOMuslosNo: false,
     pregunta1CaderasOMuslosSi: false,
     pregunta2CaderasOMuslosNo: false,
     pregunta2CaderasOMuslosSi: false,
       //Rodillas
-    rodillasNo: false,
+    rodillasNo: true,
     rodillasSi: false,
     pregunta1RodillasNo: false,
     pregunta1RodillasSi: false,
     pregunta2RodillasNo: false,
     pregunta2RodillasSi: false,
       //Tobillos
-    tobillosOPiesNo: false,
+    tobillosOPiesNo: true,
     tobillosOPiesSi: false,
     pregunta1TobillosOPiesNo: false,
     pregunta1TobillosOPiesSi: false,
     pregunta2TobillosOPiesNo: false,
     pregunta2TobillosOPiesSi: false,
     //Espalda Baja form
-    pregunta1EspaldaBajaNo: false,
+    pregunta1EspaldaBajaNo: true,
     pregunta1EspaldaBajaSi: false,
     pregunta2EspaldaBajaNo: false,
     pregunta2EspaldaBajaSi: false,
@@ -139,7 +139,7 @@ const Cuestionario_Nordico = () => {
     pregunta8EspaldaBajaNo: false,
     pregunta8EspaldaBajaSi: false,
     //Hombros
-    pregunta1ProblemasHombrosNo: false,
+    pregunta1ProblemasHombrosNo: true,
     pregunta1ProblemasHombrosSi: false,
     //10.
     pregunta2ProblemasHombrosNo: false,
@@ -179,7 +179,7 @@ const Cuestionario_Nordico = () => {
     pregunta9ProblemasHombroDerechoSi: false,
     pregunta9ProblemasAmbosHombros: false,
     //Cuello
-    pregunta1ProblemasCuelloNo: false,
+    pregunta1ProblemasCuelloNo: true,
     pregunta1ProblemasCuelloSi: false,
     //2
     pregunta2ProblemasCuelloNo: false,
