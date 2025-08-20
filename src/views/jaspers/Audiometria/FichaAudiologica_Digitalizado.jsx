@@ -162,7 +162,7 @@ export default function FichaAudiologica_Digitalizado(
     mareos: data.chk10Si,
     infeccionOidoActual: data.chk11Si,
     otros: data.chk12Si,
-    OtrosTexto: obtener("OtrosTexto"),
+    OtrosTexto: obtener("otros"),
 
     txtOtoscopia: obtener("txtOtoscopia"),
 
