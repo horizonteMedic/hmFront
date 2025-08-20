@@ -235,9 +235,261 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
       }
     }
   };
+  const leerOpcion = (res, name) =>
+    ["N", "R", "M"].find((op) => res[`${name}${op}`]) || "";
+
+  const leerOpcionDerecho = (res, name) =>
+    ["N", "R", "M"].find((op) => res[`${name}${op}1`]) || "";
+
+  const leerOpcionNorDerIz = (res, name) =>
+  [
+    ["Normal", "Normal"],
+    ["Derecha", "Derecha"],
+    ["Izquierda", "Concavidad Izquierda"],
+  ].find(([sufijo]) => res[`${name}${sufijo}`])?.[1] || "";
+
+
+  const datosReales = {
+    // === SÍNTOMAS ===
+    sintomas: {
+      tieneSintomas: data.sintomaSi, 
+      descripcion: data.sintomas 
+    },
+    
+    // === TIEMPO DE EXPERIENCIA ===
+    tiempoExperiencia: data.tipoServicio,
+    
+    // === TÉCNICA DE LEVANTAMIENTO ===
+    tecnicaLevantamiento: {
+      adecuada: data.adecuadaTecnicacargaSi // true = SI, false = NO
+    },
+    
+    // === CAPACITACIÓN EN LEVANTAMIENTO ===
+    capacitacionLevantamiento: {
+      recibida: data.capacitacionLevantamientoCargaSi // true = SI, false = NO
+    },
+    
+    // === USO DE FAJA LUMBAR ===
+    usoFajaLumbar: {
+      utiliza: data.capacitacionLevantamientoCargaSi // true = SI, false = NO
+    },
+    
+    // === EXAMEN FÍSICO - CABEZA Y CUELLO ===
+    examenFisico: {
+      cabezaCuello: {
+        extension: {
+          texto: data.extencionCabeza,
+          grado: leerOpcion(data, "extensionCabeza") // N = Normal, R = Reducido, M = Marcado
+        },
+        flexion: {
+          texto: data.flexionCabeza, 
+          grado: leerOpcion(data, "flexionCabeza")  // N = Normal, R = Reducido, M = Marcado
+        }
+      },
+      hombro: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionHombro") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionHombro") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionHombro") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionHombro") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        abduccion: {
+          izquierda: { grado: leerOpcion(data, "abduccionHombro") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "abduccionHombro") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        aduccion: {
+          izquierda: { grado: leerOpcion(data, "aduccionHombro") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "aduccionHombro") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionInterna: {
+          izquierda: { grado: leerOpcion(data, "rotacionInternaHombro") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionInternaHombro") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionExterna: {
+          izquierda: { grado: leerOpcion(data, "rotacionExternaHombro") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionExternaHombro") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      brazo: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionBrazo") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionBrazo") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionBrazo") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionBrazo") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      antebrazo: {
+        pronacion: {
+          izquierda: { grado: leerOpcion(data, "pronacionAntebrazo") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "pronacionAntebrazo") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        supinacion: {
+          izquierda: { grado: leerOpcion(data, "supinacionAntebrazo") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "supinacionAntebrazo") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      muneca: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionMunieca") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionMunieca") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionMunieca") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionMunieca") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        desviacionCubital: {
+          izquierda: { grado: leerOpcion(data, "desviacionCubitalMunieca") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "desviacionCubitalMunieca") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        desviacionRadial: {
+          izquierda: { grado: leerOpcion(data, "desiacionRadialMunieca") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "desiacionRadialMunieca  ") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      // Signos especiales de muñeca (solo SI/NO - lado izquierdo)
+      signoPhallen: {
+        izquierda: data.phallenSi // true = SI, false = NO
+      },
+      signoTinel: {
+        izquierda: data.tinelSi // true = SI, false = NO
+      },
+      torax: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionTorax") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionTorax") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionTorax") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionTorax") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacion: {
+          izquierda: { grado: leerOpcion(data, "rotacionTorax") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionTorax") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      caderas: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionCadera") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionCadera") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionCadera") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionCadera") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        abduccion: {
+          izquierda: { grado: leerOpcion(data, "abduccionCadera") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "abduccionCadera") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        aduccion: {
+          izquierda: { grado: leerOpcion(data, "aduccionCadera") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "aduccionCadera") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionInterna: {
+          izquierda: { grado: leerOpcion(data, "rotacionInternaCadera") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionInternaCadera") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionExterna: {
+          izquierda: { grado: leerOpcion(data, "rotacionExternaCadera") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionExternaCadera") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      pierna: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionPierna") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionPierna") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionPierna") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionPierna") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      rodillas: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionRodilla") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionRodilla") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionRodilla") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionRodilla") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionInterna: {
+          izquierda: { grado: leerOpcion(data, "rotacionInternaRodilla") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionInternaRodilla") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        rotacionExterna: {
+          izquierda: { grado: leerOpcion(data, "rotacionExternaRodilla") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "rotacionExternaRodilla") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      tobillos: {
+        flexion: {
+          izquierda: { grado: leerOpcion(data, "flexionTobillo") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "flexionTobillo") }    // N = Normal, R = Reducido, M = Marcado
+        },
+        extension: {
+          izquierda: { grado: leerOpcion(data, "extensionTobillo") }, // N = Normal, R = Reducido, M = Marcado
+          derecha: { grado: leerOpcionDerecho(data, "extensionTobillo") }    // N = Normal, R = Reducido, M = Marcado
+        },
+      },
+      // === NUEVA SECCIÓN: FUERZA MUSCULAR ===
+      fuerzaMuscular: {
+        grado:  ["1", "2", "3", "4", "5"].find(
+              (g) => data[`fuerzaMuscularGrado${g}`]
+            ) || "1", // Grado de fuerza muscular (1, 2, 3, 4, 5)
+      },
+      // === NUEVA SECCIÓN: COLUMNA VERTEBRAL ===
+      columnaVertebral: {
+        // 5.1. Desviación de eje
+        desviacionEje: {
+          cervical: leerOpcionNorDerIz(
+            data,
+            "columaVertebralEjeCervical"
+          ), // "Normal", "Derecha", "Concavidad Izquierda"
+          dorsal: leerOpcionNorDerIz(
+            data,
+            "columaVertebralEjeDorsal"
+          ),  // "Normal", "Derecha", "Concavidad Izquierda"
+          lumbar: leerOpcionNorDerIz(
+            data,
+            "columaVertebralEjeLumbar"
+          ), // "Normal", "Derecha", "Concavidad Izquierda"
+        },
+        // 5.2. Desviación de Columna
+        desviacionColumna: {
+          cifosis: data.columaVertebralDesviacionCifosisSi,     // true = SI, false = NO
+          escoliosis: data.columaVertebralDesviacionEscoliosisSi,   // true = SI, false = NO
+          lordosis: data.columaVertebralDesviacionLordosisSi,    // true = SI, false = NO
+          mixta: data.columaVertebralDesviacionMixtaSi         // true = SI, false = NO
+        },
+        // 5.3. Palpación - DOLOR
+        palpacionDolor: {
+          cervical: data.columaVertebralPalpacionCervicalSi,     // true = SI, false = NO
+          dorsal: data.columaVertebralPalpacionDorsalSi,      // true = SI, false = NO
+          lumbar: data.columaVertebralPalpacionLumbarSi        // true = SI, false = NO
+        },
+        // 5.4. Exploración - Signo de Lasague
+        signoLasague: {
+          derecho: data.columaVertebralExploracionLesagueDerechoSi,      // true = SI, false = NO
+          izquierdo: data.columaVertebralExploracionLesagueIzquierdoSi    // true = SI, false = NO
+        },
+        // 5.5. Diagnóstico
+        diagnostico: data.diagnostico ?? "",
+        // 5.6. Recomendaciones y Plan de Acción
+        recomendaciones: data.recomendaciones ?? "",
+        // 5.7. Tratamiento
+        tratamiento: data.tratamientoSi, // true = SI, false = NO
+        // 5.8. Conclusiones Asintomático
+        conclusionesAsintomatico: data.conclusionAsintomaticoSi // true = SI, false = NO
+      }
+    }
+  };
 
   // Usar datos reales o datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? data : datosPrueba;
+  const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
@@ -1799,15 +2051,15 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(12);
     
     // Marcar X en el grado correspondiente
-    if (gradoFuerza === 1) {
+    if (gradoFuerza === "1") {
       doc.text("X", xFuerzaMuscular1, yFuerzaMuscular); // X en grado 1
-    } else if (gradoFuerza === 2) {
+    } else if (gradoFuerza === "2") {
       doc.text("X", xFuerzaMuscular2, yFuerzaMuscular); // X en grado 2
-    } else if (gradoFuerza === 3) {
+    } else if (gradoFuerza === "3") {
       doc.text("X", xFuerzaMuscular3, yFuerzaMuscular); // X en grado 3
-    } else if (gradoFuerza === 4) {
+    } else if (gradoFuerza === "4") {
       doc.text("X", xFuerzaMuscular4, yFuerzaMuscular); // X en grado 4
-    } else if (gradoFuerza === 5) {
+    } else if (gradoFuerza === "5") {
       doc.text("X", xFuerzaMuscular5, yFuerzaMuscular); // X en grado 5
     }
     
@@ -2107,45 +2359,90 @@ export default function EvaluacionMuscoloEsqueletica(data = {}) {
 
   // === SECCIÓN XII: FIRMAS ===
   
-  // === FIRMA DEL POSTULANTE ===
-  // Posiciones para la firma del postulante
-  const xFirmaPostulante = margin + 21;  // Posición X para la firma del postulante
-  const yFirmaPostulante = margin + 245;   // Posición Y para la firma del postulante
-  const anchoFirmaPostulante = 60;         // Ancho de la imagen de firma
-  const altoFirmaPostulante = 25;          // Alto de la imagen de firma
+  // // === GENERAR PDF Y ABRIR PARA IMPRESIÓN ===
+  // const blob = doc.output("blob");
+  // const url = URL.createObjectURL(blob);
+  // const iframe = document.createElement("iframe");
+  // iframe.style.display = "none";
+  // iframe.src = url;
+  // document.body.appendChild(iframe);
+  // iframe.onload = () => {
+  //   iframe.contentWindow.focus();
+  //   iframe.contentWindow.print();
+  // };
+  const firmasAPintar = [
+    { 
+      nombre: "FIRMAP", x: margin + 21, y:  margin + 235, maxw: 50 
+    },
+    { 
+      nombre: "HUELLA", x: margin + 80, y:  margin + 235, maxw: 20 
+    },
+    { 
+      nombre: "SELLOFIRMA", x: margin + 120, y:  margin + 235, maxw: 50 
+    }
+  ];
   
-  // Imagen de firma del postulante
-  try {
-    const firmaPostulanteImg = "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png";
-    doc.addImage(firmaPostulanteImg, "PNG", xFirmaPostulante, yFirmaPostulante, anchoFirmaPostulante, altoFirmaPostulante);
-  } catch (e) {
-    // Silenciar error si no se puede cargar la imagen
-  }
-
-  // === FIRMA DEL MÉDICO ===
-  // Posiciones para la firma del médico
-  const xFirmaMedico = margin + 122;       // Posición X para la firma del médico
-  const yFirmaMedico = margin + 245;       // Posición Y para la firma del médico
-  const anchoFirmaMedico = 60;             // Ancho de la imagen de firma
-  const altoFirmaMedico = 25;              // Alto de la imagen de firma
-  
-  // Imagen de firma del médico
-  try {
-    const firmaMedicoImg = "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png";
-    doc.addImage(firmaMedicoImg, "PNG", xFirmaMedico, yFirmaMedico, anchoFirmaMedico, altoFirmaMedico);
-  } catch (e) {
-    // Silenciar error si no se puede cargar la imagen
-  }
-
-  // === GENERAR PDF Y ABRIR PARA IMPRESIÓN ===
+  // Validar que data.informacionSede exista antes de acceder a sus propiedades
+  const digitalizacion = data?.informacionSede?.digitalizacion || [];
+  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
+}
+function imprimir(doc) {
   const blob = doc.output("blob");
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
   iframe.src = url;
   document.body.appendChild(iframe);
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
+  iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+      img.onload = () => {
+        const sigH = 35; // alto máximo
+        const maxW = maxw; // ancho máximo como parámetro
+        const baseX = x;
+        const baseY = y;
+
+        let imgW = img.width;
+        let imgH = img.height;
+
+        // Escala proporcional en base a ancho y alto máximos
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        // Ahora el ancho se adapta
+        const sigW = imgW;
+
+        // Centrar la imagen
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
   };
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
 }

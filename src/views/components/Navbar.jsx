@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature, faHeartbeat } from '@fortawesome/free-solid-svg-icons';
+import { URLAzure } from '../config/config';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -42,6 +43,7 @@ const Navbar = () => {
     { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
     { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
+    // { to: "/ekg", name: "Electrocardiograma", label: "EKG", icon: faHeartbeat },
     // { to: "/musculoesqueletico", name: "Evaluación Musculoesquelética", label: "Musculoesquelético", icon: faNotesMedical },
     // { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },
     // { to: "/rayosx", name: "Rayos X", label: "Rayos X", icon: faXRay },
@@ -72,6 +74,7 @@ const Navbar = () => {
       </div>
 
       <div className="hidden md:flex items-center">
+        {URLAzure=="https://testbackendhm.azurewebsites.net" && <p className='font-bold'>DEVELOPER</p>}
         <CustomNavLink
           to="/panel-de-control"
           label="Inicio"

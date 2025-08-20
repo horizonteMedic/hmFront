@@ -317,7 +317,7 @@ const ExamenFisicoIII2021 = ({ form, handleRadioButton, handleChange, handleChan
                       type="text"
                       className="w-full border rounded px-2 py-1 text-center"
                       name="extensionCaderaIzquierda"
-                      value={form.extensionCaderaDerecha || ""}
+                      value={form.extensionCaderaIzquierda || ""}
                       onChange={handleChange}
                       placeholder="Grado"
                     />

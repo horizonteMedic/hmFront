@@ -32,7 +32,7 @@ const MusculoEsqueleticoTabSelector = () => {
             onClick={() => setActiveTab(1)}
           >
             <FontAwesomeIcon icon={faUserMd} className="mr-2" />
-            Evaluacion Musculo Esqueletica 2021
+            Evaluación Musculoesquelética BOORO
           </button>
         </nav>
 

@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
@@ -8,6 +7,11 @@ import ExamenFisicoIII2021 from "./ExamenFisicoIII2021";
 import ExamenFisicoIV2021 from "./ExamenFisicoIV2021";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { useForm } from "../../../../../hooks/useForm";
+import {
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerEvaluacionMusculoEsqueletica2021";
 
 const tabla = "evaluacion_musculo_esqueletica2021";
 const date = new Date();
@@ -21,6 +25,7 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     useSessionData();
   const initialFormState = {
     norden: "",
+    codEvaluacion: null,
     nombres: "",
     dni: "",
     areaTrabajo: "",
@@ -30,33 +35,20 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     empresa: "",
     tiempoServicio: "AÑOS",
 
-    // Síntomas
-    sintomas: "NO",
-    cualesSintomas: "NINGUNO",
-
-    // Uso de Faja Lumbar
-    usoFajaLumbar: "NO",
-
-    // Técnica de Levantamiento
-    tecnicaLevantamiento: "NO",
-
-    // Capacitación
-    capacitacionLevantamiento: "NO",
-
     // PARTE 1: APTITUD ESPALDA
-    flexFuerzaAbdomen: "",
-    cadera: "",
-    muslo: "",
-    abdomenLateralI: "",
-    totalAptitudEspalda: "",
+    flexFuerzaAbdomen: "1",
+    cadera: "1",
+    muslo: "1",
+    abdomenLateralI: "1",
+    totalAptitudEspalda: "4",
     observacionesAptitudEspalda: "",
 
     // PARTE 1: RANGOS ARTICULARES
-    abduccionHombro180: "",
-    abduccionHombro60: "",
-    rotacionExterna90: "",
-    rotacionExternaHombroInterna: "",
-    totalRangosArticulares: "",
+    abduccionHombro180: "1",
+    abduccionHombro60: "1",
+    rotacionExterna90: "1",
+    rotacionExternaHombroInterna: "1",
+    totalRangosArticulares: "4",
     observacionesRangosArticulares: "",
 
     // Campos de dolor contra resistencia
@@ -66,12 +58,12 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     dolorRotacionExternaHombroInterna: "NO",
 
     // PARTE 2: COLUMNA VERTEBRAL
-    desviacionEje: "",
-    testAdams: "",
-    dandy: "",
-    lasegue: "",
-    contracturaMuscular: "",
-    cicatrizPostOperatoria: "",
+    desviacionEje: "NO",
+    testAdams: "-",
+    dandy: "-",
+    lasegue: "-",
+    contracturaMuscular: "NO",
+    cicatrizPostOperatoria: "NO",
     desviacionEjeDescripcion: "",
     testAdamsDescripcion: "",
     dandyDescripcion: "",
@@ -80,80 +72,80 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     cicatrizPostOperatoriaDescripcion: "",
 
     // PARTE 2: TESTS
-    testJobeDerecha: "",
-    testJobeIzquierda: "",
-    testPatteDerecha: "",
-    testPatteIzquierda: "",
-    testGerberDerecha: "",
-    testGerberIzquierda: "",
-    palmUpTestDerecha: "",
-    palmUpTestIzquierda: "",
-    epicondilitisDerecha: "",
-    epicondilitisIzquierda: "",
-    epitrocleitisDerecha: "",
-    epitrocleitisIzquierda: "",
-    phalenDerecha: "",
-    phalenIzquierda: "",
-    phalenInvertidoDerecha: "",
-    phalenInvertidoIzquierda: "",
+    testJobeDerecha: "NO",
+    testJobeIzquierda: "NO",
+    testPatteDerecha: "NO",
+    testPatteIzquierda: "NO",
+    testGerberDerecha: "NO",
+    testGerberIzquierda: "NO",
+    palmUpTestDerecha: "NO",
+    palmUpTestIzquierda: "NO",
+    epicondilitisDerecha: "NO",
+    epicondilitisIzquierda: "NO",
+    epitrocleitisDerecha: "NO",
+    epitrocleitisIzquierda: "NO",
+    phalenDerecha: "NO",
+    phalenIzquierda: "NO",
+    phalenInvertidoDerecha: "NO",
+    phalenInvertidoIzquierda: "NO",
 
     // PARTE 3: MANIOBRAS DE DESCARTE
-    tinnelDerecha: "",
-    tinnelIzquierda: "",
-    finkelsTeinDerecha: "",
-    finkelsTeinIzquierda: "",
+    tinnelDerecha: "NO",
+    tinnelIzquierda: "NO",
+    finkelsTeinDerecha: "NO",
+    finkelsTeinIzquierda: "NO",
 
     // PARTE 3: EVAL. DINAMICA - CADERA Y RODILLA
-    abduccionCaderaDerecha: "",
-    abduccionCaderaIzquierda: "",
+    abduccionCaderaDerecha: "0",
+    abduccionCaderaIzquierda: "0",
     abduccionRodillaDerecha: "",
     abduccionRodillaIzquierda: "",
-    aduccionCaderaDerecha: "",
-    aduccionCaderaIzquierda: "",
+    aduccionCaderaDerecha: "0",
+    aduccionCaderaIzquierda: "0",
     aduccionRodillaDerecha: "",
     aduccionRodillaIzquierda: "",
-    flexionCaderaDerecha: "",
-    flexionCaderaIzquierda: "",
-    flexionRodillaDerecha: "",
-    flexionRodillaIzquierda: "",
-    extensionCaderaDerecha: "",
-    extensionCaderaIzquierda: "",
-    extensionRodillaDerecha: "",
-    extensionRodillaIzquierda: "",
-    rotacionExternaCaderaDerecha: "",
-    rotacionExternaCaderaIzquierda: "",
-    rotacionExternaRodillaDerecha: "",
-    rotacionExternaRodillaIzquierda: "",
-    rotacionInternaCaderaDerecha: "",
-    rotacionInternaCaderaIzquierda: "",
-    rotacionInternaRodillaDerecha: "",
-    rotacionInternaRodillaIzquierda: "",
-    irradiacionCaderaDerecha: "",
-    irradiacionCaderaIzquierda: "",
-    irradiacionRodillaDerecha: "",
-    irradiacionRodillaIzquierda: "",
-    altMasaMuscularCaderaDerecha: "",
-    altMasaMuscularCaderaIzquierda: "",
-    altMasaMuscularRodillaDerecha: "",
-    altMasaMuscularRodillaIzquierda: "",
+    flexionCaderaDerecha: "0",
+    flexionCaderaIzquierda: "0",
+    flexionRodillaDerecha: "0",
+    flexionRodillaIzquierda: "0",
+    extensionCaderaDerecha: "0",
+    extensionCaderaIzquierda: "0",
+    extensionRodillaDerecha: "0",
+    extensionRodillaIzquierda: "0",
+    rotacionExternaCaderaDerecha: "0",
+    rotacionExternaCaderaIzquierda: "0",
+    rotacionExternaRodillaDerecha: "0",
+    rotacionExternaRodillaIzquierda: "0",
+    rotacionInternaCaderaDerecha: "0",
+    rotacionInternaCaderaIzquierda: "0",
+    rotacionInternaRodillaDerecha: "0",
+    rotacionInternaRodillaIzquierda: "0",
+    irradiacionCaderaDerecha: "0",
+    irradiacionCaderaIzquierda: "0",
+    irradiacionRodillaDerecha: "0",
+    irradiacionRodillaIzquierda: "0",
+    altMasaMuscularCaderaDerecha: "0",
+    altMasaMuscularCaderaIzquierda: "0",
+    altMasaMuscularRodillaDerecha: "0",
+    altMasaMuscularRodillaIzquierda: "0",
 
     // PARTE 4: EVAL. DINAMICA - TOBILLOS
-    abduccionTobilloDerecho: "",
-    abduccionTobilloIzquierdo: "",
-    aduccionTobilloDerecho: "",
-    aduccionTobilloIzquierdo: "",
-    flexionTobilloDerecho: "",
-    flexionTobilloIzquierdo: "",
-    extensionTobilloDerecho: "",
-    extensionTobilloIzquierdo: "",
-    rotacionExternaTobilloDerecho: "",
-    rotacionExternaTobilloIzquierdo: "",
-    rotacionInternaTobilloDerecho: "",
-    rotacionInternaTobilloIzquierdo: "",
-    irradiacionTobilloDerecho: "",
-    irradiacionTobilloIzquierdo: "",
-    altMasaMuscularTobilloDerecho: "",
-    altMasaMuscularTobilloIzquierdo: "",
+    abduccionTobilloDerecho: "0",
+    abduccionTobilloIzquierdo: "0",
+    aduccionTobilloDerecho: "0",
+    aduccionTobilloIzquierdo: "0",
+    flexionTobilloDerecho: "0",
+    flexionTobilloIzquierdo: "0",
+    extensionTobilloDerecho: "0",
+    extensionTobilloIzquierdo: "0",
+    rotacionExternaTobilloDerecho: "0",
+    rotacionExternaTobilloIzquierdo: "0",
+    rotacionInternaTobilloDerecho: "0",
+    rotacionInternaTobilloIzquierdo: "0",
+    irradiacionTobilloDerecho: "0",
+    irradiacionTobilloIzquierdo: "0",
+    altMasaMuscularTobilloDerecho: "0",
+    altMasaMuscularTobilloIzquierdo: "0",
 
     cie10: "",
     nombreMedico: userCompleto?.datos?.nombres_user,
@@ -171,20 +163,20 @@ const EvaluacionMusculoEsqueletica2021 = () => {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(
-    //   form,
-    //   token,
-    //   userlogued,
-    //   handleClear,
-    //   tabla,
-    //   datosFooter,
-    //   userCompleto?.datos?.dni_user
-    // );
+    SubmitDataService(
+      form,
+      token,
+      userlogued,
+      handleClear,
+      tabla,
+      datosFooter,
+      userCompleto?.datos?.dni_user
+    );
   };
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
@@ -205,7 +197,7 @@ const EvaluacionMusculoEsqueletica2021 = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(form.norden, token, tabla, datosFooter);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
       }
     });
   };

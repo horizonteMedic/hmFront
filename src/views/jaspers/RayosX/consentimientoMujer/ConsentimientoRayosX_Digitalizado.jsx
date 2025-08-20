@@ -121,15 +121,15 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
 
     // Texto completo dividido en partes para rayos X
     const textoPartes = [
-        {text: "Yo: ", bold: false},
-        {text: datosFinales.nombre, bold: true},
+        {text: "Yo, ", bold: false},
+        {text:  datosFinales.nombre, bold: true},
         {text: " de ", bold: false},
         {text: `${datosFinales.edad} años de edad`, bold: true},
         {text: ", identificado con DNI: ", bold: false},
-        {text: datosFinales.dni, bold: true},
-        {text: " con ocupación laboral de: ", bold: false},
-        {text: datosFinales.ocupacion, bold: true},
-        {text: " de la Empresa:", bold: false}
+        {text:   datosFinales.dni, bold: true},
+        {text: " con ocupación laboral de  ", bold: false},
+        {text:   datosFinales.ocupacion, bold: true},
+        {text: "  de la Empresa:  ", bold: false}
     ];
 
     // Configuración de formato
@@ -205,13 +205,13 @@ export default function ConsentimientoRayosX_Digitalizado(data = {}) {
     doc.text(
       "Y para que así conste, firmo el presente consentimiento.",
       margin,
-      cuerpoEndY + 30
+      cuerpoEndY -10
     );
 
     doc.text(
       `${datosFinales.codigoSede}, ${formatearFechaLarga(datosFinales.fecha)}`,
       margin,
-      cuerpoEndY + 45
+      cuerpoEndY -4
     );
 
     // === 6) FOOTER CON FECHA, Y FIRMAS ===

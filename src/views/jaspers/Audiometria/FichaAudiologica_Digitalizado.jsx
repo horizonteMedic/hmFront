@@ -162,6 +162,7 @@ export default function FichaAudiologica_Digitalizado(
     mareos: data.chk10Si,
     infeccionOidoActual: data.chk11Si,
     otros: data.chk12Si,
+    OtrosTexto: obtener("OtrosTexto"),
 
     txtOtoscopia: obtener("txtOtoscopia"),
 
@@ -482,6 +483,19 @@ export default function FichaAudiologica_Digitalizado(
   ySint += 4.5;
   if (datos.otros) doc.text("X", xSintSI, ySint);
   else doc.text("X", xSintNO, ySint);
+  
+  // Mostrar texto descriptivo de "Otros" si está marcado
+  if (datos.otros && datos.OtrosTexto) {
+    const xOtrosTexto = margin + 108;
+    const yOtrosTexto = margin + 117.2;
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(
+      String(datos.OtrosTexto),
+      xOtrosTexto,
+      yOtrosTexto,
+      { maxWidth: 171 }
+    );
+  }
 
   // === OTOSCOPIA ===
   const xOtoscopia = margin + 23;
@@ -585,6 +599,50 @@ export default function FichaAudiologica_Digitalizado(
     { tipo: "x", color: "blue" },
   ];
   const prevLineWidth = doc.getLineWidth();
+  
+  // Función para dibujar líneas con separación solo cuando hay puntos superpuestos
+  const dibujarLineasConSeparacion = (pts, tipo, color) => {
+    if (pts.length < 2) return;
+    
+    doc.setLineWidth(0.4);
+    if (color === "red") doc.setDrawColor(255, 0, 0);
+    else if (color === "blue") doc.setDrawColor(0, 0, 255);
+    else doc.setDrawColor(0, 0, 0);
+    doc.setLineCap(1);
+    
+    let prev = null;
+    for (let i = 0; i < pts.length; i++) {
+      const freqIdx = freqs.indexOf(pts[i].freq);
+      if (freqIdx === -1) continue;
+      
+      let x = graphX + freqIdx * (graphW / 8);
+      let y = graphY + ((pts[i].db + 10) / 130) * graphH;
+      
+      // Verificar si hay otro punto en la misma frecuencia y dB (superpuesto)
+      const haySuperposicion = puntos.some(p => 
+        p.freq === pts[i].freq && 
+        p.db === pts[i].db && 
+        p.tipo !== pts[i].tipo && 
+        p.db !== null && 
+        p.db !== undefined
+      );
+      
+      // Solo aplicar separación si hay superposición
+      if (haySuperposicion) {
+        if (tipo === "x") {
+          x += 1; // 1mm a la derecha para líneas azules (X)
+        } else if (tipo === "circle") {
+          x -= 1; // 1mm a la izquierda para líneas rojas (círculo)
+        }
+      }
+      
+      if (prev) {
+        doc.line(prev.x, prev.y, x, y);
+      }
+      prev = { x, y };
+    }
+  };
+  
   tipos.forEach(({ tipo, color }) => {
     // Filtrar puntos de este tipo y color, y ordenarlos por frecuencia
     const pts = puntos
@@ -596,24 +654,8 @@ export default function FichaAudiologica_Digitalizado(
           p.db !== undefined
       )
       .sort((a, b) => a.freq - b.freq);
-    if (pts.length < 2) return;
-    // Dibujar línea conectando solo puntos válidos
-    doc.setLineWidth(0.4);
-    if (color === "red") doc.setDrawColor(255, 0, 0);
-    else if (color === "blue") doc.setDrawColor(0, 0, 255);
-    else doc.setDrawColor(0, 0, 0);
-    doc.setLineCap(1);
-    let prev = null;
-    for (let i = 0; i < pts.length; i++) {
-      const freqIdx = freqs.indexOf(pts[i].freq);
-      if (freqIdx === -1) continue;
-      const x = graphX + freqIdx * (graphW / 8);
-      const y = graphY + ((pts[i].db + 10) / 130) * graphH;
-      if (prev) {
-        doc.line(prev.x, prev.y, x, y);
-      }
-      prev = { x, y };
-    }
+    
+    dibujarLineasConSeparacion(pts, tipo, color);
   });
   // Dibujar los puntos (círculo, X, [, ])
   puntos.forEach((punto) => {

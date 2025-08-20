@@ -24,7 +24,8 @@ export const ImportData = (dni,Swal,getFetch,token,set,RendeSet) => {
             set({
                 ...res,
                 nombresPa: res.nombres,
-                apellidosPa: res.apellidos
+                apellidosPa: res.apellidos,
+                userRegistroDatos: res.usuarioRegistro ?? ""
               });
             RendeSet(res)
             Swal.close();

@@ -3,7 +3,7 @@ import { URLAzure } from "../../../../config/config";
 
 export function SubmitData(body, url, token) {
     const urlCompleta = `${URLAzure}${url}`;
-    console.log("tokensasasass", token);
+    // console.log("tokensasasass", token);
     const options = {
         method: 'POST',
         headers: {

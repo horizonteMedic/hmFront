@@ -25,7 +25,7 @@ export function SubmitCoprocultivo(data, user, token) {
     }
 
     const url = `${URLAzure}/api/v01/ct/manipuladores/registrarActualizarManipuladores`
-    console.log("tokensasasass", token);
+    // console.log("tokensasasass", token);
     const options = {
         method: 'POST',
         headers: {
@@ -87,7 +87,7 @@ export function SubmitCoproParasitologia(data, user, token) {
 
 
     const url = `${URLAzure}/api/v01/ct/manipuladores/registrarActualizarManipuladoresCoproparasitologico`
-    console.log("tokensasasass", token);
+    // console.log("tokensasasass", token);
     const options = {
         method: 'POST',
         headers: {

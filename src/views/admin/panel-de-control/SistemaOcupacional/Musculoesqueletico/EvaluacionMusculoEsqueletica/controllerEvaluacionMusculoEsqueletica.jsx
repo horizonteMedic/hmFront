@@ -628,7 +628,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       GetInfoServicio(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
-          "Este paciente ya cuenta con registros de Consentimiento.",
+          "Este paciente ya cuenta con registros de MusculoEsqueletica.",
           "warning"
         );
       });

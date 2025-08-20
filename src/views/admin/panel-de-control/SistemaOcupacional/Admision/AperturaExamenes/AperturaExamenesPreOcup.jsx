@@ -13,6 +13,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
 import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
+import { useSessionData } from '../../../../../hooks/useSessionData.js';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -23,8 +24,10 @@ const AperturaExamenesPreOcup = (props) => {
   const {EmpresasMulti , ContrataMulti, MedicosMulti, PruebaMulti, CargosMulti, AreaMulti, 
     ExamenMulti, ExplotacionMulti,MineralMulti, AlturaMulti, FormaPago , ListAuth} = props.listas
   
-    const [isEmpresaModalOpen, setIsEmpresaModalOpen] = useState(false);
+  const [isEmpresaModalOpen, setIsEmpresaModalOpen] = useState(false);
   const [isContrataModalOpen, setIsContrataModalOpen] = useState(false);
+
+  const { userCompleto } = useSessionData();
 
   const handleSaveEmpresa = (data) => {
     // Handle saving empresa data
@@ -74,7 +77,8 @@ const AperturaExamenesPreOcup = (props) => {
     rxcKLumbar: false,
     rxcPlomos: false,
     mercurioo: false,
-    
+    nombreMiUsuario: userCompleto?.datos?.nombres_user,
+    userRegistroDatos: "",    
   })
   const [searchHC, setSearchHC] = useState([])
   const [showEdit, setShowEdit] = useState(false)
@@ -398,7 +402,8 @@ const AperturaExamenesPreOcup = (props) => {
         ...res,
         nombresPa: res.nombres,
         apellidosPa: res.apellidos,
-        fechaAperturaPo: formatDate(res.fechaAperturaPo)
+        fechaAperturaPo: formatDate(res.fechaAperturaPo),
+        userRegistroDatos: res.usuarioRegistro ?? ""
       });
       setSearchEmpresa(res.razonEmpresa || "");
       setSearchContrata(res.razonContrata || "")
@@ -565,6 +570,7 @@ const AperturaExamenesPreOcup = (props) => {
       mercurioo: false,//13
       nombres:"",
       apellidos:"",
+      userRegistroDatos: "",    
     })
     RendeSet("")
     props.ChangeDNI("")
@@ -1417,6 +1423,28 @@ const AperturaExamenesPreOcup = (props) => {
                   </ul>
                 )}
               </div>
+            </div>            
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="userRegistroDatos" className="block w-36">Registrado por :</label>
+              <input 
+                type="text"
+                id="userRegistroDatos"
+                disabled
+                value={datos.userRegistroDatos}                
+                name="userRegistroDatos"
+                className={`border border-gray-300 capitalize px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full mt-2`}
+              />
+            </div>
+            <div className="flex items-center space-x-2 mb-1">
+              <label htmlFor="nombreMiUsuario" className="block w-36">Usuario:</label>
+              <input autoComplete="off"
+                type="text"
+                id="nombreMiUsuario"
+                disabled
+                value={datos.nombreMiUsuario}                
+                name="nombreMiUsuario"
+                className={`border border-gray-300 capitalize px-3 py-1  mb-1 rounded-md focus:outline-none flex-grow w-full mt-2`}
+              />
             </div>
             </div>
             {showEdit && <div className=" pt-4 flex justify-end items-end ">

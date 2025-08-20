@@ -345,6 +345,7 @@ export const GetInfoServicioFicha = (
           mareos: res.chk10Si ? "SI" : "NO",
           infeccion_oido_actual: res.chk11Si ? "SI" : "NO",
           otro: res.chk12Si ? "SI" : "NO",
+          otroDescripcion: res.otros ?? "",
 
           nombre_profecional: res.txtResponsable,
           conclusiones: res.txtConclusiones,
@@ -424,6 +425,7 @@ export const SubmitDataServiceFicha = async (
     chk10Si: form.mareos == "SI",
     chk11Si: form.infeccion_oido_actual == "SI",
     chk12Si: form.otro == "SI",
+    otros: form.otroDescripcion,
 
     chk1No: form.consumo_tabaco == "NO",
     chk2No: form.servicio_militar == "NO",

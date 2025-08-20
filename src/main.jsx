@@ -47,9 +47,10 @@ import MusculoEsqueleticoTabSelector from "./views/admin/panel-de-control/Sistem
 import Odontologia from "./views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx";
 import RayosX from "./views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx";
 import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
+import EKG from "./views/admin/panel-de-control/SistemaOcupacional/EKG/ekg.jsx";
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/MusculoEsqueletica/EvaluacionMuscoloEsqueletica2021_Digitalizado_boro.jsx"
+import Ficha from "./views/jaspers/Audiometria/FichaAudiologica_Digitalizado.jsx"
 
 const App = () => {
   return (
@@ -155,19 +156,20 @@ const AppContent = () => {
             path="/HistoriaOcupacional"
             element={<HistoriaOcupacional />}
           />
-          <Route path="/rayosx" element={<RayosX />} />
-          <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} />
-        </Route>
-        <Route path="/Espirometria" element={<Espirometria />} />
-        <Route path="/Oftalmologia" element={<OftalmologiaTabSelector />} />
-        <Route path="/musculoesqueletico" element={<MusculoEsqueleticoTabSelector />} />
-        <Route path="/RegistroP" element={<Formulario />} />
-        <Route
-          path="/libro-de-reclamaciones"
-          element={<LibroDeReclamaciones />}
-        />
-        <Route path="*" element={<Navigate to="/" />} />
-        <Route path="/fichapi" element={<Ficha />} />
+                  <Route path="/rayosx" element={<RayosX />} />
+        <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} />
+      </Route>
+      <Route path="/Espirometria" element={<Espirometria />} />
+      <Route path="/Oftalmologia" element={<OftalmologiaTabSelector />} />
+      <Route path="/musculoesqueletico" element={<MusculoEsqueleticoTabSelector />} />
+      <Route path="/ekg" element={<EKG />} />
+      <Route path="/RegistroP" element={<Formulario />} />
+      <Route
+        path="/libro-de-reclamaciones"
+        element={<LibroDeReclamaciones />}
+      />
+      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/fichapi" element={<Ficha />} />
       </Routes>
       {!isLoginPage && !isHiddenRoute && <Footer />}
     </>

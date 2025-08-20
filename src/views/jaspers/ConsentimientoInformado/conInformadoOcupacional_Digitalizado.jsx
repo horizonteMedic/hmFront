@@ -10,7 +10,7 @@ export default function conInformadoOcupacional_Digitalizado(data = {}) {
 
   // Datos de prueba
   const datosPrueba = {
-    nombre: "JOSUE SPENCER ROJAS",
+    nombre: "JOSUE SPENCER ROJAS SIGUENZA RAAA",
     dni: "76574022",
     ocupacion: "INGENIERO DE SISTEMAS ",
     empresa: "CORPORACION PERUANA DE CENTROS MEDICOS SAC CON RUC 20123456789 Y DENOMINACION COMERCIAL EXTENDIDA",
@@ -83,12 +83,12 @@ doc.setFont("helvetica", "normal").setFontSize(11);
 
 // Texto completo dividido en partes
 const textoPartes = [
-    {text: "Yo ", bold: false},
-    {text: datosFinales.nombre, bold: true},
+    {text: "Yo  ", bold: false},
+    {text:  datosFinales.nombre, bold: true},
     {text: " identificado con documento de identidad ", bold: false},
     {text: `N°: ${datosFinales.dni}`, bold: true},
     {text: " con ocupación laboral ", bold: false},
-    {text: datosFinales.ocupacion, bold: true},
+    {text:  datosFinales.ocupacion, bold: true},
     {text: " certifico que he sido informado/a acerca de la naturaleza y propósito del examen médico ocupacional así como pruebas complementarias determinada por la empresa:", bold: false}
 ];
 

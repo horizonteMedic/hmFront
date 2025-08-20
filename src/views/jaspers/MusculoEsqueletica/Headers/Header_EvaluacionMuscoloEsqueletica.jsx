@@ -15,8 +15,23 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     sexo: "M"
   };
 
+  const datosReales = {
+    apellidosNombres: datos?.paciente?.nombres ?? "",
+    dni: datos?.paciente?.dni ?? "",
+    empresa: datos?.paciente?.empresa ?? "",
+    contrata: datos?.paciente?.contrata ?? "",
+    fecha: datos?.fechaExamen ?? "",
+    edad: datos?.paciente?.edad ?? "",
+    areaTrabajo: datos?.paciente?.areaTrabajo ?? "",
+    sexo: datos?.paciente?.sexo ?? "",
+    sede: datos?.informacionSede?.sede ?? "",
+    codigoColor: datos?.informacionSede?.codigoColor,
+    textoColor: datos?.informacionSede?.textoColor,
+    norden: datos?.norden ?? ""
+  };
+
   // Usar datos reales o datos de prueba
-  const datosFinales = datos && Object.keys(datos).length > 0 ? datos : datosPrueba;
+  const datosFinales = datos && Object.keys(datos).length > 0 ? datosReales : datosPrueba;
 
   // === NUEVO: Usar imagen de fondo para la cabecera ===
   if (mostrarFrame) {
@@ -33,10 +48,10 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
   // Solo dibujar elementos del header en la página 1
   if (numeroPagina === 1) {
     // 3) Información de sede y número de ficha a la derecha
-    const sedeValue = datosFinales.sede || 'Trujillo-Pierola';
+    const sedeValue = datosFinales.sede || '';
     
     // Número de ficha primero - con posiciones independientes
-    const fichaNum = datosFinales.norden || datosFinales.numeroFicha || datosFinales.nroFicha || "96639";
+    const fichaNum = String(datosFinales.norden ?? "") ;
     const fichaX = pageW - margin - 20; // Posición X independiente
     const fichaY = y + 10.5; // Posición Y independiente
     
@@ -48,7 +63,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     
     // Sede debajo del número de ficha - con posiciones independientes
     const sedeX2 = pageW - margin - 18; // Posición X independiente
-    const sedeY2 = y + 3; // Posición Y independiente
+    const sedeY2 = y + 4; // Posición Y independiente
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
 
@@ -152,7 +167,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     
     // Sede en la esquina superior derecha
     const sedeX2 = pageW - margin - 18;
-    const sedeY2 = y + 3;
+    const sedeY2 = y + 4;
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
 

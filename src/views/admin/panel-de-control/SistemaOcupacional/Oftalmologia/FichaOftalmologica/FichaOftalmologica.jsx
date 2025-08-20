@@ -34,6 +34,7 @@ const initialFormState = {
   nombres: "",
   empresa: "",
   contrata: "",
+  edad: "",
   visionCercaOD: "",
   visionCercaOI: "",
   visionCercaODC: "",
@@ -115,6 +116,51 @@ export default function FichaOftalmologica({
   const obtenerInfoTabla = () => {
     getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
   };
+  function obtenerGrado(valor) {
+    const mapa = {
+      "20/20": "NINGUNA",
+      "20/25": "AMETRIOPIA LEVE",
+      "20/30": "AMETRIOPIA LEVE",
+      "20/40": "AMETRIOPIA LEVE",
+      "20/50": "AMETRIOPIA MODERADA",
+      "20/70": "AMETRIOPIA MODERADA",
+      "20/100": "AMETRIOPIA SEVERA",
+      "20/150": "AMETRIOPIA SEVERA",
+      "20/200": "AMETRIOPIA SEVERA",
+      "20/400": "AMETRIOPIA SEVERA",
+    };
+    return mapa[valor] || "";
+  }
+
+  function generarDiagnosticoLejos() {
+    const gradoLejosOD = obtenerGrado(form.visionLejosOD);
+    const gradoLejosOI = obtenerGrado(form.visionLejosOI);
+
+    if (gradoLejosOD == "NINGUNA" && gradoLejosOI == "NINGUNA")
+      return "NINGUNA";
+    else if (gradoLejosOD.includes("SEVERA") && gradoLejosOI.includes("SEVERA"))
+      return "AMETRIOPIA BILATERAL SEVERA";
+    else if (
+      gradoLejosOD.includes("MODERADA") &&
+      gradoLejosOI.includes("MODERADA")
+    )
+      return "AMETRIOPIA BILATERAL MODERADA";
+    else if (gradoLejosOD.includes("LEVE") && gradoLejosOI.includes("LEVE"))
+      return "AMETRIOPIA BILATERAL LEVE";
+    return `${gradoLejosOD} OJO DERECHO Y ${gradoLejosOI} OJO IZQUIERDO`;
+  }
+
+  function generarDiagnosticoCerca() {
+    const gradoCercaOD = obtenerGrado(form.visionCercaOD);
+    const gradoCercaOI = obtenerGrado(form.visionCercaOI);
+    const edad = parseInt(form.edad);
+    console.log(edad)
+    if (gradoCercaOD == "NINGUNA" && gradoCercaOI == "NINGUNA")
+      return "NINGUNA";
+    else if (edad >= 18 && edad <= 39) return "HIPERMETROPIA";
+    else if (edad >= 40) return "PRESBICIA";
+    return "";
+  }
 
   const handlePrint = () => {
     if (!form.norden)
@@ -276,7 +322,16 @@ export default function FichaOftalmologica({
                 name="visionCercaOI"
                 value={form.visionCercaOI || ""}
                 onChange={handleChangeNumber}
-                onKeyUp={(e) => handleNextFocus(e, "visionLejosOD")}
+                onKeyUp={(e) => {
+                  handleNextFocus(e, "visionLejosOD");
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    setForm((prev) => ({
+                      ...prev,
+                      presenciaPterigion: generarDiagnosticoCerca(),
+                    }));
+                  }
+                }}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
@@ -312,7 +367,16 @@ export default function FichaOftalmologica({
                 name="visionLejosOI"
                 value={form.visionLejosOI || ""}
                 onChange={handleChangeNumber}
-                onKeyUp={(e) => handleNextFocus(e, "visionCercaODC")}
+                onKeyUp={(e) => {
+                  handleNextFocus(e, "visionCercaODC");
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    setForm((prev) => ({
+                      ...prev,
+                      enfOculares: generarDiagnosticoLejos(),
+                    }));
+                  }
+                }}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
               />
@@ -411,7 +475,7 @@ export default function FichaOftalmologica({
               <textarea
                 name="enfOculares"
                 rows={3}
-                value={form.enfOculares || ""}  
+                value={form.enfOculares || ""}
                 onChange={handleChange}
                 // onKeyUp={(e) => handleNextFocus(e, "presenciaPterigion")}
                 className="border rounded px-2 py-1 col-span-3 resize-none"
@@ -422,7 +486,7 @@ export default function FichaOftalmologica({
                   name="ninguna"
                   checked={
                     form.enfOculares != null &&
-                    form.enfOculares.toUpperCase().includes("NINGUNA")
+                    form.enfOculares.toUpperCase() == "NINGUNA"
                   }
                   onChange={(e) => {
                     handleCheckBoxChange(e);

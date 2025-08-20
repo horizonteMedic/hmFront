@@ -129,6 +129,7 @@ const AudiometriaOhlaTabSelector = ({
     mareos: "NO",
     infeccion_oido_actual: "NO",
     otro: "NO",
+    otroDescripcion:"",
 
     nombre_profecional: fixEncodingModern(
       userlogued?.datos?.nombres_user || ""
