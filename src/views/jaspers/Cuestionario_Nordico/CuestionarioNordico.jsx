@@ -135,31 +135,48 @@ export default function CuestionarioNordico(datos = {}) {
         doc.text(`Años:                                Meses:`, textX + 32, textY + 20);
 
         doc.text(`En promedio cuántas horas a la semana trabaja?`, textX, textY + 25);
+        if (datos.horasTrabajadas) {
+          doc.setFontSize(11)
+          doc.text(`${datos.horasTrabajadas} hrs`, textX + 75, textY + 25);
+          doc.setFontSize(9)
+        }
         doc.text(`Es Ud: `, textX, textY + 30);
         doc.text(`Diestro:                              Zurdo:`, textX+31, textY + 30);
         //GENERO Mascuilo - Femenino
         doc.setDrawColor(0); // Negro
         doc.setLineWidth(0.5);
-        doc.rect(textX + 48, textY + 7 , boxSize, boxSize); // Cuadro pequeño
-        doc.rect(textX + 85, textY + 7 , boxSize, boxSize); // Cuadro pequeño
+        doc.rect(textX + 48, textY + 7 ,  6, 5); // Cuadro pequeño
+        doc.rect(textX + 85, textY + 7 ,  6, 5); // Cuadro pequeño
         //X Genero
         if (datos.sexo === "M") {
-          drawXInBox(doc, textX + 48, textY + 7, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 48, textY + 7,  6, 5); // Cuadro Masculino
         } else if (datos.sexo === "F") {
-          drawXInBox(doc, textX + 85, textY + 7, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 85, textY + 7,  6, 5); // Cuadro Femenino
         }
         
         //Años y Meses
-        doc.rect(textX + 48, textY + 17 , boxSize, boxSize); // Cuadro pequeño
-        doc.rect(textX + 85, textY + 17 , boxSize, boxSize); // Cuadro pequeño
+        doc.rect(textX + 48, textY + 17 , 6, 5); // Cuadro pequeño
+        if (datos.anios) {
+          doc.setFontSize(11)
+          const centerX = textX + 48 + 6 / 2;   // centro en X
+          const centerY = textY + 17 + 5 / 2;   // centro en Y
+          doc.text(`${datos.anios}`, centerX, centerY + 1.5, { align: "center" });
+        } 
+        doc.rect(textX + 85, textY + 17 , 6, 5); // Cuadro pequeño
+        if (datos.meses) {
+          doc.setFontSize(11)
+          const centerX = textX + 85 + 6 / 2;
+          const centerY = textY + 17 + 5 / 2;
+          doc.text(`${datos.meses}`, centerX, centerY + 1.5, { align: "center" });
+        }
         //Diestro o Zurdo
-        doc.rect(textX + 48, textY + 27 , boxSize, boxSize); // Cuadro pequeño
-        doc.rect(textX + 85, textY + 27 , boxSize, boxSize); // Cuadro pequeño
+        doc.rect(textX + 48, textY + 27 ,  6, 5); // Cuadro pequeño
+        doc.rect(textX + 85, textY + 27 ,  6, 5); // Cuadro pequeño
           //X
           if (datos.esDiestro === true) {
-            drawXInBox(doc, textX + 48, textY + 27, boxSize, boxSize); // Cuadro Masculino
+            drawXInBox(doc, textX + 48, textY + 27,  6, 5); // Cuadro Masculino
           } else if (datos.esZurdo === true) {
-            drawXInBox(doc, textX + 85, textY + 27, boxSize, boxSize); // Cuadro Femenino
+            drawXInBox(doc, textX + 85, textY + 27,  6, 5); // Cuadro Femenino
           }
       }
     },
@@ -872,7 +889,7 @@ export default function CuestionarioNordico(datos = {}) {
         }
 
         doc.setFont("helvetica", "bold");
-        doc.text(`Si Ud. respondió NO a la pregunta 9, no responda a las preguntas 10 a.`, textX, textY + 4);
+        doc.text(`Si Ud. respondió NO a la pregunta 9, no responda a las preguntas 10 a 17.`, textX, textY + 4);
         doc.setFont("helvetica", "normal");
 
         doc.text(`10.- Ud. ha tenido lesiones en sus hombros en un accidente ?`, textX, textY + 8);
@@ -911,7 +928,7 @@ export default function CuestionarioNordico(datos = {}) {
           drawXInBox(doc, textX + 188, textY + 20, boxSize, boxSize); // Cuadro Femenino
         }
 
-        doc.text(`10.- Ud. ha tenido lesiones en sus hombros en un accidente ?`, textX, textY + 27);
+        doc.text(`12.- Ud. ha tenido problemas en los hombros durante los últimos 12 meses?`, textX, textY + 27);
         doc.text(`No`, textX + 18, textY + 32);
         doc.rect(textX + 12, textY + 29, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta4ProblemasHombrosNo === true) {
@@ -964,32 +981,30 @@ export default function CuestionarioNordico(datos = {}) {
 
         //FIN ITEMS
         doc.text(`14.- El problema en sus hombros le han causado una disminución de su actividad durante los últimos  12 meses?`, textX, textY + 50);
-
-        doc.text(`5.- Los problemas de espalda baja han causado a Ud. reducción de su actividad física durante los ultimos 12 meses?`, textX, textY + 54);
-        doc.text(`a. Actividades de trabajo (en el trabajo o la casa)`, textX+8, textY + 58);
-        doc.text(`No`, textX + 160, textY + 57);
-        doc.rect(textX + 168, textY + 54, boxSize, boxSize); // Cuadro pequeño
-        doc.text(`Si`, textX + 180, textY + 57);
-        doc.rect(textX + 188, textY + 54, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`a. Actividades de trabajo (en el trabajo o la casa)`, textX+8, textY + 54);
+        doc.text(`No`, textX + 160, textY + 53 );
+        doc.rect(textX + 168, textY + 50 , boxSize, boxSize); // Cuadro pequeño
+        doc.text(`Si`, textX + 180, textY + 53);
+        doc.rect(textX + 188, textY + 50, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta6AProblemasHombrosNo === true) {
-          drawXInBox(doc, textX + 168, textY + 54, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 168, textY + 50, boxSize, boxSize); // Cuadro Masculino
         } else if (datos.pregunta6AProblemasHombrosSi === true) {
-          drawXInBox(doc, textX + 188, textY + 54, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 188, textY + 50, boxSize, boxSize); // Cuadro Femenino
         }
 
-        doc.text(`b. Actividades recreativas`, textX +8, textY + 62);
-        doc.text(`No`, textX + 160, textY + 62);
-        doc.rect(textX + 168, textY + 59, boxSize, boxSize); // Cuadro pequeño
-        doc.text(`Si`, textX + 180, textY + 62);
-        doc.rect(textX + 188, textY + 59, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`b. Actividades recreativas`, textX +8, textY + 58);
+        doc.text(`No`, textX + 160, textY + 58);
+        doc.rect(textX + 168, textY + 55, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`Si`, textX + 180, textY + 58);
+        doc.rect(textX + 188, textY + 55, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta6BProblemasHombrosNo === true) {
-          drawXInBox(doc, textX + 168, textY + 59, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 168, textY + 55, boxSize, boxSize); // Cuadro Masculino
         } else if (datos.pregunta6BProblemasHombrosSi === true) {
-          drawXInBox(doc, textX + 188, textY + 59, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 188, textY + 55, boxSize, boxSize); // Cuadro Femenino
         }
 
         //ITEMS ABAJO
-        doc.text(`13.- Cuál es la duración total del tiempo en que Ud. Ha tenido problemas en los últimos 12 meses`, textX, textY + 66);
+        doc.text(`15.- Cuál es la duración total de tiempo que el problema en sus hombros le han impedido hacer sus rutinas\nde trabajo (en el trabajo o en casa) durante los últimos 12 meses`, textX, textY + 62);
         drawCircle(doc, textX + 12, textY + 68.8)
         doc.text(`0 Días`, textX + 15, textY + 70);
         if (datos.pregunta7AProblemasHombros === true) {
@@ -1106,7 +1121,7 @@ export default function CuestionarioNordico(datos = {}) {
       [
         {
           content: " ",
-          styles: { minCellHeight: 70 },
+          styles: { minCellHeight: 68 },
         }
       ]
     ],
@@ -1195,81 +1210,77 @@ export default function CuestionarioNordico(datos = {}) {
         doc.setFont("helvetica", "normal");
         //Inicio items 2
         
-        doc.text(`14.- El problema en sus hombros le han causado una disminución de su actividad durante los últimos  12 meses?`, textX, textY + 28);
-
-        doc.text(`5- Los problemas de su cuello han causado a Ud. reducción de actividad física durante los últimos 12 meses?`, textX, textY + 32);
-        doc.text(`a. Actividades de trabajo (en el trabajo o la casa)`, textX+8, textY + 36);
-        doc.text(`No`, textX + 160, textY + 35);
-        doc.rect(textX + 168, textY + 32, boxSize, boxSize); // Cuadro pequeño
-        doc.text(`Si`, textX + 180, textY + 35);
-        doc.rect(textX + 188, textY + 32, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`5- Los problemas de su cuello han causado a Ud. reducción de actividad física durante los últimos 12 meses?`, textX, textY + 28);
+        doc.text(`a. Actividades de trabajo (en el trabajo o la casa)`, textX+8, textY + 32);
+        doc.text(`No`, textX + 160, textY + 31);
+        doc.rect(textX + 168, textY + 28, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`Si`, textX + 180, textY + 31);
+        doc.rect(textX + 188, textY + 28, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta5AProblemasCuelloNo === true) {
-          drawXInBox(doc, textX + 168, textY + 32, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 168, textY + 28, boxSize, boxSize); // Cuadro Masculino
         } else if (datos.pregunta5AProblemasCuelloSi === true) {
-          drawXInBox(doc, textX + 188, textY + 32, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 188, textY + 28, boxSize, boxSize); // Cuadro Femenino
         }
 
-        doc.text(`b. Actividades recreativas`, textX +8, textY + 40);
-        doc.text(`No`, textX + 160, textY + 40);
-        doc.rect(textX + 168, textY + 37, boxSize, boxSize); // Cuadro pequeño
-        doc.text(`Si`, textX + 180, textY + 40);
-        doc.rect(textX + 188, textY + 37, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`b. Actividades recreativas`, textX +8, textY + 36);
+        doc.text(`No`, textX + 160, textY + 36);
+        doc.rect(textX + 168, textY + 33, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`Si`, textX + 180, textY + 36);
+        doc.rect(textX + 188, textY + 33, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta5BProblemasCuelloNo === true) {
-          drawXInBox(doc, textX + 168, textY + 37, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 168, textY + 33, boxSize, boxSize); // Cuadro Masculino
         } else if (datos.pregunta5BProblemasCuelloSi === true) {
-          drawXInBox(doc, textX + 188, textY + 37, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 188, textY + 33, boxSize, boxSize); // Cuadro Femenino
         }
         
       
-        doc.text(`6- Cuál es la duracción total de tiempo que los problemas de su cuello la han impedido hacer sus rutinas de trabajo\n(en el trabajo o en casa) durante los últimos 12 meses ?`, textX, textY + 44);
-        drawCircle(doc, textX + 12, textY + 50.8)
-        doc.text(`0 Días`, textX + 15, textY + 52);
+        doc.text(`6- Cuál es la duracción total de tiempo que los problemas de su cuello la han impedido hacer sus rutinas de trabajo\n(en el trabajo o en casa) durante los últimos 12 meses ?`, textX, textY + 40);
+        drawCircle(doc, textX + 12, textY + 46.8)
+        doc.text(`0 Días`, textX + 15, textY + 48);
         if (datos.pregunta6AProblemasCuello === true) {
-          drawXInCircle(doc, textX + 12, textY + 50.8, circleR); // Cuadro Masculino
+          drawXInCircle(doc, textX + 12, textY + 46.8, circleR); // Cuadro Masculino
         } 
 
-        drawCircle(doc, textX + 32, textY + 50.8)
-        doc.text(`1-7 Días`, textX + 35, textY + 52);
+        drawCircle(doc, textX + 32, textY + 46.8)
+        doc.text(`1-7 Días`, textX + 35, textY + 48);
         if (datos.pregunta6BProblemasCuello === true) {
-          drawXInCircle(doc, textX + 32, textY + 50.8, circleR); // Cuadro Masculino
+          drawXInCircle(doc, textX + 32, textY + 46.8, circleR); // Cuadro Masculino
         } 
 
-        drawCircle(doc, textX + 52, textY + 50.8)
-        doc.text(`8-30 Días`, textX + 55, textY + 52);
+        drawCircle(doc, textX + 52, textY + 46.8)
+        doc.text(`8-30 Días`, textX + 55, textY + 48);
         if (datos.pregunta6CProblemasCuello === true) {
-          drawXInCircle(doc, textX + 52, textY + 50.8, circleR); // Cuadro Masculino
+          drawXInCircle(doc, textX + 52, textY + 46.8, circleR); // Cuadro Masculino
         } 
 
-        drawCircle(doc, textX + 72, textY + 50.8)
-        doc.text(`Más de 30 Días`, textX + 75, textY + 52);
+        drawCircle(doc, textX + 72, textY + 46.8)
+        doc.text(`Más de 30 Días`, textX + 75, textY + 48);
         if (datos.pregunta6DProblemasCuello === true) {
-          drawXInCircle(doc, textX + 72, textY + 50.8, circleR); // Cuadro Masculino
+          drawXInCircle(doc, textX + 72, textY + 46.8, circleR); // Cuadro Masculino
         } 
 
         //FIN ITEMS
-        doc.text(`7-Ha sido visto por un médico,fisioterapista, quiropráctico u otra persona del área debido a problemas en su\ncuello durante los últimos 12 meses?`, textX, textY + 56);
-        doc.text(`No`, textX + 160, textY + 56 );
-        doc.rect(textX + 168, textY + 53, boxSize, boxSize); // Cuadro pequeño
-        doc.text(`Si`, textX + 180, textY + 56);
-        doc.rect(textX + 188, textY + 53, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`7-Ha sido visto por un médico,fisioterapista, quiropráctico u otra persona del área debido a problemas en su\ncuello durante los últimos 12 meses?`, textX, textY + 52);
+        doc.text(`No`, textX + 160, textY + 52 );
+        doc.rect(textX + 168, textY + 49, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`Si`, textX + 180, textY + 52);
+        doc.rect(textX + 188, textY + 49, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta7ProblemasCuelloNo === true) {
-          drawXInBox(doc, textX + 168, textY + 53, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 168, textY + 49, boxSize, boxSize); // Cuadro Masculino
         } else if (datos.pregunta7ProblemasCuelloSi === true) {
-          drawXInBox(doc, textX + 188, textY + 53, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 188, textY + 49, boxSize, boxSize); // Cuadro Femenino
         }
 
-        doc.text(`8- Ha tenido problemas en su cuello en algún momento durante los últimos 7 días ?`, textX, textY + 63);
-        doc.text(`No`, textX + 160, textY + 63 );
-        doc.rect(textX + 168, textY + 59, boxSize, boxSize); // Cuadro pequeño
-        doc.text(`Si`, textX + 180, textY + 63);
-        doc.rect(textX + 188, textY + 59, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`8- Ha tenido problemas en su cuello en algún momento durante los últimos 7 días ?`, textX, textY + 60);
+        doc.text(`No`, textX + 160, textY + 60 );
+        doc.rect(textX + 168, textY + 57, boxSize, boxSize); // Cuadro pequeño
+        doc.text(`Si`, textX + 180, textY + 60);
+        doc.rect(textX + 188, textY + 57, boxSize, boxSize); // Cuadro pequeño
         if (datos.pregunta8ProblemasCuelloNo === true) {
-          drawXInBox(doc, textX + 168, textY + 59, boxSize, boxSize); // Cuadro Masculino
+          drawXInBox(doc, textX + 168, textY + 57, boxSize, boxSize); // Cuadro Masculino
         } else if (datos.pregunta8ProblemasCuelloSi === true) {
-          drawXInBox(doc, textX + 188, textY + 59, boxSize, boxSize); // Cuadro Femenino
+          drawXInBox(doc, textX + 188, textY + 57, boxSize, boxSize); // Cuadro Femenino
         }
-
-
       }
       }
     });
@@ -1286,7 +1297,7 @@ export default function CuestionarioNordico(datos = {}) {
       [
         {
           content: " ",
-          styles: { minCellHeight: 20 },
+          styles: { minCellHeight: 22 },
         }
       ]
     ],
@@ -1315,8 +1326,8 @@ export default function CuestionarioNordico(datos = {}) {
           const selloBase64 = canvas.toDataURL('image/png');
 
           // ===== Dimensiones máximas permitidas =====
-          const maxImgW = 40; // ancho máximo del sello
-          const maxImgH = 40; // alto máximo del sello
+          const maxImgW = 30; // ancho máximo del sello
+          const maxImgH = 20; // alto máximo del sello
 
           // ===== Escalado proporcional =====
           let imgW = s1.width;
@@ -1350,6 +1361,8 @@ export default function CuestionarioNordico(datos = {}) {
         // Línea y texto Postulante
         doc.line(90, textY +10, 140, textY+10);
         doc.text("Firma y sello del Médico", 98, textY + 14, { align: "left" });
+
+        doc.text("Gracias por su colaboración", 165,  textY + 10)
         // ===== Función para escalar y dibujar imagen =====
 function addScaledImage(doc, imgElement, maxImgW, maxImgH, centerX, baseY) {
   const canvas = document.createElement('canvas');
