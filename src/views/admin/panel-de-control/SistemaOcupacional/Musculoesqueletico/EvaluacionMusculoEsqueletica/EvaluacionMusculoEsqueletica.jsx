@@ -161,7 +161,9 @@ export default function EvaluacionMusculoEsqueletica() {
     conclusion: "SI",
     diagnostico: "",
     recomendaciones: "",
-    nombreMedico: userCompleto?.datos?.nombres_user,
+    nombreMedico: `${userCompleto?.datos?.nombres_user ?? ""} - ${
+      userCompleto?.datos?.cmp ?? ""
+    }`,
   };
 
   const {

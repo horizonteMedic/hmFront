@@ -83,6 +83,7 @@ import RayosX from "./RayosX/RayosX.jsx";
 import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
+import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -451,6 +452,21 @@ const TabComponent = () => {
                   </span>
                   <span className={styles.title}>
                     Evaluación Musculoesquelética
+                  </span>
+                </div>
+              )}
+              {tieneVista("Test Fatiga") && (
+                <div
+                  onClick={() => setActiveTab(23)}
+                  className={`${styles.gridItem} ${
+                    activeTab === 23 ? styles.active : ""
+                  }`}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faSkull} />
+                  </span>
+                  <span className={styles.title}>
+                    Test Fatiga y Somnolencia
                   </span>
                 </div>
               )}
@@ -1094,6 +1110,19 @@ const TabComponent = () => {
                 </h2>
               </div>
               <MusculoEsqueleticoTabSelector />
+            </div>
+          )}
+          {activeTab === 23 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <Test_fatiga />
             </div>
           )}
         </div>

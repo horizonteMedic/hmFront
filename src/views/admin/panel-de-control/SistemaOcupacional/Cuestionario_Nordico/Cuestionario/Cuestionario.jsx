@@ -75,7 +75,7 @@ const Cuestionario = ({token, selectedSede, userlogued, form, setForm, handleCha
                         </div>
                         <div className="flex w-auto items-center my-2">
                             <label className="text-right" htmlFor="">En promedio, cuántas horas a la semana trabaja?:</label>
-                            <input type="text" value={form.horasTrabajadas} name="horasTrabajadas"id="" className="w-20 border rounded px-2 py-1 mx-2" />
+                            <input type="text" value={form.horasTrabajadas} onChange={handleChangeNumber} name="horasTrabajadas"id="" className="w-20 border rounded px-2 py-1 mx-2" />
                         </div>
                         <div className="flex w-auto items-center my-2">
                             <label className="w-80 text-right" htmlFor="">Es Ud.:</label>

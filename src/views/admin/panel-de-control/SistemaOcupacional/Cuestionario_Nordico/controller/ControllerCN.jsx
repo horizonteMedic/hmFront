@@ -57,6 +57,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
+        sexo: res.genero
         }));
     })
     .finally(() => {
