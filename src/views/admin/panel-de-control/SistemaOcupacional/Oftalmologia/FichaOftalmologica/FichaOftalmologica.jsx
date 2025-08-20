@@ -119,15 +119,15 @@ export default function FichaOftalmologica({
   function obtenerGrado(valor) {
     const mapa = {
       "20/20": "NINGUNA",
-      "20/25": "AMETRIOPIA LEVE",
-      "20/30": "AMETRIOPIA LEVE",
-      "20/40": "AMETRIOPIA LEVE",
-      "20/50": "AMETRIOPIA MODERADA",
-      "20/70": "AMETRIOPIA MODERADA",
-      "20/100": "AMETRIOPIA SEVERA",
-      "20/150": "AMETRIOPIA SEVERA",
-      "20/200": "AMETRIOPIA SEVERA",
-      "20/400": "AMETRIOPIA SEVERA",
+      "20/25": "AMETROPIA LEVE",
+      "20/30": "AMETROPIA LEVE",
+      "20/40": "AMETROPIA LEVE",
+      "20/50": "AMETROPIA MODERADA",
+      "20/70": "AMETROPIA MODERADA",
+      "20/100": "AMETROPIA SEVERA",
+      "20/150": "AMETROPIA SEVERA",
+      "20/200": "AMETROPIA SEVERA",
+      "20/400": "AMETROPIA SEVERA",
     };
     return mapa[valor] || "";
   }
@@ -139,14 +139,14 @@ export default function FichaOftalmologica({
     if (gradoLejosOD == "NINGUNA" && gradoLejosOI == "NINGUNA")
       return "NINGUNA";
     else if (gradoLejosOD.includes("SEVERA") && gradoLejosOI.includes("SEVERA"))
-      return "AMETRIOPIA BILATERAL SEVERA";
+      return "AMETROPIA BILATERAL SEVERA";
     else if (
       gradoLejosOD.includes("MODERADA") &&
       gradoLejosOI.includes("MODERADA")
     )
-      return "AMETRIOPIA BILATERAL MODERADA";
+      return "AMETROPIA BILATERAL MODERADA";
     else if (gradoLejosOD.includes("LEVE") && gradoLejosOI.includes("LEVE"))
-      return "AMETRIOPIA BILATERAL LEVE";
+      return "AMETROPIA BILATERAL LEVE";
     return `${gradoLejosOD} OJO DERECHO Y ${gradoLejosOI} OJO IZQUIERDO`;
   }
 
