@@ -148,7 +148,9 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     altMasaMuscularTobilloIzquierdo: "0",
 
     cie10: "",
-    nombreMedico: userCompleto?.datos?.nombres_user,
+    nombreMedico: `${userCompleto?.datos?.nombres_user ?? ""} - ${
+      userCompleto?.datos?.cmp ?? ""
+    }`,
     conclusiones: "",
     recomendaciones: "",
   };

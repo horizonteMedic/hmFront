@@ -627,8 +627,8 @@ const AperturaExamenesPreOcup = (props) => {
       background: '#f0f6ff',
       color: '#22223b',
       showConfirmButton: false,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
+      allowOutsideClick: true,
+      allowEscapeKey: true,
       customClass: {
         popup: 'swal2-border-radius',
         title: 'swal2-title-custom',
