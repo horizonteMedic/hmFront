@@ -524,10 +524,17 @@ const body_Audiometria2021_Digitalizado = (doc, data) => {
   const dibujarLineasConSeparacion = (pts, tipo, color) => {
     if (pts.length < 2) return;
     
-    doc.setLineWidth(0.4);
-    if (color === "red") doc.setDrawColor(255, 0, 0);
-    else if (color === "blue") doc.setDrawColor(0, 0, 255);
-    else doc.setDrawColor(0, 0, 0);
+    // Línea roja más gruesa (0.95 puntos)
+    if (color === "red") {
+      doc.setLineWidth(0.95);
+      doc.setDrawColor(255, 0, 0);
+    } else if (color === "blue") {
+      doc.setLineWidth(0.4);
+      doc.setDrawColor(0, 0, 255);
+    } else {
+      doc.setLineWidth(0.4);
+      doc.setDrawColor(0, 0, 0);
+    }
     doc.setLineCap(1);
     
     let prev = null;
