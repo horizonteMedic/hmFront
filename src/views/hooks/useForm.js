@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
 
 export const useForm = (initialFormState) => {
   const [form, setForm] = useState(initialFormState);
@@ -32,21 +33,47 @@ export const useForm = (initialFormState) => {
   };
 
   const handleInputChangeChecked = (e) => {
-      const { name, checked } = e.target;
-      setForm(prev => ({
-          ...prev,
-          [name]: checked
-      }));
+    handleCheckBoxChange(e);
   }
+  const handleCheckBoxChange = (e) => {
+    const { name, checked } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: checked,
+    }));
+  };
+  const handlePrintDefault = (confirmarImpresion = () => { }) => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Reporte?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        confirmarImpresion();
+      }
+    });
+  };
 
   return {
     form,
     setForm,
     handleChange,
     handleChangeNumber,
-    handleRadioButton,
+    handleRadioButton, 
+    handleInputChangeChecked,
+    handleCheckBoxChange,
     handleClear,
     handleClearnotO,
-    handleInputChangeChecked
+    handlePrintDefault
   };
 };

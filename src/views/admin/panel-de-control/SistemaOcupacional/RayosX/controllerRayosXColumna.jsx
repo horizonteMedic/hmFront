@@ -34,7 +34,14 @@ export const GetInfoServicio = (nro, tabla, set, token) => {
     });
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+export const SubmitDataService = async (
+  form,
+  token,
+  user,
+  limpiar,
+  tabla,
+  datosFooter
+) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -61,7 +68,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
       }).then((result) => {
         limpiar();
         if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
+          PrintHojaR(form.norden, token, tabla, datosFooter);
         }
       });
     } else {
@@ -75,7 +82,7 @@ function convertirFecha(fecha) {
   return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
 }
 
-export const PrintHojaR = (nro, token, tabla) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
@@ -92,7 +99,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res);
+          modulo.default({ ...res, ...datosFooter });
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`

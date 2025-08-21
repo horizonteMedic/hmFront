@@ -11,6 +11,8 @@ import {
   VerifyTR,
 } from "./controllerRayoxXToraxPA";
 import Swal from "sweetalert2";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { useForm } from "../../../../hooks/useForm";
 
 const tabla = "radiografia_torax";
 const date = new Date();
@@ -42,33 +44,22 @@ const initialFormState = {
   fechaHasta: today,
 };
 
-export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
-  const [form, setForm] = useState(initialFormState);
+export default function RayosXToraxPA() {
   const [dataTabla, setDataTabla] = useState([]);
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleCheckBoxChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-  const handleCheckBoxChange = (e) => {
-    const { name, checked } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: checked,
-    }));
-  };
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
@@ -77,28 +68,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
-  };
-  const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
-    });
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleEjecutarConsulta = () => {
@@ -115,7 +85,12 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintConsultaEjecutada(form.fechaDesde, form.fechaHasta, token);
+        PrintConsultaEjecutada(
+          form.fechaDesde,
+          form.fechaHasta,
+          token,
+          datosFooter
+        );
       }
     });
   };
@@ -392,6 +367,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
             set={setForm}
             token={token}
             clean={handleClear}
+            datosFooter={datosFooter}
           />
         </div>
 
@@ -480,7 +456,7 @@ export default function RayosXToraxPA({ token, selectedSede, userlogued }) {
     </div>
   );
 }
-function Table({ data, tabla, set, token, clean }) {
+function Table({ data, tabla, set, token, clean, datosFooter }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -492,7 +468,7 @@ function Table({ data, tabla, set, token, clean }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla, datosFooter);
       }
     });
   };

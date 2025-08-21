@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -6,7 +5,8 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerRayosXColumna";
-import Swal from "sweetalert2";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { useForm } from "../../../../hooks/useForm";
 
 const tabla = "radiografia";
 const date = new Date();
@@ -33,33 +33,22 @@ const initialFormState = {
     "CUERPOS VERTEBRALES DORSOLUMBARES EVALUADOS SIN ALTERACIONES SIGNIFICATIVAS.",
 };
 
-export default function RayosXColumna({ token, selectedSede, userlogued }) {
-  const [form, setForm] = useState(initialFormState);
+export default function RayosXColumna() {
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton, 
+    handleCheckBoxChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault
+  } = useForm(initialFormState);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-  const handleRadioButton = (e, value) => {
-    const { name } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: value.toUpperCase(),
-    }));
-  };
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
 
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
@@ -68,27 +57,12 @@ export default function RayosXColumna({ token, selectedSede, userlogued }) {
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
+
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
