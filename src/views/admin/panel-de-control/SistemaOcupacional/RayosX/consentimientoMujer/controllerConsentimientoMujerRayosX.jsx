@@ -1,6 +1,5 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../../getFetch/getFetch";
-import { SubmitData } from "../model";
+import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
   "/api/v01/ct/rayosX/obtenerReporteConsentimientoRayosX";
