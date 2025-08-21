@@ -1044,11 +1044,7 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <Odontologia
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-              />
+              <Odontologia />
             </div>
           )}
           {activeTab === 19 && (

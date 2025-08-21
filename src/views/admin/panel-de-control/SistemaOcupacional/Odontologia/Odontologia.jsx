@@ -17,6 +17,8 @@ import {
 } from "./controllerOdontologia";
 import OdontogramaLevantarObservacion from "./OdontogramaLevantarObservacion";
 import Swal from "sweetalert2";
+import { useForm } from "../../../../hooks/useForm";
+import { useSessionData } from "../../../../hooks/useSessionData";
 
 const tabla = "odontograma";
 const tablaLO = "odontograma_lo";
@@ -151,13 +153,29 @@ const initialFormStateLO = {
   observaciones: "",
 };
 
-const Odontologia = ({ token, userlogued, selectedSede }) => {
+export default function Odontologia() {
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleCheckBoxChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+
+  const {
+    form: formLO,
+    setForm: setFormLO,
+    handleChange: handleChangeLO,
+    handleClear: handleClearLO,
+    handleClearnotO: handleClearnotOLO,
+  } = useForm(initialFormStateLO);
+
   const [activeTab, setActiveTab] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const [form, setForm] = useState(initialFormState);
-  const [formLO, setFormLO] = useState(initialFormStateLO);
-
   const [dataTabla, setDataTabla] = useState([]);
 
   const changeTab = (tabIndex) => {
@@ -173,48 +191,14 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
     handleClearLO();
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-  const handleCheckBoxChange = (e) => {
-    const { name, checked } = e.target;
-    setForm((f) => ({
-      ...f,
-      [name]: checked,
-    }));
-  };
-
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
-  const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla);
-  };
-
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
+  };
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleEjecutarConsulta = () => {
@@ -231,21 +215,16 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintConsultaEjecutada(form.fechaDesde, form.fechaHasta, token);
+        PrintConsultaEjecutada(
+          form.fechaDesde,
+          form.fechaHasta,
+          token,
+          datosFooter
+        );
       }
     });
   };
 
-  const handleChangeLO = (e) => {
-    const { name, value } = e.target;
-    setFormLO((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-  const handleClearLO = () => {
-    setFormLO(initialFormStateLO);
-  };
-  const handleClearnotOLO = () => {
-    setFormLO((prev) => ({ ...initialFormStateLO, norden: prev.norden }));
-  };
   const handleSaveLO = () => {
     SubmitDataServiceLO(
       formLO,
@@ -253,7 +232,8 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
       userlogued,
       handleClearLO,
       tablaLO,
-      closeModal
+      closeModal,
+      datosFooter
     );
   };
   useEffect(() => {
@@ -437,6 +417,7 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
                 setActiveTab={setActiveTab}
                 obtenerInfoTabla={obtenerInfoTabla}
                 selectedSede={selectedSede}
+                datosFooter={datosFooter}
               />
             )}
           </div>
@@ -463,6 +444,4 @@ const Odontologia = ({ token, userlogued, selectedSede }) => {
       </div>
     </div>
   );
-};
-
-export default Odontologia;
+}

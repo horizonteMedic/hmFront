@@ -33,27 +33,27 @@ function footerFichaOdontologicaCabecera(doc, opts = {}, datos = {}) {
     {
       direccion:
         datos?.dirTruPierola ||
-        "Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando Cel. 964385075",
+        "",
       celular: datos?.celTrujilloPie || "",
       email: datos?.emailTruPierola || "",
       telefono:
         datos?.telfTruPierola ||
-        "Cl. Guillermo Prescott N°127 Urb. Sto. Dominguito Telf. 044-767608",
+        "",
     },
     {
       direccion:
-        datos?.dirHuamachuco || "Sede Huamachuco: Jr. Leoncio Prado N°786",
-      celular: datos?.celHuamachuco || "Cel. 990094744-969603777",
+        datos?.dirHuamachuco || "",
+      celular: datos?.celHuamachuco || "",
       email: datos?.emailHuamachuco || "",
-      telefono: datos?.telfHuamachuco || "Telf. 044-348070",
+      telefono: datos?.telfHuamachuco || "",
     },
     {
       direccion:
         datos?.dirHuancayo ||
-        "Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
+        "",
       celular: datos?.celHuancayo || "",
       email: datos?.emailHuancayo || "",
-      telefono: datos?.telfHuancayo || "Telf. 064-659554",
+      telefono: datos?.telfHuancayo || "",
     },
   ];
   filas.forEach((fila) => {
