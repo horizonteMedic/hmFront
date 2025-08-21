@@ -37,24 +37,13 @@ const RayosX = ({ token, selectedSede, userlogued }) => {
             }`}
             onClick={() => setActiveTab(2)}
           >
-            <FontAwesomeIcon icon={faXRay} className="mr-2" /> Consentimiento Mujeres
+            <FontAwesomeIcon icon={faXRay} className="mr-2" /> Consentimiento
+            Mujeres
           </button>
         </nav>
         <div className="p-6  max-w-[95%] mx-auto">
-          {activeTab === 0 && (
-            <RayosXToraxPA
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-            />
-          )}
-          {activeTab === 1 && (
-            <RayosXColumna
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-            />
-          )}
+          {activeTab === 0 && <RayosXToraxPA />}
+          {activeTab === 1 && <RayosXColumna />}
           {activeTab === 2 && (
             <ConsentimientoMujerRayosX
               token={token}

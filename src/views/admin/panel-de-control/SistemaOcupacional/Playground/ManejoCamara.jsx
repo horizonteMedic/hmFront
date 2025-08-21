@@ -59,7 +59,7 @@ export default function ManejoCamara() {
                     <img
                       src={capturedImage}
                       alt="Captured"
-                      className="w-[210px] h-[337.5px] object-cover border "
+                      className="w-[210px] h-[337.5px] object-cover border rounded-lg"
                     />
                     <button
                       className="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors flex items-center gap-2 mt-4"
@@ -87,8 +87,15 @@ export default function ManejoCamara() {
               {/* Control Buttons */}
 
               {/* Save Button */}
-              <div className="flex justify-end">
-                <button className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors flex items-center gap-2">
+              <div
+                className={`${
+                  capturedImage ? "block" : "opacity-0"
+                } flex justify-end`}
+              >
+                <button
+                  className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors flex items-center gap-2"
+                  disabled={!capturedImage}
+                >
                   <FontAwesomeIcon icon={faSave} />
                   <span>Guardar Fotografía</span>
                 </button>
@@ -111,7 +118,7 @@ function Webcam({ setCapturedImage, type = "landscape" }) {
           facingMode: "user",
           ...aspectRatios[type],
         }}
-        className="border "
+        className="border rounded-lg"
       >
         {({ getScreenshot }) => (
           <div className="flex justify-center gap-4 my-4">

@@ -139,14 +139,14 @@ export default function FichaOftalmologica({
     if (gradoLejosOD == "NINGUNA" && gradoLejosOI == "NINGUNA")
       return "NINGUNA";
     else if (gradoLejosOD.includes("SEVERA") && gradoLejosOI.includes("SEVERA"))
-      return "AMETROPIA BILATERAL SEVERA";
+      return "AMETROPIA SEVERA BILATERAL";
     else if (
       gradoLejosOD.includes("MODERADA") &&
       gradoLejosOI.includes("MODERADA")
     )
-      return "AMETROPIA BILATERAL MODERADA";
+      return "AMETROPIA MODERADA BILATERAL";
     else if (gradoLejosOD.includes("LEVE") && gradoLejosOI.includes("LEVE"))
-      return "AMETROPIA BILATERAL LEVE";
+      return "AMETROPIA LEVE BILATERAL";
     return `${gradoLejosOD} OJO DERECHO Y ${gradoLejosOI} OJO IZQUIERDO`;
   }
 
