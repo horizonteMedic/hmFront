@@ -69,6 +69,7 @@ import {
   faSkiingNordic,
   faSkull,
   faGamepad,
+  faBed,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -86,6 +87,7 @@ import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.js
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
 import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
 import ManejoCamara from "./Playground/ManejoCamara.jsx";
+import EKG from "./EKG/ekg.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -465,7 +467,7 @@ const TabComponent = () => {
                   }`}
                 >
                   <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faSkull} />
+                    <FontAwesomeIcon icon={faBed} />
                   </span>
                   <span className={styles.title}>
                     Test Fatiga y Somnolencia
@@ -1147,7 +1149,7 @@ const TabComponent = () => {
                   Playground
                 </h2>
               </div>
-              <ManejoCamara />
+              <EKG />
             </div>
           )}
         </div>
@@ -1204,6 +1206,10 @@ const TabComponent = () => {
               break;
             case "Odontologia":
               setActiveTab(18);
+              setSubTab(0);
+              break;
+            case "Evaluación Musculoesquelética":
+              setActiveTab(22);
               setSubTab(0);
               break;
           }

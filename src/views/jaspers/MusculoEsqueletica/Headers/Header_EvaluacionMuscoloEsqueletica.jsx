@@ -25,8 +25,9 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     areaTrabajo: datos?.paciente?.areaTrabajo ?? "",
     sexo: datos?.paciente?.sexo ?? "",
     sede: datos?.informacionSede?.sede ?? "",
-    codigoColor: datos?.informacionSede?.codigoColor,
-    textoColor: datos?.informacionSede?.textoColor,
+    color: datos?.informacionSede?.color ?? "",
+    codigoColor: datos?.informacionSede?.codigoColor.trim() ?? "",
+    textoColor: datos?.informacionSede?.textoColor.trim() ?? "",
     norden: datos?.norden ?? ""
   };
 
@@ -68,33 +69,36 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
 
     // === BLOQUE CÓDIGO DE COLOR ===
-    const color = datosFinales.codigoColor || "#008f39";
-    const boxText = (datosFinales.textoColor || "F").toUpperCase();
-    let boxSize = 15;
-    let boxX = pageW - margin - boxSize; // Posición X independiente
-    let boxY = y - 11; // Subido 20 puntos (antes y + 2, ahora y - 18)
-    
-    // Draw box outline in black
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.5);
-    doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
-    // Solo renderiza si color es válido o para prueba
-    doc.setDrawColor(color);
-    doc.setLineWidth(2);
-    doc.setLineCap("round");
-    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-    doc.setLineCap("butt");
-    doc.setFontSize(22); // Aumentado de 18 a 22 para letra más grande
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(color);
-    doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
-      align: "center",
-      baseline: "middle",
-      maxWidth: boxSize - 1,
-    });
-    doc.setDrawColor(0);
-    doc.setTextColor(0);
-    doc.setLineWidth(0.2);
+    const colorValido = typeof datosFinales.color === "number" && datosFinales.color >= 1 && datosFinales.color <= 50;
+    if (colorValido) {
+      const color = datosFinales.codigoColor || "#008f39";
+      const boxText = (datosFinales.textoColor || "F").toUpperCase();
+      let boxSize = 15;
+      let boxX = pageW - margin - boxSize; // Posición X independiente
+      let boxY = y - 11; // Subido 20 puntos (antes y + 2, ahora y - 18)
+      
+      // Draw box outline in black
+      doc.setDrawColor(0);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+      // Solo renderiza si color es válido o para prueba
+      doc.setDrawColor(color);
+      doc.setLineWidth(2);
+      doc.setLineCap("round");
+      doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+      doc.setLineCap("butt");
+      doc.setFontSize(22); // Aumentado de 18 a 22 para letra más grande
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor(color);
+      doc.text(boxText, boxX + boxSize / 2, boxY + boxSize / 2, {
+        align: "center",
+        baseline: "middle",
+        maxWidth: boxSize - 1,
+      });
+      doc.setDrawColor(0);
+      doc.setTextColor(0);
+      doc.setLineWidth(0.2);
+    }
 
     // 4) NÚMERO DE PÁGINA - con posiciones independientes
     const pagX = sedeX2; // Alineado con la sede
