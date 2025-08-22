@@ -11,8 +11,8 @@ import {
   VerifyTR,
 } from "./controllerRayoxXToraxPA";
 import Swal from "sweetalert2";
-import { useSessionData } from "../../../../hooks/useSessionData";
-import { useForm } from "../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../hooks/useForm";
 
 const tabla = "radiografia_torax";
 const date = new Date();
@@ -20,6 +20,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
+
 const initialFormState = {
   norden: "",
   codRat: null,

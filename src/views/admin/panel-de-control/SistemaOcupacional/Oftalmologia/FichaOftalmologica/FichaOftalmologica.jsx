@@ -118,47 +118,59 @@ export default function FichaOftalmologica({
   };
   function obtenerGrado(valor) {
     const mapa = {
-      "20/20": "NINGUNA",
-      "20/25": "AMETROPIA LEVE",
-      "20/30": "AMETROPIA LEVE",
-      "20/40": "AMETROPIA LEVE",
-      "20/50": "AMETROPIA MODERADA",
-      "20/70": "AMETROPIA MODERADA",
-      "20/100": "AMETROPIA SEVERA",
-      "20/150": "AMETROPIA SEVERA",
-      "20/200": "AMETROPIA SEVERA",
-      "20/400": "AMETROPIA SEVERA",
+      "20/20": { tipo: "", nivel: "NINGUNA" },
+      "20/25": { tipo: "AMETROPIA", nivel: "LEVE" },
+      "20/30": { tipo: "AMETROPIA", nivel: "LEVE" },
+      "20/40": { tipo: "AMETROPIA", nivel: "LEVE" },
+      "20/50": { tipo: "AMETROPIA", nivel: "MODERADA" },
+      "20/70": { tipo: "AMETROPIA", nivel: "MODERADA" },
+      "20/100": { tipo: "AMETROPIA", nivel: "SEVERA" },
+      "20/150": { tipo: "AMETROPIA", nivel: "SEVERA" },
+      "20/200": { tipo: "AMETROPIA", nivel: "SEVERA" },
+      "20/400": { tipo: "AMETROPIA", nivel: "SEVERA" },
     };
-    return mapa[valor] || "";
+    return mapa[valor] || { tipo: "", nivel: "" };
   }
 
   function generarDiagnosticoLejos() {
-    const gradoLejosOD = obtenerGrado(form.visionLejosOD);
-    const gradoLejosOI = obtenerGrado(form.visionLejosOI);
+    const od = obtenerGrado(form.visionLejosOD);
+    const oi = obtenerGrado(form.visionLejosOI);
 
-    if (gradoLejosOD == "NINGUNA" && gradoLejosOI == "NINGUNA")
-      return "NINGUNA";
-    else if (gradoLejosOD.includes("SEVERA") && gradoLejosOI.includes("SEVERA"))
-      return "AMETROPIA SEVERA BILATERAL";
-    else if (
-      gradoLejosOD.includes("MODERADA") &&
-      gradoLejosOI.includes("MODERADA")
-    )
-      return "AMETROPIA MODERADA BILATERAL";
-    else if (gradoLejosOD.includes("LEVE") && gradoLejosOI.includes("LEVE"))
-      return "AMETROPIA LEVE BILATERAL";
-    return `${gradoLejosOD} OJO DERECHO Y ${gradoLejosOI} OJO IZQUIERDO`;
+    if (od.nivel === "NINGUNA" && oi.nivel === "NINGUNA") return "NINGUNA";
+
+    // Caso bilateral del mismo nivel
+    if (od.tipo && oi.tipo && od.nivel === oi.nivel) {
+      return `${od.tipo} ${od.nivel} BILATERAL`;
+    }
+
+    // Caso cuando ambos son ametropía pero diferentes grados
+    if (od.tipo && oi.tipo) {
+      return `${od.tipo} ${od.nivel} OJO DERECHO Y ${oi.nivel} OJO IZQUIERDO`;
+    }
+
+    // Caso mixto
+    return `${od.tipo ? od.tipo + " " + od.nivel : od.nivel} OJO DERECHO Y ${
+      oi.tipo ? oi.tipo + " " + oi.nivel : oi.nivel
+    } OJO IZQUIERDO`;
   }
 
   function generarDiagnosticoCerca() {
-    const gradoCercaOD = obtenerGrado(form.visionCercaOD);
-    const gradoCercaOI = obtenerGrado(form.visionCercaOI);
+    const od = obtenerGrado(form.visionCercaOD);
+    const oi = obtenerGrado(form.visionCercaOI);
     const edad = parseInt(form.edad);
-    console.log(edad)
-    if (gradoCercaOD == "NINGUNA" && gradoCercaOI == "NINGUNA")
+
+    // Caso sin ametropía en ambos
+    if (od.nivel === "NINGUNA" && oi.nivel === "NINGUNA") {
       return "NINGUNA";
-    else if (edad >= 18 && edad <= 39) return "HIPERMETROPIA";
-    else if (edad >= 40) return "PRESBICIA";
+    }
+
+    // Diagnóstico según edad
+    if (edad >= 18 && edad <= 39) {
+      return "HIPERMETROPIA";
+    } else if (edad >= 40) {
+      return "PRESBICIA";
+    }
+
     return "";
   }
 

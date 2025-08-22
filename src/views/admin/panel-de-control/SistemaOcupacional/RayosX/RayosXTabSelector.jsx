@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXRay } from "@fortawesome/free-solid-svg-icons";
 import styles from "./RayosX.module.css";
-import RayosXToraxPA from "./RayosXToraxPA";
-import RayosXColumna from "./RayosXColumna";
+import RayosXToraxPA from "./rayosXToraxPA/RayosXToraxPA";
+import RayosXColumna from "./rayosXColumna/RayosXColumna";
 import ConsentimientoMujerRayosX from "./consentimientoMujer/ConsentimientoMujerRayosX";
 
-const RayosX = ({ token, selectedSede, userlogued }) => {
+export default function RayosXTabSelector() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
@@ -44,17 +44,9 @@ const RayosX = ({ token, selectedSede, userlogued }) => {
         <div className="p-6  max-w-[95%] mx-auto">
           {activeTab === 0 && <RayosXToraxPA />}
           {activeTab === 1 && <RayosXColumna />}
-          {activeTab === 2 && (
-            <ConsentimientoMujerRayosX
-              token={token}
-              selectedSede={selectedSede}
-              userlogued={userlogued}
-            />
-          )}
+          {activeTab === 2 && <ConsentimientoMujerRayosX />}
         </div>
       </div>
     </div>
   );
 };
-
-export default RayosX;

@@ -1,13 +1,12 @@
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import Swal from "sweetalert2";
 import {
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
 } from "./controllerConsentimientoMujerRayosX";
-import { useAuthStore } from "../../../../../../store/auth";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
 const tabla = "consentimiento_rayosx";
 const date = new Date();
@@ -15,7 +14,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
-console.log(today);
+
 const initialFormState = {
   norden: "",
   fecha: today,
@@ -25,37 +24,24 @@ const initialFormState = {
   empresa: "",
   contrata: "",
   ocupacion: "",
-  // Texto final del consentimiento (pre-llenado)
   textoFinalConsentimiento: `Declaro que he recibido explicaciones satisfactorias sobre el propósito, naturaleza y riesgos de la toma de RAYOS X, por lo cual doy de conocimiento y declaro que a la fecha no me encuentro en estado de gestación, ya que soy consciente de los eventuales riesgos que se pueden derivar de la realización de dicho examen en caso de encontrarme gestando. Por lo cual AUTORIZO a que se me realice la radiografía, indicada por el protocolo de la empresa contratante.`,
 };
 
-export default function ConsentimientoMujerRayosX({
-  token,
-  selectedSede,
-  userlogued,
-}) {
-  const [form, setForm] = useState(initialFormState);
-  const datosFooter = useAuthStore((state) => state.datosFooter);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  };
-
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    if (/^[\d/]*$/.test(value)) {
-      setForm((f) => ({ ...f, [name]: value }));
-    }
-  };
-
-  const handleClear = () => {
-    setForm(initialFormState);
-  };
-
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-  };
+export default function ConsentimientoMujerRayosX() {
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleCheckBoxChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+  
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -65,28 +51,12 @@ export default function ConsentimientoMujerRayosX({
   };
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla,datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handlePrint = () => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Reporte?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla, datosFooter);
-      }
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 

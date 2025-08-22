@@ -119,7 +119,14 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
+export const SubmitDataService = async (
+  form,
+  token,
+  user,
+  limpiar,
+  tabla,
+  datosFooter
+) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
@@ -194,7 +201,7 @@ export const SubmitDataService = async (form, token, user, limpiar, tabla) => {
       }).then((result) => {
         limpiar();
         if (result.isConfirmed) {
-          PrintHojaR(form.norden, token, tabla);
+          PrintHojaR(form.norden, token, tabla, datosFooter);
         }
       });
     } else {
@@ -209,7 +216,8 @@ export const SubmitDataServiceLO = async (
   user,
   limpiar,
   tabla,
-  closeModal
+  closeModal,
+  datosFooter
 ) => {
   if (!form.norden) {
     await Swal.fire("Error", "Datos Incompletos", "error");
@@ -285,7 +293,7 @@ export const SubmitDataServiceLO = async (
         limpiar();
         closeModal();
         if (result.isConfirmed) {
-          PrintHojaRLO(form.norden, token, tabla);
+          PrintHojaRLO(form.norden, token, tabla, datosFooter);
         }
       });
     } else {
@@ -455,7 +463,15 @@ export const GetInfoServicioLO = (
     });
 };
 
-export const GetInfoPac = (nro, set, token, sede, onFinish = () => {Swal.close();}) => {
+export const GetInfoPac = (
+  nro,
+  set,
+  token,
+  sede,
+  onFinish = () => {
+    Swal.close();
+  }
+) => {
   getFetch(
     `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
     token
@@ -473,12 +489,9 @@ export const GetInfoPac = (nro, set, token, sede, onFinish = () => {Swal.close()
     .finally(() => {
       onFinish();
     });
-  // .finally(() => {
-  //   Swal.close();
-  // });
 };
 
-export const PrintHojaR = (nro, token, tabla) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(
@@ -498,7 +511,7 @@ export const PrintHojaR = (nro, token, tabla) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res);
+          modulo.default({ ...res, ...datosFooter });
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`
@@ -511,7 +524,7 @@ export const PrintHojaR = (nro, token, tabla) => {
     });
 };
 
-export const PrintHojaRLO = (nro, token, tabla) => {
+export const PrintHojaRLO = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
 
   getFetch(
@@ -531,7 +544,7 @@ export const PrintHojaRLO = (nro, token, tabla) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res);
+          modulo.default({ ...res, ...datosFooter });
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`
@@ -544,7 +557,7 @@ export const PrintHojaRLO = (nro, token, tabla) => {
     });
 };
 
-export const PrintConsultaEjecutada = (inicio, fin, token) => {
+export const PrintConsultaEjecutada = (inicio, fin, token, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
   getFetch(
     `${reporteConsultaUrl}?inicio=${inicio}&fin=${fin}`, //revisar
@@ -563,7 +576,7 @@ export const PrintConsultaEjecutada = (inicio, fin, token) => {
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
-          modulo.default(res);
+          modulo.default({ ...res, ...datosFooter });
         } else {
           console.error(
             `El archivo ${nombre}.jsx no exporta una función por defecto`

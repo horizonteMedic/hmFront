@@ -5,8 +5,8 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerRayosXColumna";
-import { useSessionData } from "../../../../hooks/useSessionData";
-import { useForm } from "../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../hooks/useForm";
 
 const tabla = "radiografia";
 const date = new Date();

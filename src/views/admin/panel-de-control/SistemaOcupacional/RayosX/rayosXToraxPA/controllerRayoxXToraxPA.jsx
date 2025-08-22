@@ -1,6 +1,5 @@
 import Swal from "sweetalert2";
-import { getFetch } from "../../getFetch/getFetch";
-import { SubmitData } from "./model";
+import { getFetch, SubmitData } from "../../../../../utils/apiHelpers";
 
 //===============Zona Modificación===============
 const obtenerReporteUrl = "/api/v01/ct/rayosX/obtenerReporteRadiografiaTorax";
@@ -203,10 +202,10 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/RayosX/*.jsx"
+          "../../../../../jaspers/RayosX/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../jaspers/RayosX/${nombre}.jsx`
+          `../../../../../jaspers/RayosX/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {
@@ -257,10 +256,10 @@ export const PrintConsultaEjecutada = (inicio, fin, token, datosFooter) => {
         const nombre = res.nameJasper;
         console.log(nombre);
         const jasperModules = import.meta.glob(
-          "../../../../jaspers/RayosX/*.jsx"
+          "../../../../../jaspers/RayosX/*.jsx"
         );
         const modulo = await jasperModules[
-          `../../../../jaspers/RayosX/${nombre}.jsx`
+          `../../../../../jaspers/RayosX/${nombre}.jsx`
         ]();
         // Ejecuta la función exportada por default con los datos
         if (typeof modulo.default === "function") {

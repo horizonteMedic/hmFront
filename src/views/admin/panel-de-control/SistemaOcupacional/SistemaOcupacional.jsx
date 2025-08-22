@@ -80,7 +80,7 @@ import OftalmologiaTabSelector from "./Oftalmologia/OftalmologiaTabSelector.jsx"
 import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
-import RayosX from "./RayosX/RayosX.jsx";
+import RayosXTabSelector from "./RayosX/RayosXTabSelector.jsx";
 import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
@@ -933,11 +933,7 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
               </div>
-              <RayosX
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-              />
+              <RayosXTabSelector />
             </div>
           )}
           {activeTab === 15 && (
@@ -1048,11 +1044,7 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <Odontologia
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-              />
+              <Odontologia />
             </div>
           )}
           {activeTab === 19 && (

@@ -21,6 +21,7 @@ const OdontologiaReportes = ({
   setActiveTab,
   obtenerInfoTabla,
   selectedSede,
+  datosFooter
 }) => {
   return (
     <div>
@@ -123,6 +124,7 @@ const OdontologiaReportes = ({
               clean={handleClear}
               setActiveTab={setActiveTab}
               sede={selectedSede}
+              datosFooter={datosFooter}
             />
           </div>
         </div>
@@ -132,7 +134,7 @@ const OdontologiaReportes = ({
 };
 
 // Co
-function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
+function Table({ data, tabla, set, token, clean, setActiveTab, sede, datosFooter }) {
   // confirmación antes de imprimir
   const handlePrintConfirm = (nro) => {
     Swal.fire({
@@ -144,7 +146,7 @@ function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(nro, token, tabla);
+        PrintHojaR(nro, token, tabla, datosFooter);
       }
     });
   };
@@ -171,7 +173,10 @@ function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
   }
 
   return (
-    <div className="overflow-y-auto max-w-[1000px] mx-auto" style={{ maxHeight: "450px" }}>
+    <div
+      className="overflow-y-auto max-w-[1000px] mx-auto"
+      style={{ maxHeight: "450px" }}
+    >
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">
@@ -204,7 +209,9 @@ function Table({ data, tabla, set, token, clean, setActiveTab, sede }) {
                   {row.norden || ""}
                 </td>
                 <td className="border px-2 py-1 ">{row.nombres || ""}</td>
-                <td className="border px-2 py-1 max-w-[200px]">{row.empresa || ""}</td>
+                <td className="border px-2 py-1 max-w-[200px]">
+                  {row.empresa || ""}
+                </td>
                 <td className="border px-2 py-1">{row.tipoExamen || ""}</td>
 
                 <td className="border px-2 py-1">

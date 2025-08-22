@@ -45,7 +45,7 @@ import Espirometria from "./views/admin/panel-de-control/SistemaOcupacional/Espi
 import OftalmologiaTabSelector from "./views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/OftalmologiaTabSelector.jsx";
 import MusculoEsqueleticoTabSelector from "./views/admin/panel-de-control/SistemaOcupacional/Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
 import Odontologia from "./views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx";
-import RayosX from "./views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosX.jsx";
+import RayosXTabSelector from "./views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosXTabSelector.jsx";
 import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import EKG from "./views/admin/panel-de-control/SistemaOcupacional/EKG/ekg.jsx";
 
@@ -156,7 +156,7 @@ const AppContent = () => {
             path="/HistoriaOcupacional"
             element={<HistoriaOcupacional />}
           />
-                  <Route path="/rayosx" element={<RayosX />} />
+                  <Route path="/rayosx" element={<RayosXTabSelector />} />
         <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} />
       </Route>
       <Route path="/Espirometria" element={<Espirometria />} />
