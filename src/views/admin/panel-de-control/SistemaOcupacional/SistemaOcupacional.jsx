@@ -69,6 +69,7 @@ import {
   faSkiingNordic,
   faSkull,
   faGamepad,
+  faBed,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -465,7 +466,7 @@ const TabComponent = () => {
                   }`}
                 >
                   <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faSkull} />
+                    <FontAwesomeIcon icon={faBed} />
                   </span>
                   <span className={styles.title}>
                     Test Fatiga y Somnolencia

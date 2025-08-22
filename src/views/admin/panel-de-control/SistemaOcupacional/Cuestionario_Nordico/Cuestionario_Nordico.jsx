@@ -312,13 +312,4 @@ const Cuestionario_Nordico = () => {
 
 export default Cuestionario_Nordico;
 
-Cuestionario_Nordico.propTypes = {
-  token: PropTypes.string.isRequired,
-  selectedSede: PropTypes.string.isRequired,
-  userlogued: PropTypes.object.isRequired,
-  userDatos: PropTypes.shape({
-    datos: PropTypes.shape({
-      dni_user: PropTypes.string.isRequired,
-    }).isRequired,
-  }).isRequired,
-};
+
