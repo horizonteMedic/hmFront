@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
@@ -16,7 +16,7 @@ const accesos = [
   { icon: faDeaf, label: 'Audiometría', key : "Audiometria" },
   { icon: faTooth, label: 'Odontología', key : "Odontologia" },
   { icon: faEye, label: 'Oftalmología', key : "Oftalmologia" },
-
+  { icon: faSkull, label: 'Evaluación Musculoesquelética', key : "Evaluación Musculoesquelética" },
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
@@ -24,7 +24,7 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista 
     {/* Overlay leve */}
     {open && <div className={styles.overlay} onClick={onClose} />}
     <div
-      className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}
+      className={`fixed top-0 right-0 h-full w-[320px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ${open ? 'translate-x-0' : 'translate-x-full'}`}
     >
       <div className="flex items-center justify-between px-6 py-5 border-b">
         <span className="font-bold text-lg text-[#1a2536]">Accesos rápidos</span>
