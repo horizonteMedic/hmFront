@@ -524,54 +524,56 @@ export default function FichaOftalmologica({
               />
               <div className="col-span-5 grid grid-cols-4 text-black">
                 <div></div>
-                <label className="flex items-center gap-1 font-normal text-black">
+                <label className="flex items-center gap-2 font-normal text-black">
                   <input
                     type="checkbox"
                     name="opcionPterigion"
-                    checked={form.presenciaPterigion == "PTERIGIÓN OJO DERECHO"}
+                    checked={form.presenciaPterigion.includes("PTERIGIÓN OJO DERECHO")}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? "PTERIGIÓN OJO DERECHO"
+                          ? (f.presenciaPterigion + " PTERIGIÓN OJO DERECHO") 
                           : "",
                       }))
                     }
-                  />{" "}
+                  />
                   PTERIG.OJO DEREC
                 </label>
-                <label className="flex items-center gap-1 font-normal text-black">
+                <label className="flex items-center gap-2 font-normal text-black">
                   <input
                     type="checkbox"
                     name="opcionPterigion"
-                    checked={
-                      form.presenciaPterigion == "PTERIGIÓN OJO IZQUIERDO"
-                    }
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN OJO IZQUIERDO"
+                    )}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? "PTERIGIÓN OJO IZQUIERDO"
+                          ? (f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO")
                           : "",
                       }))
                     }
-                  />{" "}
+                  />
                   PTERIG. OJO IZQ
                 </label>
-                <label className="flex items-center gap-1 font-normal text-black">
+                <label className="flex items-center gap-2 font-normal text-black">
                   <input
                     type="checkbox"
                     name="opcionPterigion"
-                    checked={form.presenciaPterigion == "PTERIGIÓN BILATERAL"}
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN BILATERAL"
+                    )}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? "PTERIGIÓN BILATERAL"
+                          ? (f.presenciaPterigion + " PTERIGIÓN BILATERAL")
                           : "",
                       }))
                     }
-                  />{" "}
+                  />
                   PTERIG. BILATERAL
                 </label>
               </div>
