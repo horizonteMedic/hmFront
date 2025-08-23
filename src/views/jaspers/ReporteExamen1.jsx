@@ -6,7 +6,16 @@ import drawC from "./components/drawC";
 import footer from "./components/footer";
 export default function ReporteExamen1 (datos){
 
-        const fecha = "02/45/5154"
+        // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
+        const formatearFecha = (fecha) => {
+            if (!fecha) return "";
+            if (typeof fecha === "string" && fecha.includes("-")) {
+                const [year, month, day] = fecha.split("-");
+                return `${day}/${month}/${year}`;
+            }
+            return fecha;
+        };
+
         const doc = new jsPDF();
         
         // Move drawLine function definition to the top
@@ -143,6 +152,128 @@ export default function ReporteExamen1 (datos){
         doc.setFont("helvetica", "bold");
         doc.text(`Registrado por : ${obtenerPrimeraPalabra(datos.userRegistro || "")}`, 17, headspace+185);
         footer(doc,datos);
+        
+        // === AGREGAR SEGUNDA PÁGINA ===
+        doc.addPage();
+        
+        // Agregar la imagen de la hoja de ruta en la mitad superior de la página 2
+        try {
+            const imgPath = "./img/pag2_hojaderuta.png";
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            
+            // Definir márgenes de 1.5pt (convertir a mm: 1.5pt ≈ 0.53mm)
+            const margin = 0.53;
+            
+            // Calcular dimensiones para que la imagen ocupe la mitad superior con márgenes
+            const imgW = pageW - (2 * margin); // 100% del ancho menos márgenes laterales
+            const imgH = (pageH / 2) - margin; // Mitad de la altura menos margen superior
+            
+            // Posicionar la imagen con márgenes
+            const imgX = margin; // Margen izquierdo
+            const imgY = margin; // Margen superior
+            
+            doc.addImage(imgPath, 'PNG', imgX, imgY, imgW, imgH);
+            
+            // === COLOCAR DATOS DE PRUEBA EN EL FRAME ===
+            // Configuración de fuentes para los datos
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            
+            // === COLOCAR DATOS REALES EN EL FRAME ===
+            // MUESTRA - Checkbox SANGRE (siempre marcado por defecto)
+            // doc.setFont("helvetica", "bold");
+            // doc.text("X", 25, 25); // X: 25, Y: 25
+            
+            // CÓDIGO
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(20);
+            doc.text(String(datos.orden || "148055"), 176.5, 12); // X: 80, Y: 35 - Ajustado para ser más visible
+            
+            // Restaurar fuente normal para los campos siguientes
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            
+            // TIPO DE EXAMEN
+            doc.text(String(datos.examen || "EXAMEN OCUPACIONAL"), 31,25.3); // X: 35, Y: 60
+            
+            // EMPRESA
+            doc.text(String(datos.empresa || "EMPRESA NO ESPECIFICADA"), 85.5, 25.3); // X: 35, Y: 68
+            
+            // CONTRATA
+            doc.text(String(datos.contrata || "CONTRATA NO ESPECIFICADA"), 155, 25.3); // X: 35, Y: 76
+            
+            // NOMBRES Y APELLIDOS
+            doc.text(String(datos.nombres || "JOSUE SPENCER ROJAS SIGUENZA"), 53.5, 31); // X: 35, Y: 84
+            
+            // EDAD
+            doc.text(datos.edad ? `${String(datos.edad)}` : "30", 140, 31); // X: 120, Y: 84
+            
+            // FECHA
+            doc.text(String(formatearFecha(datos.fecha) || "23/08/2025"), 175, 31); // X: 160, Y: 84
+            
+            // CARGO
+            doc.text(String(datos.cargo || "ADMIN DEL BAHIA ROSA"), 25, 36.2); // X: 35, Y: 92
+            
+            // === CHECKBOXES DE EVALUACIONES ===
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(255, 0, 0); // Color rojo
+            
+            // T.ALTURA - Marcar si NO está hecho en página 1 (usar la misma lógica)
+            if (!datos.testaltura ? true : !datos.cerificadoaltura && !datos.b_certialtura ? false : true) {
+                // Si está marcado en página 1, NO marcar en página 2
+            } else {
+                doc.text("X", 89, 37.3); // Marcar si NO se hizo test altura
+            }
+            
+            // PSICOSENSOMETRIA - Marcar si NO está hecho en página 1
+            if (!datos.altaps ? true : datos.psicosen ? true : false) {
+                // Si está marcado en página 1, NO marcar en página 2
+            } else {
+                doc.text("X", 111, 37.3); // Marcar si NO se hizo psicosensometría
+            }
+            
+            // M. A. (Manipulador de Alimentos) - Marcar si NO está hecho en página 1
+            if (!datos.altamanipalim ? true : datos.manipalimen ? true : false) {
+                // Si está marcado en página 1, NO marcar en página 2
+            } else {
+                doc.text("X", 130.5, 37.3); // Marcar si NO se hizo manip. alimentos
+            }
+            
+            // MET. P. (Metales Pesados) - Marcar si NO está hecho en página 1
+            if (!datos.aplomo || !datos.amercurio ? true : !datos.plomos || !datos.mercurioo ? true : false) {
+                // Si está marcado en página 1, NO marcar en página 2
+            } else {
+                doc.text("X", 154.2, 37.3); // Marcar si NO se hicieron metales pesados
+            }
+            
+            // Pb (Plomo) - Marcar si NO está hecho en página 1
+            if (!datos.aplomo ? true : datos.plomos ? true : false) {
+                // Si está marcado en página 1, NO marcar en página 2
+            } else {
+                doc.text("X", 171, 37.3); // Marcar si NO se hizo plomo
+            }
+            
+            // T. CAL (Trabajos Calientes) - Marcar si NO está hecho en página 1
+            if (!datos.altatc ? true : datos.trabcalientes ? true : false) {
+                // Si está marcado en página 1, NO marcar en página 2
+            } else {
+                doc.text("X", 194, 37.3); // Marcar si NO se hicieron trabajos calientes
+            }
+            
+            // Restaurar fuente normal
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            
+        } catch (error) {
+            console.error("No se pudo cargar la imagen de la hoja de ruta:", error);
+            // Si falla la imagen, agregar texto alternativo
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("HOJA DE RUTA", 80, 100, { align: "center" });
+        }
+        
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
 

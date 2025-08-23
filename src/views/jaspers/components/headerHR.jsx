@@ -1,6 +1,16 @@
 // views/jaspers/components/headerHR.js
 
 const headerHR = (doc, datos) => {
+  // Función para formatear fecha de YYYY-MM-DD a DD/MM/YYYY
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "";
+    if (typeof fecha === "string" && fecha.includes("-")) {
+      const [year, month, day] = fecha.split("-");
+      return `${day}/${month}/${year}`;
+    }
+    return fecha;
+  };
+
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
   const yOffset = 10;       // separación extra arriba y abajo
@@ -92,7 +102,7 @@ const headerHR = (doc, datos) => {
   doc.setFont("helvetica", "bold");
   doc.text("FECHA:", margin + 80, y1);
   doc.setFont("helvetica", "normal");
-  doc.text(`${datos.fecha || ""}`, margin + 95, y1);
+  doc.text(`${formatearFecha(datos.fecha) || ""}`, margin + 95, y1);
   
   doc.setFont("helvetica", "bold");
   doc.text("HORA:", margin + 120, y1);
