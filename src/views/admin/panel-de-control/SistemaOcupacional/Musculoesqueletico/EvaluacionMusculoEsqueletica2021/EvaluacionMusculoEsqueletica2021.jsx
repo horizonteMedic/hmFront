@@ -20,6 +20,11 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
+function fixEncodingModern(str) {
+  const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
 const EvaluacionMusculoEsqueletica2021 = () => {
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
@@ -147,12 +152,12 @@ const EvaluacionMusculoEsqueletica2021 = () => {
     altMasaMuscularTobilloDerecho: "0",
     altMasaMuscularTobilloIzquierdo: "0",
 
-    cie10: "",
-    nombreMedico: `${userCompleto?.datos?.nombres_user ?? ""} - ${
-      userCompleto?.datos?.cmp ?? ""
-    }`,
+    cie10: "Z00",
+    nombreMedico: `${fixEncodingModern(
+      userCompleto?.datos?.nombres_user ?? ""
+    )} - ${userCompleto?.datos?.cmp ?? ""}`,
     conclusiones: "",
-    recomendaciones: "",
+    recomendaciones: "-EVALUACIÓN ANUAL",
   };
   const {
     form,

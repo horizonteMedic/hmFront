@@ -19,6 +19,11 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
+function fixEncodingModern(str) {
+  const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
 export default function EvaluacionMusculoEsqueletica() {
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
@@ -160,10 +165,10 @@ export default function EvaluacionMusculoEsqueletica() {
     tratamiento: "NO",
     conclusion: "SI",
     diagnostico: "",
-    recomendaciones: "",
-    nombreMedico: `${userCompleto?.datos?.nombres_user ?? ""} - ${
-      userCompleto?.datos?.cmp ?? ""
-    }`,
+    recomendaciones: "-EVALUACIÓN ANUAL",
+    nombreMedico: `${fixEncodingModern(
+      userCompleto?.datos?.nombres_user ?? ""
+    )} - ${userCompleto?.datos?.cmp ?? ""}`,
   };
 
   const {
