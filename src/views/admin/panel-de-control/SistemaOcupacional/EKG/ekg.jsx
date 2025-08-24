@@ -6,6 +6,7 @@ import {
   faTimes,
   faClipboard,
   faSearch,
+  faPrint,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -25,23 +26,22 @@ const initialFormState = {
   fechaExam: today,
   empresaContratista: "",
   empresa: "",
-  ritmo: "SINUSAL",
-  fc: "",
-  pr: "0.20",
-  qtc: "N/E",
-  qrs: "0.08",
-  eje: "",
-  hallazgo: "",
+
+  ritmo: "1",
+  fc: "2",
+  eje: "3",
+  pr: "4",
+  qrs: "5",
+  ondaP: "6",
+  st: "7",
+  qt: "8",
+  ondaT: "9",
+
+  observaciones: "",
+  conclusiones: "",
+  hallazgos: "",
   recomendaciones: "",
-  evaluacionAnual: false,
-  evaluacion6Meses: false,
-  evaluacionCardiologo: false,
-  normal: false,
-  bradicardiaSinusalFisiologica: false,
-  bradicardiaSinusalAsintomatica: false,
-  bloqueoRamaDerecha: false,
-  desviacionEjeCardiacoIzquierda: false,
-  desviacionEjeCardiacoDerecha: false,
+
   nombres_search: "",
   codigo_search: "",
 };
@@ -69,109 +69,109 @@ export default function EKG() {
   const handleSearch = () => {};
 
   return (
-    <div className="w-full bg-gray-50 min-h-screen p-4 text-[11px]">
+    <div className="w-full   p-4 text-[11px]">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* PANEL IZQUIERDO - FORMULARIO DE DATOS */}
-        <div className="space-y-6">
-          {/* SECCIÓN SUPERIOR - FILIACIÓN */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="space-y-4 p-4 rounded border">
-              {/* Fila 1: N° Orden */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-4">
-                  <label className="font-semibold min-w-[80px] max-w-[80px] ">
-                    N° Orden :
-                  </label>
-                  <input
-                    className="border rounded px-2 py-1 w-full"
-                    name="norden"
-                    value={form.norden || ""}
-                    onKeyUp={handleSearch}
-                    onChange={handleChangeNumber}
-                  />
-                </div>
-                <div className="flex items-center gap-4">
-                  <label className="font-semibold min-w-[80px] max-w-[80px]">
-                    Fecha Examen :
-                  </label>
-                  <input
-                    type="date"
-                    className="border rounded px-2 py-1 w-full"
-                    name="fechaExam"
-                    value={form.fechaExam || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold min-w-[80px] max-w-[80px]">
-                  Nombres :
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="nombres"
-                  value={form.nombres || ""}
-                  disabled
-                />
-              </div>
 
-              {/* Fila 2: Nombres y Edad */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-4">
-                  <label className="font-semibold min-w-[80px] max-w-[80px]">
-                    Fecha de Nacimiento :
-                  </label>
-                  <input
-                    type="text"
-                    className="border rounded px-2 py-1 w-full"
-                    value={form.fechaNac || ""}
-                    name="fechaNac"
-                    disabled
-                  />
-                </div>
-                <div className="flex items-center gap-4 w-full">
-                  <label className="font-semibold min-w-[80px] max-w-[80px]">
-                    Edad :
-                  </label>
-                  <input
-                    className="border rounded px-2 py-1 w-full"
-                    name="edad"
-                    value={form.edad || ""}
-                    disabled
-                  />
-                </div>
-              </div>
-              {/* INFORMACIÓN DE EMPRESA */}
+        <div className="border rounded shadow-md p-6">
+          {/* SECCIÓN SUPERIOR - FILIACIÓN */}
+          <div className="space-y-4 p-4 rounded border">
+            {/* Fila 1: N° Orden */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-4">
-                <label className="font-semibold min-w-[80px] max-w-[80px]">
-                  Contrata :
+                <label className="font-semibold min-w-[80px] max-w-[80px] ">
+                  N° Orden :
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="contrata"
-                  value={form.contrata || ""}
-                  disabled
+                  name="norden"
+                  value={form.norden || ""}
+                  onKeyUp={handleSearch}
+                  onChange={handleChangeNumber}
                 />
               </div>
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
-                  Empresa :
+                  Fecha Examen :
+                </label>
+                <input
+                  type="date"
+                  className="border rounded px-2 py-1 w-full"
+                  name="fechaExam"
+                  value={form.fechaExam || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="font-semibold min-w-[80px] max-w-[80px]">
+                Nombres :
+              </label>
+              <input
+                className="border rounded px-2 py-1 w-full"
+                name="nombres"
+                value={form.nombres || ""}
+                disabled
+              />
+            </div>
+
+            {/* Fila 2: Nombres y Edad */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Fecha de Nacimiento :
+                </label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 w-full"
+                  value={form.fechaNac || ""}
+                  name="fechaNac"
+                  disabled
+                />
+              </div>
+              <div className="flex items-center gap-4 w-full">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Edad :
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="empresa"
-                  value={form.empresa || ""}
+                  name="edad"
+                  value={form.edad || ""}
                   disabled
                 />
               </div>
             </div>
-
+            {/* INFORMACIÓN DE EMPRESA */}
+            <div className="flex items-center gap-4">
+              <label className="font-semibold min-w-[80px] max-w-[80px]">
+                Contrata :
+              </label>
+              <input
+                className="border rounded px-2 py-1 w-full"
+                name="contrata"
+                value={form.contrata || ""}
+                disabled
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="font-semibold min-w-[80px] max-w-[80px]">
+                Empresa :
+              </label>
+              <input
+                className="border rounded px-2 py-1 w-full"
+                name="empresa"
+                value={form.empresa || ""}
+                disabled
+              />
+            </div>
+          </div>
+          <div className="space-y-3 rounded border p-4 mt-3 bg-white">
             {/* PARÁMETROS EKG */}
-            <h3 className="font-bold text-lg mt-4 mb-4 text-blue-900">
+            <h3 className="font-bold text-lg  text-blue-900 mb-3">
               Parámetros EKG
             </h3>
             {/* Checkboxes de parámetros */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 ">
               <label className="flex gap-2 font-semibold">
                 <input
                   type="checkbox"
@@ -206,144 +206,210 @@ export default function EKG() {
               </label>
             </div>
             {/* Campos de entrada */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="flex items-center gap-3">
-                <label className="font-semibold min-w-[50px]">Ritmo:</label>
+            <div className="grid grid-cols-2 md:grid-cols-3  space-y-3 gap-x-4">
+              {/** Fila 1 */}
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Ritmo:
+                </label>
                 <input
-                  className="border rounded px-3 py-2 flex-1"
+                  className="border rounded px-2 py-1 w-full"
                   name="ritmo"
-                  value={form.ritmo}
+                  value={form.ritmo ?? ""}
                   onChange={handleChange}
                 />
               </div>
-
-              <div className="flex items-center gap-3">
-                <label className="font-semibold min-w-[40px]">F.C:</label>
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  F.C. (x min):
+                </label>
                 <input
-                  className="border rounded px-3 py-2 flex-1"
+                  className="border rounded px-2 py-1 w-full"
                   name="fc"
-                  value={form.fc}
+                  value={form.fc ?? ""}
                   onChange={handleChange}
-                  placeholder="Frecuencia"
                 />
-                <span className="text-gray-600">x min</span>
               </div>
-
-              <div className="flex items-center gap-3">
-                <label className="font-semibold min-w-[40px]">P.R:</label>
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Eje (°):
+                </label>
                 <input
-                  className="border rounded px-3 py-2 flex-1"
+                  className="border rounded px-2 py-1 w-full"
                   name="pr"
-                  value={form.pr}
+                  value={form.pr ?? ""}
                   onChange={handleChange}
                 />
               </div>
 
-              <div className="flex items-center gap-3">
-                <label className="font-semibold min-w-[50px]">Q.T.C:</label>
+              {/** Fila 2 */}
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  P.R.:
+                </label>
                 <input
-                  className="border rounded px-3 py-2 flex-1"
-                  name="qtc"
-                  value={form.qtc}
+                  className="border rounded px-2 py-1 w-full"
+                  name="pr"
+                  value={form.pr ?? ""}
                   onChange={handleChange}
                 />
               </div>
-
-              <div className="flex items-center gap-3">
-                <label className="font-semibold min-w-[50px]">Q.R.S:</label>
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Q.R.S.:
+                </label>
                 <input
-                  className="border rounded px-3 py-2 flex-1"
+                  className="border rounded px-2 py-1 w-full"
                   name="qrs"
-                  value={form.qrs}
+                  value={form.qrs ?? ""}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Onda P:
+                </label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  name="ondaP"
+                  value={form.ondaP ?? ""}
                   onChange={handleChange}
                 />
               </div>
 
-              <div className="flex items-center gap-3">
-                <label className="font-semibold min-w-[40px]">Eje:</label>
+              {/** Fila 3 */}
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  S.T.:
+                </label>
                 <input
-                  className="border rounded px-3 py-2 flex-1"
-                  name="eje"
-                  value={form.eje}
+                  className="border rounded px-2 py-1 w-full"
+                  name="st"
+                  value={form.st ?? ""}
                   onChange={handleChange}
-                  placeholder="Grados"
                 />
-                <span className="text-gray-600">°</span>
               </div>
-            </div>
-
-            {/* Checkboxes de hallazgos */}
-            <div className="flex flex-wrap gap-4 mb-4">
-              <label className="flex items-center gap-2">
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Q.T.:
+                </label>
                 <input
-                  type="checkbox"
-                  name="normal"
-                  checked={form.normal}
+                  className="border rounded px-2 py-1 w-full"
+                  name="qt"
+                  value={form.qt ?? ""}
                   onChange={handleChange}
                 />
-                <span>Normal</span>
-              </label>
-              <label className="flex items-center gap-2">
+              </div>
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Onda T.:
+                </label>
                 <input
-                  type="checkbox"
-                  name="bradicardiaSinusalFisiologica"
-                  checked={form.bradicardiaSinusalFisiologica}
+                  className="border rounded px-2 py-1 w-full"
+                  name="ondaT"
+                  value={form.ondaT ?? ""}
                   onChange={handleChange}
                 />
-                <span>B.S. Fisiológica</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="bradicardiaSinusalAsintomatica"
-                  checked={form.bradicardiaSinusalAsintomatica}
-                  onChange={handleChange}
-                />
-                <span>B.S. Asintomática</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="bloqueoRamaDerecha"
-                  checked={form.bloqueoRamaDerecha}
-                  onChange={handleChange}
-                />
-                <span>B.I. Rama Derecha</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="desviacionEjeCardiacoIzquierda"
-                  checked={form.desviacionEjeCardiacoIzquierda}
-                  onChange={handleChange}
-                />
-                <span>D.I. Eje Cardíaco</span>
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="desviacionEjeCardiacoDerecha"
-                  checked={form.desviacionEjeCardiacoDerecha}
-                  onChange={handleChange}
-                />
-                <span>D.D. Eje Cardíaco</span>
-              </label>
+              </div>
             </div>
 
             {/* HALLAZGO Y RECOMENDACIONES */}
             <h3 className="font-bold text-lg mt-5 mb-4 text-blue-900">
-              Hallazgo y Recomendaciones
+              Observaciones y Conclusiones
             </h3>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div>
-                <label className="font-semibold block mb-2">Hallazgo:</label>
+                <label className="font-semibold block mb-2">
+                  Observaciones:
+                </label>
                 <textarea
                   className="border rounded px-3 py-2 w-full h-24 resize-none"
-                  name="hallazgo"
-                  value={form.hallazgo}
+                  name="observaciones"
+                  value={form.observaciones}
                   onChange={handleChange}
                   placeholder="Describa los hallazgos del EKG..."
+                />
+              </div>
+              {/* Checkboxes de hallazgos */}
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                <label className="flex  gap-2">
+                  <input
+                    type="checkbox"
+                    name="normal"
+                    checked={form.normal}
+                    onChange={handleChange}
+                  />
+                  <span>Normal</span>
+                </label>
+                <label className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    name="bradicardiaSinusalFisiologica"
+                    checked={form.bradicardiaSinusalFisiologica}
+                    onChange={handleChange}
+                  />
+                  <span>B.S. Fisiológica</span>
+                </label>
+                <label className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    name="bradicardiaSinusalAsintomatica"
+                    checked={form.bradicardiaSinusalAsintomatica}
+                    onChange={handleChange}
+                  />
+                  <span>B.S. Asintomática</span>
+                </label>
+                <label className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    name="bloqueoRamaDerecha"
+                    checked={form.bloqueoRamaDerecha}
+                    onChange={handleChange}
+                  />
+                  <span>B.I. Rama Derecha</span>
+                </label>
+                <label className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    name="desviacionEjeCardiacoIzquierda"
+                    checked={form.desviacionEjeCardiacoIzquierda}
+                    onChange={handleChange}
+                  />
+                  <span>D.I. Eje Cardíaco</span>
+                </label>
+                <label className="flex gap-2">
+                  <input
+                    type="checkbox"
+                    name="desviacionEjeCardiacoDerecha"
+                    checked={form.desviacionEjeCardiacoDerecha}
+                    onChange={handleChange}
+                  />
+                  <span>D.D. Eje Cardíaco</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-2">
+                  Conclusiones:
+                </label>
+                <textarea
+                  className="border rounded px-3 py-2 w-full h-24 resize-none"
+                  name="conclusiones"
+                  value={form.conclusiones}
+                  onChange={handleChange}
+                  placeholder="Conclusiones de EKG..."
+                />
+              </div>
+
+              <div>
+                <label className="font-semibold block mb-2">Hallazgos:</label>
+                <textarea
+                  className="border rounded px-3 py-2 w-full h-24 resize-none"
+                  name="hallazgos"
+                  value={form.hallazgos}
+                  onChange={handleChange}
+                  placeholder="Hallazgos de EKG..."
                 />
               </div>
 
@@ -392,37 +458,48 @@ export default function EKG() {
               </div>
             </div>
           </div>
-
           {/* BOTONES DE ACCIÓN */}
-          <div className="flex flex-wrap gap-4">
-            <button
-              onClick={handleSave}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-semibold"
-            >
-              <FontAwesomeIcon icon={faSave} />
-              Guardar/Actualizar
-            </button>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
+            <div className=" flex gap-4">
+              <button
+                type="button"
+                // onClick={handleSave}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+              </button>
+              <button
+                type="button"
+                // onClick={handleClear}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
+              </button>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
 
-            <button
-              onClick={handleClear}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-semibold"
-            >
-              <FontAwesomeIcon icon={faBroom} />
-              Limpiar
-            </button>
-
-            <button
-              // onClick={handleClose}
-              className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 font-semibold"
-            >
-              <FontAwesomeIcon icon={faTimes} />
-              Cerrar
-            </button>
+                <button
+                  type="button"
+                  // onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* PANEL DERECHO - BÚSQUEDA Y RESULTADOS */}
-        <div className="space-y-6">
+        <div className="border rounded shadow-md p-6">
           {/* BÚSQUEDA DE INFORMES */}
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="font-bold text-lg mb-4 text-blue-900">
@@ -505,119 +582,10 @@ export default function EKG() {
           </div>
 
           {/* DIAGRAMA DEL EJE CARDÍACO */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded border p-6">
             <h3 className="font-bold text-lg mb-4 text-blue-900">
               Diagrama del Eje Cardíaco
             </h3>
-
-            <div className="flex items-center justify-between">
-              <div className="relative w-64 h-64 mx-auto">
-                {/* Círculo principal con patrón de fondo */}
-                <div className="absolute inset-0 border-2 border-gray-300 rounded-full bg-gray-50"></div>
-
-                {/* Sistema hexaxial completo con 8 líneas que irradian desde el centro */}
-                <div className="absolute inset-0">
-                  {/* Punto central */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-black rounded-full"></div>
-
-                  {/* Líneas que irradian desde el centro cada 45° */}
-                  {Array.from({ length: 8 }, (_, i) => {
-                    const angle = i * 45 * (Math.PI / 180);
-                    const radius = 100; // Radio más pequeño para que las líneas estén dentro del círculo
-                    const x = 128 + radius * Math.cos(angle);
-                    const y = 128 + radius * Math.sin(angle);
-
-                    return (
-                      <div key={i}>
-                        {/* Línea */}
-                        <div
-                          className="absolute w-1 h-20 bg-black origin-bottom"
-                          style={{
-                            left: "128px",
-                            top: "128px",
-                            transform: `rotate(${i * 45}deg)`,
-                          }}
-                        />
-                        {/* Etiqueta de derivación */}
-                        <div
-                          className="absolute transform -translate-x-1/2 -translate-y-1/2"
-                          style={{
-                            left: `${x}px`,
-                            top: `${y}px`,
-                          }}
-                        >
-                          {i === 0 && (
-                            <span className="text-xs text-black font-semibold">
-                              AVR
-                            </span>
-                          )}
-                          {i === 1 && (
-                            <span className="text-xs text-black font-semibold">
-                              AVL
-                            </span>
-                          )}
-                          {i === 2 && (
-                            <span className="text-xs text-black font-semibold">
-                              I
-                            </span>
-                          )}
-                          {i === 3 && (
-                            <span className="text-xs text-black font-semibold">
-                              II
-                            </span>
-                          )}
-                          {i === 4 && (
-                            <span className="text-xs text-black font-semibold">
-                              AVF
-                            </span>
-                          )}
-                          {i === 5 && (
-                            <span className="text-xs text-black font-semibold">
-                              III
-                            </span>
-                          )}
-                          {i === 6 && (
-                            <span className="text-xs text-black font-semibold"></span>
-                          )}
-                          {i === 7 && (
-                            <span className="text-xs text-black font-semibold"></span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Puntos de selección del eje en el perímetro */}
-                <div className="absolute inset-0">
-                  {Array.from({ length: 8 }, (_, i) => {
-                    const angle = i * 45 * (Math.PI / 180);
-                    const radius = 120;
-                    const x = 128 + radius * Math.cos(angle);
-                    const y = 128 + radius * Math.sin(angle);
-                    return (
-                      <div
-                        key={i}
-                        className="absolute w-1.5 h-1.5 bg-gray-400 rounded-full cursor-pointer hover:bg-blue-500 border border-gray-600"
-                        style={{
-                          left: `${x}px`,
-                          top: `${y}px`,
-                          transform: "translate(-50%, -50%)",
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-
-              <button
-                // onClick={clearAxis}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded flex items-center gap-2"
-              >
-                <FontAwesomeIcon icon={faBroom} />
-                Limpiar
-              </button>
-            </div>
           </div>
         </div>
       </div>
