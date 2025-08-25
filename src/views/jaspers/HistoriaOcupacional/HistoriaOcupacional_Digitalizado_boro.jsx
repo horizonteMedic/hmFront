@@ -198,6 +198,22 @@ const signatureBlockHeight = 50; // espacio estimado total (firma + texto + marg
 const spacingAfterTable = 1;
 const totalRequired = spacingAfterTable + signatureBlockHeight;
 
+ const tablaVacia =
+      !tabla.length ||
+      tabla.every(
+        (d) =>
+          !d.fecha &&
+          !d.empresa &&
+          !d.altitud &&
+          !d.actividad &&
+          !d.areaEmpresa &&
+          !d.ocupacion &&
+          !d.socavon &&
+          !d.superficie &&
+          !d.riesgo &&
+          !d.proteccion
+      );
+
 const pageHeight = doc.internal.pageSize.getHeight();
 
 // Si no cabe el bloque de firmas, agrega página antes de imprimirlas
@@ -211,7 +227,13 @@ if ((pageHeight - finalY) < totalRequired) {
 }
 
 const signatureTop = finalY + spacingAfterTable;
-
+ if (tablaVacia) {
+      doc.setFontSize(20);
+      doc.setTextColor(255, 0, 0); // Rojo en RGB
+      doc.text("SIN EXPERIENCIA LABORAL", 95, signatureTop + 7);
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0); // Color negro
+}
     doc.text(`Fecha: ${datos.fechaHo}`,15, signatureTop + 35)
     //FIRMA
     const lineY = signatureTop + 35; // 5px debajo de la imagen
@@ -282,7 +304,7 @@ const signatureTop = finalY + spacingAfterTable;
       const imgX = sigX1 + (sigW - imgW) / 2;
       const imgY = signatureTop + (sigH - imgH) / 2;
 
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY+5, imgW, imgH);
     }
 
     if (s2) {
@@ -310,7 +332,7 @@ const signatureTop = finalY + spacingAfterTable;
       const imgX = sigX2 + (sigW - imgW) / 2;
       const imgY = signatureTop + (sigH - imgH) / 2;
 
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY+5, imgW, imgH);
     }
 
     if (s3) {
@@ -338,7 +360,7 @@ const signatureTop = finalY + spacingAfterTable;
       const imgX = lineX1S + (selloW - imgW) / 2;
       const imgY = signatureTop + (selloH - imgH) / 2;
 
-      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+      doc.addImage(selloBase64, 'PNG', imgX, imgY+5, imgW, imgH);
     }
 
     // === FOOTER ===
