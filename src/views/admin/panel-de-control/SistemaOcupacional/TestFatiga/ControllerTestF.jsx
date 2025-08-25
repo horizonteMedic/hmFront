@@ -80,7 +80,7 @@ export const GetInfoTestFatiga = (nro,tabla,set,token) => {
     })
 }
 
-export const SubmitTestFatiga = async (form,token,user,limpiar,tabla) => {
+export const SubmitTestFatiga = async (form,token,user,limpiar,tabla, datosFooter) => {
     if (!form.norden) {
         await Swal.fire('Error', 'Datos Incompletos','error')
         return
@@ -96,7 +96,7 @@ export const SubmitTestFatiga = async (form,token,user,limpiar,tabla) => {
           }).then((result) => {
               limpiar()
               if (result.isConfirmed) {
-                PrintHojaR(form.norden,token,tabla)
+                PrintHojaR(form.norden,token,tabla, datosFooter)
               }
           })
           } else {
@@ -105,7 +105,7 @@ export const SubmitTestFatiga = async (form,token,user,limpiar,tabla) => {
     })
 }
 
-export const PrintHojaR = (nro,token,tabla) => {
+export const PrintHojaR = (nro,token,tabla, datosFooter) => {
   Loading('Cargando Formato a Imprimir')
   getFetch(`/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
@@ -116,7 +116,7 @@ export const PrintHojaR = (nro,token,tabla) => {
       const modulo = await jasperModules[`../../../../jaspers/Test_Fatiga/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
-        modulo.default(res);
+        modulo.default({...res, ...datosFooter});
       } else {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }

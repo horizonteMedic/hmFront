@@ -106,7 +106,7 @@ const Test_fatiga = () => {
       },
     }).then((result) => {
       if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
       }
     });
   };
@@ -298,7 +298,7 @@ const Test_fatiga = () => {
                       <div className="flex flex-col p-2 ">
                           <button
                           type="button"
-                          onClick={() => SubmitTestFatiga(form,token,userlogued,handleClear,tabla)}
+                          onClick={() => SubmitTestFatiga(form,token,userlogued,handleClear,tabla, datosFooter)}
                           className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                           >
                               <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
