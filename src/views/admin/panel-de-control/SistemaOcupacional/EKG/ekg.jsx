@@ -11,6 +11,7 @@ import {
 import Swal from "sweetalert2";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
+import e from "cors";
 
 const tabla = "informe_electrocardiograma";
 const date = new Date();
@@ -37,6 +38,7 @@ const initialFormState = {
   st: "7",
   qt: "8",
   ondaT: "9",
+  qtc: "10",
 
   observaciones: "",
   conclusiones: "",
@@ -177,7 +179,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.ritmo === "SINUSAL"}
-                  onChange={handleCheckBoxChange}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      ritmo: e.target.checked ? "SINUSAL" : "",
+                    }));
+                  }}
                 />
                 <span>Ritmo: Sinusal</span>
               </label>
@@ -185,7 +192,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.pr === "0.20"}
-                  onChange={() => setForm((prev) => ({ ...prev, pr: "0.20" }))}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      pr: e.target.checked ? "0.20" : "",
+                    }));
+                  }}
                 />
                 <span>P.R: 0.20</span>
               </label>
@@ -193,7 +205,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.qtc === "N/E"}
-                  onChange={() => setForm((prev) => ({ ...prev, qtc: "N/E" }))}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      qtc: e.target.checked ? "N/E" : "",
+                    }));
+                  }}
                 />
                 <span>Q.T.C.: N/E</span>
               </label>
@@ -201,7 +218,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.qrs === "0.08"}
-                  onChange={() => setForm((prev) => ({ ...prev, qrs: "0.08" }))}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      qrs: e.target.checked ? "0.08" : "",
+                    }));
+                  }}
                 />
                 <span>Q.R.S.: 0.08</span>
               </label>
@@ -237,8 +259,8 @@ export default function EKG() {
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="pr"
-                  value={form.pr ?? ""}
+                  name="eje"
+                  value={form.eje ?? ""}
                   onChange={handleChange}
                 />
               </div>
@@ -309,6 +331,18 @@ export default function EKG() {
                   className="border rounded px-2 py-1 w-full"
                   name="ondaT"
                   value={form.ondaT ?? ""}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Q.T.C.:
+                </label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  name="qtc"
+                  value={form.qtc ?? ""}
                   onChange={handleChange}
                 />
               </div>
@@ -426,37 +460,6 @@ export default function EKG() {
                   placeholder="Describa las recomendaciones..."
                 />
               </div>
-
-              {/* Checkboxes de recomendaciones */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="evaluacionAnual"
-                    checked={form.evaluacionAnual}
-                    onChange={handleChange}
-                  />
-                  <span>Evaluación Anual</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="evaluacion6Meses"
-                    checked={form.evaluacion6Meses}
-                    onChange={handleChange}
-                  />
-                  <span>Ev. en 6 Meses</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="evaluacionCardiologo"
-                    checked={form.evaluacionCardiologo}
-                    onChange={handleChange}
-                  />
-                  <span>Ev. por Cardiólogo</span>
-                </label>
-              </div>
             </div>
           </div>
           {/* BOTONES DE ACCIÓN */}
@@ -558,7 +561,11 @@ export default function EKG() {
             <p className="mb-2 font-semibold">
               Diagrama de Derivaciones del ECG
             </p>
-            <img src="img/diagrama_derivaciones_ecg.png" alt="Diagrama de Derivaciones del ECG" className="mx-auto max-w-[250px] pt-5" />
+            <img
+              src="img/diagrama_derivaciones_ecg.png"
+              alt="Diagrama de Derivaciones del ECG"
+              className="mx-auto max-w-[250px] pt-5"
+            />
           </div>
         </div>
       </div>
