@@ -11,7 +11,9 @@ import {
 import Swal from "sweetalert2";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
+import e from "cors";
 
+const tabla = "informe_electrocardiograma";
 const date = new Date();
 const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   2,
@@ -36,6 +38,7 @@ const initialFormState = {
   st: "7",
   qt: "8",
   ondaT: "9",
+  qtc: "10",
 
   observaciones: "",
   conclusiones: "",
@@ -176,7 +179,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.ritmo === "SINUSAL"}
-                  onChange={handleCheckBoxChange}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      ritmo: e.target.checked ? "SINUSAL" : "",
+                    }));
+                  }}
                 />
                 <span>Ritmo: Sinusal</span>
               </label>
@@ -184,7 +192,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.pr === "0.20"}
-                  onChange={() => setForm((prev) => ({ ...prev, pr: "0.20" }))}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      pr: e.target.checked ? "0.20" : "",
+                    }));
+                  }}
                 />
                 <span>P.R: 0.20</span>
               </label>
@@ -192,7 +205,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.qtc === "N/E"}
-                  onChange={() => setForm((prev) => ({ ...prev, qtc: "N/E" }))}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      qtc: e.target.checked ? "N/E" : "",
+                    }));
+                  }}
                 />
                 <span>Q.T.C.: N/E</span>
               </label>
@@ -200,7 +218,12 @@ export default function EKG() {
                 <input
                   type="checkbox"
                   checked={form.qrs === "0.08"}
-                  onChange={() => setForm((prev) => ({ ...prev, qrs: "0.08" }))}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      qrs: e.target.checked ? "0.08" : "",
+                    }));
+                  }}
                 />
                 <span>Q.R.S.: 0.08</span>
               </label>
@@ -236,8 +259,8 @@ export default function EKG() {
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="pr"
-                  value={form.pr ?? ""}
+                  name="eje"
+                  value={form.eje ?? ""}
                   onChange={handleChange}
                 />
               </div>
@@ -311,6 +334,18 @@ export default function EKG() {
                   onChange={handleChange}
                 />
               </div>
+
+              <div className="flex items-center gap-4">
+                <label className="font-semibold min-w-[80px] max-w-[80px]">
+                  Q.T.C.:
+                </label>
+                <input
+                  className="border rounded px-2 py-1 w-full"
+                  name="qtc"
+                  value={form.qtc ?? ""}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             {/* HALLAZGO Y RECOMENDACIONES */}
@@ -333,7 +368,7 @@ export default function EKG() {
               </div>
               {/* Checkboxes de hallazgos */}
               <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                <label className="flex  gap-2">
+                <label className="flex gap-2 items-center">
                   <input
                     type="checkbox"
                     name="normal"
@@ -342,7 +377,7 @@ export default function EKG() {
                   />
                   <span>Normal</span>
                 </label>
-                <label className="flex gap-2">
+                <label className="flex gap-2 items-center">
                   <input
                     type="checkbox"
                     name="bradicardiaSinusalFisiologica"
@@ -351,7 +386,7 @@ export default function EKG() {
                   />
                   <span>B.S. Fisiológica</span>
                 </label>
-                <label className="flex gap-2">
+                <label className="flex gap-2 items-center">
                   <input
                     type="checkbox"
                     name="bradicardiaSinusalAsintomatica"
@@ -360,7 +395,7 @@ export default function EKG() {
                   />
                   <span>B.S. Asintomática</span>
                 </label>
-                <label className="flex gap-2">
+                <label className="flex gap-2 items-center">
                   <input
                     type="checkbox"
                     name="bloqueoRamaDerecha"
@@ -369,7 +404,7 @@ export default function EKG() {
                   />
                   <span>B.I. Rama Derecha</span>
                 </label>
-                <label className="flex gap-2">
+                <label className="flex gap-2 items-center">
                   <input
                     type="checkbox"
                     name="desviacionEjeCardiacoIzquierda"
@@ -378,7 +413,7 @@ export default function EKG() {
                   />
                   <span>D.I. Eje Cardíaco</span>
                 </label>
-                <label className="flex gap-2">
+                <label className="flex gap-2 items-center">
                   <input
                     type="checkbox"
                     name="desviacionEjeCardiacoDerecha"
@@ -425,37 +460,6 @@ export default function EKG() {
                   placeholder="Describa las recomendaciones..."
                 />
               </div>
-
-              {/* Checkboxes de recomendaciones */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="evaluacionAnual"
-                    checked={form.evaluacionAnual}
-                    onChange={handleChange}
-                  />
-                  <span>Evaluación Anual</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="evaluacion6Meses"
-                    checked={form.evaluacion6Meses}
-                    onChange={handleChange}
-                  />
-                  <span>Ev. en 6 Meses</span>
-                </label>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    name="evaluacionCardiologo"
-                    checked={form.evaluacionCardiologo}
-                    onChange={handleChange}
-                  />
-                  <span>Ev. por Cardiólogo</span>
-                </label>
-              </div>
             </div>
           </div>
           {/* BOTONES DE ACCIÓN */}
@@ -499,96 +503,148 @@ export default function EKG() {
         </div>
 
         {/* PANEL DERECHO - BÚSQUEDA Y RESULTADOS */}
-        <div className="border rounded shadow-md p-6">
-          {/* BÚSQUEDA DE INFORMES */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="font-bold text-lg mb-4 text-blue-900">
-              Buscar Informe
-            </h3>
-            <p className="text-gray-600 mb-4">
-              1 Clic para Editar | 2 Para Crear Informe y volver a Imprimir
-            </p>
-
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3 flex-1">
-                <label className="font-semibold min-w-[60px]">Buscar:</label>
-                <input
-                  className="border rounded px-3 py-2 flex-1"
-                  // value={searchTerm}
-                  // onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Término de búsqueda"
-                />
-              </div>
-
-              <div className="flex items-center gap-3 flex-1">
-                <label className="font-semibold min-w-[60px]">Código:</label>
-                <input
-                  className="border rounded px-3 py-2 flex-1"
-                  // value={searchCode}
-                  // onChange={(e) => setSearchCode(e.target.value)}
-                  placeholder="Código del informe"
-                />
-              </div>
-
-              <button
-                onClick={handleSearch}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex-shrink-0"
-              >
-                <FontAwesomeIcon icon={faSearch} />
-              </button>
+        <div className="border rounded p-4 flex flex-col flex-1 shadow-md">
+          <p className="mb-2 font-semibold">Buscar Informe</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3 items-center justify-center w-full">
+            <div>
+              <label className="font-semibold">Nombre :</label>
+              <input
+                className="border rounded px-2 py-1 w-full"
+                name="nombres_search"
+                value={form.nombres_search}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    obtenerInfoTabla();
+                  }
+                }}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  setForm((f) => ({ ...f, [name]: value, codigo_search: "" }));
+                }}
+              />
             </div>
-            <div className="overflow-x-auto mt-5">
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
-                      Cod
-                    </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
-                      N.Orden
-                    </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
-                      Nombre
-                    </th>
-                    <th className="border border-gray-300 px-3 py-2 text-left font-semibold">
-                      Fecha
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dataTabla.map((item, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-blue-50 cursor-pointer"
-                      // onClick={() => handleEdit(item)}
-                    >
-                      <td className="border border-gray-300 px-3 py-2">
-                        {item.codigo}
-                      </td>
-                      <td className="border border-gray-300 px-3 py-2">
-                        {item.norden}
-                      </td>
-                      <td className="border border-gray-300 px-3 py-2">
-                        {item.nombre}
-                      </td>
-                      <td className="border border-gray-300 px-3 py-2">
-                        {item.fecha}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div>
+              <label className="font-semibold ml-2">Codigo:</label>
+              <input
+                className="border rounded px-2 py-1  w-full"
+                name="codigo_search"
+                value={form.codigo_search}
+                onKeyUp={(e) => {
+                  if (e.key === "Enter") {
+                    // obtenerInfoTabla();
+                  }
+                }}
+                onChange={(e) => {
+                  const { name, value } = e.target;
+                  if (/^[\d/]*$/.test(value)) {
+                    setForm((f) => ({
+                      ...f,
+                      [name]: value,
+                      nombres_search: "",
+                    }));
+                  }
+                }}
+              />
             </div>
           </div>
-
-          {/* DIAGRAMA DEL EJE CARDÍACO */}
-          <div className="bg-white rounded border p-6">
-            <h3 className="font-bold text-lg mb-4 text-blue-900">
-              Diagrama del Eje Cardíaco
-            </h3>
+          <div className="flex-1">
+            <Table
+              data={dataTabla}
+              tabla={tabla}
+              set={setForm}
+              token={token}
+              clean={handleClear}
+              datosFooter={datosFooter}
+            />
+          </div>
+          <div className=" mt-auto mb-4">
+            <p className="mb-2 font-semibold">
+              Diagrama de Derivaciones del ECG
+            </p>
+            <img
+              src="img/diagrama_derivaciones_ecg.png"
+              alt="Diagrama de Derivaciones del ECG"
+              className="mx-auto max-w-[250px] pt-5"
+            />
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+function Table({ data, tabla, set, token, clean, datosFooter }) {
+  // confirmación antes de imprimir
+  const handlePrintConfirm = (nro) => {
+    Swal.fire({
+      title: "Confirmar impresión",
+      text: `¿Deseas imprimir la ficha Nº ${nro}?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, imprimir",
+      cancelButtonText: "No",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // PrintHojaR(nro, token, tabla, datosFooter);
+      }
+    });
+  };
+
+  function clicktable(nro) {
+    clean();
+    // Loading("Importando Datos");
+    // GetInfoServicio(nro, tabla, set, token, () => {
+    //   Swal.close();
+    // });
+  }
+  function convertirFecha(fecha) {
+    if (fecha == null || fecha === "") return "";
+    const [dia, mes, anio] = fecha.split("-");
+    return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
+  }
+
+  return (
+    <div className="overflow-y-auto mb-4 h-[280px]">
+      <table className="w-full table-auto border-collapse ">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border px-2 py-1 text-left text-lg">N° Orden</th>
+            <th className="border px-2 py-1 text-left text-lg">Nombres</th>
+            <th className="border px-2 py-1 text-left text-lg">Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.length > 0 ? (
+            data.map((row, i) => (
+              <tr
+                key={i}
+                className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg `}
+                onClick={() => clicktable(row.norden)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  handlePrintConfirm(row.norden);
+                }}
+              >
+                <td className="border px-2 py-1 font-bold">
+                  {row.norden || ""}
+                </td>
+                <td className="border px-2 py-1">{row.nombres || ""}</td>
+                <td className="border px-2 py-1">
+                  {convertirFecha(row.fechaOd)}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={5}
+                className="text-center py-4 text-gray-500 text-lg"
+              >
+                No hay datos
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 }
