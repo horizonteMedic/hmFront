@@ -80,7 +80,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     doc.text("Sexo:", 170, y + 10)
 
     doc.text("Puesto de Trabajo:", 10, y + 15)
-    doc.text("Fecha:", 130, y + 15)
+    doc.text("Fecha:", 170, y + 15)
 
     doc.text("Empresa:", 10, y + 20)
     
@@ -90,7 +90,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     doc.text(`${datos.sexoPa === "F" ? "FEMENINO" : datos.sexoPa === "M" ? "MASCULINO" : "asd"}`, 182, y + 10)
 
     doc.text(`${datos.areaO ? datos.areaO : "asd"}`, 42, y + 15)
-    doc.text(`${datos.fexamen ? datos.fexamen : "15/04/2002"}`, 143, y + 15)
+    doc.text(`${datos.fexamen ? datos.fexamen : "15/04/2002"}`, 184, y + 15)
 
     doc.text(`${datos.razonEmpresa ? datos.razonEmpresa : "asd"}`, 30, y + 20)
     
@@ -181,78 +181,78 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
         [
           { content: "1", styles: { valign: "middle", halign: "center"}},
           { content: "Sentado Leyendo"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs1Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs1Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs1Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs1Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "2", styles: { valign: "middle", halign: "center"}},
           { content: "Viendo televisión"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs2Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs2Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs2Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs2Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "3", styles: { valign: "middle", halign: "center"}},
           { content: "Sentado (por ejemplo en el teatro, en una reunión, en el cine, en una conferencia, escuchando misa o en el culto)"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs3Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs3Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs3Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs3Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "4", styles: { valign: "middle", halign: "center"}},
           { content: "Como pasajero en un automóvil, ómnibus, micro o combi durante una hora o menos de recorrido"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs4Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs4Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs4Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs4Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "5", styles: { valign: "middle", halign: "center"}},
           { content: "Recostado en la tarde si las circunstancias lo permiten"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs5Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs5Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs5Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs5Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "6", styles: { valign: "middle", halign: "center"}},
           { content: "Sentado conversando con alguien"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs6Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs6Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs6Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs6Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "7", styles: { valign: "middle", halign: "center"}},
           { content: "Sentado luego del almuerzo y sin haber bebido"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs7Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs7Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs7Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs7Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "8", styles: { valign: "middle", halign: "center"}},
           { content: "Conduciendo el automóvil cuando se detiene algunos minutos por razones de tráfico"},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs8Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs8Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs8Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs8Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "9", styles: { valign: "middle", halign: "center"}},
           { content: "Parado y apoyándose o no en una pared o mueble",},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
+          { content: `${datos.rbs9Nunca ? "0" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs9Poca ? "1" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs9Moderada ? "2" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }},
+          { content: `${datos.rbs9Alta ? "3" : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold" }}
         ],
         [
           { content: "Puntaje", styles: { valign: "middle", halign: "right", fontStyle: "bold"}, colSpan: 2 },
-          { content: "", styles: { valign: "middle", halign: "center", fontStyle: "bold"}, colSpan: 4}
+          { content: `${datos.txtPuntaje ? datos.txtPuntaje : ""}`, styles: { valign: "middle", halign: "center", fontStyle: "bold"}, colSpan: 4}
         ]
       ],
       columnStyles: {
@@ -317,6 +317,11 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
           doc.text(`NO`, startX + 63, startY + 22)
           doc.rect(startX + 74, startY + 17, 6, 6); // Cuadro pequeño
+          if (datos.rbSi === true) {
+            drawXInBox(doc, startX + 24, startY + 17,  6, 5); // Cuadro Masculino
+          } else if (datos.rbNo === true) {
+            drawXInBox(doc, startX + 74, startY + 17,  6, 5); // Cuadro Femenino
+          }
 
           autoTable(doc, {
             startY: startY + 28,
@@ -353,7 +358,94 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       }
     });
 
+    function addScaledImage(doc, imgElement, maxImgW, maxImgH, centerX, baseY) {
+      const canvas = document.createElement('canvas');
+      canvas.width = imgElement.width;
+      canvas.height = imgElement.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(imgElement, 0, 0);
+      const base64 = canvas.toDataURL('image/png');
+
+      let imgW = imgElement.width;
+      let imgH = imgElement.height;
+
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+
+      imgW *= scale;
+      imgH *= scale;
+
+      const imgX = centerX - imgW / 2;
+      const imgY = baseY - imgH - 2; // encima de la línea con 2px de margen
+
+      doc.addImage(base64, 'PNG', imgX, imgY, imgW, imgH);
+    }
+    const FirmaY = doc.lastAutoTable.finalY + 25
+
+    if (s1) {
+      const canvas = document.createElement('canvas');
+      canvas.width = s1.width;
+      canvas.height = s1.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(s1, 0, 0);
+      const selloBase64 = canvas.toDataURL('image/png');
+
+      // ===== Dimensiones máximas permitidas =====
+      const maxImgW = 30; // ancho máximo del sello
+      const maxImgH = 20; // alto máximo del sello
+
+      // ===== Escalado proporcional =====
+      let imgW = s1.width;
+      let imgH = s1.height;
+
+      const scaleW = maxImgW / imgW;
+      const scaleH = maxImgH / imgH;
+      const scale = Math.min(scaleW, scaleH, 1);
+
+      imgW *= scale;
+      imgH *= scale;
+
+      // ===== Línea de firma =====
+      const lineStart = 130;
+      const lineEnd = 180;
+      const lineMid = (lineStart + lineEnd) / 2; // punto medio en X
+
+      doc.line(lineStart, FirmaY, lineEnd, FirmaY);
+      doc.text("Firma y sello del Médico", lineStart + 8, FirmaY + 4);
+
+      // ===== Posición de la imagen centrada en la línea =====
+      const imgX = lineMid - imgW / 2;
+      const imgY = FirmaY - imgH - 2; // 2 px de margen arriba de la línea
+
+      // ===== Agregar el sello =====
+      doc.addImage(selloBase64, 'PNG', imgX, imgY, imgW, imgH);
+    }
+
+
+    
+    const lineStart = 20;
+    const lineEnd = 80;
+    const lineMid = (lineStart + lineEnd) / 2; // punto medio en X
+    // ===== Tamaño máximo permitido =====
+    const maxImgW = 20;
+    const maxImgH = 20;
+
+    doc.line(lineStart, FirmaY, lineEnd, FirmaY);
+    doc.text("Firma del Trabajador Evaluado", 26, FirmaY + 4);
+    if (s2) {
+      const centerX = (lineStart + lineMid) / 2; // punto medio de la izquierda
+      addScaledImage(doc, s2, maxImgW, maxImgH, centerX, FirmaY);
+    }
+
+    // ===== Agregar s3 (derecha del medio) =====
+    if (s3) {
+      const centerX = (lineMid + lineEnd) / 2; // punto medio de la derecha
+      addScaledImage(doc, s3, maxImgW, maxImgH, centerX, FirmaY);
+    }
     footer_TestFatiga(doc, datos)
+
+
 
 
       const blob = doc.output("blob");

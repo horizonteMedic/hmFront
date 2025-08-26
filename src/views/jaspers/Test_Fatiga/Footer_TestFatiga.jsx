@@ -4,16 +4,18 @@ function footer_TestFatiga(doc, datos) {
   const pageHeight = doc.internal.pageSize.getHeight();
   const marginBottom = 15;
   const baseY = pageHeight - marginBottom;
-  const col1X = 15;   // Dirección
+  const col1X = 5;   // Dirección
   const col2X = 90;   // Celular
   const col3X = 122;  // Email
   const col4X = 176;  // Teléfono
 
   // Línea horizontal arriba del footer
   doc.setLineWidth(0.3);
-  doc.line(15, baseY - 3, doc.internal.pageSize.getWidth() - 15, baseY - 3);
-  doc.setLineWidth(0.2);
+  doc.setDrawColor(0, 0, 255); // Azul en RGB
 
+  doc.line(5, baseY - 3, doc.internal.pageSize.getWidth() - 15, baseY - 3);
+  doc.setLineWidth(0.2);
+  doc.setDrawColor(0, 0, 0);
   doc.setFontSize(7);
   doc.setTextColor(0, 0, 0);
 
@@ -82,11 +84,6 @@ function footer_TestFatiga(doc, datos) {
     y += 4;
   });
 
-  // Renderizar la fila de Prescott solo si existe
-  if (prescott) {
-    doc.setFont('helvetica', 'normal');
-    doc.text(prescott, col1X, y, { baseline: 'top' });
-  }
 }
 
 export default footer_TestFatiga;

@@ -81,10 +81,10 @@ const Test_fatiga = () => {
     rbs9Moderada: false,
     rbs9Alta: false,
 
-    txtPuntaje: "",
+    txtPuntaje: "0",
     rbNo: false,
     rbSi: false,
-    txtMedico: "",
+    txtMedico: userCompleto.datos.nombres_user,
     dniUser: userCompleto.datos.dni_user
   };
 
@@ -111,26 +111,40 @@ const Test_fatiga = () => {
     });
   };
 
-  const handleInputChangeCheckedGroup = (e, group) => {
-        const { name } = e.target;
-        setForm(prev => {
-            const newForm = { ...prev };
+  const scoreMap = {
+  Nunca: 0,
+  Poca: 1,
+  Moderada: 2,
+    Alta: 3}
 
-            if (prev[name]) {
-                // Si ya estaba activo, lo desmarcamos
-                newForm[name] = false;
-            } else {
-                // Desmarcar todos los del grupo recibido
-                group.forEach(code => newForm[code] = false);
+ const handleInputChangeCheckedGroup = (e, group) => {
+    const { name } = e.target;
 
-                // Activar solo el seleccionado
-                newForm[name] = true;
+    setForm(prev => {
+        const newForm = { ...prev };
+
+        // Primero, desmarcamos todos los radios del grupo
+        group.forEach(code => newForm[code] = false);
+
+        // Activamos solo el seleccionado
+        newForm[name] = true;
+
+        // Calcular puntaje acumulado
+        let puntaje = 0;
+        Object.keys(newForm).forEach(key => {
+            if (newForm[key] === true) {
+                if (key.includes("Nunca")) puntaje += 0;
+                else if (key.includes("Poca")) puntaje += 1;
+                else if (key.includes("Moderada")) puntaje += 2;
+                else if (key.includes("Alta")) puntaje += 3;
             }
-
-            return newForm;
         });
-    };
 
+        newForm.txtPuntaje = puntaje;
+
+        return newForm;
+    });
+};
   const RowCheck = ({title, N, P, M, A}) => {
    
     return(
@@ -293,7 +307,7 @@ const Test_fatiga = () => {
                     <div className="flex gap-2 justify-around">
                       <div className="flex flex-col p-2 ">
                         <label htmlFor="">Nombre y Apellidos del Médico - N° de Colegiatura:</label>
-                        <input type="text" value={form.txtMedico} className="w-full border rounded px-2 py-1 mt-2" />
+                        <input type="text" value={form.txtMedico} name="txtMedico"  className="w-full border rounded px-2 py-1 mt-2" />
                       </div>
                       <div className="flex flex-col p-2 ">
                           <button
