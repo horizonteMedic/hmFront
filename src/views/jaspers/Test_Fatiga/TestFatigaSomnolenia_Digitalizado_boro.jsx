@@ -107,8 +107,6 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       },
       tableLineColor: [0, 0, 0], // color del borde externo
       tableLineWidth: 0.5,       // grosor del borde externo
-      tableLineColor: [0, 0, 0],
-      tableLineWidth: 0.5,
       body: [
         [
           { content: `Que tan probable es que usted cabecee o se quede dormido en las siguientes situaciones?. Considere los últimos meses de sus actividades habituales. No se refiere a sentirse cansado debido a actividad física. Aunque no haya realizado últimamente las situaciones descritas, considere como le habrian afectado. Use la siguiente escala y marque con una "X" la opción mas apropiada para cada situación.`
@@ -165,8 +163,6 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       },
       tableLineColor: [0, 0, 0], // color del borde externo
       tableLineWidth: 0.5,       // grosor del borde externo
-      tableLineColor: [0, 0, 0],
-      tableLineWidth: 0.5,
       body: [
         [
           { content: `Situación`, colSpan: 2, rowSpan: 2, styles: { cellPadding: 3, valign: "middle", halign: "center", fontStyle: "bold" }},
@@ -273,8 +269,6 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       },
       tableLineColor: [0, 0, 0], // color del borde externo
       tableLineWidth: 0.5,       // grosor del borde externo
-      tableLineColor: [0, 0, 0],
-      tableLineWidth: 0.5,
       body: [
         [
           { content: "", styles: {minCellHeight: 47}}
