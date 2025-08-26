@@ -93,7 +93,7 @@ export const SubmitDataService = async (
     hallazgo: form.hallazgos,
     conclusion: form.conclusiones,
     recomendaciones: form.recomendaciones,
-    informeCompleto: form.informeCompleto, //necesito
+    informeCompleto: form.informeCompleto, 
     edadPaciente: form.edad?.replace(" años", ""),
     userRegistro: user,
   };
@@ -109,52 +109,18 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-// export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-//   const jasperModules = import.meta.glob("../../../../jaspers/EKG/*.jsx");
-//   PrintHojaRDefault(
-//     nro,
-//     token,
-//     tabla,
-//     datosFooter,
-//     obtenerReporteUrl,
-//     jasperModules,
-//     "../../../../jaspers/EKG"
-//   );
-// };
-
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  Loading("Cargando Formato a Imprimir");
-
-  getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, //revisar
-    token
-  )
-    .then(async (res) => {
-      if (res.norden) {
-        console.log(res);
-        const nombre = res.nameJasper;
-        console.log(nombre);
-        const jasperModules = import.meta.glob(
-          "../../../../jaspers/EKG/*.jsx"
-        );
-        const modulo = await jasperModules[
-          `../../../../jaspers/EKG/${nombre}.jsx`
-        ]();
-        // Ejecuta la función exportada por default con los datos
-        if (typeof modulo.default === "function") {
-          modulo.default({ ...res, ...datosFooter });
-        } else {
-          console.error(
-            `El archivo ${nombre}.jsx no exporta una función por defecto`
-          );
-        }
-      }
-    })
-    .finally(() => {
-      Swal.close();
-    });
+  const jasperModules = import.meta.glob("../../../../jaspers/EKG/*.jsx");
+  PrintHojaRDefault(
+    nro,
+    token,
+    tabla,
+    datosFooter,
+    obtenerReporteUrl,
+    jasperModules,
+    "../../../../jaspers/EKG"
+  );
 };
-
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
@@ -180,18 +146,17 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   );
 };
 
-// export const GetInfoPac = (nro, set, token, sede) => {
-//   GetInfoPacDefault(nro, set, token, sede);
-// };
 const GetInfoPac = async (nro, set, token, sede) => {
   const res = await GetInfoPacDefault(nro, token, sede);
-  set((prev) => ({
-    ...prev,
-    ...res,
-    fechaNac: formatearStringFechaSimpleFirstYear(res.fechaNac ?? ""),
-    edad: res.edad + " años",
-    nombres: res.nombresApellidos,
-  }));
+  if (res) {
+    set((prev) => ({
+      ...prev,
+      ...res,
+      fechaNac: formatearStringFechaSimpleFirstYear(res.fechaNac ?? ""),
+      edad: res.edad + " años",
+      nombres: res.nombresApellidos,
+    }));
+  }
 };
 
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
