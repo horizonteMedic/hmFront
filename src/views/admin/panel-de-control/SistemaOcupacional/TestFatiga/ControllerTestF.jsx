@@ -45,7 +45,13 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoTestFatiga(nro,tabla,set,token)
+            GetInfoTestFatiga(nro,tabla,set,token, () => {
+              Swal.fire(
+                "Alerta",
+                "Este paciente ya cuenta con registros de Test Fatiga y Somnolencia.",
+                "warning"
+              );
+            })
         }
     })
 }
@@ -67,7 +73,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
     })
 }
 
-export const GetInfoTestFatiga = (nro,tabla,set,token) => {
+export const GetInfoTestFatiga = (nro,tabla,set,token, onFinish = () => {}) => {
     getFetch(`/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia?nOrden=${nro}&nameService=${tabla}`,token)
     .then((res) => {
       console.log(res)
@@ -77,7 +83,7 @@ export const GetInfoTestFatiga = (nro,tabla,set,token) => {
       }))
     })
     .finally(() => {
-      Swal.close()
+      onFinish();
     })
 }
 

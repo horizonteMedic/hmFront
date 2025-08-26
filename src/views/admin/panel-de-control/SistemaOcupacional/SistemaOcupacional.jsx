@@ -435,7 +435,7 @@ const TabComponent = () => {
                 <div
                   onClick={() => setActiveTab(21)}
                   className={`${styles.gridItem} ${
-                    activeTab === 19 ? styles.active : ""
+                    activeTab === 21 ? styles.active : ""
                   }`}
                 >
                   <span className={styles.icon}>
@@ -1210,6 +1210,14 @@ const TabComponent = () => {
               break;
             case "Evaluación Musculoesquelética":
               setActiveTab(22);
+              setSubTab(0);
+              break;
+            case "Cuestionario Nordico":
+              setActiveTab(21);
+              setSubTab(0);
+              break;
+            case "Test Fatiga":
+              setActiveTab(23);
               setSubTab(0);
               break;
           }
