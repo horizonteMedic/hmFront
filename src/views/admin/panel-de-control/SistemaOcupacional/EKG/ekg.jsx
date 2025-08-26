@@ -1,17 +1,18 @@
-import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBroom,
-  faSave,
-  faTimes,
-  faClipboard,
-  faSearch,
-  faPrint,
-} from "@fortawesome/free-solid-svg-icons";
+import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
-import e from "cors";
+import {
+  GetInfoServicio,
+  getInfoTabla,
+  Loading,
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerEKG";
+import { formatearStringFechaSimple } from "../../../../utils/formatDateUtils";
 
 const tabla = "informe_electrocardiograma";
 const date = new Date();
@@ -22,25 +23,25 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 const initialFormState = {
   norden: "",
+  codigoElectroCardiograma: null,
   nombre: "",
   edad: "",
   fechaNac: "",
   fechaExam: today,
-  empresaContratista: "",
+  contrata: "",
   empresa: "",
 
-  ritmo: "1",
-  fc: "2",
-  eje: "3",
-  pr: "4",
-  qrs: "5",
-  ondaP: "6",
-  st: "7",
-  qt: "8",
-  ondaT: "9",
-  qtc: "10",
+  informeCompleto: true,
+  ritmo: "SINUSAL",
+  fc: "",
+  eje: "",
+  pr: "0.20",
+  qrs: "0.08",
+  ondaP: "",
+  st: "",
+  ondaT: "",
+  qtc: "N/E",
 
-  observaciones: "",
   conclusiones: "",
   hallazgos: "",
   recomendaciones: "",
@@ -67,15 +68,74 @@ export default function EKG() {
 
   const [dataTabla, setDataTabla] = useState([]);
 
-  const handleSave = () => {};
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
 
-  const handleSearch = () => {};
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+
+  const handleHallazgosChange = (e, value) => {
+    const { checked } = e.target;
+    setForm((prev) => {
+      let hallazgos = prev.hallazgos;
+
+      if (checked) {
+        if (hallazgos.trim() === "" || hallazgos.trim() === "NORMAL") {
+          hallazgos = value;
+        } else {
+          hallazgos += "\n" + value;
+        }
+      } else {
+        hallazgos = "";
+      }
+
+      return { ...prev, hallazgos };
+    });
+  };
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
+  };
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
+
+  // const [ip, setIp] = useState("");
+
+  // useEffect(() => {
+  //   fetch("https://api.ipify.org?format=json")
+  //     .then((res) => res.json())
+  //     .then((data) => setIp(data.ip))
+  //     .catch((err) => console.error(err));
+  // }, []);
+
+  // useEffect(() => {
+  //   fetch("https://ipapi.co/json/")
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log("IP:", data.ip);
+  //       console.log("Ciudad:", data.city);
+  //       console.log("Región:", data.region);
+  //       console.log("País:", data.country_name);
+  //       console.log("Lat:", data.latitude, "Lng:", data.longitude);
+  //     })
+  //     .catch((err) => console.error(err));
+  // }, []);
 
   return (
     <div className="w-full   p-4 text-[11px]">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* PANEL IZQUIERDO - FORMULARIO DE DATOS */}
-
         <div className="border rounded shadow-md p-6">
           {/* SECCIÓN SUPERIOR - FILIACIÓN */}
           <div className="space-y-4 p-4 rounded border">
@@ -167,6 +227,15 @@ export default function EKG() {
                 disabled
               />
             </div>
+            <label className="flex items-center gap-[18px]">
+              <span className="font-semibold min-w-[80px] max-w-[80px]">Poderosa:</span>
+              <input
+                type="checkbox"
+                name="informeCompleto"
+                checked={form.informeCompleto}
+                onChange={handleCheckBoxChange}
+              />
+            </label>
           </div>
           <div className="space-y-3 rounded border p-4 mt-3 bg-white">
             {/* PARÁMETROS EKG */}
@@ -312,17 +381,7 @@ export default function EKG() {
                   onChange={handleChange}
                 />
               </div>
-              <div className="flex items-center gap-4">
-                <label className="font-semibold min-w-[80px] max-w-[80px]">
-                  Q.T.:
-                </label>
-                <input
-                  className="border rounded px-2 py-1 w-full"
-                  name="qt"
-                  value={form.qt ?? ""}
-                  onChange={handleChange}
-                />
-              </div>
+
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
                   Onda T.:
@@ -350,20 +409,18 @@ export default function EKG() {
 
             {/* HALLAZGO Y RECOMENDACIONES */}
             <h3 className="font-bold text-lg mt-5 mb-4 text-blue-900">
-              Observaciones y Conclusiones
+              Conclusiones y Recomendaciones
             </h3>
 
             <div className="space-y-3">
               <div>
-                <label className="font-semibold block mb-2">
-                  Observaciones:
-                </label>
+                <label className="font-semibold block mb-2">Hallazgos:</label>
                 <textarea
                   className="border rounded px-3 py-2 w-full h-24 resize-none"
-                  name="observaciones"
-                  value={form.observaciones}
+                  name="hallazgos"
+                  value={form.hallazgos}
                   onChange={handleChange}
-                  placeholder="Describa los hallazgos del EKG..."
+                  placeholder="Hallazgos de EKG..."
                 />
               </div>
               {/* Checkboxes de hallazgos */}
@@ -372,8 +429,16 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="normal"
-                    checked={form.normal}
-                    onChange={handleChange}
+                    checked={form.hallazgos.includes("NORMAL")}
+                    onChange={(e) => {
+                      setForm((prev) => ({
+                        ...prev,
+                        hallazgos: e.target.checked ? "NORMAL" : "",
+                        recomendaciones: e.target.checked
+                          ? "EVALUACIÓN ANUAL"
+                          : "",
+                      }));
+                    }}
                   />
                   <span>Normal</span>
                 </label>
@@ -381,8 +446,16 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="bradicardiaSinusalFisiologica"
-                    checked={form.bradicardiaSinusalFisiologica}
-                    onChange={handleChange}
+                    checked={form.hallazgos.includes("B.S. FISIOLÓGICA")}
+                    onChange={(e) => {
+                      handleHallazgosChange(e, "B.S. FISIOLÓGICA");
+                      setForm((prev) => ({
+                        ...prev,
+                        recomendaciones: e.target.checked
+                          ? "EVALUACIÓN ANUAL"
+                          : "",
+                      }));
+                    }}
                   />
                   <span>B.S. Fisiológica</span>
                 </label>
@@ -390,8 +463,16 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="bradicardiaSinusalAsintomatica"
-                    checked={form.bradicardiaSinusalAsintomatica}
-                    onChange={handleChange}
+                    checked={form.hallazgos.includes("B.S. ASINTOMÁTICA")}
+                    onChange={(e) => {
+                      handleHallazgosChange(e, "B.S. ASINTOMÁTICA");
+                      setForm((prev) => ({
+                        ...prev,
+                        recomendaciones: e.target.checked
+                          ? "EVALUACIÓN ANUAL"
+                          : "",
+                      }));
+                    }}
                   />
                   <span>B.S. Asintomática</span>
                 </label>
@@ -399,8 +480,16 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="bloqueoRamaDerecha"
-                    checked={form.bloqueoRamaDerecha}
-                    onChange={handleChange}
+                    checked={form.hallazgos.includes("B.I. RAMA DERECHA")}
+                    onChange={(e) => {
+                      handleHallazgosChange(e, "B.I. RAMA DERECHA");
+                      setForm((prev) => ({
+                        ...prev,
+                        recomendaciones: e.target.checked
+                          ? ""
+                          : prev.recomendaciones,
+                      }));
+                    }}
                   />
                   <span>B.I. Rama Derecha</span>
                 </label>
@@ -408,8 +497,16 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="desviacionEjeCardiacoIzquierda"
-                    checked={form.desviacionEjeCardiacoIzquierda}
-                    onChange={handleChange}
+                    checked={form.hallazgos.includes("D.I. EJE CARDÍACO")}
+                    onChange={(e) => {
+                      handleHallazgosChange(e, "D.I. EJE CARDÍACO");
+                      setForm((prev) => ({
+                        ...prev,
+                        recomendaciones: e.target.checked
+                          ? ""
+                          : prev.recomendaciones,
+                      }));
+                    }}
                   />
                   <span>D.I. Eje Cardíaco</span>
                 </label>
@@ -417,8 +514,16 @@ export default function EKG() {
                   <input
                     type="checkbox"
                     name="desviacionEjeCardiacoDerecha"
-                    checked={form.desviacionEjeCardiacoDerecha}
-                    onChange={handleChange}
+                    checked={form.hallazgos.includes("D.D. EJE CARDÍACO")}
+                    onChange={(e) => {
+                      handleHallazgosChange(e, "D.D. EJE CARDÍACO");
+                      setForm((prev) => ({
+                        ...prev,
+                        recomendaciones: e.target.checked
+                          ? ""
+                          : prev.recomendaciones,
+                      }));
+                    }}
                   />
                   <span>D.D. Eje Cardíaco</span>
                 </label>
@@ -434,17 +539,6 @@ export default function EKG() {
                   value={form.conclusiones}
                   onChange={handleChange}
                   placeholder="Conclusiones de EKG..."
-                />
-              </div>
-
-              <div>
-                <label className="font-semibold block mb-2">Hallazgos:</label>
-                <textarea
-                  className="border rounded px-3 py-2 w-full h-24 resize-none"
-                  name="hallazgos"
-                  value={form.hallazgos}
-                  onChange={handleChange}
-                  placeholder="Hallazgos de EKG..."
                 />
               </div>
 
@@ -467,14 +561,14 @@ export default function EKG() {
             <div className=" flex gap-4">
               <button
                 type="button"
-                // onClick={handleSave}
+                onClick={handleSave}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
               </button>
               <button
                 type="button"
-                // onClick={handleClear}
+                onClick={handleClear}
                 className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -492,7 +586,7 @@ export default function EKG() {
 
                 <button
                   type="button"
-                  // onClick={handlePrint}
+                  onClick={handlePrint}
                   className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
                 >
                   <FontAwesomeIcon icon={faPrint} />
@@ -504,7 +598,9 @@ export default function EKG() {
 
         {/* PANEL DERECHO - BÚSQUEDA Y RESULTADOS */}
         <div className="border rounded p-4 flex flex-col flex-1 shadow-md">
-          <p className="mb-2 font-semibold">Buscar Informe</p>
+          <p className="font-bold text-lg mt-2 mb-2 text-blue-900">
+            Buscar Informe
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-3 items-center justify-center w-full">
             <div>
               <label className="font-semibold">Nombre :</label>
@@ -531,7 +627,7 @@ export default function EKG() {
                 value={form.codigo_search}
                 onKeyUp={(e) => {
                   if (e.key === "Enter") {
-                    // obtenerInfoTabla();
+                    obtenerInfoTabla();
                   }
                 }}
                 onChange={(e) => {
@@ -558,7 +654,7 @@ export default function EKG() {
             />
           </div>
           <div className=" mt-auto mb-4">
-            <p className="mb-2 font-semibold">
+            <p className="font-bold text-lg mt-2 mb-2 text-blue-900">
               Diagrama de Derivaciones del ECG
             </p>
             <img
@@ -584,26 +680,20 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
       cancelButtonText: "No",
     }).then((result) => {
       if (result.isConfirmed) {
-        // PrintHojaR(nro, token, tabla, datosFooter);
+        PrintHojaR(nro, token, tabla, datosFooter);
       }
     });
   };
 
   function clicktable(nro) {
     clean();
-    // Loading("Importando Datos");
-    // GetInfoServicio(nro, tabla, set, token, () => {
-    //   Swal.close();
-    // });
+    Loading("Importando Datos");
+    GetInfoServicio(nro, tabla, set, token, () => {
+      Swal.close();
+    });
   }
-  function convertirFecha(fecha) {
-    if (fecha == null || fecha === "") return "";
-    const [dia, mes, anio] = fecha.split("-");
-    return `${anio}/${mes.padStart(2, "0")}/${dia.padStart(2, "0")}`;
-  }
-
   return (
-    <div className="overflow-y-auto mb-4 h-[280px]">
+    <div className="overflow-y-auto mb-4 max-h-[428px]">
       <table className="w-full table-auto border-collapse ">
         <thead>
           <tr className="bg-gray-100">
@@ -629,7 +719,7 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
                 </td>
                 <td className="border px-2 py-1">{row.nombres || ""}</td>
                 <td className="border px-2 py-1">
-                  {convertirFecha(row.fechaOd)}
+                  {formatearStringFechaSimple(row.fechaOd)}
                 </td>
               </tr>
             ))
