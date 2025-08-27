@@ -44,7 +44,6 @@ export const GetInfoServicio = async (
       fechaExam: res.fechaInforme,
       contrata: res.contrata,
       empresa: res.empresa,
-      informeCompleto: res.informeCompleto,
 
       ritmo: res.mensajeRitmo ?? "",
       fc: res.mensajeFC ?? "",
@@ -93,7 +92,6 @@ export const SubmitDataService = async (
     hallazgo: form.hallazgos,
     conclusion: form.conclusiones,
     recomendaciones: form.recomendaciones,
-    informeCompleto: form.informeCompleto, 
     edadPaciente: form.edad?.replace(" años", ""),
     userRegistro: user,
   };
