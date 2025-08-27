@@ -935,7 +935,7 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
               </div>
-              <RayosXTabSelector />
+              <RayosXTabSelector tieneVista={tieneVista} />
             </div>
           )}
           {activeTab === 15 && (
@@ -1118,7 +1118,7 @@ const TabComponent = () => {
                   Evaluación Musculoesquelética
                 </h2>
               </div>
-              <MusculoEsqueleticoTabSelector />
+              <MusculoEsqueleticoTabSelector tieneVista={tieneVista}/>
             </div>
           )}
           {activeTab === 23 && (
