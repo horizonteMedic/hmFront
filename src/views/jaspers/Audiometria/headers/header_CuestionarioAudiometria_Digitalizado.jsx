@@ -7,7 +7,7 @@
 function footerFichaAudiologicaCabecera(doc, opts = {}, datos = {}) {
   const margin = 8;
   const logoW = 38;
-  const y = 12;
+  const y = 10;
   const xOffset = opts.xOffset !== undefined ? opts.xOffset : 25;
   const fontSize = opts.fontSize !== undefined ? opts.fontSize : 6;
   const yOffset = opts.yOffset !== undefined ? opts.yOffset : -8;
@@ -140,7 +140,7 @@ const header_FichaAudiologica_Maqueta = (doc,datos) => {
   // 2) TÍTULO centrado, SEDE a la derecha en la misma línea, N° de Ficha debajo de sede
   const titulo = "CUESTIONARIO AUDIOMETRÍA";
   const tituloY = y + 12;
-  doc.setFont("helvetica", "normal").setFontSize(13);
+  doc.setFont("helvetica", "bold").setFontSize(13);
   doc.text(titulo, pageW / 2, tituloY, { align: "center" });
   doc.setFont("helvetica", "normal").setFontSize(9);
 
