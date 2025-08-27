@@ -45,7 +45,13 @@ export const VerifyTR = async (nro,tabla,token,set,sede) => {
         if (res.id === 0) {
             GetInfoPac(nro,set,token,sede)
         } else {
-            GetInfoTestFatiga(nro,tabla,set,token)
+            GetInfoTestFatiga(nro,tabla,set,token, () => {
+              Swal.fire(
+                "Alerta",
+                "Este paciente ya cuenta con registros de Test Fatiga y Somnolencia.",
+                "warning"
+              );
+            })
         }
     })
 }
@@ -58,7 +64,8 @@ export const GetInfoPac = (nro,set,token,sede) => {
         ...prev,
         ...res,
         nombres: res.nombresApellidos,
-        sexo: res.genero
+        sexo: res.genero,
+        razonEmpresa: res.empresa
         }));
     })
     .finally(() => {
@@ -66,7 +73,7 @@ export const GetInfoPac = (nro,set,token,sede) => {
     })
 }
 
-export const GetInfoTestFatiga = (nro,tabla,set,token) => {
+export const GetInfoTestFatiga = (nro,tabla,set,token, onFinish = () => {}) => {
     getFetch(`/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia?nOrden=${nro}&nameService=${tabla}`,token)
     .then((res) => {
       console.log(res)
@@ -76,11 +83,11 @@ export const GetInfoTestFatiga = (nro,tabla,set,token) => {
       }))
     })
     .finally(() => {
-      Swal.close()
+      onFinish();
     })
 }
 
-export const SubmitTestFatiga = async (form,token,user,limpiar,tabla) => {
+export const SubmitTestFatiga = async (form,token,user,limpiar,tabla, datosFooter) => {
     if (!form.norden) {
         await Swal.fire('Error', 'Datos Incompletos','error')
         return
@@ -96,7 +103,7 @@ export const SubmitTestFatiga = async (form,token,user,limpiar,tabla) => {
           }).then((result) => {
               limpiar()
               if (result.isConfirmed) {
-                PrintHojaR(form.norden,token,tabla)
+                PrintHojaR(form.norden,token,tabla, datosFooter)
               }
           })
           } else {
@@ -105,7 +112,7 @@ export const SubmitTestFatiga = async (form,token,user,limpiar,tabla) => {
     })
 }
 
-export const PrintHojaR = (nro,token,tabla) => {
+export const PrintHojaR = (nro,token,tabla, datosFooter) => {
   Loading('Cargando Formato a Imprimir')
   getFetch(`/api/v01/ct/testFatigaSomnolencia/obtenerReporteTestFatigaSomnolencia?nOrden=${nro}&nameService=${tabla}`,token)
   .then(async (res) => {
@@ -116,7 +123,7 @@ export const PrintHojaR = (nro,token,tabla) => {
       const modulo = await jasperModules[`../../../../jaspers/Test_Fatiga/${nombre}.jsx`]();
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === 'function') {
-        modulo.default(res);
+        modulo.default({...res, ...datosFooter});
       } else {
         console.error(`El archivo ${nombre}.jsx no exporta una función por defecto`);
       }

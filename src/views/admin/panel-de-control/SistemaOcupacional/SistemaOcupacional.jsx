@@ -435,7 +435,7 @@ const TabComponent = () => {
                 <div
                   onClick={() => setActiveTab(21)}
                   className={`${styles.gridItem} ${
-                    activeTab === 19 ? styles.active : ""
+                    activeTab === 21 ? styles.active : ""
                   }`}
                 >
                   <span className={styles.icon}>
@@ -935,7 +935,7 @@ const TabComponent = () => {
               <div className="w-full flex justify-center items-center mb-4">
                 <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
               </div>
-              <RayosXTabSelector />
+              <RayosXTabSelector tieneVista={tieneVista} />
             </div>
           )}
           {activeTab === 15 && (
@@ -1118,7 +1118,7 @@ const TabComponent = () => {
                   Evaluación Musculoesquelética
                 </h2>
               </div>
-              <MusculoEsqueleticoTabSelector />
+              <MusculoEsqueleticoTabSelector tieneVista={tieneVista}/>
             </div>
           )}
           {activeTab === 23 && (
@@ -1210,6 +1210,14 @@ const TabComponent = () => {
               break;
             case "Evaluación Musculoesquelética":
               setActiveTab(22);
+              setSubTab(0);
+              break;
+            case "Cuestionario Nordico":
+              setActiveTab(21);
+              setSubTab(0);
+              break;
+            case "Test Fatiga":
+              setActiveTab(23);
               setSubTab(0);
               break;
           }

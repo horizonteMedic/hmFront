@@ -18,7 +18,7 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
 
   const [dd, mm, yyyy] = data.fechaAperturaPo.split('/');
   const fechaFormateada = `${yyyy}/${mm}/${dd}`;
-  console.log("user_registro", data.user_registro);
+
   const body = {
 
     tipoOperacion: operacion,

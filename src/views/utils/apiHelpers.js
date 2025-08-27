@@ -17,7 +17,7 @@ export function SubmitData(body, url, token) {
     }).then(response => response)
 }
 
-export const getFetch = (url, token) => {
+export function getFetch(url, token) {
     const options = {
         method: 'GET',
         headers: {

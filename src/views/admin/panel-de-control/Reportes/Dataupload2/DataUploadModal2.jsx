@@ -33,7 +33,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
     .catch((error) =>{
       throw new Error('Network response was not ok.', error);
     })
-  }, [listarch])
+  }, [token])
 
   const isImageOrPDFOrExcel = (fileName) => {
     const ext = fileName.split('.').pop().toLowerCase();

@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import HeaderInformeElectrocardiogramaPoderosa from "./Header/header_InformeElectrocardiograma_DigitalizadoPoderosa.jsx";
 
-export default function InformeElectrocardiograma_DigitalizadoPoderosa(data = {}) {
+export default function InformeElectrocardiograma2023(data = {}) {
   // Datos de prueba por defecto
   const dataPrueba = {
     ritmo: "2",
