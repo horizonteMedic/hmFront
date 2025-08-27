@@ -114,3 +114,30 @@ export function SubmitToxPanel10D(data,user,token) {
             return res
         } return res.json()}).then(response => response) 
 }
+
+export function SubmitToxPanel4D(data,user,token) {
+    const body = {
+        fechaExamen: data.fecha,
+        txtrCocaina: data.valueC,
+        txtrMarihuana: data.valueM,
+        txtrOpiaceos: data.valueO,
+        txtrMethanfetamina: data.valueMet,
+        userRegistro: user,
+        userMedicoOcup: "",
+        norden: data.norden
+    };
+
+    const url = `${URLAzure}/api/v01/ct/toxicologia/registrarActualizarPanel4D`
+    const options = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    }
+    return fetch(url,options).then(res =>  {
+        if (!res.ok) {
+            return res
+        } return res.json()}).then(response => response) 
+}

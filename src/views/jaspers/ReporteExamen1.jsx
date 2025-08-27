@@ -178,7 +178,7 @@ export default function ReporteExamen1 (datos){
             // === COLOCAR DATOS DE PRUEBA EN EL FRAME ===
             // Configuración de fuentes para los datos
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             
             // === COLOCAR DATOS REALES EN EL FRAME ===
             // MUESTRA - Checkbox SANGRE (siempre marcado por defecto)
@@ -188,32 +188,64 @@ export default function ReporteExamen1 (datos){
             // CÓDIGO
             doc.setFont("helvetica", "bold");
             doc.setFontSize(20);
-            doc.text(String(datos.orden || "148055"), 176.5, 12); // X: 80, Y: 35 - Ajustado para ser más visible
+            doc.text(String(datos.orden || "148055"), 131, 12); // X: 80, Y: 35 - Ajustado para ser más visible
             
             // Restaurar fuente normal para los campos siguientes
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
+            doc.setFontSize(9);
             
             // TIPO DE EXAMEN
-            doc.text(String(datos.examen || "EXAMEN OCUPACIONAL"), 31,25.3); // X: 35, Y: 60
+            doc.setFontSize(8.5);
+            doc.text(String(datos.examen || "EXAMEN OCUPACIONAL"), 30,25.3);
+            doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
             
-            // EMPRESA
-            doc.text(String(datos.empresa || "EMPRESA NO ESPECIFICADA"), 85.5, 25.3); // X: 35, Y: 68
+            // EMPRESA - Con ancho máximo y ajuste de posición Y hacia arriba
+            const empresaTexto = String(datos.empresa || "EMPRESA NO ESPECIFICADA ");
+            const empresaMaxWidth = 50; // Ancho máximo para empresa
+            const empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
+            const empresaY = 25.3; // Posición Y base (última línea)
+            empresaLines.forEach((line, index) => {
+                // Calcular Y para que la última línea esté en empresaY y las anteriores arriba
+                const lineY = empresaY - ((empresaLines.length - 1 - index) * 3);
+                doc.text(line, 85.5, lineY);
+            });
             
-            // CONTRATA
-            doc.text(String(datos.contrata || "CONTRATA NO ESPECIFICADA"), 155, 25.3); // X: 35, Y: 76
+            // CONTRATA - Con ancho máximo y ajuste de posición Y hacia arriba
+            const contrataTexto = String(datos.contrata || "CONTRATA NO ESPECIFICADA");
+            const contrataMaxWidth = 50; // Ancho máximo para contrata
+            const contrataLines = doc.splitTextToSize(contrataTexto, contrataMaxWidth);
+            const contrataY = 25.3; // Posición Y base (última línea)
+            contrataLines.forEach((line, index) => {
+                // Calcular Y para que la última línea esté en contrataY y las anteriores arriba
+                const lineY = contrataY - ((contrataLines.length - 1 - index) * 3);
+                doc.text(line, 155, lineY);
+            });
             
             // NOMBRES Y APELLIDOS
-            doc.text(String(datos.nombres || "JOSUE SPENCER ROJAS SIGUENZA"), 53.5, 31); // X: 35, Y: 84
-            
+            doc.setFontSize(10);
+            doc.text(String(datos.nombres || "NOMBRE DE PRUEBA PACIENTE"), 53.5, 31); // X: 35, Y: 84
+            doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
+
             // EDAD
+            doc.setFontSize(10.5);
             doc.text(datos.edad ? `${String(datos.edad)}` : "30", 140, 31); // X: 120, Y: 84
+            doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
             
             // FECHA
+            doc.setFontSize(10.5);
             doc.text(String(formatearFecha(datos.fecha) || "23/08/2025"), 175, 31); // X: 160, Y: 84
+            doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
             
-            // CARGO
-            doc.text(String(datos.cargo || "ADMIN DEL BAHIA ROSA"), 25, 36.2); // X: 35, Y: 92
+            // CARGO - Con ancho máximo y ajuste de posición Y hacia arriba
+            const cargoTexto = String(datos.cargo || "CARGO NO ESPECIFICADO");
+            const cargoMaxWidth = 48; // Ancho máximo para cargo
+            const cargoLines = doc.splitTextToSize(cargoTexto, cargoMaxWidth);
+            const cargoY = 37.8; // Posición Y base (última línea)
+            cargoLines.forEach((line, index) => {
+                // Calcular Y para que la última línea esté en cargoY y las anteriores arriba
+                const lineY = cargoY - ((cargoLines.length - 1 - index) * 3);
+                doc.text(line, 24.5, lineY);
+            });
             
             // === CHECKBOXES DE EVALUACIONES ===
             doc.setFont("helvetica", "bold");
@@ -264,7 +296,7 @@ export default function ReporteExamen1 (datos){
             
             // Restaurar fuente normal
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             
         } catch (error) {
             console.error("No se pudo cargar la imagen de la hoja de ruta:", error);

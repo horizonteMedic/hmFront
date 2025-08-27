@@ -6,6 +6,7 @@ import Gonadotropina from './Gonadotropina/Gonadotropina';
 import Microbiologia from './Microbiologia/Microbiologia';
 import Inmunologia from './Inmunologia/Inmunologia';
 import Hepatitis from './Hepatitis/Hepatitis';
+import VDRL from './VDRL/VDRL';
 
 const InmunologiaTab = ({token, selectedSede, userlogued, permiso}) => {
   const [activeTab, setActiveTab] = useState(0);
@@ -18,7 +19,9 @@ const InmunologiaTab = ({token, selectedSede, userlogued, permiso}) => {
     { label: 'Inmunología', icon: faVirus,vista: 'Inmunologia',
       permiso: 'Acceso Inmunologia', component: <Inmunologia  token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
     { label: 'L. Hepatitis', icon: faSyringe,vista: 'Inmunologia',
-      permiso: 'Acceso L. Hepatitis', component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
+      permiso: 'Acceso L. Hepatitis', component: <Hepatitis token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    { label: 'VDRL', icon: faVirus,vista: 'Inmunologia',
+      permiso: 'Acceso VDRL', component: <VDRL token={token} selectedSede={selectedSede} userlogued={userlogued}/> }
   ];
     const tabsConPermiso = tabs.filter(tab => permiso(tab.vista, tab.permiso));
 

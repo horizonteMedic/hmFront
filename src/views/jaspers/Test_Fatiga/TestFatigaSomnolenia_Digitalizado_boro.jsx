@@ -85,16 +85,23 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     doc.text("Empresa:", 10, y + 20)
     
     doc.setFont("helvetica", "normal")
+    doc.rect(45, y + 6, 88, 5);
     doc.text(`${datos.nombres ? datos.nombres : "asd"}`, 47, y + 10)
+    doc.rect(144, y + 6, 22, 5);
     doc.text(`${datos.edad ? datos.edad + " AÑOS" : "asd"}`, 145, y + 10)
+    doc.rect(180, y + 6, 27, 5);
     doc.text(`${datos.sexoPa === "F" ? "FEMENINO" : datos.sexoPa === "M" ? "MASCULINO" : "asd"}`, 182, y + 10)
 
+    doc.rect(40, y + 11, 126, 5); // Área
     doc.text(`${datos.areaO ? datos.areaO : "asd"}`, 42, y + 15)
+    doc.rect(181, y + 11, 26, 5); // Fecha Examen
     doc.text(`${datos.fexamen ? datos.fexamen : "15/04/2002"}`, 184, y + 15)
 
-    doc.text(`${datos.razonEmpresa ? datos.razonEmpresa : "asd"}`, 30, y + 20)
+    doc.rect(28, y + 17, 179, 5); // Empresa
+    doc.text(`${datos.razonEmpresa ? datos.razonEmpresa : "asd"}`, 30, y + 21)
     
     y += 24
+    
     autoTable(doc, {
       startY: y,
       theme: "grid",
@@ -109,7 +116,7 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       tableLineWidth: 0.5,       // grosor del borde externo
       body: [
         [
-          { content: `Que tan probable es que usted cabecee o se quede dormido en las siguientes situaciones?. Considere los últimos meses de sus actividades habituales. No se refiere a sentirse cansado debido a actividad física. Aunque no haya realizado últimamente las situaciones descritas, considere como le habrian afectado. Use la siguiente escala y marque con una "X" la opción mas apropiada para cada situación.`
+          { content: `                              es que usted                                                    en las siguientes situaciones?. Considere los últimos meses de sus actividades habituales. No se refiere a sentirse cansado debido a actividad física. Aunque no haya realizado últimamente las situaciones descritas, considere como le habrian afectado. Use la siguiente escala y marque con una "X" la opción mas apropiada para cada situación.`
             , styles: { cellPadding: 3, }
           }
         ],
@@ -119,6 +126,16 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       ],
       didDrawCell: (data) => {
         // Detectar la segunda fila (index 1) y la primera columna (index 0)
+        if (data.row.index === 0 && data.column.index === 0) {
+            const cell = data.cell;
+            const startX = cell.x ; // margen interno
+            const startY = cell.y ;
+            doc.setFont("helvetica", "bold")
+            doc.text("Que tan probable", startX + 2.8, startY + 5.8)
+            doc.text("cabecee o se quede dormido", startX + 49, startY + 5.7)
+            doc.setFont("helvetica", "normal")
+        }
+        
         if (data.row.index === 1 && data.column.index === 0) {
           const cell = data.cell;
           const startX = cell.x + 40; // margen interno
@@ -405,9 +422,6 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       const lineEnd = 180;
       const lineMid = (lineStart + lineEnd) / 2; // punto medio en X
 
-      doc.line(lineStart, FirmaY, lineEnd, FirmaY);
-      doc.text("Firma y sello del Médico", lineStart + 8, FirmaY + 4);
-
       // ===== Posición de la imagen centrada en la línea =====
       const imgX = lineMid - imgW / 2;
       const imgY = FirmaY - imgH - 2; // 2 px de margen arriba de la línea
@@ -427,6 +441,10 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
     doc.line(lineStart, FirmaY, lineEnd, FirmaY);
     doc.text("Firma del Trabajador Evaluado", 26, FirmaY + 4);
+
+    doc.line(130, FirmaY, 180, FirmaY);
+    doc.text("Firma y sello del Médico", 130 + 8, FirmaY + 4);
+
     if (s2) {
       const centerX = (lineStart + lineMid) / 2; // punto medio de la izquierda
       addScaledImage(doc, s2, maxImgW, maxImgH, centerX, FirmaY);

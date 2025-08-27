@@ -130,52 +130,60 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
         doc.text(ln, tableX + 2, tableY + paddingTop + lineHTable - 1.2 + i * lineHTable);
       });
       let nuevoYParaTexto=tableY + paddingTop + lineHTable - 1.2;
+      // Cambiar a fuente tamaño 8 para los campos adicionales
+      doc.setFontSize(8);
       switch(p.numero){
-        case 1:
+        case 1: {
           nuevoYParaTexto += 25; // Ajuste para la pregunta 1
-          doc.text(datos?.txtrcual1||"", tableX + 2, nuevoYParaTexto) 
-          doc.text(datos?.txtrcuando1||"", tableX + 67, nuevoYParaTexto) 
-          doc.text(datos?.txtrque1||"", tableX + 132, nuevoYParaTexto) 
+          const texto1 = `${datos?.txtrcual1||"Pérdida auditiva bilateral progresiva"} - ${datos?.txtrcuando1||"2020"} - ${datos?.txtrque1||"Exposición prolongada a ruido industrial durante ocho horas diarias en fábrica metalúrgica"}`;
+          doc.text(texto1, tableX + 2, nuevoYParaTexto);
           break;
-        case 9:  
+        }
+        case 9: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 9 
-          doc.text(datos?.txtrcual9||"", tableX + 2, nuevoYParaTexto) 
-          doc.text(datos?.txtrdonde9||"", tableX + 67, nuevoYParaTexto) 
-          doc.text(datos?.txtrque9||"", tableX + 132, nuevoYParaTexto) 
+          const texto9 = `${datos?.txtrcual9||"Timpanoplastía reconstructiva del oído derecho"} - ${datos?.txtrdonde9||"Hospital Central de Lima"} - ${datos?.txtrque9||"Reparación quirúrgica del tímpano perforado por infección crónica del oído medio"}`;
+          doc.text(texto9, tableX + 2, nuevoYParaTexto);
           break;
-        case 10: 
+        }
+        case 10: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 10
-          doc.text(datos?.txtrcual10||"", tableX + 2, nuevoYParaTexto) 
-          doc.text(datos?.txtrdonde10||"", tableX + 67, nuevoYParaTexto) 
-          doc.text(datos?.txtrque10||"", tableX + 132, nuevoYParaTexto) 
+          const texto10 = `${datos?.txtrcual10||"Accidente automovilístico con impacto frontal"} - ${datos?.txtrdonde10||"Avenida Principal km 15"} - ${datos?.txtrque10||"Golpe violento en la cabeza contra el volante causando traumatismo craneoencefálico severo"}`;
+          doc.text(texto10, tableX + 2, nuevoYParaTexto);
           break;
-        case 11:    
+        }
+        case 11: {
           nuevoYParaTexto += 10; // Ajuste para la pregunta 11
-          doc.text(datos?.txtrcual11||"", tableX + 2, nuevoYParaTexto)
-          doc.text(datos?.txtrcuanto11||"", tableX + 97, nuevoYParaTexto)
+          const texto11 = `${datos?.txtrcual11||"Cisplatino para tratamiento de cáncer"} - ${datos?.txtrcuanto11||"6 meses"}`;
+          doc.text(texto11, tableX + 2, nuevoYParaTexto);
           break;
-        case 12: 
+        }
+        case 12: {
           nuevoYParaTexto += 10; // Ajuste para la pregunta 12
-          doc.text(datos?.txtrcual12||"", tableX + 2, nuevoYParaTexto)
-          doc.text(datos?.txtrcuanto12||"", tableX + 97, nuevoYParaTexto)
+          const texto12 = `${datos?.txtrcual12||"Tolueno y xileno en procesos industriales"} - ${datos?.txtrcuanto12||"2 años"}`;
+          doc.text(texto12, tableX + 2, nuevoYParaTexto);
           break;
-        case 13: 
+        }
+        case 13: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 13
-          doc.text(datos?.txtrcuanto13||"", tableX + 2, nuevoYParaTexto) 
-          doc.text(datos?.txtrcuando13||"", tableX + 67, nuevoYParaTexto) 
-          doc.text(datos?.txtrdonde13||"", tableX + 132, nuevoYParaTexto) 
+          const texto13 = `${datos?.txtrcuanto13||"5 años continuos"} - ${datos?.txtrcuando13||"2019-2024"} - ${datos?.txtrdonde13||"Fábrica metalúrgica de acero y hierro"}`;
+          doc.text(texto13, tableX + 2, nuevoYParaTexto);
           break;
-        case 14: 
+        }
+        case 14: {
           nuevoYParaTexto += 10; // Ajuste para la pregunta 14
-          doc.text(datos?.txtrcual14||"", tableX + 2, nuevoYParaTexto) 
-          doc.text(datos?.txtrdonde14||"", tableX + 67, nuevoYParaTexto) 
-          doc.text(datos?.txtrque14||"", tableX + 132, nuevoYParaTexto) 
+          const texto14 = `${datos?.txtrcual14||"Hipertensión arterial esencial controlada"} - ${datos?.txtrdonde14||"Clínica San José de Miraflores"} - ${datos?.txtrque14||"Control médico mensual con medicación antihipertensiva y monitoreo de presión arterial"}`;
+          doc.text(texto14, tableX + 2, nuevoYParaTexto);
           break;
-        case 15: 
+        }
+        case 15: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 15
-          doc.text(datos?.txtrcuantos15||"", tableX + 2, nuevoYParaTexto) 
+          const texto15 = `${datos?.txtrcuantos15||"10 cigarrillos por día durante 15 años"}`;
+          doc.text(texto15, tableX + 2, nuevoYParaTexto);
           break;
+        }
       }
+      // Restaurar el tamaño de fuente original para el resto del contenido
+      doc.setFontSize(9);
 
 
       
