@@ -3,6 +3,8 @@
  * @param {jsPDF} doc - Instancia de jsPDF
  */
 
+import { formatearFechaLarga } from "../../../utils/formatDateUtils";
+
 const HeaderInformeElectrocardiograma = (doc, datos) => {
   const margin = 8;
   const leftMargin = margin + 25;
@@ -10,12 +12,15 @@ const HeaderInformeElectrocardiograma = (doc, datos) => {
   let y = 12;
 
   // Logo a la izquierda
-  const logoW = 60, logoH = 20;
+  const logoW = 60,
+    logoH = 20;
   const logoY = y + 10;
   try {
     doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
   } catch {
-    doc.setFont("helvetica", "normal").setFontSize(9)
+    doc
+      .setFont("helvetica", "normal")
+      .setFontSize(9)
       .text("Policlinico Horizonte Medic", margin, logoY + 8);
   }
 
@@ -36,139 +41,178 @@ const HeaderInformeElectrocardiograma = (doc, datos) => {
 
   // Datos del paciente en formato de tabla
   const pacienteData = [
-    { label: "NOMBRES", value: (datos?.nombres || "JUAN CARLOS ALBERTO MARIA JOSE DE LA CRUZ").toUpperCase(), fullWidth: true },
-    { label: "EDAD", value: datos?.edad ? `${datos.edad} AÑOS` : "45 AÑOS" },
-    { label: "CONTRATA", value: datos?.contrata || "EMPRESA CONTRATISTA MEGA CONSTRUCCIONES INTERNACIONALES S.A.C. CON RUC 20123456789" },
-    { label: "EMPRESA", value: datos?.empresa || "COMPAÑÍA MINERA ANTAMINA S.A. - SEDE PRINCIPAL LIMA - PERÚ - SUCURSAL TRUJILLO" },
+    {
+      label: "NOMBRES",
+      value: (datos?.nombres || "").toUpperCase(),
+      fullWidth: true,
+    },
+    { label: "EDAD", value: datos?.edad ? `${datos.edad} AÑOS` : "" },
+    { label: "CONTRATA", value: datos?.contrata || "" },
+    { label: "EMPRESA", value: datos?.empresa || "" },
   ];
 
   // Configuración de la tabla
   const tableStartX = leftMargin;
   const tableStartY = datosPacienteY + 20;
   const tableWidth = pageW - 2 * leftMargin;
-  
+
   // Proporciones fijas para las columnas
   const labelColWidth = tableWidth * 0.25;
   const valueColWidth = tableWidth * 0.75;
-  
+
   const baseRowHeight = 6; // Reducir altura base de las filas
   const borderWidth = 0.2;
   const padding = 2;
 
   // Dibujar tabla
   let currentY = tableStartY;
-  
+
   pacienteData.forEach((item) => {
     const rowY = currentY;
-    
+
     // Si es la fila de nombres (fullWidth), usar todo el ancho disponible
     if (item.fullWidth) {
       const maxValueWidth = tableWidth - padding * 2;
-      
+
       // Calcular altura de fila basada en el contenido
       let rowHeight = baseRowHeight;
       let valueLines = [item.value];
-      
+
       if (doc.getTextWidth(item.value) > maxValueWidth) {
         valueLines = doc.splitTextToSize(item.value, maxValueWidth);
         rowHeight = Math.max(baseRowHeight, valueLines.length * 3.5 + padding);
       }
-      
-             // Dibujar bordes de la fila completa
-       doc.setDrawColor(0);
-       doc.setLineWidth(borderWidth);
-       
-       // Línea horizontal superior
-       doc.line(tableStartX, rowY, tableStartX + tableWidth, rowY);
-       
-       // Línea vertical entre columnas (separador NOMBRE | DATA)
-       doc.line(tableStartX + tableWidth * 0.25, rowY, tableStartX + tableWidth * 0.25, rowY + rowHeight);
-       
-       // Línea horizontal inferior
-       doc.line(tableStartX, rowY + rowHeight, tableStartX + tableWidth, rowY + rowHeight);
-       
-       // Línea vertical izquierda
-       doc.line(tableStartX, rowY, tableStartX, rowY + rowHeight);
-       
-       // Línea vertical derecha
-       doc.line(tableStartX + tableWidth, rowY, tableStartX + tableWidth, rowY + rowHeight);
+
+      // Dibujar bordes de la fila completa
+      doc.setDrawColor(0);
+      doc.setLineWidth(borderWidth);
+
+      // Línea horizontal superior
+      doc.line(tableStartX, rowY, tableStartX + tableWidth, rowY);
+
+      // Línea vertical entre columnas (separador NOMBRE | DATA)
+      doc.line(
+        tableStartX + tableWidth * 0.25,
+        rowY,
+        tableStartX + tableWidth * 0.25,
+        rowY + rowHeight
+      );
+
+      // Línea horizontal inferior
+      doc.line(
+        tableStartX,
+        rowY + rowHeight,
+        tableStartX + tableWidth,
+        rowY + rowHeight
+      );
+
+      // Línea vertical izquierda
+      doc.line(tableStartX, rowY, tableStartX, rowY + rowHeight);
+
+      // Línea vertical derecha
+      doc.line(
+        tableStartX + tableWidth,
+        rowY,
+        tableStartX + tableWidth,
+        rowY + rowHeight
+      );
 
       // Label en negrita (más pequeño para la fila completa)
       doc.setFont("helvetica", "bold").setFontSize(8);
       const labelX = tableStartX + padding;
-      doc.text(item.label, labelX, rowY + padding, { 
-        align: "left", 
+      doc.text(item.label, labelX, rowY + padding, {
+        align: "left",
         baseline: "top",
-        maxWidth: tableWidth * 0.25 - padding * 2
+        maxWidth: tableWidth * 0.25 - padding * 2,
       });
 
       // Valor (usando el resto del ancho)
       doc.setFont("helvetica", "normal").setFontSize(8);
       const valueX = tableStartX + tableWidth * 0.25 + padding;
-      
+
       // Para valores largos, dividir en múltiples líneas
       valueLines.forEach((line, lineIndex) => {
-        doc.text(line, valueX, rowY + padding + (lineIndex * 3.5), { 
-          align: "left", 
+        doc.text(line, valueX, rowY + padding + lineIndex * 3.5, {
+          align: "left",
           baseline: "top",
-          maxWidth: tableWidth * 0.75 - padding * 2
+          maxWidth: tableWidth * 0.75 - padding * 2,
         });
       });
-      
+
       currentY += rowHeight;
     } else {
       // Para las otras filas, mantener el comportamiento original
       const maxValueWidth = valueColWidth - padding * 2;
-      
+
       // Calcular altura de fila basada en el contenido
       let rowHeight = baseRowHeight;
       let valueLines = [item.value];
-      
+
       if (doc.getTextWidth(item.value) > maxValueWidth) {
         valueLines = doc.splitTextToSize(item.value, maxValueWidth);
         rowHeight = Math.max(baseRowHeight, valueLines.length * 3.5 + padding);
       }
-      
+
       // Dibujar bordes de la fila
       doc.setDrawColor(0);
       doc.setLineWidth(borderWidth);
-      
+
       // Línea horizontal superior
-      doc.line(tableStartX, rowY, tableStartX + labelColWidth + valueColWidth, rowY);
-      
+      doc.line(
+        tableStartX,
+        rowY,
+        tableStartX + labelColWidth + valueColWidth,
+        rowY
+      );
+
       // Línea vertical entre columnas
-      doc.line(tableStartX + labelColWidth, rowY, tableStartX + labelColWidth, rowY + rowHeight);
-      
+      doc.line(
+        tableStartX + labelColWidth,
+        rowY,
+        tableStartX + labelColWidth,
+        rowY + rowHeight
+      );
+
       // Línea horizontal inferior
-      doc.line(tableStartX, rowY + rowHeight, tableStartX + labelColWidth + valueColWidth, rowY + rowHeight);
-      
+      doc.line(
+        tableStartX,
+        rowY + rowHeight,
+        tableStartX + labelColWidth + valueColWidth,
+        rowY + rowHeight
+      );
+
       // Línea vertical izquierda
       doc.line(tableStartX, rowY, tableStartX, rowY + rowHeight);
-      
+
       // Línea vertical derecha
-      doc.line(tableStartX + labelColWidth + valueColWidth, rowY, tableStartX + labelColWidth + valueColWidth, rowY + rowHeight);
+      doc.line(
+        tableStartX + labelColWidth + valueColWidth,
+        rowY,
+        tableStartX + labelColWidth + valueColWidth,
+        rowY + rowHeight
+      );
 
       // Label en negrita
       doc.setFont("helvetica", "bold").setFontSize(9);
       const labelX = tableStartX + padding;
-      doc.text(item.label, labelX, rowY + padding, { 
-        align: "left", 
+      doc.text(item.label, labelX, rowY + padding, {
+        align: "left",
         baseline: "top",
-        maxWidth: labelColWidth - padding * 2
+        maxWidth: labelColWidth - padding * 2,
       });
 
       // Valor
       doc.setFont("helvetica", "normal").setFontSize(9);
       const valueX = tableStartX + labelColWidth + padding;
-      
+
       // Para valores largos, dividir en múltiples líneas
       valueLines.forEach((line, lineIndex) => {
-        doc.text(line, valueX, rowY + padding + (lineIndex * 3.5), { 
-          align: "left", 
-          baseline: "top"
+        doc.text(line, valueX, rowY + padding + lineIndex * 3.5, {
+          align: "left",
+          baseline: "top",
         });
       });
-      
+
       // Actualizar posición Y para la siguiente fila
       currentY += rowHeight;
     }
@@ -207,11 +251,18 @@ const HeaderInformeElectrocardiograma = (doc, datos) => {
   // Fecha del informe
   const fechaInformeY = sedeY2 + 8;
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(`Fecha informe : ${datos?.fecha || datos?.fechaExamen || ""}`, sedeX, fechaInformeY, { align: "right" });
+  const fechaTransformada = formatearFechaLarga(datos?.fechaInforme);
+  doc.text(
+    `Fecha informe : ${fechaTransformada}`,
+    sedeX,
+    fechaInformeY,
+    { align: "right" }
+  );
 
   // === BLOQUE CÓDIGO DE COLOR ===
   // Mostrar el bloque de color usando el color de texto del dato
-  const colorValido = typeof datos?.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido =
+    typeof datos?.color === "number" && datos.color >= 1 && datos.color <= 50;
   if (colorValido) {
     const color = datos?.codigoColor || "#008f39";
     const boxText = (datos?.textoColor || "E").toUpperCase();

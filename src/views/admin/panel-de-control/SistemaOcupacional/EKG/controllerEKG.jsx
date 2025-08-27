@@ -8,7 +8,7 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
-import { formatearStringFechaSimpleFirstYear } from "../../../../utils/formatDateUtils";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
   "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma";
@@ -39,7 +39,7 @@ export const GetInfoServicio = async (
       codigoElectroCardiograma: res.codigoElectroCardiograma,
       nombre: res.nombres,
       edad: res.edad + " años",
-      fechaNac: formatearStringFechaSimpleFirstYear(res.fechaNac), //necesito
+      fechaNac: formatearFechaCorta(res.fechaNac), //necesito
 
       fechaExam: res.fechaInforme,
       contrata: res.contrata,
@@ -152,7 +152,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
     set((prev) => ({
       ...prev,
       ...res,
-      fechaNac: formatearStringFechaSimpleFirstYear(res.fechaNac ?? ""),
+      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
       edad: res.edad + " años",
       nombres: res.nombresApellidos,
     }));
