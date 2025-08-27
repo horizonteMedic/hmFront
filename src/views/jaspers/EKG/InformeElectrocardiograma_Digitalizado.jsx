@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import HeaderInformeElectrocardiograma from "./Header/header_InformeElectrocardiograma_Digitalizado.jsx";
 
-export default function InformeElectrocardiograma_Digitalizado(data = {}) {
+export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
   // Datos de prueba por defecto
   const dataPrueba = {
     ritmo: "120",
