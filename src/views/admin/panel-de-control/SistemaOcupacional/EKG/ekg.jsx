@@ -12,7 +12,7 @@ import {
   SubmitDataService,
   VerifyTR,
 } from "./controllerEKG";
-import { formatearStringFechaSimple } from "../../../../utils/formatDateUtils";
+import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const tabla = "informe_electrocardiograma";
 const date = new Date();
@@ -132,8 +132,23 @@ export default function EKG() {
   //     .catch((err) => console.error(err));
   // }, []);
 
+  // import FingerprintJS from "@fingerprintjs/fingerprintjs";
+
+  // // Inicializar y obtener el ID único
+  // async function getDeviceId() {
+  //   const fp = await FingerprintJS.load();
+  //   const result = await fp.get();
+  //   console.log("Device ID:", result.visitorId);
+  //   return result.visitorId;
+  // }
+
+  // getDeviceId();
+
   return (
     <div className="w-full   p-4 text-[11px]">
+      <h2 className="text-2xl font-bold text-center mb-10">
+        Electrocardiograma
+      </h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* PANEL IZQUIERDO - FORMULARIO DE DATOS */}
         <div className="border rounded shadow-md p-6">
@@ -228,12 +243,23 @@ export default function EKG() {
               />
             </div>
             <label className="flex items-center gap-[18px]">
-              <span className="font-semibold min-w-[80px] max-w-[80px]">Poderosa:</span>
+              <span className="font-semibold min-w-[80px] max-w-[80px]">
+                Poderosa:
+              </span>
               <input
                 type="checkbox"
                 name="informeCompleto"
                 checked={form.informeCompleto}
-                onChange={handleCheckBoxChange}
+                onChange={(e) => {
+                  handleCheckBoxChange(e);
+                  setForm((prev) => ({
+                    ...prev,
+                    ondaP: "",
+                    st: "",
+                    ondaT: "",
+                    conclusiones: "",
+                  }));
+                }}
               />
             </label>
           </div>
@@ -333,7 +359,6 @@ export default function EKG() {
                   onChange={handleChange}
                 />
               </div>
-
               {/** Fila 2 */}
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
@@ -359,16 +384,15 @@ export default function EKG() {
               </div>
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
-                  Onda P:
+                  Q.T.C.:
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="ondaP"
-                  value={form.ondaP ?? ""}
+                  name="qtc"
+                  value={form.qtc ?? ""}
                   onChange={handleChange}
                 />
               </div>
-
               {/** Fila 3 */}
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
@@ -379,9 +403,9 @@ export default function EKG() {
                   name="st"
                   value={form.st ?? ""}
                   onChange={handleChange}
+                  disabled={!form.informeCompleto}
                 />
               </div>
-
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
                   Onda T.:
@@ -391,18 +415,19 @@ export default function EKG() {
                   name="ondaT"
                   value={form.ondaT ?? ""}
                   onChange={handleChange}
+                  disabled={!form.informeCompleto}
                 />
               </div>
-
               <div className="flex items-center gap-4">
                 <label className="font-semibold min-w-[80px] max-w-[80px]">
-                  Q.T.C.:
+                  Onda P:
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="qtc"
-                  value={form.qtc ?? ""}
+                  name="ondaP"
+                  value={form.ondaP ?? ""}
                   onChange={handleChange}
+                  disabled={!form.informeCompleto}
                 />
               </div>
             </div>
@@ -539,6 +564,7 @@ export default function EKG() {
                   value={form.conclusiones}
                   onChange={handleChange}
                   placeholder="Conclusiones de EKG..."
+                  disabled={!form.informeCompleto}
                 />
               </div>
 
@@ -719,7 +745,7 @@ function Table({ data, tabla, set, token, clean, datosFooter }) {
                 </td>
                 <td className="border px-2 py-1">{row.nombres || ""}</td>
                 <td className="border px-2 py-1">
-                  {formatearStringFechaSimple(row.fechaOd)}
+                  {formatearFechaCorta(row.fechaInforme)}
                 </td>
               </tr>
             ))
