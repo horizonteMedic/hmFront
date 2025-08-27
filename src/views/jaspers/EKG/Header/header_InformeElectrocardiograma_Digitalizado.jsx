@@ -4,122 +4,184 @@
  */
 
 const HeaderInformeElectrocardiograma = (doc, datos) => {
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    nombres: "JUAN CARLOS",
-    apellidos: "PEREZ GONZALEZ",
-    fecha: "15/12/2024",
-    edad: "35",
-    sede: "SE TRUJILLO NICOLAS PIEROLA PIEROLA PIEROLA",
-    norden: "990909",
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "E",
-  };
-  const datosReales = {
-    // apellidosNombres: datos?.nombres ?? "",
-    // dni: datos?.dni ?? "",
-    // empresa: datos?.empresa ?? "",
-    // contrata: datos?.contrata ?? "",
-    // fecha: datos?.fechaExamen ?? "",
-    // edad: datos?.edad ?? "",
-    // areaTrabajo: datos?.areaTrabajo ?? "",
-    // sexo: datos?.sexo ?? "",
-    // sede: datos?.informacionSede?.sede ?? "",
-    // color: datos?.informacionSede?.color ?? "",
-    // codigoColor: datos?.informacionSede?.codigoColor.trim() ?? "",
-    // textoColor: datos?.informacionSede?.textoColor.trim() ?? "",
-    // norden: datos?.norden ?? "",
-    nombres: "JUAN CARLOS",
-    apellidos: "PEREZ GONZALEZ",
-    fecha: "15/12/2024",
-    edad: "35",
-    sede: "SE TRUJILLO NICOLAS PIEROLA PIEROLA PIEROLA",
-    norden: "990909",
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "E",
-  };
-
-  // Combinar datos de prueba con datos reales
-  const datosFinales =
-    datos && Object.keys(datos).length > 0 ? datosReales : datosPrueba;
-
   const margin = 8;
+  const leftMargin = margin + 25;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
 
-  // 1) Logo a la izquierda
-  const logoW = 60,
-    logoH = 20;
+  // Logo a la izquierda
+  const logoW = 60, logoH = 20;
   const logoY = y + 10;
   try {
     doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
   } catch {
-    doc
-      .setFont("helvetica", "normal")
-      .setFontSize(9)
+    doc.setFont("helvetica", "normal").setFontSize(9)
       .text("Policlinico Horizonte Medic", margin, logoY + 8);
   }
 
-  // 3) Sección de datos del paciente
+  // Sección de datos del paciente
   const datosPacienteY = y + 35;
 
-  // Título "EXAMEN" centrado y con fuente más grande
+  // Título "EXAMEN" centrado
   doc.setFont("helvetica", "normal").setFontSize(15);
   const examTitle = "INFORME DE ELECTROCARDIOGRAMA";
   const examTitleX = pageW / 2;
   doc.text(examTitle, examTitleX, datosPacienteY + 5, { align: "center" });
 
-  // Subrayar el texto del examen - LÍNEA ARRIBA DEL TEXTO
+  // Subrayar el texto del examen
   const examWidth = doc.getTextWidth(examTitle);
   const examX = examTitleX - examWidth / 2;
   doc.setLineWidth(0.3);
   doc.line(examX, datosPacienteY + 6, examX + examWidth, datosPacienteY + 6);
 
-  // Datos del paciente - formato alineado como parámetros EKG
+  // Datos del paciente en formato de tabla
   const pacienteData = [
-    { label: "NOMBRES", value: (datosFinales.nombres || "").toUpperCase() },
-    { label: "APELLIDOS", value: (datosFinales.apellidos || "").toUpperCase() },
-    {
-      label: "FECHA",
-      value: datosFinales.fecha || datosFinales.fechaExamen || "",
-    },
-    {
-      label: "EDAD",
-      value: datosFinales.edad ? `${datosFinales.edad} AÑOS` : "",
-    },
+    { label: "NOMBRES", value: (datos?.nombres || "JUAN CARLOS ALBERTO MARIA JOSE DE LA CRUZ").toUpperCase(), fullWidth: true },
+    { label: "EDAD", value: datos?.edad ? `${datos.edad} AÑOS` : "45 AÑOS" },
+    { label: "CONTRATA", value: datos?.contrata || "EMPRESA CONTRATISTA MEGA CONSTRUCCIONES INTERNACIONALES S.A.C. CON RUC 20123456789" },
+    { label: "EMPRESA", value: datos?.empresa || "COMPAÑÍA MINERA ANTAMINA S.A. - SEDE PRINCIPAL LIMA - PERÚ - SUCURSAL TRUJILLO" },
   ];
 
-  // Usar el mismo formato que los parámetros EKG
-  const colLabelX = margin + 25;
-  const colPuntosX = colLabelX + 35; // columna fija para los ':'
-  const colValueX = colLabelX + 45; // columna fija para los valores
+  // Configuración de la tabla
+  const tableStartX = leftMargin;
+  const tableStartY = datosPacienteY + 20;
+  const tableWidth = pageW - 2 * leftMargin;
+  
+  // Proporciones fijas para las columnas
+  const labelColWidth = tableWidth * 0.25;
+  const valueColWidth = tableWidth * 0.75;
+  
+  const baseRowHeight = 6; // Reducir altura base de las filas
+  const borderWidth = 0.2;
+  const padding = 2;
 
-  let pacienteY = datosPacienteY + 20; // Ajustar posición después del título centrado
-
+  // Dibujar tabla
+  let currentY = tableStartY;
+  
   pacienteData.forEach((item) => {
-    // Label en negrita
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(item.label, colLabelX, pacienteY, { baseline: "top" });
+    const rowY = currentY;
+    
+    // Si es la fila de nombres (fullWidth), usar todo el ancho disponible
+    if (item.fullWidth) {
+      const maxValueWidth = tableWidth - padding * 2;
+      
+      // Calcular altura de fila basada en el contenido
+      let rowHeight = baseRowHeight;
+      let valueLines = [item.value];
+      
+      if (doc.getTextWidth(item.value) > maxValueWidth) {
+        valueLines = doc.splitTextToSize(item.value, maxValueWidth);
+        rowHeight = Math.max(baseRowHeight, valueLines.length * 3.5 + padding);
+      }
+      
+             // Dibujar bordes de la fila completa
+       doc.setDrawColor(0);
+       doc.setLineWidth(borderWidth);
+       
+       // Línea horizontal superior
+       doc.line(tableStartX, rowY, tableStartX + tableWidth, rowY);
+       
+       // Línea vertical entre columnas (separador NOMBRE | DATA)
+       doc.line(tableStartX + tableWidth * 0.25, rowY, tableStartX + tableWidth * 0.25, rowY + rowHeight);
+       
+       // Línea horizontal inferior
+       doc.line(tableStartX, rowY + rowHeight, tableStartX + tableWidth, rowY + rowHeight);
+       
+       // Línea vertical izquierda
+       doc.line(tableStartX, rowY, tableStartX, rowY + rowHeight);
+       
+       // Línea vertical derecha
+       doc.line(tableStartX + tableWidth, rowY, tableStartX + tableWidth, rowY + rowHeight);
 
-    // Dos puntos
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(":", colPuntosX, pacienteY, { baseline: "top" });
+      // Label en negrita (más pequeño para la fila completa)
+      doc.setFont("helvetica", "bold").setFontSize(8);
+      const labelX = tableStartX + padding;
+      doc.text(item.label, labelX, rowY + padding, { 
+        align: "left", 
+        baseline: "top",
+        maxWidth: tableWidth * 0.25 - padding * 2
+      });
 
-    // Valor
-    doc.text(item.value, colValueX, pacienteY, { baseline: "top" });
+      // Valor (usando el resto del ancho)
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      const valueX = tableStartX + tableWidth * 0.25 + padding;
+      
+      // Para valores largos, dividir en múltiples líneas
+      valueLines.forEach((line, lineIndex) => {
+        doc.text(line, valueX, rowY + padding + (lineIndex * 3.5), { 
+          align: "left", 
+          baseline: "top",
+          maxWidth: tableWidth * 0.75 - padding * 2
+        });
+      });
+      
+      currentY += rowHeight;
+    } else {
+      // Para las otras filas, mantener el comportamiento original
+      const maxValueWidth = valueColWidth - padding * 2;
+      
+      // Calcular altura de fila basada en el contenido
+      let rowHeight = baseRowHeight;
+      let valueLines = [item.value];
+      
+      if (doc.getTextWidth(item.value) > maxValueWidth) {
+        valueLines = doc.splitTextToSize(item.value, maxValueWidth);
+        rowHeight = Math.max(baseRowHeight, valueLines.length * 3.5 + padding);
+      }
+      
+      // Dibujar bordes de la fila
+      doc.setDrawColor(0);
+      doc.setLineWidth(borderWidth);
+      
+      // Línea horizontal superior
+      doc.line(tableStartX, rowY, tableStartX + labelColWidth + valueColWidth, rowY);
+      
+      // Línea vertical entre columnas
+      doc.line(tableStartX + labelColWidth, rowY, tableStartX + labelColWidth, rowY + rowHeight);
+      
+      // Línea horizontal inferior
+      doc.line(tableStartX, rowY + rowHeight, tableStartX + labelColWidth + valueColWidth, rowY + rowHeight);
+      
+      // Línea vertical izquierda
+      doc.line(tableStartX, rowY, tableStartX, rowY + rowHeight);
+      
+      // Línea vertical derecha
+      doc.line(tableStartX + labelColWidth + valueColWidth, rowY, tableStartX + labelColWidth + valueColWidth, rowY + rowHeight);
 
-    pacienteY += 4; // Espaciado igual que los parámetros EKG
+      // Label en negrita
+      doc.setFont("helvetica", "bold").setFontSize(9);
+      const labelX = tableStartX + padding;
+      doc.text(item.label, labelX, rowY + padding, { 
+        align: "left", 
+        baseline: "top",
+        maxWidth: labelColWidth - padding * 2
+      });
+
+      // Valor
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      const valueX = tableStartX + labelColWidth + padding;
+      
+      // Para valores largos, dividir en múltiples líneas
+      valueLines.forEach((line, lineIndex) => {
+        doc.text(line, valueX, rowY + padding + (lineIndex * 3.5), { 
+          align: "left", 
+          baseline: "top"
+        });
+      });
+      
+      // Actualizar posición Y para la siguiente fila
+      currentY += rowHeight;
+    }
   });
 
+  // Resto del código (información de sede, número de ficha, bloque de color)...
   // 4) Información de sede y número de ficha pegada al costado del bloque de color
-  const sedeValue = `${datosFinales.sede || ""}`;
-  const sedeX = pageW - margin - 25; // Mover más cerca del bloque de color
+  const sedeValue = `${datos?.sede || ""}`;
+  const sedeX = pageW - margin - 25;
   const sedeY = y + 6;
 
   // Número de ficha primero
-  const fichaNum = `${datosFinales.norden || ""}`;
+  const fichaNum = `${datos?.norden || ""}`;
   const fichaY = sedeY;
 
   // Texto "N° Ficha :" delante del número
@@ -142,13 +204,17 @@ const HeaderInformeElectrocardiograma = (doc, datos) => {
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(`Sede : ${sedeValue}`, sedeX, sedeY2, { align: "right" });
 
+  // Fecha del informe
+  const fechaInformeY = sedeY2 + 8;
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(`Fecha informe : ${datos?.fecha || datos?.fechaExamen || ""}`, sedeX, fechaInformeY, { align: "right" });
+
   // === BLOQUE CÓDIGO DE COLOR ===
-  // Siempre mostrar el bloque de color con datos de prueba
-  const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  // Mostrar el bloque de color usando el color de texto del dato
+  const colorValido = typeof datos?.color === "number" && datos.color >= 1 && datos.color <= 50;
   if (colorValido) {
-    const color = datosFinales.codigoColor || "#008f39";
-    const boxText = (datosFinales.textoColor || "E").toUpperCase(); // Cambiado a "E" para EKG
+    const color = datos?.codigoColor || "#008f39";
+    const boxText = (datos?.textoColor || "E").toUpperCase();
     let boxSize = 15;
     let boxX = pageW - margin - boxSize;
     let boxY = y + 2;

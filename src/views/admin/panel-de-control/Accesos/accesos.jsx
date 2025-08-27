@@ -158,7 +158,8 @@ const filteredData = data.filter((item) => {
     item.nombres.toLowerCase().includes(searchLower) ||
     item.apellidos.toLowerCase().includes(searchLower) ||
     String(item.numDocumento).toLowerCase().includes(searchLower) || // Convertir numDocumento a string
-    item.cargo.toLowerCase().includes(searchLower)
+    item.cargo.toLowerCase().includes(searchLower) ||
+    (item.razonSocial && item.razonSocial.toLowerCase().includes(searchLower))
   );
 });
 
@@ -177,7 +178,7 @@ const filteredData = data.filter((item) => {
         {/* Input para búsqueda */}
         <input
           type="text"
-          placeholder="Buscar por nombre, apellido, DNI o cargo"
+          placeholder="Buscar por nombre, apellido, DNI, cargo o razón social"
           className="p-2 border border-gray-300 rounded-md w-[300px]  mr-4"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -207,6 +208,7 @@ const filteredData = data.filter((item) => {
                   <FontAwesomeIcon icon={getSortIcon('nombres')} className="ml-2" />
                 </th>
                 <th className="border border-gray-300 px-2 py-1">Cargo</th>
+                <th className="border border-gray-300 px-2 py-1">Razón Social</th>
 
               </tr>
             </thead>
@@ -232,6 +234,7 @@ const filteredData = data.filter((item) => {
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.apellidos)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.nombres)}</td>
                   <td className="border border-gray-300 px-2 py-1">{toTitleCase(item.cargo)}</td>
+                  <td className="border border-gray-300 px-2 py-1">{item.razonSocial || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>

@@ -20,8 +20,9 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
 
   const doc = new jsPDF();
   const margin = 8;
+  const leftMargin = margin + 25; // Margen izquierdo estándar
   const pageW = doc.internal.pageSize.getWidth();
-  let y = 80;
+  let y = 100;
 
   // 1) Header
   HeaderInformeElectrocardiograma(doc, datosFinales);
@@ -33,7 +34,7 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
 
   // -------------------------------
   // Función genérica para dibujar filas tipo "Label : Valor"
-  function dibujarFilas(doc, rows, startX, startY, espaciado = 8) {
+  function dibujarFilas(doc, rows, startX, startY, espaciado = 6) {
     const colLabelX = startX;
     const colPuntosX = startX + 35;  // columna fija para los ':'
     const colValueX = startX + 45;   // columna fija para los valores
@@ -60,10 +61,10 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
 
   // -------------------------------
   // 2) Línea divisoria después del header
-  y = y + 10;
+  y = y + 8;
   const lineaDivisoriaY = y;
-  const lineaDivisoriaW = pageW - 2 * (margin + 25);
-  const lineaDivisoriaX = margin + 25;
+  const lineaDivisoriaW = pageW - 2 * leftMargin;
+  const lineaDivisoriaX = leftMargin;
   
   doc.setLineWidth(0.3);
   doc.line(lineaDivisoriaX, lineaDivisoriaY, lineaDivisoriaX + lineaDivisoriaW, lineaDivisoriaY);
@@ -79,11 +80,11 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
     { label: "Q.T.C.", value: obtener("qtc", "N/E") },
     { label: "EJE", value: obtener("eje", "1°") }
   ];
-  y = dibujarFilas(doc, parametrosEKG, margin + 25, y);
+  y = dibujarFilas(doc, parametrosEKG, leftMargin, y);
 
   // -------------------------------
   // 4) Hallazgo y Recomendaciones
-  y += 8; // Espacio después de los parámetros EKG
+  y += 4; // Espacio después de los parámetros EKG
   
   // Función para dibujar sección con label y valor multilínea
   function dibujarSeccion(doc, label, value, startX, startY, maxWidth, isList = false) {
@@ -102,20 +103,20 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
     const valueX = startX + 45; // Posición X para el valor
     
     if (value) {
-              if (isList) {
-          // Para recomendaciones: procesar como lista
-          const items = procesarRecomendaciones(value);
-          items.forEach((item, index) => {
-            // Viñeta
-            doc.text("•", valueX - 5, currentY + (index * 3), { baseline: "top" });
-            // Texto del item
-            const lines = doc.splitTextToSize(item, maxWidth - 5); // Restar espacio de la viñeta
-            lines.forEach((line, lineIndex) => {
-              doc.text(line, valueX, currentY + (index * 3) + (lineIndex * 3), { baseline: "top" });
-            });
-            currentY += (lines.length * 3);
+      if (isList) {
+        // Para recomendaciones: procesar como lista
+        const items = procesarRecomendaciones(value);
+        items.forEach((item, index) => {
+          // Viñeta
+          doc.text("•", valueX - 5, currentY + (index * 3), { baseline: "top" });
+          // Texto del item
+          const lines = doc.splitTextToSize(item, maxWidth - 5); // Restar espacio de la viñeta
+          lines.forEach((line, lineIndex) => {
+            doc.text(line, valueX, currentY + (index * 3) + (lineIndex * 3), { baseline: "top" });
           });
-          return currentY + 5; // 5 puntos de separación
+          currentY += (lines.length * 3);
+        });
+        return currentY + 3; // 3 puntos de separación
       } else {
         // Para hallazgos: texto normal
         const lines = doc.splitTextToSize(value, maxWidth);
@@ -124,11 +125,11 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
         });
         
         // Retornar la posición Y final
-        return currentY + (lines.length * 3.5) + 5; // 5 puntos de separación
+        return currentY + (lines.length * 3.5) + 3; // 3 puntos de separación
       }
     }
     
-    return currentY + 8;
+    return currentY + 4;
   }
   
   // Función para procesar recomendaciones y convertirlas en lista
@@ -152,16 +153,16 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
   
   // Dibujar HALLAZGO
   const hallazgoValue = obtener("hallazgo");
-  const hallazgoMaxWidth = pageW - (margin + 25 + 45) - margin - 10;
-  y = dibujarSeccion(doc, "HALLAZGO", hallazgoValue, margin + 25, y, hallazgoMaxWidth);
+  const hallazgoMaxWidth = pageW - (leftMargin + 45) - margin - 10;
+  y = dibujarSeccion(doc, "HALLAZGO", hallazgoValue, leftMargin, y, hallazgoMaxWidth);
   
   // Dibujar RECOMENDACIONES
   const recomendacionesValue = obtener("recomendaciones");
-  y = dibujarSeccion(doc, "RECOMENDACIONES", recomendacionesValue, margin + 25, y, hallazgoMaxWidth, true);
+  y = dibujarSeccion(doc, "RECOMENDACIONES", recomendacionesValue, leftMargin, y, hallazgoMaxWidth, true);
 
   // -------------------------------
   // 5) Sello Profesional
-  y += 20; // Espacio después de las recomendaciones
+  y += 12; // Espacio después de las recomendaciones
   
   // Agregar sello profesional centrado
   const selloY = y;
@@ -186,7 +187,7 @@ export default function InformeElectrocardiograma_Digitalizado  (data = {}) {
 
   // -------------------------------
   // 6) Footer con línea divisoria
-  y += selloH + 15; // Espacio después del sello
+  y += selloH + 8; // Espacio después del sello
   
 
   // Footer con información usando footerTR
