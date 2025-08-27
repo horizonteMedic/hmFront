@@ -5,6 +5,7 @@ import { faTint, faSquare, faCube, faLayerGroup, faThLarge, faLeaf, faFlask, faP
 import { Loading } from '../../../../../components/Loading';
 import Panel10D from './Panel10D/Panel10D';
 import Panel5D from './Panel5D/Panel5D';
+import Panel4D from './Panel4D/Panel4D';
 import Panel3D from './Panel3D/Panel3D';
 import Panel2D from './Panel2D/Panel2D';
 import MuestraDeSangre from './MuestraDeSangre/MuestraDeSangre';
@@ -23,9 +24,11 @@ const Consentimientos = ({ token, selectedSede, userlogued, permiso }) => {
       permiso: 'Acceso Cons - Panel 2D', component: <Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Panel 3D',       icon: faCube,vista: 'Consentimientos',
       permiso: 'Acceso Cons - Panel 3D',   component: <Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
+    { label: 'Panel 4D',       icon: faThLarge,vista: 'Consentimientos',
+      permiso: 'Acceso Cons - Panel 4D',   component: <Panel4D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Panel 5D',       icon: faLayerGroup,vista: 'Consentimientos',
       permiso: 'Acceso Cons - Panel 5D', component: <Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
-    { label: 'Panel 10D',      icon: faThLarge,vista: 'Consentimientos',
+    { label: 'Panel 10D',      icon: faLayerGroup,vista: 'Consentimientos',
       permiso: 'Acceso Cons - Panel 10D', component: <Panel10D token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
     { label: 'Cons. Marihuana',icon: faLeaf,vista: 'Consentimientos',
       permiso: 'Acceso Cons - Cons. Marihuana',   component: <ConsMarihuana token={token} selectedSede={selectedSede} userlogued={userlogued} /> },
