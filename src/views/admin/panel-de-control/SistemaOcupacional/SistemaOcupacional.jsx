@@ -112,6 +112,7 @@ const TabComponent = () => {
   const userlogued = useAuthStore((state) => state.userlogued);
   const Vista = useAuthStore((state) => state.listView);
   const Acceso = useAuthStore((state) => state.listAccesos);
+  console.log(Acceso)
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [labTab, setLabTab] = useState(0); // Para tabs internos de Laboratorio
   const [activeTabExamenes, setActiveTabExamenes] = useState(1); // Para ExamenesLaboratorio
