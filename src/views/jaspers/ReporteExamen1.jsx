@@ -156,6 +156,60 @@ export default function ReporteExamen1 (datos){
         // === AGREGAR SEGUNDA PÁGINA ===
         doc.addPage();
         
+        // Mostrar código de color solo en la página 2, 10 puntos más arriba
+        const pageW = doc.internal.pageSize.getWidth();
+        const margin = 15;
+        const yOffset = 0; // 10 puntos más arriba (cambiado de 10 a 0)
+        
+        // Código de color usando datos reales
+        const color = datos.codigoColor || "#008f39"; // Usar color real o verde por defecto
+        const boxText = (datos.textoColor || "F").toUpperCase(); // Usar texto real o "F" por defecto
+        
+        const boxSize = 15;
+        const boxX = pageW - margin - boxSize + 7; // 5 puntos a la derecha
+        const boxY = yOffset + 2;
+        
+        // Draw box outline in black
+        doc.setDrawColor(0);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+
+        // Línea de color
+        doc.setDrawColor(color);
+        doc.setLineWidth(2);
+        doc.setLineCap('round');
+        doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+        doc.setLineCap('butt');
+        
+        // Texto del código
+        doc.setFontSize(20); // Aumentado de 18 a 20 (2 puntos más grande)
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(color);
+        doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+          align: "center",
+          baseline: "middle",
+          maxWidth: boxSize - 1
+        });
+        
+        // Número de color al lado izquierdo
+        doc.setFontSize(60);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(255, 0, 0); // Rojo
+        const numeroColor = datos.color || "4";
+        
+        // Coordenadas individuales para el número de color
+        const numeroColorX = boxX - 15;
+        const numeroColorY = boxY + boxSize/2;
+        
+        doc.text(String(numeroColor), numeroColorX, numeroColorY, { 
+          align: "center",
+          baseline: "middle"
+        });
+        
+        // Reset color settings
+        doc.setDrawColor(0);
+        doc.setTextColor(0);
+        
         // Agregar la imagen de la hoja de ruta en la mitad superior de la página 2
         try {
             const imgPath = "./img/pag2_hojaderuta.png";
@@ -194,32 +248,96 @@ export default function ReporteExamen1 (datos){
             doc.setFont("helvetica", "normal");
             doc.setFontSize(9);
             
-            // TIPO DE EXAMEN
+            // TIPO DE EXAMEN - Solo abreviar en página 2 (autónomo)
             doc.setFontSize(8.5);
-            doc.text(String(datos.examen || "EXAMEN OCUPACIONAL"), 30,25.3);
+            
+            // Función abreviadora autónoma para página 2
+            const abreviarExamenPagina2 = (examen) => {
+                if (!examen) return "EXAMEN";
+                
+                const examenLower = examen.toLowerCase();
+                
+                // Mapeo de abreviaciones específicas para página 2
+                if (examenLower.includes("psicosensometria") || examenLower.includes("psicosensometría")) return "PSICO";
+                if (examenLower.includes("anexo16-a")) return "ANX16-A";
+                if (examenLower.includes("anexo16")) return "ANX16";
+                if (examenLower.includes("anual")) return "ANUAL";
+                if (examenLower.includes("pre-ocupacional") || examenLower.includes("preocupacional")) return "PRE-OC";
+                if (examenLower.includes("ocupacional")) return "OCUP";
+                if (examenLower.includes("periodico") || examenLower.includes("periódico")) return "PER";
+                if (examenLower.includes("retiro")) return "RETIRO";
+                if (examenLower.includes("reingreso")) return "REING";
+                if (examenLower.includes("post-ocupacional")) return "POST-OC";
+                
+                // Si no hay mapeo específico, truncar a 7 caracteres máximo
+                return examen.substring(0, 7).toUpperCase();
+            };
+            
+            // Solo aplicar abreviación en página 2 si hay datos reales del backend
+            if (datos.examen) {
+                const examenParaPagina2 = abreviarExamenPagina2(datos.examen);
+                doc.text(examenParaPagina2, 30, 25.3);
+            } else {
+                // Si no hay datos del backend, mostrar valor de prueba
+                const examenPrueba = "PRE-OC";
+                doc.text(examenPrueba, 31, 25.5);
+            }
+            
             doc.setFontSize(9); // Restaurar tamaño de fuente para los siguientes campos
             
             // EMPRESA - Con ancho máximo y ajuste de posición Y hacia arriba
             const empresaTexto = String(datos.empresa || "EMPRESA NO ESPECIFICADA ");
-            const empresaMaxWidth = 50; // Ancho máximo para empresa
-            const empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
-            const empresaY = 25.3; // Posición Y base (última línea)
+            const empresaMaxWidth = 62; // Ancho máximo para empresa
+            let empresaLines;
+            
+            // Si excede de 2 líneas, usar ancho 70 solo para la primera línea
+            if (doc.splitTextToSize(empresaTexto, empresaMaxWidth).length > 2) {
+                // Primera línea con ancho 70, resto con ancho normal
+                const primeraLinea = doc.splitTextToSize(empresaTexto, 80)[0];
+                const restoTexto = empresaTexto.substring(primeraLinea.length).trim();
+                const restoLineas = doc.splitTextToSize(restoTexto, empresaMaxWidth);
+                empresaLines = [primeraLinea, ...restoLineas];
+            } else {
+                empresaLines = doc.splitTextToSize(empresaTexto, empresaMaxWidth);
+            }
+            
+            const empresaX = 64; // Posición X específica para empresa (movida a la izquierda)
+            const empresaY = 25.5; // Posición Y base (última línea)
+            
+            // Reducir fuente si pasa de 3 líneas
+            if (empresaLines.length > 2) {
+                doc.setFontSize(8); // Reducir de 9 a 8
+            }
+            
             empresaLines.forEach((line, index) => {
                 // Calcular Y para que la última línea esté en empresaY y las anteriores arriba
                 const lineY = empresaY - ((empresaLines.length - 1 - index) * 3);
-                doc.text(line, 85.5, lineY);
+                doc.text(line, empresaX, lineY);
             });
+            
+            // Restaurar fuente para contrata
+            doc.setFontSize(9);
             
             // CONTRATA - Con ancho máximo y ajuste de posición Y hacia arriba
             const contrataTexto = String(datos.contrata || "CONTRATA NO ESPECIFICADA");
-            const contrataMaxWidth = 50; // Ancho máximo para contrata
+            const contrataMaxWidth = 62; // Ancho máximo para contrata
             const contrataLines = doc.splitTextToSize(contrataTexto, contrataMaxWidth);
-            const contrataY = 25.3; // Posición Y base (última línea)
+            const contrataX = 120; // Posición X específica para contrata (movida a la izquierda)
+            const contrataY = 25.5; // Posición Y base (última línea)
+            
+            // Reducir fuente si pasa de 3 líneas
+            if (contrataLines.length > 2) {
+                doc.setFontSize(8); // Reducir de 9 a 8
+            }
+            
             contrataLines.forEach((line, index) => {
                 // Calcular Y para que la última línea esté en contrataY y las anteriores arriba
                 const lineY = contrataY - ((contrataLines.length - 1 - index) * 3);
-                doc.text(line, 155, lineY);
+                doc.text(line, 143, lineY); // Cambiado de 155 a 110 para mover más a la izquierda
             });
+            
+            // Restaurar fuente para los siguientes campos
+            doc.setFontSize(9);
             
             // NOMBRES Y APELLIDOS
             doc.setFontSize(10);
@@ -238,7 +356,7 @@ export default function ReporteExamen1 (datos){
             
             // CARGO - Con ancho máximo y ajuste de posición Y hacia arriba
             const cargoTexto = String(datos.cargo || "CARGO NO ESPECIFICADO");
-            const cargoMaxWidth = 48; // Ancho máximo para cargo
+            const cargoMaxWidth = 45; // Ancho máximo para cargo
             const cargoLines = doc.splitTextToSize(cargoTexto, cargoMaxWidth);
             const cargoY = 37.8; // Posición Y base (última línea)
             cargoLines.forEach((line, index) => {

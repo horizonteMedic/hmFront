@@ -50,7 +50,7 @@ import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/S
 import EKG from "./views/admin/panel-de-control/SistemaOcupacional/EKG/ekg.jsx";
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Audiometria/CuestionarioAudiometria_Digitalizado.jsx"
+import Ficha from "./views/jaspers/ReporteExamen1.jsx"
 
 const App = () => {
   return (

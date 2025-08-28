@@ -341,6 +341,7 @@ const TabComponent = () => {
               )}
               {tieneVista("EKG") && (
                 <div
+                  onClick={() => setActiveTab(13)}
                   className={`${styles.gridItem} ${
                     activeTab === 13 ? styles.active : ""
                   }`}
@@ -938,6 +939,21 @@ const TabComponent = () => {
               <RayosXTabSelector tieneVista={tieneVista} />
             </div>
           )}
+          {activeTab === 13 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div>
+                <EKG />
+              </div>
+            </div>
+          )}
           {activeTab === 15 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -1118,7 +1134,7 @@ const TabComponent = () => {
                   Evaluación Musculoesquelética
                 </h2>
               </div>
-              <MusculoEsqueleticoTabSelector tieneVista={tieneVista}/>
+              <MusculoEsqueleticoTabSelector tieneVista={tieneVista} />
             </div>
           )}
           {activeTab === 23 && (
@@ -1149,7 +1165,7 @@ const TabComponent = () => {
                   Playground
                 </h2>
               </div>
-              <EKG />
+              <ManejoCamara />
             </div>
           )}
         </div>
@@ -1186,6 +1202,10 @@ const TabComponent = () => {
               break;
             case "Rayos X":
               setActiveTab(12);
+              setSubTab(0);
+              break;
+            case "EKG":
+              setActiveTab(13);
               setSubTab(0);
               break;
             case "Espirometria":
