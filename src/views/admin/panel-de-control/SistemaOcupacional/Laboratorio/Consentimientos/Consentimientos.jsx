@@ -77,7 +77,7 @@ const Consentimientos = ({ token, selectedSede, userlogued, permiso }) => {
       </div>
       </div>
       <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg">
-        {tabs[activeTab].component}
+        {tabsConPermiso[activeTab].component}
       </div>
     </div>
   );
