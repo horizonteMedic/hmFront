@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare, faCube, faLayerGroup, faThLarge } from '@fortawesome/free-solid-svg-icons';
 import Resultado_Panel2D from './Panel2D/Resultado_Panel2D';
 import Resultado_Panel3D from './Panel3D/Resultado_Panel3D';
-import Resultado_Panel4D from './Panel4D/Resultado_Panel4D';
+// import Resultado_Panel4D from './Panel4D/Resultado_Panel4D';
 import Resultado_Panel5D from './Panel5D/Resultado_Panel5D';
 import Resultado_Panel10D from './Panel10D/Resultado_Panel10D';
 
@@ -16,8 +16,8 @@ const Toxicologia = ({token, selectedSede, userlogued, permiso}) => {
       permiso: 'Acceso Tox - Panel 2D', component: <Resultado_Panel2D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
     { label: 'Panel 3D', icon: faThLarge, vista: 'Toxicologia',
       permiso: 'Acceso Tox - Panel 3D', component: <Resultado_Panel3D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
-    { label: 'Panel 4D', icon: faSquare, vista: 'Toxicologia',
-      permiso: 'Acceso Tox - Panel 4D', component: <Resultado_Panel4D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
+    // { label: 'Panel 4D', icon: faSquare, vista: 'Toxicologia',
+    //   permiso: 'Acceso Tox - Panel 4D', component: <Resultado_Panel4D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
     { label: 'Panel 5D', icon: faLayerGroup, vista: 'Toxicologia',
       permiso: 'Acceso Tox - Panel 5D', component: <Resultado_Panel5D token={token} selectedSede={selectedSede} userlogued={userlogued}/> },
     { label: 'Panel 10D', icon: faLayerGroup, vista: 'Toxicologia',
