@@ -31,7 +31,7 @@ const initialFormState = {
   contrata: "",
   empresa: "",
 
-  informeCompleto: true,
+  informeCompleto: false,
   ritmo: "SINUSAL",
   fc: "",
   eje: "",
