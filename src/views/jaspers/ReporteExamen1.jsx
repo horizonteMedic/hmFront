@@ -191,11 +191,14 @@ export default function ReporteExamen1 (datos){
           maxWidth: boxSize - 1
         });
         
-        // Número de color al lado izquierdo
+        // Número de color al lado izquierdo - AHORA USANDO EL NÚMERO DE ORDEN DEL REGISTRO
         doc.setFontSize(60);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(255, 0, 0); // Rojo
-        const numeroColor = datos.color || "4";
+        
+        // Usar el número de orden del registro en lugar del color de la API
+        // Si no viene el número de orden, usar el color como fallback
+        const numeroColor = datos.numeroOrden || datos.color || "1";
         
         // Coordenadas individuales para el número de color
         const numeroColorX = boxX - 15;
