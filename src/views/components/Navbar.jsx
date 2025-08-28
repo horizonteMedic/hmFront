@@ -38,10 +38,10 @@ const Navbar = () => {
   };
 
   const filteredNavLinks = [
-    { to: "/roles", name: "Menú de Roles", label: "Roles", icon: faUser },
-    { to: "/accesos", name: "Menú de Accesos", label: "Accesos", icon: faLock },
-    { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
-    { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
+    // { to: "/roles", name: "Menú de Roles", label: "Roles", icon: faUser },
+    // { to: "/accesos", name: "Menú de Accesos", label: "Accesos", icon: faLock },
+    // { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
+    // { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
     // { to: "/ekg", name: "Electrocardiograma", label: "EKG", icon: faHeartbeat },
     // { to: "/musculoesqueletico", name: "Evaluación Musculoesquelética", label: "Musculoesquelético", icon: faNotesMedical },

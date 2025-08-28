@@ -403,8 +403,8 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
       const selloBase64 = canvas.toDataURL('image/png');
 
       // ===== Dimensiones máximas permitidas =====
-      const maxImgW = 30; // ancho máximo del sello
-      const maxImgH = 20; // alto máximo del sello
+      const maxImgW = 50; // ancho máximo del sello
+      const maxImgH = 30; // alto máximo del sello
 
       // ===== Escalado proporcional =====
       let imgW = s1.width;
@@ -436,8 +436,8 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
     const lineEnd = 80;
     const lineMid = (lineStart + lineEnd) / 2; // punto medio en X
     // ===== Tamaño máximo permitido =====
-    const maxImgW = 20;
-    const maxImgH = 20;
+    const maxImgW = 25;
+    const maxImgH = 25;
 
     doc.line(lineStart, FirmaY, lineEnd, FirmaY);
     doc.text("Firma del Trabajador Evaluado", 26, FirmaY + 4);
@@ -447,13 +447,14 @@ export default function TestFatigaSomnolenia_Digitalizado_boro(datos = {}) {
 
     if (s2) {
       const centerX = (lineStart + lineMid) / 2; // punto medio de la izquierda
-      addScaledImage(doc, s2, maxImgW, maxImgH, centerX, FirmaY);
+      addScaledImage(doc, s2, maxImgW+10, maxImgH+10, centerX+10, FirmaY);
+
     }
 
     // ===== Agregar s3 (derecha del medio) =====
     if (s3) {
       const centerX = (lineMid + lineEnd) / 2; // punto medio de la derecha
-      addScaledImage(doc, s3, maxImgW, maxImgH, centerX, FirmaY);
+      addScaledImage(doc, s3, maxImgW, maxImgH, centerX+20, FirmaY);
     }
     footer_TestFatiga(doc, datos)
 

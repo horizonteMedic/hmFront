@@ -601,14 +601,41 @@ const AperturaExamenesPreOcup = (props) => {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
             const datos = await GetDatoHR(HC)
-            Swal.fire({
-              title: "Hoja de Ruta",
-              text: "¿Desea Imprimir?.",
-              icon: "success",
-              cancelButtonText: "Cancelar"
-            }).then((result) => {
-              if (result.isConfirmed) module.default(datos);
-            });
+            
+            // Obtener la fecha del registro que se va a imprimir
+            const registroActual = searchHC.find(item => item.n_orden === HC);
+            const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
+            
+            if (fechaRegistro) {
+              // Filtrar registros de la misma fecha del registro
+              const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
+              
+              // Buscar la posición del registro en la lista filtrada de esa fecha
+              const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
+              const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+              
+              // Agregar el número de orden a los datos
+              const datosConOrden = {
+                ...datos,
+                numeroOrden: numeroOrden
+              };
+              
+              Swal.fire({
+                title: "Hoja de Ruta",
+                text: "¿Desea Imprimir?.",
+                icon: "success",
+                cancelButtonText: "Cancelar"
+              }).then((result) => {
+                if (result.isConfirmed) module.default(datosConOrden);
+              });
+            } else {
+              // Fallback si no se encuentra el registro
+              Swal.fire({
+                title: "Error",
+                text: "No se pudo determinar la fecha del registro",
+                icon: "error"
+              });
+            }
           } else {
             console.warn('El módulo no exporta una función por defecto');
           }
@@ -660,13 +687,32 @@ const AperturaExamenesPreOcup = (props) => {
           const module = await jasperModules[filePath](); // carga el módulo
           if (typeof module.default === 'function') {
             const datos = await GetDatoHR(HC)
-            Swal.fire({
-              title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>` ,
-              html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>` ,
-              icon: 'question',
-              background: '#f0f6ff',
-              color: '#22223b',
-              showCancelButton: true,
+            
+            // Obtener la fecha del registro que se va a imprimir
+            const registroActual = searchHC.find(item => item.n_orden === HC);
+            const fechaRegistro = registroActual ? registroActual.fecha_apertura_po : null;
+            
+            if (fechaRegistro) {
+              // Filtrar registros de la misma fecha del registro
+              const registrosMismaFecha = searchHC.filter(item => item.fecha_apertura_po === fechaRegistro);
+              
+              // Buscar la posición del registro en la lista filtrada de esa fecha
+              const indiceRegistro = registrosMismaFecha.findIndex(item => item.n_orden === HC);
+              const numeroOrden = indiceRegistro !== -1 ? registrosMismaFecha.length - indiceRegistro : 1;
+              
+              // Agregar el número de orden a los datos
+              const datosConOrden = {
+                ...datos,
+                numeroOrden: numeroOrden
+              };
+              
+              Swal.fire({
+                title: `<span style='font-size:1.3em;font-weight:bold;'>¿Desea Imprimir Hoja de Ruta?</span>` ,
+                html: `<div style='font-size:1.1em;'>N° <b style='color:#2563eb;'>${HC}</b> - <span style='color:#0d9488;font-weight:bold;'>${nombres}</span></div>` ,
+                icon: 'question',
+                background: '#f0f6ff',
+                color: '#22223b',
+                showCancelButton: true,
               confirmButtonText: 'Sí, Imprimir',
               cancelButtonText: 'Cancelar',
               customClass: {
@@ -683,8 +729,16 @@ const AperturaExamenesPreOcup = (props) => {
                 popup: 'animate__animated animate__fadeOutUp'
               }
             }).then((result) => {
-              if (result.isConfirmed) module.default(datos);
+              if (result.isConfirmed) module.default(datosConOrden);
             });
+            } else {
+              // Fallback si no se encuentra el registro
+              Swal.fire({
+                title: "Error",
+                text: "No se pudo determinar la fecha del registro",
+                icon: "error"
+              });
+            }
           } else {
             console.warn('El módulo no exporta una función por defecto');
           }

@@ -147,22 +147,22 @@ const AppContent = () => {
           />
           <Route path="/protocolos" element={<Protocolos />} />
           <Route path="/SistemaOcupacional" element={<SistemaOcupacional />} />
-          <Route path="/odontologia" element={<Odontologia />} />
+          {/* <Route path="/odontologia" element={<Odontologia />} />
           <Route
             path="/SistemaOcupacional/odontologia"
             element={<Odontologia />}
-          />
-          <Route
+          /> */}
+          {/* <Route
             path="/HistoriaOcupacional"
             element={<HistoriaOcupacional />}
-          />
-                  <Route path="/rayosx" element={<RayosXTabSelector />} />
-        <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} />
+          /> */}
+                  {/* <Route path="/rayosx" element={<RayosXTabSelector />} />
+        <Route path="/consentimiento-informado" element={<ConsentimientoInformadoOcupacional />} /> */}
       </Route>
-      <Route path="/Espirometria" element={<Espirometria />} />
+      {/* <Route path="/Espirometria" element={<Espirometria />} />
       <Route path="/Oftalmologia" element={<OftalmologiaTabSelector />} />
       <Route path="/musculoesqueletico" element={<MusculoEsqueleticoTabSelector />} />
-      <Route path="/ekg" element={<EKG />} />
+      <Route path="/ekg" element={<EKG />} /> */}
       <Route path="/RegistroP" element={<Formulario />} />
       <Route
         path="/libro-de-reclamaciones"
