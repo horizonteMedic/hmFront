@@ -1,150 +1,310 @@
-import headerAnexoCB_boro from "./Header/Header_AnexoCB_boro_Digitalizado";
+import jsPDF from "jspdf";
 
-/**
- * AnexoCB_boro_Digitalizado - Documento completo con header y tabla de datos del paciente
- * @param {jsPDF} doc - Instancia de jsPDF
- * @param {Object} datos - Datos del documento y paciente
- */
-const AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidos: "DELGADO VEGA",
-    nombres: "VIVIANA AYDE",
-    dni: "75461024",
-    fechaNacimiento: "19/03/2000",
-    edad: "25",
-    sexo: "FEMENINO",
-    direccion: "AV. EL PELIGRO",
-    empresaContratista: "CORPORACION PERUANA DE CENTROS MEDICOS SAC",
-    empresa: "MONARCA GOLD S.A.C.",
-    actividadRealizar: "CAPATAZ",
-    sede: "Trujillo-Pierola",
-    norden: "99164",
-    color: 1,
-    codigoColor: "#FFA500",
-    textoColor: "T"
+export default function GenerarDatosPaciente(data = {}) {
+  const datos = {
+    apellidos: data.apellidos ?? "DELGADO VEGA",
+    nombres: data.nombres ?? "VIVIANA AYDE",
+    dni: data.dni ?? "75461024",
+    fechaNacimiento: data.fechaNacimiento ?? "19/03/2000",
+    edad: data.edad ?? "25 AÑOS",
+    sexo: data.sexo ?? "FEMENINO",
+    direccion: data.direccion ?? "AV. EL PELIGRO",
+    empresaContratista:
+      data.empresaContratista ??
+      "ESTA ES UNA EMPRESA SUPER LARGA PARA PROBAR EL AJUSTE DE TEXTO AUTOMÁTICO",
+    empresa: data.empresa ?? "MONARCA GOLD S.A.C.",
+    actividadRealizar: data.actividadRealizar ?? "CAPATAZ",
+    antecedentes: data.antecedentes ?? [
+      { texto: "Accidente cerebrovascular", si: true, no: false },
+      { texto: "Angina inestable", si: true, no: false },
+      { texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent", si: true, no: false },
+      { texto: "Antecedente de edema cerebral de altura", si: true, no: false },
+      { texto: "Antecendente de edema pulmonar de altura", si: true, no: false },
+      { texto: "Antecedente de Neumotórax en los ultimos 6 meses", si: true, no: false },
+      { texto: "Arritmia cardiaca no controlada", si: true, no: false },
+      { texto: "Cardiomiopatía hipertrófica idiopática", si: false, no: true },
+      { texto: "Cirugía mayor en los últimos 30 días", si: false, no: true },
+      { texto: "Cualquier insuficiencia en la válvula aórtica", si: true, no: false },
+      { texto: "Diabetes Mellitus", si: true, no: false },
+      { texto: "Embarazo", si: true, no: false },
+      { texto: "Epilepsia", si: true, no: false },
+      { texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada", si: true, no: false },
+      { texto: "Eritrocitosis excesiva (mal de montaña crónico)", si: true, no: false },
+      { texto: "Hipertensión arterial", si: true, no: false },
+      { texto: "Hipertensión pulmonar", si: true, no: false },
+      { texto: "Infarto al miocardio en los últimos 6 meses", si: true, no: false },
+      { texto: "Insuficiencia cardíaca congestiva", si: true, no: false },
+      { texto: "Patología hemorrágica de retina", si: true, no: false },
+      { texto: "Patología Valvular Cardiáca en tratamiento", si: false, no: true },
+      { texto: "Presencia de marcapasos", si: false, no: true },
+      { texto: "Presencia de riesgo cardiovascular alto", si: true, no: false },
+      { texto: "Trastornos de la coagulación", si: false, no: true },
+      { texto: "Trombosis venosa cerebral", si: false, no: true },
+      { texto: "Otros", si: true, no: false },
+    ],
   };
 
-  // Combinar datos de prueba con datos reales
-  const datosFinales = datos && Object.keys(datos).length > 0 ? datos : datosPrueba;
+  const doc = new jsPDF();
+  const leftMargin = 10;
+  let y = 20;
 
-  // === HEADER ===
-  headerAnexoCB_boro(doc, datosFinales);
+  // ===== TÍTULO =====
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.rect(leftMargin, y, 190, 6);
+  doc.text("DATOS DEL PACIENTE", leftMargin + 70, y + 4);
+  y += 6;
 
-  const margin = 8;
-  const pageW = doc.internal.pageSize.getWidth();
-  let y = 50; // Empezar después del header
+  // ===== FILA 1: Apellidos - Nombres =====
+  doc.setFontSize(8);
+  doc.rect(leftMargin, y, 95, 6);
+  doc.text("Apellidos :", leftMargin + 2, y + 4);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.apellidos, leftMargin + 25, y + 4);
 
-  // === TÍTULO "DATOS DEL PACIENTE" ===
-  const tituloY = y;
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  const titulo = "DATOS DEL PACIENTE";
-  const tituloX = pageW / 2;
-  doc.text(titulo, tituloX, tituloY, { align: "center" });
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin + 95, y, 95, 6);
+  doc.text("Nombres :", leftMargin + 97, y + 4);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.nombres, leftMargin + 120, y + 4);
+  y += 6;
 
-  // === TABLA DE DATOS DEL PACIENTE ===
-  const tablaY = tituloY + 8;
-  const tableX = margin + 20;
-  const tableY = tablaY;
-  const tableW = pageW - 2 * (margin + 20);
-  const tableH = 32; // Altura para 4 filas
+  // ===== FILA 2: DNI - Fecha Nacimiento - Edad - Sexo =====
+  const row2Height = 8;
+  const colDNI = 40, colFecha = 70, colEdad = 30, colSexo = 50;
 
-  // Marco de la tabla
-  doc.setLineWidth(0.5);
-  doc.rect(tableX, tableY, tableW, tableH);
+  doc.rect(leftMargin, y, colDNI, row2Height);
+  doc.setFont("helvetica", "bold");
+  doc.text("DNI :", leftMargin + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.dni, leftMargin + 2, y + 6);
 
-  // Líneas horizontales internas para separar las 4 filas
-  doc.line(tableX, tableY + 8, tableX + tableW, tableY + 8);   // Fila 1
-  doc.line(tableX, tableY + 16, tableX + tableW, tableY + 16); // Fila 2
-  doc.line(tableX, tableY + 24, tableX + tableW, tableY + 24); // Fila 3
+  doc.rect(leftMargin + colDNI, y, colFecha, row2Height);
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha Nacimiento(dd/mm/aa)", leftMargin + colDNI + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.fechaNacimiento, leftMargin + colDNI + 2, y + 6);
 
-  // Líneas verticales para separar columnas
-  // Fila 1: Apellidos (50%) + Nombres (50%)
-  const col1W = tableW * 0.5;
-  doc.line(tableX + col1W, tableY, tableX + col1W, tableY + 8);
+  doc.rect(leftMargin + colDNI + colFecha, y, colEdad, row2Height);
+  doc.setFont("helvetica", "bold");
+  doc.text("Edad :", leftMargin + colDNI + colFecha + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.edad, leftMargin + colDNI + colFecha + 2, y + 6);
 
-  // Fila 2: DNI (25%) + Fecha Nacimiento (25%) + Edad (25%) + Sexo (25%)
-  const col2W = tableW * 0.25;
-  doc.line(tableX + col2W, tableY + 8, tableX + col2W, tableY + 16);
-  doc.line(tableX + col2W * 2, tableY + 8, tableX + col2W * 2, tableY + 16);
-  doc.line(tableX + col2W * 3, tableY + 8, tableX + col2W * 3, tableY + 16);
+  doc.rect(leftMargin + colDNI + colFecha + colEdad, y, colSexo, row2Height);
+  doc.setFont("helvetica", "bold");
+  doc.text("Sexo :", leftMargin + colDNI + colFecha + colEdad + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.sexo, leftMargin + colDNI + colFecha + colEdad + 2, y + 6);
+  y += row2Height;
 
-  // Fila 3: Dirección (100%)
-  // No necesita líneas verticales
+  // ===== FILA 3: Dirección =====
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin, y, 190, 6);
+  doc.text("Dirección :", leftMargin + 2, y + 4);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.direccion, leftMargin + 25, y + 4);
+  y += 6;
 
-  // Fila 4: Empresa Contratista (33.33%) + Empresa (33.33%) + Actividad (33.33%)
-  const col4W = tableW / 3;
-  doc.line(tableX + col4W, tableY + 16, tableX + col4W, tableY + 24);
-  doc.line(tableX + col4W * 2, tableY + 16, tableX + col4W * 2, tableY + 24);
+  // ===== FILA 4: Empresa Contratista - Empresa - Actividad =====
+  const row4Height = 15;
+  const colContratista = 70, colEmpresa = 60, colActividad = 60;
 
-  // Contenido de la tabla
+  // Empresa Contratista
+  doc.rect(leftMargin, y, colContratista, row4Height);
+  doc.setFont("helvetica", "bold");
+  doc.text("Empresa Contratista :", leftMargin + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  let textoContratista = doc.splitTextToSize(datos.empresaContratista, colContratista - 4);
+  doc.text(textoContratista, leftMargin + 2, y + 8);
+
+  // Empresa
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin + colContratista, y, colEmpresa, row4Height);
+  doc.text("Empresa :", leftMargin + colContratista + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  let textoEmpresa = doc.splitTextToSize(datos.empresa, colEmpresa - 4);
+  doc.text(textoEmpresa, leftMargin + colContratista + 2, y + 8);
+
+  // Actividad a Realizar
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin + colContratista + colEmpresa, y, colActividad, row4Height);
+  doc.text("Actividad a Realizar :", leftMargin + colContratista + colEmpresa + 2, y + 3);
+  doc.setFont("helvetica", "normal");
+  let textoActividad = doc.splitTextToSize(datos.actividadRealizar, colActividad - 4);
+  doc.text(textoActividad, leftMargin + colContratista + colEmpresa + 2, y + 8);
+  y += row4Height + 0;
+
+  // ===== TABLA ANTECEDENTES PATOLÓGICOS =====
+  const colTexto = 170, colNo = 10, colSi = 10;
+  doc.setFont("helvetica", "bold");
+
+  // Encabezados
+  doc.rect(leftMargin, y, colTexto, 8);
+  doc.text("ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
+
+  doc.rect(leftMargin + colTexto, y, colNo, 8);
+  doc.text("NO", leftMargin + colTexto + 2, y + 5);
+
+  doc.rect(leftMargin + colTexto + colNo, y, colSi, 8);
+  doc.text("SI", leftMargin + colTexto + colNo + 2, y + 5);
+
+  y += 8;
+
+  doc.setFont("helvetica", "normal");
+  datos.antecedentes.forEach((item) => {
+    let textoDividido = doc.splitTextToSize(item.texto, colTexto - 4);
+    let altura = textoDividido.length * 4 + 1;
+
+    // Texto
+    doc.rect(leftMargin, y, colTexto, altura);
+    doc.text(textoDividido, leftMargin + 2, y + 3.5);
+
+    // NO
+    doc.rect(leftMargin + colTexto, y, colNo, altura);
+    if (item.no === true) doc.text("X", leftMargin + colTexto + 3, y + 3);
+
+    // SI
+    doc.rect(leftMargin + colTexto + colNo, y, colSi, altura);
+    if (item.si === true) doc.text("X", leftMargin + colTexto + colNo + 3, y + 3);
+
+    y += altura;
+  });
+
+    // ===== COMENTARIOS DEL MÉDICO =====
+  // y += 1;
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin, y, 190, 8);
+  doc.text("Comentarios del Médico :", leftMargin + 2, y + 4);
+  y += 8;
+   
+  // Variables para firma de prueba en comentarios
+  const firmaPruebaX = leftMargin + 55;
+  const firmaPruebaY = y -15;
+  const firmaPruebaWidth = 40;
+  const firmaPruebaHeight = 22;
+  
+  // Variables para huella digital en comentarios
+  const huellaDigitalX = leftMargin + 99;
+  const huellaDigitalY = y - 15;
+  const huellaDigitalWidth = 25;
+  const huellaDigitalHeight = 18;
+  
+  // Agregar firma de prueba y huella flotantes
+  doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaPruebaX, firmaPruebaY, firmaPruebaWidth, firmaPruebaHeight);
+  // doc.text("PRUEBA", leftMargin + 135, y);
+   
+  // Agregar huella digital (ajustada para que salga vertical)
+  // Intercambiamos width y height para que la huella salga vertical
+  doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaDigitalX, huellaDigitalY, huellaDigitalHeight, huellaDigitalWidth);
+  y += 5;
+
+  // ===== CERTIFICACIÓN DE APTITUD =====
+  // y += 5;
   doc.setFont("helvetica", "normal").setFontSize(8);
+  const certificacionTexto = "Revisados los antecedentes y examen médico según anexo16, por el presente documento certifico que él/ella se encuentra";
+  doc.text(certificacionTexto, leftMargin, y);
+  y += 4;
 
-  // Primera fila - Apellidos y Nombres (2 celdas)
-  // Primera celda: Apellidos
-  doc.setFont("helvetica", "normal");
-  doc.text("Apellidos :", tableX + 2, tableY + 5);
+  // Opciones APTO/NO APTO en línea con el texto
+  doc.text("APTO ( )", leftMargin, y);
+  doc.text(", NO APTO ( )", leftMargin + 35, y);
+  doc.text(" X", leftMargin + 75, y);
+  doc.text(" para acceder a emplazamientos ubicados en Gran Altitud Geográfica (>2500 msnm)", leftMargin + 85, y);
+  y += 4;
+
+  // ===== TABLA INFORMACIÓN DEL MÉDICO RESPONSABLE =====
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.rect(leftMargin, y, 190, 8);
+  doc.text("INFORMACIÓN DEL MÉDICO RESPONSABLE DEL EXAMEN", leftMargin + 2, y + 5);
+  y += 8;
+
+  // Fila 1: Apellidos - Nombres
+  const medicoRowHeight = 8;
+  doc.rect(leftMargin, y, 95, medicoRowHeight);
   doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.apellidos || "", tableX + 25, tableY + 5);
-
-  // Segunda celda: Nombres
+  doc.text("Apellidos :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("Nombres :", tableX + col1W + 2, tableY + 5);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.nombres || "", tableX + col1W + 25, tableY + 5);
+  doc.text("SOPLOPUCO MARCE", leftMargin + 25, y + 4);
 
-  // Segunda fila - DNI, Fecha Nacimiento, Edad, Sexo (4 celdas)
-  // Primera celda: DNI
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin + 95, y, 95, medicoRowHeight);
+  doc.text("Nombres :", leftMargin + 97, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("DNI / CE / NIE :", tableX + 2, tableY + 13);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.dni || "", tableX + 25, tableY + 13);
+  doc.text("SHNEIDER", leftMargin + 120, y + 4);
+  y += medicoRowHeight;
 
-  // Segunda celda: Fecha Nacimiento
+  // Fila 2: Dirección
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin, y, 190, medicoRowHeight);
+  doc.text("Dirección :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("Fecha Nacimiento(dd/mm/aa) :", tableX + col2W + 2, tableY + 13);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.fechaNacimiento || "", tableX + col2W + 25, tableY + 13);
+  doc.text("null", leftMargin + 25, y + 4);
+  y += medicoRowHeight;
 
-  // Tercera celda: Edad
+  // Fila 3: Correo - Fax - Cel
+  const colCorreo = 65, colFax = 65, colCel = 60;
+  doc.rect(leftMargin, y, colCorreo, medicoRowHeight);
+  doc.setFont("helvetica", "bold");
+  doc.text("Correo electrónico :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("Edad :", tableX + col2W * 2 + 2, tableY + 13);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.edad + " AÑOS" || "", tableX + col2W * 2 + 25, tableY + 13);
+  // doc.text("", leftMargin + 25, y + 4);
 
-  // Cuarta celda: Sexo
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin + colCorreo, y, colFax, medicoRowHeight);
+  doc.text("Fax :", leftMargin + colCorreo + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("Sexo :", tableX + col2W * 3 + 2, tableY + 13);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.sexo || "", tableX + col2W * 3 + 25, tableY + 13);
+  // doc.text("", leftMargin + colCorreo + 25, y + 4);
 
-  // Tercera fila - Dirección (1 celda)
+  doc.setFont("helvetica", "bold");
+  doc.rect(leftMargin + colCorreo + colFax, y, colCel, medicoRowHeight);
+  doc.text("Cel :", leftMargin + colCorreo + colFax + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("Dirección :", tableX + 2, tableY + 21);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.direccion || "", tableX + 25, tableY + 21);
+  // doc.text("", leftMargin + colCorreo + colFax + 25, y + 4);
+  y += medicoRowHeight;
 
-  // Cuarta fila - Empresa Contratista, Empresa, Actividad (3 celdas)
-  // Primera celda: Empresa Contratista
+  // Fila 4: CMP - Fecha - Firma y Sello
+  const colCMP = 40, colFechaMedico = 60, colFirma = 90;
+  const firmaRowHeight = 15; // Altura aumentada para esta fila específica
+  
+  // CMP: Label arriba, valor abajo
+  doc.rect(leftMargin, y, colCMP, firmaRowHeight);
+  doc.setFont("helvetica", "bold");
+  doc.text("CMP :", leftMargin + 2, y + 2);
   doc.setFont("helvetica", "normal");
-  doc.text("Empresa Contratista :", tableX + 2, tableY + 29);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.empresaContratista || "", tableX + 25, tableY + 29);
+  doc.text("74582", leftMargin + 2, y + 6);
 
-  // Segunda celda: Empresa
+  // Fecha: Label arriba, valor abajo
+  doc.rect(leftMargin + colCMP, y, colFechaMedico, firmaRowHeight);
+  doc.setFont("helvetica", "bold");
+  doc.text("Fecha (dd/mm/aa) :", leftMargin + colCMP + 2, y + 2);
   doc.setFont("helvetica", "normal");
-  doc.text("Empresa :", tableX + col4W + 2, tableY + 29);
+  doc.text("17/07/2025", leftMargin + colCMP + 2, y + 6);
+
+  // Firma y sello: Label arriba, valor abajo
+  doc.rect(leftMargin + colCMP + colFechaMedico, y, colFirma, firmaRowHeight);
   doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.empresa || "", tableX + col4W + 25, tableY + 29);
+  doc.text("Firma y sello :", leftMargin + colCMP + colFechaMedico + 2, y + 2);
+  
+  // Variables para firma del médico en tabla de información
+  const firmaMedicoX = leftMargin + colCMP + colFechaMedico + 25;
+  const firmaMedicoY = y + 3; // Ajustado para centrar mejor en la fila más alta
+  const firmaMedicoWidth = 35;
+  const firmaMedicoHeight = 12; // Altura de la firma aumentada
+  
+  // Agregar firma y sello médico
+  doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
+  y += firmaRowHeight + 5;
 
-  // Tercera celda: Actividad a Realizar
-  doc.setFont("helvetica", "normal");
-  doc.text("Actividad a Realizar :", tableX + col4W * 2 + 2, tableY + 29);
-  doc.setFont("helvetica", "bold");
-  doc.text(datosFinales.actividadRealizar || "", tableX + col4W * 2 + 25, tableY + 29);
+  // Imprimir / Preview
+  imprimir(doc);
+}
 
-  // Restaurar fuente normal
-  doc.setFont("helvetica", "normal").setFontSize(10);
-};
-
-export default AnexoCB_boro_Digitalizado;
+function imprimir(doc) {
+  const blob = doc.output("blob");
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => iframe.contentWindow.print();
+}

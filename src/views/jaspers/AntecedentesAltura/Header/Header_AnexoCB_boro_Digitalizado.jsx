@@ -1,169 +1,124 @@
 /**
- * Header para AnexoCB_boro (logo izq, footer cabecera, sede/ficha derecha, bloque color)
+ * Header para ANEXO CB - ANTECEDENTES DE ALTURA (BORO)
  * @param {jsPDF} doc - Instancia de jsPDF
- * @param {Object} opts - Opciones de configuración
  * @param {Object} datos - Datos del documento
  */
-const headerAnexoCB_boro = (doc, datos = {}) => {
-  const margin = 8;
+const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
+  // Datos por defecto para el header
+  const headerData = {
+    nombreSede: datos.nombreSede || "TRUJILLO NICOLAS DE PIEROLA - HM",
+    numeroFicha: datos.numeroFicha || "99164",
+    color: datos.color || 1,
+    codigoColor: datos.codigoColor || "#E3BF34",
+    textoColor: datos.textoColor || "L"
+  };
+
+  const margin = 18;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
 
-  // === 1) LOGO A LA IZQUIERDA ===
-  const logoW = 38;
-  const logoH = 13;
-  const logoY = y - 1;
+  // === 1) LOGO Y TÍTULO PRINCIPAL ===
+  const logoW = 42;
+  const logoH = 15;
+  const logoY = y - 4;
+  const logoX = margin;
+
   try {
-    doc.addImage("./img/logo-color.png", "PNG", margin, logoY, logoW, logoH);
+    doc.addImage("./img/logo-color.png", "PNG", logoX, logoY, logoW, logoH);
   } catch {
     doc
       .setFont("helvetica", "normal")
       .setFontSize(9)
-      .text("Policlinico Horizonte Medic", margin, logoY + 8);
+      .text("Policlinico Horizonte Medic", logoX, logoY + 8);
   }
 
-  // === 2) FOOTER HORIZONTAL DE CABECERA (datos de contacto) ===
-  const footerCabecera = (doc, opts = {}, datos = {}) => {
-    const logoW = 38;
-    const xOffset = opts.xOffset !== undefined ? opts.xOffset : 25;
-    const fontSize = opts.fontSize !== undefined ? opts.fontSize : 6;
-    const yOffset = opts.yOffset !== undefined ? opts.yOffset : -8;
-    const baseX = margin + logoW + 8 - xOffset;
-    let yFila = y + 2 + yOffset;
-    const rowH = 3.2;
-    
-    doc.setFontSize(fontSize);
-    doc.setTextColor(0, 0, 0);
-    
-    const filas = [
-      {
-        direccion: datos?.dirTruPierola || "",
-        celular: datos?.celTrujilloPie || "",
-        email: datos?.emailTruPierola || "",
-        telefono: datos?.telfTruPierola || ""
-      },
-      {
-        direccion: datos?.dirHuamachuco || "",
-        celular: datos?.celHuamachuco || "",
-        email: datos?.emailHuamachuco || "",
-        telefono: datos?.telfHuamachuco || ""
-      },
-      {
-        direccion: datos?.dirHuancayo || "",
-        celular: datos?.celHuancayo || "",
-        email: datos?.emailHuancayo || "",
-        telefono: datos?.telfHuancayo || ""
-      }
-    ];
-    
-    filas.forEach((fila) => {
-      let x = baseX;
-      if (fila.direccion) {
-        const idx2 = fila.direccion.indexOf(":");
-        if (idx2 !== -1) {
-          const sedeNombre = fila.direccion.substring(0, idx2 + 1);
-          const sedeResto = fila.direccion.substring(idx2 + 1);
-          doc.setFont('helvetica', 'bold');
-          doc.text(sedeNombre, x, yFila, { baseline: 'top' });
-          x += doc.getTextWidth(sedeNombre) + 2;
-          doc.setFont('helvetica', 'normal');
-          doc.text(sedeResto, x, yFila, { baseline: 'top' });
-          x += doc.getTextWidth(sedeResto) + 6;
-        } else {
-          doc.setFont('helvetica', 'normal');
-          doc.text(fila.direccion, x, yFila, { baseline: 'top' });
-          x += doc.getTextWidth(fila.direccion) + 6;
-        }
-      }
-      if (fila.celular) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Cel.', x, yFila, { baseline: 'top' });
-        x += doc.getTextWidth('Cel.');
-        doc.setFont('helvetica', 'normal');
-        doc.text(` ${fila.celular}`, x, yFila, { baseline: 'top' });
-        x += doc.getTextWidth(` ${fila.celular}`) + 6;
-      }
-      if (fila.email) {
-        doc.setFont('helvetica', 'normal');
-        doc.text(fila.email, x, yFila, { baseline: 'top' });
-        x += doc.getTextWidth(fila.email) + 6;
-      }
-      if (fila.telefono) {
-        doc.setFont('helvetica', 'bold');
-        doc.text('Telf.', x, yFila, { baseline: 'top' });
-        x += doc.getTextWidth('Telf.');
-        doc.setFont('helvetica', 'normal');
-        doc.text(` ${fila.telefono}`, x, yFila, { baseline: 'top' });
-      }
-      yFila += rowH;
-    });
-  };
-
-  // Ejecutar footer de cabecera
-  footerCabecera(doc, { xOffset: 25, fontSize: 6, yOffset: -8 }, datos);
-
-  // === 3) SEDE Y NÚMERO DE FICHA A LA DERECHA ===
-  const sedeValue = `${datos.sede || ''}`;
-  const sedeX = pageW - margin - 20;
-  const sedeY = y + 6;
-  
-  // Sede a la derecha
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  const sedeLabelWidth = doc.getTextWidth("Sede:");
-  const sedeLabelX = sedeX - sedeLabelWidth - 51.5;
-  
-  doc.text("Sede:", sedeLabelX, sedeY, { align: "left" });
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(sedeValue, sedeX, sedeY, { align: "right" });
-
-  // N° de Ficha debajo de la sede
-  const fichaDato = `${datos.norden || datos.numeroFicha || ''}`;
-  const fichaY = sedeY + 5.4;
-  const fichaX = pageW - margin - 20;
-  
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  const fichaLabelWidth = doc.getTextWidth("N° Ficha:");
-  const fichaLabelX = fichaX - fichaLabelWidth - 22;
-  
-  doc.text("N° Ficha:", fichaLabelX, fichaY + 1, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(fichaDato, fichaX, fichaY + 1, { align: "right" });
-
-  // === 4) BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
-  const color = datos.codigoColor || "#008f39";
-  const boxText = (datos.textoColor || "T").toUpperCase();
+  // === 2) BLOQUE CÓDIGO DE COLOR ===
+  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 50;
+  const color = headerData.codigoColor || "#E3BF34";
+  const boxText = (headerData.textoColor || "L").toUpperCase();
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
-  let boxY = y - 3;
-  
+  let boxY = y - 6.5;
+
   if (colorValido) {
-    // Draw box outline in black
     doc.setDrawColor(0);
     doc.setLineWidth(0.5);
     doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
-    
-    // Solo renderiza si color es válido
     doc.setDrawColor(color);
     doc.setLineWidth(2);
     doc.setLineCap('round');
-    doc.line(boxX + boxSize + 3, boxY, boxY + boxSize);
-    doc.setLineCap('butt');
+    doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.2);
     doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(color);
-    doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
-      align: "center", 
-      baseline: "middle", 
-      maxWidth: boxSize - 1 
+    doc.text(boxText, boxX + boxSize/2, boxY + boxSize/2, {
+      align: "center",
+      baseline: "middle",
+      maxWidth: boxSize - 1
     });
     doc.setDrawColor(0);
     doc.setTextColor(0);
     doc.setLineWidth(0.2);
   }
 
-  // Restaurar fuente normal
-  doc.setFont("helvetica", "normal").setFontSize(10);
+  y -= 7;
+
+  // === 3) NÚMERO DE FICHA Y SEDE ===
+  const fichaX = pageW - margin - 18;
+  const bloqueY = y + 5;
+
+  // Número de orden arriba
+  const fichaValue = String(headerData.numeroFicha || '');
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const fichaLabel = "N° Ficha:";
+  const fichaLabelWidth = doc.getTextWidth(fichaLabel);
+  const fichaLabelX = fichaX - fichaLabelWidth - 25;
+
+  doc.text(fichaLabel, fichaLabelX, bloqueY, { align: "left" });
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(fichaValue, fichaX, bloqueY, { align: "right" });
+
+  // === 4) SEDE ===
+  const sedeValue = String(headerData.nombreSede || '');
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const sedeValueWidth = doc.getTextWidth(sedeValue);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const sedeLabel = "Sede:";
+  const sedeLabelWidth = doc.getTextWidth(sedeLabel);
+  const sedeLabelX = fichaX - sedeValueWidth - sedeLabelWidth - 5;
+
+  doc.text(sedeLabel, sedeLabelX, bloqueY + 10, { align: "left" });
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(sedeValue, fichaX, bloqueY + 10, { align: "right" });
+
+  // === 5) TÍTULO PRINCIPAL DEL DOCUMENTO ===
+  y = y + 35;
+
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+
+  const titulo = "ENFERMEDADES QUE PUEDEN AGRAVARSE EN ALTITUD GEOGRÁFICA";
+  const tituloX = pageW / 2;
+
+  doc.text(titulo, tituloX, y, { align: "center" });
+
+  // Subrayar el título
+  const tituloWidth = doc.getTextWidth(titulo);
+  const tituloStartX = tituloX - tituloWidth / 2;
+
+  doc.setLineWidth(0.5);
+  doc.line(tituloStartX, y + 2, tituloStartX + tituloWidth, y + 2);
+
+  // === 6) LÍNEA DIVISORIA ===
+  y = y + 8;
+  doc.setLineWidth(0.3);
+  doc.line(margin, y, pageW - margin, y);
+
+  return y + 5;
 };
 
-export default headerAnexoCB_boro;
+export default Header_AnexoCB_boro_Digitalizado;
