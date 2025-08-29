@@ -1,20 +1,20 @@
 import jsPDF from "jspdf";
-import Header_AnexoCB_boro_Digitalizado from "./Header/Header_AnexoCB_boro_Digitalizado";
+import Header_AnexoCB_Digitalizado from "./Header/Header_AnexoCB_Digitalizado";
 
-export default function GenerarDatosPacienteBoro(data = {}) {
+export default function GenerarDatosPaciente(data = {}) {
   const datos = {
-    apellidos: data.apellidos ?? "CASTILLO PLASENCIA",
-    nombres: data.nombres ?? "HADY KATHERINE",
-    dni: data.dni ?? "21139408",
-    fechaNacimiento: data.fechaNacimiento ?? "19/03/1993",
-    edad: data.edad ?? "31",
+    apellidos: data.apellidos ?? "DELGADO VEGA",
+    nombres: data.nombres ?? "VIVIANA AYDE",
+    dni: data.dni ?? "75461024",
+    fechaNacimiento: data.fechaNacimiento ?? "19/03/2000",
+    edad: data.edad ?? "25 AÑOS",
     sexo: data.sexo ?? "FEMENINO",
     direccion: data.direccion ?? "AV. EL PELIGRO",
     empresaContratista:
       data.empresaContratista ??
       "ESTA ES UNA EMPRESA SUPER LARGA PARA PROBAR EL AJUSTE DE TEXTO AUTOMÁTICO",
-    empresa: data.empresa ?? "MINERA BOROO MISQUICHILCA S.A.",
-    actividadRealizar: data.actividadRealizar ?? "DAD",
+    empresa: data.empresa ?? "MONARCA GOLD S.A.C.",
+    actividadRealizar: data.actividadRealizar ?? "CAPATAZ",
     antecedentes: data.antecedentes ?? [
       { texto: "Accidente cerebrovascular", si: true, no: false },
       { texto: "Angina inestable", si: true, no: false },
@@ -47,17 +47,8 @@ export default function GenerarDatosPacienteBoro(data = {}) {
 
   const doc = new jsPDF();
   
-  // Usar el header de Boro
-  let y = Header_AnexoCB_boro_Digitalizado(doc, {
-    ...data,
-    apellidosNombres: `${datos.apellidos} ${datos.nombres}`,
-    edad: datos.edad,
-    empresa: datos.empresa,
-    sexo: datos.sexo,
-    puestoTrabajo: datos.actividadRealizar,
-    fecha: data.fecha || "04/11/2024"
-  });
-  
+  // Usar el header
+  let y = Header_AnexoCB_Digitalizado(doc, data);
   const leftMargin = 10;
 
   // ===== TÍTULO =====
@@ -162,7 +153,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
 
   y += 8;
 
-  doc.setFont("helvetica", "normal").setFontSize(8.5);
+  doc.setFont("helvetica", "normal").setFontSize(8.5); // Aumentado de 8 a 9
   datos.antecedentes.forEach((item) => {
     let textoDividido = doc.splitTextToSize(item.texto, colTexto - 4);
     let altura = textoDividido.length * 4 + 1;
@@ -182,7 +173,8 @@ export default function GenerarDatosPacienteBoro(data = {}) {
     y += altura;
   });
 
-  // ===== COMENTARIOS DEL MÉDICO =====
+    // ===== COMENTARIOS DEL MÉDICO =====
+  // y += 1;
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin, y, 190, 8);
   doc.text("Comentarios del Médico :", leftMargin + 2, y + 4);
@@ -202,12 +194,15 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   
   // Agregar firma de prueba y huella flotantes
   doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaPruebaX, firmaPruebaY, firmaPruebaWidth, firmaPruebaHeight);
+  // doc.text("PRUEBA", leftMargin + 135, y);
    
   // Agregar huella digital (ajustada para que salga vertical)
+  // Intercambiamos width y height para que la huella salga vertical
   doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaDigitalX, huellaDigitalY, huellaDigitalHeight, huellaDigitalWidth);
   y += 5;
 
   // ===== CERTIFICACIÓN DE APTITUD =====
+  // y += 5;
   doc.setFont("helvetica", "normal").setFontSize(8);
   const certificacionTexto = "Revisados los antecedentes y examen médico según anexo16, por el presente documento certifico que él/ella se encuentra";
   doc.text(certificacionTexto, leftMargin, y);
@@ -251,8 +246,8 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   y += medicoRowHeight;
 
   // Fila 3: Correo - Fax - Cel
-  const colCorreo = 100, colFax = 45, colCel = 45;
-  const correoRowHeight = 12;
+  const colCorreo = 100, colFax = 45, colCel = 45; // Correo más ancho, Fax y Cel más estrechos
+  const correoRowHeight = 12; // Altura aumentada para label arriba y valor abajo
   
   // Correo: Label arriba, valor abajo
   doc.rect(leftMargin, y, colCorreo, correoRowHeight);
@@ -265,16 +260,18 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   doc.rect(leftMargin + colCorreo, y, colFax, correoRowHeight);
   doc.text("Fax :", leftMargin + colCorreo + 2, y + 4);
   doc.setFont("helvetica", "normal");
+  // doc.text("", leftMargin + colCorreo + 25, y + 4);
 
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin + colCorreo + colFax, y, colCel, correoRowHeight);
   doc.text("Cel :", leftMargin + colCorreo + colFax + 2, y + 4);
   doc.setFont("helvetica", "normal");
+  // doc.text("", leftMargin + colCorreo + colFax + 25, y + 4);
   y += correoRowHeight;
 
   // Fila 4: CMP - Fecha - Firma y Sello
   const colCMP = 40, colFechaMedico = 60, colFirma = 90;
-  const firmaRowHeight = 12;
+  const firmaRowHeight = 12; // Altura aumentada para label arriba y valor abajo
   
   // CMP: Label arriba, valor abajo
   doc.rect(leftMargin, y, colCMP, firmaRowHeight);
@@ -295,13 +292,13 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.text("Firma y sello :", leftMargin + colCMP + colFechaMedico + 2, y + 4);
   
-  // Variables para firma del médico flotante
+  // Variables para firma del médico flotante (puedes ajustar X e Y a tu gusto)
   const firmaMedicoX = leftMargin + colCMP + colFechaMedico + 35;
-  const firmaMedicoY = y -4;
+  const firmaMedicoY = y -4; // Posición Y ajustable
   const firmaMedicoWidth = 45;
-  const firmaMedicoHeight = 25;
+  const firmaMedicoHeight = 25; // Altura de la firma
   
-  // Agregar firma y sello médico (flotante)
+  // Agregar firma y sello médico (flotante, puedes mover X e Y)
   doc.addImage("public/img/firmas_sellos_prueba/firma_sello.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
   y += firmaRowHeight + 5;
 
