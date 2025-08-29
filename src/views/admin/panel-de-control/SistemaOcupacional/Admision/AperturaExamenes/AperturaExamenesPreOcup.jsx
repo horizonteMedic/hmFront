@@ -14,6 +14,7 @@ import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
 import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
 import { useSessionData } from '../../../../../hooks/useSessionData.js';
+import { fixEncodingModern } from '../../../../../utils/helpers.js';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -77,7 +78,7 @@ const AperturaExamenesPreOcup = (props) => {
     rxcKLumbar: false,
     rxcPlomos: false,
     mercurioo: false,
-    nombreMiUsuario: userCompleto?.datos?.nombres_user,
+    nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
     userRegistroDatos: "",    
   })
   const [searchHC, setSearchHC] = useState([])
