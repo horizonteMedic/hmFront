@@ -9,6 +9,7 @@ import {
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
   "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma";
@@ -157,14 +158,40 @@ const GetInfoPac = async (nro, set, token, sede) => {
   }
 };
 
-export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
-  getInfoTablaDefault(
-    nombreSearch,
-    codigoSearch,
-    setData,
-    token,
-    obtenerReporteInfoTablaUrl
-  );
+// export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
+//   getInfoTablaDefault(
+//     nombreSearch,
+//     codigoSearch,
+//     setData,
+//     token,
+//     obtenerReporteInfoTablaUrl
+//   );
+// };
+export const getInfoTabla = (
+  nombreSearch,
+  codigoSearch,
+  usuario,
+  setData,
+  token
+) => {
+  try {
+    getFetch(
+      `${obtenerReporteInfoTablaUrl}?${codigoSearch == "" ? "" : `&nOrden=${codigoSearch}`
+      }
+    ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}&usuario=${usuario}`,
+      token
+    ).then((res) => {
+      console.log("pros", res);
+      setData(res);
+    });
+  } catch (error) {
+    console.error("Error en getInfoTabla:", error);
+    Swal.fire(
+      "Error",
+      "Ocurrió un error al obtener los datos de la tabla",
+      "error"
+    );
+  }
 };
 
 export const Loading = (mensaje) => {
