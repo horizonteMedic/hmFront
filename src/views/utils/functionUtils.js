@@ -30,25 +30,6 @@ export const LoadingDefault = (text) => {
         },
     });
 };
-// export const GetInfoPacDefault = (nro, set, token, sede) => {
-//     getFetch(
-//         `/api/v01/ct/infoPersonalPaciente/busquedaPorFiltros?nOrden=${nro}&nomSede=${sede}`,
-//         token
-//     )
-//         .then((res) => {
-//             console.log("pros", res);
-//             set((prev) => ({
-//                 ...prev,
-//                 ...res,
-//                 fechaNac: convertirFecha(res.fechaNac),
-//                 edad: res.edad + " años",
-//                 nombres: res.nombresApellidos,
-//             }));
-//         })
-//         .finally(() => {
-//             Swal.close();
-//         });
-// };
 export const GetInfoPacDefault = async (nro, token, sede) => {
     try {
         const res = await getFetch(
