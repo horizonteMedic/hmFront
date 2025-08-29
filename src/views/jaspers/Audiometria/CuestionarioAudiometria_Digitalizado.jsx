@@ -1,6 +1,5 @@
 import jsPDF from "jspdf";
 import headerFicha from "./headers/header_CuestionarioAudiometria_Digitalizado.jsx";
-import footer from "../components/footer.jsx";
 
 /**
  * Genera y muestra la FICHA AUDIOLÓGICA con todas las preguntas (1–16),
@@ -17,7 +16,6 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
   const doc = new jsPDF();
   const margin = 8;
   const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
   const boxSize = 5;
   const lineHTable = 5;
   const paddingTop = 0.5;
@@ -118,7 +116,6 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
 
     // filas de preguntas 1-15
     preguntas.forEach(p => {
-      const resp = datos.preguntas?.find(q => q.numero === p.numero)?.valor || "";
       const lines = doc.splitTextToSize(p.texto, colPreguntaW - 4);
       const contentH = lines.length * lineHTable;
       // Si la pregunta es 1, 9, 10, 11, 12, 13, 14 o 15, agrego espacio extra
@@ -135,50 +132,65 @@ export default function CuestionarioAudiometria_Digitalizado(datos) {
       switch(p.numero){
         case 1: {
           nuevoYParaTexto += 25; // Ajuste para la pregunta 1
-          const texto1 = `${datos?.txtrcual1||"Pérdida auditiva bilateral progresiva"} - ${datos?.txtrcuando1||"2020"} - ${datos?.txtrque1||"Exposición prolongada a ruido industrial durante ocho horas diarias en fábrica metalúrgica"}`;
-          doc.text(texto1, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcual1 || datos?.txtrcuando1 || datos?.txtrque1) {
+            const texto1 = [datos.txtrcual1, datos.txtrcuando1, datos.txtrque1].filter(Boolean).join(" - ");
+            doc.text(texto1, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 9: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 9 
-          const texto9 = `${datos?.txtrcual9||"Timpanoplastía reconstructiva del oído derecho"} - ${datos?.txtrdonde9||"Hospital Central de Lima"} - ${datos?.txtrque9||"Reparación quirúrgica del tímpano perforado por infección crónica del oído medio"}`;
-          doc.text(texto9, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcual9 || datos?.txtrdonde9 || datos?.txtrque9) {
+            const texto9 = [datos.txtrcual9, datos.txtrdonde9, datos.txtrque9].filter(Boolean).join(" - ");
+            doc.text(texto9, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 10: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 10
-          const texto10 = `${datos?.txtrcual10||"Accidente automovilístico con impacto frontal"} - ${datos?.txtrdonde10||"Avenida Principal km 15"} - ${datos?.txtrque10||"Golpe violento en la cabeza contra el volante causando traumatismo craneoencefálico severo"}`;
-          doc.text(texto10, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcual10 || datos?.txtrdonde10 || datos?.txtrque10) {
+            const texto10 = [datos.txtrcual10, datos.txtrdonde10, datos.txtrque10].filter(Boolean).join(" - ");
+            doc.text(texto10, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 11: {
           nuevoYParaTexto += 10; // Ajuste para la pregunta 11
-          const texto11 = `${datos?.txtrcual11||"Cisplatino para tratamiento de cáncer"} - ${datos?.txtrcuanto11||"6 meses"}`;
-          doc.text(texto11, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcual11 || datos?.txtrcuanto11) {
+            const texto11 = [datos.txtrcual11, datos.txtrcuanto11].filter(Boolean).join(" - ");
+            doc.text(texto11, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 12: {
           nuevoYParaTexto += 10; // Ajuste para la pregunta 12
-          const texto12 = `${datos?.txtrcual12||"Tolueno y xileno en procesos industriales"} - ${datos?.txtrcuanto12||"2 años"}`;
-          doc.text(texto12, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcual12 || datos?.txtrcuanto12) {
+            const texto12 = [datos.txtrcual12, datos.txtrcuanto12].filter(Boolean).join(" - ");
+            doc.text(texto12, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 13: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 13
-          const texto13 = `${datos?.txtrcuanto13||"5 años continuos"} - ${datos?.txtrcuando13||"2019-2024"} - ${datos?.txtrdonde13||"Fábrica metalúrgica de acero y hierro"}`;
-          doc.text(texto13, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcuanto13 || datos?.txtrcuando13 || datos?.txtrdonde13) {
+            const texto13 = [datos.txtrcuanto13, datos.txtrcuando13, datos.txtrdonde13].filter(Boolean).join(" - ");
+            doc.text(texto13, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 14: {
           nuevoYParaTexto += 10; // Ajuste para la pregunta 14
-          const texto14 = `${datos?.txtrcual14||"Hipertensión arterial esencial controlada"} - ${datos?.txtrdonde14||"Clínica San José de Miraflores"} - ${datos?.txtrque14||"Control médico mensual con medicación antihipertensiva y monitoreo de presión arterial"}`;
-          doc.text(texto14, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcual14 || datos?.txtrdonde14 || datos?.txtrque14) {
+            const texto14 = [datos.txtrcual14, datos.txtrdonde14, datos.txtrque14].filter(Boolean).join(" - ");
+            doc.text(texto14, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
         case 15: {
           nuevoYParaTexto += 5; // Ajuste para la pregunta 15
-          const texto15 = `${datos?.txtrcuantos15||"10 cigarrillos por día durante 15 años"}`;
-          doc.text(texto15, tableX + 2, nuevoYParaTexto);
+          if (datos?.txtrcuantos15) {
+            doc.text(datos.txtrcuantos15, tableX + 2, nuevoYParaTexto);
+          }
           break;
         }
       }

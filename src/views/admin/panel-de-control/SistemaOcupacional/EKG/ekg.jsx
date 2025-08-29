@@ -21,38 +21,38 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
   "0"
 )}-${String(date.getDate()).padStart(2, "0")}`;
 
-const initialFormState = {
-  norden: "",
-  codigoElectroCardiograma: null,
-  nombre: "",
-  edad: "",
-  fechaNac: "",
-  fechaExam: today,
-  contrata: "",
-  empresa: "",
-
-  informeCompleto: false,
-  ritmo: "SINUSAL",
-  fc: "",
-  eje: "",
-  pr: "0.20",
-  qrs: "0.08",
-  ondaP: "",
-  st: "",
-  ondaT: "",
-  qtc: "N/E",
-
-  conclusiones: "",
-  hallazgos: "",
-  recomendaciones: "",
-
-  nombres_search: "",
-  codigo_search: "",
-};
-
 export default function EKG() {
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
+  const initialFormState = {
+    norden: "",
+    codigoElectroCardiograma: null,
+    nombre: "",
+    edad: "",
+    fechaNac: "",
+    fechaExam: today,
+    contrata: "",
+    empresa: "",
+
+    informeCompleto: false,
+    ritmo: "SINUSAL",
+    fc: "",
+    eje: "",
+    pr: "0.20",
+    qrs: "0.08",
+    ondaP: "",
+    st: "",
+    ondaT: "",
+    qtc: "N/E",
+
+    conclusiones: "",
+    hallazgos: "",
+    recomendaciones: "",
+
+    nombres_search: "",
+    codigo_search: "",
+    usuario: userlogued ?? "",
+  };
 
   const {
     form,
@@ -104,7 +104,15 @@ export default function EKG() {
   };
 
   const obtenerInfoTabla = () => {
-    getInfoTabla(form.nombres_search, form.codigo_search, setDataTabla, token);
+    console.log("usuario", form.usuario);
+
+    getInfoTabla(
+      form.nombres_search,
+      form.codigo_search,
+      form.usuario,
+      setDataTabla,
+      token
+    );
   };
   useEffect(() => {
     obtenerInfoTabla();

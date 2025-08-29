@@ -14,6 +14,7 @@ import ModalEmpresa from './modals/modalEmpresa/ModalEmpresa';
 import ModalContrata from './modals/modalContrata/ModalContrata';
 import { format } from 'date-fns';
 import { useSessionData } from '../../../../../hooks/useSessionData.js';
+import { fixEncodingModern } from '../../../../../utils/helpers.js';
 
 const AperturaExamenesPreOcup = (props) => {
   const today = new Date();
@@ -77,7 +78,7 @@ const AperturaExamenesPreOcup = (props) => {
     rxcKLumbar: false,
     rxcPlomos: false,
     mercurioo: false,
-    nombreMiUsuario: userCompleto?.datos?.nombres_user,
+    nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
     userRegistroDatos: "",    
   })
   const [searchHC, setSearchHC] = useState([])
@@ -629,11 +630,28 @@ const AperturaExamenesPreOcup = (props) => {
                 if (result.isConfirmed) module.default(datosConOrden);
               });
             } else {
-              // Fallback si no se encuentra el registro
+              // Si no se encuentra el registro en searchHC (caso de nuevo registro), usar la fecha actual
+              const fechaHoy = format(new Date(), 'yyyy-MM-dd');
+              
+              // Filtrar registros de la fecha de hoy
+              const registrosHoy = searchHC.filter(item => item.fecha_apertura_po === fechaHoy);
+              
+              // El nuevo registro será el siguiente número
+              const numeroOrden = registrosHoy.length + 1;
+              
+              // Agregar el número de orden a los datos
+              const datosConOrden = {
+                ...datos,
+                numeroOrden: numeroOrden
+              };
+              
               Swal.fire({
-                title: "Error",
-                text: "No se pudo determinar la fecha del registro",
-                icon: "error"
+                title: "Hoja de Ruta",
+                text: "¿Desea Imprimir?.",
+                icon: "success",
+                cancelButtonText: "Cancelar"
+              }).then((result) => {
+                if (result.isConfirmed) module.default(datosConOrden);
               });
             }
           } else {

@@ -105,9 +105,11 @@ const HeaderInformeElectrocardiogramaPoderosa = (doc, datos) => {
 
     dni: datos?.dni,
     empresa: datos?.empresa ?? "",
-    procedencia: "",
-    presionArterial: "",
-    antecedentesCardiologicos: "",
+    procedencia: datos?.procedencia ?? "",
+
+    presionArterial: datos?.presionArterial ?? "",
+
+    antecedentesCardiologicos: datos?.antecedentesCardiologicos ?? "",
     sede: datos?.sede ?? "",
     norden: datos?.norden ?? "",
   };
