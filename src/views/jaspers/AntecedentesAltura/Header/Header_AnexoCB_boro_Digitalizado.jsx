@@ -118,46 +118,66 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   y = y + 6;
 
   doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("1.- DATOS DEL PACIENTE", margin, y);
+  doc.text("1. DATOS DEL PACIENTE", margin, y);
 
   y = y + 6;
 
   // Fila 1: Apellidos y Nombres | Edad
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Apellidos y Nombres:", margin, y);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(headerData.apellidosNombres, margin + 45, y);
+  const labelApellidos = "Apellidos y Nombres: ";
+  doc.text(labelApellidos, margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const apellidosX = margin + doc.getTextWidth(labelApellidos) + 3;
+  doc.text(headerData.apellidosNombres, apellidosX, y);
   
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Edad:", pageW - marginRight - 80, y);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(headerData.edad + " años", pageW - marginRight - 50, y);
+  const labelEdad = "Edad: ";
+  doc.text(labelEdad, pageW - marginRight - 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const edadX = pageW - marginRight - 45 + doc.getTextWidth(labelEdad) + 3;
+  doc.text(headerData.edad + " años", edadX, y);
 
   y = y + 6;
 
   // Fila 2: Empresa | Sexo
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Empresa:", margin, y);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(headerData.empresa, margin + 25, y);
+  const labelEmpresa = "Empresa: ";
+  doc.text(labelEmpresa, margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const empresaX = margin + doc.getTextWidth(labelEmpresa) + 3;
   
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sexo:", pageW - marginRight - 80, y);
+  // Calcular el ancho máximo disponible para empresa (sin afectar Sexo)
+  const maxWidthEmpresa = pageW - marginRight - 45 - empresaX - 10; // 10 de separación
+  
+  // Dividir el texto de empresa si es muy largo
+  const empresaTexto = doc.splitTextToSize(headerData.empresa, maxWidthEmpresa);
+  doc.text(empresaTexto, empresaX, y);
+  
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(headerData.sexo, pageW - marginRight - 50, y);
+  const labelSexo = "Sexo: ";
+  doc.text(labelSexo, pageW - marginRight - 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const sexoX = pageW - marginRight - 45 + doc.getTextWidth(labelSexo) + 3;
+  doc.text(headerData.sexo, sexoX, y);
 
-  y = y + 6;
+  // Calcular la altura necesaria para empresa (mínimo 6, máximo según líneas)
+  const alturaEmpresa = Math.max(6, empresaTexto.length * 4);
+  y = y + alturaEmpresa;
 
   // Fila 3: Puesto de Trabajo | Fecha
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Puesto de Trabajo:", margin, y);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(headerData.puestoTrabajo, margin + 45, y);
+  const labelPuesto = "Puesto de Trabajo: ";
+  doc.text(labelPuesto, margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const puestoX = margin + doc.getTextWidth(labelPuesto) + 3;
+  doc.text(headerData.puestoTrabajo, puestoX, y);
   
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Fecha:", pageW - marginRight - 80, y);
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text(headerData.fecha, pageW - marginRight - 50, y);
+  const labelFecha = "Fecha: ";
+  doc.text(labelFecha, pageW - marginRight - 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const fechaX = pageW - marginRight - 45 + doc.getTextWidth(labelFecha) + 3;
+  doc.text(headerData.fecha, fechaX, y);
 
   // === 7) CUADRO DE TEXTO "EL PRESENTE..." ===
   y = y + 5;
