@@ -70,6 +70,7 @@ import {
   faSkull,
   faGamepad,
   faBed,
+  faMountain,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -484,7 +485,7 @@ const TabComponent = () => {
                   onClick={() => setActiveTab(25)}
                 >
                   <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faVial} />
+                    <FontAwesomeIcon icon={faMountain} />
                   </span>
                   <span className={styles.title}>Antecedentes de Altura</span>
                 </div>
@@ -1192,7 +1193,7 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <AntecedentesDeAltura/>
+              <AntecedentesDeAltura />
             </div>
           )}
         </div>
@@ -1265,6 +1266,10 @@ const TabComponent = () => {
               break;
             case "Test Fatiga":
               setActiveTab(23);
+              setSubTab(0);
+              break;
+            case "Antecedentes de Altura":
+              setActiveTab(25);
               setSubTab(0);
               break;
           }

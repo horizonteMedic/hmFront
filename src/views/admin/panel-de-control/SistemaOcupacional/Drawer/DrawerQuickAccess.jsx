@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
@@ -19,6 +19,7 @@ const accesos = [
   { icon: faSkull, label: 'Evaluación Musculoesquelética', key : "Evaluación Musculoesquelética" },
   { icon: faSkiingNordic, label: 'Cuestionario Nordico', key : "Cuestionario Nordico" },
   { icon: faBed, label: 'Test Fatiga y Somnolencia', key : "Test Fatiga" },
+  { icon: faMountain, label: 'Antecedentes de Altura', key : "Antecedentes de Altura" },
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
