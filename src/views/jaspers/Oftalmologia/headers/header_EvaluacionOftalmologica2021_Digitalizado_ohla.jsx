@@ -86,7 +86,7 @@ const header_EvaluacionOftalmologica2021_Digitalizado_ohla = (
 
   // === BLOQUE CÓDIGO DE COLOR ===
   const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
   let boxSize = 15;

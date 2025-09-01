@@ -12,7 +12,7 @@ const headerTriaje = (doc, datos) => {
   let color = null;
   let boxText = null;
 
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
   if (colorValido) {
     color = datos.codigoColor || "#008f39";
     boxText = (datos.textoColor || "F").toUpperCase();

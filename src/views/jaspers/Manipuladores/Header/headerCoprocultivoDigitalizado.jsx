@@ -74,7 +74,7 @@ doc.line(
   doc.text("Muestra :", margin, y);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.txtmuestra || ""}`, margin + 25, y);
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

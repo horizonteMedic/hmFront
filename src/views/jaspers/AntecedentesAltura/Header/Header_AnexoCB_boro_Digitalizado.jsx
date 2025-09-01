@@ -33,7 +33,7 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
 
   try {
     doc.addImage("./img/logo-color.png", "PNG", logoX, logoY, logoW, logoH);
-  } catch {
+  } catch (error) {
     doc
       .setFont("helvetica", "normal")
       .setFontSize(9)
@@ -41,7 +41,7 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   }
 
   // === 2) BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 50;
+  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 150;
   const color = headerData.codigoColor || "#E3BF34";
   const boxText = (headerData.textoColor || "L").toUpperCase();
   let boxSize = 15;

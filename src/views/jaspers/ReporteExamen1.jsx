@@ -192,6 +192,8 @@ export default function ReporteExamen1 (datos){
         });
         
         // Número de color al lado izquierdo - AHORA USANDO EL NÚMERO DE ORDEN DEL REGISTRO
+        // COMENTADO: Ya no se necesita mostrar el número visiblemente en la página 2
+        /*
         doc.setFontSize(60);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(255, 0, 0); // Rojo
@@ -208,6 +210,7 @@ export default function ReporteExamen1 (datos){
           align: "center",
           baseline: "middle"
         });
+        */
         
         // Reset color settings
         doc.setDrawColor(0);
