@@ -10,22 +10,30 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
     numeroFicha: datos.numeroFicha || "99164",
     color: datos.color || 1,
     codigoColor: datos.codigoColor || "#E3BF34",
-    textoColor: datos.textoColor || "L"
+    textoColor: datos.textoColor || "L",
+    // Datos del paciente
+    apellidosNombres: datos.apellidosNombres || "CASTILLO PLASENCIA HADY KATHERINE",
+    edad: datos.edad || "31",
+    empresa: datos.empresa || "MINERA BOROO MISQUICHILCA S.A.",
+    sexo: datos.sexo || "FEMENINO",
+    puestoTrabajo: datos.puestoTrabajo || "DAD",
+    fecha: datos.fecha || "04/11/2024"
   };
 
-  const margin = 18;
+  const margin = 12;
+  const marginRight = 14;
   const pageW = doc.internal.pageSize.getWidth();
   let y = 12;
 
   // === 1) LOGO Y TÍTULO PRINCIPAL ===
-  const logoW = 42;
-  const logoH = 15;
+  const logoW = 60;
+  const logoH = 18;
   const logoY = y - 4;
   const logoX = margin;
 
   try {
     doc.addImage("./img/logo-color.png", "PNG", logoX, logoY, logoW, logoH);
-  } catch {
+  } catch (error) {
     doc
       .setFont("helvetica", "normal")
       .setFontSize(9)
@@ -33,11 +41,11 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   }
 
   // === 2) BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 50;
+  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 150;
   const color = headerData.codigoColor || "#E3BF34";
   const boxText = (headerData.textoColor || "L").toUpperCase();
   let boxSize = 15;
-  let boxX = pageW - margin - boxSize;
+  let boxX = pageW - marginRight - boxSize;
   let boxY = y - 6.5;
 
   if (colorValido) {
@@ -50,7 +58,7 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
     doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
     doc.setDrawColor(0);
     doc.setLineWidth(0.2);
-    doc.setFontSize(18);
+    doc.setFontSize(25);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(color);
     doc.text(boxText, boxX + boxSize/2, boxY + boxSize/2, {
@@ -66,7 +74,7 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   y -= 7;
 
   // === 3) NÚMERO DE FICHA Y SEDE ===
-  const fichaX = pageW - margin - 18;
+  const fichaX = pageW - marginRight - 18;
   const bloqueY = y + 5;
 
   // Número de orden arriba
@@ -77,9 +85,9 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   const fichaLabelWidth = doc.getTextWidth(fichaLabel);
   const fichaLabelX = fichaX - fichaLabelWidth - 25;
 
-  doc.text(fichaLabel, fichaLabelX, bloqueY, { align: "left" });
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(fichaValue, fichaX, bloqueY, { align: "right" });
+  doc.text(fichaLabel, fichaLabelX, bloqueY + 3, { align: "left" });
+  doc.setFont("helvetica", "bold").setFontSize(23);
+  doc.text(fichaValue, fichaX, bloqueY + 3, { align: "right" });
 
   // === 4) SEDE ===
   const sedeValue = String(headerData.nombreSede || '');
@@ -96,7 +104,7 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   doc.text(sedeValue, fichaX, bloqueY + 10, { align: "right" });
 
   // === 5) TÍTULO PRINCIPAL DEL DOCUMENTO ===
-  y = y + 35;
+  y = y + 25;
 
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
@@ -106,19 +114,96 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
 
   doc.text(titulo, tituloX, y, { align: "center" });
 
-  // Subrayar el título
-  const tituloWidth = doc.getTextWidth(titulo);
-  const tituloStartX = tituloX - tituloWidth / 2;
+  // === 6) DATOS DEL PACIENTE ===
+  y = y + 6;
 
+  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.text("1. DATOS DEL PACIENTE", margin, y);
+
+  y = y + 6;
+
+  // Fila 1: Apellidos y Nombres | Edad
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const labelApellidos = "Apellidos y Nombres: ";
+  doc.text(labelApellidos, margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const apellidosX = margin + doc.getTextWidth(labelApellidos) + 3;
+  doc.text(headerData.apellidosNombres, apellidosX, y);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const labelEdad = "Edad: ";
+  doc.text(labelEdad, pageW - marginRight - 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const edadX = pageW - marginRight - 45 + doc.getTextWidth(labelEdad) + 3;
+  doc.text(headerData.edad + " años", edadX, y);
+
+  y = y + 6;
+
+  // Fila 2: Empresa | Sexo
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const labelEmpresa = "Empresa: ";
+  doc.text(labelEmpresa, margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const empresaX = margin + doc.getTextWidth(labelEmpresa) + 3;
+  
+  // Calcular el ancho máximo disponible para empresa (sin afectar Sexo)
+  const maxWidthEmpresa = pageW - marginRight - 45 - empresaX - 10; // 10 de separación
+  
+  // Dividir el texto de empresa si es muy largo
+  const empresaTexto = doc.splitTextToSize(headerData.empresa, maxWidthEmpresa);
+  doc.text(empresaTexto, empresaX, y);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const labelSexo = "Sexo: ";
+  doc.text(labelSexo, pageW - marginRight - 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const sexoX = pageW - marginRight - 45 + doc.getTextWidth(labelSexo) + 3;
+  doc.text(headerData.sexo, sexoX, y);
+
+  // Calcular la altura necesaria para empresa (mínimo 6, máximo según líneas)
+  const alturaEmpresa = Math.max(6, empresaTexto.length * 4);
+  y = y + alturaEmpresa;
+
+  // Fila 3: Puesto de Trabajo | Fecha
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const labelPuesto = "Puesto de Trabajo: ";
+  doc.text(labelPuesto, margin, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const puestoX = margin + doc.getTextWidth(labelPuesto) + 3;
+  doc.text(headerData.puestoTrabajo, puestoX, y);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const labelFecha = "Fecha: ";
+  doc.text(labelFecha, pageW - marginRight - 45, y);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const fechaX = pageW - marginRight - 45 + doc.getTextWidth(labelFecha) + 3;
+  doc.text(headerData.fecha, fechaX, y);
+
+  // === 7) CUADRO DE TEXTO "EL PRESENTE..." ===
+  y = y + 5;
+
+  const cuadroWidth = 190;
+  const cuadroHeight = 12;
+  const cuadroX = 10;
+  const cuadroY = y;
+
+  // Dibujar el cuadro
+  doc.setDrawColor(0);
   doc.setLineWidth(0.5);
-  doc.line(tituloStartX, y + 2, tituloStartX + tituloWidth, y + 2);
+  doc.rect(cuadroX, cuadroY, cuadroWidth, cuadroHeight);
 
-  // === 6) LÍNEA DIVISORIA ===
-  y = y + 8;
-  doc.setLineWidth(0.3);
-  doc.line(margin, y, pageW - margin, y);
+  // Texto dentro del cuadro
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setTextColor(0, 0, 0);
+  
+  const textoCuadro = "El presente documento es un instrumento de evaluación médica que permite identificar patologías que pueden agravarse al trabajar en altitud geográfica. La información contenida es confidencial y de uso exclusivo para fines médicos ocupacionales.";
+  
+  doc.text(textoCuadro, cuadroX + 5, cuadroY + 5, {
+    align: "justify",
+    maxWidth: cuadroWidth - 10
+  });
 
-  return y + 5;
+  return y + cuadroHeight + 0;
 };
 
 export default Header_AnexoCB_boro_Digitalizado;

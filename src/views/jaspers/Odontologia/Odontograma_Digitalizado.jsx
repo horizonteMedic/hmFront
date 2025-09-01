@@ -227,7 +227,7 @@ const headerOdontograma = (doc, datos) => {
     { xOffset: -42, fontSize: 7.5, yOffset: -8 },
     datos
   );
-const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
   if (colorValido) {
   // === BLOQUE CÓDIGO DE COLOR ===
   const color = datos.codigoColor || "#008f39";
