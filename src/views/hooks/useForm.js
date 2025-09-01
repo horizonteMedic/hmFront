@@ -24,6 +24,14 @@ export const useForm = (initialFormState) => {
     }));
   };
 
+  const handleRadioButtonBoolean = (e, value) => {
+    const { name } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: value,
+    }));
+  };
+
   const handleClear = () => {
     setForm(initialFormState);
   };
@@ -69,11 +77,12 @@ export const useForm = (initialFormState) => {
     setForm,
     handleChange,
     handleChangeNumber,
-    handleRadioButton, 
+    handleRadioButton,
     handleInputChangeChecked,
     handleCheckBoxChange,
     handleClear,
     handleClearnotO,
-    handlePrintDefault
+    handlePrintDefault,
+    handleRadioButtonBoolean
   };
 };

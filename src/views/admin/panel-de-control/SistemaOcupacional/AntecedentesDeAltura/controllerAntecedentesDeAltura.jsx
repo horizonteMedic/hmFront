@@ -2,21 +2,17 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
-  getInfoTablaDefault,
   LoadingDefault,
   PrintHojaRDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
-  "/api/v01/ct/antecedentesAltura/obtenerReporteAntecedentesAltura";
+  "/api/v01/ct/antecedentesEnfermedadesAltura/obtenerReporteAntecedentesEnfermedadesAltura";
 const registrarUrl =
-  "/api/v01/ct/antecedentesAltura/registrarActualizarAntecedentesAltura";
-const obtenerReporteInfoTablaUrl =
-  "/api/v01/ct/antecedentesAltura/obtenerAntecedentesAlturaPorFiltros";
+  "/api/v01/ct/antecedentesEnfermedadesAltura/registrarActualizarAntecedentesEnfermedadesAltura";
 
 export const GetInfoServicio = async (
   nro,
@@ -35,56 +31,48 @@ export const GetInfoServicio = async (
   if (res) {
     set((prev) => ({
       ...prev,
-      ...res,
-      norden: res.norden,
-      codigoAntecedentesAltura: res.codigoAntecedentesAltura,
-      nombre: res.nombres,
+      norden: res.antecedentes?.norden ?? "",
+      codigoAntecedentesAltura: res.antecedentes?.codigoEnfermedadesAltura,
+      nombres: res.nombres ?? "",
       edad: res.edad + " años",
-      fechaNac: formatearFechaCorta(res.fechaNac),
-      fechaExam: res.fechaInforme,
-      contrata: res.contrata,
-      empresa: res.empresa,
-      dni: res.dni,
-      sexo: res.sexo,
-      actividadRealizar: res.actividadRealizar,
-      apto: res.apto,
-      
-      // Información del médico
-      nombreMedico: res.nombreMedico,
-      cmp: res.cmp,
-      emailMedico: res.emailMedico,
-      direccionMedico: res.direccionMedico,
-      
+      fechaNac: formatearFechaCorta(res?.fechaNacimientoPaciente ?? ""),
+      fechaExam: res.antecedentes?.fechaAntecedente ?? "",
+      contrata: res.contrata ?? "",
+      empresa: res.empresa ?? "",
+      dni: res.dni ?? "",
+      sexo: res.sexo ?? "",
+      cargo: res.cargo ?? "",
+      apto: res.antecedentes?.esApto,
+
       // Antecedentes patológicos
-      accidenteCerebrovascular: res.accidenteCerebrovascular,
-      anginaInestable: res.anginaInestable,
-      antecedenteBypass: res.antecedenteBypass,
-      antecedenteEdemaCerebral: res.antecedenteEdemaCerebral,
-      antecedenteEdemaPulmonar: res.antecedenteEdemaPulmonar,
-      antecedenteNeumotorax: res.antecedenteNeumotorax,
-      arritmiaCardiaca: res.arritmiaCardiaca,
-      cardiomiopatiaHipertrofica: res.cardiomiopatiaHipertrofica,
-      cirugiaMayor: res.cirugiaMayor,
-      insuficienciaValvulaAortica: res.insuficienciaValvulaAortica,
-      diabetesMellitus: res.diabetesMellitus,
-      embarazo: res.embarazo,
-      epilepsia: res.epilepsia,
-      epoc: res.epoc,
-      eritrocitosisExcesiva: res.eritrocitosisExcesiva,
-      hipertensionArterial: res.hipertensionArterial,
-      hipertensionPulmonar: res.hipertensionPulmonar,
-      infartoMiocardio: res.infartoMiocardio,
-      insuficienciaCardiaca: res.insuficienciaCardiaca,
-      patologiaHemorragicaRetina: res.patologiaHemorragicaRetina,
-      patologiaValvularCardiaca: res.patologiaValvularCardiaca,
-      presenciaMarcapasos: res.presenciaMarcapasos,
-      riesgoCardiovascularAlto: res.riesgoCardiovascularAlto,
-      trastornosCoagulacion: res.trastornosCoagulacion,
-      trombosisVenosaCerebral: res.trombosisVenosaCerebral,
-      otros: res.otros,
-      otrosDescripcion: res.otrosDescripcion,
-      
-      comentarios: res.comentarios,
+      accidenteCerebrovascular: res.antecedentes?.accidenteCerebroVascularSi,
+      anginaInestable: res.antecedentes?.antecedentes?.anginaInestableSi,
+      antecedenteBypass: res.antecedentes?.antecedenteBypassArterialSi,
+      antecedenteEdemaCerebral: res.antecedentes?.antecedenteEdemaCerebralSi,
+      antecedenteEdemaPulmonar: res.antecedentes?.antecedenteEdemaPulmonarSi,
+      antecedenteNeumotorax: res.antecedentes?.antecedenteNeumotoraxSi,
+      arritmiaCardiaca: res.antecedentes?.arritmiaCardiacaSi,
+      cardiomiopatiaHipertrofica: res.antecedentes?.cardiomiopatiaSi,
+      cirugiaMayor: res.antecedentes?.cirujiaMayorSi,
+      insuficienciaValvulaAortica: res.antecedentes?.cualquierInsuficienciaSi,
+      diabetesMellitus: res.antecedentes?.diabetesMellitusSi,
+      embarazo: res.antecedentes?.embarazoSi,
+      epilepsia: res.antecedentes?.epilepsiaSi,
+      epoc: res.antecedentes?.epocSi,
+      eritrocitosisExcesiva: res.antecedentes?.eritrocitosisSi,
+      hipertensionArterial: res.antecedentes?.hipertensionArterialSi,
+      hipertensionPulmonar: res.antecedentes?.hipertensionPulmonarSi,
+      infartoMiocardio: res.antecedentes?.infartoMiocardioSi,
+      insuficienciaCardiaca: res.antecedentes?.insuficienciaCardiacaSi,
+      patologiaHemorragicaRetina: res.antecedentes?.patologiaHemorragicaSi,
+      patologiaValvularCardiaca: res.antecedentes?.patologiaValvularSi,
+      presenciaMarcapasos: res.antecedentes?.presenciaMarcapasosSi,
+      riesgoCardiovascularAlto: res.antecedentes?.presenciaRiesgoCardioSi,
+      trastornosCoagulacion: res.antecedentes?.transtornoCoagulacionSi,
+      trombosisVenosaCerebral: res.antecedentes?.trombosisSi,
+      otros: res.antecedentes?.otrosSi,
+      otrosDescripcion: res.antecedentes?.otrosDescripcion ?? "",
+      comentarios: res.antecedentes?.observaciones ?? "",
     }));
   }
 };
@@ -101,56 +89,72 @@ export const SubmitDataService = async (
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
-  
+
   const body = {
-    codigoAntecedentesAltura: form.codigoAntecedentesAltura,
-    norden: form.norden,
-    fechaInforme: form.fechaExam,
-    dni: form.dni,
-    nombres: form.nombre,
-    sexo: form.sexo,
-    fechaNac: form.fechaNac,
+    codigoEnfermedadesAltura: form.codigoAntecedentesAltura,
+    fechaAntecedente: form.fechaExam,
     edad: form.edad?.replace(" años", ""),
-    actividadRealizar: form.actividadRealizar,
-    apto: form.apto,
-    
-    // Información del médico
-    nombreMedico: form.nombreMedico,
-    cmp: form.cmp,
-    emailMedico: form.emailMedico,
-    direccionMedico: form.direccionMedico,
-    
-    // Antecedentes patológicos
-    accidenteCerebrovascular: form.accidenteCerebrovascular,
-    anginaInestable: form.anginaInestable,
-    antecedenteBypass: form.antecedenteBypass,
-    antecedenteEdemaCerebral: form.antecedenteEdemaCerebral,
-    antecedenteEdemaPulmonar: form.antecedenteEdemaPulmonar,
-    antecedenteNeumotorax: form.antecedenteNeumotorax,
-    arritmiaCardiaca: form.arritmiaCardiaca,
-    cardiomiopatiaHipertrofica: form.cardiomiopatiaHipertrofica,
-    cirugiaMayor: form.cirugiaMayor,
-    insuficienciaValvulaAortica: form.insuficienciaValvulaAortica,
-    diabetesMellitus: form.diabetesMellitus,
-    embarazo: form.embarazo,
-    epilepsia: form.epilepsia,
-    epoc: form.epoc,
-    eritrocitosisExcesiva: form.eritrocitosisExcesiva,
-    hipertensionArterial: form.hipertensionArterial,
-    hipertensionPulmonar: form.hipertensionPulmonar,
-    infartoMiocardio: form.infartoMiocardio,
-    insuficienciaCardiaca: form.insuficienciaCardiaca,
-    patologiaHemorragicaRetina: form.patologiaHemorragicaRetina,
-    patologiaValvularCardiaca: form.patologiaValvularCardiaca,
-    presenciaMarcapasos: form.presenciaMarcapasos,
-    riesgoCardiovascularAlto: form.riesgoCardiovascularAlto,
-    trastornosCoagulacion: form.trastornosCoagulacion,
-    trombosisVenosaCerebral: form.trombosisVenosaCerebral,
-    otros: form.otros,
+    dniUsuario: form.dniMedico,
+    direccionUsuario: form.direccionMedico,
+    emailUsuario: form.emailMedico,
+    norden: form.norden,
+    esApto: form.apto,
+    noEsApto: !form.apto,
+    accidenteCerebroVascularNo: !form.accidenteCerebrovascular,
+    accidenteCerebroVascularSi: form.accidenteCerebrovascular,
+    anginaInestableNo: !form.anginaInestable,
+    anginaInestableSi: form.anginaInestable,
+    antecedenteBypassArterialNo: !form.antecedenteBypass,
+    antecedenteBypassArterialSi: form.antecedenteBypass,
+    antecedenteEdemaCerebralNo: !form.antecedenteEdemaCerebral,
+    antecedenteEdemaCerebralSi: form.antecedenteEdemaCerebral,
+    antecedenteEdemaPulmonarNo: !form.antecedenteEdemaPulmonar,
+    antecedenteEdemaPulmonarSi: form.antecedenteEdemaPulmonar,
+    antecedenteNeumotoraxNo: !form.antecedenteNeumotorax,
+    antecedenteNeumotoraxSi: form.antecedenteNeumotorax,
+    arritmiaCardiacaNo: !form.arritmiaCardiaca,
+    arritmiaCardiacaSi: form.arritmiaCardiaca,
+    cardiomiopatiaNo: !form.cardiomiopatiaHipertrofica,
+    cardiomiopatiaSi: form.cardiomiopatiaHipertrofica,
+    cirujiaMayorNo: !form.cirugiaMayor,
+    cirujiaMayorSi: form.cirugiaMayor,
+    cualquierInsuficienciaNo: !form.insuficienciaValvulaAortica,
+    cualquierInsuficienciaSi: form.insuficienciaValvulaAortica,
+    diabetesMellitusNo: !form.diabetesMellitus,
+    diabetesMellitusSi: form.diabetesMellitus,
+    embarazoNo: !form.embarazo,
+    embarazoSi: form.embarazo,
+    epilepsiaNo: !form.epilepsia,
+    epilepsiaSi: form.epilepsia,
+    epocNo: !form.epoc,
+    epocSi: form.epoc,
+    eritrocitosisNo: !form.eritrocitosisExcesiva,
+    eritrocitosisSi: form.eritrocitosisExcesiva,
+    hipertensionArterialNo: !form.hipertensionArterial,
+    hipertensionArterialSi: form.hipertensionArterial,
+    hipertensionPulmonarNo: !form.hipertensionPulmonar,
+    hipertensionPulmonarSi: form.hipertensionPulmonar,
+    infartoMiocardioNo: !form.infartoMiocardio,
+    infartoMiocardioSi: form.infartoMiocardio,
+    insuficienciaCardiacaNo: !form.insuficienciaCardiaca,
+    insuficienciaCardiacaSi: form.insuficienciaCardiaca,
+    patologiaHemorragicaNo: !form.patologiaHemorragicaRetina,
+    patologiaHemorragicaSi: form.patologiaHemorragicaRetina,
+    patologiaValvularNo: !form.patologiaValvularCardiaca,
+    patologiaValvularSi: form.patologiaValvularCardiaca,
+    presenciaMarcaPasosNo: !form.presenciaMarcapasos,
+    presenciaMarcaPasosSi: form.presenciaMarcapasos,
+    presenciaRiesgoCardioNo: !form.riesgoCardiovascularAlto,
+    presenciaRiesgoCardioSi: form.riesgoCardiovascularAlto,
+    transtornoCoagulacionNo: !form.trastornosCoagulacion,
+    transtornoCoagulacionSi: form.trastornosCoagulacion,
+    trombosisNo: !form.trombosisVenosaCerebral,
+    trombosisSi: form.trombosisVenosaCerebral,
+    otrosNo: !form.otros,
+    otrosSi: form.otros,
     otrosDescripcion: form.otrosDescripcion,
-    
-    comentarios: form.comentarios,
-    userRegistro: user,
+    observaciones: form.comentarios,
+    usuarioRegistro: user,
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -165,7 +169,9 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  const jasperModules = import.meta.glob("../../../../jaspers/AntecedentesDeAltura/*.jsx");
+  const jasperModules = import.meta.glob(
+    "../../../../jaspers/AntecedentesAltura/*.jsx"
+  );
   PrintHojaRDefault(
     nro,
     token,
@@ -173,7 +179,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     datosFooter,
     obtenerReporteUrl,
     jasperModules,
-    "../../../../jaspers/AntecedentesDeAltura"
+    "../../../../jaspers/AntecedentesAltura"
   );
 };
 
@@ -211,35 +217,9 @@ const GetInfoPac = async (nro, set, token, sede) => {
       edad: res.edad + " años",
       nombres: res.nombresApellidos,
       dni: res.dni,
-      sexo: res.sexo,
+      sexo: res.genero,
+      cargo: res.cargo,
     }));
-  }
-};
-
-export const getInfoTabla = (
-  nombreSearch,
-  codigoSearch,
-  usuario,
-  setData,
-  token
-) => {
-  try {
-    getFetch(
-      `${obtenerReporteInfoTablaUrl}?${codigoSearch == "" ? "" : `&nOrden=${codigoSearch}`
-      }
-    ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}&usuario=${usuario}`,
-      token
-    ).then((res) => {
-      console.log("pros", res);
-      setData(res);
-    });
-  } catch (error) {
-    console.error("Error en getInfoTabla:", error);
-    Swal.fire(
-      "Error",
-      "Ocurrió un error al obtener los datos de la tabla",
-      "error"
-    );
   }
 };
 

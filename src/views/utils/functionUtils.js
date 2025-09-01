@@ -124,7 +124,6 @@ export const VerifyTRDefault = async (nro, tabla, token, set, sede, noTieneRegis
             noTieneRegistro();//datos paciente
         } else {
             tieneRegistro();//obtener data servicio
-
         }
     });
 };
@@ -141,7 +140,6 @@ export const GetInfoServicioDefault = async (
             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
             token
         );
-
         if (res?.norden) {
             console.log(res);
             return res;
