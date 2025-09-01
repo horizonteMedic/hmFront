@@ -200,7 +200,7 @@ const HeaderRagiografiaToraxPA = (doc, datos) => {
   doc.text(`Sede : ${sedeValue}`, sedeX, sedeY2, { align: "right" });
 
   // === BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
   if (colorValido) {
     const color = datos.codigoColor || "#008f39";
     const boxText = (datos.textoColor || "F").toUpperCase();
