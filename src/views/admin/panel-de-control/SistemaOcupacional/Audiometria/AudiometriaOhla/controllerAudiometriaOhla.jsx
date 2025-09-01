@@ -347,7 +347,6 @@ export const GetInfoServicioFicha = (
           otro: res.chk12Si ? "SI" : "NO",
           otroDescripcion: res.otros ?? "",
 
-          nombre_profecional: res.txtResponsable,
           conclusiones: res.txtConclusiones,
           nombre_medico: res.txtMedico,
 

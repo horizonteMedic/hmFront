@@ -19,7 +19,6 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 export default function AntecedentesDeAltura() {
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
-
   const initialFormState = {
     norden: "",
     codigoAntecedentesAltura: null,
@@ -38,8 +37,8 @@ export default function AntecedentesDeAltura() {
     dniMedico: userCompleto?.datos?.dni_user ?? "",
     nombreMedico: fixEncodingModern(userCompleto?.datos?.nombres_user ?? ""),
     cmp: userCompleto?.datos?.cmp ?? "",
-    emailMedico: "",
-    direccionMedico: "",
+    emailMedico: fixEncodingModern(userCompleto?.datos?.email ?? ""),
+    direccionMedico: fixEncodingModern(userCompleto?.datos?.direccion ?? ""),
 
     // Antecedentes patológicos - todos en false por defecto
     accidenteCerebrovascular: false,
@@ -304,7 +303,8 @@ export default function AntecedentesDeAltura() {
                 </label>
                 <input
                   className="border rounded px-2 py-1 w-full"
-                  name="emailMedico"
+                  name="email"
+                  value={form.email || ""}
                   disabled
                 />
               </div>

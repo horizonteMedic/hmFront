@@ -46,7 +46,7 @@ export const GetInfoServicio = async (
 
       // Antecedentes patológicos
       accidenteCerebrovascular: res.antecedentes?.accidenteCerebroVascularSi,
-      anginaInestable: res.antecedentes?.antecedentes?.anginaInestableSi,
+      anginaInestable: res.antecedentes?.anginaInestableSi,
       antecedenteBypass: res.antecedentes?.antecedenteBypassArterialSi,
       antecedenteEdemaCerebral: res.antecedentes?.antecedenteEdemaCerebralSi,
       antecedenteEdemaPulmonar: res.antecedentes?.antecedenteEdemaPulmonarSi,
@@ -66,7 +66,7 @@ export const GetInfoServicio = async (
       insuficienciaCardiaca: res.antecedentes?.insuficienciaCardiacaSi,
       patologiaHemorragicaRetina: res.antecedentes?.patologiaHemorragicaSi,
       patologiaValvularCardiaca: res.antecedentes?.patologiaValvularSi,
-      presenciaMarcapasos: res.antecedentes?.presenciaMarcapasosSi,
+      presenciaMarcapasos: res.antecedentes?.presenciaMarcaPasosSi,
       riesgoCardiovascularAlto: res.antecedentes?.presenciaRiesgoCardioSi,
       trastornosCoagulacion: res.antecedentes?.transtornoCoagulacionSi,
       trombosisVenosaCerebral: res.antecedentes?.trombosisSi,
