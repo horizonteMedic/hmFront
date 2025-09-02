@@ -6,11 +6,11 @@
 const Header_AnexoCB_Digitalizado = (doc, datos = {}) => {
   // Datos por defecto para el header
   const headerData = {
-    nombreSede: datos.nombreSede || "TRUJILLO NICOLAS DE PIEROLA - HM",
-    numeroFicha: datos.numeroFicha || "99164",
-    color: datos.color || 1,
-    codigoColor: datos.codigoColor || "#E3BF34",
-    textoColor: datos.textoColor || "L"
+    nombreSede: String(datos.sede || ""),
+    numeroFicha: String(datos.norden || ""),
+    color: datos.color ?? 0,
+    codigoColor: datos.codigoColor ,
+    textoColor: datos.textoColor 
   };
 
   const margin = 12;

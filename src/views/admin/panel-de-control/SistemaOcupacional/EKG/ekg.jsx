@@ -447,7 +447,7 @@ export default function EKG() {
 
             <div className="space-y-3">
               <div>
-                <label className="font-semibold block mb-2">Hallazgos:</label>
+                <label className="font-semibold block mb-2">Hallazgos/Observaciones:</label>
                 <textarea
                   className="border rounded px-3 py-2 w-full h-24 resize-none"
                   name="hallazgos"
