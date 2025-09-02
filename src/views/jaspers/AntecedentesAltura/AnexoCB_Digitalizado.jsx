@@ -46,6 +46,7 @@ export default function GenerarDatosPaciente(data = {}) {
     ],
     esApto: true,
     observaciones: "comentario",
+    otrosDescripcion:"otrosObser",
     apellidosUsuario: "Apellidos doctor",
     nombresUsuario: "Nombres doctor",
     cmpUsuario: "1234",
@@ -145,12 +146,13 @@ export default function GenerarDatosPaciente(data = {}) {
         no: data?.antecedentes?.otrosNo },
     ],
     observaciones: data?.antecedentes?.observaciones??"",
+    otrosDescripcion:data?.antecedentes?.otrosDescripcion??"",
     esApto: data?.antecedentes?.esApto,
     //doctor
-    apellidosUsuario: data?.antecedentes?.apellidosUsuario??"",
-    nombresUsuario: data?.antecedentes?.nombresUsuario??"",
-    cmpUsuario: String(data?.antecedentes?.cmpUsuario??""),
-    fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? "")
+    apellidosUsuario: data?.apellidosUsuario??"",
+    nombresUsuario: data?.nombresUsuario??"",
+    cmpUsuario: String(data?.cmpUsuario??""),
+    fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? ""),
 
   };
    const datos =
@@ -291,7 +293,8 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.rect(leftMargin, y, 190, 8);
   doc.text("Comentarios del Médico :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.observaciones, leftMargin + 45, y + 4);
+  doc.text(datos.otrosDescripcion, leftMargin + 15, y-1.5,);
+  doc.text(datos.observaciones, leftMargin + 45, y + 4,{maxWidth:100});
   y += 8;
    
   // Variables para firma de prueba en comentarios
