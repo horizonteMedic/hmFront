@@ -1,36 +1,93 @@
 import jsPDF from "jspdf";
 import Header_AnexoCB_boro_Digitalizado from "./Header/Header_AnexoCB_boro_Digitalizado";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
 
 export default function GenerarDatosPacienteBoro(data = {}) {
   const datos = {
-    antecedentes: data.antecedentes ?? [
-      { texto: "Accidente cerebrovascular", si: true, no: false },
-      { texto: "Angina inestable", si: true, no: false },
-      { texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent", si: true, no: false },
-      { texto: "Antecedente de edema cerebral de altura", si: true, no: false },
-      { texto: "Antecendente de edema pulmonar de altura", si: true, no: false },
-      { texto: "Antecedente de Neumotórax en los ultimos 6 meses", si: true, no: false },
-      { texto: "Arritmia cardiaca no controlada", si: true, no: false },
-      { texto: "Cardiomiopatía hipertrófica idiopática", si: false, no: true },
-      { texto: "Cirugía mayor en los últimos 30 días", si: false, no: true },
-      { texto: "Cualquier insuficiencia en la válvula aórtica", si: true, no: false },
-      { texto: "Diabetes Mellitus", si: true, no: false },
-      { texto: "Embarazo", si: true, no: false },
-      { texto: "Epilepsia", si: true, no: false },
-      { texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada", si: true, no: false },
-      { texto: "Eritrocitosis excesiva (mal de montaña crónico)", si: true, no: false },
-      { texto: "Hipertensión arterial", si: true, no: false },
-      { texto: "Hipertensión pulmonar", si: true, no: false },
-      { texto: "Infarto al miocardio en los últimos 6 meses", si: true, no: false },
-      { texto: "Insuficiencia cardíaca congestiva", si: true, no: false },
-      { texto: "Patología hemorrágica de retina", si: true, no: false },
-      { texto: "Patología Valvular Cardiáca en tratamiento", si: false, no: true },
-      { texto: "Presencia de marcapasos", si: false, no: true },
-      { texto: "Presencia de riesgo cardiovascular alto", si: true, no: false },
-      { texto: "Trastornos de la coagulación", si: false, no: true },
-      { texto: "Trombosis venosa cerebral", si: false, no: true },
-      { texto: "Otros", si: true, no: false },
+    nombreSede: String(data.sede || ""),
+    antecedentes: [
+      { texto: "Accidente cerebrovascular", 
+        si: data?.antecedentes?.accidenteCerebroVascularSi,
+        no: data?.antecedentes?.accidenteCerebroVascularNo },
+      { texto: "Angina inestable", 
+        si: data?.antecedentes?.anginaInestableSi,
+        no: data?.antecedentes?.anginaInestableNo },
+      { texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent", 
+        si: data?.antecedentes?.antecedenteBypassArterialSi,
+        no: data?.antecedentes?.antecedenteBypassArterialNo },
+      { texto: "Antecedente de edema cerebral de altura", 
+        si: data?.antecedentes?.antecedenteEdemaCerebralSi,
+        no: data?.antecedentes?.antecedenteEdemaCerebralNo },
+      { texto: "Antecendente de edema pulmonar de altura", 
+        si: data?.antecedentes?.antecedenteEdemaPulmonarSi,
+        no: data?.antecedentes?.antecedenteEdemaPulmonarNo },
+      { texto: "Antecedente de Neumotórax en los ultimos 6 meses", 
+        si: data?.antecedentes?.antecedenteNeumotoraxSi,
+        no: data?.antecedentes?.antecedenteNeumotoraxNo },
+      { texto: "Arritmia cardiaca no controlada", 
+        si: data?.antecedentes?.arritmiaCardiacaSi,
+        no: data?.antecedentes?.arritmiaCardiacaNo },
+      { texto: "Cardiomiopatía hipertrófica idiopática", 
+        si: data?.antecedentes?.cardiomiopatiaSi,
+        no: data?.antecedentes?.cardiomiopatiaNo },
+      { texto: "Cirugía mayor en los últimos 30 días", 
+        si: data?.antecedentes?.cirujiaMayorSi,
+        no: data?.antecedentes?.cirujiaMayorNo }, 
+      { texto: "Cualquier insuficiencia en la válvula aórtica", 
+        si: data?.antecedentes?.cualquierInsuficienciaSi,
+        no: data?.antecedentes?.cualquierInsuficienciaNo },
+      { texto: "Diabetes Mellitus", 
+        si: data?.antecedentes?.diabetesMellitusSi,
+        no: data?.antecedentes?.diabetesMellitusNo },
+      { texto: "Embarazo", 
+        si: data?.antecedentes?.embarazoSi,
+        no: data?.antecedentes?.embarazoNo },
+      { texto: "Epilepsia", 
+        si: data?.antecedentes?.epilepsiaSi,
+        no: data?.antecedentes?.epilepsiaNo },
+      { texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada", 
+        si: data?.antecedentes?.epocSi,
+        no: data?.antecedentes?.epocNo },
+      { texto: "Eritrocitosis excesiva (mal de montaña crónico)", 
+        si: data?.antecedentes?.eritrocitosisSi,
+        no: data?.antecedentes?.eritrocitosisNo },
+      { texto: "Hipertensión arterial", 
+        si: data?.antecedentes?.hipertensionArterialSi,
+        no: data?.antecedentes?.hipertensionArterialNo },
+      { texto: "Hipertensión pulmonar", 
+        si: data?.antecedentes?.hipertensionPulmonarSi,
+        no: data?.antecedentes?.hipertensionPulmonarNo },
+      { texto: "Infarto al miocardio en los últimos 6 meses", 
+        si: data?.antecedentes?.infartoMiocardioSi,
+        no: data?.antecedentes?.infartoMiocardioNo },
+      { texto: "Insuficiencia cardíaca congestiva", 
+        si: data?.antecedentes?.insuficienciaCardiacaSi,
+        no: data?.antecedentes?.insuficienciaCardiacaNo },
+      { texto: "Patología hemorrágica de retina", 
+        si: data?.antecedentes?.patologiaHemorragicaSi,
+        no: data?.antecedentes?.patologiaHemorragicaNo },
+      { texto: "Patología Valvular Cardiáca en tratamiento", 
+        si: data?.antecedentes?.patologiaValvularSi,
+        no: data?.antecedentes?.patologiaValvularNo },
+      { texto: "Presencia de marcapasos", 
+        si: data?.antecedentes?.presenciaMarcaPasosSi,
+        no: data?.antecedentes?.presenciaMarcaPasosNo },
+      { texto: "Presencia de riesgo cardiovascular alto", 
+        si: data?.antecedentes?.presenciaRiesgoCardioSi,
+        no: data?.antecedentes?.presenciaRiesgoCardioNo },
+      { texto: "Trastornos de la coagulación", 
+        si: data?.antecedentes?.transtornoCoagulacionSi,
+        no: data?.antecedentes?.transtornoCoagulacionNo },
+      { texto: "Trombosis venosa cerebral", 
+        si: data?.antecedentes?.trombosisSi,
+        no: data?.antecedentes?.trombosisNo },
+      { texto: "Otros", 
+        si: data?.antecedentes?.otrosSi,
+        no: data?.antecedentes?.otrosNo },
     ],
+    observaciones: data?.antecedentes?.observaciones??"",
+    esApto: data?.antecedentes?.esApto,
+    fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? "")
   };
 
   const doc = new jsPDF();
@@ -84,24 +141,8 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
   doc.text("3. Comentarios del Médico :", leftMargin + 2, y + 4);
   y += 8;
    
-  // Variables para firma de prueba en comentarios
-  const firmaPruebaX = leftMargin + 58;
-  const firmaPruebaY = y -19;
-  const firmaPruebaWidth = 45;
-  const firmaPruebaHeight = 25;
+
   
-  // Variables para huella digital en comentarios
-  const huellaDigitalX = leftMargin + 105;
-  const huellaDigitalY = y - 19;
-  const huellaDigitalWidth = 25;
-  const huellaDigitalHeight = 18;
-  
-  // Agregar firma de prueba y huella flotantes
-  doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaPruebaX, firmaPruebaY, firmaPruebaWidth, firmaPruebaHeight);
-   
-  // Agregar huella digital (ajustada para que salga vertical)
-  doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaDigitalX, huellaDigitalY, huellaDigitalHeight, huellaDigitalWidth);
-  y += 5;
 
   // ===== 4. CONCLUSIONES =====
   doc.setFont("helvetica", "bold").setFontSize(10);
@@ -116,8 +157,8 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
 
   // Opciones APTO/NO APTO en línea con el texto
   doc.setFont("helvetica", "bold");
-  doc.text("APTO ( )", leftMargin, y);
-  doc.text(", NO APTO (X)", leftMargin + 35, y);
+  doc.text(`APTO (${datos.esApto ? "X" : " "})`, leftMargin, y);
+  doc.text(`, NO APTO (${!datos.esApto ? "X" : " "})`, leftMargin + 35, y);
   doc.setFont("helvetica", "normal");
   doc.text(" para acceder a emplazamientos ubicados en Gran Altitud Geográfica (>2500 msnm)", leftMargin + 75, y);
   y += 8;
@@ -128,7 +169,7 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
   y += 4;
   
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Trujillo-Pierola, 04/11/2024", leftMargin, y);
+  doc.text(`${datos.nombreSede}, ${datos.fechaExamen}`, leftMargin, y);
   y += 8;
 
   // ===== FIRMA DEL TRABAJADOR =====
@@ -145,8 +186,8 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
   const huellaTrabajadorHeight = 15;
   
   // Agregar firma del trabajador y huella
-  doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaTrabajadorX, firmaTrabajadorY, firmaTrabajadorWidth, firmaTrabajadorHeight);
-  doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaTrabajadorX, huellaTrabajadorY, huellaTrabajadorHeight, huellaTrabajadorWidth);
+  // doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaTrabajadorX, firmaTrabajadorY, firmaTrabajadorWidth, firmaTrabajadorHeight);
+  // doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaTrabajadorX, huellaTrabajadorY, huellaTrabajadorHeight, huellaTrabajadorWidth);
   y += 35;
 
   // ===== SELLO Y FIRMA DEL MÉDICO =====
@@ -157,7 +198,7 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
   const firmaMedicoHeight = 28;
   
   // Agregar firma y sello médico
-  doc.addImage("public/img/firmas_sellos_prueba/firma_sello.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
+  // doc.addImage("public/img/firmas_sellos_prueba/firma_sello.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
   
   // Línea horizontal debajo de la firma del médico
   doc.line(leftMargin + 110, firmaMedicoY + 25, leftMargin + 180, firmaMedicoY + 25);
@@ -167,8 +208,33 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
   doc.text("Sello y Firma del Médico Responsable de la Evaluación", leftMargin + 110, firmaMedicoY + 30);
   y += 10;
 
-  // Imprimir / Preview
-  imprimir(doc);
+  
+   const firmasAPintar = [
+    {
+      nombre: "FIRMAP",
+      x: firmaTrabajadorX,
+      y: firmaTrabajadorY,
+      maxw: 40,
+    },
+    {
+      nombre: "HUELLA",
+      x: huellaTrabajadorX,
+      y: huellaTrabajadorY,
+      maxw: 15,
+    },
+    {
+      nombre: "SELLOFIRMA",
+      x: firmaMedicoX,
+      y: firmaMedicoY-10,
+      maxw: 50,
+    },
+  ];
+
+  // Validar que data.informacionSede exista antes de acceder a sus propiedades
+  const digitalizacion = data?.digitalizacion || [];
+  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
 }
 
 function imprimir(doc) {
@@ -179,4 +245,53 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+      img.onload = () => {
+        const sigH = 35; // alto máximo
+        const maxW = maxw; // ancho máximo como parámetro
+        const baseX = x;
+        const baseY = y;
+
+        let imgW = img.width;
+        let imgH = img.height;
+
+        // Escala proporcional en base a ancho y alto máximos
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        // Ahora el ancho se adapta
+        const sigW = imgW;
+
+        // Centrar la imagen
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
+  };
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
 }

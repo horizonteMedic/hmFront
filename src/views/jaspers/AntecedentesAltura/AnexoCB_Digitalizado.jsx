@@ -1,8 +1,9 @@
 import jsPDF from "jspdf";
 import Header_AnexoCB_Digitalizado from "./Header/Header_AnexoCB_Digitalizado";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
 
 export default function GenerarDatosPaciente(data = {}) {
-  const datos = {
+  const datosPrueba = {
     apellidos: data.apellidos ?? "DELGADO VEGA",
     nombres: data.nombres ?? "VIVIANA AYDE",
     dni: data.dni ?? "75461024",
@@ -43,7 +44,118 @@ export default function GenerarDatosPaciente(data = {}) {
       { texto: "Trombosis venosa cerebral", si: false, no: true },
       { texto: "Otros", si: true, no: false },
     ],
+    esApto: true,
+    observaciones: "comentario",
+    apellidosUsuario: "Apellidos doctor",
+    nombresUsuario: "Nombres doctor",
+    cmpUsuario: "1234",
+    fechaExamen: "12/03/2023"
   };
+  const datosReales = {
+    apellidos: data.apellidos ?? "",
+    nombres: data.nombres ?? "",
+    dni: String(data.dni ?? ""),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente ?? ""),
+    edad: String(data.edad ?? ""),
+    sexo: data.sexo ?? "",
+    direccion: String(data.direccionPaciente ?? ""),
+    empresaContratista:
+      data.contrata ??
+      "",
+    empresa: data.empresa ?? "",
+    actividadRealizar: data.cargo ?? "",
+    antecedentes: [
+      { texto: "Accidente cerebrovascular", 
+        si: data?.antecedentes?.accidenteCerebroVascularSi,
+        no: data?.antecedentes?.accidenteCerebroVascularNo },
+      { texto: "Angina inestable", 
+        si: data?.antecedentes?.anginaInestableSi,
+        no: data?.antecedentes?.anginaInestableNo },
+      { texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent", 
+        si: data?.antecedentes?.antecedenteBypassArterialSi,
+        no: data?.antecedentes?.antecedenteBypassArterialNo },
+      { texto: "Antecedente de edema cerebral de altura", 
+        si: data?.antecedentes?.antecedenteEdemaCerebralSi,
+        no: data?.antecedentes?.antecedenteEdemaCerebralNo },
+      { texto: "Antecendente de edema pulmonar de altura", 
+        si: data?.antecedentes?.antecedenteEdemaPulmonarSi,
+        no: data?.antecedentes?.antecedenteEdemaPulmonarNo },
+      { texto: "Antecedente de Neumotórax en los ultimos 6 meses", 
+        si: data?.antecedentes?.antecedenteNeumotoraxSi,
+        no: data?.antecedentes?.antecedenteNeumotoraxNo },
+      { texto: "Arritmia cardiaca no controlada", 
+        si: data?.antecedentes?.arritmiaCardiacaSi,
+        no: data?.antecedentes?.arritmiaCardiacaNo },
+      { texto: "Cardiomiopatía hipertrófica idiopática", 
+        si: data?.antecedentes?.cardiomiopatiaSi,
+        no: data?.antecedentes?.cardiomiopatiaNo },
+      { texto: "Cirugía mayor en los últimos 30 días", 
+        si: data?.antecedentes?.cirujiaMayorSi,
+        no: data?.antecedentes?.cirujiaMayorNo }, 
+      { texto: "Cualquier insuficiencia en la válvula aórtica", 
+        si: data?.antecedentes?.cualquierInsuficienciaSi,
+        no: data?.antecedentes?.cualquierInsuficienciaNo },
+      { texto: "Diabetes Mellitus", 
+        si: data?.antecedentes?.diabetesMellitusSi,
+        no: data?.antecedentes?.diabetesMellitusNo },
+      { texto: "Embarazo", 
+        si: data?.antecedentes?.embarazoSi,
+        no: data?.antecedentes?.embarazoNo },
+      { texto: "Epilepsia", 
+        si: data?.antecedentes?.epilepsiaSi,
+        no: data?.antecedentes?.epilepsiaNo },
+      { texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada", 
+        si: data?.antecedentes?.epocSi,
+        no: data?.antecedentes?.epocNo },
+      { texto: "Eritrocitosis excesiva (mal de montaña crónico)", 
+        si: data?.antecedentes?.eritrocitosisSi,
+        no: data?.antecedentes?.eritrocitosisNo },
+      { texto: "Hipertensión arterial", 
+        si: data?.antecedentes?.hipertensionArterialSi,
+        no: data?.antecedentes?.hipertensionArterialNo },
+      { texto: "Hipertensión pulmonar", 
+        si: data?.antecedentes?.hipertensionPulmonarSi,
+        no: data?.antecedentes?.hipertensionPulmonarNo },
+      { texto: "Infarto al miocardio en los últimos 6 meses", 
+        si: data?.antecedentes?.infartoMiocardioSi,
+        no: data?.antecedentes?.infartoMiocardioNo },
+      { texto: "Insuficiencia cardíaca congestiva", 
+        si: data?.antecedentes?.insuficienciaCardiacaSi,
+        no: data?.antecedentes?.insuficienciaCardiacaNo },
+      { texto: "Patología hemorrágica de retina", 
+        si: data?.antecedentes?.patologiaHemorragicaSi,
+        no: data?.antecedentes?.patologiaHemorragicaNo },
+      { texto: "Patología Valvular Cardiáca en tratamiento", 
+        si: data?.antecedentes?.patologiaValvularSi,
+        no: data?.antecedentes?.patologiaValvularNo },
+      { texto: "Presencia de marcapasos", 
+        si: data?.antecedentes?.presenciaMarcaPasosSi,
+        no: data?.antecedentes?.presenciaMarcaPasosNo },
+      { texto: "Presencia de riesgo cardiovascular alto", 
+        si: data?.antecedentes?.presenciaRiesgoCardioSi,
+        no: data?.antecedentes?.presenciaRiesgoCardioNo },
+      { texto: "Trastornos de la coagulación", 
+        si: data?.antecedentes?.transtornoCoagulacionSi,
+        no: data?.antecedentes?.transtornoCoagulacionNo },
+      { texto: "Trombosis venosa cerebral", 
+        si: data?.antecedentes?.trombosisSi,
+        no: data?.antecedentes?.trombosisNo },
+      { texto: "Otros", 
+        si: data?.antecedentes?.otrosSi,
+        no: data?.antecedentes?.otrosNo },
+    ],
+    observaciones: data?.antecedentes?.observaciones??"",
+    esApto: data?.antecedentes?.esApto,
+    //doctor
+    apellidosUsuario: data?.antecedentes?.apellidosUsuario??"",
+    nombresUsuario: data?.antecedentes?.nombresUsuario??"",
+    cmpUsuario: String(data?.antecedentes?.cmpUsuario??""),
+    fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? "")
+
+  };
+   const datos =
+    data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
+
 
   const doc = new jsPDF();
   
@@ -178,6 +290,8 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin, y, 190, 8);
   doc.text("Comentarios del Médico :", leftMargin + 2, y + 4);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.observaciones, leftMargin + 45, y + 4);
   y += 8;
    
   // Variables para firma de prueba en comentarios
@@ -193,12 +307,12 @@ export default function GenerarDatosPaciente(data = {}) {
   const huellaDigitalHeight = 18;
   
   // Agregar firma de prueba y huella flotantes
-  doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaPruebaX, firmaPruebaY, firmaPruebaWidth, firmaPruebaHeight);
+  // doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaPruebaX, firmaPruebaY, firmaPruebaWidth, firmaPruebaHeight);
   // doc.text("PRUEBA", leftMargin + 135, y);
    
   // Agregar huella digital (ajustada para que salga vertical)
   // Intercambiamos width y height para que la huella salga vertical
-  doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaDigitalX, huellaDigitalY, huellaDigitalHeight, huellaDigitalWidth);
+  // doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaDigitalX, huellaDigitalY, huellaDigitalHeight, huellaDigitalWidth);
   y += 5;
 
   // ===== CERTIFICACIÓN DE APTITUD =====
@@ -210,8 +324,8 @@ export default function GenerarDatosPaciente(data = {}) {
 
   // Opciones APTO/NO APTO en línea con el texto
   doc.setFont("helvetica", "bold");
-  doc.text("APTO ( )", leftMargin, y);
-  doc.text(", NO APTO (X)", leftMargin + 35, y);
+  doc.text(`APTO (${datos.esApto ? "X" : " "})`, leftMargin, y);
+  doc.text(`, NO APTO (${!datos.esApto ? "X" : " "})`, leftMargin + 35, y);
   doc.setFont("helvetica", "normal");
   doc.text(" para acceder a emplazamientos ubicados en Gran Altitud Geográfica (>2500 msnm)", leftMargin + 75, y);
   y += 4;
@@ -228,13 +342,13 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.text("Apellidos :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("SOPLOPUCO MARCE", leftMargin + 25, y + 4);
+  doc.text(datos.apellidosUsuario, leftMargin + 25, y + 4);
 
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin + 95, y, 95, medicoRowHeight);
   doc.text("Nombres :", leftMargin + 97, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("SHNEIDER", leftMargin + 120, y + 4);
+  doc.text(datos.nombresUsuario, leftMargin + 120, y + 4);
   y += medicoRowHeight;
 
   // Fila 2: Dirección
@@ -242,7 +356,7 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.rect(leftMargin, y, 190, medicoRowHeight);
   doc.text("Dirección :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("null", leftMargin + 25, y + 4);
+  doc.text("", leftMargin + 25, y + 4);
   y += medicoRowHeight;
 
   // Fila 3: Correo - Fax - Cel
@@ -254,7 +368,7 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.text("Correo electrónico :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("medico@ejemplo.com", leftMargin + 2, y + 9);
+  doc.text("", leftMargin + 2, y + 9);
 
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin + colCorreo, y, colFax, correoRowHeight);
@@ -278,14 +392,14 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.text("CMP :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("74582", leftMargin + 2, y + 9);
+  doc.text(datos.cmpUsuario, leftMargin + 2, y + 9);
 
   // Fecha: Label arriba, valor abajo
   doc.rect(leftMargin + colCMP, y, colFechaMedico, firmaRowHeight);
   doc.setFont("helvetica", "bold");
   doc.text("Fecha (dd/mm/aa) :", leftMargin + colCMP + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text("17/07/2025", leftMargin + colCMP + 2, y + 9);
+  doc.text(datos.fechaExamen, leftMargin + colCMP + 2, y + 9);
 
   // Firma y sello: Solo label, la firma será flotante
   doc.rect(leftMargin + colCMP + colFechaMedico, y, colFirma, firmaRowHeight);
@@ -299,11 +413,36 @@ export default function GenerarDatosPaciente(data = {}) {
   const firmaMedicoHeight = 25; // Altura de la firma
   
   // Agregar firma y sello médico (flotante, puedes mover X e Y)
-  doc.addImage("public/img/firmas_sellos_prueba/firma_sello.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
+  // doc.addImage("public/img/firmas_sellos_prueba/firma_sello.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
   y += firmaRowHeight + 5;
 
   // Imprimir / Preview
-  imprimir(doc);
+   const firmasAPintar = [
+    {
+      nombre: "FIRMAP",
+      x: firmaPruebaX,
+      y: firmaPruebaY,
+      maxw: 40,
+    },
+    {
+      nombre: "HUELLA",
+      x: huellaDigitalX,
+      y: huellaDigitalY,
+      maxw: 24,
+    },
+    {
+      nombre: "SELLOFIRMA",
+      x: firmaMedicoX,
+      y: firmaMedicoY-10,
+      maxw: 50,
+    },
+  ];
+
+  // Validar que data.informacionSede exista antes de acceder a sus propiedades
+  const digitalizacion = data?.digitalizacion || [];
+  agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
+    imprimir(doc);
+  });
 }
 
 function imprimir(doc) {
@@ -314,4 +453,53 @@ function imprimir(doc) {
   iframe.src = url;
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
+}
+
+function agregarFirmas(doc, digitalizacion = [], firmasAPintar = []) {
+  const addSello = (imagenUrl, x, y, maxw = 100) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.src = imagenUrl;
+      img.onload = () => {
+        const sigH = 35; // alto máximo
+        const maxW = maxw; // ancho máximo como parámetro
+        const baseX = x;
+        const baseY = y;
+
+        let imgW = img.width;
+        let imgH = img.height;
+
+        // Escala proporcional en base a ancho y alto máximos
+        const scale = Math.min(maxW / imgW, sigH / imgH, 1);
+        imgW *= scale;
+        imgH *= scale;
+
+        // Ahora el ancho se adapta
+        const sigW = imgW;
+
+        // Centrar la imagen
+        const imgX = baseX + (sigW - imgW) / 2;
+        const imgY = baseY + (sigH - imgH) / 2;
+
+        doc.addImage(imagenUrl, "PNG", imgX, imgY, imgW, imgH);
+        resolve();
+      };
+      img.onerror = (e) => {
+        console.error("Error al cargar la imagen:", e);
+        resolve();
+      };
+    });
+  };
+
+  const firmas = digitalizacion.reduce(
+    (acc, d) => ({ ...acc, [d.nombreDigitalizacion]: d.url }),
+    {}
+  );
+
+  const promesasFirmas = firmasAPintar
+    .filter((f) => firmas[f.nombre])
+    .map((f) => addSello(firmas[f.nombre], f.x, f.y, f.maxw));
+
+  return Promise.all(promesasFirmas);
 }
