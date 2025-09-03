@@ -118,30 +118,34 @@ export default function InformeElectrocardiograma2023(data = {}) {
   y += 5;
 
   // -------------------------------
-  // 5) Observaciones
-  const observacionesValue = obtener("observaciones");
-  if (observacionesValue) {
-    // Label en negrita
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("OBSERVACIONES", margin + 25, y, { baseline: "top" });
+  // 5) Hallazgos
+  const hallazgosValue = obtener("observaciones");
+  
+  // Label en negrita
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("HALLAZGOS", margin + 25, y, { baseline: "top" });
 
-    // Dos puntos alineados
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(":", margin + 25 + 35, y, { baseline: "top" });
+  // Dos puntos alineados
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(":", margin + 25 + 35, y, { baseline: "top" });
 
-    // Valor
-    const observacionesX = margin + 25 + 45;
-    const observacionesMaxWidth = pageW - observacionesX - margin - 10;
+  // Valor
+  const hallazgosX = margin + 25 + 45;
+  const hallazgosMaxWidth = pageW - hallazgosX - margin - 10;
+  
+  if (hallazgosValue) {
     const lines = doc.splitTextToSize(
-      observacionesValue,
-      observacionesMaxWidth
+      hallazgosValue,
+      hallazgosMaxWidth
     );
 
     lines.forEach((line, index) => {
-      doc.text(line, observacionesX, y + index * 3, { baseline: "top" });
+      doc.text(line, hallazgosX, y + index * 3, { baseline: "top" });
     });
 
     y += lines.length * 3 + 5;
+  } else {
+    y += 5;
   }
 
   // -------------------------------
@@ -159,18 +163,20 @@ export default function InformeElectrocardiograma2023(data = {}) {
   // -------------------------------
   // 7) Conclusión
   const conclusionValue = obtener("conclusion");
+  
+  // Label en negrita
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("CONCLUSION", margin + 25, y, { baseline: "top" });
+
+  // Dos puntos alineados
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(":", margin + 25 + 35, y, { baseline: "top" });
+
+  // Valor
+  const conclusionX = margin + 25 + 45;
+  const conclusionMaxWidth = pageW - conclusionX - margin - 10;
+  
   if (conclusionValue) {
-    // Label en negrita
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("CONCLUSION", margin + 25, y, { baseline: "top" });
-
-    // Dos puntos alineados
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(":", margin + 25 + 35, y, { baseline: "top" });
-
-    // Valor
-    const conclusionX = margin + 25 + 45;
-    const conclusionMaxWidth = pageW - conclusionX - margin - 10;
     const lines = doc.splitTextToSize(conclusionValue, conclusionMaxWidth);
 
     lines.forEach((line, index) => {
@@ -179,13 +185,6 @@ export default function InformeElectrocardiograma2023(data = {}) {
 
     y += lines.length * 3 + 5;
   } else {
-    // Solo el label si no hay valor
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text("CONCLUSION", margin + 25, y, { baseline: "top" });
-
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(":", margin + 25 + 35, y, { baseline: "top" });
-
     y += 5;
   }
 

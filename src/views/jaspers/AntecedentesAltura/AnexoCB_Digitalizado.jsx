@@ -191,7 +191,7 @@ export default function GenerarDatosPaciente(data = {}) {
 
   doc.rect(leftMargin, y, colDNI, row2Height);
   doc.setFont("helvetica", "bold");
-  doc.text("DNI :", leftMargin + 2, y + 3);
+  doc.text("DNI/CE :", leftMargin + 2, y + 3);
   doc.setFont("helvetica", "normal");
   doc.text(datos.dni, leftMargin + 2, y + 6);
 
@@ -205,13 +205,22 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.text("Edad :", leftMargin + colDNI + colFecha + 2, y + 3);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.edad, leftMargin + colDNI + colFecha + 2, y + 6);
+  doc.text(datos.edad + " AÑOS", leftMargin + colDNI + colFecha + 2, y + 6);
 
   doc.rect(leftMargin + colDNI + colFecha + colEdad, y, colSexo, row2Height);
   doc.setFont("helvetica", "bold");
   doc.text("Sexo :", leftMargin + colDNI + colFecha + colEdad + 2, y + 3);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.sexo, leftMargin + colDNI + colFecha + colEdad + 2, y + 6);
+  
+  // Convertir M/F a texto completo
+  let sexoTexto = datos.sexo;
+  if (sexoTexto === "M") {
+    sexoTexto = "MASCULINO";
+  } else if (sexoTexto === "F") {
+    sexoTexto = "FEMENINO";
+  }
+  
+  doc.text(sexoTexto, leftMargin + colDNI + colFecha + colEdad + 2, y + 6);
   y += row2Height;
 
   // ===== FILA 3: Dirección =====
