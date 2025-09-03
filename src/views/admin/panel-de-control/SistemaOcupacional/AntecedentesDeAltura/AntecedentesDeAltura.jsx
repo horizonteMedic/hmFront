@@ -37,7 +37,7 @@ export default function AntecedentesDeAltura() {
     dniMedico: userCompleto?.datos?.dni_user ?? "",
     nombreMedico: fixEncodingModern(userCompleto?.datos?.nombres_user ?? ""),
     cmp: userCompleto?.datos?.cmp ?? "",
-    emailMedico: fixEncodingModern(userCompleto?.datos?.email ?? ""),
+    email: fixEncodingModern(userCompleto?.datos?.email ?? ""),
     direccionMedico: fixEncodingModern(userCompleto?.datos?.direccion ?? ""),
 
     // Antecedentes patológicos - todos en false por defecto

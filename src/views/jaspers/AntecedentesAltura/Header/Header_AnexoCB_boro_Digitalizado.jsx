@@ -1,3 +1,5 @@
+import { formatearFechaCorta } from "../../../utils/formatDateUtils";
+
 /**
  * Header para ANEXO CB - ANTECEDENTES DE ALTURA (BORO)
  * @param {jsPDF} doc - Instancia de jsPDF
@@ -6,18 +8,18 @@
 const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   // Datos por defecto para el header
   const headerData = {
-    nombreSede: datos.nombreSede || "TRUJILLO NICOLAS DE PIEROLA - HM",
-    numeroFicha: datos.numeroFicha || "99164",
-    color: datos.color || 1,
-    codigoColor: datos.codigoColor || "#E3BF34",
-    textoColor: datos.textoColor || "L",
+    nombreSede: String(datos.sede || ""),
+    numeroFicha:  String(datos.norden || ""),
+    color: datos.color || 0,
+    codigoColor: datos.codigoColor ,
+    textoColor: datos.textoColor,
     // Datos del paciente
-    apellidosNombres: datos.apellidosNombres || "CASTILLO PLASENCIA HADY KATHERINE",
-    edad: datos.edad || "31",
-    empresa: datos.empresa || "MINERA BOROO MISQUICHILCA S.A.",
-    sexo: datos.sexo || "FEMENINO",
-    puestoTrabajo: datos.puestoTrabajo || "DAD",
-    fecha: datos.fecha || "04/11/2024"
+    apellidosNombres: `${datos.nombres ?? ""} ${datos.apellidos ?? ""}`,
+    edad: String(datos.edad || ""),
+    empresa: String(datos.empresa || ""),
+    sexo: String(datos.sexo || ""),
+    puestoTrabajo: String(datos.cargo || ""),
+    fecha: formatearFechaCorta(datos?.antecedentes?.fechaAntecedente ?? ""),
   };
 
   const margin = 12;
