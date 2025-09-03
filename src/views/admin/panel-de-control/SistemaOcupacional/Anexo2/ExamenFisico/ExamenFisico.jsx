@@ -1,6 +1,97 @@
 
 
+import { useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBroom, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../hooks/useForm";
+import {
+  getInfoTabla,
+  PrintHojaR,
+  SubmitDataService,
+} from "./controllerExamenFisico";
+
+const tabla = "informe_examen_fisico";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
 const ExamenFisico = () => {
+  const { token, userlogued, datosFooter } = useSessionData();
+  
+  const initialFormState = {
+    norden: "",
+    codigoExamenFisico: null,
+    nombre: "",
+    edad: "",
+    fechaNac: "",
+    fechaExam: today,
+    contrata: "",
+    empresa: "",
+
+    // Examen Físico por Sistemas
+    cabeza: "",
+    cuello: "",
+    boca: "",
+    faringe: "",
+    nariz: "",
+    oidos: "",
+    marcha: "",
+    piel: "",
+    aparatoRespiratorio: "",
+    apaCardiovascular: "",
+    aparatoDigestivo: "",
+    aGenitourinario: "",
+    aparatoLocomotor: "",
+    miembrosSuperiores: "",
+    miembrosInferiores: "",
+    sistemaLinfatico: "",
+    sistemaNervioso: "",
+    columnaVertebral: "",
+
+    // Otros Exámenes
+    otrosExamenes: "",
+
+    // Médico que Certifica
+    medicoCertifica: "",
+
+    nombres_search: "",
+    codigo_search: "",
+    usuario: userlogued ?? "",
+  };
+
+  const {
+    form,
+    handleChange,
+    handleClear,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+
+  useEffect(() => {
+    const obtenerInfoTabla = () => {
+      getInfoTabla(
+        form.nombres_search,
+        form.codigo_search,
+        form.usuario,
+        () => {},
+        token
+      );
+    };
+    obtenerInfoTabla();
+  }, [form.nombres_search, form.codigo_search, form.usuario, token]);
+
   return (
     <div className="p-6" style={{ fontSize: '11px' }}>
       <h3 className="font-semibold mb-6 text-gray-800">Examen Físico por Sistemas</h3>
@@ -12,7 +103,9 @@ const ExamenFisico = () => {
           <label className="w-48  font-medium text-gray-700 mt-2">Cabeza:</label>
           <input 
             type="text" 
-            defaultValue="CENTRAL, PRESENCIA DE CABELLO FRONDOSO, NO MASAS, NO TUMORACIONES."
+            name="cabeza"
+            value={form.cabeza || ""}
+            onChange={handleChange}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
           />
         </div>
@@ -212,6 +305,44 @@ const ExamenFisico = () => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Nombre del médico"
           />
+        </div>
+      </div>
+
+      {/* Botones de Acción */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4 mt-6">
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+          <div className="flex items-center gap-2">
+            <input
+              name="norden"
+              value={form.norden}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 text-base w-24"
+            />
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faPrint} />
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,8 +1,143 @@
 
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faPlus, faBroom, faPen, faChartBar } from "@fortawesome/free-solid-svg-icons";
+import { faCalendarAlt, faPlus, faBroom, faPen, faChartBar, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { useForm } from "../../../../../hooks/useForm";
+import {
+  GetInfoServicio,
+  getInfoTabla,
+  Loading,
+  PrintHojaR,
+  SubmitDataService,
+  VerifyTR,
+} from "./controllerResultados";
+import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+
+const tabla = "informe_resultados_examen";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
 
 const Resultados = () => {
+  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
+  
+  const initialFormState = {
+    norden: "",
+    codigoResultados: null,
+    nombre: "",
+    edad: "",
+    fechaNac: "",
+    fechaExam: today,
+    contrata: "",
+    empresa: "",
+
+    // Aptitud del Paciente
+    aptitud: "apto",
+    fecha: "",
+    fechaVencimiento: "",
+    restricciones: "",
+
+    // Recomendaciones y Restricciones
+    corregirAgudezaVisualTotal: false,
+    corregirAgudezaVisual: false,
+    dietaHipocalorica: false,
+    evitarMovimientosDisergonomicos: false,
+    noTrabajoAltoRiesgo: false,
+    noTrabajoSobre18m: false,
+    usoEppAuditivo: false,
+    usoLentesCorrectorConducir: false,
+    usoLentesCorrectorTrabajo: false,
+    usoLentesCorrectorTrabajo18m: false,
+    ninguno: false,
+    noConducirVehiculos: false,
+    usoEppAuditivoGeneral: false,
+
+    // Resultados de Laboratorio
+    vsg: "",
+    glucosa: "",
+    creatinina: "",
+    marihuana: "",
+    cocaina: "",
+    hemoglobina: "",
+
+    // Estado del Paciente
+    nroOrden: "",
+    nombres: "",
+    tipoExamen: "",
+
+    // Exámenes Realizados
+    triaje: "",
+    labClinico: "",
+    electrocardiograma: "",
+    rxToraxPA: "",
+    fichaAudiologica: "",
+    espirometria: "",
+    odontograma: "",
+    psicologia: "",
+    anexo7D: "",
+    histOcupacional: "",
+    fichaAntPatologicos: "",
+    cuestionarioNordico: "",
+    certTrabajoAltura: "",
+    detencionSAS: "",
+    consentimientoDosaje: "",
+    exRxSanguineos: "",
+    perimetroToraxico: "",
+    oftalmologia: "",
+
+    nombres_search: "",
+    codigo_search: "",
+    usuario: userlogued ?? "",
+  };
+
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleCheckBoxChange,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
+  const [dataTabla, setDataTabla] = useState([]);
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
+
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+
+  const obtenerInfoTabla = () => {
+    getInfoTabla(
+      form.nombres_search,
+      form.codigo_search,
+      form.usuario,
+      setDataTabla,
+      token
+    );
+  };
+
+  useEffect(() => {
+    obtenerInfoTabla();
+  }, []);
+
   return (
     <div className="p-6" style={{ fontSize: '11px' }}>
       <h3 className="font-semibold mb-6 text-gray-800">Resultados del Examen Ocupacional</h3>
@@ -16,7 +151,14 @@ const Resultados = () => {
           {/* Radio buttons de aptitud */}
           <div className="space-y-3 mb-4">
             <label className="flex items-center">
-              <input type="radio" name="aptitud" value="apto" defaultChecked className="mr-3 h-4 w-4" />
+              <input 
+                type="radio" 
+                name="aptitud" 
+                value="apto" 
+                checked={form.aptitud === "apto"}
+                onChange={handleChange}
+                className="mr-3 h-4 w-4" 
+              />
               <span>APTO (para el puesto en el que trabaja o postula)</span>
             </label>
             <label className="flex items-center">
@@ -298,6 +440,44 @@ const Resultados = () => {
             <FontAwesomeIcon icon={faChartBar} className="mr-2" />
             Certificación previa Trabajo en altura
           </button>
+        </div>
+      </div>
+
+      {/* Botones de Acción */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4 mt-6">
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
+          </button>
+        </div>
+        <div className="flex flex-col items-end">
+          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+          <div className="flex items-center gap-2">
+            <input
+              name="norden"
+              value={form.norden}
+              onChange={handleChange}
+              className="border rounded px-2 py-1 text-base w-24"
+            />
+            <button
+              type="button"
+              onClick={handlePrint}
+              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faPrint} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
