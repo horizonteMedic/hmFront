@@ -1,4 +1,4 @@
-import { URLAzure } from "../../../../config/config";
+import { URLAzure } from "../../../../../config/config";
 
 export function SubmitConsentimientoInformado(data,user,token) {
     const body = {

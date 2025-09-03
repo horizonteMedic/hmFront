@@ -43,7 +43,7 @@ const Navbar = () => {
     // { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
     // { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
-    { to: "/permisos", name: "Permisos", label: "Permisos", icon: faKey },
+    // { to: "/permisos", name: "Permisos", label: "Permisos", icon: faKey },
     // { to: "/ekg", name: "Electrocardiograma", label: "EKG", icon: faHeartbeat },
     // { to: "/musculoesqueletico", name: "Evaluación Musculoesquelética", label: "Musculoesquelético", icon: faNotesMedical },
     // { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },

@@ -36,15 +36,8 @@ import {
 } from "./Admision/model/Combobox.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUsers,
   faClipboardList,
-  faFileExcel,
-  faExpand,
-  faTicket,
-  faFileSignature,
   faStethoscope,
-  faFileContract,
-  faChartLine,
   faVial,
   faUserCheck,
   faUserMd,
@@ -55,7 +48,6 @@ import {
   faTooth,
   faEye,
   faBars,
-  faTimes,
   faFlask,
   faFilter,
   faVirus,
@@ -63,7 +55,6 @@ import {
   faFileAlt,
   faMicroscope,
   faVialVirus,
-  faNotesMedical,
   faFileWaveform,
   faAnchor,
   faSkiingNordic,
@@ -72,6 +63,7 @@ import {
   faBed,
   faMountain,
   fa2,
+  faCheckToSlot,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -84,7 +76,7 @@ import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
 import RayosXTabSelector from "./RayosX/RayosXTabSelector.jsx";
-import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
+import ConsentimientoInformadoOcupacional from "./Consentimientos/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
 import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
@@ -92,6 +84,7 @@ import ManejoCamara from "./Playground/ManejoCamara.jsx";
 import EKG from "./EKG/ekg.jsx";
 import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.jsx";
 import Anexo2 from "./Anexo2/Anexo2.jsx";
+import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -425,11 +418,11 @@ const TabComponent = () => {
                 <div
                   onClick={() => setActiveTab(20)}
                   className={`${styles.gridItem} ${
-                    activeTab === 19 ? styles.active : ""
+                    activeTab === 20 ? styles.active : ""
                   }`}
                 >
                   <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faAnchor} />
+                    <FontAwesomeIcon icon={faCheckToSlot} />
                   </span>
                   <span className={styles.title}>
                     Modulo de Consentimientos
@@ -1123,12 +1116,12 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <ConsentimientoInformadoOcupacional
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-                userDatos={userlogued}
-              />
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Módulo de Consentimientos
+                </h2>
+              </div>
+              <ConsentimientosTabSelector tieneVista={tieneVista} />
             </div>
           )}
           {activeTab === 21 && (
