@@ -23,8 +23,6 @@ const initialFormState = {
   nombres: "",
   edad: "",
   dni: "",
-  empresa: "",
-  contrata: "",
   textoFinalConsentimiento: `NO PADEZCO DE ENFERMEDAD ALGUNA, NI PRESENTO SÍNTOMAS DE NINGÚN TIPO, por lo cual me considero un persona completamente SANA.`,
 };
 
@@ -153,26 +151,12 @@ export default function ConsentimientoBuenaSalud() {
 
         {/* Texto del Consentimiento */}
         <div className="space-y-4 mb-6">
-          <div className="text-justify ">
-            <div className="flex mb-3">
-              <p className="mb-3 font-semibold min-w-[169px]">de la Empresa:</p>
-              <input
-                className="border rounded px-2 py-1 w-full"
-                name="empresa"
-                value={form.empresa || ""}
-                onChange={handleChange}
-                disabled
-                placeholder="Empresa"
-              />
-            </div>
-
-            <p className="text-justify leading-relaxed">
-              {form.textoFinalConsentimiento}
-            </p>
-            <p className="text-justify leading-relaxed mt-3">
-              Por lo que soy responsable de lo anteriormente declarado.
-            </p>
-          </div>
+          <p className="text-justify leading-relaxed">
+            {form.textoFinalConsentimiento}
+          </p>
+          <p className="text-justify leading-relaxed mt-3">
+            Por lo que soy responsable de lo anteriormente declarado.
+          </p>
         </div>
 
         {/* Fecha y Hora */}
