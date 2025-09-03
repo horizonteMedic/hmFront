@@ -26,3 +26,35 @@ export function getFetch(url, token) {
     }
     return fetch(URLAzure + url, options).then(res => res.json()).then(response => response)
 }
+
+export function updateData(body, url, token) {
+    const urlCompleta = `${URLAzure}${url}`;
+    const options = {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+    }
+    return fetch(urlCompleta, options).then(res => {
+        if (!res.ok) {
+            return res
+        } return res.json()
+    }).then(response => response)
+}
+
+export function deleteData(url, token) {
+    const urlCompleta = `${URLAzure}${url}`;
+    const options = {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    }
+    return fetch(urlCompleta, options).then(res => {
+        if (!res.ok) {
+            return res
+        } return res.json()
+    }).then(response => response)
+}
