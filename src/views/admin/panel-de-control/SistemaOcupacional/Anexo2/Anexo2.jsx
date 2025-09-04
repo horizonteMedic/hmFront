@@ -5,87 +5,236 @@ import {
   faStethoscope,
   faHeartbeat,
   faChartLine,
-  faPlus
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import Examenes from "./Examenes/Examenes";
 import DatosPersonales from "./DatosPersonales/DatosPersonales";
+import { useForm } from "../../../../hooks/useForm";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 
-// Componentes de contenido para cada tab
-
-
-
-
-
-
-
+const tabla = "informe_electrocardiograma";
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
 
 // Panel de Observaciones Generales
-const PanelObservaciones = () => (
-  <div className="bg-gray-50 p-4 h-full">
-    <div className="space-y-4">
-      {/* Observaciones Generales */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <div className="flex justify-between items-center mb-3">
-          <h4 className="font-medium text-gray-700">Observaciones Generales :</h4>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text=[11px] flex items-center">
-            <FontAwesomeIcon icon={faPlus} className="mr-1" />
-            Agregar
-          </button>
-        </div>
-        <textarea 
-          rows="8" 
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
-          placeholder="RADIOGRAFIA DE COLUMNA LUMBOSACRA AP-L..."
-        ></textarea>
-      </div>
-
-      {/* Perfil Lipídico */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <h4 className="font-medium text-gray-700 mb-3">Perfil Lipídico</h4>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text=[11px] text-gray-600">Colesterol Total :</label>
-            <input type="text" value="2" className="w-16 px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="text=[11px] text-gray-600">L.D.L Colesterol :</label>
-            <input type="text" value="4" className="w-16 px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="text=[11px] text-gray-600">H.D.L Colesterol :</label>
-            <input type="text" value="5" className="w-16 px-2 py-1 border border-gray-300 rounded text-center text-red-600" />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="text=[11px] text-gray-600">V.L.D.L Colesterol :</label>
-            <input type="text" value="6" className="w-16 px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div className="flex items-center justify-between">
-            <label className="text=[11px] text-gray-600">Trigliceridos :</label>
-            <input type="text" value="3" className="w-16 px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-        </div>
-      </div>
-
-      {/* Botón Asignar Médico */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <button className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded font-medium">
-          ASIGNAR MEDICO
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 export default function Anexo2() {
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
+
+  const initialFormState = {
+    norden: "",
+    nomExamen: "",
+    fechaExam: today,
+    //Info personal
+    dni: "",
+    nombres: "",
+    apellidos: "",
+    fechaNac: "",
+    sexo: "",
+    edad: "",
+    //Contacto y Estado Civil
+    lugarNac: "",
+    domicilio: "",
+    telefono: "",
+    estadoCivil: "",
+    gradoInstruccion: "",
+    //Información Laboral
+    empresa: "",
+    contrata: "",
+    mineralExp: "",
+    explotacion: "",
+    alturaLaboral: "",
+    //Detalles del Puesto
+    puestoPostula: "",
+    areaPuesto: "",
+    puestoActual: "",
+    tiempoPuesto: "",
+
+    //Ant. Personales
+    neoplasia: false,
+    neoplasiaDescripcion: "",
+    quemaduras: false,
+    quemadurasDescripcion: "",
+    otrosAntecedentes: false,
+    otrosAntecedentesDescripcion: "",
+    its: false,
+    itsDescripcion: "",
+    cirugias: false,
+    cirugiasDescripcion: "",
+
+    //Residencia en el lugar de trabajo
+    reside: false,
+    tiempoReside: "",
+    essalud: false,
+    sctr: false,
+    eps: false,
+    otrosResidencia: false,
+    otrosResidencia1: false,
+
+    //Número de Hijos
+    hijosVivos: "",
+    hijosMuertos: "",
+    hijosDependientes: "",
+    totalHijos: "",
+
+    //Antecedentes Familiares
+    antecendentesPadre: "",
+    antecendentesMadre: "",
+    antecendentesHermano: "",
+    antecendentesEsposao: "",
+
+    //Medicamentos
+    tomaMedicamento: false,
+    tipoMedicamentos: "",
+    frecuenciaMedicamentos: "",
+
+    //Absentismo: Enfermedades y accidentes
+    enfermedadAccidente: "",
+    enfermedadAsociadaTrabajo: false,
+    anioEnfermedad: "",
+    diasDescanso: "",
+    dataEnfermedades: [],
+
+    // //Medidas Generales
+    // talla: "",
+    // peso: "",
+    // imc: "",
+
+    //===============================
+    //TAB LATERAL
+    //===============================
+    observacionesGenerales: "",
+    colesterolTotal: "",
+    LDLColesterol: "",
+    HDLColesterol: "",
+    VLDLColesterol: "",
+    trigliceridos: "",
+    //Comparacion Grupo Sanguineo
+    grupoSanguineoPrevio: "",
+    grupoSanguineoGrupo: "",
+    //Grupo Sanguineo
+    grupoSanguineo: "",
+    factorRh: "",
+    //Resultados de Laboratorio
+    vsg: "",
+    glucosa: "",
+    creatinina: "",
+    marihuana: "",
+    cocaina: "",
+    hemoglobinaHematocrito: "",
+
+    //===============================
+    //SEGUNDA TAB EXAMENES
+    //===============================
+    // Función Respiratoria
+    fvc: "",
+    fev1: "",
+    fev1Fvc: "",
+    fef2575: "",
+    conclusionRespiratoria: "",
+    normalRespiratoria: false,
+    pObstruccion: false,
+
+    // Medidas Generales
+    temperatura: "",
+    cintura: "",
+    cadera: "",
+    icc: "",
+
+    // Signos Vitales
+    frecuenciaRespiratoria: "",
+    frecuenciaCardiaca: "",
+    saturacionO2: "",
+    perimetro: "",
+
+    // Audiometría - Oído Derecho
+    od500: "",
+    od1000: "",
+    od2000: "",
+    od3000: "",
+    od4000: "",
+    od6000: "",
+    od8000: "",
+
+    // Audiometría - Oído Izquierdo
+    oi500: "",
+    oi1000: "",
+    oi2000: "",
+    oi3000: "",
+    oi4000: "",
+    oi6000: "",
+    oi8000: "",
+
+    // Ojos
+    visionCercaOd: "",
+    visionCercaOi: "",
+    visionCercaOdCorregida: "",
+    visionCercaOiCorregida: "",
+    visionLejosOd: "",
+    visionLejosOi: "",
+    visionLejosOdCorregida: "",
+    visionLejosOiCorregida: "",
+    visionColores: "",
+    enfermedadOculares: "",
+    enfermedadOtros: "",
+    reflejosPupilares: "",
+    visionBinocular: "",
+
+    // Dentadura
+    piezasMalEstado: "",
+    piezasFaltan: "",
+
+    // Presión Arterial
+    presionSistolica: "",
+    presionDiastolica: "",
+
+    // Grupo Sanguíneo
+    grupoSanguineo: "",
+    rh: "",
+
+    // Observaciones Generales
+    ectoscopia: "",
+    estadoMental: "",
+    anamnesis: "",
+  };
+
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleCheckBoxChange,
+    handleClear,
+    handleClearnotO,
+    handleRadioButtonBoolean,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [
-    { id: 0, name: "Datos Personales", icon: faUser, component: DatosPersonales },
+    {
+      id: 0,
+      name: "Datos Personales",
+      icon: faUser,
+      component: DatosPersonales,
+    },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    { id: 2, name: "Examen Físico", icon: faHeartbeat, component: ExamenFisico },
-    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados }
+    {
+      id: 2,
+      name: "Examen Físico",
+      icon: faHeartbeat,
+      component: ExamenFisico,
+    },
+    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
 
   return (
@@ -116,15 +265,40 @@ export default function Anexo2() {
             <div className="max-w-full">
               {tabs.map((tab) => {
                 const Component = tab.component;
-                return activeTab === tab.id && <Component key={tab.id} />;
+                return (
+                  activeTab === tab.id && (
+                    <Component
+                      key={tab.id}
+                      form={form}
+                      setForm={setForm}
+                      handleChange={handleChange}
+                      handleChangeNumber={handleChangeNumber}
+                      handleRadioButton={handleRadioButton}
+                      handleCheckBoxChange={handleCheckBoxChange}
+                      handleClear={handleClear}
+                      handleClearnotO={handleClearnotO}
+                      handleRadioButtonBoolean={handleRadioButtonBoolean}
+                    />
+                  )
+                );
               })}
             </div>
           </div>
         </div>
-        
+
         {/* Panel lateral de datos - 20% */}
         <div className="w-1/5 border-l border-gray-200">
-          <PanelObservaciones />
+          <PanelObservaciones
+            form={form}
+            setForm={setForm}
+            handleChange={handleChange}
+            handleChangeNumber={handleChangeNumber}
+            handleRadioButton={handleRadioButton}
+            handleCheckBoxChange={handleCheckBoxChange}
+            handleClear={handleClear}
+            handleClearnotO={handleClearnotO}
+            handleRadioButtonBoolean={handleRadioButtonBoolean}
+          />
         </div>
       </div>
     </div>

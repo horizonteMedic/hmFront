@@ -143,7 +143,7 @@ const Resultados = () => {
       <h3 className="font-semibold mb-6 text-gray-800">Resultados del Examen Ocupacional</h3>
           
       {/* Primera fila - 3 columnas */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Columna 1 - Aptitud del Paciente */}
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="font-semibold text-gray-800 mb-4">Aptitud del Paciente</p>
@@ -281,7 +281,7 @@ const Resultados = () => {
         </div>
 
         {/* Columna 3 - Resultados de Laboratorio */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        {/* <div className="bg-white border border-gray-200 rounded-lg p-6">
           <p className="font-semibold text-gray-800 mb-4">Resultados de Laboratorio</p>
           
           <div className="space-y-3">
@@ -313,7 +313,7 @@ const Resultados = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Segunda fila - Estado del Paciente (1 columna) */}
