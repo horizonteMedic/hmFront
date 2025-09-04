@@ -87,6 +87,7 @@ export default function GenerarDatosPacienteBoro(data = {}) {
     ],
     observaciones: data?.antecedentes?.observaciones??"",
     esApto: data?.antecedentes?.esApto,
+    otrosDescripcion:data?.antecedentes?.otrosDescripcion??"",
     fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? "")
   };
 
@@ -139,14 +140,17 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin, y, 190, 8);
   doc.text("3. Comentarios del Médico :", leftMargin + 2, y + 4);
+  doc.setFont("helvetica", "normal");
+  doc.text(datos.otrosDescripcion, leftMargin + 15, y-1.5,);
+  doc.text(datos.observaciones, leftMargin + 45, y + 4,{maxWidth:100});
   y += 8;
-   
-
   
+  
+ 
 
   // ===== 4. CONCLUSIONES =====
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("4. CONCLUSIONES", leftMargin, y);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("4. CONCLUSIONES", leftMargin, y+3.5);
   y += 6;
 
   // Texto de certificación

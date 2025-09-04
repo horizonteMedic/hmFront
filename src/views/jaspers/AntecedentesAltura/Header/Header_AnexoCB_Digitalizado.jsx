@@ -36,8 +36,21 @@ const Header_AnexoCB_Digitalizado = (doc, datos = {}) => {
   // === 2) BLOQUE CÓDIGO DE COLOR ===
   const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 150;
   const color = headerData.codigoColor || "#E3BF34";
-  const boxText = (headerData.textoColor || "L").toUpperCase();
+  
+  // Convertir M/F a texto completo
+  let boxText = (headerData.textoColor || "L").toUpperCase();
+  if (boxText === "M") {
+    boxText = "MASCULINO";
+  } else if (boxText === "F") {
+    boxText = "FEMENINO";
+  }
+  
+  // Ajustar el tamaño de la caja según el texto
   let boxSize = 15;
+  if (boxText === "MASCULINO" || boxText === "FEMENINO") {
+    boxSize = 35; // Caja más ancha para texto completo
+  }
+  
   let boxX = pageW - marginRight - boxSize;
   let boxY = y - 6.5;
 
@@ -51,7 +64,14 @@ const Header_AnexoCB_Digitalizado = (doc, datos = {}) => {
     doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
     doc.setDrawColor(0);
     doc.setLineWidth(0.2);
-    doc.setFontSize(25); // Aumentado de 18 a 25
+    
+    // Ajustar el tamaño de fuente según el texto
+    let fontSize = 25;
+    if (boxText === "MASCULINO" || boxText === "FEMENINO") {
+      fontSize = 8; // Fuente más pequeña para texto completo
+    }
+    
+    doc.setFontSize(fontSize);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(color);
     doc.text(boxText, boxX + boxSize/2, boxY + boxSize/2, {

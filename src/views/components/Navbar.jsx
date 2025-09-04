@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature, faHeartbeat } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature, faHeartbeat, faKey } from '@fortawesome/free-solid-svg-icons';
 import { URLAzure } from '../config/config';
 
 const Navbar = () => {
@@ -43,6 +43,7 @@ const Navbar = () => {
     // { to: "/reporte-pacientes", name: "Reportes", label: "Reportes", icon: faChartBar },
     // { to: "/matriz-postulante", name: "Matriz Postulante", label: "Matriz Postulante", icon: faList },
     { to: "/SistemaOcupacional", name: "Modulo Ocupacional", label: "Ocupacional", icon: faNotesMedical },
+    // { to: "/permisos", name: "Permisos", label: "Permisos", icon: faKey },
     // { to: "/ekg", name: "Electrocardiograma", label: "EKG", icon: faHeartbeat },
     // { to: "/musculoesqueletico", name: "Evaluación Musculoesquelética", label: "Musculoesquelético", icon: faNotesMedical },
     // { to: "/odontologia", name: "Odontología", label: "Odontología", icon: faTooth },

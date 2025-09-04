@@ -39,15 +39,9 @@ import AdministrarContratas from "./views/admin/panel-de-control/Configuracion/A
 import Protocolos from "./views/admin/panel-de-control/Configuracion/Protocolos/Protocolos.jsx";
 import LibroDeReclamaciones from "./views/admin/LibroDeReclamaciones/LibroDeReclamaciones.jsx";
 import Formulario from "./views/admin/RegistroUnico/Formulario.jsx";
+import Permisos from "./views/admin/Permisos/Permisos.jsx";
 import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx";
-import HistoriaOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/HistoriaOcupacional/HistoriaOcupacional.jsx";
-import Espirometria from "./views/admin/panel-de-control/SistemaOcupacional/Espirometria/Espirometria.jsx";
-import OftalmologiaTabSelector from "./views/admin/panel-de-control/SistemaOcupacional/Oftalmologia/OftalmologiaTabSelector.jsx";
-import MusculoEsqueleticoTabSelector from "./views/admin/panel-de-control/SistemaOcupacional/Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
-import Odontologia from "./views/admin/panel-de-control/SistemaOcupacional/Odontologia/Odontologia.jsx";
-import RayosXTabSelector from "./views/admin/panel-de-control/SistemaOcupacional/RayosX/RayosXTabSelector.jsx";
-import ConsentimientoInformadoOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
-import EKG from "./views/admin/panel-de-control/SistemaOcupacional/EKG/ekg.jsx";
+
 
 //SIMULADOR DE jaspers
 import Ficha from "./views/jaspers/AntecedentesAltura/AnexoCB_boro_Digitalizado.jsx"
@@ -168,6 +162,7 @@ const AppContent = () => {
         path="/libro-de-reclamaciones"
         element={<LibroDeReclamaciones />}
       />
+      <Route path="/permisos" element={<Permisos />} />
       <Route path="*" element={<Navigate to="/" />} />
       <Route path="/fichapi" element={<Ficha />} />
       </Routes>
