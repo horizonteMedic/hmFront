@@ -4,11 +4,15 @@ export default function InputsRadioGroup({
   onChange,
   disabled = false,
   options = [], // [{ label: "Texto", value: "valor" }]
+  className = "",
 }) {
   return (
     <div className="flex gap-4">
       {options.map((option) => (
-        <label key={option.value} className="flex items-center gap-1">
+        <label
+          key={option.value}
+          className={`flex items-center gap-1 ${className}`}
+        >
           <input
             type="radio"
             name={name}

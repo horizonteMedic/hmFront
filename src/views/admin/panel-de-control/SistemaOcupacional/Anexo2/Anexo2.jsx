@@ -138,9 +138,8 @@ export default function Anexo2() {
     fev1: "",
     fev1Fvc: "",
     fef2575: "",
+    tipoFuncionRespiratoria: "",
     conclusionRespiratoria: "",
-    normalRespiratoria: false,
-    pObstruccion: false,
 
     // Medidas Generales
     temperatura: "",
