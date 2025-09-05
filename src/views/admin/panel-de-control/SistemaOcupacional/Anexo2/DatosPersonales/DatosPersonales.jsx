@@ -15,6 +15,36 @@ export default function DatosPersonales({
   handleClearnotO,
   handleRadioButtonBoolean,
 }) {
+  function handleAgregarEnfermedad() {
+    setForm((prev) => {
+      const nuevasEnfermedades = [
+        ...prev.dataEnfermedades,
+        {
+          enfermedad: prev.enfermedad,
+          asociadoTrabajo: prev.asociadoTrabajo,
+          anio: prev.anio,
+          diasDescanso: prev.diasDescanso,
+        },
+      ].sort((a, b) => Number(a.anio) - Number(b.anio)); // Ordena de menor a mayor
+
+      return {
+        ...prev,
+        enfermedad: "",
+        asociadoTrabajo: false,
+        anio: "",
+        diasDescanso: "",
+        dataEnfermedades: nuevasEnfermedades,
+      };
+    });
+  }
+
+  function handleLimpiarEnfermedad() {
+    setForm((prev) => ({
+      ...prev,
+      dataEnfermedades: [],
+    }));
+  }
+
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
       {/* Header con información del examen */}
@@ -217,25 +247,42 @@ export default function DatosPersonales({
                 <InputCheckbox
                   label="Neoplasia"
                   checked={form.neoplasia}
-                  onChange={handleCheckBoxChange}
+                  name="neoplasia"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        neoplasiaDescripcion: "",
+                      }));
+                  }}
                 />
                 <InputTextOneLine
                   name="neoplasiaDescripcion"
                   value={form.neoplasiaDescripcion}
                   onChange={handleChange}
+                  disabled={!form.neoplasia}
                 />
               </div>
               <div className="grid grid-cols-2">
                 <InputCheckbox
                   label="ITS"
                   checked={form.its}
-                  onChange={handleCheckBoxChange}
                   name="its"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        itsDescripcion: "",
+                      }));
+                  }}
                 />
                 <InputTextOneLine
                   name="itsDescripcion"
                   value={form.itsDescripcion}
                   onChange={handleChange}
+                  disabled={!form.its}
                 />
               </div>
 
@@ -243,13 +290,21 @@ export default function DatosPersonales({
                 <InputCheckbox
                   label="Quemaduras"
                   checked={form.quemaduras}
-                  onChange={handleCheckBoxChange}
                   name="quemaduras"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        quemadurasDescripcion: "",
+                      }));
+                  }}
                 />
                 <InputTextOneLine
                   name="quemadurasDescripcion"
                   value={form.quemadurasDescripcion}
                   onChange={handleChange}
+                  disabled={!form.quemaduras}
                 />
               </div>
 
@@ -257,13 +312,21 @@ export default function DatosPersonales({
                 <InputCheckbox
                   label="Cirugías"
                   checked={form.cirugias}
-                  onChange={handleCheckBoxChange}
                   name="cirugias"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        cirugiasDescripcion: "",
+                      }));
+                  }}
                 />
                 <InputTextOneLine
                   name="cirugiasDescripcion"
                   value={form.cirugiasDescripcion}
                   onChange={handleChange}
+                  disabled={!form.cirugias}
                 />
               </div>
 
@@ -271,13 +334,21 @@ export default function DatosPersonales({
                 <InputCheckbox
                   label="Otros"
                   checked={form.otrosAntecedentes}
-                  onChange={handleCheckBoxChange}
                   name="otrosAntecedentes"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        otrosAntecedentesDescripcion: "",
+                      }));
+                  }}
                 />
                 <InputTextOneLine
                   name="otrosAntecedentesDescripcion"
                   value={form.otrosAntecedentesDescripcion}
                   onChange={handleChange}
+                  disabled={!form.otrosAntecedentes}
                   className="col-span-3 -ml-0.5"
                 />
               </div>
@@ -420,7 +491,15 @@ export default function DatosPersonales({
               <InputsBooleanRadioGroup
                 name="tomaMedicamento"
                 value={form.tomaMedicamento}
-                onChange={handleRadioButtonBoolean}
+                onChange={(e, value) => {
+                  handleRadioButtonBoolean(e, value);
+                  if (!value)
+                    setForm((prevForm) => ({
+                      ...prevForm,
+                      tipoMedicamentos: "",
+                      frecuenciaMedicamentos: "",
+                    }));
+                }}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -429,50 +508,17 @@ export default function DatosPersonales({
                 name="tipoMedicamentos"
                 value={form.tipoMedicamentos}
                 onChange={handleChange}
+                disabled={!form.tomaMedicamento}
               />
               <InputTextOneLine
                 label="Frecuencia"
                 name="frecuenciaMedicamentos"
                 value={form.frecuenciaMedicamentos}
                 onChange={handleChange}
+                disabled={!form.tomaMedicamento}
               />
             </div>
           </div>
-
-          {/* Medidas Generales */}
-          {/* <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Medidas Generales
-            </h4>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Talla:</label>
-                <input
-                  type="text"
-                  defaultValue="170"
-                  className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center"
-                />
-                <span>m.</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Peso:</label>
-                <input
-                  type="text"
-                  defaultValue="65"
-                  className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center"
-                />
-                <span>Kg.</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">IMC:</label>
-                <input
-                  type="text"
-                  defaultValue="0.00"
-                  className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center"
-                />
-              </div>
-            </div>
-          </div> */}
 
           {/* Absentismo */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -483,8 +529,8 @@ export default function DatosPersonales({
               {/* Enfermedad, Accidente */}
               <InputTextOneLine
                 label="Enfermedad, Accidente"
-                name="enfermedadAccidente"
-                value={form.enfermedadAccidente}
+                name="enfermedad"
+                value={form.enfermedad}
                 onChange={handleChange}
               />
               {/* Asociado al Trabajo */}
@@ -493,30 +539,36 @@ export default function DatosPersonales({
                   Asociado al Trabajo:
                 </label>
                 <InputsBooleanRadioGroup
-                  name="enfermedadAsociadaTrabajo"
-                  value={form.enfermedadAsociadaTrabajo}
+                  name="asociadoTrabajo"
+                  value={form.asociadoTrabajo}
                   onChange={handleRadioButtonBoolean}
                 />
               </div>
               {/* Año y Días descanso */}
               <InputTextOneLine
                 label="Año"
-                name="anioEnfermedad"
-                value={form.anioEnfermedad}
-                onChange={handleChange}
+                name="anio"
+                value={form.anio}
+                onChange={handleChangeNumber}
               />
               <InputTextOneLine
                 label="Días descanso"
                 name="diasDescanso"
                 value={form.diasDescanso}
-                onChange={handleChange}
+                onChange={handleChangeNumber}
               />
             </div>
-            <div className="flex gap-4 justify-center mt-3">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded">
+            <div className="flex gap-4 justify-center mt-3 mb-3">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                onClick={handleAgregarEnfermedad}
+              >
                 Agregar
               </button>
-              <button className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded">
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded"
+                onClick={handleLimpiarEnfermedad}
+              >
                 Limpiar
               </button>
             </div>
@@ -552,17 +604,12 @@ function Table({ data }) {
               <tr
                 key={i}
                 className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg `}
-                // onClick={() => clicktable(row.norden)}
-                // onContextMenu={(e) => {
-                //   e.preventDefault();
-                //   handlePrintConfirm(row.norden);
-                // }}
               >
                 <td className="border px-2 py-1 font-bold">
                   {row.enfermedad ?? ""}
                 </td>
                 <td className="border px-2 py-1">
-                  {row.asociadoTrabajo ?? ""}
+                  {row.asociadoTrabajo ? "SÍ" : "NO"}
                 </td>
                 <td className="border px-2 py-1">{row.anio ?? ""}</td>
                 <td className="border px-2 py-1">{row.diasDescanso ?? ""}</td>

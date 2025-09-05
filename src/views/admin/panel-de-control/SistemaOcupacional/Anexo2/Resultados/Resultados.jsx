@@ -1,5 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faPen, faChartBar } from "@fortawesome/free-solid-svg-icons";
 import {
   InputCheckbox,
   InputsRadioGroup,
@@ -7,7 +5,7 @@ import {
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
-const Resultados = ({
+export default function Resultados({
   form,
   setForm,
   handleChange,
@@ -17,7 +15,48 @@ const Resultados = ({
   handleClear,
   handleClearnotO,
   handleRadioButtonBoolean,
-}) => {
+}) {
+  const RestriccionCheckbox = ({ label, name }) => {
+    return (
+      <InputCheckbox
+        label={label}
+        checked={form[name]}
+        name={name}
+        onChange={(e) => {
+          if (e.target.checked) {
+            setForm((prev) => ({
+              ...prev,
+              [name]: true,
+              ninguno: false,
+              restricciones:
+                prev.restricciones === "NINGUNO" || prev.restricciones === ""
+                  ? label
+                  : prev.restricciones + "\n" + label,
+            }));
+          } else {
+            setForm((prev) => ({
+              ...prev,
+              [name]: false,
+              restricciones: "",
+              corregirAgudezaVisualTotal: false,
+              corregirAgudezaVisual: false,
+              dietaHipocalorica: false,
+              evitarMovimientosDisergonomicos: false,
+              noTrabajoAltoRiesgo: false,
+              noTrabajoSobre18m: false,
+              usoEppAuditivo: false,
+              usoLentesCorrectorConducir: false,
+              usoLentesCorrectorTrabajo: false,
+              usoLentesCorrectorTrabajo18m: false,
+              noConducirVehiculos: false,
+              usoEppAuditivoGeneral: false,
+            }));
+          }
+        }}
+      />
+    );
+  };
+
   return (
     <div className="p-6" style={{ fontSize: "11px" }}>
       <h3 className="font-semibold mb-6 text-gray-800">
@@ -54,12 +93,13 @@ const Resultados = ({
           />
 
           {/* Fechas */}
-          <div className="grid grid-cols-2 gap-x-4 my-3">
+          <div className="grid gap-y-2 my-2">
             <InputTextOneLine
               label="Fecha"
               type="date"
               name="fechaAptitud"
               value={form.fechaAptitud}
+              onChange={handleChange}
               labelWidth="120px"
             />
             <InputTextOneLine
@@ -67,6 +107,7 @@ const Resultados = ({
               type="date"
               name="fechaVencimiento"
               value={form.fechaVencimiento}
+              onChange={handleChange}
               labelWidth="120px"
             />
           </div>
@@ -76,7 +117,7 @@ const Resultados = ({
             label="Restricciones"
             name="restricciones"
             value={form.restricciones}
-            disabled
+            onChange={handleChange}
           />
         </div>
 
@@ -86,82 +127,76 @@ const Resultados = ({
             Recomendaciones y Restricciones
           </p>
           <div className="space-y-2 mb-4">
-            <InputCheckbox
+            <RestriccionCheckbox
               label="CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
-              checked={form.corregirAgudezaVisualTotal}
-              onChange={handleCheckBoxChange}
               name="corregirAgudezaVisualTotal"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
-              checked={form.corregirAgudezaVisual}
-              onChange={handleCheckBoxChange}
               name="corregirAgudezaVisual"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="DIETA HIPOCALORICA Y EJERCICIOS"
-              checked={form.dietaHipocalorica}
-              onChange={handleCheckBoxChange}
               name="dietaHipocalorica"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS"
-              checked={form.evitarMovimientosDisergonomicos}
-              onChange={handleCheckBoxChange}
               name="evitarMovimientosDisergonomicos"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="NO HACER TRABAJO DE ALTO RIESGO"
-              checked={form.noTrabajoAltoRiesgo}
-              onChange={handleCheckBoxChange}
               name="noTrabajoAltoRiesgo"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO"
-              checked={form.noTrabajoSobre18m}
-              onChange={handleCheckBoxChange}
               name="noTrabajoSobre18m"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO ≥80 DB"
-              checked={form.usoEppAuditivo}
-              onChange={handleCheckBoxChange}
               name="usoEppAuditivo"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHICULOS MOTORIZADOS"
-              checked={form.usoLentesCorrectorConducir}
-              onChange={handleCheckBoxChange}
               name="usoLentesCorrectorConducir"
             />
-            <InputCheckbox
-              label="USO DE LENTES CORRECTORES PARA TRABAJO."
-              checked={form.usoLentesCorrectorTrabajo}
-              onChange={handleCheckBoxChange}
+            <RestriccionCheckbox
+              label="USO DE LENTES CORRECTORES PARA TRABAJO"
               name="usoLentesCorrectorTrabajo"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
-              checked={form.usoLentesCorrectorTrabajo18m}
-              onChange={handleCheckBoxChange}
               name="usoLentesCorrectorTrabajo18m"
             />
             <InputCheckbox
-              label="NINGUNO."
+              label="NINGUNO"
               checked={form.ninguno}
-              onChange={handleCheckBoxChange}
+              onChange={(e) => {
+                handleCheckBoxChange(e);
+                setForm((prev) => ({
+                  ...prev,
+                  restricciones: e.target.checked ? "NINGUNO" : "",
+                  corregirAgudezaVisualTotal: false,
+                  corregirAgudezaVisual: false,
+                  dietaHipocalorica: false,
+                  evitarMovimientosDisergonomicos: false,
+                  noTrabajoAltoRiesgo: false,
+                  noTrabajoSobre18m: false,
+                  usoEppAuditivo: false,
+                  usoLentesCorrectorConducir: false,
+                  usoLentesCorrectorTrabajo: false,
+                  usoLentesCorrectorTrabajo18m: false,
+                  noConducirVehiculos: false,
+                  usoEppAuditivoGeneral: false,
+                }));
+              }}
               name="ninguno"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="NO CONDUCIR VEHICULOS"
-              checked={form.noConducirVehiculos}
-              onChange={handleCheckBoxChange}
               name="noConducirVehiculos"
             />
-            <InputCheckbox
+            <RestriccionCheckbox
               label="USO DE EPP AUDITIVO"
-              checked={form.usoEppAuditivoGeneral}
-              onChange={handleCheckBoxChange}
               name="usoEppAuditivoGeneral"
             />
           </div>
@@ -326,6 +361,4 @@ const Resultados = ({
       </div>
     </div>
   );
-};
-
-export default Resultados;
+}

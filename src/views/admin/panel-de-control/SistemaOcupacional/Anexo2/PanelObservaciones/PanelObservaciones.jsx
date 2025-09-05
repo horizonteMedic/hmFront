@@ -23,7 +23,7 @@ export default function PanelObservaciones({
         {/* Observaciones Generales */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <InputTextArea
-            rows={8}
+            rows={18}
             label="Observaciones Generales"
             name="observacionesGenerales"
             value={form.observacionesGenerales}

@@ -70,7 +70,7 @@ export default function Anexo2() {
     cirugiasDescripcion: "",
 
     //Residencia en el lugar de trabajo
-    reside: false,
+    reside: true,
     tiempoReside: "",
     essalud: false,
     sctr: false,
@@ -96,9 +96,9 @@ export default function Anexo2() {
     frecuenciaMedicamentos: "",
 
     //Absentismo: Enfermedades y accidentes
-    enfermedadAccidente: "",
-    enfermedadAsociadaTrabajo: false,
-    anioEnfermedad: "",
+    enfermedad: "",
+    asociadoTrabajo: false,
+    anio: "",
     diasDescanso: "",
     dataEnfermedades: [],
 
@@ -206,24 +206,32 @@ export default function Anexo2() {
     //=============================================================================================
 
     // Examen Físico por Sistemas
-    cabeza: "",
-    cuello: "",
-    boca: "",
-    faringe: "",
-    nariz: "",
+    cabeza:
+      "CENTRAL, PRESENCIA DE CABELLO FRONDOSO, NO MASAS, NO TUMORACIONES.",
+    cuello: "CENTRAL, MOVIL, NO MASAS NO TUMORACIONES.",
+    boca: "HUMECTADA, LENGUA ROSADA,CARRILLOS ROSADOS,NO MASA, NO TUMORACIONES, NO LESIONES EN MUCOSA.",
+    faringe:
+      "HUMECTADA, SONROSADA, AMIGADALAS NO HIPERTROFICAS, NO CONGESTIVAS.",
+    nariz: "CENTRAL, PERMEABLE",
     oidos: "",
-    marcha: "",
-    piel: "",
-    aparatoRespiratorio: "",
-    apaCardiovascular: "",
-    aparatoDigestivo: "",
-    aGenitourinario: "",
-    aparatoLocomotor: "",
-    miembrosSuperiores: "",
-    miembrosInferiores: "",
-    sistemaLinfatico: "",
-    sistemaNervioso: "",
-    columnaVertebral: "",
+    marcha: "NORMAL",
+    piel: "NORMAL.NO  MANCHA, NO SPRESENCIA DE LUNARES SOSPECHOSOS DE MALIGNIDAD.",
+    aparatoRespiratorio:
+      "RESPIRACION  NORMAL,EXPANSION TORACICA SIMETRICA, BPMV EN ACP, NO RALES.",
+    apaCardiovascular:
+      "NO INGURGITACION YUGULAR, CAROTIDEO,RADIAL, FEMORAL, PEDIO CONSERVADOS.RCRR, NO SOPLOS, NO FROTES.",
+    aparatoDigestivo:
+      "ABDOMEN PLANO, RHA CONSERVADOS, NO RUIDOS ANORMALES, BLANDO, DEPRESIBLE, NO DOLOR A LA PALPACION SUPERFICIAL NI PROFUNDA, NO MASAS NI TUMORACIONES PALPABLES.",
+    aGenitourinario:
+      "PPL: NEGATIVO. PRU: NEGATIVO.HIPOGASTRIO PLANO, B/D, NO DOLOROSO A LA PALPACION SUPERFIAL NI PROFUNDA.NO MASAS NI TUMORACIONES PALPABLES.",
+    aparatoLocomotor:
+      "BIPEDESTACION,MUSCULATURA CONSERVADA, MOTRICIDAD CORPORAL Y SEGMENTARIA CONSERVADA.",
+    miembrosSuperiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
+    miembrosInferiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
+    sistemaLinfatico: "NO ADENOMEGALIAS PATOLOGICA.",
+    sistemaNervioso:
+      "DESPIERTO, OTEP, SENSIBILIDAD Y MOTRICIDAD CONSERVADA, ROTS CONSERVADOS.PARES CRANEALES CONSERVADOS.NO SIGNOS MENINGEOS.",
+    columnaVertebral: "CENTRAL, CURVATURAS CONSERVADAS, MOTRICIDAD CONSERVADA.",
 
     // Otros Exámenes
     otrosExamenes: "",
@@ -236,8 +244,8 @@ export default function Anexo2() {
     //=============================================================================================
     // Aptitud del Paciente
     aptitud: "APTO",
-    fechaAptitud: "",
-    fechaVencimiento: "",
+    fechaAptitud: today,
+    fechaVencimiento: today,
     restricciones: "",
 
     // Recomendaciones y Restricciones

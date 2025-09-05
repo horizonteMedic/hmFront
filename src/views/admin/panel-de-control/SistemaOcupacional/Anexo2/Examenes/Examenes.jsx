@@ -34,35 +34,36 @@ export default function Examenes({
               name="fvc"
               value={form.fvc}
               disabled
-              labelWidth="90px"
+              labelWidth="80px"
             />
             <InputTextOneLine
               label="FEV1 (% I.)"
               name="fev1"
               value={form.fev1}
               disabled
-              labelWidth="90px"
+              labelWidth="80px"
             />
             <InputTextOneLine
               label="FEV1/FVC (%)"
               name="fev1Fvc"
               value={form.fev1Fvc}
               disabled
-              labelWidth="90px"
+              labelWidth="80px"
             />
             <InputTextOneLine
               label="FEF 25-75% (l/s.)"
               name="fef2575"
               value={form.fef2575}
               disabled
-              labelWidth="90px"
+              labelWidth="80px"
             />
           </div>
           <InputTextArea
-            rows={2}
+            rows={3}
             label="Conclusión"
             name="conclusionRespiratoria"
             value={form.conclusionRespiratoria}
+            onChange={handleChange}
           />
         </div>
 
@@ -174,7 +175,8 @@ export default function Examenes({
 
           <div className="mb-3">
             <h5 className="font-semibold mb-1">Oído Derecho</h5>
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            <div className="grid grid-cols-8 gap-1 mb-2">
+              <div className="text-center font-semibold">Hz</div>
               <div className="text-center font-semibold">500</div>
               <div className="text-center font-semibold">1000</div>
               <div className="text-center font-semibold">2000</div>
@@ -183,7 +185,8 @@ export default function Examenes({
               <div className="text-center font-semibold">6000</div>
               <div className="text-center font-semibold">8000</div>
             </div>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-8 gap-1">
+              <div className="text-center font-semibold my-auto">db (A)</div>
               <InputTextOneLine name="od500" value={form.od500} disabled />
               <InputTextOneLine name="od1000" value={form.od1000} disabled />
               <InputTextOneLine name="od2000" value={form.od2000} disabled />
@@ -192,14 +195,12 @@ export default function Examenes({
               <InputTextOneLine name="od6000" value={form.od6000} disabled />
               <InputTextOneLine name="od8000" value={form.od8000} disabled />
             </div>
-            <div className="text-center font-semibold mt-2">
-              <span>db (A)</span>
-            </div>
           </div>
 
-          <div>
+          <div className="mt-4">
             <h5 className="font-semibold mb-1">Oído Izquierdo</h5>
-            <div className="grid grid-cols-7 gap-1 mb-2">
+            <div className="grid grid-cols-8 gap-1 mb-2">
+              <div className="text-center font-semibold">Hz</div>
               <div className="text-center font-semibold">500</div>
               <div className="text-center font-semibold">1000</div>
               <div className="text-center font-semibold">2000</div>
@@ -208,7 +209,8 @@ export default function Examenes({
               <div className="text-center font-semibold">6000</div>
               <div className="text-center font-semibold">8000</div>
             </div>
-            <div className="grid grid-cols-7 gap-1">
+            <div className="grid grid-cols-8 gap-1">
+              <div className="text-center font-semibold my-auto">db (A)</div>
               <InputTextOneLine name="oi500" value={form.oi500} disabled />
               <InputTextOneLine name="oi1000" value={form.oi1000} disabled />
               <InputTextOneLine name="oi2000" value={form.oi2000} disabled />
@@ -216,9 +218,6 @@ export default function Examenes({
               <InputTextOneLine name="oi4000" value={form.oi4000} disabled />
               <InputTextOneLine name="oi6000" value={form.oi6000} disabled />
               <InputTextOneLine name="oi8000" value={form.oi8000} disabled />
-            </div>
-            <div className="text-center font-semibold mt-2">
-              <span>db (A)</span>
             </div>
           </div>
         </div>
@@ -360,6 +359,7 @@ export default function Examenes({
                   label="Anamnesis"
                   name="anamnesis"
                   value={form.anamnesis}
+                  onChange={handleChange}
                 />
               </div>
             </div>
