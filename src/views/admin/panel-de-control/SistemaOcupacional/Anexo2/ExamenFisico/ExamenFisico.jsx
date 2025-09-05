@@ -19,7 +19,7 @@ export default function ExamenFisico({
   searchNombreMedico,
   filteredNombresMedicos,
   setFilteredNombresMedicos,
-  MedicosMulti
+  MedicosMulti,
 }) {
   return (
     <div className="p-6" style={{ fontSize: "11px" }}>
@@ -196,7 +196,7 @@ export default function ExamenFisico({
               id="nombre_medico"
               name="nombre_medico"
               type="text"
-              value={searchNombreMedico || ""}
+              value={form.nombre_medico || ""}
               placeholder="Escribe para buscar médico..."
               onChange={handleNombreMedicoSearch}
               className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
@@ -207,12 +207,12 @@ export default function ExamenFisico({
                 }
               }}
               onFocus={() => {
-                if (searchNombreMedico) {
+                if (form.nombre_medico) {
                   setFilteredNombresMedicos(
                     MedicosMulti.filter((emp) =>
                       emp.mensaje
                         .toLowerCase()
-                        .includes(searchNombreMedico.toLowerCase())
+                        .includes(form.nombre_medico.toLowerCase())
                     )
                   );
                 }
@@ -221,7 +221,7 @@ export default function ExamenFisico({
                 setTimeout(() => setFilteredNombresMedicos([]), 100)
               }
             />
-            {searchNombreMedico && filteredNombresMedicos.length > 0 && (
+            {form.nombre_medico && filteredNombresMedicos.length > 0 && (
               <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
                 {filteredNombresMedicos.map((medico) => (
                   <li

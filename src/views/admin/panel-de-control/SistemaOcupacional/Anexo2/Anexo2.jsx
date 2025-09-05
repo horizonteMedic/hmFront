@@ -300,14 +300,12 @@ export default function Anexo2({ listas }) {
     handleRadioButton,
     handleCheckBoxChange,
     handleRadioButtonBoolean,
+    handleClear,
+    handleClearnotO,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const [activeTab, setActiveTab] = useState(0);
-
-  const [searchNombreMedico, setSearchNombreMedico] = useState(
-    form.nombre_medico
-  );
   const [filteredNombresMedicos, setFilteredNombresMedicos] = useState([]);
 
   const tabs = [
@@ -327,23 +325,10 @@ export default function Anexo2({ listas }) {
     { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
 
-  const handleClear = () => {
-    setForm(initialFormState);
-    setSearchNombreMedico("");
-  };
-
-  const handleClearnotO = () => {
-    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
-    setSearchNombreMedico("");
-  };
-
   const handleNombreMedicoSearch = (e) => {
     const v = e.target.value.toUpperCase();
-    if (v === "") {
-      setForm((d) => ({ ...d, nombre_medico: "" }));
-    }
     setForm((d) => ({ ...d, nombre_medico: v }));
-    setSearchNombreMedico(v);
+
     setFilteredNombresMedicos(
       v
         ? MedicosMulti.filter((medico) =>
@@ -354,7 +339,6 @@ export default function Anexo2({ listas }) {
   };
 
   const handleSelectNombreMedico = (medico) => {
-    setSearchNombreMedico(medico.mensaje);
     setForm((d) => ({ ...d, nombre_medico: medico.mensaje }));
     setFilteredNombresMedicos([]);
   };
@@ -402,7 +386,7 @@ export default function Anexo2({ listas }) {
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
                       handleNombreMedicoSearch={handleNombreMedicoSearch}
                       handleSelectNombreMedico={handleSelectNombreMedico}
-                      searchNombreMedico={searchNombreMedico}
+                      // searchNombreMedico={searchNombreMedico}
                       filteredNombresMedicos={filteredNombresMedicos}
                       setFilteredNombresMedicos={setFilteredNombresMedicos}
                       MedicosMulti={MedicosMulti}
