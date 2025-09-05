@@ -5,7 +5,6 @@ import {
   faStethoscope,
   faHeartbeat,
   faChartLine,
-  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
@@ -26,7 +25,7 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 export default function Anexo2({ listas }) {
   const { MedicosMulti } = listas;
-  console.log(MedicosMulti);
+  // console.log(MedicosMulti);
 
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
@@ -288,8 +287,9 @@ export default function Anexo2({ listas }) {
     perimetroToraxico: "",
     oftalmologia: "",
 
-    // Médico que Certifica
+    // Médico que Certifica //BUSCADOR
     nombre_medico: "",
+    filteredNombresMedicos: [],
   };
 
   const {
@@ -306,7 +306,6 @@ export default function Anexo2({ listas }) {
   } = useForm(initialFormState);
 
   const [activeTab, setActiveTab] = useState(0);
-  const [filteredNombresMedicos, setFilteredNombresMedicos] = useState([]);
 
   const tabs = [
     {
@@ -324,24 +323,6 @@ export default function Anexo2({ listas }) {
     },
     { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
-
-  const handleNombreMedicoSearch = (e) => {
-    const v = e.target.value.toUpperCase();
-    setForm((d) => ({ ...d, nombre_medico: v }));
-
-    setFilteredNombresMedicos(
-      v
-        ? MedicosMulti.filter((medico) =>
-            medico.mensaje.toLowerCase().includes(v.toLowerCase())
-          )
-        : []
-    );
-  };
-
-  const handleSelectNombreMedico = (medico) => {
-    setForm((d) => ({ ...d, nombre_medico: medico.mensaje }));
-    setFilteredNombresMedicos([]);
-  };
 
   return (
     <div className="mx-auto bg-white overflow-hidden ">
@@ -384,11 +365,6 @@ export default function Anexo2({ listas }) {
                       handleClear={handleClear}
                       handleClearnotO={handleClearnotO}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
-                      handleNombreMedicoSearch={handleNombreMedicoSearch}
-                      handleSelectNombreMedico={handleSelectNombreMedico}
-                      // searchNombreMedico={searchNombreMedico}
-                      filteredNombresMedicos={filteredNombresMedicos}
-                      setFilteredNombresMedicos={setFilteredNombresMedicos}
                       MedicosMulti={MedicosMulti}
                     />
                   )
