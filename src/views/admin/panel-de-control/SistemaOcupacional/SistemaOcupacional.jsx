@@ -1214,6 +1214,11 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Anexo 2
+                </h2>
+              </div>
               <Anexo2 />
             </div>
           )}

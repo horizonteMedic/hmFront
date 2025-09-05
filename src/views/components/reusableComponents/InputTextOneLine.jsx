@@ -1,5 +1,5 @@
 export default function InputTextOneLine({
-  label,
+  label = "",
   name,
   value,
   onChange,
@@ -10,11 +10,12 @@ export default function InputTextOneLine({
   className = "",
 }) {
   return (
-    <div className={`flex items-center gap-4 ${className}`}>
+    <div className={`flex items-center gap-4  ${className}`}>
       {label && (
         <label
           className="font-semibold"
           style={{ minWidth: labelWidth, maxWidth: labelWidth }}
+          htmlFor={name}
         >
           {label} :
         </label>
@@ -24,6 +25,7 @@ export default function InputTextOneLine({
         className={`border rounded px-2 py-1 w-full ${
           disabled ? "bg-gray-100" : ""
         }`}
+        id={name}
         name={name}
         value={value ?? ""}
         onKeyUp={onKeyUp}

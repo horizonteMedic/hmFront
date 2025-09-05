@@ -1,5 +1,10 @@
-import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
-import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import { faBroom, faSave } from "@fortawesome/free-solid-svg-icons";
+import {
+  InputsRadioGroup,
+  InputTextArea,
+  InputTextOneLine,
+} from "../../../../../components/reusableComponents/ResusableComponents";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function PanelObservaciones({
   form,
@@ -13,21 +18,16 @@ export default function PanelObservaciones({
   handleRadioButtonBoolean,
 }) {
   return (
-    <div className="bg-gray-50 p-4 h-full">
+    <div className="p-4 h-full mt-16">
       <div className="space-y-4">
         {/* Observaciones Generales */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <div className="flex justify-between items-center mb-3">
-            <h4 className="font-semibold text-gray-700">
-              Observaciones Generales :
-            </h4>
-          </div>
-          <textarea
-            rows="8"
+          <InputTextArea
+            rows={8}
+            label="Observaciones Generales"
             name="observacionesGenerales"
-            value={form.observacionesGenerales ?? ""}
+            value={form.observacionesGenerales}
             disabled
-            className="border rounded px-2 py-1 w-full resize-none bg-gray-100"
           />
         </div>
 
@@ -85,16 +85,12 @@ export default function PanelObservaciones({
           </h4>
           <div className="flex items-center space-x-2">
             <InputTextOneLine
-              label=""
               name="grupoSanguineoPrevio"
               value={form.grupoSanguineoPrevio}
               disabled
             />
-
             <span className="font-medium">=</span>
-
             <InputTextOneLine
-              label=""
               name="grupoSanguineoGrupo"
               value={form.grupoSanguineoGrupo}
               disabled
@@ -144,7 +140,6 @@ export default function PanelObservaciones({
               labelWidth="110px"
               disabled
             />
-
             <InputTextOneLine
               label="Glucosa"
               name="glucosa"
@@ -152,7 +147,6 @@ export default function PanelObservaciones({
               labelWidth="110px"
               disabled
             />
-
             <InputTextOneLine
               label="Creatinina"
               name="creatinina"
@@ -160,7 +154,6 @@ export default function PanelObservaciones({
               labelWidth="110px"
               disabled
             />
-
             <InputTextOneLine
               label="Marihuana"
               name="marihuana"
@@ -168,7 +161,6 @@ export default function PanelObservaciones({
               labelWidth="110px"
               disabled
             />
-
             <InputTextOneLine
               label="Cocaína"
               name="cocaina"
@@ -176,7 +168,6 @@ export default function PanelObservaciones({
               labelWidth="110px"
               disabled
             />
-
             <InputTextOneLine
               label="Hemoglobina / Hematocrito (gr. %)"
               name="hemoglobinaHematocrito"
@@ -188,9 +179,26 @@ export default function PanelObservaciones({
         </div>
 
         {/* Botón Asignar Médico */}
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        {/* <div className="bg-white p-4 rounded-lg shadow-sm">
           <button className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded font-medium">
             ASIGNAR MEDICO
+          </button>
+        </div> */}
+        {/* Botones de Acción */}
+        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+          <button
+            type="button"
+            // onClick={handleSave}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+          </button>
+          <button
+            type="button"
+            // onClick={handleClear}
+            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+          >
+            <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
         </div>
       </div>

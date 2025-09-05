@@ -4,10 +4,13 @@ export default function InputsRadioGroup({
   onChange,
   disabled = false,
   options = [], // [{ label: "Texto", value: "valor" }]
+  vertical = false,
   className = "",
 }) {
   return (
-    <div className="flex gap-4">
+    <div
+      className={`flex ${vertical ? "flex-col gap-y-2" : "flex-row gap-4"}`}
+    >
       {options.map((option) => (
         <label
           key={option.value}

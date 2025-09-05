@@ -1,6 +1,8 @@
-import InputCheckbox from "../../../../../components/reusableComponents/InputCheckbox";
-import InputsBooleanRadioGroup from "../../../../../components/reusableComponents/InputsBooleanRadioGroup";
-import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import {
+  InputCheckbox,
+  InputsBooleanRadioGroup,
+  InputTextOneLine,
+} from "../../../../../components/reusableComponents/ResusableComponents";
 
 export default function DatosPersonales({
   form,
@@ -201,8 +203,6 @@ export default function DatosPersonales({
               />
             </div>
           </div>
-
-          
         </div>
 
         {/* Columna Derecha */}
@@ -220,7 +220,6 @@ export default function DatosPersonales({
                   onChange={handleCheckBoxChange}
                 />
                 <InputTextOneLine
-                  label=""
                   name="neoplasiaDescripcion"
                   value={form.neoplasiaDescripcion}
                   onChange={handleChange}
@@ -234,7 +233,6 @@ export default function DatosPersonales({
                   name="its"
                 />
                 <InputTextOneLine
-                  label=""
                   name="itsDescripcion"
                   value={form.itsDescripcion}
                   onChange={handleChange}
@@ -249,7 +247,6 @@ export default function DatosPersonales({
                   name="quemaduras"
                 />
                 <InputTextOneLine
-                  label=""
                   name="quemadurasDescripcion"
                   value={form.quemadurasDescripcion}
                   onChange={handleChange}
@@ -264,7 +261,6 @@ export default function DatosPersonales({
                   name="cirugias"
                 />
                 <InputTextOneLine
-                  label=""
                   name="cirugiasDescripcion"
                   value={form.cirugiasDescripcion}
                   onChange={handleChange}
@@ -279,7 +275,6 @@ export default function DatosPersonales({
                   name="otrosAntecedentes"
                 />
                 <InputTextOneLine
-                  label=""
                   name="otrosAntecedentesDescripcion"
                   value={form.otrosAntecedentesDescripcion}
                   onChange={handleChange}
@@ -588,5 +583,3 @@ function Table({ data }) {
     </div>
   );
 }
-
-

@@ -102,14 +102,9 @@ export default function Anexo2() {
     diasDescanso: "",
     dataEnfermedades: [],
 
-    // //Medidas Generales
-    // talla: "",
-    // peso: "",
-    // imc: "",
-
-    //===============================
+    //=============================================================================================
     //TAB LATERAL
-    //===============================
+    //=============================================================================================
     observacionesGenerales: "",
     colesterolTotal: "",
     LDLColesterol: "",
@@ -130,28 +125,37 @@ export default function Anexo2() {
     cocaina: "",
     hemoglobinaHematocrito: "",
 
-    //===============================
+    //=============================================================================================
     //SEGUNDA TAB EXAMENES
-    //===============================
+    //=============================================================================================
     // Función Respiratoria
     fvc: "",
     fev1: "",
     fev1Fvc: "",
     fef2575: "",
-    tipoFuncionRespiratoria: "",
     conclusionRespiratoria: "",
 
-    // Medidas Generales
+    // Información Triaje
+    //Medidas Generales
     temperatura: "",
     cintura: "",
     cadera: "",
     icc: "",
+
+    //Medidas Generales
+    talla: "",
+    peso: "",
+    imc: "",
 
     // Signos Vitales
     frecuenciaRespiratoria: "",
     frecuenciaCardiaca: "",
     saturacionO2: "",
     perimetro: "",
+
+    // Presión Arterial
+    presionSistolica: "",
+    presionDiastolica: "",
 
     // Audiometría - Oído Derecho
     od500: "",
@@ -176,32 +180,105 @@ export default function Anexo2() {
     visionCercaOi: "",
     visionCercaOdCorregida: "",
     visionCercaOiCorregida: "",
+
     visionLejosOd: "",
     visionLejosOi: "",
     visionLejosOdCorregida: "",
     visionLejosOiCorregida: "",
+
     visionColores: "",
     enfermedadOculares: "",
     enfermedadOtros: "",
     reflejosPupilares: "",
     visionBinocular: "",
 
-    // Dentadura
-    piezasMalEstado: "",
-    piezasFaltan: "",
-
-    // Presión Arterial
-    presionSistolica: "",
-    presionDiastolica: "",
-
-    // Grupo Sanguíneo
-    grupoSanguineo: "",
-    rh: "",
-
     // Observaciones Generales
     ectoscopia: "",
     estadoMental: "",
     anamnesis: "",
+
+    // Dentadura
+    piezasMalEstado: "",
+    piezasFaltan: "",
+
+    //=============================================================================================
+    //TERCERA TAB EXAMEN FISICO
+    //=============================================================================================
+
+    // Examen Físico por Sistemas
+    cabeza: "",
+    cuello: "",
+    boca: "",
+    faringe: "",
+    nariz: "",
+    oidos: "",
+    marcha: "",
+    piel: "",
+    aparatoRespiratorio: "",
+    apaCardiovascular: "",
+    aparatoDigestivo: "",
+    aGenitourinario: "",
+    aparatoLocomotor: "",
+    miembrosSuperiores: "",
+    miembrosInferiores: "",
+    sistemaLinfatico: "",
+    sistemaNervioso: "",
+    columnaVertebral: "",
+
+    // Otros Exámenes
+    otrosExamenes: "",
+
+    // Médico que Certifica
+    medicoCertifica: "",
+
+    //=============================================================================================
+    //CUARTA TAB RESULTADOS
+    //=============================================================================================
+    // Aptitud del Paciente
+    aptitud: "APTO",
+    fechaAptitud: "",
+    fechaVencimiento: "",
+    restricciones: "",
+
+    // Recomendaciones y Restricciones
+    corregirAgudezaVisualTotal: false,
+    corregirAgudezaVisual: false,
+    dietaHipocalorica: false,
+    evitarMovimientosDisergonomicos: false,
+    noTrabajoAltoRiesgo: false,
+    noTrabajoSobre18m: false,
+    usoEppAuditivo: false,
+    usoLentesCorrectorConducir: false,
+    usoLentesCorrectorTrabajo: false,
+    usoLentesCorrectorTrabajo18m: false,
+    ninguno: false,
+    noConducirVehiculos: false,
+    usoEppAuditivoGeneral: false,
+
+    // Estado del Paciente
+    nordenEstadoPaciente: "",
+    nombresEstadoPaciente: "",
+    tipoExamenEstadoPaciente: "",
+
+    // Exámenes Realizados
+    triaje: "",
+    labClinico: "",
+    electrocardiograma: "",
+    rxToraxPA: "",
+    fichaAudiologica: "",
+    espirometria: "",
+    odontograma: "",
+    psicologia: "",
+    anexo7D: "",
+    histOcupacional: "",
+    fichaAntPatologicos: "",
+    cuestionarioNordico: "",
+    certTrabajoAltura: "",
+    detencionSAS: "",
+    consentimientoDosaje: "",
+    exRxSanguineos: "",
+    perimetroToraxico: "",
+    oftalmologia: "",
   };
 
   const {
@@ -237,13 +314,13 @@ export default function Anexo2() {
   ];
 
   return (
-    <div className="mx-auto bg-white rounded-lg shadow-md overflow-hidden py-8">
+    <div className="mx-auto bg-white overflow-hidden ">
       <div className="flex h-full">
         {/* Contenido principal - 80% */}
         <div className="w-4/5">
           <div className="w-full">
             {/* Tab Navigation */}
-            <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+            <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20 ">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -286,7 +363,7 @@ export default function Anexo2() {
         </div>
 
         {/* Panel lateral de datos - 20% */}
-        <div className="w-1/5 border-l border-gray-200">
+        <div className="w-1/5  border-gray-200">
           <PanelObservaciones
             form={form}
             setForm={setForm}
