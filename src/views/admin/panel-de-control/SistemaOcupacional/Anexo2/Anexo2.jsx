@@ -24,7 +24,10 @@ const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
 
 // Panel de Observaciones Generales
 
-export default function Anexo2() {
+export default function Anexo2({ listas }) {
+  const { MedicosMulti } = listas;
+  console.log(MedicosMulti);
+
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
 
@@ -236,9 +239,6 @@ export default function Anexo2() {
     // Otros Exámenes
     otrosExamenes: "",
 
-    // Médico que Certifica
-    medicoCertifica: "",
-
     //=============================================================================================
     //CUARTA TAB RESULTADOS
     //=============================================================================================
@@ -287,6 +287,9 @@ export default function Anexo2() {
     exRxSanguineos: "",
     perimetroToraxico: "",
     oftalmologia: "",
+
+    // Médico que Certifica
+    nombre_medico: "",
   };
 
   const {
@@ -296,13 +299,16 @@ export default function Anexo2() {
     handleChangeNumber,
     handleRadioButton,
     handleCheckBoxChange,
-    handleClear,
-    handleClearnotO,
     handleRadioButtonBoolean,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const [activeTab, setActiveTab] = useState(0);
+
+  const [searchNombreMedico, setSearchNombreMedico] = useState(
+    form.nombre_medico
+  );
+  const [filteredNombresMedicos, setFilteredNombresMedicos] = useState([]);
 
   const tabs = [
     {
@@ -320,6 +326,38 @@ export default function Anexo2() {
     },
     { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
+
+  const handleClear = () => {
+    setForm(initialFormState);
+    setSearchNombreMedico("");
+  };
+
+  const handleClearnotO = () => {
+    setForm((prev) => ({ ...initialFormState, norden: prev.norden }));
+    setSearchNombreMedico("");
+  };
+
+  const handleNombreMedicoSearch = (e) => {
+    const v = e.target.value.toUpperCase();
+    if (v === "") {
+      setForm((d) => ({ ...d, nombre_medico: "" }));
+    }
+    setForm((d) => ({ ...d, nombre_medico: v }));
+    setSearchNombreMedico(v);
+    setFilteredNombresMedicos(
+      v
+        ? MedicosMulti.filter((medico) =>
+            medico.mensaje.toLowerCase().includes(v.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const handleSelectNombreMedico = (medico) => {
+    setSearchNombreMedico(medico.mensaje);
+    setForm((d) => ({ ...d, nombre_medico: medico.mensaje }));
+    setFilteredNombresMedicos([]);
+  };
 
   return (
     <div className="mx-auto bg-white overflow-hidden ">
@@ -362,6 +400,12 @@ export default function Anexo2() {
                       handleClear={handleClear}
                       handleClearnotO={handleClearnotO}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
+                      handleNombreMedicoSearch={handleNombreMedicoSearch}
+                      handleSelectNombreMedico={handleSelectNombreMedico}
+                      searchNombreMedico={searchNombreMedico}
+                      filteredNombresMedicos={filteredNombresMedicos}
+                      setFilteredNombresMedicos={setFilteredNombresMedicos}
+                      MedicosMulti={MedicosMulti}
                     />
                   )
                 );

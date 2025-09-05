@@ -13,6 +13,13 @@ export default function ExamenFisico({
   handleClear,
   handleClearnotO,
   handleRadioButtonBoolean,
+
+  handleNombreMedicoSearch,
+  handleSelectNombreMedico,
+  searchNombreMedico,
+  filteredNombresMedicos,
+  setFilteredNombresMedicos,
+  MedicosMulti
 }) {
   return (
     <div className="p-6" style={{ fontSize: "11px" }}>
@@ -183,11 +190,51 @@ export default function ExamenFisico({
           <label className="block font-semibold  mb-1">
             Medico que Certifica:
           </label>
-          <InputTextOneLine
-            name="medicoCertifica"
-            value={form.medicoCertifica}
-            disabled
-          />
+          <div className="relative flex-grow flex items-center">
+            <input
+              autoComplete="off"
+              id="nombre_medico"
+              name="nombre_medico"
+              type="text"
+              value={searchNombreMedico || ""}
+              placeholder="Escribe para buscar médico..."
+              onChange={handleNombreMedicoSearch}
+              className={`border pointer border-gray-300 px-3 py-1 mb-1 rounded-md focus:outline-none w-full `}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && filteredNombresMedicos.length > 0) {
+                  e.preventDefault();
+                  handleSelectNombreMedico(filteredNombresMedicos[0]);
+                }
+              }}
+              onFocus={() => {
+                if (searchNombreMedico) {
+                  setFilteredNombresMedicos(
+                    MedicosMulti.filter((emp) =>
+                      emp.mensaje
+                        .toLowerCase()
+                        .includes(searchNombreMedico.toLowerCase())
+                    )
+                  );
+                }
+              }}
+              onBlur={() =>
+                setTimeout(() => setFilteredNombresMedicos([]), 100)
+              }
+            />
+            {searchNombreMedico && filteredNombresMedicos.length > 0 && (
+              <ul className="absolute inset-x-0 top-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto z-10">
+                {filteredNombresMedicos.map((medico) => (
+                  <li
+                    key={medico.id}
+                    className="cursor-pointer px-3 py-2 hover:bg-gray-100"
+                    onMouseDown={() => handleSelectNombreMedico(medico)}
+                  >
+                    {medico.mensaje}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </div>
     </div>

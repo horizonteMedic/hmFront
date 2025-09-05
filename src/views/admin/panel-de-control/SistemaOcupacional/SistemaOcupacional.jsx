@@ -1219,7 +1219,7 @@ const TabComponent = () => {
                   Anexo 2
                 </h2>
               </div>
-              <Anexo2 />
+              <Anexo2 listas={listasCombos}/>
             </div>
           )}
         </div>
