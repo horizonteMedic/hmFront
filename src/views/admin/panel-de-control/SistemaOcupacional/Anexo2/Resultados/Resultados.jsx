@@ -9,12 +9,9 @@ export default function Resultados({
   form,
   setForm,
   handleChange,
-  handleChangeNumber,
   handleRadioButton,
   handleCheckBoxChange,
-  handleClear,
-  handleClearnotO,
-  handleRadioButtonBoolean,
+  handlePrint,
 }) {
   const RestriccionCheckbox = ({ label, name }) => {
     return (
@@ -351,10 +348,16 @@ export default function Resultados({
       <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
         <p className="font-semibold  mb-2">Imprimir Informes de Exámenes</p>
         <div className="flex flex-wrap gap-4">
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => handlePrint(1)}
+          >
             Anexo 7C - N°1
           </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => handlePrint(2)}
+          >
             Anexo 7C - N°2
           </button>
         </div>

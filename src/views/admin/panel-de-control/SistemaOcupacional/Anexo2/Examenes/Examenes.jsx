@@ -5,14 +5,7 @@ import {
 
 export default function Examenes({
   form,
-  setForm,
   handleChange,
-  handleChangeNumber,
-  handleRadioButton,
-  handleCheckBoxChange,
-  handleClear,
-  handleClearnotO,
-  handleRadioButtonBoolean,
 }) {
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>

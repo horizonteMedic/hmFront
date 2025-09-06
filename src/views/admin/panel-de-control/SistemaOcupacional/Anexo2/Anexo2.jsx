@@ -10,18 +10,15 @@ import Resultados from "./Resultados/Resultados";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import Examenes from "./Examenes/Examenes";
 import DatosPersonales from "./DatosPersonales/DatosPersonales";
+import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
+import { getToday } from "../../../../utils/helpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
+import Swal from "sweetalert2";
 
-const tabla = "informe_electrocardiograma";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
-
-// Panel de Observaciones Generales
+const tabla = " anexo_agroindustrial";
+const today = getToday();
 
 export default function Anexo2({ listas }) {
   const { MedicosMulti } = listas;
@@ -288,7 +285,7 @@ export default function Anexo2({ listas }) {
     oftalmologia: "",
 
     // Médico que Certifica //BUSCADOR
-    nombre_medico: "",
+    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     filteredNombresMedicos: [],
   };
 
@@ -323,6 +320,38 @@ export default function Anexo2({ listas }) {
     },
     { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
+  const handlePrint = (numPage) => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Anexo 2?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden, token, tabla, numPage, datosFooter);
+      }
+    });
+  };
 
   return (
     <div className="mx-auto bg-white overflow-hidden ">
@@ -366,6 +395,8 @@ export default function Anexo2({ listas }) {
                       handleClearnotO={handleClearnotO}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
                       MedicosMulti={MedicosMulti}
+                      handlePrint={handlePrint}
+                      handleSearch={handleSearch}
                     />
                   )
                 );
@@ -375,17 +406,12 @@ export default function Anexo2({ listas }) {
         </div>
 
         {/* Panel lateral de datos - 20% */}
-        <div className="w-1/5  border-gray-200">
+        <div className="w-1/5">
           <PanelObservaciones
             form={form}
-            setForm={setForm}
-            handleChange={handleChange}
-            handleChangeNumber={handleChangeNumber}
             handleRadioButton={handleRadioButton}
-            handleCheckBoxChange={handleCheckBoxChange}
             handleClear={handleClear}
-            handleClearnotO={handleClearnotO}
-            handleRadioButtonBoolean={handleRadioButtonBoolean}
+            handleSave={handleSave}
           />
         </div>
       </div>

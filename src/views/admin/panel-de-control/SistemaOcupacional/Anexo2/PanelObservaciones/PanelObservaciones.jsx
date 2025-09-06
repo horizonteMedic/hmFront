@@ -8,14 +8,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function PanelObservaciones({
   form,
-  setForm,
-  handleChange,
-  handleChangeNumber,
   handleRadioButton,
-  handleCheckBoxChange,
   handleClear,
-  handleClearnotO,
-  handleRadioButtonBoolean,
+  handleSave,
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -177,25 +172,18 @@ export default function PanelObservaciones({
             />
           </div>
         </div>
-
-        {/* Botón Asignar Médico */}
-        {/* <div className="bg-white p-4 rounded-lg shadow-sm">
-          <button className="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded font-medium">
-            ASIGNAR MEDICO
-          </button>
-        </div> */}
         {/* Botones de Acción */}
         <div className="flex flex-col md:flex-row justify-center items-center gap-4">
           <button
             type="button"
-            // onClick={handleSave}
+            onClick={handleSave}
             className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
           </button>
           <button
             type="button"
-            // onClick={handleClear}
+            onClick={handleClear}
             className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
           >
             <FontAwesomeIcon icon={faBroom} /> Limpiar

@@ -7,13 +7,6 @@ export default function ExamenFisico({
   form,
   setForm,
   handleChange,
-  handleChangeNumber,
-  handleRadioButton,
-  handleCheckBoxChange,
-  handleClear,
-  handleClearnotO,
-  handleRadioButtonBoolean,
-
   MedicosMulti,
 }) {
   const handleNombreMedicoSearch = (e) => {

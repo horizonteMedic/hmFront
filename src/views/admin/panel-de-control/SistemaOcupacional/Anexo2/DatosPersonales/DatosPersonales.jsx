@@ -9,11 +9,9 @@ export default function DatosPersonales({
   setForm,
   handleChange,
   handleChangeNumber,
-  handleRadioButton,
   handleCheckBoxChange,
-  handleClear,
-  handleClearnotO,
   handleRadioButtonBoolean,
+  handleSearch,
 }) {
   function handleAgregarEnfermedad() {
     setForm((prev) => {
@@ -55,7 +53,7 @@ export default function DatosPersonales({
             label="N° Orden"
             name="norden"
             value={form.norden}
-            // onKeyUp={handleSearch}
+            onKeyUp={handleSearch}
             onChange={handleChangeNumber}
             labelWidth="100px"
           />
