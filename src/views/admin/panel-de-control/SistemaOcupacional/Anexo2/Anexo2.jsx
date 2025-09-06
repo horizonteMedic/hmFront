@@ -31,6 +31,7 @@ export default function Anexo2({ listas }) {
     norden: "",
     nomExamen: "",
     fechaExam: today,
+    codigoAnexo: null,
     //Info personal
     dni: "",
     nombres: "",
