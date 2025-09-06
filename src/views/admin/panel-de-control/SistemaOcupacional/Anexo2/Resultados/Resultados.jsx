@@ -1,487 +1,367 @@
-
-import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendarAlt, faPlus, faBroom, faPen, faChartBar, faSave, faPrint } from "@fortawesome/free-solid-svg-icons";
-import { useSessionData } from "../../../../../hooks/useSessionData";
-import { useForm } from "../../../../../hooks/useForm";
 import {
-  GetInfoServicio,
-  getInfoTabla,
-  Loading,
-  PrintHojaR,
-  SubmitDataService,
-  VerifyTR,
-} from "./controllerResultados";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
+  InputCheckbox,
+  InputsRadioGroup,
+  InputTextArea,
+  InputTextOneLine,
+} from "../../../../../components/reusableComponents/ResusableComponents";
 
-const tabla = "informe_resultados_examen";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
-
-const Resultados = () => {
-  const { token, userlogued, selectedSede, datosFooter } = useSessionData();
-  
-  const initialFormState = {
-    norden: "",
-    codigoResultados: null,
-    nombre: "",
-    edad: "",
-    fechaNac: "",
-    fechaExam: today,
-    contrata: "",
-    empresa: "",
-
-    // Aptitud del Paciente
-    aptitud: "apto",
-    fecha: "",
-    fechaVencimiento: "",
-    restricciones: "",
-
-    // Recomendaciones y Restricciones
-    corregirAgudezaVisualTotal: false,
-    corregirAgudezaVisual: false,
-    dietaHipocalorica: false,
-    evitarMovimientosDisergonomicos: false,
-    noTrabajoAltoRiesgo: false,
-    noTrabajoSobre18m: false,
-    usoEppAuditivo: false,
-    usoLentesCorrectorConducir: false,
-    usoLentesCorrectorTrabajo: false,
-    usoLentesCorrectorTrabajo18m: false,
-    ninguno: false,
-    noConducirVehiculos: false,
-    usoEppAuditivoGeneral: false,
-
-    // Resultados de Laboratorio
-    vsg: "",
-    glucosa: "",
-    creatinina: "",
-    marihuana: "",
-    cocaina: "",
-    hemoglobina: "",
-
-    // Estado del Paciente
-    nroOrden: "",
-    nombres: "",
-    tipoExamen: "",
-
-    // Exámenes Realizados
-    triaje: "",
-    labClinico: "",
-    electrocardiograma: "",
-    rxToraxPA: "",
-    fichaAudiologica: "",
-    espirometria: "",
-    odontograma: "",
-    psicologia: "",
-    anexo7D: "",
-    histOcupacional: "",
-    fichaAntPatologicos: "",
-    cuestionarioNordico: "",
-    certTrabajoAltura: "",
-    detencionSAS: "",
-    consentimientoDosaje: "",
-    exRxSanguineos: "",
-    perimetroToraxico: "",
-    oftalmologia: "",
-
-    nombres_search: "",
-    codigo_search: "",
-    usuario: userlogued ?? "",
-  };
-
-  const {
-    form,
-    setForm,
-    handleChange,
-    handleChangeNumber,
-    handleCheckBoxChange,
-    handleClear,
-    handleClearnotO,
-    handlePrintDefault,
-  } = useForm(initialFormState);
-
-  const [dataTabla, setDataTabla] = useState([]);
-
-  const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
-  };
-
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      handleClearnotO();
-      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
-    }
-  };
-
-  const handlePrint = () => {
-    handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
-    });
-  };
-
-  const obtenerInfoTabla = () => {
-    getInfoTabla(
-      form.nombres_search,
-      form.codigo_search,
-      form.usuario,
-      setDataTabla,
-      token
+export default function Resultados({
+  form,
+  setForm,
+  handleChange,
+  handleRadioButton,
+  handleCheckBoxChange,
+  handlePrint,
+}) {
+  const RestriccionCheckbox = ({ label, name }) => {
+    return (
+      <InputCheckbox
+        label={label}
+        checked={form[name]}
+        name={name}
+        onChange={(e) => {
+          if (e.target.checked) {
+            setForm((prev) => ({
+              ...prev,
+              [name]: true,
+              ninguno: false,
+              restricciones:
+                prev.restricciones === "NINGUNO" || prev.restricciones === ""
+                  ? label
+                  : prev.restricciones + "\n" + label,
+            }));
+          } else {
+            setForm((prev) => ({
+              ...prev,
+              [name]: false,
+              restricciones: "",
+              corregirAgudezaVisualTotal: false,
+              corregirAgudezaVisual: false,
+              dietaHipocalorica: false,
+              evitarMovimientosDisergonomicos: false,
+              noTrabajoAltoRiesgo: false,
+              noTrabajoSobre18m: false,
+              usoEppAuditivo: false,
+              usoLentesCorrectorConducir: false,
+              usoLentesCorrectorTrabajo: false,
+              usoLentesCorrectorTrabajo18m: false,
+              noConducirVehiculos: false,
+              usoEppAuditivoGeneral: false,
+            }));
+          }
+        }}
+      />
     );
   };
 
-  useEffect(() => {
-    obtenerInfoTabla();
-  }, []);
-
   return (
-    <div className="p-6" style={{ fontSize: '11px' }}>
-      <h3 className="font-semibold mb-6 text-gray-800">Resultados del Examen Ocupacional</h3>
-          
+    <div className="p-6" style={{ fontSize: "11px" }}>
+      <h3 className="font-semibold mb-6 text-gray-800">
+        Resultados del Examen Ocupacional
+      </h3>
+
       {/* Primera fila - 3 columnas */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         {/* Columna 1 - Aptitud del Paciente */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="font-semibold text-gray-800 mb-4">Aptitud del Paciente</p>
-          
-          {/* Radio buttons de aptitud */}
-          <div className="space-y-3 mb-4">
-            <label className="flex items-center">
-              <input 
-                type="radio" 
-                name="aptitud" 
-                value="apto" 
-                checked={form.aptitud === "apto"}
-                onChange={handleChange}
-                className="mr-3 h-4 w-4" 
-              />
-              <span>APTO (para el puesto en el que trabaja o postula)</span>
-            </label>
-            <label className="flex items-center">
-              <input type="radio" name="aptitud" value="apto-con-restricciones" className="mr-3 h-4 w-4" />
-              <span>APTO CON RESTRICCION (para el puesto en el que trabaja o postula)</span>
-            </label>
-            <label className="flex items-center">
-              <input type="radio" name="aptitud" value="no-apto" className="mr-3 h-4 w-4" />
-              <span>NO APTO (para el puesto en el que trabaja o postula)</span>
-            </label>
-          </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="font-semibold text-gray-800 mb-2">
+            Aptitud del Paciente
+          </p>
+          <InputsRadioGroup
+            name="aptitud"
+            value={form.aptitud}
+            onChange={handleRadioButton}
+            vertical
+            options={[
+              {
+                label: "APTO (para el puesto en el que trabaja o postula)",
+                value: "APTO",
+              },
+              {
+                label:
+                  "APTO CON RESTRICCION (para el puesto en el que trabaja o postula)",
+                value: "RESTRICCION",
+              },
+              {
+                label: "NO APTO (para el puesto en el que trabaja o postula)",
+                value: "NO APTO",
+              },
+            ]}
+          />
 
           {/* Fechas */}
-          <div className="space-y-3 mb-4">
-            <div>
-              <label className="block font-medium text-gray-700 mb-1">Fecha:</label>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  defaultValue="22/08/2025" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <FontAwesomeIcon icon={faCalendarAlt} className="absolute right-3 top-3 text-gray-400" />
-              </div>
-            </div>
-            <div>
-              <label className="block font-medium text-gray-700 mb-1">Fecha Venc.:</label>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  defaultValue="22/08/2026" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <FontAwesomeIcon icon={faCalendarAlt} className="absolute right-3 top-3 text-gray-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Restricciones */}
-          <div>
-            <label className="block font-medium text-gray-700 mb-2">Restricciones:</label>
-            <textarea 
-              rows="3" 
-              defaultValue="-NINGUNO"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-blue-50"
+          <div className="grid gap-y-2 my-2">
+            <InputTextOneLine
+              label="Fecha"
+              type="date"
+              name="fechaAptitud"
+              value={form.fechaAptitud}
+              onChange={handleChange}
+              labelWidth="120px"
+            />
+            <InputTextOneLine
+              label="Fecha Vencimiento"
+              type="date"
+              name="fechaVencimiento"
+              value={form.fechaVencimiento}
+              onChange={handleChange}
+              labelWidth="120px"
             />
           </div>
+          {/* Restricciones */}
+          <InputTextArea
+            rows={9}
+            label="Restricciones"
+            name="restricciones"
+            value={form.restricciones}
+            onChange={handleChange}
+          />
         </div>
 
         {/* Columna 2 - Recomendaciones y Restricciones */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="font-semibold text-gray-800 mb-4">Recomendaciones y Restricciones</p>
-          
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="font-semibold text-gray-800 mb-2">
+            Recomendaciones y Restricciones
+          </p>
           <div className="space-y-2 mb-4">
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">DIETA HIPOCALORICA Y EJERCICIOS</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">NO HACER TRABAJO DE ALTO RIESGO</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO {'>='}80 DB</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHICULOS MOTORIZADOS</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">USO DE LENTES CORRECTORES PARA TRABAJO.</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">NINGUNO.</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">NO CONDUCIR VEHICULOS</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="mr-2" />
-              <span className="">USO DE EPP AUDITIVO</span>
-            </label>
-          </div>
-
-          {/* Botones de operación */}
-          <div className="flex space-x-2">
-            <button className="flex items-center px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 ">
-              <FontAwesomeIcon icon={faPlus} className="mr-1" />
-              Agregar/Actualizar
-            </button>
-            <button className="flex items-center px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 ">
-              <FontAwesomeIcon icon={faBroom} className="mr-1" />
-              Limpiar
-            </button>
-          </div>
-        </div>
-
-        {/* Columna 3 - Resultados de Laboratorio */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="font-semibold text-gray-800 mb-4">Resultados de Laboratorio</p>
-          
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <label className=" text-gray-600">V.S.G:</label>
-              <input type="text" defaultValue="N/A" className="w-20 px-2 py-1 border border-gray-300 rounded text-center" />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className=" text-gray-600">Glucosa:</label>
-              <input type="text" className="w-20 px-2 py-1 border border-gray-300 rounded text-center" />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className=" text-gray-600">Creatinina:</label>
-              <input type="text" defaultValue="N/A" className="w-20 px-2 py-1 border border-gray-300 rounded text-center" />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className=" text-gray-600">Marihuana:</label>
-              <input type="text" defaultValue="POSITIVO" className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-200" />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className=" text-gray-600">Cocaina:</label>
-              <input type="text" defaultValue="POSITIVO" className="w-20 px-2 py-1 border border-gray-300 rounded text-center bg-gray-200" />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className=" text-gray-600">Hemoglobina / Hema...:</label>
-              <div className="flex items-center">
-                <input type="text" className="w-20 px-2 py-1 border border-gray-300 rounded text-center" />
-                <span className="ml-1  text-gray-500">gr. %</span>
-              </div>
-            </div>
+            <RestriccionCheckbox
+              label="CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+              name="corregirAgudezaVisualTotal"
+            />
+            <RestriccionCheckbox
+              label="CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+              name="corregirAgudezaVisual"
+            />
+            <RestriccionCheckbox
+              label="DIETA HIPOCALORICA Y EJERCICIOS"
+              name="dietaHipocalorica"
+            />
+            <RestriccionCheckbox
+              label="EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS"
+              name="evitarMovimientosDisergonomicos"
+            />
+            <RestriccionCheckbox
+              label="NO HACER TRABAJO DE ALTO RIESGO"
+              name="noTrabajoAltoRiesgo"
+            />
+            <RestriccionCheckbox
+              label="NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO"
+              name="noTrabajoSobre18m"
+            />
+            <RestriccionCheckbox
+              label="USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO ≥80 DB"
+              name="usoEppAuditivo"
+            />
+            <RestriccionCheckbox
+              label="USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHICULOS MOTORIZADOS"
+              name="usoLentesCorrectorConducir"
+            />
+            <RestriccionCheckbox
+              label="USO DE LENTES CORRECTORES PARA TRABAJO"
+              name="usoLentesCorrectorTrabajo"
+            />
+            <RestriccionCheckbox
+              label="USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+              name="usoLentesCorrectorTrabajo18m"
+            />
+            <InputCheckbox
+              label="NINGUNO"
+              checked={form.ninguno}
+              onChange={(e) => {
+                handleCheckBoxChange(e);
+                setForm((prev) => ({
+                  ...prev,
+                  restricciones: e.target.checked ? "NINGUNO" : "",
+                  corregirAgudezaVisualTotal: false,
+                  corregirAgudezaVisual: false,
+                  dietaHipocalorica: false,
+                  evitarMovimientosDisergonomicos: false,
+                  noTrabajoAltoRiesgo: false,
+                  noTrabajoSobre18m: false,
+                  usoEppAuditivo: false,
+                  usoLentesCorrectorConducir: false,
+                  usoLentesCorrectorTrabajo: false,
+                  usoLentesCorrectorTrabajo18m: false,
+                  noConducirVehiculos: false,
+                  usoEppAuditivoGeneral: false,
+                }));
+              }}
+              name="ninguno"
+            />
+            <RestriccionCheckbox
+              label="NO CONDUCIR VEHICULOS"
+              name="noConducirVehiculos"
+            />
+            <RestriccionCheckbox
+              label="USO DE EPP AUDITIVO"
+              name="usoEppAuditivoGeneral"
+            />
           </div>
         </div>
       </div>
+      <h3 className="font-semibold mb-6 text-gray-800">Estado Paciente</h3>
 
       {/* Segunda fila - Estado del Paciente (1 columna) */}
       <div className="mb-6">
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <p className="font-semibold text-gray-800 mb-4">Estado de Paciente</p>
-          
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="font-semibold text-gray-800 mb-2">Datos de Paciente</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block  font-medium text-gray-700 mb-1">Nro Orden :</label>
-              <div className="relative">
-                <input type="text" className="w-full px-3 py-2 border border-orange-300 rounded-md bg-orange-50" />
-                <FontAwesomeIcon icon={faPlus} className="absolute right-3 top-3 text-gray-400" />
-              </div>
-            </div>
-            <div>
-              <label className="block  font-medium text-gray-700 mb-1">Nombres :</label>
-              <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-            </div>
-            <div>
-              <label className="block  font-medium text-gray-700 mb-1">Tipo Examén :</label>
-              <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md" />
-            </div>
+            <InputTextArea
+              label="Nro Orden"
+              name="nordenEstadoPaciente"
+              value={form.nordenEstadoPaciente}
+              onChange={handleChange}
+            />
+            <InputTextArea
+              label="Nombres"
+              name="nombresEstadoPaciente"
+              value={form.nombresEstadoPaciente}
+              disabled
+            />
+            <InputTextArea
+              label="Tipo Examen"
+              name="tipoExamenEstadoPaciente"
+              value={form.tipoExamenEstadoPaciente}
+              disabled
+            />
           </div>
         </div>
       </div>
 
       {/* Sección de Exámenes */}
-      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
-        <p className="font-semibold text-gray-800 mb-4">Exámenes Realizados</p>
-        
+      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
+        <p className="font-semibold text-gray-800 mb-2">Exámenes Realizados</p>
+
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Triaje:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Lab. Clinico:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Electrocardiograma:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Rx. Torax P.A:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Ficha Audiologica:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Espirometria:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Odontograma:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Psicologia:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Anexo 7D:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Hist. Ocupacional:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Ficha Ant. Patológicos:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Cuestionario Nórdico:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Cert. Trabajo Altura:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Detención S.A.S:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Consentimiento Dosaje:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Ex. Rx Sanguineos:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Perimetro Toraxico:</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
-          <div>
-            <label className="block  font-medium text-gray-700 mb-1">Oftalmología :</label>
-            <input type="text" className="w-full px-2 py-1 border border-gray-300 rounded text-center" />
-          </div>
+          <InputTextArea
+            label="Triaje"
+            name="triaje"
+            value={form.triaje}
+            disabled
+          />
+          <InputTextArea
+            label="Lab. Clinico"
+            name="labClinico"
+            value={form.labClinico}
+            disabled
+          />
+          <InputTextArea
+            label="Electrocardiograma"
+            name="electrocardiograma"
+            value={form.electrocardiograma}
+            disabled
+          />
+          <InputTextArea
+            label="Rx. Torax P.A"
+            name="rxToraxPA"
+            value={form.rxToraxPA}
+            disabled
+          />
+          <InputTextArea
+            label="Ficha Audiologica"
+            name="fichaAudiologica"
+            value={form.fichaAudiologica}
+            disabled
+          />
+          <InputTextArea
+            label="Espirometria"
+            name="espirometria"
+            value={form.espirometria}
+            disabled
+          />
+          <InputTextArea
+            label="Odontograma"
+            name="odontograma"
+            value={form.odontograma}
+            disabled
+          />
+          <InputTextArea
+            label="Psicologia"
+            name="psicologia"
+            value={form.psicologia}
+            disabled
+          />
+          <InputTextArea
+            label="Anexo 7D"
+            name="anexo7D"
+            value={form.anexo7D}
+            disabled
+          />
+          <InputTextArea
+            label="Hist. Ocupacional"
+            name="histOcupacional"
+            value={form.histOcupacional}
+            disabled
+          />
+          <InputTextArea
+            label="Ficha Ant. Patológicos"
+            name="fichaAntPatologicos"
+            value={form.fichaAntPatologicos}
+            disabled
+          />
+          <InputTextArea
+            label="Cuestionario Nórdico"
+            name="cuestionarioNordico"
+            value={form.cuestionarioNordico}
+            disabled
+          />
+          <InputTextArea
+            label="Cert. Trabajo Altura"
+            name="certTrabajoAltura"
+            value={form.certTrabajoAltura}
+            disabled
+          />
+          <InputTextArea
+            label="Detención S.A.S"
+            name="detencionSAS"
+            value={form.detencionSAS}
+            disabled
+          />
+          <InputTextArea
+            label="Consentimiento Dosaje"
+            name="consentimientoDosaje"
+            value={form.consentimientoDosaje}
+            disabled
+          />
+          <InputTextArea
+            label="Ex. Rx Sanguineos"
+            name="exRxSanguineos"
+            value={form.exRxSanguineos}
+            disabled
+          />
+          <InputTextArea
+            label="Perimetro Toraxico"
+            name="perimetroToraxico"
+            value={form.perimetroToraxico}
+            disabled
+          />
+          <InputTextArea
+            label="Oftalmología"
+            name="oftalmologia"
+            value={form.oftalmologia}
+            disabled
+          />
         </div>
       </div>
 
       {/* Sección de Impresión de Informes */}
-      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-6">
-        <p className="font-semibold text-gray-800 mb-4">Imprimir Informes de Exámenes</p>
-        
+      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
+        <p className="font-semibold  mb-2">Imprimir Informes de Exámenes</p>
         <div className="flex flex-wrap gap-4">
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => handlePrint(1)}
+          >
             Anexo 7C - N°1
           </button>
-          <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            onClick={() => handlePrint(2)}
+          >
             Anexo 7C - N°2
           </button>
-          <button className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-            <FontAwesomeIcon icon={faPen} className="mr-2" />
-            Aptitud Medica
-          </button>
-          <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700">
-            <FontAwesomeIcon icon={faChartBar} className="mr-2" />
-            Certificación previa Trabajo en altura
-          </button>
-        </div>
-      </div>
-
-      {/* Botones de Acción */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4 mt-6">
-        <div className="flex gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
-        <div className="flex flex-col items-end">
-          <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-          <div className="flex items-center gap-2">
-            <input
-              name="norden"
-              value={form.norden}
-              onChange={handleChange}
-              className="border rounded px-2 py-1 text-base w-24"
-            />
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faPrint} />
-            </button>
-          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default Resultados;
+}

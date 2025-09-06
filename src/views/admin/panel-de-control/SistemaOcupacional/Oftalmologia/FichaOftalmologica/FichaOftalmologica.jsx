@@ -340,7 +340,7 @@ export default function FichaOftalmologica({
                     e.preventDefault();
                     setForm((prev) => ({
                       ...prev,
-                      presenciaPterigion: generarDiagnosticoCerca(),
+                      enfOculares: generarDiagnosticoCerca(),
                     }));
                   }
                 }}
@@ -385,7 +385,7 @@ export default function FichaOftalmologica({
                     e.preventDefault();
                     setForm((prev) => ({
                       ...prev,
-                      enfOculares: generarDiagnosticoLejos(),
+                      presenciaPterigion: generarDiagnosticoLejos(),
                     }));
                   }
                 }}

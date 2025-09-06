@@ -1,30 +1,77 @@
-const DatosPersonales = () => {
+import {
+  InputCheckbox,
+  InputsBooleanRadioGroup,
+  InputTextOneLine,
+} from "../../../../../components/reusableComponents/ResusableComponents";
+
+export default function DatosPersonales({
+  form,
+  setForm,
+  handleChange,
+  handleChangeNumber,
+  handleCheckBoxChange,
+  handleRadioButtonBoolean,
+  handleSearch,
+}) {
+  function handleAgregarEnfermedad() {
+    setForm((prev) => {
+      const nuevasEnfermedades = [
+        ...prev.dataEnfermedades,
+        {
+          enfermedad: prev.enfermedad,
+          asociadoTrabajo: prev.asociadoTrabajo,
+          anio: prev.anio,
+          diasDescanso: prev.diasDescanso,
+        },
+      ].sort((a, b) => Number(a.anio) - Number(b.anio)); // Ordena de menor a mayor
+
+      return {
+        ...prev,
+        enfermedad: "",
+        asociadoTrabajo: false,
+        anio: "",
+        diasDescanso: "",
+        dataEnfermedades: nuevasEnfermedades,
+      };
+    });
+  }
+
+  function handleLimpiarEnfermedad() {
+    setForm((prev) => ({
+      ...prev,
+      dataEnfermedades: [],
+    }));
+  }
+
   return (
-    <div className="p-4" style={{ fontSize: '10px' }}>
-      <h3 className="font-semibold mb-4 text-gray-800">Datos Personales</h3>
-      
+    <div className="p-4" style={{ fontSize: "10px" }}>
       {/* Header con información del examen */}
       <div className="bg-white border border-gray-200 rounded-lg p-3 mb-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-          <div className="lg:col-span-3">
-            <div className="flex items-center space-x-2">
-              <label className="w-16 font-medium text-gray-700">N° Orden:</label>
-              <input type="text" defaultValue="96639" className="w-20 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              <button className="px-2 py-1 bg-blue-500 text-white rounded text-xs">Editar</button>
-            </div>
-          </div>
-          <div className="lg:col-span-4">
-            <div className="flex items-center space-x-2">
-              <label className="w-20 font-medium text-gray-700">Ex-Médico:</label>
-              <input type="text" defaultValue="PRE-OCUPACIONAL" className="w-32 px-1 py-0.5 border border-gray-300 rounded" />
-            </div>
-          </div>
-          <div className="lg:col-span-5">
-            <div className="flex items-center space-x-2">
-              <label className="w-24 font-medium text-gray-700">Fecha Exámen:</label>
-              <input type="text" defaultValue="22/08/2025" className="w-24 px-1 py-0.5 border border-gray-300 rounded text-center" />
-            </div>
-          </div>
+        <h3 className="font-semibold mb-2 text-gray-800">Datos Personales</h3>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form.norden}
+            onKeyUp={handleSearch}
+            onChange={handleChangeNumber}
+            labelWidth="100px"
+          />
+          <InputTextOneLine
+            label="Examen Médico"
+            name="nomExamen"
+            value={form.nomExamen}
+            disabled
+            labelWidth="100px"
+          />
+          <InputTextOneLine
+            label="Fecha Examen"
+            name="fechaExam"
+            type="date"
+            value={form.fechaExam}
+            onChange={handleChange}
+            labelWidth="100px"
+          />
         </div>
       </div>
 
@@ -34,96 +81,154 @@ const DatosPersonales = () => {
         <div className="lg:col-span-6 space-y-3">
           {/* Identificación Personal */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Identificación Personal</h4>
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Identificación Personal
+            </h4>
             <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">DNI:</label>
-                <input type="text" defaultValue="72384273" className="w-20 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Nombres:</label>
-                <input type="text" defaultValue="HADY KATHERINE" className="w-32 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Apellidos:</label>
-                <input type="text" defaultValue="CASTILLO PLASENCIA" className="w-32 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Fecha Nac.:</label>
-                <input type="text" defaultValue="23/01/1994" className="w-20 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Sexo:</label>
-                <input type="text" defaultValue="F" className="w-8 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Edad:</label>
-                <input type="text" defaultValue="31" className="w-8 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
+              <InputTextOneLine
+                label="DNI"
+                name="dni"
+                value={form.dni}
+                disabled
+                labelWidth="65px"
+              />
+              <InputTextOneLine
+                label="Fecha Nac."
+                name="fechaNac"
+                value={form.fechaNac}
+                disabled
+                labelWidth="65px"
+              />
+              <InputTextOneLine
+                label="Nombres"
+                name="nombres"
+                value={form.nombres}
+                disabled
+                labelWidth="65px"
+              />
+              <InputTextOneLine
+                label="Apellidos"
+                name="apellidos"
+                value={form.apellidos}
+                disabled
+                labelWidth="65px"
+              />
+              <InputTextOneLine
+                label="Sexo"
+                name="sexo"
+                value={form.sexo}
+                disabled
+                labelWidth="65px"
+              />
+              <InputTextOneLine
+                label="Edad"
+                name="edad"
+                value={form.edad}
+                disabled
+                labelWidth="65px"
+              />
             </div>
           </div>
 
           {/* Contacto y Estado Civil */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Contacto y Estado Civil</h4>
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Contacto y Estado Civil
+            </h4>
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-20 font-medium text-gray-700">Lugar Nac.:</label>
-                <input type="text" defaultValue="TRUJILLO" className="w-24 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-20 font-medium text-gray-700">Domicilio:</label>
-                <input type="text" defaultValue="SAC 1 URB PARQUE INDUSTRIAL MZ D LT 3" className="w-48 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-20 font-medium text-gray-700">Teléfono:</label>
-                <input type="text" defaultValue="969394955" className="w-24 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-20 font-medium text-gray-700">Estado Civil:</label>
-                <input type="text" defaultValue="SOLTERO" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-20 font-medium text-gray-700">Grado Inst.:</label>
-                <input type="text" defaultValue="TECNICO" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
+              <InputTextOneLine
+                label="Lugar Nac."
+                name="lugarNac"
+                value={form.lugarNac}
+                disabled
+              />
+              <InputTextOneLine
+                label="Domicilio"
+                name="domicilio"
+                value={form.domicilio}
+                disabled
+              />
+              <InputTextOneLine
+                label="Teléfono"
+                name="telefono"
+                value={form.telefono}
+                disabled
+              />
+              <InputTextOneLine
+                label="Estado Civil"
+                name="estadoCivil"
+                value={form.estadoCivil}
+                disabled
+              />
+              <InputTextOneLine
+                label="Grado Inst."
+                name="gradoInstruccion"
+                value={form.gradoInstruccion}
+                disabled
+              />
             </div>
           </div>
 
           {/* Información Laboral */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Información Laboral</h4>
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Información Laboral
+            </h4>
             <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Empresa:</label>
-                <input type="text" defaultValue="MINERA BOROO MISQUICHILCA S.A." className="w-48 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Contrata:</label>
-                <input type="text" defaultValue="N/A" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Mineral Exp:</label>
-                <input type="text" defaultValue="NO APLICA" className="w-24 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Explotación:</label>
-                <input type="text" defaultValue="SUPERFICIE" className="w-24 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Altura Labor:</label>
-                <input type="text" defaultValue="DEBAJO 2500" className="w-24 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-            </div>
-          </div>
-
-          {/* Comparación Grupo Sanguíneo */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Comparación Grupo Sanguíneo</h4>
-            <div className="flex items-center space-x-2">
-              <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              <span className="font-medium">-</span>
-              <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded text-center" />
+              <InputTextOneLine
+                label="Empresa"
+                name="empresa"
+                value={form.empresa}
+                disabled
+              />
+              <InputTextOneLine
+                label="Contrata"
+                name="contrata"
+                value={form.contrata}
+                disabled
+              />
+              <InputTextOneLine
+                label="Mineral Exp"
+                name="mineralExp"
+                value={form.mineralExp}
+                disabled
+              />
+              <InputTextOneLine
+                label="Explotación"
+                name="explotacion"
+                value={form.explotacion}
+                disabled
+              />
+              <InputTextOneLine
+                label="Altura Labor"
+                name="alturaLaboral"
+                value={form.alturaLaboral}
+                disabled
+              />
+              <InputTextOneLine
+                label="Puesto Postula"
+                name="puestoPostula"
+                value={form.puestoPostula}
+                disabled
+              />
+              <InputTextOneLine
+                label="Área Puesto"
+                name="areaPuesto"
+                value={form.areaPuesto}
+                disabled
+              />
+              <InputTextOneLine
+                label="Puesto Actual"
+                name="puestoActual"
+                value={form.puestoActual}
+                disabled
+              />
+              <InputTextOneLine
+                label="Tiempo"
+                name="tiempoPuesto"
+                value={form.tiempoPuesto}
+                disabled
+              />
             </div>
           </div>
         </div>
@@ -132,219 +237,394 @@ const DatosPersonales = () => {
         <div className="lg:col-span-6 space-y-3">
           {/* Antecedentes Personales */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Ant. Personales</h4>
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Antecedentes Personales
+            </h4>
             <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" className="mr-1" />
-                <label className="w-16 font-medium text-gray-700">Neoplasia:</label>
-                <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
+              <div className="grid grid-cols-2">
+                <InputCheckbox
+                  label="Neoplasia"
+                  checked={form.neoplasia}
+                  name="neoplasia"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        neoplasiaDescripcion: "",
+                      }));
+                  }}
+                />
+                <InputTextOneLine
+                  name="neoplasiaDescripcion"
+                  value={form.neoplasiaDescripcion}
+                  onChange={handleChange}
+                  disabled={!form.neoplasia}
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" className="mr-1" />
-                <label className="w-16 font-medium text-gray-700">ITS:</label>
-                <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
+              <div className="grid grid-cols-2">
+                <InputCheckbox
+                  label="ITS"
+                  checked={form.its}
+                  name="its"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        itsDescripcion: "",
+                      }));
+                  }}
+                />
+                <InputTextOneLine
+                  name="itsDescripcion"
+                  value={form.itsDescripcion}
+                  onChange={handleChange}
+                  disabled={!form.its}
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" className="mr-1" />
-                <label className="w-16 font-medium text-gray-700">Quemaduras:</label>
-                <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
+
+              <div className="grid grid-cols-2">
+                <InputCheckbox
+                  label="Quemaduras"
+                  checked={form.quemaduras}
+                  name="quemaduras"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        quemadurasDescripcion: "",
+                      }));
+                  }}
+                />
+                <InputTextOneLine
+                  name="quemadurasDescripcion"
+                  value={form.quemadurasDescripcion}
+                  onChange={handleChange}
+                  disabled={!form.quemaduras}
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" className="mr-1" />
-                <label className="w-16 font-medium text-gray-700">Cirugías:</label>
-                <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
+
+              <div className="grid grid-cols-2">
+                <InputCheckbox
+                  label="Cirugías"
+                  checked={form.cirugias}
+                  name="cirugias"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        cirugiasDescripcion: "",
+                      }));
+                  }}
+                />
+                <InputTextOneLine
+                  name="cirugiasDescripcion"
+                  value={form.cirugiasDescripcion}
+                  onChange={handleChange}
+                  disabled={!form.cirugias}
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <input type="checkbox" className="mr-1" />
-                <label className="w-16 font-medium text-gray-700">Otros:</label>
-                <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
+
+              <div className="grid grid-cols-4 col-span-2">
+                <InputCheckbox
+                  label="Otros"
+                  checked={form.otrosAntecedentes}
+                  name="otrosAntecedentes"
+                  onChange={(e) => {
+                    handleCheckBoxChange(e);
+                    if (!e.target.checked)
+                      setForm((prevForm) => ({
+                        ...prevForm,
+                        otrosAntecedentesDescripcion: "",
+                      }));
+                  }}
+                />
+                <InputTextOneLine
+                  name="otrosAntecedentesDescripcion"
+                  value={form.otrosAntecedentesDescripcion}
+                  onChange={handleChange}
+                  disabled={!form.otrosAntecedentes}
+                  className="col-span-3 -ml-0.5"
+                />
               </div>
             </div>
           </div>
 
-          {/* Residencia en el lugar de trabajo */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Residencia en el lugar de trabajo</h4>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
-                <label className="font-medium text-gray-700">Reside:</label>
-                <label className="flex items-center">
-                  <input type="radio" name="reside" value="SI" className="mr-1" />
-                  <span>SI</span>
-                </label>
-                <label className="flex items-center">
-                  <input type="radio" name="reside" value="NO" className="mr-1" />
-                  <span>NO</span>
-                </label>
-                <label className="w-12 font-medium text-gray-700">Tiempo:</label>
-                <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
+          <div className="w-full grid grid-cols-2 gap-4">
+            {/* Residencia en el lugar de trabajo */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Residencia en el lugar de trabajo
+              </h4>
+              <div className="space-y-2">
+                <div className="grid gap-2 grid-cols-1 ">
+                  <div className="flex gap-4">
+                    <label className="font-semibold text-gray-700 max-w-[80px] min-w-[80px]">
+                      Reside:
+                    </label>
+                    <InputsBooleanRadioGroup
+                      name="reside"
+                      value={form.reside}
+                      onChange={handleRadioButtonBoolean}
+                    />
+                  </div>
+                  <InputTextOneLine
+                    label="Tiempo"
+                    name="tiempoReside"
+                    value={form.tiempoReside}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <InputCheckbox
+                    label="ESSALUD"
+                    checked={form.essalud}
+                    onChange={handleCheckBoxChange}
+                    name="essalud"
+                  />
+                  <InputCheckbox
+                    label="EPS"
+                    checked={form.eps}
+                    onChange={handleCheckBoxChange}
+                    name="eps"
+                  />
+                  <InputCheckbox
+                    label="Otros"
+                    checked={form.otrosResidencia}
+                    onChange={handleCheckBoxChange}
+                    name="otrosResidencia"
+                  />
+                  <InputCheckbox
+                    label="SCTR"
+                    checked={form.sctr}
+                    onChange={handleCheckBoxChange}
+                    name="sctr"
+                  />
+                  <InputCheckbox
+                    label="Otros"
+                    checked={form.otrosResidencia1}
+                    onChange={handleCheckBoxChange}
+                    name="otrosResidencia1"
+                  />
+                </div>
               </div>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="mr-1" />
-                  <label className="w-16 font-medium text-gray-700">ESSALUD:</label>
-                  <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="mr-1" />
-                  <label className="w-16 font-medium text-gray-700">EPS:</label>
-                  <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="mr-1" />
-                  <label className="w-16 font-medium text-gray-700">SCTR:</label>
-                  <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input type="checkbox" className="mr-1" />
-                  <label className="w-16 font-medium text-gray-700">Otros:</label>
-                  <input type="text" className="w-16 px-1 py-0.5 border border-gray-300 rounded" />
-                </div>
+            </div>
+            {/* Número de Hijos */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <h4 className="font-semibold text-gray-800 mb-2">
+                Número de Hijos
+              </h4>
+              <div className="grid grid-cols-1 gap-2">
+                <InputTextOneLine
+                  label="Vivos"
+                  name="hijosVivos"
+                  value={form.hijosVivos}
+                  onChange={handleChange}
+                />
+                <InputTextOneLine
+                  label="Muertos"
+                  name="hijosMuertos"
+                  value={form.hijosMuertos}
+                  onChange={handleChange}
+                />
+                <InputTextOneLine
+                  label="Dependientes"
+                  name="hijosDependientes"
+                  value={form.hijosDependientes}
+                  onChange={handleChange}
+                />
+                <InputTextOneLine
+                  label="Total"
+                  name="totalHijos"
+                  value={form.totalHijos}
+                  onChange={handleChange}
+                />
               </div>
             </div>
           </div>
 
           {/* Antecedentes Familiares */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Antecedentes Familiares</h4>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Padre:</label>
-                <input type="text" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Madre:</label>
-                <input type="text" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Hermanos:</label>
-                <input type="text" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-16 font-medium text-gray-700">Esposa(o):</label>
-                <input type="text" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-            </div>
-          </div>
-
-          {/* Detalles del Puesto */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Detalles del Puesto</h4>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-24 font-medium text-gray-700">Puesto Postula:</label>
-                <input type="text" defaultValue="ASISTENTE ADMINISTRATIVA" className="w-32 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-24 font-medium text-gray-700">Área:</label>
-                <input type="text" defaultValue="ADMINISTRACION" className="w-24 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-24 font-medium text-gray-700">Puesto Actual:</label>
-                <input type="text" defaultValue="N/A" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-24 font-medium text-gray-700">Tiempo:</label>
-                <input type="text" defaultValue="N/A" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Antecedentes Familiares
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              <InputTextOneLine
+                label="Padre"
+                name="antecendentesPadre"
+                value={form.antecendentesPadre}
+                onChange={handleChange}
+              />
+              <InputTextOneLine
+                label="Madre"
+                name="antecendentesMadre"
+                value={form.antecendentesMadre}
+                onChange={handleChange}
+              />
+              <InputTextOneLine
+                label="Hermanos"
+                name="antecendentesHermano"
+                value={form.antecendentesHermano}
+                onChange={handleChange}
+              />
+              <InputTextOneLine
+                label="Esposa(o)"
+                name="antecendentesEsposao"
+                value={form.antecendentesEsposao}
+                onChange={handleChange}
+              />
             </div>
           </div>
 
           {/* Medicamentos */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
             <h4 className="font-semibold text-gray-800 mb-2">Medicamentos</h4>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-3">
-                <label className="font-medium text-gray-700">Toma medicamentos:</label>
-                <label className="flex items-center">
-                  <input type="radio" name="medicamentos" value="SI" className="mr-1" />
-                  <span>SI</span>
-                </label>
-                <label className="flex items-center">
-                  <input type="radio" name="medicamentos" value="NO" className="mr-1" defaultChecked />
-                  <span>NO</span>
-                </label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Tipo:</label>
-                <input type="text" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-                <label className="w-16 font-medium text-gray-700">Frecuencia:</label>
-                <input type="text" className="w-20 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
+            <div className="flex gap-4">
+              <label className="font-semibold text-gray-700 max-w-[120px] min-w-[120px]">
+                Toma medicamentos:
+              </label>
+              <InputsBooleanRadioGroup
+                name="tomaMedicamento"
+                value={form.tomaMedicamento}
+                onChange={(e, value) => {
+                  handleRadioButtonBoolean(e, value);
+                  if (!value)
+                    setForm((prevForm) => ({
+                      ...prevForm,
+                      tipoMedicamentos: "",
+                      frecuenciaMedicamentos: "",
+                    }));
+                }}
+              />
             </div>
-          </div>
-
-          {/* Número de Hijos */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Número de Hijos</h4>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Vivos:</label>
-                <input type="text" defaultValue="0" className="w-8 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Muertos:</label>
-                <input type="text" defaultValue="0" className="w-8 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-20 font-medium text-gray-700">N° Dependientes:</label>
-                <input type="text" className="w-8 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
-            </div>
-          </div>
-
-          {/* Medidas Generales */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Medidas Generales</h4>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Talla:</label>
-                <input type="text" defaultValue="170" className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center" />
-                <span>m.</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Peso:</label>
-                <input type="text" defaultValue="65" className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center" />
-                <span>Kg.</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">IMC:</label>
-                <input type="text" defaultValue="0.00" className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
+            <div className="grid grid-cols-2 gap-4">
+              <InputTextOneLine
+                label="Tipo"
+                name="tipoMedicamentos"
+                value={form.tipoMedicamentos}
+                onChange={handleChange}
+                disabled={!form.tomaMedicamento}
+              />
+              <InputTextOneLine
+                label="Frecuencia"
+                name="frecuenciaMedicamentos"
+                value={form.frecuenciaMedicamentos}
+                onChange={handleChange}
+                disabled={!form.tomaMedicamento}
+              />
             </div>
           </div>
 
           {/* Absentismo */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Absentismo: Enfermedades y accidentes</h4>
-            <div className="space-y-2">
-              <div className="flex items-center space-x-2">
-                <label className="w-24 font-medium text-gray-700">Enfermedad, Accidente:</label>
-                <input type="text" className="w-32 px-1 py-0.5 border border-gray-300 rounded" />
-              </div>
-              <div className="flex items-center space-x-3">
-                <label className="w-24 font-medium text-gray-700">Asociado al Trabajo:</label>
-                <label className="flex items-center">
-                  <input type="radio" name="asociado" value="SI" className="mr-1" />
-                  <span>SI</span>
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Absentismo: Enfermedades y accidentes
+            </h4>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {/* Enfermedad, Accidente */}
+              <InputTextOneLine
+                label="Enfermedad, Accidente"
+                name="enfermedad"
+                value={form.enfermedad}
+                onChange={handleChange}
+              />
+              {/* Asociado al Trabajo */}
+              <div className="flex items-center gap-4">
+                <label className="font-semibold text-gray-700 min-w-[120px]">
+                  Asociado al Trabajo:
                 </label>
-                <label className="flex items-center">
-                  <input type="radio" name="asociado" value="NO" className="mr-1" />
-                  <span>NO</span>
-                </label>
+                <InputsBooleanRadioGroup
+                  name="asociadoTrabajo"
+                  value={form.asociadoTrabajo}
+                  onChange={handleRadioButtonBoolean}
+                />
               </div>
-              <div className="flex items-center space-x-2">
-                <label className="w-12 font-medium text-gray-700">Año:</label>
-                <input type="text" className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center" />
-                <label className="w-20 font-medium text-gray-700">Días descanso:</label>
-                <input type="text" className="w-12 px-1 py-0.5 border border-gray-300 rounded text-center" />
-              </div>
+              {/* Año y Días descanso */}
+              <InputTextOneLine
+                label="Año"
+                name="anio"
+                value={form.anio}
+                onChange={handleChangeNumber}
+              />
+              <InputTextOneLine
+                label="Días descanso"
+                name="diasDescanso"
+                value={form.diasDescanso}
+                onChange={handleChangeNumber}
+              />
             </div>
+            <div className="flex gap-4 justify-center mt-3 mb-3">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white px-4 py-2 rounded"
+                onClick={handleAgregarEnfermedad}
+              >
+                Agregar
+              </button>
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded"
+                onClick={handleLimpiarEnfermedad}
+              >
+                Limpiar
+              </button>
+            </div>
+            <Table data={form.dataEnfermedades} />
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default DatosPersonales;
+function Table({ data }) {
+  return (
+    <div className="overflow-y-auto py-3" style={{ maxHeight: "150px" }}>
+      <table className="w-full table-auto border-collapse ">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border px-2 py-1 text-left text-lg">
+              Enfermedad-Accidente
+            </th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Asociado Trabajo
+            </th>
+            <th className="border px-2 py-1 text-left text-lg">Año</th>
+            <th className="border px-2 py-1 text-left text-lg">
+              Días Descanso
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.length > 0 ? (
+            data.map((row, i) => (
+              <tr
+                key={i}
+                className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg `}
+              >
+                <td className="border px-2 py-1 font-bold">
+                  {row.enfermedad ?? ""}
+                </td>
+                <td className="border px-2 py-1">
+                  {row.asociadoTrabajo ? "SÍ" : "NO"}
+                </td>
+                <td className="border px-2 py-1">{row.anio ?? ""}</td>
+                <td className="border px-2 py-1">{row.diasDescanso ?? ""}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={5}
+                className="text-center py-4 text-gray-500 text-lg"
+              >
+                No hay datos
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
