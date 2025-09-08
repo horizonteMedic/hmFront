@@ -227,7 +227,7 @@ const Header_AnexoCB_boro_Digitalizado = (doc, datos = {}) => {
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.setTextColor(0, 0, 0);
   
-  const textoCuadro = "El presente documento es un instrumento de evaluación médica que permite identificar patologías que pueden agravarse al trabajar en altitud geográfica. La información contenida es confidencial y de uso exclusivo para fines médicos ocupacionales.";
+  const textoCuadro = "El presente listado de patologías deberá ser precisado por la persona que accederá a una operación minera en altitud geográfica. El Médico evaluador deberá evaluar los antecedentes y condición actual del paciente para determinar si es procedente o no el acceso del paciente a altitud geográfica. De ser necesario, el médico evaluador deberá solicitar las pruebas e interconsultas complementarias para evaluar el caso antes de emitir su conclusión.";
   
   doc.text(textoCuadro, cuadroX + 5, cuadroY + 5, {
     align: "justify",

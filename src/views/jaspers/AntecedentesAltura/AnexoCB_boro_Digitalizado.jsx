@@ -155,7 +155,7 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
 
   // Texto de certificación
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const certificacionTexto = "Revisados los antecedentes y examen médico según anexo16, por el presente documento certifico que él/ella se encuentra";
+  const certificacionTexto = "Revisados los antecedentes y examen médico según Anexo 16 y 16-A, por el presente documento certifico que él/la trabajadoría/postulante; se encuentra";
   doc.text(certificacionTexto, leftMargin, y);
   y += 4;
 
