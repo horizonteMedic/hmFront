@@ -58,6 +58,40 @@ export const GetInfoServicio = async (
     }));
   }
 };
+function validacionSistolica(sistolica1, diastolica1) {//txtObservacionesFichaMedica append
+  if (sistolica1 >= 140 || diastolica1 >= 90) return "HTA NO CONTROLADA.\n";
+  else return "";
+}
+function validacionAudiometria(txtOD500, diagnostico) { //txtObservacionesFichaMedica append
+  if (txtOD500 != "" && txtOD500 != "N/A" && diagnostico != "NORMAL")
+    return `${diagnostico}. USO DE EPP AUDITIVO. EVALUACION ANUAL.\n`;
+  else if (txtOD500 == "N/A") return "NO PASO EXAMEN AUDIOMETRIA.\n";
+  return "";
+}
+function validacionIMC(txtIMC) {//txtObservacionesFichaMedica append
+  if (!txtIMC) return [false, ""];
+
+  const imc = parseFloat(txtIMC);
+  if (isNaN(imc)) return [false, ""];
+
+  let mensaje = "";
+  let colorRojo = false;
+
+  if (imc >= 25 && imc < 30) {
+    colorRojo = true;
+    mensaje = "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.";
+  } else if (imc >= 30 && imc < 35) {
+    colorRojo = true;
+    mensaje =
+      "OBESIDAD I: NO HACER TRABAJO >1.8 M N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.";
+  } else if (imc >= 35 && imc < 40) {
+    colorRojo = true;
+    mensaje =
+      "OBESIDAD II: NO HACER TRABAJO >1.8 M N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.";
+  }
+
+  return [colorRojo, mensaje];
+}
 
 export const SubmitDataService = async (
   form,
@@ -166,18 +200,18 @@ export const SubmitDataService = async (
       userRegistro: form.user,
     })),
   };
-  console.log(body)
+  console.log(body);
 
-  // await SubmitDataServiceDefault(
-  //   token,
-  //   limpiar,
-  //   body,
-  //   registrarUrl,
-  //   () => {
-  //     Swal.close();
-  //   },
-  //   false
-  // );
+  await SubmitDataServiceDefault(
+    token,
+    limpiar,
+    body,
+    registrarUrl,
+    () => {
+      Swal.close();
+    },
+    false
+  );
 };
 
 export const GetInfoServicioTabla = (nro, tabla, set, token) => {

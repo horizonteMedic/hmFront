@@ -70,7 +70,28 @@ export default function Resultados({
           <InputsRadioGroup
             name="aptitud"
             value={form.aptitud}
-            onChange={handleRadioButton}
+            onChange={(e, value) => {
+              if (value == "APTO") {
+                setForm((prev) => ({
+                  ...prev,
+                  restricciones: "NINGUNO",
+                  ninguno: true,
+                  corregirAgudezaVisualTotal: false,
+                  corregirAgudezaVisual: false,
+                  dietaHipocalorica: false,
+                  evitarMovimientosDisergonomicos: false,
+                  noTrabajoAltoRiesgo: false,
+                  noTrabajoSobre18m: false,
+                  usoEppAuditivo: false,
+                  usoLentesCorrectorConducir: false,
+                  usoLentesCorrectorTrabajo: false,
+                  usoLentesCorrectorTrabajo18m: false,
+                  noConducirVehiculos: false,
+                  usoEppAuditivoGeneral: false,
+                }));
+              }
+              handleRadioButton(e, value);
+            }}
             vertical
             options={[
               {
