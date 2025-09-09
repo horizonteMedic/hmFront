@@ -146,6 +146,7 @@ export default function Anexo2({ listas }) {
     talla: "",
     peso: "",
     imc: "",
+    imcRojo: false,
 
     // Signos Vitales
     frecuenciaRespiratoria: "",
@@ -243,7 +244,7 @@ export default function Anexo2({ listas }) {
     aptitud: "APTO",
     fechaAptitud: today,
     fechaVencimiento: today,
-    restricciones: "",
+    restricciones: "NINGUNO",
 
     // Recomendaciones y Restricciones
     corregirAgudezaVisualTotal: false,
@@ -256,7 +257,7 @@ export default function Anexo2({ listas }) {
     usoLentesCorrectorConducir: false,
     usoLentesCorrectorTrabajo: false,
     usoLentesCorrectorTrabajo18m: false,
-    ninguno: false,
+    ninguno: true,
     noConducirVehiculos: false,
     usoEppAuditivoGeneral: false,
 

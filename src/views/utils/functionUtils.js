@@ -137,7 +137,7 @@ export const GetInfoServicioDefault = async (
 ) => {
     try {
         const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
+            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
             token
         );
         if (res?.norden) {
