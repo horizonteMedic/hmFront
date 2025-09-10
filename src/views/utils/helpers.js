@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { addYears, format } from "date-fns";
 
 export function fixEncodingModern(str) {
     const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
@@ -6,4 +6,7 @@ export function fixEncodingModern(str) {
 }
 export function getToday() {
     return format(new Date(), "yyyy-MM-dd");
+}
+export function getTodayPlusOneYear() {
+    return format(addYears(new Date(), 1), "yyyy-MM-dd");
 }
