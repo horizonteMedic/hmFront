@@ -17,7 +17,7 @@ import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
 import Swal from "sweetalert2";
 
-const tabla = " anexo_agroindustrial";
+const tabla = "anexo_agroindustrial";
 const today = getToday();
 
 export default function Anexo2({ listas }) {
