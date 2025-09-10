@@ -514,6 +514,7 @@ export const GetInfoServicio = async (
     const data = {
       norden: res.norden,
       observacionesGenerales: "", //txtObservacionesFichaMedica
+      otrosExamenes: "", //txtOtrosEx
     };
     if (res.informacionesGeneralRadiografia_info_general != null) {
       data.observacionesGenerales += `INFORME RADIOGRAFICO : ${res.informacionesGeneralRadiografia_info_general}\n`;
@@ -632,90 +633,70 @@ export const GetInfoServicio = async (
       ? "-"
       : "";
 
-
-    // txtVSG.setText(vsg);
-    // txtGlucosaBio.setText(gluc);
-    // txtCreatininaBio.setText(creat);
-    // txtOtrosEx.append("-HEMOGRAMA: NORMAL. \n");
-    // txtOtrosEx.append(gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n");
-    // txtOtrosEx.append(
-    //   creat == null ? "" : "-CREATININA: " + creat + " mg/dl. \n"
-    // );
-    // txtOtrosEx.append(vsg == null ? "" : "-VSG: " + vsg + ". \n");
-    // txtOtrosEx.append("-EX ORINA: NORMAL. \n");
-    // txtOtrosEx.append(
-    //   oConn.setResult.getString("txtcocaina") == null
-    //     ? ""
-    //     : "-COCAINA: " + oConn.setResult.getString("txtcocaina") + ". \n"
-    // );
-    // txtOtrosEx.append(
-    //   oConn.setResult.getString("txtmarihuana") == null
-    //     ? ""
-    //     : "-MARIHUANA: " + oConn.setResult.getString("txtmarihuana") + "."
-    // );
-    // sexo = oConn.setResult.getString("sexo_pa");
+    data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
+    data.otrosExamenes += gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
+    data.otrosExamenes +=
+      creat == null ? "" : "CREATININA: " + creat + " mg/dl.\n";
+    data.otrosExamenes += vsg == null ? "" : "VSG: " + vsg + ". \n";
+    data.otrosExamenes += "EX ORINA: NORMAL. \n";
+    data.otrosExamenes += coca == null ? "" : "COCAINA: " + coca + ". \n";
+    data.otrosExamenes += marig == null ? "" : "MARIHUANA: " + marig + ". \n";
+    const sexo = res.sexo_sexo_pa;
     //===============================
-    // if (!"N/A".equals(hemo) && !txtHemoHema.getText().isEmpty()) {
-    //   // float hemoglobina=Float.parseFloat(hemo);
-    //   if ("M".equals(sexo)) {
-    //     if (hemoglobina < 14 || hemoglobina > 20) {
-    //       txtHemoHema.setForeground(Color.red);
-    //     } else {
-    //       txtHemoHema.setForeground(Color.BLACK);
-    //     }
-    //   }
-    //   if ("F".equals(sexo)) {
-    //     if (hemoglobina < 13.5 || hemoglobina > 20) {
-    //       txtHemoHema.setForeground(Color.red);
-    //     } else {
-    //       txtHemoHema.setForeground(Color.BLACK);
-    //     }
-    //   }
-    // }
+    if (hemo != "N/A" && hemo != "") {
+      const hemoglobina = parseFloat(hemo);
+      if (sexo == "M") {
+        if (hemoglobina < 14 || hemoglobina > 20) {
+          // txtHemoHema.setForeground(Color.red); // REVISAR
+        } else {
+          // txtHemoHema.setForeground(Color.BLACK); // REVISAR
+        }
+      }
+      if (sexo == "F") {
+        if (hemoglobina < 13.5 || hemoglobina > 20) {
+          // txtHemoHema.setForeground(Color.red);  // REVISAR
+        } else {
+          // txtHemoHema.setForeground(Color.BLACK);  // REVISAR
+        }
+      }
+    }
 
-    // txtVSG.setText(vsg);
-    // txtGlucosaBio.setText(gluc);
-    // txtCreatininaBio.setText(creat);
-    // if (
-    //   !txtGlucosaBio.getText().isEmpty() &&
-    //   !"N/A".equals(txtGlucosaBio.getText())
-    // ) {
-    //   // float glucosa = Float.parseFloat(txtGlucosaBio.getText().toString());
-    //   if (glucosa >= 110 || glucosa < 70) {
-    //     txtGlucosaBio.setForeground(Color.red);
-    //   } else {
-    //     txtGlucosaBio.setForeground(Color.black);
-    //   }
-    // }
-    // if (
-    //   !txtCreatininaBio.getText().isEmpty() &&
-    //   !"N/A".equals(txtCreatininaBio.getText())
-    // ) {
-    //   // float cretinina = Float.parseFloat(txtCreatininaBio.getText().toString());
-    //   if (cretinina >= 1.4 || cretinina < 0.8) {
-    //     txtCreatininaBio.setForeground(Color.red);
-    //   } else {
-    //     txtCreatininaBio.setForeground(Color.black);
-    //   }
-    // }
+    data.vsg = vsg;
+    data.glucosa = gluc;
+    data.creatinina = creat;
+    if (gluc != "" && gluc != "N/A") {
+      const glucosa = parseFloat(gluc);
+      if (glucosa >= 110 || glucosa < 70) {
+        // txtGlucosaBio.setForeground(Color.red);  // REVISAR
+      } else {
+        // txtGlucosaBio.setForeground(Color.black);  // REVISAR
+      }
+    }
+    if (creat != "" && creat != "N/A") {
+      const cretinina = parseFloat(creat);
+      if (cretinina >= 1.4 || cretinina < 0.8) {
+        // txtCreatininaBio.setForeground(Color.red);  // REVISAR
+      } else {
+        // txtCreatininaBio.setForeground(Color.black);  // REVISAR
+      }
+    }
     //==========================
-    // txtTipoExamen.setText(oConn.setResult.getString("nom_examen"));
-    // txtDni.setText(oConn.setResult.getString("cod_pa"));
-    // txtNombre.setText(oConn.setResult.getString("nombres_pa"));
-    // txtApellido.setText(oConn.setResult.getString("apellidos_pa"));
-    // FechaNacimiento.setDate(oConn.setResult.getDate("fecha_nacimiento_pa"));
-    // txtSexo.setText(oConn.setResult.getString("sexo_pa"));
-
-    // txtLugarNacimiento.setText(oConn.setResult.getString("lugar_nac_pa"));
-    // txtDomicilio.setText(oConn.setResult.getString("direccion_pa"));
-    // txtTelefono.setText(oConn.setResult.getString("tel_casa_pa"));
-    // txtEstadoCivil.setText(oConn.setResult.getString("estado_civil_pa"));
-    // txtGradoInstruccion.setText(oConn.setResult.getString("nivel_est_pa"));
-    // txtEmpresa.setText(oConn.setResult.getString("razon_empresa"));
-    // txtContrata.setText(oConn.setResult.getString("razon_contrata"));
-    // txtEdad.setText(
-    //   String.valueOf(oFunc.calcularEdad(FechaNacimiento.getCalendar()))
-    // );
+    data.nomExamen = res.nombreExamen_nom_examen ?? "";
+    data.dni = res.dni_cod_pa ?? "";
+    data.nombres = res.nombres_nombres_pa ?? "";
+    data.apellidos = res.apellidos_apellidos_pa ?? "";
+    data.fechaNac = formatearFechaCorta(
+      res.fechaNacimientoPaciente_fecha_nacimiento_pa
+    );
+    res.sexo = res.sexo_sexo_pa ?? "";
+    res.lugarNac = res.lugarNacPaciente_lugar_nac_pa ?? "";
+    res.domicilio = res.direccionPaciente_direccion_pa ?? "";
+    res.telefono = res.telefonoCasaPaciente_tel_casa_pa ?? "";
+    res.estadoCivil = res.estadoCivilPaciente_estado_civil_pa ?? "";
+    res.gradoInstruccion = res.nivelEstudiosPaciente_nivel_est_pa ?? "";
+    res.empresa = res.empresa_razon_empresa ?? "";
+    res.contrata = res.contrata_razon_contrata ?? "";
+    data.edad = (res.edad_fecha_nacimiento_pa ?? "") + " años";
     // txtExplotacionEn.setText(oConn.setResult.getString("nom_ex"));
 
     // txtAlturaLabor.setText(oConn.setResult.getString("altura_po"));
