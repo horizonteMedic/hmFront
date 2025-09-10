@@ -1054,9 +1054,9 @@ export const GetInfoServicioEditar = (
               : res.aptoRestriccion_apto_re
               ? "RESTRICCION"
               : "",
-            fechaAptitud: res.fechaApertura_fecha_apertura_po ?? "",
-            fechaVencimiento: res.fechaApertura_fecha_apertura_po ?? "", //REVISAR
-            nombre_medico: res.medico ?? "", //REVISAR
+            fechaAptitud: res.fechaDesde_fechadesde ?? "",
+            fechaVencimiento: res.fechaHasta_fechahasta ?? "", //REVISAR
+            nombre_medico: res.medico_medico ?? "", //REVISAR
             dataEnfermedades: res.accidentes ?? [],
           };
 
