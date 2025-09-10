@@ -15,44 +15,6 @@ const obtenerReporteUrl =
 const registrarUrl =
   "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
 
-function validacionSistolica(sistolica1, diastolica1) {
-  //txtObservacionesFichaMedica append
-  if (sistolica1 >= 140 || diastolica1 >= 90) return "HTA NO CONTROLADA.\n";
-  else return "";
-}
-function validacionAudiometria(txtOD500, diagnostico) {
-  //txtObservacionesFichaMedica append
-  if (txtOD500 != "" && txtOD500 != "N/A" && diagnostico != "NORMAL")
-    return `${diagnostico}. USO DE EPP AUDITIVO. EVALUACION ANUAL.\n`;
-  else if (txtOD500 == "N/A") return "NO PASO EXAMEN AUDIOMETRIA.\n";
-  return "";
-}
-function validacionIMC(txtIMC) {
-  //txtObservacionesFichaMedica append
-  if (!txtIMC) return [false, ""];
-
-  const imc = parseFloat(txtIMC);
-  if (isNaN(imc)) return [false, ""];
-
-  let mensaje = "";
-  let colorRojo = false;
-
-  if (imc >= 25 && imc < 30) {
-    colorRojo = true;
-    mensaje = "SOBREPESO: DIETA HIPOCALÓRICA Y EJERCICIOS.";
-  } else if (imc >= 30 && imc < 35) {
-    colorRojo = true;
-    mensaje =
-      "OBESIDAD I: NO HACER TRABAJO >1.8 M N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.";
-  } else if (imc >= 35 && imc < 40) {
-    colorRojo = true;
-    mensaje =
-      "OBESIDAD II: NO HACER TRABAJO >1.8 M N PISO. DIETA HIPOCALÓRICA Y EJERCICIOS.";
-  }
-
-  return [colorRojo, mensaje];
-}
-
 export const SubmitDataService = async (
   form,
   token,
@@ -234,7 +196,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     },
     () => {
       //Tiene registro
-      GetInfoServicio(nro, tabla, set, token, () => {
+      GetInfoServicioEditar(nro, tabla, set, token, () => {
         Swal.fire(
           "Alerta",
           "Este paciente ya cuenta con registros de Anexo 2.",
@@ -515,7 +477,6 @@ export const GetInfoServicio = (
           //================================================================================================================================================
           let data = {
             norden: res.norden_n_orden,
-            codigoAnexo: res.codigoAnexo_cod_anexo,
             puestoActual: res.puestoActual_txtpuestoactual ?? "",
             tiempoPuesto: res.tiempo_txttiempo ?? "",
             observacionesGenerales: "", //txtObservacionesFichaMedica
@@ -638,9 +599,9 @@ export const GetInfoServicio = (
             ? "AB"
             : "";
           data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo
-            ? "+"
+            ? "RH(+)"
             : res.grupoSanguineoRhNegativo_rbrhnegativo
-            ? "-"
+            ? "RH(-)"
             : "";
 
           data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
@@ -958,6 +919,354 @@ export const GetInfoServicio = (
             }
           }
           console.log("DATAAA", data);
+          set((prev) => ({ ...prev, ...data }));
+        }
+      } else {
+        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+      }
+    })
+    .finally(() => {
+      onFinish();
+    });
+};
+
+export const GetInfoServicioEditar = (
+  nro,
+  tabla,
+  set,
+  token,
+  onFinish = () => {}
+) => {
+  getFetch(
+    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+    token
+  )
+    .then((res) => {
+      if (res.norden_n_orden) {
+        console.log(res);
+        if (res) {
+          let data = {
+            norden: res.norden_n_orden,
+            codigoAnexo: res.codigoAnexo_cod_anexo,
+            observacionesGenerales: "", //txtObservacionesFichaMedica
+            otrosExamenes: "", //txtOtrosEx
+            conclusionRespiratoria: "", //txtconclusion
+
+            //nuevos
+            fechaExam: res.fechaAnexo_fecha,
+
+            //Ant. Personales
+            neoplasia: res.neoplasia_chkneoplasia,
+            neoplasiaDescripcion: res.neoplasiaDescripcion_txtneoplasia ?? "",
+            quemaduras: res.quemaduras_chkquemaduras,
+            quemadurasDescripcion:
+              res.quemadurasDescripcion_txtquemaduras ?? "",
+            otrosAntecedentes: res.antecedentesPersonalesOtros_chkapotros,
+            otrosAntecedentesDescripcion:
+              res.antecedentesPersonalesOtrosDescripcion_txtotrosantecendetes ??
+              "",
+            its: res.its_chkits,
+            itsDescripcion: res.itsDescripcion_txtits ?? "",
+            cirugias: res.cirugias_chkcirugias,
+            cirugiasDescripcion: res.cirugiasDescripcion_txtcirugias ?? "",
+
+            //Residencia en el lugar de trabajo
+            reside: res.residenciaSi_chkresidenciasi,
+            tiempoReside: res.residenciaTiempo_txttiemporesidencia ?? "",
+            essalud: res.essalud_chkessalud,
+            sctr: res.sctr_chksctr,
+            eps: res.eps_chkeps,
+            otrosResidencia: res.residenciaTrabajoOtros_chkotros,
+            otrosResidencia1: res.sctrOtros_chkotros1,
+
+            //Antecedentes Familiares
+            antecendentesPadre:
+              res.padreAntecedentesPatologicos_padre_detall ?? "",
+            antecendentesMadre:
+              res.madreAntecedentesPatologicos_madre_detall ?? "",
+            antecendentesHermano:
+              res.hermanosAntecedentesPatologicos_hermanos_detall ?? "",
+            antecendentesEsposao:
+              res.esposaAntecedentesPatologicos_espos_cony_detall ?? "",
+
+            //Detalles del Puesto
+            puestoActual: res.puestoActual_txtpuestoactual ?? "",
+            tiempoPuesto: res.tiempo_txttiempo ?? "",
+
+            //Medicamentos
+            tomaMedicamento: res.medicamentosSi_rbsimed,
+            tipoMedicamentos: res.tipoMedicamento_txttipomedicamento ?? "",
+            frecuenciaMedicamentos:
+              res.frecuenciaMedicamentos_txtfrecuenciamed ?? "",
+
+            //Número de Hijos
+            hijosDependientes: res.numeroDependientes_txtndependientes ?? "",
+            totalHijos: res.totalHijos_txttotalhijos ?? "",
+
+            // Examen Físico por Sistemas
+            cabeza: res.cabeza_txtpelo ?? "",
+            nariz: res.nariz_txtnariz ?? "",
+            cuello: res.cuello_txtcuello ?? "",
+            perimetro: res.perimetro_txtperimetro ?? "",
+            boca: res.boca_txtboca ?? "",
+            oidos: res.oidos_txtoidos ?? "",
+            faringe: res.faringe_txtfaringe ?? "",
+
+            visionColores: res.visionColores_v_colores ?? "",
+            enfermedadOculares:
+              res.enfermedadesOcularesOftalmo_e_oculares ?? "",
+            enfermedadOtros:
+              res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "",
+            reflejosPupilares: res.reflejosPupilares_r_pupilares ?? "",
+            visionBinocular: res.visionBinocular_v_binocular ?? "",
+
+            miembrosSuperiores:
+              res.miembrosSuperiores_txtmiembrossuperiores ?? "",
+            miembrosInferiores:
+              res.miembrosInferiores_txtmiembrosinferiores ?? "",
+
+            // Observaciones Generales
+            ectoscopia: res.ectoscopia_txtectoscopia ?? "",
+            estadoMental: res.estadoMental_txtestadomental ?? "",
+            anamnesis: res.anamnesis_txtanamnesis ?? "",
+            marcha: res.marcha_txtmarcha ?? "",
+            columnaVertebral: res.columnaVertebral_txtcolumnavertebral ?? "",
+            aparatoRespiratorio:
+              res.aparatoRespiratorio_txtaparatorespiratorio ?? "",
+            apaCardiovascular:
+              res.aparatoCardiovascular_txtaparatocardiovascular ?? "",
+            aparatoDigestivo: res.aparatoDigestivo_txtaparatodigestivo ?? "",
+            aGenitourinario:
+              res.aparatoGeiotourinario_txtaparatogeiotourinario ?? "",
+            aparatoLocomotor: res.aparatoLocomotor_txtaparatolocomotor ?? "",
+            sistemaLinfatico: res.sistemaLinfatico_txtsistemalinfatico ?? "",
+            sistemaNervioso: res.sistemaNervioso_sistemanervioso ?? "",
+            piel: res.piel_txtpiel ?? "",
+            observacionesGenerales:
+              res.observacionesFichaMedica_txtobservacionesfm ?? "",
+            conclusionRespiratoria: res.conclusion_txtconclusion ?? "",
+            restricciones: res.restricciones_txtrestricciones ?? "",
+            edad: (res.edad_fecha_nacimiento_pa ?? "") + " años",
+            aptitud: res.esApto_apto_si
+              ? "APTO"
+              : res.noEsApto_apto_no
+              ? "NO APTO"
+              : res.aptoRestriccion_apto_re
+              ? "RESTRICCION"
+              : "",
+            fechaAptitud: res.fechaApertura_fecha_apertura_po ?? "",
+            fechaVencimiento: res.fechaApertura_fecha_apertura_po ?? "", //REVISAR
+            nombre_medico: res.medico ?? "", //REVISAR
+            dataEnfermedades: res.accidentes ?? [],
+          };
+
+          if (res.observacionesOdonto_txtobservaciones != null)
+            data.observacionesGenerales += `ODONTOGRAMA : ${res.observacionesOdonto_txtobservaciones}\n`;
+
+          if (res.observacionesRadiografiaTorax_txtobservacionesrt != null)
+            data.observacionesGenerales += `RADIOGRAFIA: ${res.observacionesRadiografiaTorax_txtobservacionesrt}\n`;
+
+          if (res.observacionesLabClinico_txtobservacioneslb != null)
+            data.observacionesGenerales += `LAB CLINICO: ${res.observacionesLabClinico_txtobservacioneslb}\n`;
+
+          const coca = res.cocaina_txtcocaina;
+          const marig = res.marihuana_txtmarihuana;
+          //==============================
+          if (coca == "REACTIVO" || coca == "POSITIVO") {
+            data.observacionesGenerales += "COCAINA:" + coca + "\n";
+            // txtCoca.setForeground(Color.red);      // REVISAR
+            data.cocaina = coca;
+          } else {
+            data.cocaina = coca;
+          }
+          if (marig == "REACTIVO" || marig == "POSITIVO") {
+            data.observacionesGenerales += `MARIHUANA: ${marig}\n`;
+            //txtMarig.setForeground(Color.red);    // REVISAR
+            data.marihuana = marig;
+          } else {
+            data.marihuana = marig;
+          }
+          const vsg = res.vsg_txtvsg;
+          const gluc = res.glucosa_txtglucosabio;
+          const creat = res.creatina_txtcreatininabio;
+          const hemo = res.hemoglobina_txthemoglobina;
+
+          data.hemoglobinaHematocrito = hemo;
+          data.grupoSanguineo = res.grupoSanguineoO_chko
+            ? "O"
+            : res.grupoSanguineoA_chka
+            ? "A"
+            : res.grupoSanguineoB_chkb
+            ? "B"
+            : res.grupoSanguineoAB_chkab
+            ? "AB"
+            : "";
+          data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo
+            ? "RH(+)"
+            : res.grupoSanguineoRhNegativo_rbrhnegativo
+            ? "RH(-)"
+            : "";
+          data.vsg = vsg;
+          data.glucosa = gluc;
+          data.creatinina = creat;
+          data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
+          data.otrosExamenes +=
+            gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
+          data.otrosExamenes +=
+            creat == null ? "" : "CREATININA: " + creat + " mg/dl.\n";
+          data.otrosExamenes += vsg == null ? "" : "VSG: " + vsg + ". \n";
+          data.otrosExamenes += "EX ORINA: NORMAL. \n";
+          data.otrosExamenes += coca == null ? "" : "COCAINA: " + coca + ". \n";
+          data.otrosExamenes +=
+            marig == null ? "" : "MARIHUANA: " + marig + ". \n";
+
+          const sexo = res.sexo_sexo_pa;
+          if (hemo != "N/A" && hemo != "") {
+            const hemoglobina = parseFloat(hemo);
+            if (sexo == "M") {
+              if (hemoglobina < 14 || hemoglobina > 20) {
+                // txtHemoHema.setForeground(Color.red); // REVISAR
+              } else {
+                // txtHemoHema.setForeground(Color.BLACK); // REVISAR
+              }
+            }
+            if (sexo == "F") {
+              if (hemoglobina < 13.5 || hemoglobina > 20) {
+                // txtHemoHema.setForeground(Color.red);  // REVISAR
+              } else {
+                // txtHemoHema.setForeground(Color.BLACK);  // REVISAR
+              }
+            }
+          }
+
+          if (gluc != "" && gluc != "N/A") {
+            const glucosa = parseFloat(gluc);
+            if (glucosa >= 110 || glucosa < 70) {
+              // txtGlucosaBio.setForeground(Color.red);  // REVISAR
+            } else {
+              // txtGlucosaBio.setForeground(Color.black);  // REVISAR
+            }
+          }
+
+          if (creat != "" && creat != "N/A") {
+            const cretinina = parseFloat(creat);
+            if (cretinina >= 1.4 || cretinina < 0.8) {
+              // txtCreatininaBio.setForeground(Color.red);  // REVISAR
+            } else {
+              // txtCreatininaBio.setForeground(Color.black);  // REVISAR
+            }
+          }
+          if (res.examenRadiograficosSanguineos_txtobservacionesrs != "null") {
+            data.observacionesGenerales += `EX. RX SANGUINEOS : ${res.examenRadiograficosSanguineos_txtobservacionesrs}\n`;
+          }
+          data.nomExamen = res.nombreExamen_nom_examen ?? "";
+          data.dni = res.dni_cod_pa ?? "";
+          data.nombres = res.nombres_nombres_pa ?? "";
+          data.apellidos = res.apellidos_apellidos_pa ?? "";
+          data.fechaNac = formatearFechaCorta(
+            res.fechaNacimientoPaciente_fecha_nacimiento_pa
+          );
+          data.sexo = res.sexo_sexo_pa ?? "";
+          data.lugarNac = res.lugarNacPaciente_lugar_nac_pa ?? "";
+          data.domicilio = res.direccionPaciente_direccion_pa ?? "";
+          data.telefono = res.telefonoCasaPaciente_tel_casa_pa ?? "";
+          data.estadoCivil = res.estadoCivilPaciente_estado_civil_pa ?? "";
+          data.gradoInstruccion = res.nivelEstudiosPaciente_nivel_est_pa ?? "";
+          data.empresa = res.empresa_razon_empresa ?? "";
+          data.contrata = res.contrata_razon_contrata ?? "";
+          data.edad = (res.edad_fecha_nacimiento_pa ?? "") + " años";
+          data.explotacion = res.explotacion_nom_ex ?? "";
+          data.alturaLaboral = res.altura_altura_po ?? "";
+          data.mineralExp = res.mineral_mineral_po ?? "";
+          data.puestoPostula = res.cargo_cargo_de ?? "";
+          if (res.nombreExamen_nom_examen == "ANUAL") {
+            data.puestoActual = res.cargo_cargo_de ?? "";
+          }
+          data.areaPuesto = res.area_area_o ?? "";
+
+          data.fvc = res.fvc_fvc ?? "";
+          data.fev1 = res.fev1_fev1 ?? "";
+          data.fev1Fvc = res.fev1fvc_fev1fvc ?? "";
+          data.fef2575 = res.fef2575_fef25_75 ?? "";
+
+          data.conclusionRespiratoria = res.interpretacion_interpretacion ?? "";
+          data.piezasMalEstado = res.piezasMalEstado_txtpiezasmalestado ?? "";
+          data.piezasFaltan = res.ausentes_txtausentes ?? "";
+
+          // Hijos
+          data.hijosVivos =
+            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos || "0";
+          data.hijosMuertos =
+            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ||
+            "0";
+
+          data.imc = res.imc_imc ?? "";
+          // Medidas Generales
+          data.talla = res.talla_talla ?? "";
+          data.peso = res.peso_peso ?? "";
+          data.perimetro = res.perimetroCuello_perimetro_cuello ?? "";
+          data.temperatura = res.temperatura_temperatura ?? "";
+          data.cintura = res.cintura_cintura ?? "";
+          data.cadera = res.cadera_cadera ?? "";
+          data.icc = res.icc_icc ?? "";
+          data.frecuenciaRespiratoria = res.frespiratoria_f_respiratoria ?? "";
+          data.frecuenciaCardiaca = res.fcardiaca_f_cardiaca ?? "";
+          data.saturacionO2 = res.sat02_sat_02 ?? "";
+          data.presionSistolica = res.sistolica_sistolica ?? "";
+          data.presionDiastolica = res.diastolica_diastolica ?? "";
+
+          data.visionCercaOd = res.visionCercaSinCorregirOd_v_cerca_s_od ?? "";
+          data.visionCercaOi = res.visionCercaSinCorregirOi_v_cerca_s_oi ?? "";
+          data.visionCercaOdCorregida =
+            res.visionCercaCorregidaOd_v_cerca_c_od ?? "";
+          data.visionCercaOiCorregida =
+            res.visionCercaCorregidaOi_v_cerca_c_oi ?? "";
+          data.visionLejosOd = res.visionLejosSinCorregirOd_v_lejos_s_od ?? "";
+          data.visionLejosOi = res.visionLejosSinCorregirOi_v_lejos_s_oi ?? "";
+          data.visionLejosOdCorregida =
+            res.visionLejosCorregidaOd_v_lejos_c_od ?? "";
+          data.visionLejosOiCorregida =
+            res.visionLejosCorregidaOi_v_lejos_c_oi ?? "";
+          data.visionBinocular = res.visionBinocular_v_binocular ?? "";
+
+          // //************************************************************
+          data.od500 = res.oidoDerecho500_o_d_500 ?? "";
+          data.od1000 = res.oidoDerecho1000_o_d_1000 ?? "";
+          data.od2000 = res.oidoDerecho2000_o_d_2000 ?? "";
+          data.od3000 = res.oidoDerecho3000_o_d_3000 ?? "";
+          data.od4000 = res.oidoDerecho4000_o_d_4000 ?? "";
+          data.od6000 = res.oidoDerecho6000_o_d_6000 ?? "";
+          data.od8000 = res.oidoDerecho8000_o_d_8000 ?? "";
+          data.oi500 = res.oidoIzquierdo500_o_i_500 ?? "";
+          data.oi1000 = res.oidoIzquierdo1000_o_i_1000 ?? "";
+          data.oi2000 = res.oidoIzquierdo2000_o_i_2000 ?? "";
+          data.oi3000 = res.oidoIzquierdo3000_o_i_3000 ?? "";
+          data.oi4000 = res.oidoIzquierdo4000_o_i_4000 ?? "";
+          data.oi6000 = res.oidoIzquierdo6000_o_i_6000 ?? "";
+          data.oi8000 = res.oidoIzquierdo8000_o_i_8000 ?? "";
+
+          if (data.hijosVivos && data.hijosMuertos) {
+            const hv = parseInt(data.hijosVivos) || 0;
+            const hm = parseInt(data.hijosMuertos) || 0;
+            data.totalHijos = (hv + hm).toString();
+          }
+
+          // electroCardiograma();=======================
+          const hallazgoECG =
+            res.hallazgosInformeElectroCardiograma_hallazgo ?? "";
+          const recomendacionesECG =
+            res.recomendacionesInformeElectroCardiograma_recomendaciones ?? "";
+
+          if (hallazgoECG && hallazgoECG !== "NORMAL.") {
+            if (recomendacionesECG) {
+              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}.${recomendacionesECG}\n`;
+            } else {
+              data.observacionesGenerales += `\n -ELECTROCARDIOGRAMA: ${hallazgoECG}\n`;
+            }
+          }
+
+          //FIN==============
+          console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...data }));
         }
       } else {
