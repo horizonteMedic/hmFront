@@ -981,13 +981,13 @@ export const GetInfoServicioEditar = (
 
             //Antecedentes Familiares
             antecendentesPadre:
-              res.padreAntecedentesPatologicos_padre_detall ?? "",
+              res.padre_txtpadre ?? "",
             antecendentesMadre:
-              res.madreAntecedentesPatologicos_madre_detall ?? "",
+              res.madre_txtmadre ?? "",
             antecendentesHermano:
-              res.hermanosAntecedentesPatologicos_hermanos_detall ?? "",
+              res.hermanos_txthermanos ?? "",
             antecendentesEsposao:
-              res.esposaAntecedentesPatologicos_espos_cony_detall ?? "",
+              res.esposa_txtesposa ?? "",
 
             //Detalles del Puesto
             puestoActual: res.puestoActual_txtpuestoactual ?? "",

@@ -340,7 +340,7 @@ export default function FichaOftalmologica({
                     e.preventDefault();
                     setForm((prev) => ({
                       ...prev,
-                      enfOculares: generarDiagnosticoCerca(),
+                      presenciaPterigion: generarDiagnosticoCerca(),
                     }));
                   }
                 }}
@@ -385,7 +385,7 @@ export default function FichaOftalmologica({
                     e.preventDefault();
                     setForm((prev) => ({
                       ...prev,
-                      presenciaPterigion: generarDiagnosticoLejos(),
+                      enfOculares: generarDiagnosticoLejos(),
                     }));
                   }
                 }}
@@ -528,12 +528,14 @@ export default function FichaOftalmologica({
                   <input
                     type="checkbox"
                     name="opcionPterigion"
-                    checked={form.presenciaPterigion.includes("PTERIGIÓN OJO DERECHO")}
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN OJO DERECHO"
+                    )}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? (f.presenciaPterigion + " PTERIGIÓN OJO DERECHO") 
+                          ? f.presenciaPterigion + " PTERIGIÓN OJO DERECHO"
                           : "",
                       }))
                     }
@@ -551,7 +553,7 @@ export default function FichaOftalmologica({
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? (f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO")
+                          ? f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO"
                           : "",
                       }))
                     }
@@ -569,7 +571,7 @@ export default function FichaOftalmologica({
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? (f.presenciaPterigion + " PTERIGIÓN BILATERAL")
+                          ? f.presenciaPterigion + " PTERIGIÓN BILATERAL"
                           : "",
                       }))
                     }
