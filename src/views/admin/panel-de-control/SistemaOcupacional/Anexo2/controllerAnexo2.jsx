@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
 import {
   LoadingDefault,
-  SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
@@ -126,15 +125,6 @@ export const SubmitDataService = async (
   };
   console.log(body);
 
-  // await SubmitDataServiceDefault(
-  //   token,
-  //   limpiar,
-  //   body,
-  //   registrarUrl,
-  //   () => {
-  //     PrintHojaR(form.norden, token, tabla, datosFooter);
-  //   }
-  // );
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
     if (res.id === 1 || res.id === 0) {
@@ -1025,7 +1015,7 @@ export const GetInfoServicioEditar = (
               // txtCreatininaBio.setForeground(Color.black);  // REVISAR
             }
           }
-          if (res.examenRadiograficosSanguineos_txtobservacionesrs != "null") {
+          if (res.examenRadiograficosSanguineos_txtobservacionesrs != null) {
             data.observacionesGenerales += `EX. RX SANGUINEOS : ${res.examenRadiograficosSanguineos_txtobservacionesrs}\n`;
           }
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
@@ -1135,6 +1125,35 @@ export const GetInfoServicioEditar = (
           }
 
           //FIN==============
+
+          // Mapear restricciones a checkboxes
+          const restriccionesTexto = data.restricciones || "";
+
+          // Definir mapeo de textos a nombres de campos
+          const restriccionesMap = {
+            "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "corregirAgudezaVisualTotal",
+            "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "corregirAgudezaVisual",
+            "DIETA HIPOCALORICA Y EJERCICIOS": "dietaHipocalorica",
+            "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS": "evitarMovimientosDisergonomicos",
+            "NO HACER TRABAJO DE ALTO RIESGO": "noTrabajoAltoRiesgo",
+            "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO": "noTrabajoSobre18m",
+            "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO ≥80 DB": "usoEppAuditivo",
+            "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHICULOS MOTORIZADOS": "usoLentesCorrectorConducir",
+            "USO DE LENTES CORRECTORES PARA TRABAJO": "usoLentesCorrectorTrabajo",
+            "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "usoLentesCorrectorTrabajo18m"
+          };
+
+          // Marcar checkboxes basándose en el texto de restricciones
+          Object.entries(restriccionesMap).forEach(([texto, campo]) => {
+            if (restriccionesTexto.includes(texto)) {
+              data[campo] = true;
+            } else {
+              data[campo] = false;
+            }
+          });
+          // Marcar "ninguno" si restricciones es "NINGUNO" o está vacío
+          data.ninguno = restriccionesTexto === "NINGUNO" || restriccionesTexto === "";
+
           console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...data }));
         }
