@@ -430,16 +430,18 @@ export const GetInfoServicio = (
           if (coca == "REACTIVO") {
             data.observacionesGenerales += `TEST DE COCAINA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
             // txtCoca.setForeground(Color.red);      // REVISAR
+            data.cocainaRed = true;
             data.cocaina = "REACTIVO";
           } else {
             data.cocaina = coca;
           }
           if (marig == "REACTIVO") {
             data.observacionesGenerales += `MARIHUANA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
-            //txtMarig.setForeground(Color.red);    // REVISAR
+            data.marihuanaRed = true;
             data.marihuana = "REACTIVO";
           } else {
             data.marihuana = marig;
+            data.marihuanaRed = false;
           }
           //===============================
           const vsg = res.vsg_txtvsg;
@@ -479,16 +481,16 @@ export const GetInfoServicio = (
             const hemoglobina = parseFloat(hemo);
             if (sexo == "M") {
               if (hemoglobina < 14 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red); // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK); // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
             if (sexo == "F") {
               if (hemoglobina < 13.5 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red);  // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK);  // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
           }
@@ -499,17 +501,17 @@ export const GetInfoServicio = (
           if (gluc != "" && gluc != "N/A") {
             const glucosa = parseFloat(gluc);
             if (glucosa >= 110 || glucosa < 70) {
-              // txtGlucosaBio.setForeground(Color.red);  // REVISAR
+              data.glucosaRed = true;
             } else {
-              // txtGlucosaBio.setForeground(Color.black);  // REVISAR
+              data.glucosaRed = false;
             }
           }
           if (creat != "" && creat != "N/A") {
             const cretinina = parseFloat(creat);
             if (cretinina >= 1.4 || cretinina < 0.8) {
-              // txtCreatininaBio.setForeground(Color.red);  // REVISAR
+              data.creatininaRed = true;
             } else {
-              // txtCreatininaBio.setForeground(Color.black);  // REVISAR
+              data.creatininaRed = false;
             }
           }
           //==========================
@@ -933,17 +935,20 @@ export const GetInfoServicioEditar = (
           //==============================
           if (coca == "REACTIVO" || coca == "POSITIVO") {
             data.observacionesGenerales += "COCAINA:" + coca + "\n";
-            // txtCoca.setForeground(Color.red);      // REVISAR
+            data.cocainaRed = true;
             data.cocaina = coca;
           } else {
+            data.cocainaRed = false;
             data.cocaina = coca;
           }
           if (marig == "REACTIVO" || marig == "POSITIVO") {
             data.observacionesGenerales += `MARIHUANA: ${marig}\n`;
             //txtMarig.setForeground(Color.red);    // REVISAR
             data.marihuana = marig;
+            data.marihuanaRed = true;
           } else {
             data.marihuana = marig;
+            data.marihuanaRed = false;
           }
           const vsg = res.vsg_txtvsg;
           const gluc = res.glucosa_txtglucosabio;
@@ -984,16 +989,16 @@ export const GetInfoServicioEditar = (
             const hemoglobina = parseFloat(hemo);
             if (sexo == "M") {
               if (hemoglobina < 14 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red); // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK); // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
             if (sexo == "F") {
               if (hemoglobina < 13.5 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red);  // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK);  // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
           }
@@ -1001,18 +1006,18 @@ export const GetInfoServicioEditar = (
           if (gluc != "" && gluc != "N/A") {
             const glucosa = parseFloat(gluc);
             if (glucosa >= 110 || glucosa < 70) {
-              // txtGlucosaBio.setForeground(Color.red);  // REVISAR
+              data.glucosaRed = true;
             } else {
-              // txtGlucosaBio.setForeground(Color.black);  // REVISAR
+              data.glucosaRed = false;
             }
           }
 
           if (creat != "" && creat != "N/A") {
             const cretinina = parseFloat(creat);
             if (cretinina >= 1.4 || cretinina < 0.8) {
-              // txtCreatininaBio.setForeground(Color.red);  // REVISAR
+              data.creatininaRed = true;
             } else {
-              // txtCreatininaBio.setForeground(Color.black);  // REVISAR
+              data.creatininaRed = false;
             }
           }
           if (res.examenRadiograficosSanguineos_txtobservacionesrs != null) {

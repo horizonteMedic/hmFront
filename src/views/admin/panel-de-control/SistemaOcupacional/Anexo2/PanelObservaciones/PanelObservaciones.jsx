@@ -137,6 +137,7 @@ export default function PanelObservaciones({
               value={form.glucosa}
               labelWidth="110px"
               disabled
+              className={form.glucosaRed ? "text-red-600" : ""}
             />
             <InputTextOneLine
               label="Creatinina"
@@ -144,6 +145,7 @@ export default function PanelObservaciones({
               value={form.creatinina}
               labelWidth="110px"
               disabled
+              className={form.creatininaRed ? "text-red-600" : ""}
             />
             <InputTextOneLine
               label="Marihuana"
@@ -151,6 +153,7 @@ export default function PanelObservaciones({
               value={form.marihuana}
               labelWidth="110px"
               disabled
+              className={form.marihuanaRed ? "text-red-600" : ""}
             />
             <InputTextOneLine
               label="Cocaína"
@@ -158,6 +161,7 @@ export default function PanelObservaciones({
               value={form.cocaina}
               labelWidth="110px"
               disabled
+              className={form.cocainaRed ? "text-red-600" : ""}
             />
             <InputTextOneLine
               label="Hemoglobina / Hematocrito (gr. %)"
@@ -165,6 +169,7 @@ export default function PanelObservaciones({
               value={form.hemoglobinaHematocrito}
               labelWidth="110px"
               disabled
+              className={form.hemoglobinaRed ? "text-red-600" : ""}
             />
           </div>
         </div>

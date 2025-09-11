@@ -123,6 +123,12 @@ export default function Anexo2({ listas }) {
     creatinina: "",
     marihuana: "",
     cocaina: "",
+    cocainaRed: false,
+    marihuanaRed: false,
+    hemoglobinaRed: false,
+    glucosaRed: false,
+    creatininaRed: false,
+
     hemoglobinaHematocrito: "",
 
     //=============================================================================================
