@@ -265,8 +265,9 @@ export default function ReporteExamen1 (datos){
                 
                 // Mapeo de abreviaciones específicas para página 2
                 if (examenLower.includes("psicosensometria") || examenLower.includes("psicosensometría")) return "PSICO";
-                if (examenLower.includes("anexo16-a")) return "ANX16-A";
-                if (examenLower.includes("anexo16")) return "ANX16";
+                if (examenLower.includes("anexo16-a") || examenLower.includes("anexo 16-a")) return "ANX16-A";
+                if (examenLower.includes("anexo16a") || examenLower.includes("anexo 16a")) return "ANX16A";
+                if (examenLower.includes("anexo16") || examenLower.includes("anexo 16")) return "ANX16";
                 if (examenLower.includes("anual")) return "ANUAL";
                 if (examenLower.includes("pre-ocupacional") || examenLower.includes("preocupacional")) return "PRE-OC";
                 if (examenLower.includes("ocupacional")) return "OCUP";

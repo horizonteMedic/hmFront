@@ -80,7 +80,7 @@ import ConsentimientoInformadoOcupacional from "./Consentimientos/Consentimiento
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
 import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
-import ManejoCamara from "./Playground/ManejoCamara.jsx";
+import Anexo16 from "./Anexo16/Anexo16.jsx";
 import EKG from "./EKG/ekg.jsx";
 import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.jsx";
 import Anexo2 from "./Anexo2/Anexo2.jsx";
@@ -1188,7 +1188,7 @@ const TabComponent = () => {
                   Playground
                 </h2>
               </div>
-              <ManejoCamara />
+              <Anexo16 listas={listasCombos}/>
             </div>
           )}
           {activeTab === 25 && (
