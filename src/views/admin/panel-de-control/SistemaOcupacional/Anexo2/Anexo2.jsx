@@ -54,8 +54,8 @@ export default function Anexo2({ listas }) {
     //Detalles del Puesto
     puestoPostula: "",
     areaPuesto: "",
-    puestoActual: "",
-    tiempoPuesto: "",
+    puestoActual: "N/A",
+    tiempoPuesto: "N/A",
 
     //Ant. Personales
     neoplasia: false,
@@ -341,7 +341,7 @@ export default function Anexo2({ listas }) {
     }
   };
 
-  const handlePrint = (numPage) => {
+  const handlePrint = (numPage = 1) => {
     if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
     Swal.fire({

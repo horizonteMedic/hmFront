@@ -391,16 +391,16 @@ export default function Resultados({
         <div className="flex flex-wrap gap-4">
           <button
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => handlePrint(1)}
+            onClick={() => handlePrint()}
           >
-            Anexo 7C - N°1
+            Anexo 7C
           </button>
-          <button
+          {/* <button
             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             onClick={() => handlePrint(2)}
           >
             Anexo 7C - N°2
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

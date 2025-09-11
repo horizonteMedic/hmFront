@@ -13,7 +13,7 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
 
   const datosReales = {
     sede: datos?.informacionSede?.sede ?? "Trujillo-Nicolas de Pierola",
-    norden: datos?.norden ?? "",
+    norden: String(datos?.norden_n_orden ?? ""),
     color: datos?.informacionSede?.color ?? 1,
     codigoColor: datos?.informacionSede?.codigoColor?.trim() ?? "#008f39",
     textoColor: datos?.informacionSede?.textoColor?.trim() ?? "F"

@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
-  GetInfoServicioDefault,
   LoadingDefault,
   PrintHojaRDefault,
   SubmitDataServiceDefault,
@@ -151,22 +150,16 @@ export const PrintHojaR = (nro, token, tabla, numPage, datosFooter) => {
     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
     token
   ).then(async (res) => {
-    if (res.norden) {
-      const nombre = res.nameJasper;
+    if (res.norden_n_orden) {
+      // const nombre = res.nameJasper;
+      const nombre = "Anexo2";
       console.log(nombre);
       const jasperModules = import.meta.glob(
-        "../../../../../jaspers/Cuestionario_Nordico/*.jsx"
+        "../../../../jaspers/Anexo2/*.jsx"
       );
-      let modulo;
-      if (numPage == 2) {
-        modulo = await jasperModules[
-          `../../../../../jaspers/Cuestionario_Nordico/${nombre}.jsx`
-        ]();
-      } else {
-        modulo = await jasperModules[
-          `../../../../../jaspers/Cuestionario_Nordico/${nombre}.jsx`
-        ]();
-      }
+      const modulo = await jasperModules[
+        `../../../../jaspers/Anexo2/${nombre}.jsx`
+      ]();
 
       // Ejecuta la función exportada por default con los datos
       if (typeof modulo.default === "function") {
@@ -1251,9 +1244,9 @@ export const GetInfoServicioEditar = (
 
           // Hijos
           data.hijosVivos =
-            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos || "0";
+            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? "0";
           data.hijosMuertos =
-            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ||
+            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ??
             "0";
 
           data.imc = res.imc_imc ?? "";

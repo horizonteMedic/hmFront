@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import headerAnexo2 from "./Headers/Header_Anexo2.jsx";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 
 export default function Anexo2(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -251,114 +252,114 @@ export default function Anexo2(data = {}) {
   // Datos reales (mapeo desde data)
   const datosReales = {
     // === INFORMACIÓN GENERAL ===
-    numeroOrden: data.numeroOrden ?? "",
+    numeroOrden: String(data.norden_n_orden ?? ""),
     tipoEvaluacion: {
-      preOcupacional: data.tipoEvaluacionPreOcupacional ?? false,
-      anual: data.tipoEvaluacionAnual ?? false,
-      retiro: data.tipoEvaluacionRetiro ?? false,
-      otros: data.tipoEvaluacionOtros ?? false
+      preOcupacional: data.nombreExamen_nom_examen=="PRE-OCUPACIONAL" ?? false, 
+      anual: data.nombreExamen_nom_examen=="ANUAL" ?? false,
+      retiro: data.nombreExamen_nom_examen=="RETIRO" ?? false,
+      otros: data.nombreExamen_nom_examen!="PRE-OCUPACIONAL" && data.nombreExamen_nom_examen!="ANUAL" && data.nombreExamen_nom_examen!="RETIRO" 
     },
-    fechaExamen: data.fechaExamen ?? "",
+    fechaExamen: formatearFechaCorta(data.fechaAnexo_fecha ?? ""), //agregar formateo
     lugarExamen: {
-      departamento: data.lugarExamenDepartamento ?? "",
-      provincia: data.lugarExamenProvincia ?? "",
-      distrito: data.lugarExamenDistrito ?? ""
+      departamento: data.departamentoPaciente_departamento_pa ?? "",//revisar pedir
+      provincia: data.provinciaPaciente_provincia_pa ?? "",//revisar pedir
+      distrito: data.distritoPaciente_distrito_pa ?? ""//revisar pedir
     },
     
     // === DATOS DE LA EMPRESA ===
     datosEmpresa: {
-      contrata: data.contrata ?? "",
-      empresa: data.empresa ?? "",
-      actividadEconomica: data.actividadEconomica ?? "",
-      lugarTrabajo: data.lugarTrabajo ?? ""
+      contrata: data.contrata_razon_contrata ?? "",
+      empresa: data.empresa_razon_empresa ?? "",
+      actividadEconomica: "",
+      lugarTrabajo:  ""
     },
     
     // === UBICACIÓN Y PUESTO ===
     ubicacion: {
-      departamento: data.ubicacionDepartamento ?? "",
-      provincia: data.ubicacionProvincia ?? "",
-      distrito: data.ubicacionDistrito ?? ""
+      departamento:  "",
+      provincia: "",
+      distrito: ""
     },
-    puestoPostula: data.puestoPostula ?? "",
+    puestoPostula: data.cargo_cargo_de ?? "",
     
     // === II. FILIACIÓN DEL TRABAJADOR ===
     filiacionTrabajador: {
-      nombresApellidos: data.nombresApellidos ?? "",
-      fechaNacimiento: data.fechaNacimiento ?? "",
-      edad: data.edad ?? "",
-      domicilioFiscal: data.domicilioFiscal ?? "",
-      dni: data.dni ?? "",
+      nombresApellidos: (data.nombres_nombres_pa ?? "") + " " + (data.apellidos_apellidos_pa ?? ""),
+      fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? ""), //agregar formateo
+      edad: (data.edad_fecha_nacimiento_pa ?? "")+" años",
+      domicilioFiscal: data.direccionPaciente_direccion_pa ?? "",
+      dni: String(data.dni_cod_pa ?? ""),
       ubicacion: {
-        departamento: data.filiacionDepartamento ?? "",
-        provincia: data.filiacionProvincia ?? "",
-        distrito: data.filiacionDistrito ?? ""
+        departamento: data.departamentoPaciente_departamento_pa ?? "",
+        provincia: data.provinciaPaciente_provincia_pa ?? "",
+        distrito: data.distritoPaciente_distrito_pa ?? ""
       },
       residenciaLugarTrabajo: {
-        si: data.residenciaLugarTrabajoSi ?? false,
-        no: data.residenciaLugarTrabajoNo ?? false
+        si: data.residenciaSi_chkresidenciasi ?? false,
+        no: data.residenciaNo_chkresidenciano ?? false
       },
-      tiempoResidencia: data.tiempoResidencia ?? "",
+      tiempoResidencia: data.residenciaTiempo_txttiemporesidencia ?? "",
       seguros: {
-        essalud: data.essalud ?? false,
-        eps: data.eps ?? false,
-        otro1: data.otroSeguro1 ?? false,
-        sctr: data.sctr ?? false,
-        otro2: data.otroSeguro2 ?? false
+        essalud: data.essalud_chkessalud ?? false,
+        eps: data.eps_chkeps ?? false,
+        otro1: data.residenciaTrabajoOtros_chkotros ?? false,
+        sctr: data.sctr_chksctr ?? false,
+        otro2: data.sctrOtros_chkotros1 ?? false
       },
       contacto: {
-        correoElectronico: data.correoElectronico ?? "",
-        telefono: data.telefono ?? "",
-        gradoInstruccion: data.gradoInstruccion ?? ""
+        correoElectronico: data.emailPaciente_email_pa ?? "",
+        telefono: data.celularPaciente_cel_pa ?? "",
+        gradoInstruccion: data.nivelEstudiosPaciente_nivel_est_pa ?? ""
       },
-      estadoCivil: data.estadoCivil ?? "",
-      totalHijos: data.totalHijos ?? "",
-      dependientes: data.dependientes ?? ""
+      estadoCivil: data.estadoCivilPaciente_estado_civil_pa ?? "",
+      totalHijos: data.totalHijos_txttotalhijos ?? "",
+      dependientes: data.numeroDependientes_txtndependientes ?? ""
     },
     
     // === III. ANTECEDENTES PATOLÓGICOS PERSONALES ===
     antecedentesPatologicos: {
       // Condiciones médicas - Columna 1 (Izquierda)
-      alergias: { si: data.alergiasSi ?? false, no: data.alergiasNo ?? false },
-      asma: { si: data.asmaSi ?? false, no: data.asmaNo ?? false },
-      bronquitis: { si: data.bronquitisSi ?? false, no: data.bronquitisNo ?? false },
-      quemaduras: { si: data.quemadurasSi ?? false, no: data.quemadurasNo ?? false },
-      cirugias: { si: data.cirugiasSi ?? false, no: data.cirugiasNo ?? false },
+      alergias: { si: data.alergiasSi ?? false, no: data.alergiasNo ?? false },//revisar pedir
+      asma: { si: data.asmaSi ?? false, no: data.asmaNo ?? false },//revisar pedir
+      bronquitis: { si: data.bronquitisSi ?? false, no: data.bronquitisNo ?? false },//revisar pedir
+      quemaduras: { si: data.quemaduras_chkquemaduras ?? false, no: !data.quemaduras_chkquemaduras ?? true },
+      cirugias: { si: data.cirugias_chkcirugias ?? false, no: !data.cirugias_chkcirugias ?? true },
       
       // Condiciones médicas - Columna 2 (Centro)
-      tbc: { si: data.tbcSi ?? false, no: data.tbcNo ?? false },
-      its: { si: data.itsSi ?? false, no: data.itsNo ?? false },
-      convulsiones: { si: data.convulsionesSi ?? false, no: data.convulsionesNo ?? false },
-      neoplasia: { si: data.neoplasiaSi ?? false, no: data.neoplasiaNo ?? false },
-      intoxicaciones: { si: data.intoxicacionesSi ?? false, no: data.intoxicacionesNo ?? false },
+      tbc: { si: data.tbcSi ?? false, no: data.tbcNo ?? false }, //revisar pedir
+      its: { si: data.its_chkits ?? false, no: !data.its_chkits ?? true },
+      convulsiones: { si: data.convulsionesSi ?? false, no: data.convulsionesNo ?? false },//revisar pedir
+      neoplasia: { si: data.neoplasia_chkneoplasia ?? false, no: !data.neoplasia_chkneoplasia ?? true },
+      intoxicaciones: { si: data.intoxicacionesSi ?? false, no: data.intoxicacionesNo ?? false },//revisar pedir
       
       // Condiciones médicas - Columna 3 (Derecha)
-      hepatitis: { si: data.hepatitisSi ?? false, no: data.hepatitisNo ?? false },
-      tifoidea: { si: data.tifoideaSi ?? false, no: data.tifoideaNo ?? false },
-      hta: { si: data.htaSi ?? false, no: data.htaNo ?? false },
-      diabetes: { si: data.diabetesSi ?? false, no: data.diabetesNo ?? false },
-      otros: { si: data.otrosSi ?? false, no: data.otrosNo ?? false },
+      hepatitis: { si: data.hepatitisSi ?? false, no: data.hepatitisNo ?? false },//revisar pedir
+      tifoidea: { si: data.tifoideaSi ?? false, no: data.tifoideaNo ?? false },//revisar pedir
+      hta: { si: data.htaSi ?? false, no: data.htaNo ?? false },//revisar pedir
+      diabetes: { si: data.diabetesSi ?? false, no: data.diabetesNo ?? false },//revisar pedir
+      otros: { si: data.antecedentesPersonalesOtros_chkapotros ?? false, no: !data.antecedentesPersonalesOtros_chkapotros ?? true },
       
       // Hábitos Nocivos
       habitosNocivos: {
-        alcohol: { si: data.alcoholSi ?? false, no: data.alcoholNo ?? false, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholCantidad ?? "" },
-        tabaco: { si: data.tabacoSi ?? false, no: data.tabacoNo ?? false, tipo: data.tabacoTipo ?? "", cantidad: data.tabacoCantidad ?? "" },
-        drogas: { si: data.drogasSi ?? false, no: data.drogasNo ?? false, tipo: data.drogasTipo ?? "", cantidad: data.drogasCantidad ?? "" },
-        medicamento: { si: data.medicamentoSi ?? false, no: data.medicamentoNo ?? false, tipo: data.medicamentoTipo ?? "", cantidad: data.medicamentoCantidad ?? "" }
+        alcohol: { si: data.alcoholSi ?? false, no: data.alcoholNo ?? false, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholCantidad ?? "" },//revisar pedir
+        tabaco: { si: data.tabacoSi ?? false, no: data.tabacoNo ?? false, tipo: data.tabacoTipo ?? "", cantidad: data.tabacoCantidad ?? "" },//revisar pedir
+        drogas: { si: data.drogasSi ?? false, no: data.drogasNo ?? false, tipo: data.drogasTipo ?? "", cantidad: data.drogasCantidad ?? "" },//revisar pedir
+        medicamento: { si: data.medicamentosSi_rbsimed ?? false, no: data.medicamentosNo_rbnomed ?? false, tipo: data.tipoMedicamento_txttipomedicamento ?? "", cantidad: data.frecuenciaMedicamentos_txtfrecuenciamed ?? "" }
       }
     },
     
     // === IV. ANTECEDENTES PATOLÓGICOS FAMILIARES ===
     antecedentesFamiliares: {
-      padre: data.padre ?? "",
-      madre: data.madre ?? "",
-      hermanos: data.hermanos ?? "",
-      esposa: data.esposa ?? "",
-      hijosVivos: data.hijosVivos ?? "",
-      numeroHijos: data.numeroHijos ?? ""
+      padre: data.padre_txtpadre ?? "",
+      madre: data.madre_txtmadre ?? "",
+      hermanos: data.hermanos_txthermanos ?? "",
+      esposa: data.esposa_txtesposa ?? "",
+      hijosVivos: String(data.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? ""),
+      numeroHijos: String(data.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ?? "")
     },
     
     // === ABSENTISMO ===
-    absentismo: {
+    absentismo: { //revisar deberia ser una tabla
       lesionesMusculares: {
         asociadoTrabajo: { si: data.lesionesMuscularesSi ?? false, no: data.lesionesMuscularesNo ?? false },
         año: data.lesionesMuscularesAno ?? "",
@@ -373,24 +374,24 @@ export default function Anexo2(data = {}) {
     
     // === V. EVALUACIÓN MÉDICA ===
     evaluacionMedica: {
-      anamnesis: data.anamnesis ?? "",
+      anamnesis: data.anamnesis_txtanamnesis ?? "",
       examenClinico: {
-        talla: data.talla ?? "",
-        peso: data.peso ?? "",
-        imc: data.imc ?? "",
+        talla: data.talla_talla ?? "",
+        peso: data.peso_peso ?? "",
+        imc: data.imc_imc ?? "",
         pulso: data.pulso ?? "",
-        frecuenciaRespiratoria: data.frecuenciaRespiratoria ?? "",
-        frecuenciaCardiaca: data.frecuenciaCardiaca ?? "",
-        presionArterial: data.presionArterial ?? "",
-        temperatura: data.temperatura ?? "",
-        otros: data.otros ?? ""
+        frecuenciaRespiratoria: data.frespiratoria_f_respiratoria ?? "",
+        frecuenciaCardiaca: data.fcardiaca_f_cardiaca ?? "",
+        presionArterial: data.sistolica_sistolica ?? "",
+        temperatura: data.temperatura_temperatura ?? "",
+        otros: data.otrosExamenes_txtotrosex ?? ""
       },
       // === EXAMEN FÍSICO ===
-      ectoscopia: data.ectoscopia ?? "",
-      estadoMental: data.estadoMental ?? "",
+      ectoscopia: data.ectoscopia_txtectoscopia ?? "",
+      estadoMental: data.estadoMental_txtestadomental ?? "",
       examenFisico: {
-        piel: data.examenFisicoPiel ?? "",
-        cabello: data.examenFisicoCabello ?? ""
+        piel: data.piel_txtpiel ?? "",
+        cabello: data.cabeza_txtpelo ?? ""
       }
     },
     
@@ -399,87 +400,87 @@ export default function Anexo2(data = {}) {
       // Sin Hallazgos - Sin Corregir
       sinCorregir: {
         visionCerca: {
-          od: data.visionCercaSinCorregirOD ?? "",
-          oi: data.visionCercaSinCorregirOI ?? ""
+          od: data.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
+          oi: data.visionCercaSinCorregirOi_v_cerca_s_oi ?? ""
         },
         visionLejos: {
-          od: data.visionLejosSinCorregirOD ?? "",
-          oi: data.visionLejosSinCorregirOI ?? ""
+          od: data.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
+          oi: data.visionLejosSinCorregirOi_v_lejos_s_oi ?? ""
         }
       },
       // Sin Hallazgos - Corregida
       corregida: {
         visionCerca: {
-          od: data.visionCercaCorregidaOD ?? "",
-          oi: data.visionCercaCorregidaOI ?? ""
+          od: data.visionCercaCorregidaOd_v_cerca_c_od ?? "",
+          oi: data.visionCercaCorregidaOi_v_cerca_c_oi ?? ""
         },
         visionLejos: {
-          od: data.visionLejosCorregidaOD ?? "",
-          oi: data.visionLejosCorregidaOI ?? ""
+          od: data.visionLejosCorregidaOd_v_lejos_c_od ?? "",
+          oi: data.visionLejosCorregidaOi_v_lejos_c_oi ?? ""
         }
       },
       // Visión de Colores (campo único)
-      visionColores: data.visionColores ?? "",
+      visionColores: data.visionColores_v_colores ?? "",
       // Hallazgos
       hallazgos: {
-        enfermedadesOculares: data.enfermedadesOculares ?? "",
-        reflejosPupilares: data.reflejosPupilares ?? ""
+        enfermedadesOculares: data.enfermedadesOcularesOftalmo_e_oculares ?? "",
+        reflejosPupilares: data.reflejosPupilares_r_pupilares ?? ""
       }
     },
     
     // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
     examenFisicoSistemas: {
-      oidos: data.oidos ?? "",
-      nariz: data.nariz ?? "",
-      boca: data.boca ?? "",
-      faringe: data.faringe ?? "",
-      cuello: data.cuello ?? "",
-      aparatoRespiratorio: data.aparatoRespiratorio ?? "",
-      aparatoCardiovascular: data.aparatoCardiovascular ?? "",
-      aparatoDigestivo: data.aparatoDigestivo ?? "",
-      aparatoGenitourinario: data.aparatoGenitourinario ?? "",
-      aparatoLocomotor: data.aparatoLocomotor ?? "",
-      sistemaLinfatico: data.sistemaLinfatico ?? "",
-      marcha: data.marcha ?? "",
-      columna: data.columna ?? "",
-      miembrosSuperiores: data.miembrosSuperiores ?? "",
-      miembrosInferiores: data.miembrosInferiores ?? "",
-      sistemaNervioso: data.sistemaNervioso ?? ""
+      oidos: data.oidos_txtoidos ?? "",
+      nariz: data.nariz_txtnariz ?? "",
+      boca: data.boca_txtboca ?? "",
+      faringe: data.faringe_txtfaringe ?? "",
+      cuello: data.cuello_txtcuello ?? "",
+      aparatoRespiratorio: data.aparatoRespiratorio_txtaparatorespiratorio ?? "",
+      aparatoCardiovascular: data.aparatoCardiovascular_txtaparatocardiovascular ?? "",
+      aparatoDigestivo: data.aparatoDigestivo_txtaparatodigestivo ?? "",
+      aparatoGenitourinario: data.aparatoGeiotourinario_txtaparatogeiotourinario ?? "",
+      aparatoLocomotor: data.aparatoLocomotor_txtaparatolocomotor ?? "",
+      sistemaLinfatico: data.sistemaLinfatico_txtsistemalinfatico ?? "",
+      marcha: data.marcha_txtmarcha ?? "",
+      columna: data.columnaVertebral_txtcolumnavertebral ?? "",
+      miembrosSuperiores: data.miembrosSuperiores_txtmiembrossuperiores ?? "",
+      miembrosInferiores: data.miembrosInferiores_txtmiembrosinferiores ?? "",
+      sistemaNervioso: data.sistemaNervioso_sistemanervioso ?? ""
     },
     
     // === PÁGINA 2: CONCLUSIONES Y DIAGNÓSTICOS ===
     conclusiones: {
       // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA
-      conclusionesEvaluacionPsicologica: data.conclusionesEvaluacionPsicologica ?? "",
+      conclusionesEvaluacionPsicologica: data.recomendacionesInfoPsicologico_recomendaciones ?? "",
       
       // VII. CONCLUSIONES RADIOGRÁFICAS
-      conclusionesRadiograficas: data.conclusionesRadiograficas ?? "",
+      conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
       
       // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO
-      hallazgosPatologicosLaboratorio: data.hallazgosPatologicosLaboratorio ?? "",
+      hallazgosPatologicosLaboratorio: data.observacionesLabClinico_txtobservacioneslb ?? "",
       
       // IX. CONCLUSIÓN AUDIOMETRÍA
-      conclusionAudiometria: data.conclusionAudiometria ?? "",
+      conclusionAudiometria: data.diagnosticoAudiometria_diagnostico ?? "",
       
       // X. CONCLUSIÓN DE ESPIROMETRÍA
-      conclusionEspirometria: data.conclusionEspirometria ?? "",
+      conclusionEspirometria: data.conclusion_txtconclusion ?? "",
       
       // XI. OTROS
-      otros: data.otros ?? "",
+      otros: data.otrosExamenes_txtotrosex ?? "",
       
       // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES
-      diagnosticoMedicoOcupacional: data.diagnosticoMedicoOcupacional ?? ""
+      diagnosticoMedicoOcupacional: data.observacionesFichaMedica_txtobservacionesfm ?? ""
     },
     
     // === PÁGINA 2: SECCIÓN XIII - CONCLUSIONES FINALES ===
     conclusionesFinales: {
       // Checkboxes de aptitud
-      apto: data.apto ?? false,
-      aptoConRestriccion: data.aptoConRestriccion ?? false,
-      noApto: data.noApto ?? false,
+      apto: data.esApto_apto_si ?? false,
+      aptoConRestriccion: data.aptoRestriccion_apto_re ?? false,
+      noApto: data.noEsApto_apto_no ?? false,
       
       // Campo de restricciones
-      restricciones: data.restricciones ?? "",
+      restricciones: data.restricciones_txtrestricciones ?? "",
       
       // Firmas
       firmaMedico: data.firmaMedico ?? "/img/firmas_sellos_prueba/firma_sello.png",

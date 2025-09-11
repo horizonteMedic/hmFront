@@ -221,13 +221,13 @@ export default function DatosPersonales({
                 label="Puesto Actual"
                 name="puestoActual"
                 value={form.puestoActual}
-                disabled
+                onChange={handleChange}
               />
               <InputTextOneLine
                 label="Tiempo"
                 name="tiempoPuesto"
                 value={form.tiempoPuesto}
-                disabled
+                onChange={handleChange}
               />
             </div>
           </div>
