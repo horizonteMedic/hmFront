@@ -14,7 +14,7 @@ import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
+import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
 import Swal from "sweetalert2";
 
 const tabla = "anexo_agroindustrial";
@@ -333,6 +333,14 @@ export default function Anexo2({ listas }) {
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
+
+  const handleSearchExamenesRealizados = (e) => {
+    if (e.key === "Enter") {
+      // handleClearnotO();
+      GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close() });
+    }
+  };
+
   const handlePrint = (numPage) => {
     if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
@@ -366,11 +374,10 @@ export default function Anexo2({ listas }) {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${
-                    activeTab === tab.id
-                      ? "border-[#233245] text-[#233245] font-semibold"
-                      : "border-transparent"
-                  }`}
+                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                    ? "border-[#233245] text-[#233245] font-semibold"
+                    : "border-transparent"
+                    }`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   <FontAwesomeIcon icon={tab.icon} className="mr-2" />
@@ -399,6 +406,7 @@ export default function Anexo2({ listas }) {
                       MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
                       handleSearch={handleSearch}
+                      handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                     />
                   )
                 );

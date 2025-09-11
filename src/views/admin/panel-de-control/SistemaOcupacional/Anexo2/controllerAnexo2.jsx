@@ -2,6 +2,7 @@ import Swal from "sweetalert2";
 import {
   GetInfoPacDefault,
   GetInfoServicioDefault,
+  LoadingDefault,
   PrintHojaRDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
@@ -14,6 +15,8 @@ const obtenerReporteUrl =
   "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
 const registrarUrl =
   "/api/v01/ct/anexos/anexo2/registrarActualizarAnexoAgroindustrial";
+const obtenerExamenesRealizadosUrl =
+  "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
 
 export const SubmitDataService = async (
   form,
@@ -224,12 +227,65 @@ export const Loading = (mensaje) => {
   LoadingDefault(mensaje);
 };
 
+export const GetExamenesRealizados = (
+  nro,
+  set,
+  token,
+  onFinish = () => { }
+) => {
+  LoadingDefault("Obteniendo Exámenes Realizados");
+  getFetch(
+    `${obtenerExamenesRealizadosUrl}?nOrden=${nro}`,
+    token
+  )
+    .then((res) => {
+      if (res) {
+        console.log(res);
+        set((prev) => ({
+          ...prev,
+          // Estado del Paciente
+          nordenEstadoPaciente: nro,
+          nombresEstadoPaciente: "",
+          tipoExamenEstadoPaciente: "",
+
+          // Exámenes Realizados - convertir booleanos a  "PASADO" : "POR PASAR",
+          triaje: res.triaje ? "PASADO" : "POR PASAR",
+          labClinico: res.laboratorioClinico ? "PASADO" : "POR PASAR",
+          electrocardiograma: res.electroCardiograma ? "PASADO" : "POR PASAR",
+          rxToraxPA: res.radiografiaTorax ? "PASADO" : "POR PASAR",
+          fichaAudiologica: res.fichaAudiologica ? "PASADO" : "POR PASAR",
+          espirometria: res.espirometria ? "PASADO" : "POR PASAR",
+          odontograma: res.odontograma ? "PASADO" : "POR PASAR",
+          psicologia: res.psicologia ? "PASADO" : "POR PASAR",
+          anexo7D: res.anexo7D ? "PASADO" : "POR PASAR",
+          histOcupacional: res.historiaOcupacional ? "PASADO" : "POR PASAR",
+          fichaAntPatologicos: res.fichaAntecedentesPatologicos ? "PASADO" : "POR PASAR",
+          cuestionarioNordico: res.cuestionarioNordico ? "PASADO" : "POR PASAR",
+          certTrabajoAltura: res.certificadoTrabajoAltura ? "PASADO" : "POR PASAR",
+          detencionSAS: res.detencionSAS ? "PASADO" : "POR PASAR",
+          consentimientoDosaje: res.consentimientoDosaje ? "PASADO" : "POR PASAR",
+          exRxSanguineos: res.examenRadiografiaSanguineos ? "PASADO" : "POR PASAR",
+          perimetroToraxico: res.perimetroToraxico ? "PASADO" : "POR PASAR",
+          oftalmologia: res.oftalmologia ? "PASADO" : "POR PASAR",
+        }));
+        onFinish();
+      } else {
+        console.log("No se encontraron datos de exámenes realizados");
+        onFinish();
+      }
+    })
+    .catch((error) => {
+      console.error("Error al obtener exámenes realizados:", error);
+      onFinish();
+    });
+};
+
 export const GetInfoServicio = (
   nro,
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(
     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
@@ -548,9 +604,9 @@ export const GetInfoServicio = (
             }
             if (
               res.conclusionesRadiograficas_txtconclusionesradiograficas !=
-                null &&
+              null &&
               res.conclusionesRadiograficas_txtconclusionesradiograficas !=
-                "NORMAL"
+              "NORMAL"
             ) {
               data.observacionesGenerales +=
                 res.conclusionesRadiograficas_txtconclusionesradiograficas;
@@ -592,17 +648,17 @@ export const GetInfoServicio = (
           data.grupoSanguineo = res.grupoSanguineoO_chko
             ? "O"
             : res.grupoSanguineoA_chka
-            ? "A"
-            : res.grupoSanguineoB_chkb
-            ? "B"
-            : res.grupoSanguineoAB_chkab
-            ? "AB"
-            : "";
+              ? "A"
+              : res.grupoSanguineoB_chkb
+                ? "B"
+                : res.grupoSanguineoAB_chkab
+                  ? "AB"
+                  : "";
           data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo
             ? "RH(+)"
             : res.grupoSanguineoRhNegativo_rbrhnegativo
-            ? "RH(-)"
-            : "";
+              ? "RH(-)"
+              : "";
 
           data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
           data.otrosExamenes +=
@@ -935,7 +991,7 @@ export const GetInfoServicioEditar = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(
     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
@@ -1050,10 +1106,10 @@ export const GetInfoServicioEditar = (
             aptitud: res.esApto_apto_si
               ? "APTO"
               : res.noEsApto_apto_no
-              ? "NO APTO"
-              : res.aptoRestriccion_apto_re
-              ? "RESTRICCION"
-              : "",
+                ? "NO APTO"
+                : res.aptoRestriccion_apto_re
+                  ? "RESTRICCION"
+                  : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "", //REVISAR
             nombre_medico: res.medico_medico ?? "", //REVISAR
@@ -1095,17 +1151,17 @@ export const GetInfoServicioEditar = (
           data.grupoSanguineo = res.grupoSanguineoO_chko
             ? "O"
             : res.grupoSanguineoA_chka
-            ? "A"
-            : res.grupoSanguineoB_chkb
-            ? "B"
-            : res.grupoSanguineoAB_chkab
-            ? "AB"
-            : "";
+              ? "A"
+              : res.grupoSanguineoB_chkb
+                ? "B"
+                : res.grupoSanguineoAB_chkab
+                  ? "AB"
+                  : "";
           data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo
             ? "RH(+)"
             : res.grupoSanguineoRhNegativo_rbrhnegativo
-            ? "RH(-)"
-            : "";
+              ? "RH(-)"
+              : "";
           data.vsg = vsg;
           data.glucosa = gluc;
           data.creatinina = creat;

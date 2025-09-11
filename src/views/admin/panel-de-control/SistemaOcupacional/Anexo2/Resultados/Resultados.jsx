@@ -12,6 +12,7 @@ export default function Resultados({
   handleRadioButton,
   handleCheckBoxChange,
   handlePrint,
+  handleSearchExamenesRealizados
 }) {
   const RestriccionCheckbox = ({ label, name }) => {
     return (
@@ -227,19 +228,20 @@ export default function Resultados({
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="font-semibold text-gray-800 mb-2">Datos de Paciente</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <InputTextArea
+            <InputTextOneLine
               label="Nro Orden"
               name="nordenEstadoPaciente"
               value={form.nordenEstadoPaciente}
               onChange={handleChange}
+              onKeyUp={handleSearchExamenesRealizados}
             />
-            <InputTextArea
+            <InputTextOneLine
               label="Nombres"
               name="nombresEstadoPaciente"
               value={form.nombresEstadoPaciente}
               disabled
             />
-            <InputTextArea
+            <InputTextOneLine
               label="Tipo Examen"
               name="tipoExamenEstadoPaciente"
               value={form.tipoExamenEstadoPaciente}
@@ -259,108 +261,126 @@ export default function Resultados({
             name="triaje"
             value={form.triaje}
             disabled
+            className={form.triaje === "PASADO" ? "text-green-600" : form.triaje === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Lab. Clinico"
             name="labClinico"
             value={form.labClinico}
             disabled
+            className={form.labClinico === "PASADO" ? "text-green-600" : form.labClinico === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Electrocardiograma"
             name="electrocardiograma"
             value={form.electrocardiograma}
             disabled
+            className={form.electrocardiograma === "PASADO" ? "text-green-600" : form.electrocardiograma === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Rx. Torax P.A"
             name="rxToraxPA"
             value={form.rxToraxPA}
             disabled
+            className={form.rxToraxPA === "PASADO" ? "text-green-600" : form.rxToraxPA === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Ficha Audiologica"
             name="fichaAudiologica"
             value={form.fichaAudiologica}
             disabled
+            className={form.fichaAudiologica === "PASADO" ? "text-green-600" : form.fichaAudiologica === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Espirometria"
             name="espirometria"
             value={form.espirometria}
             disabled
+            className={form.espirometria === "PASADO" ? "text-green-600" : form.espirometria === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Odontograma"
             name="odontograma"
             value={form.odontograma}
             disabled
+            className={form.odontograma === "PASADO" ? "text-green-600" : form.odontograma === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Psicologia"
             name="psicologia"
             value={form.psicologia}
             disabled
+            className={form.psicologia === "PASADO" ? "text-green-600" : form.psicologia === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Anexo 7D"
             name="anexo7D"
             value={form.anexo7D}
             disabled
+            className={form.anexo7D === "PASADO" ? "text-green-600" : form.anexo7D === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Hist. Ocupacional"
             name="histOcupacional"
             value={form.histOcupacional}
             disabled
+            className={form.histOcupacional === "PASADO" ? "text-green-600" : form.histOcupacional === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Ficha Ant. Patológicos"
             name="fichaAntPatologicos"
             value={form.fichaAntPatologicos}
             disabled
+            className={form.fichaAntPatologicos === "PASADO" ? "text-green-600" : form.fichaAntPatologicos === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Cuestionario Nórdico"
             name="cuestionarioNordico"
             value={form.cuestionarioNordico}
             disabled
+            className={form.cuestionarioNordico === "PASADO" ? "text-green-600" : form.cuestionarioNordico === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Cert. Trabajo Altura"
             name="certTrabajoAltura"
             value={form.certTrabajoAltura}
             disabled
+            className={form.certTrabajoAltura === "PASADO" ? "text-green-600" : form.certTrabajoAltura === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Detención S.A.S"
             name="detencionSAS"
             value={form.detencionSAS}
             disabled
+            className={form.detencionSAS === "PASADO" ? "text-green-600" : form.detencionSAS === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Consentimiento Dosaje"
             name="consentimientoDosaje"
             value={form.consentimientoDosaje}
             disabled
+            className={form.consentimientoDosaje === "PASADO" ? "text-green-600" : form.consentimientoDosaje === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Ex. Rx Sanguineos"
             name="exRxSanguineos"
             value={form.exRxSanguineos}
             disabled
+            className={form.exRxSanguineos === "PASADO" ? "text-green-600" : form.exRxSanguineos === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Perimetro Toraxico"
             name="perimetroToraxico"
             value={form.perimetroToraxico}
             disabled
+            className={form.perimetroToraxico === "PASADO" ? "text-green-600" : form.perimetroToraxico === "POR PASAR" ? "text-red-600" : ""}
           />
           <InputTextArea
             label="Oftalmología"
             name="oftalmologia"
             value={form.oftalmologia}
             disabled
+            className={form.oftalmologia === "PASADO" ? "text-green-600" : form.oftalmologia === "POR PASAR" ? "text-red-600" : ""}
           />
         </div>
       </div>
