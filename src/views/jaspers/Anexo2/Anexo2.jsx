@@ -151,6 +151,99 @@ export default function Anexo2(data = {}) {
         piel: "Tegumento íntegro, sin lesiones visibles, de coloración normal. No se observan manchas, lunares atípicos o lesiones sospechosas. ",
         cabello: "Cabello normal, sin alopecia patológica. Presenta buena densidad y distribución. No se observan signos de caspa excesiva"
       }
+    },
+    
+    // === PÁGINA 2: EXAMEN DE OJOS ===
+    examenOjos: {
+      // Sin Hallazgos - Sin Corregir
+      sinCorregir: {
+        visionCerca: {
+          od: "20/20", // Ojo derecho
+          oi: "20/20"  // Ojo izquierdo
+        },
+        visionLejos: {
+          od: "20/20",
+          oi: "20/20"
+        }
+      },
+      // Sin Hallazgos - Corregida
+      corregida: {
+        visionCerca: {
+          od: "20/25",
+          oi: "20/25"
+        },
+        visionLejos: {
+          od: "20/20",
+          oi: "20/20"
+        }
+      },
+      // Visión de Colores (campo único)
+      visionColores: "10/14",
+      // Hallazgos
+      hallazgos: {
+        enfermedadesOculares: "Sin patologías oculares evidentes. Fundoscopía normal bilateral. No alteraciones en la motilidad ocular. ",
+        reflejosPupilares: "CONSERVADO"
+      }
+    },
+    
+    // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
+    examenFisicoSistemas: {
+      oidos: "Oídos normales, sin secreciones patológicas. Membranas timpánicas íntegras.",
+      nariz: "Nariz permeable, sin obstrucciones. Mucosa nasal normal.",
+      boca: "Cavidad oral normal, sin lesiones. Mucosa oral íntegra.",
+      faringe: "Faringe normal, sin signos de inflamación.",
+      cuello: "Cuello sin masas palpables, tiroides normal.",
+      aparatoRespiratorio: "Auscultación pulmonar normal, sin sibilancias ni crepitantes.",
+      aparatoCardiovascular: "Ritmo cardíaco regular, sin soplos. Pulso periférico normal.",
+      aparatoDigestivo: "Abdomen blando, no doloroso. No hepatomegalia ni esplenomegalia.",
+      aparatoGenitourinario: "Sistema genitourinario normal al examen externo. Sistema genitourinario normal al examen externo Sistema genitourinario normal al examen externo Sistema genitourinario normal al examen externo Sistema genitourinario normaL",
+      aparatoLocomotor: "Articulaciones con movilidad normal, sin limitaciones.",
+      sistemaLinfatico: "No adenopatías palpables.",
+      marcha: "Marcha normal, sin alteraciones.",
+      columna: "Columna vertebral alineada, sin desviaciones.",
+      miembrosSuperiores: "Miembros superiores con movilidad completa, sin limitaciones.",
+      miembrosInferiores: "Miembros inferiores con movilidad completa, sin limitaciones.",
+      sistemaNervioso: "Reflejos normales, coordinación conservada."
+    },
+    
+    // === PÁGINA 2: CONCLUSIONES Y DIAGNÓSTICOS ===
+    conclusiones: {
+      // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA
+      conclusionesEvaluacionPsicologica: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      
+        // VII. CONCLUSIONES RADIOGRÁFICAS
+        conclusionesRadiograficas: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      
+      // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO
+      hallazgosPatologicosLaboratorio: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      
+      // IX. CONCLUSIÓN AUDIOMETRÍA
+      conclusionAudiometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      
+      // X. CONCLUSIÓN DE ESPIROMETRÍA
+      conclusionEspirometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      
+      // XI. OTROS
+      otros: "No se registran otros hallazgos de relevancia clínica.",
+      
+      // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES
+      diagnosticoMedicoOcupacional: "APTO PARA EL PUESTO DE TRABAJO. El trabajador presenta un estado de salud general satisfactorio sin contraindicaciones médicas para el desempeño de sus funciones laborales. Se recomienda continuar con las medidas de seguridad y salud ocupacional establecidas, realizar evaluaciones médicas periódicas según normativa vigente, y mantener un estilo de vida saludable con ejercicio regular y alimentación balanceada."
+    },
+    
+    // === PÁGINA 2: SECCIÓN XIII - CONCLUSIONES FINALES ===
+    conclusionesFinales: {
+      // Checkboxes de aptitud
+      apto: true,
+      aptoConRestriccion: true,
+      noApto: true,
+      
+      // Campo de restricciones
+      restricciones: "Sin restricciones médicas específicas. Sin restricciones médicas específicas. ",
+      
+      // Firmas
+      firmaMedico: "/img/firmas_sellos_prueba/firma_sello.png",
+      huellaPaciente: "/img/firmas_sellos_prueba/HUELLA_DIGITAL.png",
+      firmaPaciente: "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png"
     }
   };
 
@@ -299,6 +392,99 @@ export default function Anexo2(data = {}) {
         piel: data.examenFisicoPiel ?? "",
         cabello: data.examenFisicoCabello ?? ""
       }
+    },
+    
+    // === PÁGINA 2: EXAMEN DE OJOS ===
+    examenOjos: {
+      // Sin Hallazgos - Sin Corregir
+      sinCorregir: {
+        visionCerca: {
+          od: data.visionCercaSinCorregirOD ?? "",
+          oi: data.visionCercaSinCorregirOI ?? ""
+        },
+        visionLejos: {
+          od: data.visionLejosSinCorregirOD ?? "",
+          oi: data.visionLejosSinCorregirOI ?? ""
+        }
+      },
+      // Sin Hallazgos - Corregida
+      corregida: {
+        visionCerca: {
+          od: data.visionCercaCorregidaOD ?? "",
+          oi: data.visionCercaCorregidaOI ?? ""
+        },
+        visionLejos: {
+          od: data.visionLejosCorregidaOD ?? "",
+          oi: data.visionLejosCorregidaOI ?? ""
+        }
+      },
+      // Visión de Colores (campo único)
+      visionColores: data.visionColores ?? "",
+      // Hallazgos
+      hallazgos: {
+        enfermedadesOculares: data.enfermedadesOculares ?? "",
+        reflejosPupilares: data.reflejosPupilares ?? ""
+      }
+    },
+    
+    // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
+    examenFisicoSistemas: {
+      oidos: data.oidos ?? "",
+      nariz: data.nariz ?? "",
+      boca: data.boca ?? "",
+      faringe: data.faringe ?? "",
+      cuello: data.cuello ?? "",
+      aparatoRespiratorio: data.aparatoRespiratorio ?? "",
+      aparatoCardiovascular: data.aparatoCardiovascular ?? "",
+      aparatoDigestivo: data.aparatoDigestivo ?? "",
+      aparatoGenitourinario: data.aparatoGenitourinario ?? "",
+      aparatoLocomotor: data.aparatoLocomotor ?? "",
+      sistemaLinfatico: data.sistemaLinfatico ?? "",
+      marcha: data.marcha ?? "",
+      columna: data.columna ?? "",
+      miembrosSuperiores: data.miembrosSuperiores ?? "",
+      miembrosInferiores: data.miembrosInferiores ?? "",
+      sistemaNervioso: data.sistemaNervioso ?? ""
+    },
+    
+    // === PÁGINA 2: CONCLUSIONES Y DIAGNÓSTICOS ===
+    conclusiones: {
+      // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA
+      conclusionesEvaluacionPsicologica: data.conclusionesEvaluacionPsicologica ?? "",
+      
+      // VII. CONCLUSIONES RADIOGRÁFICAS
+      conclusionesRadiograficas: data.conclusionesRadiograficas ?? "",
+      
+      // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO
+      hallazgosPatologicosLaboratorio: data.hallazgosPatologicosLaboratorio ?? "",
+      
+      // IX. CONCLUSIÓN AUDIOMETRÍA
+      conclusionAudiometria: data.conclusionAudiometria ?? "",
+      
+      // X. CONCLUSIÓN DE ESPIROMETRÍA
+      conclusionEspirometria: data.conclusionEspirometria ?? "",
+      
+      // XI. OTROS
+      otros: data.otros ?? "",
+      
+      // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES
+      diagnosticoMedicoOcupacional: data.diagnosticoMedicoOcupacional ?? ""
+    },
+    
+    // === PÁGINA 2: SECCIÓN XIII - CONCLUSIONES FINALES ===
+    conclusionesFinales: {
+      // Checkboxes de aptitud
+      apto: data.apto ?? false,
+      aptoConRestriccion: data.aptoConRestriccion ?? false,
+      noApto: data.noApto ?? false,
+      
+      // Campo de restricciones
+      restricciones: data.restricciones ?? "",
+      
+      // Firmas
+      firmaMedico: data.firmaMedico ?? "/img/firmas_sellos_prueba/firma_sello.png",
+      huellaPaciente: data.huellaPaciente ?? "/img/firmas_sellos_prueba/HUELLA_DIGITAL.png",
+      firmaPaciente: data.firmaPaciente ?? "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png"
     }
   };
 
@@ -1166,6 +1352,303 @@ export default function Anexo2(data = {}) {
   // Validar que data.informacionSede exista antes de acceder a sus propiedades
   const digitalizacion = data?.informacionSede?.digitalizacion || [];
   agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
+    // === PÁGINA 2 ===
+    doc.addPage();
+    
+    // === 0) HEADER para Página 2 ===
+    headerAnexo2(doc, data, 2);
+    
+    // === 1) Imagen de fondo para Anexo2 - Página 2 ===
+    const fondoImg2 = "/img/Anexo2/Pag2_anexo2.png";
+    
+    // Usar todo el ancho del documento pero no toda la altura
+    const imgWidth2 = pageW; // Todo el ancho disponible
+    const imgHeight2 = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
+
+    // Posicionar desde abajo hacia arriba
+    const xOffset2 = 0;
+    const yOffset2 = pageH - imgHeight2 - 8; // Subido 5 puntos hacia arriba
+
+    try {
+      doc.addImage(fondoImg2, "PNG", xOffset2, yOffset2, imgWidth2, imgHeight2);
+    } catch (e) {
+      doc.text("Imagen de Anexo2 Página 2 no disponible", margin, yOffset2 + 10);
+    }
+    
+    // === 2) CAMPOS DE DATOS PARA PÁGINA 2 - EXAMEN DE OJOS ===
+    if (datosFinales.examenOjos) {
+      const examenOjos = datosFinales.examenOjos;
+      
+      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      
+      // === SECCIÓN: SIN HALLAZGOS - SIN CORREGIR ===
+      // Visión de Cerca - Sin Corregir
+      const xVisionCercaSinCorregirOD = 37.5; // Posición X para O.D.
+      const yVisionCercaSinCorregirOD = 40; // Posición Y para O.D.
+
+      const xVisionCercaSinCorregirOI = 55; // Posición X para O.I.
+      const yVisionCercaSinCorregirOI = 40; // Posición Y para O.I.
+      
+      // Visión de Lejos - Sin Corregir
+      const xVisionLejosSinCorregirOD = 37.5;
+      const yVisionLejosSinCorregirOD = 45;
+      const xVisionLejosSinCorregirOI = 55;
+      const yVisionLejosSinCorregirOI = 45;
+      
+      // === SECCIÓN: SIN HALLAZGOS - CORREGIDA ===
+      // Visión de Cerca - Corregida
+      const xVisionCercaCorregidaOD = 73; // Posición X para O.D.
+      const yVisionCercaCorregidaOD = 40; // Posición Y para O.D.
+      const xVisionCercaCorregidaOI = 91.5  ; // Posición X para O.I.
+      const yVisionCercaCorregidaOI = 40; // Posición Y para O.I.
+      
+      // Visión de Lejos - Corregida
+      const xVisionLejosCorregidaOD = 73;
+      const yVisionLejosCorregidaOD = 45;
+      const xVisionLejosCorregidaOI = 91.5;
+      const yVisionLejosCorregidaOI = 45;
+      
+      // Visión de Colores (campo único que abarca toda la fila)
+      const xVisionColores = 68; // Centrado en toda la fila
+      const yVisionColores = 50;
+      
+      // === SECCIÓN: HALLAZGOS ===
+      // Enfermedades Oculares
+      const xEnfermedadesOculares = 110;
+      const yEnfermedadesOculares = 35;
+      
+      // Reflejos Pupilares
+      const xReflejosPupilares = 141.5;
+      const yReflejosPupilares = 49.5;
+      
+      // Renderizar datos - Sin Corregir
+      if (examenOjos.sinCorregir) {
+        const sinCorregir = examenOjos.sinCorregir;
+        
+        // Visión de Cerca
+        if (sinCorregir.visionCerca) {
+          if (sinCorregir.visionCerca.od) {
+            doc.text(sinCorregir.visionCerca.od, xVisionCercaSinCorregirOD, yVisionCercaSinCorregirOD);
+          }
+          if (sinCorregir.visionCerca.oi) {
+            doc.text(sinCorregir.visionCerca.oi, xVisionCercaSinCorregirOI, yVisionCercaSinCorregirOI);
+          }
+        }
+        
+        // Visión de Lejos
+        if (sinCorregir.visionLejos) {
+          if (sinCorregir.visionLejos.od) {
+            doc.text(sinCorregir.visionLejos.od, xVisionLejosSinCorregirOD, yVisionLejosSinCorregirOD);
+          }
+          if (sinCorregir.visionLejos.oi) {
+            doc.text(sinCorregir.visionLejos.oi, xVisionLejosSinCorregirOI, yVisionLejosSinCorregirOI);
+          }
+        }
+        
+      }
+      
+      // Renderizar datos - Corregida
+      if (examenOjos.corregida) {
+        const corregida = examenOjos.corregida;
+        
+        // Visión de Cerca
+        if (corregida.visionCerca) {
+          if (corregida.visionCerca.od) {
+            doc.text(corregida.visionCerca.od, xVisionCercaCorregidaOD, yVisionCercaCorregidaOD);
+          }
+          if (corregida.visionCerca.oi) {
+            doc.text(corregida.visionCerca.oi, xVisionCercaCorregidaOI, yVisionCercaCorregidaOI);
+          }
+        }
+        
+        // Visión de Lejos
+        if (corregida.visionLejos) {
+          if (corregida.visionLejos.od) {
+            doc.text(corregida.visionLejos.od, xVisionLejosCorregidaOD, yVisionLejosCorregidaOD);
+          }
+          if (corregida.visionLejos.oi) {
+            doc.text(corregida.visionLejos.oi, xVisionLejosCorregidaOI, yVisionLejosCorregidaOI);
+          }
+        }
+      }
+      
+      // Visión de Colores (campo único que abarca toda la fila)
+      if (examenOjos.visionColores) {
+        doc.text(examenOjos.visionColores, xVisionColores, yVisionColores, { align: "center" });
+      }
+      
+      // Renderizar Hallazgos
+      if (examenOjos.hallazgos) {
+        // Enfermedades Oculares
+        if (examenOjos.hallazgos.enfermedadesOculares) {
+          doc.setFontSize(9);
+          doc.text(examenOjos.hallazgos.enfermedadesOculares, xEnfermedadesOculares, yEnfermedadesOculares, { maxWidth: 100 });
+        }
+        
+        // Reflejos Pupilares
+        if (examenOjos.hallazgos.reflejosPupilares) {
+          doc.setFontSize(9);
+          doc.text(examenOjos.hallazgos.reflejosPupilares, xReflejosPupilares, yReflejosPupilares, { maxWidth: 100 });
+        }
+      }
+    }
+    
+    // === SECCIÓN: EXAMEN FÍSICO POR SISTEMAS ===
+    if (datosFinales.examenFisicoSistemas) {
+      const sistemas = datosFinales.examenFisicoSistemas;
+      
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      
+      // Posiciones para cada sistema (ajustar según la imagen real)
+      const posicionesSistemas = [
+        { campo: 'oidos', x: 36, y: 54.2},
+        { campo: 'nariz', x: 36, y: 59.3 },
+        { campo: 'boca', x: 36, y: 64.4 },
+        { campo: 'faringe', x: 36, y: 69 },
+        { campo: 'cuello', x: 36, y: 73.8 },
+        { campo: 'aparatoRespiratorio', x: 36, y: 78.6 },
+        { campo: 'aparatoCardiovascular', x: 36, y: 86 },
+        { campo: 'aparatoDigestivo', x: 36, y: 94 },
+        { campo: 'aparatoGenitourinario', x: 36, y: 102 },
+        { campo: 'aparatoLocomotor', x: 36, y: 109.3 },
+        { campo: 'sistemaLinfatico', x: 36, y: 114.2 },
+        { campo: 'marcha', x: 36, y: 119 },
+        { campo: 'columna', x: 36, y: 124 },
+        { campo: 'miembrosSuperiores', x: 36, y: 129 },
+        { campo: 'miembrosInferiores', x: 36, y: 137 },
+        { campo: 'sistemaNervioso', x: 36, y: 145 }
+      ];
+      
+      // Renderizar cada sistema
+      posicionesSistemas.forEach(({ campo, x, y }) => {
+        if (sistemas[campo]) {
+          doc.text(sistemas[campo], x, y, { maxWidth: 170, lineHeightFactor: 0.9 });
+        }
+      });
+    }
+    
+    // === SECCIÓN: CONCLUSIONES Y DIAGNÓSTICOS ===
+    if (datosFinales.conclusiones) {
+      const conclusiones = datosFinales.conclusiones;
+      
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      
+      // Posiciones para cada sección de conclusiones (ajustar según la imagen real)
+      const posicionesConclusiones = [
+        // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA (ancho completo)
+        { campo: 'conclusionesEvaluacionPsicologica', x: 5, y: 159, maxWidth: 180 },
+        
+        // VII. CONCLUSIONES RADIOGRÁFICAS (mitad izquierda)
+        { campo: 'conclusionesRadiograficas', x: 5, y: 178, maxWidth: 100 },
+        
+        // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO (mitad derecha)
+        { campo: 'hallazgosPatologicosLaboratorio', x: 110, y: 178, maxWidth: 100 },
+        
+        // IX. CONCLUSIÓN AUDIOMETRÍA (mitad  )
+        { campo: 'conclusionAudiometria', x: 5, y: 196, maxWidth: 80 },
+        
+        // X. CONCLUSIÓN DE ESPIROMETRÍA (mitad derecha)
+        { campo: 'conclusionEspirometria', x: 110, y: 196, maxWidth: 80 },
+        
+        // XI. OTROS (mitad izquierda)
+        { campo: 'otros', x: 5, y: 210, maxWidth: 180 },
+        
+        // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES (ancho completo)
+        { campo: 'diagnosticoMedicoOcupacional', x: 5, y: 225, maxWidth: 180 }
+      ];
+      
+      // Renderizar cada conclusión
+      posicionesConclusiones.forEach(({ campo, x, y, maxWidth }) => {
+        if (conclusiones[campo]) {
+          doc.text(conclusiones[campo], x, y, { maxWidth, lineHeightFactor: 0.9 });
+        }
+      });
+    }
+    
+    // === SECCIÓN: XIII - CONCLUSIONES FINALES ===
+    if (datosFinales.conclusionesFinales) {
+      const conclusionesFinales = datosFinales.conclusionesFinales;
+      
+      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      
+      // Posiciones para checkboxes de aptitud
+      const xApto = 30.5;
+      const yApto = 269.6;
+      const xAptoConRestriccion = 30.5;
+      const yAptoConRestriccion = 276.7;
+      const xNoApto = 30.5;
+      const yNoApto = 285;
+      
+      // Posición para campo de restricciones
+      const xRestricciones = 45;
+      const yRestricciones = 270;
+      
+       // Posiciones para la firma del médico
+      const xFirmaMedico = 120;
+      const yFirmaMedico = 263;
+
+      // Posiciones para la firma del paciente
+      const xFirmaPaciente = 158;
+      const yFirmaPaciente = 263;
+
+      // Posiciones para la huella del paciente
+      const xHuellaPaciente = 194;
+      const yHuellaPaciente = 260;
+      
+      // Renderizar checkboxes de aptitud
+      doc.setTextColor(0, 0, 255); // Color azul para las X
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      
+      if (conclusionesFinales.apto) {
+        doc.text("X", xApto, yApto);
+      }
+      if (conclusionesFinales.aptoConRestriccion) {
+        doc.text("X", xAptoConRestriccion, yAptoConRestriccion);
+      }
+      if (conclusionesFinales.noApto) {
+        doc.text("X", xNoApto, yNoApto);
+      }
+      
+      doc.setTextColor(0, 0, 0); // Resetear a negro
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      
+      // Renderizar campo de restricciones
+      if (conclusionesFinales.restricciones) {
+        doc.text(conclusionesFinales.restricciones, xRestricciones, yRestricciones, { maxWidth: 75 });
+      }
+      
+      // Renderizar firmas
+      if (conclusionesFinales.firmaMedico) {
+        try {
+          doc.addImage(conclusionesFinales.firmaMedico, "PNG", xFirmaMedico, yFirmaMedico, 40, 20);
+        } catch (e) {
+          console.error("Error al cargar firma del médico:", e);
+        }
+      }
+      
+      // Firma del paciente
+      if (conclusionesFinales.firmaPaciente) {
+        try {
+          doc.addImage(conclusionesFinales.firmaPaciente, "PNG", xFirmaPaciente, yFirmaPaciente, 40, 20);
+        } catch (e) {
+          console.error("Error al cargar firma del paciente:", e);
+        }
+      }
+      
+      // Huella del paciente
+      if (conclusionesFinales.huellaPaciente) {
+        try {
+          doc.addImage(conclusionesFinales.huellaPaciente, "PNG", xHuellaPaciente, yHuellaPaciente, 15, 25);
+        } catch (e) {
+          console.error("Error al cargar huella del paciente:", e);
+        }
+      }
+    }
+    
     imprimir(doc);
   });
 }
