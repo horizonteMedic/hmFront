@@ -1,14 +1,12 @@
 import Swal from "sweetalert2";
 import {
-  GetInfoPacDefault,
   LoadingDefault,
-  PrintHojaRDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
-import { getFetch } from "../../../../utils/apiHelpers";
+import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
   "/api/v01/ct/anexos/anexo2/obtenerReporteAnexo2Completo";
@@ -19,6 +17,7 @@ const obtenerExamenesRealizadosUrl =
 
 export const SubmitDataService = async (
   form,
+  setForm,
   token,
   user,
   limpiar,
@@ -29,6 +28,7 @@ export const SubmitDataService = async (
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
+  Loading("Registrando Datos");
   const body = {
     codigoAnexo: form.codigoAnexo,
     norden: form.norden,
@@ -116,26 +116,47 @@ export const SubmitDataService = async (
     fechaDesde: form.fechaAptitud,
     fechaVence: form.fechaVencimiento,
     medico: form.nombre_medico,
-    userRegistro: form.user,
+    userRegistro: user,
     accidentes: form.dataEnfermedades.map((item) => ({
       ...item,
       codigoAnexo: null,
       fecha: null,
-      userRegistro: form.user,
+      userRegistro: user,
     })),
   };
   console.log(body);
 
-  await SubmitDataServiceDefault(
-    token,
-    limpiar,
-    body,
-    registrarUrl,
-    () => {
-      Swal.close();
-    },
-    false
-  );
+  // await SubmitDataServiceDefault(
+  //   token,
+  //   limpiar,
+  //   body,
+  //   registrarUrl,
+  //   () => {
+  //     PrintHojaR(form.norden, token, tabla, datosFooter);
+  //   }
+  // );
+  SubmitData(body, registrarUrl, token).then((res) => {
+    console.log(res);
+    if (res.id === 1 || res.id === 0) {
+      Swal.fire({
+        title: "Exito",
+        text: `${res.mensaje},\n¿Desea imprimir?`,
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        const nordenNuevo = form.norden;
+        limpiar();
+        GetExamenesRealizados(nordenNuevo, setForm, token, () => { Swal.close() });
+        if (result.isConfirmed) {
+          PrintHojaR(form.norden, token, tabla, datosFooter);
+        }
+      });
+    } else {
+      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
+    }
+  });
 };
 
 export const GetInfoServicioTabla = (nro, tabla, set, token) => {
@@ -144,7 +165,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
   });
 };
 
-export const PrintHojaR = (nro, token, tabla, numPage, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
   Loading("Cargando Formato a Imprimir");
   getFetch(
     `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
@@ -176,6 +197,7 @@ export const PrintHojaR = (nro, token, tabla, numPage, datosFooter) => {
   });
 };
 
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
   VerifyTRDefault(
     nro,
@@ -185,9 +207,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     sede,
     () => {
       //NO Tiene registro
-      // GetInfoPac(nro, set, token, sede);
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
+      ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+        GetInfoServicio(nro, tabla, set, token, () => {
+          Swal.close();
+        });
       });
     },
     () => {
@@ -201,19 +224,6 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
       });
     }
   );
-};
-
-const GetInfoPac = async (nro, set, token, sede) => {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad + " años",
-      nombres: res.nombresApellidos,
-    }));
-  }
 };
 
 export const Loading = (mensaje) => {
@@ -273,6 +283,52 @@ export const GetExamenesRealizados = (
     });
 };
 
+
+export const ValidarExamenesRealizados = (
+  nro,
+  token,
+  onComplete = () => { }
+) => {
+  getFetch(
+    `${obtenerExamenesRealizadosUrl}?nOrden=${nro}`,
+    token
+  )
+    .then((res) => {
+      if (res) {
+        console.log(res);
+
+        const examenes = {
+          'Ficha Antecedentes Patológicos': res.fichaAntecedentesPatologicos,
+          'Triaje': res.triaje,
+          'Oftalmología': res.oftalmologia,
+          'Espirometría': res.espirometria,
+          'Radiografía de Tórax': res.radiografiaTorax,
+          'Laboratorio Clínico': res.laboratorioClinico,
+          'Odontograma': res.odontograma,
+          'Ficha Audiológica': res.fichaAudiologica
+        };
+
+        const examenesFaltantes = Object.keys(examenes).filter(examen => !examenes[examen]);
+
+        if (examenesFaltantes.length === 0) {
+          onComplete();
+        } else {
+          const listaFaltantes = examenesFaltantes.map(examen => `• ${examen}`).join('<br>');
+          Swal.fire({
+            title: "Alerta",
+            html: `<div style="text-align: center;">El paciente no ha realizado los siguientes exámenes:<br><br></div><div style="text-align: left;margin-left:5px">${listaFaltantes}</div>`,
+            icon: "warning"
+          });
+        }
+      } else {
+        console.log("No se encontraron datos de exámenes realizados");
+      }
+    })
+    .catch((error) => {
+      console.error("Error al obtener exámenes realizados:", error);
+    });
+};
+
 export const GetInfoServicio = (
   nro,
   tabla,
@@ -288,242 +344,6 @@ export const GetInfoServicio = (
       if (res.norden_n_orden) {
         console.log(res);
         if (res) {
-          // set((prev) => ({
-          //   ...prev,
-          //   ...res,
-          //   norden: res.norden,
-          //   nomExamen: res.nombreExamen ?? "",
-          //   fechaExam: res.fechaAnexo,
-          //   codigoAnexo: res.codigoAnexo,
-          //   //Info personal
-          //   dni: res.dni ?? "",
-          //   nombres: res.nombres ?? "",
-          //   apellidos: res.apellidos ?? "", //revisar
-          //   fechaNac: formatearFechaCorta(res.fechaNacimientoPaciente),
-          //   sexo: res.sexo ?? "",
-          //   edad: (res.edad ?? "") + " años",
-          //   //Contacto y Estado Civil
-          //   lugarNac: res.lugarNacPaciente ?? "",
-          //   domicilio: res.direccionPaciente ?? "",
-          //   telefono: res.celularPaciente ?? "",
-          //   estadoCivil: res.estadoCivilPaciente ?? "",
-          //   gradoInstruccion: res.nivelEstudiosPaciente ?? "",
-          //   //Información Laboral
-          //   empresa: res.empresa ?? "",
-          //   contrata: res.contrata ?? "",
-          //   mineralExp: res.mineral ?? "",
-          //   explotacion: res.explotacion ?? "",
-          //   alturaLaboral: res.alturaLaboral ?? "",
-          //   //Detalles del Puesto
-          //   puestoPostula: res.cargo ?? "",
-          //   areaPuesto: res.areaPuesto ?? "", //revisar
-          //   puestoActual: res.puestoActual_txtpuestoactual ?? "",
-          //   tiempoPuesto: res.tiempo_txttiempo ?? "",
-
-          //   //Ant. Personales
-          //   neoplasia: res.neoplasia,
-          //   neoplasiaDescripcion: res.neoplasiaDescripcion ?? "",
-          //   quemaduras: res.quemaduras,
-          //   quemadurasDescripcion: res.quemadurasDescripcion ?? "",
-          //   otrosAntecedentes: res.antecedentesPersonalesOtros,
-          //   otrosAntecedentesDescripcion:
-          //     res.antecedentesPersonalesOtrosDescripcion ?? "",
-          //   its: res.its,
-          //   itsDescripcion: res.itsDescripcion ?? "",
-          //   cirugias: res.cirugias,
-          //   cirugiasDescripcion: res.cirugiasDescripcion ?? "",
-
-          //   //Residencia en el lugar de trabajo
-          //   reside: res.residenciaSi,
-          //   tiempoReside: res.residenciaTiempo ?? "",
-          //   essalud: res.essalud,
-          //   sctr: res.sctr,
-          //   eps: res.eps,
-          //   otrosResidencia: res.residenciaTrabajoOtros,
-          //   otrosResidencia1: res.sctrOtros,
-
-          //   //Número de Hijos
-          //   hijosVivos: res.hijosvivosAntecedentesPatologicos ?? "",
-          //   hijosMuertos: res.hijosfallecidosAntecedentesPatologicos ?? "",
-          //   hijosDependientes: res.numeroDependientes ?? "",
-          //   totalHijos: res.totalhijos ?? "",
-
-          //   //Antecedentes Familiares
-          //   antecendentesPadre: res.padreAntecedentesPatologicos ?? "",
-          //   antecendentesMadre: res.madreAntecedentesPatologicos ?? "",
-          //   antecendentesHermano: res.hermanosAntecedentesPatologicos ?? "",
-          //   antecendentesEsposao: res.esposaAntecedentesPatologicos ?? "",
-
-          //   //Medicamentos
-          //   tomaMedicamento: res.medicamentosSi,
-          //   tipoMedicamentos: res.tipoMedicamento ?? "",
-          //   frecuenciaMedicamentos: res.frecuenciaMedicamentos ?? "",
-
-          //   //Absentismo: Enfermedades y accidentes
-          //   // dataEnfermedades: [],      //VIENE DE OTRO ENDPOINT
-
-          //   //=============================================================================================
-          //   //TAB LATERAL
-          //   //=============================================================================================
-          //   observacionesGenerales: res.observacionesFichaMedica??"",
-          //   colesterolTotal: res.colesterol ?? "",
-          //   LDLColesterol: res.ldlColesterol ?? "",
-          //   HDLColesterol: res.hdlColesterol ?? "",
-          //   VLDLColesterol: res.vldlColesterol ?? "",
-          //   trigliceridos: res.trigliseridos ?? "",
-          //   //Comparacion Grupo Sanguineo
-          //   grupoSanguineoPrevio: "", //revisar
-          //   grupoSanguineoGrupo: "", //revisar
-          //   //Grupo Sanguineo
-          //   grupoSanguineo: "", //revisar
-          //   factorRh: "", //revisar
-          //   //Resultados de Laboratorio
-          //   vsg: "", //revisar
-          //   glucosa: "", //revisar
-          //   creatinina: "", //revisar
-          //   marihuana: "", //revisar
-          //   cocaina: "", //revisar
-          //   hemoglobinaHematocrito: "", //revisar
-
-          //   //=============================================================================================
-          //   //SEGUNDA TAB EXAMENES
-          //   //=============================================================================================
-          //   // Función Respiratoria
-          //   fvc: res.fvc ?? "",
-          //   fev1: res.fev1 ?? "",
-          //   fev1Fvc: res.fev1Fvc ?? "",
-          //   fef2575: res.fef2575 ?? "",
-          //   conclusionRespiratoria: "", //revisar
-
-          //   // Información Triaje
-          //   //Medidas Generales
-          //   temperatura: res.temperatura ?? "",
-          //   cintura: res.cintura ?? "",
-          //   cadera: res.cadera ?? "",
-          //   icc: res.icc ?? "",
-
-          //   //Medidas Generales
-          //   talla: res.talla ?? "",
-          //   peso: res.peso ?? "",
-          //   imc: res.imc ?? "",
-          //   imcRojo: false, //REVISAR
-
-          //   // Signos Vitales
-          //   frecuenciaRespiratoria: res.frespiratoria ?? "",
-          //   frecuenciaCardiaca: res.fcardiaca ?? "",
-          //   saturacionO2: res.sat02 ?? "",
-          //   perimetro: "", //revisar? es perimetroCuello??
-
-          //   // Presión Arterial
-          //   presionSistolica: res.sistolica ?? "",
-          //   presionDiastolica: res.diastolica ?? "",
-
-          //   // Audiometría - Oído Derecho
-          //   od500: res.oidoDerecho500 ?? "",
-          //   od1000: res.oidoDerecho1000 ?? "",
-          //   od2000: res.oidoDerecho2000 ?? "",
-          //   od3000: res.oidoDerecho3000 ?? "",
-          //   od4000: res.oidoDerecho4000 ?? "",
-          //   od6000: res.oidoDerecho6000 ?? "",
-          //   od8000: res.oidoDerecho8000 ?? "",
-
-          //   // Audiometría - Oído Izquierdo
-          //   oi500: res.oidoIzquierdo500 ?? "",
-          //   oi1000: res.oidoIzquierdo1000 ?? "",
-          //   oi2000: res.oidoIzquierdo2000 ?? "",
-          //   oi3000: res.oidoIzquierdo3000 ?? "",
-          //   oi4000: res.oidoIzquierdo4000 ?? "",
-          //   oi6000: res.oidoIzquierdo6000 ?? "",
-          //   oi8000: res.oidoIzquierdo8000 ?? "",
-
-          //   // Ojos
-          //   visionCercaOd: res.visionCercaSinCorregirOd ?? "",
-          //   visionCercaOi: res.visionCercaSinCorregirOi ?? "",
-          //   visionCercaOdCorregida: res.visionCercaCorregidaOd ?? "",
-          //   visionCercaOiCorregida: res.visionCercaCorregidaOi ?? "",
-
-          //   visionLejosOd: res.visionLejosSinCorregirOd ?? "",
-          //   visionLejosOi: res.visionLejosSinCorregirOi ?? "",
-          //   visionLejosOdCorregida: res.visionLejosCorregidaOd ?? "",
-          //   visionLejosOiCorregida: res.visionLejosCorregidaOi ?? "",
-
-          //   visionColores: res.visionColores ?? "",
-          //   enfermedadOculares: res.enfermedadesOcularesOftalmo ?? "",
-          //   enfermedadOtros: res.enfermedadesOcularesOtrosOftalmo ?? "",
-          //   reflejosPupilares: res.reflejosPupilares ?? "",
-          //   visionBinocular: res.visionBinocular ?? "",
-
-          //   // Observaciones Generales
-          //   ectoscopia: res.ectoscopia ?? "",
-          //   estadoMental: res.estadomental ?? "",
-          //   anamnesis: res.anamnesis ?? "",
-
-          //   // Dentadura
-          //   piezasMalEstado: res.piezasMalEstado ?? "",
-          //   piezasFaltan: "", //revisar
-
-          //   //=============================================================================================
-          //   //TERCERA TAB EXAMEN FISICO
-          //   //=============================================================================================
-
-          //   // Examen Físico por Sistemas
-          //   cabeza: res.cabeza ?? "",
-          //   cuello: res.cuello ?? "",
-          //   boca: res.boca ?? "",
-          //   faringe: res.faringe ?? "",
-          //   nariz: res.nariz ?? "",
-          //   oidos: res.oidos ?? "",
-          //   marcha: res.marcha ?? "",
-          //   piel: res.piel ?? "",
-          //   aparatoRespiratorio: res.aparatoRespiratorio ?? "",
-          //   apaCardiovascular: res.aparatoCardiovascular ?? "",
-          //   aparatoDigestivo: res.aparatoDigestivo ?? "",
-          //   aGenitourinario: res.aparatoGeiotourinario ?? "",
-          //   aparatoLocomotor: res.aparatoLocomotor ?? "",
-          //   miembrosSuperiores: res.miembrosSuperiores ?? "",
-          //   miembrosInferiores: res.miembrosInferiores ?? "",
-          //   sistemaLinfatico: res.sistemaLinfatico ?? "",
-          //   sistemaNervioso: res.sistemaNervioso ?? "",
-          //   columnaVertebral: res.columnaVertebral ?? "",
-
-          //   // Otros Exámenes
-          //   otrosExamenes: res.otrosExamenes ?? "",
-
-          //   //=============================================================================================
-          //   //CUARTA TAB RESULTADOS
-          //   //=============================================================================================
-          //   // Aptitud del Paciente
-          //   aptitud: res.esApto
-          //     ? "APTO"
-          //     : res.noEsApto
-          //     ? "NO APTO"
-          //     : res.aptoRestriccion
-          //     ? "RESTRICCION"
-          //     : "",
-          //   fechaAptitud: new Date(), //revisar
-          //   fechaVencimiento: new Date(), //revisar
-          //   restricciones: res.restricciones ?? "",
-
-          //   // Recomendaciones y Restricciones
-          //   corregirAgudezaVisualTotal: false, //revisar validar del texto
-          //   corregirAgudezaVisual: false, //revisar validar del texto
-          //   dietaHipocalorica: false, //revisar validar del texto
-          //   evitarMovimientosDisergonomicos: false, //revisar validar del texto
-          //   noTrabajoAltoRiesgo: false, //revisar validar del texto
-          //   noTrabajoSobre18m: false, //revisar validar del texto
-          //   usoEppAuditivo: false, //revisar validar del texto
-          //   usoLentesCorrectorConducir: false, //revisar validar del texto
-          //   usoLentesCorrectorTrabajo: false, //revisar validar del texto
-          //   usoLentesCorrectorTrabajo18m: false, //revisar validar del texto
-          //   ninguno: true, //revisar validar del texto
-          //   noConducirVehiculos: false, //revisar validar del texto
-          //   usoEppAuditivoGeneral: false, //revisar validar del texto
-
-          //   // Médico que Certifica //BUSCADOR
-          //   nombre_medico: "", //revisar
-          // }));
-          //================================================================================================================================================
-          //================================================================================================================================================
           let data = {
             norden: res.norden_n_orden,
             puestoActual: res.puestoActual_txtpuestoactual ?? "",

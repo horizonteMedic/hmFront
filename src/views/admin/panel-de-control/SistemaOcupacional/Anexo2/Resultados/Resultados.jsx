@@ -1,9 +1,11 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   InputCheckbox,
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
+import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 
 export default function Resultados({
   form,
@@ -12,6 +14,8 @@ export default function Resultados({
   handleRadioButton,
   handleCheckBoxChange,
   handlePrint,
+  handleSave,
+  handleClear,
   handleSearchExamenesRealizados
 }) {
   const RestriccionCheckbox = ({ label, name }) => {
@@ -221,7 +225,49 @@ export default function Resultados({
           </div>
         </div>
       </div>
-      <h3 className="font-semibold mb-6 text-gray-800">Estado Paciente</h3>
+      {/* Sección de Impresión de Informes */}
+      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
+        <p className="font-semibold  mb-2">Imprimir Informes de Exámenes</p>
+        {/* BOTONES DE ACCIÓN */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4  ">
+          <div className=" flex gap-4">
+            <button
+              type="button"
+              onClick={handleSave}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+            </button>
+            <button
+              type="button"
+              onClick={handleClear}
+              className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+            >
+              <FontAwesomeIcon icon={faBroom} /> Limpiar
+            </button>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+            <div className="flex items-center gap-2">
+              <input
+                name="norden"
+                value={form.norden}
+                onChange={handleChange}
+                className="border rounded px-2 py-1 text-base w-24"
+              />
+
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faPrint} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <h3 className="font-semibold mb-6 text-gray-800 mt-4">Estado Paciente</h3>
 
       {/* Segunda fila - Estado del Paciente (1 columna) */}
       <div className="mb-6">
@@ -385,24 +431,6 @@ export default function Resultados({
         </div>
       </div>
 
-      {/* Sección de Impresión de Informes */}
-      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
-        <p className="font-semibold  mb-2">Imprimir Informes de Exámenes</p>
-        <div className="flex flex-wrap gap-4">
-          <button
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => handlePrint()}
-          >
-            Anexo 7C
-          </button>
-          {/* <button
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => handlePrint(2)}
-          >
-            Anexo 7C - N°2
-          </button> */}
-        </div>
-      </div>
     </div>
   );
 }

@@ -1,16 +1,12 @@
-import { faBroom, faSave } from "@fortawesome/free-solid-svg-icons";
 import {
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function PanelObservaciones({
   form,
   handleRadioButton,
-  handleClear,
-  handleSave,
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -171,23 +167,6 @@ export default function PanelObservaciones({
               disabled
             />
           </div>
-        </div>
-        {/* Botones de Acción */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
         </div>
       </div>
     </div>

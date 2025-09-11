@@ -21,8 +21,7 @@ export default function InputsRadioGroup({
             name={name}
             value={option.value}
             checked={value === option.value}
-            onChange={(e) => onChange(e, option.value)}
-            disabled={disabled}
+            onChange={(e) => disabled ? null : onChange(e, option.value)}
           />
           <span>{option.label}</span>
         </label>

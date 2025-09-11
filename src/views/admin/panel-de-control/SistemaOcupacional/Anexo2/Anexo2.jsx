@@ -324,7 +324,7 @@ export default function Anexo2({ listas }) {
   ];
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
@@ -341,25 +341,10 @@ export default function Anexo2({ listas }) {
     }
   };
 
-  const handlePrint = (numPage = 1) => {
-    if (!form.norden)
-      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
-    Swal.fire({
-      title: "¿Desea Imprimir Anexo 2?",
-      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, Imprimir",
-      cancelButtonText: "Cancelar",
-      customClass: {
-        title: "swal2-title",
-        confirmButton: "swal2-confirm",
-        cancelButton: "swal2-cancel",
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        PrintHojaR(form.norden, token, tabla, numPage, datosFooter);
-      }
+
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
@@ -405,6 +390,7 @@ export default function Anexo2({ listas }) {
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
                       MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
+                      handleSave={handleSave}
                       handleSearch={handleSearch}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                     />
