@@ -238,8 +238,8 @@ export const GetExamenesRealizados = (
           ...prev,
           // Estado del Paciente
           nordenEstadoPaciente: nro,
-          nombresEstadoPaciente: "",
-          tipoExamenEstadoPaciente: "",
+          nombresEstadoPaciente: res.nombresPaciente ?? "",
+          tipoExamenEstadoPaciente: res.nombreExamen ?? "",
 
           // Exámenes Realizados - convertir booleanos a  "PASADO" : "POR PASAR",
           triaje: res.triaje ? "PASADO" : "POR PASAR",
