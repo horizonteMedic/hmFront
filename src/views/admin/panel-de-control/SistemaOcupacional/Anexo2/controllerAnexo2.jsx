@@ -465,7 +465,13 @@ export const GetInfoServicio = (
               ? "RH(-)"
               : "";
 
-          data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
+          data.otrosExamenes += "HEMOGRAMA: " + vsg != null && hemo != null ? "NORMAL" : "N/A" + "\n";
+          data.otrosExamenes += "GRUPO SANGUINEO: " +
+            (data.grupoSanguineo + res.grupoSanguineoRhPositivo_rbrhpositivo
+              ? "+"
+              : res.grupoSanguineoRhNegativo_rbrhnegativo
+                ? "-"
+                : "") + "\n";
           data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
           data.otrosExamenes +=
@@ -973,7 +979,13 @@ export const GetInfoServicioEditar = (
           data.vsg = vsg;
           data.glucosa = gluc;
           data.creatinina = creat;
-          data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
+          data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes += "GRUPO SANGUINEO: " +
+            (data.grupoSanguineo + res.grupoSanguineoRhPositivo_rbrhpositivo
+              ? "+"
+              : res.grupoSanguineoRhNegativo_rbrhnegativo
+                ? "-"
+                : "") + "\n";
           data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
           data.otrosExamenes +=
