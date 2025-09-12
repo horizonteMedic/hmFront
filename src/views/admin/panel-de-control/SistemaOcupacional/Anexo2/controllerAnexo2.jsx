@@ -465,9 +465,9 @@ export const GetInfoServicio = (
               ? "RH(-)"
               : "";
 
-          data.otrosExamenes += "HEMOGRAMA: " + vsg != null && hemo != null ? "NORMAL" : "N/A" + "\n";
+          data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
           data.otrosExamenes += "GRUPO SANGUINEO: " +
-            (data.grupoSanguineo + res.grupoSanguineoRhPositivo_rbrhpositivo
+            (data.grupoSanguineo) + (res.grupoSanguineoRhPositivo_rbrhpositivo
               ? "+"
               : res.grupoSanguineoRhNegativo_rbrhnegativo
                 ? "-"
@@ -657,6 +657,7 @@ export const GetInfoServicio = (
           data.visionBinocular = res.visionBinocular_v_binocular ?? "";
           data.enfermedadOculares =
             res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
+          data.reflejosPupilares = res.reflejosPupilares_r_pupilares ?? "";
           data.enfermedadOtros =
             res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "NINGUNA";
 
@@ -981,7 +982,7 @@ export const GetInfoServicioEditar = (
           data.creatinina = creat;
           data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
           data.otrosExamenes += "GRUPO SANGUINEO: " +
-            (data.grupoSanguineo + res.grupoSanguineoRhPositivo_rbrhpositivo
+            (data.grupoSanguineo) + (res.grupoSanguineoRhPositivo_rbrhpositivo
               ? "+"
               : res.grupoSanguineoRhNegativo_rbrhnegativo
                 ? "-"
