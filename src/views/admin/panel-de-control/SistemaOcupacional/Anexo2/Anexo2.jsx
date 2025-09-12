@@ -200,9 +200,9 @@ export default function Anexo2({ listas }) {
     visionBinocular: "",
 
     // Observaciones Generales
-    ectoscopia: "",
-    estadoMental: "",
-    anamnesis: "",
+    ectoscopia: "APARENTA BUEN ESTADO DE SALUD.",
+    estadoMental: "DESPIERTO, OTEP, COMUNICATIVO.",
+    anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
 
     // Dentadura
     piezasMalEstado: "",
