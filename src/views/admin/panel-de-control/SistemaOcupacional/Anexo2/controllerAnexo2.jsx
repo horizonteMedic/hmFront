@@ -295,7 +295,7 @@ export const ValidarExamenesRealizados = (
           'Radiografía de Tórax': res.radiografiaTorax,
           'Laboratorio Clínico': res.laboratorioClinico,
           'Odontograma': res.odontograma,
-          'Ficha Audiológica': res.fichaAudiologica
+          'Ficha Audiológica': res.audiometriaPo
         };
 
         const examenesFaltantes = Object.keys(examenes).filter(examen => !examenes[examen]);
@@ -429,7 +429,6 @@ export const GetInfoServicio = (
           //==============================
           if (coca == "REACTIVO") {
             data.observacionesGenerales += `TEST DE COCAINA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
-            // txtCoca.setForeground(Color.red);      // REVISAR
             data.cocainaRed = true;
             data.cocaina = "REACTIVO";
           } else {
@@ -593,9 +592,9 @@ export const GetInfoServicio = (
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
           // Hijos
           data.hijosVivos =
-            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos || "0";
+            res.hijosVivosAnexo2_txthijosvivos || "0";
           data.hijosMuertos =
-            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ||
+            res.hijosMuertosAnexo2_txthijosmuertos ||
             "0";
 
           if (data.hijosVivos && data.hijosMuertos) {
@@ -608,17 +607,17 @@ export const GetInfoServicio = (
           data.imc = res.imc_imc ?? "";
           if (data.imc && data.imc !== "") {
             const imc = parseFloat(data.imc);
-            //   txtIMC.setForeground(Color.black); //revisar
+            data.imcRed = false;
             if (imc >= 25 && imc < 30) {
-              //     txtIMC.setForeground(Color.red);
+              data.imcRed = true;
               data.observacionesGenerales +=
                 "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
             } else if (imc >= 30 && imc < 35) {
-              //     txtIMC.setForeground(Color.red);
+              data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             } else if (imc >= 35 && imc < 40) {
-              //     txtIMC.setForeground(Color.red);
+              data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             }
@@ -640,7 +639,7 @@ export const GetInfoServicio = (
 
           // Grupo Sanguíneo Laboratorio
           data.grupoSanguineoGrupo =
-            res.grupoFactorNuevo_grupo_factor_nuevo ?? ""; //revisar
+            res.grupoFactorNuevo_grupo_factor_nuevo ?? "";
           data.visionCercaOd = res.visionCercaSinCorregirOd_v_cerca_s_od ?? "";
           data.visionCercaOi = res.visionCercaSinCorregirOi_v_cerca_s_oi ?? "";
           data.visionCercaOdCorregida =
@@ -749,20 +748,20 @@ export const GetInfoServicio = (
 
           if (ct > 200) {
             data.observacionesGenerales += "HIPERCOLESTEROLEMIA.";
-            //   txtColesterol.setForeground(Color.red);
+            data.colesterolRed = true;
           }
           if (trigli > 150) {
             data.observacionesGenerales += "- HIPERTRIGLICERIDEMIA.";
-            //   txtTrigliseridos.setForeground(Color.red);
+            data.trigliceridosRed = true;
           }
           if (ldl > 129) {
-            // txtLDLColesterol.setForeground(Color.red);
+            data.LDLColesterolRed = true;
           }
           if (hdl < 40 || hdl > 60) {
-            // txtHDLColesterol.setForeground(Color.red);
+            data.HDLColesterolRed = true;
           }
           if (vldl > 30) {
-            //   txtVLDLColesterol.setForeground(Color.red);
+            data.VLDLColesterolRed = true;
           }
           if (
             ct > 200 ||
@@ -923,8 +922,8 @@ export const GetInfoServicioEditar = (
                   ? "RESTRICCION"
                   : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
-            fechaVencimiento: res.fechaHasta_fechahasta ?? "", //REVISAR
-            nombre_medico: res.medico_medico ?? "", //REVISAR
+            fechaVencimiento: res.fechaHasta_fechahasta ?? "",
+            nombre_medico: res.medico_medico ?? "",
             dataEnfermedades: res.accidentes ?? [],
           };
 
@@ -950,7 +949,6 @@ export const GetInfoServicioEditar = (
           }
           if (marig == "REACTIVO" || marig == "POSITIVO") {
             data.observacionesGenerales += `MARIHUANA: ${marig}\n`;
-            //txtMarig.setForeground(Color.red);    // REVISAR
             data.marihuana = marig;
             data.marihuanaRed = true;
           } else {
@@ -963,6 +961,8 @@ export const GetInfoServicioEditar = (
           const hemo = res.hemoglobina_txthemoglobina;
 
           data.hemoglobinaHematocrito = hemo;
+          data.grupoSanguineoGrupo =
+            res.grupoFactorNuevo_grupo_factor_nuevo ?? "";
           data.grupoSanguineo = res.grupoSanguineoO_chko
             ? "O"
             : res.grupoSanguineoA_chka
@@ -1072,9 +1072,9 @@ export const GetInfoServicioEditar = (
 
           // Hijos
           data.hijosVivos =
-            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? "0";
+            res.hijosVivosAnexo2_txthijosvivos ?? "0";
           data.hijosMuertos =
-            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ??
+            res.hijosMuertosAnexo2_txthijosmuertos ??
             "0";
 
           data.imc = res.imc_imc ?? "";
@@ -1143,6 +1143,48 @@ export const GetInfoServicioEditar = (
           }
 
           //FIN==============
+
+          // cargarAnalisisB();=======================
+          data.colesterolTotal = res.colesterol_txtcolesterol ?? "";
+          data.LDLColesterol = res.ldlColesterol_txtldlcolesterol ?? "";
+          data.HDLColesterol = res.hdlColesterol_txthdlcolesterol ?? "";
+          data.VLDLColesterol = res.vldlColesterol_txtvldlcolesterol ?? "";
+          data.trigliceridos = res.trigliseridos_txttrigliseridos ?? "";
+          const ct = parseFloat(data.colesterolTotal);
+          const ldl = parseFloat(data.LDLColesterol) || 0;
+          const hdl = parseFloat(data.HDLColesterol) || 0;
+          const vldl = parseFloat(data.VLDLColesterol) || 0;
+          const trigli = parseFloat(data.trigliceridos) || 0;
+
+          if (ct > 200) {
+            data.observacionesGenerales += "HIPERCOLESTEROLEMIA.";
+            data.colesterolRed = true;
+          }
+          if (trigli > 150) {
+            data.observacionesGenerales += "- HIPERTRIGLICERIDEMIA.";
+            data.trigliceridosRed = true;
+          }
+          if (ldl > 129) {
+            data.LDLColesterolRed = true;
+          }
+          if (hdl < 40 || hdl > 60) {
+            data.HDLColesterolRed = true;
+          }
+          if (vldl > 30) {
+            data.VLDLColesterolRed = true;
+          }
+          if (
+            ct > 200 ||
+            trigli > 150 ||
+            ldl > 129 ||
+            hdl < 40 ||
+            hdl > 60 ||
+            vldl > 30
+          ) {
+            data.observacionesGenerales +=
+              "DIETA HIPOCALORICA Y EJERCICIOS. \n";
+          }
+          //==============================
 
           // Mapear restricciones a checkboxes
           const restriccionesTexto = data.restricciones || "";

@@ -111,6 +111,14 @@ export default function Anexo2({ listas }) {
     HDLColesterol: "",
     VLDLColesterol: "",
     trigliceridos: "",
+
+    colesterolRed: false,
+    trigliceridosRed: false,
+    LDLColesterolRed: false,
+    HDLColesterolRed: false,
+    VLDLColesterolRed: false,
+    imcRed: false,
+    
     //Comparacion Grupo Sanguineo
     grupoSanguineoPrevio: "",
     grupoSanguineoGrupo: "",
@@ -128,6 +136,7 @@ export default function Anexo2({ listas }) {
     hemoglobinaRed: false,
     glucosaRed: false,
     creatininaRed: false,
+
 
     hemoglobinaHematocrito: "",
 
@@ -152,7 +161,6 @@ export default function Anexo2({ listas }) {
     talla: "",
     peso: "",
     imc: "",
-    imcRojo: false,
 
     // Signos Vitales
     frecuenciaRespiratoria: "",

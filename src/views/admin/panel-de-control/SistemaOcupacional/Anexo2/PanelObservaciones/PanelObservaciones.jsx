@@ -136,6 +136,7 @@ export default function PanelObservaciones({
                 value={form.colesterolTotal}
                 labelWidth="100px"
                 disabled
+                className={form.colesterolRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="L.D.L Colesterol"
@@ -143,6 +144,7 @@ export default function PanelObservaciones({
                 value={form.LDLColesterol}
                 labelWidth="100px"
                 disabled
+                className={form.LDLColesterolRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="H.D.L Colesterol"
@@ -150,6 +152,7 @@ export default function PanelObservaciones({
                 value={form.HDLColesterol}
                 labelWidth="100px"
                 disabled
+                className={form.HDLColesterolRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="V.L.D.L Colesterol"
@@ -157,6 +160,7 @@ export default function PanelObservaciones({
                 value={form.VLDLColesterol}
                 labelWidth="100px"
                 disabled
+                className={form.VLDLColesterolRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="Triglicéridos"
@@ -164,6 +168,7 @@ export default function PanelObservaciones({
                 value={form.trigliceridos}
                 labelWidth="100px"
                 disabled
+                className={form.trigliceridosRed ? "text-red-600" : ""}
               />
             </div>
           </div>

@@ -115,6 +115,7 @@ export default function Examenes({
                 value={form.imc}
                 disabled
                 labelWidth="108px"
+                className={form.imcRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="F. Respiratoria(min)"
