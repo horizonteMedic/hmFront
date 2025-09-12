@@ -44,7 +44,7 @@ import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupaciona
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/TestAltura1.jsx"
+import Ficha from "./views/jaspers/ModuloConsentimientos/ConsentimientoBuenaSalud/ConsentimientoBuenaSalud2021_Digitalizado.jsx"
 
 const App = () => {
   return (
