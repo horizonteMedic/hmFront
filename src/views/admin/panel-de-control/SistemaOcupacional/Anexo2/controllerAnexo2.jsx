@@ -336,8 +336,8 @@ export const GetInfoServicio = (
         if (res) {
           let data = {
             norden: res.norden_n_orden,
-            puestoActual: res.puestoActual_txtpuestoactual ?? "",
-            tiempoPuesto: res.tiempo_txttiempo ?? "",
+            puestoActual: res.puestoActual_txtpuestoactual ?? "N/A",
+            tiempoPuesto: res.tiempo_txttiempo ?? "N/A",
             observacionesGenerales: "", //txtObservacionesFichaMedica
             otrosExamenes: "", //txtOtrosEx
             conclusionRespiratoria: "", //txtconclusion
@@ -858,8 +858,8 @@ export const GetInfoServicioEditar = (
               res.esposa_txtesposa ?? "",
 
             //Detalles del Puesto
-            puestoActual: res.puestoActual_txtpuestoactual ?? "",
-            tiempoPuesto: res.tiempo_txttiempo ?? "",
+            puestoActual: res.puestoActual_txtpuestoactual ?? "N/A",
+            tiempoPuesto: res.tiempo_txttiempo ?? "N/A",
 
             //Medicamentos
             tomaMedicamento: res.medicamentosSi_rbsimed,
