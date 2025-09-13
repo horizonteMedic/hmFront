@@ -499,12 +499,15 @@ export default function Anexo2(data = {}) {
   // === 1) Imagen de fondo para Anexo2 ===
   const fondoImg = "/img/Anexo2/Pag1_anexo2.png";
   
-  // Usar todo el ancho del documento pero no toda la altura
-  const imgWidth = pageW; // Todo el ancho disponible
+  // Márgenes de 8mm a cada lado
+  const margenLateral = 8; // 8mm
+  
+  // Usar el ancho del documento menos los márgenes laterales
+  const imgWidth = pageW - (margenLateral * 2); // Ancho menos márgenes
   const imgHeight = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
 
-  // Posicionar desde abajo hacia arriba
-  const xOffset = 0;
+  // Posicionar desde abajo hacia arriba con márgenes laterales
+  const xOffset = margenLateral; // Margen izquierdo
   const yOffset = pageH - imgHeight - 8; // Subido 5 puntos hacia arriba
 
   try {
@@ -1362,12 +1365,15 @@ export default function Anexo2(data = {}) {
     // === 1) Imagen de fondo para Anexo2 - Página 2 ===
     const fondoImg2 = "/img/Anexo2/Pag2_anexo2.png";
     
-    // Usar todo el ancho del documento pero no toda la altura
-    const imgWidth2 = pageW; // Todo el ancho disponible
+    // Márgenes de 8mm a cada lado (usar la misma variable de la página 1)
+    const margenLateral2 = 8; // 8mm
+    
+    // Usar el ancho del documento menos los márgenes laterales
+    const imgWidth2 = pageW - (margenLateral2 * 2); // Ancho menos márgenes
     const imgHeight2 = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
 
-    // Posicionar desde abajo hacia arriba
-    const xOffset2 = 0;
+    // Posicionar desde abajo hacia arriba con márgenes laterales
+    const xOffset2 = margenLateral2; // Margen izquierdo
     const yOffset2 = pageH - imgHeight2 - 8; // Subido 5 puntos hacia arriba
 
     try {
