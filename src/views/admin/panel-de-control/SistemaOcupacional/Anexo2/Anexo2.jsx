@@ -111,6 +111,14 @@ export default function Anexo2({ listas }) {
     HDLColesterol: "",
     VLDLColesterol: "",
     trigliceridos: "",
+
+    colesterolRed: false,
+    trigliceridosRed: false,
+    LDLColesterolRed: false,
+    HDLColesterolRed: false,
+    VLDLColesterolRed: false,
+    imcRed: false,
+    
     //Comparacion Grupo Sanguineo
     grupoSanguineoPrevio: "",
     grupoSanguineoGrupo: "",
@@ -123,6 +131,13 @@ export default function Anexo2({ listas }) {
     creatinina: "",
     marihuana: "",
     cocaina: "",
+    cocainaRed: false,
+    marihuanaRed: false,
+    hemoglobinaRed: false,
+    glucosaRed: false,
+    creatininaRed: false,
+
+
     hemoglobinaHematocrito: "",
 
     //=============================================================================================
@@ -146,7 +161,6 @@ export default function Anexo2({ listas }) {
     talla: "",
     peso: "",
     imc: "",
-    imcRojo: false,
 
     // Signos Vitales
     frecuenciaRespiratoria: "",
@@ -194,9 +208,9 @@ export default function Anexo2({ listas }) {
     visionBinocular: "",
 
     // Observaciones Generales
-    ectoscopia: "",
-    estadoMental: "",
-    anamnesis: "",
+    ectoscopia: "APARENTA BUEN ESTADO DE SALUD.",
+    estadoMental: "DESPIERTO, OTEP, COMUNICATIVO.",
+    anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
 
     // Dentadura
     piezasMalEstado: "",

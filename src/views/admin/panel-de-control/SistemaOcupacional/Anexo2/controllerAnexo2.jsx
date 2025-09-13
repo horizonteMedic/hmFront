@@ -1,7 +1,6 @@
 import Swal from "sweetalert2";
 import {
   LoadingDefault,
-  SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
@@ -126,15 +125,6 @@ export const SubmitDataService = async (
   };
   console.log(body);
 
-  // await SubmitDataServiceDefault(
-  //   token,
-  //   limpiar,
-  //   body,
-  //   registrarUrl,
-  //   () => {
-  //     PrintHojaR(form.norden, token, tabla, datosFooter);
-  //   }
-  // );
   SubmitData(body, registrarUrl, token).then((res) => {
     console.log(res);
     if (res.id === 1 || res.id === 0) {
@@ -248,8 +238,8 @@ export const GetExamenesRealizados = (
           ...prev,
           // Estado del Paciente
           nordenEstadoPaciente: nro,
-          nombresEstadoPaciente: "",
-          tipoExamenEstadoPaciente: "",
+          nombresEstadoPaciente: res.nombresPaciente ?? "",
+          tipoExamenEstadoPaciente: res.nombreExamen ?? "",
 
           // Exámenes Realizados - convertir booleanos a  "PASADO" : "POR PASAR",
           triaje: res.triaje ? "PASADO" : "POR PASAR",
@@ -305,7 +295,7 @@ export const ValidarExamenesRealizados = (
           'Radiografía de Tórax': res.radiografiaTorax,
           'Laboratorio Clínico': res.laboratorioClinico,
           'Odontograma': res.odontograma,
-          'Ficha Audiológica': res.fichaAudiologica
+          'Ficha Audiológica': res.audiometriaPo
         };
 
         const examenesFaltantes = Object.keys(examenes).filter(examen => !examenes[examen]);
@@ -346,8 +336,8 @@ export const GetInfoServicio = (
         if (res) {
           let data = {
             norden: res.norden_n_orden,
-            puestoActual: res.puestoActual_txtpuestoactual ?? "",
-            tiempoPuesto: res.tiempo_txttiempo ?? "",
+            puestoActual: res.puestoActual_txtpuestoactual ?? "N/A",
+            tiempoPuesto: res.tiempo_txttiempo ?? "N/A",
             observacionesGenerales: "", //txtObservacionesFichaMedica
             otrosExamenes: "", //txtOtrosEx
             conclusionRespiratoria: "", //txtconclusion
@@ -439,17 +429,18 @@ export const GetInfoServicio = (
           //==============================
           if (coca == "REACTIVO") {
             data.observacionesGenerales += `TEST DE COCAINA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
-            // txtCoca.setForeground(Color.red);      // REVISAR
+            data.cocainaRed = true;
             data.cocaina = "REACTIVO";
           } else {
             data.cocaina = coca;
           }
           if (marig == "REACTIVO") {
             data.observacionesGenerales += `MARIHUANA: COLABORADOR DE LA COMUNIDAD, CONSUME HOJA DE COCA.\n`;
-            //txtMarig.setForeground(Color.red);    // REVISAR
+            data.marihuanaRed = true;
             data.marihuana = "REACTIVO";
           } else {
             data.marihuana = marig;
+            data.marihuanaRed = false;
           }
           //===============================
           const vsg = res.vsg_txtvsg;
@@ -473,7 +464,13 @@ export const GetInfoServicio = (
               ? "RH(-)"
               : "";
 
-          data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
+          data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes += "GRUPO SANGUINEO: " +
+            (data.grupoSanguineo) + (res.grupoSanguineoRhPositivo_rbrhpositivo
+              ? "+"
+              : res.grupoSanguineoRhNegativo_rbrhnegativo
+                ? "-"
+                : "") + "\n";
           data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
           data.otrosExamenes +=
@@ -489,16 +486,16 @@ export const GetInfoServicio = (
             const hemoglobina = parseFloat(hemo);
             if (sexo == "M") {
               if (hemoglobina < 14 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red); // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK); // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
             if (sexo == "F") {
               if (hemoglobina < 13.5 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red);  // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK);  // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
           }
@@ -509,17 +506,17 @@ export const GetInfoServicio = (
           if (gluc != "" && gluc != "N/A") {
             const glucosa = parseFloat(gluc);
             if (glucosa >= 110 || glucosa < 70) {
-              // txtGlucosaBio.setForeground(Color.red);  // REVISAR
+              data.glucosaRed = true;
             } else {
-              // txtGlucosaBio.setForeground(Color.black);  // REVISAR
+              data.glucosaRed = false;
             }
           }
           if (creat != "" && creat != "N/A") {
             const cretinina = parseFloat(creat);
             if (cretinina >= 1.4 || cretinina < 0.8) {
-              // txtCreatininaBio.setForeground(Color.red);  // REVISAR
+              data.creatininaRed = true;
             } else {
-              // txtCreatininaBio.setForeground(Color.black);  // REVISAR
+              data.creatininaRed = false;
             }
           }
           //==========================
@@ -595,9 +592,9 @@ export const GetInfoServicio = (
           data.piezasFaltan = res.ausentes_txtausentes ?? "";
           // Hijos
           data.hijosVivos =
-            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos || "0";
+            res.hijosVivosAnexo2_txthijosvivos || "0";
           data.hijosMuertos =
-            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ||
+            res.hijosMuertosAnexo2_txthijosmuertos ||
             "0";
 
           if (data.hijosVivos && data.hijosMuertos) {
@@ -610,17 +607,17 @@ export const GetInfoServicio = (
           data.imc = res.imc_imc ?? "";
           if (data.imc && data.imc !== "") {
             const imc = parseFloat(data.imc);
-            //   txtIMC.setForeground(Color.black); //revisar
+            data.imcRed = false;
             if (imc >= 25 && imc < 30) {
-              //     txtIMC.setForeground(Color.red);
+              data.imcRed = true;
               data.observacionesGenerales +=
                 "SOBREPESO:DIETA HIPOCALORICA Y EJERCICIOS.\n";
             } else if (imc >= 30 && imc < 35) {
-              //     txtIMC.setForeground(Color.red);
+              data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD I.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             } else if (imc >= 35 && imc < 40) {
-              //     txtIMC.setForeground(Color.red);
+              data.imcRed = true;
               data.observacionesGenerales +=
                 "OBESIDAD II.NO HACER TRABAJO 1.8 M.N PISO.DIETA HIPOCALORICA Y EJERCICIOS\n";
             }
@@ -642,7 +639,7 @@ export const GetInfoServicio = (
 
           // Grupo Sanguíneo Laboratorio
           data.grupoSanguineoGrupo =
-            res.grupoFactorNuevo_grupo_factor_nuevo ?? ""; //revisar
+            res.grupoFactorNuevo_grupo_factor_nuevo ?? "";
           data.visionCercaOd = res.visionCercaSinCorregirOd_v_cerca_s_od ?? "";
           data.visionCercaOi = res.visionCercaSinCorregirOi_v_cerca_s_oi ?? "";
           data.visionCercaOdCorregida =
@@ -659,6 +656,7 @@ export const GetInfoServicio = (
           data.visionBinocular = res.visionBinocular_v_binocular ?? "";
           data.enfermedadOculares =
             res.enfermedadesOcularesOftalmo_e_oculares ?? "NINGUNA";
+          data.reflejosPupilares = res.reflejosPupilares_r_pupilares ?? "";
           data.enfermedadOtros =
             res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "NINGUNA";
 
@@ -750,20 +748,20 @@ export const GetInfoServicio = (
 
           if (ct > 200) {
             data.observacionesGenerales += "HIPERCOLESTEROLEMIA.";
-            //   txtColesterol.setForeground(Color.red);
+            data.colesterolRed = true;
           }
           if (trigli > 150) {
             data.observacionesGenerales += "- HIPERTRIGLICERIDEMIA.";
-            //   txtTrigliseridos.setForeground(Color.red);
+            data.trigliceridosRed = true;
           }
           if (ldl > 129) {
-            // txtLDLColesterol.setForeground(Color.red);
+            data.LDLColesterolRed = true;
           }
           if (hdl < 40 || hdl > 60) {
-            // txtHDLColesterol.setForeground(Color.red);
+            data.HDLColesterolRed = true;
           }
           if (vldl > 30) {
-            //   txtVLDLColesterol.setForeground(Color.red);
+            data.VLDLColesterolRed = true;
           }
           if (
             ct > 200 ||
@@ -859,8 +857,8 @@ export const GetInfoServicioEditar = (
               res.esposa_txtesposa ?? "",
 
             //Detalles del Puesto
-            puestoActual: res.puestoActual_txtpuestoactual ?? "",
-            tiempoPuesto: res.tiempo_txttiempo ?? "",
+            puestoActual: res.puestoActual_txtpuestoactual ?? "N/A",
+            tiempoPuesto: res.tiempo_txttiempo ?? "N/A",
 
             //Medicamentos
             tomaMedicamento: res.medicamentosSi_rbsimed,
@@ -924,8 +922,8 @@ export const GetInfoServicioEditar = (
                   ? "RESTRICCION"
                   : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
-            fechaVencimiento: res.fechaHasta_fechahasta ?? "", //REVISAR
-            nombre_medico: res.medico_medico ?? "", //REVISAR
+            fechaVencimiento: res.fechaHasta_fechahasta ?? "",
+            nombre_medico: res.medico_medico ?? "",
             dataEnfermedades: res.accidentes ?? [],
           };
 
@@ -943,17 +941,19 @@ export const GetInfoServicioEditar = (
           //==============================
           if (coca == "REACTIVO" || coca == "POSITIVO") {
             data.observacionesGenerales += "COCAINA:" + coca + "\n";
-            // txtCoca.setForeground(Color.red);      // REVISAR
+            data.cocainaRed = true;
             data.cocaina = coca;
           } else {
+            data.cocainaRed = false;
             data.cocaina = coca;
           }
           if (marig == "REACTIVO" || marig == "POSITIVO") {
             data.observacionesGenerales += `MARIHUANA: ${marig}\n`;
-            //txtMarig.setForeground(Color.red);    // REVISAR
             data.marihuana = marig;
+            data.marihuanaRed = true;
           } else {
             data.marihuana = marig;
+            data.marihuanaRed = false;
           }
           const vsg = res.vsg_txtvsg;
           const gluc = res.glucosa_txtglucosabio;
@@ -961,6 +961,8 @@ export const GetInfoServicioEditar = (
           const hemo = res.hemoglobina_txthemoglobina;
 
           data.hemoglobinaHematocrito = hemo;
+          data.grupoSanguineoGrupo =
+            res.grupoFactorNuevo_grupo_factor_nuevo ?? "";
           data.grupoSanguineo = res.grupoSanguineoO_chko
             ? "O"
             : res.grupoSanguineoA_chka
@@ -978,7 +980,13 @@ export const GetInfoServicioEditar = (
           data.vsg = vsg;
           data.glucosa = gluc;
           data.creatinina = creat;
-          data.otrosExamenes += "HEMOGRAMA: NORMAL. \n";
+          data.otrosExamenes += "HEMOGRAMA: " + (vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+          data.otrosExamenes += "GRUPO SANGUINEO: " +
+            (data.grupoSanguineo) + (res.grupoSanguineoRhPositivo_rbrhpositivo
+              ? "+"
+              : res.grupoSanguineoRhNegativo_rbrhnegativo
+                ? "-"
+                : "") + "\n";
           data.otrosExamenes +=
             gluc == null ? "" : "GLUCOSA: " + gluc + " mg/dl.\n";
           data.otrosExamenes +=
@@ -994,16 +1002,16 @@ export const GetInfoServicioEditar = (
             const hemoglobina = parseFloat(hemo);
             if (sexo == "M") {
               if (hemoglobina < 14 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red); // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK); // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
             if (sexo == "F") {
               if (hemoglobina < 13.5 || hemoglobina > 20) {
-                // txtHemoHema.setForeground(Color.red);  // REVISAR
+                data.hemoglobinaRed = true;
               } else {
-                // txtHemoHema.setForeground(Color.BLACK);  // REVISAR
+                data.hemoglobinaRed = false;
               }
             }
           }
@@ -1011,21 +1019,21 @@ export const GetInfoServicioEditar = (
           if (gluc != "" && gluc != "N/A") {
             const glucosa = parseFloat(gluc);
             if (glucosa >= 110 || glucosa < 70) {
-              // txtGlucosaBio.setForeground(Color.red);  // REVISAR
+              data.glucosaRed = true;
             } else {
-              // txtGlucosaBio.setForeground(Color.black);  // REVISAR
+              data.glucosaRed = false;
             }
           }
 
           if (creat != "" && creat != "N/A") {
             const cretinina = parseFloat(creat);
             if (cretinina >= 1.4 || cretinina < 0.8) {
-              // txtCreatininaBio.setForeground(Color.red);  // REVISAR
+              data.creatininaRed = true;
             } else {
-              // txtCreatininaBio.setForeground(Color.black);  // REVISAR
+              data.creatininaRed = false;
             }
           }
-          if (res.examenRadiograficosSanguineos_txtobservacionesrs != "null") {
+          if (res.examenRadiograficosSanguineos_txtobservacionesrs != null) {
             data.observacionesGenerales += `EX. RX SANGUINEOS : ${res.examenRadiograficosSanguineos_txtobservacionesrs}\n`;
           }
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
@@ -1064,9 +1072,9 @@ export const GetInfoServicioEditar = (
 
           // Hijos
           data.hijosVivos =
-            res.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? "0";
+            res.hijosVivosAnexo2_txthijosvivos ?? "0";
           data.hijosMuertos =
-            res.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ??
+            res.hijosMuertosAnexo2_txthijosmuertos ??
             "0";
 
           data.imc = res.imc_imc ?? "";
@@ -1135,6 +1143,77 @@ export const GetInfoServicioEditar = (
           }
 
           //FIN==============
+
+          // cargarAnalisisB();=======================
+          data.colesterolTotal = res.colesterol_txtcolesterol ?? "";
+          data.LDLColesterol = res.ldlColesterol_txtldlcolesterol ?? "";
+          data.HDLColesterol = res.hdlColesterol_txthdlcolesterol ?? "";
+          data.VLDLColesterol = res.vldlColesterol_txtvldlcolesterol ?? "";
+          data.trigliceridos = res.trigliseridos_txttrigliseridos ?? "";
+          const ct = parseFloat(data.colesterolTotal);
+          const ldl = parseFloat(data.LDLColesterol) || 0;
+          const hdl = parseFloat(data.HDLColesterol) || 0;
+          const vldl = parseFloat(data.VLDLColesterol) || 0;
+          const trigli = parseFloat(data.trigliceridos) || 0;
+
+          if (ct > 200) {
+            data.observacionesGenerales += "HIPERCOLESTEROLEMIA.";
+            data.colesterolRed = true;
+          }
+          if (trigli > 150) {
+            data.observacionesGenerales += "- HIPERTRIGLICERIDEMIA.";
+            data.trigliceridosRed = true;
+          }
+          if (ldl > 129) {
+            data.LDLColesterolRed = true;
+          }
+          if (hdl < 40 || hdl > 60) {
+            data.HDLColesterolRed = true;
+          }
+          if (vldl > 30) {
+            data.VLDLColesterolRed = true;
+          }
+          if (
+            ct > 200 ||
+            trigli > 150 ||
+            ldl > 129 ||
+            hdl < 40 ||
+            hdl > 60 ||
+            vldl > 30
+          ) {
+            data.observacionesGenerales +=
+              "DIETA HIPOCALORICA Y EJERCICIOS. \n";
+          }
+          //==============================
+
+          // Mapear restricciones a checkboxes
+          const restriccionesTexto = data.restricciones || "";
+
+          // Definir mapeo de textos a nombres de campos
+          const restriccionesMap = {
+            "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "corregirAgudezaVisualTotal",
+            "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "corregirAgudezaVisual",
+            "DIETA HIPOCALORICA Y EJERCICIOS": "dietaHipocalorica",
+            "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS": "evitarMovimientosDisergonomicos",
+            "NO HACER TRABAJO DE ALTO RIESGO": "noTrabajoAltoRiesgo",
+            "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO": "noTrabajoSobre18m",
+            "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO ≥80 DB": "usoEppAuditivo",
+            "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHICULOS MOTORIZADOS": "usoLentesCorrectorConducir",
+            "USO DE LENTES CORRECTORES PARA TRABAJO": "usoLentesCorrectorTrabajo",
+            "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO": "usoLentesCorrectorTrabajo18m"
+          };
+
+          // Marcar checkboxes basándose en el texto de restricciones
+          Object.entries(restriccionesMap).forEach(([texto, campo]) => {
+            if (restriccionesTexto.includes(texto)) {
+              data[campo] = true;
+            } else {
+              data[campo] = false;
+            }
+          });
+          // Marcar "ninguno" si restricciones es "NINGUNO" o está vacío
+          data.ninguno = restriccionesTexto === "NINGUNO" || restriccionesTexto === "";
+
           console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...data }));
         }

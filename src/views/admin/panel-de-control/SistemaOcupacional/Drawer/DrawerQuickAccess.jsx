@@ -1,26 +1,27 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2 } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1 } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
-  { icon: faUserCheck, label: 'Admisión', key : "Admision" },
-  { icon: faStethoscope, label: 'Triaje',  key : "Triaje" },
-  { icon: faVial, label: 'Laboratorio',  key : "Laboratorio Clinico" },
-  { icon: faUserMd, label: 'Psicología',  key : "Psicologia" },
-  { icon: faUserMd, label: 'Medicina General', key : "Medicina General" },
-  { icon: faXRay, label: 'Rayos X', key : "Rayos X" },
-  { icon: faHeartbeat, label: 'EKG', key : "EKG" },
-  { icon: faFileWaveform, label:"Historia Ocupacional", key:"Historia Ocupacional"},
-  { icon: faLungs, label: 'Espirometría', key : "Espirometria" },
-  { icon: faDeaf, label: 'Audiometría', key : "Audiometria" },
-  { icon: faTooth, label: 'Odontología', key : "Odontologia" },
-  { icon: faEye, label: 'Oftalmología', key : "Oftalmologia" },
-  { icon: faSkull, label: 'Evaluación Musculoesquelética', key : "Evaluación Musculoesquelética" },
-  { icon: faSkiingNordic, label: 'Cuestionario Nordico', key : "Cuestionario Nordico" },
-  { icon: faBed, label: 'Test Fatiga y Somnolencia', key : "Test Fatiga" },
-  { icon: faMountain, label: 'Antecedentes de Altura', key : "Antecedentes de Altura" },
-  { icon: fa2, label: "Anexo 2", key : "Anexo 2" },
+  { icon: faUserCheck, label: 'Admisión', key: "Admision" },
+  { icon: faStethoscope, label: 'Triaje', key: "Triaje" },
+  { icon: faVial, label: 'Laboratorio', key: "Laboratorio Clinico" },
+  { icon: faUserMd, label: 'Psicología', key: "Psicologia" },
+  { icon: faUserMd, label: 'Medicina General', key: "Medicina General" },
+  { icon: faXRay, label: 'Rayos X', key: "Rayos X" },
+  { icon: faHeartbeat, label: 'EKG', key: "EKG" },
+  { icon: faFileWaveform, label: "Historia Ocupacional", key: "Historia Ocupacional" },
+  { icon: faLungs, label: 'Espirometría', key: "Espirometria" },
+  { icon: faDeaf, label: 'Audiometría', key: "Audiometria" },
+  { icon: faTooth, label: 'Odontología', key: "Odontologia" },
+  { icon: faEye, label: 'Oftalmología', key: "Oftalmologia" },
+  { icon: faSkull, label: 'Evaluación Musculoesquelética', key: "Evaluación Musculoesquelética" },
+  { icon: faSkiingNordic, label: 'Cuestionario Nordico', key: "Cuestionario Nordico" },
+  { icon: faBed, label: 'Test Fatiga y Somnolencia', key: "Test Fatiga" },
+  { icon: faMountain, label: 'Antecedentes de Altura', key: "Antecedentes de Altura" },
+  { icon: fa2, label: "Anexo 2", key: "Anexo 2" },
+  { icon: fa1, label: "Anexo 16", key: "Anexo 16" },
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
@@ -47,19 +48,20 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista 
           <span className="font-bold text-lg text-gray-900 group-hover:text-white transition-all duration-200">Inicio</span>
         </button>
         {accesos
-        .filter(item => tieneVista(item.key))
-        .map((item, idx) => (
-          <button
-            key={item.label}
-            className={`flex items-center gap-4 bg-gray-100 hover:bg-[#1a2536] rounded-xl px-4 py-4 transition-all duration-200 group text-left ${activeIndex === idx ? 'ring-2 ring-[#1a2536]' : ''}`}
-            onClick={() => onNavigate(item.key)}
-          >
-            <span className="text-orange-500 text-2xl group-hover:text-white transition-all duration-200">
-              <FontAwesomeIcon icon={item.icon} />
-            </span>
-            <span className="font-bold text-lg text-gray-900 group-hover:text-white transition-all duration-200">{item.label}</span>
-          </button>
-        ))}
+          .filter(item => tieneVista(item.key))
+          .map((item, idx) => (
+            <button
+              key={item.label}
+              className={`flex items-center gap-4 bg-gray-100 hover:bg-[#1a2536] rounded-xl px-4 py-4 transition-all duration-200 group text-left ${activeIndex === idx ? 'ring-2 ring-[#1a2536]' : ''}`}
+              onClick={() => onNavigate(item.key)}
+            >
+              <span className="text-orange-500 text-2xl group-hover:text-white transition-all duration-200">
+                <FontAwesomeIcon icon={item.icon} />
+                {item.key === "Anexo 16" && <FontAwesomeIcon icon={fa6} />}
+              </span>
+              <span className="font-bold text-lg text-gray-900 group-hover:text-white transition-all duration-200">{item.label}</span>
+            </button>
+          ))}
       </div>
     </div>
   </>

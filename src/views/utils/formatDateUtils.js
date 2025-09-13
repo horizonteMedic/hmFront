@@ -9,3 +9,12 @@ export function formatearFechaLarga(fechaStr) {//INPUT 2025-01-28 //OUTPUT 28 de
         ? format(new Date(fechaStr + "T00:00:00"), "d 'de' MMMM 'de' yyyy", { locale: es })
         : "";
 }
+
+export function formatearFechaLargaConDia(fechaStr) {//INPUT 2025-01-28 //OUTPUT 28 Domingo de enero de 2025
+    const resultado = format(
+        new Date(fechaStr + "T00:00:00"),
+        "EEEE d 'de' MMMM 'de' yyyy",
+        { locale: es }
+    );
+    return resultado.charAt(0).toUpperCase() + resultado.slice(1);
+}

@@ -19,7 +19,7 @@ export const GetInfoServicio = async (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   const res = await GetInfoServicioDefault(
     nro,
@@ -33,29 +33,10 @@ export const GetInfoServicio = async (
       ...prev,
       ...res,
       norden: res.norden,
-      codigoElectroCardiograma: res.codigoElectroCardiograma,
-      nombre: res.nombres,
-      edad: res.edad + " años",
-      fechaNac: formatearFechaCorta(res.fechaNac), //necesito
-
-      fechaExam: res.fechaInforme,
-      contrata: res.contrata,
-      empresa: res.empresa,
-
-      ritmo: res.mensajeRitmo ?? "",
-      fc: res.mensajeFC ?? "",
-      eje: res.mensajeEje ?? "",
-      pr: res.mensajePr ?? "",
-      qrs: res.mensajeQrs ?? "",
-      ondaP: res.mensajeOndaP ?? "",
-      st: res.mensajeSt ?? "",
-      ondaT: res.mensajeOndaT ?? "",
-      qtc: res.mensajeQtC ?? "",
-
-      informeCompleto: res.informeCompleto ?? "", //necesito
-      conclusiones: res.conclusion ?? "",
-      hallazgos: res.hallazgo ?? "",
-      recomendaciones: res.recomendaciones ?? "",
+      fecha: res.fechaInforme,
+      nombres: res.nombres,
+      edad: res.edad,
+      dni: res.dni,
     }));
   }
 };
@@ -73,24 +54,15 @@ export const SubmitDataService = async (
     return;
   }
   const body = {
-    codigoElectroCardiograma: form.codigoElectroCardiograma,
-    norden: form.norden,
-    fechaInforme: form.fechaExam,
-    informeCompleto: form.informeCompleto,
-    mensajeRitmo: form.ritmo,
-    mensajePr: form.pr,
-    mensajeFC: form.fc,
-    mensajeQtC: form.qtc,
-    mensajeQrs: form.qrs,
-    mensajeOndaP: form.ondaP,
-    mensajeSt: form.st,
-    mensajeOndaT: form.ondaT,
-    mensajeEje: form.eje,
-    hallazgo: form.hallazgos,
-    conclusion: form.conclusiones,
-    recomendaciones: form.recomendaciones,
-    edadPaciente: form.edad?.replace(" años", ""),
-    userRegistro: user,
+    norden: data.norden,
+    fecha: data.fecha,
+    hora: date.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }),
+    userRegistro: user
   };
 
   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -148,7 +120,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
       ...prev,
       ...res,
       fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad + " años",
+      edad: res.edad,
       nombres: res.nombresApellidos,
     }));
   }
