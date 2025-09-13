@@ -13,10 +13,10 @@ export default function Anexo2(data = {}) {
     // === INFORMACIÓN GENERAL ===
     numeroOrden: "96639",
     tipoEvaluacion: {
-      preOcupacional: false,
+      preOcupacional: true,
       anual: true,
-      retiro: false,
-      otros: false
+      retiro: true,
+      otros: true
     },
     fechaExamen: "05/08/2025",
     lugarExamen: {
@@ -55,7 +55,7 @@ export default function Anexo2(data = {}) {
       },
       residenciaLugarTrabajo: {
         si: true,
-        no: false
+        no: true
       },
       tiempoResidencia: "5 años",
       seguros: {
@@ -213,16 +213,16 @@ export default function Anexo2(data = {}) {
       conclusionesEvaluacionPsicologica: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
       
         // VII. CONCLUSIONES RADIOGRÁFICAS
-        conclusionesRadiograficas: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+        conclusionesRadiograficas: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
       
       // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO
-      hallazgosPatologicosLaboratorio: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      hallazgosPatologicosLaboratorio: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
       
       // IX. CONCLUSIÓN AUDIOMETRÍA
-      conclusionAudiometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      conclusionAudiometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP ",
       
       // X. CONCLUSIÓN DE ESPIROMETRÍA
-      conclusionEspirometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      conclusionEspirometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
       
       // XI. OTROS
       otros: "No se registran otros hallazgos de relevancia clínica.",
@@ -517,24 +517,24 @@ export default function Anexo2(data = {}) {
   }
 
   // === 2) CAMPOS DE DATOS PERSONALIZABLES ===
-  doc.setFont("helvetica", "bold").setFontSize(10);
+  doc.setFont("helvetica", "bold").setFontSize(9);
 
   // === SECCIÓN: INFORMACIÓN GENERAL ===
   // Número de Orden
-  const xNumeroOrden = 25; // Posición X para número de orden
+  const xNumeroOrden = 32; // Posición X para número de orden
   const yNumeroOrden = 26; // Posición Y para número de orden (subido 5 puntos)
   
   // Tipo de Evaluación - Posiciones X para checkboxes
-  const xTipoPreOcupacional = 78.5; // Posición X para PRE-OCUPACIONAL
+  const xTipoPreOcupacional = 80; // Posición X para PRE-OCUPACIONAL
   const yTipoPreOcupacional = 31.2; // Posición Y para PRE-OCUPACIONAL (subido 5 puntos)
   
-  const xTipoAnual = 110; // Posición X para ANUAL
+  const xTipoAnual = 109; // Posición X para ANUAL
   const yTipoAnual = 31.2; // Posición Y para ANUAL (subido 5 puntos)
 
-  const xTipoRetiro = 145.5; // Posición X para RETIRO
+  const xTipoRetiro = 142.4; // Posición X para RETIRO
   const yTipoRetiro = 31.2; // Posición Y para RETIRO (subido 5 puntos)
 
-  const xTipoOtros = 179.3; // Posición X para OTROS
+  const xTipoOtros = 174.5; // Posición X para OTROS
   const yTipoOtros = 31.2; // Posición Y para OTROS (subido 5 puntos)
   
   // Fecha de Examen
@@ -542,18 +542,18 @@ export default function Anexo2(data = {}) {
   const yFechaExamen = 26; // Posición Y para fecha de examen (subido 5 puntos)
   
   // Lugar de Examen
-  const xLugarDepartamento = 57; // Posición X para departamento
+  const xLugarDepartamento = 55; // Posición X para departamento
   const yLugarDepartamento = 36.2; // Posición Y para departamento
-  const xLugarProvincia = 119; // Posición X para provincia
+  const xLugarProvincia = 105; // Posición X para provincia
   const yLugarProvincia = 36.2; // Posición Y para provincia
-  const xLugarDistrito = 175; // Posición X para distrito
+  const xLugarDistrito = 147.4; // Posición X para distrito
   const yLugarDistrito = 36.2; // Posición Y para distrito
 
   // Información General
   // Número de Orden
   if (datosFinales.numeroOrden) {
     doc.setFont("helvetica", "normal").setFontSize(13);
-    doc.text(datosFinales.numeroOrden, xNumeroOrden, yNumeroOrden);
+    doc.text(datosFinales.numeroOrden.toUpperCase(), xNumeroOrden, yNumeroOrden);
   }
   
   // Tipo de Evaluación - Checkboxes
@@ -579,31 +579,32 @@ export default function Anexo2(data = {}) {
   
   // Fecha de Examen
   if (datosFinales.fechaExamen) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text(datosFinales.fechaExamen, xFechaExamen, yFechaExamen);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(datosFinales.fechaExamen.toUpperCase(), xFechaExamen, yFechaExamen);
   }
   
   // Lugar de Examen
   if (datosFinales.lugarExamen) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     if (datosFinales.lugarExamen.departamento) {
-      doc.text(datosFinales.lugarExamen.departamento, xLugarDepartamento, yLugarDepartamento);
+      doc.text(datosFinales.lugarExamen.departamento.toUpperCase(), xLugarDepartamento, yLugarDepartamento);
     }
     if (datosFinales.lugarExamen.provincia) {
-      doc.text(datosFinales.lugarExamen.provincia, xLugarProvincia, yLugarProvincia);
+      doc.text(datosFinales.lugarExamen.provincia.toUpperCase(), xLugarProvincia, yLugarProvincia);
     }
     if (datosFinales.lugarExamen.distrito) {
-      doc.text(datosFinales.lugarExamen.distrito, xLugarDistrito, yLugarDistrito);
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(datosFinales.lugarExamen.distrito.toUpperCase(), xLugarDistrito, yLugarDistrito);
     }
   }
 
   // === SECCIÓN: I. DATOS DE LA EMPRESA ===
   // Posiciones para datos de la empresa
-  const xContrata = 25; // Posición X para contrata
+  const xContrata = 27; // Posición X para contrata
   const yContrata = 47; // Posición Y para contrata
-  const xEmpresa = 25; // Posición X para empresa
+  const xEmpresa = 27; // Posición X para empresa
   const yEmpresa = 52; // Posición Y para empresa
-  const xActividadEconomica = 35; // Posición X para actividad económica
+  const xActividadEconomica = 40; // Posición X para actividad económica
   const yActividadEconomica = 57; // Posición Y para actividad económica
   const xLugarTrabajo = 35; // Posición X para lugar de trabajo
   const yLugarTrabajo = 62; // Posición Y para lugar de trabajo
@@ -612,64 +613,65 @@ export default function Anexo2(data = {}) {
   if (datosFinales.datosEmpresa) {
     const empresa = datosFinales.datosEmpresa;
     
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     
     // Contrata
     if (empresa.contrata) {
-      doc.text(empresa.contrata, xContrata, yContrata);
+      doc.text(empresa.contrata.toUpperCase(), xContrata, yContrata);
     }
     
     // Empresa
     if (empresa.empresa) {
-      doc.text(empresa.empresa, xEmpresa, yEmpresa);
+      doc.text(empresa.empresa.toUpperCase(), xEmpresa, yEmpresa);
     }
     
     // Actividad Económica
     if (empresa.actividadEconomica) {
-      doc.text(empresa.actividadEconomica, xActividadEconomica, yActividadEconomica);
+      doc.text(empresa.actividadEconomica.toUpperCase(), xActividadEconomica, yActividadEconomica);
     }
     
     // Lugar de trabajo
     if (empresa.lugarTrabajo) {
-      doc.text(empresa.lugarTrabajo, xLugarTrabajo, yLugarTrabajo);
+      doc.text(empresa.lugarTrabajo.toUpperCase(), xLugarTrabajo, yLugarTrabajo);
     }
   }
 
   // === SECCIÓN: UBICACIÓN Y PUESTO ===
   // Posiciones para ubicación
-  const xUbicacionDepartamento = 57; // Posición X para departamento
+  const xUbicacionDepartamento = 55; // Posición X para departamento
   const yUbicacionDepartamento = 68; // Posición Y para departamento
-  const xUbicacionProvincia = 119; // Posición X para provincia
+  const xUbicacionProvincia = 105; // Posición X para provincia
   const yUbicacionProvincia = 68; // Posición Y para provincia
-  const xUbicacionDistrito = 175; // Posición X para distrito
+  const xUbicacionDistrito = 147.4; // Posición X para distrito
   const yUbicacionDistrito = 68; // Posición Y para distrito
   
   // Posición para puesto a que postula
-  const xPuestoPostula = 69; // Posición X para puesto a que postula
+  const xPuestoPostula = 74; // Posición X para puesto a que postula
   const yPuestoPostula = 73; // Posición Y para puesto a que postula
 
   // Ubicación
   if (datosFinales.ubicacion) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     
     if (datosFinales.ubicacion.departamento) {
-      doc.text(datosFinales.ubicacion.departamento, xUbicacionDepartamento, yUbicacionDepartamento);
+      doc.text(datosFinales.ubicacion.departamento.toUpperCase(), xUbicacionDepartamento, yUbicacionDepartamento);
     }
     if (datosFinales.ubicacion.provincia) {
-      doc.text(datosFinales.ubicacion.provincia, xUbicacionProvincia, yUbicacionProvincia);
+      doc.text(datosFinales.ubicacion.provincia.toUpperCase(), xUbicacionProvincia, yUbicacionProvincia);
     }
     if (datosFinales.ubicacion.distrito) {
-      doc.text(datosFinales.ubicacion.distrito, xUbicacionDistrito, yUbicacionDistrito);
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(datosFinales.ubicacion.distrito.toUpperCase(), xUbicacionDistrito, yUbicacionDistrito);
     }
   }
   
   // Puesto a que postula - Solo si es PRE-OCUPACIONAL
   if (datosFinales.tipoEvaluacion?.preOcupacional && datosFinales.puestoPostula) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.puestoPostula, xPuestoPostula, yPuestoPostula);
+    doc.text(datosFinales.puestoPostula.toUpperCase(), xPuestoPostula, yPuestoPostula);
   }
 
   // === SECCIÓN: II. FILIACIÓN DEL TRABAJADOR ===
@@ -677,95 +679,97 @@ export default function Anexo2(data = {}) {
     const filiacion = datosFinales.filiacionTrabajador;
     
     // Posiciones para filiación del trabajador
-    const xNombresApellidos = 35;
+    const xNombresApellidos = 40;
     const yNombresApellidos = 84.2;
     const xFechaNacimiento = 128;
     const yFechaNacimiento = 84.2;
     const xEdad = 173;
     const yEdad = 84.2;
     
-    const xDomicilioFiscal = 32;
+    const xDomicilioFiscal = 34;
     const yDomicilioFiscal = 89.7;
     const xDni = 173;
     const yDni = 89.7;
     
-    const xUbicacionDept = 57;
-    const yUbicacionDept = 95;
-    const xUbicacionProv = 119;
-    const yUbicacionProv = 95;
-    const xUbicacionDist = 175;
-    const yUbicacionDist = 95;
+    const xUbicacionDept = 55;
+    const yUbicacionDept = 94;
+    const xUbicacionProv = 115;
+    const yUbicacionProv = 94;
+    const xUbicacionDist = 147.4;
+    const yUbicacionDist = 94;
     
-    const xResidenciaSi = 81;
+    const xResidenciaSi = 83;
     const yResidenciaSi = 100.5;
-    const xResidenciaNo = 106.3;
+    const xResidenciaNo = 105.2;
     const yResidenciaNo = 100.5;
     const xTiempoResidencia = 160;
     const yTiempoResidencia = 100.2;
     
-    const xEssalud = 38;
+    const xEssalud = 42;
     const yEssalud = 105.8;
-    const xEps = 75;
+    const xEps = 79;
     const yEps = 105.8;
     const xOtro1 = 115;
     const yOtro1 = 105.8;
-    const xSctr = 155;
+    const xSctr = 151;
     const ySctr = 105.8;
-    const xOtro2 = 195;
+    const xOtro2 = 188;
     const yOtro2 = 105.8;
     
-    const xCorreo = 35;
+    const xCorreo = 39;
     const yCorreo = 110.5;
     const xTelefono = 108;
     const yTelefono = 110.5;
-    const xGradoInstruccion = 165;
+    const xGradoInstruccion = 160;
     const yGradoInstruccion = 110.5;
     
-    const xEstadoCivil = 25;
+    const xEstadoCivil = 30;
     const yEstadoCivil = 115.8;
     const xTotalHijos = 90;
     const yTotalHijos = 115.8;
     const xDependientes =  170;
     const yDependientes = 115.8;
     
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     
     // Nombres y Apellidos
     if (filiacion.nombresApellidos) {
-      doc.text(filiacion.nombresApellidos, xNombresApellidos, yNombresApellidos);
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(filiacion.nombresApellidos.toUpperCase(), xNombresApellidos, yNombresApellidos);
     }
     
     // Fecha de Nacimiento
     if (filiacion.fechaNacimiento) {
-      doc.text(filiacion.fechaNacimiento, xFechaNacimiento, yFechaNacimiento);
+      doc.text(filiacion.fechaNacimiento.toUpperCase(), xFechaNacimiento, yFechaNacimiento);
     }
     
     // Edad
     if (filiacion.edad) {
-      doc.text(`${filiacion.edad} Años`, xEdad, yEdad);
+      doc.text(`${filiacion.edad}`.toUpperCase(), xEdad, yEdad);
     }
     
     // Domicilio Fiscal
     if (filiacion.domicilioFiscal) {
-      doc.text(filiacion.domicilioFiscal, xDomicilioFiscal, yDomicilioFiscal);
+      doc.text(filiacion.domicilioFiscal.toUpperCase(), xDomicilioFiscal, yDomicilioFiscal);
     }
     
     // DNI
     if (filiacion.dni) {
-      doc.text(filiacion.dni, xDni, yDni);
+      doc.text(filiacion.dni.toUpperCase(), xDni, yDni);
     }
     
     // Ubicación
     if (filiacion.ubicacion) {
       if (filiacion.ubicacion.departamento) {
-        doc.text(filiacion.ubicacion.departamento, xUbicacionDept, yUbicacionDept);
+        doc.text(filiacion.ubicacion.departamento.toUpperCase(), xUbicacionDept, yUbicacionDept);
       }
       if (filiacion.ubicacion.provincia) {
-        doc.text(filiacion.ubicacion.provincia, xUbicacionProv, yUbicacionProv);
+        doc.text(filiacion.ubicacion.provincia.toUpperCase(), xUbicacionProv, yUbicacionProv);
       }
       if (filiacion.ubicacion.distrito) {
-        doc.text(filiacion.ubicacion.distrito, xUbicacionDist, yUbicacionDist);
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        doc.text(filiacion.ubicacion.distrito.toUpperCase(), xUbicacionDist, yUbicacionDist);
       }
     }
     
@@ -782,12 +786,12 @@ export default function Anexo2(data = {}) {
       }
       
       doc.setTextColor(0, 0, 0); // Resetear a negro
-      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setFont("helvetica", "normal").setFontSize(9);
     }
     
     // Tiempo de residencia
     if (filiacion.tiempoResidencia) {
-      doc.text(filiacion.tiempoResidencia, xTiempoResidencia, yTiempoResidencia);
+      doc.text(filiacion.tiempoResidencia.toUpperCase(), xTiempoResidencia, yTiempoResidencia);
     }
     
     // Seguros - Checkboxes
@@ -812,35 +816,36 @@ export default function Anexo2(data = {}) {
       }
       
       doc.setTextColor(0, 0, 0); // Resetear a negro
-      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setFont("helvetica", "normal").setFontSize(9);
     }
     
     // Contacto
     if (filiacion.contacto) {
       if (filiacion.contacto.correoElectronico) {
-        doc.text(filiacion.contacto.correoElectronico, xCorreo, yCorreo);
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        doc.text(filiacion.contacto.correoElectronico.toUpperCase(), xCorreo, yCorreo);
       }
       if (filiacion.contacto.telefono) {
-        doc.text(filiacion.contacto.telefono, xTelefono, yTelefono);
+        doc.text(filiacion.contacto.telefono.toUpperCase(), xTelefono, yTelefono);
       }
       if (filiacion.contacto.gradoInstruccion) {
-        doc.text(filiacion.contacto.gradoInstruccion, xGradoInstruccion, yGradoInstruccion);
+        doc.text(filiacion.contacto.gradoInstruccion.toUpperCase(), xGradoInstruccion, yGradoInstruccion);
       }
     }
     
     // Estado Civil
     if (filiacion.estadoCivil) {
-      doc.text(filiacion.estadoCivil, xEstadoCivil, yEstadoCivil);
+      doc.text(filiacion.estadoCivil.toUpperCase(), xEstadoCivil, yEstadoCivil);
     }
     
     // Total de hijos
     if (filiacion.totalHijos) {
-      doc.text(filiacion.totalHijos, xTotalHijos, yTotalHijos);
+      doc.text(filiacion.totalHijos.toUpperCase(), xTotalHijos, yTotalHijos);
     }
     
     // Dependientes
     if (filiacion.dependientes) {
-      doc.text(filiacion.dependientes, xDependientes, yDependientes);
+      doc.text(filiacion.dependientes.toUpperCase(), xDependientes, yDependientes);
     }
   }
 
@@ -849,29 +854,29 @@ export default function Anexo2(data = {}) {
     const antecedentes = datosFinales.antecedentesPatologicos;
     
     // Posiciones para condiciones médicas - Columna 1 (Izquierda)
-    const xAlergiasSi = 32;
+    const xAlergiasSi = 37.5;
     const yAlergiasSi = 132.8;
-    const xAlergiasNo = 37.5;
+    const xAlergiasNo = 43;
     const yAlergiasNo = 132.8;
     
-    const xAsmaSi = 32;
+    const xAsmaSi = 37.5;
     const yAsmaSi = 138;
-    const xAsmaNo = 37.5;
+    const xAsmaNo = 43;
     const yAsmaNo = 138;
     
-    const xBronquitisSi = 32;
+    const xBronquitisSi = 37.5;
     const yBronquitisSi = 143.2;
-    const xBronquitisNo = 37.5;
+    const xBronquitisNo = 43;
     const yBronquitisNo = 143.2;
     
-    const xQuemadurasSi = 32;
+    const xQuemadurasSi = 37.5;
     const yQuemadurasSi = 148.4;
-    const xQuemadurasNo = 37.5;
+    const xQuemadurasNo = 43;
     const yQuemadurasNo = 148.4;
     
-    const xCirugiasSi = 32;
+    const xCirugiasSi = 37.5;
     const yCirugiasSi = 153.6;
-    const xCirugiasNo = 37.5;
+    const xCirugiasNo = 43;
     const yCirugiasNo = 153.6;
     
     // Posiciones para condiciones médicas - Columna 2 (Centro)
@@ -901,81 +906,81 @@ export default function Anexo2(data = {}) {
     const yIntoxicacionesNo = 153.6;
     
     // Posiciones para condiciones médicas - Columna 3 (Derecha)
-    const xHepatitisSi = 156.5;
+    const xHepatitisSi = 152;
     const yHepatitisSi = 132.8;
-    const xHepatitisNo = 161.8;
+    const xHepatitisNo = 156.9;
     const yHepatitisNo = 132.8;
     
-    const xTifoideaSi = 156.5;
+    const xTifoideaSi = 152;
     const yTifoideaSi = 138;
-    const xTifoideaNo = 161.8;
+    const xTifoideaNo = 156.9;
     const yTifoideaNo = 138;
     
-    const xHtaSi = 156.5;
+    const xHtaSi = 152;
     const yHtaSi = 143.2;
-    const xHtaNo = 161.8;
+    const xHtaNo = 156.9;
     const yHtaNo = 143.2;
     
-    const xDiabetesSi = 156.5;
+    const xDiabetesSi = 152;
     const yDiabetesSi = 148.4;
-    const xDiabetesNo = 161.8;
+    const xDiabetesNo = 156.9;
     const yDiabetesNo = 148.4;
     
-    const xOtrosSi = 156.5;
+    const xOtrosSi = 152;
     const yOtrosSi = 153.6;
-    const xOtrosNo = 161.8;
+    const xOtrosNo = 156.9;
     const yOtrosNo = 153.6;
     
     // Posiciones para Hábitos Nocivos
     // Alcohol
-    const xAlcoholSi = 32;
+    const xAlcoholSi = 37.5;
     const yAlcoholSi = 164.4;
-    const xAlcoholNo = 37.5;
+    const xAlcoholNo = 43;
     const yAlcoholNo = 164.4;
-
-    const xAlcoholTipo = 46;
+   
+    const xAlcoholTipo = 50;
     const yAlcoholTipo = 164.2;
 
     const xAlcoholCantidad = 108;
     const yAlcoholCantidad = 164.2;
     
     // Tabaco
-    const xTabacoSi = 32;
+    const xTabacoSi = 37.5;
     const yTabacoSi = 169.8;
-    const xTabacoNo = 37.5;
+    const xTabacoNo = 43;
     const yTabacoNo = 169.8;
 
-    const xTabacoTipo = 46;
+    const xTabacoTipo = 50;
     const yTabacoTipo = 169.6;
 
     const xTabacoCantidad = 108;
     const yTabacoCantidad = 169.6;
     
     // Drogas
-    const xDrogasSi = 32;
+    const xDrogasSi = 37.5;
     const yDrogasSi = 175.2;
-    const xDrogasNo = 37.5;
+    const xDrogasNo = 43;
     const yDrogasNo = 175.2;
 
-    const xDrogasTipo = 46;
+    const xDrogasTipo = 50;
     const yDrogasTipo = 175;
 
     const xDrogasCantidad = 108;
     const yDrogasCantidad = 175;
     
     // Medicamento
-    const xMedicamentoSi = 32;
+    const xMedicamentoSi = 37.5;
     const yMedicamentoSi = 180.6;
-    const xMedicamentoNo = 37.5;
+    const xMedicamentoNo = 43;
     const yMedicamentoNo = 180.6;
     
-    const xMedicamentoTipo = 46;
+    const xMedicamentoTipo = 50;
     const yMedicamentoTipo = 180.4;
 
     const xMedicamentoCantidad = 108;
     const yMedicamentoCantidad = 180.4;
     
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     
     // Función para renderizar checkboxes SI/NO
@@ -991,7 +996,7 @@ export default function Anexo2(data = {}) {
       }
       
       doc.setTextColor(0, 0, 0); // Resetear a negro
-      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setFont("helvetica", "normal").setFontSize(9);
     };
     
     // Condiciones médicas - Columna 1 (Izquierda)
@@ -1021,10 +1026,10 @@ export default function Anexo2(data = {}) {
       if (antecedentes.habitosNocivos.alcohol) {
         renderCheckbox(antecedentes.habitosNocivos.alcohol, xAlcoholSi, yAlcoholSi, xAlcoholNo, yAlcoholNo);
         if (antecedentes.habitosNocivos.alcohol.tipo) {
-          doc.text(antecedentes.habitosNocivos.alcohol.tipo, xAlcoholTipo, yAlcoholTipo);
+          doc.text(antecedentes.habitosNocivos.alcohol.tipo.toUpperCase(), xAlcoholTipo, yAlcoholTipo);
         }
         if (antecedentes.habitosNocivos.alcohol.cantidad) {
-          doc.text(antecedentes.habitosNocivos.alcohol.cantidad, xAlcoholCantidad, yAlcoholCantidad);
+          doc.text(antecedentes.habitosNocivos.alcohol.cantidad.toUpperCase(), xAlcoholCantidad, yAlcoholCantidad);
         }
       }
       
@@ -1032,10 +1037,10 @@ export default function Anexo2(data = {}) {
       if (antecedentes.habitosNocivos.tabaco) {
         renderCheckbox(antecedentes.habitosNocivos.tabaco, xTabacoSi, yTabacoSi, xTabacoNo, yTabacoNo);
         if (antecedentes.habitosNocivos.tabaco.tipo) {
-          doc.text(antecedentes.habitosNocivos.tabaco.tipo, xTabacoTipo, yTabacoTipo);
+          doc.text(antecedentes.habitosNocivos.tabaco.tipo.toUpperCase(), xTabacoTipo, yTabacoTipo);
         }
         if (antecedentes.habitosNocivos.tabaco.cantidad) {
-          doc.text(antecedentes.habitosNocivos.tabaco.cantidad, xTabacoCantidad, yTabacoCantidad);
+          doc.text(antecedentes.habitosNocivos.tabaco.cantidad.toUpperCase(), xTabacoCantidad, yTabacoCantidad);
         }
       }
       
@@ -1043,10 +1048,10 @@ export default function Anexo2(data = {}) {
       if (antecedentes.habitosNocivos.drogas) {
         renderCheckbox(antecedentes.habitosNocivos.drogas, xDrogasSi, yDrogasSi, xDrogasNo, yDrogasNo);
         if (antecedentes.habitosNocivos.drogas.tipo) {
-          doc.text(antecedentes.habitosNocivos.drogas.tipo, xDrogasTipo, yDrogasTipo);
+          doc.text(antecedentes.habitosNocivos.drogas.tipo.toUpperCase(), xDrogasTipo, yDrogasTipo);
         }
         if (antecedentes.habitosNocivos.drogas.cantidad) {
-          doc.text(antecedentes.habitosNocivos.drogas.cantidad, xDrogasCantidad, yDrogasCantidad);
+          doc.text(antecedentes.habitosNocivos.drogas.cantidad.toUpperCase(), xDrogasCantidad, yDrogasCantidad);
         }
       }
       
@@ -1054,10 +1059,10 @@ export default function Anexo2(data = {}) {
       if (antecedentes.habitosNocivos.medicamento) {
         renderCheckbox(antecedentes.habitosNocivos.medicamento, xMedicamentoSi, yMedicamentoSi, xMedicamentoNo, yMedicamentoNo);
         if (antecedentes.habitosNocivos.medicamento.tipo) {
-          doc.text(antecedentes.habitosNocivos.medicamento.tipo, xMedicamentoTipo, yMedicamentoTipo);
+          doc.text(antecedentes.habitosNocivos.medicamento.tipo.toUpperCase(), xMedicamentoTipo, yMedicamentoTipo);
         }
         if (antecedentes.habitosNocivos.medicamento.cantidad) {
-          doc.text(antecedentes.habitosNocivos.medicamento.cantidad, xMedicamentoCantidad, yMedicamentoCantidad);
+          doc.text(antecedentes.habitosNocivos.medicamento.cantidad.toUpperCase(), xMedicamentoCantidad, yMedicamentoCantidad);
         }
       }
     }
@@ -1071,52 +1076,52 @@ export default function Anexo2(data = {}) {
     const xPadre = 25;
     const yPadre = 190;
 
-    const xMadre = 100;
+    const xMadre = 90;
     const yMadre = 190;
 
-    const xHermanos = 170;
+    const xHermanos = 160;
     const yHermanos = 190;
     
     const xEsposa = 25;
     const yEsposa = 196;
 
-    const xHijosVivos = 100;
+    const xHijosVivos = 90;
     const yHijosVivos = 196;
 
-    const xNumeroHijos = 170;
+    const xNumeroHijos = 160;
     const yNumeroHijos = 196;
     
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     
     // Padre
     if (familia.padre) {
-      doc.text(familia.padre, xPadre, yPadre);
+      doc.text(familia.padre.toUpperCase(), xPadre, yPadre);
     }
     
     // Madre
     if (familia.madre) {
-      doc.text(familia.madre, xMadre, yMadre);
+      doc.text(familia.madre.toUpperCase(), xMadre, yMadre);
     }
     
     // Hermanos
     if (familia.hermanos) {
-      doc.text(familia.hermanos, xHermanos, yHermanos);
+      doc.text(familia.hermanos.toUpperCase(), xHermanos, yHermanos);
     }
     
     // Esposa
     if (familia.esposa) {
-      doc.text(familia.esposa, xEsposa, yEsposa);
+      doc.text(familia.esposa.toUpperCase(), xEsposa, yEsposa);
     }
     
     // Hijos vivos
     if (familia.hijosVivos) {
-      doc.text(familia.hijosVivos, xHijosVivos, yHijosVivos);
+      doc.text(familia.hijosVivos.toUpperCase(), xHijosVivos, yHijosVivos);
     }
     
     // Número de hijos
     if (familia.numeroHijos) {
-      doc.text(familia.numeroHijos, xNumeroHijos, yNumeroHijos);
+      doc.text(familia.numeroHijos.toUpperCase(), xNumeroHijos, yNumeroHijos);
     }
   }
 
@@ -1149,7 +1154,7 @@ export default function Anexo2(data = {}) {
     const xLesionActualizadaDias = 181.5;
     const yLesionActualizadaDias = 220;
     
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     
     // Lesiones Musculares
@@ -1169,17 +1174,17 @@ export default function Anexo2(data = {}) {
         }
         
         doc.setTextColor(0, 0, 0); // Resetear a negro
-        doc.setFont("helvetica", "normal").setFontSize(10);
+        doc.setFont("helvetica", "normal").setFontSize(9);
       }
       
       // Año
       if (lesion.año) {
-        doc.text(lesion.año, xLesionesMuscularesAno, yLesionesMuscularesAno);
+        doc.text(lesion.año.toUpperCase(), xLesionesMuscularesAno, yLesionesMuscularesAno);
       }
       
       // Días de descanso
       if (lesion.diasDescanso) {
-        doc.text(lesion.diasDescanso, xLesionesMuscularesDias, yLesionesMuscularesDias, { align: "center" });
+        doc.text(lesion.diasDescanso.toUpperCase(), xLesionesMuscularesDias, yLesionesMuscularesDias, { align: "center" });
       }
     }
     
@@ -1200,17 +1205,17 @@ export default function Anexo2(data = {}) {
         }
         
         doc.setTextColor(0, 0, 0); // Resetear a negro
-        doc.setFont("helvetica", "normal").setFontSize(10);
+        doc.setFont("helvetica", "normal").setFontSize(9);
       }
       
       // Año
       if (lesion.año) {
-        doc.text(lesion.año, xLesionActualizadaAno, yLesionActualizadaAno);
+        doc.text(lesion.año.toUpperCase(), xLesionActualizadaAno, yLesionActualizadaAno);
       }
       
       // Días de descanso
       if (lesion.diasDescanso) {
-        doc.text(lesion.diasDescanso, xLesionActualizadaDias, yLesionActualizadaDias, { align: "center" });
+        doc.text(lesion.diasDescanso.toUpperCase(), xLesionActualizadaDias, yLesionActualizadaDias, { align: "center" });
       }
     }
   }
@@ -1220,39 +1225,39 @@ export default function Anexo2(data = {}) {
     const evaluacion = datosFinales.evaluacionMedica;
     
     // Posiciones para evaluación médica
-    const xAnamnesis = 25;
-    const yAnamnesis = 230.5;
+    const xAnamnesis = 30;
+    const yAnamnesis = 254;
     
     // Examen clínico - Fila 1
-    const xTalla = 48;
-    const yTalla = 239;
-    const xPeso = 95;
-    const yPeso = 239;
-    const xImc = 135;
-    const yImc = 239;
-    const xPulso = 180;
-    const yPulso = 239;
+    const xTalla = 43;
+    const yTalla = 262.4;
+    const xPeso = 70;
+    const yPeso = 262.4;
+    const xImc =  85;
+    const yImc = 262.4;
+    const xPulso = 107;
+    const yPulso = 262.4;
     
     // Examen clínico - Fila 2
-    const xFrecuenciaRespiratoria = 48;
-    const yFrecuenciaRespiratoria = 244.3;
-    const xFrecuenciaCardiaca = 95;
-    const yFrecuenciaCardiaca = 244.3;
-    const xPresionArterial = 135;
-    const yPresionArterial = 244.3;
-    const xTemperatura = 189;
-    const yTemperatura = 244.3;
+    const xFrecuenciaRespiratoria = 135;
+    const yFrecuenciaRespiratoria = 262.4;
+    const xFrecuenciaCardiaca = 157;
+    const yFrecuenciaCardiaca = 262.4;
+    const xPresionArterial = 172;
+    const yPresionArterial = 262.4;
+    const xTemperatura = 193;
+    const yTemperatura = 262.4;
     
     // Examen clínico - Fila 3
-    const xOtros = 48;
-    const yOtros = 249.5;
+    const xOtros = 37;
+    const yOtros = 268;
     
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     
     // Anamnesis
     if (evaluacion.anamnesis) {
-      doc.text(evaluacion.anamnesis, xAnamnesis, yAnamnesis, { maxWidth: 170 });
+      doc.text(evaluacion.anamnesis.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 170 });
     }
     
     // Examen clínico
@@ -1261,82 +1266,63 @@ export default function Anexo2(data = {}) {
       
       // Fila 1
       if (examen.talla) {
-        doc.text(examen.talla, xTalla, yTalla);
+        doc.text(examen.talla.toUpperCase(), xTalla, yTalla);
       }
       if (examen.peso) {
-        doc.text(examen.peso, xPeso, yPeso);
+        doc.text(examen.peso.toUpperCase(), xPeso, yPeso);
       }
       if (examen.imc) {
-        doc.text(examen.imc, xImc, yImc);
+        doc.text(examen.imc.toUpperCase(), xImc, yImc);
       }
       if (examen.pulso) {
-        doc.text(examen.pulso, xPulso, yPulso);
+        doc.text(examen.pulso.toUpperCase(), xPulso, yPulso);
       }
       
       // Fila 2
       if (examen.frecuenciaRespiratoria) {
-        doc.text(examen.frecuenciaRespiratoria, xFrecuenciaRespiratoria, yFrecuenciaRespiratoria);
+        doc.text(examen.frecuenciaRespiratoria.toUpperCase(), xFrecuenciaRespiratoria, yFrecuenciaRespiratoria);
       }
       if (examen.frecuenciaCardiaca) {
-        doc.text(examen.frecuenciaCardiaca, xFrecuenciaCardiaca, yFrecuenciaCardiaca);
+        doc.text(examen.frecuenciaCardiaca.toUpperCase(), xFrecuenciaCardiaca, yFrecuenciaCardiaca);
       }
       if (examen.presionArterial) {
-        doc.text(examen.presionArterial, xPresionArterial, yPresionArterial);
+        doc.text(examen.presionArterial.toUpperCase(), xPresionArterial, yPresionArterial);
       }
       if (examen.temperatura) {
-        doc.text(examen.temperatura, xTemperatura, yTemperatura);
+        doc.text(examen.temperatura.toUpperCase(), xTemperatura, yTemperatura);
       }
       
       // Fila 3
       if (examen.otros) {
-        doc.text(examen.otros, xOtros, yOtros);
+        doc.setFont("helvetica", "normal").setFontSize(8);
+        // Si es una lista (array), convertir a string separado por comas
+        let otrosTexto = examen.otros;
+        if (Array.isArray(examen.otros)) {
+          otrosTexto = examen.otros.join(", ");
+        } else if (typeof otrosTexto === 'string') {
+          // Si es string pero tiene saltos de línea, reemplazarlos por comas
+          otrosTexto = otrosTexto.replace(/\n/g, ", ");
+        }
+        doc.text(otrosTexto.toUpperCase(), xOtros, yOtros, { maxWidth: 170 });
       }
     }
-  }
-
-  // === SECCIÓN: EXAMEN FÍSICO ===
-  if (datosFinales.evaluacionMedica) {
-    const evaluacion = datosFinales.evaluacionMedica;
     
-    // Posiciones para Ectoscopía y Estado Mental
-    const xEctoscopia = 25;
-    const yEctoscopia = 255;
-    const xEstadoMental = 28;
-    const yEstadoMental = 262.3;
-    
-    // Posiciones para la tabla de Examen Físico (solo para referencia, no se usan)
-    
-    // Posiciones para los hallazgos (los textos "Piel:", "Cabello:" ya están en la imagen)
-    const xPielHallazgos = 37;
-    const yPielHallazgos = 282;
-    
-    const xCabelloHallazgos = 37;
-    const yCabelloHallazgos = 287;
-    
-    doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.setTextColor(0, 0, 0);
+    // Ectoscopía y Estado Mental (parte de Evaluación Médica)
+    const xEctoscopia = 34;
+    const yEctoscopia = 277.8;
+    const xEstadoMental = 34;
+    const yEstadoMental = 284.1;
     
     // Ectoscopía
     if (evaluacion.ectoscopia) {
-      doc.text(evaluacion.ectoscopia, xEctoscopia, yEctoscopia, { maxWidth: 170 });
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(evaluacion.ectoscopia.toUpperCase(), xEctoscopia, yEctoscopia, { maxWidth: 170 });
     }
     
     // Estado Mental
     if (evaluacion.estadoMental) {
-      doc.text(evaluacion.estadoMental, xEstadoMental, yEstadoMental, { maxWidth: 170 });
-    }
-    
-    // Solo renderizar los hallazgos (los textos "Piel:", "Cabello:" ya están en la imagen)
-    doc.setFont("helvetica", "normal").setFontSize(10);
-    
-    // Hallazgos de Piel
-    if (evaluacion.examenFisico?.piel) {
-      doc.text(evaluacion.examenFisico.piel, xPielHallazgos, yPielHallazgos, { maxWidth: 170 });
-    }
-    
-    // Hallazgos de Cabello
-    if (evaluacion.examenFisico?.cabello) {
-      doc.text(evaluacion.examenFisico.cabello, xCabelloHallazgos, yCabelloHallazgos, { maxWidth: 170 });
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(evaluacion.estadoMental.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 170 });
     }
   }
 
@@ -1386,48 +1372,48 @@ export default function Anexo2(data = {}) {
     if (datosFinales.examenOjos) {
       const examenOjos = datosFinales.examenOjos;
       
-      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
       
       // === SECCIÓN: SIN HALLAZGOS - SIN CORREGIR ===
       // Visión de Cerca - Sin Corregir
-      const xVisionCercaSinCorregirOD = 37.5; // Posición X para O.D.
-      const yVisionCercaSinCorregirOD = 40; // Posición Y para O.D.
+      const xVisionCercaSinCorregirOD = 41; // Posición X para O.D.
+      const yVisionCercaSinCorregirOD = 83; // Posición Y para O.D.
 
-      const xVisionCercaSinCorregirOI = 55; // Posición X para O.I.
-      const yVisionCercaSinCorregirOI = 40; // Posición Y para O.I.
+      const xVisionCercaSinCorregirOI = 58; // Posición X para O.I.
+      const yVisionCercaSinCorregirOI = 83; // Posición Y para O.I.
       
       // Visión de Lejos - Sin Corregir
-      const xVisionLejosSinCorregirOD = 37.5;
-      const yVisionLejosSinCorregirOD = 45;
-      const xVisionLejosSinCorregirOI = 55;
-      const yVisionLejosSinCorregirOI = 45;
+      const xVisionLejosSinCorregirOD = 41;
+      const yVisionLejosSinCorregirOD = 89;
+      const xVisionLejosSinCorregirOI = 58;
+      const yVisionLejosSinCorregirOI = 89;
       
       // === SECCIÓN: SIN HALLAZGOS - CORREGIDA ===
       // Visión de Cerca - Corregida
-      const xVisionCercaCorregidaOD = 73; // Posición X para O.D.
-      const yVisionCercaCorregidaOD = 40; // Posición Y para O.D.
+      const xVisionCercaCorregidaOD = 74; // Posición X para O.D.
+      const yVisionCercaCorregidaOD = 83; // Posición Y para O.D.
       const xVisionCercaCorregidaOI = 91.5  ; // Posición X para O.I.
-      const yVisionCercaCorregidaOI = 40; // Posición Y para O.I.
+      const yVisionCercaCorregidaOI = 83; // Posición Y para O.I.
       
       // Visión de Lejos - Corregida
-      const xVisionLejosCorregidaOD = 73;
-      const yVisionLejosCorregidaOD = 45;
+      const xVisionLejosCorregidaOD = 74;
+      const yVisionLejosCorregidaOD = 89;
       const xVisionLejosCorregidaOI = 91.5;
-      const yVisionLejosCorregidaOI = 45;
+      const yVisionLejosCorregidaOI = 89;
       
       // Visión de Colores (campo único que abarca toda la fila)
-      const xVisionColores = 68; // Centrado en toda la fila
-      const yVisionColores = 50;
+      const xVisionColores = 69; // Centrado en toda la fila
+      const yVisionColores = 96;
       
       // === SECCIÓN: HALLAZGOS ===
       // Enfermedades Oculares
-      const xEnfermedadesOculares = 110;
-      const yEnfermedadesOculares = 35;
+      const xEnfermedadesOculares = 108;
+      const yEnfermedadesOculares = 74;
       
       // Reflejos Pupilares
       const xReflejosPupilares = 141.5;
-      const yReflejosPupilares = 49.5;
+      const yReflejosPupilares = 96;
       
       // Renderizar datos - Sin Corregir
       if (examenOjos.sinCorregir) {
@@ -1436,20 +1422,20 @@ export default function Anexo2(data = {}) {
         // Visión de Cerca
         if (sinCorregir.visionCerca) {
           if (sinCorregir.visionCerca.od) {
-            doc.text(sinCorregir.visionCerca.od, xVisionCercaSinCorregirOD, yVisionCercaSinCorregirOD);
+            doc.text(sinCorregir.visionCerca.od.toUpperCase(), xVisionCercaSinCorregirOD, yVisionCercaSinCorregirOD);
           }
           if (sinCorregir.visionCerca.oi) {
-            doc.text(sinCorregir.visionCerca.oi, xVisionCercaSinCorregirOI, yVisionCercaSinCorregirOI);
+            doc.text(sinCorregir.visionCerca.oi.toUpperCase(), xVisionCercaSinCorregirOI, yVisionCercaSinCorregirOI);
           }
         }
         
         // Visión de Lejos
         if (sinCorregir.visionLejos) {
           if (sinCorregir.visionLejos.od) {
-            doc.text(sinCorregir.visionLejos.od, xVisionLejosSinCorregirOD, yVisionLejosSinCorregirOD);
+            doc.text(sinCorregir.visionLejos.od.toUpperCase(), xVisionLejosSinCorregirOD, yVisionLejosSinCorregirOD);
           }
           if (sinCorregir.visionLejos.oi) {
-            doc.text(sinCorregir.visionLejos.oi, xVisionLejosSinCorregirOI, yVisionLejosSinCorregirOI);
+            doc.text(sinCorregir.visionLejos.oi.toUpperCase(), xVisionLejosSinCorregirOI, yVisionLejosSinCorregirOI);
           }
         }
         
@@ -1462,27 +1448,27 @@ export default function Anexo2(data = {}) {
         // Visión de Cerca
         if (corregida.visionCerca) {
           if (corregida.visionCerca.od) {
-            doc.text(corregida.visionCerca.od, xVisionCercaCorregidaOD, yVisionCercaCorregidaOD);
+            doc.text(corregida.visionCerca.od.toUpperCase(), xVisionCercaCorregidaOD, yVisionCercaCorregidaOD);
           }
           if (corregida.visionCerca.oi) {
-            doc.text(corregida.visionCerca.oi, xVisionCercaCorregidaOI, yVisionCercaCorregidaOI);
+            doc.text(corregida.visionCerca.oi.toUpperCase(), xVisionCercaCorregidaOI, yVisionCercaCorregidaOI);
           }
         }
         
         // Visión de Lejos
         if (corregida.visionLejos) {
           if (corregida.visionLejos.od) {
-            doc.text(corregida.visionLejos.od, xVisionLejosCorregidaOD, yVisionLejosCorregidaOD);
+            doc.text(corregida.visionLejos.od.toUpperCase(), xVisionLejosCorregidaOD, yVisionLejosCorregidaOD);
           }
           if (corregida.visionLejos.oi) {
-            doc.text(corregida.visionLejos.oi, xVisionLejosCorregidaOI, yVisionLejosCorregidaOI);
+            doc.text(corregida.visionLejos.oi.toUpperCase(), xVisionLejosCorregidaOI, yVisionLejosCorregidaOI);
           }
         }
       }
       
       // Visión de Colores (campo único que abarca toda la fila)
       if (examenOjos.visionColores) {
-        doc.text(examenOjos.visionColores, xVisionColores, yVisionColores, { align: "center" });
+        doc.text(examenOjos.visionColores.toUpperCase(), xVisionColores, yVisionColores, { align: "center" });
       }
       
       // Renderizar Hallazgos
@@ -1490,14 +1476,42 @@ export default function Anexo2(data = {}) {
         // Enfermedades Oculares
         if (examenOjos.hallazgos.enfermedadesOculares) {
           doc.setFontSize(9);
-          doc.text(examenOjos.hallazgos.enfermedadesOculares, xEnfermedadesOculares, yEnfermedadesOculares, { maxWidth: 100 });
+          doc.text(examenOjos.hallazgos.enfermedadesOculares.toUpperCase(), xEnfermedadesOculares, yEnfermedadesOculares, { maxWidth: 100 });
         }
         
         // Reflejos Pupilares
         if (examenOjos.hallazgos.reflejosPupilares) {
           doc.setFontSize(9);
-          doc.text(examenOjos.hallazgos.reflejosPupilares, xReflejosPupilares, yReflejosPupilares, { maxWidth: 100 });
+          doc.text(examenOjos.hallazgos.reflejosPupilares.toUpperCase(), xReflejosPupilares, yReflejosPupilares, { maxWidth: 100 });
         }
+      }
+    }
+    
+    // === SECCIÓN: EXAMEN FÍSICO ===
+    if (datosFinales.evaluacionMedica) {
+      const evaluacion = datosFinales.evaluacionMedica;
+      
+      // Posiciones para los hallazgos (los textos "Piel:", "Cabello:" ya están en la imagen)
+      const xPielHallazgos = 25;
+      const yPielHallazgos = 39;
+      
+      const xCabelloHallazgos = 25;
+      const yCabelloHallazgos = 50;
+      
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      
+      // Solo renderizar los hallazgos (los textos "Piel:", "Cabello:" ya están en la imagen)
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      
+      // Hallazgos de Piel
+      if (evaluacion.examenFisico?.piel) {
+        doc.text(evaluacion.examenFisico.piel.toUpperCase(), xPielHallazgos, yPielHallazgos, { maxWidth: 170 });
+      }
+      
+      // Hallazgos de Cabello
+      if (evaluacion.examenFisico?.cabello) {
+        doc.text(evaluacion.examenFisico.cabello.toUpperCase(), xCabelloHallazgos, yCabelloHallazgos, { maxWidth: 170 });
       }
     }
     
@@ -1510,31 +1524,60 @@ export default function Anexo2(data = {}) {
       
       // Posiciones para cada sistema (ajustar según la imagen real)
       const posicionesSistemas = [
-        { campo: 'oidos', x: 36, y: 54.2},
-        { campo: 'nariz', x: 36, y: 59.3 },
-        { campo: 'boca', x: 36, y: 64.4 },
-        { campo: 'faringe', x: 36, y: 69 },
-        { campo: 'cuello', x: 36, y: 73.8 },
-        { campo: 'aparatoRespiratorio', x: 36, y: 78.6 },
-        { campo: 'aparatoCardiovascular', x: 36, y: 86 },
-        { campo: 'aparatoDigestivo', x: 36, y: 94 },
-        { campo: 'aparatoGenitourinario', x: 36, y: 102 },
-        { campo: 'aparatoLocomotor', x: 36, y: 109.3 },
-        { campo: 'sistemaLinfatico', x: 36, y: 114.2 },
-        { campo: 'marcha', x: 36, y: 119 },
-        { campo: 'columna', x: 36, y: 124 },
-        { campo: 'miembrosSuperiores', x: 36, y: 129 },
-        { campo: 'miembrosInferiores', x: 36, y: 137 },
-        { campo: 'sistemaNervioso', x: 36, y: 145 }
+        { campo: 'oidos', x: 40, y: 104},
+        { campo: 'nariz', x: 40, y: 115 },
+        { campo: 'boca', x: 40, y: 126},
+        { campo: 'faringe', x: 40, y: 139 },
+        { campo: 'cuello', x: 40, y: 150},
+        { campo: 'aparatoRespiratorio', x: 40, y: 162},
+        { campo: 'aparatoCardiovascular', x: 40, y: 174 },
+        { campo: 'aparatoDigestivo', x: 40, y: 186 },
+        { campo: 'aparatoGenitourinario', x: 40, y: 198 },
+        { campo: 'aparatoLocomotor', x: 40, y:  210 },
+        { campo: 'sistemaLinfatico', x: 40, y: 222 },
+        { campo: 'marcha', x: 40, y: 234 },
+        { campo: 'columna', x: 40, y: 245 },
+        { campo: 'miembrosSuperiores', x: 40, y: 258 },
+        { campo: 'miembrosInferiores', x: 40, y: 270 },
+        { campo: 'sistemaNervioso', x: 40, y: 281 }
       ];
       
       // Renderizar cada sistema
       posicionesSistemas.forEach(({ campo, x, y }) => {
         if (sistemas[campo]) {
-          doc.text(sistemas[campo], x, y, { maxWidth: 170, lineHeightFactor: 0.9 });
+          doc.text(sistemas[campo].toUpperCase(), x, y, { maxWidth: 160, lineHeightFactor: 0.9 });
         }
       });
     }
+    
+    
+    // === PÁGINA 3 ===
+    doc.addPage();
+    
+    // === 0) HEADER para Página 3 ===
+    headerAnexo2(doc, data, 3);
+    
+    // === 1) Imagen de fondo para Anexo2 - Página 3 ===
+    const fondoImg3 = "/img/Anexo2/Pag3_anexo2.png";
+    
+    // Márgenes de 8mm a cada lado (usar la misma variable de las páginas anteriores)
+    const margenLateral3 = 8; // 8mm
+    
+    // Usar el ancho del documento menos los márgenes laterales
+    const imgWidth3 = pageW - (margenLateral3 * 2); // Ancho menos márgenes
+    const imgHeight3 = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
+
+    // Posicionar desde abajo hacia arriba con márgenes laterales
+    const xOffset3 = margenLateral3; // Margen izquierdo
+    const yOffset3 = pageH - imgHeight3 - 8; // Subido 5 puntos hacia arriba
+
+    try {
+      doc.addImage(fondoImg3, "PNG", xOffset3, yOffset3, imgWidth3, imgHeight3);
+    } catch (e) {
+      doc.text("Imagen de Anexo2 Página 3 no disponible", margin, yOffset3 + 10);
+    }
+    
+    // === 2) CAMPOS DE DATOS PARA PÁGINA 3 - CONCLUSIONES Y FIRMAS ===
     
     // === SECCIÓN: CONCLUSIONES Y DIAGNÓSTICOS ===
     if (datosFinales.conclusiones) {
@@ -1546,31 +1589,47 @@ export default function Anexo2(data = {}) {
       // Posiciones para cada sección de conclusiones (ajustar según la imagen real)
       const posicionesConclusiones = [
         // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA (ancho completo)
-        { campo: 'conclusionesEvaluacionPsicologica', x: 5, y: 159, maxWidth: 180 },
+        { campo: 'conclusionesEvaluacionPsicologica', x: 12, y: 32, maxWidth: 170 },
         
         // VII. CONCLUSIONES RADIOGRÁFICAS (mitad izquierda)
-        { campo: 'conclusionesRadiograficas', x: 5, y: 178, maxWidth: 100 },
+        { campo: 'conclusionesRadiograficas', x: 12, y: 67, maxWidth: 100 },
         
         // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO (mitad derecha)
-        { campo: 'hallazgosPatologicosLaboratorio', x: 110, y: 178, maxWidth: 100 },
+        { campo: 'hallazgosPatologicosLaboratorio', x: 110, y: 67, maxWidth: 100 },
         
-        // IX. CONCLUSIÓN AUDIOMETRÍA (mitad  )
-        { campo: 'conclusionAudiometria', x: 5, y: 196, maxWidth: 80 },
+        // IX. CONCLUSIÓN AUDIOMETRÍA (mitad izquierda)
+        { campo: 'conclusionAudiometria', x: 12, y: 100, maxWidth: 100 },
         
         // X. CONCLUSIÓN DE ESPIROMETRÍA (mitad derecha)
-        { campo: 'conclusionEspirometria', x: 110, y: 196, maxWidth: 80 },
+        { campo: 'conclusionEspirometria', x: 110, y: 100, maxWidth: 100 },
         
-        // XI. OTROS (mitad izquierda)
-        { campo: 'otros', x: 5, y: 210, maxWidth: 180 },
+        // XI. OTROS (ancho completo)
+        { campo: 'otros', x: 12, y: 133, maxWidth: 170 },
         
         // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES (ancho completo)
-        { campo: 'diagnosticoMedicoOcupacional', x: 5, y: 225, maxWidth: 180 }
+        { campo: 'diagnosticoMedicoOcupacional', x: 12, y: 180, maxWidth: 170 }
       ];
       
       // Renderizar cada conclusión
       posicionesConclusiones.forEach(({ campo, x, y, maxWidth }) => {
         if (conclusiones[campo]) {
-          doc.text(conclusiones[campo], x, y, { maxWidth, lineHeightFactor: 0.9 });
+          // Solo manejar listas para campos específicos que lo necesiten
+          let texto = conclusiones[campo];
+          
+          // Campos que SÍ necesitan conversión de listas a texto con comas
+          const camposConListas = ['conclusionesEvaluacionPsicologica', 'conclusionesRadiograficas', 'hallazgosPatologicosLaboratorio', 'conclusionAudiometria', 'conclusionEspirometria'];
+          
+          if (camposConListas.includes(campo)) {
+            if (Array.isArray(conclusiones[campo])) {
+              texto = conclusiones[campo].join(", ");
+            } else if (typeof texto === 'string') {
+              // Si es string pero tiene saltos de línea, reemplazarlos por comas
+              texto = texto.replace(/\n/g, ", ");
+            }
+          }
+          // Para 'otros' y 'diagnosticoMedicoOcupacional' mantener el formato original
+          
+          doc.text(texto.toUpperCase(), x, y, { maxWidth, lineHeightFactor: 1 });
         }
       });
     }
@@ -1579,28 +1638,28 @@ export default function Anexo2(data = {}) {
     if (datosFinales.conclusionesFinales) {
       const conclusionesFinales = datosFinales.conclusionesFinales;
       
-      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
       
       // Posiciones para checkboxes de aptitud
-      const xApto = 30.5;
-      const yApto = 269.6;
-      const xAptoConRestriccion = 30.5;
-      const yAptoConRestriccion = 276.7;
-      const xNoApto = 30.5;
-      const yNoApto = 285;
+      const xApto = 36;
+      const yApto = 267.5;
+      const xAptoConRestriccion = 36;
+      const yAptoConRestriccion = 276;
+      const xNoApto = 36;
+      const yNoApto = 284;
       
       // Posición para campo de restricciones
-      const xRestricciones = 45;
-      const yRestricciones = 270;
+      const xRestricciones = 47;
+      const yRestricciones = 266;
       
        // Posiciones para la firma del médico
       const xFirmaMedico = 120;
-      const yFirmaMedico = 263;
+      const yFirmaMedico = 260;
 
       // Posiciones para la firma del paciente
       const xFirmaPaciente = 158;
-      const yFirmaPaciente = 263;
+      const yFirmaPaciente = 260;
 
       // Posiciones para la huella del paciente
       const xHuellaPaciente = 194;
@@ -1625,7 +1684,7 @@ export default function Anexo2(data = {}) {
       
       // Renderizar campo de restricciones
       if (conclusionesFinales.restricciones) {
-        doc.text(conclusionesFinales.restricciones, xRestricciones, yRestricciones, { maxWidth: 75 });
+        doc.text(conclusionesFinales.restricciones.toUpperCase(), xRestricciones, yRestricciones, { maxWidth: 70 });
       }
       
       // Renderizar firmas
