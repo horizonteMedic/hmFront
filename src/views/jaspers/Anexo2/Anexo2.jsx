@@ -24,7 +24,7 @@ export default function Anexo2(data = {}) {
       provincia: "Trujillo",
       distrito: "Trujillo"
     },
-    
+
     // === DATOS DE LA EMPRESA ===
     datosEmpresa: {
       contrata: "MINERA FALCON S.A.C.",
@@ -32,15 +32,15 @@ export default function Anexo2(data = {}) {
       actividadEconomica: "Explotación de minerales",
       lugarTrabajo: "Interior mina"
     },
-    
+
     // === UBICACIÓN Y PUESTO ===
     ubicacion: {
       departamento: "La Libertad",
-      provincia: "Trujillo", 
+      provincia: "Trujillo",
       distrito: "Trujillo"
     },
     puestoPostula: "Operador de maquinaria pesada",
-    
+
     // === II. FILIACIÓN DEL TRABAJADOR ===
     filiacionTrabajador: {
       nombresApellidos: "Juan Carlos Pérez García",
@@ -74,7 +74,7 @@ export default function Anexo2(data = {}) {
       totalHijos: "2",
       dependientes: "3"
     },
-    
+
     // === III. ANTECEDENTES PATOLÓGICOS PERSONALES ===
     antecedentesPatologicos: {
       // Condiciones médicas - Columna 1 (Izquierda)
@@ -83,21 +83,21 @@ export default function Anexo2(data = {}) {
       bronquitis: { si: true, no: true },
       quemaduras: { si: true, no: true },
       cirugias: { si: true, no: true },
-      
+
       // Condiciones médicas - Columna 2 (Centro)
       tbc: { si: true, no: true },
       its: { si: true, no: true },
       convulsiones: { si: true, no: true },
       neoplasia: { si: true, no: true },
       intoxicaciones: { si: true, no: true },
-      
+
       // Condiciones médicas - Columna 3 (Derecha)
       hepatitis: { si: true, no: true },
       tifoidea: { si: true, no: true },
       hta: { si: true, no: true },
       diabetes: { si: true, no: true },
       otros: { si: true, no: true },
-      
+
       // Hábitos Nocivos
       habitosNocivos: {
         alcohol: { si: true, no: true, tipo: "Ocasional", cantidad: "2-3 veces por mes" },
@@ -106,7 +106,7 @@ export default function Anexo2(data = {}) {
         medicamento: { si: true, no: true, tipo: "Antihipertensivos", cantidad: "Diario" }
       }
     },
-    
+
     // === IV. ANTECEDENTES PATOLÓGICOS FAMILIARES ===
     antecedentesFamiliares: {
       padre: "Diabetes, Hipertensión",
@@ -116,7 +116,7 @@ export default function Anexo2(data = {}) {
       hijosVivos: "2",
       numeroHijos: "2"
     },
-    
+
     // === ABSENTISMO ===
     absentismo: {
       lesionesMusculares: {
@@ -130,7 +130,7 @@ export default function Anexo2(data = {}) {
         diasDescanso: "5"
       }
     },
-    
+
     // === V. EVALUACIÓN MÉDICA ===
     evaluacionMedica: {
       anamnesis: "Paciente refiere dolor lumbar intermitente desde hace 6 meses, relacionado con actividades laborales. No antecedentes de traumatismos recientes.",
@@ -153,7 +153,7 @@ export default function Anexo2(data = {}) {
         cabello: "Cabello normal, sin alopecia patológica. Presenta buena densidad y distribución. No se observan signos de caspa excesiva"
       }
     },
-    
+
     // === PÁGINA 2: EXAMEN DE OJOS ===
     examenOjos: {
       // Sin Hallazgos - Sin Corregir
@@ -186,7 +186,7 @@ export default function Anexo2(data = {}) {
         reflejosPupilares: "CONSERVADO"
       }
     },
-    
+
     // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
     examenFisicoSistemas: {
       oidos: "Oídos normales, sin secreciones patológicas. Membranas timpánicas íntegras.",
@@ -206,41 +206,41 @@ export default function Anexo2(data = {}) {
       miembrosInferiores: "Miembros inferiores con movilidad completa, sin limitaciones.",
       sistemaNervioso: "Reflejos normales, coordinación conservada."
     },
-    
+
     // === PÁGINA 2: CONCLUSIONES Y DIAGNÓSTICOS ===
     conclusiones: {
       // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA
       conclusionesEvaluacionPsicologica: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
-      
-        // VII. CONCLUSIONES RADIOGRÁFICAS
-        conclusionesRadiograficas: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
-      
+
+      // VII. CONCLUSIONES RADIOGRÁFICAS
+      conclusionesRadiograficas: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
+
       // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO
       hallazgosPatologicosLaboratorio: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
-      
+
       // IX. CONCLUSIÓN AUDIOMETRÍA
       conclusionAudiometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP ",
-      
+
       // X. CONCLUSIÓN DE ESPIROMETRÍA
       conclusionEspirometria: "TRAMA BRONCOVASCULAR ACENTUADA EN ACP. TRAMA BRONCOVASCULAR ACENTUADA EN ACP",
-      
+
       // XI. OTROS
       otros: "No se registran otros hallazgos de relevancia clínica.",
-      
+
       // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES
       diagnosticoMedicoOcupacional: "APTO PARA EL PUESTO DE TRABAJO. El trabajador presenta un estado de salud general satisfactorio sin contraindicaciones médicas para el desempeño de sus funciones laborales. Se recomienda continuar con las medidas de seguridad y salud ocupacional establecidas, realizar evaluaciones médicas periódicas según normativa vigente, y mantener un estilo de vida saludable con ejercicio regular y alimentación balanceada."
     },
-    
+
     // === PÁGINA 2: SECCIÓN XIII - CONCLUSIONES FINALES ===
     conclusionesFinales: {
       // Checkboxes de aptitud
       apto: true,
       aptoConRestriccion: true,
       noApto: true,
-      
+
       // Campo de restricciones
       restricciones: "Sin restricciones médicas específicas. Sin restricciones médicas específicas. ",
-      
+
       // Firmas
       firmaMedico: "/img/firmas_sellos_prueba/firma_sello.png",
       huellaPaciente: "/img/firmas_sellos_prueba/HUELLA_DIGITAL.png",
@@ -254,10 +254,10 @@ export default function Anexo2(data = {}) {
     // === INFORMACIÓN GENERAL ===
     numeroOrden: String(data.norden_n_orden ?? ""),
     tipoEvaluacion: {
-      preOcupacional: data.nombreExamen_nom_examen=="PRE-OCUPACIONAL" ?? false, 
-      anual: data.nombreExamen_nom_examen=="ANUAL" ?? false,
-      retiro: data.nombreExamen_nom_examen=="RETIRO" ?? false,
-      otros: data.nombreExamen_nom_examen!="PRE-OCUPACIONAL" && data.nombreExamen_nom_examen!="ANUAL" && data.nombreExamen_nom_examen!="RETIRO" 
+      preOcupacional: data.nombreExamen_nom_examen == "PRE-OCUPACIONAL" ?? false,
+      anual: data.nombreExamen_nom_examen == "ANUAL" ?? false,
+      retiro: data.nombreExamen_nom_examen == "RETIRO" ?? false,
+      otros: data.nombreExamen_nom_examen != "PRE-OCUPACIONAL" && data.nombreExamen_nom_examen != "ANUAL" && data.nombreExamen_nom_examen != "RETIRO"
     },
     fechaExamen: formatearFechaCorta(data.fechaAnexo_fecha ?? ""), //agregar formateo
     lugarExamen: {
@@ -265,28 +265,28 @@ export default function Anexo2(data = {}) {
       provincia: data.provinciaPaciente_provincia_pa ?? "",//revisar pedir
       distrito: data.distritoPaciente_distrito_pa ?? ""//revisar pedir
     },
-    
+
     // === DATOS DE LA EMPRESA ===
     datosEmpresa: {
       contrata: data.contrata_razon_contrata ?? "",
       empresa: data.empresa_razon_empresa ?? "",
       actividadEconomica: "",
-      lugarTrabajo:  ""
+      lugarTrabajo: ""
     },
-    
+
     // === UBICACIÓN Y PUESTO ===
     ubicacion: {
-      departamento:  "",
+      departamento: "",
       provincia: "",
       distrito: ""
     },
     puestoPostula: data.cargo_cargo_de ?? "",
-    
+
     // === II. FILIACIÓN DEL TRABAJADOR ===
     filiacionTrabajador: {
       nombresApellidos: (data.nombres_nombres_pa ?? "") + " " + (data.apellidos_apellidos_pa ?? ""),
       fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? ""), //agregar formateo
-      edad: (data.edad_fecha_nacimiento_pa ?? "")+" años",
+      edad: (data.edad_fecha_nacimiento_pa ?? "") + " años",
       domicilioFiscal: data.direccionPaciente_direccion_pa ?? "",
       dni: String(data.dni_cod_pa ?? ""),
       ubicacion: {
@@ -315,39 +315,39 @@ export default function Anexo2(data = {}) {
       totalHijos: data.totalHijos_txttotalhijos ?? "",
       dependientes: data.numeroDependientes_txtndependientes ?? ""
     },
-    
+
     // === III. ANTECEDENTES PATOLÓGICOS PERSONALES ===
     antecedentesPatologicos: {
       // Condiciones médicas - Columna 1 (Izquierda)
-      alergias: { si: data.alergiasSi ?? false, no: data.alergiasNo ?? false },//revisar pedir
-      asma: { si: data.asmaSi ?? false, no: data.asmaNo ?? false },//revisar pedir
-      bronquitis: { si: data.bronquitisSi ?? false, no: data.bronquitisNo ?? false },//revisar pedir
+      alergias: { si: data.alergias ?? false, no: !data.alergias ?? true },//revisar pedir
+      asma: { si: data.asma ?? false, no: !data.asma ?? true },//revisar pedir
+      bronquitis: { si: data.bronquitis ?? false, no: !data.bronquitis ?? true },//revisar pedir
       quemaduras: { si: data.quemaduras_chkquemaduras ?? false, no: !data.quemaduras_chkquemaduras ?? true },
       cirugias: { si: data.cirugias_chkcirugias ?? false, no: !data.cirugias_chkcirugias ?? true },
-      
+
       // Condiciones médicas - Columna 2 (Centro)
-      tbc: { si: data.tbcSi ?? false, no: data.tbcNo ?? false }, //revisar pedir
+      tbc: { si: data.tbc ?? false, no: !data.tbc ?? true }, //revisar pedir
       its: { si: data.its_chkits ?? false, no: !data.its_chkits ?? true },
-      convulsiones: { si: data.convulsionesSi ?? false, no: data.convulsionesNo ?? false },//revisar pedir
+      convulsiones: { si: data.convulsiones ?? false, no: !data.convulsiones ?? true },//revisar pedir
       neoplasia: { si: data.neoplasia_chkneoplasia ?? false, no: !data.neoplasia_chkneoplasia ?? true },
-      intoxicaciones: { si: data.intoxicacionesSi ?? false, no: data.intoxicacionesNo ?? false },//revisar pedir
-      
+      intoxicaciones: { si: data.intoxicaciones ?? false, no: !data.intoxicaciones ?? true },//revisar pedir
+
       // Condiciones médicas - Columna 3 (Derecha)
-      hepatitis: { si: data.hepatitisSi ?? false, no: data.hepatitisNo ?? false },//revisar pedir
-      tifoidea: { si: data.tifoideaSi ?? false, no: data.tifoideaNo ?? false },//revisar pedir
-      hta: { si: data.htaSi ?? false, no: data.htaNo ?? false },//revisar pedir
-      diabetes: { si: data.diabetesSi ?? false, no: data.diabetesNo ?? false },//revisar pedir
+      hepatitis: { si: data.hepatitis ?? false, no: !data.hepatitis ?? true },//revisar pedir
+      tifoidea: { si: data.tifoidea ?? false, no: !data.tifoidea ?? true },//revisar pedir
+      hta: { si: data.hta ?? false, no: !data.hta ?? true },//revisar pedir
+      diabetes: { si: data.diabetes ?? false, no: !data.diabetes ?? true },//revisar pedir
       otros: { si: data.antecedentesPersonalesOtros_chkapotros ?? false, no: !data.antecedentesPersonalesOtros_chkapotros ?? true },
-      
+
       // Hábitos Nocivos
       habitosNocivos: {
-        alcohol: { si: data.alcoholSi ?? false, no: data.alcoholNo ?? false, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholCantidad ?? "" },//revisar pedir
-        tabaco: { si: data.tabacoSi ?? false, no: data.tabacoNo ?? false, tipo: data.tabacoTipo ?? "", cantidad: data.tabacoCantidad ?? "" },//revisar pedir
-        drogas: { si: data.drogasSi ?? false, no: data.drogasNo ?? false, tipo: data.drogasTipo ?? "", cantidad: data.drogasCantidad ?? "" },//revisar pedir
+        alcohol: { si: data.alcohol ?? false, no: !data.alcohol ?? true, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholCantidad ?? "" },//revisar pedir
+        tabaco: { si: data.tabaco ?? false, no: !data.tabaco ?? true, tipo: data.tabacoTipo ?? "", cantidad: data.tabacoCantidad ?? "" },//revisar pedir
+        drogas: { si: data.drogas ?? false, no: !data.drogas ?? true, tipo: data.drogasTipo ?? "", cantidad: data.drogasCantidad ?? "" },//revisar pedir
         medicamento: { si: data.medicamentosSi_rbsimed ?? false, no: data.medicamentosNo_rbnomed ?? false, tipo: data.tipoMedicamento_txttipomedicamento ?? "", cantidad: data.frecuenciaMedicamentos_txtfrecuenciamed ?? "" }
       }
     },
-    
+
     // === IV. ANTECEDENTES PATOLÓGICOS FAMILIARES ===
     antecedentesFamiliares: {
       padre: data.padre_txtpadre ?? "",
@@ -357,7 +357,7 @@ export default function Anexo2(data = {}) {
       hijosVivos: String(data.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? ""),
       numeroHijos: String(data.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ?? "")
     },
-    
+
     // === ABSENTISMO ===
     absentismo: { //revisar deberia ser una tabla
       lesionesMusculares: {
@@ -371,7 +371,7 @@ export default function Anexo2(data = {}) {
         diasDescanso: data.lesionActualizadaDias ?? ""
       }
     },
-    
+
     // === V. EVALUACIÓN MÉDICA ===
     evaluacionMedica: {
       anamnesis: data.anamnesis_txtanamnesis ?? "",
@@ -394,7 +394,7 @@ export default function Anexo2(data = {}) {
         cabello: data.cabeza_txtpelo ?? ""
       }
     },
-    
+
     // === PÁGINA 2: EXAMEN DE OJOS ===
     examenOjos: {
       // Sin Hallazgos - Sin Corregir
@@ -427,7 +427,7 @@ export default function Anexo2(data = {}) {
         reflejosPupilares: data.reflejosPupilares_r_pupilares ?? ""
       }
     },
-    
+
     // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
     examenFisicoSistemas: {
       oidos: data.oidos_txtoidos ?? "",
@@ -447,45 +447,51 @@ export default function Anexo2(data = {}) {
       miembrosInferiores: data.miembrosInferiores_txtmiembrosinferiores ?? "",
       sistemaNervioso: data.sistemaNervioso_sistemanervioso ?? ""
     },
-    
+
     // === PÁGINA 2: CONCLUSIONES Y DIAGNÓSTICOS ===
     conclusiones: {
       // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA
       conclusionesEvaluacionPsicologica: data.recomendacionesInfoPsicologico_recomendaciones ?? "",
-      
+
       // VII. CONCLUSIONES RADIOGRÁFICAS
       conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
-      
+
       // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO
       hallazgosPatologicosLaboratorio: data.observacionesLabClinico_txtobservacioneslb ?? "",
-      
+
       // IX. CONCLUSIÓN AUDIOMETRÍA
       conclusionAudiometria: data.diagnosticoAudiometria_diagnostico ?? "",
-      
+
       // X. CONCLUSIÓN DE ESPIROMETRÍA
       conclusionEspirometria: data.conclusion_txtconclusion ?? "",
-      
+
       // XI. OTROS
       otros: data.otrosExamenes_txtotrosex ?? "",
-      
+
       // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES
       diagnosticoMedicoOcupacional: data.observacionesFichaMedica_txtobservacionesfm ?? ""
     },
-    
+
     // === PÁGINA 2: SECCIÓN XIII - CONCLUSIONES FINALES ===
     conclusionesFinales: {
       // Checkboxes de aptitud
       apto: data.esApto_apto_si ?? false,
       aptoConRestriccion: data.aptoRestriccion_apto_re ?? false,
       noApto: data.noEsApto_apto_no ?? false,
-      
+
       // Campo de restricciones
       restricciones: data.restricciones_txtrestricciones ?? "",
-      
+
       // Firmas
-      firmaMedico: data.firmaMedico ?? "/img/firmas_sellos_prueba/firma_sello.png",
-      huellaPaciente: data.huellaPaciente ?? "/img/firmas_sellos_prueba/HUELLA_DIGITAL.png",
-      firmaPaciente: data.firmaPaciente ?? "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png"
+      firmaMedico: data.digitalizacion.find(
+        item => item.nombreDigitalizacion === "SELLOFIRMA"
+      )?.url ?? "",
+      huellaPaciente: data.digitalizacion.find(
+        item => item.nombreDigitalizacion === "HUELLA"
+      )?.url ?? "",
+      firmaPaciente: data.digitalizacion.find(
+        item => item.nombreDigitalizacion === "FIRMAP"
+      )?.url ?? ""
     }
   };
 
@@ -498,10 +504,10 @@ export default function Anexo2(data = {}) {
 
   // === 1) Imagen de fondo para Anexo2 ===
   const fondoImg = "/img/Anexo2/Pag1_anexo2.png";
-  
+
   // Márgenes de 8mm a cada lado
   const margenLateral = 8; // 8mm
-  
+
   // Usar el ancho del documento menos los márgenes laterales
   const imgWidth = pageW - (margenLateral * 2); // Ancho menos márgenes
   const imgHeight = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
@@ -523,11 +529,11 @@ export default function Anexo2(data = {}) {
   // Número de Orden
   const xNumeroOrden = 32; // Posición X para número de orden
   const yNumeroOrden = 26; // Posición Y para número de orden (subido 5 puntos)
-  
+
   // Tipo de Evaluación - Posiciones X para checkboxes
   const xTipoPreOcupacional = 80; // Posición X para PRE-OCUPACIONAL
   const yTipoPreOcupacional = 31.2; // Posición Y para PRE-OCUPACIONAL (subido 5 puntos)
-  
+
   const xTipoAnual = 109; // Posición X para ANUAL
   const yTipoAnual = 31.2; // Posición Y para ANUAL (subido 5 puntos)
 
@@ -536,11 +542,11 @@ export default function Anexo2(data = {}) {
 
   const xTipoOtros = 174.5; // Posición X para OTROS
   const yTipoOtros = 31.2; // Posición Y para OTROS (subido 5 puntos)
-  
+
   // Fecha de Examen
   const xFechaExamen = 135; // Posición X para fecha de examen
   const yFechaExamen = 26; // Posición Y para fecha de examen (subido 5 puntos)
-  
+
   // Lugar de Examen
   const xLugarDepartamento = 55; // Posición X para departamento
   const yLugarDepartamento = 36.2; // Posición Y para departamento
@@ -555,12 +561,12 @@ export default function Anexo2(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(13);
     doc.text(datosFinales.numeroOrden.toUpperCase(), xNumeroOrden, yNumeroOrden);
   }
-  
+
   // Tipo de Evaluación - Checkboxes
   if (datosFinales.tipoEvaluacion) {
     doc.setTextColor(0, 0, 255); // Color azul para las X
     doc.setFont("helvetica", "bold").setFontSize(12);
-    
+
     if (datosFinales.tipoEvaluacion.preOcupacional) {
       doc.text("X", xTipoPreOcupacional, yTipoPreOcupacional);
     }
@@ -573,16 +579,16 @@ export default function Anexo2(data = {}) {
     if (datosFinales.tipoEvaluacion.otros) {
       doc.text("X", xTipoOtros, yTipoOtros);
     }
-    
+
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
-  
+
   // Fecha de Examen
   if (datosFinales.fechaExamen) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(datosFinales.fechaExamen.toUpperCase(), xFechaExamen, yFechaExamen);
   }
-  
+
   // Lugar de Examen
   if (datosFinales.lugarExamen) {
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -612,25 +618,25 @@ export default function Anexo2(data = {}) {
   // Datos de la Empresa
   if (datosFinales.datosEmpresa) {
     const empresa = datosFinales.datosEmpresa;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    
+
     // Contrata
     if (empresa.contrata) {
       doc.text(empresa.contrata.toUpperCase(), xContrata, yContrata);
     }
-    
+
     // Empresa
     if (empresa.empresa) {
       doc.text(empresa.empresa.toUpperCase(), xEmpresa, yEmpresa);
     }
-    
+
     // Actividad Económica
     if (empresa.actividadEconomica) {
       doc.text(empresa.actividadEconomica.toUpperCase(), xActividadEconomica, yActividadEconomica);
     }
-    
+
     // Lugar de trabajo
     if (empresa.lugarTrabajo) {
       doc.text(empresa.lugarTrabajo.toUpperCase(), xLugarTrabajo, yLugarTrabajo);
@@ -645,7 +651,7 @@ export default function Anexo2(data = {}) {
   const yUbicacionProvincia = 68; // Posición Y para provincia
   const xUbicacionDistrito = 147.4; // Posición X para distrito
   const yUbicacionDistrito = 68; // Posición Y para distrito
-  
+
   // Posición para puesto a que postula
   const xPuestoPostula = 74; // Posición X para puesto a que postula
   const yPuestoPostula = 73; // Posición Y para puesto a que postula
@@ -654,7 +660,7 @@ export default function Anexo2(data = {}) {
   if (datosFinales.ubicacion) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    
+
     if (datosFinales.ubicacion.departamento) {
       doc.text(datosFinales.ubicacion.departamento.toUpperCase(), xUbicacionDepartamento, yUbicacionDepartamento);
     }
@@ -666,7 +672,7 @@ export default function Anexo2(data = {}) {
       doc.text(datosFinales.ubicacion.distrito.toUpperCase(), xUbicacionDistrito, yUbicacionDistrito);
     }
   }
-  
+
   // Puesto a que postula - Solo si es PRE-OCUPACIONAL
   if (datosFinales.tipoEvaluacion?.preOcupacional && datosFinales.puestoPostula) {
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -677,7 +683,7 @@ export default function Anexo2(data = {}) {
   // === SECCIÓN: II. FILIACIÓN DEL TRABAJADOR ===
   if (datosFinales.filiacionTrabajador) {
     const filiacion = datosFinales.filiacionTrabajador;
-    
+
     // Posiciones para filiación del trabajador
     const xNombresApellidos = 40;
     const yNombresApellidos = 84.2;
@@ -685,26 +691,26 @@ export default function Anexo2(data = {}) {
     const yFechaNacimiento = 84.2;
     const xEdad = 173;
     const yEdad = 84.2;
-    
+
     const xDomicilioFiscal = 34;
     const yDomicilioFiscal = 89.7;
     const xDni = 173;
     const yDni = 89.7;
-    
+
     const xUbicacionDept = 55;
     const yUbicacionDept = 94;
     const xUbicacionProv = 115;
     const yUbicacionProv = 94;
     const xUbicacionDist = 147.4;
     const yUbicacionDist = 94;
-    
+
     const xResidenciaSi = 83;
     const yResidenciaSi = 100.5;
     const xResidenciaNo = 105.2;
     const yResidenciaNo = 100.5;
     const xTiempoResidencia = 160;
     const yTiempoResidencia = 100.2;
-    
+
     const xEssalud = 42;
     const yEssalud = 105.8;
     const xEps = 79;
@@ -715,50 +721,50 @@ export default function Anexo2(data = {}) {
     const ySctr = 105.8;
     const xOtro2 = 188;
     const yOtro2 = 105.8;
-    
+
     const xCorreo = 39;
     const yCorreo = 110.5;
     const xTelefono = 108;
     const yTelefono = 110.5;
     const xGradoInstruccion = 160;
     const yGradoInstruccion = 110.5;
-    
+
     const xEstadoCivil = 30;
     const yEstadoCivil = 115.8;
     const xTotalHijos = 90;
     const yTotalHijos = 115.8;
-    const xDependientes =  170;
+    const xDependientes = 170;
     const yDependientes = 115.8;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    
+
     // Nombres y Apellidos
     if (filiacion.nombresApellidos) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(filiacion.nombresApellidos.toUpperCase(), xNombresApellidos, yNombresApellidos);
     }
-    
+
     // Fecha de Nacimiento
     if (filiacion.fechaNacimiento) {
       doc.text(filiacion.fechaNacimiento.toUpperCase(), xFechaNacimiento, yFechaNacimiento);
     }
-    
+
     // Edad
     if (filiacion.edad) {
       doc.text(`${filiacion.edad}`.toUpperCase(), xEdad, yEdad);
     }
-    
+
     // Domicilio Fiscal
     if (filiacion.domicilioFiscal) {
       doc.text(filiacion.domicilioFiscal.toUpperCase(), xDomicilioFiscal, yDomicilioFiscal);
     }
-    
+
     // DNI
     if (filiacion.dni) {
       doc.text(filiacion.dni.toUpperCase(), xDni, yDni);
     }
-    
+
     // Ubicación
     if (filiacion.ubicacion) {
       if (filiacion.ubicacion.departamento) {
@@ -772,33 +778,33 @@ export default function Anexo2(data = {}) {
         doc.text(filiacion.ubicacion.distrito.toUpperCase(), xUbicacionDist, yUbicacionDist);
       }
     }
-    
+
     // Residencia en el lugar de trabajo - Checkboxes
     if (filiacion.residenciaLugarTrabajo) {
       doc.setTextColor(0, 0, 255); // Color azul para las X
       doc.setFont("helvetica", "bold").setFontSize(12);
-      
+
       if (filiacion.residenciaLugarTrabajo.si) {
         doc.text("X", xResidenciaSi, yResidenciaSi);
       }
       if (filiacion.residenciaLugarTrabajo.no) {
         doc.text("X", xResidenciaNo, yResidenciaNo);
       }
-      
+
       doc.setTextColor(0, 0, 0); // Resetear a negro
       doc.setFont("helvetica", "normal").setFontSize(9);
     }
-    
+
     // Tiempo de residencia
     if (filiacion.tiempoResidencia) {
       doc.text(filiacion.tiempoResidencia.toUpperCase(), xTiempoResidencia, yTiempoResidencia);
     }
-    
+
     // Seguros - Checkboxes
     if (filiacion.seguros) {
       doc.setTextColor(0, 0, 255); // Color azul para las X
       doc.setFont("helvetica", "bold").setFontSize(12);
-      
+
       if (filiacion.seguros.essalud) {
         doc.text("X", xEssalud, yEssalud);
       }
@@ -814,11 +820,11 @@ export default function Anexo2(data = {}) {
       if (filiacion.seguros.otro2) {
         doc.text("X", xOtro2, yOtro2);
       }
-      
+
       doc.setTextColor(0, 0, 0); // Resetear a negro
       doc.setFont("helvetica", "normal").setFontSize(9);
     }
-    
+
     // Contacto
     if (filiacion.contacto) {
       if (filiacion.contacto.correoElectronico) {
@@ -832,17 +838,17 @@ export default function Anexo2(data = {}) {
         doc.text(filiacion.contacto.gradoInstruccion.toUpperCase(), xGradoInstruccion, yGradoInstruccion);
       }
     }
-    
+
     // Estado Civil
     if (filiacion.estadoCivil) {
       doc.text(filiacion.estadoCivil.toUpperCase(), xEstadoCivil, yEstadoCivil);
     }
-    
+
     // Total de hijos
     if (filiacion.totalHijos) {
       doc.text(filiacion.totalHijos.toUpperCase(), xTotalHijos, yTotalHijos);
     }
-    
+
     // Dependientes
     if (filiacion.dependientes) {
       doc.text(filiacion.dependientes.toUpperCase(), xDependientes, yDependientes);
@@ -852,98 +858,98 @@ export default function Anexo2(data = {}) {
   // === SECCIÓN: III. ANTECEDENTES PATOLÓGICOS PERSONALES ===
   if (datosFinales.antecedentesPatologicos) {
     const antecedentes = datosFinales.antecedentesPatologicos;
-    
+
     // Posiciones para condiciones médicas - Columna 1 (Izquierda)
     const xAlergiasSi = 37.5;
     const yAlergiasSi = 132.8;
     const xAlergiasNo = 43;
     const yAlergiasNo = 132.8;
-    
+
     const xAsmaSi = 37.5;
     const yAsmaSi = 138;
     const xAsmaNo = 43;
     const yAsmaNo = 138;
-    
+
     const xBronquitisSi = 37.5;
     const yBronquitisSi = 143.2;
     const xBronquitisNo = 43;
     const yBronquitisNo = 143.2;
-    
+
     const xQuemadurasSi = 37.5;
     const yQuemadurasSi = 148.4;
     const xQuemadurasNo = 43;
     const yQuemadurasNo = 148.4;
-    
+
     const xCirugiasSi = 37.5;
     const yCirugiasSi = 153.6;
     const xCirugiasNo = 43;
     const yCirugiasNo = 153.6;
-    
+
     // Posiciones para condiciones médicas - Columna 2 (Centro)
     const xTbcSi = 93.8;
     const yTbcSi = 132.8;
     const xTbcNo = 98.8;
     const yTbcNo = 132.8;
-    
+
     const xItsSi = 93.8;
     const yItsSi = 138;
     const xItsNo = 98.8;
     const yItsNo = 138;
-    
+
     const xConvulsionesSi = 93.8;
     const yConvulsionesSi = 143.2;
     const xConvulsionesNo = 98.8;
     const yConvulsionesNo = 143.2;
-    
+
     const xNeoplasiaSi = 93.8;
     const yNeoplasiaSi = 148.4;
     const xNeoplasiaNo = 98.80;
     const yNeoplasiaNo = 148.4;
-    
+
     const xIntoxicacionesSi = 93.8;
     const yIntoxicacionesSi = 153.6;
     const xIntoxicacionesNo = 98.8;
     const yIntoxicacionesNo = 153.6;
-    
+
     // Posiciones para condiciones médicas - Columna 3 (Derecha)
     const xHepatitisSi = 152;
     const yHepatitisSi = 132.8;
     const xHepatitisNo = 156.9;
     const yHepatitisNo = 132.8;
-    
+
     const xTifoideaSi = 152;
     const yTifoideaSi = 138;
     const xTifoideaNo = 156.9;
     const yTifoideaNo = 138;
-    
+
     const xHtaSi = 152;
     const yHtaSi = 143.2;
     const xHtaNo = 156.9;
     const yHtaNo = 143.2;
-    
+
     const xDiabetesSi = 152;
     const yDiabetesSi = 148.4;
     const xDiabetesNo = 156.9;
     const yDiabetesNo = 148.4;
-    
+
     const xOtrosSi = 152;
     const yOtrosSi = 153.6;
     const xOtrosNo = 156.9;
     const yOtrosNo = 153.6;
-    
+
     // Posiciones para Hábitos Nocivos
     // Alcohol
     const xAlcoholSi = 37.5;
     const yAlcoholSi = 164.4;
     const xAlcoholNo = 43;
     const yAlcoholNo = 164.4;
-   
+
     const xAlcoholTipo = 50;
     const yAlcoholTipo = 164.2;
 
     const xAlcoholCantidad = 108;
     const yAlcoholCantidad = 164.2;
-    
+
     // Tabaco
     const xTabacoSi = 37.5;
     const yTabacoSi = 169.8;
@@ -955,7 +961,7 @@ export default function Anexo2(data = {}) {
 
     const xTabacoCantidad = 108;
     const yTabacoCantidad = 169.6;
-    
+
     // Drogas
     const xDrogasSi = 37.5;
     const yDrogasSi = 175.2;
@@ -967,59 +973,59 @@ export default function Anexo2(data = {}) {
 
     const xDrogasCantidad = 108;
     const yDrogasCantidad = 175;
-    
+
     // Medicamento
     const xMedicamentoSi = 37.5;
     const yMedicamentoSi = 180.6;
     const xMedicamentoNo = 43;
     const yMedicamentoNo = 180.6;
-    
+
     const xMedicamentoTipo = 50;
     const yMedicamentoTipo = 180.4;
 
     const xMedicamentoCantidad = 108;
     const yMedicamentoCantidad = 180.4;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    
+
     // Función para renderizar checkboxes SI/NO
     const renderCheckbox = (condicion, xSi, ySi, xNo, yNo) => {
       doc.setTextColor(0, 0, 255); // Color azul para las X
       doc.setFont("helvetica", "bold").setFontSize(12);
-      
+
       if (condicion.si) {
         doc.text("X", xSi, ySi);
       }
       if (condicion.no) {
         doc.text("X", xNo, yNo);
       }
-      
+
       doc.setTextColor(0, 0, 0); // Resetear a negro
       doc.setFont("helvetica", "normal").setFontSize(9);
     };
-    
+
     // Condiciones médicas - Columna 1 (Izquierda)
     renderCheckbox(antecedentes.alergias, xAlergiasSi, yAlergiasSi, xAlergiasNo, yAlergiasNo);
     renderCheckbox(antecedentes.asma, xAsmaSi, yAsmaSi, xAsmaNo, yAsmaNo);
     renderCheckbox(antecedentes.bronquitis, xBronquitisSi, yBronquitisSi, xBronquitisNo, yBronquitisNo);
     renderCheckbox(antecedentes.quemaduras, xQuemadurasSi, yQuemadurasSi, xQuemadurasNo, yQuemadurasNo);
     renderCheckbox(antecedentes.cirugias, xCirugiasSi, yCirugiasSi, xCirugiasNo, yCirugiasNo);
-    
+
     // Condiciones médicas - Columna 2 (Centro)
     renderCheckbox(antecedentes.tbc, xTbcSi, yTbcSi, xTbcNo, yTbcNo);
     renderCheckbox(antecedentes.its, xItsSi, yItsSi, xItsNo, yItsNo);
     renderCheckbox(antecedentes.convulsiones, xConvulsionesSi, yConvulsionesSi, xConvulsionesNo, yConvulsionesNo);
     renderCheckbox(antecedentes.neoplasia, xNeoplasiaSi, yNeoplasiaSi, xNeoplasiaNo, yNeoplasiaNo);
     renderCheckbox(antecedentes.intoxicaciones, xIntoxicacionesSi, yIntoxicacionesSi, xIntoxicacionesNo, yIntoxicacionesNo);
-    
+
     // Condiciones médicas - Columna 3 (Derecha)
     renderCheckbox(antecedentes.hepatitis, xHepatitisSi, yHepatitisSi, xHepatitisNo, yHepatitisNo);
     renderCheckbox(antecedentes.tifoidea, xTifoideaSi, yTifoideaSi, xTifoideaNo, yTifoideaNo);
     renderCheckbox(antecedentes.hta, xHtaSi, yHtaSi, xHtaNo, yHtaNo);
     renderCheckbox(antecedentes.diabetes, xDiabetesSi, yDiabetesSi, xDiabetesNo, yDiabetesNo);
     renderCheckbox(antecedentes.otros, xOtrosSi, yOtrosSi, xOtrosNo, yOtrosNo);
-    
+
     // Hábitos Nocivos
     if (antecedentes.habitosNocivos) {
       // Alcohol - Checkbox + campos de texto
@@ -1032,7 +1038,7 @@ export default function Anexo2(data = {}) {
           doc.text(antecedentes.habitosNocivos.alcohol.cantidad.toUpperCase(), xAlcoholCantidad, yAlcoholCantidad);
         }
       }
-      
+
       // Tabaco - Checkbox + campos de texto
       if (antecedentes.habitosNocivos.tabaco) {
         renderCheckbox(antecedentes.habitosNocivos.tabaco, xTabacoSi, yTabacoSi, xTabacoNo, yTabacoNo);
@@ -1043,7 +1049,7 @@ export default function Anexo2(data = {}) {
           doc.text(antecedentes.habitosNocivos.tabaco.cantidad.toUpperCase(), xTabacoCantidad, yTabacoCantidad);
         }
       }
-      
+
       // Drogas - Checkbox + campos de texto
       if (antecedentes.habitosNocivos.drogas) {
         renderCheckbox(antecedentes.habitosNocivos.drogas, xDrogasSi, yDrogasSi, xDrogasNo, yDrogasNo);
@@ -1054,7 +1060,7 @@ export default function Anexo2(data = {}) {
           doc.text(antecedentes.habitosNocivos.drogas.cantidad.toUpperCase(), xDrogasCantidad, yDrogasCantidad);
         }
       }
-      
+
       // Medicamento - Checkbox + campos de texto
       if (antecedentes.habitosNocivos.medicamento) {
         renderCheckbox(antecedentes.habitosNocivos.medicamento, xMedicamentoSi, yMedicamentoSi, xMedicamentoNo, yMedicamentoNo);
@@ -1071,7 +1077,7 @@ export default function Anexo2(data = {}) {
   // === SECCIÓN: IV. ANTECEDENTES PATOLÓGICOS FAMILIARES ===
   if (datosFinales.antecedentesFamiliares) {
     const familia = datosFinales.antecedentesFamiliares;
-    
+
     // Posiciones para antecedentes familiares
     const xPadre = 25;
     const yPadre = 190;
@@ -1081,7 +1087,7 @@ export default function Anexo2(data = {}) {
 
     const xHermanos = 160;
     const yHermanos = 190;
-    
+
     const xEsposa = 25;
     const yEsposa = 196;
 
@@ -1090,35 +1096,35 @@ export default function Anexo2(data = {}) {
 
     const xNumeroHijos = 160;
     const yNumeroHijos = 196;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    
+
     // Padre
     if (familia.padre) {
       doc.text(familia.padre.toUpperCase(), xPadre, yPadre);
     }
-    
+
     // Madre
     if (familia.madre) {
       doc.text(familia.madre.toUpperCase(), xMadre, yMadre);
     }
-    
+
     // Hermanos
     if (familia.hermanos) {
       doc.text(familia.hermanos.toUpperCase(), xHermanos, yHermanos);
     }
-    
+
     // Esposa
     if (familia.esposa) {
       doc.text(familia.esposa.toUpperCase(), xEsposa, yEsposa);
     }
-    
+
     // Hijos vivos
     if (familia.hijosVivos) {
       doc.text(familia.hijosVivos.toUpperCase(), xHijosVivos, yHijosVivos);
     }
-    
+
     // Número de hijos
     if (familia.numeroHijos) {
       doc.text(familia.numeroHijos.toUpperCase(), xNumeroHijos, yNumeroHijos);
@@ -1128,20 +1134,20 @@ export default function Anexo2(data = {}) {
   // === SECCIÓN: ABSENTISMO ===
   if (datosFinales.absentismo) {
     const absentismo = datosFinales.absentismo;
-    
+
     // Posiciones para absentismo
     const xLesionesMuscularesSi = 107.8;
     const yLesionesMuscularesSi = 214.6;
 
     const xLesionesMuscularesNo = 126;
-    const yLesionesMuscularesNo =  214.6;
-    
+    const yLesionesMuscularesNo = 214.6;
+
     const xLesionesMuscularesAno = 143;
-    const yLesionesMuscularesAno =  214.6;
-    
+    const yLesionesMuscularesAno = 214.6;
+
     const xLesionesMuscularesDias = 181.5;
-    const yLesionesMuscularesDias =  214.6;
-    
+    const yLesionesMuscularesDias = 214.6;
+
     const xLesionActualizadaSi = 107.8;
     const yLesionActualizadaSi = 220;
 
@@ -1153,66 +1159,66 @@ export default function Anexo2(data = {}) {
 
     const xLesionActualizadaDias = 181.5;
     const yLesionActualizadaDias = 220;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    
+
     // Lesiones Musculares
     if (absentismo.lesionesMusculares) {
       const lesion = absentismo.lesionesMusculares;
-      
+
       // Checkbox SI/NO
       if (lesion.asociadoTrabajo) {
         doc.setTextColor(0, 0, 255); // Color azul para las X
         doc.setFont("helvetica", "bold").setFontSize(12);
-        
+
         if (lesion.asociadoTrabajo.si) {
           doc.text("X", xLesionesMuscularesSi, yLesionesMuscularesSi);
         }
         if (lesion.asociadoTrabajo.no) {
           doc.text("X", xLesionesMuscularesNo, yLesionesMuscularesNo);
         }
-        
+
         doc.setTextColor(0, 0, 0); // Resetear a negro
         doc.setFont("helvetica", "normal").setFontSize(9);
       }
-      
+
       // Año
       if (lesion.año) {
         doc.text(lesion.año.toUpperCase(), xLesionesMuscularesAno, yLesionesMuscularesAno);
       }
-      
+
       // Días de descanso
       if (lesion.diasDescanso) {
         doc.text(lesion.diasDescanso.toUpperCase(), xLesionesMuscularesDias, yLesionesMuscularesDias, { align: "center" });
       }
     }
-    
+
     // Lesión Actualizada
     if (absentismo.lesionActualizada) {
       const lesion = absentismo.lesionActualizada;
-      
+
       // Checkbox SI/NO
       if (lesion.asociadoTrabajo) {
         doc.setTextColor(0, 0, 255); // Color azul para las X
         doc.setFont("helvetica", "bold").setFontSize(12);
-        
+
         if (lesion.asociadoTrabajo.si) {
           doc.text("X", xLesionActualizadaSi, yLesionActualizadaSi);
         }
         if (lesion.asociadoTrabajo.no) {
           doc.text("X", xLesionActualizadaNo, yLesionActualizadaNo);
         }
-        
+
         doc.setTextColor(0, 0, 0); // Resetear a negro
         doc.setFont("helvetica", "normal").setFontSize(9);
       }
-      
+
       // Año
       if (lesion.año) {
         doc.text(lesion.año.toUpperCase(), xLesionActualizadaAno, yLesionActualizadaAno);
       }
-      
+
       // Días de descanso
       if (lesion.diasDescanso) {
         doc.text(lesion.diasDescanso.toUpperCase(), xLesionActualizadaDias, yLesionActualizadaDias, { align: "center" });
@@ -1223,21 +1229,21 @@ export default function Anexo2(data = {}) {
   // === SECCIÓN: V. EVALUACIÓN MÉDICA ===
   if (datosFinales.evaluacionMedica) {
     const evaluacion = datosFinales.evaluacionMedica;
-    
+
     // Posiciones para evaluación médica
     const xAnamnesis = 30;
     const yAnamnesis = 254;
-    
+
     // Examen clínico - Fila 1
     const xTalla = 43;
     const yTalla = 262.4;
     const xPeso = 70;
     const yPeso = 262.4;
-    const xImc =  85;
+    const xImc = 85;
     const yImc = 262.4;
     const xPulso = 107;
     const yPulso = 262.4;
-    
+
     // Examen clínico - Fila 2
     const xFrecuenciaRespiratoria = 135;
     const yFrecuenciaRespiratoria = 262.4;
@@ -1247,23 +1253,23 @@ export default function Anexo2(data = {}) {
     const yPresionArterial = 262.4;
     const xTemperatura = 193;
     const yTemperatura = 262.4;
-    
+
     // Examen clínico - Fila 3
     const xOtros = 37;
     const yOtros = 268;
-    
+
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
-    
+
     // Anamnesis
     if (evaluacion.anamnesis) {
       doc.text(evaluacion.anamnesis.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 170 });
     }
-    
+
     // Examen clínico
     if (evaluacion.examenClinico) {
       const examen = evaluacion.examenClinico;
-      
+
       // Fila 1
       if (examen.talla) {
         doc.text(examen.talla.toUpperCase(), xTalla, yTalla);
@@ -1277,7 +1283,7 @@ export default function Anexo2(data = {}) {
       if (examen.pulso) {
         doc.text(examen.pulso.toUpperCase(), xPulso, yPulso);
       }
-      
+
       // Fila 2
       if (examen.frecuenciaRespiratoria) {
         doc.text(examen.frecuenciaRespiratoria.toUpperCase(), xFrecuenciaRespiratoria, yFrecuenciaRespiratoria);
@@ -1291,7 +1297,7 @@ export default function Anexo2(data = {}) {
       if (examen.temperatura) {
         doc.text(examen.temperatura.toUpperCase(), xTemperatura, yTemperatura);
       }
-      
+
       // Fila 3
       if (examen.otros) {
         doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1306,19 +1312,19 @@ export default function Anexo2(data = {}) {
         doc.text(otrosTexto.toUpperCase(), xOtros, yOtros, { maxWidth: 170 });
       }
     }
-    
+
     // Ectoscopía y Estado Mental (parte de Evaluación Médica)
     const xEctoscopia = 34;
     const yEctoscopia = 277.8;
     const xEstadoMental = 34;
     const yEstadoMental = 284.1;
-    
+
     // Ectoscopía
     if (evaluacion.ectoscopia) {
       doc.setFont("helvetica", "normal").setFontSize(8);
       doc.text(evaluacion.ectoscopia.toUpperCase(), xEctoscopia, yEctoscopia, { maxWidth: 170 });
     }
-    
+
     // Estado Mental
     if (evaluacion.estadoMental) {
       doc.setFont("helvetica", "normal").setFontSize(8);
@@ -1328,32 +1334,32 @@ export default function Anexo2(data = {}) {
 
   // === SECCIÓN: FIRMAS ===
   const firmasAPintar = [
-    { 
-      nombre: "FIRMAP", x: 21, y: 350, maxw: 50 
+    {
+      nombre: "FIRMAP", x: 21, y: 350, maxw: 50
     },
-    { 
-      nombre: "HUELLA", x: 80, y: 350, maxw: 20 
+    {
+      nombre: "HUELLA", x: 80, y: 350, maxw: 20
     },
-    { 
-      nombre: "SELLOFIRMA", x: 120, y: 350, maxw: 50 
+    {
+      nombre: "SELLOFIRMA", x: 120, y: 350, maxw: 50
     }
   ];
-  
+
   // Validar que data.informacionSede exista antes de acceder a sus propiedades
   const digitalizacion = data?.informacionSede?.digitalizacion || [];
   agregarFirmas(doc, digitalizacion, firmasAPintar).then(() => {
     // === PÁGINA 2 ===
     doc.addPage();
-    
+
     // === 0) HEADER para Página 2 ===
     headerAnexo2(doc, data, 2);
-    
+
     // === 1) Imagen de fondo para Anexo2 - Página 2 ===
     const fondoImg2 = "/img/Anexo2/Pag2_anexo2.png";
-    
+
     // Márgenes de 8mm a cada lado (usar la misma variable de la página 1)
     const margenLateral2 = 8; // 8mm
-    
+
     // Usar el ancho del documento menos los márgenes laterales
     const imgWidth2 = pageW - (margenLateral2 * 2); // Ancho menos márgenes
     const imgHeight2 = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
@@ -1367,14 +1373,14 @@ export default function Anexo2(data = {}) {
     } catch (e) {
       doc.text("Imagen de Anexo2 Página 2 no disponible", margin, yOffset2 + 10);
     }
-    
+
     // === 2) CAMPOS DE DATOS PARA PÁGINA 2 - EXAMEN DE OJOS ===
     if (datosFinales.examenOjos) {
       const examenOjos = datosFinales.examenOjos;
-      
+
       doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
-      
+
       // === SECCIÓN: SIN HALLAZGOS - SIN CORREGIR ===
       // Visión de Cerca - Sin Corregir
       const xVisionCercaSinCorregirOD = 41; // Posición X para O.D.
@@ -1382,43 +1388,43 @@ export default function Anexo2(data = {}) {
 
       const xVisionCercaSinCorregirOI = 58; // Posición X para O.I.
       const yVisionCercaSinCorregirOI = 83; // Posición Y para O.I.
-      
+
       // Visión de Lejos - Sin Corregir
       const xVisionLejosSinCorregirOD = 41;
       const yVisionLejosSinCorregirOD = 89;
       const xVisionLejosSinCorregirOI = 58;
       const yVisionLejosSinCorregirOI = 89;
-      
+
       // === SECCIÓN: SIN HALLAZGOS - CORREGIDA ===
       // Visión de Cerca - Corregida
       const xVisionCercaCorregidaOD = 74; // Posición X para O.D.
       const yVisionCercaCorregidaOD = 83; // Posición Y para O.D.
-      const xVisionCercaCorregidaOI = 91.5  ; // Posición X para O.I.
+      const xVisionCercaCorregidaOI = 91.5; // Posición X para O.I.
       const yVisionCercaCorregidaOI = 83; // Posición Y para O.I.
-      
+
       // Visión de Lejos - Corregida
       const xVisionLejosCorregidaOD = 74;
       const yVisionLejosCorregidaOD = 89;
       const xVisionLejosCorregidaOI = 91.5;
       const yVisionLejosCorregidaOI = 89;
-      
+
       // Visión de Colores (campo único que abarca toda la fila)
       const xVisionColores = 69; // Centrado en toda la fila
       const yVisionColores = 96;
-      
+
       // === SECCIÓN: HALLAZGOS ===
       // Enfermedades Oculares
       const xEnfermedadesOculares = 108;
       const yEnfermedadesOculares = 74;
-      
+
       // Reflejos Pupilares
       const xReflejosPupilares = 141.5;
       const yReflejosPupilares = 96;
-      
+
       // Renderizar datos - Sin Corregir
       if (examenOjos.sinCorregir) {
         const sinCorregir = examenOjos.sinCorregir;
-        
+
         // Visión de Cerca
         if (sinCorregir.visionCerca) {
           if (sinCorregir.visionCerca.od) {
@@ -1428,7 +1434,7 @@ export default function Anexo2(data = {}) {
             doc.text(sinCorregir.visionCerca.oi.toUpperCase(), xVisionCercaSinCorregirOI, yVisionCercaSinCorregirOI);
           }
         }
-        
+
         // Visión de Lejos
         if (sinCorregir.visionLejos) {
           if (sinCorregir.visionLejos.od) {
@@ -1438,13 +1444,13 @@ export default function Anexo2(data = {}) {
             doc.text(sinCorregir.visionLejos.oi.toUpperCase(), xVisionLejosSinCorregirOI, yVisionLejosSinCorregirOI);
           }
         }
-        
+
       }
-      
+
       // Renderizar datos - Corregida
       if (examenOjos.corregida) {
         const corregida = examenOjos.corregida;
-        
+
         // Visión de Cerca
         if (corregida.visionCerca) {
           if (corregida.visionCerca.od) {
@@ -1454,7 +1460,7 @@ export default function Anexo2(data = {}) {
             doc.text(corregida.visionCerca.oi.toUpperCase(), xVisionCercaCorregidaOI, yVisionCercaCorregidaOI);
           }
         }
-        
+
         // Visión de Lejos
         if (corregida.visionLejos) {
           if (corregida.visionLejos.od) {
@@ -1465,12 +1471,12 @@ export default function Anexo2(data = {}) {
           }
         }
       }
-      
+
       // Visión de Colores (campo único que abarca toda la fila)
       if (examenOjos.visionColores) {
         doc.text(examenOjos.visionColores.toUpperCase(), xVisionColores, yVisionColores, { align: "center" });
       }
-      
+
       // Renderizar Hallazgos
       if (examenOjos.hallazgos) {
         // Enfermedades Oculares
@@ -1478,7 +1484,7 @@ export default function Anexo2(data = {}) {
           doc.setFontSize(9);
           doc.text(examenOjos.hallazgos.enfermedadesOculares.toUpperCase(), xEnfermedadesOculares, yEnfermedadesOculares, { maxWidth: 100 });
         }
-        
+
         // Reflejos Pupilares
         if (examenOjos.hallazgos.reflejosPupilares) {
           doc.setFontSize(9);
@@ -1486,54 +1492,54 @@ export default function Anexo2(data = {}) {
         }
       }
     }
-    
+
     // === SECCIÓN: EXAMEN FÍSICO ===
     if (datosFinales.evaluacionMedica) {
       const evaluacion = datosFinales.evaluacionMedica;
-      
+
       // Posiciones para los hallazgos (los textos "Piel:", "Cabello:" ya están en la imagen)
       const xPielHallazgos = 25;
       const yPielHallazgos = 39;
-      
+
       const xCabelloHallazgos = 25;
       const yCabelloHallazgos = 50;
-      
+
       doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
-      
+
       // Solo renderizar los hallazgos (los textos "Piel:", "Cabello:" ya están en la imagen)
       doc.setFont("helvetica", "normal").setFontSize(9);
-      
+
       // Hallazgos de Piel
       if (evaluacion.examenFisico?.piel) {
         doc.text(evaluacion.examenFisico.piel.toUpperCase(), xPielHallazgos, yPielHallazgos, { maxWidth: 170 });
       }
-      
+
       // Hallazgos de Cabello
       if (evaluacion.examenFisico?.cabello) {
         doc.text(evaluacion.examenFisico.cabello.toUpperCase(), xCabelloHallazgos, yCabelloHallazgos, { maxWidth: 170 });
       }
     }
-    
+
     // === SECCIÓN: EXAMEN FÍSICO POR SISTEMAS ===
     if (datosFinales.examenFisicoSistemas) {
       const sistemas = datosFinales.examenFisicoSistemas;
-      
+
       doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
-      
+
       // Posiciones para cada sistema (ajustar según la imagen real)
       const posicionesSistemas = [
-        { campo: 'oidos', x: 40, y: 104},
+        { campo: 'oidos', x: 40, y: 104 },
         { campo: 'nariz', x: 40, y: 115 },
-        { campo: 'boca', x: 40, y: 126},
+        { campo: 'boca', x: 40, y: 126 },
         { campo: 'faringe', x: 40, y: 139 },
-        { campo: 'cuello', x: 40, y: 150},
-        { campo: 'aparatoRespiratorio', x: 40, y: 162},
+        { campo: 'cuello', x: 40, y: 150 },
+        { campo: 'aparatoRespiratorio', x: 40, y: 162 },
         { campo: 'aparatoCardiovascular', x: 40, y: 174 },
         { campo: 'aparatoDigestivo', x: 40, y: 186 },
         { campo: 'aparatoGenitourinario', x: 40, y: 198 },
-        { campo: 'aparatoLocomotor', x: 40, y:  210 },
+        { campo: 'aparatoLocomotor', x: 40, y: 210 },
         { campo: 'sistemaLinfatico', x: 40, y: 222 },
         { campo: 'marcha', x: 40, y: 234 },
         { campo: 'columna', x: 40, y: 245 },
@@ -1541,7 +1547,7 @@ export default function Anexo2(data = {}) {
         { campo: 'miembrosInferiores', x: 40, y: 270 },
         { campo: 'sistemaNervioso', x: 40, y: 281 }
       ];
-      
+
       // Renderizar cada sistema
       posicionesSistemas.forEach(({ campo, x, y }) => {
         if (sistemas[campo]) {
@@ -1549,20 +1555,20 @@ export default function Anexo2(data = {}) {
         }
       });
     }
-    
-    
+
+
     // === PÁGINA 3 ===
     doc.addPage();
-    
+
     // === 0) HEADER para Página 3 ===
     headerAnexo2(doc, data, 3);
-    
+
     // === 1) Imagen de fondo para Anexo2 - Página 3 ===
     const fondoImg3 = "/img/Anexo2/Pag3_anexo2.png";
-    
+
     // Márgenes de 8mm a cada lado (usar la misma variable de las páginas anteriores)
     const margenLateral3 = 8; // 8mm
-    
+
     // Usar el ancho del documento menos los márgenes laterales
     const imgWidth3 = pageW - (margenLateral3 * 2); // Ancho menos márgenes
     const imgHeight3 = pageH * 0.9; // 90% de la altura para dejar espacio para ajustar
@@ -1576,49 +1582,49 @@ export default function Anexo2(data = {}) {
     } catch (e) {
       doc.text("Imagen de Anexo2 Página 3 no disponible", margin, yOffset3 + 10);
     }
-    
+
     // === 2) CAMPOS DE DATOS PARA PÁGINA 3 - CONCLUSIONES Y FIRMAS ===
-    
+
     // === SECCIÓN: CONCLUSIONES Y DIAGNÓSTICOS ===
     if (datosFinales.conclusiones) {
       const conclusiones = datosFinales.conclusiones;
-      
+
       doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
-      
+
       // Posiciones para cada sección de conclusiones (ajustar según la imagen real)
       const posicionesConclusiones = [
         // VI. CONCLUSIONES DE EVALUACIÓN PSICOLÓGICA (ancho completo)
         { campo: 'conclusionesEvaluacionPsicologica', x: 12, y: 32, maxWidth: 170 },
-        
+
         // VII. CONCLUSIONES RADIOGRÁFICAS (mitad izquierda)
         { campo: 'conclusionesRadiograficas', x: 12, y: 67, maxWidth: 100 },
-        
+
         // VIII. HALLAZGOS PATOLÓGICOS DE LABORATORIO (mitad derecha)
         { campo: 'hallazgosPatologicosLaboratorio', x: 110, y: 67, maxWidth: 100 },
-        
+
         // IX. CONCLUSIÓN AUDIOMETRÍA (mitad izquierda)
         { campo: 'conclusionAudiometria', x: 12, y: 100, maxWidth: 100 },
-        
+
         // X. CONCLUSIÓN DE ESPIROMETRÍA (mitad derecha)
         { campo: 'conclusionEspirometria', x: 110, y: 100, maxWidth: 100 },
-        
+
         // XI. OTROS (ancho completo)
         { campo: 'otros', x: 12, y: 133, maxWidth: 170 },
-        
+
         // XII. DIAGNÓSTICO MÉDICO OCUPACIONAL Y RECOMENDACIONES (ancho completo)
         { campo: 'diagnosticoMedicoOcupacional', x: 12, y: 180, maxWidth: 170 }
       ];
-      
+
       // Renderizar cada conclusión
       posicionesConclusiones.forEach(({ campo, x, y, maxWidth }) => {
         if (conclusiones[campo]) {
           // Solo manejar listas para campos específicos que lo necesiten
           let texto = conclusiones[campo];
-          
+
           // Campos que SÍ necesitan conversión de listas a texto con comas
           const camposConListas = ['conclusionesEvaluacionPsicologica', 'conclusionesRadiograficas', 'hallazgosPatologicosLaboratorio', 'conclusionAudiometria', 'conclusionEspirometria'];
-          
+
           if (camposConListas.includes(campo)) {
             if (Array.isArray(conclusiones[campo])) {
               texto = conclusiones[campo].join(", ");
@@ -1628,19 +1634,19 @@ export default function Anexo2(data = {}) {
             }
           }
           // Para 'otros' y 'diagnosticoMedicoOcupacional' mantener el formato original
-          
+
           doc.text(texto.toUpperCase(), x, y, { maxWidth, lineHeightFactor: 1 });
         }
       });
     }
-    
+
     // === SECCIÓN: XIII - CONCLUSIONES FINALES ===
     if (datosFinales.conclusionesFinales) {
       const conclusionesFinales = datosFinales.conclusionesFinales;
-      
+
       doc.setFont("helvetica", "normal").setFontSize(9);
       doc.setTextColor(0, 0, 0);
-      
+
       // Posiciones para checkboxes de aptitud
       const xApto = 36;
       const yApto = 267.5;
@@ -1648,12 +1654,12 @@ export default function Anexo2(data = {}) {
       const yAptoConRestriccion = 276;
       const xNoApto = 36;
       const yNoApto = 284;
-      
+
       // Posición para campo de restricciones
       const xRestricciones = 47;
       const yRestricciones = 266;
-      
-       // Posiciones para la firma del médico
+
+      // Posiciones para la firma del médico
       const xFirmaMedico = 120;
       const yFirmaMedico = 260;
 
@@ -1664,11 +1670,11 @@ export default function Anexo2(data = {}) {
       // Posiciones para la huella del paciente
       const xHuellaPaciente = 194;
       const yHuellaPaciente = 260;
-      
+
       // Renderizar checkboxes de aptitud
       doc.setTextColor(0, 0, 255); // Color azul para las X
       doc.setFont("helvetica", "bold").setFontSize(12);
-      
+
       if (conclusionesFinales.apto) {
         doc.text("X", xApto, yApto);
       }
@@ -1678,15 +1684,15 @@ export default function Anexo2(data = {}) {
       if (conclusionesFinales.noApto) {
         doc.text("X", xNoApto, yNoApto);
       }
-      
+
       doc.setTextColor(0, 0, 0); // Resetear a negro
       doc.setFont("helvetica", "normal").setFontSize(9);
-      
+
       // Renderizar campo de restricciones
       if (conclusionesFinales.restricciones) {
         doc.text(conclusionesFinales.restricciones.toUpperCase(), xRestricciones, yRestricciones, { maxWidth: 70 });
       }
-      
+
       // Renderizar firmas
       if (conclusionesFinales.firmaMedico) {
         try {
@@ -1695,7 +1701,7 @@ export default function Anexo2(data = {}) {
           console.error("Error al cargar firma del médico:", e);
         }
       }
-      
+
       // Firma del paciente
       if (conclusionesFinales.firmaPaciente) {
         try {
@@ -1704,7 +1710,7 @@ export default function Anexo2(data = {}) {
           console.error("Error al cargar firma del paciente:", e);
         }
       }
-      
+
       // Huella del paciente
       if (conclusionesFinales.huellaPaciente) {
         try {
@@ -1714,7 +1720,7 @@ export default function Anexo2(data = {}) {
         }
       }
     }
-    
+
     imprimir(doc);
   });
 }
