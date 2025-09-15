@@ -261,9 +261,9 @@ export default function Anexo2(data = {}) {
     },
     fechaExamen: formatearFechaCorta(data.fechaAnexo_fecha ?? ""), //agregar formateo
     lugarExamen: {
-      departamento: data.departamentoPaciente_departamento_pa ?? "",//revisar pedir
-      provincia: data.provinciaPaciente_provincia_pa ?? "",//revisar pedir
-      distrito: data.distritoPaciente_distrito_pa ?? ""//revisar pedir
+      departamento: data.departamentoExamen ?? "",//revisar pedir
+      provincia: data.provinciaExamen ?? "",//revisar pedir
+      distrito: data.distritoExamen ?? ""//revisar pedir
     },
 
     // === DATOS DE LA EMPRESA ===
@@ -280,7 +280,7 @@ export default function Anexo2(data = {}) {
       provincia: "",
       distrito: ""
     },
-    puestoPostula: data.cargo_cargo_de ?? "",
+    puestoPostula: data.nombreExamen_nom_examen == "PRE-OCUPACIONAL" ? (data.cargo_cargo_de ?? "") : "",
 
     // === II. FILIACIÓN DEL TRABAJADOR ===
     filiacionTrabajador: {
@@ -354,8 +354,8 @@ export default function Anexo2(data = {}) {
       madre: data.madre_txtmadre ?? "",
       hermanos: data.hermanos_txthermanos ?? "",
       esposa: data.esposa_txtesposa ?? "",
-      hijosVivos: String(data.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? ""),
-      numeroHijos: String(data.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ?? "")
+      hijosVivos: String(data.hijosVivosAnexo2_txthijosvivos ?? ""),
+      numeroHijos: String(data.hijosMuertosAnexo2_txthijosmuertos ?? "")
     },
 
     // === ABSENTISMO ===

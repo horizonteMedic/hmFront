@@ -44,7 +44,7 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
   const colorValido =
     typeof datosFinales.color === "number" &&
     datosFinales.color >= 1 &&
-    datosFinales.color <= 150;
+    datosFinales.color <= 500;
 
   const color = datosFinales.codigoColor || "#008f39";
   const boxText = (datosFinales.textoColor || "F").toUpperCase();

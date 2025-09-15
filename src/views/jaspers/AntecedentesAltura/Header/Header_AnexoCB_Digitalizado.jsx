@@ -34,7 +34,7 @@ const Header_AnexoCB_Digitalizado = (doc, datos = {}) => {
   }
 
   // === 2) BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 150;
+  const colorValido = typeof headerData.color === "number" && headerData.color >= 1 && headerData.color <= 500;
   const color = headerData.codigoColor || "#E3BF34";
   
   // Convertir M/F a texto completo
