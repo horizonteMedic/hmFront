@@ -382,19 +382,8 @@ const Formulario = () => {
                 <InputText label='Apellidos' name='apellidos' value={datos.apellidos} handleChange={handleChange} />
                 <div className='h-full'>
                   <label htmlFor='fechaNacimiento' className=" font-semibold text-white w-full" style={{ fontSize: '15px' }}>Fecha de Nacimiento:</label>
-                  <DatePicker
-                    id='fechaNacimiento'
-                    selected={datos.fechaNacimiento}
-                    onChange={date => setDatos({...datos, fechaNacimiento: date})}
-                    className="form-input border rounded w-full h-10 px-2"
-                    dateFormat="dd/MM/yyyy"
-                    showYearDropdown
-                    scrollableYearDropdown
-                    yearDropdownItemNumber={200} // Ajusta según la cantidad de años necesarios
-                    minDate={new Date("1800-01-01")} // Establece la fecha mínima permitida
-                    maxDate={new Date()} // Establece la fecha máxima permitida (hoy)
-                    
-                  />
+                  <input type="date" className='form-input border rounded w-full h-10 px-2' name="fechaNacimiento" value={datos.fechaNacimiento} onChange={e => setDatos({...datos, fechaNacimiento: e.target.value})}  id="fechaNacimiento" />
+                  
                     <label htmlFor='fechaNacimiento' className="text-gray-500 text-sm block mt-2">Formato: Día/Mes/Año</label>
 
                 </div>
