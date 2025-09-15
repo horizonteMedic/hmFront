@@ -171,7 +171,7 @@ export default function ReporteExamen1 (datos){
         (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
             ? datos.textoColor.trim().toUpperCase()
             : "F");
-        const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+        const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
         if (colorValido) {
             const boxSize = 15;
             const boxX = pageW - margin - boxSize + 7; // 5 puntos a la derecha

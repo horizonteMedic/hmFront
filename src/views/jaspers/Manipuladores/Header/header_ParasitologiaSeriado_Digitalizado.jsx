@@ -63,7 +63,7 @@ const headerManipuladores = (doc, datos = {}, yStart = 10) => {
   doc.text("Muestra :", margin + blockOffset, y);
   doc.setFont("helvetica", "normal");
   doc.text(`HECES`, margin + blockOffset + 22, y);
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

@@ -30,7 +30,7 @@ const header_FichaAudiologica = (doc, datos = {}) => {
   // === BLOQUE CÓDIGO DE COLOR ===
   // Prueba: si no hay datos.color, usar uno de ejemplo
   const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
   let boxSize = 15;

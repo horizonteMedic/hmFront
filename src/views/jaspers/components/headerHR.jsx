@@ -27,7 +27,7 @@ const headerHR = (doc, datos) => {
   console.log("color", color);
   console.log("datos.color", datos.color);
 
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
 
     console.log("colorValido", colorValido);
   if (colorValido) {

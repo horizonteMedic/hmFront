@@ -141,7 +141,7 @@ const HeaderRAYOSXXXOFI = (doc, datos) => {
 
   // === BLOQUE CÓDIGO DE COLOR ===
   const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     const color = datos.codigoColor || "#008f39";
     const boxText = (datos.textoColor || "F").toUpperCase();

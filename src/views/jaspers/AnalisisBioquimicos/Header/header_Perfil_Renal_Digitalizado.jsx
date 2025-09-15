@@ -66,7 +66,7 @@ export default function header_Perfil_Renal_Digitalizado(doc, datos) {
   drawPatientDataRow('DNI :', String(datos.dni));
   drawPatientDataRow('Fecha :', formatDateToShort(datos.fechaExamen));
 
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

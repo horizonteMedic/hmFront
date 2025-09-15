@@ -52,7 +52,7 @@ const headerAnalisisBioquimicos = (doc, datos = {}) => {
   doc.text(sedeValue, textX + sedeLabelWidth + 2, sedeY);
 
   // --- Cuadro de color a la derecha de los textos ---
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

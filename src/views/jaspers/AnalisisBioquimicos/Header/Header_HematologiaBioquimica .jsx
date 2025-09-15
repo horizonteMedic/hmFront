@@ -15,7 +15,7 @@ const Header_HematologiaBioquimica = (doc, datos = {}) => {
   doc.addImage(img, "PNG", margin, y, logoW, logoH);
 
   // Determinar si hay color
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   let colorBoxWidth = 0;
   if (colorValido) colorBoxWidth = 22; // 15mm box + 7mm espacio
 
