@@ -1,21 +1,17 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-
-import { useForm } from "../../../../../hooks/useForm";
-import { useSessionData } from "../../../../../hooks/useSessionData";
 import {
   PrintHojaR,
   SubmitDataService,
   VerifyTR,
 } from "./controllerConsentimientoBuenaSalud";
-import { useEffect, useState } from "react";
+import { getToday } from "../../../../../utils/helpers";
+import useRealTime from "../../../../../hooks/useRealTime";
+import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
-const tabla = "consentimiento_rayosx";
-const date = new Date();
-const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-  2,
-  "0"
-)}-${String(date.getDate()).padStart(2, "0")}`;
+const tabla = "consentimientobuenasalud";
+const today = getToday();
 
 const initialFormState = {
   norden: "",
@@ -39,15 +35,7 @@ export default function ConsentimientoBuenaSalud() {
     handlePrintDefault,
   } = useForm(initialFormState);
 
-  const [hora, setHora] = useState(new Date().toLocaleTimeString());
-
-  useEffect(() => {
-    const intervalo = setInterval(() => {
-      setHora(new Date().toLocaleTimeString());
-    }, 1000);
-
-    return () => clearInterval(intervalo); // limpiar cuando el componente se desmonte
-  }, []);
+  const hora = useRealTime();
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -134,19 +122,6 @@ export default function ConsentimientoBuenaSalud() {
             />
           </div>
 
-          {/* <div className="flex items-center gap-4">
-            <label className="font-semibold min-w-[150px]">
-              con ocupación laboral de:
-            </label>
-            <input
-              className="border rounded px-2 py-1 flex-1"
-              name="ocupacion"
-              value={form.ocupacion || ""}
-              onChange={handleChange}
-              disabled
-              placeholder="Ocupación laboral"
-            />
-          </div> */}
         </div>
 
         {/* Texto del Consentimiento */}

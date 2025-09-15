@@ -3,25 +3,23 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser,
   faStethoscope,
-  faHeartbeat,
   faChartLine,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
-import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import Examenes from "./Examenes/Examenes";
 import DatosPersonales from "./DatosPersonales/DatosPersonales";
 import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
-import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo2";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
 
-const tabla = "anexo_agroindustrial";
+const tabla = "anexo_16";
 const today = getToday();
 
-export default function Anexo2({ listas }) {
-  const { MedicosMulti } = listas;
+export default function Anexo16({ listas }) {
+  const { MedicosMulti } = listas || {};
   // console.log(MedicosMulti);
 
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -54,74 +52,64 @@ export default function Anexo2({ listas }) {
     //Detalles del Puesto
     puestoPostula: "",
     areaPuesto: "",
-    puestoActual: "N/A",
-    tiempoPuesto: "N/A",
+    puestoActual: "",
+    tiempoPuesto: "",
+    reubicacion: false,
 
-    //Ant. Personales
-    neoplasia: false,
-    neoplasiaDescripcion: "",
-    quemaduras: false,
-    quemadurasDescripcion: "",
-    otrosAntecedentes: false,
-    otrosAntecedentesDescripcion: "",
-    its: false,
-    itsDescripcion: "",
-    cirugias: false,
-    cirugiasDescripcion: "",
+    //Agentes presentes en Trabajo Actual
+    ruido: false,
+    polvo: false,
+    vidSegmentario: false,
+    vidTotal: false,
+    alturaEstruct: false,
+    vibraciones: false,
+    cancerigenos: false,
+    mutagenicos: false,
+    solventes: false,
+    metales: false,
+    alturaGeograf: false,
+    temperaturaAgente: false,
+    biologicos: false,
+    posturas: false,
+    turnos: false,
+    quimicos: false,
+    cargas: false,
+    movRepet: false,
+    pvd: false,
+    electricos: false,
+    otros: false,
 
-    //Residencia en el lugar de trabajo
-    reside: true,
-    tiempoReside: "",
-    essalud: false,
-    sctr: false,
-    eps: false,
-    otrosResidencia: false,
-    otrosResidencia1: false,
+    //Antecedentes
+    antecedentesPersonalesOcupacionales: "",
+    antecedentesFamiliares: "",
+    grupoSanguineoPrevio: "",
+    grupoSanguineoGrupo: "",
+    antecedentesPatologicos: "",
 
     //Número de Hijos
     hijosVivos: "",
     hijosMuertos: "",
-    hijosDependientes: "",
-    totalHijos: "",
 
-    //Antecedentes Familiares
-    antecendentesPadre: "",
-    antecendentesMadre: "",
-    antecendentesHermano: "",
-    antecendentesEsposao: "",
+    //Inmunizaciones
+    tetano: false,
+    hepatitisB: false,
+    fiebreAmarilla: false,
 
-    //Medicamentos
-    tomaMedicamento: false,
-    tipoMedicamentos: "",
-    frecuenciaMedicamentos: "",
-
-    //Absentismo: Enfermedades y accidentes
-    enfermedad: "",
-    asociadoTrabajo: false,
-    anio: "",
-    diasDescanso: "",
-    dataEnfermedades: [],
+    //Hábitos
+    tabaco: "nada",
+    alcohol: "nada",
+    drogas: "nada",
 
     //=============================================================================================
     //TAB LATERAL
     //=============================================================================================
     observacionesGenerales: "",
+    conclusiones: "",
     colesterolTotal: "",
     LDLColesterol: "",
     HDLColesterol: "",
     VLDLColesterol: "",
     trigliceridos: "",
-
-    colesterolRed: false,
-    trigliceridosRed: false,
-    LDLColesterolRed: false,
-    HDLColesterolRed: false,
-    VLDLColesterolRed: false,
-    imcRed: false,
-    
-    //Comparacion Grupo Sanguineo
-    grupoSanguineoPrevio: "",
-    grupoSanguineoGrupo: "",
     //Grupo Sanguineo
     grupoSanguineo: "",
     factorRh: "",
@@ -131,13 +119,6 @@ export default function Anexo2({ listas }) {
     creatinina: "",
     marihuana: "",
     cocaina: "",
-    cocainaRed: false,
-    marihuanaRed: false,
-    hemoglobinaRed: false,
-    glucosaRed: false,
-    creatininaRed: false,
-
-
     hemoglobinaHematocrito: "",
 
     //=============================================================================================
@@ -161,6 +142,7 @@ export default function Anexo2({ listas }) {
     talla: "",
     peso: "",
     imc: "",
+    imcRojo: false,
 
     // Signos Vitales
     frecuenciaRespiratoria: "",
@@ -208,52 +190,67 @@ export default function Anexo2({ listas }) {
     visionBinocular: "",
 
     // Observaciones Generales
-    ectoscopia: "APARENTA BUEN ESTADO DE SALUD.",
-    estadoMental: "DESPIERTO, OTEP, COMUNICATIVO.",
-    anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
+    ectoscopia: "",
+    estadoMental: "",
+    anamnesis: "",
 
     // Dentadura
     piezasMalEstado: "",
     piezasFaltan: "",
+    dentaduraObservaciones: "",
+
+    // Examen Físico
+    cabeza: "",
+    nariz: "",
+    cuello: "",
+    perimetro: "",
+    bocaAmigdalasFaringeLaringe: "",
+    otoscopiaOd: true,
+    otoscopiaOi: true,
+    torax: "",
+    corazon: "",
+    pulmones: "",
+    pulmonesObservaciones: "",
+    miembrosSuperiores: "",
+    miembrosInferiores: "",
+    reflejosOsteotendinosos: "",
+    marcha: "",
 
     //=============================================================================================
-    //TERCERA TAB EXAMEN FISICO
+    //TERCERA TAB RESULTADOS
     //=============================================================================================
-
-    // Examen Físico por Sistemas
-    cabeza:
-      "CENTRAL, PRESENCIA DE CABELLO FRONDOSO, NO MASAS, NO TUMORACIONES.",
-    cuello: "CENTRAL, MOVIL, NO MASAS NO TUMORACIONES.",
-    boca: "HUMECTADA, LENGUA ROSADA,CARRILLOS ROSADOS,NO MASA, NO TUMORACIONES, NO LESIONES EN MUCOSA.",
-    faringe:
-      "HUMECTADA, SONROSADA, AMIGADALAS NO HIPERTROFICAS, NO CONGESTIVAS.",
-    nariz: "CENTRAL, PERMEABLE",
-    oidos: "",
-    marcha: "NORMAL",
-    piel: "NORMAL.NO  MANCHA, NO SPRESENCIA DE LUNARES SOSPECHOSOS DE MALIGNIDAD.",
-    aparatoRespiratorio:
-      "RESPIRACION  NORMAL,EXPANSION TORACICA SIMETRICA, BPMV EN ACP, NO RALES.",
-    apaCardiovascular:
-      "NO INGURGITACION YUGULAR, CAROTIDEO,RADIAL, FEMORAL, PEDIO CONSERVADOS.RCRR, NO SOPLOS, NO FROTES.",
-    aparatoDigestivo:
-      "ABDOMEN PLANO, RHA CONSERVADOS, NO RUIDOS ANORMALES, BLANDO, DEPRESIBLE, NO DOLOR A LA PALPACION SUPERFICIAL NI PROFUNDA, NO MASAS NI TUMORACIONES PALPABLES.",
-    aGenitourinario:
-      "PPL: NEGATIVO. PRU: NEGATIVO.HIPOGASTRIO PLANO, B/D, NO DOLOROSO A LA PALPACION SUPERFIAL NI PROFUNDA.NO MASAS NI TUMORACIONES PALPABLES.",
-    aparatoLocomotor:
-      "BIPEDESTACION,MUSCULATURA CONSERVADA, MOTRICIDAD CORPORAL Y SEGMENTARIA CONSERVADA.",
-    miembrosSuperiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
-    miembrosInferiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
-    sistemaLinfatico: "NO ADENOMEGALIAS PATOLOGICA.",
-    sistemaNervioso:
-      "DESPIERTO, OTEP, SENSIBILIDAD Y MOTRICIDAD CONSERVADA, ROTS CONSERVADOS.PARES CRANEALES CONSERVADOS.NO SIGNOS MENINGEOS.",
-    columnaVertebral: "CENTRAL, CURVATURAS CONSERVADAS, MOTRICIDAD CONSERVADA.",
-
-    // Otros Exámenes
+    // Exámenes de Laboratorio
+    grupoSanguineo: "",
+    rhFactor: "",
+    glucosa: "",
+    creatinina: "",
+    coca: "",
+    marihuana: "",
+    hemoglobinaHematocrito: "",
+    vsg: "",
+    nitritos: "",
+    proteinas: "",
+    cetonas: "",
+    leucocitos: "",
+    urobilinogeno: "",
+    bilirrubina: "",
+    glucosaQuimico: "",
+    sangre: "",
+    leucocitosSedimento: "",
+    celulasEpiteliales: "",
+    cilindios: "",
+    bacterias: "",
+    hematies: "",
+    cristales: "",
+    pus: "",
+    otrosSedimento: "",
+    colorFisico: "",
+    aspectoFisico: "",
+    densidadFisico: "",
+    phFisico: "",
     otrosExamenes: "",
+    aptoParaTrabajar: "si",
 
-    //=============================================================================================
-    //CUARTA TAB RESULTADOS
-    //=============================================================================================
     // Aptitud del Paciente
     aptitud: "APTO",
     fechaAptitud: today,
@@ -315,7 +312,6 @@ export default function Anexo2({ listas }) {
     handleRadioButtonBoolean,
     handleClear,
     handleClearnotO,
-    handlePrintDefault,
   } = useForm(initialFormState);
 
   const [activeTab, setActiveTab] = useState(0);
@@ -328,17 +324,11 @@ export default function Anexo2({ listas }) {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    {
-      id: 2,
-      name: "Examen Físico",
-      icon: faHeartbeat,
-      component: ExamenFisico,
-    },
-    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
+    { id: 2, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
 
   const handleSave = () => {
-    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
@@ -347,18 +337,25 @@ export default function Anexo2({ listas }) {
       VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
-
-  const handleSearchExamenesRealizados = (e) => {
-    if (e.key === "Enter") {
-      // handleClearnotO();
-      GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close() });
-    }
-  };
-
-
-  const handlePrint = () => {
-    handlePrintDefault(() => {
-      PrintHojaR(form.norden, token, tabla, datosFooter);
+  const handlePrint = (numPage) => {
+    if (!form.norden)
+      return Swal.fire("Error", "Debe colocar un N° Orden", "error");
+    Swal.fire({
+      title: "¿Desea Imprimir Anexo 16?",
+      html: `<div style='font-size:1.1em;margin-top:8px;'><b style='color:#5b6ef5;'>N° Orden: ${form.norden}</b></div>`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, Imprimir",
+      cancelButtonText: "Cancelar",
+      customClass: {
+        title: "swal2-title",
+        confirmButton: "swal2-confirm",
+        cancelButton: "swal2-cancel",
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        PrintHojaR(form.norden, token, tabla, numPage, datosFooter);
+      }
     });
   };
 
@@ -373,10 +370,11 @@ export default function Anexo2({ listas }) {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
-                    ? "border-[#233245] text-[#233245] font-semibold"
-                    : "border-transparent"
-                    }`}
+                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${
+                    activeTab === tab.id
+                      ? "border-[#233245] text-[#233245] font-semibold"
+                      : "border-transparent"
+                  }`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   <FontAwesomeIcon icon={tab.icon} className="mr-2" />
@@ -404,9 +402,7 @@ export default function Anexo2({ listas }) {
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
                       MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
-                      handleSave={handleSave}
                       handleSearch={handleSearch}
-                      handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                     />
                   )
                 );

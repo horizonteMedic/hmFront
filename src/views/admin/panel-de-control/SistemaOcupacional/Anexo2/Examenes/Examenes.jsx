@@ -16,7 +16,7 @@ export default function Examenes({
       {/* Cuatro columnas arriba */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
         {/* Función Respiratoria */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
+        <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">
             Función Respiratoria Abs
           </h4>
@@ -60,7 +60,7 @@ export default function Examenes({
           />
         </div>
 
-        <div className="lg:col-span-4">
+        <div className="lg:col-span-5">
           {/* Información Triaje */}
           <div className=" bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-2">
@@ -115,6 +115,7 @@ export default function Examenes({
                 value={form.imc}
                 disabled
                 labelWidth="108px"
+                className={form.imcRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="F. Respiratoria(min)"

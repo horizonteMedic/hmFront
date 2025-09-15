@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import {
   InputCheckbox,
   InputsBooleanRadioGroup,
@@ -40,6 +41,13 @@ export default function DatosPersonales({
     setForm((prev) => ({
       ...prev,
       dataEnfermedades: [],
+    }));
+  }
+
+  function handleEliminarEnfermedad(index) {
+    setForm((prev) => ({
+      ...prev,
+      dataEnfermedades: prev.dataEnfermedades.filter((_, i) => i !== index),
     }));
   }
 
@@ -221,13 +229,13 @@ export default function DatosPersonales({
                 label="Puesto Actual"
                 name="puestoActual"
                 value={form.puestoActual}
-                disabled
+                onChange={handleChange}
               />
               <InputTextOneLine
                 label="Tiempo"
                 name="tiempoPuesto"
                 value={form.tiempoPuesto}
-                disabled
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -570,7 +578,7 @@ export default function DatosPersonales({
                 Limpiar
               </button>
             </div>
-            <Table data={form.dataEnfermedades} />
+            <Table data={form.dataEnfermedades} onEliminar={handleEliminarEnfermedad} />
           </div>
         </div>
       </div>
@@ -578,7 +586,27 @@ export default function DatosPersonales({
   );
 }
 
-function Table({ data }) {
+function Table({ data, onEliminar }) {
+  const handleContextMenu = (e, index) => {
+    e.preventDefault();
+
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Este elemento se eliminará permanentemente.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onEliminar(index);
+        Swal.fire("Eliminado", "El elemento ha sido eliminado.", "success");
+      }
+    });
+  }
+
   return (
     <div className="overflow-y-auto py-3" style={{ maxHeight: "150px" }}>
       <table className="w-full table-auto border-collapse ">
@@ -602,6 +630,8 @@ function Table({ data }) {
               <tr
                 key={i}
                 className={`hover:bg-[#233245] hover:text-white cursor-pointer text-lg `}
+                onContextMenu={(e) => handleContextMenu(e, i)}
+                title="Click derecho para eliminar"
               >
                 <td className="border px-2 py-1 font-bold">
                   {row.enfermedad ?? ""}

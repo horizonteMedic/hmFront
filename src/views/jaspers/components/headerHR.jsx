@@ -16,13 +16,23 @@ const headerHR = (doc, datos) => {
   const yOffset = 10;       // separación extra arriba y abajo
   const lineHeight = 4;     // altura entre líneas en mm
 
-  let color = null;
-  let boxText = null;
+  let color =
+    (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
+      ? datos.codigoColor.trim()
+      : "#008f39");
+  let boxText =
+    (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
+      ? datos.textoColor.trim().toUpperCase()
+      : "F");
+  console.log("color", color);
+  console.log("datos.color", datos.color);
 
   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+
+    console.log("colorValido", colorValido);
   if (colorValido) {
-    color = datos.codigoColor || "#008f39";
-    boxText = (datos.textoColor || "F").toUpperCase();
+    // color = datos.codigoColor || "#008f39";
+    // boxText = (datos.textoColor || "F").toUpperCase();
   
     const boxSize = 15;
     const boxX = pageW - margin - boxSize;
