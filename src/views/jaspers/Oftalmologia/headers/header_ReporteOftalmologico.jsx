@@ -101,7 +101,7 @@ const header_ReporteOftalmologico = (doc, datos = {}) => {
   footerFichaOftalmoCabecera(doc, datos);
   // === BLOQUE CÓDIGO DE COLOR ===
   const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   // const color = datos.codigoColor || "#008f39";
   // const boxText = (datos.textoColor || "F").toUpperCase();
   const color = (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
