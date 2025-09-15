@@ -180,7 +180,7 @@ const HeaderInformeElectrocardiogramaPoderosa = (doc, datos) => {
   });
 
   const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     // === 4) BLOQUE CÓDIGO DE COLOR A LA DERECHA ===
     // Siempre mostrar el bloque de color con datos de prueba

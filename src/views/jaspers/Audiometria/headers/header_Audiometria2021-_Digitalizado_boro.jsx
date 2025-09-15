@@ -21,7 +21,7 @@ const header_Audiometria2021_Digitalizado = (doc, datos = {}) => {
   }
 
   // === BLOQUE CÓDIGO DE COLOR ===
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   const color = datos.codigoColor || "#008f39";
   const boxText = (datos.textoColor || "F").toUpperCase();
   let boxSize = 15;

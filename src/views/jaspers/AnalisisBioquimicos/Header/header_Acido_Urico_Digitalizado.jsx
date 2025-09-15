@@ -88,7 +88,7 @@ const header_Acido_Urico_Digitalizado = (doc, datos = {}) => {
   
   // Reseteo de estilos para el cuerpo
   doc.setFont('helvetica', 'normal').setFontSize(10).setLineWidth(0.2);
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

@@ -146,7 +146,7 @@ const header_OIT = (doc, datos = {}) => {
 
 
   // Prueba: si no hay datos.color, usar uno de ejemplo
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     // === BLOQUE CÓDIGO DE COLOR ===
   const color = datos.codigoColor || "#008f39";

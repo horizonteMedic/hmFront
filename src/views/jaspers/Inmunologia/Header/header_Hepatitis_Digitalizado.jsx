@@ -33,7 +33,7 @@ const headerHepatitisDigitalizado = (doc, datos = {}) => {
   }
 
   // --- Código de color ---
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;
@@ -113,7 +113,7 @@ const headerHepatitisDigitalizado = (doc, datos = {}) => {
   doc.setLineWidth(0.2);
 
   // Mostrar código de color si está presente
-  if (typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150) {
+  if (typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();
     let boxSize = 15;

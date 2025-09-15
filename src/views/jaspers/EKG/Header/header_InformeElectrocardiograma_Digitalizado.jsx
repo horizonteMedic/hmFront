@@ -262,7 +262,7 @@ const HeaderInformeElectrocardiograma = (doc, datos) => {
   // === BLOQUE CÓDIGO DE COLOR ===
   // Mostrar el bloque de color usando el color de texto del dato
   const colorValido =
-    typeof datos?.color === "number" && datos.color >= 1 && datos.color <= 150;
+    typeof datos?.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     const color = datos?.codigoColor || "#008f39";
     const boxText = (datos?.textoColor || "E").toUpperCase();

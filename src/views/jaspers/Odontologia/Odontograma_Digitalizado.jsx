@@ -227,11 +227,17 @@ const headerOdontograma = (doc, datos) => {
     { xOffset: -42, fontSize: 7.5, yOffset: -8 },
     datos
   );
-const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 150;
+const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
   // === BLOQUE CÓDIGO DE COLOR ===
-  const color = datos.codigoColor || "#008f39";
-  const boxText = (datos.textoColor || "F").toUpperCase();
+  // const color = datos.codigoColor || "#008f39";
+  // const boxText = (datos.textoColor || "F").toUpperCase();
+  const color = (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
+            ? datos.codigoColor.trim()
+            : "#008f39");
+  const boxText = (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
+            ? datos.textoColor.trim().toUpperCase()
+            : "F");
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;
