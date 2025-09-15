@@ -29,9 +29,15 @@ const header_EvaluacionOftalmologica2021_Digitalizado_boro = (
 
   // === BLOQUE CÓDIGO DE COLOR ===
   const colorValido =
-    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
-  const color = datos.codigoColor || "#008f39";
-  const boxText = (datos.textoColor || "F").toUpperCase();
+    typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
+  // const color = datos.codigoColor || "#008f39";
+  // const boxText = (datos.textoColor || "F").toUpperCase();
+  const color = (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
+            ? datos.codigoColor.trim()
+            : "#008f39");
+  const boxText = (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
+            ? datos.textoColor.trim().toUpperCase()
+            : "F");
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y + 2;

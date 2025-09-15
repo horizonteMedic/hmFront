@@ -162,56 +162,68 @@ export default function ReporteExamen1 (datos){
         const yOffset = 0; // 10 puntos más arriba (cambiado de 10 a 0)
         
         // Código de color usando datos reales
-        const color = datos.codigoColor || "#008f39"; // Usar color real o verde por defecto
-        const boxText = (datos.textoColor || "F").toUpperCase(); // Usar texto real o "F" por defecto
-        
-        const boxSize = 15;
-        const boxX = pageW - margin - boxSize + 7; // 5 puntos a la derecha
-        const boxY = yOffset + 2;
-        
-        // Draw box outline in black
-        doc.setDrawColor(0);
-        doc.setLineWidth(0.5);
-        doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+       const color =
+        (datos.codigoColor?.trim() && datos.codigoColor.trim() !== ""
+            ? datos.codigoColor.trim()
+            : "#008f39");
 
-        // Línea de color
-        doc.setDrawColor(color);
-        doc.setLineWidth(2);
-        doc.setLineCap('round');
-        doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
-        doc.setLineCap('butt');
-        
-        // Texto del código
-        doc.setFontSize(20); // Aumentado de 18 a 20 (2 puntos más grande)
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(color);
-        doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
-          align: "center",
-          baseline: "middle",
-          maxWidth: boxSize - 1
-        });
-        
-        // Número de color al lado izquierdo - AHORA USANDO EL NÚMERO DE ORDEN DEL REGISTRO
-        doc.setFontSize(60);
-        doc.setFont("helvetica", "bold");
-        doc.setTextColor(255, 0, 0); // Rojo
-        
-        // Usar el número de orden del registro en lugar del color de la API
-        // Si no viene el número de orden, usar el color como fallback
-        const numeroColor = datos.numeroOrden || datos.color || "1";
-        
-        // Coordenadas individuales para el número de color
-        const numeroColorX = boxX - 15;
-        const numeroColorY = boxY + boxSize/2;
-        
-        doc.text(String(numeroColor), numeroColorX, numeroColorY, { 
-          align: "center",
-          baseline: "middle"
-        });
-        
-        // Reset color settings
-        doc.setDrawColor(0);
-        doc.setTextColor(0);
+        const boxText =
+        (datos.textoColor?.trim() && datos.textoColor.trim() !== ""
+            ? datos.textoColor.trim().toUpperCase()
+            : "F");
+        const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
+        if (colorValido) {
+            const boxSize = 15;
+            const boxX = pageW - margin - boxSize + 7; // 5 puntos a la derecha
+            const boxY = yOffset + 2;
+            
+            // Draw box outline in black
+            doc.setDrawColor(0);
+            doc.setLineWidth(0.5);
+            doc.roundedRect(boxX, boxY, boxSize, boxSize, 2, 2);
+
+            // Línea de color
+            doc.setDrawColor(color);
+            doc.setLineWidth(2);
+            doc.setLineCap('round');
+            doc.line(boxX + boxSize + 3, boxY, boxX + boxSize + 3, boxY + boxSize);
+            doc.setLineCap('butt');
+            
+            // Texto del código
+            doc.setFontSize(20); // Aumentado de 18 a 20 (2 puntos más grande)
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(color);
+            doc.text(boxText, boxX + boxSize/2, boxY + (boxSize/2), { 
+            align: "center",
+            baseline: "middle",
+            maxWidth: boxSize - 1
+            });
+            
+            // Número de color al lado izquierdo - AHORA USANDO EL NÚMERO DE ORDEN DEL REGISTRO
+            // COMENTADO: Ya no se necesita mostrar el número visiblemente en la página 2
+            /*
+            doc.setFontSize(60);
+            doc.setFont("helvetica", "bold");
+            doc.setTextColor(255, 0, 0); // Rojo
+            
+            // Usar el número de orden del registro en lugar del color de la API
+            // Si no viene el número de orden, usar el color como fallback
+            const numeroColor = datos.numeroOrden || datos.color || "1";
+            
+            // Coordenadas individuales para el número de color
+            const numeroColorX = boxX - 15;
+            const numeroColorY = boxY + boxSize/2;
+            
+            doc.text(String(numeroColor), numeroColorX, numeroColorY, { 
+            align: "center",
+            baseline: "middle"
+            });
+            */
+            
+            // Reset color settings
+            doc.setDrawColor(0);
+            doc.setTextColor(0);
+        }
         
         // Agregar la imagen de la hoja de ruta en la mitad superior de la página 2
         try {
@@ -262,8 +274,9 @@ export default function ReporteExamen1 (datos){
                 
                 // Mapeo de abreviaciones específicas para página 2
                 if (examenLower.includes("psicosensometria") || examenLower.includes("psicosensometría")) return "PSICO";
-                if (examenLower.includes("anexo16-a")) return "ANX16-A";
-                if (examenLower.includes("anexo16")) return "ANX16";
+                if (examenLower.includes("anexo16-a") || examenLower.includes("anexo 16-a")) return "ANX16-A";
+                if (examenLower.includes("anexo16a") || examenLower.includes("anexo 16a")) return "ANX16A";
+                if (examenLower.includes("anexo16") || examenLower.includes("anexo 16")) return "ANX16";
                 if (examenLower.includes("anual")) return "ANUAL";
                 if (examenLower.includes("pre-ocupacional") || examenLower.includes("preocupacional")) return "PRE-OC";
                 if (examenLower.includes("ocupacional")) return "OCUP";

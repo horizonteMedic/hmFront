@@ -36,15 +36,8 @@ import {
 } from "./Admision/model/Combobox.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faUsers,
   faClipboardList,
-  faFileExcel,
-  faExpand,
-  faTicket,
-  faFileSignature,
   faStethoscope,
-  faFileContract,
-  faChartLine,
   faVial,
   faUserCheck,
   faUserMd,
@@ -55,7 +48,6 @@ import {
   faTooth,
   faEye,
   faBars,
-  faTimes,
   faFlask,
   faFilter,
   faVirus,
@@ -63,7 +55,6 @@ import {
   faFileAlt,
   faMicroscope,
   faVialVirus,
-  faNotesMedical,
   faFileWaveform,
   faAnchor,
   faSkiingNordic,
@@ -72,6 +63,10 @@ import {
   faBed,
   faMountain,
   fa2,
+  faCheckToSlot,
+  faFileMedicalAlt,
+  fa1,
+  fa6,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -84,14 +79,15 @@ import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
 import RayosXTabSelector from "./RayosX/RayosXTabSelector.jsx";
-import ConsentimientoInformadoOcupacional from "./ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
+import ConsentimientoInformadoOcupacional from "./Consentimientos/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
 import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
-import ManejoCamara from "./Playground/ManejoCamara.jsx";
+import Anexo16 from "./Anexo16/Anexo16.jsx";
 import EKG from "./EKG/ekg.jsx";
 import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.jsx";
 import Anexo2 from "./Anexo2/Anexo2.jsx";
+import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -243,9 +239,8 @@ const TabComponent = () => {
             <div className={styles.gridContainer}>
               {tieneVista("Admision") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 0 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 0 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(0)}
                 >
                   <span className={styles.icon}>
@@ -256,9 +251,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Triaje") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 1 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 1 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(1)}
                 >
                   <span className={styles.icon}>
@@ -269,9 +263,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Laboratorio Clinico") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 2 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 2 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(2)}
                 >
                   <span className={styles.icon}>
@@ -282,9 +275,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Historia Ocupacional") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 16 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 16 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(16)}
                 >
                   <span className={styles.icon}>
@@ -293,11 +285,11 @@ const TabComponent = () => {
                   <span className={styles.title}>Historia Ocupacional</span>
                 </div>
               )}
+
               {tieneVista("Coproparasitologico") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 3 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 3 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(3)}
                 >
                   <span className={styles.icon}>
@@ -308,9 +300,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Psicologia") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 10 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faUserMd} />
@@ -320,9 +311,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Medicina General") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 11 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 11 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faUserMd} />
@@ -333,9 +323,8 @@ const TabComponent = () => {
               {tieneVista("Rayos X") && (
                 <div
                   onClick={() => setActiveTab(12)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 12 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 12 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faXRay} />
@@ -346,9 +335,8 @@ const TabComponent = () => {
               {tieneVista("EKG") && (
                 <div
                   onClick={() => setActiveTab(13)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 13 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 13 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faHeartbeat} />
@@ -359,9 +347,8 @@ const TabComponent = () => {
               {tieneVista("Espirometria") && (
                 <div
                   onClick={() => setActiveTab(14)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 14 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 14 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faLungs} />
@@ -372,9 +359,8 @@ const TabComponent = () => {
               {tieneVista("Audiometria") && (
                 <div
                   onClick={() => setActiveTab(15)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 15 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 15 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faDeaf} />
@@ -385,9 +371,8 @@ const TabComponent = () => {
               {tieneVista("Odontologia") && (
                 <div
                   onClick={() => setActiveTab(18)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 18 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 18 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faTooth} />
@@ -398,9 +383,8 @@ const TabComponent = () => {
               {tieneVista("Oftalmologia") && (
                 <div
                   onClick={() => setActiveTab(17)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 17 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 17 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faEye} />
@@ -411,9 +395,8 @@ const TabComponent = () => {
               {tieneVista("OIT") && (
                 <div
                   onClick={() => setActiveTab(19)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 19 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 19 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faAnchor} />
@@ -424,12 +407,11 @@ const TabComponent = () => {
               {tieneVista("Modulo de Consentimientos") && (
                 <div
                   onClick={() => setActiveTab(20)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 19 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 20 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faAnchor} />
+                    <FontAwesomeIcon icon={faCheckToSlot} />
                   </span>
                   <span className={styles.title}>
                     Modulo de Consentimientos
@@ -439,9 +421,8 @@ const TabComponent = () => {
               {tieneVista("Cuestionario Nordico") && (
                 <div
                   onClick={() => setActiveTab(21)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 21 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 21 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faSkiingNordic} />
@@ -452,9 +433,8 @@ const TabComponent = () => {
               {tieneVista("Evaluación Musculoesquelética") && (
                 <div
                   onClick={() => setActiveTab(22)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 22 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 22 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faSkull} />
@@ -467,9 +447,8 @@ const TabComponent = () => {
               {tieneVista("Test Fatiga") && (
                 <div
                   onClick={() => setActiveTab(23)}
-                  className={`${styles.gridItem} ${
-                    activeTab === 23 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 23 ? styles.active : ""
+                    }`}
                 >
                   <span className={styles.icon}>
                     <FontAwesomeIcon icon={faBed} />
@@ -481,9 +460,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Antecedentes de Altura") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 25 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 25 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(25)}
                 >
                   <span className={styles.icon}>
@@ -494,9 +472,8 @@ const TabComponent = () => {
               )}
               {tieneVista("Anexo 2") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 26 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 26 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(26)}
                 >
                   <span className={styles.icon}>
@@ -505,11 +482,23 @@ const TabComponent = () => {
                   <span className={styles.title}>Anexo 2</span>
                 </div>
               )}
+              {tieneVista("Anexo 16") && (
+                <div
+                  className={`${styles.gridItem} ${activeTab === 27 ? styles.active : ""
+                    }`}
+                  onClick={() => setActiveTab(27)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={fa1} />
+                    <FontAwesomeIcon icon={fa6} />
+                  </span>
+                  <span className={styles.title}>Anexo 16</span>
+                </div>
+              )}
               {tieneVista("Playground") && (
                 <div
-                  className={`${styles.gridItem} ${
-                    activeTab === 24 ? styles.active : ""
-                  }`}
+                  className={`${styles.gridItem} ${activeTab === 24 ? styles.active : ""
+                    }`}
                   onClick={() => setActiveTab(24)}
                 >
                   <span className={styles.icon}>
@@ -555,9 +544,8 @@ const TabComponent = () => {
                 <div className={styles.tabHeader}>
                   {/*Esto se va a mostrar por defecto */}
                   <button
-                    className={`${styles.tabButton} ${
-                      subTab === 0 ? styles.active : ""
-                    }`}
+                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
+                      }`}
                     onClick={() => setSubTab(0)}
                   >
                     Registro de Pacientes
@@ -565,9 +553,8 @@ const TabComponent = () => {
 
                   {tienePermisoEnVista("Admision", "Acceso a Examenes Pre") && (
                     <button
-                      className={`${styles.tabButton} ${
-                        subTab === 2 ? styles.active : ""
-                      }`}
+                      className={`${styles.tabButton} ${subTab === 2 ? styles.active : ""
+                        }`}
                       onClick={() => setSubTab(2)}
                     >
                       Apertura Exámenes PreOcup
@@ -577,28 +564,26 @@ const TabComponent = () => {
                     "Admision",
                     "Acceso Consentimiento de Digitalizacion"
                   ) && (
-                    <button
-                      className={`${styles.tabButton} ${
-                        subTab === 1 ? styles.active : ""
-                      }`}
-                      onClick={() => setSubTab(1)}
-                    >
-                      Consentimiento Digitalización
-                    </button>
-                  )}
+                      <button
+                        className={`${styles.tabButton} ${subTab === 1 ? styles.active : ""
+                          }`}
+                        onClick={() => setSubTab(1)}
+                      >
+                        Consentimiento Digitalización
+                      </button>
+                    )}
                   {tienePermisoEnVista(
                     "Admision",
                     "Acceso Reserva de Pacientes"
                   ) && (
-                    <button
-                      className={`${styles.tabButton} ${
-                        subTab === 3 ? styles.active : ""
-                      }`}
-                      onClick={() => setSubTab(3)}
-                    >
-                      Reserva de Pacientes
-                    </button>
-                  )}
+                      <button
+                        className={`${styles.tabButton} ${subTab === 3 ? styles.active : ""
+                          }`}
+                        onClick={() => setSubTab(3)}
+                      >
+                        Reserva de Pacientes
+                      </button>
+                    )}
                 </div>
                 <div>
                   {subTab === 0 && (
@@ -685,9 +670,8 @@ const TabComponent = () => {
               <nav className={styles.labNav}>
                 {tieneVista("Laboratorio Clinico Formulario") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 0 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 0 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(0)}
                   >
                     <FontAwesomeIcon icon={faFlask} className="mr-2" />
@@ -696,9 +680,8 @@ const TabComponent = () => {
                 )}
                 {tieneVista("Laboratorio Clinico Formulario") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 1 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 1 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(1)}
                   >
                     <FontAwesomeIcon icon={faFilter} className="mr-2" />
@@ -707,9 +690,8 @@ const TabComponent = () => {
                 )}
                 {tieneVista("Inmunologia") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 2 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 2 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(2)}
                   >
                     <FontAwesomeIcon icon={faVirus} className="mr-2" />
@@ -718,9 +700,8 @@ const TabComponent = () => {
                 )}
                 {tieneVista("Toxicologia") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 3 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 3 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(3)}
                   >
                     <FontAwesomeIcon icon={faSyringe} className="mr-2" />
@@ -729,9 +710,8 @@ const TabComponent = () => {
                 )}
                 {tieneVista("Consentimientos") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 4 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 4 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(4)}
                   >
                     <FontAwesomeIcon icon={faFileAlt} className="mr-2" />
@@ -740,9 +720,8 @@ const TabComponent = () => {
                 )}
                 {tieneVista("Manipuladores") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 5 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 5 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(5)}
                   >
                     <FontAwesomeIcon icon={faMicroscope} className="mr-2" />
@@ -751,9 +730,8 @@ const TabComponent = () => {
                 )}
                 {tieneVista("Pruebas Covid") && (
                   <button
-                    className={`${styles.labNavButton} ${
-                      labTab === 6 ? styles.labNavButtonActive : ""
-                    }`}
+                    className={`${styles.labNavButton} ${labTab === 6 ? styles.labNavButtonActive : ""
+                      }`}
                     onClick={() => setLabTab(6)}
                   >
                     <FontAwesomeIcon icon={faVialVirus} className="mr-2" />
@@ -933,9 +911,8 @@ const TabComponent = () => {
                 <div className={styles.tabHeader}>
                   {/*Esto se va a mostrar por defecto */}
                   <button
-                    className={`${styles.tabButton} ${
-                      subTab === 0 ? styles.active : ""
-                    }`}
+                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
+                      }`}
                     onClick={() => setSubTab(0)}
                   >
                     Espirometría
@@ -1005,26 +982,23 @@ const TabComponent = () => {
                 <div className={styles.tabHeader}>
                   {/*Esto se va a mostrar por defecto */}
                   <button
-                    className={`${styles.tabButton} ${
-                      subTab === 0 ? styles.active : ""
-                    }`}
+                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
+                      }`}
                     onClick={() => setSubTab(0)}
                   >
                     Audiometria
                   </button>
 
                   <button
-                    className={`${styles.tabButton} ${
-                      subTab === 1 ? styles.active : ""
-                    }`}
+                    className={`${styles.tabButton} ${subTab === 1 ? styles.active : ""
+                      }`}
                     onClick={() => setSubTab(1)}
                   >
                     Audiometria Ohla
                   </button>
                   <button
-                    className={`${styles.tabButton} ${
-                      subTab === 2 ? styles.active : ""
-                    }`}
+                    className={`${styles.tabButton} ${subTab === 2 ? styles.active : ""
+                      }`}
                     onClick={() => setSubTab(2)}
                   >
                     Cuestionario de Audiometria
@@ -1123,12 +1097,12 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <ConsentimientoInformadoOcupacional
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-                userDatos={userlogued}
-              />
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Módulo de Consentimientos
+                </h2>
+              </div>
+              <ConsentimientosTabSelector tieneVista={tieneVista} />
             </div>
           )}
           {activeTab === 21 && (
@@ -1195,7 +1169,7 @@ const TabComponent = () => {
                   Playground
                 </h2>
               </div>
-              <ManejoCamara />
+              <Anexo16 listas={listasCombos} />
             </div>
           )}
           {activeTab === 25 && (
@@ -1221,7 +1195,30 @@ const TabComponent = () => {
                   ← Atrás
                 </button>
               </div>
-              <Anexo2 />
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Anexo 2
+                </h2>
+              </div>
+              <Anexo2 listas={listasCombos} />
+            </div>
+          )}
+          {activeTab === 27 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Anexo 16
+                </h2>
+              </div>
+              <Anexo16 listas={listasCombos} />
             </div>
           )}
         </div>
@@ -1302,6 +1299,10 @@ const TabComponent = () => {
               break;
             case "Anexo 2":
               setActiveTab(26);
+              setSubTab(0);
+              break;
+            case "Anexo 16":
+              setActiveTab(27);
               setSubTab(0);
               break;
           }

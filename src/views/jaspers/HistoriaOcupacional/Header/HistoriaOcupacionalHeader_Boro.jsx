@@ -48,7 +48,7 @@
 //   }
 
 //   // --- Cuadro de color a la derecha ---
-//   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+//   const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
 //   let boxSize = 15;
 //   let boxX = pageW - margin - boxSize;
 //   let boxY = y - 3;
@@ -196,7 +196,7 @@ const header_HistoriaOcupacional_Boro = (doc, datos = {}) => {
   }
 
   // --- Cuadro de color a la derecha ---
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   let boxSize = 15;
   let boxX = pageW - margin - boxSize;
   let boxY = y - 3;

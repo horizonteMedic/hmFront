@@ -53,7 +53,7 @@ const headerMicrobiologia = (doc, datos = {}) => {
   doc.text("Fecha :", margin, y);
   doc.setFont("helvetica", "normal");
   doc.text(`${datos.fecha || ""}`, margin + 22, y);
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

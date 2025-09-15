@@ -23,11 +23,20 @@ export const HematologiaBioquimicaSIEO = ({
 
   const [tableLab, settableLab] = useState([]);
   const setField = (field, value) => {
+    // Si el valor es "N/A" (con o sin espacios), aplicar trim
+    if (value && value.trim && value.trim().toUpperCase() === "N/A") {
+      value = "N/A";
+    }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleInputChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    let value = e.target.value;
+    // Si el valor es "N/A" (con o sin espacios), aplicar trim
+    if (value && value.trim().toUpperCase() === "N/A") {
+      value = "N/A";
+    }
+    setForm({ ...form, [e.target.name]: value });
   };
 
   const handleClear = () => {
@@ -141,7 +150,7 @@ export const HematologiaBioquimicaSIEO = ({
   // Función para setear todos los campos de Hematología a 'N/A' o restaurar
   const handleHematologiaNA = (checked) => {
     setHematologiaNA(checked);
-    const value = checked ? "N/A" : "";
+    const value = checked ? "N/A".trim() : "";
     setForm((prev) => {
       const newFields = {};
       hematologiaKeys.forEach((k) => {
@@ -567,7 +576,7 @@ export const HematologiaBioquimicaSIEO = ({
                     checked={form.glucosaNA || form.glucosa === "N/A"}
                     onChange={(v) => {
                       setField("glucosaNA", v);
-                      setField("glucosa", v ? "N/A" : "");
+                      setField("glucosa", v ? "N/A".trim() : "");
                     }}
                   />
                 </span>
@@ -598,7 +607,7 @@ export const HematologiaBioquimicaSIEO = ({
                     checked={form.creatininaNA || form.creatinina === "N/A"}
                     onChange={(v) => {
                       setField("creatininaNA", v);
-                      setField("creatinina", v ? "N/A" : "");
+                      setField("creatinina", v ? "N/A".trim() : "");
                     }}
                   />
                 </span>
@@ -653,7 +662,7 @@ export const HematologiaBioquimicaSIEO = ({
                     onChange={(v) => {
                       setRprNA(v);
                       setField("rprNA", v);
-                      setField("rpr", v ? "N/A" : "");
+                      setField("rpr", v ? "N/A".trim() : "");
                     }}
                   />
                 </div>
@@ -696,7 +705,7 @@ export const HematologiaBioquimicaSIEO = ({
                     onChange={(v) => {
                       setVihNA(v);
                       setField("vihNA", v);
-                      setField("vih", v ? "N/A" : "");
+                      setField("vih", v ? "N/A".trim() : "");
                     }}
                   />
                 </div>

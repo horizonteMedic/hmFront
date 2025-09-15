@@ -181,14 +181,14 @@ export default function ModalLevantarObservacion({
               <input
                 name="visionCercaODC"
                 value={form.visionCercaODC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionCercaOIC")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionCercaOIC"
                 value={form.visionCercaOIC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosODC")}
                 className="border rounded px-2 py-1"
               />
@@ -211,14 +211,14 @@ export default function ModalLevantarObservacion({
               <input
                 name="visionLejosODC"
                 value={form.visionLejosODC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosOIC")}
                 className="border rounded px-2 py-1"
               />
               <input
                 name="visionLejosOIC"
                 value={form.visionLejosOIC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionColores")}
                 className="border rounded px-2 py-1"
               />

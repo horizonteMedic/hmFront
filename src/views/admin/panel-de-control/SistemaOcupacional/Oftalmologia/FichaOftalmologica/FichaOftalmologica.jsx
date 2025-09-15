@@ -325,7 +325,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionCercaOD"
                 value={form.visionCercaOD || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionCercaOI")}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
@@ -333,7 +333,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionCercaOI"
                 value={form.visionCercaOI || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => {
                   handleNextFocus(e, "visionLejosOD");
                   if (e.key === "Enter") {
@@ -350,7 +350,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionCercaODC"
                 value={form.visionCercaODC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionCercaOIC")}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
@@ -358,7 +358,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionCercaOIC"
                 value={form.visionCercaOIC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosODC")}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
@@ -370,7 +370,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionLejosOD"
                 value={form.visionLejosOD || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosOI")}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
@@ -378,7 +378,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionLejosOI"
                 value={form.visionLejosOI || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => {
                   handleNextFocus(e, "visionCercaODC");
                   if (e.key === "Enter") {
@@ -395,7 +395,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionLejosODC"
                 value={form.visionLejosODC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionLejosOIC")}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
@@ -403,7 +403,7 @@ export default function FichaOftalmologica({
               <input
                 name="visionLejosOIC"
                 value={form.visionLejosOIC || ""}
-                onChange={handleChangeNumber}
+                onChange={handleChange}
                 onKeyUp={(e) => handleNextFocus(e, "visionColores")}
                 onBlur={handleBlur}
                 className="border rounded px-2 py-1"
@@ -528,12 +528,14 @@ export default function FichaOftalmologica({
                   <input
                     type="checkbox"
                     name="opcionPterigion"
-                    checked={form.presenciaPterigion.includes("PTERIGIÓN OJO DERECHO")}
+                    checked={form.presenciaPterigion.includes(
+                      "PTERIGIÓN OJO DERECHO"
+                    )}
                     onChange={(e) =>
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? (f.presenciaPterigion + " PTERIGIÓN OJO DERECHO") 
+                          ? f.presenciaPterigion + " PTERIGIÓN OJO DERECHO"
                           : "",
                       }))
                     }
@@ -551,7 +553,7 @@ export default function FichaOftalmologica({
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? (f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO")
+                          ? f.presenciaPterigion + " PTERIGIÓN OJO IZQUIERDO"
                           : "",
                       }))
                     }
@@ -569,7 +571,7 @@ export default function FichaOftalmologica({
                       setForm((f) => ({
                         ...f,
                         presenciaPterigion: e.target.checked
-                          ? (f.presenciaPterigion + " PTERIGIÓN BILATERAL")
+                          ? f.presenciaPterigion + " PTERIGIÓN BILATERAL"
                           : "",
                       }))
                     }

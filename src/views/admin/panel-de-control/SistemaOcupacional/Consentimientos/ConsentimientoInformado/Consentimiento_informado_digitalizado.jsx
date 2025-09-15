@@ -2,16 +2,14 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBroom,
-  faCalendar,
-  faEdit,
   faPrint,
   faSave,
   faSync,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { getFetch } from "../../getFetch/getFetch";
+import { getFetch } from "../../../getFetch/getFetch";
 import { SubmitConsentimientoInformado } from "./model";
-import { useSessionData } from "../../../../hooks/useSessionData";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
 const tabla = "consentimientoInformado";
 const date = new Date();
@@ -56,10 +54,10 @@ const initialFormState = {
   textoFinalConsentimiento: `De acuerdo a los peligros y riesgos identificados en mi puesto de trabajo. En ese sentido en forma consciente y voluntaria doy mi consentimiento, para que se me realice el examen médico ocupacional de acuerdo a la Resolución ministerial N° 312-2011/MINSA. Y doy fe que la información brindada a HORIZONTE MEDIC es verídica. Así mismo, autorizo a HORIZONTE MEDIC para que brinde mi historia clínica y toda información resultante de mi examen médico ocupacional al Médico Ocupacional de mi empresa para que tenga acceso a mi Historia Clínica de acuerdo a la N.T.N° 022 MINSA/dgsp-V.02 y Ley N° 26842, Ley general de salud.`,
 };
 
-export default function ConsentimientoInformadoOcupacional({ token, selectedSede, userlogued, userDatos }) {
+export default function ConsentimientoInformadoOcupacional() {
   const [form, setForm] = useState(initialFormState);
   const [isEditing, setIsEditing] = useState(false);
-  const { datosFooter, userCompleto } =
+  const {token, selectedSede, userlogued, datosFooter } =
     useSessionData();
 
   useEffect(() => {
@@ -229,8 +227,8 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
           console.log(res)
           const nombre = res.nameJasper;
           console.log(nombre)
-          const jasperModules = import.meta.glob('../../../../jaspers/ConsentimientoInformado/*.jsx');
-          const modulo = await jasperModules[`../../../../jaspers/ConsentimientoInformado/${nombre}.jsx`]();
+          const jasperModules = import.meta.glob('../../../../../jaspers/ConsentimientoInformado/*.jsx');
+          const modulo = await jasperModules[`../../../../../jaspers/ConsentimientoInformado/${nombre}.jsx`]();
           // Ejecuta la función exportada por default con los datos
           if (typeof modulo.default === 'function') {
             modulo.default({ ...res, ...datosFooter });
@@ -282,7 +280,7 @@ export default function ConsentimientoInformadoOcupacional({ token, selectedSede
   };
 
   return (
-    <div className="w-[90%] mx-auto text-[11px] my-12">
+    <div className="w-[90%] mx-auto text-[11px] mt-12">
       {/* Título principal */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">

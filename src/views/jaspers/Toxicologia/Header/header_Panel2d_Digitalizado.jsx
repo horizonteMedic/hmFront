@@ -88,7 +88,7 @@ const header_Panel2d_Digitalizado = (doc, datos = {}) => {
   doc.setFont('helvetica', 'normal');
   const fechaLabelWidth = doc.getTextWidth(fechaLabel);
   doc.text(formatDateToLong(datos.fechaExamen), patientDataX + fechaLabelWidth + 2, y);
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

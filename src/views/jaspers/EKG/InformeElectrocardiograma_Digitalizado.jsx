@@ -17,11 +17,11 @@ export default function InformeElectrocardiograma_Digitalizado(data = {}) {
 
   const datosReales = {
     ritmo: data.mensajeRitmo ?? "",
-    frecuencia: data.mensajeFC ?? "",
-    pr: data.mensajePr ?? "",
-    qrs: data.mensajeQrs ?? "",
-    qtc: data.mensajeQtC ?? "",
-    eje: data.mensajeEje ?? "",
+    frecuencia: `${data.mensajeFC ?? ""} x min`,
+    pr: `${data.mensajePr ?? ""} ms`,
+    qrs: `${data.mensajeQrs ?? ""} ms`,
+    qtc: `${data.mensajeQtC ?? ""} ms`,
+    eje: `${data.mensajeEje ?? ""} °`,
     hallazgo: data.hallazgo ?? "",
     recomendaciones: data.recomendaciones ?? "",
   };

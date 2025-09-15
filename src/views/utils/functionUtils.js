@@ -124,7 +124,6 @@ export const VerifyTRDefault = async (nro, tabla, token, set, sede, noTieneRegis
             noTieneRegistro();//datos paciente
         } else {
             tieneRegistro();//obtener data servicio
-
         }
     });
 };
@@ -138,10 +137,9 @@ export const GetInfoServicioDefault = async (
 ) => {
     try {
         const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
+            `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
             token
         );
-
         if (res?.norden) {
             console.log(res);
             return res;
@@ -163,25 +161,31 @@ export const SubmitDataServiceDefault = async (
     limpiar,
     body,
     registrarUrl,
-    onFinish = () => { }
+    onFinish = () => { },
+    tienePrint = true,
 ) => {
     LoadingDefault("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
         console.log(res);
         if (res.id === 1 || res.id === 0) {
-            Swal.fire({
-                title: "Exito",
-                text: `${res.mensaje},\n¿Desea imprimir?`,
-                icon: "success",
-                showCancelButton: true,
-                confirmButtonColor: "#3085d6",
-                cancelButtonColor: "#d33",
-            }).then((result) => {
-                limpiar();
-                if (result.isConfirmed) {
-                    onFinish();
-                }
-            });
+            if (tienePrint) {
+                Swal.fire({
+                    title: "Exito",
+                    text: `${res.mensaje},\n¿Desea imprimir?`,
+                    icon: "success",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        onFinish();
+                    }
+                });
+
+            } else {
+                onFinish();
+            }
+            limpiar();
         } else {
             Swal.fire("Error", "Ocurrio un error al Registrar", "error");
         }

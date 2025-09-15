@@ -26,7 +26,7 @@ const headerConsentimiento = (doc, datos = {}) => {
   doc.text(`${datos.sede || ''}`, pageW - 90, y + 14);
 
 
-  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 50;
+  const colorValido = typeof datos.color === "number" && datos.color >= 1 && datos.color <= 500;
   if (colorValido) {
     let color = datos.codigoColor || "#008f39";
     let boxText = (datos.textoColor || "F").toUpperCase();

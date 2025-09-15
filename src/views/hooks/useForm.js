@@ -4,9 +4,23 @@ import Swal from "sweetalert2";
 export const useForm = (initialFormState) => {
   const [form, setForm] = useState(initialFormState);
 
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+  // };
+  
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
+    const { name, value, selectionStart, selectionEnd } = e.target;
+
+    setForm((f) => {
+      const upper = value.toUpperCase();
+      return { ...f, [name]: upper };
+    });
+
+    // Restaurar posición del cursor en el próximo ciclo
+    requestAnimationFrame(() => {
+      e.target.setSelectionRange(selectionStart, selectionEnd);
+    });
   };
 
   const handleChangeNumber = (e) => {
@@ -21,6 +35,14 @@ export const useForm = (initialFormState) => {
     setForm((f) => ({
       ...f,
       [name]: value.toUpperCase(),
+    }));
+  };
+
+  const handleRadioButtonBoolean = (e, value) => {
+    const { name } = e.target;
+    setForm((f) => ({
+      ...f,
+      [name]: value,
     }));
   };
 
@@ -69,11 +91,12 @@ export const useForm = (initialFormState) => {
     setForm,
     handleChange,
     handleChangeNumber,
-    handleRadioButton, 
+    handleRadioButton,
     handleInputChangeChecked,
     handleCheckBoxChange,
     handleClear,
     handleClearnotO,
-    handlePrintDefault
+    handlePrintDefault,
+    handleRadioButtonBoolean
   };
 };
