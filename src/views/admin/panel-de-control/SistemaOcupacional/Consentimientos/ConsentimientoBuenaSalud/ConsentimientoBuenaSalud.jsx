@@ -29,6 +29,7 @@ export default function ConsentimientoBuenaSalud() {
     form,
     setForm,
     handleChange,
+    handleChangeSimple,
     handleChangeNumber,
     handleClear,
     handleClearnotO,
@@ -93,7 +94,6 @@ export default function ConsentimientoBuenaSalud() {
               className="border rounded px-2 py-1 flex-1"
               name="nombres"
               value={form.nombres || ""}
-              onChange={handleChange}
               disabled
               placeholder="Nombre completo"
             />
@@ -104,7 +104,6 @@ export default function ConsentimientoBuenaSalud() {
               className="border rounded px-2 py-1 w-48"
               name="edad"
               value={form.edad || ""}
-              onChange={handleChange}
               disabled
               placeholder="Edad"
             />
@@ -116,7 +115,6 @@ export default function ConsentimientoBuenaSalud() {
               className="border rounded px-2 py-1 w-48"
               name="dni"
               value={form.dni || ""}
-              onChange={handleChange}
               disabled
               placeholder="DNI"
             />
@@ -143,8 +141,8 @@ export default function ConsentimientoBuenaSalud() {
                 type="date"
                 className="border rounded px-2 py-1"
                 name="fecha"
-                value={form.fecha || ""}
-                onChange={handleChange}
+                value={form.fecha}
+                onChange={handleChangeSimple}
               />
             </div>
           </div>

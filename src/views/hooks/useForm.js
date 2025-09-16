@@ -4,11 +4,11 @@ import Swal from "sweetalert2";
 export const useForm = (initialFormState) => {
   const [form, setForm] = useState(initialFormState);
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setForm((f) => ({ ...f, [name]: value.toUpperCase() }));
-  // };
-  
+  const handleChangeSimple = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+  };
+
   const handleChange = (e) => {
     const { name, value, selectionStart, selectionEnd } = e.target;
 
@@ -89,6 +89,7 @@ export const useForm = (initialFormState) => {
   return {
     form,
     setForm,
+    handleChangeSimple,
     handleChange,
     handleChangeNumber,
     handleRadioButton,

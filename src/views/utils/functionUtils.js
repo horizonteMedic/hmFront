@@ -57,7 +57,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
     LoadingDefault("Cargando Formato a Imprimir");
 
     getFetch(
-        `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`,
+        `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
         token
     )
         .then(async (res) => {
