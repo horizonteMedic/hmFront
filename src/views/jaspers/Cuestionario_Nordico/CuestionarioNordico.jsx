@@ -1346,7 +1346,7 @@ export default function CuestionarioNordico(datos = {}) {
           const lineMid = (lineStart + lineEnd) / 2; // punto medio en X
 
           doc.line(lineStart, textY + 10, lineEnd, textY + 10);
-          doc.text("Firma y sello del Médico", 30, textY + 14);
+          // doc.text("Firma y huella del paciente", 30, textY + 14);
 
           // ===== Posición de la imagen centrada en la línea =====
           const imgX = lineMid - imgW / 2;
@@ -1360,7 +1360,7 @@ export default function CuestionarioNordico(datos = {}) {
 
         // Línea y texto Postulante
         doc.line(90, textY +10, 140, textY+10);
-        doc.text("Firma y sello del Médico", 98, textY + 14, { align: "left" });
+        doc.text("Firma y huella del paciente", 98, textY + 14, { align: "left" });
 
         doc.text("Gracias por su colaboración", 165,  textY + 10)
         // ===== Función para escalar y dibujar imagen =====
