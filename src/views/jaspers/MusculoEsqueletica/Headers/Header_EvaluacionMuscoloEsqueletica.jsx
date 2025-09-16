@@ -69,7 +69,7 @@ const headerEvaluacionMuscoloEsqueletica = (doc, datos, mostrarFrame = true, num
     doc.text(`Sede : ${sedeValue}`, sedeX2, sedeY2, { align: "right" });
 
     // === BLOQUE CÓDIGO DE COLOR ===
-    const colorValido = typeof datosFinales.color === "number" && datosFinales.color >= 1 && datosFinales.color <= 150;
+    const colorValido = typeof datosFinales.color === "number" && datosFinales.color >= 1 && datosFinales.color <= 500;
     if (colorValido) {
       const color = datosFinales.codigoColor || "#008f39";
       const boxText = (datosFinales.textoColor || "F").toUpperCase();

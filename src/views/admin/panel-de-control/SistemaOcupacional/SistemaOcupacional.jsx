@@ -88,6 +88,7 @@ import EKG from "./EKG/ekg.jsx";
 import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.jsx";
 import Anexo2 from "./Anexo2/Anexo2.jsx";
 import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSelector.jsx";
+import InformePsicologico from "./Psicologia/InformePsicologico/InformePsicologico.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -1169,7 +1170,7 @@ const TabComponent = () => {
                   Playground
                 </h2>
               </div>
-              <Anexo16 listas={listasCombos} />
+              <InformePsicologico />
             </div>
           )}
           {activeTab === 25 && (
