@@ -7,6 +7,9 @@ export default function Anexo2(data = {}) {
   const margin = 0; // Sin márgenes
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
+  
+  // Extraer accidentes directamente del JSON
+  const accidentes = data.accidentes || [];
 
   // Datos de prueba para los campos de Anexo2
   const datosPrueba = {
@@ -119,16 +122,35 @@ export default function Anexo2(data = {}) {
 
     // === ABSENTISMO ===
     absentismo: {
-      lesionesMusculares: {
-        asociadoTrabajo: { si: true, no: true },
-        año: "2023",
-        diasDescanso: "15"
-      },
-      lesionActualizada: {
-        asociadoTrabajo: { si: true, no: true },
-        año: "2024",
-        diasDescanso: "5"
-      }
+      enfermedades: [
+        {
+          enfermedad: "FRACTURITA ",
+          asociadoTrabajo: { si: false, no: true },
+          año: "2024",
+          diasDescanso: "30",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "QUEMADURA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "25",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        }
+      ]
     },
 
     // === V. EVALUACIÓN MÉDICA ===
@@ -359,17 +381,20 @@ export default function Anexo2(data = {}) {
     },
 
     // === ABSENTISMO ===
-    absentismo: { //revisar deberia ser una tabla
-      lesionesMusculares: {
-        asociadoTrabajo: { si: data.lesionesMuscularesSi ?? false, no: data.lesionesMuscularesNo ?? false },
-        año: data.lesionesMuscularesAno ?? "",
-        diasDescanso: data.lesionesMuscularesDias ?? ""
-      },
-      lesionActualizada: {
-        asociadoTrabajo: { si: data.lesionActualizadaSi ?? false, no: data.lesionActualizadaNo ?? false },
-        año: data.lesionActualizadaAno ?? "",
-        diasDescanso: data.lesionActualizadaDias ?? ""
-      }
+    absentismo: {
+      // Usar accidentes directamente del JSON
+      enfermedades: accidentes?.map(accidente => ({
+        enfermedad: accidente.enfermedad ?? "",
+        asociadoTrabajo: { 
+          si: accidente.asociadoTrabajo === "true" || accidente.asociadoTrabajo === true, 
+          no: accidente.asociadoTrabajo === "false" || accidente.asociadoTrabajo === false 
+        },
+        año: accidente.anio ?? "",
+        diasDescanso: accidente.diasDescanso ?? "",
+        codigoAnexo: accidente.codigoAnexo ?? "",
+        fecha: accidente.fecha ?? "",
+        userRegistro: accidente.userRegistro ?? ""
+      })) ?? []
     },
 
     // === V. EVALUACIÓN MÉDICA ===
@@ -483,20 +508,21 @@ export default function Anexo2(data = {}) {
       restricciones: data.restricciones_txtrestricciones ?? "",
 
       // Firmas
-      firmaMedico: data.digitalizacion.find(
+      firmaMedico: data.digitalizacion?.find(
         item => item.nombreDigitalizacion === "SELLOFIRMA"
       )?.url ?? "",
-      huellaPaciente: data.digitalizacion.find(
+      huellaPaciente: data.digitalizacion?.find(
         item => item.nombreDigitalizacion === "HUELLA"
       )?.url ?? "",
-      firmaPaciente: data.digitalizacion.find(
+      firmaPaciente: data.digitalizacion?.find(
         item => item.nombreDigitalizacion === "FIRMAP"
       )?.url ?? ""
     }
   };
 
   // Usar datos reales o datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
+  // Verificar si hay datos reales de la API (presencia de norden_n_orden indica datos reales)
+  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
@@ -1132,51 +1158,46 @@ export default function Anexo2(data = {}) {
   }
 
   // === SECCIÓN: ABSENTISMO ===
-  if (datosFinales.absentismo) {
-    const absentismo = datosFinales.absentismo;
+  if (datosFinales.absentismo && datosFinales.absentismo.enfermedades) {
+    const enfermedades = datosFinales.absentismo.enfermedades;
 
-    // Posiciones para absentismo
-    const xLesionesMuscularesSi = 107.8;
-    const yLesionesMuscularesSi = 214.6;
+    // Posiciones base para la primera fila
+    const xBaseEnfermedad = 20; // Posición para el nombre de la enfermedad
+    const yBaseEnfermedad = 214.3;
+    const xBaseSi = 107.8;
+    const yBaseSi = 214.3;
+    const xBaseNo = 124;
+    const yBaseNo = 214.3;  
+    const xBaseAno = 138.5;
+    const yBaseAno = 214.3;
+    const xBaseDias = 180;
+    const yBaseDias = 214.3;
 
-    const xLesionesMuscularesNo = 126;
-    const yLesionesMuscularesNo = 214.6;
-
-    const xLesionesMuscularesAno = 143;
-    const yLesionesMuscularesAno = 214.6;
-
-    const xLesionesMuscularesDias = 181.5;
-    const yLesionesMuscularesDias = 214.6;
-
-    const xLesionActualizadaSi = 107.8;
-    const yLesionActualizadaSi = 220;
-
-    const xLesionActualizadaNo = 126;
-    const yLesionActualizadaNo = 220;
-
-    const xLesionActualizadaAno = 143;
-    const yLesionActualizadaAno = 220;
-
-    const xLesionActualizadaDias = 181.5;
-    const yLesionActualizadaDias = 220;
+    // Espaciado entre filas
+    const espaciadoFila = 5.4;
 
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
 
-    // Lesiones Musculares
-    if (absentismo.lesionesMusculares) {
-      const lesion = absentismo.lesionesMusculares;
-
+    // Renderizar hasta 2 enfermedades (o las que quepan en el espacio disponible)
+    enfermedades.slice(0, 2).forEach((enfermedad, index) => {
+      const yOffset = index * espaciadoFila;
+      
+      // Nombre de la enfermedad/accidente
+      if (enfermedad.enfermedad) {
+        doc.text(enfermedad.enfermedad.toUpperCase(), xBaseEnfermedad, yBaseEnfermedad + yOffset);
+      }
+      
       // Checkbox SI/NO
-      if (lesion.asociadoTrabajo) {
+      if (enfermedad.asociadoTrabajo) {
         doc.setTextColor(0, 0, 255); // Color azul para las X
         doc.setFont("helvetica", "bold").setFontSize(12);
 
-        if (lesion.asociadoTrabajo.si) {
-          doc.text("X", xLesionesMuscularesSi, yLesionesMuscularesSi);
+        if (enfermedad.asociadoTrabajo.si) {
+          doc.text("X", xBaseSi, yBaseSi + yOffset);
         }
-        if (lesion.asociadoTrabajo.no) {
-          doc.text("X", xLesionesMuscularesNo, yLesionesMuscularesNo);
+        if (enfermedad.asociadoTrabajo.no) {
+          doc.text("X", xBaseNo, yBaseNo + yOffset);
         }
 
         doc.setTextColor(0, 0, 0); // Resetear a negro
@@ -1184,46 +1205,15 @@ export default function Anexo2(data = {}) {
       }
 
       // Año
-      if (lesion.año) {
-        doc.text(lesion.año.toUpperCase(), xLesionesMuscularesAno, yLesionesMuscularesAno);
+      if (enfermedad.año) {
+        doc.text(enfermedad.año.toUpperCase(), xBaseAno, yBaseAno + yOffset);
       }
 
       // Días de descanso
-      if (lesion.diasDescanso) {
-        doc.text(lesion.diasDescanso.toUpperCase(), xLesionesMuscularesDias, yLesionesMuscularesDias, { align: "center" });
+      if (enfermedad.diasDescanso) {
+        doc.text(enfermedad.diasDescanso.toUpperCase(), xBaseDias, yBaseDias + yOffset, { align: "center" });
       }
-    }
-
-    // Lesión Actualizada
-    if (absentismo.lesionActualizada) {
-      const lesion = absentismo.lesionActualizada;
-
-      // Checkbox SI/NO
-      if (lesion.asociadoTrabajo) {
-        doc.setTextColor(0, 0, 255); // Color azul para las X
-        doc.setFont("helvetica", "bold").setFontSize(12);
-
-        if (lesion.asociadoTrabajo.si) {
-          doc.text("X", xLesionActualizadaSi, yLesionActualizadaSi);
-        }
-        if (lesion.asociadoTrabajo.no) {
-          doc.text("X", xLesionActualizadaNo, yLesionActualizadaNo);
-        }
-
-        doc.setTextColor(0, 0, 0); // Resetear a negro
-        doc.setFont("helvetica", "normal").setFontSize(9);
-      }
-
-      // Año
-      if (lesion.año) {
-        doc.text(lesion.año.toUpperCase(), xLesionActualizadaAno, yLesionActualizadaAno);
-      }
-
-      // Días de descanso
-      if (lesion.diasDescanso) {
-        doc.text(lesion.diasDescanso.toUpperCase(), xLesionActualizadaDias, yLesionActualizadaDias, { align: "center" });
-      }
-    }
+    });
   }
 
   // === SECCIÓN: V. EVALUACIÓN MÉDICA ===
