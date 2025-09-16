@@ -60,10 +60,10 @@ export default function Resultados({
         Resultados del Examen Ocupacional - Anexo 16
       </h3>
 
-      {/* Sección de Exámenes de Laboratorio */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-6">
+      {/* Primera fila - 3 grids */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
         {/* Grupo Sanguíneo */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Grupo Sanguíneo</h4>
           <div className="space-y-2">
             <div>
@@ -92,226 +92,304 @@ export default function Resultados({
                 ]}
               />
             </div>
-            <div className="space-y-1">
-              <InputTextOneLine
-                label="Glucosa:"
-                name="glucosa"
-                value={form.glucosa}
-                onChange={handleChange}
-                labelWidth="80px"
-              />
-              <InputTextOneLine
-                label="Creatinina:"
-                name="creatinina"
-                value={form.creatinina}
-                onChange={handleChange}
-                labelWidth="80px"
-              />
-              <InputTextOneLine
-                label="Coca:"
-                name="coca"
-                value={form.coca}
-                onChange={handleChange}
-                labelWidth="80px"
-              />
-              <InputTextOneLine
-                label="Marih.:"
-                name="marihuana"
-                value={form.marihuana}
-                onChange={handleChange}
-                labelWidth="80px"
-              />
-              <InputTextOneLine
-                label="Hemoglobina/Hematocrito:"
-                name="hemoglobinaHematocrito"
-                value={form.hemoglobinaHematocrito}
-                onChange={handleChange}
-                labelWidth="80px"
-              />
-              <InputTextOneLine
-                label="V.S.G:"
-                name="vsg"
-                value={form.vsg}
-                onChange={handleChange}
-                labelWidth="80px"
-              />
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <label className="font-semibold min-w-[80px]">Glucosa</label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  name="glucosa"
+                  value={form.glucosa}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold min-w-[80px]">Creatinina</label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  name="creatinina"
+                  value={form.creatinina}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold min-w-[80px]">Coca</label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  name="coca"
+                  value={form.coca}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold min-w-[80px]">Marih.</label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  name="marihuana"
+                  value={form.marihuana}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold min-w-[80px]">Hemoglobina/Hematocrito</label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  name="hemoglobinaHematocrito"
+                  value={form.hemoglobinaHematocrito}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold min-w-[80px]">V.S.G</label>
+                <input
+                  type="text"
+                  className="border rounded px-2 py-1 flex-1"
+                  name="vsg"
+                  value={form.vsg}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </div>
         </div>
 
         {/* Exámen Químico */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Exámen Químico</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <InputTextOneLine
-              label="Nitritos:"
-              name="nitritos"
-              value={form.nitritos}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Proteínas:"
-              name="proteinas"
-              value={form.proteinas}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Cetonas:"
-              name="cetonas"
-              value={form.cetonas}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Leucocitos:"
-              name="leucocitos"
-              value={form.leucocitos}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Urobilinogeno:"
-              name="urobilinogeno"
-              value={form.urobilinogeno}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Bilirrubina:"
-              name="bilirrubina"
-              value={form.bilirrubina}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Glucosa:"
-              name="glucosaQuimico"
-              value={form.glucosaQuimico}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Sangre:"
-              name="sangre"
-              value={form.sangre}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Nitritos</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="nitritos"
+                value={form.nitritos}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Proteínas</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="proteinas"
+                value={form.proteinas}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Cetonas</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="cetonas"
+                value={form.cetonas}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Leucocitos</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="leucocitos"
+                value={form.leucocitos}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Urobilinogeno</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="urobilinogeno"
+                value={form.urobilinogeno}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Bilirrubina</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="bilirrubina"
+                value={form.bilirrubina}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Glucosa</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="glucosaQuimico"
+                value={form.glucosaQuimico}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Sangre</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="sangre"
+                value={form.sangre}
+                onChange={handleChange}
+              />
+            </div>
           </div>
         </div>
 
         {/* Sedimento Unitario */}
-        <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-3">
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Sedimento Unitario</h4>
-          <div className="grid grid-cols-2 gap-2">
-            <InputTextOneLine
-              label="Leucocitos:"
-              name="leucocitosSedimento"
-              value={form.leucocitosSedimento}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Cel.Epiteliales:"
-              name="celulasEpiteliales"
-              value={form.celulasEpiteliales}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Cilindios:"
-              name="cilindios"
-              value={form.cilindios}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Bacterías:"
-              name="bacterias"
-              value={form.bacterias}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Hematies:"
-              name="hematies"
-              value={form.hematies}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Cristales:"
-              name="cristales"
-              value={form.cristales}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Pus:"
-              name="pus"
-              value={form.pus}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-            <InputTextOneLine
-              label="Otros:"
-              name="otrosSedimento"
-              value={form.otrosSedimento}
-              onChange={handleChange}
-              labelWidth="80px"
-            />
-          </div>
-        </div>
-
-        {/* Exámen Físico y Otros Exámenes */}
-        <div className="lg:col-span-3 space-y-3">
-          {/* Exámen Físico */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Exámen Físico</h4>
-            <div className="grid grid-cols-2 gap-2">
-              <InputTextOneLine
-                label="Color:"
-                name="colorFisico"
-                value={form.colorFisico}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Leucocitos</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="leucocitosSedimento"
+                value={form.leucocitosSedimento}
                 onChange={handleChange}
-                labelWidth="60px"
               />
-              <InputTextOneLine
-                label="Aspecto:"
-                name="aspectoFisico"
-                value={form.aspectoFisico}
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Cel.Epiteliales</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="celulasEpiteliales"
+                value={form.celulasEpiteliales}
                 onChange={handleChange}
-                labelWidth="60px"
               />
-              <InputTextOneLine
-                label="Densidad:"
-                name="densidadFisico"
-                value={form.densidadFisico}
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Cilindios</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="cilindios"
+                value={form.cilindios}
                 onChange={handleChange}
-                labelWidth="60px"
               />
-              <InputTextOneLine
-                label="PH:"
-                name="phFisico"
-                value={form.phFisico}
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Bacterías</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="bacterias"
+                value={form.bacterias}
                 onChange={handleChange}
-                labelWidth="60px"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Hematies</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="hematies"
+                value={form.hematies}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Cristales</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="cristales"
+                value={form.cristales}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Pus</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="pus"
+                value={form.pus}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[80px]">Otros</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="otrosSedimento"
+                value={form.otrosSedimento}
+                onChange={handleChange}
               />
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Otros Exámenes */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">Otros Exámenes</h4>
-            <InputTextArea
-              rows={4}
-              name="otrosExamenes"
-              value={form.otrosExamenes}
-              onChange={handleChange}
-            />
+      {/* Segunda fila - 2 grids: Examen Físico + Otros Exámenes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+        {/* Exámen Físico */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <h4 className="font-semibold text-gray-800 mb-2">Exámen Físico</h4>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[60px]">Color</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="colorFisico"
+                value={form.colorFisico}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[60px]">Aspecto</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="aspectoFisico"
+                value={form.aspectoFisico}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[60px]">Densidad</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="densidadFisico"
+                value={form.densidadFisico}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold min-w-[60px]">PH</label>
+              <input
+                type="text"
+                className="border rounded px-2 py-1 flex-1"
+                name="phFisico"
+                value={form.phFisico}
+                onChange={handleChange}
+              />
+            </div>
           </div>
+        </div>
+
+        {/* Otros Exámenes */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <h4 className="font-semibold text-gray-800 mb-2">Otros Exámenes</h4>
+          <InputTextArea
+            rows={4}
+            name="otrosExamenes"
+            value={form.otrosExamenes}
+            onChange={handleChange}
+          />
         </div>
       </div>
 

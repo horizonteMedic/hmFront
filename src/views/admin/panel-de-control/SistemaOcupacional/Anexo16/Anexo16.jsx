@@ -418,6 +418,8 @@ export default function Anexo16({ listas }) {
             handleRadioButton={handleRadioButton}
             handleClear={handleClear}
             handleSave={handleSave}
+            activeTab={activeTab}
+            handleChange={handleChange}
           />
         </div>
       </div>

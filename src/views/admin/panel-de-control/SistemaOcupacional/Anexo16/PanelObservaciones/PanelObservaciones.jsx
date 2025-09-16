@@ -1,4 +1,4 @@
-import { faBroom, faSave } from "@fortawesome/free-solid-svg-icons";
+import { faBroom, faSave, faUser } from "@fortawesome/free-solid-svg-icons";
 import {
   InputsRadioGroup,
   InputTextArea,
@@ -11,6 +11,8 @@ export default function PanelObservaciones({
   handleRadioButton,
   handleClear,
   handleSave,
+  activeTab,
+  handleChange,
 }) {
   return (
     <div className="p-4 h-full mt-16">
@@ -22,7 +24,7 @@ export default function PanelObservaciones({
             label="Observaciones Generales"
             name="observacionesGenerales"
             value={form.observacionesGenerales}
-            disabled
+            onChange={handleChange}
           />
         </div>
  {/* Conclusiones */}
@@ -32,15 +34,18 @@ export default function PanelObservaciones({
              label="Conclusiones"
              name="conclusiones"
              value={form.conclusiones}
-             disabled
+             onChange={handleChange}
            />
          </div>
 
          {/* Audiometría Normal */}
          <div className="bg-blue-100 border border-blue-200 rounded-lg p-3">
-           <div className="text-red-600 font-bold text-sm uppercase">
-             AUDIOMETRIA - NORMAL - NORMAL .EVALUACION ANUA L
-           </div>
+           <InputTextOneLine
+             name="audiometriaNormal"
+             value={form.audiometriaNormal || "AUDIOMETRIA - NORMAL - NORMAL .EVALUACION ANUA L"}
+             onChange={handleChange}
+             className="text-red-600 font-bold text-sm uppercase w-full"
+           />
          </div>
         {/* Perfil Lipídico */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -52,7 +57,7 @@ export default function PanelObservaciones({
                 name="colesterolTotal"
                 value={form.colesterolTotal}
                 labelWidth="100px"
-                disabled
+                onChange={handleChange}
               />
 
               <InputTextOneLine
@@ -60,7 +65,7 @@ export default function PanelObservaciones({
                 name="LDLColesterol"
                 value={form.LDLColesterol}
                 labelWidth="100px"
-                disabled
+                onChange={handleChange}
               />
 
               <InputTextOneLine
@@ -68,7 +73,7 @@ export default function PanelObservaciones({
                 name="HDLColesterol"
                 value={form.HDLColesterol}
                 labelWidth="100px"
-                disabled
+                onChange={handleChange}
               />
 
               <InputTextOneLine
@@ -76,7 +81,7 @@ export default function PanelObservaciones({
                 name="VLDLColesterol"
                 value={form.VLDLColesterol}
                 labelWidth="100px"
-                disabled
+                onChange={handleChange}
               />
 
               <InputTextOneLine
@@ -84,31 +89,23 @@ export default function PanelObservaciones({
                 name="trigliceridos"
                 value={form.trigliceridos}
                 labelWidth="100px"
-                disabled
+                onChange={handleChange}
               />
             </div>
           </div>
          </div>
 
-        
-       
-         {/* Botones de Acción */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-          >
-            <FontAwesomeIcon icon={faBroom} /> Limpiar
-          </button>
-        </div>
+         {/* Botón Asignar Médico - Solo en el tab de Resultados */}
+         {activeTab === 2 && (
+           <div className="flex justify-center">
+             <button
+               type="button"
+               className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+             >
+               <FontAwesomeIcon icon={faUser} /> Asignar Médico
+             </button>
+           </div>
+         )}
       </div>
     </div>
   );
