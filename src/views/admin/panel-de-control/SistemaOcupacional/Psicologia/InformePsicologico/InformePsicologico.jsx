@@ -17,7 +17,6 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 // import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
-import Swal from "sweetalert2";
 
 const tabla = "informe_psicologico";
 const today = getToday();
@@ -102,8 +101,6 @@ export default function InformePsicologico() {
         handleChange,
         handleChangeNumber,
         handleRadioButton,
-        handleCheckBoxChange,
-        handleRadioButtonBoolean,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
@@ -217,35 +214,35 @@ export default function InformePsicologico() {
     const handleAreaCheckboxChange = (areaType) => (e) => {
         const { name, checked } = e.target;
         const config = areaConfigurations[areaType];
-        
+
         if (!config) return;
-        
+
         // Encontrar el grupo al que pertenece el checkbox
         const groupName = Object.keys(config.groups).find(group =>
             config.groups[group].includes(name)
         );
-        
+
         if (!groupName) return;
-        
+
         const group = config.groups[groupName];
         const textToAdd = config.texts[name];
-        
+
         setForm(prevForm => {
             const newForm = { ...prevForm };
-            
+
             // Desmarcar todos los checkboxes del grupo
             group.forEach(checkboxName => {
                 newForm[checkboxName] = false;
             });
-            
+
             // Si se está marcando (no desmarcando), marcar el seleccionado
             if (checked) {
                 newForm[name] = true;
             }
-            
+
             // Actualizar el texto del área correspondiente
             let currentText = prevForm[config.fieldName] || "";
-            
+
             // Remover textos previos del mismo grupo
             group.forEach(checkboxName => {
                 const textToRemove = config.texts[checkboxName];
@@ -258,7 +255,7 @@ export default function InformePsicologico() {
                     }
                 }
             });
-            
+
             // Agregar el nuevo texto si se está marcando
             if (checked && textToAdd) {
                 if (currentText.trim()) {
@@ -267,9 +264,9 @@ export default function InformePsicologico() {
                     currentText = textToAdd;
                 }
             }
-            
+
             newForm[config.fieldName] = currentText;
-            
+
             return newForm;
         });
     };
@@ -288,12 +285,6 @@ export default function InformePsicologico() {
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             console.log("Función de búsqueda comentada");
-        }
-    };
-
-    const handleSearchExamenesRealizados = (e) => {
-        if (e.key === "Enter") {
-            console.log("Función de búsqueda de exámenes comentada");
         }
     };
 
