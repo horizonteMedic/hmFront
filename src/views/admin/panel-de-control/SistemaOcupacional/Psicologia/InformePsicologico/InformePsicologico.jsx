@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faUser,
     faHeartbeat,
-    faChartLine,
+    faPrint,
+    faBroom,
+    faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
@@ -76,7 +79,6 @@ export default function InformePsicologico() {
         facilidadPs: false,
         dificultadPs: false,
 
-
         // Área de Organicidad
         areaOrganicidad: "",
         orientadoEnTiempo: false,
@@ -92,13 +94,6 @@ export default function InformePsicologico() {
 
         // Aprobó Test
         aproboTest: "",
-
-        // Observaciones generales del panel lateral
-        observacionesGenerales: "",
-
-        // Médico que Certifica
-        nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
-        filteredNombresMedicos: [],
     };
 
     const {
@@ -113,6 +108,41 @@ export default function InformePsicologico() {
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState);
+
+    // Estado para el select de recomendaciones predefinidas
+    const [selectedRecomendacion, setSelectedRecomendacion] = useState("");
+
+    // Opciones predefinidas para recomendaciones
+    const opcionesRecomendaciones = [
+        "Se recomienda seguimiento psicológico periódico",
+        "Mantener un ambiente laboral saludable y libre de estrés",
+        "Implementar técnicas de manejo del estrés",
+        "Fomentar la comunicación asertiva en el equipo de trabajo",
+        "Realizar pausas activas durante la jornada laboral",
+        "Promover el equilibrio entre vida laboral y personal",
+        "Capacitación en habilidades de liderazgo",
+        "Evaluación psicológica de seguimiento en 6 meses",
+        "Apoyo psicológico especializado si es necesario",
+        "Fortalecer la autoestima y confianza personal"
+    ];
+
+    // Función para agregar recomendación seleccionada al campo
+    const agregarRecomendacion = () => {
+        if (selectedRecomendacion) {
+            const textoActual = form.recomendaciones;
+            const nuevoTexto = textoActual
+                ? `${textoActual}\n• ${selectedRecomendacion}`
+                : `• ${selectedRecomendacion}`;
+
+            setForm({
+                ...form,
+                recomendaciones: nuevoTexto
+            });
+
+            // Limpiar el select después de agregar
+            setSelectedRecomendacion("");
+        }
+    };
 
 
     // Funciones temporales sin funcionalidad del controller
@@ -139,10 +169,10 @@ export default function InformePsicologico() {
     return (
         <div className="mx-auto bg-white overflow-hidden ">
             <div className="flex h-full">
-                <div className="w-full space-y-6 p-4">
+                <div className="w-full space-y-3 p-4">
                     {/*==========================Datos Necesarios Section==========================*/}
                     <div>
-                        <div className="flex items-center">
+                        <div className="flex items-center px-6">
                             <FontAwesomeIcon icon={faUser} className="mr-2 text-[#233245]" />
                             <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">Datos Necesarios</h2>
                         </div>
@@ -151,7 +181,7 @@ export default function InformePsicologico() {
                             {/* Header con información del examen */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3 ">
                                 <h3 className="font-semibold mb-2">Informe Psicológico</h3>
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                                     <InputTextOneLine
                                         label="N° Orden"
                                         name="norden"
@@ -168,11 +198,20 @@ export default function InformePsicologico() {
                                         onChange={handleChange}
                                         labelWidth="120px"
                                     />
+                                    <div className="flex gap-4 items-center">
+                                        <h4 className="font-semibold min-w-[120px] max-w-[120px]">Aprobó Test :</h4>
+                                        <InputsRadioGroup
+                                            options={[{ value: "SI", label: "Sí" }, { value: "NO", label: "No" }]}
+                                            name="aproboTest"
+                                            value={form.aproboTest}
+                                            onChange={(e, value) => { handleRadioButton(e, value) }}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             {/* Contenido principal */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Datos Necesarios</h4>
+                                <h4 className="font-semibold mb-2">Datos Necesarios</h4>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {/* Columna Izquierda */}
@@ -275,7 +314,7 @@ export default function InformePsicologico() {
                     </div>
                     {/*==========================Área Intelectual Section==========================*/}
                     <div>
-                        <div className="flex items-center mb-4">
+                        <div className="flex items-center mb-2 px-6">
                             <FontAwesomeIcon icon={faHeartbeat} className="mr-2 text-[#233245]" />
                             <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">Áreas</h2>
                         </div>
@@ -540,63 +579,84 @@ export default function InformePsicologico() {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Recomendaciones */}
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3 mt-4">
+                                        <h4 className="font-semibold mb-3">Recomendaciones:</h4>
+
+                                        {/* Select y botón para agregar recomendaciones predefinidas */}
+                                        <div className="flex gap-2 mb-3">
+                                            <select
+                                                value={selectedRecomendacion}
+                                                onChange={(e) => setSelectedRecomendacion(e.target.value)}
+                                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            >
+                                                <option value="">Seleccionar recomendación predefinida...</option>
+                                                {opcionesRecomendaciones.map((opcion, index) => (
+                                                    <option key={index} value={opcion}>
+                                                        {opcion}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <button
+                                                type="button"
+                                                onClick={agregarRecomendacion}
+                                                disabled={!selectedRecomendacion}
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                                            >
+                                                Agregar
+                                            </button>
+                                        </div>
+
+                                        <InputTextArea
+                                            rows={4}
+                                            name="recomendaciones"
+                                            value={form.recomendaciones}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Recomendaciones */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3 mt-4">
-                                <h4 className="font-semibold mb-3">Recomendaciones:</h4>
-                                <InputTextArea
-                                    rows={4}
-                                    name="recomendaciones"
-                                    value={form.recomendaciones}
-                                    disabled
-                                />
-                            </div>
+
                         </div>
                     </div>
 
-                    {/* Área Personalidad Section */}
-                    <div className="pb-6">
-                        <div className="flex items-center mb-4">
-                            <FontAwesomeIcon icon={faChartLine} className="mr-2 text-[#233245]" />
-                            <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">Área Personalidad</h2>
+                    {/* BOTONES DE ACCIÓN */}
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 px-12">
+                        <div className="flex gap-4">
+                            <button
+                                type="button"
+                                onClick={handleSave}
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                            >
+                                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleClear}
+                                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                            >
+                                <FontAwesomeIcon icon={faBroom} /> Limpiar
+                            </button>
                         </div>
-                        {/* ===== SECCIÓN: ÁREA PERSONALIDAD ===== */}
-                        <div className="p-4" style={{ fontSize: "10px" }}>
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Aprobó Test:</h4>
+                        <div className="flex flex-col items-end">
+                            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    name="norden"
+                                    value={form.norden}
+                                    onChange={handleChange}
+                                    className="border rounded px-2 py-1 text-base w-24"
+                                />
 
-                                <div className="flex items-center space-x-4 mb-4">
-                                    <InputsRadioGroup
-                                        options={[{ value: "Si", label: "Sí" }, { value: "No", label: "No" }]}
-                                        name="aproboTest"
-                                        selectedValue={form.aproboTest}
-                                        onChange={handleRadioButton}
-                                        direction="horizontal"
-                                    />
-                                </div>
-
-                                {/* Botones de acción */}
-                                <div className="flex space-x-2 mt-4">
-                                    <button
-                                        onClick={handleSave}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded text-xs hover:bg-blue-600 flex items-center"
-                                    >
-                                        💾 Guardar
-                                    </button>
-                                    <button
-                                        onClick={handlePrint}
-                                        className="bg-green-500 text-white px-4 py-2 rounded text-xs hover:bg-green-600 flex items-center"
-                                    >
-                                        🖨️ Actualizar
-                                    </button>
-                                    <button
-                                        className="bg-yellow-500 text-white px-4 py-2 rounded text-xs hover:bg-yellow-600 flex items-center"
-                                    >
-                                        🧹 Limpiar
-                                    </button>
-                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handlePrint}
+                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                                >
+                                    <FontAwesomeIcon icon={faPrint} />
+                                </button>
                             </div>
                         </div>
                     </div>
