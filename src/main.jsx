@@ -44,7 +44,7 @@ import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupaciona
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Anexo2/Anexo2.jsx"
+import Ficha from "./views/jaspers/ModuloPsicologia/InformePsicologico/InformePsicologico.jsx"
 
 const App = () => {
   return (
