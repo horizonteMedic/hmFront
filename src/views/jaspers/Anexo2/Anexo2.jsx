@@ -409,7 +409,7 @@ export default function Anexo2(data = {}) {
         frecuenciaCardiaca: data.fcardiaca_f_cardiaca ?? "",
         presionArterial: data.sistolica_sistolica ?? "",
         temperatura: data.temperatura_temperatura ?? "",
-        otros: data.otrosExamenes_txtotrosex ?? ""
+        otros: `SAR O2 : ${data.sat02_sat_02 ?? ""}`
       },
       // === EXAMEN FÍSICO ===
       ectoscopia: data.ectoscopia_txtectoscopia ?? "",
@@ -1179,8 +1179,8 @@ export default function Anexo2(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
 
-    // Renderizar hasta 2 enfermedades (o las que quepan en el espacio disponible)
-    enfermedades.slice(0, 2).forEach((enfermedad, index) => {
+    // Renderizar hasta 7 enfermedades (o las que quepan en el espacio disponible)
+    enfermedades.slice(0, 7).forEach((enfermedad, index) => {
       const yOffset = index * espaciadoFila;
       
       // Nombre de la enfermedad/accidente
