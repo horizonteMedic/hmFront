@@ -429,6 +429,7 @@ export default function DatosPersonales({
                     { label: "Nada", value: "NADA" },
                     { label: "Poco", value: "POCO" },
                     { label: "Habitual", value: "HABITUAL" },
+                    { label: "Excesivo", value: "EXCESIVO" },
                   ]}
                 />
               </div>
@@ -442,6 +443,7 @@ export default function DatosPersonales({
                     { label: "Nada", value: "NADA" },
                     { label: "Poco", value: "POCO" },
                     { label: "Habitual", value: "HABITUAL" },
+                    { label: "Excesivo", value: "EXCESIVO" },
                   ]}
                 />
               </div>
@@ -455,6 +457,7 @@ export default function DatosPersonales({
                     { label: "Nada", value: "NADA" },
                     { label: "Poco", value: "POCO" },
                     { label: "Habitual", value: "HABITUAL" },
+                    { label: "Excesivo", value: "EXCESIVO" },
                   ]}
                 />
               </div>

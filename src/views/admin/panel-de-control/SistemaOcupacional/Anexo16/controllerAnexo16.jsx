@@ -1,7 +1,5 @@
 import Swal from "sweetalert2";
 import {
-  GetInfoPacDefault,
-  GetInfoServicioDefault,
   PrintHojaRDefault,
   SubmitDataServiceDefault,
   VerifyTRDefault,
@@ -10,10 +8,10 @@ import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { getFetch } from "../../../../utils/apiHelpers";
 
-const obtenerReporteUrl =
-  "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16Completo";
-const registrarUrl =
-  "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo16";
+const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
+const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
+const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
+const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 
 export const SubmitDataService = async (
   form,
@@ -28,157 +26,112 @@ export const SubmitDataService = async (
     return;
   }
   const body = {
-    codigoAnexo: form.codigoAnexo,
     norden: form.norden,
+    codigoAnexo: form.codigoAnexo,
     fecha: form.fechaExam,
-    //Ant. Personales
-    neoplasia: form.neoplasia,
-    neoplasiaDescripcion: form.neoplasiaDescripcion,
-    its: form.its,
-    itsDescripcion: form.itsDescripcion,
-    quemaduras: form.quemaduras,
-    quemadurasDescripcion: form.quemadurasDescripcion,
-    cirugias: form.cirugias,
-    cirugiasDescripcion: form.cirugiasDescripcion,
-    antecedentesPersonalesOtros: form.otrosAntecedentes,
-    antecedentesPersonalesOtrosDescripcion: form.otrosAntecedentesDescripcion,
-
-    //Residencia en el lugar de trabajo
-    residenciaSi: form.reside,
-    residenciaNo: !form.reside,
-    residenciaTiempo: form.tiempoReside,
-    essalud: form.essalud,
-    eps: form.eps,
-    residenciaTrabajoOtros: form.otrosResidencia,
-    sctr: form.sctr,
-    sctrOtros: form.otrosResidencia1,
-
-    //Antecedentes Familiares
-    padre: form.antecendentesPadre,
-    madre: form.antecendentesMadre,
-    hermanos: form.antecendentesHermano,
-    esposa: form.antecendentesEsposao,
-
-    //Detalles del Puesto
+    ruido: form.ruido,
+    polvo: form.polvo,
+    vidSegmentario: form.vidSegmentario,
+    vidTotal: form.vidTotal,
+    cancerigenos: form.cancerigenos,
+    mutagenicos: form.mutagenicos,
+    solventes: form.solventes,
+    metales: form.metales,
+    temperatura: form.temperaturaAgente,
+    biologicos: form.biologicos,
+    posturas: form.posturas,
+    turnos: form.turnos,
+    cargas: form.cargas,
+    movRepet: form.movRepet,
+    pvd: form.pvd,
+    otros: form.otros,
+    reubicacionSi: form.reubicacion,
+    reubicacionNo: !form.reubicacion,
+    tabacoNada: form.tabaco === "NADA",
+    tabacoPoco: form.tabaco === "POCO",
+    tabacoHabitual: form.tabaco === "HABITUAL",
+    tabacoExcesivo: form.tabaco === "EXCESIVO",
+    alcoholNada: form.alcohol === "NADA",
+    alcoholPoco: form.alcohol === "POCO",
+    alcoholHabitual: form.alcohol === "HABITUAL",
+    alcoholExcesivo: form.alcohol === "EXCESIVO",
+    drogasNada: form.drogas === "NADA",
+    drogasPoco: form.drogas === "POCO",
+    drogasHabitual: form.drogas === "HABITUAL",
+    drogasExcesivo: form.drogas === "EXCESIVO",
     puestoActual: form.puestoActual,
     tiempo: form.tiempoPuesto,
-
-    //Medicamentos
-    medicamentosSi: form.tomaMedicamento,
-    medicamentosNo: !form.tomaMedicamento,
-    tipoMedicamento: form.tipoMedicamentos,
-    frecuenciaMedicamentos: form.frecuenciaMedicamentos,
-
-    //Número de Hijos
+    antecedentesPersonales: form.antecedentesPersonalesOcupacionales,
+    antecedentesFamiliares: form.antecedentesFamiliares,
     hijosVivos: form.hijosVivos,
     hijosMuertos: form.hijosMuertos,
-    totalHijos: form.totalHijos,
-    numeroDependientes: form.hijosDependientes,
-
-    // Examen Físico por Sistemas
     cabeza: form.cabeza,
     nariz: form.nariz,
     cuello: form.cuello,
     perimetro: form.perimetro,
-    boca: form.boca,
-    oidos: form.oidos,
-    faringe: form.faringe,
+    bocaAmigdalasFaringeLaringe: form.bocaAmigdalasFaringeLaringe,
     visionColores: form.visionColores,
     enfermedadesOculares: form.enfermedadOculares,
     reflejosPupilares: form.reflejosPupilares,
-    visionBinocular: form.visionBinocular,
+    binocular: form.visionBinocular,
+    od: form.otoscopiaOd,
+    oi: form.otoscopiaOi,
+    torax: form.torax,
+    corazon: form.corazon,
+    pulmonesNormal: form.pulmones === "NORMAL",
+    pulmonesAnormal: form.pulmones === "ANORMAL",
+    pulmonesDescripcion: form.pulmonesObservaciones,
     miembrosSuperiores: form.miembrosSuperiores,
     miembrosInferiores: form.miembrosInferiores,
-    ectoscopia: form.ectoscopia,
-    estadoMental: form.estadoMental,
-    anamnesis: form.anamnesis,
+    reflejosOsteotendinosos: form.reflejosOsteotendinosos,
     marcha: form.marcha,
-    columnaVertebral: form.columnaVertebral,
-    aparatoRespiratorio: form.aparatoRespiratorio,
-    aparatoCardiovascular: form.apaCardiovascular,
-    aparatoDigestivo: form.aparatoDigestivo,
-    aparatoGeiotourinario: form.aGenitourinario,
-    aparatoLocomotor: form.aparatoLocomotor,
-    sistemaLinfatico: form.sistemaLinfatico,
-    piel: form.piel,
+    columnaVertebral: form.columnaVertebral, //revisar
+    abdomen: form.abdomen, //revisar
+    anillosInguinales: form.anillosInguinales, //revisar
+    organosGenitales: form.organosGenitales, //revisar
+    tactoRectalNoHizo: form.tactoRectalNoHizo, //revisar
+    tactoRectalNormal: form.tactoRectalNormal, //revisar
+    tactoRectalAnormal: form.tactoRectalAnormal, //revisar
+    describirObservacion: form.describirObservacion, //revisar
+    hernias: form.hernias, //revisar
+    varices: form.varices, //revisar
+    ganglios: form.ganglios, //revisar
+    lenguage: form.lenguage, //revisar
     observacionesFichaMedica: form.observacionesGenerales,
     conclusion: form.conclusionRespiratoria,
-    edad: form.edad + " años",
+    tetano: form.tetano,
+    hepatitisB: form.hepatitisB,
+    fiebreAmarilla: form.fiebreAmarilla,
+    edad: form.edad,
+    diagnosticoAudio: form.observaciones,
     enfermedadesOcularesOtros: form.enfermedadOtros,
-    sistemaNervioso: form.sistemaNervioso,
-    otrosExamenes: form.otrosExamenes,
-    restricciones: form.restricciones,
-
-    esApto: form.aptitud == "APTO",
-    noEsApto: form.aptitud == "NO APTO",
-    aptoRestriccion: form.aptitud == "RESTRICCION",
-    fechaDesde: form.fechaAptitud,
-    fechaVence: form.fechaVencimiento,
-    medico: form.nombre_medico,
-    userRegistro: form.user,
-    accidentes: form.dataEnfermedades.map((item) => ({
-      ...item,
-      codigoAnexo: null,
-      fecha: null,
-      userRegistro: form.user,
-    })),
+    conclusionMedico: form.conclusionMedico,
+    antecedentesPersonales2: form.otroAntecedentePersonal,
+    estadoMental: form.estadoMental, //revisar
+    anamnesis: form.anamnesis, //revisar
+    alturaEstructura: form.alturaEstruct,
+    alturaGeografica: form.alturaGeograf,
+    quimicos: form.quimicos,
+    electricos: form.electricos,
+    vibraciones: form.vibraciones,
+    userRegistro: user,
   };
-  console.log(body);
+  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+    PrintHojaR(form.norden, token, tabla, datosFooter);
+  });
+};
 
-  await SubmitDataServiceDefault(
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+  const jasperModules = import.meta.glob("../../../../jaspers/Anexo16/*.jsx");
+  PrintHojaRDefault(
+    nro,
     token,
-    limpiar,
-    body,
-    registrarUrl,
-    () => {
-      Swal.close();
-    },
-    false
+    tabla,
+    datosFooter,
+    obtenerParaJasperUrl,
+    jasperModules,
+    "../../../../jaspers/Anexo16"
   );
-};
-
-export const GetInfoServicioTabla = (nro, tabla, set, token) => {
-  GetInfoServicio(nro, tabla, set, token, () => {
-    Swal.close();
-  });
-};
-
-export const PrintHojaR = (nro, token, tabla, numPage, datosFooter) => {
-  Loading("Cargando Formato a Imprimir");
-  getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=true`,
-    token
-  ).then(async (res) => {
-    if (res.norden) {
-      const nombre = res.nameJasper;
-      console.log(nombre);
-      const jasperModules = import.meta.glob(
-        "../../../../../jaspers/Anexo16/*.jsx"
-      );
-      let modulo;
-      if (numPage == 2) {
-        modulo = await jasperModules[
-          `../../../../../jaspers/Anexo16/${nombre}.jsx`
-        ]();
-      } else {
-        modulo = await jasperModules[
-          `../../../../../jaspers/Anexo16/${nombre}.jsx`
-        ]();
-      }
-
-      // Ejecuta la función exportada por default con los datos
-      if (typeof modulo.default === "function") {
-        modulo.default({ ...res, datosFooter });
-      } else {
-        console.error(
-          `El archivo ${nombre}.jsx no exporta una función por defecto`
-        );
-      }
-      Swal.close();
-    } else {
-      Swal.close();
-    }
-  });
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
@@ -207,32 +160,17 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
   );
 };
 
-const GetInfoPac = async (nro, set, token, sede) => {
-  const res = await GetInfoPacDefault(nro, token, sede);
-  if (res) {
-    set((prev) => ({
-      ...prev,
-      ...res,
-      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad + " años",
-      nombres: res.nombresApellidos,
-    }));
-  }
-};
-
-export const Loading = (mensaje) => {
-  LoadingDefault(mensaje);
-};
+export const Loading = (mensaje) => { LoadingDefault(mensaje); };
 
 export const GetInfoServicio = (
   nro,
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+    `${obtenerSimpleUrl}?nOrden=${nro}&nameService=${tabla}`,
     token
   )
     .then((res) => {
@@ -247,7 +185,7 @@ export const GetInfoServicio = (
             otrosExamenes: "",
             conclusionRespiratoria: "",
           };
-          
+
           // Procesar datos específicos del Anexo 16
           data.nomExamen = res.nombreExamen_nom_examen ?? "";
           data.dni = res.dni_cod_pa ?? "";
@@ -273,7 +211,7 @@ export const GetInfoServicio = (
 
           const today = getToday();
           const todayPlusOneYear = getTodayPlusOneYear();
-          
+
           data.fechaExam = today;
           data.fechaAptitud = today;
           data.fechaVencimiento = todayPlusOneYear;
@@ -295,10 +233,10 @@ export const GetInfoServicioEditar = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(
-    `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
+    `${obtenerParaEditarUrl}?nOrden=${nro}&nameService=${tabla}`,
     token
   )
     .then((res) => {
@@ -312,7 +250,7 @@ export const GetInfoServicioEditar = (
             otrosExamenes: "",
             conclusionRespiratoria: "",
             fechaExam: res.fechaAnexo_fecha,
-            
+
             // Datos específicos del Anexo 16
             nomExamen: res.nombreExamen_nom_examen ?? "",
             dni: res.dni_cod_pa ?? "",
@@ -335,14 +273,14 @@ export const GetInfoServicioEditar = (
             mineralExp: res.mineral_mineral_po ?? "",
             puestoPostula: res.cargo_cargo_de ?? "",
             areaPuesto: res.area_area_o ?? "",
-            
+
             aptitud: res.esApto_apto_si
               ? "APTO"
               : res.noEsApto_apto_no
-              ? "NO APTO"
-              : res.aptoRestriccion_apto_re
-              ? "RESTRICCION"
-              : "",
+                ? "NO APTO"
+                : res.aptoRestriccion_apto_re
+                  ? "RESTRICCION"
+                  : "",
             fechaAptitud: res.fechaDesde_fechadesde ?? "",
             fechaVencimiento: res.fechaHasta_fechahasta ?? "",
             nombre_medico: res.medico_medico ?? "",

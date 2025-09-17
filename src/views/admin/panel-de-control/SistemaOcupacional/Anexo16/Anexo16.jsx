@@ -98,7 +98,7 @@ export default function Anexo16({ listas }) {
     //TAB LATERAL
     //=============================================================================================
     observacionesGenerales: "",
-    conclusiones: "",
+    conclusionMedico: "",
     colesterolTotal: "",
     //Resultados de Laboratorio
     vsg: "",
@@ -110,8 +110,8 @@ export default function Anexo16({ listas }) {
     //Grupo Sanguineo
     grupoSanguineoPrevio: "",
     grupoSanguineoGrupo: "",
-    grupoSanguineo: "",
-    factorRh: "",
+    grupoSanguineo: "O",
+    factorRh: "RH(+)",
     //Resultados de Laboratorio
     LDLColesterol: "",
     HDLColesterol: "",

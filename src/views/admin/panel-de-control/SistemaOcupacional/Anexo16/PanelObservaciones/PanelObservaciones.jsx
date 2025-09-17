@@ -38,8 +38,8 @@ export default function PanelObservaciones({
           <InputTextArea
             rows={8}
             label="Conclusiones"
-            name="conclusiones"
-            value={form.conclusiones}
+            name="conclusionMedico"
+            value={form.conclusionMedico}
             onChange={handleChange}
           />
         </div>
