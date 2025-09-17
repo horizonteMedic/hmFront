@@ -15,12 +15,11 @@ import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
 
-const tabla = "anexo_16";
+const tabla = "anexo7c";
 const today = getToday();
 
 export default function Anexo16({ listas }) {
   const { MedicosMulti } = listas || {};
-  // console.log(MedicosMulti);
 
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
@@ -43,19 +42,6 @@ export default function Anexo16({ listas }) {
     telefono: "",
     estadoCivil: "",
     gradoInstruccion: "",
-    //Información Laboral
-    empresa: "",
-    contrata: "",
-    mineralExp: "",
-    explotacion: "",
-    alturaLaboral: "",
-    //Detalles del Puesto
-    puestoPostula: "",
-    areaPuesto: "",
-    puestoActual: "",
-    tiempoPuesto: "",
-    reubicacion: false,
-
     //Agentes presentes en Trabajo Actual
     ruido: false,
     polvo: false,
@@ -78,27 +64,35 @@ export default function Anexo16({ listas }) {
     pvd: false,
     electricos: false,
     otros: false,
+    //Información Laboral
+    empresa: "",
+    contrata: "",
+    mineralExp: "",
+    explotacion: "",
+    alturaLaboral: "",
+    //Detalles del Puesto
+    puestoPostula: "",
+    areaPuesto: "",
+    puestoActual: "",
+    tiempoPuesto: "",
+    reubicacion: false,
 
     //Antecedentes
     antecedentesPersonalesOcupacionales: "",
+    otroAntecedentePersonal: "",
     antecedentesFamiliares: "",
-    grupoSanguineoPrevio: "",
-    grupoSanguineoGrupo: "",
     antecedentesPatologicos: "",
-
+    //Hábitos
+    tabaco: "NADA",
+    alcohol: "NADA",
+    drogas: "NADA",
     //Número de Hijos
     hijosVivos: "",
     hijosMuertos: "",
-
     //Inmunizaciones
     tetano: false,
     hepatitisB: false,
     fiebreAmarilla: false,
-
-    //Hábitos
-    tabaco: "nada",
-    alcohol: "nada",
-    drogas: "nada",
 
     //=============================================================================================
     //TAB LATERAL
@@ -106,13 +100,6 @@ export default function Anexo16({ listas }) {
     observacionesGenerales: "",
     conclusiones: "",
     colesterolTotal: "",
-    LDLColesterol: "",
-    HDLColesterol: "",
-    VLDLColesterol: "",
-    trigliceridos: "",
-    //Grupo Sanguineo
-    grupoSanguineo: "",
-    factorRh: "",
     //Resultados de Laboratorio
     vsg: "",
     glucosa: "",
@@ -120,39 +107,40 @@ export default function Anexo16({ listas }) {
     marihuana: "",
     cocaina: "",
     hemoglobinaHematocrito: "",
+    //Grupo Sanguineo
+    grupoSanguineoPrevio: "",
+    grupoSanguineoGrupo: "",
+    grupoSanguineo: "",
+    factorRh: "",
+    //Resultados de Laboratorio
+    LDLColesterol: "",
+    HDLColesterol: "",
+    VLDLColesterol: "",
+    trigliceridos: "",
+
 
     //=============================================================================================
     //SEGUNDA TAB EXAMENES
     //=============================================================================================
-    // Función Respiratoria
-    fvc: "",
-    fev1: "",
-    fev1Fvc: "",
-    fef2575: "",
-    conclusionRespiratoria: "",
-
     // Información Triaje
     //Medidas Generales
     temperatura: "",
     cintura: "",
     cadera: "",
     icc: "",
+    // Signos Vitales
+    frecuenciaRespiratoria: "",
+    frecuenciaCardiaca: "",
+    saturacionO2: "",
+    // Presión Arterial
+    presionSistolica: "",
+    presionDiastolica: "",
 
     //Medidas Generales
     talla: "",
     peso: "",
     imc: "",
     imcRojo: false,
-
-    // Signos Vitales
-    frecuenciaRespiratoria: "",
-    frecuenciaCardiaca: "",
-    saturacionO2: "",
-    perimetro: "",
-
-    // Presión Arterial
-    presionSistolica: "",
-    presionDiastolica: "",
 
     // Audiometría - Oído Derecho
     od500: "",
@@ -172,6 +160,30 @@ export default function Anexo16({ listas }) {
     oi6000: "",
     oi8000: "",
 
+    otoscopiaOd: "",
+    otoscopiaOi: "",
+
+    // Función Respiratoria
+    fvc: "",
+    funcionABSNormal: false,
+    funcionABSOBSTR: false,
+    fev1: "",
+    fev1Fvc: "",
+    fef2575: "",
+    conclusionRespiratoria: "",
+
+    // Examen Físico
+    cabeza: "",
+    nariz: "",
+    cuello: "",
+    perimetro: "",
+    bocaAmigdalasFaringeLaringe: "",
+    //Miembros y reflejos
+    miembrosSuperiores: "",
+    miembrosInferiores: "",
+    reflejosOsteotendinosos: "",
+    marcha: "",
+
     // Ojos
     visionCercaOd: "",
     visionCercaOi: "",
@@ -189,45 +201,19 @@ export default function Anexo16({ listas }) {
     reflejosPupilares: "",
     visionBinocular: "",
 
-    // Observaciones Generales
-    ectoscopia: "",
-    estadoMental: "",
-    anamnesis: "",
-
+    pulmones: "NORMAL",
+    pulmonesObservaciones: "",
+    torax: "",
+    corazon: "",
     // Dentadura
     piezasMalEstado: "",
     piezasFaltan: "",
     dentaduraObservaciones: "",
 
-    // Examen Físico
-    cabeza: "",
-    nariz: "",
-    cuello: "",
-    perimetro: "",
-    bocaAmigdalasFaringeLaringe: "",
-    otoscopiaOd: true,
-    otoscopiaOi: true,
-    torax: "",
-    corazon: "",
-    pulmones: "",
-    pulmonesObservaciones: "",
-    miembrosSuperiores: "",
-    miembrosInferiores: "",
-    reflejosOsteotendinosos: "",
-    marcha: "",
-
     //=============================================================================================
     //TERCERA TAB RESULTADOS
     //=============================================================================================
     // Exámenes de Laboratorio
-    grupoSanguineo: "",
-    rhFactor: "",
-    glucosa: "",
-    creatinina: "",
-    coca: "",
-    marihuana: "",
-    hemoglobinaHematocrito: "",
-    vsg: "",
     nitritos: "",
     proteinas: "",
     cetonas: "",
@@ -249,28 +235,7 @@ export default function Anexo16({ listas }) {
     densidadFisico: "",
     phFisico: "",
     otrosExamenes: "",
-    aptoParaTrabajar: "si",
-
-    // Aptitud del Paciente
-    aptitud: "APTO",
-    fechaAptitud: today,
-    fechaVencimiento: today,
-    restricciones: "NINGUNO",
-
-    // Recomendaciones y Restricciones
-    corregirAgudezaVisualTotal: false,
-    corregirAgudezaVisual: false,
-    dietaHipocalorica: false,
-    evitarMovimientosDisergonomicos: false,
-    noTrabajoAltoRiesgo: false,
-    noTrabajoSobre18m: false,
-    usoEppAuditivo: false,
-    usoLentesCorrectorConducir: false,
-    usoLentesCorrectorTrabajo: false,
-    usoLentesCorrectorTrabajo18m: false,
-    ninguno: true,
-    noConducirVehiculos: false,
-    usoEppAuditivoGeneral: false,
+    aptoParaTrabajar: "SI",
 
     // Estado del Paciente
     nordenEstadoPaciente: "",
@@ -370,11 +335,10 @@ export default function Anexo16({ listas }) {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${
-                    activeTab === tab.id
-                      ? "border-[#233245] text-[#233245] font-semibold"
-                      : "border-transparent"
-                  }`}
+                  className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                    ? "border-[#233245] text-[#233245] font-semibold"
+                    : "border-transparent"
+                    }`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   <FontAwesomeIcon icon={tab.icon} className="mr-2" />

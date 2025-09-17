@@ -8,7 +8,6 @@ import {
 
 export default function DatosPersonales({
   form,
-  setForm,
   handleChange,
   handleChangeNumber,
   handleCheckBoxChange,
@@ -20,8 +19,7 @@ export default function DatosPersonales({
     <div className="p-4" style={{ fontSize: "10px" }}>
       {/* Header con información del examen */}
       <div className="bg-white border border-gray-200 rounded-lg p-3 mb-4">
-        <h3 className="font-semibold mb-2 text-gray-800">Anexo 16</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           <InputTextOneLine
             label="N° Orden"
             name="norden"
@@ -372,63 +370,42 @@ export default function DatosPersonales({
           <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
             <div className="space-y-4">
               {/* Antecedentes Personales */}
-              <div className="flex flex-col">
-                <label className="font-semibold text-gray-700 mb-1">
-                  Antecedentes Personales y/o Ocupacionales (enfermedad y/o accidente)
-                </label>
-                <input
-                  type="text"
+              <div className="flex flex-col gap-2">
+                <InputTextOneLine
+                  label="Antecedentes Personales y/o Ocupacionales (enfermedad y/o accidente)"
                   name="antecedentesPersonalesOcupacionales"
-                  value={form.antecedentesPersonalesOcupacionales || ""}
+                  value={form.antecedentesPersonalesOcupacionales}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  labelOnTop
                 />
-                <input
-                  type="text"
+                <InputTextOneLine
                   name="otroAntecedentePersonal"
-                  value={form.otroAntecedentePersonal || ""}
+                  value={form.otroAntecedentePersonal}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 mt-2 border border-gray-300 rounded-md text-gray-800  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               {/* Antecedentes Familiares */}
-              <div className="flex flex-col">
-                <label className="font-semibold text-gray-700 mb-1">Antecedentes Familiares</label>
-                <input
-                  type="text"
-                  name="antecedentesFamiliares"
-                  value={form.antecedentesFamiliares || ""}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+              <InputTextOneLine
+                label="Antecedentes Familiares"
+                name="antecedentesFamiliares"
+                value={form.antecedentesFamiliares}
+                onChange={handleChange}
+                labelOnTop
+              />
             </div>
           </div>
         </div>
 
-      {/* Columna Derecha - Antecedentes Patológicos */}
-        <div className="space-y-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Antecedentes Patológicos
-            </h4>
-            <div className="space-y-3">
-              <div>
-          
-                <textarea
-                  name="antecedentesPatologicos"
-                  value={form.antecedentesPatologicos || ""}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-800 
-                            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent 
-                            bg-gray-50 resize-none"
-                  placeholder="Describa antecedentes patológicos..."
-                />
-              </div>
-            </div>
-          </div>
+        {/* Columna Derecha - Antecedentes Patológicos */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+          <InputTextArea
+            rows={6}
+            label="Antecedentes Patológicos"
+            name="antecedentesPatologicos"
+            value={form.antecedentesPatologicos || ""}
+            disabled
+          />
         </div>
 
       </div>
@@ -449,9 +426,9 @@ export default function DatosPersonales({
                   value={form.tabaco}
                   onChange={handleRadioButton}
                   options={[
-                    { label: "Nada", value: "nada" },
-                    { label: "Poco", value: "poco" },
-                    { label: "Habitual", value: "habitual" },
+                    { label: "Nada", value: "NADA" },
+                    { label: "Poco", value: "POCO" },
+                    { label: "Habitual", value: "HABITUAL" },
                   ]}
                 />
               </div>
@@ -462,9 +439,9 @@ export default function DatosPersonales({
                   value={form.alcohol}
                   onChange={handleRadioButton}
                   options={[
-                    { label: "Nada", value: "nada" },
-                    { label: "Poco", value: "poco" },
-                    { label: "Habitual", value: "habitual" },
+                    { label: "Nada", value: "NADA" },
+                    { label: "Poco", value: "POCO" },
+                    { label: "Habitual", value: "HABITUAL" },
                   ]}
                 />
               </div>
@@ -475,9 +452,9 @@ export default function DatosPersonales({
                   value={form.drogas}
                   onChange={handleRadioButton}
                   options={[
-                    { label: "Nada", value: "nada" },
-                    { label: "Poco", value: "poco" },
-                    { label: "Habitual", value: "habitual" },
+                    { label: "Nada", value: "NADA" },
+                    { label: "Poco", value: "POCO" },
+                    { label: "Habitual", value: "HABITUAL" },
                   ]}
                 />
               </div>
@@ -487,7 +464,7 @@ export default function DatosPersonales({
 
         {/* Columna Derecha - Número de Hijos e Inmunizaciones */}
         <div className="space-y-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 ">
             <div className="space-y-4">
               {/* Número de Hijos */}
               <div>
@@ -499,43 +476,44 @@ export default function DatosPersonales({
                     label="Vivos"
                     name="hijosVivos"
                     value={form.hijosVivos}
-                    onChange={handleChange}
+                    disabled
                   />
                   <InputTextOneLine
                     label="Muertos"
                     name="hijosMuertos"
                     value={form.hijosMuertos}
-                    onChange={handleChange}
+                    disabled
                   />
                 </div>
               </div>
 
-              {/* Inmunizaciones */}
-              <div>
-                <h4 className="font-semibold text-gray-800 mb-2">
-                  Inmunizaciones
-                </h4>
-                <div className="grid grid-cols-3 gap-2">
-                  <InputCheckbox
-                    label="Tetano"
-                    checked={form.tetano}
-                    name="tetano"
-                    onChange={handleCheckBoxChange}
-                  />
-                  <InputCheckbox
-                    label="Hepatitis - B"
-                    checked={form.hepatitisB}
-                    name="hepatitisB"
-                    onChange={handleCheckBoxChange}
-                  />
-                  <InputCheckbox
-                    label="Fiebre Amarilla"
-                    checked={form.fiebreAmarilla}
-                    name="fiebreAmarilla"
-                    onChange={handleCheckBoxChange}
-                  />
-                </div>
-              </div>
+
+            </div>
+          </div>
+          {/* Inmunizaciones */}
+          <div className="bg-white border border-gray-200 rounded-lg p-3 ">
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Inmunizaciones
+            </h4>
+            <div className="grid grid-cols-3 gap-2">
+              <InputCheckbox
+                label="Tetano"
+                checked={form.tetano}
+                name="tetano"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Hepatitis - B"
+                checked={form.hepatitisB}
+                name="hepatitisB"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Fiebre Amarilla"
+                checked={form.fiebreAmarilla}
+                name="fiebreAmarilla"
+                onChange={handleCheckBoxChange}
+              />
             </div>
           </div>
         </div>
