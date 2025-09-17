@@ -98,8 +98,9 @@ export default function Anexo16({ listas }) {
     //TAB LATERAL
     //=============================================================================================
     observacionesGenerales: "",
+    observacionesAudio: "",
     conclusionMedico: "",
-    colesterolTotal: "",
+
     //Resultados de Laboratorio
     vsg: "",
     glucosa: "",
@@ -113,6 +114,7 @@ export default function Anexo16({ listas }) {
     grupoSanguineo: "O",
     factorRh: "RH(+)",
     //Resultados de Laboratorio
+    colesterolTotal: "",
     LDLColesterol: "",
     HDLColesterol: "",
     VLDLColesterol: "",
