@@ -415,9 +415,7 @@ export default function DatosPersonales({
             </h4>
             <div className="space-y-3">
               <div>
-                <label className="font-semibold text-gray-700 mb-1 block">
-                  Antecedentes Patológicos:
-                </label>
+          
                 <textarea
                   name="antecedentesPatologicos"
                   value={form.antecedentesPatologicos || ""}

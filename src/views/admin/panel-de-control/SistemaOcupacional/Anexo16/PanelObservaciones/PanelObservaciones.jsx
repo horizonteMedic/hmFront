@@ -21,6 +21,27 @@ export default function PanelObservaciones({
             disabled
           />
         </div>
+         {/* Observaciones */}
+         <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <InputTextArea
+            rows={8}
+            label="Observaciones"
+            name="observaciones"
+            value={form.observaciones}
+            disabled
+          />
+        </div>
+
+        {/* Conclusiones */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <InputTextArea
+            rows={8}
+            label="Conclusiones"
+            name="conclusiones"
+            value={form.conclusiones}
+            disabled
+          />
+        </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="font-semibold text-gray-800 mb-2">
             Resultados de Laboratorio
@@ -173,6 +194,8 @@ export default function PanelObservaciones({
             </div>
           </div>
         </div>
+
+       
       </div>
     </div>
   );
