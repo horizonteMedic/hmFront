@@ -1,9 +1,11 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   InputCheckbox,
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
 } from "../../../../../components/reusableComponents/ResusableComponents";
+import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 
 export default function Resultados({
   form,
@@ -12,6 +14,8 @@ export default function Resultados({
   handleRadioButton,
   handleCheckBoxChange,
   handlePrint,
+  handleSave,
+  handleClear,
 }) {
   const RestriccionCheckbox = ({ label, name }) => {
     return (
@@ -56,106 +60,10 @@ export default function Resultados({
 
   return (
     <div className="p-6" style={{ fontSize: "11px" }}>
-      <h3 className="font-semibold mb-6 text-gray-800">
-        Resultados del Examen Ocupacional - Anexo 16
-      </h3>
-
+    
       {/* Primera fila - 3 grids */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
-        {/* Grupo Sanguíneo */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold text-gray-800 mb-2">Grupo Sanguíneo</h4>
-          <div className="space-y-2">
-            <div>
-              <label className="font-semibold text-gray-700 mb-1 block">Tipo:</label>
-              <InputsRadioGroup
-                name="grupoSanguineo"
-                value={form.grupoSanguineo}
-                onChange={handleRadioButton}
-                options={[
-                  { label: "O", value: "O" },
-                  { label: "A", value: "A" },
-                  { label: "B", value: "B" },
-                  { label: "AB", value: "AB" },
-                ]}
-              />
-            </div>
-            <div>
-              <label className="font-semibold text-gray-700 mb-1 block">Rh:</label>
-              <InputsRadioGroup
-                name="rhFactor"
-                value={form.rhFactor}
-                onChange={handleRadioButton}
-                options={[
-                  { label: "Rh(+)", value: "positivo" },
-                  { label: "Rh(-)", value: "negativo" },
-                ]}
-              />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <label className="font-semibold min-w-[80px]">Glucosa</label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 flex-1"
-                  name="glucosa"
-                  value={form.glucosa}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold min-w-[80px]">Creatinina</label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 flex-1"
-                  name="creatinina"
-                  value={form.creatinina}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold min-w-[80px]">Coca</label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 flex-1"
-                  name="coca"
-                  value={form.coca}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold min-w-[80px]">Marih.</label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 flex-1"
-                  name="marihuana"
-                  value={form.marihuana}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold min-w-[80px]">Hemoglobina/Hematocrito</label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 flex-1"
-                  name="hemoglobinaHematocrito"
-                  value={form.hemoglobinaHematocrito}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="font-semibold min-w-[80px]">V.S.G</label>
-                <input
-                  type="text"
-                  className="border rounded px-2 py-1 flex-1"
-                  name="vsg"
-                  value={form.vsg}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+        
 
         {/* Exámen Químico */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -393,29 +301,60 @@ export default function Resultados({
         </div>
       </div>
 
-      {/* Apto para Trabajar */}
-      <div className="mb-6">
+      {/* Apto para Trabajar y Operaciones - 2 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
+        {/* Columna 1 - Apto para Trabajar */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Apto para Trabajar</h4>
-          <div className="flex items-center gap-4">
-            <InputsRadioGroup
-              name="aptoParaTrabajar"
-              value={form.aptoParaTrabajar}
-              onChange={handleRadioButton}
-              options={[
-                { label: "SI", value: "si" },
-                { label: "NO", value: "no" },
-                { label: "Reevaluación", value: "reevaluacion" },
-              ]}
-            />
-            <div className="ml-auto">
-              <h5 className="font-semibold text-gray-700 mb-2">Operaciones</h5>
-              <div className="flex gap-2">
-                <button className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                  Agregar/Actualizar
-                </button>
-                <button className="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700">
-                  Limpiar
+          <InputsRadioGroup
+            name="aptoParaTrabajar"
+            value={form.aptoParaTrabajar}
+            onChange={handleRadioButton}
+            options={[
+              { label: "SI", value: "si" },
+              { label: "NO", value: "no" },
+              { label: "Reevaluación", value: "reevaluacion" },
+            ]}
+          />
+        </div>
+
+        {/* Columna 2 - Operaciones */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <p className="font-semibold text-gray-800 mb-2">Imprimir Informes de Exámenes</p>
+          {/* BOTONES DE ACCIÓN */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex gap-4">
+              <button
+                type="button"
+                onClick={handleSave}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+              </button>
+              <button
+                type="button"
+                onClick={handleClear}
+                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+              >
+                <FontAwesomeIcon icon={faBroom} /> Limpiar
+              </button>
+            </div>
+            <div className="flex flex-col items-end">
+              <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+              <div className="flex items-center gap-2">
+                <input
+                  name="norden"
+                  value={form.norden}
+                  onChange={handleChange}
+                  className="border rounded px-2 py-1 text-base w-24"
+                />
+
+                <button
+                  type="button"
+                  onClick={handlePrint}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                >
+                  <FontAwesomeIcon icon={faPrint} />
                 </button>
               </div>
             </div>
@@ -569,24 +508,6 @@ export default function Resultados({
         </div>
       </div>
 
-      {/* Sección de Impresión de Informes */}
-      <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
-        <p className="font-semibold  mb-2">Imprimir Informes de Exámenes</p>
-        <div className="flex flex-wrap gap-4">
-          <button
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => handlePrint(1)}
-          >
-            Anexo 16 - N°1
-          </button>
-          <button
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => handlePrint(2)}
-          >
-            Anexo 16 - N°2
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

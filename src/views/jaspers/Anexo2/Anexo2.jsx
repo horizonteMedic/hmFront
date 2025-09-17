@@ -124,10 +124,46 @@ export default function Anexo2(data = {}) {
     absentismo: {
       enfermedades: [
         {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
           enfermedad: "FRACTURITA ",
           asociadoTrabajo: { si: false, no: true },
           año: "2024",
           diasDescanso: "30",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "QUEMADURA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "25",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
           codigoAnexo: 10559,
           fecha: null,
           userRegistro: null
@@ -1161,31 +1197,35 @@ export default function Anexo2(data = {}) {
   if (datosFinales.absentismo && datosFinales.absentismo.enfermedades) {
     const enfermedades = datosFinales.absentismo.enfermedades;
 
-    // Posiciones base para la primera fila
-    const xBaseEnfermedad = 20; // Posición para el nombre de la enfermedad
-    const yBaseEnfermedad = 214.3;
-    const xBaseSi = 107.8;
-    const yBaseSi = 214.3;
-    const xBaseNo = 124;
-    const yBaseNo = 214.3;  
-    const xBaseAno = 138.5;
-    const yBaseAno = 214.3;
-    const xBaseDias = 180;
-    const yBaseDias = 214.3;
-
-    // Espaciado entre filas
-    const espaciadoFila = 5.4;
+    // Posiciones individuales para cada fila (puedes editar cada una)
+    const posicionesFilas = [
+      // Fila 1
+      { xEnfermedad: 13, yEnfermedad: 214, xSi: 107.8, ySi: 214, xNo: 124, yNo: 214, xAno: 138.5, yAno: 214, xDias: 180, yDias: 214 },
+      // Fila 2
+      { xEnfermedad: 13, yEnfermedad: 219, xSi: 107.8, ySi: 219, xNo: 124, yNo: 219, xAno: 138.5, yAno: 219, xDias: 180, yDias: 219 },
+      // Fila 3
+      { xEnfermedad: 13, yEnfermedad: 224, xSi: 107.8, ySi: 224, xNo: 124, yNo: 224, xAno: 138.5, yAno: 224, xDias: 180, yDias: 224 },
+      // Fila 4
+      { xEnfermedad: 13, yEnfermedad: 229, xSi: 107.8, ySi: 229, xNo: 124, yNo: 229, xAno: 138.5, yAno: 229, xDias: 180, yDias: 229 },
+      // Fila 5
+      { xEnfermedad: 13, yEnfermedad: 234, xSi: 107.8, ySi: 234, xNo: 124, yNo: 234, xAno: 138.5, yAno: 234, xDias: 180, yDias: 234 },
+      // Fila 6
+      { xEnfermedad: 13, yEnfermedad: 239, xSi: 107.8, ySi: 239, xNo: 124, yNo: 239, xAno: 138.5, yAno: 239, xDias: 180, yDias: 239 },
+      // Fila 7
+      { xEnfermedad: 13, yEnfermedad: 244, xSi: 107.8, ySi: 244, xNo: 124, yNo: 244, xAno: 138.5, yAno: 244, xDias: 180, yDias: 244 }
+    ];
 
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
 
-    // Renderizar hasta 7 enfermedades (o las que quepan en el espacio disponible)
+    // Renderizar hasta 7 enfermedades con posiciones individuales
     enfermedades.slice(0, 7).forEach((enfermedad, index) => {
-      const yOffset = index * espaciadoFila;
+      const pos = posicionesFilas[index];
+      if (!pos) return; // Si no hay posición definida, saltar
       
       // Nombre de la enfermedad/accidente
       if (enfermedad.enfermedad) {
-        doc.text(enfermedad.enfermedad.toUpperCase(), xBaseEnfermedad, yBaseEnfermedad + yOffset);
+        doc.text(enfermedad.enfermedad.toUpperCase(), pos.xEnfermedad, pos.yEnfermedad);
       }
       
       // Checkbox SI/NO
@@ -1194,10 +1234,10 @@ export default function Anexo2(data = {}) {
         doc.setFont("helvetica", "bold").setFontSize(12);
 
         if (enfermedad.asociadoTrabajo.si) {
-          doc.text("X", xBaseSi, yBaseSi + yOffset);
+          doc.text("X", pos.xSi, pos.ySi);
         }
         if (enfermedad.asociadoTrabajo.no) {
-          doc.text("X", xBaseNo, yBaseNo + yOffset);
+          doc.text("X", pos.xNo, pos.yNo);
         }
 
         doc.setTextColor(0, 0, 0); // Resetear a negro
@@ -1206,12 +1246,12 @@ export default function Anexo2(data = {}) {
 
       // Año
       if (enfermedad.año) {
-        doc.text(enfermedad.año.toUpperCase(), xBaseAno, yBaseAno + yOffset);
+        doc.text(enfermedad.año.toUpperCase(), pos.xAno, pos.yAno);
       }
 
       // Días de descanso
       if (enfermedad.diasDescanso) {
-        doc.text(enfermedad.diasDescanso.toUpperCase(), xBaseDias, yBaseDias + yOffset, { align: "center" });
+        doc.text(enfermedad.diasDescanso.toUpperCase(), pos.xDias, pos.yDias, { align: "center" });
       }
     });
   }

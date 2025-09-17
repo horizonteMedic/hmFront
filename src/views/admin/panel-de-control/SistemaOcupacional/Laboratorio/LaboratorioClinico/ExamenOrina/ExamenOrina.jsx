@@ -142,8 +142,8 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
       if (checked) {
         let newForm = { ...prev };
         Object.keys(newForm).forEach(key => {
-          // Poner 'N/A' en todos los campos string
-          if (typeof newForm[key] === 'string') {
+          // Poner 'N/A' en todos los campos string excepto observaciones
+          if (typeof newForm[key] === 'string' && key !== 'observaciones') {
             newForm[key] = 'N/A';
           }
           // Desmarcar todos los radios de drogas
@@ -157,8 +157,8 @@ export default function ExamenOrina({token, selectedSede, userlogued, form, setF
         // Asegurar que los campos de drogas queden vacíos
         newForm.Cocaina = 'N/A';
         newForm.Marihuana = 'N/A';
-        // Observaciones también en N/A
-        newForm.observaciones = 'N/A';
+        // Observaciones se mantiene vacío
+        newForm.observaciones = '';
         newForm.NoAplica = true;
         return newForm;
       } else {
