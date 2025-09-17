@@ -11,17 +11,17 @@ export default function InformePsicologico(data = {}) {
 
     // Datos de prueba basados en la imagen
     const datosPrueba = {
-        nombre: "VIVIANA AYDE DELGADO VEGA",
-        edad: "25",
-        direccion: "AV. EL PESCADOR",
-        gradoInstruccion: "UNIVERSITARIO",
-        cargoDesempenar: "CAPATAAZ",
-        empresa: "MONARCA GOLD S.A.C.",
-        fechaNacimiento: "19 de marzo 2000",
-        lugarNacimiento: "CHICLAYO",
-        estadoCivil: "SOLTERO",
-        ocupacion: "ING. SISTEMAS",
-        fechaEntrevista: "miércoles 03 septiembre 2025",
+        nombre: "MARIANA ALEJANDRA GUTIÉRREZ DE LA CRUZ MARI ALE GUTIÉRREZ",
+        edad: "32",
+        direccion: "JR. LAS GARDENIAS MZ. F LT. 24 URB. SANTA MARÍA DE LOS ÁNGELES – SAN JUAN DE LURIGANCHO, LIMA",
+        gradoInstruccion: "UNIVERSIDAD",
+        cargoDesempenar: "COORDINADORA GENERAL DE PROCESOS ESTRA",
+        empresa: "CONSORCIO INTERNACIONAL ANDINO DE INGENIERÍA Y SERVICIOS S.A.C.",
+        fechaNacimiento: "15 de agosto de 1993",
+        lugarNacimiento: "AREQUIPA, PERÚ",
+        estadoCivil: "CASADA",
+        ocupacion: "INGENIERA INDUSTRIAL CON ESPECIALIZACIÓN EN OPTIMIZACIÓN DE SIS",
+        fechaEntrevista: "viernes 10 de octubre de 2025",
         codigoEntrevista: "63163",
         numeroFicha: "99164",
         sede: "Trujillo-Piérola"
@@ -53,17 +53,61 @@ export default function InformePsicologico(data = {}) {
         fechaEntrevista: obtenerString("fechaEntrevista"),
         codigoEntrevista: obtenerString("codigoEntrevista"),
         numeroFicha: obtenerString("numeroFicha"),
-        sede: obtenerString("sede")
+        sede: obtenerString("sede"),
+        areaIntelectual: obtenerString("areaIntelectual"),
+        areaPersonalidad: obtenerString("areaPersonalidad"),
+        areaOrganicidad: obtenerString("areaOrganicidad"),
+        areaPsicomotricidad: obtenerString("areaPsicomotricidad"),
+        recomendaciones: obtenerString("recomendaciones")
     };
 
     // Usar datos reales o datos de prueba
     const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
+    // Función para dividir texto largo en múltiples líneas
+    const dividirTextoEnLineas = (texto, maxWidth, fontSize = 10) => {
+        if (!texto) return [''];
+
+        doc.setFontSize(fontSize);
+        const palabras = texto.split(' ');
+        const lineas = [];
+        let lineaActual = '';
+
+        for (let i = 0; i < palabras.length; i++) {
+            const palabraActual = palabras[i];
+            const lineaTemporal = lineaActual ? `${lineaActual} ${palabraActual}` : palabraActual;
+
+            // Verificar si la línea temporal excede el ancho máximo
+            const anchoLinea = doc.getTextWidth(lineaTemporal);
+
+            if (anchoLinea <= maxWidth) {
+                lineaActual = lineaTemporal;
+            } else {
+                // Si la línea actual no está vacía, agregarla a las líneas
+                if (lineaActual) {
+                    lineas.push(lineaActual);
+                    lineaActual = palabraActual;
+                } else {
+                    // Si una sola palabra es muy larga, agregarla de todos modos
+                    lineas.push(palabraActual);
+                }
+            }
+        }
+
+        // Agregar la última línea si no está vacía
+        if (lineaActual) {
+            lineas.push(lineaActual);
+        }
+
+        // Limitar a máximo 3 líneas
+        return lineas.slice(0, 3);
+    };
+
     // === HEADER ===
     headerInformePsicologico(doc, datosFinales);
 
     // === TÍTULO PRINCIPAL ===
-    let currentY = 35;
+    let currentY = 27;
     doc.setFont("helvetica", "bold").setFontSize(15);
     doc.text("INFORME PSICOLÓGICO", pageW / 2, currentY, { align: "center" });
 
@@ -82,27 +126,33 @@ export default function InformePsicologico(data = {}) {
     doc.setFont("helvetica", "bold");
     doc.text("Nombre completo", margin, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.nombre, margin + labelWidth, currentY);
+
+    // Aplicar función de texto multilínea para nombres largos
+    const lineasNombre = dividirTextoEnLineas(datosFinales.nombre, 67, 10);
+    lineasNombre.forEach((linea, index) => {
+        doc.text(linea, margin - 12 + labelWidth, currentY + (index * 4));
+    });
 
     // Fecha de Nacimiento (derecha)
     doc.setFont("helvetica", "bold");
     doc.text("Fecha de Nacimiento", margin + 110, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.fechaNacimiento, margin + 160, currentY);
+    doc.text(datosFinales.fechaNacimiento, margin - 10 + 160, currentY);
 
-    currentY += lineHeight;
+    // Ajustar currentY basado en el número de líneas del nombre
+    currentY += lineHeight + (lineasNombre.length > 1 ? (lineasNombre.length - 1) * 4 : 0);
 
     // Edad
     doc.setFont("helvetica", "bold");
     doc.text("Edad", margin, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(`${datosFinales.edad} AÑOS`, margin + labelWidth, currentY);
+    doc.text(`${datosFinales.edad} AÑOS`, margin - 12 + labelWidth, currentY);
 
     // Lugar de Nacimiento (derecha)
     doc.setFont("helvetica", "bold");
     doc.text("Lugar de Nacimiento", margin + 110, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.lugarNacimiento, margin + 160, currentY);
+    doc.text(datosFinales.lugarNacimiento, margin - 10 + 160, currentY);
 
     currentY += lineHeight;
 
@@ -110,27 +160,33 @@ export default function InformePsicologico(data = {}) {
     doc.setFont("helvetica", "bold");
     doc.text("Dirección", margin, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.direccion, margin + labelWidth, currentY);
+
+    // Aplicar función de texto multilínea para direcciones largas
+    const lineasDireccion = dividirTextoEnLineas(datosFinales.direccion, 67, 10);
+    lineasDireccion.forEach((linea, index) => {
+        doc.text(linea, margin - 12 + labelWidth, currentY + (index * 4));
+    });
 
     // Estado Civil (derecha)
     doc.setFont("helvetica", "bold");
     doc.text("Estado Civil", margin + 110, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.estadoCivil, margin + 160, currentY);
+    doc.text(datosFinales.estadoCivil, margin - 10 + 160, currentY);
 
-    currentY += lineHeight;
+    // Ajustar currentY basado en el número de líneas de la dirección
+    currentY += lineHeight + (lineasDireccion.length > 1 ? (lineasDireccion.length - 1) * 4 : 0);
 
     // Grado de Instrucción
     doc.setFont("helvetica", "bold");
     doc.text("Grado de Instrucción", margin, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.gradoInstruccion, margin + labelWidth, currentY);
+    doc.text(datosFinales.gradoInstruccion, margin - 12 + labelWidth, currentY);
 
     // Ocupación (derecha)
     doc.setFont("helvetica", "bold");
     doc.text("Ocupación", margin + 110, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.ocupacion, margin + 160, currentY);
+    doc.text(datosFinales.ocupacion, margin - 10 + 160, currentY, { maxWidth: 67 });
 
     currentY += lineHeight;
 
@@ -138,24 +194,38 @@ export default function InformePsicologico(data = {}) {
     doc.setFont("helvetica", "bold");
     doc.text("Cargo a Desempeñar", margin, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.cargoDesempenar, margin + labelWidth, currentY);
+    
+    // Aplicar función de texto multilínea para cargos largos
+    const lineasCargo = dividirTextoEnLineas(datosFinales.cargoDesempenar, 67, 10);
+    lineasCargo.forEach((linea, index) => {
+        doc.text(linea, margin - 12 + labelWidth, currentY + (index * 4));
+    });
 
-    currentY += lineHeight;
+    // Ajustar currentY basado en el número de líneas del cargo
+    currentY += lineHeight + (lineasCargo.length > 1 ? (lineasCargo.length - 1) * 4 : 0);
 
     // Empresa
     doc.setFont("helvetica", "bold");
     doc.text("Empresa", margin, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.empresa, margin + labelWidth, currentY);
+
+    // Aplicar función de texto multilínea para nombres de empresa largos
+    const lineasEmpresa = dividirTextoEnLineas(datosFinales.empresa, 67, 10);
+    lineasEmpresa.forEach((linea, index) => {
+        doc.text(linea, margin - 12 + labelWidth, currentY + (index * 4));
+    });
 
     // Fecha de Entrevista (derecha)
     doc.setFont("helvetica", "bold");
     doc.text("Fecha de Entrevista", margin + 110, currentY);
     doc.setFont("helvetica", "normal");
-    doc.text(datosFinales.fechaEntrevista, margin + 160, currentY);
+    doc.text(datosFinales.fechaEntrevista, margin - 10 + 160, currentY);
+
+    // Ajustar currentY basado en el número de líneas de la empresa
+    currentY += (lineasEmpresa.length > 1 ? (lineasEmpresa.length - 1) * 4 : 0);
 
     // === II.- RESULTADOS ===
-    currentY += 15;
+    currentY += 10;
     doc.setFont("helvetica", "bold").setFontSize(11);
     doc.text("II.- RESULTADOS", margin, currentY);
 
@@ -166,22 +236,30 @@ export default function InformePsicologico(data = {}) {
 
     currentY += 6;
     doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.", margin + 5, currentY);
 
-    currentY += 5;
-    doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON FACILIDAD.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON DIFICULTAD.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON FACILIDAD.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON DIFICULTAD.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("- NO SE EVIDENCIA DAÑO ORGÁNICO.", margin + 5, currentY);
+    // Renderizar el contenido del área intelectual desde la variable
+    if (datosFinales.areaIntelectual) {
+        const lineasAreaIntelectual = datosFinales.areaIntelectual.split('\n');
+        lineasAreaIntelectual.forEach(linea => {
+            if (linea.trim()) {
+                doc.text(linea, margin + 5, currentY);
+                currentY += 5;
+            }
+        });
+    } else {
+        // Contenido por defecto si no hay datos
+        doc.text("- EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON FACILIDAD.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON DIFICULTAD.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON FACILIDAD.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- COMPRENDE Y PROCESA LA INFORMACIÓN CON DIFICULTAD.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- NO SE EVIDENCIA DAÑO ORGÁNICO.", margin + 5, currentY);
+    }
 
     // b.- Área de Personalidad
     currentY += 10;
@@ -190,7 +268,20 @@ export default function InformePsicologico(data = {}) {
 
     currentY += 6;
     doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text("ESTO ES UNA PRUEBA", margin + 5, currentY);
+
+    // Renderizar el contenido del área de personalidad desde la variable
+    if (datosFinales.areaPersonalidad) {
+        const lineasAreaPersonalidad = datosFinales.areaPersonalidad.split('\n');
+        lineasAreaPersonalidad.forEach(linea => {
+            if (linea.trim()) {
+                doc.text(linea, margin + 5, currentY);
+                currentY += 5;
+            }
+        });
+    } else {
+        // Contenido por defecto si no hay datos
+        doc.text("ESTO ES UNA PRUEBA", margin + 5, currentY);
+    }
 
     // c.- Área de Organicidad
     currentY += 15;
@@ -199,19 +290,28 @@ export default function InformePsicologico(data = {}) {
 
     currentY += 6;
     doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text("- ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA.", margin + 5, currentY);
 
-    currentY += 5;
-    doc.text("- POSEE UN ALTO MANEJO DE FACULTADES MENTALES.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("- POSEE UN ADECUADO MANEJO DE FACULTADES MENTALES.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("- POSEE UN BAJO MANEJO DE FACULTADES MENTALES.", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("NO SE EVIDENCIA DAÑO ORGÁNICO.", margin + 5, currentY);
+    // Renderizar el contenido del área de organicidad desde la variable
+    if (datosFinales.areaOrganicidad) {
+        const lineasAreaOrganicidad = datosFinales.areaOrganicidad.split('\n');
+        lineasAreaOrganicidad.forEach(linea => {
+            if (linea.trim()) {
+                doc.text(linea, margin + 5, currentY);
+                currentY += 5;
+            }
+        });
+    } else {
+        // Contenido por defecto si no hay datos
+        doc.text("- ORIENTADO EN TIEMPO, ESPACIO, Y PERSONA.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- POSEE UN ALTO MANEJO DE FACULTADES MENTALES.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- POSEE UN ADECUADO MANEJO DE FACULTADES MENTALES.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("- POSEE UN BAJO MANEJO DE FACULTADES MENTALES.", margin + 5, currentY);
+        currentY += 5;
+        doc.text("NO SE EVIDENCIA DAÑO ORGÁNICO.", margin + 5, currentY);
+    }
 
     // d.- Área de Psicomotricidad
     currentY += 15;
@@ -220,7 +320,20 @@ export default function InformePsicologico(data = {}) {
 
     currentY += 6;
     doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text("- NIVEL BAJO EN DESARROLLO PSICOMOTOR.", margin + 5, currentY);
+
+    // Renderizar el contenido del área de psicomotricidad desde la variable
+    if (datosFinales.areaPsicomotricidad) {
+        const lineasAreaPsicomotricidad = datosFinales.areaPsicomotricidad.split('\n');
+        lineasAreaPsicomotricidad.forEach(linea => {
+            if (linea.trim()) {
+                doc.text(linea, margin + 5, currentY);
+                currentY += 5;
+            }
+        });
+    } else {
+        // Contenido por defecto si no hay datos
+        doc.text("- NIVEL BAJO EN DESARROLLO PSICOMOTOR.", margin + 5, currentY);
+    }
 
     // e.- Recomendaciones
     currentY += 15;
@@ -229,13 +342,24 @@ export default function InformePsicologico(data = {}) {
 
     currentY += 6;
     doc.setFont("helvetica", "normal").setFontSize(10);
-    doc.text("REALIZAR ACTIVIDADES FÍSICAS PARA REFORZAR SUS FUNCIONES COGNITIVAS", margin + 5, currentY);
 
-    currentY += 5;
-    doc.text("ASISTIR A TALLERES DE GESTIÓN EMOCIONAL", margin + 5, currentY);
-
-    currentY += 5;
-    doc.text("ORIENTACIÓN Y CONSEJERÍA PSICOLÓGICA.", margin + 5, currentY);
+    // Renderizar el contenido de las recomendaciones desde la variable
+    if (datosFinales.recomendaciones) {
+        const lineasRecomendaciones = datosFinales.recomendaciones.split('\n');
+        lineasRecomendaciones.forEach(linea => {
+            if (linea.trim()) {
+                doc.text(linea, margin + 5, currentY);
+                currentY += 5;
+            }
+        });
+    } else {
+        // Contenido por defecto si no hay datos
+        doc.text("REALIZAR ACTIVIDADES FÍSICAS PARA REFORZAR SUS FUNCIONES COGNITIVAS", margin + 5, currentY);
+        currentY += 5;
+        doc.text("ASISTIR A TALLERES DE GESTIÓN EMOCIONAL", margin + 5, currentY);
+        currentY += 5;
+        doc.text("ORIENTACIÓN Y CONSEJERÍA PSICOLÓGICA.", margin + 5, currentY);
+    }
 
     // === III.- APTO PARA EL CARGO ===
     currentY += 20;
