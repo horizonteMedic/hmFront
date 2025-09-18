@@ -2,14 +2,12 @@ import {
   InputTextOneLine,
   InputTextArea,
   InputsRadioGroup,
-  InputCheckbox,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
 export default function Abdomen({
   form,
   handleChange,
   handleRadioButton,
-  handleCheckBoxChange
 }) {
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
@@ -22,7 +20,7 @@ export default function Abdomen({
           <div className="space-y-3 flex-1">
             {/* Abdomen */}
             <InputTextOneLine
-              label="Abdomen:"
+              label="Abdomen"
               name="abdomen"
               value={form.abdomen}
               onChange={handleChange}
@@ -31,7 +29,7 @@ export default function Abdomen({
 
             {/* Columna Vertebral */}
             <InputTextOneLine
-              label="Columna Vertebral:"
+              label="Columna Vertebral"
               name="columnaVertebral"
               value={form.columnaVertebral}
               onChange={handleChange}
@@ -40,7 +38,7 @@ export default function Abdomen({
 
             {/* Anillos Inguinales */}
             <InputTextOneLine
-              label="Anillos Inguinales:"
+              label="Anillos Inguinales"
               name="anillosInguinales"
               value={form.anillosInguinales}
               onChange={handleChange}
@@ -49,7 +47,7 @@ export default function Abdomen({
 
             {/* Órganos Genitales */}
             <InputTextOneLine
-              label="Órganos Genitales:"
+              label="Órganos Genitales"
               name="organosGenitales"
               value={form.organosGenitales}
               onChange={handleChange}
@@ -249,17 +247,14 @@ export default function Abdomen({
                 <div className="flex items-end gap-2">
                   {/* Grupo CERO */}
                   <div className="flex flex-col items-center">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="clasificacion"
-                        value="0/0"
-                        checked={form.clasificacion === "0/0"}
-                        onChange={handleRadioButton}
-                        className="w-4 h-4"
-                      />
-                      <span className="text=[11px] text-blue-600 font-medium">0/0</span>
-                    </label>
+                    <InputsRadioGroup
+                      name="clasificacion"
+                      value={form.clasificacion}
+                      onChange={handleRadioButton}
+                      options={[
+                        { label: "0/0", value: "0/0" },
+                      ]}
+                    />
                     <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                       CERO
                     </div>
@@ -269,17 +264,14 @@ export default function Abdomen({
 
                   {/* Grupo 1/0 */}
                   <div className="flex flex-col items-center">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="clasificacion"
-                        value="1/0"
-                        checked={form.clasificacion === "1/0"}
-                        onChange={handleRadioButton}
-                        className="w-4 h-4"
-                      />
-                      <span className="text=[11px] text-blue-600 font-medium">1/0</span>
-                    </label>
+                    <InputsRadioGroup
+                      name="clasificacion"
+                      value={form.clasificacion}
+                      onChange={handleRadioButton}
+                      options={[
+                        { label: "1/0", value: "1/0" },
+                      ]}
+                    />
                     <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                       1/0
                     </div>
@@ -290,33 +282,27 @@ export default function Abdomen({
                   {/* Grupo UNO */}
                   <div className="flex gap-2">
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="1/1"
-                          checked={form.clasificacion === "1/1"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">1/1</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "1/1", value: "1/1" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         UNO
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="1/2"
-                          checked={form.clasificacion === "1/2"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">1/2</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "1/2", value: "1/2" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         UNO
                       </div>
@@ -328,49 +314,40 @@ export default function Abdomen({
                   {/* Grupo DOS */}
                   <div className="flex gap-2">
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="2/1"
-                          checked={form.clasificacion === "2/1"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">2/1</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "2/1", value: "2/1" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         DOS
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="2/2"
-                          checked={form.clasificacion === "2/2"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">2/2</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "2/2", value: "2/2" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         DOS
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="2/3"
-                          checked={form.clasificacion === "2/3"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">2/3</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "2/3", value: "2/3" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         DOS
                       </div>
@@ -382,49 +359,40 @@ export default function Abdomen({
                   {/* Grupo TRES */}
                   <div className="flex gap-2">
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="3/2"
-                          checked={form.clasificacion === "3/2"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">3/2</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "3/2", value: "3/2" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         TRES
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="3/3"
-                          checked={form.clasificacion === "3/3"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">3/3</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "3/3", value: "3/3" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         TRES
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="3/+"
-                          checked={form.clasificacion === "3/+"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">3/+</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "3/+", value: "3/+" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         TRES
                       </div>
@@ -436,36 +404,27 @@ export default function Abdomen({
                   {/* Grupo CUATRO */}
                   <div className="flex gap-2">
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="A,B,C"
-                          checked={form.clasificacion === "A,B,C"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">A, B C</span>
-                      </label>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "A, B y C", value: "ABC" },
+                        ]}
+                      />
                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
                         CUATRO
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="clasificacion"
-                          value="St"
-                          checked={form.clasificacion === "St"}
-                          onChange={handleRadioButton}
-                          className="w-4 h-4"
-                        />
-                        <span className="text=[11px] text-blue-600 font-medium">St</span>
-                      </label>
-                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                        CUATRO
-                      </div>
+                      <InputsRadioGroup
+                        name="clasificacion"
+                        value={form.clasificacion}
+                        onChange={handleRadioButton}
+                        options={[
+                          { label: "St", value: "ST" },
+                        ]}
+                      />
                     </div>
                   </div>
                 </div>
@@ -476,24 +435,16 @@ export default function Abdomen({
             <div>
               <h5 className="font-semibold text-gray-700 mb-2">Reacciones Serológicas Lues - aLues</h5>
               <div className="flex gap-4">
-                <label className="flex items-center gap-1">
-                  <input
-                    type="checkbox"
-                    name="reaccionesSerologicasPositivo"
-                    checked={form.reaccionesSerologicasPositivo}
-                    onChange={handleCheckBoxChange} //disabled
-                  />
-                  <span >Positivo</span>
-                </label>
-                <label className="flex items-center gap-1">
-                  <input
-                    type="checkbox"
-                    name="reaccionesSerologicasNegativo"
-                    checked={form.reaccionesSerologicasNegativo}
-                    onChange={handleCheckBoxChange}//disabled // negativo por defecto 
-                  />
-                  <span>Negativo</span>
-                </label>
+                <InputsRadioGroup
+                  name="reaccionesSerologicas"
+                  value={form.reaccionesSerologicas}
+                  onChange={handleRadioButton}
+                  disabled
+                  options={[
+                    { label: "Positivo", value: "POSITIVO" },
+                    { label: "Negativo", value: "NEGATIVO" },
+                  ]}
+                />
               </div>
             </div>
 

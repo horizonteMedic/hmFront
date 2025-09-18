@@ -212,9 +212,44 @@ export default function Anexo16({ listas }) {
     piezasMalEstado: "",
     piezasFaltan: "",
     dentaduraObservaciones: "",
-
     //=============================================================================================
     //TERCERA TAB RESULTADOS
+    //=============================================================================================
+    // Examen Físico - Abdomen
+    abdomen: "",
+    columnaVertebral: "",
+    anillosInguinales: "",
+    organosGenitales: "",
+    //Tacto Rectal
+    tactoRectal: "NO_SE_HIZO",
+    hernias: "",
+    varices: "",
+    ganglios: "",
+    evaluacionCognitiva: "",
+    //Información Radiológica
+    numeroRx: "",
+    fechaRx: "",
+    calidadRx: "",
+    simbolosRx: "",
+    //Conclusiones Radiográficas
+    vertices: "",
+    hilios: "",
+    senos: "",
+    mediastinos: "",
+    conclusionesRadiograficas: "",
+    siluetaCardiovascular: "",
+    //Estado Mental y Anamnesis
+    estadoMental: "",
+    anamnesis: "",
+    //Clasificación y Neumoconiosis
+    clasificacion: "0/0",
+    reaccionesSerologicas: "NEGATIVO",
+    sinNeumoconiosis: "",
+    imagenRadiograficaPolvo: "",
+    conNeumoconiosis: "",
+
+    //=============================================================================================
+    //CUARTA TAB RESULTADOS
     //=============================================================================================
     // Exámenes de Laboratorio
     nitritos: "",

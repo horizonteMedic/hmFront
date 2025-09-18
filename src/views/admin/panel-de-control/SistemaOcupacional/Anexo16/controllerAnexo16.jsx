@@ -5,7 +5,6 @@ import {
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { getFetch } from "../../../../utils/apiHelpers";
 
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
@@ -86,20 +85,20 @@ export const SubmitDataService = async (
     miembrosInferiores: form.miembrosInferiores,
     reflejosOsteotendinosos: form.reflejosOsteotendinosos,
     marcha: form.marcha,
-    columnaVertebral: "",
-    abdomen: "",
-    anillosInguinales: "",
-    organosGenitales: "",
-    tactoRectalNoHizo: "",
-    tactoRectalNormal: "",
-    tactoRectalAnormal: "",
-    describirObservacion: "",
-    hernias: "",
-    varices: "",
-    ganglios: "",
-    lenguage: "",
-    estadoMental: "",
-    anamnesis: "",
+    columnaVertebral: form.columnaVertebral,
+    abdomen: form.abdomen,
+    anillosInguinales: form.anillosInguinales,
+    organosGenitales: form.organosGenitales,
+    tactoRectalNoHizo: form.tactoRectal == "NO_SE_HIZO",
+    tactoRectalNormal: form.tactoRectalNormal == "NORMAL",
+    tactoRectalAnormal: form.tactoRectalNormal == "ANORMAL",
+    describirObservacion: false,
+    hernias: form.hernias,
+    varices: form.varices,
+    ganglios: form.ganglios,
+    lenguage: form.evaluacionCognitiva,
+    estadoMental: form.estadoMental,
+    anamnesis: form.anamnesis,
     observacionesFichaMedica: form.observacionesGenerales,
     conclusion: form.conclusionRespiratoria,
     tetano: form.tetano,
@@ -614,6 +613,229 @@ export const GetInfoServicio = (
     });
 };
 
+// Función adaptada del código Java (líneas 915-1076) para mapear datos adicionales
+export const MapearDatosAdicionales = (res, data, contador = 1) => {
+  try {
+    // =============================================================================================
+    // SECCIÓN VISUAL - Examen Oftalmológico   muestraVisual
+    // =============================================================================================
+
+    // Visión cercana sin corregir
+    data.visionCercaOd = res.visionCercaSinCorregirOd_v_cerca_s_od ?? "";
+    data.visionCercaOi = res.visionCercaSinCorregirOi_v_cerca_s_oi ?? "";
+
+    // Visión lejana sin corregir
+    data.visionLejosOd = res.visionLejosSinCorregirOd_v_lejos_s_od ?? "";
+    data.visionLejosOi = res.visionLejosSinCorregirOi_v_lejos_s_oi ?? "";
+
+    // Visión corregida - //revisar: Verificar mapeo de campos ODCC, OICC, ODLC, OILC
+    data.visionCercaOdCorregida = res.visionCercaCorregidaOd_v_cerca_c_od ?? "";
+    data.visionCercaOiCorregida = res.visionCercaCorregidaOi_v_cerca_c_oi ?? "";
+    data.visionLejosOdCorregida = res.visionLejosCorregidaOd_v_lejos_c_od ?? "";
+    data.visionLejosOiCorregida = res.visionLejosCorregidaOi_v_lejos_c_oi ?? "";
+
+    // Otros exámenes visuales
+    data.visionColores = res.visionColoresAnexo7c_txtvisioncolores ?? "";
+    data.visionBinocular = res.visionBinocular_v_binocular ?? "";
+    data.reflejosPupilares = res.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "";
+    data.enfermedadOculares = res.enfermedadesOcularesOftalmo_e_oculares ?? "";
+    data.enfermedadOtros = res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "";
+
+    // =============================================================================================
+    // SECCIÓN RADIOGRAFÍA Y SANGRE    editarRadiogrSan
+    // =============================================================================================
+
+    // Información básica del paciente
+    data.dni = res.dni_cod_pa;
+    data.norden = res.norden_n_orden;
+
+    // Radiografía de tórax - //revisar: Verificar si estos campos están en el JSON correcto
+    data.vertices = res.verticesRadiografiaTorax_txtvertices ?? "";
+    data.hilios = res.hiliosRadiografiaTorax_txthilios ?? "";
+    data.senos = res.senosCostoFrenicosRadiografiaTorax_txtsenoscostofrenicos ?? "";
+    data.mediastinos = res.mediastinosRadiografiaTorax_txtmediastinos ?? "";
+    data.siluetaCardiovascular = res.siluetaCardioVascularRadiografiaTorax_txtsiluetacardiovascular ?? "";
+    data.conclusionesRadiograficas = res.conclusionesRadiograficasTorax_txtconclusionesradiograficas ?? "";
+    data.camposPulmones = res.camposPulmonesRadiografiaTorax_txtcampospulm ?? "";
+
+    // Hemoglobina y validación por sexo
+    data.hemoglobinaHematocrito = res.hemoglobina_txthemoglobina ?? "";
+    // Reacciones serológicas
+    data.reaccionesSerologicas = res.positivoLaboratorioClinico_chkpositivo ? "POSITIVO" :
+      res.negativoLaboratorioClinico_chknegativo ? "NEGATIVO" : "NEGATIVO";
+    data.nombres = res.nombres_nombres_pa ?? "";
+    data.apellidos = res.apellidos_apellidos_pa ?? "";
+    // Grupo sanguíneo
+    data.grupoSanguineo = res.grupoSanguineoO_chko ? "O" :
+      res.grupoSanguineoA_chka ? "A" :
+        res.grupoSanguineoB_chkb ? "B" :
+          res.grupoSanguineoAB_chkab ? "AB" : "O";
+
+    data.factorRh = res.grupoSanguineoRhPositivo_rbrhpositivo ? "RH(+)" :
+      res.grupoSanguineoRhNegativo_rbrhnegativo ? "RH(-)" : "RH(+)";
+
+    // Fechas y calidad - //revisar: Verificar formato de fechas
+    data.fechaRx = res.fechaRx ?? ""; //revisar: Campo no encontrado en JSON
+    data.calidadRx = res.calidadRx ?? ""; //revisar: Campo no encontrado en JSON
+    data.simbolosRx = res.simbolosRx ?? ""; //revisar: Campo no encontrado en JSON
+
+    // Clasificación radiográfica -
+    // Los campos ex_0, ex_10, etc. necesitan ser mapeados a la clasificación correcta
+    if (res.ex_0) data.clasificacion = "0/0"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_10) data.clasificacion = "1/0"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_11) data.clasificacion = "1/1"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_12) data.clasificacion = "1/2"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_21) data.clasificacion = "2/1"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_22) data.clasificacion = "2/2"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_23) data.clasificacion = "2/3"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_32) data.clasificacion = "3/2"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_33) data.clasificacion = "3/3"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_3mas) data.clasificacion = "3/+"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_abc) data.clasificacion = "ABC"; //revisar: Campo no encontrado en JSON
+    else if (res.ex_st) data.clasificacion = "ST"; //revisar: Campo no encontrado en JSON
+
+    // Neumoconiosis
+    data.sinNeumoconiosis = res.sinNeumoconiosis ?? ""; //revisar: Campo no encontrado en JSON
+    data.conNeumoconiosis = res.conNeumoconiosis ?? ""; //revisar: Campo no encontrado en JSON
+    data.imagenRadiograficaPolvo = res.polvoAnexo7c_chkpolvo ?? "";
+
+    // Aptitud para trabajar - //revisar: Verificar lógica de aptitud
+    if (res.apto_si) data.aptoParaTrabajar = "SI";
+    else if (res.apto_no) data.aptoParaTrabajar = "NO";
+    else if (res.apto_re) data.aptoParaTrabajar = "REEVALUACION"; //revisar: Verificar si existe esta opción
+
+    const sexo = res.sexo_sexo_pa ?? data.sexo;
+    if (data.hemoglobinaHematocrito && data.hemoglobinaHematocrito !== "" && data.hemoglobinaHematocrito !== "N/A") {
+      const hemoglobina = parseFloat(data.hemoglobinaHematocrito);
+      if (!isNaN(hemoglobina)) {
+        if (sexo === "M" || sexo === "MASCULINO") {
+          data.hemoglobinaRed = (hemoglobina < 14 || hemoglobina > 20);
+        } else if (sexo === "F" || sexo === "FEMENINO") {
+          data.hemoglobinaRed = (hemoglobina < 13.5 || hemoglobina > 20);
+        }
+      }
+    }
+
+
+    // =============================================================================================
+    // SECCIÓN ELECTROCARDIOGRAMA electroCardiograma
+    // =============================================================================================
+
+    const hallazgo = res.hallazgosInformeElectroCardiograma_hallazgo;
+    const recomendaciones = res.recomendacionesInformeElectroCardiograma_recomendaciones;
+
+    if (hallazgo && hallazgo !== "NORMAL.") {
+      let electrocardiogramaText = `${contador}-ELECTROCARDIOGRAMA: ${hallazgo}`;
+      if (recomendaciones) {
+        electrocardiogramaText += `.${recomendaciones}`;
+      }
+
+      // Agregar a observaciones generales si existe
+      if (data.observacionesGenerales) {
+        data.observacionesGenerales += electrocardiogramaText + "\n";
+      } else {
+        data.observacionesGenerales = electrocardiogramaText + "\n";
+      }
+      contador++;
+    }
+
+    // =============================================================================================
+    // SECCIÓN EXAMEN DE ORINA
+    // =============================================================================================
+
+    // Examen físico de orina
+    data.colorFisico = res.examenFisicoColor_txtcoloref ?? "";
+    data.aspectoFisico = res.examenFisicoAspecto_txtaspectoef ?? "";
+    data.densidadFisico = res.examenFisicoDensidad_txtdensidadef ?? "";
+    data.phFisico = res.examenFisicoPh_txtphef ?? "";
+
+    // Examen químico de orina
+    data.nitritos = res.examenQuimicoNitritos_txtnitritoseq ?? "";
+    data.proteinas = res.examenQuimicoProteinas_txtproteinaseq ?? "";
+    data.leucocitos = res.examenQuimicoLeucocitos_txtleucocitoseq ?? "";
+    data.cetonas = res.examenQuimicoCetonas_txtcetonaseq ?? "";
+    data.urobilinogeno = res.examenQuimicoUrobilinogeno_txturobilinogenoeq ?? "";
+    data.bilirrubina = res.examenQuimicoBilirubina_txtbilirubinaeq ?? "";
+    data.glucosaQuimico = res.examenQuimicoGlucosa_txtglucosaeq ?? "";
+    data.sangre = res.examenQuimicoSangre_txtsangreeq ?? "";
+
+    // Sedimento urinario
+    data.leucocitosSedimento = res.sedimientoUrinarioLeucocitos_txtleucocitossu ?? "";
+    data.celulasEpiteliales = res.sedimientoUrinarioEpiteliales_txtcelepitelialessu ?? "";
+    data.cilindios = res.sedimientoUrinarioCilindios_txtcilindiossu ?? "";
+    data.bacterias = res.sedimientoUrinarioBacterias_txtbacteriassu ?? "";
+    data.hematies = res.sedimientoUrinarioHematies_txthematiessu ?? "";
+    data.cristales = res.sedimientoUrinarioCristales_txtcristalessu ?? "";
+    data.pus = res.sedimientoUrinarioPus_txtpussu ?? "";
+    data.otrosSedimento = res.sedimientoUrinarioOtros_txtotrossu ?? "";
+
+    // =============================================================================================
+    // SECCIÓN ANÁLISIS BIOQUÍMICO
+    // =============================================================================================
+
+    // Perfil lipídico
+    data.colesterolTotal = res.colesterolAnalisisBioquimico_txtcolesterol ?? "";
+    data.LDLColesterol = res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "";
+    data.HDLColesterol = res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "";
+    data.VLDLColesterol = res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "";
+    data.trigliceridos = res.trigliseridosAnalisisBioquimico_txttrigliseridos ?? "";
+
+    // Validaciones y observaciones para perfil lipídico
+    if (data.colesterolTotal && data.colesterolTotal !== "-" && data.colesterolTotal !== "") {
+      const colesterol = parseFloat(data.colesterolTotal);
+      if (!isNaN(colesterol) && colesterol > 200) {
+        const observacion = `${contador}- HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
+        data.observacionesGenerales = (data.observacionesGenerales || "") + observacion;
+        data.colesterolRed = true;
+        contador++;
+      }
+    }
+
+    if (data.LDLColesterol && data.LDLColesterol !== "-" && data.LDLColesterol !== "") {
+      const ldl = parseFloat(data.LDLColesterol);
+      if (!isNaN(ldl)) {
+        data.ldlRed = (ldl > 129);
+      }
+    }
+
+    if (data.HDLColesterol && data.HDLColesterol !== "-" && data.HDLColesterol !== "") {
+      const hdl = parseFloat(data.HDLColesterol);
+      if (!isNaN(hdl)) {
+        data.hdlRed = (hdl < 40 || hdl > 60);
+      }
+    }
+
+    if (data.VLDLColesterol && data.VLDLColesterol !== "-" && data.VLDLColesterol !== "") {
+      const vldl = parseFloat(data.VLDLColesterol);
+      if (!isNaN(vldl)) {
+        data.vldlRed = (vldl > 30);
+      }
+    }
+
+    if (data.trigliceridos && data.trigliceridos !== "-" && data.trigliceridos !== "") {
+      const trigliceridos = parseFloat(data.trigliceridos);
+      if (!isNaN(trigliceridos) && trigliceridos > 150) {
+        const observacion = `${contador}- HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS.\n`;
+        data.observacionesGenerales = (data.observacionesGenerales || "") + observacion;
+        data.trigliceridosRed = true;
+        contador++;
+      }
+    }
+
+    // =============================================================================================
+    // SECCIÓN ANTECEDENTES PATOLÓGICOS
+    // =============================================================================================
+
+    data.antecedentesPatologicos = res.ante_patologicos??"" ;//revisar no hay en json
+
+    return data;
+
+  } catch (error) {
+    console.error("Error en MapearDatosAdicionales:", error);
+    return data; // Retornar data original en caso de error
+  }
+};
+
 export const GetInfoServicioEditar = (
   nro,
   tabla,
@@ -913,6 +1135,169 @@ export const GetInfoServicioEditar = (
           data.electricos = res.electricosAnexo7c_electricos ?? false;
           data.vibraciones = res.vibracionesAnexo7c_vibraciones ?? false;
 
+          // //muestraVisual
+          // txtCercaSinCorregirOD.setText(oConn.setResult.getString("v_cerca_s_od"));
+          // txtCercaSinCorregirOI.setText(oConn.setResult.getString("v_cerca_s_oi"));
+          // txtLejosSinCorregirOD.setText(oConn.setResult.getString("v_lejos_s_od"));
+          // txtLejosSinCorregirOI.setText(oConn.setResult.getString("v_lejos_s_oi"));
+
+          // txtCercaCorregidaOD.setText(oConn.setResult.getString("ODCC"));
+          // txtCercaCorregidaOI.setText(oConn.setResult.getString("OICC"));
+          // txtLejosCorregidaOD.setText(oConn.setResult.getString("ODLC"));
+          // txtLejosCorregidaOI.setText(oConn.setResult.getString("OILC"));
+          // txtVisionColores.setText(oConn.setResult.getString("VC"));
+          // txtBinocular.setText(oConn.setResult.getString("VB"));
+          // txtReflejosPupilares.setText(oConn.setResult.getString("RP"));
+          // txtEnfermedadesOculares.setText(oConn.setResult.getString("e_oculares"));
+          // //end muestraVisual
+
+          // //editarRadiogrSan
+
+          // txtDNI.setText(oConn.setResult.getString("cod_pa"));
+          // txtRx.setText(oConn.setResult.getString("n_orden"));
+          // txtVertices.setText(oConn.setResult.getString("txtvertices"));
+          // txtHilios.setText(oConn.setResult.getString("txthilios"));
+          // txtSenos.setText(oConn.setResult.getString("txtsenoscostofrenicos"));
+          // txtMediastinos.setText(oConn.setResult.getString("txtmediastinos"));
+          // txtSiluetaCardioVascular.setText(oConn.setResult.getString("txtsiluetacardiovascular"));
+          // txtConclusionesRx.setText(oConn.setResult.getString("txtconclusionesradiograficas"));
+          // txtHemoHema.setText(oConn.setResult.getString("txthemoglobina"));
+
+          // chkPositivo.setSelected(oConn.setResult.getBoolean("chkpositivo"));
+          // chkNegativo.setSelected(oConn.setResult.getBoolean("chknegativo"));
+          // txtNombres.setText(oConn.setResult.getString("nombres_pa").concat(" ").concat(oConn.setResult.getString("apellidos_pa")));
+          // rbO.setSelected(oConn.setResult.getBoolean("chko"));
+          // rbA.setSelected(oConn.setResult.getBoolean("chka"));
+          // rbB.setSelected(oConn.setResult.getBoolean("chkb"));
+          // rbAB.setSelected(oConn.setResult.getBoolean("chkab"));
+          // rbRhPositivo.setSelected(oConn.setResult.getBoolean("rbrhpositivo"));
+          // rbRhNegativo.setSelected(oConn.setResult.getBoolean("rbrhnegativo"));
+          // FechaRx.setDate(oConn.setResult.getDate("fecha_exra"));
+          // txtCalidad.setText(oConn.setResult.getString("txtcalidad"));
+          // txtSimbolos.setText(oConn.setResult.getString("txtsimbolos"));
+          // rb0.setSelected(oConn.setResult.getBoolean("ex_0"));
+          // rb1.setSelected(oConn.setResult.getBoolean("ex_10"));
+          // rb2.setSelected(oConn.setResult.getBoolean("ex_11"));
+          // rb3.setSelected(oConn.setResult.getBoolean("ex_12"));
+          // rb4.setSelected(oConn.setResult.getBoolean("ex_21"));
+          // rb5.setSelected(oConn.setResult.getBoolean("ex_22"));
+          // rb6.setSelected(oConn.setResult.getBoolean("ex_23"));
+          // rb7.setSelected(oConn.setResult.getBoolean("ex_32"));
+          // rb8.setSelected(oConn.setResult.getBoolean("ex_33"));
+          // rb9.setSelected(oConn.setResult.getBoolean("ex_3mas"));
+          // rb10.setSelected(oConn.setResult.getBoolean("ex_abc"));
+          // rb11.setSelected(oConn.setResult.getBoolean("ex_st"));
+          // txtSinNeumoconiosis.setText(oConn.setResult.getString("txtsinneumoconiosis"));
+          // txtConNeumoconiosis.setText(oConn.setResult.getString("txtconneumoconiosis"));
+          // txtImagenRxExPolvo.setText(oConn.setResult.getString("txtirep"));
+          // rbSI.setSelected(oConn.setResult.getBoolean("apto_si"));
+          // rbNO.setSelected(oConn.setResult.getBoolean("apto_no"));
+          // rbReevaluacion.setSelected(oConn.setResult.getBoolean("apto_re"));
+          // sexo = oConn.setResult.getString("sexo_pa");
+          // if (txtHemoHema.getText() != null || txtHemoHema.getText() != "") {
+          //               float hemoglobina = Float.parseFloat(txtHemoHema.getText().toString());
+
+
+          //   if ("M".equals(sexo)) {
+          //     if (hemoglobina < 14 || hemoglobina > 20) {
+          //       txtHemoHema.setForeground(Color.red);
+          //     } else {
+          //       txtHemoHema.setForeground(Color.BLACK);
+          //     }
+          //   }
+          //   if ("F".equals(sexo)) {
+          //     if (hemoglobina < 13.5 || hemoglobina > 20) {
+          //       txtHemoHema.setForeground(Color.red);
+          //     } else {
+          //       txtHemoHema.setForeground(Color.BLACK);
+          //     }
+          //   }
+          // }
+          // //end editarRadiogrSan
+
+          // //electrocardiograma
+          // if ((oConn.setResult.getString("hallazgo") != null && !"NORMAL.".equals(oConn.setResult.getString("hallazgo")))) {
+          //   if (oConn.setResult.getString("recomendaciones") != null) {
+          //     txtObservacionesFichaMedica.append(String.valueOf(contador) + "-ELECTROCARDIOGRAMA: " + oConn.setResult.getString("hallazgo") + "."
+          //       + oConn.setResult.getString("recomendaciones") + "\n");
+          //     contador++;
+          //   } else {
+          //     txtObservacionesFichaMedica.append(String.valueOf(contador) + "-" + "ELECTROCARDIOGRAMA: " + oConn.setResult.getString("hallazgo") + "\n");
+          //     contador++;
+          //   }
+
+          // }
+          // // end electrocardiograma
+
+          // //examenOrina
+          // txtColorEF.setText(oConn.setResult.getString("txtcoloref"));
+          // txtAspectoEF.setText(oConn.setResult.getString("txtaspectoef"));
+          // txtDensidadEF.setText(oConn.setResult.getString("txtdensidadef"));
+          // txtPhEF.setText(oConn.setResult.getString("txtphef"));
+          // txtNitritosEQ.setText(oConn.setResult.getString("txtnitritoseq"));
+          // txtProteinasEQ.setText(oConn.setResult.getString("txtproteinaseq"));
+          // txtLeucocitosEQ.setText(oConn.setResult.getString("txtleucocitoseq"));
+          // txtCetonasEQ.setText(oConn.setResult.getString("txtcetonaseq"));
+          // txtUrobilinogenoEQ.setText(oConn.setResult.getString("txturobilinogenoeq"));
+          // txtBilirubinaEQ.setText(oConn.setResult.getString("txtbilirubinaeq"));
+          // txtGlucosaEQ.setText(oConn.setResult.getString("txtglucosaeq"));
+          // txtSangreEQ.setText(oConn.setResult.getString("txtsangreeq"));
+          // txtLeucocitosSU.setText(oConn.setResult.getString("txtleucocitossu"));
+          // txtCelEpitelialesSU.setText(oConn.setResult.getString("txtcelepitelialessu"));
+          // txtCilindiosSU.setText(oConn.setResult.getString("txtcilindiossu"));
+          // txtBacteriasSU.setText(oConn.setResult.getString("txtbacteriassu"));
+          // txtHematiesSU.setText(oConn.setResult.getString("txthematiessu"));
+          // txtCristalesSU.setText(oConn.setResult.getString("txtcristalessu"));
+          // txtPusSU.setText(oConn.setResult.getString("txtpussu"));
+          // txtOtrosSu.setText(oConn.setResult.getString("txtotrossu"));
+          // //end examenOrina
+
+          // //cargarAnalisisB
+          // txtColesterol.setText(oConn.setResult.getString("txtcolesterol"));
+          // txtLDLColesterol.setText(oConn.setResult.getString("txtldlcolesterol"));
+          // txtHDLColesterol.setText(oConn.setResult.getString("txthdlcolesterol"));
+          // txtVLDLColesterol.setText(oConn.setResult.getString("txtvldlcolesterol"));
+          // txtTrigliseridos.setText(oConn.setResult.getString("txttrigliseridos"));
+          //       float ct, ldl, hdl, vldl, trigli;
+          // if (!txtColesterol.getText().equals("-")) {
+          //   ct = Float.parseFloat(txtColesterol.getText());
+          //   if (ct > 200) {
+          //     txtObservacionesFichaMedica.append(String.valueOf(contador) + "- HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS. \n ");
+          //     txtColesterol.setForeground(Color.red);
+          //     contador++;
+          //   }
+          // }
+          // if (!txtLDLColesterol.getText().equals("-")) {
+          //   ldl = Float.parseFloat(txtLDLColesterol.getText().toString());
+          //   if (ldl > 129) {
+          //     txtLDLColesterol.setForeground(Color.red);
+          //   }
+          // }
+          // if (!txtHDLColesterol.getText().equals("-")) {
+          //   hdl = Float.parseFloat(txtHDLColesterol.getText().toString());
+          //   if (hdl < 40 || hdl > 60) {
+          //     txtHDLColesterol.setForeground(Color.red);
+          //   }
+          // }
+          // if (!txtVLDLColesterol.getText().equals("-")) {
+          //   vldl = Float.parseFloat(txtVLDLColesterol.getText().toString());
+          //   if (vldl > 30) {
+          //     txtVLDLColesterol.setForeground(Color.red);
+          //   }
+          // }
+          // if (!txtTrigliseridos.getText().equals("-")) {
+          //   trigli = Float.parseFloat(txtTrigliseridos.getText().toString());
+          //   if (trigli > 150) {
+          //     txtObservacionesFichaMedica.append(String.valueOf(contador) + "- HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS. \n ");
+          //     txtTrigliseridos.setForeground(Color.red);
+          //     contador++;
+          //   }
+          // }
+          // //end cargarAnalisisB
+          // //cargaAntecedentesPatologicos
+          // ant_pato.setText(oConn.setResult.getString("ante_patologicos"));
+          // //end  cargaAntecedentesPatologicos
+
           console.log("DATA EDITAR", data);
           set((prev) => ({ ...prev, ...data }));
         }
@@ -926,165 +1311,3 @@ export const GetInfoServicioEditar = (
 };
 
 
-// //muestraVisual
-// txtCercaSinCorregirOD.setText(oConn.setResult.getString("v_cerca_s_od"));
-// txtCercaSinCorregirOI.setText(oConn.setResult.getString("v_cerca_s_oi"));
-// txtLejosSinCorregirOD.setText(oConn.setResult.getString("v_lejos_s_od"));
-// txtLejosSinCorregirOI.setText(oConn.setResult.getString("v_lejos_s_oi"));
-
-// txtCercaCorregidaOD.setText(oConn.setResult.getString("ODCC"));
-// txtCercaCorregidaOI.setText(oConn.setResult.getString("OICC"));
-// txtLejosCorregidaOD.setText(oConn.setResult.getString("ODLC"));
-// txtLejosCorregidaOI.setText(oConn.setResult.getString("OILC"));
-// txtVisionColores.setText(oConn.setResult.getString("VC"));
-// txtBinocular.setText(oConn.setResult.getString("VB"));
-// txtReflejosPupilares.setText(oConn.setResult.getString("RP"));
-// txtEnfermedadesOculares.setText(oConn.setResult.getString("e_oculares"));
-// //end muestraVisual
-
-// //editarRadiogrSan
-
-// txtDNI.setText(oConn.setResult.getString("cod_pa"));
-// txtRx.setText(oConn.setResult.getString("n_orden"));
-// txtVertices.setText(oConn.setResult.getString("txtvertices"));
-// txtHilios.setText(oConn.setResult.getString("txthilios"));
-// txtSenos.setText(oConn.setResult.getString("txtsenoscostofrenicos"));
-// txtMediastinos.setText(oConn.setResult.getString("txtmediastinos"));
-// txtSiluetaCardioVascular.setText(oConn.setResult.getString("txtsiluetacardiovascular"));
-// txtConclusionesRx.setText(oConn.setResult.getString("txtconclusionesradiograficas"));
-// txtHemoHema.setText(oConn.setResult.getString("txthemoglobina"));
-
-// chkPositivo.setSelected(oConn.setResult.getBoolean("chkpositivo"));
-// chkNegativo.setSelected(oConn.setResult.getBoolean("chknegativo"));
-// txtNombres.setText(oConn.setResult.getString("nombres_pa").concat(" ").concat(oConn.setResult.getString("apellidos_pa")));
-// rbO.setSelected(oConn.setResult.getBoolean("chko"));
-// rbA.setSelected(oConn.setResult.getBoolean("chka"));
-// rbB.setSelected(oConn.setResult.getBoolean("chkb"));
-// rbAB.setSelected(oConn.setResult.getBoolean("chkab"));
-// rbRhPositivo.setSelected(oConn.setResult.getBoolean("rbrhpositivo"));
-// rbRhNegativo.setSelected(oConn.setResult.getBoolean("rbrhnegativo"));
-// FechaRx.setDate(oConn.setResult.getDate("fecha_exra"));
-// txtCalidad.setText(oConn.setResult.getString("txtcalidad"));
-// txtSimbolos.setText(oConn.setResult.getString("txtsimbolos"));
-// rb0.setSelected(oConn.setResult.getBoolean("ex_0"));
-// rb1.setSelected(oConn.setResult.getBoolean("ex_10"));
-// rb2.setSelected(oConn.setResult.getBoolean("ex_11"));
-// rb3.setSelected(oConn.setResult.getBoolean("ex_12"));
-// rb4.setSelected(oConn.setResult.getBoolean("ex_21"));
-// rb5.setSelected(oConn.setResult.getBoolean("ex_22"));
-// rb6.setSelected(oConn.setResult.getBoolean("ex_23"));
-// rb7.setSelected(oConn.setResult.getBoolean("ex_32"));
-// rb8.setSelected(oConn.setResult.getBoolean("ex_33"));
-// rb9.setSelected(oConn.setResult.getBoolean("ex_3mas"));
-// rb10.setSelected(oConn.setResult.getBoolean("ex_abc"));
-// rb11.setSelected(oConn.setResult.getBoolean("ex_st"));
-// txtSinNeumoconiosis.setText(oConn.setResult.getString("txtsinneumoconiosis"));
-// txtConNeumoconiosis.setText(oConn.setResult.getString("txtconneumoconiosis"));
-// txtImagenRxExPolvo.setText(oConn.setResult.getString("txtirep"));
-// rbSI.setSelected(oConn.setResult.getBoolean("apto_si"));
-// rbNO.setSelected(oConn.setResult.getBoolean("apto_no"));
-// rbReevaluacion.setSelected(oConn.setResult.getBoolean("apto_re"));
-// sexo = oConn.setResult.getString("sexo_pa");
-// if (txtHemoHema.getText() != null || txtHemoHema.getText() != "") {
-//               float hemoglobina = Float.parseFloat(txtHemoHema.getText().toString());
-
-
-//   if ("M".equals(sexo)) {
-//     if (hemoglobina < 14 || hemoglobina > 20) {
-//       txtHemoHema.setForeground(Color.red);
-//     } else {
-//       txtHemoHema.setForeground(Color.BLACK);
-//     }
-//   }
-//   if ("F".equals(sexo)) {
-//     if (hemoglobina < 13.5 || hemoglobina > 20) {
-//       txtHemoHema.setForeground(Color.red);
-//     } else {
-//       txtHemoHema.setForeground(Color.BLACK);
-//     }
-//   }
-// }
-// //end editarRadiogrSan
-
-// //electrocardiograma
-// if ((oConn.setResult.getString("hallazgo") != null && !"NORMAL.".equals(oConn.setResult.getString("hallazgo")))) {
-//   if (oConn.setResult.getString("recomendaciones") != null) {
-//     txtObservacionesFichaMedica.append(String.valueOf(contador) + "-ELECTROCARDIOGRAMA: " + oConn.setResult.getString("hallazgo") + "."
-//       + oConn.setResult.getString("recomendaciones") + "\n");
-//     contador++;
-//   } else {
-//     txtObservacionesFichaMedica.append(String.valueOf(contador) + "-" + "ELECTROCARDIOGRAMA: " + oConn.setResult.getString("hallazgo") + "\n");
-//     contador++;
-//   }
-
-// }
-// // end electrocardiograma
-
-// //examenOrina
-// txtColorEF.setText(oConn.setResult.getString("txtcoloref"));
-// txtAspectoEF.setText(oConn.setResult.getString("txtaspectoef"));
-// txtDensidadEF.setText(oConn.setResult.getString("txtdensidadef"));
-// txtPhEF.setText(oConn.setResult.getString("txtphef"));
-// txtNitritosEQ.setText(oConn.setResult.getString("txtnitritoseq"));
-// txtProteinasEQ.setText(oConn.setResult.getString("txtproteinaseq"));
-// txtLeucocitosEQ.setText(oConn.setResult.getString("txtleucocitoseq"));
-// txtCetonasEQ.setText(oConn.setResult.getString("txtcetonaseq"));
-// txtUrobilinogenoEQ.setText(oConn.setResult.getString("txturobilinogenoeq"));
-// txtBilirubinaEQ.setText(oConn.setResult.getString("txtbilirubinaeq"));
-// txtGlucosaEQ.setText(oConn.setResult.getString("txtglucosaeq"));
-// txtSangreEQ.setText(oConn.setResult.getString("txtsangreeq"));
-// txtLeucocitosSU.setText(oConn.setResult.getString("txtleucocitossu"));
-// txtCelEpitelialesSU.setText(oConn.setResult.getString("txtcelepitelialessu"));
-// txtCilindiosSU.setText(oConn.setResult.getString("txtcilindiossu"));
-// txtBacteriasSU.setText(oConn.setResult.getString("txtbacteriassu"));
-// txtHematiesSU.setText(oConn.setResult.getString("txthematiessu"));
-// txtCristalesSU.setText(oConn.setResult.getString("txtcristalessu"));
-// txtPusSU.setText(oConn.setResult.getString("txtpussu"));
-// txtOtrosSu.setText(oConn.setResult.getString("txtotrossu"));
-// //end examenOrina
-
-// //cargarAnalisisB
-// txtColesterol.setText(oConn.setResult.getString("txtcolesterol"));
-// txtLDLColesterol.setText(oConn.setResult.getString("txtldlcolesterol"));
-// txtHDLColesterol.setText(oConn.setResult.getString("txthdlcolesterol"));
-// txtVLDLColesterol.setText(oConn.setResult.getString("txtvldlcolesterol"));
-// txtTrigliseridos.setText(oConn.setResult.getString("txttrigliseridos"));
-//       float ct, ldl, hdl, vldl, trigli;
-// if (!txtColesterol.getText().equals("-")) {
-//   ct = Float.parseFloat(txtColesterol.getText());
-//   if (ct > 200) {
-//     txtObservacionesFichaMedica.append(String.valueOf(contador) + "- HIPERCOLESTEROLEMIA.DIETA HIPOCALORICA Y EJERCICIOS. \n ");
-//     txtColesterol.setForeground(Color.red);
-//     contador++;
-//   }
-// }
-// if (!txtLDLColesterol.getText().equals("-")) {
-//   ldl = Float.parseFloat(txtLDLColesterol.getText().toString());
-//   if (ldl > 129) {
-//     txtLDLColesterol.setForeground(Color.red);
-//   }
-// }
-// if (!txtHDLColesterol.getText().equals("-")) {
-//   hdl = Float.parseFloat(txtHDLColesterol.getText().toString());
-//   if (hdl < 40 || hdl > 60) {
-//     txtHDLColesterol.setForeground(Color.red);
-//   }
-// }
-// if (!txtVLDLColesterol.getText().equals("-")) {
-//   vldl = Float.parseFloat(txtVLDLColesterol.getText().toString());
-//   if (vldl > 30) {
-//     txtVLDLColesterol.setForeground(Color.red);
-//   }
-// }
-// if (!txtTrigliseridos.getText().equals("-")) {
-//   trigli = Float.parseFloat(txtTrigliseridos.getText().toString());
-//   if (trigli > 150) {
-//     txtObservacionesFichaMedica.append(String.valueOf(contador) + "- HIPERTRIGLICERIDEMIA.DIETA HIPOCALORICA Y EJERCICIOS. \n ");
-//     txtTrigliseridos.setForeground(Color.red);
-//     contador++;
-//   }
-// }
-// //end cargarAnalisisB
-// //cargaAntecedentesPatologicos
-// ant_pato.setText(oConn.setResult.getString("ante_patologicos"));
-// //end  cargaAntecedentesPatologicos
