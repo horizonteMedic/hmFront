@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  InputCheckbox,
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
@@ -11,178 +10,99 @@ export default function Resultados({
   form,
   setForm,
   handleChange,
+  handleChangeNumber,
   handleRadioButton,
-  handleCheckBoxChange,
   handlePrint,
   handleSave,
   handleClear,
+  MedicosMulti,
 }) {
-  // Array de médicos para autocompletado
-  const MedicosMulti = [
-    { id: 1, mensaje: "Dr. Juan Pérez" },
-    { id: 2, mensaje: "Dra. María García" },
-    { id: 3, mensaje: "Dr. Carlos López" },
-    { id: 4, mensaje: "Dra. Ana Martínez" },
-    { id: 5, mensaje: "Dr. Luis Rodríguez" },
-    { id: 6, mensaje: "Dra. Carmen Sánchez" },
-    { id: 7, mensaje: "Dr. Pedro González" },
-    { id: 8, mensaje: "Dra. Laura Fernández" },
-  ];
-
-  // Función para manejar la búsqueda de médicos
   const handleNombreMedicoSearch = (e) => {
-    const value = e.target.value;
-    setForm((prev) => ({
-      ...prev,
-      nombre_medico: value,
-      filteredNombresMedicos: value
+    const v = e.target.value.toUpperCase();
+    setForm((d) => ({
+      ...d,
+      nombre_medico: v,
+      filteredNombresMedicos: v
         ? MedicosMulti.filter((medico) =>
-            medico.mensaje.toLowerCase().includes(value.toLowerCase())
-          )
+          medico.mensaje.toLowerCase().includes(v.toLowerCase())
+        )
         : [],
     }));
   };
-
-  // Función para seleccionar un médico
   const handleSelectNombreMedico = (medico) => {
-    setForm((prev) => ({
-      ...prev,
+    setForm((d) => ({
+      ...d,
       nombre_medico: medico.mensaje,
       filteredNombresMedicos: [],
     }));
   };
-  const RestriccionCheckbox = ({ label, name }) => {
-    return (
-      <InputCheckbox
-        label={label}
-        checked={form[name]}
-        name={name}
-        onChange={(e) => {
-          if (e.target.checked) {
-            setForm((prev) => ({
-              ...prev,
-              [name]: true,
-              ninguno: false,
-              restricciones:
-                prev.restricciones === "NINGUNO" || prev.restricciones === ""
-                  ? label
-                  : prev.restricciones + "\n" + label,
-            }));
-          } else {
-            setForm((prev) => ({
-              ...prev,
-              [name]: false,
-              restricciones: "",
-              corregirAgudezaVisualTotal: false,
-              corregirAgudezaVisual: false,
-              dietaHipocalorica: false,
-              evitarMovimientosDisergonomicos: false,
-              noTrabajoAltoRiesgo: false,
-              noTrabajoSobre18m: false,
-              usoEppAuditivo: false,
-              usoLentesCorrectorConducir: false,
-              usoLentesCorrectorTrabajo: false,
-              usoLentesCorrectorTrabajo18m: false,
-              noConducirVehiculos: false,
-              usoEppAuditivoGeneral: false,
-            }));
-          }
-        }}
-      />
-    );
-  };
+
 
   return (
     <div className="p-6" style={{ fontSize: "11px" }}>
-    
+
       {/* Primera fila - 3 grids */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-6">
-        
-
         {/* Exámen Químico */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Exámen Químico</h4>
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Nitritos</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="nitritos"
-                value={form.nitritos}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Proteínas</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="proteinas"
-                value={form.proteinas}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Cetonas</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="cetonas"
-                value={form.cetonas}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Leucocitos</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="leucocitos"
-                value={form.leucocitos}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Urobilinogeno</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="urobilinogeno"
-                value={form.urobilinogeno}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Bilirrubina</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="bilirrubina"
-                value={form.bilirrubina}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Glucosa</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="glucosaQuimico"
-                value={form.glucosaQuimico}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Sangre</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="sangre"
-                value={form.sangre}
-                onChange={handleChange}
-              />
-            </div>
+            <InputTextOneLine
+              label="Nitritos"
+              name="nitritos"
+              value={form.nitritos}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Proteínas"
+              name="proteinas"
+              value={form.proteinas}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Cetonas"
+              name="cetonas"
+              value={form.cetonas}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Leucocitos"
+              name="leucocitos"
+              value={form.leucocitos}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Urobilinogeno"
+              name="urobilinogeno"
+              value={form.urobilinogeno}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Bilirrubina"
+              name="bilirrubina"
+              value={form.bilirrubina}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Glucosa"
+              name="glucosaQuimico"
+              value={form.glucosaQuimico}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Sangre"
+              name="sangre"
+              value={form.sangre}
+              labelWidth="90px"
+              disabled
+            />
           </div>
         </div>
 
@@ -190,86 +110,62 @@ export default function Resultados({
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Sedimento Unitario</h4>
           <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Leucocitos</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="leucocitosSedimento"
-                value={form.leucocitosSedimento}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Cel.Epiteliales</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="celulasEpiteliales"
-                value={form.celulasEpiteliales}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Cilindios</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="cilindios"
-                value={form.cilindios}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Bacterías</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="bacterias"
-                value={form.bacterias}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Hematies</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="hematies"
-                value={form.hematies}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Cristales</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="cristales"
-                value={form.cristales}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Pus</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="pus"
-                value={form.pus}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[80px]">Otros</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="otrosSedimento"
-                value={form.otrosSedimento}
-                onChange={handleChange}
-              />
-            </div>
+            <InputTextOneLine
+              label="Leucocitos"
+              name="leucocitosSedimento"
+              value={form.leucocitosSedimento}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Cel.Epiteliales"
+              name="celulasEpiteliales"
+              value={form.celulasEpiteliales}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Cilindios"
+              name="cilindios"
+              value={form.cilindios}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Bacterías"
+              name="bacterias"
+              value={form.bacterias}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Hematies"
+              name="hematies"
+              value={form.hematies}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Cristales"
+              name="cristales"
+              value={form.cristales}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Pus"
+              name="pus"
+              value={form.pus}
+              labelWidth="90px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Otros"
+              name="otrosSedimento"
+              value={form.otrosSedimento}
+              labelWidth="90px"
+              disabled
+            />
           </div>
         </div>
       </div>
@@ -280,46 +176,34 @@ export default function Resultados({
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-800 mb-2">Exámen Físico</h4>
           <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[60px]">Color</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="colorFisico"
-                value={form.colorFisico}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[60px]">Aspecto</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="aspectoFisico"
-                value={form.aspectoFisico}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[60px]">Densidad</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="densidadFisico"
-                value={form.densidadFisico}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="font-semibold min-w-[60px]">PH</label>
-              <input
-                type="text"
-                className="border rounded px-2 py-1 flex-1"
-                name="phFisico"
-                value={form.phFisico}
-                onChange={handleChange}
-              />
-            </div>
+            <InputTextOneLine
+              label="Color"
+              name="colorFisico"
+              value={form.colorFisico}
+              labelWidth="60px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Aspecto"
+              name="aspectoFisico"
+              value={form.aspectoFisico}
+              labelWidth="60px"
+              disabled
+            />
+            <InputTextOneLine
+              label="Densidad"
+              name="densidadFisico"
+              value={form.densidadFisico}
+              labelWidth="60px"
+              disabled
+            />
+            <InputTextOneLine
+              label="PH"
+              name="phFisico"
+              value={form.phFisico}
+              labelWidth="60px"
+              disabled
+            />
           </div>
         </div>
 
@@ -345,15 +229,16 @@ export default function Resultados({
             value={form.aptoParaTrabajar}
             onChange={handleRadioButton}
             options={[
-              { label: "SI", value: "si" },
-              { label: "NO", value: "no" },
-              { label: "Reevaluación", value: "reevaluacion" },
+              { label: "SI", value: "SI" },
+              { label: "NO", value: "NO" },
+              { label: "REEVALUACIÓN", value: "REEVALUACION" },
             ]}
+            disabled
           />
-          
+
           {/* Médico que Certifica */}
-          <div className="mt-4">
-            <label className="block font-semibold mb-1">
+          <div className="mt-2">
+            <label className="block font-semibold  mb-1">
               Medico que Certifica:
             </label>
             <div className="relative flex-grow flex items-center">
@@ -466,23 +351,26 @@ export default function Resultados({
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="font-semibold text-gray-800 mb-2">Datos de Paciente</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <InputTextArea
+            <InputTextOneLine
               label="Nro Orden"
               name="nordenEstadoPaciente"
               value={form.nordenEstadoPaciente}
-              onChange={handleChange}
+              onChange={handleChangeNumber}
+              labelOnTop
             />
-            <InputTextArea
+            <InputTextOneLine
               label="Nombres"
               name="nombresEstadoPaciente"
               value={form.nombresEstadoPaciente}
               disabled
+              labelOnTop
             />
-            <InputTextArea
+            <InputTextOneLine
               label="Tipo Examen"
               name="tipoExamenEstadoPaciente"
               value={form.tipoExamenEstadoPaciente}
               disabled
+              labelOnTop
             />
           </div>
         </div>

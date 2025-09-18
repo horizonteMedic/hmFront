@@ -4,11 +4,13 @@ import {
   faUser,
   faStethoscope,
   faChartLine,
+  faHeartbeat,
 } from "@fortawesome/free-solid-svg-icons";
 import Resultados from "./Resultados/Resultados";
 import Examenes from "./Examenes/Examenes";
 import DatosPersonales from "./DatosPersonales/DatosPersonales";
 import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
+import Abdomen from "./Abdomen/Abdomen";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
@@ -203,7 +205,6 @@ export default function Anexo16({ listas }) {
     cabeza: "",
     nariz: "",
     cuello: "",
-    perimetro: "",
     bocaAmigdalasFaringeLaringe: "",
     otoscopiaOd: true,
     otoscopiaOi: true,
@@ -216,18 +217,41 @@ export default function Anexo16({ listas }) {
     reflejosOsteotendinosos: "",
     marcha: "",
 
+    // Abdomen y Examen Físico
+    abdomen: "",
+    columnaVertebral: "",
+    anillosInguinales: "",
+    organosGenitales: "",
+    tactoRectal: "",
+    describirTactoRectal: false,
+    tactoRectalObservaciones: "",
+    hernias: "",
+    varices: "",
+    ganglios: "",
+    evaluacionCognitiva: "",
+    clasificacion: "",
+    reaccionesSerologicasPositivo: false,
+    reaccionesSerologicasNegativo: false,
+    sinNeumoconiosis: "",
+    imagenRadiograficaPolvo: "",
+    conNeumoconiosis: "",
+    numeroRx: "",
+    fechaRx: "",
+    calidadRx: "",
+    simbolosRx: "",
+    vertices: "",
+    hilios: "",
+    senos: "",
+    mediastinos: "",
+    conclusionesRadiograficas: "",
+    siluetaCardiovascular: "",
+
     //=============================================================================================
     //TERCERA TAB RESULTADOS
     //=============================================================================================
     // Exámenes de Laboratorio
-    grupoSanguineo: "",
     rhFactor: "",
-    glucosa: "",
-    creatinina: "",
     coca: "",
-    marihuana: "",
-    hemoglobinaHematocrito: "",
-    vsg: "",
     nitritos: "",
     proteinas: "",
     cetonas: "",
@@ -324,7 +348,8 @@ export default function Anexo16({ listas }) {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    { id: 2, name: "Resultados", icon: faChartLine, component: Resultados },
+    { id: 2, name: "Abdomen", icon: faHeartbeat, component: Abdomen },
+    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
   ];
 
   const handleSave = () => {

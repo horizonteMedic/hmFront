@@ -118,7 +118,7 @@ export default function Anexo2({ listas }) {
     HDLColesterolRed: false,
     VLDLColesterolRed: false,
     imcRed: false,
-    
+
     //Comparacion Grupo Sanguineo
     grupoSanguineoPrevio: "",
     grupoSanguineoGrupo: "",
@@ -419,6 +419,7 @@ export default function Anexo2({ listas }) {
         <div className="w-1/5">
           <PanelObservaciones
             form={form}
+            handleChange={handleChange}
             handleRadioButton={handleRadioButton}
             handleClear={handleClear}
             handleSave={handleSave}
