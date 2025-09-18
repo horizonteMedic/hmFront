@@ -18,7 +18,7 @@ export default function Abdomen({
         {/* Examen Físico - Abdomen */}
         <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
           <h4 className="font-semibold text-gray-800 mb-3">Examen Físico - Abdomen</h4>
-          
+
           <div className="space-y-3 flex-1">
             {/* Abdomen */}
             <InputTextOneLine
@@ -62,7 +62,7 @@ export default function Abdomen({
         {/* Tacto Rectal */}
         <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
           <h4 className="font-semibold text-gray-800 mb-3">Tacto Rectal</h4>
-          
+
           <div className="space-y-3 flex-1">
             <InputsRadioGroup
               name="tactoRectal"
@@ -74,24 +74,6 @@ export default function Abdomen({
                 { label: "Anormal", value: "ANORMAL" },
               ]}
             />
-            <div className="flex items-center gap-2">
-              <InputCheckbox
-                label="Describir en Observación:"
-                checked={form.describirTactoRectal}
-                onChange={handleCheckBoxChange}
-                name="describirTactoRectal"
-              />
-            </div>
-            {form.describirTactoRectal && (
-              <InputTextArea
-                rows={2}
-                name="tactoRectalObservaciones"
-                value={form.tactoRectalObservaciones}
-                onChange={handleChange}
-                placeholder="Describir hallazgos del tacto rectal..."
-              />
-            )}
-
             {/* Campos adicionales */}
             <div className="border-t pt-3 mt-3 space-y-3">
               {/* Primera fila - 3 columnas */}
@@ -137,21 +119,21 @@ export default function Abdomen({
         {/* Información Radiológica */}
         <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
           <h4 className="font-semibold text-gray-800 mb-3">Información Radiológica</h4>
-          
+
           <div className="space-y-3 flex-1">
             <div className="grid grid-cols-2 gap-3">
               <InputTextOneLine
                 label="N°Rx"
                 name="numeroRx"
                 value={form.numeroRx}
-                onChange={handleChange}
+                disabled
                 labelWidth="80px"
               />
               <InputTextOneLine
                 label="Fecha"
                 name="fechaRx"
                 value={form.fechaRx}
-                onChange={handleChange}
+                disabled
                 labelWidth="80px"
               />
               <InputTextOneLine
@@ -175,7 +157,7 @@ export default function Abdomen({
         {/* Conclusiones Radiográficas */}
         <div className="bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
           <h4 className="font-semibold text-gray-800 mb-3">Conclusiones Radiográficas</h4>
-          
+
           <div className="space-y-3 flex-1">
             <div className="grid grid-cols-2 gap-3">
               <InputTextOneLine
@@ -226,15 +208,15 @@ export default function Abdomen({
           </div>
         </div>
       </div>
-      
 
-    
+
+
       {/* Tercera fila - 2 columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3">
         {/* Estado Mental y Anamnesis */}
         <div className="lg:col-span-2 bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
           <h4 className="font-semibold text-gray-800 mb-3">Estado Mental y Anamnesis</h4>
-          
+
           <div className="space-y-4 flex-1">
             <InputTextOneLine
               label="Estado Mental"
@@ -243,7 +225,7 @@ export default function Abdomen({
               onChange={handleChange}
               labelWidth="120px"
             />
-            
+
             <InputTextArea
               rows={4}
               label="Anamnesis"
@@ -258,237 +240,237 @@ export default function Abdomen({
         {/* Clasificación y Neumoconiosis */}
         <div className="lg:col-span-3 bg-white border border-gray-200 rounded-lg p-3 h-full flex flex-col">
           <h4 className="font-semibold text-gray-800 mb-3">Clasificación y Neumoconiosis</h4>
-          
+
           <div className="space-y-4 flex-1">
-             {/* Sistema de Clasificación */}
-             <div>
-               <h5 className="font-semibold text-gray-700 mb-2">Clasificación</h5>
-               <div className="space-y-2">
-                 <div className="flex items-end gap-2">
-                   {/* Grupo CERO */}
-                   <div className="flex flex-col items-center">
-                     <label className="flex items-center gap-2">
-                       <input
-                         type="radio"
-                         name="clasificacion"
-                         value="0/0"
-                         checked={form.clasificacion === "0/0"}
-                         onChange={handleRadioButton}
-                         className="w-4 h-4"
-                       />
-                       <span className="text=[11px] text-blue-600 font-medium">0/0</span>
-                     </label>
-                     <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                       CERO
-                     </div>
-                   </div>
-                   
-                   <div className="w-px h-10 bg-gray-300"></div>
-                   
-                   {/* Grupo 1/0 */}
-                   <div className="flex flex-col items-center">
-                     <label className="flex items-center gap-2">
-                       <input
-                         type="radio"
-                         name="clasificacion"
-                         value="1/0"
-                         checked={form.clasificacion === "1/0"}
-                         onChange={handleRadioButton}
-                         className="w-4 h-4"
-                       />
-                       <span className="text=[11px] text-blue-600 font-medium">1/0</span>
-                     </label>
-                     <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                       1/0
-                     </div>
-                   </div>
-                   
-                   <div className="w-px h-10 bg-gray-300"></div>
-                   
-                   {/* Grupo UNO */}
-                   <div className="flex gap-2">
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="1/1"
-                           checked={form.clasificacion === "1/1"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">1/1</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         UNO
-                       </div>
-                     </div>
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="1/2"
-                           checked={form.clasificacion === "1/2"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">1/2</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         UNO
-                       </div>
-                     </div>
-                   </div>
-                   
-                   <div className="w-px h-10 bg-gray-300"></div>
-                   
-                   {/* Grupo DOS */}
-                   <div className="flex gap-2">
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="2/1"
-                           checked={form.clasificacion === "2/1"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">2/1</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         DOS
-                       </div>
-                     </div>
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="2/2"
-                           checked={form.clasificacion === "2/2"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">2/2</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         DOS
-                       </div>
-                     </div>
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="2/3"
-                           checked={form.clasificacion === "2/3"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">2/3</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         DOS
-                       </div>
-                     </div>
-                   </div>
-                   
-                   <div className="w-px h-10 bg-gray-300"></div>
-                   
-                   {/* Grupo TRES */}
-                   <div className="flex gap-2">
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="3/2"
-                           checked={form.clasificacion === "3/2"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">3/2</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         TRES
-                       </div>
-                     </div>
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="3/3"
-                           checked={form.clasificacion === "3/3"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">3/3</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         TRES
-                       </div>
-                     </div>
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="3/+"
-                           checked={form.clasificacion === "3/+"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">3/+</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         TRES
-                       </div>
-                     </div>
-                   </div>
-                   
-                   <div className="w-px h-10 bg-gray-300"></div>
-                   
-                   {/* Grupo CUATRO */}
-                   <div className="flex gap-2">
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="A,B,C"
-                           checked={form.clasificacion === "A,B,C"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">A, B C</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         CUATRO
-                       </div>
-                     </div>
-                     <div className="flex flex-col items-center">
-                       <label className="flex items-center gap-2">
-                         <input
-                           type="radio"
-                           name="clasificacion"
-                           value="St"
-                           checked={form.clasificacion === "St"}
-                           onChange={handleRadioButton}
-                           className="w-4 h-4"
-                         />
-                         <span className="text=[11px] text-blue-600 font-medium">St</span>
-                       </label>
-                       <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
-                         CUATRO
-                       </div>
-                     </div>
-                   </div>
-                 </div>
-               </div>
-             </div>
+            {/* Sistema de Clasificación */}
+            <div>
+              <h5 className="font-semibold text-gray-700 mb-2">Clasificación</h5>
+              <div className="space-y-2">
+                <div className="flex items-end gap-2">
+                  {/* Grupo CERO */}
+                  <div className="flex flex-col items-center">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="clasificacion"
+                        value="0/0"
+                        checked={form.clasificacion === "0/0"}
+                        onChange={handleRadioButton}
+                        className="w-4 h-4"
+                      />
+                      <span className="text=[11px] text-blue-600 font-medium">0/0</span>
+                    </label>
+                    <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                      CERO
+                    </div>
+                  </div>
+
+                  <div className="w-px h-10 bg-gray-300"></div>
+
+                  {/* Grupo 1/0 */}
+                  <div className="flex flex-col items-center">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="clasificacion"
+                        value="1/0"
+                        checked={form.clasificacion === "1/0"}
+                        onChange={handleRadioButton}
+                        className="w-4 h-4"
+                      />
+                      <span className="text=[11px] text-blue-600 font-medium">1/0</span>
+                    </label>
+                    <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                      1/0
+                    </div>
+                  </div>
+
+                  <div className="w-px h-10 bg-gray-300"></div>
+
+                  {/* Grupo UNO */}
+                  <div className="flex gap-2">
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="1/1"
+                          checked={form.clasificacion === "1/1"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">1/1</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        UNO
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="1/2"
+                          checked={form.clasificacion === "1/2"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">1/2</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        UNO
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-px h-10 bg-gray-300"></div>
+
+                  {/* Grupo DOS */}
+                  <div className="flex gap-2">
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="2/1"
+                          checked={form.clasificacion === "2/1"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">2/1</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        DOS
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="2/2"
+                          checked={form.clasificacion === "2/2"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">2/2</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        DOS
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="2/3"
+                          checked={form.clasificacion === "2/3"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">2/3</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        DOS
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-px h-10 bg-gray-300"></div>
+
+                  {/* Grupo TRES */}
+                  <div className="flex gap-2">
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="3/2"
+                          checked={form.clasificacion === "3/2"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">3/2</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        TRES
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="3/3"
+                          checked={form.clasificacion === "3/3"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">3/3</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        TRES
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="3/+"
+                          checked={form.clasificacion === "3/+"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">3/+</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        TRES
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="w-px h-10 bg-gray-300"></div>
+
+                  {/* Grupo CUATRO */}
+                  <div className="flex gap-2">
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="A,B,C"
+                          checked={form.clasificacion === "A,B,C"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">A, B C</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        CUATRO
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="clasificacion"
+                          value="St"
+                          checked={form.clasificacion === "St"}
+                          onChange={handleRadioButton}
+                          className="w-4 h-4"
+                        />
+                        <span className="text=[11px] text-blue-600 font-medium">St</span>
+                      </label>
+                      <div className="bg-yellow-200 border border-yellow-300 px-3 py-2 rounded text=[11px] font-semibold text-black">
+                        CUATRO
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {/* Reacciones Serológicas */}
             <div>
@@ -499,7 +481,7 @@ export default function Abdomen({
                     type="checkbox"
                     name="reaccionesSerologicasPositivo"
                     checked={form.reaccionesSerologicasPositivo}
-                    onChange={handleCheckBoxChange}
+                    onChange={handleCheckBoxChange} //disabled
                   />
                   <span >Positivo</span>
                 </label>
@@ -508,7 +490,7 @@ export default function Abdomen({
                     type="checkbox"
                     name="reaccionesSerologicasNegativo"
                     checked={form.reaccionesSerologicasNegativo}
-                    onChange={handleCheckBoxChange}
+                    onChange={handleCheckBoxChange}//disabled // negativo por defecto 
                   />
                   <span>Negativo</span>
                 </label>

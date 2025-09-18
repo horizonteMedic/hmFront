@@ -14,6 +14,7 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
+import Abdomen from "./Abdomen/Abdomen";
 
 const tabla = "anexo7c";
 const today = getToday();
@@ -291,7 +292,9 @@ export default function Anexo16({ listas }) {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    { id: 2, name: "Resultados", icon: faChartLine, component: Resultados },
+    { id: 2, name: "Abdomen", icon: faChartLine, component: Abdomen },
+    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
+
   ];
 
   const handleSave = () => {
