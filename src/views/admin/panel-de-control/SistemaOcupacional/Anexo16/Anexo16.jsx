@@ -78,8 +78,8 @@ export default function Anexo16({ listas }) {
     reubicacion: false,
 
     //Antecedentes
-    antecedentesPersonalesOcupacionales: "",
-    otroAntecedentePersonal: "",
+    antecedentesPersonales2: "",
+    antecedentesPersonales: "",
     antecedentesFamiliares: "",
     antecedentesPatologicos: "",
     //Hábitos

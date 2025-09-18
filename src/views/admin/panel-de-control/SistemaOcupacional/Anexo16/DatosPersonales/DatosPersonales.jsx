@@ -373,14 +373,14 @@ export default function DatosPersonales({
               <div className="flex flex-col gap-2">
                 <InputTextOneLine
                   label="Antecedentes Personales y/o Ocupacionales (enfermedad y/o accidente)"
-                  name="antecedentesPersonalesOcupacionales"
-                  value={form.antecedentesPersonalesOcupacionales}
+                  name="antecedentesPersonales2"
+                  value={form.antecedentesPersonales2}
                   onChange={handleChange}
                   labelOnTop
                 />
                 <InputTextOneLine
-                  name="otroAntecedentePersonal"
-                  value={form.otroAntecedentePersonal}
+                  name="antecedentesPersonales"
+                  value={form.antecedentesPersonales}
                   onChange={handleChange}
                 />
               </div>
