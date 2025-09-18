@@ -7,6 +7,9 @@ export default function Anexo2(data = {}) {
   const margin = 0; // Sin márgenes
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
+  
+  // Extraer accidentes directamente del JSON
+  const accidentes = data.accidentes || [];
 
   // Datos de prueba para los campos de Anexo2
   const datosPrueba = {
@@ -119,16 +122,71 @@ export default function Anexo2(data = {}) {
 
     // === ABSENTISMO ===
     absentismo: {
-      lesionesMusculares: {
-        asociadoTrabajo: { si: true, no: true },
-        año: "2023",
-        diasDescanso: "15"
-      },
-      lesionActualizada: {
-        asociadoTrabajo: { si: true, no: true },
-        año: "2024",
-        diasDescanso: "5"
-      }
+      enfermedades: [
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA ",
+          asociadoTrabajo: { si: false, no: true },
+          año: "2024",
+          diasDescanso: "30",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "QUEMADURA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "25",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "QUEMADURA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "25",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        },
+        {
+          enfermedad: "FRACTURITA",
+          asociadoTrabajo: { si: true, no: false },
+          año: "2025",
+          diasDescanso: "4",
+          codigoAnexo: 10559,
+          fecha: null,
+          userRegistro: null
+        }
+      ]
     },
 
     // === V. EVALUACIÓN MÉDICA ===
@@ -261,9 +319,9 @@ export default function Anexo2(data = {}) {
     },
     fechaExamen: formatearFechaCorta(data.fechaAnexo_fecha ?? ""), //agregar formateo
     lugarExamen: {
-      departamento: data.departamentoPaciente_departamento_pa ?? "",//revisar pedir
-      provincia: data.provinciaPaciente_provincia_pa ?? "",//revisar pedir
-      distrito: data.distritoPaciente_distrito_pa ?? ""//revisar pedir
+      departamento: data.departamentoExamen ?? "",//revisar pedir
+      provincia: data.provinciaExamen ?? "",//revisar pedir
+      distrito: data.distritoExamen ?? ""//revisar pedir
     },
 
     // === DATOS DE LA EMPRESA ===
@@ -280,7 +338,7 @@ export default function Anexo2(data = {}) {
       provincia: "",
       distrito: ""
     },
-    puestoPostula: data.cargo_cargo_de ?? "",
+    puestoPostula: data.nombreExamen_nom_examen == "PRE-OCUPACIONAL" ? (data.cargo_cargo_de ?? "") : "",
 
     // === II. FILIACIÓN DEL TRABAJADOR ===
     filiacionTrabajador: {
@@ -354,22 +412,25 @@ export default function Anexo2(data = {}) {
       madre: data.madre_txtmadre ?? "",
       hermanos: data.hermanos_txthermanos ?? "",
       esposa: data.esposa_txtesposa ?? "",
-      hijosVivos: String(data.hijosVivosAntecedentesPatologicos_txtvhijosvivos ?? ""),
-      numeroHijos: String(data.hijosFallecidosAntecedentesPatologicos_txtvhijosfallecidos ?? "")
+      hijosVivos: String(data.hijosVivosAnexo2_txthijosvivos ?? ""),
+      numeroHijos: String(data.hijosMuertosAnexo2_txthijosmuertos ?? "")
     },
 
     // === ABSENTISMO ===
-    absentismo: { //revisar deberia ser una tabla
-      lesionesMusculares: {
-        asociadoTrabajo: { si: data.lesionesMuscularesSi ?? false, no: data.lesionesMuscularesNo ?? false },
-        año: data.lesionesMuscularesAno ?? "",
-        diasDescanso: data.lesionesMuscularesDias ?? ""
-      },
-      lesionActualizada: {
-        asociadoTrabajo: { si: data.lesionActualizadaSi ?? false, no: data.lesionActualizadaNo ?? false },
-        año: data.lesionActualizadaAno ?? "",
-        diasDescanso: data.lesionActualizadaDias ?? ""
-      }
+    absentismo: {
+      // Usar accidentes directamente del JSON
+      enfermedades: accidentes?.map(accidente => ({
+        enfermedad: accidente.enfermedad ?? "",
+        asociadoTrabajo: { 
+          si: accidente.asociadoTrabajo === "true" || accidente.asociadoTrabajo === true, 
+          no: accidente.asociadoTrabajo === "false" || accidente.asociadoTrabajo === false 
+        },
+        año: accidente.anio ?? "",
+        diasDescanso: accidente.diasDescanso ?? "",
+        codigoAnexo: accidente.codigoAnexo ?? "",
+        fecha: accidente.fecha ?? "",
+        userRegistro: accidente.userRegistro ?? ""
+      })) ?? []
     },
 
     // === V. EVALUACIÓN MÉDICA ===
@@ -384,7 +445,7 @@ export default function Anexo2(data = {}) {
         frecuenciaCardiaca: data.fcardiaca_f_cardiaca ?? "",
         presionArterial: data.sistolica_sistolica ?? "",
         temperatura: data.temperatura_temperatura ?? "",
-        otros: data.otrosExamenes_txtotrosex ?? ""
+        otros: `SAR O2 : ${data.sat02_sat_02 ?? ""}`
       },
       // === EXAMEN FÍSICO ===
       ectoscopia: data.ectoscopia_txtectoscopia ?? "",
@@ -483,20 +544,21 @@ export default function Anexo2(data = {}) {
       restricciones: data.restricciones_txtrestricciones ?? "",
 
       // Firmas
-      firmaMedico: data.digitalizacion.find(
+      firmaMedico: data.digitalizacion?.find(
         item => item.nombreDigitalizacion === "SELLOFIRMA"
       )?.url ?? "",
-      huellaPaciente: data.digitalizacion.find(
+      huellaPaciente: data.digitalizacion?.find(
         item => item.nombreDigitalizacion === "HUELLA"
       )?.url ?? "",
-      firmaPaciente: data.digitalizacion.find(
+      firmaPaciente: data.digitalizacion?.find(
         item => item.nombreDigitalizacion === "FIRMAP"
       )?.url ?? ""
     }
   };
 
   // Usar datos reales o datos de prueba
-  const datosFinales = data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
+  // Verificar si hay datos reales de la API (presencia de norden_n_orden indica datos reales)
+  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
@@ -1132,51 +1194,50 @@ export default function Anexo2(data = {}) {
   }
 
   // === SECCIÓN: ABSENTISMO ===
-  if (datosFinales.absentismo) {
-    const absentismo = datosFinales.absentismo;
+  if (datosFinales.absentismo && datosFinales.absentismo.enfermedades) {
+    const enfermedades = datosFinales.absentismo.enfermedades;
 
-    // Posiciones para absentismo
-    const xLesionesMuscularesSi = 107.8;
-    const yLesionesMuscularesSi = 214.6;
-
-    const xLesionesMuscularesNo = 126;
-    const yLesionesMuscularesNo = 214.6;
-
-    const xLesionesMuscularesAno = 143;
-    const yLesionesMuscularesAno = 214.6;
-
-    const xLesionesMuscularesDias = 181.5;
-    const yLesionesMuscularesDias = 214.6;
-
-    const xLesionActualizadaSi = 107.8;
-    const yLesionActualizadaSi = 220;
-
-    const xLesionActualizadaNo = 126;
-    const yLesionActualizadaNo = 220;
-
-    const xLesionActualizadaAno = 143;
-    const yLesionActualizadaAno = 220;
-
-    const xLesionActualizadaDias = 181.5;
-    const yLesionActualizadaDias = 220;
+    // Posiciones individuales para cada fila (puedes editar cada una)
+    const posicionesFilas = [
+      // Fila 1
+      { xEnfermedad: 13, yEnfermedad: 214, xSi: 107.8, ySi: 214, xNo: 124, yNo: 214, xAno: 138.5, yAno: 214, xDias: 180, yDias: 214 },
+      // Fila 2
+      { xEnfermedad: 13, yEnfermedad: 219, xSi: 107.8, ySi: 219, xNo: 124, yNo: 219, xAno: 138.5, yAno: 219, xDias: 180, yDias: 219 },
+      // Fila 3
+      { xEnfermedad: 13, yEnfermedad: 224, xSi: 107.8, ySi: 224, xNo: 124, yNo: 224, xAno: 138.5, yAno: 224, xDias: 180, yDias: 224 },
+      // Fila 4
+      { xEnfermedad: 13, yEnfermedad: 229, xSi: 107.8, ySi: 229, xNo: 124, yNo: 229, xAno: 138.5, yAno: 229, xDias: 180, yDias: 229 },
+      // Fila 5
+      { xEnfermedad: 13, yEnfermedad: 234, xSi: 107.8, ySi: 234, xNo: 124, yNo: 234, xAno: 138.5, yAno: 234, xDias: 180, yDias: 234 },
+      // Fila 6
+      { xEnfermedad: 13, yEnfermedad: 239, xSi: 107.8, ySi: 239, xNo: 124, yNo: 239, xAno: 138.5, yAno: 239, xDias: 180, yDias: 239 },
+      // Fila 7
+      { xEnfermedad: 13, yEnfermedad: 244, xSi: 107.8, ySi: 244, xNo: 124, yNo: 244, xAno: 138.5, yAno: 244, xDias: 180, yDias: 244 }
+    ];
 
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
 
-    // Lesiones Musculares
-    if (absentismo.lesionesMusculares) {
-      const lesion = absentismo.lesionesMusculares;
-
+    // Renderizar hasta 7 enfermedades con posiciones individuales
+    enfermedades.slice(0, 7).forEach((enfermedad, index) => {
+      const pos = posicionesFilas[index];
+      if (!pos) return; // Si no hay posición definida, saltar
+      
+      // Nombre de la enfermedad/accidente
+      if (enfermedad.enfermedad) {
+        doc.text(enfermedad.enfermedad.toUpperCase(), pos.xEnfermedad, pos.yEnfermedad);
+      }
+      
       // Checkbox SI/NO
-      if (lesion.asociadoTrabajo) {
+      if (enfermedad.asociadoTrabajo) {
         doc.setTextColor(0, 0, 255); // Color azul para las X
         doc.setFont("helvetica", "bold").setFontSize(12);
 
-        if (lesion.asociadoTrabajo.si) {
-          doc.text("X", xLesionesMuscularesSi, yLesionesMuscularesSi);
+        if (enfermedad.asociadoTrabajo.si) {
+          doc.text("X", pos.xSi, pos.ySi);
         }
-        if (lesion.asociadoTrabajo.no) {
-          doc.text("X", xLesionesMuscularesNo, yLesionesMuscularesNo);
+        if (enfermedad.asociadoTrabajo.no) {
+          doc.text("X", pos.xNo, pos.yNo);
         }
 
         doc.setTextColor(0, 0, 0); // Resetear a negro
@@ -1184,46 +1245,15 @@ export default function Anexo2(data = {}) {
       }
 
       // Año
-      if (lesion.año) {
-        doc.text(lesion.año.toUpperCase(), xLesionesMuscularesAno, yLesionesMuscularesAno);
+      if (enfermedad.año) {
+        doc.text(enfermedad.año.toUpperCase(), pos.xAno, pos.yAno);
       }
 
       // Días de descanso
-      if (lesion.diasDescanso) {
-        doc.text(lesion.diasDescanso.toUpperCase(), xLesionesMuscularesDias, yLesionesMuscularesDias, { align: "center" });
+      if (enfermedad.diasDescanso) {
+        doc.text(enfermedad.diasDescanso.toUpperCase(), pos.xDias, pos.yDias, { align: "center" });
       }
-    }
-
-    // Lesión Actualizada
-    if (absentismo.lesionActualizada) {
-      const lesion = absentismo.lesionActualizada;
-
-      // Checkbox SI/NO
-      if (lesion.asociadoTrabajo) {
-        doc.setTextColor(0, 0, 255); // Color azul para las X
-        doc.setFont("helvetica", "bold").setFontSize(12);
-
-        if (lesion.asociadoTrabajo.si) {
-          doc.text("X", xLesionActualizadaSi, yLesionActualizadaSi);
-        }
-        if (lesion.asociadoTrabajo.no) {
-          doc.text("X", xLesionActualizadaNo, yLesionActualizadaNo);
-        }
-
-        doc.setTextColor(0, 0, 0); // Resetear a negro
-        doc.setFont("helvetica", "normal").setFontSize(9);
-      }
-
-      // Año
-      if (lesion.año) {
-        doc.text(lesion.año.toUpperCase(), xLesionActualizadaAno, yLesionActualizadaAno);
-      }
-
-      // Días de descanso
-      if (lesion.diasDescanso) {
-        doc.text(lesion.diasDescanso.toUpperCase(), xLesionActualizadaDias, yLesionActualizadaDias, { align: "center" });
-      }
-    }
+    });
   }
 
   // === SECCIÓN: V. EVALUACIÓN MÉDICA ===

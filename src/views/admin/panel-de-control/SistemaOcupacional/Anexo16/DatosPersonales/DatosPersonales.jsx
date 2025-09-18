@@ -8,7 +8,6 @@ import {
 
 export default function DatosPersonales({
   form,
-  setForm,
   handleChange,
   handleChangeNumber,
   handleCheckBoxChange,
@@ -20,8 +19,7 @@ export default function DatosPersonales({
     <div className="p-4" style={{ fontSize: "10px" }}>
       {/* Header con información del examen */}
       <div className="bg-white border border-gray-200 rounded-lg p-3 mb-4">
-        <h3 className="font-semibold mb-2 text-gray-800">Anexo 16</h3>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
           <InputTextOneLine
             label="N° Orden"
             name="norden"
@@ -48,12 +46,11 @@ export default function DatosPersonales({
         </div>
       </div>
 
-      {/* Contenido principal - 2 columnas */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        {/* Columna Izquierda */}
-        <div className="lg:col-span-6 space-y-3">
-          {/* Identificación Personal */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
+      {/* Primera fila - 2 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+        {/* Columna Izquierda - Identificación Personal */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
             <h4 className="font-semibold text-gray-800 mb-2">
               Identificación Personal
             </h4>
@@ -137,143 +134,11 @@ export default function DatosPersonales({
               />
             </div>
           </div>
-
-          {/* Información Laboral */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Información Laboral
-            </h4>
-            <div className="space-y-2">
-              <InputTextOneLine
-                label="Empresa"
-                name="empresa"
-                value={form.empresa}
-                disabled
-              />
-              <InputTextOneLine
-                label="Contrata"
-                name="contrata"
-                value={form.contrata}
-                disabled
-              />
-              <InputTextOneLine
-                label="Mineral Exp"
-                name="mineralExp"
-                value={form.mineralExp}
-                disabled
-              />
-              <InputTextOneLine
-                label="Explotación en"
-                name="explotacion"
-                value={form.explotacion}
-                disabled
-              />
-              <InputTextOneLine
-                label="Altura de Labor"
-                name="alturaLaboral"
-                value={form.alturaLaboral}
-                disabled
-              />
-            </div>
-          </div>
-
-          {/* Datos del Puesto */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Datos del Puesto
-            </h4>
-            <div className="space-y-2">
-              <InputTextOneLine
-                label="Puesto al que Postula"
-                name="puestoPostula"
-                value={form.puestoPostula}
-                disabled
-              />
-              <InputTextOneLine
-                label="Puesto Actual"
-                name="puestoActual"
-                value={form.puestoActual}
-                disabled
-              />
-              <InputTextOneLine
-                label="Tiempo"
-                name="tiempoPuesto"
-                value={form.tiempoPuesto}
-                disabled
-              />
-              <InputTextOneLine
-                label="Area"
-                name="areaPuesto"
-                value={form.areaPuesto}
-                disabled
-              />
-              <div className="flex items-center gap-4">
-                <label className="font-semibold text-gray-700 min-w-[100px]">
-                  Reubicación:
-                </label>
-                <InputsBooleanRadioGroup
-                  name="reubicacion"
-                  value={form.reubicacion}
-                  onChange={handleRadioButtonBoolean}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Antecedentes */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Antecedentes
-            </h4>
-            <div className="space-y-2">
-              <InputTextArea
-                rows={3}
-                label="Antecedentes Personales y/o Ocupacionales (enfermedad y/o accidente)"
-                name="antecedentesPersonalesOcupacionales"
-                value={form.antecedentesPersonalesOcupacionales}
-                onChange={handleChange}
-              />
-              <InputTextOneLine
-                label="Antecedentes Familiares"
-                name="antecedentesFamiliares"
-                value={form.antecedentesFamiliares}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-
-          {/* Comparación Grupo Sanguíneo y Antecedentes Patológicos */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Comparación Grupo Sanguíneo
-            </h4>
-            <div className="flex items-center space-x-2 mb-3">
-              <InputTextOneLine
-                name="grupoSanguineoPrevio"
-                value={form.grupoSanguineoPrevio}
-                onChange={handleChange}
-              />
-              <span className="font-medium">=</span>
-              <InputTextOneLine
-                name="grupoSanguineoGrupo"
-                value={form.grupoSanguineoGrupo}
-                onChange={handleChange}
-              />
-            </div>
-            <InputTextArea
-              rows={2}
-              label="Antecedentes Patológicos"
-              name="antecedentesPatologicos"
-              value={form.antecedentesPatologicos}
-              onChange={handleChange}
-            />
-          </div>
         </div>
 
-        {/* Columna Derecha */}
-        <div className="lg:col-span-6 space-y-3">
-          {/* Agentes presentes en Trabajo Actual */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
+        {/* Columna Derecha - Agentes presentes en Trabajo Actual */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
             <h4 className="font-semibold text-gray-800 mb-2">
               Agentes presentes en Trabajo Actual
             </h4>
@@ -406,30 +271,230 @@ export default function DatosPersonales({
               />
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Número de Hijos */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
+      {/* Segunda fila - 2 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+        {/* Columna Izquierda - Información Laboral */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
             <h4 className="font-semibold text-gray-800 mb-2">
-              Número de Hijos
+              Información Laboral
             </h4>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-2">
               <InputTextOneLine
-                label="Vivos"
-                name="hijosVivos"
-                value={form.hijosVivos}
-                onChange={handleChange}
+                label="Empresa"
+                name="empresa"
+                value={form.empresa}
+                disabled
               />
               <InputTextOneLine
-                label="Muertos"
-                name="hijosMuertos"
-                value={form.hijosMuertos}
-                onChange={handleChange}
+                label="Contrata"
+                name="contrata"
+                value={form.contrata}
+                disabled
+              />
+              <InputTextOneLine
+                label="Mineral Exp"
+                name="mineralExp"
+                value={form.mineralExp}
+                disabled
+              />
+              <InputTextOneLine
+                label="Explotación en"
+                name="explotacion"
+                value={form.explotacion}
+                disabled
+              />
+              <InputTextOneLine
+                label="Altura de Labor"
+                name="alturaLaboral"
+                value={form.alturaLaboral}
+                disabled
               />
             </div>
           </div>
+        </div>
 
+        {/* Columna Derecha - Datos del Puesto */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Datos del Puesto
+            </h4>
+            <div className="space-y-2">
+              <InputTextOneLine
+                label="Puesto al que Postula"
+                name="puestoPostula"
+                value={form.puestoPostula}
+                disabled
+              />
+              <InputTextOneLine
+                label="Puesto Actual"
+                name="puestoActual"
+                value={form.puestoActual}
+                disabled
+              />
+              <InputTextOneLine
+                label="Tiempo"
+                name="tiempoPuesto"
+                value={form.tiempoPuesto}
+                disabled
+              />
+              <InputTextOneLine
+                label="Area"
+                name="areaPuesto"
+                value={form.areaPuesto}
+                disabled
+              />
+              <div className="flex items-center gap-4">
+                <label className="font-semibold text-gray-700 min-w-[100px]">
+                  Reubicación:
+                </label>
+                <InputsBooleanRadioGroup
+                  name="reubicacion"
+                  value={form.reubicacion}
+                  onChange={handleRadioButtonBoolean}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tercera fila - 2 columnas - Antecedentes */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-3">
+        {/* Columna Izquierda - Antecedentes Personales y Familiares */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+            <div className="space-y-4">
+              {/* Antecedentes Personales */}
+              <div className="flex flex-col gap-2">
+                <InputTextOneLine
+                  label="Antecedentes Personales y/o Ocupacionales (enfermedad y/o accidente)"
+                  name="antecedentesPersonalesOcupacionales"
+                  value={form.antecedentesPersonalesOcupacionales}
+                  onChange={handleChange}
+                  labelOnTop
+                />
+                <InputTextOneLine
+                  name="otroAntecedentePersonal"
+                  value={form.otroAntecedentePersonal}
+                  onChange={handleChange}
+                />
+              </div>
+
+              {/* Antecedentes Familiares */}
+              <InputTextOneLine
+                label="Antecedentes Familiares"
+                name="antecedentesFamiliares"
+                value={form.antecedentesFamiliares}
+                onChange={handleChange}
+                labelOnTop
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Columna Derecha - Antecedentes Patológicos */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+          <InputTextArea
+            rows={6}
+            label="Antecedentes Patológicos"
+            name="antecedentesPatologicos"
+            value={form.antecedentesPatologicos || ""}
+            disabled
+          />
+        </div>
+
+      </div>
+
+      {/* Cuarta fila - 2 columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {/* Columna Izquierda - Hábitos */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Hábitos
+            </h4>
+            <div className="space-y-3">
+              <div>
+                <label className="font-semibold text-gray-700 mb-1 block">Tabaco:</label>
+                <InputsRadioGroup
+                  name="tabaco"
+                  value={form.tabaco}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Nada", value: "NADA" },
+                    { label: "Poco", value: "POCO" },
+                    { label: "Habitual", value: "HABITUAL" },
+                    { label: "Excesivo", value: "EXCESIVO" },
+                  ]}
+                />
+              </div>
+              <div>
+                <label className="font-semibold text-gray-700 mb-1 block">Alcohol:</label>
+                <InputsRadioGroup
+                  name="alcohol"
+                  value={form.alcohol}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Nada", value: "NADA" },
+                    { label: "Poco", value: "POCO" },
+                    { label: "Habitual", value: "HABITUAL" },
+                    { label: "Excesivo", value: "EXCESIVO" },
+                  ]}
+                />
+              </div>
+              <div>
+                <label className="font-semibold text-gray-700 mb-1 block">Drogas:</label>
+                <InputsRadioGroup
+                  name="drogas"
+                  value={form.drogas}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Nada", value: "NADA" },
+                    { label: "Poco", value: "POCO" },
+                    { label: "Habitual", value: "HABITUAL" },
+                    { label: "Excesivo", value: "EXCESIVO" },
+                  ]}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Columna Derecha - Número de Hijos e Inmunizaciones */}
+        <div className="space-y-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 ">
+            <div className="space-y-4">
+              {/* Número de Hijos */}
+              <div>
+                <h4 className="font-semibold text-gray-800 mb-2">
+                  Número de Hijos
+                </h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <InputTextOneLine
+                    label="Vivos"
+                    name="hijosVivos"
+                    value={form.hijosVivos}
+                    disabled
+                  />
+                  <InputTextOneLine
+                    label="Muertos"
+                    name="hijosMuertos"
+                    value={form.hijosMuertos}
+                    disabled
+                  />
+                </div>
+              </div>
+
+
+            </div>
+          </div>
           {/* Inmunizaciones */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 ">
             <h4 className="font-semibold text-gray-800 mb-2">
               Inmunizaciones
             </h4>
@@ -451,81 +516,6 @@ export default function DatosPersonales({
                 checked={form.fiebreAmarilla}
                 name="fiebreAmarilla"
                 onChange={handleCheckBoxChange}
-              />
-            </div>
-          </div>
-
-          {/* Hábitos */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Hábitos
-            </h4>
-            <div className="space-y-3">
-              <div>
-                <label className="font-semibold text-gray-700 mb-1 block">Tabaco:</label>
-                <InputsRadioGroup
-                  name="tabaco"
-                  value={form.tabaco}
-                  onChange={handleRadioButton}
-                  options={[
-                    { label: "Nada", value: "nada" },
-                    { label: "Poco", value: "poco" },
-                    { label: "Habitual", value: "habitual" },
-                  ]}
-                />
-              </div>
-              <div>
-                <label className="font-semibold text-gray-700 mb-1 block">Alcohol:</label>
-                <InputsRadioGroup
-                  name="alcohol"
-                  value={form.alcohol}
-                  onChange={handleRadioButton}
-                  options={[
-                    { label: "Nada", value: "nada" },
-                    { label: "Poco", value: "poco" },
-                    { label: "Habitual", value: "habitual" },
-                  ]}
-                />
-              </div>
-              <div>
-                <label className="font-semibold text-gray-700 mb-1 block">Drogas:</label>
-                <InputsRadioGroup
-                  name="drogas"
-                  value={form.drogas}
-                  onChange={handleRadioButton}
-                  options={[
-                    { label: "Nada", value: "nada" },
-                    { label: "Poco", value: "poco" },
-                    { label: "Habitual", value: "habitual" },
-                  ]}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Medidas Físicas */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-2">
-              Medidas Físicas
-            </h4>
-            <div className="grid grid-cols-3 gap-2">
-              <InputTextOneLine
-                label="Talla (m)"
-                name="talla"
-                value={form.talla}
-                disabled
-              />
-              <InputTextOneLine
-                label="Peso (Kg)"
-                name="peso"
-                value={form.peso}
-                disabled
-              />
-              <InputTextOneLine
-                label="IMC"
-                name="imc"
-                value={form.imc}
-                disabled
               />
             </div>
           </div>

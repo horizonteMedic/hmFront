@@ -12,7 +12,7 @@ export default function InputTextArea({
     <div className={`w-full ${className}`}>
       {label && (
         <label className="block font-semibold mb-1" htmlFor={name}>
-          {label}:
+          {label} :
         </label>
       )}
       <textarea

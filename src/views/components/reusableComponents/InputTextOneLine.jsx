@@ -8,13 +8,14 @@ export default function InputTextOneLine({
   type = "text",
   labelWidth = "80px",
   className = "",
+  labelOnTop = false,// por defecto en la izquierda
 }) {
   return (
-    <div className={`flex items-center gap-4  ${className}`}>
+    <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"} ${className}`}>
       {label && (
         <label
           className="font-semibold"
-          style={{ minWidth: labelWidth, maxWidth: labelWidth }}
+          style={labelOnTop ? {} : { minWidth: labelWidth, maxWidth: labelWidth }}
           htmlFor={name}
         >
           {label} :
@@ -22,9 +23,8 @@ export default function InputTextOneLine({
       )}
       <input
         type={type}
-        className={`border rounded px-2 py-1 w-full ${
-          disabled ? "bg-gray-100" : ""
-        }`}
+        className={`border rounded px-2 py-1 w-full ${disabled ? "bg-gray-100" : ""
+          }`}
         id={name}
         name={name}
         value={value ?? ""}

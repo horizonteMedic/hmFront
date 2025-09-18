@@ -7,12 +7,11 @@ import {
   SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-  "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma";
+  "/api/v01/ct/anexos/anexo16/obtenerReporteConsentimientoBuenaSalud";
 const registrarUrl =
-  "/api/v01/ct/electroCardiograma/registrarActualizarInformeElectroCardiograma";
+  "/api/v01/ct/anexos/anexo16/registrarActualizarConsentimientoBuenaSalud";
 
 export const GetInfoServicio = async (
   nro,
@@ -32,11 +31,11 @@ export const GetInfoServicio = async (
     set((prev) => ({
       ...prev,
       ...res,
-      norden: res.norden,
-      fecha: res.fechaInforme,
-      nombres: res.nombres,
-      edad: res.edad,
-      dni: res.dni,
+      norden: res.norden ?? "",
+      fecha: res.fecha,
+      nombres: res.nombres ?? "",
+      edad: res.edad ?? "",
+      dni: res.dni ?? "",
     }));
   }
 };
@@ -54,9 +53,9 @@ export const SubmitDataService = async (
     return;
   }
   const body = {
-    norden: data.norden,
-    fecha: data.fecha,
-    hora: date.toLocaleTimeString('en-US', {
+    norden: form.norden,
+    fecha: form.fecha,
+    hora: new Date().toLocaleTimeString('en-US', {
       hour12: false,
       hour: '2-digit',
       minute: '2-digit',
@@ -77,7 +76,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  const jasperModules = import.meta.glob("../../../../jaspers/ModuloConsentimientos/ConsentimientoBuenaSalud/*.jsx");
+  const jasperModules = import.meta.glob("../../../../../jaspers/ModuloConsentimientos/ConsentimientoBuenaSalud/*.jsx");
   PrintHojaRDefault(
     nro,
     token,
@@ -85,7 +84,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     datosFooter,
     obtenerReporteUrl,
     jasperModules,
-    "../../../../jaspers/ModuloConsentimientos/ConsentimientoBuenaSalud"
+    "../../../../../jaspers/ModuloConsentimientos/ConsentimientoBuenaSalud"
   );
 };
 
@@ -119,9 +118,9 @@ const GetInfoPac = async (nro, set, token, sede) => {
     set((prev) => ({
       ...prev,
       ...res,
-      fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
-      edad: res.edad,
-      nombres: res.nombresApellidos,
+      // fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
+      // edad: res.edad,
+      // nombres: res.nombresApellidos,
     }));
   }
 };
