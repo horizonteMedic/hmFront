@@ -9,12 +9,10 @@ export default function Examenes({
   form,
   handleChange,
   handleRadioButton,
-  handleCheckBoxChange
+  handleCheckBoxChange,
 }) {
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
-
-
       {/* Primera fila - 2 columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
         {/* Información Triaje */}
@@ -88,7 +86,9 @@ export default function Examenes({
             />
             {/* Medidas Físicas integradas */}
             <div className="col-span-2 border-t pt-3 mt-3">
-              <h5 className="font-semibold text-gray-800 mb-3 ">Medidas Físicas</h5>
+              <h5 className="font-semibold text-gray-800 mb-3 ">
+                Medidas Físicas
+              </h5>
               <div className="grid grid-cols-3 gap-3">
                 <InputTextOneLine
                   label="Talla (m)"
@@ -297,7 +297,9 @@ export default function Examenes({
 
             {/* Miembros y Reflejos integrados */}
             <div className="border-t pt-2 mt-3">
-              <h5 className="font-semibold text-gray-800 mb-2">Miembros y Reflejos</h5>
+              <h5 className="font-semibold text-gray-800 mb-2">
+                Miembros y Reflejos
+              </h5>
               <div className="grid grid-cols-2 gap-2">
                 <InputTextOneLine
                   label="Miembros Superiores"
