@@ -479,13 +479,13 @@ export default function DatosPersonales({
                     label="Vivos"
                     name="hijosVivos"
                     value={form.hijosVivos}
-                    disabled
+                    onChange={handleChangeNumber}
                   />
                   <InputTextOneLine
                     label="Muertos"
                     name="hijosMuertos"
                     value={form.hijosMuertos}
-                    disabled
+                    onChange={handleChangeNumber}
                   />
                 </div>
               </div>

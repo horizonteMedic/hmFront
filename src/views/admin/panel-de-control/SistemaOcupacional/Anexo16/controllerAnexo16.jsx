@@ -6,6 +6,7 @@ import {
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
+import { getToday } from "../../../../utils/helpers";
 
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
 const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
@@ -754,6 +755,7 @@ export const MapearDatosAdicionales = (res, data, contador = 1, isEdit = false) 
       data.otrosExamenes += coca == null ? "" : ("-COCAINA: " + coca + ". \n");
       data.otrosExamenes += marig == null ? "" : ("-MARIHUANA: " + marig + ".");
 
+      data.fechaRx = formatearFechaCorta(getToday());
       data.calidadRx = "2";
       data.simbolosRx = "N/A";
       const sexo = res.sexo_sexo_pa ?? "";
@@ -769,6 +771,7 @@ export const MapearDatosAdicionales = (res, data, contador = 1, isEdit = false) 
         }
       }
     }
+    data.numeroRx = res.norden_n_orden ?? "";
 
     // =============================================================================================
     // SECCIÓN ELECTROCARDIOGRAMA electroCardiograma
