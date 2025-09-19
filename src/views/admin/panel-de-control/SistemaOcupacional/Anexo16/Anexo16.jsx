@@ -333,7 +333,7 @@ export default function Anexo16({ listas }) {
   ];
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form,setForm, token, userlogued, handleClear, tabla, datosFooter);
   };
   const handleSearchExamenesRealizados = (e) => {
     if (e.key === "Enter") {
@@ -414,6 +414,7 @@ export default function Anexo16({ listas }) {
                       MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
                       handleSearch={handleSearch}
+                      handleSave={handleSave}
                       handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                     />
                   )
@@ -428,8 +429,7 @@ export default function Anexo16({ listas }) {
           <PanelObservaciones
             form={form}
             handleRadioButton={handleRadioButton}
-            handleClear={handleClear}
-            handleSave={handleSave}
+
             activeTab={activeTab}
             handleChange={handleChange}
           />

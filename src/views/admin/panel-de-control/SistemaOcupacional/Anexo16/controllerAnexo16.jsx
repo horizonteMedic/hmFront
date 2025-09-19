@@ -5,7 +5,7 @@ import {
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
+import { getFetch, SubmitData } from "../../../../utils/apiHelpers";
 import { getToday } from "../../../../utils/helpers";
 
 const registrarUrl = "/api/v01/ct/anexos/anexo16/registrarActualizarAnexo7c";
