@@ -297,27 +297,64 @@ export default function Anexo16(data = {}) {
          conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
          siluetaCardiovascular: "NORMAL"
        },
-       // Reacciones serológicas
-       reaccionesSerologicas: {
-         lues: "a -Lues",
-         titulacion: "0/0" // Primera opción marcada
-       },
+        // Reacciones serológicas
+        reaccionesSerologicas: {
+          titulacion: "0/0" // Primera opción marcada
+        },
+        // Reacciones serológicas LUES
+        reaccionesSerologicasLues: {
+          positivo: true,
+          negativo: true
+        },
        // Grupo sanguíneo
        grupoSanguineo: {
          grupo: {
            o: true,
-           a: false,
-           b: false,
-           ab: false
+           a: true,
+           b: true,
+           ab: true
          },
          factorRh: {
            positivo: true,
-           negativo: false
+           negativo: true
          }
        },
-       // Hemoglobina/Hematocrito
-       hemoglobinaHematocrito: "13 gr. %"
-    };
+        // Hemoglobina/Hematocrito
+        hemoglobinaHematocrito: "13 gr. %",
+        // Otros exámenes
+        otrosExamenes: "Hemograma completo normal. Glicemia en ayunas: 85 mg/dl",
+        // Perfil lipídico
+        perfilLipidico: {
+          colesterolTotal: "180",
+          ldl: "110",
+          hdl: "45",
+          vldl: "25",
+          trigliceridos: "150"
+        },
+        // Apto para trabajar
+        aptoParaTrabajar: {
+          si: true,
+          no: true
+        },
+        // Revaluación de empresa
+        revaluacionEmpresa: true,
+        // Observaciones
+        observaciones: [
+          "1-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. .- EVALUACION ANUAL.",
+          "2-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
+          "3-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+          "4-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+          "5- EVALUACION POR NEUMOLOGIA",
+          "6-7-- USO DE LENTES CORRECTORES.",
+          "8-AMETROPIA LEVE BILATERAL- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.",
+          "9-- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.:EVALUACION POR OFTALMOLOGIA.",
+          "10-ODONTOGRAMA : NO PASO EXAMEN ODONTOLOGICO",
+          "AUDIOMETRIA - NORMAL - NORMAL .EVALUACION ANUAL",
+          "11-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. - EVALUACION ANUAL.",
+          "12-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
+          "1-ELECTROCARDIOGRAMA: - EVALUACION ANUAL."
+        ]
+      };
 
   // Usar datos de prueba por ahora
   const datosFinales = datosPrueba;
@@ -1377,22 +1414,14 @@ export default function Anexo16(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
-  // REACCIONES SEROLÓGICAS LUES
-  const xReaccionesSerologicasLues = 25;
-  const yReaccionesSerologicasLues = 190;
-  if (datosFinales.reaccionesSerologicas && datosFinales.reaccionesSerologicas.lues) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.reaccionesSerologicas.lues.toUpperCase(), xReaccionesSerologicasLues, yReaccionesSerologicasLues);
-  }
 
   // === SECCIÓN: GRUPO SANGUÍNEO ===
   // GRUPO SANGUÍNEO - Checkboxes
   const grupoSanguineoPosiciones = [
-    { tipo: "o", x: 25, y: 200, texto: "O" },
-    { tipo: "a", x: 40, y: 200, texto: "A" },
-    { tipo: "b", x: 55, y: 200, texto: "B" },
-    { tipo: "ab", x: 70, y: 200, texto: "AB" }
+    { tipo: "o", x: 21, y: 176, texto: "O" },
+    { tipo: "a", x: 33.3, y: 176, texto: "A" },
+    { tipo: "b", x: 46.4, y: 176, texto: "B" },
+    { tipo: "ab", x: 58.2, y: 176, texto: "AB" }
   ];
 
   if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.grupo) {
@@ -1410,8 +1439,8 @@ export default function Anexo16(data = {}) {
 
   // FACTOR RH - Checkboxes
   const factorRhPosiciones = [
-    { tipo: "negativo", x: 85, y: 200, texto: "Rh(-)" },
-    { tipo: "positivo", x: 100, y: 200, texto: "Rh(+)" }
+    { tipo: "negativo", x: 75.4, y: 176, texto: "Rh(-)" },
+    { tipo: "positivo", x: 93, y: 176, texto: "Rh(+)" }
   ];
 
   if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.factorRh) {
@@ -1428,13 +1457,175 @@ export default function Anexo16(data = {}) {
   }
 
   // === SECCIÓN: HEMOGLOBINA/HEMATOCRITO ===
-  const xHemoglobinaHematocrito = 25;
-  const yHemoglobinaHematocrito = 210;
+  const xHemoglobinaHematocrito = 109;
+  const yHemoglobinaHematocrito = 175;
   if (datosFinales.hemoglobinaHematocrito) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "bold").setFontSize(9);
     doc.setTextColor(255, 0, 0); // Color rojo como en la imagen
     doc.text(datosFinales.hemoglobinaHematocrito.toUpperCase(), xHemoglobinaHematocrito, yHemoglobinaHematocrito);
   }
+
+  // === SECCIÓN: REACCIONES SEROLÓGICAS LUES ===
+  const reaccionesSerologicasLuesPosiciones = [
+    { tipo: "positivo", x: 166.5, y: 143.5, texto: "POSITIVO" },
+    { tipo: "negativo", x: 193, y: 143.5, texto: "NEGATIVO" }
+  ];
+
+  if (datosFinales.reaccionesSerologicasLues) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    reaccionesSerologicasLuesPosiciones.forEach(pos => {
+      if (datosFinales.reaccionesSerologicasLues[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN: OTROS EXÁMENES ===
+  const xOtrosExamenes = 145.5;
+  const yOtrosExamenes = 154;
+  if (datosFinales.otrosExamenes) {
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.otrosExamenes.toUpperCase(), xOtrosExamenes, yOtrosExamenes, { maxWidth: 55 });
+  }
+
+  // === SECCIÓN: PERFIL LIPÍDICO ===
+  // Colesterol Total
+  const xColesterolTotal = 167;
+  const yColesterolTotal = 206;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.colesterolTotal) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.perfilLipidico.colesterolTotal, xColesterolTotal, yColesterolTotal);
+  }
+
+  // LDL
+  const xLdl = 167;
+  const yLdl = 210;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.ldl) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.perfilLipidico.ldl, xLdl, yLdl);
+  }
+
+  // HDL
+  const xHdl = 167;
+  const yHdl = 214;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.hdl) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.perfilLipidico.hdl, xHdl, yHdl);
+  }
+
+  // VLDL
+  const xVldl = 167;
+  const yVldl = 218;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.vldl) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.perfilLipidico.vldl, xVldl, yVldl);
+  }
+
+  // Triglicéridos
+  const xTrigliceridos = 167;
+  const yTrigliceridos = 222;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.trigliceridos) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.perfilLipidico.trigliceridos, xTrigliceridos, yTrigliceridos);
+  }
+
+  // === SECCIÓN: APTO PARA TRABAJAR ===
+  const aptoParaTrabajarPosiciones = [
+    { tipo: "si", x: 23, y: 194.2, texto: "SI" },
+    { tipo: "no", x: 35.4, y: 194.2, texto: "NO" }
+  ];
+
+  if (datosFinales.aptoParaTrabajar) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    aptoParaTrabajarPosiciones.forEach(pos => {
+      if (datosFinales.aptoParaTrabajar[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN: REVALUACIÓN DE EMPRESA ===
+  const xRevaluacionEmpresa = 35.4;
+  const yRevaluacionEmpresa = 200.5;
+  if (datosFinales.revaluacionEmpresa) {
+    doc.setTextColor(0, 0, 255); // Color azul para la X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", xRevaluacionEmpresa, yRevaluacionEmpresa);
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+
+  // === SECCIÓN: FIRMA Y SELLO ===
+  const xFirmaSello = 75;
+  const yFirmaSello = 187;
+  try {
+    const firmaSelloImg = "/img/firmas_sellos_prueba/firma_sello.png";
+    doc.addImage(firmaSelloImg, "PNG", xFirmaSello, yFirmaSello, 38, 25);
+  } catch (e) {
+    doc.text("Firma y Sello", xFirmaSello, yFirmaSello + 10);
+  }
+
+  // === SECCIÓN: OBSERVACIONES ===
+  const xObservaciones = 12;
+  let yPosicionActual = 219; // Variable para rastrear la posición actual
+  const espacioEntreObservaciones = 1.2; // Espacio entre observaciones (reducido)
+  const lineHeight = 3.1; // Altura entre líneas de texto dividido
+  const maxWidth = 130; // Ancho máximo
+  
+  if (datosFinales.observaciones && Array.isArray(datosFinales.observaciones)) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    
+    datosFinales.observaciones.forEach((observacion) => {
+      // Dividir texto largo en múltiples líneas si es necesario
+      const lines = doc.splitTextToSize(observacion.toUpperCase(), maxWidth);
+      
+      // Dibujar cada línea de la observación actual
+      lines.forEach((line, lineIndex) => {
+        const yLinePosition = yPosicionActual + (lineIndex * lineHeight);
+        doc.text(line, xObservaciones, yLinePosition);
+      });
+      
+      // Calcular la nueva posición para la siguiente observación
+      // Sumar el número de líneas de esta observación + espacio entre observaciones
+      yPosicionActual += (lines.length * lineHeight) + espacioEntreObservaciones;
+    });
+  }
+
+  // === SECCIÓN: FIRMA DEL EXAMINADO ===
+  const xFirmaExaminado = 155;
+  const yFirmaExaminado = 224;
+  try {
+    const firmaExaminadoImg = "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png";
+    doc.addImage(firmaExaminadoImg, "PNG", xFirmaExaminado, yFirmaExaminado, 40, 28);
+  } catch (e) {
+    doc.text("Firma del Examinado", xFirmaExaminado, yFirmaExaminado + 10);
+  }
+
+  // === SECCIÓN: HUELLA DIGITAL ===
+  const xHuellaDigital = 165;
+  const yHuellaDigital = 257;
+  try {
+    const huellaDigitalImg = "/img/firmas_sellos_prueba/HUELLA_DIGITAL.png";
+    doc.addImage(huellaDigitalImg, "PNG", xHuellaDigital, yHuellaDigital, 18, 25);
+  } catch (e) {
+    doc.text("Huella Digital", xHuellaDigital, yHuellaDigital + 10);
+  }
+
 
   // === IMPRIMIR ===
   imprimir(doc);
