@@ -739,6 +739,8 @@ export const MapearDatosAdicionales = (res, data, contador = 1, isEdit = false) 
       const vsg = res.vsgLaboratorioClinico_txtvsg;
       const gluc = res.glucosaLaboratorioClinico_txtglucosabio;
       const creat = res.creatininaLaboratorioClinico_txtcreatininabio;
+      const coca = res.cocainaLaboratorioClinico_txtcocaina;
+      const marig = res.marihuanaLaboratorioClinico_txtmarihuana;
 
       data.vsg = vsg ?? "";
       data.glucosa = gluc ?? "";
