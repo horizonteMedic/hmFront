@@ -12,7 +12,7 @@ import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
+import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
 import Abdomen from "./Abdomen/Abdomen";
 
@@ -335,6 +335,13 @@ export default function Anexo16({ listas }) {
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
+  const handleSearchExamenesRealizados = (e) => {
+    if (e.key === "Enter") {
+      // handleClearnotO();
+      GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close() });
+    }
+  };
+
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -407,6 +414,7 @@ export default function Anexo16({ listas }) {
                       MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
                       handleSearch={handleSearch}
+                      handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                     />
                   )
                 );

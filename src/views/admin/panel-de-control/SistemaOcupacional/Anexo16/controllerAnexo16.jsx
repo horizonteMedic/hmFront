@@ -1,7 +1,7 @@
 import Swal from "sweetalert2";
 import {
+  LoadingDefault,
   PrintHojaRDefault,
-  SubmitDataServiceDefault,
   VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
@@ -13,8 +13,120 @@ const obtenerSimpleUrl = "/api/v01/ct/anexos/anexo16/obtenerAnexo16";
 const obtenerParaEditarUrl = "/api/v01/ct/anexos/anexo16/reporteEditarAnexo16";
 const obtenerParaJasperUrl = "/api/v01/ct/anexos/anexo16/obtenerReporteAnexo16";
 
+const obtenerExamenesRealizadosUrl =
+  "/api/v01/ct/anexos/anexo2/obtenerExamenesRealizados";
+
+// export const SubmitDataService = async (
+//   form,
+//   token,
+//   user,
+//   limpiar,
+//   tabla,
+//   datosFooter
+// ) => {
+//   if (!form.norden) {
+//     await Swal.fire("Error", "Datos Incompletos", "error");
+//     return;
+//   }
+//   const body = {
+//     norden: form.norden,
+//     codigoAnexo: form.codigoAnexo,
+//     fecha: form.fechaExam,
+//     ruido: form.ruido,
+//     polvo: form.polvo,
+//     vidSegmentario: form.vidSegmentario,
+//     vidTotal: form.vidTotal,
+//     cancerigenos: form.cancerigenos,
+//     mutagenicos: form.mutagenicos,
+//     solventes: form.solventes,
+//     metales: form.metales,
+//     temperatura: form.temperaturaAgente,
+//     biologicos: form.biologicos,
+//     posturas: form.posturas,
+//     turnos: form.turnos,
+//     cargas: form.cargas,
+//     movRepet: form.movRepet,
+//     pvd: form.pvd,
+//     otros: form.otros,
+//     reubicacionSi: form.reubicacion,
+//     reubicacionNo: !form.reubicacion,
+//     tabacoNada: form.tabaco === "NADA",
+//     tabacoPoco: form.tabaco === "POCO",
+//     tabacoHabitual: form.tabaco === "HABITUAL",
+//     tabacoExcesivo: form.tabaco === "EXCESIVO",
+//     alcoholNada: form.alcohol === "NADA",
+//     alcoholPoco: form.alcohol === "POCO",
+//     alcoholHabitual: form.alcohol === "HABITUAL",
+//     alcoholExcesivo: form.alcohol === "EXCESIVO",
+//     drogasNada: form.drogas === "NADA",
+//     drogasPoco: form.drogas === "POCO",
+//     drogasHabitual: form.drogas === "HABITUAL",
+//     drogasExcesivo: form.drogas === "EXCESIVO",
+//     puestoActual: form.puestoActual,
+//     tiempo: form.tiempoPuesto,
+//     antecedentesPersonales: form.antecedentesPersonales,
+//     antecedentesPersonales2: form.antecedentesPersonales2,
+//     antecedentesFamiliares: form.antecedentesFamiliares,
+//     hijosVivos: form.hijosVivos,
+//     hijosMuertos: form.hijosMuertos,
+//     cabeza: form.cabeza,
+//     nariz: form.nariz,
+//     cuello: form.cuello,
+//     perimetro: form.perimetro,
+//     bocaAmigdalasFaringeLaringe: form.bocaAmigdalasFaringeLaringe,
+//     visionColores: form.visionColores,
+//     enfermedadesOculares: form.enfermedadOculares,
+//     reflejosPupilares: form.reflejosPupilares,
+//     binocular: form.visionBinocular,
+//     od: form.otoscopiaOd,
+//     oi: form.otoscopiaOi,
+//     torax: form.torax,
+//     corazon: form.corazon,
+//     pulmonesNormal: form.pulmones === "NORMAL",
+//     pulmonesAnormal: form.pulmones === "ANORMAL",
+//     pulmonesDescripcion: form.pulmonesObservaciones,
+//     miembrosSuperiores: form.miembrosSuperiores,
+//     miembrosInferiores: form.miembrosInferiores,
+//     reflejosOsteotendinosos: form.reflejosOsteotendinosos,
+//     marcha: form.marcha,
+//     columnaVertebral: form.columnaVertebral,
+//     abdomen: form.abdomen,
+//     anillosInguinales: form.anillosInguinales,
+//     organosGenitales: form.organosGenitales,
+//     tactoRectalNoHizo: form.tactoRectal == "NO_SE_HIZO",
+//     tactoRectalNormal: form.tactoRectalNormal == "NORMAL",
+//     tactoRectalAnormal: form.tactoRectalNormal == "ANORMAL",
+//     describirObservacion: false,
+//     hernias: form.hernias,
+//     varices: form.varices,
+//     ganglios: form.ganglios,
+//     lenguage: form.evaluacionCognitiva,
+//     estadoMental: form.estadoMental,
+//     anamnesis: form.anamnesis,
+//     observacionesFichaMedica: form.observacionesGenerales,
+//     conclusion: form.conclusionRespiratoria,
+//     tetano: form.tetano,
+//     hepatitisB: form.hepatitisB,
+//     fiebreAmarilla: form.fiebreAmarilla,
+//     edad: form.edad,
+//     diagnosticoAudio: form.diagnosticoAudio,
+//     enfermedadesOcularesOtros: form.enfermedadOtros,
+//     conclusionMedico: form.conclusionMedico,
+
+//     alturaEstructura: form.alturaEstruct,
+//     alturaGeografica: form.alturaGeograf,
+//     quimicos: form.quimicos,
+//     electricos: form.electricos,
+//     vibraciones: form.vibraciones,
+//     userRegistro: user,
+//   };
+//   await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
+//     PrintHojaR(form.norden, token, tabla, datosFooter);
+//   });
+// };
 export const SubmitDataService = async (
   form,
+  setForm,
   token,
   user,
   limpiar,
@@ -25,6 +137,7 @@ export const SubmitDataService = async (
     await Swal.fire("Error", "Datos Incompletos", "error");
     return;
   }
+  Loading("Registrando Datos");
   const body = {
     norden: form.norden,
     codigoAnexo: form.codigoAnexo,
@@ -117,8 +230,29 @@ export const SubmitDataService = async (
     vibraciones: form.vibraciones,
     userRegistro: user,
   };
-  await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-    PrintHojaR(form.norden, token, tabla, datosFooter);
+  console.log(body);
+
+  SubmitData(body, registrarUrl, token).then((res) => {
+    console.log(res);
+    if (res.id === 1 || res.id === 0) {
+      Swal.fire({
+        title: "Exito",
+        text: `${res.mensaje},\n¿Desea imprimir?`,
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        const nordenNuevo = form.norden;
+        limpiar();
+        GetExamenesRealizados(nordenNuevo, setForm, token, () => { Swal.close() });
+        if (result.isConfirmed) {
+          PrintHojaR(form.norden, token, tabla, datosFooter);
+        }
+      });
+    } else {
+      Swal.fire("Error", "Ocurrio un error al Registrar", "error");
+    }
   });
 };
 
@@ -144,8 +278,10 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
     sede,
     () => {
       //NO Tiene registro
-      GetInfoServicio(nro, tabla, set, token, () => {
-        Swal.close();
+      ValidarExamenesRealizados(nro, token, () => { //en caso pase se ejectua esto 
+        GetInfoServicio(nro, tabla, set, token, () => {
+          Swal.close();
+        });
       });
     },
     () => {
@@ -593,7 +729,6 @@ export const GetInfoServicio = (
               data.contador++;
             }
           }
-
           console.log("DATAAA", data);
           set((prev) => ({ ...prev, ...data }));
         }
@@ -602,6 +737,100 @@ export const GetInfoServicio = (
       }
     })
     .finally(() => {
+      onFinish();
+    });
+};
+export const ValidarExamenesRealizados = (
+  nro,
+  token,
+  onComplete = () => { }
+) => {
+  getFetch(
+    `${obtenerExamenesRealizadosUrl}?nOrden=${nro}`,
+    token
+  )
+    .then((res) => {
+      if (res) {
+        console.log(res);
+
+        const examenes = {
+          'Antecedentes Patológicos': res.fichaAntecedentesPatologicos,
+          'Triaje': res.triaje,
+          'Espirometría': res.espirometria,
+          'Radiografía de Tórax': res.radiografiaTorax,
+          'Laboratorio Clínico': res.laboratorioClinico,
+          'Odontograma': res.odontograma,
+        };
+
+        const examenesFaltantes = Object.keys(examenes).filter(examen => !examenes[examen]);
+
+        if (examenesFaltantes.length === 0) {
+          onComplete();
+        } else {
+          const listaFaltantes = examenesFaltantes.map(examen => `• ${examen}`).join('<br>');
+          Swal.fire({
+            title: "Alerta",
+            html: `<div style="text-align: center;">El paciente no ha realizado los siguientes exámenes:<br><br></div><div style="text-align: left;margin-left:5px">${listaFaltantes}</div>`,
+            icon: "warning"
+          });
+        }
+      } else {
+        console.log("No se encontraron datos de exámenes realizados");
+      }
+    })
+    .catch((error) => {
+      console.error("Error al obtener exámenes realizados:", error);
+    });
+};
+export const GetExamenesRealizados = (
+  nro,
+  set,
+  token,
+  onFinish = () => { }
+) => {
+  LoadingDefault("Obteniendo Exámenes Realizados");
+  getFetch(
+    `${obtenerExamenesRealizadosUrl}?nOrden=${nro}`,
+    token
+  )
+    .then((res) => {
+      if (res) {
+        console.log(res);
+        set((prev) => ({
+          ...prev,
+          // Estado del Paciente
+          nordenEstadoPaciente: nro,
+          nombresEstadoPaciente: res.nombresPaciente ?? "",
+          tipoExamenEstadoPaciente: res.nombreExamen ?? "",
+
+          // Exámenes Realizados - convertir booleanos a  "PASADO" : "POR PASAR",
+          triaje: res.triaje ? "PASADO" : "POR PASAR",
+          labClinico: res.laboratorioClinico ? "PASADO" : "POR PASAR",
+          electrocardiograma: res.electroCardiograma ? "PASADO" : "POR PASAR",
+          rxToraxPA: res.radiografiaTorax ? "PASADO" : "POR PASAR",
+          fichaAudiologica: res.fichaAudiologica ? "PASADO" : "POR PASAR",
+          espirometria: res.espirometria ? "PASADO" : "POR PASAR",
+          odontograma: res.odontograma ? "PASADO" : "POR PASAR",
+          psicologia: res.psicologia ? "PASADO" : "POR PASAR",
+          anexo7D: res.anexo7D ? "PASADO" : "POR PASAR",
+          histOcupacional: res.historiaOcupacional ? "PASADO" : "POR PASAR",
+          fichaAntPatologicos: res.fichaAntecedentesPatologicos ? "PASADO" : "POR PASAR",
+          cuestionarioNordico: res.cuestionarioNordico ? "PASADO" : "POR PASAR",
+          certTrabajoAltura: res.certificadoTrabajoAltura ? "PASADO" : "POR PASAR",
+          detencionSAS: res.detencionSAS ? "PASADO" : "POR PASAR",
+          consentimientoDosaje: res.consentimientoDosaje ? "PASADO" : "POR PASAR",
+          exRxSanguineos: res.examenRadiografiaSanguineos ? "PASADO" : "POR PASAR",
+          perimetroToraxico: res.perimetroToraxico ? "PASADO" : "POR PASAR",
+          oftalmologia: res.oftalmologia ? "PASADO" : "POR PASAR",
+        }));
+        onFinish();
+      } else {
+        console.log("No se encontraron datos de exámenes realizados");
+        onFinish();
+      }
+    })
+    .catch((error) => {
+      console.error("Error al obtener exámenes realizados:", error);
       onFinish();
     });
 };
@@ -1041,8 +1270,13 @@ export const GetInfoServicioEditar = (
           data.piezasFaltan = res.ausentesOdontograma_txtausentes ?? "";
 
           // Children information based on gender
-          data.hijosVivos = res.hijosVivosAntecedentes_txtvhijosvivos ?? "0";
-          data.hijosMuertos = res.hijosFallecidosAntecedentes_txtvhijosfallecidos ?? "0";
+          if (data.sexo === "M") {
+            data.hijosVivos = res.hijosVivosAntecedentes_txtvhijosvivos ?? "0";
+            data.hijosMuertos = res.hijosFallecidosAntecedentes_txtvhijosfallecidos ?? "0";
+          } else {
+            data.hijosVivos = res.getdHijosVivosAntecedentes_txtdhijosvivos ?? "0";
+            data.hijosMuertos = res.getdHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
+          }
 
           // Physical measurements
           data.imc = res.imcTriaje_imc ?? "";
