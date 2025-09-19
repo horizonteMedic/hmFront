@@ -216,21 +216,21 @@ export default function Anexo16({ listas }) {
     //TERCERA TAB RESULTADOS
     //=============================================================================================
     // Examen Físico - Abdomen
-    abdomen: "",
-    columnaVertebral: "",
-    anillosInguinales: "",
-    organosGenitales: "",
+    abdomen: "RHA(+), B/D, NO DOLOROSO A LA PALPACION",
+    columnaVertebral: "CENTRAL, MOVIL, CURVATURAS CONSERVADAS",
+    anillosInguinales: "CONSERVADOS",
+    organosGenitales: "DE CARACTER NORMAL",
     //Tacto Rectal
     tactoRectal: "NO_SE_HIZO",
-    hernias: "",
-    varices: "",
-    ganglios: "",
-    evaluacionCognitiva: "",
+    hernias: "NO",
+    varices: "NO",
+    ganglios: "NO LINFADENOPATIAS",
+    evaluacionCognitiva: "NORMAL",
     //Información Radiológica
     numeroRx: "",
     fechaRx: "",
     calidadRx: "",
-    simbolosRx: "",
+    simbolosRx: "N/A",
     //Conclusiones Radiográficas
     vertices: "",
     hilios: "",
@@ -239,8 +239,8 @@ export default function Anexo16({ listas }) {
     conclusionesRadiograficas: "",
     siluetaCardiovascular: "",
     //Estado Mental y Anamnesis
-    estadoMental: "",
-    anamnesis: "",
+    estadoMental: "DESPIERTO, OTEP, COMUNICATIVO.",
+    anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
     //Clasificación y Neumoconiosis
     clasificacion: "0/0",
     reaccionesSerologicas: "NEGATIVO",
