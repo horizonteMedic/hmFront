@@ -234,9 +234,7 @@ export default function Resultados({
               { label: "NO", value: "NO" },
               { label: "REEVALUACIÓN", value: "REEVALUACION" },
             ]}
-            disabled
-          />
-
+          /> 
           {/* Médico que Certifica */}
           <div className="mt-2">
             <label className="block font-semibold  mb-1">

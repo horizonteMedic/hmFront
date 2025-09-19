@@ -10,6 +10,7 @@ export default function Examenes({
   handleChange,
   handleRadioButton,
   handleCheckBoxChange,
+  setForm,
 }) {
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
@@ -451,7 +452,13 @@ export default function Examenes({
               <InputsRadioGroup
                 name="pulmones"
                 value={form.pulmones}
-                onChange={handleRadioButton}
+                onChange={(e, value) => {
+                  handleRadioButton(e, value)
+                  if (value == "ANORMAL") {
+                    setForm(prev => ({ ...prev, pulmonesObservaciones: "" }));
+                  }
+
+                }}
                 options={[
                   { label: "Normal", value: "NORMAL" },
                   { label: "Anormal", value: "ANORMAL" },
