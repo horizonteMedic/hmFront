@@ -340,7 +340,7 @@ export default function DatosPersonales({
                 label="Tiempo"
                 name="tiempoPuesto"
                 value={form.tiempoPuesto}
-                disabled
+                onChange={handleChangeNumber}
               />
               <InputTextOneLine
                 label="Area"

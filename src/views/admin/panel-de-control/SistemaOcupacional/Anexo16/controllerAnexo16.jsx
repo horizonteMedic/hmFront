@@ -184,7 +184,7 @@ export const GetInfoServicio = (
           let data = {
             norden: res.norden_n_orden,
             observacionesGenerales: "",
-            diagnosticoAudio: "",
+            observacionesAudio: "",
             contador: 1
           };
           data = MapearDatosAdicionales(res, data, data.contador, false);
@@ -457,65 +457,62 @@ export const GetInfoServicio = (
           // Diagnóstico audiométrico
           const diagnosticoAudiometrico = res.diagnosticoAudiometricoCompleto_diagnostico ?? "";
           if (data.od500 !== "" && data.od500 !== "N/A" && diagnosticoAudiometrico !== "NORMAL" && diagnosticoAudiometrico !== "") {
-            data.diagnosticoAudio = "AUDIOMETRIA " + diagnosticoAudiometrico + ".EVALUACION ANUAL ";
+            data.observacionesAudio = "AUDIOMETRIA " + diagnosticoAudiometrico + ".EVALUACION ANUAL ";
           } else if (data.od500 === "N/A" || data.od500 === "") {
-            data.diagnosticoAudio = "NO PASO EXAMEN AUDIOMETRIA.\n";
+            data.observacionesAudio = "NO PASO EXAMEN AUDIOMETRIA.\n";
           }
-
           // Evaluación audiométrica detallada
           if (res.normalAudiometria_chkdnormal) {
-            data.diagnosticoAudio = "NORMAL";
+            data.observacionesAudio = "NORMAL";
           } else {
-            let audioObservaciones = "";
             if (res.traumaLeveOdAudiometria_chkdtaleveod && res.traumaLeveOiAudiometria_chkdtaleveoi) {
-              audioObservaciones += "Trauma Acústico Bilateral Leve ";
+              data.observacionesAudio += "Trauma Acústico Bilateral Leve ";
             }
             if (res.traumaLeveOdAudiometria_chkdtaleveod) {
-              audioObservaciones += "\n Trauma Acústico Leve OD";
+              data.observacionesAudio += "\n Trauma Acústico Leve OD";
             }
             if (res.traumaLeveOiAudiometria_chkdtaleveoi) {
-              audioObservaciones += "\n Trauma Acústico Leve OI";
+              data.observacionesAudio += "\n Trauma Acústico Leve OI";
             }
             if (res.traumaAvanzadoOdAudiometria_chkdtaavanzadood && res.traumaAvanzadoOiAudiometria_chkdtaavanzadooi) {
-              audioObservaciones += "\n Trauma Acústico Bilateral Avanzado ";
+              data.observacionesAudio += "\n Trauma Acústico Bilateral Avanzado ";
             }
             if (res.traumaAvanzadoOdAudiometria_chkdtaavanzadood) {
-              audioObservaciones += "\n Trauma Acústico Avanzado OD";
+              data.observacionesAudio += "\n Trauma Acústico Avanzado OD";
             }
             if (res.traumaAvanzadoOiAudiometria_chkdtaavanzadooi) {
-              audioObservaciones += "\n Trauma Acústico Avanzado OI";
+              data.observacionesAudio += "\n Trauma Acústico Avanzado OI";
             }
             if (res.hipoacusiaLeveOdAudiometria_chkdhrleveod && res.hipoacusiaLeveOiAudiometria_chkdhrleveoi) {
-              audioObservaciones += "\n Hipoacusia Bilateral Inducida por Ruido, Leve ";
+              data.observacionesAudio += "\n Hipoacusia Bilateral Inducida por Ruido, Leve ";
             }
             if (res.hipoacusiaLeveOdAudiometria_chkdhrleveod) {
-              audioObservaciones += "\n Hipoacusia Inducida por Ruido, Leve  OD";
+              data.observacionesAudio += "\n Hipoacusia Inducida por Ruido, Leve  OD";
             }
             if (res.hipoacusiaLeveOiAudiometria_chkdhrleveoi) {
-              audioObservaciones += "\n Hipoacusia Inducida por Ruido, Leve  OI";
+              data.observacionesAudio += "\n Hipoacusia Inducida por Ruido, Leve  OI";
             }
             if (res.hipoacusiaModeradaOdAudiometria_chkdhrmoderadood && res.hipoacusiaModeradaOiAudiometria_chkdhrmoderadooi) {
-              audioObservaciones += "\n Hipoacusia Bilateral Inducida por Ruido, Moderada";
+              data.observacionesAudio += "\n Hipoacusia Bilateral Inducida por Ruido, Moderada";
             }
             if (res.hipoacusiaModeradaOdAudiometria_chkdhrmoderadood) {
-              audioObservaciones += "\n Hipoacusia Inducida por Ruido, Moderada OD";
+              data.observacionesAudio += "\n Hipoacusia Inducida por Ruido, Moderada OD";
             }
             if (res.hipoacusiaModeradaOiAudiometria_chkdhrmoderadooi) {
-              audioObservaciones += "\n Hipoacusia Inducida por Ruido, Moderada OI";
+              data.observacionesAudio += "\n Hipoacusia Inducida por Ruido, Moderada OI";
             }
             if (res.hipoacusiaAvanzadaOdAudiometria_chkdhravanzadaod && res.hipoacusiaAvanzadaOiAudiometria_chkdhravanzadaoi) {
-              audioObservaciones += "\n Hipoacusia Bilateral Inducida por Ruido, Avanzada ";
+              data.observacionesAudio += "\n Hipoacusia Bilateral Inducida por Ruido, Avanzada ";
             }
             if (res.hipoacusiaAvanzadaOdAudiometria_chkdhravanzadaod) {
-              audioObservaciones += "\n Hipoacusia Inducida por Ruido, Avanzada  OD";
+              data.observacionesAudio += "\n Hipoacusia Inducida por Ruido, Avanzada  OD";
             }
             if (res.hipoacusiaAvanzadaOiAudiometria_chkdhravanzadaoi) {
-              audioObservaciones += "\n Hipoacusia Inducida por Ruido, Avanzada  OI";
+              data.observacionesAudio += "\n Hipoacusia Inducida por Ruido, Avanzada  OI";
             }
             if (res.otrasHipoacusiasAudiometria_chkotrashipoacusias) {
-              audioObservaciones += "\n  OTRAS HIPOACUSIAS: " + (res.otrasHipoacusiasAudiometria_txtotrashipoacusias ?? "");
+              data.observacionesAudio += "\n  OTRAS HIPOACUSIAS: " + (res.otrasHipoacusiasAudiometria_txtotrashipoacusias ?? "");
             }
-            data.diagnosticoAudio = audioObservaciones;
           }
 
           // Presbiacusia
@@ -785,7 +782,6 @@ export const MapearDatosAdicionales = (res, data, contador = 1, isEdit = false) 
       if (recomendaciones) {
         electrocardiogramaText += `.${recomendaciones}`;
       }
-
       // Agregar a observaciones generales si existe
       if (data.observacionesGenerales) {
         data.observacionesGenerales += electrocardiogramaText + "\n";

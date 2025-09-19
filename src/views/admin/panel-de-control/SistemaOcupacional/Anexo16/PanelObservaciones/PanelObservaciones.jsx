@@ -27,8 +27,8 @@ export default function PanelObservaciones({
           <InputTextArea
             rows={8}
             label="Observaciones"
-            name="diagnosticoAudio"
-            value={form.diagnosticoAudio}
+            name="observacionesAudio"
+            value={form.observacionesAudio}
             onChange={handleChange}
           />
         </div>
