@@ -109,6 +109,7 @@ export default function Examenes({
                   label="IMC"
                   name="imc"
                   value={form.imc}
+                  className={form.imcRed ? "text-red-600" : ""}
                   disabled
                   labelOnTop
                 />

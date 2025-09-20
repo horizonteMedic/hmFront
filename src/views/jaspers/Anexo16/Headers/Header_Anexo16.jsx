@@ -17,11 +17,11 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
   };
 
   const datosReales = {
-    sede: datos?.informacionSede?.sede ?? "Trujillo-Nicolas de Pierola",
+    sede: datos?.sede ?? "Trujillo-Nicolas de Pierola",
     norden: String(datos?.norden_n_orden ?? ""),
-    color: datos?.informacionSede?.color ?? 1,
-    codigoColor: datos?.informacionSede?.codigoColor?.trim() ?? "#008f39",
-    textoColor: datos?.informacionSede?.textoColor?.trim() ?? "F"
+    color: datos?.color ?? 1,
+    codigoColor: datos?.codigoColor?.trim() ?? "#008f39",
+    textoColor: datos?.textoColor?.trim() ?? "F"
   };
 
   const datosFinales = datos && Object.keys(datos).length > 0 ? datosReales : datosPrueba;

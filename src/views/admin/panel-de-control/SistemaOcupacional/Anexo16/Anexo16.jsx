@@ -300,6 +300,20 @@ export default function Anexo16({ listas }) {
     perimetroToraxico: "",
     oftalmologia: "",
 
+    //colores
+    cocainaRed: "",
+    marihuanaRed: "",
+    glucosaRed:"",
+    creatininaRed:"",
+    imcRed:"",
+    hemoglobinaRed:"",
+    colesterolRed:"",
+    
+    ldlRed:"",
+    hdlRed:"",
+    vldlRed:"",
+    trigliceridosRed:"",
+    
     // Médico que Certifica //BUSCADOR
     nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     filteredNombresMedicos: [],
@@ -333,7 +347,7 @@ export default function Anexo16({ listas }) {
   ];
 
   const handleSave = () => {
-    SubmitDataService(form,setForm, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
   };
   const handleSearchExamenesRealizados = (e) => {
     if (e.key === "Enter") {

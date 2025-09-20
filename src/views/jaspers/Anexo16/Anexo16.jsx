@@ -381,7 +381,7 @@ export default function Anexo16(data = {}) {
         femenino: res.sexo_sexo_pa === "F" ?? false
       },
       dni: res.dni_cod_pa ?? "",
-      telefono: res.celularPaciente_cel_pa ?? "", //revisar - también hay telefonoTrabajoPaciente_tel_trabajo_pa y telefonoCasaPaciente_tel_casa_pa
+      telefono: res.celularPaciente_cel_pa ?? "", 
       estadoCivil: {
         soltero: res.estadoCivilPaciente_estado_civil_pa === "SOLTERO" ?? false,
         casado: res.estadoCivilPaciente_estado_civil_pa === "CASADO" ?? false,
@@ -445,8 +445,8 @@ export default function Anexo16(data = {}) {
     },
     // Número de hijos
     numeroHijos: {
-      vivos: res.hijosVivosAnexo7c_txthijosvivos ?? "",
-      muertos: res.hijosMuertosAnexo7c ?? ""
+      vivos: res.hijosVivosAnexo7c_txthijosvivos ?? "0",
+      muertos: res.hijosMuertosAnexo7c ?? "0"
     },
     // Hábitos
     habitos: {
@@ -491,8 +491,8 @@ export default function Anexo16(data = {}) {
     // Evaluación física
     evaluacionFisica: {
       cabeza: res.cabezaAnexo7c_txtcabeza ?? "",
-      perimetroCuello: res.perimetroCuelloTriaje_perimetro_cuello ?? "", //revisar - también hay perimetroCuelloTriaje_perimetro_cuello
-      bocaAmigdalas: res.baflAnexo7c_txtb_a_f_l ?? "", //revisar - verificar si es el campo correcto
+      perimetroCuello: res.perimetroCuelloTriaje_perimetro_cuello ?? "", 
+      bocaAmigdalas: res.baflAnexo7c_txtb_a_f_l ?? "", 
       cuello: res.cuelloAnexo7c_txtcuello ?? "",
       nariz: res.narizAnexo7c_txtnariz ?? "",
       dentadura: {
