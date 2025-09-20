@@ -6,7 +6,7 @@ export default function Anexo16Boroo(data = {}) {
   const margin = 0; // Sin márgenes
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  
+
   // === PÁGINA 1 ===
   // === 0) HEADER ===
   headerAnexo16Boroo(doc, data, 1);
@@ -32,7 +32,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // === 2) CAMPOS DE DATOS PERSONALIZABLES PARA PÁGINA 1 ===
-  
+
   // Datos de prueba para Anexo16 Boroo
   const datosPrueba = {
     fechaExamen: "15/08/2025",
@@ -68,274 +68,574 @@ export default function Anexo16Boroo(data = {}) {
         viudo: true,
         divorciado: true
       },
-        gradoInstruccion: {
-          analfabeto: true,
-          primariaCompleta: true,
-          primariaIncompleta: true,
-          secundariaCompleta: true,  // Sec.Com marcado
-          secundariaIncompleta: true,
-          universidad: true,
-          tecnico: true
-        }
-      },
-      // Factores de riesgo ocupacional
-      factoresRiesgo: {
-        // Primera columna
-        ruido: true,
-        polvo: true,
-        vibSegmentario: true,
-        vibTotal: true,
-        // Segunda columna
-        cancerigenos: true,
-        mutagenicos: true,
-        solventes: true,
-        metales: true,
-        // Tercera columna
-        temperatura: true,
-        biologicos: true,
-        posturas: true,
-        turnos: true,
-        // Cuarta columna
-        carga: true,
-        movRepet: true,
-        pvd: true,
-        otros: true
-      },
-      // Información del puesto
-      informacionPuesto: {
-        puestoPostula: "Operador de Maquinaria Pesada",
-        puestoActual: "Asistente de Operaciones",
-        tiempo: "2 años",
-        reubicacion: {
-          si: true,
-          no: true  // NO marcado
-        }
-      },
-      // Antecedentes médicos
-      antecedentesMedicos: {
-        personales: "Hipertensión arterial desde 2020. Accidente laboral en 2019 con fractura de brazo derecho.",
-        familiares: "Padre con diabetes tipo 2. Madre con hipertensión arterial."
-      },
-      // Inmunizaciones
-      inmunizaciones: {
-        tetano: true,
-        hepatitisB: true,
-        fiebreAmarilla: true
-      },
-      // Número de hijos
-      numeroHijos: {
-        vivos: "2",
-        muertos: "0"
-      },
-      // Hábitos
-      habitos: {
-        tabaco: {
-          nada: true,
-          poco: true,
-          habitual: true,
-          excesivo: true
-        },
-        alcohol: {
-          nada: true,
-          poco: true,
-          habitual: true,
-          excesivo: true
-        },
-        drogas: {
-          nada: true,
-          poco: true,
-          habitual: true,
-          excesivo: true
-        }
-      },
-      // Medidas corporales
-      medidasCorporales: {
-        talla: "175",
-        peso: "78",
-        imc: "25.4",
-        cintura: "85",
-        cadera: "95",
-        icc: "0.89"
-      },
-      // Función respiratoria
-      funcionRespiratoria: {
-        fvc: "4.2",
-        fev1: "3.5",
-        fev1Fvc: "83.3",
-        fef2575: "3.1",
-        conclusion: "Función pulmonar normal"
-      },
-      // Temperatura
-      temperatura: "36.5",
-      // Evaluación física
-      evaluacionFisica: {
-        cabeza: "NORMAL, SIN ALTERACIONES VISIBLES",
-        perimetroCuello: "38.5",
-        bocaAmigdalas: "MUCOSA ORAL NORMAL, AMÍGDALAS SIN ALTERACIONES",
-        cuello: "NORMAL, SIN ADENOPATÍAS",
-        nariz: "NORMAL, SIN OBSTRUCCIONES",
-        dentadura: {
-          piezasMalEstado: "1",
-          piezasFaltantes: "2"
-        }
-      },
-      // Evaluación oftalmológica
-      evaluacionOftalmologica: {
-        vision: {
-          cerca: {
-            sinCorregir: {
-              od: "20/20",  // Ojo derecho
-              oi: "20/25"   // Ojo izquierdo
-            },
-            corregida: {
-              od: "20/20",
-              oi: "20/20"
-            }
-          },
-          lejos: {
-            sinCorregir: {
-              od: "20/30",
-              oi: "20/40"
-            },
-            corregida: {
-              od: "20/20",
-              oi: "20/20"
-            }
-          }
-        },
-        enfermedadesOculares: "NINGUNA",
-        reflejosPupilares: "NORMALES, ISOCÓRICAS, FOTORREACTIVAS",
-        testIshihara: "NORMAL",
-        testColoresPuros: "NORMAL",
-        testProfundidad: "NORMAL"
-      },
-      // Evaluación de oídos
-      evaluacionOidos: {
-        audiometria: {
-          oidoDerecho: {
-            frecuencia500: "20",
-            frecuencia1000: "15",
-            frecuencia2000: "20",
-            frecuencia3000: "25",
-            frecuencia4000: "10",
-            frecuencia5000: "5",
-            frecuencia8000: "10"
-          },
-          oidoIzquierdo: {
-            frecuencia500: "10",
-            frecuencia1000: "5",
-            frecuencia2000: "10",
-            frecuencia3000: "15",
-            frecuencia4000: "10",
-            frecuencia5000: "10",
-            frecuencia8000: "5"
-          }
-        },
-        otoscopia: {
-          oidoDerecho: "NORMAL",
-          oidoIzquierdo: "NORMAL"
-        }
-      },
-      // Cardiovascular
-      cardiovascular: "CONSERVADO",
-      // Signos vitales
-      signosVitales: {
-        frecuenciaRespiratoria: "18",
-        frecuenciaCardiaca: "72",
-        saturacionOxigeno: "98",
-        presionArterial: {
-          sistolica: "120",
-          diastolica: "80"
-        }
-      },
-      // Evaluación física adicional
-      evaluacionFisicaAdicional: {
-        pulmones: {
-          normal: true,
-          anormal: true,
-          descripcion: "AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS"
-        },
-        miembrosSuperiores: "MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES",
-        miembrosInferiores: "MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS"
-      },
-      // Página 2 - Evaluación neurológica y física
-      evaluacionNeurologica: {
-        reflejosOsteotendinosos: "CONSERVADOS",
-        marcha: "NORMAL"
-      },
-      // Evaluación de columna y abdomen
-      evaluacionColumnaAbdomen: {
-        columnaVertebral: "CENTRAL, MÓVIL, CURVATURAS CONSERVADAS",
-        abdomen: "RHA(+), B/D, NO DOLOROSO A LA PALPACIÓN",
-        anillosInguinales: "CONSERVADOS",
-        organosGenitales: "DE CARÁCTER NORMAL"
-      },
-      // Evaluación rectal y hernias
-      evaluacionRectalHernias: {
-        tactoRectal: {
-          noSeHizo: true,
-          anormal: true,
-          normal: true
-        },
-        hernias: "NO",
-        varices: "NO",
-        gangliosLinfaticos: "NO LINFADENOPATÍAS"
-      },
-      // Evaluación mental
-      evaluacionMental: {
-        lenguajeAtencionMemoria: "NORMAL",
-        anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD",
-        estadoMental: "DESPIERTO, OTEP, COMUNICATIVO"
-      },
-      // Radiografía de tórax
-      radiografiaTorax: {
-        numeroRx: "96639",
-        fecha: "28/05/2025",
-        calidad: "2",
-        simbolos: "N/A",
-        vertices: "LIBRES",
-        hilios: "NORMALES",
-        senos: "LIBRES",
-        mediastinos: "NORMALES",
-        conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
-        siluetaCardiovascular: "NORMAL"
-      },
-      // Reacciones serológicas
-      reaccionesSerologicas: {
-        titulacion: "0/0" // Primera opción marcada
-      },
-      // Reacciones serológicas LUES
-      reaccionesSerologicasLues: {
-        positivo: true,
-        negativo: false
-      },
-      // Otros exámenes
-      otrosExamenes: "Examen de orina: NORMAL. Hemograma: NORMAL. Glicemia: 85 mg/dl.",
-      // Documento de identidad
-      docIdentidad: "76543210",
-      // Exámenes de laboratorio
-      examenesLaboratorio: {
-        // Hemograma Completo
-        vsg: "15",
-        glucosa: "85",
-        urea: "25",
-        creatinina: "0.9",
-        // Perfil Lipídico Completo
-        ldl: "110",
-        hdl: "45",
-        vldl: "25",
-        trigliceridos: "150",
-        colesterolTotal: "180",
-        // Examen Completo de Orina
-        cocainaOrina: "NEGATIVO",
-        marihuanaOrina: "NEGATIVO",
-        mercurioOrina: "NORMAL",
-        plomoOrina: "NORMAL"
+      gradoInstruccion: {
+        analfabeto: true,
+        primariaCompleta: true,
+        primariaIncompleta: true,
+        secundariaCompleta: true,  // Sec.Com marcado
+        secundariaIncompleta: true,
+        universidad: true,
+        tecnico: true
       }
-    };
+    },
+    // Factores de riesgo ocupacional
+    factoresRiesgo: {
+      // Primera columna
+      ruido: true,
+      polvo: true,
+      vibSegmentario: true,
+      vibTotal: true,
+      // Segunda columna
+      cancerigenos: true,
+      mutagenicos: true,
+      solventes: true,
+      metales: true,
+      // Tercera columna
+      temperatura: true,
+      biologicos: true,
+      posturas: true,
+      turnos: true,
+      // Cuarta columna
+      carga: true,
+      movRepet: true,
+      pvd: true,
+      otros: true
+    },
+    // Información del puesto
+    informacionPuesto: {
+      puestoPostula: "Operador de Maquinaria Pesada",
+      puestoActual: "Asistente de Operaciones",
+      tiempo: "2 años",
+      reubicacion: {
+        si: true,
+        no: true  // NO marcado
+      }
+    },
+    // Antecedentes médicos
+    antecedentesMedicos: {
+      personales: "Hipertensión arterial desde 2020. Accidente laboral en 2019 con fractura de brazo derecho.",
+      familiares: "Padre con diabetes tipo 2. Madre con hipertensión arterial."
+    },
+    // Inmunizaciones
+    inmunizaciones: {
+      tetano: true,
+      hepatitisB: true,
+      fiebreAmarilla: true
+    },
+    // Número de hijos
+    numeroHijos: {
+      vivos: "2",
+      muertos: "0"
+    },
+    // Hábitos
+    habitos: {
+      tabaco: {
+        nada: true,
+        poco: true,
+        habitual: true,
+        excesivo: true
+      },
+      alcohol: {
+        nada: true,
+        poco: true,
+        habitual: true,
+        excesivo: true
+      },
+      drogas: {
+        nada: true,
+        poco: true,
+        habitual: true,
+        excesivo: true
+      }
+    },
+    // Medidas corporales
+    medidasCorporales: {
+      talla: "175",
+      peso: "78",
+      imc: "25.4",
+      cintura: "85",
+      cadera: "95",
+      icc: "0.89"
+    },
+    // Función respiratoria
+    funcionRespiratoria: {
+      fvc: "4.2",
+      fev1: "3.5",
+      fev1Fvc: "83.3",
+      fef2575: "3.1",
+      conclusion: "Función pulmonar normal"
+    },
+    // Temperatura
+    temperatura: "36.5",
+    // Evaluación física
+    evaluacionFisica: {
+      cabeza: "NORMAL, SIN ALTERACIONES VISIBLES",
+      perimetroCuello: "38.5",
+      bocaAmigdalas: "MUCOSA ORAL NORMAL, AMÍGDALAS SIN ALTERACIONES",
+      cuello: "NORMAL, SIN ADENOPATÍAS",
+      nariz: "NORMAL, SIN OBSTRUCCIONES",
+      dentadura: {
+        piezasMalEstado: "1",
+        piezasFaltantes: "2"
+      }
+    },
+    // Evaluación oftalmológica
+    evaluacionOftalmologica: {
+      vision: {
+        cerca: {
+          sinCorregir: {
+            od: "20/20",  // Ojo derecho
+            oi: "20/25"   // Ojo izquierdo
+          },
+          corregida: {
+            od: "20/20",
+            oi: "20/20"
+          }
+        },
+        lejos: {
+          sinCorregir: {
+            od: "20/30",
+            oi: "20/40"
+          },
+          corregida: {
+            od: "20/20",
+            oi: "20/20"
+          }
+        }
+      },
+      enfermedadesOculares: "NINGUNA",
+      reflejosPupilares: "NORMALES, ISOCÓRICAS, FOTORREACTIVAS",
+      testIshihara: "NORMAL",
+      testColoresPuros: "NORMAL",
+      testProfundidad: "NORMAL"
+    },
+    // Evaluación de oídos
+    evaluacionOidos: {
+      audiometria: {
+        oidoDerecho: {
+          frecuencia500: "20",
+          frecuencia1000: "15",
+          frecuencia2000: "20",
+          frecuencia3000: "25",
+          frecuencia4000: "10",
+          frecuencia5000: "5",
+          frecuencia8000: "10"
+        },
+        oidoIzquierdo: {
+          frecuencia500: "10",
+          frecuencia1000: "5",
+          frecuencia2000: "10",
+          frecuencia3000: "15",
+          frecuencia4000: "10",
+          frecuencia5000: "10",
+          frecuencia8000: "5"
+        }
+      },
+      otoscopia: {
+        oidoDerecho: "NORMAL",
+        oidoIzquierdo: "NORMAL"
+      }
+    },
+    // Cardiovascular
+    cardiovascular: "CONSERVADO",
+    // Signos vitales
+    signosVitales: {
+      frecuenciaRespiratoria: "18",
+      frecuenciaCardiaca: "72",
+      saturacionOxigeno: "98",
+      presionArterial: {
+        sistolica: "120",
+        diastolica: "80"
+      }
+    },
+    // Evaluación física adicional
+    evaluacionFisicaAdicional: {
+      pulmones: {
+        normal: true,
+        anormal: true,
+        descripcion: "AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS"
+      },
+      miembrosSuperiores: "MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES",
+      miembrosInferiores: "MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS"
+    },
+    // Página 2 - Evaluación neurológica y física
+    evaluacionNeurologica: {
+      reflejosOsteotendinosos: "CONSERVADOS",
+      marcha: "NORMAL"
+    },
+    // Evaluación de columna y abdomen
+    evaluacionColumnaAbdomen: {
+      columnaVertebral: "CENTRAL, MÓVIL, CURVATURAS CONSERVADAS",
+      abdomen: "RHA(+), B/D, NO DOLOROSO A LA PALPACIÓN",
+      anillosInguinales: "CONSERVADOS",
+      organosGenitales: "DE CARÁCTER NORMAL"
+    },
+    // Evaluación rectal y hernias
+    evaluacionRectalHernias: {
+      tactoRectal: {
+        noSeHizo: true,
+        anormal: true,
+        normal: true
+      },
+      hernias: "NO",
+      varices: "NO",
+      gangliosLinfaticos: "NO LINFADENOPATÍAS"
+    },
+    // Evaluación mental
+    evaluacionMental: {
+      lenguajeAtencionMemoria: "NORMAL",
+      anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD",
+      estadoMental: "DESPIERTO, OTEP, COMUNICATIVO"
+    },
+    // Radiografía de tórax
+    radiografiaTorax: {
+      numeroRx: "96639",
+      fecha: "28/05/2025",
+      calidad: "2",
+      simbolos: "N/A",
+      vertices: "LIBRES",
+      hilios: "NORMALES",
+      senos: "LIBRES",
+      mediastinos: "NORMALES",
+      conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
+      siluetaCardiovascular: "NORMAL"
+    },
+    // Reacciones serológicas
+    reaccionesSerologicas: {
+      titulacion: "0/0" // Primera opción marcada
+    },
+    // Reacciones serológicas LUES
+    reaccionesSerologicasLues: {
+      positivo: true,
+      negativo: false
+    },
+    // Otros exámenes
+    otrosExamenes: "Examen de orina: NORMAL. Hemograma: NORMAL. Glicemia: 85 mg/dl.",
+    // Documento de identidad
+    docIdentidad: "76543210",
+    // Exámenes de laboratorio
+    examenesLaboratorio: {
+      // Hemograma Completo
+      vsg: "15",
+      glucosa: "85",
+      urea: "25",
+      creatinina: "0.9",
+      // Perfil Lipídico Completo
+      ldl: "110",
+      hdl: "45",
+      vldl: "25",
+      trigliceridos: "150",
+      colesterolTotal: "180",
+      // Examen Completo de Orina
+      cocainaOrina: "NEGATIVO",
+      marihuanaOrina: "NEGATIVO",
+      mercurioOrina: "NORMAL",
+      plomoOrina: "NORMAL"
+    }
+  };
+  const datosReales = {
+    fechaExamen: res.fechaAnexo7c_fecha ?? "",
+    mineralesExplotados: res.mineral_mineral_po ?? "",
+    lugarFechaNacimiento: res.lugarNacimientoPaciente_lugar_nac_pa ?? "",
+    domicilioHabitual: res.direccionPaciente_direccion ?? "",
+    tipoTrabajo: {
+      superficie: res.explotacion_nom_ex === "SUPERFICIE" ?? false,
+      concentrador: res.explotacion_nom_ex === "CONCENTRADOR" ?? false,
+      subsuelo: res.explotacion_nom_ex === "SUBSUELO" ?? false
+    },
+    alturaLabor: {
+      debajo2500: res.altura_altura_po === "DEBAJO 2500" ?? false,
+      rango2501_4000: res.altura_altura_po === "2501 A 4000" ?? false,
+      rango2501_3000: res.altura_altura_po === "2501 A 3000" ?? false,
+      rango4001_4500: res.altura_altura_po === "4001 A 4500" ?? false,
+      rango2001_3500: res.altura_altura_po === "2001 A 3500" ?? false,
+      mas4501: res.altura_altura_po === "MAS DE 4501" ?? false
+    },
+    // Datos personales
+    datosPersonales: {
+      edad: res.edad_edad ?? "",
+      sexo: {
+        masculino: res.sexo_sexo_pa === "M" ?? false,
+        femenino: res.sexo_sexo_pa === "F" ?? false
+      },
+      dni: res.dni_cod_pa ?? "",
+      telefono: res.celularPaciente_cel_pa ?? "",
+      estadoCivil: {
+        soltero: res.estadoCivilPaciente_estado_civil_pa === "SOLTERO" ?? false,
+        casado: res.estadoCivilPaciente_estado_civil_pa === "CASADO" ?? false,
+        conviviente: res.estadoCivilPaciente_estado_civil_pa === "CONVIVIENTE" ?? false,
+        viudo: res.estadoCivilPaciente_estado_civil_pa === "VIUDO" ?? false,
+        divorciado: res.estadoCivilPaciente_estado_civil_pa === "DIVORCIADO" ?? false
+      },
+      gradoInstruccion: {
+        analfabeto: res.nivelEstudioPaciente_nivel_est_pa === "ANALFABETO" ?? false,
+        primariaCompleta: res.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA COMPLETA" ?? false,
+        primariaIncompleta: res.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA INCOMPLETA" ?? false,
+        secundariaCompleta: res.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA COMPLETA" ?? false,
+        secundariaIncompleta: res.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA INCOMPLETA" ?? false,
+        universidad: res.nivelEstudioPaciente_nivel_est_pa === "UNIVERSIDAD" ?? false,
+        tecnico: res.nivelEstudioPaciente_nivel_est_pa === "TECNICO" ?? false
+      }
+    },
+    // Factores de riesgo ocupacional
+    factoresRiesgo: {
+      // Primera columna
+      ruido: res.ruidoAnexo7c_chkruido ?? false,
+      polvo: res.polvoAnexo7c_chkpolvo ?? false,
+      vibSegmentario: res.vidSegmentarioAnexo7c_chkvidsegmentario ?? false,
+      vibTotal: res.vidTotalAnexo7c_chkvidtotal ?? false,
+      // Segunda columna
+      cancerigenos: res.cancerigenosAnexo7c_chkcancerigenos ?? false,
+      mutagenicos: res.mutagenicosAnexo7c_chkmutagenicos ?? false,
+      solventes: res.solventesAnexo7c_chksolventes ?? false,
+      metales: res.metalesAnexo7c_chkmetales ?? false,
+      // Tercera columna
+      temperatura: res.temperaturaAnexo7c_chktemperatura ?? false,
+      biologicos: res.biologicosAnexo7c_chkbiologicos ?? false,
+      posturas: res.posturasAnexo7c_chkposturas ?? false,
+      turnos: res.turnosAnexo7c_chkturnos ?? false,
+      // Cuarta columna
+      carga: res.cargasAnexo7c_chkcargas ?? false,
+      movRepet: res.movRepetAnexo7c_chkmovrepet ?? false,
+      pvd: res.pvdAnexo7c_chkpvd ?? false,
+      otros: res.otrosAnexo7c_chkotros ?? false
+    },
+    // Información del puesto
+    informacionPuesto: {
+      puestoPostula: res.cargo_cargo_de ?? "",
+      puestoActual: res.puestoActualAnexo7c_txtpuestoactual ?? "",
+      tiempo: res.tiempoAnexo7c_txttiempo ?? "",
+      reubicacion: {
+        si: res.reubicacionSiAnexo7c_tbrsi ?? false,
+        no: res.reubicacionNoAnexo7c_rbrno ?? false
+      }
+    },
+    // Antecedentes médicos
+    antecedentesMedicos: {
+      personales: res.antecedentesPersonalesAnexo7c_txtantecedentespersonales ?? "",
+      familiares: res.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares ?? ""
+    },
+    // Inmunizaciones
+    inmunizaciones: {
+      tetano: res.tetanoAnexo7c_tetano ?? false,
+      hepatitisB: res.hepatitisBAnexo7c_hepatitisb ?? false,
+      fiebreAmarilla: res.fiebreAmarillaAnexo7c_fiebreamarilla ?? false
+    },
+    // Número de hijos
+    numeroHijos: {
+      vivos: res.hijosVivosAnexo7c_txthijosvivos ?? "0",
+      muertos: res.hijosMuertosAnexo7c ?? "0"
+    },
+    // Hábitos
+    habitos: {
+      tabaco: {
+        nada: res.tabacoNadaAexo7c_chktnada ?? false,
+        poco: res.tabacoPocoAnexo7c_chktpoco ?? false,
+        habitual: res.tabacoHabitualAnexo7c_chkthabitual ?? false,
+        excesivo: res.tabacoExcesivoAnexo7c_chktexcesivo ?? false
+      },
+      alcohol: {
+        nada: res.alcoholNadaAnexo7c_chkanada ?? false,
+        poco: res.alcoholPocoAnexo7c_chkapoco ?? false,
+        habitual: res.alcoholHabitualAnexo7c_chkahabitual ?? false,
+        excesivo: res.alcoholExcesivoAnexo7c_chkaexcesivo ?? false
+      },
+      drogas: {
+        nada: res.drogasNadaAnexo7c_chkdnada ?? false,
+        poco: res.drogasPocoAnexo7c_chkdpoco ?? false,
+        habitual: res.drogasHabitualAnexo7c_chkdhabitual ?? false,
+        excesivo: res.drogasExcesivoAnexo7c_chkdexcesivo ?? false
+      }
+    },
+    // Medidas corporales
+    medidasCorporales: {
+      talla: res.tallaTriaje_talla ?? "",
+      peso: res.pesoTriaje_peso ?? "",
+      imc: res.imcTriaje_imc ?? "",
+      cintura: res.cinturaTriaje_cintura ?? "",
+      cadera: res.caderaTriaje_cadera ?? "",
+      icc: res.iccTriaje_icc ?? ""
+    },
+    // Función respiratoria
+    funcionRespiratoria: {
+      fvc: res.fvcFuncionRespiratoria_fvc ?? "",
+      fev1: res.fev1FuncionRespiratoria_fev1 ?? "",
+      fev1Fvc: res.fev1FvcFuncionRespiratoria_fev1fvc ?? "",
+      fef2575: res.fef2575FuncionRespiratoria_fef25_75 ?? "",
+      conclusion: res.conclusionAnexo7c_txtconclusion ?? ""
+    },
+    // Temperatura
+    temperatura: res.temperaturaTriaje_temperatura ?? "",
+    // Evaluación física
+    evaluacionFisica: {
+      cabeza: res.cabezaAnexo7c_txtcabeza ?? "",
+      perimetroCuello: res.perimetroCuelloTriaje_perimetro_cuello ?? "",
+      bocaAmigdalas: res.baflAnexo7c_txtb_a_f_l ?? "",
+      cuello: res.cuelloAnexo7c_txtcuello ?? "",
+      nariz: res.narizAnexo7c_txtnariz ?? "",
+      dentadura: {
+        piezasMalEstado: res.piezasMalEstadoOdontograma_txtpiezasmalestado ?? "",
+        piezasFaltantes: res.ausentesOdontograma_txtausentes ?? ""
+      }
+    },
+    // Evaluación oftalmológica
+    evaluacionOftalmologica: {
+      vision: {
+        cerca: {
+          sinCorregir: {
+            od: res.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
+            oi: res.visionCercaSinCorregirOi_v_cerca_s_oi ?? ""
+          },
+          corregida: {
+            od: res.odcc_odcc ?? "",
+            oi: res.oicc_oicc ?? ""
+          }
+        },
+        lejos: {
+          sinCorregir: {
+            od: res.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
+            oi: res.visionLejosSinCorregirOi_v_lejos_s_oi ?? ""
+          },
+          corregida: {
+            od: res.odlc_odlc ?? "",
+            oi: res.oilc_oilc ?? ""
+          }
+        }
+      },
+      enfermedadesOculares: res.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
+      reflejosPupilares: res.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "",
+      testIshihara: res.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (res.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""), //revisar - mapeo de test
+      testColoresPuros: res.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (res.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""), //revisar - mapeo de test
+      testProfundidad: res.tecestereopsiaNormal_rbtecestereopsia_normal ? "NORMAL" : (res.tecestereopsiaAnormal_rbtecestereopsia_anormal ? "ANORMAL" : "") //revisar - mapeo de test
+    },
+    // Evaluación de oídos
+    evaluacionOidos: {
+      audiometria: {
+        oidoDerecho: {
+          frecuencia500: res.oidoDerecho500Audiometria_o_d_500 ?? "",
+          frecuencia1000: res.oidoDerecho1000Audiometria_o_d_1000 ?? "",
+          frecuencia2000: res.oidoDerecho2000Audiometria_o_d_2000 ?? "",
+          frecuencia3000: res.oidoDerecho3000Audiometria_o_d_3000 ?? "",
+          frecuencia4000: res.oidoDerecho4000Audiometria_o_d_4000 ?? "",
+          frecuencia5000: res.oidoDerecho6000Audiometria_o_d_6000 ?? "", //revisar - no hay campo 5000 en JSON, usando 6000
+          frecuencia8000: res.oidoDerecho8000Audiometria_o_d_8000 ?? ""
+        },
+        oidoIzquierdo: {
+          frecuencia500: res.oidoIzquierdo500Audiometria_o_i_500 ?? "",
+          frecuencia1000: res.oidoIzquierdo1000Audiometria_o_i_1000 ?? "",
+          frecuencia2000: res.oidoIzquierdo2000Audiometria_o_i_2000 ?? "",
+          frecuencia3000: res.oidoIzquierdo3000Audiometria_o_i_3000 ?? "",
+          frecuencia4000: res.oidoIzquierdo4000Audiometria_o_i_4000 ?? "",
+          frecuencia5000: res.oidoIzquierdo6000Audiometria_o_i_6000 ?? "", //revisar - no hay campo 5000 en JSON, usando 6000
+          frecuencia8000: res.oidoIzquierdo8000Audiometria_o_i_8000 ?? ""
+        }
+      },
+      otoscopia: {
+        oidoDerecho: res.odAnexo7c_txtod ?? "",
+        oidoIzquierdo: res.oiAnexo7c_txtoi ?? ""
+      }
+    },
+    // Cardiovascular
+    cardiovascular: res.toraxAnexo7c_txttorax ?? "", //revisar - usando campo tórax como cardiovascular
+    // Signos vitales
+    signosVitales: {
+      frecuenciaRespiratoria: res.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
+      frecuenciaCardiaca: res.frecuenciaCardiacaTriaje_f_cardiaca ?? "",
+      saturacionOxigeno: res.saturacionOxigenoTriaje_sat_02 ?? "",
+      presionArterial: {
+        sistolica: res.sistolicaTriaje_sistolica ?? "",
+        diastolica: res.diastolicaTriaje_diastolica ?? ""
+      }
+    },
+    // Evaluación física adicional
+    evaluacionFisicaAdicional: {
+      pulmones: {
+        normal: res.pulmonesNormalAnexo7c_rbnormal ?? false,
+        anormal: res.pulmonesAnormalAnexo7c_rbanormal ?? false,
+        descripcion: res.pulmonesDescripcionAnexo7c_txtpulmones ?? ""
+      },
+      miembrosSuperiores: res.miembrosSuperioresAnexo7c_txtmiembrossuperiores ?? "",
+      miembrosInferiores: res.miembrosInferioresAnexo7c_txtmiembrosinferiores ?? ""
+    },
+    // Página 2 - Evaluación neurológica y física
+    evaluacionNeurologica: {
+      reflejosOsteotendinosos: res.reflejosOsteotendinososAnexo7c_txtreflejososteotendinosos ?? "",
+      marcha: res.marchaAnexo7c_txtmarcha ?? ""
+    },
+    // Evaluación de columna y abdomen
+    evaluacionColumnaAbdomen: {
+      columnaVertebral: res.columnaVertebralAnexo7c_txtcolumnavertebral ?? "",
+      abdomen: res.abdomenAnexo7c_txtabdomen ?? "",
+      anillosInguinales: res.anillosInguinalesAnexo7c_txtanillosinguinales ?? "",
+      organosGenitales: res.organosGenitalesAnexo7c_txtorganosgenitales ?? ""
+    },
+    // Evaluación rectal y hernias
+    evaluacionRectalHernias: {
+      tactoRectal: {
+        noSeHizo: res.tactoRectalNoHizoAnexo7c_rbtnohizo ?? false,
+        anormal: res.tactoRectalAnormalAnexo7c_rbtanormal ?? false,
+        normal: res.tactoRectalNormalAnexo7c_rbtnormal ?? false
+      },
+      hernias: res.herniasAnexo7c_txthernias ?? "",
+      varices: res.varicesAnexo7c_txtvarices ?? "",
+      gangliosLinfaticos: res.gangliosAnexo7c_txtganglios ?? ""
+    },
+    // Evaluación mental
+    evaluacionMental: {
+      lenguajeAtencionMemoria: res.lenguageAnexo7c_txtlenguage ?? "",
+      anamnesis: res.anamnesisAnexo7c_txtanamnesis ?? "",
+      estadoMental: res.estadoMentalAnexo7c_txtestadomental ?? ""
+    },
+    // Radiografía de tórax
+    radiografiaTorax: {
+      numeroRx: res.nrx_n_rx ?? "",
+      fecha: res.fechaExamenRadiografico_fecha_exra ?? "",
+      calidad: res.calidadExamenRadiografico_txtcalidad ?? "",
+      simbolos: res.simbolosExamenRadiografico_txtsimbolos ?? "",
+      vertices: res.verticesRadiografiaTorax_txtvertices ?? "",
+      hilios: res.hilosRadiografiaTorax_txthilios ?? "",
+      senos: res.senosCostoFrenicos_txtsenoscostofrenicos ?? "",
+      mediastinos: res.meadiastinos_txtmediastinos ?? "",
+      conclusionesRadiograficas: res.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
+      siluetaCardiovascular: res.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
+    },
+    // Reacciones serológicas
+    reaccionesSerologicas: {
+      titulacion: "", //revisar - no hay campo específico en JSON para titulación
+    },
+    // Reacciones serológicas LUES
+    reaccionesSerologicasLues: {
+      positivo: res.positivoLaboratorioClinico_chkpositivo ?? false,
+      negativo: res.negativoLaboratorioClinico_chknegativo ?? false
+    },
+    // Otros exámenes
+    otrosExamenes: res.examenRadiograficoOtros_txtotrosex ?? "",
+    // Documento de identidad
+    docIdentidad: res.dni_cod_pa ?? "", //revisar - usando mismo campo que dni
+    // Exámenes de laboratorio
+    examenesLaboratorio: {
+      // Hemograma Completo
+      vsg: res.vsgLaboratorioClinico_txtvsg ?? "",
+      glucosa: res.glucosaLaboratorioClinico_txtglucosabio ?? "",
+      urea: "", //revisar - no hay campo específico en JSON
+      creatinina: res.creatininaLaboratorioClinico_txtcreatininabio ?? "",
+      // Perfil Lipídico Completo
+      ldl: res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
+      hdl: res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "",
+      vldl: res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "",
+      trigliceridos: res.trigliceridosAnalisisBioquimico_txttrigliceridos ?? "",
+      colesterolTotal: res.colesterolAnalisisBioquimico_txtcolesterol ?? "",
+      // Examen Completo de Orina
+      cocainaOrina: res.cocainaLaboratorioClinico_txtcocaina ?? "",
+      marihuanaOrina: res.marihuanaLaboratorioClinico_txtmarihuana ?? "",
+      mercurioOrina: "", //revisar - no hay campo específico en JSON
+      plomoOrina: "" //revisar - no hay campo específico en JSON
+    }
+  };
 
   // Usar datos de prueba por ahora
-  const datosFinales = datosPrueba;
+  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
+
 
   // === SECCIÓN: FECHA DEL EXAMEN Y MINERALES ===
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -356,7 +656,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // === SECCIÓN: COLUMNAS PRINCIPALES ===
-  
+
   // Columna 1: LUGAR Y FECHA DE NACIMIENTO
   const xLugarNacimiento = 15;
   const yLugarNacimiento = 50;
@@ -425,7 +725,7 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0);
     // Número de edad centrado
     doc.text(datosFinales.datosPersonales.edad, xEdad, yEdad, { align: 'center' });
-    
+
     // "Años" centrado abajo
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Años", xEdad, yEdad + 3, { align: 'center' });
@@ -1170,7 +1470,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // === 2) CAMPOS DE DATOS PERSONALIZABLES PARA PÁGINA 2 ===
-  
+
   // === SECCIÓN: EVALUACIÓN NEUROLÓGICA ===
   // REFLEJOS OSTEOTENDINOSOS
   const xReflejosOsteotendinosos = 55;
@@ -1538,7 +1838,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // === EXAMEN COMPLETO DE ORINA ===
   // Cocaína en Orina
-  const xCocainaOrina = 127 ;
+  const xCocainaOrina = 127;
   const yCocainaOrina = 170.5;
   if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.cocainaOrina) {
     doc.setFont("helvetica", "normal").setFontSize(7.5);
@@ -1588,7 +1888,7 @@ export default function Anexo16Boroo(data = {}) {
   const yFirmaPaciente = 195;
   const firmaWidth = 40;
   const firmaHeight = 18;
-  
+
   try {
     doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
   } catch (e) {
