@@ -512,12 +512,12 @@ export default function Examenes({
                 disabled
                 labelOnTop
               />
-              <InputTextOneLine
+              <InputTextArea
                 label="Observaciones"
+                rows={8}
                 name="dentaduraObservaciones"
                 value={form.dentaduraObservaciones}
                 disabled
-                labelOnTop
               />
             </div>
           </div>
