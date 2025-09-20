@@ -504,9 +504,9 @@ export default function Anexo16Boroo(data = {}) {
       },
       enfermedadesOculares: res.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
       reflejosPupilares: res.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "",
-      testIshihara: res.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (res.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""), //revisar - mapeo de test
-      testColoresPuros: res.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (res.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""), //revisar - mapeo de test
-      testProfundidad: res.tecestereopsiaNormal_rbtecestereopsia_normal ? "NORMAL" : (res.tecestereopsiaAnormal_rbtecestereopsia_anormal ? "ANORMAL" : "") //revisar - mapeo de test
+      testIshihara: res.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (res.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""), 
+      testColoresPuros: res.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (res.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""), 
+      testProfundidad: res.tecestereopsiaNormal_rbtecestereopsia_normal ? "NORMAL" : (res.tecestereopsiaAnormal_rbtecestereopsia_anormal ? "ANORMAL" : "") 
     },
     // Evaluación de oídos
     evaluacionOidos: {
@@ -536,7 +536,7 @@ export default function Anexo16Boroo(data = {}) {
       }
     },
     // Cardiovascular
-    cardiovascular: res.toraxAnexo7c_txttorax ?? "", //revisar - usando campo tórax como cardiovascular
+    cardiovascular: res.corazonAnexo7c_txtcorazon ?? "",
     // Signos vitales
     signosVitales: {
       frecuenciaRespiratoria: res.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
@@ -601,7 +601,7 @@ export default function Anexo16Boroo(data = {}) {
     },
     // Reacciones serológicas
     reaccionesSerologicas: {
-      titulacion: "", //revisar - no hay campo específico en JSON para titulación
+      titulacion: "",
     },
     // Reacciones serológicas LUES
     reaccionesSerologicasLues: {
@@ -611,13 +611,13 @@ export default function Anexo16Boroo(data = {}) {
     // Otros exámenes
     otrosExamenes: res.examenRadiograficoOtros_txtotrosex ?? "",
     // Documento de identidad
-    docIdentidad: res.dni_cod_pa ?? "", //revisar - usando mismo campo que dni
+    docIdentidad: res.dni_cod_pa ?? "", 
     // Exámenes de laboratorio
     examenesLaboratorio: {
       // Hemograma Completo
       vsg: res.vsgLaboratorioClinico_txtvsg ?? "",
       glucosa: res.glucosaLaboratorioClinico_txtglucosabio ?? "",
-      urea: "", //revisar - no hay campo específico en JSON
+      urea: "N/A", //revisar - no hay campo específico en JSON
       creatinina: res.creatininaLaboratorioClinico_txtcreatininabio ?? "",
       // Perfil Lipídico Completo
       ldl: res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
@@ -628,8 +628,8 @@ export default function Anexo16Boroo(data = {}) {
       // Examen Completo de Orina
       cocainaOrina: res.cocainaLaboratorioClinico_txtcocaina ?? "",
       marihuanaOrina: res.marihuanaLaboratorioClinico_txtmarihuana ?? "",
-      mercurioOrina: "", //revisar - no hay campo específico en JSON
-      plomoOrina: "" //revisar - no hay campo específico en JSON
+      mercurioOrina: "N/A", //revisar - no hay campo específico en JSON
+      plomoOrina: "N/A" //revisar - no hay campo específico en JSON
     }
   };
 

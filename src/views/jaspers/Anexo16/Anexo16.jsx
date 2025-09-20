@@ -532,22 +532,22 @@ export default function Anexo16(data = {}) {
     evaluacionOidos: {
       audiometria: {
         oidoDerecho: {
-          frecuencia500: res.oidoDerecho500Audiometria_o_d_500 ?? "", //revisar - solo hay un campo de audiometría en JSON
-          frecuencia1000: "", //revisar - no hay campo específico en JSON
-          frecuencia2000: "", //revisar - no hay campo específico en JSON
-          frecuencia3000: "", //revisar - no hay campo específico en JSON
-          frecuencia4000: "", //revisar - no hay campo específico en JSON
-          frecuencia6000: "", //revisar - no hay campo específico en JSON
-          frecuencia8000: "" //revisar - no hay campo específico en JSON
+          frecuencia500: res.oidoDerecho500Audiometria_o_d_500 ?? "", 
+          frecuencia1000: res.oidoDerecho1000Audiometria_o_d_1000 ?? "", 
+          frecuencia2000: res.oidoDerecho2000Audiometria_o_d_2000 ?? "", 
+          frecuencia3000: res.oidoDerecho3000Audiometria_o_d_3000 ?? "", 
+          frecuencia4000: res.oidoDerecho4000Audiometria_o_d_4000 ?? "", 
+          frecuencia6000: res.oidoDerecho6000Audiometria_o_d_6000 ?? "", 
+          frecuencia8000: res.oidoDerecho8000Audiometria_o_d_8000 ?? "", 
         },
         oidoIzquierdo: {
-          frecuencia500: "", //revisar - no hay campo específico en JSON
-          frecuencia1000: "", //revisar - no hay campo específico en JSON
-          frecuencia2000: "", //revisar - no hay campo específico en JSON
-          frecuencia3000: "", //revisar - no hay campo específico en JSON
-          frecuencia4000: "", //revisar - no hay campo específico en JSON
-          frecuencia6000: "", //revisar - no hay campo específico en JSON
-          frecuencia8000: "" //revisar - no hay campo específico en JSON
+          frecuencia500: res.oidoIzquierdo500Audiometria_o_i_500 ?? "", 
+          frecuencia1000: res.oidoIzquierdo1000Audiometria_o_i_1000 ?? "", 
+          frecuencia2000: res.oidoIzquierdo2000Audiometria_o_i_2000 ?? "", 
+          frecuencia3000: res.oidoIzquierdo3000Audiometria_o_i_3000 ?? "", 
+          frecuencia4000: res.oidoIzquierdo4000Audiometria_o_i_4000 ?? "", 
+          frecuencia6000: res.oidoIzquierdo6000Audiometria_o_i_6000 ?? "", 
+          frecuencia8000: res.oidoIzquierdo8000Audiometria_o_i_8000 ?? "", 
         }
       },
       otoscopia: {
