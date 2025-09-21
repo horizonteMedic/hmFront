@@ -210,8 +210,8 @@ export default function Resultados({
 
         {/* Otros Exámenes */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold text-gray-800 mb-2">Otros Exámenes</h4>
           <InputTextArea
+            label="Otros Exámenes"
             rows={4}
             name="otrosExamenes"
             value={form.otrosExamenes}
@@ -234,7 +234,7 @@ export default function Resultados({
               { label: "NO", value: "NO" },
               { label: "REEVALUACIÓN", value: "REEVALUACION" },
             ]}
-          /> 
+          />
           {/* Médico que Certifica */}
           <div className="mt-2">
             <label className="block font-semibold  mb-1">

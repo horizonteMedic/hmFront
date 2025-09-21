@@ -141,9 +141,9 @@ export const SubmitDataService = async (
       calificacionExSt: form.clasificacion == "ST",
       sinNeumoconiosis: form.sinNeumoconiosis,
       conNeumoconiosis: form.conNeumoconiosis,
-      irep: "string", //REVISAR
-      otros: "string", //REVISAR
-      observacionesRs: "string", //REVISAR
+      irep: form.imagenRadiograficaPolvo, 
+      otros: form.otrosExamenes, 
+      observacionesRs: "",
       aptoSi: form.aptoParaTrabajar == "SI",
       aptoNo: form.aptoParaTrabajar == "NO",
       aptoRe: form.aptoParaTrabajar == "REEVALUACION",
@@ -156,7 +156,7 @@ export const SubmitDataService = async (
     if (res.id === 1 || res.id === 0) {
       Swal.fire({
         title: "Exito",
-        text: `${res.mensaje},\n¿Desea imprimir?`,
+        text: `Registro creado con éxito,\n¿Desea imprimir?`,
         icon: "success",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
@@ -1349,7 +1349,7 @@ export const GetInfoServicioEditar = (
             norden: res.norden_n_orden,
             observacionesGenerales: "",
             observacionesAudio: "",
-            codigoAnexo: codigoAnexo7c_cod_anexo ?? "",
+            codigoAnexo: res.codigoAnexo7c_cod_anexo ?? "",
           };
 
           // Build observacionesGenerales from different medical areas
