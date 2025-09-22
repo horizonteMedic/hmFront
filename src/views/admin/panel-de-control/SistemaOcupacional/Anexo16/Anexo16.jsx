@@ -245,8 +245,8 @@ export default function Anexo16({ listas }) {
     //Clasificación y Neumoconiosis
     clasificacion: "0/0",
     reaccionesSerologicas: "NEGATIVO",
-    sinNeumoconiosis: "",
-    imagenRadiograficaPolvo: "",
+    sinNeumoconiosis: "NORMAL",
+    imagenRadiograficaPolvo: "SOSPECHA",
     conNeumoconiosis: "",
 
     //=============================================================================================

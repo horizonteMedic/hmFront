@@ -1660,7 +1660,7 @@ export const GetInfoServicioEditar = (
           data.otoscopiaOi = res.oiAnexo7c_txtoi ?? "";
           data.torax = res.toraxAnexo7c_txttorax ?? "";
           data.corazon = res.corazonAnexo7c_txtcorazon ?? "";
-          data.pulmones = res.pulmonesNormalAnexo7c_rbnormal ? "NORMAL" : "";
+          data.pulmones = res.pulmonesNormalAnexo7c_rbnormal ? "NORMAL" : "ANORMAL";
           data.pulmonesObservaciones =
             res.pulmonesDescripcionAnexo7c_txtpulmones ?? "";
           data.miembrosSuperiores =
