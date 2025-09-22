@@ -1365,7 +1365,7 @@ export const GetInfoServicioEditar = (
             norden: res.norden_n_orden,
             observacionesGenerales: "",
             observacionesAudio: "",
-            codigoAnexo: res.codigoAnexo7c_cod_anexo ?? "",
+            codigoAnexo: res.codigoAnexo7c_cod_anexo,
             codigoExamenRadiograficoSanguineo: res.codigoExamenRadiograficoSanguineo_cod_exra,
             imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
           };

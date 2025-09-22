@@ -21,15 +21,15 @@ const headerAnexo16Boroo = (doc, datos, numeroPagina = 1) => {
   };
 
   const datosReales = {
-    sede: datos?.informacionSede?.sede ?? "Trujillo-Pierola",
+    sede: datos?.sede ?? "",
     norden: String(datos?.norden_n_orden ?? ""),
-    color: datos?.informacionSede?.color ?? 1,
-    codigoColor: datos?.informacionSede?.codigoColor?.trim() ?? "#008f39",
-    textoColor: datos?.informacionSede?.textoColor?.trim() ?? "F",
-    empresa: datos?.empresa ?? "ESTA ES UNA EMPRESA SUPER LARGA QUE DEBE BAJAR PARA CONTINUAR EL TEXTO",
-    contrata: datos?.contrata ?? "ESTA ES UNA CONTRATA SUPER LARGA QUE TAMBIEN DEBE BAJAR PARA CONTINUAR",
-    apellidosNombres: datos?.apellidosNombres ?? "CASTILLO PLASENCIA HADY KATHERINE",
-    tipoExamen: datos?.tipoExamen ?? "PRE OCUPACIONAL"
+    color: datos?.color ?? 1,
+    codigoColor: datos?.codigoColor?.trim() ?? "#008f39",
+    textoColor: datos?.textoColor?.trim() ?? "F",
+    empresa: datos?.empresa_razon_empresa ?? "",
+    contrata: datos?.contrata_razon_contrata ?? "",
+    apellidosNombres: datos?.nombres_nombres ?? "",
+    tipoExamen: datos?.nombreExamen_nom_examen ?? "",
   };
 
   const datosFinales = datos && Object.keys(datos).length > 0 ? datosReales : datosPrueba;

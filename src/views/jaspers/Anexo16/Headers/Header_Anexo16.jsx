@@ -1,10 +1,10 @@
 const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   // Márgenes de 8mm a cada lado (consistente con Anexo2)
   const margenLateral = 8; // 8mm
   const margenSuperior = 15; // 15mm - margen superior aumentado
-  
+
   let y = margenSuperior; // Posición ajustada con margen superior
 
   // Datos de prueba
@@ -21,15 +21,15 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
   };
 
   const datosReales = {
-    sede: datos?.informacionSede?.sede ?? "Trujillo-Nicolas de Pierola",
+    sede: datos?.sede ?? "",
     norden: String(datos?.norden_n_orden ?? ""),
-    color: datos?.informacionSede?.color ?? 1,
-    codigoColor: datos?.informacionSede?.codigoColor?.trim() ?? "#008f39",
-    textoColor: datos?.informacionSede?.textoColor?.trim() ?? "F",
-    empresa: datos?.empresa ?? "ESTA ES UNA EMPRESA SUPER LARGA QUE DEBE BAJAR PARA CONTINUAR EL TEXTO",
-    contrata: datos?.contrata ?? "ESTA ES UNA CONTRATA SUPER LARGA QUE TAMBIEN DEBE BAJAR PARA CONTINUAR",
-    apellidosNombres: datos?.apellidosNombres ?? "CASTILLO PLASENCIA HADY KATHERINE",
-    tipoExamen: datos?.tipoExamen ?? "PRE OCUPACIONAL"
+    color: datos?.color ?? 1,
+    codigoColor: datos?.codigoColor?.trim() ?? "#008f39",
+    textoColor: datos?.textoColor?.trim() ?? "F",
+    empresa: datos?.empresa_razon_empresa ?? "",
+    contrata: datos?.contrata_razon_contrata ?? "",
+    apellidosNombres: datos?.nombres_nombres ?? "",
+    tipoExamen: datos?.nombreExamen_nom_examen ?? "",
   };
 
   const datosFinales = datos && Object.keys(datos).length > 0 ? datosReales : datosPrueba;
@@ -37,7 +37,7 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
   // 1) Logo a la izquierda - alineado con número de orden
   const logoW = 50,
     logoH = 15;
-  const logoY = y -8; // Alineado con infoY (número de orden)
+  const logoY = y - 8; // Alineado con infoY (número de orden)
   const logoX = margenLateral; // Posición con margen lateral
   try {
     doc.addImage("./img/logo-color.png", "PNG", logoX, logoY - 2, logoW, logoH);
@@ -138,90 +138,90 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
 
   // 4) SECCIONES DE DATOS DEL PACIENTE EN 3 FILAS
   let dataY = tituloY + 7; // Posición después del título, más cerca
-  
+
   // Calcular posiciones de las columnas para la fila 1
   const col1X = margenLateral; // Columna izquierda
   const col2X = pageW / 2 + 10; // Columna derecha (mitad de la página + margen)
-  
+
   // === FILA 1: NOMBRE APELLIDOS + EXAMEN MEDICO ===
   // NOMBRE APELLIDOS (columna izquierda)
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("NOMBRE APELLIDOS:", col1X, dataY);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Calcular ancho disponible para el texto de nombre
   const nombreLabelWidth = doc.getTextWidth("NOMBRE APELLIDOS:");
   const nombreStartX = col1X + nombreLabelWidth + 5;
   const nombreMaxWidth = col2X - nombreStartX - 10; // Ancho disponible hasta la columna derecha
-  
+
   // Dividir el texto de nombre en líneas si es necesario
   const nombreLines = doc.splitTextToSize(datosFinales.apellidosNombres, nombreMaxWidth);
   let nombreY = dataY;
-  
+
   nombreLines.forEach((line, index) => {
     doc.text(line, nombreStartX, nombreY);
     if (index < nombreLines.length - 1) {
       nombreY += 4; // Espaciado entre líneas del mismo campo
     }
   });
-  
+
   // EXAMEN MEDICO (columna derecha)
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("EXAMEN MEDICO:", col2X, dataY);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.tipoExamen, col2X + 30, dataY);
-  
+
   // Ajustar dataY basado en la fila más larga
   const fila1MaxY = Math.max(nombreY, dataY);
   dataY = fila1MaxY + 4;
-  
+
   // === FILA 2: SOLO EMPRESA (ancho completo) ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("EMPRESA:", col1X, dataY);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Calcular ancho disponible para el texto de empresa (ancho completo)
   const empresaLabelWidth = doc.getTextWidth("EMPRESA:");
   const empresaStartX = col1X + empresaLabelWidth + 5;
   const empresaMaxWidth = pageW - margenLateral - empresaStartX - 10; // Ancho completo hasta el borde derecho
-  
+
   // Dividir el texto de empresa en líneas si es necesario
   const empresaLines = doc.splitTextToSize(datosFinales.empresa, empresaMaxWidth);
   let empresaY = dataY;
-  
+
   empresaLines.forEach((line, index) => {
     doc.text(line, empresaStartX, empresaY);
     if (index < empresaLines.length - 1) {
       empresaY += 4; // Espaciado entre líneas del mismo campo
     }
   });
-  
+
   dataY = empresaY + 4;
-  
+
   // === FILA 3: SOLO CONTRATA (ancho completo) ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("CONTRATA:", col1X, dataY);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   // Calcular ancho disponible para el texto de contrata (ancho completo)
   const contrataLabelWidth = doc.getTextWidth("CONTRATA:");
   const contrataStartX = col1X + contrataLabelWidth + 5;
   const contrataMaxWidth = pageW - margenLateral - contrataStartX - 10; // Ancho completo hasta el borde derecho
-  
+
   // Dividir el texto de contrata en líneas si es necesario
   const contrataLines = doc.splitTextToSize(datosFinales.contrata, contrataMaxWidth);
   let contrataY = dataY;
-  
+
   contrataLines.forEach((line, index) => {
     doc.text(line, contrataStartX, contrataY);
     if (index < contrataLines.length - 1) {
       contrataY += 4; // Espaciado entre líneas del mismo campo
     }
   });
-  
+
   dataY = contrataY;
-  
-  
+
+
   // restaurar fuente normal
   doc.setFont("helvetica", "normal").setFontSize(10);
   doc.setTextColor(0, 0, 0);
