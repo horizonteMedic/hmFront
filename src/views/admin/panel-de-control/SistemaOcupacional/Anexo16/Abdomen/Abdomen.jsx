@@ -129,6 +129,7 @@ export default function Abdomen({
               />
               <InputTextOneLine
                 label="Fecha"
+                type="date"
                 name="fechaRx"
                 value={form.fechaRx}
                 disabled

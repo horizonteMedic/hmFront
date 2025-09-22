@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
-import headerAnexo16Boroo from "./Headers/Header_Anexo16_Boroo.jsx";
+import headerAnexo16 from "./Headers/Header_Anexo16.jsx";
 
-export default function Anexo16Boroo(data = {}) {
+export default function Anexo16(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 0; // Sin márgenes
   const pageW = doc.internal.pageSize.getWidth();
@@ -9,12 +9,12 @@ export default function Anexo16Boroo(data = {}) {
 
   // === PÁGINA 1 ===
   // === 0) HEADER ===
-  headerAnexo16Boroo(doc, data, 1);
+  headerAnexo16(doc, data, 1);
 
-  // === 1) Imagen de fondo para Anexo16 Boroo - Página 1 ===
-  const fondoImg = "/img/Anexo16/Anexo16_Boroo_Pag1.png";
+  // === 1) Imagen de fondo para Anexo16 - Página 1 ===
+  const fondoImg = "/img/Anexo16/Anexo16_pag1.png";
 
-  // Márgenes de 6mm a cada lado (consistente con Anexo16 normal)
+  // Márgenes de 8mm a cada lado (consistente con Anexo2)
   const margenLateral = 6; // 6mm
 
   // Usar el ancho del documento menos los márgenes laterales
@@ -28,12 +28,12 @@ export default function Anexo16Boroo(data = {}) {
   try {
     doc.addImage(fondoImg, "PNG", xOffset, yOffset, imgWidth, imgHeight);
   } catch (e) {
-    doc.text("Imagen de Anexo16 Boroo Página 1 no disponible", margin, yOffset + 10);
+    doc.text("Imagen de Anexo16 Página 1 no disponible", margin, yOffset + 10);
   }
 
   // === 2) CAMPOS DE DATOS PERSONALIZABLES PARA PÁGINA 1 ===
 
-  // Datos de prueba para Anexo16 Boroo
+  // Datos de prueba para Anexo16
   const datosPrueba = {
     fechaExamen: "15/08/2025",
     mineralesExplotados: "Oro, Plata, Cobre",
@@ -201,13 +201,11 @@ export default function Anexo16Boroo(data = {}) {
             od: "20/20",
             oi: "20/20"
           }
-        }
+        },
+        colores: "NORMAL"
       },
       enfermedadesOculares: "NINGUNA",
-      reflejosPupilares: "NORMALES, ISOCÓRICAS, FOTORREACTIVAS",
-      testIshihara: "NORMAL",
-      testColoresPuros: "NORMAL",
-      testProfundidad: "NORMAL"
+      reflejosPupilares: "NORMALES, ISOCÓRICAS, FOTORREACTIVAS"
     },
     // Evaluación de oídos
     evaluacionOidos: {
@@ -218,7 +216,7 @@ export default function Anexo16Boroo(data = {}) {
           frecuencia2000: "20",
           frecuencia3000: "25",
           frecuencia4000: "10",
-          frecuencia5000: "5",
+          frecuencia6000: "5",
           frecuencia8000: "10"
         },
         oidoIzquierdo: {
@@ -227,7 +225,7 @@ export default function Anexo16Boroo(data = {}) {
           frecuencia2000: "10",
           frecuencia3000: "15",
           frecuencia4000: "10",
-          frecuencia5000: "10",
+          frecuencia6000: "10",
           frecuencia8000: "5"
         }
       },
@@ -236,8 +234,6 @@ export default function Anexo16Boroo(data = {}) {
         oidoIzquierdo: "NORMAL"
       }
     },
-    // Cardiovascular
-    cardiovascular: "CONSERVADO",
     // Signos vitales
     signosVitales: {
       frecuenciaRespiratoria: "18",
@@ -253,10 +249,10 @@ export default function Anexo16Boroo(data = {}) {
       pulmones: {
         normal: true,
         anormal: true,
-        descripcion: "AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS"
+        descripcion: "AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS,AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS"
       },
-      miembrosSuperiores: "MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES",
-      miembrosInferiores: "MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS"
+      miembrosSuperiores: "MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES,MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES,MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES,MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES",
+      miembrosInferiores: "MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS,MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS,MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS,MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS"
     },
     // Página 2 - Evaluación neurológica y física
     evaluacionNeurologica: {
@@ -275,7 +271,8 @@ export default function Anexo16Boroo(data = {}) {
       tactoRectal: {
         noSeHizo: true,
         anormal: true,
-        normal: true
+        normal: true,
+        describirEnObservacion: true
       },
       hernias: "NO",
       varices: "NO",
@@ -307,175 +304,200 @@ export default function Anexo16Boroo(data = {}) {
     // Reacciones serológicas LUES
     reaccionesSerologicasLues: {
       positivo: true,
-      negativo: false
+      negativo: true
     },
+    // Grupo sanguíneo
+    grupoSanguineo: {
+      grupo: {
+        o: true,
+        a: true,
+        b: true,
+        ab: true
+      },
+      factorRh: {
+        positivo: true,
+        negativo: true
+      }
+    },
+    // Hemoglobina/Hematocrito
+    hemoglobinaHematocrito: "13 gr. %",
     // Otros exámenes
-    otrosExamenes: "Examen de orina: NORMAL. Hemograma: NORMAL. Glicemia: 85 mg/dl.",
-    // Documento de identidad
-    docIdentidad: "76543210",
-    // Exámenes de laboratorio
-    examenesLaboratorio: {
-      // Hemograma Completo
-      vsg: "15",
-      glucosa: "85",
-      urea: "25",
-      creatinina: "0.9",
-      // Perfil Lipídico Completo
+    otrosExamenes: "Hemograma completo normal. Glicemia en ayunas: 85 mg/dl",
+    // Perfil lipídico
+    perfilLipidico: {
+      colesterolTotal: "180",
       ldl: "110",
       hdl: "45",
       vldl: "25",
-      trigliceridos: "150",
-      colesterolTotal: "180",
-      // Examen Completo de Orina
-      cocainaOrina: "NEGATIVO",
-      marihuanaOrina: "NEGATIVO",
-      mercurioOrina: "NORMAL",
-      plomoOrina: "NORMAL"
-    }
+      trigliceridos: "150"
+    },
+    // Apto para trabajar
+    aptoParaTrabajar: {
+      si: true,
+      no: true
+    },
+    // Revaluación de empresa
+    revaluacionEmpresa: true,
+    // Observaciones
+    observaciones: [
+      "1-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. .- EVALUACION ANUAL.",
+      "2-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
+      "3-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      "4-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      "5- EVALUACION POR NEUMOLOGIA",
+      "6-7-- USO DE LENTES CORRECTORES.",
+      "8-AMETROPIA LEVE BILATERAL- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.",
+      "9-- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.:EVALUACION POR OFTALMOLOGIA.",
+      "10-ODONTOGRAMA : NO PASO EXAMEN ODONTOLOGICO",
+      "AUDIOMETRIA - NORMAL - NORMAL .EVALUACION ANUAL",
+      "11-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. - EVALUACION ANUAL.",
+      "12-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
+      "1-ELECTROCARDIOGRAMA: - EVALUACION ANUAL."
+    ]
   };
   const datosReales = {
-    fechaExamen: res.fechaAnexo7c_fecha ?? "",
-    mineralesExplotados: res.mineral_mineral_po ?? "",
-    lugarFechaNacimiento: res.lugarNacimientoPaciente_lugar_nac_pa ?? "",
-    domicilioHabitual: res.direccionPaciente_direccion ?? "",
+    fechaExamen: data.fechaAnexo7c_fecha ?? "",
+    mineralesExplotados: data.mineral_mineral_po ?? "",
+    lugarFechaNacimiento: data.lugarNacimientoPaciente_lugar_nac_pa ?? "",
+    domicilioHabitual: data.direccionPaciente_direccion ?? "",
     tipoTrabajo: {
-      superficie: res.explotacion_nom_ex === "SUPERFICIE" ?? false,
-      concentrador: res.explotacion_nom_ex === "CONCENTRADOR" ?? false,
-      subsuelo: res.explotacion_nom_ex === "SUBSUELO" ?? false
+      superficie: data.explotacion_nom_ex == "SUPERFICIE",
+      concentrador: data.explotacion_nom_ex == "CONCENTRADOR",
+      subsuelo: data.explotacion_nom_ex == "SUBSUELO",
     },
     alturaLabor: {
-      debajo2500: res.altura_altura_po === "DEBAJO 2500" ?? false,
-      rango2501_4000: res.altura_altura_po === "2501 A 4000" ?? false,
-      rango2501_3000: res.altura_altura_po === "2501 A 3000" ?? false,
-      rango4001_4500: res.altura_altura_po === "4001 A 4500" ?? false,
-      rango2001_3500: res.altura_altura_po === "2001 A 3500" ?? false,
-      mas4501: res.altura_altura_po === "MAS DE 4501" ?? false
+      debajo2500: data.altura_altura_po == "DEBAJO 2500",
+      rango2501_4000: data.altura_altura_po == "2501 A 4000",
+      rango2501_3000: data.altura_altura_po == "2501 A 3000",
+      rango4001_4500: data.altura_altura_po == "4001 A 4500",
+      rango2001_3500: data.altura_altura_po == "2001 A 3500",
+      mas4501: data.altura_altura_po == "MAS DE 4501"
     },
     // Datos personales
     datosPersonales: {
-      edad: res.edad_edad ?? "",
+      edad: data.edad_edad ?? "",
       sexo: {
-        masculino: res.sexo_sexo_pa === "M" ?? false,
-        femenino: res.sexo_sexo_pa === "F" ?? false
+        masculino: data.sexo_sexo_pa === "M" ?? false,
+        femenino: data.sexo_sexo_pa === "F" ?? false
       },
-      dni: res.dni_cod_pa ?? "",
-      telefono: res.celularPaciente_cel_pa ?? "",
+      dni: String(data.dni_cod_pa ?? ""),
+      telefono: data.celularPaciente_cel_pa ?? "",
       estadoCivil: {
-        soltero: res.estadoCivilPaciente_estado_civil_pa === "SOLTERO" ?? false,
-        casado: res.estadoCivilPaciente_estado_civil_pa === "CASADO" ?? false,
-        conviviente: res.estadoCivilPaciente_estado_civil_pa === "CONVIVIENTE" ?? false,
-        viudo: res.estadoCivilPaciente_estado_civil_pa === "VIUDO" ?? false,
-        divorciado: res.estadoCivilPaciente_estado_civil_pa === "DIVORCIADO" ?? false
+        soltero: data.estadoCivilPaciente_estado_civil_pa === "SOLTERO" ?? false,
+        casado: data.estadoCivilPaciente_estado_civil_pa === "CASADO" ?? false,
+        conviviente: data.estadoCivilPaciente_estado_civil_pa === "CONVIVIENTE" ?? false,
+        viudo: data.estadoCivilPaciente_estado_civil_pa === "VIUDO" ?? false,
+        divorciado: data.estadoCivilPaciente_estado_civil_pa === "DIVORCIADO" ?? false
       },
       gradoInstruccion: {
-        analfabeto: res.nivelEstudioPaciente_nivel_est_pa === "ANALFABETO" ?? false,
-        primariaCompleta: res.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA COMPLETA" ?? false,
-        primariaIncompleta: res.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA INCOMPLETA" ?? false,
-        secundariaCompleta: res.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA COMPLETA" ?? false,
-        secundariaIncompleta: res.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA INCOMPLETA" ?? false,
-        universidad: res.nivelEstudioPaciente_nivel_est_pa === "UNIVERSIDAD" ?? false,
-        tecnico: res.nivelEstudioPaciente_nivel_est_pa === "TECNICO" ?? false
+        analfabeto: data.nivelEstudioPaciente_nivel_est_pa === "ANALFABLETO" ?? false,
+        primariaCompleta: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA COMPLETA" ?? false,
+        primariaIncompleta: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA INCOMPLETA" ?? false,
+        secundariaCompleta: data.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA COMPLETA" ?? false,
+        secundariaIncompleta: data.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA INCOMPLETA" ?? false,
+        universidad: data.nivelEstudioPaciente_nivel_est_pa === "UNIVERSIDAD" ?? false,
+        tecnico: data.nivelEstudioPaciente_nivel_est_pa === "TECNICO" ?? false
       }
     },
     // Factores de riesgo ocupacional
     factoresRiesgo: {
       // Primera columna
-      ruido: res.ruidoAnexo7c_chkruido ?? false,
-      polvo: res.polvoAnexo7c_chkpolvo ?? false,
-      vibSegmentario: res.vidSegmentarioAnexo7c_chkvidsegmentario ?? false,
-      vibTotal: res.vidTotalAnexo7c_chkvidtotal ?? false,
+      ruido: data.ruidoAnexo7c_chkruido ?? false,
+      polvo: data.polvoAnexo7c_chkpolvo ?? false,
+      vibSegmentario: data.vidSegmentarioAnexo7c_chkvidsegmentario ?? false,
+      vibTotal: data.vidTotalAnexo7c_chkvidtotal ?? false,
       // Segunda columna
-      cancerigenos: res.cancerigenosAnexo7c_chkcancerigenos ?? false,
-      mutagenicos: res.mutagenicosAnexo7c_chkmutagenicos ?? false,
-      solventes: res.solventesAnexo7c_chksolventes ?? false,
-      metales: res.metalesAnexo7c_chkmetales ?? false,
+      cancerigenos: data.cancerigenosAnexo7c_chkcancerigenos ?? false,
+      mutagenicos: data.mutagenicosAnexo7c_chkmutagenicos ?? false,
+      solventes: data.solventesAnexo7c_chksolventes ?? false,
+      metales: data.metalesAnexo7c_chkmetales ?? false,
       // Tercera columna
-      temperatura: res.temperaturaAnexo7c_chktemperatura ?? false,
-      biologicos: res.biologicosAnexo7c_chkbiologicos ?? false,
-      posturas: res.posturasAnexo7c_chkposturas ?? false,
-      turnos: res.turnosAnexo7c_chkturnos ?? false,
+      temperatura: data.temperaturaAnexo7c_chktemperatura ?? false,
+      biologicos: data.biologicosAnexo7c_chkbiologicos ?? false,
+      posturas: data.posturasAnexo7c_chkposturas ?? false,
+      turnos: data.turnosAnexo7c_chkturnos ?? false,
       // Cuarta columna
-      carga: res.cargasAnexo7c_chkcargas ?? false,
-      movRepet: res.movRepetAnexo7c_chkmovrepet ?? false,
-      pvd: res.pvdAnexo7c_chkpvd ?? false,
-      otros: res.otrosAnexo7c_chkotros ?? false
+      carga: data.cargasAnexo7c_chkcargas ?? false,
+      movRepet: data.movRepetAnexo7c_chkmovrepet ?? false,
+      pvd: data.pvdAnexo7c_chkpvd ?? false,
+      otros: data.otrosAnexo7c_chkotros ?? false
     },
     // Información del puesto
     informacionPuesto: {
-      puestoPostula: res.cargo_cargo_de ?? "",
-      puestoActual: res.puestoActualAnexo7c_txtpuestoactual ?? "",
-      tiempo: res.tiempoAnexo7c_txttiempo ?? "",
+      puestoPostula: data.cargo_cargo_de ?? "",
+      puestoActual: data.puestoActualAnexo7c_txtpuestoactual ?? "",
+      tiempo: data.tiempoAnexo7c_txttiempo ?? "",
       reubicacion: {
-        si: res.reubicacionSiAnexo7c_tbrsi ?? false,
-        no: res.reubicacionNoAnexo7c_rbrno ?? false
+        si: data.reubicacionSiAnexo7c_tbrsi ?? false,
+        no: data.reubicacionNoAnexo7c_rbrno ?? false
       }
     },
     // Antecedentes médicos
     antecedentesMedicos: {
-      personales: res.antecedentesPersonalesAnexo7c_txtantecedentespersonales ?? "",
-      familiares: res.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares ?? ""
+      personales: data.antecedentesPersonalesAnexo7c_txtantecedentespersonales ?? "",
+      familiares: data.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares ?? ""
     },
     // Inmunizaciones
     inmunizaciones: {
-      tetano: res.tetanoAnexo7c_tetano ?? false,
-      hepatitisB: res.hepatitisBAnexo7c_hepatitisb ?? false,
-      fiebreAmarilla: res.fiebreAmarillaAnexo7c_fiebreamarilla ?? false
+      tetano: data.tetanoAnexo7c_tetano ?? false,
+      hepatitisB: data.hepatitisBAnexo7c_hepatitisb ?? false,
+      fiebreAmarilla: data.fiebreAmarillaAnexo7c_fiebreamarilla ?? false
     },
     // Número de hijos
     numeroHijos: {
-      vivos: res.hijosVivosAnexo7c_txthijosvivos ?? "0",
-      muertos: res.hijosMuertosAnexo7c ?? "0"
+      vivos: data.hijosVivosAnexo7c_txthijosvivos ?? "0",
+      muertos: data.hijosMuertosAnexo7c ?? "0"
     },
     // Hábitos
     habitos: {
       tabaco: {
-        nada: res.tabacoNadaAexo7c_chktnada ?? false,
-        poco: res.tabacoPocoAnexo7c_chktpoco ?? false,
-        habitual: res.tabacoHabitualAnexo7c_chkthabitual ?? false,
-        excesivo: res.tabacoExcesivoAnexo7c_chktexcesivo ?? false
+        nada: data.tabacoNadaAexo7c_chktnada ?? false,
+        poco: data.tabacoPocoAnexo7c_chktpoco ?? false,
+        habitual: data.tabacoHabitualAnexo7c_chkthabitual ?? false,
+        excesivo: data.tabacoExcesivoAnexo7c_chktexcesivo ?? false
       },
       alcohol: {
-        nada: res.alcoholNadaAnexo7c_chkanada ?? false,
-        poco: res.alcoholPocoAnexo7c_chkapoco ?? false,
-        habitual: res.alcoholHabitualAnexo7c_chkahabitual ?? false,
-        excesivo: res.alcoholExcesivoAnexo7c_chkaexcesivo ?? false
+        nada: data.alcoholNadaAnexo7c_chkanada ?? false,
+        poco: data.alcoholPocoAnexo7c_chkapoco ?? false,
+        habitual: data.alcoholHabitualAnexo7c_chkahabitual ?? false,
+        excesivo: data.alcoholExcesivoAnexo7c_chkaexcesivo ?? false
       },
       drogas: {
-        nada: res.drogasNadaAnexo7c_chkdnada ?? false,
-        poco: res.drogasPocoAnexo7c_chkdpoco ?? false,
-        habitual: res.drogasHabitualAnexo7c_chkdhabitual ?? false,
-        excesivo: res.drogasExcesivoAnexo7c_chkdexcesivo ?? false
+        nada: data.drogasNadaAnexo7c_chkdnada ?? false,
+        poco: data.drogasPocoAnexo7c_chkdpoco ?? false,
+        habitual: data.drogasHabitualAnexo7c_chkdhabitual ?? false,
+        excesivo: data.drogasExcesivoAnexo7c_chkdexcesivo ?? false
       }
     },
     // Medidas corporales
     medidasCorporales: {
-      talla: res.tallaTriaje_talla ?? "",
-      peso: res.pesoTriaje_peso ?? "",
-      imc: res.imcTriaje_imc ?? "",
-      cintura: res.cinturaTriaje_cintura ?? "",
-      cadera: res.caderaTriaje_cadera ?? "",
-      icc: res.iccTriaje_icc ?? ""
+      talla: data.tallaTriaje_talla ?? "",
+      peso: data.pesoTriaje_peso ?? "",
+      imc: data.imcTriaje_imc ?? "",
+      cintura: data.cinturaTriaje_cintura ?? "",
+      cadera: data.caderaTriaje_cadera ?? "",
+      icc: data.iccTriaje_icc ?? ""
     },
     // Función respiratoria
     funcionRespiratoria: {
-      fvc: res.fvcFuncionRespiratoria_fvc ?? "",
-      fev1: res.fev1FuncionRespiratoria_fev1 ?? "",
-      fev1Fvc: res.fev1FvcFuncionRespiratoria_fev1fvc ?? "",
-      fef2575: res.fef2575FuncionRespiratoria_fef25_75 ?? "",
-      conclusion: res.conclusionAnexo7c_txtconclusion ?? ""
+      fvc: data.fvcFuncionRespiratoria_fvc ?? "",
+      fev1: data.fev1FuncionRespiratoria_fev1 ?? "",
+      fev1Fvc: data.fev1FvcFuncionRespiratoria_fev1fvc ?? "",
+      fef2575: data.fef2575FuncionRespiratoria_fef25_75 ?? "",
+      conclusion: data.conclusionAnexo7c_txtconclusion ?? ""
     },
     // Temperatura
-    temperatura: res.temperaturaTriaje_temperatura ?? "",
+    temperatura: data.temperaturaTriaje_temperatura ?? "",
     // Evaluación física
     evaluacionFisica: {
-      cabeza: res.cabezaAnexo7c_txtcabeza ?? "",
-      perimetroCuello: res.perimetroCuelloTriaje_perimetro_cuello ?? "",
-      bocaAmigdalas: res.baflAnexo7c_txtb_a_f_l ?? "",
-      cuello: res.cuelloAnexo7c_txtcuello ?? "",
-      nariz: res.narizAnexo7c_txtnariz ?? "",
+      cabeza: data.cabezaAnexo7c_txtcabeza ?? "",
+      perimetroCuello: data.perimetroCuelloTriaje_perimetro_cuello ?? "",
+      bocaAmigdalas: data.baflAnexo7c_txtb_a_f_l ?? "",
+      cuello: data.cuelloAnexo7c_txtcuello ?? "",
+      nariz: data.narizAnexo7c_txtnariz ?? "",
       dentadura: {
-        piezasMalEstado: res.piezasMalEstadoOdontograma_txtpiezasmalestado ?? "",
-        piezasFaltantes: res.ausentesOdontograma_txtausentes ?? ""
+        piezasMalEstado: String(data.piezasMalEstadoOdontograma_txtpiezasmalestado ?? "0"),
+        piezasFaltantes: String(data.ausentesOdontograma_txtausentes ?? "0")
       }
     },
     // Evaluación oftalmológica
@@ -483,121 +505,118 @@ export default function Anexo16Boroo(data = {}) {
       vision: {
         cerca: {
           sinCorregir: {
-            od: res.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
-            oi: res.visionCercaSinCorregirOi_v_cerca_s_oi ?? ""
+            od: data.visionCercaSinCorregirOd_v_cerca_s_od ?? "",
+            oi: data.visionCercaSinCorregirOi_v_cerca_s_oi ?? ""
           },
           corregida: {
-            od: res.odcc_odcc ?? "",
-            oi: res.oicc_oicc ?? ""
+            od: data.odcc_odcc ?? "",
+            oi: data.oicc_oicc ?? ""
           }
         },
         lejos: {
           sinCorregir: {
-            od: res.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
-            oi: res.visionLejosSinCorregirOi_v_lejos_s_oi ?? ""
+            od: data.visionLejosSinCorregirOd_v_lejos_s_od ?? "",
+            oi: data.visionLejosSinCorregirOi_v_lejos_s_oi ?? ""
           },
           corregida: {
-            od: res.odlc_odlc ?? "",
-            oi: res.oilc_oilc ?? ""
+            od: data.odlc_odlc ?? "",
+            oi: data.oilc_oilc ?? ""
           }
-        }
+        },
+        colores: data.visionColoresAnexo7c_txtvisioncolores ?? ""
       },
-      enfermedadesOculares: res.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
-      reflejosPupilares: res.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "",
-      testIshihara: res.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (res.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""), 
-      testColoresPuros: res.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (res.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""), 
-      testProfundidad: res.tecestereopsiaNormal_rbtecestereopsia_normal ? "NORMAL" : (res.tecestereopsiaAnormal_rbtecestereopsia_anormal ? "ANORMAL" : "") 
+      enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
+      reflejosPupilares: data.reflejosPupilaresAnexo7c_txtreflejospupilares ?? ""
     },
     // Evaluación de oídos
     evaluacionOidos: {
       audiometria: {
         oidoDerecho: {
-          frecuencia500: res.oidoDerecho500Audiometria_o_d_500 ?? "",
-          frecuencia1000: res.oidoDerecho1000Audiometria_o_d_1000 ?? "",
-          frecuencia2000: res.oidoDerecho2000Audiometria_o_d_2000 ?? "",
-          frecuencia3000: res.oidoDerecho3000Audiometria_o_d_3000 ?? "",
-          frecuencia4000: res.oidoDerecho4000Audiometria_o_d_4000 ?? "",
-          frecuencia5000: res.oidoDerecho6000Audiometria_o_d_6000 ?? "", //revisar - no hay campo 5000 en JSON, usando 6000
-          frecuencia8000: res.oidoDerecho8000Audiometria_o_d_8000 ?? ""
+          frecuencia500: data.oidoDerecho500Audiometria_o_d_500 ?? "",
+          frecuencia1000: data.oidoDerecho1000Audiometria_o_d_1000 ?? "",
+          frecuencia2000: data.oidoDerecho2000Audiometria_o_d_2000 ?? "",
+          frecuencia3000: data.oidoDerecho3000Audiometria_o_d_3000 ?? "",
+          frecuencia4000: data.oidoDerecho4000Audiometria_o_d_4000 ?? "",
+          frecuencia6000: data.oidoDerecho6000Audiometria_o_d_6000 ?? "",
+          frecuencia8000: data.oidoDerecho8000Audiometria_o_d_8000 ?? "",
         },
         oidoIzquierdo: {
-          frecuencia500: res.oidoIzquierdo500Audiometria_o_i_500 ?? "",
-          frecuencia1000: res.oidoIzquierdo1000Audiometria_o_i_1000 ?? "",
-          frecuencia2000: res.oidoIzquierdo2000Audiometria_o_i_2000 ?? "",
-          frecuencia3000: res.oidoIzquierdo3000Audiometria_o_i_3000 ?? "",
-          frecuencia4000: res.oidoIzquierdo4000Audiometria_o_i_4000 ?? "",
-          frecuencia5000: res.oidoIzquierdo6000Audiometria_o_i_6000 ?? "", //revisar - no hay campo 5000 en JSON, usando 6000
-          frecuencia8000: res.oidoIzquierdo8000Audiometria_o_i_8000 ?? ""
+          frecuencia500: data.oidoIzquierdo500Audiometria_o_i_500 ?? "",
+          frecuencia1000: data.oidoIzquierdo1000Audiometria_o_i_1000 ?? "",
+          frecuencia2000: data.oidoIzquierdo2000Audiometria_o_i_2000 ?? "",
+          frecuencia3000: data.oidoIzquierdo3000Audiometria_o_i_3000 ?? "",
+          frecuencia4000: data.oidoIzquierdo4000Audiometria_o_i_4000 ?? "",
+          frecuencia6000: data.oidoIzquierdo6000Audiometria_o_i_6000 ?? "",
+          frecuencia8000: data.oidoIzquierdo8000Audiometria_o_i_8000 ?? "",
         }
       },
       otoscopia: {
-        oidoDerecho: res.odAnexo7c_txtod ?? "",
-        oidoIzquierdo: res.oiAnexo7c_txtoi ?? ""
+        oidoDerecho: data.odAnexo7c_txtod ?? "",
+        oidoIzquierdo: data.oiAnexo7c_txtoi ?? ""
       }
     },
-    // Cardiovascular
-    cardiovascular: res.corazonAnexo7c_txtcorazon ?? "",
     // Signos vitales
     signosVitales: {
-      frecuenciaRespiratoria: res.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
-      frecuenciaCardiaca: res.frecuenciaCardiacaTriaje_f_cardiaca ?? "",
-      saturacionOxigeno: res.saturacionOxigenoTriaje_sat_02 ?? "",
+      frecuenciaRespiratoria: data.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
+      frecuenciaCardiaca: data.frecuenciaCardiacaTriaje_f_cardiaca ?? "",
+      saturacionOxigeno: data.saturacionOxigenoTriaje_sat_02 ?? "",
       presionArterial: {
-        sistolica: res.sistolicaTriaje_sistolica ?? "",
-        diastolica: res.diastolicaTriaje_diastolica ?? ""
+        sistolica: data.sistolicaTriaje_sistolica ?? "",
+        diastolica: data.diastolicaTriaje_diastolica ?? ""
       }
     },
     // Evaluación física adicional
     evaluacionFisicaAdicional: {
       pulmones: {
-        normal: res.pulmonesNormalAnexo7c_rbnormal ?? false,
-        anormal: res.pulmonesAnormalAnexo7c_rbanormal ?? false,
-        descripcion: res.pulmonesDescripcionAnexo7c_txtpulmones ?? ""
+        normal: data.pulmonesNormalAnexo7c_rbnormal ?? false,
+        anormal: data.pulmonesAnormalAnexo7c_rbanormal ?? false,
+        descripcion: data.pulmonesDescripcionAnexo7c_txtpulmones ?? ""
       },
-      miembrosSuperiores: res.miembrosSuperioresAnexo7c_txtmiembrossuperiores ?? "",
-      miembrosInferiores: res.miembrosInferioresAnexo7c_txtmiembrosinferiores ?? ""
+      miembrosSuperiores: data.miembrosSuperioresAnexo7c_txtmiembrossuperiores ?? "",
+      miembrosInferiores: data.miembrosInferioresAnexo7c_txtmiembrosinferiores ?? ""
     },
     // Página 2 - Evaluación neurológica y física
     evaluacionNeurologica: {
-      reflejosOsteotendinosos: res.reflejosOsteotendinososAnexo7c_txtreflejososteotendinosos ?? "",
-      marcha: res.marchaAnexo7c_txtmarcha ?? ""
+      reflejosOsteotendinosos: data.reflejosOsteotendinososAnexo7c_txtreflejososteotendinosos ?? "",
+      marcha: data.marchaAnexo7c_txtmarcha ?? ""
     },
     // Evaluación de columna y abdomen
     evaluacionColumnaAbdomen: {
-      columnaVertebral: res.columnaVertebralAnexo7c_txtcolumnavertebral ?? "",
-      abdomen: res.abdomenAnexo7c_txtabdomen ?? "",
-      anillosInguinales: res.anillosInguinalesAnexo7c_txtanillosinguinales ?? "",
-      organosGenitales: res.organosGenitalesAnexo7c_txtorganosgenitales ?? ""
+      columnaVertebral: data.columnaVertebralAnexo7c_txtcolumnavertebral ?? "",
+      abdomen: data.abdomenAnexo7c_txtabdomen ?? "",
+      anillosInguinales: data.anillosInguinalesAnexo7c_txtanillosinguinales ?? "",
+      organosGenitales: data.organosGenitalesAnexo7c_txtorganosgenitales ?? ""
     },
     // Evaluación rectal y hernias
     evaluacionRectalHernias: {
       tactoRectal: {
-        noSeHizo: res.tactoRectalNoHizoAnexo7c_rbtnohizo ?? false,
-        anormal: res.tactoRectalAnormalAnexo7c_rbtanormal ?? false,
-        normal: res.tactoRectalNormalAnexo7c_rbtnormal ?? false
+        noSeHizo: data.tactoRectalNoHizoAnexo7c_rbtnohizo ?? false,
+        anormal: data.tactoRectalAnormalAnexo7c_rbtanormal ?? false,
+        normal: data.tactoRectalNormalAnexo7c_rbtnormal ?? false,
+        describirEnObservacion: data.describirObservacionAnexo7c_chkdescribirobservacion ?? false
       },
-      hernias: res.herniasAnexo7c_txthernias ?? "",
-      varices: res.varicesAnexo7c_txtvarices ?? "",
-      gangliosLinfaticos: res.gangliosAnexo7c_txtganglios ?? ""
+      hernias: data.herniasAnexo7c_txthernias ?? "",
+      varices: data.varicesAnexo7c_txtvarices ?? "",
+      gangliosLinfaticos: data.gangliosAnexo7c_txtganglios ?? ""
     },
     // Evaluación mental
     evaluacionMental: {
-      lenguajeAtencionMemoria: res.lenguageAnexo7c_txtlenguage ?? "",
-      anamnesis: res.anamnesisAnexo7c_txtanamnesis ?? "",
-      estadoMental: res.estadoMentalAnexo7c_txtestadomental ?? ""
+      lenguajeAtencionMemoria: data.lenguageAnexo7c_txtlenguage ?? "",
+      anamnesis: data.anamnesisAnexo7c_txtanamnesis ?? "",
+      estadoMental: data.estadoMentalAnexo7c_txtestadomental ?? ""
     },
     // Radiografía de tórax
     radiografiaTorax: {
-      numeroRx: res.nrx_n_rx ?? "",
-      fecha: res.fechaExamenRadiografico_fecha_exra ?? "",
-      calidad: res.calidadExamenRadiografico_txtcalidad ?? "",
-      simbolos: res.simbolosExamenRadiografico_txtsimbolos ?? "",
-      vertices: res.verticesRadiografiaTorax_txtvertices ?? "",
-      hilios: res.hilosRadiografiaTorax_txthilios ?? "",
-      senos: res.senosCostoFrenicos_txtsenoscostofrenicos ?? "",
-      mediastinos: res.meadiastinos_txtmediastinos ?? "",
-      conclusionesRadiograficas: res.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
-      siluetaCardiovascular: res.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
+      numeroRx: String(data.nrx_n_rx ?? ""),
+      fecha: data.fechaExamenRadiografico_fecha_exra ?? "",
+      calidad: data.calidadExamenRadiografico_txtcalidad ?? "",
+      simbolos: data.simbolosExamenRadiografico_txtsimbolos ?? "",
+      vertices: data.verticesRadiografiaTorax_txtvertices ?? "",
+      hilios: data.hilosRadiografiaTorax_txthilios ?? "",
+      senos: data.senosCostoFrenicos_txtsenoscostofrenicos ?? "",
+      mediastinos: data.meadiastinos_txtmediastinos ?? "",
+      conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
+      siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
     },
     // Reacciones serológicas
     reaccionesSerologicas: {
@@ -605,32 +624,45 @@ export default function Anexo16Boroo(data = {}) {
     },
     // Reacciones serológicas LUES
     reaccionesSerologicasLues: {
-      positivo: res.positivoLaboratorioClinico_chkpositivo ?? false,
-      negativo: res.negativoLaboratorioClinico_chknegativo ?? false
+      positivo: data.positivoLaboratorioClinico_chkpositivo ?? false,
+      negativo: data.negativoLaboratorioClinico_chknegativo ?? false
     },
+    // Grupo sanguíneo
+    grupoSanguineo: {
+      grupo: {
+        o: data.grupoSanguineoO_chko ?? false,
+        a: data.grupoSanguineoA_chka ?? false,
+        b: data.grupoSanguineoB_chkb ?? false,
+        ab: data.grupoSanguineoAB_chkab ?? false
+      },
+      factorRh: {
+        positivo: data.grupoSanguineoRhPositivo_rbrhpositivo ?? false,
+        negativo: data.grupoSanguineoRhNegativo_rbrhnegativo ?? false
+      }
+    },
+    // Hemoglobina/Hematocrito
+    hemoglobinaHematocrito: data.hemoglobina_txthemoglobina ?? "",
     // Otros exámenes
-    otrosExamenes: res.examenRadiograficoOtros_txtotrosex ?? "",
-    // Documento de identidad
-    docIdentidad: res.dni_cod_pa ?? "", 
-    // Exámenes de laboratorio
-    examenesLaboratorio: {
-      // Hemograma Completo
-      vsg: res.vsgLaboratorioClinico_txtvsg ?? "",
-      glucosa: res.glucosaLaboratorioClinico_txtglucosabio ?? "",
-      urea: "N/A", //revisar - no hay campo específico en JSON
-      creatinina: res.creatininaLaboratorioClinico_txtcreatininabio ?? "",
-      // Perfil Lipídico Completo
-      ldl: res.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
-      hdl: res.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "",
-      vldl: res.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "",
-      trigliceridos: res.trigliceridosAnalisisBioquimico_txttrigliceridos ?? "",
-      colesterolTotal: res.colesterolAnalisisBioquimico_txtcolesterol ?? "",
-      // Examen Completo de Orina
-      cocainaOrina: res.cocainaLaboratorioClinico_txtcocaina ?? "",
-      marihuanaOrina: res.marihuanaLaboratorioClinico_txtmarihuana ?? "",
-      mercurioOrina: "N/A", //revisar - no hay campo específico en JSON
-      plomoOrina: "N/A" //revisar - no hay campo específico en JSON
-    }
+    otrosExamenes: data.examenRadiograficoOtros_txtotrosex ?? "",
+    // Perfil lipídico
+    perfilLipidico: {
+      colesterolTotal: data.colesterolAnalisisBioquimico_txtcolesterol ?? "",
+      ldl: data.ldlcolesterolAnalisisBioquimico_txtldlcolesterol ?? "",
+      hdl: data.hdlcolesterolAnalisisBioquimico_txthdlcolesterol ?? "",
+      vldl: data.vldlcolesterolAnalisisBioquimico_txtvldlcolesterol ?? "",
+      trigliceridos: data.trigliceridosAnalisisBioquimico_txttrigliceridos ?? ""
+    },
+    // Apto para trabajar
+    aptoParaTrabajar: {
+      si: data.examenRadiograficoAptoSi_apto_si ?? false,
+      no: data.examenRadiograficoAptoNo_apto_no ?? false
+    },
+    // Revaluación de empresa
+    revaluacionEmpresa: data.examenRadiograficoAptoRe_apto_re ?? false,
+    // Observaciones
+    observaciones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm
+      ? data.observacionesFichaMedicaAnexo7c_txtobservacionesfm.split('\n').filter(obs => obs.trim() !== '')
+      : []
   };
 
   // Usar datos de prueba por ahora
@@ -675,7 +707,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // Columna 3: TIPO DE TRABAJO - Checkboxes (SUPERFICIE, CONCENTRADOR, SUBSUELO)
   const tipoTrabajoPosiciones = [
-    { tipo: "superficie", x: 128, y: 47, texto: "SUPERFICIE" },
+    { tipo: "superficie", x: 128, y: 46, texto: "SUPERFICIE" },
     { tipo: "concentrador", x: 128, y: 54, texto: "CONCENTRADOR" },
     { tipo: "subsuelo", x: 128, y: 61, texto: "SUBSUELO" }
   ];
@@ -719,16 +751,11 @@ export default function Anexo16Boroo(data = {}) {
   // === SECCIÓN: DATOS PERSONALES ===
   // EDAD
   const xEdad = 11;
-  const yEdad = 74;
+  const yEdad = 73.5;
   if (datosFinales.datosPersonales && datosFinales.datosPersonales.edad) {
-    doc.setFont("helvetica", "normal").setFontSize(10);
+    doc.setFont("helvetica", "normal").setFontSize(11);
     doc.setTextColor(0, 0, 0);
-    // Número de edad centrado
-    doc.text(datosFinales.datosPersonales.edad, xEdad, yEdad, { align: 'center' });
-
-    // "Años" centrado abajo
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Años", xEdad, yEdad + 3, { align: 'center' });
+    doc.text(datosFinales.datosPersonales.edad, xEdad, yEdad);
   }
 
   // SEXO - Checkboxes
@@ -856,35 +883,35 @@ export default function Anexo16Boroo(data = {}) {
   // === SECCIÓN: INFORMACIÓN DEL PUESTO ===
   // Puesto al que Postula
   const xPuestoPostula = 155;
-  const yPuestoPostula = 88;
+  const yPuestoPostula = 89;
   if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.puestoPostula) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.informacionPuesto.puestoPostula.toUpperCase(), xPuestoPostula, yPuestoPostula);
   }
 
   // Puesto Actual
   const xPuestoActual = 155;
-  const yPuestoActual = 93;
+  const yPuestoActual = 94;
   if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.puestoActual) {
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.informacionPuesto.puestoActual.toUpperCase(), xPuestoActual, yPuestoActual);
   }
 
   // Tiempo
   const xTiempo = 155;
-  const yTiempo = 98.5;
+  const yTiempo = 99;
   if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.tiempo) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.informacionPuesto.tiempo.toUpperCase(), xTiempo, yTiempo);
   }
 
   // Reubicación - Checkboxes
   const reubicacionPosiciones = [
-    { tipo: "si", x: 173, y: 104, texto: "SI" },
-    { tipo: "no", x: 190, y: 104, texto: "NO" }
+    { tipo: "si", x: 148.5, y: 104, texto: "SI" },
+    { tipo: "no", x: 165, y: 104, texto: "NO" }
   ];
 
   if (datosFinales.informacionPuesto && datosFinales.informacionPuesto.reubicacion) {
@@ -918,6 +945,7 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.antecedentesMedicos.familiares.toUpperCase(), xAntecedentesFamiliares, yAntecedentesFamiliares, { maxWidth: 70 });
   }
+
 
   // === SECCIÓN: INMUNIZACIONES ===
   const inmunizacionesPosiciones = [
@@ -1122,7 +1150,7 @@ export default function Anexo16Boroo(data = {}) {
   const xBocaAmigdalas = 15;
   const yBocaAmigdalas = 183;
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.bocaAmigdalas) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.evaluacionFisica.bocaAmigdalas.toUpperCase(), xBocaAmigdalas, yBocaAmigdalas, { maxWidth: 60 });
   }
@@ -1151,7 +1179,7 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.dentadura && datosFinales.evaluacionFisica.dentadura.piezasMalEstado) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.dentadura.piezasMalEstado.toUpperCase(), xPiezasMalEstado, yPiezasMalEstado, { maxWidth: 60 });
+    doc.text(datosFinales.evaluacionFisica.dentadura.piezasMalEstado, xPiezasMalEstado, yPiezasMalEstado, { maxWidth: 60 });
   }
 
   // DENTADURA - Piezas que faltan
@@ -1160,7 +1188,7 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.dentadura && datosFinales.evaluacionFisica.dentadura.piezasFaltantes) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.dentadura.piezasFaltantes.toUpperCase(), xPiezasFaltantes, yPiezasFaltantes, { maxWidth: 60 });
+    doc.text(datosFinales.evaluacionFisica.dentadura.piezasFaltantes, xPiezasFaltantes, yPiezasFaltantes, { maxWidth: 60 });
   }
 
   // === SECCIÓN: EVALUACIÓN OFTALMOLÓGICA (OJOS) ===
@@ -1232,6 +1260,15 @@ export default function Anexo16Boroo(data = {}) {
     doc.text(datosFinales.evaluacionOftalmologica.vision.lejos.corregida.oi.toUpperCase(), xVisionLejosCorregidaOI, yVisionLejosCorregidaOI);
   }
 
+  // VISIÓN DE COLORES
+  const xVisionColores = 70;
+  const yVisionColores = 216;
+  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.vision && datosFinales.evaluacionOftalmologica.vision.colores) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.evaluacionOftalmologica.vision.colores.toUpperCase(), xVisionColores, yVisionColores, { align: 'center' });
+  }
+
   // ENFERMEDADES OCULARES
   const xEnfermedadesOculares = 110;
   const yEnfermedadesOculares = 195;
@@ -1242,40 +1279,12 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // REFLEJOS PUPILARES
-  const xReflejosPupilares = 135;
-  const yReflejosPupilares = 210;
+  const xReflejosPupilares = 141;
+  const yReflejosPupilares = 216;
   if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.reflejosPupilares) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.evaluacionOftalmologica.reflejosPupilares.toUpperCase(), xReflejosPupilares, yReflejosPupilares, { maxWidth: 100 });
-  }
-
-  // === SECCIÓN: TESTS DE VISIÓN ===
-  // TEST DE ISHIHARA
-  const xTestIshihara = 64;
-  const yTestIshihara = 216.5;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.testIshihara) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.testIshihara.toUpperCase(), xTestIshihara, yTestIshihara);
-  }
-
-  // TEST DE COLORES PUROS
-  const xTestColoresPuros = 120;
-  const yTestColoresPuros = 216.5;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.testColoresPuros) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.testColoresPuros.toUpperCase(), xTestColoresPuros, yTestColoresPuros);
-  }
-
-  // TEST DE PROFUNDIDAD
-  const xTestProfundidad = 178;
-  const yTestProfundidad = 216.5;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.testProfundidad) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionOftalmologica.testProfundidad.toUpperCase(), xTestProfundidad, yTestProfundidad);
   }
 
   // === SECCIÓN: EVALUACIÓN DE OÍDOS ===
@@ -1286,7 +1295,7 @@ export default function Anexo16Boroo(data = {}) {
     { frecuencia: "frecuencia2000", x: 52, y: 233, valor: "20" },
     { frecuencia: "frecuencia3000", x: 63, y: 233, valor: "25" },
     { frecuencia: "frecuencia4000", x: 74, y: 233, valor: "10" },
-    { frecuencia: "frecuencia5000", x: 85, y: 233, valor: "5" },
+    { frecuencia: "frecuencia6000", x: 85, y: 233, valor: "5" },
     { frecuencia: "frecuencia8000", x: 97, y: 233, valor: "10" }
   ];
 
@@ -1308,7 +1317,7 @@ export default function Anexo16Boroo(data = {}) {
     { frecuencia: "frecuencia2000", x: 151, y: 233, valor: "10" },
     { frecuencia: "frecuencia3000", x: 163, y: 233, valor: "15" },
     { frecuencia: "frecuencia4000", x: 173, y: 233, valor: "10" },
-    { frecuencia: "frecuencia5000", x: 185, y: 233, valor: "10" },
+    { frecuencia: "frecuencia6000", x: 185, y: 233, valor: "10" },
     { frecuencia: "frecuencia8000", x: 197, y: 233, valor: "5" }
   ];
 
@@ -1339,62 +1348,6 @@ export default function Anexo16Boroo(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.evaluacionOidos.otoscopia.oidoIzquierdo.toUpperCase(), xOtoscopiaOidoIzquierdo, yOtoscopiaOidoIzquierdo);
-  }
-
-  // === SECCIÓN: CARDIOVASCULAR ===
-  const xCardiovascular = 40;
-  const yCardiovascular = 251;
-  if (datosFinales.cardiovascular) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.cardiovascular.toUpperCase(), xCardiovascular, yCardiovascular, { maxWidth: 100 });
-  }
-
-  // === SECCIÓN: PULMONES ===
-  // PULMONES - Checkboxes
-  const pulmonesPosiciones = [
-    { tipo: "normal", x: 43.7, y: 259.5, texto: "Normal" },
-    { tipo: "anormal", x: 74.2, y: 259.5, texto: "Anormal" }
-  ];
-
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
-    doc.setFont("helvetica", "bold").setFontSize(12);
-
-    pulmonesPosiciones.forEach(pos => {
-      if (datosFinales.evaluacionFisicaAdicional.pulmones[pos.tipo]) {
-        doc.text("X", pos.x, pos.y);
-      }
-    });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
-  }
-
-  // PULMONES - Descripción
-  const xPulmonesDescripcion = 30;
-  const yPulmonesDescripcion = 264;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones && datosFinales.evaluacionFisicaAdicional.pulmones.descripcion) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.pulmones.descripcion.toUpperCase(), xPulmonesDescripcion, yPulmonesDescripcion, { maxWidth: 160 });
-  }
-
-  // === SECCIÓN: MIEMBROS SUPERIORES ===
-  const xMiembrosSuperiores = 40;
-  const yMiembrosSuperiores = 271;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.miembrosSuperiores) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.miembrosSuperiores.toUpperCase(), xMiembrosSuperiores, yMiembrosSuperiores, { maxWidth: 160 });
-  }
-
-  // === SECCIÓN: MIEMBROS INFERIORES ===
-  const xMiembrosInferiores = 40;
-  const yMiembrosInferiores = 281;
-  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.miembrosInferiores) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.miembrosInferiores.toUpperCase(), xMiembrosInferiores, yMiembrosInferiores, { maxWidth: 160 });
   }
 
   // === SECCIÓN: SIGNOS VITALES ===
@@ -1443,16 +1396,63 @@ export default function Anexo16Boroo(data = {}) {
     doc.text(datosFinales.signosVitales.presionArterial.diastolica, xPresionDiastolica, yPresionDiastolica, { align: 'center' });
   }
 
+  // === SECCIÓN: EVALUACIÓN FÍSICA ADICIONAL ===
+  // PULMONES - Checkboxes
+  const pulmonesPosiciones = [
+    { tipo: "normal", x: 43.7, y: 259.5, texto: "Normal" },
+    { tipo: "anormal", x: 74.2, y: 259.5, texto: "Anormal" }
+  ];
+
+  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    pulmonesPosiciones.forEach(pos => {
+      if (datosFinales.evaluacionFisicaAdicional.pulmones[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // PULMONES - Descripción
+  const xPulmonesDescripcion = 30;
+  const yPulmonesDescripcion = 264;
+  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones && datosFinales.evaluacionFisicaAdicional.pulmones.descripcion) {
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.evaluacionFisicaAdicional.pulmones.descripcion.toUpperCase(), xPulmonesDescripcion, yPulmonesDescripcion, { maxWidth: 160 });
+  }
+
+  // MIEMBROS SUPERIORES
+  const xMiembrosSuperiores = 40;
+  const yMiembrosSuperiores = 270.5;
+  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.miembrosSuperiores) {
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.evaluacionFisicaAdicional.miembrosSuperiores.toUpperCase(), xMiembrosSuperiores, yMiembrosSuperiores, { maxWidth: 160 });
+  }
+
+  // MIEMBROS INFERIORES
+  const xMiembrosInferiores = 40;
+  const yMiembrosInferiores = 280.5;
+  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.miembrosInferiores) {
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.evaluacionFisicaAdicional.miembrosInferiores.toUpperCase(), xMiembrosInferiores, yMiembrosInferiores, { maxWidth: 160 });
+  }
+
   // === PÁGINA 2 ===
   doc.addPage();
 
   // === 0) HEADER para Página 2 ===
-  headerAnexo16Boroo(doc, data, 2);
+  headerAnexo16(doc, data, 2);
 
-  // === 1) Imagen de fondo para Anexo16 Boroo - Página 2 ===
-  const fondoImg2 = "/img/Anexo16/Anexo16_Boroo_Pag2.png";
+  // === 1) Imagen de fondo para Anexo16 - Página 2 ===
+  const fondoImg2 = "/img/Anexo16/Anexo16_pag2.png";
 
-  // Márgenes de 6mm a cada lado (usar la misma variable de la página 1)
+  // Márgenes de 8mm a cada lado (usar la misma variable de la página 1)
   const margenLateral2 = 6; // 6mm
 
   // Usar el ancho del documento menos los márgenes laterales
@@ -1466,7 +1466,7 @@ export default function Anexo16Boroo(data = {}) {
   try {
     doc.addImage(fondoImg2, "PNG", xOffset2, yOffset2, imgWidth2, imgHeight2);
   } catch (e) {
-    doc.text("Imagen de Anexo16 Boroo Página 2 no disponible", margin, yOffset2 + 10);
+    doc.text("Imagen de Anexo16 Página 2 no disponible", margin, yOffset2 + 10);
   }
 
   // === 2) CAMPOS DE DATOS PERSONALIZABLES PARA PÁGINA 2 ===
@@ -1559,7 +1559,8 @@ export default function Anexo16Boroo(data = {}) {
   const tactoRectalPosiciones = [
     { tipo: "noSeHizo", x: 136.4, y: 60, texto: "NO SE HIZO" },
     { tipo: "anormal", x: 189, y: 60, texto: "ANORMAL" },
-    { tipo: "normal", x: 136.4, y: 65.2, texto: "NORMAL" }
+    { tipo: "normal", x: 136.4, y: 65.2, texto: "NORMAL" },
+    { tipo: "describirEnObservacion", x: 189, y: 65.2, texto: "DESCRIBIR EN OBSERVACIÓN" }
   ];
 
   if (datosFinales.evaluacionRectalHernias && datosFinales.evaluacionRectalHernias.tactoRectal) {
@@ -1574,7 +1575,6 @@ export default function Anexo16Boroo(data = {}) {
 
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
-
   // === SECCIÓN: EVALUACIÓN MENTAL ===
   // LENGUAJE, ATENCIÓN, MEMORIA, INTELIGENCIA, ORIENTACIÓN, AFECTIVIDAD
   const xLenguajeAtencionMemoria = 15;
@@ -1587,7 +1587,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // ANAMNESIS
   const xAnamnesis = 27;
-  const yAnamnesis = 98;
+  const yAnamnesis = 99;
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.anamnesis) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
@@ -1596,7 +1596,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // ESTADO MENTAL
   const xEstadoMental = 35;
-  const yEstadoMental = 102;
+  const yEstadoMental = 103.1;
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.estadoMental) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
@@ -1606,7 +1606,7 @@ export default function Anexo16Boroo(data = {}) {
   // === SECCIÓN: RADIOGRAFÍA DE TÓRAX ===
   // N° RX
   const xNumeroRx = 26;
-  const yNumeroRx = 109;
+  const yNumeroRx = 111;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.numeroRx) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1615,7 +1615,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // FECHA
   const xFechaRx = 26;
-  const yFechaRx = 114;
+  const yFechaRx = 116;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.fecha) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1624,7 +1624,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // CALIDAD
   const xCalidad = 26;
-  const yCalidad = 118.5;
+  const yCalidad = 121;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.calidad) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1633,7 +1633,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // SÍMBOLOS
   const xSimbolos = 26;
-  const ySimbolos = 123.5;
+  const ySimbolos = 125.5;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.simbolos) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1642,7 +1642,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // VÉRTICES
   const xVertices = 95;
-  const yVertices = 108;
+  const yVertices = 110;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.vertices) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1651,7 +1651,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // HILIOS NORMALES
   const xHilios = 95;
-  const yHilios = 117.2;
+  const yHilios = 116;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.hilios) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1660,7 +1660,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // SENOS
   const xSenos = 94.5;
-  const ySenos = 121.7;
+  const ySenos = 122;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.senos) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1669,7 +1669,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // MEDIASTINOS
   const xMediastinos = 170;
-  const yMediastinos = 113;
+  const yMediastinos = 115;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.mediastinos) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1677,8 +1677,8 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // CONCLUSIONES RADIOGRÁFICAS
-  const xConclusionesRadiograficas = 84;
-  const yConclusionesRadiograficas = 130;
+  const xConclusionesRadiograficas = 85;
+  const yConclusionesRadiograficas = 132;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.conclusionesRadiograficas) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1686,8 +1686,8 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // SILUETA CARDIOVASCULAR
-  const xSiluetaCardiovascular = 150;
-  const ySiluetaCardiovascular = 123;
+  const xSiluetaCardiovascular = 155;
+  const ySiluetaCardiovascular = 126;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.siluetaCardiovascular) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
@@ -1695,20 +1695,20 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // === SECCIÓN: REACCIONES SEROLÓGICAS ===
-  // TITULACIÓN - Checkboxes (Clasificación ILO)
+  // TITULACIÓN - Checkboxes
   const titulacionPosiciones = [
-    { titulo: "0/0", x: 12, y: 136.7, marcado: true },
-    { titulo: "1/0", x: 28.5, y: 136.7, marcado: true },
-    { titulo: "1/1", x: 40.2, y: 136.7, marcado: true },
-    { titulo: "1/2", x: 49.5, y: 136.7, marcado: true },
-    { titulo: "2/1", x: 59, y: 136.7, marcado: true },
-    { titulo: "2/2", x: 69, y: 136.7, marcado: true },
-    { titulo: "2/3", x: 79, y: 136.7, marcado: true },
-    { titulo: "3/2", x: 89, y: 136.7, marcado: true },
-    { titulo: "3/3", x: 98.5, y: 136.7, marcado: true },
-    { titulo: "3/+", x: 108.5, y: 136.7, marcado: true },
-    { titulo: "A,B,C", x: 122, y: 136.7, marcado: true },
-    { titulo: "St", x: 136, y: 136.7, marcado: true }
+    { titulo: "0/0", x: 12, y: 138.6, marcado: true },
+    { titulo: "1/0", x: 28.5, y: 138.6, marcado: true },
+    { titulo: "1/1", x: 40.2, y: 138.6, marcado: true },
+    { titulo: "1/2", x: 49.5, y: 138.6, marcado: true },
+    { titulo: "2/1", x: 59, y: 138.6, marcado: true },
+    { titulo: "2/2", x: 69, y: 138.6, marcado: true },
+    { titulo: "2/3", x: 79, y: 138.6, marcado: true },
+    { titulo: "3/2", x: 89, y: 138.6, marcado: true },
+    { titulo: "3/3", x: 98.5, y: 138.6, marcado: true },
+    { titulo: "3/+", x: 108.5, y: 138.6, marcado: true },
+    { titulo: "A,B,C", x: 122, y: 138.4, marcado: true },
+    { titulo: "St", x: 136, y: 138.6, marcado: true }
   ];
 
   if (datosFinales.reaccionesSerologicas && datosFinales.reaccionesSerologicas.titulacion) {
@@ -1724,10 +1724,61 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
+
+  // === SECCIÓN: GRUPO SANGUÍNEO ===
+  // GRUPO SANGUÍNEO - Checkboxes
+  const grupoSanguineoPosiciones = [
+    { tipo: "o", x: 21, y: 176, texto: "O" },
+    { tipo: "a", x: 33.3, y: 176, texto: "A" },
+    { tipo: "b", x: 46.4, y: 176, texto: "B" },
+    { tipo: "ab", x: 58.2, y: 176, texto: "AB" }
+  ];
+
+  if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.grupo) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    grupoSanguineoPosiciones.forEach(pos => {
+      if (datosFinales.grupoSanguineo.grupo[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // FACTOR RH - Checkboxes
+  const factorRhPosiciones = [
+    { tipo: "negativo", x: 75.4, y: 176, texto: "Rh(-)" },
+    { tipo: "positivo", x: 93, y: 176, texto: "Rh(+)" }
+  ];
+
+  if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.factorRh) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    factorRhPosiciones.forEach(pos => {
+      if (datosFinales.grupoSanguineo.factorRh[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
+  // === SECCIÓN: HEMOGLOBINA/HEMATOCRITO ===
+  const xHemoglobinaHematocrito = 109;
+  const yHemoglobinaHematocrito = 175;
+  if (datosFinales.hemoglobinaHematocrito) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(255, 0, 0); // Color rojo como en la imagen
+    doc.text(datosFinales.hemoglobinaHematocrito.toUpperCase(), xHemoglobinaHematocrito, yHemoglobinaHematocrito);
+  }
+
   // === SECCIÓN: REACCIONES SEROLÓGICAS LUES ===
   const reaccionesSerologicasLuesPosiciones = [
-    { tipo: "positivo", x: 166.1, y: 142, texto: "POSITIVO" },
-    { tipo: "negativo", x: 193, y: 142, texto: "NEGATIVO" }
+    { tipo: "positivo", x: 166.5, y: 143.5, texto: "POSITIVO" },
+    { tipo: "negativo", x: 193, y: 143.5, texto: "NEGATIVO" }
   ];
 
   if (datosFinales.reaccionesSerologicasLues) {
@@ -1743,7 +1794,7 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
-  // === SECCIÓN: OTROS EXAMENES ===
+  // === SECCIÓN: OTROS EXÁMENES ===
   const xOtrosExamenes = 145.5;
   const yOtrosExamenes = 154;
   if (datosFinales.otrosExamenes) {
@@ -1752,150 +1803,143 @@ export default function Anexo16Boroo(data = {}) {
     doc.text(datosFinales.otrosExamenes.toUpperCase(), xOtrosExamenes, yOtrosExamenes, { maxWidth: 55 });
   }
 
-  // === SECCIÓN: EXAMENES DE LABORATORIO ===
-  // === HEMOGRAMA COMPLETO ===
-  // VSG
-  const xVsg = 25;
-  const yVsg = 170.5;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.vsg) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+  // === SECCIÓN: PERFIL LIPÍDICO ===
+  // Colesterol Total
+  const xColesterolTotal = 167;
+  const yColesterolTotal = 206;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.colesterolTotal) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.vsg.toUpperCase(), xVsg, yVsg);
+    doc.text(datosFinales.perfilLipidico.colesterolTotal, xColesterolTotal, yColesterolTotal);
   }
 
-  // Glucosa
-  const xGlucosa = 25;
-  const yGlucosa = 175;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.glucosa) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+  // LDL
+  const xLdl = 167;
+  const yLdl = 210;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.ldl) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.glucosa.toUpperCase(), xGlucosa, yGlucosa);
+    doc.text(datosFinales.perfilLipidico.ldl, xLdl, yLdl);
   }
 
-  // Úrea
-  const xUrea = 25;
-  const yUrea = 179;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.urea) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+  // HDL
+  const xHdl = 167;
+  const yHdl = 214;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.hdl) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.urea.toUpperCase(), xUrea, yUrea);
+    doc.text(datosFinales.perfilLipidico.hdl, xHdl, yHdl);
   }
 
-  // Creatinina
-  const xCreatinina = 25;
-  const yCreatinina = 183.1;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.creatinina) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+  // VLDL
+  const xVldl = 167;
+  const yVldl = 218;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.vldl) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.creatinina.toUpperCase(), xCreatinina, yCreatinina);
-  }
-
-  // === PERFIL LIPÍDICO COMPLETO ===
-  // L.D.L
-  const xLdl = 75;
-  const yLdl = 170.5;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.ldl) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.ldl.toUpperCase(), xLdl, yLdl);
-  }
-
-  // H.D.L
-  const xHdl = 75;
-  const yHdl = 175;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.hdl) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.hdl.toUpperCase(), xHdl, yHdl);
-  }
-
-  // V.L.D.L
-  const xVldl = 75;
-  const yVldl = 179;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.vldl) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.vldl.toUpperCase(), xVldl, yVldl);
+    doc.text(datosFinales.perfilLipidico.vldl, xVldl, yVldl);
   }
 
   // Triglicéridos
-  const xTrigliceridos = 75;
-  const yTrigliceridos = 183.1;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.trigliceridos) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+  const xTrigliceridos = 167;
+  const yTrigliceridos = 222;
+  if (datosFinales.perfilLipidico && datosFinales.perfilLipidico.trigliceridos) {
+    doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.trigliceridos.toUpperCase(), xTrigliceridos, yTrigliceridos);
+    doc.text(datosFinales.perfilLipidico.trigliceridos, xTrigliceridos, yTrigliceridos);
   }
 
-  // Colesterol Total
-  const xColesterolTotal = 75;
-  const yColesterolTotal = 187;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.colesterolTotal) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.colesterolTotal.toUpperCase(), xColesterolTotal, yColesterolTotal);
+  // === SECCIÓN: APTO PARA TRABAJAR ===
+  const aptoParaTrabajarPosiciones = [
+    { tipo: "si", x: 23, y: 194.2, texto: "SI" },
+    { tipo: "no", x: 35.4, y: 194.2, texto: "NO" }
+  ];
+
+  if (datosFinales.aptoParaTrabajar) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    aptoParaTrabajarPosiciones.forEach(pos => {
+      if (datosFinales.aptoParaTrabajar[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
-  // === EXAMEN COMPLETO DE ORINA ===
-  // Cocaína en Orina
-  const xCocainaOrina = 127;
-  const yCocainaOrina = 170.5;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.cocainaOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.cocainaOrina.toUpperCase(), xCocainaOrina, yCocainaOrina);
+  // === SECCIÓN: REVALUACIÓN DE EMPRESA ===
+  const xRevaluacionEmpresa = 35.4;
+  const yRevaluacionEmpresa = 200.5;
+  if (datosFinales.revaluacionEmpresa) {
+    doc.setTextColor(0, 0, 255); // Color azul para la X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", xRevaluacionEmpresa, yRevaluacionEmpresa);
+    doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
-  // Marihuana en Orina
-  const xMarihuanaOrina = 127;
-  const yMarihuanaOrina = 175;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.marihuanaOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.marihuanaOrina.toUpperCase(), xMarihuanaOrina, yMarihuanaOrina);
-  }
 
-  // Mercurio en Orina
-  const xMercurioOrina = 127;
-  const yMercurioOrina = 179;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.mercurioOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.mercurioOrina.toUpperCase(), xMercurioOrina, yMercurioOrina);
-  }
-
-  // Plomo en Orina
-  const xPlomoOrina = 127;
-  const yPlomoOrina = 183.1;
-  if (datosFinales.examenesLaboratorio && datosFinales.examenesLaboratorio.plomoOrina) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.examenesLaboratorio.plomoOrina.toUpperCase(), xPlomoOrina, yPlomoOrina);
-  }
-
-  // === SECCIÓN: DOCUMENTO DE IDENTIDAD Y FIRMA ===
-  // Solo el DNI (sin etiqueta "Doc. de Identidad:")
-  const xDocIdentidad = 170;
-  const yDocIdentidad = 217;
-  if (datosFinales.docIdentidad) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.docIdentidad.toUpperCase(), xDocIdentidad, yDocIdentidad);
-  }
-
-  // Firma del paciente (imagen)
-  const xFirmaPaciente = 150;
-  const yFirmaPaciente = 195;
-  const firmaWidth = 40;
-  const firmaHeight = 18;
-
+  // === SECCIÓN: FIRMA Y SELLO ===
+  const xFirmaSello = 75;
+  const yFirmaSello = 187;
   try {
-    doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
+    const firmaSelloImg = data.digitalizacion?.find(
+      item => item.nombreDigitalizacion === "SELLOFIRMA"
+    )?.url ?? "";
+    doc.addImage(firmaSelloImg, "PNG", xFirmaSello, yFirmaSello, 38, 25);
   } catch (e) {
-    // Si no se puede cargar la imagen, mostrar texto alternativo
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Firma y Sello", xFirmaSello, yFirmaSello + 10);
+  }
+
+  // === SECCIÓN: OBSERVACIONES ===
+  const xObservaciones = 12;
+  let yPosicionActual = 219; // Variable para rastrear la posición actual
+  const espacioEntreObservaciones = 1.2; // Espacio entre observaciones (reducido)
+  const lineHeight = 3.1; // Altura entre líneas de texto dividido
+  const maxWidth = 130; // Ancho máximo
+
+  if (datosFinales.observaciones && Array.isArray(datosFinales.observaciones)) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);
-    doc.text("Firma del Paciente", xFirmaPaciente, yFirmaPaciente + 8);
+
+    datosFinales.observaciones.forEach((observacion) => {
+      // Dividir texto largo en múltiples líneas si es necesario
+      const lines = doc.splitTextToSize(observacion.toUpperCase(), maxWidth);
+
+      // Dibujar cada línea de la observación actual
+      lines.forEach((line, lineIndex) => {
+        const yLinePosition = yPosicionActual + (lineIndex * lineHeight);
+        doc.text(line, xObservaciones, yLinePosition);
+      });
+
+      // Calcular la nueva posición para la siguiente observación
+      // Sumar el número de líneas de esta observación + espacio entre observaciones
+      yPosicionActual += (lines.length * lineHeight) + espacioEntreObservaciones;
+    });
+  }
+
+  // === SECCIÓN: FIRMA DEL EXAMINADO ===
+  const xFirmaExaminado = 155;
+  const yFirmaExaminado = 224;
+  try {
+    const firmaExaminadoImg = data.digitalizacion?.find(
+        item => item.nombreDigitalizacion === "FIRMAP"
+      )?.url ?? "";
+    doc.addImage(firmaExaminadoImg, "PNG", xFirmaExaminado, yFirmaExaminado, 40, 28);
+  } catch (e) {
+    doc.text("Firma del Examinado", xFirmaExaminado, yFirmaExaminado + 10);
+  }
+
+  // === SECCIÓN: HUELLA DIGITAL ===
+  const xHuellaDigital = 165;
+  const yHuellaDigital = 257;
+  try {
+    const huellaDigitalImg = data.digitalizacion?.find(
+        item => item.nombreDigitalizacion === "HUELLA"
+      )?.url ?? "";
+    doc.addImage(huellaDigitalImg, "PNG", xHuellaDigital, yHuellaDigital, 18, 25);
+  } catch (e) {
+    doc.text("Huella Digital", xHuellaDigital, yHuellaDigital + 10);
   }
 
 

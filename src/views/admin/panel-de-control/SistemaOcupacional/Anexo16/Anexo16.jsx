@@ -228,7 +228,8 @@ export default function Anexo16({ listas }) {
     evaluacionCognitiva: "NORMAL",
     //Información Radiológica
     numeroRx: "",
-    fechaRx: "",
+    codigoExamenRadiograficoSanguineo: null,
+    fechaRx: getToday(),
     calidadRx: "",
     simbolosRx: "N/A",
     //Conclusiones Radiográficas
@@ -303,17 +304,17 @@ export default function Anexo16({ listas }) {
     //colores
     cocainaRed: "",
     marihuanaRed: "",
-    glucosaRed:"",
-    creatininaRed:"",
-    imcRed:"",
-    hemoglobinaRed:"",
-    colesterolRed:"",
-    
-    ldlRed:"",
-    hdlRed:"",
-    vldlRed:"",
-    trigliceridosRed:"",
-    
+    glucosaRed: "",
+    creatininaRed: "",
+    imcRed: "",
+    hemoglobinaRed: "",
+    colesterolRed: "",
+
+    ldlRed: "",
+    hdlRed: "",
+    vldlRed: "",
+    trigliceridosRed: "",
+
     // Médico que Certifica //BUSCADOR
     nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     filteredNombresMedicos: [],

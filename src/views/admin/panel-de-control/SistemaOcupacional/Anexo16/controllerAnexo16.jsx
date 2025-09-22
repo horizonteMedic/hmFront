@@ -121,7 +121,7 @@ export const SubmitDataService = async (
     electricos: form.electricos,
     vibraciones: form.vibraciones,
     examenRadiograficoSanguineo: {
-      codigoExamenRadiograficoSanguineo: 0,
+      codigoExamenRadiograficoSanguineo: form.codigoExamenRadiograficoSanguineo,
       nrx: form.numeroRx,
       fechaExamenRadiograficoSanguineo: form.fechaRx,
       calidad: form.calidadRx,
@@ -141,8 +141,8 @@ export const SubmitDataService = async (
       calificacionExSt: form.clasificacion == "ST",
       sinNeumoconiosis: form.sinNeumoconiosis,
       conNeumoconiosis: form.conNeumoconiosis,
-      irep: form.imagenRadiograficaPolvo, 
-      otros: form.otrosExamenes, 
+      irep: form.imagenRadiograficaPolvo,
+      otros: form.otrosExamenes,
       observacionesRs: "",
       aptoSi: form.aptoParaTrabajar == "SI",
       aptoNo: form.aptoParaTrabajar == "NO",
@@ -178,16 +178,34 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-  const jasperModules = import.meta.glob("../../../../jaspers/Anexo16/*.jsx");
-  PrintHojaRDefault(
-    nro,
-    token,
-    tabla,
-    datosFooter,
-    obtenerParaJasperUrl,
-    jasperModules,
-    "../../../../jaspers/Anexo16"
-  );
+  Loading("Cargando Formato a Imprimir");
+  getFetch(
+    `${obtenerParaJasperUrl}?nOrden=${nro}&nameService=${tabla}`,
+    token
+  ).then(async (res) => {
+    if (res.norden_n_orden) {
+      const nombre = res.nameJasper;
+      console.log(nombre);
+      const jasperModules = import.meta.glob(
+        "../../../../jaspers/Anexo16/*.jsx"
+      );
+      const modulo = await jasperModules[
+        `../../../../jaspers/Anexo16/${nombre}.jsx`
+      ]();
+
+      // Ejecuta la función exportada por default con los datos
+      if (typeof modulo.default === "function") {
+        modulo.default({ ...res, datosFooter });
+      } else {
+        console.error(
+          `El archivo ${nombre}.jsx no exporta una función por defecto`
+        );
+      }
+      Swal.close();
+    } else {
+      Swal.close();
+    }
+  });
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
@@ -1056,9 +1074,7 @@ export const MapearDatosAdicionales = (
           : "RH(+)";
 
       // Fechas y calidad
-      data.fechaRx = formatearFechaCorta(
-        res.fechaExamenRadiografico_fecha_exra ?? ""
-      );
+      data.fechaRx = res.fechaExamenRadiografico_fecha_exra ?? "";
       data.calidadRx = res.calidadExamenRadiografico_txtcalidad ?? "";
       data.simbolosRx = res.simbolosExamenRadiografico_txtsimbolos ?? "";
 
@@ -1167,7 +1183,7 @@ export const MapearDatosAdicionales = (
       data.otrosExamenes += coca == null ? "" : "-COCAINA: " + coca + ". \n";
       data.otrosExamenes += marig == null ? "" : "-MARIHUANA: " + marig + ".";
 
-      data.fechaRx = formatearFechaCorta(getToday());
+      data.fechaRx = getToday();
       data.calidadRx = "2";
       data.simbolosRx = "N/A";
       const sexo = res.sexo_sexo_pa ?? "";
@@ -1350,6 +1366,7 @@ export const GetInfoServicioEditar = (
             observacionesGenerales: "",
             observacionesAudio: "",
             codigoAnexo: res.codigoAnexo7c_cod_anexo ?? "",
+            codigoExamenRadiograficoSanguineo: res.codigoExamenRadiograficoSanguineo_cod_exra,
           };
 
           // Build observacionesGenerales from different medical areas
