@@ -558,9 +558,9 @@ export const GetInfoServicio = (
               res.hijosFallecidosAntecedentes_txtvhijosfallecidos ?? "0";
           } else {
             data.hijosVivos =
-              res.getdHijosVivosAntecedentes_txtdhijosvivos ?? "0";
+              res.detalleHijosVivosAntecedentes_txtdhijosvivos ?? "0";
             data.hijosMuertos =
-              res.getdHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
+              res.detalleHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
           }
 
           // IMC
@@ -1528,9 +1528,9 @@ export const GetInfoServicioEditar = (
               res.hijosFallecidosAntecedentes_txtvhijosfallecidos ?? "0";
           } else {
             data.hijosVivos =
-              res.getdHijosVivosAntecedentes_txtdhijosvivos ?? "0";
+              res.detalleHijosVivosAntecedentes_txtdhijosvivos ?? "0";
             data.hijosMuertos =
-              res.getdHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
+              res.detalleHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
           }
 
           // Physical measurements

@@ -527,7 +527,7 @@ export default function Anexo16(data = {}) {
         },
         colores: data.visionColoresAnexo7c_txtvisioncolores ?? ""
       },
-      enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
+      enfermedadesOculares: `${data.enfermedadesOcularesOftalmo_e_oculares ?? ""}\n${data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
       reflejosPupilares: data.reflejosPupilaresAnexo7c_txtreflejospupilares ?? ""
     },
     // Evaluación de oídos
@@ -625,12 +625,25 @@ export default function Anexo16(data = {}) {
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
+      titulacion_0_0: data.examenRadiografico0_ex_0 ?? false,
+      titulacion_1_0: data.examenRadiografico10_ex_10 ?? false,
+      titulacion_1_1: data.examenRadiografico11_ex_11 ?? false,
+      titulacion_1_2: data.examenRadiografico12_ex_12 ?? false,
+      titulacion_2_1: data.examenRadiografico21_ex_21 ?? false,
+      titulacion_2_2: data.examenRadiografico22_ex_22 ?? false,
+      titulacion_2_3: data.examenRadiografico23_ex_23 ?? false,
+      titulacion_3_2: data.examenRadiografico32_ex_32 ?? false,
+      titulacion_3_3: data.examenRadiografico33_ex_33 ?? false,
+      titulacion_3_plus: data.examenRadiografico3mas_ex_3mas ?? false,
+      titulacion_abc: data.examenRadiograficoAbc_ex_abc ?? false,
+      titulacion_st: data.examenRadiograficoSt_ex_st ?? false,
     },
     // Reacciones serológicas LUES
     reaccionesSerologicasLues: {
       positivo: data.positivoLaboratorioClinico_chkpositivo ?? false,
       negativo: data.negativoLaboratorioClinico_chknegativo ?? false
     },
+    
     // Grupo sanguíneo
     grupoSanguineo: {
       grupo: {
@@ -1711,21 +1724,21 @@ export default function Anexo16(data = {}) {
   // === SECCIÓN: REACCIONES SEROLÓGICAS ===
   // TITULACIÓN - Checkboxes
   const titulacionPosiciones = [
-    { titulo: "0/0", x: 12, y: 138.6, marcado: true },
-    { titulo: "1/0", x: 28.5, y: 138.6, marcado: true },
-    { titulo: "1/1", x: 40.2, y: 138.6, marcado: true },
-    { titulo: "1/2", x: 49.5, y: 138.6, marcado: true },
-    { titulo: "2/1", x: 59, y: 138.6, marcado: true },
-    { titulo: "2/2", x: 69, y: 138.6, marcado: true },
-    { titulo: "2/3", x: 79, y: 138.6, marcado: true },
-    { titulo: "3/2", x: 89, y: 138.6, marcado: true },
-    { titulo: "3/3", x: 98.5, y: 138.6, marcado: true },
-    { titulo: "3/+", x: 108.5, y: 138.6, marcado: true },
-    { titulo: "A,B,C", x: 122, y: 138.4, marcado: true },
-    { titulo: "St", x: 136, y: 138.6, marcado: true }
+    { titulo: "0/0", x: 12, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_0_0 },
+    { titulo: "1/0", x: 28.5, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_1_0 },
+    { titulo: "1/1", x: 40.2, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_1_1 },
+    { titulo: "1/2", x: 49.5, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_1_2 },
+    { titulo: "2/1", x: 59, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_2_1 },
+    { titulo: "2/2", x: 69, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_2_2 },
+    { titulo: "2/3", x: 79, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_2_3 },
+    { titulo: "3/2", x: 89, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_3_2 },
+    { titulo: "3/3", x: 98.5, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_3_3 },
+    { titulo: "3/+", x: 108.5, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_3_plus },
+    { titulo: "A,B,C", x: 122, y: 138.4, marcado: datosFinales.reaccionesSerologicas.titulacion_abc },
+    { titulo: "St", x: 136, y: 138.6, marcado: datosFinales.reaccionesSerologicas.titulacion_st }
   ];
 
-  if (datosFinales.reaccionesSerologicas && datosFinales.reaccionesSerologicas.titulacion) {
+  if (datosFinales.reaccionesSerologicas) {
     doc.setTextColor(0, 0, 255); // Color azul para las X
     doc.setFont("helvetica", "bold").setFontSize(12);
 
@@ -1900,7 +1913,7 @@ export default function Anexo16(data = {}) {
     const firmaSelloImg = data.digitalizacion?.find(
       item => item.nombreDigitalizacion === "SELLOFIRMA"
     )?.url ?? "";
-    doc.addImage(firmaSelloImg, "PNG", xFirmaSello, yFirmaSello, 38, 25);
+    doc.addImage(firmaSelloImg, "PNG", xFirmaSello, yFirmaSello - 5, 38, 25);
   } catch (e) {
     doc.text("Firma y Sello", xFirmaSello, yFirmaSello + 10);
   }
@@ -1937,8 +1950,8 @@ export default function Anexo16(data = {}) {
   const yFirmaExaminado = 224;
   try {
     const firmaExaminadoImg = data.digitalizacion?.find(
-        item => item.nombreDigitalizacion === "FIRMAP"
-      )?.url ?? "";
+      item => item.nombreDigitalizacion === "FIRMAP"
+    )?.url ?? "";
     doc.addImage(firmaExaminadoImg, "PNG", xFirmaExaminado, yFirmaExaminado, 40, 28);
   } catch (e) {
     doc.text("Firma del Examinado", xFirmaExaminado, yFirmaExaminado + 10);
@@ -1949,8 +1962,8 @@ export default function Anexo16(data = {}) {
   const yHuellaDigital = 257;
   try {
     const huellaDigitalImg = data.digitalizacion?.find(
-        item => item.nombreDigitalizacion === "HUELLA"
-      )?.url ?? "";
+      item => item.nombreDigitalizacion === "HUELLA"
+    )?.url ?? "";
     doc.addImage(huellaDigitalImg, "PNG", xHuellaDigital, yHuellaDigital, 18, 25);
   } catch (e) {
     doc.text("Huella Digital", xHuellaDigital, yHuellaDigital + 10);
