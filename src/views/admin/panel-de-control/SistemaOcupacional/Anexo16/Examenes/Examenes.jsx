@@ -286,7 +286,7 @@ export default function Examenes({
               label="Perímetro (cm)"
               name="perimetro"
               value={form.perimetro}
-              onChange={handleChange}
+              disabled
               labelWidth="90px"
             />
             <InputTextArea
