@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import headerAnexo16Boroo from "./Headers/Header_Anexo16_Boroo.jsx";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 
 export default function Anexo16Boroo(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -361,7 +362,7 @@ export default function Anexo16Boroo(data = {}) {
   const datosReales = {
     fechaExamen: data.fechaAnexo7c_fecha ?? "",
     mineralesExplotados: data.mineral_mineral_po ?? "",
-    lugarFechaNacimiento: data.lugarNacimientoPaciente_lugar_nac_pa ?? "",
+    lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
     domicilioHabitual: data.direccionPaciente_direccion ?? "",
     tipoTrabajo: {
       superficie: data.explotacion_nom_ex === "SUPERFICIE" ?? false,
@@ -527,7 +528,7 @@ export default function Anexo16Boroo(data = {}) {
           }
         }
       },
-      enfermedadesOculares: data.enfermedadesOcularesAnexo7c_txtenfermedadesoculares ?? "",
+      enfermedadesOculares: `${data.enfermedadesOcularesOftalmo_e_oculares ?? ""}\n${data.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? ""}`,
       reflejosPupilares: data.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "",
       testIshihara: data.tecishiharaNormal_rbtecishihara_normal ? "NORMAL" : (data.tecishiharaAnormal_rbtecishihara_anormal ? "ANORMAL" : ""),
       testColoresPuros: data.teccoleresNormal_rbteccoleres_normal ? "NORMAL" : (data.teccoleresAnormal_rbteccoleres_anormal ? "ANORMAL" : ""),
@@ -614,7 +615,7 @@ export default function Anexo16Boroo(data = {}) {
     // Radiografía de tórax
     radiografiaTorax: {
       numeroRx: String(data.nrx_n_rx ?? ""),
-      fecha: data.fechaExamenRadiografico_fecha_exra ?? "",
+      fecha: formatearFechaCorta(data.fechaExamenRadiografico_fecha_exra ?? ""),
       calidad: data.calidadExamenRadiografico_txtcalidad ?? "",
       simbolos: data.simbolosExamenRadiografico_txtsimbolos ?? "",
       vertices: data.verticesRadiografiaTorax_txtvertices ?? "",
@@ -627,6 +628,18 @@ export default function Anexo16Boroo(data = {}) {
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
+      titulacion_0_0: data.examenRadiografico0_ex_0 ?? false,
+      titulacion_1_0: data.examenRadiografico10_ex_10 ?? false,
+      titulacion_1_1: data.examenRadiografico11_ex_11 ?? false,
+      titulacion_1_2: data.examenRadiografico12_ex_12 ?? false,
+      titulacion_2_1: data.examenRadiografico21_ex_21 ?? false,
+      titulacion_2_2: data.examenRadiografico22_ex_22 ?? false,
+      titulacion_2_3: data.examenRadiografico23_ex_23 ?? false,
+      titulacion_3_2: data.examenRadiografico32_ex_32 ?? false,
+      titulacion_3_3: data.examenRadiografico33_ex_33 ?? false,
+      titulacion_3_plus: data.examenRadiografico3mas_ex_3mas ?? false,
+      titulacion_abc: data.examenRadiograficoAbc_ex_abc ?? false,
+      titulacion_st: data.examenRadiograficoSt_ex_st ?? false,
     },
     // Reacciones serológicas LUES
     reaccionesSerologicasLues: {
@@ -679,8 +692,8 @@ export default function Anexo16Boroo(data = {}) {
       plomoOrina: "N/A" //revisar - no hay campo específico en JSON
     },
     // Conclusiones y Recomendaciones/Restricciones (Página 2)
-    conclusiones: data.conclusionesAnexo7c_txtconclusiones ?? "",
-    recomendacionesRestricciones: data.recomendacionesRestriccionesAnexo7c_txtrecomendaciones ?? ""
+    conclusiones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
+    recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? ""
   };
 
   // Usar datos de prueba por ahora
@@ -1747,18 +1760,18 @@ export default function Anexo16Boroo(data = {}) {
   // === SECCIÓN: REACCIONES SEROLÓGICAS ===
   // TITULACIÓN - Checkboxes (Clasificación ILO)
   const titulacionPosiciones = [
-    { titulo: "0/0", x: 12, y: 136.7, marcado: true },
-    { titulo: "1/0", x: 28.5, y: 136.7, marcado: true },
-    { titulo: "1/1", x: 40.2, y: 136.7, marcado: true },
-    { titulo: "1/2", x: 49.5, y: 136.7, marcado: true },
-    { titulo: "2/1", x: 59, y: 136.7, marcado: true },
-    { titulo: "2/2", x: 69, y: 136.7, marcado: true },
-    { titulo: "2/3", x: 79, y: 136.7, marcado: true },
-    { titulo: "3/2", x: 89, y: 136.7, marcado: true },
-    { titulo: "3/3", x: 98.5, y: 136.7, marcado: true },
-    { titulo: "3/+", x: 108.5, y: 136.7, marcado: true },
-    { titulo: "A,B,C", x: 122, y: 136.7, marcado: true },
-    { titulo: "St", x: 136, y: 136.7, marcado: true }
+    { titulo: "0/0", x: 12, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_0_0 },
+    { titulo: "1/0", x: 28.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_1_0 },
+    { titulo: "1/1", x: 40.2, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_1_1 },
+    { titulo: "1/2", x: 49.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_1_2 },
+    { titulo: "2/1", x: 59, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_2_1 },
+    { titulo: "2/2", x: 69, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_2_2 },
+    { titulo: "2/3", x: 79, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_2_3 },
+    { titulo: "3/2", x: 89, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_3_2 },
+    { titulo: "3/3", x: 98.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_3_3 },
+    { titulo: "3/+", x: 108.5, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_3_plus },
+    { titulo: "A,B,C", x: 122, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_abc },
+    { titulo: "St", x: 136, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_st }
   ];
 
   if (datosFinales.reaccionesSerologicas && datosFinales.reaccionesSerologicas.titulacion) {
@@ -1843,7 +1856,9 @@ export default function Anexo16Boroo(data = {}) {
   const firmaMedicoHeight = 20;
 
   try {
-    doc.addImage("/img/firmas_sellos_prueba/firma_sello.png", "PNG", xFirmaMedico, yFirmaMedico, firmaMedicoWidth, firmaMedicoHeight);
+    doc.addImage(data.digitalizacion?.find(
+      item => item.nombreDigitalizacion === "SELLOFIRMA"
+    )?.url ?? "", "PNG", xFirmaMedico, yFirmaMedico, firmaMedicoWidth, firmaMedicoHeight);
   } catch (e) {
     // Si no se puede cargar la imagen, mostrar texto alternativo
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -2049,7 +2064,9 @@ export default function Anexo16Boroo(data = {}) {
   const firmaHeight = 18;
 
   try {
-    doc.addImage("/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
+    doc.addImage(data.digitalizacion?.find(
+      item => item.nombreDigitalizacion === "FIRMAP"
+    )?.url ?? "", "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
   } catch (e) {
     // Si no se puede cargar la imagen, mostrar texto alternativo
     doc.setFont("helvetica", "normal").setFontSize(8);

@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import headerAnexo16 from "./Headers/Header_Anexo16.jsx";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 
 export default function Anexo16(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -360,7 +361,7 @@ export default function Anexo16(data = {}) {
   const datosReales = {
     fechaExamen: data.fechaAnexo7c_fecha ?? "",
     mineralesExplotados: data.mineral_mineral_po ?? "",
-    lugarFechaNacimiento: data.lugarNacimientoPaciente_lugar_nac_pa ?? "",
+    lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
     domicilioHabitual: data.direccionPaciente_direccion ?? "",
     tipoTrabajo: {
       superficie: data.explotacion_nom_ex == "SUPERFICIE",
@@ -643,7 +644,7 @@ export default function Anexo16(data = {}) {
       positivo: data.positivoLaboratorioClinico_chkpositivo ?? false,
       negativo: data.negativoLaboratorioClinico_chknegativo ?? false
     },
-    
+
     // Grupo sanguíneo
     grupoSanguineo: {
       grupo: {
