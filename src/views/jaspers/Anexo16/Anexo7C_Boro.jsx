@@ -307,10 +307,32 @@ export default function Anexo16Boroo(data = {}) {
     // Reacciones serológicas LUES
     reaccionesSerologicasLues: {
       positivo: true,
-      negativo: false
+      negativo: true
     },
+    // Grupo sanguíneo
+    grupoSanguineo: {
+      grupo: {
+        o: true,
+        a: true,
+        b: true,
+        ab: true
+      },
+      factorRh: {
+        positivo: true,
+        negativo: true
+      }
+    },
+    // Hemoglobina/Hematocrito
+    hemoglobinaHematocrito: "13 gr. %",
     // Otros exámenes
     otrosExamenes: "Examen de orina: NORMAL. Hemograma: NORMAL. Glicemia: 85 mg/dl.",
+    // Apto para trabajar
+    aptoParaTrabajar: {
+      si: true,
+      no: true,
+    },
+    // Revaluación de empresa
+    revaluacionEmpresa: true,
     // Documento de identidad
     docIdentidad: "76543210",
     // Exámenes de laboratorio
@@ -331,7 +353,10 @@ export default function Anexo16Boroo(data = {}) {
       marihuanaOrina: "NEGATIVO",
       mercurioOrina: "NORMAL",
       plomoOrina: "NORMAL"
-    }
+    },
+    // Conclusiones y Recomendaciones/Restricciones (Página 2)
+    conclusiones: "EVALUACIÓN CLÍNICA DENTRO DE PARÁMETROS NORMALES.",
+    recomendacionesRestricciones: "MANTENER HÁBITOS SALUDABLES. CONTROL MÉDICO ANUAL."
   };
   const datosReales = {
     fechaExamen: data.fechaAnexo7c_fecha ?? "",
@@ -608,8 +633,30 @@ export default function Anexo16Boroo(data = {}) {
       positivo: data.positivoLaboratorioClinico_chkpositivo ?? false,
       negativo: data.negativoLaboratorioClinico_chknegativo ?? false
     },
+    // Grupo sanguíneo
+    grupoSanguineo: {
+      grupo: {
+        o: data.grupoSanguineoO_chko ?? false,
+        a: data.grupoSanguineoA_chka ?? false,
+        b: data.grupoSanguineoB_chkb ?? false,
+        ab: data.grupoSanguineoAB_chkab ?? false
+      },
+      factorRh: {
+        positivo: data.grupoSanguineoRhPositivo_rbrhpositivo ?? false,
+        negativo: data.grupoSanguineoRhNegativo_rbrhnegativo ?? false
+      }
+    },
+    // Hemoglobina/Hematocrito
+    hemoglobinaHematocrito: data.hemoglobina_txthemoglobina ?? "",
     // Otros exámenes
     otrosExamenes: data.examenRadiograficoOtros_txtotrosex ?? "",
+    // Apto para trabajar
+    aptoParaTrabajar: {
+      si: data.examenRadiograficoAptoSi_apto_si ?? false,
+      no: data.examenRadiograficoAptoNo_apto_no ?? false
+    },
+    // Revaluación de empresa
+    revaluacionEmpresa: data.examenRadiograficoAptoRe_apto_re ?? false,
     // Documento de identidad
     docIdentidad: String(data.dni_cod_pa ?? ""),
     // Exámenes de laboratorio
@@ -630,7 +677,10 @@ export default function Anexo16Boroo(data = {}) {
       marihuanaOrina: data.marihuanaLaboratorioClinico_txtmarihuana ?? "",
       mercurioOrina: "N/A", //revisar - no hay campo específico en JSON
       plomoOrina: "N/A" //revisar - no hay campo específico en JSON
-    }
+    },
+    // Conclusiones y Recomendaciones/Restricciones (Página 2)
+    conclusiones: data.conclusionesAnexo7c_txtconclusiones ?? "",
+    recomendacionesRestricciones: data.recomendacionesRestriccionesAnexo7c_txtrecomendaciones ?? ""
   };
 
   // Usar datos de prueba por ahora
@@ -1724,6 +1774,93 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
+  // === SECCIÓN: GRUPO SANGUÍNEO ===
+  const grupoSanguineoPosiciones = [
+    { tipo: "o", x: 21.2, y: 200.5, texto: "O" },
+    { tipo: "a", x: 33.3, y: 200.5, texto: "A" },
+    { tipo: "b", x: 46.4, y: 200.5, texto: "B" },
+    { tipo: "ab", x: 58.2, y: 200.5, texto: "AB" }
+  ];
+
+  if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.grupo) {
+    doc.setTextColor(0, 0, 255);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    grupoSanguineoPosiciones.forEach(pos => {
+      if (datosFinales.grupoSanguineo.grupo[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+    doc.setTextColor(0, 0, 0);
+  }
+
+  // FACTOR RH - Checkboxes
+  const factorRhPosiciones = [
+    { tipo: "negativo", x: 74.5, y: 200.5, texto: "Rh(-)" },
+    { tipo: "positivo", x: 92, y: 200.5, texto: "Rh(+)" }
+  ];
+
+  if (datosFinales.grupoSanguineo && datosFinales.grupoSanguineo.factorRh) {
+    doc.setTextColor(0, 0, 255);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    factorRhPosiciones.forEach(pos => {
+      if (datosFinales.grupoSanguineo.factorRh[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+    doc.setTextColor(0, 0, 0);
+  }
+
+  // === SECCIÓN: HEMOGLOBINA/HEMATOCRITO ===
+  const xHemoglobinaHematocrito = 108;
+  const yHemoglobinaHematocrito = 200.5;
+  if (datosFinales.hemoglobinaHematocrito) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(255, 0, 0);
+    doc.text(datosFinales.hemoglobinaHematocrito.toUpperCase(), xHemoglobinaHematocrito, yHemoglobinaHematocrito);
+  }
+
+  // === SECCIÓN: APTO PARA TRABAJAR ===
+  const aptoParaTrabajarPosiciones = [
+    { tipo: "si", x: 23.2, y: 212, texto: "SI" },
+    { tipo: "no", x: 35.4, y: 212, texto: "NO" }
+  ];
+
+  if (datosFinales.aptoParaTrabajar) {
+    doc.setTextColor(0, 0, 255);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    aptoParaTrabajarPosiciones.forEach(pos => {
+      if (datosFinales.aptoParaTrabajar[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+    doc.setTextColor(0, 0, 0);
+  }
+
+  // === FIRMA Y SELLO MÉDICO ===
+  const xFirmaMedico = 78;
+  const yFirmaMedico = 206;
+  const firmaMedicoWidth = 40;
+  const firmaMedicoHeight = 20;
+
+  try {
+    doc.addImage("/img/firmas_sellos_prueba/firma_sello.png", "PNG", xFirmaMedico, yFirmaMedico, firmaMedicoWidth, firmaMedicoHeight);
+  } catch (e) {
+    // Si no se puede cargar la imagen, mostrar texto alternativo
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Firma y Sello Médico", xFirmaMedico, yFirmaMedico + 8);
+  }
+
+  // === SECCIÓN: REVALUACIÓN DE EMPRESA ===
+  const xRevaluacionEmpresa = 35.4;
+  const yRevaluacionEmpresa = 219.5;
+  if (datosFinales.revaluacionEmpresa) {
+    doc.setTextColor(0, 0, 255);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", xRevaluacionEmpresa, yRevaluacionEmpresa);
+    doc.setTextColor(0, 0, 0);
+  }
+
   // === SECCIÓN: REACCIONES SEROLÓGICAS LUES ===
   const reaccionesSerologicasLuesPosiciones = [
     { tipo: "positivo", x: 166.1, y: 142, texto: "POSITIVO" },
@@ -1731,16 +1868,14 @@ export default function Anexo16Boroo(data = {}) {
   ];
 
   if (datosFinales.reaccionesSerologicasLues) {
-    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setTextColor(0, 0, 255);
     doc.setFont("helvetica", "bold").setFontSize(12);
-
     reaccionesSerologicasLuesPosiciones.forEach(pos => {
       if (datosFinales.reaccionesSerologicasLues[pos.tipo]) {
         doc.text("X", pos.x, pos.y);
       }
     });
-
-    doc.setTextColor(0, 0, 0); // Resetear a negro
+    doc.setTextColor(0, 0, 0);
   }
 
   // === SECCIÓN: OTROS EXAMENES ===
@@ -1871,6 +2006,30 @@ export default function Anexo16Boroo(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(7.5);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.examenesLaboratorio.plomoOrina.toUpperCase(), xPlomoOrina, yPlomoOrina);
+  }
+
+  // === SECCIÓN: CONCLUSIONES Y RECOMENDACIONES / RESTRICCIONES ===
+  // Columna izquierda: CONCLUSIONES
+  const xConclusiones2 = 12;
+  const yConclusiones2 = 235;
+  if (datosFinales.conclusiones) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.conclusiones.toUpperCase(), xConclusiones2, yConclusiones2, { maxWidth: 80 });
+  }
+
+  // Columna derecha: RECOMENDACIONES / RESTRICCIONES
+  const xRecomendaciones2 = 120;
+  const yRecomendaciones2 = 235;
+  if (datosFinales.recomendacionesRestricciones) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text(
+      datosFinales.recomendacionesRestricciones.toUpperCase(),
+      xRecomendaciones2,
+      yRecomendaciones2,
+      { maxWidth: 80 }
+    );
   }
 
   // === SECCIÓN: DOCUMENTO DE IDENTIDAD Y FIRMA ===
