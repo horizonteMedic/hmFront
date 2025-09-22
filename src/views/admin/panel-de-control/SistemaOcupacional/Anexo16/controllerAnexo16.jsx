@@ -1367,6 +1367,7 @@ export const GetInfoServicioEditar = (
             observacionesAudio: "",
             codigoAnexo: res.codigoAnexo7c_cod_anexo ?? "",
             codigoExamenRadiograficoSanguineo: res.codigoExamenRadiograficoSanguineo_cod_exra,
+            imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
           };
 
           // Build observacionesGenerales from different medical areas
