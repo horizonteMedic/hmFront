@@ -234,6 +234,8 @@ export default function Anexo16(data = {}) {
         oidoIzquierdo: "NORMAL"
       }
     },
+    // Cardiovascular
+    cardiovascular: "CONSERVADO",
     // Signos vitales
     signosVitales: {
       frecuenciaRespiratoria: "18",
@@ -555,6 +557,8 @@ export default function Anexo16(data = {}) {
         oidoIzquierdo: data.oiAnexo7c_txtoi ?? ""
       }
     },
+    // Cardiovascular
+    cardiovascular: data.corazonAnexo7c_txtcorazon ?? "",
     // Signos vitales
     signosVitales: {
       frecuenciaRespiratoria: data.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
@@ -1023,7 +1027,8 @@ export default function Anexo16(data = {}) {
   if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.talla) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.talla, xTalla, yTalla);
+    // Referencia de la plantilla: talla en metros
+    doc.text(datosFinales.medidasCorporales.talla + " m", xTalla, yTalla);
   }
 
   // Peso
@@ -1032,7 +1037,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.peso) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.peso, xPeso, yPeso);
+    doc.text(datosFinales.medidasCorporales.peso + " kg", xPeso, yPeso);
   }
 
   // IMC
@@ -1051,7 +1056,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fvc) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fvc, xFvc, yFvc);
+    doc.text(datosFinales.funcionRespiratoria.fvc + " L", xFvc, yFvc);
   }
 
   // FEV1
@@ -1060,7 +1065,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fev1) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fev1, xFev1, yFev1);
+    doc.text(datosFinales.funcionRespiratoria.fev1 + " L", xFev1, yFev1);
   }
 
   // FEV1/FVC
@@ -1069,7 +1074,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fev1Fvc) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fev1Fvc, xFev1Fvc, yFev1Fvc);
+    doc.text(datosFinales.funcionRespiratoria.fev1Fvc + " %", xFev1Fvc, yFev1Fvc);
   }
 
   // FEF 25-75%
@@ -1078,7 +1083,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fef2575) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.funcionRespiratoria.fef2575, xFef2575, yFef2575);
+    doc.text(datosFinales.funcionRespiratoria.fef2575 + " l/s", xFef2575, yFef2575);
   }
 
   // Conclusión
@@ -1096,7 +1101,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.temperatura) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.temperatura, xTemperatura, yTemperatura);
+    doc.text(datosFinales.temperatura + " °C", xTemperatura, yTemperatura);
   }
 
   // === SECCIÓN: CINTURA / CADERA / ICC ===
@@ -1106,7 +1111,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.cintura) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.cintura, xCintura, yCintura);
+    doc.text(datosFinales.medidasCorporales.cintura + " cm", xCintura, yCintura);
   }
 
   // Cadera
@@ -1115,7 +1120,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.medidasCorporales && datosFinales.medidasCorporales.cadera) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.medidasCorporales.cadera, xCadera, yCadera);
+    doc.text(datosFinales.medidasCorporales.cadera + " cm", xCadera, yCadera);
   }
 
   // ICC
@@ -1143,34 +1148,34 @@ export default function Anexo16(data = {}) {
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.perimetroCuello) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.perimetroCuello.toUpperCase(), xPerimetroCuello, yPerimetroCuello);
+    doc.text(datosFinales.evaluacionFisica.perimetroCuello + " cm", xPerimetroCuello, yPerimetroCuello);
   }
 
   // BOCA, AMÍGDALAS, FARINGE, LARINGE
-  const xBocaAmigdalas = 15;
+  const xBocaAmigdalas = 11;
   const yBocaAmigdalas = 183;
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.bocaAmigdalas) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(705);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.bocaAmigdalas.toUpperCase(), xBocaAmigdalas, yBocaAmigdalas, { maxWidth: 60 });
+    doc.text(datosFinales.evaluacionFisica.bocaAmigdalas.toUpperCase(), xBocaAmigdalas, yBocaAmigdalas, { maxWidth: 80 });
   }
 
   // CUELLO
-  const xCuello = 125;
+  const xCuello = 123;
   const yCuello = 170;
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.cuello) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.cuello.toUpperCase(), xCuello, yCuello, { maxWidth: 60 });
+    doc.text(datosFinales.evaluacionFisica.cuello.toUpperCase(), xCuello, yCuello, { maxWidth: 80 });
   }
 
   // NARÍZ
-  const xNariz = 125;
+  const xNariz = 123;
   const yNariz = 175;
   if (datosFinales.evaluacionFisica && datosFinales.evaluacionFisica.nariz) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisica.nariz.toUpperCase(), xNariz, yNariz, { maxWidth: 60 });
+    doc.text(datosFinales.evaluacionFisica.nariz.toUpperCase(), xNariz, yNariz, { maxWidth: 80 });
   }
 
   // DENTADURA - Piezas en mal estado
@@ -1357,7 +1362,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.signosVitales && datosFinales.signosVitales.frecuenciaRespiratoria) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.frecuenciaRespiratoria, xFrecuenciaRespiratoria, yFrecuenciaRespiratoria);
+    doc.text(datosFinales.signosVitales.frecuenciaRespiratoria + " x min", xFrecuenciaRespiratoria, yFrecuenciaRespiratoria);
   }
 
   // F.Cardíaca
@@ -1366,7 +1371,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.signosVitales && datosFinales.signosVitales.frecuenciaCardiaca) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.frecuenciaCardiaca, xFrecuenciaCardiaca, yFrecuenciaCardiaca);
+    doc.text(datosFinales.signosVitales.frecuenciaCardiaca + " x min", xFrecuenciaCardiaca, yFrecuenciaCardiaca);
   }
 
   // Sat.02
@@ -1375,7 +1380,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.signosVitales && datosFinales.signosVitales.saturacionOxigeno) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.saturacionOxigeno, xSaturacionOxigeno, ySaturacionOxigeno);
+    doc.text(datosFinales.signosVitales.saturacionOxigeno + " %", xSaturacionOxigeno, ySaturacionOxigeno);
   }
 
   // PRESIÓN ARTERIAL SISTÉMICA - Sistólica
@@ -1384,7 +1389,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.signosVitales && datosFinales.signosVitales.presionArterial && datosFinales.signosVitales.presionArterial.sistolica) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.presionArterial.sistolica, xPresionSistolica, yPresionSistolica, { align: 'center' });
+    doc.text(datosFinales.signosVitales.presionArterial.sistolica + " mmHg", xPresionSistolica, yPresionSistolica, { align: 'center' });
   }
 
   // PRESIÓN ARTERIAL SISTÉMICA - Diastólica
@@ -1393,7 +1398,16 @@ export default function Anexo16(data = {}) {
   if (datosFinales.signosVitales && datosFinales.signosVitales.presionArterial && datosFinales.signosVitales.presionArterial.diastolica) {
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.signosVitales.presionArterial.diastolica, xPresionDiastolica, yPresionDiastolica, { align: 'center' });
+    doc.text(datosFinales.signosVitales.presionArterial.diastolica + " mmHg", xPresionDiastolica, yPresionDiastolica, { align: 'center' });
+  }
+
+  // === SECCIÓN: CARDIOVASCULAR ===
+  const xCardiovascular = 40;
+  const yCardiovascular = 251;
+  if (datosFinales.cardiovascular) {
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.cardiovascular.toUpperCase(), xCardiovascular, yCardiovascular, { maxWidth: 100 });
   }
 
   // === SECCIÓN: EVALUACIÓN FÍSICA ADICIONAL ===
@@ -1589,18 +1603,18 @@ export default function Anexo16(data = {}) {
   const xAnamnesis = 27;
   const yAnamnesis = 99;
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.anamnesis) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionMental.anamnesis.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 150 });
+    doc.text(datosFinales.evaluacionMental.anamnesis.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 180 });
   }
 
   // ESTADO MENTAL
   const xEstadoMental = 35;
   const yEstadoMental = 103.1;
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.estadoMental) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7)
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionMental.estadoMental.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 150 });
+    doc.text(datosFinales.evaluacionMental.estadoMental.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 180 });
   }
 
   // === SECCIÓN: RADIOGRAFÍA DE TÓRAX ===
@@ -1772,7 +1786,7 @@ export default function Anexo16(data = {}) {
   if (datosFinales.hemoglobinaHematocrito) {
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.setTextColor(255, 0, 0); // Color rojo como en la imagen
-    doc.text(datosFinales.hemoglobinaHematocrito.toUpperCase(), xHemoglobinaHematocrito, yHemoglobinaHematocrito);
+    doc.text(datosFinales.hemoglobinaHematocrito + " gr. %", xHemoglobinaHematocrito, yHemoglobinaHematocrito);
   }
 
   // === SECCIÓN: REACCIONES SEROLÓGICAS LUES ===

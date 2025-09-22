@@ -84,20 +84,26 @@ const headerAnexo16Boroo = (doc, datos, numeroPagina = 1) => {
   y -= 7;
 
   // 2) Información organizada a la derecha
-  const infoX = pageW - margenLateral - 5; // Margen lateral + 5mm del borde derecho
   const infoY = y + 2; // Ajustado para y = margenSuperior
 
-  // Número de orden
-  const fichaValue = String(datosFinales.norden || "").padStart(5, "0") + "-TP";
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  // Número de orden (alineado a la DERECHA del cuadro de color)
+  const fichaValue = String(datosFinales.norden || "").padStart(5, "0");
   const ordenLabel = "N° de ORDEN:";
-  const ordenLabelWidth = doc.getTextWidth(ordenLabel);
-  const ordenX = infoX - 60; // Posición con margen (corrido 10 puntos a la izquierda)
-  doc.text(ordenLabel, ordenX, infoY);
+  // Medir con las fuentes correctas
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(fichaValue, ordenX + ordenLabelWidth + 2, infoY);
+  const fichaWidth = doc.getTextWidth(fichaValue);
+  const fichaEndX = boxX - 2;
+  const fichaStartX = fichaEndX - fichaWidth;
+  // Label a la izquierda del número
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const ordenLabelWidth = doc.getTextWidth(ordenLabel);
+  const ordenLabelX = fichaStartX - 2 - ordenLabelWidth;
+  // Pintar
+  doc.text(ordenLabel, ordenLabelX, infoY);
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(fichaValue, fichaStartX, infoY);
 
-  // === SEDE (dinámica para no pisar bloque de color) ===
+  // === SEDE (pegado al borde del cuadro de color) ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   const sedeLabel = "Sede:";
   const sedeLabelWidth = doc.getTextWidth(sedeLabel);
@@ -107,22 +113,26 @@ const headerAnexo16Boroo = (doc, datos, numeroPagina = 1) => {
   const sedeValueWidth = doc.getTextWidth(sedeValue);
   const sedeTotalWidth = sedeLabelWidth + 2 + sedeValueWidth;
 
-  const espacioMinimo = 10;
-  const limiteDerecho = boxX - espacioMinimo;
-  const sedeX = Math.max(ordenX, limiteDerecho - sedeTotalWidth);
+  const sedeX = boxX - sedeTotalWidth - 2; // Pegado al borde del cuadro de color
 
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text(sedeLabel, sedeX, infoY + 5);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(sedeValue, sedeX + sedeLabelWidth + 2, infoY + 5);
 
-  // Página
-  doc.setFont("helvetica", "bold").setFontSize(9);
+  // Página (alineado a la DERECHA del cuadro de color)
   const pagLabel = "Pag:";
-  const pagLabelWidth = doc.getTextWidth(pagLabel);
-  doc.text(pagLabel, ordenX, infoY + 10);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(numeroPagina.toString(), ordenX + pagLabelWidth + 2, infoY + 10);
+  const pagValue = numeroPagina.toString();
+  const pagValueWidth = doc.getTextWidth(pagValue);
+  const pagValueEndX = boxX - 2;
+  const pagValueStartX = pagValueEndX - pagValueWidth;
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  const pagLabelWidth = doc.getTextWidth(pagLabel);
+  const pagLabelX = pagValueStartX - 2 - pagLabelWidth;
+  doc.text(pagLabel, pagLabelX, infoY + 10);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(pagValue, pagValueStartX, infoY + 10);
 
   // 3) TÍTULO centrado
   doc.setFont("helvetica", "bold").setFontSize(11);
@@ -146,11 +156,11 @@ const headerAnexo16Boroo = (doc, datos, numeroPagina = 1) => {
   // === FILA 1: NOMBRE APELLIDOS + EXAMEN MEDICO ===
   // NOMBRE APELLIDOS (columna izquierda)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("NOMBRE APELLIDOS:", col1X, dataY);
+  doc.text("NOMBRE Y APELLIDOS:", col1X, dataY);
   doc.setFont("helvetica", "normal").setFontSize(8);
   
   // Calcular ancho disponible para el texto de nombre
-  const nombreLabelWidth = doc.getTextWidth("NOMBRE APELLIDOS:");
+  const nombreLabelWidth = doc.getTextWidth("NOMBRE Y APELLIDOS:");
   const nombreStartX = col1X + nombreLabelWidth + 5;
   const nombreMaxWidth = col2X - nombreStartX - 10; // Ancho disponible hasta la columna derecha
   
