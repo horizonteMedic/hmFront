@@ -360,7 +360,7 @@ export default function Anexo16Boroo(data = {}) {
     recomendacionesRestricciones: "MANTENER HÁBITOS SALUDABLES. CONTROL MÉDICO ANUAL."
   };
   const datosReales = {
-    fechaExamen: data.fechaAnexo7c_fecha ?? "",
+    fechaExamen: formatearFechaCorta(data.fechaAnexo7c_fecha ?? ""),
     mineralesExplotados: data.mineral_mineral_po ?? "",
     lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
     domicilioHabitual: data.direccionPaciente_direccion ?? "",
@@ -1856,9 +1856,10 @@ export default function Anexo16Boroo(data = {}) {
   const firmaMedicoHeight = 20;
 
   try {
-    doc.addImage(data.digitalizacion?.find(
+    const firmaSelloImg = data.digitalizacion?.find(
       item => item.nombreDigitalizacion === "SELLOFIRMA"
-    )?.url ?? "", "PNG", xFirmaMedico, yFirmaMedico, firmaMedicoWidth, firmaMedicoHeight);
+    )?.url ?? "";
+    doc.addImage(firmaSelloImg, "PNG", xFirmaMedico, yFirmaMedico, firmaMedicoWidth, firmaMedicoHeight);
   } catch (e) {
     // Si no se puede cargar la imagen, mostrar texto alternativo
     doc.setFont("helvetica", "normal").setFontSize(8);
@@ -2058,22 +2059,32 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // Firma del paciente (imagen)
-  const xFirmaPaciente = 150;
+  const xFirmaPaciente = 150-5;
   const yFirmaPaciente = 195;
   const firmaWidth = 40;
   const firmaHeight = 18;
 
   try {
-    doc.addImage(data.digitalizacion?.find(
+    const firmaExaminadoImg = data.digitalizacion?.find(
       item => item.nombreDigitalizacion === "FIRMAP"
-    )?.url ?? "", "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
+    )?.url ?? "";
+    doc.addImage(firmaExaminadoImg, "PNG", xFirmaPaciente, yFirmaPaciente, firmaWidth, firmaHeight);
   } catch (e) {
     // Si no se puede cargar la imagen, mostrar texto alternativo
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.setTextColor(0, 0, 0);
     doc.text("Firma del Paciente", xFirmaPaciente, yFirmaPaciente + 8);
   }
-
+  const xHuellaDigital = 195-8;
+  const yHuellaDigital = 185;
+  try {
+    const huellaDigitalImg = data.digitalizacion?.find(
+      item => item.nombreDigitalizacion === "HUELLA"
+    )?.url ?? "";
+    doc.addImage(huellaDigitalImg, "PNG", xHuellaDigital, yHuellaDigital, 18, 25);
+  } catch (e) {
+    doc.text("Huella Digital", xHuellaDigital, yHuellaDigital + 10);
+  }
 
   // === IMPRIMIR ===
   imprimir(doc);

@@ -359,7 +359,7 @@ export default function Anexo16(data = {}) {
     ]
   };
   const datosReales = {
-    fechaExamen: data.fechaAnexo7c_fecha ?? "",
+    fechaExamen: formatearFechaCorta(data.fechaAnexo7c_fecha ?? ""),
     mineralesExplotados: data.mineral_mineral_po ?? "",
     lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
     domicilioHabitual: data.direccionPaciente_direccion ?? "",
