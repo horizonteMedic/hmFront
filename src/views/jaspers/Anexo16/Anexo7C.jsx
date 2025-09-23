@@ -2,6 +2,36 @@ import jsPDF from "jspdf";
 import headerAnexo16 from "./Headers/Header_Anexo16.jsx";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 
+// Función para formatear fecha a DD/MM/YYYY
+function formatearFechaDDMMYYYY(fecha) {
+  if (!fecha) return "";
+  
+  try {
+    // Si ya está en formato DD/MM/YYYY, devolverlo tal como está
+    if (typeof fecha === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
+      return fecha;
+    }
+    
+    // Crear objeto Date
+    const fechaObj = new Date(fecha);
+    
+    // Verificar si la fecha es válida
+    if (isNaN(fechaObj.getTime())) {
+      return "";
+    }
+    
+    // Formatear a DD/MM/YYYY
+    const dia = fechaObj.getDate().toString().padStart(2, '0');
+    const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
+    const año = fechaObj.getFullYear();
+    
+    return `${dia}/${mes}/${año}`;
+  } catch (error) {
+    console.error('Error formateando fecha:', error);
+    return "";
+  }
+}
+
 export default function Anexo16(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 0; // Sin márgenes
@@ -359,7 +389,7 @@ export default function Anexo16(data = {}) {
     ]
   };
   const datosReales = {
-    fechaExamen: data.fechaAnexo7c_fecha ?? "",
+    fechaExamen: formatearFechaDDMMYYYY(data.fechaAnexo7c_fecha),
     mineralesExplotados: data.mineral_mineral_po ?? "",
     lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
     domicilioHabitual: data.direccionPaciente_direccion ?? "",
@@ -613,7 +643,7 @@ export default function Anexo16(data = {}) {
     // Radiografía de tórax
     radiografiaTorax: {
       numeroRx: String(data.nrx_n_rx ?? ""),
-      fecha: data.fechaExamenRadiografico_fecha_exra ?? "",
+      fecha: formatearFechaDDMMYYYY(data.fechaExamenRadiografico_fecha_exra),
       calidad: data.calidadExamenRadiografico_txtcalidad ?? "",
       simbolos: data.simbolosExamenRadiografico_txtsimbolos ?? "",
       vertices: data.verticesRadiografiaTorax_txtvertices ?? "",

@@ -44,7 +44,7 @@ import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupaciona
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Anexo16/Anexo7C.jsx"
+import Ficha from "./views/jaspers/Anexo16/Anexo7C_Boro.jsx"
 
 const App = () => {
   return (
