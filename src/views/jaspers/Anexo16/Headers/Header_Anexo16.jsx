@@ -160,12 +160,12 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
   // === FILA 1: NOMBRE APELLIDOS + EXAMEN MEDICO ===
   // NOMBRE APELLIDOS (columna izquierda)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("NOMBRE Y APELLIDOS:", col1X, dataY);
+  doc.text("APELLIDOS Y NOMBRES:", col1X, dataY);
   doc.setFont("helvetica", "normal").setFontSize(8);
 
   // Calcular ancho disponible para el texto de nombre
-  const nombreLabelWidth = doc.getTextWidth("NOMBRE Y APELLIDOS:");
-  const nombreStartX = col1X + nombreLabelWidth + 5;
+  const nombreLabelWidth = doc.getTextWidth("APELLIDOS Y NOMBRES:");
+  const nombreStartX = col1X + nombreLabelWidth + 8;
   const nombreMaxWidth = col2X - nombreStartX - 10; // Ancho disponible hasta la columna derecha
 
   // Dividir el texto de nombre en líneas si es necesario

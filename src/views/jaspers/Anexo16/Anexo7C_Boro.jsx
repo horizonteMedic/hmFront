@@ -301,6 +301,10 @@ export default function Anexo16Boroo(data = {}) {
       conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
       siluetaCardiovascular: "NORMAL"
     },
+    // Textos de Neumoconiosis
+    textoNeumoconiosis1: "Texto de prueba 1 largo para ver como se ve",
+    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve", 
+    textoNeumoconiosis3: "Texto de prueba 3 largo para ver como se ve",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "0/0" // Primera opción marcada
@@ -641,6 +645,10 @@ export default function Anexo16Boroo(data = {}) {
       conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
       siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
     },
+    // Textos de Neumoconiosis
+    textoNeumoconiosis1: data.textoNeumoconiosis1 ?? "Texto de prueba 1 largo para ver como se ve",
+    textoNeumoconiosis2: data.textoNeumoconiosis2 ?? "Texto de prueba 2 largo para ver como se ve",
+    textoNeumoconiosis3: data.textoNeumoconiosis3 ?? "Texto de prueba 3 largo para ver como se ve",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
@@ -1791,6 +1799,34 @@ export default function Anexo16Boroo(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.radiografiaTorax.siluetaCardiovascular.toUpperCase(), xSiluetaCardiovascular, ySiluetaCardiovascular, { maxWidth: 40 });
+  }
+
+  // === SECCIÓN: TEXTOS DE NEUMOCONIOSIS ===
+  // Texto Neumoconiosis 1
+  const xTextoNeumoconiosis1 = 8;
+  const yTextoNeumoconiosis1 = 152;
+  if (datosFinales.textoNeumoconiosis1) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.textoNeumoconiosis1.toUpperCase(), xTextoNeumoconiosis1, yTextoNeumoconiosis1, { maxWidth: 35 });
+  }
+
+  // Texto Neumoconiosis 2
+  const xTextoNeumoconiosis2 = 44;
+  const yTextoNeumoconiosis2 = 152;
+  if (datosFinales.textoNeumoconiosis2) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.textoNeumoconiosis2.toUpperCase(), xTextoNeumoconiosis2, yTextoNeumoconiosis2, { maxWidth: 40 });
+  }
+
+  // Texto Neumoconiosis 3
+  const xTextoNeumoconiosis3 = 86;
+  const yTextoNeumoconiosis3 = 152;
+  if (datosFinales.textoNeumoconiosis3) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.textoNeumoconiosis3.toUpperCase(), xTextoNeumoconiosis3, yTextoNeumoconiosis3, { maxWidth: 55 });
   }
 
   // === SECCIÓN: REACCIONES SEROLÓGICAS ===
