@@ -558,9 +558,9 @@ export const GetInfoServicio = (
               res.hijosFallecidosAntecedentes_txtvhijosfallecidos ?? "0";
           } else {
             data.hijosVivos =
-              res.detalleHijosVivosAntecedentes_txtdhijosvivos ?? "0";
+              res.dHijosVivosAntecedentes_txtdhijosvivos ?? "0";
             data.hijosMuertos =
-              res.detalleHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
+              res.dHijosFallecidosAntecedentes_txtdhijosfallecidos ?? "0";
           }
 
           // IMC
