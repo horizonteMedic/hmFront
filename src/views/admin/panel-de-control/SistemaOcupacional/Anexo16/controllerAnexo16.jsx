@@ -910,6 +910,7 @@ export const ValidarExamenesRealizados = (
           "Radiografía de Tórax": res.radiografiaTorax,
           "Laboratorio Clínico": res.laboratorioClinico,
           Odontograma: res.odontograma,
+          Audiometría: res.audiometriaPo,
         };
 
         const examenesFaltantes = Object.keys(examenes).filter(

@@ -91,6 +91,7 @@ import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.js
 import Anexo2 from "./Anexo2/Anexo2.jsx";
 import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSelector.jsx";
 import InformePsicologico from "./Psicologia/InformePsicologico/InformePsicologico.jsx";
+import Anexo16A from "./Laboratorio/ExamenesLaboratorio/Anexo16A/Anexo16A.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -1265,7 +1266,7 @@ const TabComponent = () => {
                   Anexo 16 A
                 </h2>
               </div>
-              <Anexo16 listas={listasCombos} />
+              <Anexo16A />
             </div>
           )}
           {activeTab === 29 && (
