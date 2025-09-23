@@ -428,7 +428,7 @@ export default function Anexo16(data = {}) {
         primariaIncompleta: data.nivelEstudioPaciente_nivel_est_pa === "PRIMARIA INCOMPLETA" ?? false,
         secundariaCompleta: data.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA COMPLETA" ?? false,
         secundariaIncompleta: data.nivelEstudioPaciente_nivel_est_pa === "SECUNDARIA INCOMPLETA" ?? false,
-        universidad: data.nivelEstudioPaciente_nivel_est_pa === "UNIVERSIDAD" ?? false,
+        universidad: data.nivelEstudioPaciente_nivel_est_pa === "UNIVERSITARIO" ?? false,
         tecnico: data.nivelEstudioPaciente_nivel_est_pa === "TECNICO" ?? false
       }
     },
