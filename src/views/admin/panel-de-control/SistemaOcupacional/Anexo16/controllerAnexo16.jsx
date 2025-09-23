@@ -1459,7 +1459,7 @@ export const GetInfoServicioEditar = (
           data.otrosExamenes += "HEMOGRAMA: " + (
             res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
               res.sedimientoUrinarioHematies_txthematiessu != null &&
-              vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
+              vsg != null && res.hemoglobina_txthemoglobina != null ? "NORMAL" : "N/A") + "\n";
           data.otrosExamenes +=
             gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
           data.otrosExamenes +=
