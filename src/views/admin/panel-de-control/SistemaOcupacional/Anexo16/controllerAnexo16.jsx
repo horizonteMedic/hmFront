@@ -1523,7 +1523,7 @@ export const GetInfoServicioEditar = (
           // Respiratory function
           data.fvc = res.fvcFuncionRespiratoria_fvc ?? "";
           data.fev1 = res.fev1FuncionRespiratoria_fev1 ?? "";
-          data.fev1fvc = res.fev1FvcFuncionRespiratoria_fev1fvc ?? "";
+          data.fev1Fvc = res.fev1FvcFuncionRespiratoria_fev1fvc ?? "";
           data.fef2575 = res.fef2575FuncionRespiratoria_fef25_75 ?? "";
 
           // Dental information
@@ -1614,7 +1614,7 @@ export const GetInfoServicioEditar = (
 
           // Tobacco and alcohol consumption
           data.reubicacion = res.reubicacionSiAnexo7c_tbrsi ?? false;
-          data.tabaco = res.tabacoNadaAnexo7c_chktnada
+          data.tabaco = res.tabacoNadaAexo7c_chktnada
             ? "NADA"
             : res.tabacoPocoAnexo7c_chktpoco
               ? "POCO"
