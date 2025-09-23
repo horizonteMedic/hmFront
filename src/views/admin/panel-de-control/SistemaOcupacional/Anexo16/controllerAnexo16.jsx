@@ -906,6 +906,7 @@ export const ValidarExamenesRealizados = (
         const examenes = {
           "Antecedentes Patológicos": res.fichaAntecedentesPatologicos,
           Triaje: res.triaje,
+          'Oftalmología': res.oftalmologia,
           Espirometría: res.espirometria,
           "Radiografía de Tórax": res.radiografiaTorax,
           "Laboratorio Clínico": res.laboratorioClinico,
