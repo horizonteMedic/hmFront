@@ -67,6 +67,8 @@ import {
   faFileMedicalAlt,
   fa1,
   fa6,
+  faA,
+  faBacterium,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -494,6 +496,32 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={fa6} />
                   </span>
                   <span className={styles.title}>Anexo 16</span>
+                </div>
+              )}
+              {tieneVista("Anexo 16 A") && (
+                <div
+                  className={`${styles.gridItem} ${activeTab === 28 ? styles.active : ""
+                    }`}
+                  onClick={() => setActiveTab(28)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={fa1} />
+                    <FontAwesomeIcon icon={fa6} />
+                    <FontAwesomeIcon icon={faA} className="ml-2" />
+                  </span>
+                  <span className={styles.title}>Anexo 16 A</span>
+                </div>
+              )}
+              {tieneVista("Antecedentes Patologicos") && (
+                <div
+                  className={`${styles.gridItem} ${activeTab === 29 ? styles.active : ""
+                    }`}
+                  onClick={() => setActiveTab(29)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faBacterium} />
+                  </span>
+                  <span className={styles.title}>Antecedentes Patológicos</span>
                 </div>
               )}
               {tieneVista("Playground") && (
@@ -1222,6 +1250,42 @@ const TabComponent = () => {
               <Anexo16 listas={listasCombos} />
             </div>
           )}
+          {activeTab === 28 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Anexo 16 A
+                </h2>
+              </div>
+              <Anexo16 listas={listasCombos} />
+            </div>
+          )}
+          {activeTab === 29 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Antecedentes Patológicos
+                </h2>
+              </div>
+              <Anexo16 listas={listasCombos} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -1304,6 +1368,14 @@ const TabComponent = () => {
               break;
             case "Anexo 16":
               setActiveTab(27);
+              setSubTab(0);
+              break;
+            case "Anexo 16 A":
+              setActiveTab(28);
+              setSubTab(0);
+              break;
+            case "Antecedentes Patologicos":
+              setActiveTab(29);
               setSubTab(0);
               break;
           }
