@@ -1175,7 +1175,11 @@ export const MapearDatosAdicionales = (
       data.glucosa = gluc ?? "";
       data.creatinina = creat ?? "";
       data.otrosExamenes = "";
-      data.otrosExamenes += `-HEMOGRAMA: NORMAL. \n`;
+      // data.otrosExamenes += `-HEMOGRAMA: NORMAL. \n`; //revisar
+      data.otrosExamenes += "HEMOGRAMA: " + (
+        res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
+          res.sedimientoUrinarioHematies_txthematiessu != null &&
+          vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
       data.otrosExamenes +=
         gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
       data.otrosExamenes +=
@@ -1451,7 +1455,11 @@ export const GetInfoServicioEditar = (
 
           // Build otrosExamenes field
           data.otrosExamenes = "";
-          data.otrosExamenes += "-HEMOGRAMA: NORMAL. \n";
+          // data.otrosExamenes += "-HEMOGRAMA: NORMAL. \n";//revisar
+          data.otrosExamenes += "HEMOGRAMA: " + (
+            res.examenQuimicoLeucocitos_txtleucocitoseq != null &&
+              res.sedimientoUrinarioHematies_txthematiessu != null &&
+              vsg != null && hemo != null ? "NORMAL" : "N/A") + "\n";
           data.otrosExamenes +=
             gluc == null ? "" : "-GLUCOSA: " + gluc + " mg/dl. \n";
           data.otrosExamenes +=
