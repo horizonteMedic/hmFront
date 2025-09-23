@@ -303,7 +303,7 @@ export default function Anexo16Boroo(data = {}) {
     },
     // Textos de Neumoconiosis
     textoNeumoconiosis1: "Texto de prueba 1 largo para ver como se ve",
-    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve", 
+    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve",
     textoNeumoconiosis3: "Texto de prueba 3 largo para ver como se ve",
     // Reacciones serológicas
     reaccionesSerologicas: {
@@ -646,9 +646,9 @@ export default function Anexo16Boroo(data = {}) {
       siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
     },
     // Textos de Neumoconiosis
-    textoNeumoconiosis1: data.textoNeumoconiosis1 ?? "Texto de prueba 1 largo para ver como se ve",
-    textoNeumoconiosis2: data.textoNeumoconiosis2 ?? "Texto de prueba 2 largo para ver como se ve",
-    textoNeumoconiosis3: data.textoNeumoconiosis3 ?? "Texto de prueba 3 largo para ver como se ve",
+    textoNeumoconiosis1: data.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "",
+    textoNeumoconiosis2: data.examenRadiograficoIrep_txtirep ?? "",
+    textoNeumoconiosis3: data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis ?? "",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
@@ -1682,14 +1682,14 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.anamnesis) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    
+
     // Limpiar el texto: remover saltos de línea y espacios extra
     const textoLimpio = datosFinales.evaluacionMental.anamnesis
       .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
       .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
       .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
       .trim(); // Remover espacios al inicio y final
-    
+
     doc.text(textoLimpio.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 180 });
   }
 
@@ -1699,14 +1699,14 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.estadoMental) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    
+
     // Limpiar el texto: remover saltos de línea y espacios extra
     const textoLimpio = datosFinales.evaluacionMental.estadoMental
       .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
       .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
       .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
       .trim(); // Remover espacios al inicio y final
-    
+
     doc.text(textoLimpio.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 180 });
   }
 
@@ -2148,7 +2148,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // Firma del paciente (imagen)
-  const xFirmaPaciente = 150-5;
+  const xFirmaPaciente = 150 - 5;
   const yFirmaPaciente = 195;
   const firmaWidth = 40;
   const firmaHeight = 18;
@@ -2164,7 +2164,7 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0);
     doc.text("Firma del Paciente", xFirmaPaciente, yFirmaPaciente + 8);
   }
-  const xHuellaDigital = 195-8;
+  const xHuellaDigital = 195 - 8;
   const yHuellaDigital = 185;
   try {
     const huellaDigitalImg = data.digitalizacion?.find(

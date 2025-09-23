@@ -658,9 +658,9 @@ export default function Anexo16(data = {}) {
       siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
     },
     // Textos de Neumoconiosis
-    textoNeumoconiosis1: data.textoNeumoconiosis1 ?? "Texto de prueba 1 largo para ver como se ve",
-    textoNeumoconiosis2: data.textoNeumoconiosis2 ?? "Texto de prueba 2 largo para ver como se ve",
-    textoNeumoconiosis3: data.textoNeumoconiosis3 ?? "Texto de prueba 3 largo para ver como se ve",
+    textoNeumoconiosis1: data.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "",
+    textoNeumoconiosis2: data.examenRadiograficoIrep_txtirep ?? "",
+    textoNeumoconiosis3: data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis ?? "",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
