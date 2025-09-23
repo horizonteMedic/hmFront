@@ -301,6 +301,10 @@ export default function Anexo16Boroo(data = {}) {
       conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
       siluetaCardiovascular: "NORMAL"
     },
+    // Textos de Neumoconiosis
+    textoNeumoconiosis1: "Texto de prueba 1 largo para ver como se ve",
+    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve",
+    textoNeumoconiosis3: "Texto de prueba 3 largo para ver como se ve",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "0/0" // Primera opción marcada
@@ -641,6 +645,10 @@ export default function Anexo16Boroo(data = {}) {
       conclusionesRadiograficas: data.conclusionesRadiograficas_txtconclusionesradiograficas ?? "",
       siluetaCardiovascular: data.siluetaCardioVascular_txtsiluetacardiovascular ?? ""
     },
+    // Textos de Neumoconiosis
+    textoNeumoconiosis1: data.examenRadiograficoSinNeumoconiosis_txtsinneumoconiosis ?? "",
+    textoNeumoconiosis2: data.examenRadiograficoIrep_txtirep ?? "",
+    textoNeumoconiosis3: data.examenRadiograficoConNeumoconiosis_txtconneumoconiosis ?? "",
     // Reacciones serológicas
     reaccionesSerologicas: {
       titulacion: "",
@@ -1674,14 +1682,14 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.anamnesis) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    
+
     // Limpiar el texto: remover saltos de línea y espacios extra
     const textoLimpio = datosFinales.evaluacionMental.anamnesis
       .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
       .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
       .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
       .trim(); // Remover espacios al inicio y final
-    
+
     doc.text(textoLimpio.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 180 });
   }
 
@@ -1691,14 +1699,14 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.estadoMental) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    
+
     // Limpiar el texto: remover saltos de línea y espacios extra
     const textoLimpio = datosFinales.evaluacionMental.estadoMental
       .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
       .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
       .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
       .trim(); // Remover espacios al inicio y final
-    
+
     doc.text(textoLimpio.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 180 });
   }
 
@@ -1791,6 +1799,34 @@ export default function Anexo16Boroo(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.radiografiaTorax.siluetaCardiovascular.toUpperCase(), xSiluetaCardiovascular, ySiluetaCardiovascular, { maxWidth: 40 });
+  }
+
+  // === SECCIÓN: TEXTOS DE NEUMOCONIOSIS ===
+  // Texto Neumoconiosis 1
+  const xTextoNeumoconiosis1 = 8;
+  const yTextoNeumoconiosis1 = 154;
+  if (datosFinales.textoNeumoconiosis1) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.textoNeumoconiosis1.toUpperCase(), xTextoNeumoconiosis1, yTextoNeumoconiosis1, { maxWidth: 35 });
+  }
+
+  // Texto Neumoconiosis 2
+  const xTextoNeumoconiosis2 = 44;
+  const yTextoNeumoconiosis2 = 154;
+  if (datosFinales.textoNeumoconiosis2) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.textoNeumoconiosis2.toUpperCase(), xTextoNeumoconiosis2, yTextoNeumoconiosis2, { maxWidth: 40 });
+  }
+
+  // Texto Neumoconiosis 3
+  const xTextoNeumoconiosis3 = 86;
+  const yTextoNeumoconiosis3 = 154;
+  if (datosFinales.textoNeumoconiosis3) {
+    doc.setFont("helvetica", "normal").setFontSize(6.5);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.textoNeumoconiosis3.toUpperCase(), xTextoNeumoconiosis3, yTextoNeumoconiosis3, { maxWidth: 55 });
   }
 
   // === SECCIÓN: REACCIONES SEROLÓGICAS ===
@@ -2112,7 +2148,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // Firma del paciente (imagen)
-  const xFirmaPaciente = 150-5;
+  const xFirmaPaciente = 150 - 5;
   const yFirmaPaciente = 195;
   const firmaWidth = 40;
   const firmaHeight = 18;
@@ -2128,7 +2164,7 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0);
     doc.text("Firma del Paciente", xFirmaPaciente, yFirmaPaciente + 8);
   }
-  const xHuellaDigital = 195-8;
+  const xHuellaDigital = 195 - 8;
   const yHuellaDigital = 185;
   try {
     const huellaDigitalImg = data.digitalizacion?.find(
