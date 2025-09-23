@@ -1810,7 +1810,7 @@ export default function Anexo16Boroo(data = {}) {
     { titulo: "St", x: 136, y: 136.7, marcado: datosFinales.reaccionesSerologicas.titulacion_st }
   ];
 
-  if (datosFinales.reaccionesSerologicas && datosFinales.reaccionesSerologicas.titulacion) {
+  if (datosFinales.reaccionesSerologicas) {
     doc.setTextColor(0, 0, 255); // Color azul para las X
     doc.setFont("helvetica", "bold").setFontSize(12);
 

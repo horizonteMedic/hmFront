@@ -60,77 +60,77 @@ export default function DatosPersonales({
                 name="dni"
                 value={form.dni}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Nombres"
                 name="nombres"
                 value={form.nombres}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Apellidos"
                 name="apellidos"
                 value={form.apellidos}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Fecha Nac."
                 name="fechaNac"
                 value={form.fechaNac}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Sexo"
                 name="sexo"
                 value={form.sexo}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Edad (años)"
                 name="edad"
                 value={form.edad}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Lugar Nac."
                 name="lugarNac"
                 value={form.lugarNac}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Domicilio"
                 name="domicilio"
                 value={form.domicilio}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Teléfono"
                 name="telefono"
                 value={form.telefono}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Estado Civil"
                 name="estadoCivil"
                 value={form.estadoCivil}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Grado Inst."
                 name="gradoInstruccion"
                 value={form.gradoInstruccion}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
             </div>
           </div>
