@@ -12,8 +12,9 @@ import PanelObservaciones from "./PanelObservaciones/PanelObservaciones";
 import { useForm } from "../../../../hooks/useForm";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
+import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAnexo16";
 import Swal from "sweetalert2";
+import Abdomen from "./Abdomen/Abdomen";
 
 const tabla = "anexo7c";
 const today = getToday();
@@ -43,24 +44,24 @@ export default function Anexo16({ listas }) {
     estadoCivil: "",
     gradoInstruccion: "",
     //Agentes presentes en Trabajo Actual
-    ruido: false,
-    polvo: false,
-    vidSegmentario: false,
-    vidTotal: false,
-    alturaEstruct: false,
-    vibraciones: false,
+    ruido: true,
+    polvo: true,
+    vidSegmentario: true,
+    vidTotal: true,
+    alturaEstruct: true,
+    vibraciones: true,
     cancerigenos: false,
     mutagenicos: false,
     solventes: false,
     metales: false,
     alturaGeograf: false,
-    temperaturaAgente: false,
+    temperaturaAgente: true,
     biologicos: false,
-    posturas: false,
+    posturas: true,
     turnos: false,
     quimicos: false,
-    cargas: false,
-    movRepet: false,
+    cargas: true,
+    movRepet: true,
     pvd: false,
     electricos: false,
     otros: false,
@@ -71,16 +72,16 @@ export default function Anexo16({ listas }) {
     explotacion: "",
     alturaLaboral: "",
     //Detalles del Puesto
-    puestoPostula: "",
+    puestoPostula: "N/A",
     areaPuesto: "",
-    puestoActual: "",
-    tiempoPuesto: "",
+    puestoActual: "N/A",
+    tiempoPuesto: "N/A",
     reubicacion: false,
 
     //Antecedentes
-    antecedentesPersonalesOcupacionales: "",
-    otroAntecedentePersonal: "",
-    antecedentesFamiliares: "",
+    antecedentesPersonales2: "NINGUNO",
+    antecedentesPersonales: "NIEGA DB, TBC, HTA, CONVULSIONES, ASMA, ALERGIAS, ACCIDENTES",
+    antecedentesFamiliares: "NO CONTRIBUTORIOS",
     antecedentesPatologicos: "",
     //Hábitos
     tabaco: "NADA",
@@ -106,7 +107,7 @@ export default function Anexo16({ listas }) {
     glucosa: "",
     creatinina: "",
     marihuana: "",
-    cocaina: "",
+    cocaina: "NO REACTIVO",
     hemoglobinaHematocrito: "",
     //Grupo Sanguineo
     grupoSanguineoPrevio: "",
@@ -162,8 +163,8 @@ export default function Anexo16({ listas }) {
     oi6000: "",
     oi8000: "",
 
-    otoscopiaOd: "",
-    otoscopiaOi: "",
+    otoscopiaOd: "NORMAL",
+    otoscopiaOi: "NORMAL",
 
     // Función Respiratoria
     fvc: "",
@@ -175,16 +176,16 @@ export default function Anexo16({ listas }) {
     conclusionRespiratoria: "",
 
     // Examen Físico
-    cabeza: "",
-    nariz: "",
-    cuello: "",
+    cabeza: "NORMAL",
+    nariz: "CENTRAL, PERMEABLE",
+    cuello: "CENTRAL, MOVIL",
     perimetro: "",
-    bocaAmigdalasFaringeLaringe: "",
+    bocaAmigdalasFaringeLaringe: "HUMECTADA, NO HIPERTROFICAS, NO CONGESTIVAS",
     //Miembros y reflejos
-    miembrosSuperiores: "",
-    miembrosInferiores: "",
-    reflejosOsteotendinosos: "",
-    marcha: "",
+    miembrosSuperiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
+    miembrosInferiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
+    reflejosOsteotendinosos: "CONSERVADOS",
+    marcha: "NORMAL",
 
     // Ojos
     visionCercaOd: "",
@@ -197,23 +198,59 @@ export default function Anexo16({ listas }) {
     visionLejosOdCorregida: "",
     visionLejosOiCorregida: "",
 
-    visionColores: "",
-    enfermedadOculares: "",
-    enfermedadOtros: "",
-    reflejosPupilares: "",
+    visionColores: "NORMAL",
+    enfermedadOculares: "NINGUNA",
+    enfermedadOtros: "NINGUNA",
+    reflejosPupilares: "CONSERVADOS",
     visionBinocular: "",
 
     pulmones: "NORMAL",
-    pulmonesObservaciones: "",
-    torax: "",
-    corazon: "",
+    pulmonesObservaciones: "BPMV EN ACP. NO RALES.",
+    torax: "BPMV EN ACP, NO RALES.",
+    corazon: "RCRR, NO SOPLOS.",
     // Dentadura
     piezasMalEstado: "",
     piezasFaltan: "",
     dentaduraObservaciones: "",
-
     //=============================================================================================
     //TERCERA TAB RESULTADOS
+    //=============================================================================================
+    // Examen Físico - Abdomen
+    abdomen: "RHA(+), B/D, NO DOLOROSO A LA PALPACION",
+    columnaVertebral: "CENTRAL, MOVIL, CURVATURAS CONSERVADAS",
+    anillosInguinales: "CONSERVADOS",
+    organosGenitales: "DE CARACTER NORMAL",
+    //Tacto Rectal
+    tactoRectal: "NO_SE_HIZO",
+    hernias: "NO",
+    varices: "NO",
+    ganglios: "NO LINFADENOPATIAS",
+    evaluacionCognitiva: "NORMAL",
+    //Información Radiológica
+    numeroRx: "",
+    codigoExamenRadiograficoSanguineo: null,
+    fechaRx: getToday(),
+    calidadRx: "",
+    simbolosRx: "N/A",
+    //Conclusiones Radiográficas
+    vertices: "",
+    hilios: "",
+    senos: "",
+    mediastinos: "",
+    conclusionesRadiograficas: "",
+    siluetaCardiovascular: "",
+    //Estado Mental y Anamnesis
+    estadoMental: "DESPIERTO, OTEP, COMUNICATIVO.",
+    anamnesis: "COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.",
+    //Clasificación y Neumoconiosis
+    clasificacion: "0/0",
+    reaccionesSerologicas: "NEGATIVO",
+    sinNeumoconiosis: "NORMAL",
+    imagenRadiograficaPolvo: "SOSPECHA",
+    conNeumoconiosis: "",
+
+    //=============================================================================================
+    //CUARTA TAB RESULTADOS
     //=============================================================================================
     // Exámenes de Laboratorio
     nitritos: "",
@@ -264,6 +301,20 @@ export default function Anexo16({ listas }) {
     perimetroToraxico: "",
     oftalmologia: "",
 
+    //colores
+    cocainaRed: "",
+    marihuanaRed: "",
+    glucosaRed: "",
+    creatininaRed: "",
+    imcRed: "",
+    hemoglobinaRed: "",
+    colesterolRed: "",
+
+    ldlRed: "",
+    hdlRed: "",
+    vldlRed: "",
+    trigliceridosRed: "",
+
     // Médico que Certifica //BUSCADOR
     nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     filteredNombresMedicos: [],
@@ -291,12 +342,21 @@ export default function Anexo16({ listas }) {
       component: DatosPersonales,
     },
     { id: 1, name: "Exámenes", icon: faStethoscope, component: Examenes },
-    { id: 2, name: "Resultados", icon: faChartLine, component: Resultados },
+    { id: 2, name: "Abdomen", icon: faChartLine, component: Abdomen },
+    { id: 3, name: "Resultados", icon: faChartLine, component: Resultados },
+
   ];
 
   const handleSave = () => {
-    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, setForm, token, userlogued, handleClear, tabla, datosFooter);
   };
+  const handleSearchExamenesRealizados = (e) => {
+    if (e.key === "Enter") {
+      // handleClearnotO();
+      GetExamenesRealizados(form.nordenEstadoPaciente, setForm, token, () => { Swal.close() });
+    }
+  };
+
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
@@ -369,6 +429,8 @@ export default function Anexo16({ listas }) {
                       MedicosMulti={MedicosMulti}
                       handlePrint={handlePrint}
                       handleSearch={handleSearch}
+                      handleSave={handleSave}
+                      handleSearchExamenesRealizados={handleSearchExamenesRealizados}
                     />
                   )
                 );
@@ -382,8 +444,7 @@ export default function Anexo16({ listas }) {
           <PanelObservaciones
             form={form}
             handleRadioButton={handleRadioButton}
-            handleClear={handleClear}
-            handleSave={handleSave}
+
             activeTab={activeTab}
             handleChange={handleChange}
           />

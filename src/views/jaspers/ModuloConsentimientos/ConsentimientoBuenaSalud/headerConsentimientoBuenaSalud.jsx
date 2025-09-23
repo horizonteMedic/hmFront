@@ -17,12 +17,12 @@ const headerConsentimientoBuenaSalud = (doc, datos) => {
   }
 
   // === 2) NÚMERO DE FICHA Y SEDE AL COSTADO DEL BLOQUE DE COLOR ===
-  const sedeValue = `${datos.sede || 'ESTE ES UNA SEDE DE PRUEBA'}`;
+  const sedeValue = `${datos.sedeDescripcion || ''}`;
   const sedeX = pageW - margin - 20;
   const sedeY = y + 6;
   
   // Número de ficha primero
-  const fichaNum = String(datos.norden || datos.numeroFicha || "96639");
+  const fichaNum = String(datos.norden || datos.numeroFicha || "");
   const fichaY = sedeY;
   
   // Texto "N° Ficha :" delante del número

@@ -1,8 +1,8 @@
-import React from 'react';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faBroom, faPrint, faEdit } from '@fortawesome/free-solid-svg-icons';
 
-const Anexo16A = ({ token, selectedSede }) => {
+const Anexo16A = () => {
   return (
     <div className="max-w-4xl mx-auto bg-white rounded shadow p-8">
       <h2 className="text-2xl font-bold mb-6 text-center">Anexo 16A</h2>

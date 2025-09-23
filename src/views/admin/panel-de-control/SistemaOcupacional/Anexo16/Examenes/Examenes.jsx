@@ -9,12 +9,11 @@ export default function Examenes({
   form,
   handleChange,
   handleRadioButton,
-  handleCheckBoxChange
+  handleCheckBoxChange,
+  setForm,
 }) {
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
-
-
       {/* Primera fila - 2 columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
         {/* Información Triaje */}
@@ -88,7 +87,9 @@ export default function Examenes({
             />
             {/* Medidas Físicas integradas */}
             <div className="col-span-2 border-t pt-3 mt-3">
-              <h5 className="font-semibold text-gray-800 mb-3 ">Medidas Físicas</h5>
+              <h5 className="font-semibold text-gray-800 mb-3 ">
+                Medidas Físicas
+              </h5>
               <div className="grid grid-cols-3 gap-3">
                 <InputTextOneLine
                   label="Talla (m)"
@@ -108,6 +109,7 @@ export default function Examenes({
                   label="IMC"
                   name="imc"
                   value={form.imc}
+                  className={form.imcRed ? "text-red-600" : ""}
                   disabled
                   labelOnTop
                 />
@@ -284,7 +286,7 @@ export default function Examenes({
               label="Perímetro (cm)"
               name="perimetro"
               value={form.perimetro}
-              onChange={handleChange}
+              disabled
               labelWidth="90px"
             />
             <InputTextArea
@@ -297,7 +299,9 @@ export default function Examenes({
 
             {/* Miembros y Reflejos integrados */}
             <div className="border-t pt-2 mt-3">
-              <h5 className="font-semibold text-gray-800 mb-2">Miembros y Reflejos</h5>
+              <h5 className="font-semibold text-gray-800 mb-2">
+                Miembros y Reflejos
+              </h5>
               <div className="grid grid-cols-2 gap-2">
                 <InputTextOneLine
                   label="Miembros Superiores"
@@ -449,7 +453,13 @@ export default function Examenes({
               <InputsRadioGroup
                 name="pulmones"
                 value={form.pulmones}
-                onChange={handleRadioButton}
+                onChange={(e, value) => {
+                  handleRadioButton(e, value)
+                  if (value == "ANORMAL") {
+                    setForm(prev => ({ ...prev, pulmonesObservaciones: "" }));
+                  }
+
+                }}
                 options={[
                   { label: "Normal", value: "NORMAL" },
                   { label: "Anormal", value: "ANORMAL" },
@@ -502,12 +512,12 @@ export default function Examenes({
                 disabled
                 labelOnTop
               />
-              <InputTextOneLine
+              <InputTextArea
                 label="Observaciones"
+                rows={8}
                 name="dentaduraObservaciones"
                 value={form.dentaduraObservaciones}
                 disabled
-                labelOnTop
               />
             </div>
           </div>

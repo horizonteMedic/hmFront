@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1 } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1, faA, faBacterium } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
@@ -22,6 +22,8 @@ const accesos = [
   { icon: faMountain, label: 'Antecedentes de Altura', key: "Antecedentes de Altura" },
   { icon: fa2, label: "Anexo 2", key: "Anexo 2" },
   { icon: fa1, label: "Anexo 16", key: "Anexo 16" },
+  { icon: fa1, label: "Anexo 16 A", key: "Anexo 16 A" },
+  { icon: faBacterium, label: "Antecedentes Patológicos", key: "Antecedentes Patologicos" },
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
@@ -58,6 +60,7 @@ const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista 
               <span className="text-orange-500 text-2xl group-hover:text-white transition-all duration-200">
                 <FontAwesomeIcon icon={item.icon} />
                 {item.key === "Anexo 16" && <FontAwesomeIcon icon={fa6} />}
+                {item.key === "Anexo 16 A" && <><FontAwesomeIcon icon={fa6} /> <FontAwesomeIcon icon={faA} className='ml-1'/></>}
               </span>
               <span className="font-bold text-lg text-gray-900 group-hover:text-white transition-all duration-200">{item.label}</span>
             </button>

@@ -60,77 +60,77 @@ export default function DatosPersonales({
                 name="dni"
                 value={form.dni}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Nombres"
                 name="nombres"
                 value={form.nombres}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Apellidos"
                 name="apellidos"
                 value={form.apellidos}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Fecha Nac."
                 name="fechaNac"
                 value={form.fechaNac}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Sexo"
                 name="sexo"
                 value={form.sexo}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
-                label="Edad"
+                label="Edad (años)"
                 name="edad"
                 value={form.edad}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Lugar Nac."
                 name="lugarNac"
                 value={form.lugarNac}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Domicilio"
                 name="domicilio"
                 value={form.domicilio}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Teléfono"
                 name="telefono"
                 value={form.telefono}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Estado Civil"
                 name="estadoCivil"
                 value={form.estadoCivil}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
               <InputTextOneLine
                 label="Grado Inst."
                 name="gradoInstruccion"
                 value={form.gradoInstruccion}
                 disabled
-                labelWidth="65px"
+                labelWidth="68px"
               />
             </div>
           </div>
@@ -340,7 +340,7 @@ export default function DatosPersonales({
                 label="Tiempo"
                 name="tiempoPuesto"
                 value={form.tiempoPuesto}
-                disabled
+                onChange={handleChangeNumber}
               />
               <InputTextOneLine
                 label="Area"
@@ -373,14 +373,14 @@ export default function DatosPersonales({
               <div className="flex flex-col gap-2">
                 <InputTextOneLine
                   label="Antecedentes Personales y/o Ocupacionales (enfermedad y/o accidente)"
-                  name="antecedentesPersonalesOcupacionales"
-                  value={form.antecedentesPersonalesOcupacionales}
+                  name="antecedentesPersonales2"
+                  value={form.antecedentesPersonales2}
                   onChange={handleChange}
                   labelOnTop
                 />
                 <InputTextOneLine
-                  name="otroAntecedentePersonal"
-                  value={form.otroAntecedentePersonal}
+                  name="antecedentesPersonales"
+                  value={form.antecedentesPersonales}
                   onChange={handleChange}
                 />
               </div>
@@ -479,13 +479,13 @@ export default function DatosPersonales({
                     label="Vivos"
                     name="hijosVivos"
                     value={form.hijosVivos}
-                    disabled
+                    onChange={handleChangeNumber}
                   />
                   <InputTextOneLine
                     label="Muertos"
                     name="hijosMuertos"
                     value={form.hijosMuertos}
-                    disabled
+                    onChange={handleChangeNumber}
                   />
                 </div>
               </div>

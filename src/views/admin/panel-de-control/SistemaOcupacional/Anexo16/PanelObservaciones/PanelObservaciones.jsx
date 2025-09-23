@@ -27,8 +27,8 @@ export default function PanelObservaciones({
           <InputTextArea
             rows={8}
             label="Observaciones"
-            name="diagnosticoAudio"
-            value={form.diagnosticoAudio}
+            name="observacionesAudio"
+            value={form.observacionesAudio}
             onChange={handleChange}
           />
         </div>
@@ -42,6 +42,54 @@ export default function PanelObservaciones({
             value={form.conclusionMedico}
             onChange={handleChange}
           />
+        </div>
+        {/* Comparación Grupo Sanguíneo */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <h4 className="font-semibold text-gray-800 mb-2">
+            Comparación Grupo Sanguíneo
+          </h4>
+          <div className="flex items-center space-x-2">
+            <InputTextOneLine
+              name="grupoSanguineoPrevio"
+              value={form.grupoSanguineoPrevio}
+              disabled
+            />
+            <span className="font-medium">=</span>
+            <InputTextOneLine
+              name="grupoSanguineoGrupo"
+              value={form.grupoSanguineoGrupo}
+              disabled
+            />
+          </div>
+        </div>
+        {/* Grupo Sanguíneo */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1">
+          <h4 className="font-semibold text-gray-800 mb-2">Grupo Sanguíneo</h4>
+
+          <div className="space-y-2">
+            <InputsRadioGroup
+              name="grupoSanguineo"
+              value={form.grupoSanguineo}
+              onChange={handleRadioButton}
+              disabled
+              options={[
+                { label: "O", value: "O" },
+                { label: "A", value: "A" },
+                { label: "B", value: "B" },
+                { label: "AB", value: "AB" },
+              ]}
+            />
+            <InputsRadioGroup
+              name="factorRh"
+              value={form.factorRh}
+              onChange={handleRadioButton}
+              disabled
+              options={[
+                { label: "Rh(+)", value: "RH(+)" },
+                { label: "Rh(-)", value: "RH(-)" },
+              ]}
+            />
+          </div>
         </div>
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <p className="font-semibold text-gray-800 mb-2">
@@ -99,54 +147,8 @@ export default function PanelObservaciones({
           </div>
         </div>
 
-        {/* Comparación Grupo Sanguíneo */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold text-gray-800 mb-2">
-            Comparación Grupo Sanguíneo
-          </h4>
-          <div className="flex items-center space-x-2">
-            <InputTextOneLine
-              name="grupoSanguineoPrevio"
-              value={form.grupoSanguineoPrevio}
-              disabled
-            />
-            <span className="font-medium">=</span>
-            <InputTextOneLine
-              name="grupoSanguineoGrupo"
-              value={form.grupoSanguineoGrupo}
-              disabled
-            />
-          </div>
-        </div>
-        {/* Grupo Sanguíneo */}
-        <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1">
-          <h4 className="font-semibold text-gray-800 mb-2">Grupo Sanguíneo</h4>
 
-          <div className="space-y-2">
-            <InputsRadioGroup
-              name="grupoSanguineo"
-              value={form.grupoSanguineo}
-              onChange={handleRadioButton}
-              disabled
-              options={[
-                { label: "O", value: "O" },
-                { label: "A", value: "A" },
-                { label: "B", value: "B" },
-                { label: "AB", value: "AB" },
-              ]}
-            />
-            <InputsRadioGroup
-              name="factorRh"
-              value={form.factorRh}
-              onChange={handleRadioButton}
-              disabled
-              options={[
-                { label: "Rh(+)", value: "RH(+)" },
-                { label: "Rh(-)", value: "RH(-)" },
-              ]}
-            />
-          </div>
-        </div>
+
         {/* Perfil Lipídico */}
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold text-gray-700 mb-3">Perfil Lipídico</h4>
@@ -166,7 +168,7 @@ export default function PanelObservaciones({
                 value={form.LDLColesterol}
                 labelWidth="100px"
                 disabled
-                className={form.LDLColesterolRed ? "text-red-600" : ""}
+                className={form.ldlRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="H.D.L Colesterol"
@@ -174,7 +176,7 @@ export default function PanelObservaciones({
                 value={form.HDLColesterol}
                 labelWidth="100px"
                 disabled
-                className={form.HDLColesterolRed ? "text-red-600" : ""}
+                className={form.hdlRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="V.L.D.L Colesterol"
@@ -182,7 +184,7 @@ export default function PanelObservaciones({
                 value={form.VLDLColesterol}
                 labelWidth="100px"
                 disabled
-                className={form.VLDLColesterolRed ? "text-red-600" : ""}
+                className={form.vldlRed ? "text-red-600" : ""}
               />
               <InputTextOneLine
                 label="Triglicéridos"
