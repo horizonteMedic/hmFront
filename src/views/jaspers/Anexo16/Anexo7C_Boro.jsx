@@ -294,9 +294,9 @@ export default function Anexo16Boroo(data = {}) {
       fecha: "28/05/2025",
       calidad: "2",
       simbolos: "N/A",
-      vertices: "LIBRES",
-      hilios: "NORMALES",
-      senos: "LIBRES",
+      vertices: "TEXTO MAS LARGO PRUEBA",
+      hilios: "TEXTO MAS LARGO PRUEBA",
+      senos: "TEXTO MAS LARGO PRUEBA",
       mediastinos: "NORMALES",
       conclusionesRadiograficas: "TRAMA BRONCOVASCULAR",
       siluetaCardiovascular: "NORMAL"
@@ -357,7 +357,23 @@ export default function Anexo16Boroo(data = {}) {
     },
     // Conclusiones y Recomendaciones/Restricciones (Página 2)
     conclusiones: "EVALUACIÓN CLÍNICA DENTRO DE PARÁMETROS NORMALES.",
-    recomendacionesRestricciones: "MANTENER HÁBITOS SALUDABLES. CONTROL MÉDICO ANUAL."
+    recomendacionesRestricciones: "MANTENER HÁBITOS SALUDABLES. CONTROL MÉDICO ANUAL.",
+    // Observaciones
+    observaciones: [
+      "1-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. .- EVALUACION ANUAL.",
+      "2-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
+      "3-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      "4-TRAMA BRONCOVASCULAR ACENTUADA EN ACP.",
+      "5- EVALUACION POR NEUMOLOGIA",
+      "6-7-- USO DE LENTES CORRECTORES.",
+      "8-AMETROPIA LEVE BILATERAL- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.",
+      "9-- DISCROMATOPSIA. - PTERIGIÓN BILATERAL.:EVALUACION POR OFTALMOLOGIA.",
+      "10-ODONTOGRAMA : NO PASO EXAMEN ODONTOLOGICO",
+      "AUDIOMETRIA - NORMAL - NORMAL .EVALUACION ANUAL",
+      "11-ELECTROCARDIOGRAMA: BRADICARDIA SINUSAL ASINTOMATICA. DESVIACION IZQUIERDA DEL EJE CARDIACO. DESVIACION DERECHA DEL EJE CARDIACO. DESVIACION IZQUIERDA DEL EJE CARDIACO. - EVALUACION ANUAL.",
+      "12-ELECTROCARDIOGRAMA PODEROSA: .- EVALUACION ANUAL. - EVALUACION EN 6 MESES.",
+      "1-ELECTROCARDIOGRAMA: - EVALUACION ANUAL."
+    ]
   };
   const datosReales = {
     fechaExamen: formatearFechaCorta(data.fechaAnexo7c_fecha ?? ""),
@@ -693,7 +709,11 @@ export default function Anexo16Boroo(data = {}) {
     },
     // Conclusiones y Recomendaciones/Restricciones (Página 2)
     conclusiones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? "",
-    recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? ""
+    recomendacionesRestricciones: data.conclusionMedicoAnexo7c_txtconclusionmed ?? "",
+    // Observaciones
+    observaciones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm
+      ? data.observacionesFichaMedicaAnexo7c_txtobservacionesfm.split('\n').filter(obs => obs.trim() !== '')
+      : []
   };
 
   // Usar datos de prueba por ahora
@@ -1654,7 +1674,15 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.anamnesis) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionMental.anamnesis.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 180 });
+    
+    // Limpiar el texto: remover saltos de línea y espacios extra
+    const textoLimpio = datosFinales.evaluacionMental.anamnesis
+      .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
+      .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
+      .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
+      .trim(); // Remover espacios al inicio y final
+    
+    doc.text(textoLimpio.toUpperCase(), xAnamnesis, yAnamnesis, { maxWidth: 180 });
   }
 
   // ESTADO MENTAL
@@ -1663,7 +1691,15 @@ export default function Anexo16Boroo(data = {}) {
   if (datosFinales.evaluacionMental && datosFinales.evaluacionMental.estadoMental) {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionMental.estadoMental.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 180 });
+    
+    // Limpiar el texto: remover saltos de línea y espacios extra
+    const textoLimpio = datosFinales.evaluacionMental.estadoMental
+      .replace(/\n/g, ' ') // Reemplazar saltos de línea con espacios
+      .replace(/\r/g, ' ') // Reemplazar retornos de carro con espacios
+      .replace(/\s+/g, ' ') // Reemplazar múltiples espacios con uno solo
+      .trim(); // Remover espacios al inicio y final
+    
+    doc.text(textoLimpio.toUpperCase(), xEstadoMental, yEstadoMental, { maxWidth: 180 });
   }
 
   // === SECCIÓN: RADIOGRAFÍA DE TÓRAX ===
@@ -1698,7 +1734,7 @@ export default function Anexo16Boroo(data = {}) {
   const xSimbolos = 26;
   const ySimbolos = 123.5;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.simbolos) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.radiografiaTorax.simbolos, xSimbolos, ySimbolos);
   }
@@ -1707,54 +1743,54 @@ export default function Anexo16Boroo(data = {}) {
   const xVertices = 95;
   const yVertices = 108;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.vertices) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.vertices.toUpperCase(), xVertices, yVertices);
+    doc.text(datosFinales.radiografiaTorax.vertices.toUpperCase(), xVertices, yVertices, { maxWidth: 40 });
   }
 
   // HILIOS NORMALES
-  const xHilios = 95;
-  const yHilios = 117.2;
+  const xHilios = 90;
+  const yHilios = 116;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.hilios) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.hilios.toUpperCase(), xHilios, yHilios);
+    doc.text(datosFinales.radiografiaTorax.hilios.toUpperCase(), xHilios, yHilios, { maxWidth: 40 });
   }
 
   // SENOS
-  const xSenos = 94.5;
-  const ySenos = 121.7;
+  const xSenos = 90;
+  const ySenos = 121;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.senos) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.senos.toUpperCase(), xSenos, ySenos);
+    doc.text(datosFinales.radiografiaTorax.senos.toUpperCase(), xSenos, ySenos, { maxWidth: 40 });
   }
 
   // MEDIASTINOS
   const xMediastinos = 170;
   const yMediastinos = 113;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.mediastinos) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.mediastinos.toUpperCase(), xMediastinos, yMediastinos);
+    doc.text(datosFinales.radiografiaTorax.mediastinos.toUpperCase(), xMediastinos, yMediastinos, { maxWidth: 40 });
   }
 
   // CONCLUSIONES RADIOGRÁFICAS
   const xConclusionesRadiograficas = 84;
   const yConclusionesRadiograficas = 130;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.conclusionesRadiograficas) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.conclusionesRadiograficas.toUpperCase(), xConclusionesRadiograficas, yConclusionesRadiograficas);
+    doc.text(datosFinales.radiografiaTorax.conclusionesRadiograficas.toUpperCase(), xConclusionesRadiograficas, yConclusionesRadiograficas, { maxWidth: 40 });
   }
 
   // SILUETA CARDIOVASCULAR
   const xSiluetaCardiovascular = 150;
   const ySiluetaCardiovascular = 123;
   if (datosFinales.radiografiaTorax && datosFinales.radiografiaTorax.siluetaCardiovascular) {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.radiografiaTorax.siluetaCardiovascular.toUpperCase(), xSiluetaCardiovascular, ySiluetaCardiovascular);
+    doc.text(datosFinales.radiografiaTorax.siluetaCardiovascular.toUpperCase(), xSiluetaCardiovascular, ySiluetaCardiovascular, { maxWidth: 40 });
   }
 
   // === SECCIÓN: REACCIONES SEROLÓGICAS ===
@@ -2024,14 +2060,31 @@ export default function Anexo16Boroo(data = {}) {
     doc.text(datosFinales.examenesLaboratorio.plomoOrina.toUpperCase(), xPlomoOrina, yPlomoOrina);
   }
 
-  // === SECCIÓN: CONCLUSIONES Y RECOMENDACIONES / RESTRICCIONES ===
-  // Columna izquierda: CONCLUSIONES
-  const xConclusiones2 = 12;
-  const yConclusiones2 = 235;
-  if (datosFinales.conclusiones) {
-    doc.setFont("helvetica", "normal").setFontSize(8);
+  // === SECCIÓN: OBSERVACIONES ===
+  const xObservaciones = 10;
+  let yPosicionActual = 231; // Variable para rastrear la posición actual
+  const espacioEntreObservaciones = 0.5; // Espacio entre observaciones (muy reducido)
+  const lineHeight = 2.5; // Altura entre líneas de texto dividido (más compacto)
+  const maxWidth = 100; // Ancho máximo
+
+  if (datosFinales.observaciones && Array.isArray(datosFinales.observaciones)) {
+    doc.setFont("helvetica", "normal").setFontSize(5.5);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.conclusiones.toUpperCase(), xConclusiones2, yConclusiones2, { maxWidth: 80 });
+
+    datosFinales.observaciones.forEach((observacion) => {
+      // Dividir texto largo en múltiples líneas si es necesario
+      const lines = doc.splitTextToSize(observacion.toUpperCase(), maxWidth);
+
+      // Dibujar cada línea de la observación actual
+      lines.forEach((line, lineIndex) => {
+        const yLinePosition = yPosicionActual + (lineIndex * lineHeight);
+        doc.text(line, xObservaciones, yLinePosition);
+      });
+
+      // Calcular la nueva posición para la siguiente observación
+      // Sumar el número de líneas de esta observación + espacio entre observaciones
+      yPosicionActual += (lines.length * lineHeight) + espacioEntreObservaciones;
+    });
   }
 
   // Columna derecha: RECOMENDACIONES / RESTRICCIONES
