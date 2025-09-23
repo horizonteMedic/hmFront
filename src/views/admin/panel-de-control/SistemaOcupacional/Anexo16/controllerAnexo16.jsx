@@ -1485,8 +1485,8 @@ export const GetInfoServicioEditar = (
           data.empresa = res.empresa_razon_empresa ?? "";
           data.contrata = res.contrata_razon_contrata ?? "";
           // Age calculation
-          if (data.fechaNacimiento) {
-            const birthDate = new Date(data.fechaNacimiento);
+          if (data.fechaNac) {
+            const birthDate = new Date(data.fechaNac);
             const today = new Date();
             let age = today.getFullYear() - birthDate.getFullYear();
             const monthDiff = today.getMonth() - birthDate.getMonth();

@@ -91,7 +91,7 @@ export default function DatosPersonales({
                 labelWidth="65px"
               />
               <InputTextOneLine
-                label="Edad"
+                label="Edad (años)"
                 name="edad"
                 value={form.edad}
                 disabled
