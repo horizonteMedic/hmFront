@@ -41,6 +41,7 @@ import LibroDeReclamaciones from "./views/admin/LibroDeReclamaciones/LibroDeRecl
 import Formulario from "./views/admin/RegistroUnico/Formulario.jsx";
 import Permisos from "./views/admin/Permisos/Permisos.jsx";
 import SistemaOcupacional from "./views/admin/panel-de-control/SistemaOcupacional/SistemaOcupacional.jsx";
+import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A/Anexo16A.jsx";
 
 
 //SIMULADOR DE jaspers
@@ -163,6 +164,7 @@ const AppContent = () => {
         element={<LibroDeReclamaciones />}
       />
       <Route path="/permisos" element={<Permisos />} />
+      <Route path="/anexo16a" element={<Anexo16A />} />
       <Route path="*" element={<Navigate to="/" />} />
       <Route path="/fichapi" element={<Ficha />} />
       </Routes>
