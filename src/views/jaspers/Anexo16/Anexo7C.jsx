@@ -1763,7 +1763,7 @@ export default function Anexo16(data = {}) {
   // === SECCIÓN: TEXTOS DE NEUMOCONIOSIS ===
   // Texto Neumoconiosis 1
   const xTextoNeumoconiosis1 = 8;
-  const yTextoNeumoconiosis1 = 155;
+  const yTextoNeumoconiosis1 = 156.5;
   if (datosFinales.textoNeumoconiosis1) {
     doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);
@@ -1772,7 +1772,7 @@ export default function Anexo16(data = {}) {
 
   // Texto Neumoconiosis 2
   const xTextoNeumoconiosis2 = 44;
-  const yTextoNeumoconiosis2 = 155;
+  const yTextoNeumoconiosis2 = 156.5;
   if (datosFinales.textoNeumoconiosis2) {
     doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);
@@ -1781,7 +1781,7 @@ export default function Anexo16(data = {}) {
 
   // Texto Neumoconiosis 3
   const xTextoNeumoconiosis3 = 86;
-  const yTextoNeumoconiosis3 = 155;
+  const yTextoNeumoconiosis3 = 156.5;
   if (datosFinales.textoNeumoconiosis3) {
     doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);

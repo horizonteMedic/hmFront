@@ -1804,7 +1804,7 @@ export default function Anexo16Boroo(data = {}) {
   // === SECCIÓN: TEXTOS DE NEUMOCONIOSIS ===
   // Texto Neumoconiosis 1
   const xTextoNeumoconiosis1 = 8;
-  const yTextoNeumoconiosis1 = 152;
+  const yTextoNeumoconiosis1 = 154;
   if (datosFinales.textoNeumoconiosis1) {
     doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);
@@ -1813,7 +1813,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // Texto Neumoconiosis 2
   const xTextoNeumoconiosis2 = 44;
-  const yTextoNeumoconiosis2 = 152;
+  const yTextoNeumoconiosis2 = 154;
   if (datosFinales.textoNeumoconiosis2) {
     doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);
@@ -1822,7 +1822,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // Texto Neumoconiosis 3
   const xTextoNeumoconiosis3 = 86;
-  const yTextoNeumoconiosis3 = 152;
+  const yTextoNeumoconiosis3 = 154;
   if (datosFinales.textoNeumoconiosis3) {
     doc.setFont("helvetica", "normal").setFontSize(6.5);
     doc.setTextColor(0, 0, 0);
