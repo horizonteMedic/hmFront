@@ -140,18 +140,22 @@ const headerAnexo2 = (doc, datos, numeroPagina = 1) => {
 
   // 3) TÍTULO centrado
   doc.setFont("helvetica", "bold").setFontSize(11);
-  const titulo = "ANEXO 16";
-  const tituloY = y + 10;
-  doc.text(titulo, pageW / 2, tituloY, { align: "center" });
+  const titulo1 = "ANEXO N° 16";
+  const titulo2 = "FICHA MEDICA OCUPACIONAL";
+  const tituloY = y + 5; // Subido 5 puntos
+  doc.text(titulo1, pageW / 2, tituloY, { align: "center" });
+  doc.text(titulo2, pageW / 2, tituloY + 5, { align: "center" });
 
-  const w = doc.getTextWidth(titulo);
+  const w1 = doc.getTextWidth(titulo1);
+  const w2 = doc.getTextWidth(titulo2);
+  const maxW = Math.max(w1, w2);
   doc
     .setLineWidth(0.7)
-    .line((pageW - w) / 2, tituloY + 2, (pageW + w) / 2, tituloY + 2)
+    .line((pageW - maxW) / 2, tituloY + 7, (pageW + maxW) / 2, tituloY + 7)
     .setLineWidth(0.2);
 
   // 4) SECCIONES DE DATOS DEL PACIENTE EN 3 FILAS
-  let dataY = tituloY + 7; // Posición después del título, más cerca
+  let dataY = y + 17; // Posición fija después del título original
 
   // Calcular posiciones de las columnas para la fila 1
   const col1X = margenLateral; // Columna izquierda
