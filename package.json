@@ -23,7 +23,7 @@
     "@mui/material": "^5.15.17",
     "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@popperjs/core": "^2.11.8",
-    "@react-pdf/renderer": "^3.4.4",
+    "@react-pdf/renderer": "^3.4.5",
     "@tabler/core": "^1.0.0-beta20",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
