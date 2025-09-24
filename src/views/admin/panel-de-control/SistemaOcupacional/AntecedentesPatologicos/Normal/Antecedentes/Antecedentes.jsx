@@ -7,7 +7,7 @@ import Varones from "./Varones/Varones";
 import Damas from "./Damas/Damas";
 
 // Componente Antecedentes Quirúrgicos
-export default function Antecedentes({ form }) {
+export default function Antecedentes({ form, handleSiNoChange }) {
   const [antecedentesQuirurgicos, setAntecedentesQuirurgicos] = useState([]);
   const [nuevoAntecedente, setNuevoAntecedente] = useState({
     fecha: "",
@@ -43,6 +43,29 @@ export default function Antecedentes({ form }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Validación especial para campos numéricos
+    if (name === "diasHospitalizacion" || name === "fecha") {
+      // Solo permitir números y campo vacío
+      if (value === "") {
+        setNuevoAntecedente(prev => ({
+          ...prev,
+          [name]: ""
+        }));
+        return;
+      }
+      
+      // Verificar que solo contenga números
+      if (!/^\d+$/.test(value)) {
+        return; // No actualizar si contiene letras o caracteres especiales
+      }
+      
+      const numericValue = parseInt(value);
+      if (numericValue < 0) {
+        return; // No actualizar si es negativo
+      }
+    }
+    
     setNuevoAntecedente(prev => ({
       ...prev,
       [name]: value
@@ -109,16 +132,20 @@ export default function Antecedentes({ form }) {
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
             <div>
-              <label className="block font-medium mb-1">Fecha</label>
+              <label className="block font-medium mb-1">Año</label>
               <InputTextOneLine
                 name="fecha"
-                type="date"
+                type="number"
                 value={nuevoAntecedente.fecha}
                 onChange={handleInputChange}
+                placeholder="Ej: 2023"
+                min="0"
+                max="2030"
+                inputMode="numeric"
               />
             </div>
             <div>
-              <label className="block font-medium mb-1">Hospital (Nombre - Lugar) Operación</label>
+              <label className="block font-medium mb-1">Hospital (Nombre - Lugar)</label>
               <InputTextOneLine
                 name="hospital"
                 value={nuevoAntecedente.hospital}
@@ -140,6 +167,8 @@ export default function Antecedentes({ form }) {
                 type="number"
                 value={nuevoAntecedente.diasHospitalizacion}
                 onChange={handleInputChange}
+                min="0"
+                inputMode="numeric"
               />
             </div>
             <div>
@@ -175,7 +204,7 @@ export default function Antecedentes({ form }) {
           <table className="w-full border-collapse">
             <thead className="bg-blue-100">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Fecha</th>
+                <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Año</th>
                 <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Hospital(Nombre - Lugar)</th>
                 <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Operación</th>
                 <th className="px-4 py-3 text-left font-semibold border-b border-gray-300">Días</th>
@@ -236,6 +265,8 @@ export default function Antecedentes({ form }) {
                 activeTabReproduccion === tab.id && (
                   <Component
                     key={tab.id}
+                    form={form}
+                    handleSiNoChange={handleSiNoChange}
                   />
                 )
               );

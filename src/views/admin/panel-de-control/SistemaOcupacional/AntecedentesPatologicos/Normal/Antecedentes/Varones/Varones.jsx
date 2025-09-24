@@ -2,7 +2,16 @@
 import { InputTextOneLine, InputTextArea } from "../../../../../../../components/reusableComponents/ResusableComponents";
 
 // Componente Antecedentes de Reproducción - Varones
-export default function Varones() {
+export default function Varones({ form, handleSiNoChange }) {
+  const handleKeyUp = (e, nextFieldName) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const nextField = document.querySelector(`input[name="${nextFieldName}"]`);
+      if (nextField) {
+        nextField.focus();
+      }
+    }
+  };
   return (
     <div className="space-y-4">
       <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -13,8 +22,9 @@ export default function Varones() {
             <span className="font-medium min-w-[200px]">Número de hijos vivos:</span>
             <InputTextOneLine
               name="hijosVivos"
-              value=""
-              onChange={() => {}}
+              value={form?.hijosVivos || ""}
+              onChange={(e) => handleSiNoChange("hijosVivos", e, e.target.value)}
+              onKeyUp={(e) => handleKeyUp(e, "hijosFallecidos")}
             />
           </div>
           
@@ -22,8 +32,9 @@ export default function Varones() {
             <span className="font-medium min-w-[200px]">Número de hijos fallecidos:</span>
             <InputTextOneLine
               name="hijosFallecidos"
-              value=""
-              onChange={() => {}}
+              value={form?.hijosFallecidos || ""}
+              onChange={(e) => handleSiNoChange("hijosFallecidos", e, e.target.value)}
+              onKeyUp={(e) => handleKeyUp(e, "abortosParejas")}
             />
           </div>
           
@@ -31,8 +42,9 @@ export default function Varones() {
             <span className="font-medium min-w-[200px]">Número de Abortos en sus parejas:</span>
             <InputTextOneLine
               name="abortosParejas"
-              value=""
-              onChange={() => {}}
+              value={form?.abortosParejas || ""}
+              onChange={(e) => handleSiNoChange("abortosParejas", e, e.target.value)}
+              onKeyUp={(e) => handleKeyUp(e, "causasAbortos")}
             />
           </div>
           
@@ -41,8 +53,8 @@ export default function Varones() {
             <InputTextArea
               rows={4}
               name="causasAbortos"
-              value=""
-              onChange={() => {}}
+              value={form?.causasAbortos || ""}
+              onChange={(e) => handleSiNoChange("causasAbortos", e, e.target.value)}
             />
           </div>
         </div>
