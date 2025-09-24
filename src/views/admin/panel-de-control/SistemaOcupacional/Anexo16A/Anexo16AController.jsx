@@ -188,7 +188,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoPac(nro, set, token, sede);
+            // GetInfoPac(nro, set, token, sede);
+            GetInfoServicio(nro, tabla, set, token, () => { });
         },
         () => {
             //Tiene registro
@@ -212,7 +213,7 @@ const GetInfoPac = async (nro, set, token, sede) => {
             fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad + " años",
             nombres: res.nombresApellidos,
-            sexo:res.genero,
+            sexo: res.genero,
             actividadRealizar: res.cargo,
         }));
     }
