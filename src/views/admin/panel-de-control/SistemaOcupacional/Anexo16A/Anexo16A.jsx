@@ -14,6 +14,7 @@ import {
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
+import { SubmitDataService, VerifyTR } from "./Anexo16AController";
 
 const tabla = "anexo16a";
 const today = getToday();
@@ -25,6 +26,7 @@ export default function Anexo16A() {
   const initialFormState = {
     norden: "",
     fechaExam: today,
+    codigoAnexo: null,
     apto: false,
     actividadRealizar: "",
     dni: "",
@@ -48,10 +50,10 @@ export default function Anexo16A() {
     diabetes: false,
     hipertension: false,
     embarazo: false,
-    fur: false,
     furDescripcion: "",
     problemasNeurologicos: false,
     infeccionesRecientes: false,
+    medicacionActual: "",
     obesidadMorbida: false,
     problemasCardiacos: false,
     problemasRespiratorios: false,
@@ -67,7 +69,7 @@ export default function Anexo16A() {
     sobrepeso: false,
     htaControlada: false,
     lentesCorrectivos: false,
-    empresaContratista: "",
+    contrata: "",
     empresa: "",
     observaciones: "",
     //Agudeza Visual
@@ -77,14 +79,11 @@ export default function Anexo16A() {
     vlOI: "",
     vcCorregidaOD: "",
     vlCorregidaOD: "",
-    vclrsOD: "",
-    vbOD: "",
-    rpOD: "",
+    vclrs: "",
+    vb: "",
+    rp: "",
     vcCorregidaOI: "",
     vlCorregidaOI: "",
-    vclrsOI: "",
-    vbOI: "",
-    rpOI: "",
     enfermedadesOculares: ""
   }
   const {
@@ -95,19 +94,20 @@ export default function Anexo16A() {
     handleRadioButtonBoolean,
     handleRadioButton,
     handleCheckBoxChange,
+    handleChangeSimple,
     handleClear,
     handleClearnotO,
     handlePrintDefault,
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
   const handlePrint = () => {
@@ -179,7 +179,7 @@ export default function Anexo16A() {
                 name="fechaExam"
                 type="date"
                 value={form?.fechaExam}
-                onChange={handleChange}
+                onChange={handleChangeSimple}
                 labelWidth="60px"
               />
               <div className="flex items-center gap-4">
@@ -196,7 +196,7 @@ export default function Anexo16A() {
                 label="Actividad a Realizar"
                 name="actividadRealizar"
                 value={form?.actividadRealizar}
-                onChange={handleChange}
+                disabled
                 labelWidth="120px"
               />
             </div>
@@ -219,11 +219,11 @@ export default function Anexo16A() {
               </div>
             </div>
           </div>
-        {/* Empresa Contratista */}
+          {/* Empresa Contratista */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <InputTextOneLine label="Emp. Contratista" name="empresaContratista" value={form?.empresaContratista || ""} onChange={handleChange} />
-              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa || ""} onChange={handleChange} />
+              <InputTextOneLine label="Emp. Contratista" name="contrata" value={form?.contrata} disabled />
+              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa} disabled />
             </div>
           </div>
           {/* Funciones Vitales */}
@@ -325,22 +325,7 @@ export default function Anexo16A() {
                     onChange={handleRadioButtonBoolean}
                   />
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span  >FUR:</span>
-                    <InputTextOneLine name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} disabled={!form.fur} />
-                  </div>
-                  <InputsBooleanRadioGroup
-                    name="fur"
-                    value={form?.fur}
-                    onChange={(e, value) => {
-                      if (value == false) {
-                        setForm({ ...form, furDescripcion: "" })
-                      }
-                      handleRadioButtonBoolean(e, value)
-                    }}
-                  />
-                </div>
+                <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} disabled={!form.embarazo} />
                 <div className="flex items-center justify-between">
                   <span>Problemas Neurológicos: Epilepsia, vértigo, etc</span>
                   <InputsBooleanRadioGroup
@@ -429,9 +414,15 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="usoMedicacion"
                     value={form?.usoMedicacion}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => {
+                      if (value == false)
+                        setForm(prev => ({ ...prev, medicacionActual: "" }));
+                      handleRadioButtonBoolean(e, value)
+                    }}
                   />
                 </div>
+                <InputTextOneLine label="Medicación Actual" name="medicacionActual" value={form?.medicacionActual} onChange={handleChange} disabled={!form.usoMedicacion} />
+
               </div>
             </div>
           </div>
@@ -478,15 +469,6 @@ export default function Anexo16A() {
               />
             </div>
           </div>
-
-          {/* Empresa Contratista */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <InputTextOneLine label="Contrata" name="empresaContratista" value={form?.empresaContratista} onChange={handleChange} disabled />
-              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa} onChange={handleChange} disabled />
-            </div>
-          </div>
-
           {/* Observaciones */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
@@ -549,15 +531,15 @@ export default function Anexo16A() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.Clrs:</span>
-                      <InputTextOneLine name="vclrsOD" value={form?.vclrsOD} disabled />
+                      <InputTextOneLine name="vclrs" value={form?.vclrs} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.B.:</span>
-                      <InputTextOneLine name="vbOD" value={form?.vbOD} disabled />
+                      <InputTextOneLine name="vb" value={form?.vb} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">R.P.:</span>
-                      <InputTextOneLine name="rpOD" value={form?.rpOD} disabled />
+                      <InputTextOneLine name="rp" value={form?.rp} disabled />
                     </div>
                   </div>
                 </div>
@@ -573,16 +555,16 @@ export default function Anexo16A() {
                       <InputTextOneLine name="vlCorregidaOI" value={form?.vlCorregidaOI} disabled />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.Clrs:</span>
-                      <InputTextOneLine name="vclrsOI" value={form?.vclrsOI} disabled />
+                      <span className="text-[11px] min-w-[30px]">:</span>
+                      {/* <InputTextOneLine name="vclrs" value={form?.vclrs} disabled /> */}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.B.:</span>
-                      <InputTextOneLine name="vbOI" value={form?.vbOI} disabled />
+                      <span className="text-[11px] min-w-[30px]">:</span>
+                      {/* <InputTextOneLine name="vbOI" value={form?.vbOI} disabled /> */}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">R.P.:</span>
-                      <InputTextOneLine name="rpOI" value={form?.rpOI} disabled />
+                      <span className="text-[11px] min-w-[30px]">:</span>
+                      {/* <InputTextOneLine name="rpOI" value={form?.rpOI} disabled /> */}
                     </div>
                   </div>
                 </div>
