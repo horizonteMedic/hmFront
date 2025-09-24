@@ -140,7 +140,7 @@ export const GetInfoServicioDefault = async (
             `${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}&esJasper=false`,
             token
         );
-        if (res?.norden) {
+        if (res?.norden || res?.norden_n_orden) {
             console.log(res);
             return res;
         } else {
