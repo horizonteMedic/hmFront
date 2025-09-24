@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+/* eslint-disable react/prop-types, no-unused-vars */
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,7 +9,6 @@ import {
 import {
   InputCheckbox,
   InputsBooleanRadioGroup,
-  InputsRadioGroup,
   InputTextOneLine,
   InputTextArea,
 } from "../../../../components/reusableComponents/ResusableComponents";
@@ -109,7 +108,28 @@ export default function Anexo16A({
 
   const handleCheckBoxChange = (e) => {
     const { name, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: checked }));
+    // Mapeo de recomendaciones para autollenar observaciones como lista
+    const recommendationLabels = {
+      corregirAgudeza: "Corregir Agudeza Visual",
+      obesidadDieta: "Obesidad I. Dieta Hipocalórica y Ejercicios",
+      diabetesControlado: "D m II controlado, tto con:.....",
+      sobrepeso: "Sobrepeso. Dieta Hipocalórica y Ejercicios",
+      htaControlada: "HTA Controlada, en tto con:...",
+      lentesCorrectivos: "Uso de Lentes Correct. Lectura de Cerca",
+    };
+
+    setForm(prev => {
+      const updated = { ...prev, [name]: checked };
+      // Solo construir observaciones si el cambio pertenece a recomendaciones
+      if (Object.prototype.hasOwnProperty.call(recommendationLabels, name)) {
+        const selected = Object.entries(recommendationLabels)
+          .filter(([key]) => updated[key])
+          .map(([, label]) => `- ${label}`)
+          .join('\n');
+        updated.observaciones = selected;
+      }
+      return updated;
+    });
     if (propHandleCheckBoxChange) propHandleCheckBoxChange(e);
   };
 
@@ -192,7 +212,13 @@ export default function Anexo16A({
               </div>
             </div>
           </div>
-
+        {/* Empresa Contratista */}
+          <div className="bg-white border border-gray-200 rounded-lg p-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <InputTextOneLine label="Emp. Contratista" name="empresaContratista" value={form?.empresaContratista || ""} onChange={handleChange} />
+              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa || ""} onChange={handleChange} />
+            </div>
+          </div>
           {/* Funciones Vitales */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -433,62 +459,60 @@ export default function Anexo16A({
             </div>
           </div>
 
-          {/* Recomendaciones */}
+          {/* Recomendaciones y Observaciones en columnas */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-3">Recomendaciones</h4>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-              <InputCheckbox 
-                label="Corregir Agudeza Visual"
-                checked={!!form?.corregirAgudeza} 
-                name="corregirAgudeza" 
-                onChange={handleCheckBoxChange} 
-              />
-              <InputCheckbox 
-                label="Obesidad I. Dieta Hipocalórica y Ejercicios"
-                checked={!!form?.obesidadDieta} 
-                name="obesidadDieta" 
-                onChange={handleCheckBoxChange} 
-              />
-              <InputCheckbox 
-                label="D m II controlado, tto con:....."
-                checked={!!form?.diabetesControlado} 
-                name="diabetesControlado" 
-                onChange={handleCheckBoxChange} 
-              />
-              <InputCheckbox 
-                label="Sobrepeso. Dieta Hipocalórica y Ejercicios"
-                checked={!!form?.sobrepeso} 
-                name="sobrepeso" 
-                onChange={handleCheckBoxChange} 
-              />
-              <InputCheckbox 
-                label="HTA Controlada, en tto con:..."
-                checked={!!form?.htaControlada} 
-                name="htaControlada" 
-                onChange={handleCheckBoxChange} 
-              />
-              <InputCheckbox 
-                label="Uso de Lentes Correct. Lectura de Cerca"
-                checked={!!form?.lentesCorrectivos} 
-                name="lentesCorrectivos" 
-                onChange={handleCheckBoxChange} 
-              />
-            </div>
-      </div>
-
-          {/* Empresa Contratista */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <InputTextOneLine label="Emp. Contratista" name="empresaContratista" value={form?.empresaContratista || ""} onChange={handleChange} />
-              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa || ""} onChange={handleChange} />
+            <h4 className="font-semibold text-gray-800 mb-3">Recomendaciones y Observaciones</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {/* Columna 1: Recomendaciones */}
+              <div className="grid grid-cols-1 gap-2">
+                <InputCheckbox 
+                  label="Corregir Agudeza Visual"
+                  checked={!!form?.corregirAgudeza} 
+                  name="corregirAgudeza" 
+                  onChange={handleCheckBoxChange} 
+                />
+                <InputCheckbox 
+                  label="Obesidad I. Dieta Hipocalórica y Ejercicios"
+                  checked={!!form?.obesidadDieta} 
+                  name="obesidadDieta" 
+                  onChange={handleCheckBoxChange} 
+                />
+                <InputCheckbox 
+                  label="D m II controlado, tto con:....."
+                  checked={!!form?.diabetesControlado} 
+                  name="diabetesControlado" 
+                  onChange={handleCheckBoxChange} 
+                />
+                <InputCheckbox 
+                  label="Sobrepeso. Dieta Hipocalórica y Ejercicios"
+                  checked={!!form?.sobrepeso} 
+                  name="sobrepeso" 
+                  onChange={handleCheckBoxChange} 
+                />
+                <InputCheckbox 
+                  label="HTA Controlada, en tto con:..."
+                  checked={!!form?.htaControlada} 
+                  name="htaControlada" 
+                  onChange={handleCheckBoxChange} 
+                />
+                <InputCheckbox 
+                  label="Uso de Lentes Correct. Lectura de Cerca"
+                  checked={!!form?.lentesCorrectivos} 
+                  name="lentesCorrectivos" 
+                  onChange={handleCheckBoxChange} 
+                />
+              </div>
+              {/* Columna 2: Observaciones autogeneradas */}
+              <div>
+                <h5 className="font-semibold text-gray-700 mb-2">Observaciones</h5>
+                <InputTextArea rows={8} name="observaciones" value={form?.observaciones || ""} onChange={handleChange} readOnly />
+              </div>
             </div>
           </div>
 
-          {/* Observaciones */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
-            <InputTextArea rows={4} name="observaciones" value={form?.observaciones || ""} onChange={handleChange} />
-          </div>
+       
+
+          {/* (Observaciones integradas en Recomendaciones) */}
         </div>
 
         {/* Columna de Agudeza Visual (derecha) - 1/4 del ancho */}
