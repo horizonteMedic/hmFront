@@ -66,6 +66,9 @@ export function SubmitHistoriaC(data, sede, token, operacion) {
     rxcLumbosacra: data.rxcLumbosacra, //5
     rxcPlomos: data.rxcPlomos,//12
     mercurioo: data.mercurioo,//13
+    tmarihuana: data.tmarihuana,
+    tcocaina: data.tcocaina, 
+    espaciosConfinados: data.espaciosConfinados, 
     user_registro: data.user_registro,
   };
 
