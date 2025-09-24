@@ -9,6 +9,7 @@ import {
     VerifyTRDefault,
 } from "../../../../utils/functionUtils";
 import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
+import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/anexo16a/obtenerReporteAnexo16a";
@@ -69,12 +70,12 @@ export const GetInfoServicio = async (
             otraCondicion: res.otraCondicionMedicaSiAnexo16a_si14,
             alergias: res.alergiasSiAnexo16a_si15,
             usoMedicacion: res.usoMedicacionActualSiAnexo16a_si16,
-            corregirAgudeza: res.observacionesAnexo16a_observaciones.includes("Corregir Agudeza Visual"),
-            obesidadDieta: res.observacionesAnexo16a_observaciones.includes("Obesidad I. Dieta Hipocalórica y Ejercicios"),
-            diabetesControlado: res.observacionesAnexo16a_observaciones.includes("D m II controlado, tto con:....."),
-            sobrepeso: res.observacionesAnexo16a_observaciones.includes("Sobrepeso. Dieta Hipocalórica y Ejercicios"),
-            htaControlada: res.observacionesAnexo16a_observaciones.includes("HTA Controlada, en tto con:..."),
-            lentesCorrectivos: res.observacionesAnexo16a_observaciones.includes("Uso de Lentes Correct. Lectura de Cerca"),
+            corregirAgudeza: res.observacionesAnexo16a_observaciones?.includes("Corregir Agudeza Visual") || false,
+            obesidadDieta: res.observacionesAnexo16a_observaciones?.includes("Obesidad I. Dieta Hipocalórica y Ejercicios") || false,
+            diabetesControlado: res.observacionesAnexo16a_observaciones?.includes("D m II controlado, tto con:.....") || false,
+            sobrepeso: res.observacionesAnexo16a_observaciones?.includes("Sobrepeso. Dieta Hipocalórica y Ejercicios") || false,
+            htaControlada: res.observacionesAnexo16a_observaciones?.includes("HTA Controlada, en tto con:...") || false,
+            lentesCorrectivos: res.observacionesAnexo16a_observaciones?.includes("Uso de Lentes Correct. Lectura de Cerca") || false,
             contrata: res.contrata_razon_contrata,
             empresa: res.empresa_razon_empresa,
             observaciones: res.observacionesAnexo16a_observaciones,
@@ -180,7 +181,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
 };
 
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+    VerifyTRPerzonalizado(
         nro,
         tabla,
         token,
@@ -188,7 +189,6 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            // GetInfoPac(nro, set, token, sede);
             GetInfoServicio(nro, tabla, set, token, () => { });
         },
         () => {
@@ -200,8 +200,42 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
                     "warning"
                 );
             });
+        },
+        () => {
+            //Necesita triaje
+            Swal.fire(
+                "Alerta",
+                "El paciente necesita pasar por Triaje para poder registrarse.",
+                "warning"
+            );
         }
     );
+};
+
+export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaTriaje = () => { }) => {
+    if (!nro) {
+        await Swal.fire(
+            "Error",
+            "Debe Introducir un Nro de Historia Clínica válido",
+            "error"
+        );
+        return;
+    }
+    Loading("Validando datos");
+    getFetch(
+        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+        token
+    ).then((res) => {
+        console.log(res);
+        if (res.id === 0) {
+            //No tiene registro previo 
+            noTieneRegistro();//datos paciente
+        } else if (res.id === 2) {
+            necesitaTriaje();
+        } else {
+            tieneRegistro();//obtener data servicio
+        }
+    });
 };
 
 const GetInfoPac = async (nro, set, token, sede) => {
