@@ -216,7 +216,8 @@ export default function IndicarEnfermedades({
               <InputTextOneLine
                 name="numeroCigarrillos"
                 value={form?.numeroCigarrillos || ""}
-                onChange={() => {}}
+                onChange={(e) => handleSiNoChange("numeroCigarrillos", e, e.target.value)}
+                disabled={form?.fumar === false}
               />
             </div>
           </div>
@@ -268,7 +269,8 @@ export default function IndicarEnfermedades({
               <InputTextOneLine
                 name="tipoLicor"
                 value={form?.tipoLicor || ""}
-                onChange={() => {}}
+                onChange={(e) => handleSiNoChange("tipoLicor", e, e.target.value)}
+                disabled={form?.licor === false}
               />
             </div>
 
@@ -279,12 +281,14 @@ export default function IndicarEnfermedades({
                 name="unaVezMes"
                 checked={!!form?.unaVezMes}
                 onChange={(e) => handleSiNoChange("unaVezMes", e, e.target.checked)}
+                disabled={form?.licor === false}
               />
               <span className="font-medium col-span-1 text-right">Frecuencia:</span>
               <InputTextOneLine
                 name="frecuenciaLicor"
                 value={form?.frecuenciaLicor || ""}
-                onChange={() => {}}
+                onChange={(e) => handleSiNoChange("frecuenciaLicor", e, e.target.value)}
+                disabled={form?.licor === false}
               />
             </div>
           </div>
@@ -319,7 +323,8 @@ export default function IndicarEnfermedades({
               <InputTextOneLine
                 name="tipoDrogas"
                 value={form?.tipoDrogas || ""}
-                onChange={() => {}}
+                onChange={(e) => handleSiNoChange("tipoDrogas", e, e.target.value)}
+                disabled={form?.drogas === false}
               />
             </div>
 
@@ -330,12 +335,14 @@ export default function IndicarEnfermedades({
                 name="quinceDiasMes"
                 checked={!!form?.quinceDiasMes}
                 onChange={(e) => handleSiNoChange("quinceDiasMes", e, e.target.checked)}
+                disabled={form?.drogas === false}
               />
               <span className="font-medium col-span-1 text-right">Frecuencia:</span>
               <InputTextOneLine
                 name="frecuenciaDrogas"
                 value={form?.frecuenciaDrogas || ""}
-                onChange={() => {}}
+                onChange={(e) => handleSiNoChange("frecuenciaDrogas", e, e.target.value)}
+                disabled={form?.drogas === false}
               />
             </div>
           </div>
@@ -358,7 +365,8 @@ export default function IndicarEnfermedades({
             <InputTextOneLine
               name="tipoOtros"
               value={form?.tipoOtros || ""}
-              onChange={() => {}}
+              onChange={(e) => handleSiNoChange("tipoOtros", e, e.target.value)}
+              disabled={form?.otros === false}
             />
           </div>
 
@@ -369,7 +377,8 @@ export default function IndicarEnfermedades({
              <InputTextOneLine
                name="frecuenciaOtros"
                value={form?.frecuenciaOtros || ""}
-               onChange={() => {}}
+               onChange={(e) => handleSiNoChange("frecuenciaOtros", e, e.target.value)}
+               disabled={form?.otros === false}
              />
            </div>
         </div>
