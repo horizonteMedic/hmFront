@@ -10,3 +10,8 @@ export function getToday() {
 export function getTodayPlusOneYear() {
     return format(addYears(new Date(), 1), "yyyy-MM-dd");
 }
+export function getSign(data, name) { //HUELLA // FIRMAP // SELLOFIRMA
+    return data.digitalizacion?.find(
+        item => item.nombreDigitalizacion === name
+    )?.url ?? ""
+}

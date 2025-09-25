@@ -121,12 +121,12 @@ export default function Anexo16A() {
 
   // Textos específicos para cada checkbox
   const checkboxTexts = {
-    corregirAgudeza: "Corregir Agudeza Visual",
-    obesidadDieta: "Obesidad I. Dieta Hipocalórica y Ejercicios",
-    diabetesControlado: "D m II controlado, tto con:.....",
-    sobrepeso: "Sobrepeso. Dieta Hipocalórica y Ejercicios",
-    htaControlada: "HTA Controlada, en tto con:...",
-    lentesCorrectivos: "Uso de Lentes Correct. Lectura de Cerca"
+    corregirAgudeza: "Corregir Agudeza Visual".toUpperCase(),
+    obesidadDieta: "Obesidad I. Dieta Hipocalórica y Ejercicios".toUpperCase(),
+    diabetesControlado: "D m II controlado, tto con:.....".toUpperCase(),
+    sobrepeso: "Sobrepeso. Dieta Hipocalórica y Ejercicios".toUpperCase(),
+    htaControlada: "HTA Controlada, en tto con:...".toUpperCase(),
+    lentesCorrectivos: "Uso de Lentes Correct. Lectura de Cerca".toUpperCase(),
   };
 
   // Handler personalizado para checkboxes que actualiza observaciones
@@ -317,7 +317,7 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="hipertension"
                     value={form?.hipertension}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, hipertensionRed: false })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -354,7 +354,7 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="obesidadMorbida"
                     value={form?.obesidadMorbida}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, obesidadMorbidaRed: false })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
@@ -378,7 +378,7 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="problemasOftalmologicos"
                     value={form?.problemasOftalmologicos}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, problemasOftalmologicosRed: false })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
