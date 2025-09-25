@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 
-export default function Anexo16A_Jasper(data = {}) {
+export default function Anexo16A_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const margin = 0;
   const pageW = doc.internal.pageSize.getWidth();
@@ -8,14 +8,15 @@ export default function Anexo16A_Jasper(data = {}) {
 
   // Datos de prueba por defecto
   const datosPrueba = {
-    numeroFicha: "96639",
     apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
+    fechaExamen: "04/11/2024",
+    sexo: "F",
     documentoIdentidad: "72384273",
-    fechaNacimiento: "23/01/1994",
     edad: "31 años",
-    direccion: "SAC1 URB PARQUE INDUSTRIAL MZ D LT 3",
-    empleador: "MINERA BOROO MISQUICHILCA S.A.",
-    actividadRealizar: "DAD",
+    areaTrabajo: "MINERÍA",
+    puestoTrabajo: "DAD",
+    empresa: "MINERA BOROO MISQUICHILCA S.A.",
+    contrata: "CONTRATA EJEMPLO S.A.C.",
     vitalSigns: {
       fc: "64",
       fr: "19",
@@ -50,14 +51,16 @@ export default function Anexo16A_Jasper(data = {}) {
 
   // Usar datos reales si existen, sino usar datos de prueba
   const datosFinales = data && data.norden ? {
-    numeroFicha: data.norden || datosPrueba.numeroFicha,
     apellidosNombres: data.nombres || datosPrueba.apellidosNombres,
+    fechaExamen: data.fechaExamen || datosPrueba.fechaExamen,
+    sexo: data.sexo || datosPrueba.sexo,
     documentoIdentidad: data.dni || datosPrueba.documentoIdentidad,
-    fechaNacimiento: data.fechaNac || datosPrueba.fechaNacimiento,
     edad: data.edad || datosPrueba.edad,
-    direccion: data.direccion || datosPrueba.direccion,
-    empleador: data.empresa || datosPrueba.empleador,
-    actividadRealizar: data.actividadRealizar || datosPrueba.actividadRealizar,
+    areaTrabajo: data.areaTrabajo || datosPrueba.areaTrabajo,
+    puestoTrabajo: data.puestoTrabajo || datosPrueba.puestoTrabajo,
+    empresa: data.empresa || datosPrueba.empresa,
+    contrata: data.contrata || datosPrueba.contrata,
+    apto: data.apto !== undefined ? data.apto : true,
     vitalSigns: {
       fc: data.fc || datosPrueba.vitalSigns.fc,
       fr: data.fr || datosPrueba.vitalSigns.fr,
@@ -95,10 +98,6 @@ export default function Anexo16A_Jasper(data = {}) {
   doc.text("EVALUACION MÉDICA PARA ASCENSO A GRANDES ALTITUDES", pageW / 2, 30, { align: "center" });
   doc.text("(mayor de 2,500 m.s.n.m.)", pageW / 2, 34, { align: "center" });
 
-  // Número de Ficha
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.rect(pageW - 35, 15, 30, 8);
-  doc.text("Nº Ficha : " + datosFinales.numeroFicha, pageW - 32, 20);
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -107,32 +106,34 @@ export default function Anexo16A_Jasper(data = {}) {
   // Datos personales
   const datosPersonales = [
     { label: "Apellidos y Nombres:", value: datosFinales.apellidosNombres, x: 15, y: 45 },
-    { label: "Documento de identidad:", value: datosFinales.documentoIdentidad, x: 15, y: 50 },
-    { label: "Fecha Nacimiento(dd/mm/aa):", value: datosFinales.fechaNacimiento, x: 15, y: 55},
-    { label: "Edad:", value: datosFinales.edad, x: 15, y: 60 },
-    { label: "Dirección:", value: datosFinales.direccion, x: 15, y: 65 },
-    { label: "Empleador:", value: datosFinales.empleador, x: 15, y: 70},
-    { label: "Actividad a Realizar:", value: datosFinales.actividadRealizar, x: 15, y: 75 }
+    { label: "Fecha de Examen:", value: datosFinales.fechaExamen, x: 15, y: 50 },
+    { label: "Sexo:", value: datosFinales.sexo, x: 15, y: 55 },
+    { label: "DNI:", value: datosFinales.documentoIdentidad, x: 15, y: 60 },
+    { label: "Edad:", value: datosFinales.edad, x: 15, y: 65 },
+    { label: "Área de Trabajo:", value: datosFinales.areaTrabajo, x: 15, y: 70 },
+    { label: "Puesto de Trabajo:", value: datosFinales.puestoTrabajo, x: 15, y: 75 },
+    { label: "Empresa:", value: datosFinales.empresa, x: 15, y: 80 },
+    { label: "Contrata:", value: datosFinales.contrata, x: 15, y: 85 }
   ];
 
   datosPersonales.forEach(item => {
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(item.label, item.x, item.y);
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(item.value, item.x + 60, item.y);
+    doc.text(item.value, item.x + 50, item.y);
   });
 
   // === SECCIÓN 2: FUNCIONES VITALES ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("2. Funciones Vitales:", 15, 83.5);
+  doc.text("2. Funciones Vitales:", 15, 93.5);
 
   // Signos vitales en fila
   const signosVitales = [
-    { label: "FC:", value: datosFinales.vitalSigns.fc + " x min", x: 60, y: 81 },
-    { label: "FR:", value: datosFinales.vitalSigns.fr + " x min", x: 100, y: 81 },
-    { label: "PA:", value: datosFinales.vitalSigns.pa + " mmHg", x: 130, y: 81 },
-    { label: "Sat. O2:", value: datosFinales.vitalSigns.satO2 + " %", x: 60, y: 85 },
-    { label: "IMC:", value: datosFinales.vitalSigns.imc + " kg/m2", x: 100, y: 85 }
+    { label: "FC:", value: datosFinales.vitalSigns.fc + " x min", x: 60, y: 91 },
+    { label: "FR:", value: datosFinales.vitalSigns.fr + " x min", x: 100, y: 91 },
+    { label: "PA:", value: datosFinales.vitalSigns.pa + " mmHg", x: 130, y: 91 },
+    { label: "Sat. O2:", value: datosFinales.vitalSigns.satO2 + " %", x: 60, y: 95 },
+    { label: "IMC:", value: datosFinales.vitalSigns.imc + " kg/m2", x: 100, y: 95 }
   ];
 
   signosVitales.forEach((signo, index) => {
@@ -151,30 +152,30 @@ export default function Anexo16A_Jasper(data = {}) {
 
   // === SECCIÓN 3: CONDICIONES MÉDICAS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("3. El / La presenta o ha presentado en los últimos 6 meses:", 15, 90);
+  doc.text("3. El / La presenta o ha presentado en los últimos 6 meses:", 15, 100);
   
   // Encabezados SI y NO
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("SI", 130.5, 90);
-  doc.text("NO", 144.5, 90);
+  doc.text("SI", 130.5, 100);
+  doc.text("NO", 144.5, 100);
 
   // Lista de condiciones médicas
   const condiciones = [
-    { texto: "Cirugía mayor reciente", campo: "cirugiaMayor", x: 30, y: 95 },
-    { texto: "Desórdenes de la coagulación, trombosis, etc.", campo: "desordenesCoagulacion", x: 30, y: 100 },
-    { texto: "Diabetes Mellitus", campo: "diabetes", x: 30, y: 105 },
-    { texto: "Hipertensión Arterial", campo: "hipertension", x: 30, y: 110 },
-    { texto: "Embarazo", campo: "embarazo", x: 30, y: 115 },
-    { texto: "Problemas neurológicos: epilepsia, vértigo, etc.", campo: "problemasNeurologicos", x: 30, y: 120 },
-    { texto: "Infecciones recientes (especialmente oídos, nariz, garganta)", campo: "infeccionesRecientes", x: 30, y: 125 },
-    { texto: "Obesidad Mórbida (IMC mayor a 35 m/kg2)", campo: "obesidadMorbida", x: 30, y: 130 },
-    { texto: "Problemas Cardíacos: marcapasos, coronariopatía, etc.", campo: "problemasCardiacos", x: 30, y: 135 },
-    { texto: "Problemas Respiratorios: asma, EPOC, etc.", campo: "problemasRespiratorios", x: 30, y: 140 },
-    { texto: "Problemas Oftalmológicos: retinopatía, glaucoma, etc.", campo: "problemasOftalmologicos", x: 30, y: 145 },
-    { texto: "Problemas Digestivos: úlcera péptica, hepatitis, etc.", campo: "problemasDigestivos", x: 30, y: 150 },
-    { texto: "Apnea del Sueño", campo: "apneaSueño", x: 30, y: 155 },
-    { texto: "Alergias", campo: "alergias", x: 30, y: 160 },
-    { texto: "Otra condición médica importante", campo: "otraCondicion", x: 30, y: 165 }
+    { texto: "Cirugía mayor reciente", campo: "cirugiaMayor", x: 30, y: 105 },
+    { texto: "Desórdenes de la coagulación, trombosis, etc.", campo: "desordenesCoagulacion", x: 30, y: 110 },
+    { texto: "Diabetes Mellitus", campo: "diabetes", x: 30, y: 115 },
+    { texto: "Hipertensión Arterial", campo: "hipertension", x: 30, y: 120 },
+    { texto: "Embarazo", campo: "embarazo", x: 30, y: 125 },
+    { texto: "Problemas neurológicos: epilepsia, vértigo, etc.", campo: "problemasNeurologicos", x: 30, y: 130 },
+    { texto: "Infecciones recientes (especialmente oídos, nariz, garganta)", campo: "infeccionesRecientes", x: 30, y: 135 },
+    { texto: "Obesidad Mórbida (IMC mayor a 35 m/kg2)", campo: "obesidadMorbida", x: 30, y: 140 },
+    { texto: "Problemas Cardíacos: marcapasos, coronariopatía, etc.", campo: "problemasCardiacos", x: 30, y: 145 },
+    { texto: "Problemas Respiratorios: asma, EPOC, etc.", campo: "problemasRespiratorios", x: 30, y: 150 },
+    { texto: "Problemas Oftalmológicos: retinopatía, glaucoma, etc.", campo: "problemasOftalmologicos", x: 30, y: 155 },
+    { texto: "Problemas Digestivos: úlcera péptica, hepatitis, etc.", campo: "problemasDigestivos", x: 30, y: 160 },
+    { texto: "Apnea del Sueño", campo: "apneaSueño", x: 30, y: 165 },
+    { texto: "Alergias", campo: "alergias", x: 30, y: 170 },
+    { texto: "Otra condición médica importante", campo: "otraCondicion", x: 30, y: 175 }
   ];
 
   condiciones.forEach(condicion => {
@@ -207,17 +208,17 @@ export default function Anexo16A_Jasper(data = {}) {
 
   // === USO DE MEDICACIÓN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Uso de medicación Actual:", 30, 170);
+  doc.text("Uso de medicación Actual:", 30, 180);
   
   // Texto con guiones para simular línea
   doc.setFont("helvetica", "normal").setFontSize(9);
   if (datosFinales.medicacionActual) {
-    doc.text(datosFinales.medicacionActual, 84, 170);
+    doc.text(datosFinales.medicacionActual, 84, 180);
   }
 
   // === DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Declaro que las respuestas dadas en el presente documento son verdaderas y estoy consciente que el ocultar o falsear información me puede causar daño por lo que asumo total responsabilidad de ello.", 15, 175, { maxWidth: 180 });
+  doc.text("Declaro que las respuestas dadas en el presente documento son verdaderas y estoy consciente que el ocultar o falsear información me puede causar daño por lo que asumo total responsabilidad de ello.", 15, 185, { maxWidth: 180 });
 
   // === FIRMA Y HUELLA DIGITAL ===
   // Centrar horizontalmente en la página (A4 = 210mm)
@@ -231,76 +232,76 @@ export default function Anexo16A_Jasper(data = {}) {
   // Firma del paciente (lado izquierdo) - imagen arriba, línea, texto abajo
   try {
     const firmaImg = "/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png";
-    doc.addImage(firmaImg, "PNG", startX, 180, 45, 25); // Imagen arriba
+    doc.addImage(firmaImg, "PNG", startX, 190, 45, 25); // Imagen arriba
   } catch (e) {
-    doc.text("[Firma]", startX + 5, 230);
+    doc.text("[Firma]", startX + 5, 240);
   }
-  doc.line(startX, 204, startX + firmaWidth, 204); // Línea debajo de la imagen
+  doc.line(startX, 214, startX + firmaWidth, 214); // Línea debajo de la imagen
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("firma", startX + 15, 207); // Texto centrado debajo de la línea
+  doc.text("firma", startX + 15, 217); // Texto centrado debajo de la línea
   
   // Huella dactilar (lado derecho) - recuadro, texto abajo
   const huellaX = startX + firmaWidth + gap;
-  doc.rect(huellaX, 180, 25, 25); // Recuadro
+  doc.rect(huellaX, 190, 25, 25); // Recuadro
   try {
     const huellaImg = "/img/firmas_sellos_prueba/HUELLA_DIGITAL.png";
-    doc.addImage(huellaImg, "PNG", huellaX + 3, 180, 18, 25); // Huella dentro del recuadro
+    doc.addImage(huellaImg, "PNG", huellaX + 3, 190, 18, 25); // Huella dentro del recuadro
   } catch (e) {
-    doc.text("[Huella]", huellaX + 5, 235);
+    doc.text("[Huella]", huellaX + 5, 245);
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("huella paciente", huellaX + 2, 207.2); // Texto centrado debajo del recuadro
+  doc.text("huella paciente", huellaX + 2, 217.2); // Texto centrado debajo del recuadro
 
   
 
-  // === SECCIÓN LABORATORIO ===
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Laboratorio:", 15,212);
-  
-  // Datos de laboratorio
-  const datosLaboratorio = [
-    { label: "Hemoglobina:", value: "13 g%", x: 40, y: 212 },
-    { label: "Hematocrito:", value: "62%", x: 80, y: 212 },
-    { label: "Glucosa:", value: "N/A mg/dL", x: 118, y: 212 },
-    { label: "EKG (>= 45años):", value: "Normal", x: 155, y: 212 }
-  ];
-
-  datosLaboratorio.forEach((item, index) => {
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(item.label, item.x, item.y);
-    doc.setFont("helvetica", "normal").setFontSize(9);
-    
-    // Ajustar espaciado para cada elemento
-    let valueX = item.x + 22;
-    if (item.label === "Hemoglobina:") {
-      valueX = item.x + 24; // Espacio para Hemoglobina
-    } else if (item.label === "Hematocrito:") {
-      valueX = item.x + 22; // Espacio para Hematocrito
-    } else if (item.label === "Glucosa:") {
-      valueX = item.x + 15; // Espacio para Glucosa
-    } else if (item.label === "EKG (>= 45años):") {
-      valueX = item.x + 28; // Espacio para EKG
-    }
-    
-    doc.text(item.value, valueX, item.y);
-  });
 
   // === CERTIFICACIÓN MÉDICA ===
   doc.setFont("helvetica", "normal").setFontSize(9);
-  const certificacionTexto = "Conforme a la declaración del / de la paciente y las pruebas complementarias, certifico que se encuentra APTO para ascender a grandes altitudes (mayor a 2,500 m.s.n.m); sin embargo, no aseguro el desempeño durante el ascenso durante su permanencia.";
+  const estadoApto = datosFinales.apto !== undefined ? datosFinales.apto : true; // Default true si no se especifica
+  const estadoTexto = estadoApto ? "APTO" : "NO APTO";
+  
+  // Texto antes del estado
+  const textoAntes = "Conforme a la declaración del / de la paciente y las pruebas complementarias, certifico que se encuentra ";
+  const textoDespues = " para ascender a grandes altitudes (mayor a 2,500 m.s.n.m); sin embargo, no aseguro el desempeño durante el ascenso durante su permanencia.";
   
   // Dividir el texto en líneas
-  const certificacionLineas = doc.splitTextToSize(certificacionTexto, 175);
-  let yPos = 218;
+  const certificacionLineas = doc.splitTextToSize(textoAntes + estadoTexto + textoDespues, 175);
+  let yPos = 222;
   
   certificacionLineas.forEach(linea => {
-    doc.text(linea, 15, yPos);
+    // Verificar si la línea contiene el estado
+    if (linea.includes(estadoTexto)) {
+      // Dividir la línea en partes para poder hacer bold solo el estado
+      const partes = linea.split(estadoTexto);
+      
+      // Escribir la primera parte
+      if (partes[0]) {
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text(partes[0], 15, yPos);
+      }
+      
+      // Escribir el estado en bold con espacio
+      const xPosEstado = 15 + doc.getTextWidth(partes[0]);
+      doc.setFont("helvetica", "bold").setFontSize(9);
+      doc.text(" " + estadoTexto + " ", xPosEstado, yPos);
+      
+      // Escribir la última parte
+      if (partes[1]) {
+        const xPosFinal = xPosEstado + doc.getTextWidth(" " + estadoTexto + " ");
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text(partes[1], xPosFinal, yPos);
+      }
+    } else {
+      // Línea normal sin estado
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.text(linea, 15, yPos);
+    }
     yPos += 3.5;
   });
 
   // === OBSERVACIONES MÉDICAS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Observaciones:", 15, 230);
+  doc.text("Observaciones:", 15, 234);
   
   // Observaciones dinámicas - puede recibir array o string
   let observacionesLista = [];
@@ -319,11 +320,11 @@ export default function Anexo16A_Jasper(data = {}) {
   }
   
   // Dibujar cada observación
-  let observacionY = 235;
+  let observacionY = 239;
   observacionesLista.forEach((observacion, index) => {
-    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(`- ${observacion}`, 15, observacionY);
-    observacionY += 5; // Espacio entre observaciones
+    observacionY += 4; // Espacio entre observaciones
   });
 
   // Calcular posición Y final de observaciones para ajustar secciones siguientes

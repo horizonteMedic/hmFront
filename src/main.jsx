@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Anexo16A/Anexo16A_Jasper.jsx"
+import Ficha from "./views/jaspers/AntecedentesPatologicos/ficha_antecedente_patologico_Digitalizado.jsx"
 
 const App = () => {
   return (

@@ -7,30 +7,29 @@ export default function FichaAntecedentePatologico(data = {}) {
 
   // Datos de prueba por defecto
   const datosPrueba = {
-    numeroFicha: "99164",
-    nombresApellidos: "DELGADO VEGA VIVIANA AYDE",
-    fechaExamen: "12 julio 2025",
-    sexo: "FEMENINO",
-    dni: "12345678",
-    edad: "25 AÑOS",
+    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
+    fechaExamen: "04/11/2024",
+    sexo: "F",
+    documentoIdentidad: "72384273",
+    edad: "31 años",
     areaTrabajo: "MINERÍA",
-    puestoTrabajo: "CAPATAZ",
+    puestoTrabajo: "DAD",
     empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA MINERA S.A.C."
+    contrata: "CONTRATA"
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
   const datosFinales = data && data.norden ? {
-    numeroFicha: data.norden || datosPrueba.numeroFicha,
-    nombresApellidos: data.nombres || datosPrueba.nombresApellidos,
+    apellidosNombres: data.nombres || datosPrueba.apellidosNombres,
     fechaExamen: data.fechaExamen || datosPrueba.fechaExamen,
     sexo: data.sexo || datosPrueba.sexo,
-    dni: data.dni || datosPrueba.dni,
+    documentoIdentidad: data.dni || datosPrueba.documentoIdentidad,
     edad: data.edad || datosPrueba.edad,
     areaTrabajo: data.areaTrabajo || datosPrueba.areaTrabajo,
     puestoTrabajo: data.puestoTrabajo || datosPrueba.puestoTrabajo,
     empresa: data.empresa || datosPrueba.empresa,
-    contrata: data.contrata || datosPrueba.contrata
+    contrata: data.contrata || datosPrueba.contrata,
+    antecedentesQuirurgicos: data.antecedentesQuirurgicos || []
   } : datosPrueba;
 
   // === HEADER ===
@@ -38,26 +37,21 @@ export default function FichaAntecedentePatologico(data = {}) {
   doc.setTextColor(0, 0, 0);
   doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", pageW / 2, 26, { align: "center" });
 
-  // === DATOS ADMINISTRATIVOS ===
-  // Número de Ficha con recuadro (lado derecho)
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.rect(pageW - 35, 15, 30, 8);
-  doc.text("N° Ficha : " + datosFinales.numeroFicha, pageW - 32, 20);
-
-  // Fecha de Examen (lado izquierdo, debajo del recuadro)
+  // === FECHA DE EXAMEN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Fecha Examen " + datosFinales.fechaExamen, 15, 30);
+  doc.text("Fecha Examen: " + datosFinales.fechaExamen, 15, 30);
 
-  // === DATOS PERSONALES (lado izquierdo) ===
+  // === DATOS PERSONALES ===
   const datosPersonales = [
-    { label: "Nombres y Apellidos", value: datosFinales.nombresApellidos, x: 15, y: 40 },
-    { label: "Sexo", value: datosFinales.sexo, x: 15, y: 45 },
-    { label: "DNI", value: datosFinales.dni, x: 15, y: 50 },
-    { label: "Edad", value: datosFinales.edad, x: 15, y: 55 },
-    { label: "Area de Trabajo", value: datosFinales.areaTrabajo, x: 15, y: 60 },
-    { label: "Puesto de Trabajo", value: datosFinales.puestoTrabajo, x: 15, y: 65 },
-    { label: "Empresa", value: datosFinales.empresa, x: 15, y: 70 },
-    { label: "Contrata", value: datosFinales.contrata, x: 15, y: 75 }
+    { label: "Apellidos y Nombres:", value: datosFinales.apellidosNombres, x: 15, y: 40 },
+    { label: "Fecha de Examen:", value: datosFinales.fechaExamen, x: 15, y: 45 },
+    { label: "Sexo:", value: datosFinales.sexo, x: 15, y: 50 },
+    { label: "DNI:", value: datosFinales.documentoIdentidad, x: 15, y: 55 },
+    { label: "Edad:", value: datosFinales.edad, x: 15, y: 60 },
+    { label: "Área de Trabajo:", value: datosFinales.areaTrabajo, x: 15, y: 65 },
+    { label: "Puesto de Trabajo:", value: datosFinales.puestoTrabajo, x: 15, y: 70 },
+    { label: "Empresa:", value: datosFinales.empresa, x: 15, y: 75 },
+    { label: "Contrata:", value: datosFinales.contrata, x: 15, y: 80 }
   ];
 
   datosPersonales.forEach(item => {
@@ -68,11 +62,20 @@ export default function FichaAntecedentePatologico(data = {}) {
   });
 
   // === ANTECEDENTES PATOLÓGICOS PERSONALES ===
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("1. Antecedentes Patologicos Personales:", 15, 80);
+  // Marco único para toda la sección
+  const marcoInicioY = 92;
+  const marcoFinY = 182;
+  const marcoInicioX = 15;
+  const marcoFinX = 200;
+  
+  // Marco rectangular principal que encierra todo
+  doc.rect(marcoInicioX, marcoInicioY, marcoFinX - marcoInicioX, marcoFinY - marcoInicioY);
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Marcar con una X las Enfermedades que han tenido o tienen:", 15, 85);
+  doc.text("1. Antecedentes Patologicos Personales:", 15, 90);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Marcar con una X las Enfermedades que han tenido o tienen:", 20, 95);
 
   // Listas de enfermedades por columna
   const col1 = [
@@ -146,7 +149,7 @@ export default function FichaAntecedentePatologico(data = {}) {
   ];
 
   // Configuración de posiciones
-  const startY = 90;
+  const startY = 100;
   const stepY = 4;
   const posicionesX = [20, 80, 140]; // 3 columnas
 
@@ -185,7 +188,10 @@ export default function FichaAntecedentePatologico(data = {}) {
     frecuenciaLicor: "3-4 veces por semana",
     drogas: true,
     tipoDrogas: "Marihuana y Cocaína",
-    frecuenciaDrogas: "Ocasionalmente (fines de semana)"
+    frecuenciaDrogas: "Ocasionalmente (fines de semana)",
+    otros: false,
+    tipoOtros: "—",
+    frecuenciaOtros: "—"
   };
 
   // Renderizar en PDF
@@ -209,43 +215,52 @@ export default function FichaAntecedentePatologico(data = {}) {
   });
 // === SEVERIDAD Y FECHA ===
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("Fecha :", 80, 170);
+doc.text("Fecha :", 80, 180);
 doc.setFont("helvetica", "normal").setFontSize(9);
-doc.text("15/12/2024", 95, 170);
+doc.text("15/12/2024", 95, 180);
 
 // LEVE
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("LEVE (   )", 120, 170);
+doc.text("LEVE (   )", 120, 180);
 if (severidadCovid.leve) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.setTextColor(255, 0, 0);
-  doc.text("X", 130.5, 170.2); // coordenada dentro del paréntesis
+  doc.text("X", 130.5, 180.2); // coordenada dentro del paréntesis
   doc.setTextColor(0, 0, 0);
 }
 
 // MODERADO
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("MODERADO (   )", 140, 170);
+doc.text("MODERADO (   )", 140, 180);
 if (severidadCovid.moderado) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.setTextColor(255, 0, 0);
-  doc.text("X",161, 170.2); // ajustar dentro del (   )
+  doc.text("X",161, 180.2); // ajustar dentro del (   )
   doc.setTextColor(0, 0, 0);
 }
 
 // SEVERO
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("SEVERO (   )", 172, 170);
+doc.text("SEVERO (   )", 172, 180);
 if (severidadCovid.severo) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.setTextColor(255, 0, 0);
-  doc.text("X", 187.4, 170.2); // dentro del (   )
+  doc.text("X", 187.4, 180.2); // dentro del (   )
   doc.setTextColor(0, 0, 0);
 }
 
   // === SÍNTOMAS FRECUENTES ===
-doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("Indicar las enfermedades que ha tenido o tiene, con mucha frecuencia:", 15, 177);
+  // Marco para la sección de síntomas
+  const sintomasMarcoInicioY = 183.5;
+  const sintomasMarcoFinY = 230;
+  const sintomasMarcoInicioX = 15;
+  const sintomasMarcoFinX = 200;
+  
+  // Marco rectangular para síntomas
+  doc.rect(sintomasMarcoInicioX, sintomasMarcoInicioY, sintomasMarcoFinX - sintomasMarcoInicioX, sintomasMarcoFinY - sintomasMarcoInicioY);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Indicar las enfermedades que ha tenido o tiene, con mucha frecuencia:", 20, 187);
 
 // Listas de síntomas por columna
 const sintomasCol1 = [
@@ -288,7 +303,7 @@ const sintomasCol3 = [
 ];
 
 // Configuración de posiciones para síntomas
-const sintomasStartY = 182;
+const sintomasStartY = 192;
 const sintomasStepY = 4;
 const sintomasPosicionesX = [20, 80, 140]; // 3 columnas
 
@@ -333,25 +348,38 @@ sintomasFrecuentes.forEach(sintoma => {
 
 
   // === HABITOS NOSIVOS ===
-doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("Habitos Nosivos:", 15, 225);
+  // Marco para la sección de hábitos nocivos
+  const habitosMarcoInicioY = 231.5;
+  const habitosMarcoFinY = 290;
+  const habitosMarcoInicioX = 15;
+  const habitosMarcoFinX = 200;
+  
+  // Marco rectangular para hábitos nocivos
+  doc.rect(habitosMarcoInicioX, habitosMarcoInicioY, habitosMarcoFinX - habitosMarcoInicioX, habitosMarcoFinY - habitosMarcoInicioY);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Habitos Nosivos:", 20, 235);
 
 const habitosNosivosItems = [
-  { label: "Fumar", campo: "fumar", y: 235, subFields: [
-    { label: "Numeros de Cigarrillos", campo: "numeroCigarrillos", x: 80, y: 235, valorX: 125, valorY: 235 }
+  { label: "Fumar", campo: "fumar", y: 240, subFields: [
+    { label: "Numeros de Cigarrillos", campo: "numeroCigarrillos", x: 80, y: 240, valorX: 125, valorY: 240 }
   ]},
-  { label: "Licor", campo: "licor", y: 245, subFields: [
-    { label: "Tipo mas Frecuente", campo: "tipoLicor", x: 80, y: 245, valorX: 125, valorY: 245 },
-    { label: "Frecuencia", campo: "frecuenciaLicor", x: 80, y: 250, valorX: 125, valorY: 250 }
+  { label: "Licor", campo: "licor", y: 247, subFields: [
+    { label: "Tipo mas Frecuente", campo: "tipoLicor", x: 80, y: 247, valorX: 125, valorY: 247 },
+    { label: "Frecuencia", campo: "frecuenciaLicor", x: 80, y: 252, valorX: 125, valorY: 252 }
   ]},
-  { label: "Drogas", campo: "drogas", y: 260, subFields: [
-    { label: "Tipo Probado o que Usa", campo: "tipoDrogas", x: 80, y: 260, valorX: 125, valorY: 260 },
-    { label: "Frecuencia", campo: "frecuenciaDrogas", x: 80, y: 265, valorX: 125, valorY: 265 }
+  { label: "Drogas", campo: "drogas", y: 258, subFields: [
+    { label: "Tipo Probado o que Usa", campo: "tipoDrogas", x: 80, y: 258, valorX: 125, valorY: 258 },
+    { label: "Frecuencia", campo: "frecuenciaDrogas", x: 80, y: 263, valorX: 125, valorY: 263 }
+  ]},
+  { label: "Otros", campo: "otros", y: 269, subFields: [
+    { label: "Tipo", campo: "tipoOtros", x: 80, y: 269, valorX: 125, valorY: 269 },
+    { label: "Frecuencia", campo: "frecuenciaOtros", x: 80, y: 274, valorX: 125, valorY: 274 }
   ]}
 ];
 
 habitosNosivosItems.forEach(item => {
-  const labelX = 15;
+  const labelX = 20;
   const checkboxSiX = labelX + 20;
   const checkboxNoX = labelX + 40;
   const checkboxY = item.y - 2.5;
@@ -359,24 +387,30 @@ habitosNosivosItems.forEach(item => {
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(item.label, labelX, item.y);
 
-  // SI con paréntesis
+  // SI con paréntesis de ancho fijo
   doc.text("SI (", checkboxSiX, item.y);
   if (habitosNosivosMarcados[item.campo]) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.setTextColor(255, 0, 0);
-    doc.text("X", checkboxSiX + 7.2, item.y +0.5);
+    doc.text("X", checkboxSiX + 7.2, item.y + 0.5);
     doc.setTextColor(0, 0, 0);
+  } else {
+    // Espacio vacío para mantener el ancho
+    doc.text(" ", checkboxSiX + 7.2, item.y + 0.5);
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(")", checkboxSiX + 12, item.y);
 
-  // NO con paréntesis
+  // NO con paréntesis de ancho fijo
   doc.text("NO (", checkboxNoX, item.y);
   if (!habitosNosivosMarcados[item.campo]) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.setTextColor(255, 0, 0);
-    doc.text("X", checkboxNoX + 8, item.y - 0.5);
+    doc.text("X", checkboxNoX + 8, item.y + 0.5);
     doc.setTextColor(0, 0, 0);
+  } else {
+    // Espacio vacío para mantener el ancho
+    doc.text(" ", checkboxNoX + 7.2, item.y + 0.5);
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(")", checkboxNoX + 12, item.y);
@@ -393,6 +427,152 @@ habitosNosivosItems.forEach(item => {
   });
 });
 
+
+  // === PÁGINA 2 ===
+  doc.addPage();
+  
+  // === HEADER PÁGINA 2 ===
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", pageW / 2, 26, { align: "center" });
+
+  // Número de Ficha y Página
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("Nº Ficha: " + datosFinales.numeroFicha, pageW - 40, 20);
+  doc.text("Pag. 02", pageW - 20, 20);
+  
+  // Sede
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Sede: Trujillo-Pierola", 15, 30);
+
+  // === ANTECEDENTES QUIRÚRGICOS ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("ANTECEDENTES QUIRÚRGICOS", 15, 40);
+
+  // Tabla de antecedentes quirúrgicos
+  const tablaInicioY = 45;
+  const tablaInicioX = 15;
+  const colWidths = [20, 50, 40, 25, 25]; // Anchos de columnas ajustados
+  const rowHeight = 6;
+  const numRows = 8;
+  const tablaAncho = colWidths.reduce((a, b) => a + b, 0);
+
+  // Datos de antecedentes quirúrgicos (dinámicos)
+  const antecedentesQuirurgicos = datosFinales.antecedentesQuirurgicos || [
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
+    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" }
+  ];
+
+  // Encabezados de la tabla
+  const encabezados = [
+    "Fecha",
+    "Hospital (Nombre - Lugar)",
+    "Operación",
+    "Días Hospitalización",
+    "Complicaciones"
+  ];
+
+  // Dibujar encabezados
+  let currentX = tablaInicioX;
+  encabezados.forEach((encabezado, index) => {
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(encabezado, currentX, tablaInicioY);
+    currentX += colWidths[index];
+  });
+
+  // Dibujar líneas de la tabla
+  // Línea horizontal superior
+  doc.line(tablaInicioX, tablaInicioY + 2, tablaInicioX + tablaAncho, tablaInicioY + 2);
+  
+  // Líneas verticales
+  currentX = tablaInicioX;
+  for (let i = 0; i <= encabezados.length; i++) {
+    doc.line(currentX, tablaInicioY - 2, currentX, tablaInicioY + 2 + (numRows * rowHeight));
+    if (i < encabezados.length) {
+      currentX += colWidths[i];
+    }
+  }
+
+  // Líneas horizontales para filas
+  for (let i = 0; i <= numRows; i++) {
+    const y = tablaInicioY + 2 + (i * rowHeight);
+    doc.line(tablaInicioX, y, tablaInicioX + tablaAncho, y);
+  }
+
+  // Llenar datos en la tabla
+  antecedentesQuirurgicos.forEach((fila, rowIndex) => {
+    if (rowIndex < numRows) {
+      const rowY = tablaInicioY + 2 + ((rowIndex + 1) * rowHeight) - 1;
+      let colX = tablaInicioX + 2;
+      
+      // Fecha
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(fila.fecha || "", colX, rowY);
+      colX += colWidths[0];
+      
+      // Hospital
+      doc.text(fila.hospital || "", colX, rowY);
+      colX += colWidths[1];
+      
+      // Operación
+      doc.text(fila.operacion || "", colX, rowY);
+      colX += colWidths[2];
+      
+      // Días Hospitalización
+      doc.text(fila.diasHospitalizacion || "", colX, rowY);
+      colX += colWidths[3];
+      
+      // Complicaciones
+      doc.text(fila.complicaciones || "", colX, rowY);
+    }
+  });
+
+  // === ANTECEDENTES DE REPRODUCCIÓN ===
+  const reproY = tablaInicioY + 2 + (numRows * rowHeight) + 10;
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("ANTECEDENTES DE REPRODUCCIÓN", 15, reproY);
+
+  // En caso de Damas
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("En caso de Damas:", 15, reproY + 8);
+
+  const camposDamas = [
+    "Inicio de mestruación:",
+    "Inicio de vida sexual:",
+    "Número de parejas sexual a la actualidad:",
+    "Número de hijos vivos:",
+    "Número de hijos fallecidos:",
+    "Número de abortos:",
+    "Precisar Causas:"
+  ];
+
+  camposDamas.forEach((campo, index) => {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(campo, 20, reproY + 15 + (index * 5));
+  });
+
+  // En caso de Varones
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("En caso de Varones:", 15, reproY + 55);
+
+  const camposVarones = [
+    "Número de hijos vivos:",
+    "Número de hijos fallecidos:",
+    "Número de abortos en sus parejas:",
+    "Precisar Causas:"
+  ];
+
+  camposVarones.forEach((campo, index) => {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(campo, 20, reproY + 62 + (index * 5));
+  });
 
   // === IMPRIMIR ===
   imprimir(doc);
