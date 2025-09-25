@@ -34,36 +34,82 @@ export default function AntecedentesPatologicos({
           </div>
         </div>
 
-        {/* Fecha y Severidad */}
+        {/* COVID 19, Fecha y Severidad */}
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-2">
-            <span className="font-semibold">Fecha:</span>
+            <InputCheckbox 
+              label="COVID 19" 
+              name="covid19" 
+              checked={!!form?.covid19} 
+              onChange={(e) => handleSiNoChange("covid19", e, e.target.checked)} 
+            />
+          </div>
+          <div className={`flex items-center gap-2 ${!form?.covid19 ? 'opacity-50' : ''}`}>
+            <span className={`font-semibold ${!form?.covid19 ? 'text-gray-400' : ''}`}>Fecha:</span>
             <InputTextOneLine 
               name="fechaEnfermedades" 
               type="date" 
               value={form?.fechaEnfermedades || ""} 
               onChange={() => {}} 
+              disabled={!form?.covid19}
+              className={!form?.covid19 ? 'disabled:opacity-50 disabled:cursor-not-allowed' : ''}
             />
           </div>
           <div className="flex items-center gap-4">
-            <InputCheckbox 
-              label="LEVE" 
-              name="severidadLeve" 
-              checked={!!form?.severidadLeve} 
-              onChange={(e) => handleSiNoChange("severidadLeve", e, e.target.checked)} 
-            />
-            <InputCheckbox 
-              label="MODERADO" 
-              name="severidadModerado" 
-              checked={!!form?.severidadModerado} 
-              onChange={(e) => handleSiNoChange("severidadModerado", e, e.target.checked)} 
-            />
-            <InputCheckbox 
-              label="SEVERO" 
-              name="severidadSevero" 
-              checked={!!form?.severidadSevero} 
-              onChange={(e) => handleSiNoChange("severidadSevero", e, e.target.checked)} 
-            />
+            <div className={`flex items-center gap-2 ${!form?.covid19 ? 'opacity-50' : ''}`}>
+              <input
+                type="checkbox"
+                name="severidadLeve"
+                checked={!!form?.severidadLeve}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    // Desmarcar los otros checkboxes
+                    handleSiNoChange("severidadModerado", e, false);
+                    handleSiNoChange("severidadSevero", e, false);
+                  }
+                  handleSiNoChange("severidadLeve", e, e.target.checked);
+                }}
+                disabled={!form?.covid19}
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <span className={` ${!form?.covid19 ? 'text-gray-400' : ''}`}>LEVE</span>
+            </div>
+            <div className={`flex items-center gap-2 ${!form?.covid19 ? 'opacity-50' : ''}`}>
+              <input
+                type="checkbox"
+                name="severidadModerado"
+                checked={!!form?.severidadModerado}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    // Desmarcar los otros checkboxes
+                    handleSiNoChange("severidadLeve", e, false);
+                    handleSiNoChange("severidadSevero", e, false);
+                  }
+                  handleSiNoChange("severidadModerado", e, e.target.checked);
+                }}
+                disabled={!form?.covid19}
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <span className={` ${!form?.covid19 ? 'text-gray-400' : ''}`}>MODERADO</span>
+            </div>
+            <div className={`flex items-center gap-2 ${!form?.covid19 ? 'opacity-50' : ''}`}>
+              <input
+                type="checkbox"
+                name="severidadSevero"
+                checked={!!form?.severidadSevero}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    // Desmarcar los otros checkboxes
+                    handleSiNoChange("severidadLeve", e, false);
+                    handleSiNoChange("severidadModerado", e, false);
+                  }
+                  handleSiNoChange("severidadSevero", e, e.target.checked);
+                }}
+                disabled={!form?.covid19}
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+              <span className={` ${!form?.covid19 ? 'text-gray-400' : ''}`}>SEVERO</span>
+            </div>
           </div>
         </div>
 
@@ -359,7 +405,7 @@ export default function AntecedentesPatologicos({
                       />
                     </div>
                     
-                    <div className="text-sm text-gray-600 italic">
+                    <div className=" text-gray-600 italic">
                       Si la Respuesta es SI, responder las líneas inferiores
                     </div>
                   </div>
@@ -429,7 +475,7 @@ export default function AntecedentesPatologicos({
                       />
                     </div>
                     
-                    <div className="text-sm text-gray-600 italic">
+                    <div className=" text-gray-600 italic">
                       Si la Respuesta es SI, responder las líneas inferiores
                     </div>
                   </div>
