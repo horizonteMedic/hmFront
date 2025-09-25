@@ -3,7 +3,6 @@ import jsPDF from "jspdf";
 export default function FichaAntecedentePatologico(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
   
   // Contador de páginas dinámico
   let numeroPagina = 1;
@@ -469,11 +468,10 @@ habitosNosivosItems.forEach(item => {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Antecedentes Quirúrgicos:", 15, 40);
 
-  // Tabla de antecedentes quirúrgicos
-  const tablaInicioY = 45;
+  // Tabla de antecedentes quirúrgicos - con separación del título
+  const tablaInicioY = 45; // Aumentado de 42 a 45 para mayor separación
   const tablaInicioX = 15;
   const colWidths = [20, 55, 40, 17, 53]; // Anchos de columnas ajustados
-  const rowHeight = 6;
   const tablaAncho = colWidths.reduce((a, b) => a + b, 0);
 
   // Datos de antecedentes quirúrgicos (dinámicos) - solo los que tienen datos
@@ -507,7 +505,6 @@ habitosNosivosItems.forEach(item => {
     antecedente.diasHospitalizacion || antecedente.complicaciones
   );
   
-  const numRows = antecedentesConDatos.length;
 
   // Encabezados de la tabla con coordenadas individuales
   const encabezados = [
@@ -530,11 +527,6 @@ habitosNosivosItems.forEach(item => {
   
   // Líneas verticales - se dibujarán después de calcular las alturas dinámicas
 
-  // Función para ajustar texto con salto de línea automático
-  const ajustarTexto = (texto, maxWidth) => {
-    if (!texto) return "";
-    return texto; // Devolver texto completo, jsPDF manejará el salto de línea
-  };
 
   // Función para calcular la altura necesaria de una fila
   const calcularAlturaFila = (fila, colWidths, doc) => {
@@ -557,7 +549,11 @@ habitosNosivosItems.forEach(item => {
       }
     });
     
-    return maxLineas * 4; // 4mm por línea (ajustable)
+    // Altura completamente dinámica basada en el contenido real + márgenes superior e inferior
+    const alturaContenido = maxLineas * 4; // 4mm por línea
+    const margenSuperior = 1.5; // 1.5mm margen superior (aumentado para mejor visualización)
+    const margenInferior = 0.5; // 0.5mm margen inferior
+    return alturaContenido + margenSuperior + margenInferior;
   };
 
   // Calcular alturas de filas dinámicamente
@@ -587,7 +583,9 @@ habitosNosivosItems.forEach(item => {
   let currentY = tablaInicioY + 2;
   antecedentesConDatos.forEach((fila, rowIndex) => {
     const alturaFila = alturasFilas[rowIndex];
-    const rowY = currentY + (alturaFila / 2) - 3.5; // Centrar verticalmente y subir 1.5mm
+    // Posición Y con margen superior de 1.5mm desde el inicio de la fila
+    const margenSuperior = 1.5;
+    const rowY = currentY + margenSuperior + 2; // 1.5mm margen + 2mm para centrar el texto
     let colX = tablaInicioX + 2;
     
     // Fecha
