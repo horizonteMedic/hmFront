@@ -46,7 +46,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     observaciones: [
       "USO DE LENTES CORRECTORES",
       "ALERGIA A PENICILINA",
-     
+
     ],
     medico: {
       nombres: "SANCHEZ QUIÑONES JOSE ALEJANDRO",
@@ -56,12 +56,12 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     }
   };
   const datosReales = {
-    apellidosNombres: String((data.apellidos_apellidos_pa || "") + (data.nombres_nombres_pa || "")),
+    apellidosNombres: String((data.apellidos_apellidos_pa || "") + " " + (data.nombres_nombres_pa || "")),
     fechaExamen: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || ""),
     sexo: data.sexo_sexo_pa || "",
     documentoIdentidad: String(data.dni_cod_pa || ""),
     edad: String(data.edad_edad ?? ""),
-    areaTrabajo: data.cargo_cargo_de || "", //revisar - podría ser areaTrabajo específico
+    areaTrabajo: data.area_area_o || "",
     puestoTrabajo: data.cargo_cargo_de || "",
     empresa: data.empresa_razon_empresa || "",
     contrata: data.contrata_razon_contrata || "",
@@ -90,19 +90,19 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       alergias: data.alergiasSiAnexo16a_si15 || false,
       otraCondicion: data.otraCondicionMedicaSiAnexo16a_si14 || false
     },
-     medicacionActual: data.medicacionActual || "",
-     fur: data.fur || "",
-     observaciones: data.observaciones || "",
-     medico: {
-       nombres: data.medicoNombres || "SANCHEZ QUIÑONES JOSE ALEJANDRO",
-       direccion: data.medicoDireccion || "Av. Nicolas de Piérola N°1106 Urb. San Fernando",
-       cmp: data.medicoCmp || "80135",
-       fecha: data.medicoFecha || "04/11/2024"
-     }
+    medicacionActual: data.medicacionActualAnexo16a_m_actual || "",
+    fur: data.furDescripcionAnexo16a_txtfur || "",
+    observaciones: data.observacionesAnexo16a_observaciones || "",
+    medico: {
+      nombres: String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
+      direccion: data.direccionSede || "",
+      cmp: data.cmpUsuario_cmp_user || "",
+      fecha: ""
+    }
   };
-  
+
   // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
 
   // === HEADER ===
   doc.setFont("helvetica", "bold").setFontSize(12);
@@ -219,7 +219,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       doc.text("X", noX + 0.5, checkboxY + 3.5);
       doc.setTextColor(0, 0, 0); // Resetear a negro
     }
-    
+
     // Si es embarazo y está marcado como SI, mostrar campo FUR en la misma línea
     if (condicion.campo === "embarazo" && datosFinales.condiciones[condicion.campo]) {
       doc.setFont("helvetica", "normal").setFontSize(9);
