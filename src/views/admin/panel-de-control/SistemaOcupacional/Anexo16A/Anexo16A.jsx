@@ -43,6 +43,7 @@ export default function Anexo16A() {
     peso: "",
     talla: "",
     medicoNombre: userCompleto?.datos?.nombres_user?.toUpperCase() ?? "",
+    medicoDNI: userCompleto?.datos?.dni_user ?? "",
     medicoCmp: userCompleto?.datos?.cmp?.toUpperCase() ?? "",
     medicoDireccion: userCompleto?.datos?.direccion?.toUpperCase() ?? "",
     cirugiaMayor: false,
@@ -325,7 +326,7 @@ export default function Anexo16A() {
                   <InputsBooleanRadioGroup
                     name="embarazo"
                     value={form?.embarazo}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, furDescripcion: "" })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} disabled={!form.embarazo} />

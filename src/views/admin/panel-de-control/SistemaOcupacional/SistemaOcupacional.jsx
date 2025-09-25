@@ -189,14 +189,6 @@ const TabComponent = () => {
     celPa: "",
   });
 
-  // Estado del formulario para Antecedentes Patológicos
-  const [formAntecedentes, setFormAntecedentes] = useState({});
-
-  // Función para manejar cambios en checkboxes y radio buttons
-  const handleSiNoChangeAntecedentes = (fieldName, e, value) => {
-    setFormAntecedentes(prev => ({ ...prev, [fieldName]: value }));
-  };
-
   const listasCombos = {
     EmpresasMulti,
     ContrataMulti,
@@ -1293,11 +1285,7 @@ const TabComponent = () => {
                   Antecedentes Patológicos
                 </h2>
               </div>
-              <AntecedentesPatologicos 
-                form={formAntecedentes}
-                handleSiNoChange={handleSiNoChangeAntecedentes}
-                listas={listasCombos} 
-              />
+              <AntecedentesPatologicos/>
             </div>
           )}
         </div>

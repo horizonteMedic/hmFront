@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { InputCheckbox, InputTextOneLine, InputsBooleanRadioGroup } from "../../../../../../components/reusableComponents/ResusableComponents";
+import { InputCheckbox, InputTextOneLine, InputsBooleanRadioGroup } from "../../../../../components/reusableComponents/ResusableComponents";
 
 // Componente Indicar Enfermedades
 export default function IndicarEnfermedades({

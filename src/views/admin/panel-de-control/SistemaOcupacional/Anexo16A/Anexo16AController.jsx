@@ -710,7 +710,7 @@ export const SubmitDataService = async (
         codigoAnexo16a: form.codigoAnexo,
         fechaExamen: form.fechaExam,
         edad: form.edad,
-        dni: form.dni,
+        dni: form.medicoDNI,
         direccionClinica: form.medicoDireccion,
         apto: form.apto,
         noApto: !form.apto,
