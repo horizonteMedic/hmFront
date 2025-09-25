@@ -61,7 +61,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
         token
     )
         .then(async (res) => {
-            if (res.norden) {
+            if (res.norden || res.norden_n_orden) {
                 console.log(res);
                 const nombre = res.nameJasper;
                 console.log(nombre);
