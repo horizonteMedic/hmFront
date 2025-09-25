@@ -2,9 +2,7 @@ import jsPDF from "jspdf";
 
 export default function Anexo16A_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-  const margin = 0;
   const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
 
   // Datos de prueba por defecto
   const datosPrueba = {
@@ -29,7 +27,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
       desordenesCoagulacion: false,
       diabetes: false,
       hipertension: false,
-      embarazo: false,
+      embarazo: true,
       problemasNeurologicos: false,
       infeccionesRecientes: true,
       obesidadMorbida: false,
@@ -42,11 +40,18 @@ export default function Anexo16A_Digitalizado(data = {}) {
       otraCondicion: false
     },
     medicacionActual: "Paracetamol 500mg cada 8 horas",
+    fur: "15/08/2024", // Fecha de última regla
     observaciones: [
       "USO DE LENTES CORRECTORES",
       "ALERGIA A PENICILINA",
      
-    ]
+    ],
+    medico: {
+      nombres: "SANCHEZ QUIÑONES JOSE ALEJANDRO",
+      direccion: "Av. Nicolas de Piérola N°1106 Urb. San Fernando",
+      cmp: "80135",
+      fecha: "04/11/2024"
+    }
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
@@ -86,7 +91,14 @@ export default function Anexo16A_Digitalizado(data = {}) {
       otraCondicion: data.otraCondicion || false
     },
     medicacionActual: data.medicacionActual || "",
-    observaciones: data.observaciones || ""
+    fur: data.fur || "",
+    observaciones: data.observaciones || "",
+    medico: {
+      nombres: data.medicoNombres || datosPrueba.medico.nombres,
+      direccion: data.medicoDireccion || datosPrueba.medico.direccion,
+      cmp: data.medicoCmp || datosPrueba.medico.cmp,
+      fecha: data.medicoFecha || datosPrueba.medico.fecha
+    }
   } : datosPrueba;
 
   // === HEADER ===
@@ -136,7 +148,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
     { label: "IMC:", value: datosFinales.vitalSigns.imc + " kg/m2", x: 100, y: 95 }
   ];
 
-  signosVitales.forEach((signo, index) => {
+  signosVitales.forEach((signo) => {
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(signo.label, signo.x, signo.y);
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -203,6 +215,13 @@ export default function Anexo16A_Digitalizado(data = {}) {
       doc.setTextColor(255, 0, 0); // Color rojo
       doc.text("X", noX + 0.5, checkboxY + 3.5);
       doc.setTextColor(0, 0, 0); // Resetear a negro
+    }
+    
+    // Si es embarazo y está marcado como SI, mostrar campo FUR en la misma línea
+    if (condicion.campo === "embarazo" && datosFinales.condiciones[condicion.campo]) {
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.text("FUR:", 160, 126); // Posición X e Y específica para FUR
+      doc.text(datosFinales.fur || "00/00/0000", 170, 126);
     }
   });
 
@@ -321,7 +340,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
   
   // Dibujar cada observación
   let observacionY = 239;
-  observacionesLista.forEach((observacion, index) => {
+  observacionesLista.forEach((observacion) => {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(`- ${observacion}`, 15, observacionY);
     observacionY += 4; // Espacio entre observaciones
@@ -335,10 +354,10 @@ export default function Anexo16A_Digitalizado(data = {}) {
   doc.text("Datos del Médico:", 15, observacionesFinalY + 5);
 
   const datosMedico = [
-    { label: "Apellidos y Nombres:", value: "SANCHEZ QUIÑONES JOSE ALEJANDRO", x: 15, y: observacionesFinalY + 10 },
-    { label: "Dirección:", value: "Av. Nicolas de Piérola N°1106 Urb. San Fernando", x: 15, y: observacionesFinalY + 15 },
-    { label: "CMP:", value: "80135", x: 15, y: observacionesFinalY + 20 },
-    { label: "Fecha (dd/mm/aa):", value: "04/11/2024", x: 15, y: observacionesFinalY + 25 }
+    { label: "Apellidos y Nombres:", value: datosFinales.medico.nombres, x: 15, y: observacionesFinalY + 10 },
+    { label: "Dirección:", value: datosFinales.medico.direccion, x: 15, y: observacionesFinalY + 15 },
+    { label: "CMP:", value: datosFinales.medico.cmp, x: 15, y: observacionesFinalY + 20 },
+    { label: "Fecha (dd/mm/aa):", value: datosFinales.medico.fecha, x: 15, y: observacionesFinalY + 25 }
   ];
 
   datosMedico.forEach(item => {

@@ -4,6 +4,9 @@ export default function FichaAntecedentePatologico(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
+  
+  // Contador de páginas dinámico
+  let numeroPagina = 1;
 
   // Datos de prueba por defecto
   const datosPrueba = {
@@ -15,7 +18,8 @@ export default function FichaAntecedentePatologico(data = {}) {
     areaTrabajo: "MINERÍA",
     puestoTrabajo: "DAD",
     empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA"
+    contrata: "CONTRATA",
+    sede: "Trujillo-Pierola"
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
@@ -29,17 +33,32 @@ export default function FichaAntecedentePatologico(data = {}) {
     puestoTrabajo: data.puestoTrabajo || datosPrueba.puestoTrabajo,
     empresa: data.empresa || datosPrueba.empresa,
     contrata: data.contrata || datosPrueba.contrata,
-    antecedentesQuirurgicos: data.antecedentesQuirurgicos || []
-  } : datosPrueba;
+    antecedentesQuirurgicos: data.antecedentesQuirurgicos || [],
+    numeroFicha: data.numeroFicha || "99164",
+    sede: data.sede || datosPrueba.sede
+  } : {
+    ...datosPrueba,
+    numeroFicha: "99164"
+  };
 
   // === HEADER ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", pageW / 2, 26, { align: "center" });
 
+  // Número de Ficha y Página - Página 1 (tipo lista)
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("Nro de ficha: ", pageW - 50, 20);
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
+
+
   // === FECHA DE EXAMEN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Fecha Examen: " + datosFinales.fechaExamen, 15, 30);
+  doc.text("Fecha Examen: " + datosFinales.fechaExamen, 15, 35);
 
   // === DATOS PERSONALES ===
   const datosPersonales = [
@@ -430,149 +449,319 @@ habitosNosivosItems.forEach(item => {
 
   // === PÁGINA 2 ===
   doc.addPage();
+  numeroPagina++; // Incrementar contador de página
   
   // === HEADER PÁGINA 2 ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
   doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", pageW / 2, 26, { align: "center" });
 
-  // Número de Ficha y Página
+  // Número de Ficha y Página (tipo lista)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nº Ficha: " + datosFinales.numeroFicha, pageW - 40, 20);
-  doc.text("Pag. 02", pageW - 20, 20);
-  
-  // Sede
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Sede: Trujillo-Pierola", 15, 30);
+  doc.text("Nro de ficha: ", pageW - 50, 20);
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
 
   // === ANTECEDENTES QUIRÚRGICOS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("ANTECEDENTES QUIRÚRGICOS", 15, 40);
+  doc.text("Antecedentes Quirúrgicos:", 15, 40);
 
   // Tabla de antecedentes quirúrgicos
   const tablaInicioY = 45;
   const tablaInicioX = 15;
-  const colWidths = [20, 50, 40, 25, 25]; // Anchos de columnas ajustados
+  const colWidths = [20, 55, 40, 17, 53]; // Anchos de columnas ajustados
   const rowHeight = 6;
-  const numRows = 8;
   const tablaAncho = colWidths.reduce((a, b) => a + b, 0);
 
-  // Datos de antecedentes quirúrgicos (dinámicos)
+  // Datos de antecedentes quirúrgicos (dinámicos) - solo los que tienen datos
   const antecedentesQuirurgicos = datosFinales.antecedentesQuirurgicos || [
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" },
-    { fecha: "", hospital: "", operacion: "", diasHospitalizacion: "", complicaciones: "" }
+    { 
+      fecha: "2022", 
+      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
+      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
+      diasHospitalizacion: "3", 
+      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+    },
+    { 
+      fecha: "2022", 
+      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
+      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
+      diasHospitalizacion: "3", 
+      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+    },
+    { 
+      fecha: "2022", 
+      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
+      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
+      diasHospitalizacion: "3", 
+      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+    }
   ];
+  
+  // Filtrar solo los registros que tienen al menos un campo con datos
+  const antecedentesConDatos = antecedentesQuirurgicos.filter(antecedente => 
+    antecedente.fecha || antecedente.hospital || antecedente.operacion || 
+    antecedente.diasHospitalizacion || antecedente.complicaciones
+  );
+  
+  const numRows = antecedentesConDatos.length;
 
-  // Encabezados de la tabla
+  // Encabezados de la tabla con coordenadas individuales
   const encabezados = [
-    "Fecha",
-    "Hospital (Nombre - Lugar)",
-    "Operación",
-    "Días Hospitalización",
-    "Complicaciones"
+    { texto: "Fecha", x: 21, y: 46 },
+    { texto: "Hospital (Nombre - Lugar)", x: 44, y: 46 },
+    { texto: "Operación", x: 103, y: 46 },
+    { texto: "Días.H.", x: 133, y: 46 },
+    { texto: "Complicaciones", x: 164, y: 46 }
   ];
 
   // Dibujar encabezados
-  let currentX = tablaInicioX;
-  encabezados.forEach((encabezado, index) => {
+  encabezados.forEach((encabezado) => {
     doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text(encabezado, currentX, tablaInicioY);
-    currentX += colWidths[index];
+    doc.text(encabezado.texto, encabezado.x, encabezado.y);
   });
 
   // Dibujar líneas de la tabla
-  // Línea horizontal superior
-  doc.line(tablaInicioX, tablaInicioY + 2, tablaInicioX + tablaAncho, tablaInicioY + 2);
+  // Línea horizontal superior (arriba de los encabezados)
+  doc.line(tablaInicioX, tablaInicioY - 2, tablaInicioX + tablaAncho, tablaInicioY - 2);
   
-  // Líneas verticales
-  currentX = tablaInicioX;
+  // Líneas verticales - se dibujarán después de calcular las alturas dinámicas
+
+  // Función para ajustar texto con salto de línea automático
+  const ajustarTexto = (texto, maxWidth) => {
+    if (!texto) return "";
+    return texto; // Devolver texto completo, jsPDF manejará el salto de línea
+  };
+
+  // Función para calcular la altura necesaria de una fila
+  const calcularAlturaFila = (fila, colWidths, doc) => {
+    let maxLineas = 1;
+    
+    // Calcular líneas necesarias para cada campo
+    const campos = [
+      { texto: fila.fecha || "", ancho: colWidths[0] - 2 },
+      { texto: fila.hospital || "", ancho: colWidths[1] - 2 },
+      { texto: fila.operacion || "", ancho: colWidths[2] - 2 },
+      { texto: fila.diasHospitalizacion || "", ancho: colWidths[3] - 2 },
+      { texto: fila.complicaciones || "", ancho: colWidths[4] - 2 }
+    ];
+    
+    campos.forEach(campo => {
+      if (campo.texto) {
+        const lineas = doc.getTextWidth(campo.texto) / campo.ancho;
+        const lineasNecesarias = Math.ceil(lineas);
+        maxLineas = Math.max(maxLineas, lineasNecesarias);
+      }
+    });
+    
+    return maxLineas * 4; // 4mm por línea (ajustable)
+  };
+
+  // Calcular alturas de filas dinámicamente
+  const alturasFilas = antecedentesConDatos.map(fila => calcularAlturaFila(fila, colWidths, doc));
+  const alturaTotalFilas = alturasFilas.reduce((sum, altura) => sum + altura, 0);
+
+  // Líneas horizontales para filas con alturas dinámicas
+  let lineY = tablaInicioY + 2;
+  doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea superior
+  
+  alturasFilas.forEach((alturaFila, index) => {
+    lineY += alturaFila;
+    doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea inferior de cada fila
+  });
+
+  // Líneas verticales dinámicas - se extienden hasta el final de la tabla
+  const alturaTotalTabla = alturaTotalFilas + 2; // +2 para el espacio de los encabezados
+  let currentX = tablaInicioX;
   for (let i = 0; i <= encabezados.length; i++) {
-    doc.line(currentX, tablaInicioY - 2, currentX, tablaInicioY + 2 + (numRows * rowHeight));
+    doc.line(currentX, tablaInicioY - 2, currentX, tablaInicioY + alturaTotalTabla);
     if (i < encabezados.length) {
       currentX += colWidths[i];
     }
   }
 
-  // Líneas horizontales para filas
-  for (let i = 0; i <= numRows; i++) {
-    const y = tablaInicioY + 2 + (i * rowHeight);
-    doc.line(tablaInicioX, y, tablaInicioX + tablaAncho, y);
-  }
-
-  // Llenar datos en la tabla
-  antecedentesQuirurgicos.forEach((fila, rowIndex) => {
-    if (rowIndex < numRows) {
-      const rowY = tablaInicioY + 2 + ((rowIndex + 1) * rowHeight) - 1;
-      let colX = tablaInicioX + 2;
-      
-      // Fecha
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      doc.text(fila.fecha || "", colX, rowY);
-      colX += colWidths[0];
-      
-      // Hospital
-      doc.text(fila.hospital || "", colX, rowY);
-      colX += colWidths[1];
-      
-      // Operación
-      doc.text(fila.operacion || "", colX, rowY);
-      colX += colWidths[2];
-      
-      // Días Hospitalización
-      doc.text(fila.diasHospitalizacion || "", colX, rowY);
-      colX += colWidths[3];
-      
-      // Complicaciones
-      doc.text(fila.complicaciones || "", colX, rowY);
-    }
+  // Llenar datos en la tabla con alturas dinámicas
+  let currentY = tablaInicioY + 2;
+  antecedentesConDatos.forEach((fila, rowIndex) => {
+    const alturaFila = alturasFilas[rowIndex];
+    const rowY = currentY + (alturaFila / 2) - 3.5; // Centrar verticalmente y subir 1.5mm
+    let colX = tablaInicioX + 2;
+    
+    // Fecha
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(fila.fecha || "", colX, rowY, { maxWidth: colWidths[0] - 2 });
+    colX += colWidths[0];
+    
+    // Hospital
+    doc.text(fila.hospital || "", colX, rowY, { maxWidth: colWidths[1] - 2 });
+    colX += colWidths[1];
+    
+    // Operación
+    doc.text(fila.operacion || "", colX, rowY, { maxWidth: colWidths[2] - 2 });
+    colX += colWidths[2];
+    
+    // Días Hospitalización
+    doc.text(fila.diasHospitalizacion || "", colX, rowY, { maxWidth: colWidths[3] - 2 });
+    colX += colWidths[3];
+    
+    // Complicaciones
+    doc.text(fila.complicaciones || "", colX, rowY, { maxWidth: colWidths[4] - 2 });
+    
+    currentY += alturaFila;
   });
 
   // === ANTECEDENTES DE REPRODUCCIÓN ===
-  const reproY = tablaInicioY + 2 + (numRows * rowHeight) + 10;
+  const reproY = tablaInicioY + 2 + alturaTotalFilas + 10;
+  
+  // Datos de prueba para antecedentes de reproducción
+  const datosReproduccion = {
+    damas: {
+      inicioMenstruacion: "12 años",
+      inicioVidaSexual: "18 años", 
+      numeroParejas: "2",
+      hijosVivos: "1",
+      hijosFallecidos: "0",
+      numeroAbortos: "1",
+      causasAbortos: "Complicaciones médicas"
+    },
+    varones: {
+      hijosVivos: "2",
+      hijosFallecidos: "0", 
+      abortosParejas: "1",
+      causasAbortos: "Complicaciones médicas"
+    }
+  };
+
+  // Calcular altura total de la sección
+  const alturaSeccionDamas = 7 * 5 + 10; // 7 campos * 5mm + margen
+  const alturaSeccionVarones = 4 * 5 + 10; // 4 campos * 5mm + margen
+  const alturaTotalRepro = alturaSeccionDamas + alturaSeccionVarones + 20; // +20 para títulos y espaciado
+
+  // Marco para Antecedentes de Reproducción
+  const marcoReproInicioX = 15;
+  const marcoReproFinX = 200;
+  const marcoReproInicioY = reproY - 5;
+  const marcoReproFinY = reproY + alturaTotalRepro;
+
+  // Dibujar marco rectangular
+  doc.rect(marcoReproInicioX, marcoReproInicioY, marcoReproFinX - marcoReproInicioX, marcoReproFinY - marcoReproInicioY);
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("ANTECEDENTES DE REPRODUCCIÓN", 15, reproY);
+  doc.text("Antecedentes de Reproducción:", 16, reproY);
 
   // En caso de Damas
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("En caso de Damas:", 15, reproY + 8);
+  doc.text("En caso de Damas:", 20, reproY + 8);
 
   const camposDamas = [
-    "Inicio de mestruación:",
-    "Inicio de vida sexual:",
-    "Número de parejas sexual a la actualidad:",
-    "Número de hijos vivos:",
-    "Número de hijos fallecidos:",
-    "Número de abortos:",
-    "Precisar Causas:"
+    { label: "Inicio de mestruación:", value: datosReproduccion.damas.inicioMenstruacion, y: reproY + 15 },
+    { label: "Inicio de vida sexual:", value: datosReproduccion.damas.inicioVidaSexual, y: reproY + 20 },
+    { label: "Número de parejas sexual a la actualidad:", value: datosReproduccion.damas.numeroParejas, y: reproY + 25 },
+    { label: "Número de hijos vivos:", value: datosReproduccion.damas.hijosVivos, y: reproY + 30 },
+    { label: "Número de hijos fallecidos:", value: datosReproduccion.damas.hijosFallecidos, y: reproY + 35 },
+    { label: "Número de abortos:", value: datosReproduccion.damas.numeroAbortos, y: reproY + 40 },
+    { label: "Precisar Causas:", value: datosReproduccion.damas.causasAbortos, y: reproY + 45 }
   ];
 
-  camposDamas.forEach((campo, index) => {
+  camposDamas.forEach((campo) => {
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(campo, 20, reproY + 15 + (index * 5));
+    doc.text(campo.label, 25, campo.y);
+    doc.text(campo.value, 25 + 80, campo.y); // Valor a 80mm del inicio
   });
 
   // En caso de Varones
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("En caso de Varones:", 15, reproY + 55);
+  doc.text("En caso de Varones:", 20, reproY + 55);
 
   const camposVarones = [
-    "Número de hijos vivos:",
-    "Número de hijos fallecidos:",
-    "Número de abortos en sus parejas:",
-    "Precisar Causas:"
+    { label: "Número de hijos vivos:", value: datosReproduccion.varones.hijosVivos, y: reproY + 62 },
+    { label: "Número de hijos fallecidos:", value: datosReproduccion.varones.hijosFallecidos, y: reproY + 67 },
+    { label: "Número de abortos en sus parejas:", value: datosReproduccion.varones.abortosParejas, y: reproY + 72 },
+    { label: "Precisar Causas:", value: datosReproduccion.varones.causasAbortos, y: reproY + 77 }
   ];
 
-  camposVarones.forEach((campo, index) => {
+  camposVarones.forEach((campo) => {
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(campo, 20, reproY + 62 + (index * 5));
+    doc.text(campo.label, 25, campo.y);
+    doc.text(campo.value, 25 + 80, campo.y); // Valor a 80mm del inicio
   });
+
+  // === DECLARACIÓN Y FIRMAS ===
+  const declaracionY = reproY + alturaTotalRepro + 8; // Más margen
+  
+  // Texto de declaración centrado
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,", pageW / 2, declaracionY, { align: "center" });
+  doc.text("ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.", pageW / 2, declaracionY + 4, { align: "center" });
+  
+  // Fecha centrada
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("FECHA: " + datosFinales.fechaExamen, pageW / 2, declaracionY + 10, { align: "center" });
+  
+  // Sección de firmas con más margen
+  const firmasY = declaracionY + 23;
+  
+  // Firma del paciente - CENTRADA con coordenadas individuales
+  const firmaPacienteX = pageW / 4; // 1/4 del ancho de página
+  const firmaPacienteTextoY = firmasY + 22; // Bajar el texto 40mm
+  const firmaPacienteLineaY = firmaPacienteTextoY - 5; // Línea 5mm ANTES del texto
+  
+  // Línea para firma del paciente (ARRIBA del texto)
+  doc.line(firmaPacienteX - 30, firmaPacienteLineaY, firmaPacienteX + 30, firmaPacienteLineaY);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("FIRMA DEL POSTULANTE", firmaPacienteX, firmaPacienteTextoY, { align: "center" });
+  
+  // Firma del médico - CENTRADA con coordenadas individuales
+  const firmaMedicoX = (pageW / 4) * 3; // 3/4 del ancho de página
+  const firmaMedicoTextoY = firmasY + 22; // Bajar el texto 40mm
+  const firmaMedicoLineaY = firmaMedicoTextoY - 5; // Línea 5mm ANTES del texto
+  
+  // Línea para firma del médico (ARRIBA del texto)
+  doc.line(firmaMedicoX - 30, firmaMedicoLineaY, firmaMedicoX + 30, firmaMedicoLineaY);
+  
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("MÉDICO MEDICINA OCUPACIONAL", firmaMedicoX, firmaMedicoTextoY, { align: "center" });
+  
+  // Agregar imágenes de firmas y huella
+  try {
+    // Firma del paciente - centrada
+    // Tamaño: 40mm ancho x 25mm alto
+    // Posición: X = firmaPacienteX - 12, Y = firmasY - 8
+    doc.addImage(
+      '/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png',
+      'PNG',
+      firmaPacienteX - 30, firmasY - 8, 40, 25
+    );
+    
+    // Huella digital - centrada
+    // Tamaño: 15mm ancho x 21mm alto
+    // Posición: X = firmaPacienteX + 5, Y = firmasY - 8
+    doc.addImage(
+      '/img/firmas_sellos_prueba/HUELLA_DIGITAL.png',
+      'PNG',
+      firmaPacienteX + 10, firmasY - 5, 15, 21
+    );
+    
+    // Firma/sello del médico - centrada
+    // Tamaño: 40mm ancho x 25mm alto
+    // Posición: X = firmaMedicoX - 12, Y = firmasY - 8
+    doc.addImage(
+      '/img/firmas_sellos_prueba/firma_sello.png',
+      'PNG',
+      firmaMedicoX - 19, firmasY - 8, 40, 25
+    );
+  } catch (error) {
+    console.log("Error al cargar las imágenes:", error);
+    // Si hay error, mostrar texto alternativo centrado
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("[FIRMA PACIENTE]", firmaPacienteX - 10, firmasY - 2);
+    doc.text("[HUELLA]", firmaPacienteX + 5, firmasY - 2);
+    doc.text("[FIRMA MÉDICO]", firmaMedicoX - 10, firmasY - 2);
+  }
 
   // === IMPRIMIR ===
   imprimir(doc);
