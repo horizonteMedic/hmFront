@@ -14,7 +14,7 @@ import {
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
-import { SubmitDataService, VerifyTR } from "./Anexo16AController";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./Anexo16AController";
 
 const tabla = "anexo16a";
 const today = getToday();
@@ -84,7 +84,12 @@ export default function Anexo16A() {
     rp: "",
     vcCorregidaOI: "",
     vlCorregidaOI: "",
-    enfermedadesOculares: ""
+    enfermedadesOculares: "",
+
+    imcRed: false,
+    obesidadMorbidaRed: false,
+    hipertensionRed: false,
+    problemasOftalmologicosRed: false,
   }
   const {
     form,
@@ -92,8 +97,6 @@ export default function Anexo16A() {
     handleChange,
     handleChangeNumber,
     handleRadioButtonBoolean,
-    handleRadioButton,
-    handleCheckBoxChange,
     handleChangeSimple,
     handleClear,
     handleClearnotO,
@@ -112,7 +115,7 @@ export default function Anexo16A() {
   };
   const handlePrint = () => {
     handlePrintDefault(() => {
-      // PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
@@ -245,7 +248,7 @@ export default function Anexo16A() {
                 <span className="text-gray-500">x min.</span>
               </div>
               <div className="flex items-center gap-2">
-                <label className="font-semibold text-gray-700 min-w-[30px]">IMC:</label>
+                <label className={`font-semibold text-gray-700 min-w-[30px] ${form?.imcRed ? 'text-red-500' : ''}`}>IMC:</label>
                 <InputTextOneLine name="imc" value={form?.imc} disabled />
               </div>
               <div className="flex items-center gap-2">
@@ -310,7 +313,7 @@ export default function Anexo16A() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span >Hipertensión Arterial</span>
+                  <span className={`${form?.hipertensionRed ? 'text-red-500' : ''}`}>Hipertensión Arterial</span>
                   <InputsBooleanRadioGroup
                     name="hipertension"
                     value={form?.hipertension}
@@ -347,7 +350,7 @@ export default function Anexo16A() {
               {/* Columna Derecha */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span >Obesidad Mórbida (IMC mayor a 35 m/Kg 2)</span>
+                  <span className={`${form?.obesidadMorbidaRed ? 'text-red-500' : ''}`}>Obesidad Mórbida (IMC mayor a 35 m/Kg 2)</span>
                   <InputsBooleanRadioGroup
                     name="obesidadMorbida"
                     value={form?.obesidadMorbida}
@@ -371,7 +374,7 @@ export default function Anexo16A() {
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span  >Problemas Oftalmológicos: Retinopatía, glaucoma, etc</span>
+                  <span className={`${form?.problemasOftalmologicosRed ? 'text-red-500' : ''}`}>Problemas Oftalmológicos: Retinopatía, glaucoma, etc</span>
                   <InputsBooleanRadioGroup
                     name="problemasOftalmologicos"
                     value={form?.problemasOftalmologicos}
