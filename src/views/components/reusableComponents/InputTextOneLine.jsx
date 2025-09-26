@@ -9,6 +9,8 @@ export default function InputTextOneLine({
   labelWidth = "80px",
   className = "",
   labelOnTop = false,// por defecto en la izquierda
+  inputMode,
+  ...props
 }) {
   return (
     <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"} ${className}`}>

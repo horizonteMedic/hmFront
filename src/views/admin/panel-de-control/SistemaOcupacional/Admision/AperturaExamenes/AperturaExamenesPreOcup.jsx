@@ -78,6 +78,11 @@ const AperturaExamenesPreOcup = (props) => {
     rxcKLumbar: false,
     rxcPlomos: false,
     mercurioo: false,
+
+    espaciosConfinados:false,
+    tmarihuana:false,
+    tcocaina:false,
+
     nombreMiUsuario: fixEncodingModern(userCompleto?.datos?.nombres_user),
     userRegistroDatos: "",    
   })
@@ -568,7 +573,12 @@ const AperturaExamenesPreOcup = (props) => {
       rxcDorsoLumbar: false, //9
       rxcKLumbar: false, //10
       rxcPlomos: false,//12
-      mercurioo: false,//13
+      mercurioo: false,//13}
+
+      espaciosConfinados:false,
+      tmarihuana:false,
+      tcocaina:false,
+
       nombres:"",
       apellidos:"",
       userRegistroDatos: "",    
@@ -1328,6 +1338,19 @@ const AperturaExamenesPreOcup = (props) => {
                   <input type="checkbox" title='MERCURIO EN ORINA' disabled={habilitar} checked={datos.mercurioo} onChange={handleCheack} id="examenAdicional15" name="mercurioo" className="mr-2" />
                   <label htmlFor="examenAdicional15" title='MERCURIO EN ORINA'>MER.O</label>
                 </div>
+                <div className="flex items-center mr-4 mb-2">
+                  <input type="checkbox" title='ESPACIOS CONFINADOS' disabled={habilitar} checked={datos.espaciosConfinados} onChange={handleCheack} id="examenAdicional16" name="espaciosConfinados" className="mr-2" />
+                  <label htmlFor="examenAdicional16" title='ESPACIOS CONFINADOS'>ESP.CONF</label>
+                </div>
+                <div className="flex items-center mr-4 mb-2">
+                  <input type="checkbox" title='MARIHUANA' disabled={habilitar} checked={datos.tmarihuana} onChange={handleCheack} id="examenAdicional17" name="tmarihuana" className="mr-2" />
+                  <label htmlFor="examenAdicional17" title='MARIHUANA'>MARIHUANA</label>
+                </div>
+                <div className="flex items-center mr-4 mb-2">
+                  <input type="checkbox" title='COCAINA' disabled={habilitar} checked={datos.tcocaina} onChange={handleCheack} id="examenAdicional18" name="tcocaina" className="mr-2" />
+                  <label htmlFor="examenAdicional18" title='COCAINA'>COCAINA</label>
+                </div>
+                
               </div>
             </div>
          

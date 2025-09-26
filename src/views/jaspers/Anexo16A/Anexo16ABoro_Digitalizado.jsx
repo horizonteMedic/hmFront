@@ -1,290 +1,425 @@
 import jsPDF from "jspdf";
-import headerAnexo16ABoro_Digitalizado from "./Header/Header_Anexo16ABoro_Digitalizado";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
+import { getSign } from "../../utils/helpers";
 
-const Anexo16ABoro_Digitalizado = (datos) => {
-  const doc = new jsPDF("p", "mm", "a4");
+export default function Anexo16ABoro_Digitalizado(data = {}) {
+  const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
 
-  // Márgenes
-  const margenLateral = 8;
-  const margenSuperior = 15;
+  // Datos de prueba por defecto
+  const datosPrueba = {
+    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
+    fechaExamen: "04/11/2024",
+    sexo: "F",
+    documentoIdentidad: "72384273",
+    edad: "31 años",
+    areaTrabajo: "MINERÍA",
+    puestoTrabajo: "DAD",
+    empresa: "MINERA BOROO MISQUICHILCA S.A.",
+    contrata: "CONTRATA EJEMPLO S.A.C.",
+    vitalSigns: {
+      fc: "64",
+      fr: "19",
+      pa: "120/60",
+      satO2: "99",
+      imc: "23.48"
+    },
+    condiciones: {
+      cirugiaMayor: false,
+      desordenesCoagulacion: false,
+      diabetes: false,
+      hipertension: false,
+      embarazo: false,
+      problemasNeurologicos: false,
+      infeccionesRecientes: true,
+      obesidadMorbida: false,
+      problemasCardiacos: false,
+      problemasRespiratorios: false,
+      problemasOftalmologicos: true,
+      problemasDigestivos: false,
+      apneaSueño: false,
+      alergias: false,
+      otraCondicion: false
+    },
+    medicacionActual: "Paracetamol 500mg cada 8 horas",
+    fur: "15/08/2024", // Fecha de última regla
+    observaciones: [
+      "USO DE LENTES CORRECTORES",
+      "ALERGIA A PENICILINA",
 
-  // Agregar header
-  headerAnexo16ABoro_Digitalizado(doc, datos, 1);
-
-  // Posición inicial después del header
-  let y = 70; // Ajustar según el header
-
-  // === FUNCIONES VITALES ===
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("FUNCIONES VITALES", margenLateral, y);
-
-  y += 6;
-
-  // Datos de funciones vitales
-  const funcionesVitales = {
-    fc: datos?.fc || "64",
-    fr: datos?.fr || "19", 
-    pa: datos?.pa || "120/60",
-    satO2: datos?.satO2 || "99",
-    imc: datos?.imc || "23.48"
+    ],
+    medico: {
+      nombres: "SANCHEZ QUIÑONES JOSE ALEJANDRO",
+      direccion: "Av. Nicolas de Piérola N°1106 Urb. San Fernando",
+      cmp: "80135",
+      fecha: "04/11/2024"
+    }
+  };
+  const datosReales = {
+    apellidosNombres: String((data.apellidos_apellidos_pa || "") + " " + (data.nombres_nombres_pa || "")),
+    fechaExamen: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || ""),
+    sexo: data.sexo_sexo_pa || "",
+    documentoIdentidad: String(data.dni_cod_pa || ""),
+    edad: String(data.edad_edad ?? ""),
+    areaTrabajo: data.area_area_o || "",
+    puestoTrabajo: data.cargo_cargo_de || "",
+    empresa: data.empresa_razon_empresa || "",
+    contrata: data.contrata_razon_contrata || "",
+    apto: data.aptoAnexo16a_apto !== undefined ? data.aptoAnexo16a_apto : true,
+    vitalSigns: {
+      fc: String(data.frecuenciaCardiacaTriaje_f_cardiaca || ""),
+      fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria || ""),
+      pa: String(data.sistolicaTriaje_sistolica || "") + "/" + String(data.diastolicaTriaje_diastolica || ""), //revisar - combinación de sistólica y diastólica
+      satO2: String(data.saturacionOxigenoTriaje_sat_02 || ""),
+      imc: String(data.imcTriaje_imc || "")
+    },
+    condiciones: {
+      cirugiaMayor: data.cirujiaMayorRecienteSiAnexo16a_si1 || false,
+      desordenesCoagulacion: data.desordenCoagulacionSiAnexo16a_si2 || false,
+      diabetes: data.diabetesMellitusSiAnexo16a_si3 || false,
+      hipertension: data.hipertensionArterialSiAnexo16a_si4 || false,
+      embarazo: data.embarazoSiAnexo16a_si5 || false,
+      problemasNeurologicos: data.problemaNeurologicoSiAnexo16a_si6 || false,
+      infeccionesRecientes: data.infeccionRecienteSiAnexo16a_si7 || false,
+      obesidadMorbida: data.obesidadMorbididadSiAnexo16a_si8 || false,
+      problemasCardiacos: data.problemasCardiacoSiAnexo16a_si9 || false,
+      problemasRespiratorios: data.problemasRespiratoriosSiAnexo16a_si10 || false,
+      problemasOftalmologicos: data.problemasOftalmologicosSiAnexo16a_si11 || false,
+      problemasDigestivos: data.problemasDigestivosSiAnexo16a_si12 || false,
+      apneaSueño: data.apneaDelSuenoSiAnexo16a_si13 || false,
+      alergias: data.alergiasSiAnexo16a_si15 || false,
+      otraCondicion: data.otraCondicionMedicaSiAnexo16a_si14 || false
+    },
+    medicacionActual: data.medicacionActualAnexo16a_m_actual || "",
+    fur: data.furDescripcionAnexo16a_txtfur || "",
+    observaciones: data.observacionesAnexo16a_observaciones || "",
+    medico: {
+      nombres: String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
+      direccion: data.direccionSede || "",
+      cmp: data.cmpUsuario_cmp_user || "",
+      fecha: ""
+    }
   };
 
-  // FC
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("FC:", margenLateral, y);
-  doc.text(`${funcionesVitales.fc} x min`, margenLateral + 12, y);
+  // Usar datos reales si existen, sino usar datos de prueba
+  const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
 
-  // FR
-  doc.text("FR:", margenLateral + 40, y);
-  doc.text(`${funcionesVitales.fr} x min`, margenLateral + 52, y);
+  // === HEADER ===
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text("ANEXO N° 16 - A", pageW / 2, 26, { align: "center" });
 
-  // PA
-  doc.text("PA:", margenLateral + 80, y);
-  doc.text(`${funcionesVitales.pa} mmHg`, margenLateral + 92, y);
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.text("EVALUACION MÉDICA PARA ASCENSO A GRANDES ALTITUDES", pageW / 2, 30, { align: "center" });
+  doc.text("(mayor de 2,500 m.s.n.m.)", pageW / 2, 34, { align: "center" });
 
-  // Sat O2
-  doc.text("Sat. O2:", margenLateral + 120, y);
-  doc.text(`${funcionesVitales.satO2}%`, margenLateral + 140, y);
 
-  y += 4;
+  // === SECCIÓN 1: DATOS PERSONALES ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("1. Datos Personales", 15, 40);
 
-  // IMC
-  doc.text("IMC:", margenLateral, y);
-  doc.text(`${funcionesVitales.imc} kg/m2`, margenLateral + 12, y);
-
-  y += 10;
-
-  // === ANTECEDENTES MÉDICOS ===
-  doc.setFont("helvetica", "bold").setFontSize(10);
-  doc.text("El / La presenta o ha presentado en los últimos 6 m", margenLateral, y);
-
-  y += 6;
-
-  // Lista de condiciones médicas con sus respuestas según la imagen
-  const condicionesMedicas = [
-    { texto: "Cirugía mayor reciente", si: true, no: false },
-    { texto: "Desórdenes de la coagulación, trombosis", si: true, no: false },
-    { texto: "Diabetes Mellitus", si: true, no: false },
-    { texto: "Hipertensión Arterial", si: false, no: true },
-    { texto: "Embarazo", si: true, no: false },
-    { texto: "Problemas neurológicos: epilepsia, vértigo, etc.", si: true, no: false },
-    { texto: "Infecciones recientes (especialmente oídos, nariz, garganta)", si: true, no: false },
-    { texto: "Obesidad Mórbida (IMC mayor a 35 m/kg2)", si: true, no: false },
-    { texto: "Problemas Cardíacos: marcapasos, coronariopatía, etc.", si: true, no: false },
-    { texto: "Problemas Respiratorios: asma, EPOC, etc.", si: false, no: true },
-    { texto: "Problemas Oftalmológicos: retinopatía, glaucoma, etc.", si: true, no: false },
-    { texto: "Problemas Digestivos: úlcera péptica, hepatitis, etc.", si: true, no: false },
-    { texto: "Apnea del Sueño", si: true, no: false },
-    { texto: "Alergias", si: true, no: false },
-    { texto: "Otra condición médica importante", si: true, no: false }
+  // Datos personales
+  const datosPersonales = [
+    { label: "Apellidos y Nombres:", value: datosFinales.apellidosNombres, x: 15, y: 45 },
+    { label: "Fecha de Examen:", value: datosFinales.fechaExamen, x: 15, y: 50 },
+    { label: "Sexo:", value: datosFinales.sexo, x: 15, y: 55 },
+    { label: "DNI:", value: datosFinales.documentoIdentidad, x: 15, y: 60 },
+    { label: "Edad:", value: datosFinales.edad, x: 15, y: 65 },
+    { label: "Área de Trabajo:", value: datosFinales.areaTrabajo, x: 15, y: 70 },
+    { label: "Puesto de Trabajo:", value: datosFinales.puestoTrabajo, x: 15, y: 75 },
+    { label: "Empresa:", value: datosFinales.empresa, x: 15, y: 80 },
+    { label: "Contrata:", value: datosFinales.contrata, x: 15, y: 85 }
   ];
 
-  condicionesMedicas.forEach((condicion) => {
-    // Dibujar checkboxes
-    const checkboxX = margenLateral + 3;
-    const checkboxY = y - 1;
-    const checkboxSize = 2.5;
-
-    // Checkbox NO
-    doc.setDrawColor(0);
-    doc.setLineWidth(0.3);
-    doc.rect(checkboxX, checkboxY, checkboxSize, checkboxSize);
-    if (condicion.no) {
-      doc.setFont("helvetica", "bold").setFontSize(7);
-      doc.text("X", checkboxX + 0.3, checkboxY + 1.5);
-    }
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text("NO", checkboxX + 4, checkboxY + 1.5);
-
-    // Checkbox SI
-    const siCheckboxX = checkboxX + 15;
-    doc.rect(siCheckboxX, checkboxY, checkboxSize, checkboxSize);
-    if (condicion.si) {
-      doc.setFont("helvetica", "bold").setFontSize(7);
-      doc.text("X", siCheckboxX + 0.3, checkboxY + 1.5);
-    }
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text("SI", siCheckboxX + 4, checkboxY + 1.5);
-
-    // Texto de la condición
-    doc.text(condicion.texto, siCheckboxX + 12, checkboxY + 1.5);
-
-    y += 3;
+  datosPersonales.forEach(item => {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(item.label, item.x, item.y);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(item.value, item.x + 50, item.y);
   });
 
-  y += 3;
+  // === SECCIÓN 2: FUNCIONES VITALES ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("2. Funciones Vitales:", 15, 93.5);
 
-  // Uso de medicación actual
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Uso de medicación Actual :", margenLateral, y);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text(datos?.medicacionActual || "", margenLateral + 45, y);
+  // Signos vitales en fila
+  const signosVitales = [
+    { label: "FC:", value: datosFinales.vitalSigns.fc + " x min", x: 60, y: 91 },
+    { label: "FR:", value: datosFinales.vitalSigns.fr + " x min", x: 100, y: 91 },
+    { label: "PA:", value: datosFinales.vitalSigns.pa + " mmHg", x: 130, y: 91 },
+    { label: "Sat. O2:", value: datosFinales.vitalSigns.satO2 + " %", x: 60, y: 95 },
+    { label: "IMC:", value: datosFinales.vitalSigns.imc + " kg/m2", x: 100, y: 95 }
+  ];
 
-  y += 8;
+  signosVitales.forEach((signo) => {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(signo.label, signo.x, signo.y);
+    doc.setFont("helvetica", "normal").setFontSize(9);
 
-  // === DECLARACIÓN DEL PACIENTE ===
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  const declaracion = "Declaro que las respuestas dadas en el presente documento son verdaderas y estoy consciente que el ocultar o falsear información me puede causar daño por lo que asumo total responsabilidad de ello.";
-  const declaracionLines = doc.splitTextToSize(declaracion, pageW - 2 * margenLateral);
-  declaracionLines.forEach(line => {
-    doc.text(line, margenLateral, y);
-    y += 2.5;
+    // Ajustar espaciado solo para Sat. O2
+    let valueX = signo.x + 8;
+    if (signo.label === "Sat. O2:") {
+      valueX = signo.x + 14; // Más espacio para Sat. O2
+    }
+
+    doc.text(signo.value, valueX, signo.y);
   });
 
-  y += 6;
+  // === SECCIÓN 3: CONDICIONES MÉDICAS ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("3. El / La presenta o ha presentado en los últimos 6 meses:", 15, 100);
 
-  // Firma del paciente y huella
-  const firmaY = y;
-  
-  // Firma del paciente
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Firma del paciente", margenLateral, firmaY);
-  
-  // Línea para firma
-  doc.setLineWidth(0.3);
-  doc.line(margenLateral, firmaY + 1.5, margenLateral + 35, firmaY + 1.5);
+  // Encabezados SI y NO
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("SI", 130.5, 100);
+  doc.text("NO", 144.5, 100);
 
-  // Huella dactilar
-  const huellaX = pageW - margenLateral - 25;
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("Huella dactilar", huellaX, firmaY);
-  
-  // Cuadrado para huella
-  doc.setDrawColor(0);
-  doc.setLineWidth(0.3);
-  doc.rect(huellaX, firmaY + 1.5, 20, 20);
-  
-  // Agregar imagen de huella
-  try {
-    doc.addImage("./img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaX + 1, firmaY + 3, 18, 18);
-  } catch (error) {
-    console.log("Error cargando huella:", error);
+  // Lista de condiciones médicas
+  const condiciones = [
+    { texto: "Cirugía mayor reciente", campo: "cirugiaMayor", x: 30, y: 105 },
+    { texto: "Desórdenes de la coagulación, trombosis, etc.", campo: "desordenesCoagulacion", x: 30, y: 110 },
+    { texto: "Diabetes Mellitus", campo: "diabetes", x: 30, y: 115 },
+    { texto: "Hipertensión Arterial", campo: "hipertension", x: 30, y: 120 },
+    { texto: "Embarazo", campo: "embarazo", x: 30, y: 125 },
+    { texto: "Problemas neurológicos: epilepsia, vértigo, etc.", campo: "problemasNeurologicos", x: 30, y: 130 },
+    { texto: "Infecciones recientes (especialmente oídos, nariz, garganta)", campo: "infeccionesRecientes", x: 30, y: 135 },
+    { texto: "Obesidad Mórbida (IMC mayor a 35 m/kg2)", campo: "obesidadMorbida", x: 30, y: 140 },
+    { texto: "Problemas Cardíacos: marcapasos, coronariopatía, etc.", campo: "problemasCardiacos", x: 30, y: 145 },
+    { texto: "Problemas Respiratorios: asma, EPOC, etc.", campo: "problemasRespiratorios", x: 30, y: 150 },
+    { texto: "Problemas Oftalmológicos: retinopatía, glaucoma, etc.", campo: "problemasOftalmologicos", x: 30, y: 155 },
+    { texto: "Problemas Digestivos: úlcera péptica, hepatitis, etc.", campo: "problemasDigestivos", x: 30, y: 160 },
+    { texto: "Apnea del Sueño", campo: "apneaSueño", x: 30, y: 165 },
+    { texto: "Alergias", campo: "alergias", x: 30, y: 170 },
+    { texto: "Otra condición médica importante", campo: "otraCondicion", x: 30, y: 175 }
+  ];
+
+  condiciones.forEach(condicion => {
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(condicion.texto, condicion.x, condicion.y);
+
+    // Checkboxes SI/NO
+    const siX = condicion.x + 100;
+    const noX = condicion.x + 115;
+    const checkboxY = condicion.y - 2;
+
+    // Dibujar checkbox SI
+    doc.rect(siX, checkboxY, 4, 4);
+    if (datosFinales.condiciones[condicion.campo]) {
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.setTextColor(255, 0, 0); // Color rojo
+      doc.text("X", siX + 0.5, checkboxY + 3.5);
+      doc.setTextColor(0, 0, 0); // Resetear a negro
+    }
+
+    // Dibujar checkbox NO
+    doc.rect(noX, checkboxY, 4, 4);
+    if (!datosFinales.condiciones[condicion.campo]) {
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.setTextColor(255, 0, 0); // Color rojo
+      doc.text("X", noX + 0.5, checkboxY + 3.5);
+      doc.setTextColor(0, 0, 0); // Resetear a negro
+    }
+
+    // Si es embarazo y está marcado como SI, mostrar campo FUR en la misma línea
+    if (condicion.campo === "embarazo" && datosFinales.condiciones[condicion.campo]) {
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.text("FUR:", 160, 126); // Posición X e Y específica para FUR
+      doc.text(datosFinales.fur || "00/00/0000", 170, 126);
+    }
+  });
+
+  // === USO DE MEDICACIÓN ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Uso de medicación Actual:", 30, 180);
+
+  // Texto con guiones para simular línea
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  if (datosFinales.medicacionActual) {
+    doc.text(datosFinales.medicacionActual, 84, 180);
   }
 
-  y += 25;
+  // === DECLARACIÓN ===
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Declaro que las respuestas dadas en el presente documento son verdaderas y estoy consciente que el ocultar o falsear información me puede causar daño por lo que asumo total responsabilidad de ello.", 15, 185, { maxWidth: 180 });
 
-  // === LABORATORIO ===
+  // === FIRMA Y HUELLA DIGITAL ===
+  // Centrar horizontalmente en la página (A4 = 210mm)
+  const pageWidth = 210;
+  const firmaWidth = 45; // Ancho del bloque de firma
+  const huellaWidth = 25; // Ancho del bloque de huella
+  const gap = 30; // Espacio entre bloques
+  const totalWidth = firmaWidth + gap + huellaWidth;
+  const startX = (pageWidth - totalWidth) / 2; // Centrar el conjunto
+
+  // Firma del paciente (lado izquierdo) - imagen arriba, línea, texto abajo
+  try {
+    const firmaImg = getSign(data, "FIRMAP");
+    console.log("firmaImg", firmaImg);
+    doc.addImage(firmaImg, "PNG", startX, 190, 45, 25); // Imagen arriba
+  } catch (e) {
+    doc.text("[Firma]", startX + 5, 240);
+  }
+  doc.line(startX, 214, startX + firmaWidth, 214); // Línea debajo de la imagen
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("firma", startX + 15, 217); // Texto centrado debajo de la línea
+
+  // Huella dactilar (lado derecho) - recuadro, texto abajo
+  const huellaX = startX + firmaWidth + gap;
+  doc.rect(huellaX, 190, 25, 25); // Recuadro
+  try {
+    const huellaImg = getSign(data, "HUELLA");
+    doc.addImage(huellaImg, "PNG", huellaX + 3, 190, 18, 25); // Huella dentro del recuadro
+  } catch (e) {
+    doc.text("[Huella]", huellaX + 5, 245);
+  }
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("huella paciente", huellaX + 2, 217.2); // Texto centrado debajo del recuadro
+
+
+
+  // === SECCIÓN LABORATORIO ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("LABORATORIO", margenLateral, y);
-
-  y += 6;
+  doc.text("Laboratorio:", 15, 222);
 
   // Datos de laboratorio
-  const laboratorio = {
-    hemoglobina: datos?.hemoglobina || "13",
-    hematocrito: datos?.hematocrito || "62",
-    glucosa: datos?.glucosa || "N/A",
-    ekg: datos?.ekg || ""
-  };
+  const datosLaboratorio = [
+    { label: "Hemoglobina:", value: "13 g%", x: 40, y: 222 },
+    { label: "Hematocrito:", value: "62%", x: 80, y: 222 },
+    { label: "Glucosa:", value: "N/A mg/dL", x: 118, y: 222 },
+    { label: "EKG (>= 45años):", value: "Normal", x: 155, y: 222 }
+  ];
 
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Hemoglobina:", margenLateral, y);
-  doc.text(`${laboratorio.hemoglobina} g%`, margenLateral + 25, y);
+  datosLaboratorio.forEach((item) => {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(item.label, item.x, item.y);
+    doc.setFont("helvetica", "normal").setFontSize(9);
 
-  doc.text("Hematocrito:", margenLateral + 50, y);
-  doc.text(`${laboratorio.hematocrito}%`, margenLateral + 75, y);
+    // Ajustar espaciado para cada elemento
+    let valueX = item.x + 22;
+    if (item.label === "Hemoglobina:") {
+      valueX = item.x + 24; // Espacio para Hemoglobina
+    } else if (item.label === "Hematocrito:") {
+      valueX = item.x + 22; // Espacio para Hematocrito
+    } else if (item.label === "Glucosa:") {
+      valueX = item.x + 15; // Espacio para Glucosa
+    } else if (item.label === "EKG (>= 45años):") {
+      valueX = item.x + 28; // Espacio para EKG
+    }
 
-  y += 4;
-
-  doc.text("Glucosa:", margenLateral, y);
-  doc.text(`${laboratorio.glucosa} mg/dL`, margenLateral + 25, y);
-
-  doc.text("EKG (>= 45años):", margenLateral + 50, y);
-  doc.text(laboratorio.ekg, margenLateral + 85, y);
-
-  y += 12;
+    doc.text(item.value, valueX, item.y);
+  });
 
   // === CERTIFICACIÓN MÉDICA ===
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  const certificacion = "Conforme a la declaración del / de la paciente y las pruebas complementarias, certifico que se encuentra APTO ______ para ascender a grandes altitudes (mayor a 2,500 m.s.n.m); sin embargo, no aseguro el desempeño durante el ascenso durante su permanencia.";
-  const certificacionLines = doc.splitTextToSize(certificacion, pageW - 2 * margenLateral);
-  certificacionLines.forEach(line => {
-    doc.text(line, margenLateral, y);
-    y += 2.5;
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  const estadoApto = datosFinales.apto !== undefined ? datosFinales.apto : false; // Default true si no se especifica
+  const estadoTexto = estadoApto ? "APTO" : "NO APTO";
+
+  // Texto antes del estado
+  const textoAntes = "Conforme a la declaración del / de la paciente y las pruebas complementarias, certifico que se encuentra ";
+  const textoDespues = " para ascender a grandes altitudes (mayor a 2,500 m.s.n.m); sin embargo, no aseguro el desempeño durante el ascenso durante su permanencia.";
+
+  // Dividir el texto en líneas
+  const certificacionLineas = doc.splitTextToSize(textoAntes + estadoTexto + textoDespues, 175);
+  let yPos = 228;
+
+  certificacionLineas.forEach(linea => {
+    // Verificar si la línea contiene el estado
+    if (linea.includes(estadoTexto)) {
+      // Dividir la línea en partes para poder hacer bold solo el estado
+      const partes = linea.split(estadoTexto);
+
+      // Escribir la primera parte
+      if (partes[0]) {
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text(partes[0], 15, yPos);
+      }
+
+      // Escribir el estado en bold con espacio
+      const xPosEstado = 15 + doc.getTextWidth(partes[0]);
+      doc.setFont("helvetica", "bold").setFontSize(9);
+      doc.text(" " + estadoTexto + " ", xPosEstado, yPos);
+
+      // Escribir la última parte
+      if (partes[1]) {
+        const xPosFinal = xPosEstado + doc.getTextWidth(" " + estadoTexto + " ");
+        doc.setFont("helvetica", "normal").setFontSize(9);
+        doc.text(partes[1], xPosFinal, yPos);
+      }
+    } else {
+      // Línea normal sin estado
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      doc.text(linea, 15, yPos);
+    }
+    yPos += 3.5;
   });
 
-  y += 6;
+  // === OBSERVACIONES MÉDICAS ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Observaciones:", 15, 240);
 
-  // === OBSERVACIONES ===
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Observaciones:", margenLateral, y);
-  y += 4;
+  // Observaciones dinámicas - puede recibir array o string
+  let observacionesLista = [];
+  if (datosFinales.observaciones) {
+    if (Array.isArray(datosFinales.observaciones)) {
+      observacionesLista = datosFinales.observaciones;
+    } else {
+      // Si es string, dividir por saltos de línea o comas
+      observacionesLista = datosFinales.observaciones.split(/[\n,;]/).map(obs => obs.trim()).filter(obs => obs);
+    }
+  }
 
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  const observaciones = datos?.observaciones || ["- USO DE LENTES CORRECTORES."];
-  observaciones.forEach(obs => {
-    doc.text(obs, margenLateral, y);
-    y += 3;
+  // Si no hay observaciones en los datos, usar la observación por defecto
+  if (observacionesLista.length === 0) {
+    observacionesLista = ["USO DE LENTES CORRECTORES"];
+  }
+
+  // Dibujar cada observación
+  let observacionY = 245;
+  observacionesLista.forEach((observacion) => {
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.text(`- ${observacion}`, 15, observacionY);
+    observacionY += 4; // Espacio entre observaciones
   });
 
-  y += 8;
+  // Calcular posición Y final de observaciones para ajustar secciones siguientes
+  const observacionesFinalY = observacionY - 3; // Espacio adicional después de la última observación
 
   // === DATOS DEL MÉDICO ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("DATOS DEL MÉDICO", margenLateral, y);
+  doc.text("Datos del Médico:", 15, observacionesFinalY + 5);
 
-  y += 6;
+  const datosMedico = [
+    { label: "Apellidos y Nombres:", value: datosFinales.medico.nombres, x: 15, y: observacionesFinalY + 10 },
+    { label: "Dirección:", value: datosFinales.medico.direccion, x: 15, y: observacionesFinalY + 15 },
+    { label: "CMP:", value: datosFinales.medico.cmp, x: 15, y: observacionesFinalY + 20 },
+    { label: "Fecha (dd/mm/aa):", value: datosFinales.medico.fecha, x: 15, y: observacionesFinalY + 25 }
+  ];
 
-  // Datos del médico
-  const datosMedico = {
-    apellidosNombres: datos?.medicoApellidosNombres || "SANCHEZ QUIÑONES JOSE ALEJANDRO",
-    direccion: datos?.medicoDireccion || "Av. Nicolas de Piérola N°1106 Urb. San Fernando",
-    cmp: datos?.medicoCmp || "80135",
-    fecha: datos?.medicoFecha || "04/11/2024"
-  };
+  datosMedico.forEach(item => {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text(item.label, item.x, item.y);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(item.value, item.x + 35, item.y);
+  });
 
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Apellidos y Nombres:", margenLateral, y);
-  doc.text(datosMedico.apellidosNombres, margenLateral + 45, y);
+  // === FIRMA Y SELLO DEL MÉDICO ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Firma y sello de Médico", 150, observacionesFinalY + 30);
 
-  y += 4;
+  // Firma del médico (lado derecho)
+  const firmaMedicoX = pageW - 68;
+  const firmaMedicoY = observacionesFinalY + 5;
 
-  doc.text("Dirección:", margenLateral, y);
-  doc.text(datosMedico.direccion, margenLateral + 25, y);
-
-  y += 4;
-
-  doc.text("CMP:", margenLateral, y);
-  doc.text(datosMedico.cmp, margenLateral + 15, y);
-
-  doc.text("Fecha (dd/mm/aa):", margenLateral + 50, y);
-  doc.text(datosMedico.fecha, margenLateral + 85, y);
-
-  y += 4;
-
-  doc.text("Firma y sello:", margenLateral, y);
-
-  // Área para firma y sello del médico (coordenadas configurables)
-  const firmaMedicoX = typeof datos?.firmaX === "number" ? datos.firmaX : margenLateral;
-  const firmaMedicoY = typeof datos?.firmaY === "number" ? datos.firmaY : y + 3;
-  
-  // Línea para firma
-  doc.setLineWidth(0.3);
-  doc.line(firmaMedicoX, firmaMedicoY, firmaMedicoX + 50, firmaMedicoY);
-
-  // Agregar imagen de firma
   try {
-    doc.addImage("./img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaMedicoX, firmaMedicoY - 4, 35, 12);
-  } catch (error) {
-    console.log("Error cargando firma:", error);
-  }
-  
-  // Agregar sello como imagen (reemplaza el círculo dibujado)
-  const selloImgX = typeof datos?.selloX === "number" ? datos.selloX : (firmaMedicoX + 60);
-  const selloImgY = typeof datos?.selloY === "number" ? datos.selloY : (firmaMedicoY - 10);
-  const selloAncho = typeof datos?.selloW === "number" ? datos.selloW : 24;
-  const selloAlto = typeof datos?.selloH === "number" ? datos.selloH : 24;
-  try {
-    doc.addImage("./img/firmas_sellos_prueba/firma_sello.png", "PNG", selloImgX, selloImgY, selloAncho, selloAlto);
-  } catch (error) {
-    console.log("Error cargando sello:", error);
+    const firmaMedicoImg = getSign(data, "SELLOFIRMA");
+    doc.addImage(firmaMedicoImg, "PNG", firmaMedicoX, firmaMedicoY, 50, 20);
+  } catch (e) {
+    doc.text("[Firma Dr. Sanchez]", firmaMedicoX + 5, firmaMedicoY + 15);
   }
 
   // === IMPRIMIR ===
   imprimir(doc);
-};
+}
 
 function imprimir(doc) {
   const blob = doc.output("blob");
@@ -295,5 +430,3 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-
-export default Anexo16ABoro_Digitalizado;

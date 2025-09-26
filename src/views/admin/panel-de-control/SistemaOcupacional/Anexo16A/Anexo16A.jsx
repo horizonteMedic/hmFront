@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,30 +8,26 @@ import {
 import {
   InputCheckbox,
   InputsBooleanRadioGroup,
-  InputsRadioGroup,
   InputTextOneLine,
   InputTextArea,
 } from "../../../../components/reusableComponents/ResusableComponents";
+import { useSessionData } from "../../../../hooks/useSessionData";
+import { getToday } from "../../../../utils/helpers";
+import { useForm } from "../../../../hooks/useForm";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./Anexo16AController";
 
-// Vista base para Anexo 16-A - Formulario médico ocupacional
-export default function Anexo16A({
-  form: propForm,
-  handleChange: propHandleChange,
-  handleChangeNumber: propHandleChangeNumber,
-  handleCheckBoxChange: propHandleCheckBoxChange,
-  handleRadioButtonBoolean: propHandleRadioButtonBoolean,
-  handleRadioButton: propHandleRadioButton,
-  handleSearch: propHandleSearch,
-  handlePrint,
-  handleSave,
-  handleClear,
-}) {
-  // Estado local del formulario
-  const [form, setForm] = useState(propForm || {
+const tabla = "anexo16a";
+const today = getToday();
+
+export default function Anexo16A() {
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
+
+  const initialFormState = {
     norden: "",
-    fechaExam: "",
+    fechaExam: today,
+    codigoAnexo: null,
     apto: false,
-    inapto: false,
     actividadRealizar: "",
     dni: "",
     nombres: "",
@@ -47,18 +42,19 @@ export default function Anexo16A({
     temperatura: "",
     peso: "",
     talla: "",
-    medicoNombre: "",
-    medicoCmp: "",
-    medicoDireccion: "",
+    medicoNombre: userCompleto?.datos?.nombres_user?.toUpperCase() ?? "",
+    medicoDNI: userCompleto?.datos?.dni_user ?? "",
+    medicoCmp: userCompleto?.datos?.cmp?.toUpperCase() ?? "",
+    medicoDireccion: userCompleto?.datos?.direccion?.toUpperCase() ?? "",
     cirugiaMayor: false,
     desordenesCoagulacion: false,
     diabetes: false,
     hipertension: false,
     embarazo: false,
-    fur: false,
-    furFecha: "",
+    furDescripcion: "",
     problemasNeurologicos: false,
-    infecionesRecientes: false,
+    infeccionesRecientes: false,
+    medicacionActual: "",
     obesidadMorbida: false,
     problemasCardiacos: false,
     problemasRespiratorios: false,
@@ -74,55 +70,96 @@ export default function Anexo16A({
     sobrepeso: false,
     htaControlada: false,
     lentesCorrectivos: false,
-    empresaContratista: "",
+    contrata: "",
     empresa: "",
     observaciones: "",
+    //Agudeza Visual
     vcOD: "",
     vlOD: "",
     vcOI: "",
     vlOI: "",
     vcCorregidaOD: "",
     vlCorregidaOD: "",
-    vclrsOD: "",
-    vbOD: "",
-    rpOD: "",
+    vclrs: "",
+    vb: "",
+    rp: "",
     vcCorregidaOI: "",
     vlCorregidaOI: "",
-    vclrsOI: "",
-    vbOI: "",
-    rpOI: "",
-    enfermedadesOculares: ""
-  });
+    enfermedadesOculares: "",
 
-  // Funciones de manejo de formulario
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    if (propHandleChange) propHandleChange(e);
-  };
+    imcRed: false,
+    obesidadMorbidaRed: false,
+    hipertensionRed: false,
+    problemasOftalmologicosRed: false,
+  }
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButtonBoolean,
+    handleChangeSimple,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
 
-  const handleChangeNumber = (e) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    if (propHandleChangeNumber) propHandleChangeNumber(e);
-  };
-
-  const handleCheckBoxChange = (e) => {
-    const { name, checked } = e.target;
-    setForm(prev => ({ ...prev, [name]: checked }));
-    if (propHandleCheckBoxChange) propHandleCheckBoxChange(e);
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
-    if (propHandleSearch) propHandleSearch(e);
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
   };
 
-  // Función auxiliar para manejar radio buttons SI/NO
-  const handleSiNoChange = (fieldName, e, value) => {
-    setForm(prev => ({ ...prev, [fieldName]: value }));
-    if (propHandleCheckBoxChange) {
-      propHandleCheckBoxChange({ target: { name: fieldName, checked: value } });
-    }
+  // Textos específicos para cada checkbox
+  const checkboxTexts = {
+    corregirAgudeza: "Corregir Agudeza Visual".toUpperCase(),
+    obesidadDieta: "Obesidad I. Dieta Hipocalórica y Ejercicios".toUpperCase(),
+    diabetesControlado: "D m II controlado, tto con:.....".toUpperCase(),
+    sobrepeso: "Sobrepeso. Dieta Hipocalórica y Ejercicios".toUpperCase(),
+    htaControlada: "HTA Controlada, en tto con:...".toUpperCase(),
+    lentesCorrectivos: "Uso de Lentes Correct. Lectura de Cerca".toUpperCase(),
+  };
+
+  // Handler personalizado para checkboxes que actualiza observaciones
+  const handleCheckBoxChangeWithObservations = (e) => {
+    const { name, checked } = e.target;
+    const textoAsociado = checkboxTexts[name];
+
+    setForm((prevForm) => {
+      // Actualizar el estado del checkbox
+      const newForm = { ...prevForm, [name]: checked };
+
+      // Obtener observaciones actuales y convertir a array de líneas
+      const observacionesActuales = (prevForm.observaciones || "").split("\n").filter(line => line.trim() !== "");
+
+      if (checked) {
+        // Si se marca el checkbox, agregar el texto si no existe
+        if (textoAsociado && !observacionesActuales.includes(textoAsociado)) {
+          observacionesActuales.push(textoAsociado);
+        }
+      } else {
+        // Si se desmarca el checkbox, eliminar el texto asociado
+        const index = observacionesActuales.indexOf(textoAsociado);
+        if (index > -1) {
+          observacionesActuales.splice(index, 1);
+        }
+      }
+
+      // Actualizar las observaciones
+      newForm.observaciones = observacionesActuales.join("\n");
+
+      return newForm;
+    });
   };
   return (
     <div className="p-4" style={{ fontSize: "10px" }}>
@@ -130,37 +167,31 @@ export default function Anexo16A({
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
         {/* Columna principal (izquierda) - 3/4 del ancho */}
         <div className="lg:col-span-3 space-y-4">
-      {/* Encabezado */}
+          {/* Encabezado */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-          <InputTextOneLine
-            label="N° Orden"
-            name="norden"
-            value={form?.norden || ""}
-            onKeyUp={handleSearch}
-            onChange={handleChangeNumber}
+              <InputTextOneLine
+                label="N° Orden"
+                name="norden"
+                value={form?.norden}
+                onKeyUp={handleSearch}
+                onChange={handleChangeNumber}
                 labelWidth="80px"
-          />
-          <InputTextOneLine
+              />
+              <InputTextOneLine
                 label="Fecha"
-            name="fechaExam"
-            type="date"
-            value={form?.fechaExam || ""}
-            onChange={handleChange}
+                name="fechaExam"
+                type="date"
+                value={form?.fechaExam}
+                onChange={handleChangeSimple}
                 labelWidth="60px"
               />
               <div className="flex items-center gap-4">
                 <span className="font-semibold text-gray-700">Apto/Inapto:</span>
                 <InputsBooleanRadioGroup
-                  name="aptoInapto"
-                  value={form?.apto ? true : form?.inapto ? false : null}
-                  onChange={(e, value) => {
-                    setForm(prev => ({ 
-                      ...prev, 
-                      apto: value === true, 
-                      inapto: value === false 
-                    }));
-                  }}
+                  name="apto"
+                  value={form?.apto}
+                  onChange={handleRadioButtonBoolean}
                   trueLabel="Apto"
                   falseLabel="Inapto"
                 />
@@ -168,12 +199,12 @@ export default function Anexo16A({
               <InputTextOneLine
                 label="Actividad a Realizar"
                 name="actividadRealizar"
-                value={form?.actividadRealizar || ""}
-                onChange={handleChange}
+                value={form?.actividadRealizar}
+                disabled
                 labelWidth="120px"
-          />
-        </div>
-      </div>
+              />
+            </div>
+          </div>
 
           {/* Información del Paciente */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -181,56 +212,62 @@ export default function Anexo16A({
             <div className="space-y-3">
               {/* Fila 1: Nombres y Fecha de Nacimiento */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                <InputTextOneLine label="Nombres y Apellidos" name="nombres" value={form?.nombres || ""} disabled labelWidth="140px" />
-                <InputTextOneLine label="Fecha de Nacimiento" name="fechaNac" type="date" value={form?.fechaNac || ""} disabled labelWidth="140px" />
+                <InputTextOneLine label="Nombres y Apellidos" name="nombres" value={form?.nombres} disabled labelWidth="140px" />
+                <InputTextOneLine label="Fecha de Nacimiento" name="fechaNac" value={form?.fechaNac} disabled labelWidth="140px" />
               </div>
               {/* Fila 2: DNI, Sexo y Edad */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                <InputTextOneLine label="DNI" name="dni" value={form?.dni || ""} disabled labelWidth="60px" />
-                <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo || ""} disabled labelWidth="50px" />
-                <InputTextOneLine label="Edad" name="edad" value={form?.edad || ""} disabled labelWidth="50px" />
+                <InputTextOneLine label="DNI" name="dni" value={form?.dni} disabled labelWidth="60px" />
+                <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled labelWidth="50px" />
+                <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled labelWidth="50px" />
               </div>
             </div>
           </div>
-
+          {/* Empresa Contratista */}
+          <div className="bg-white border border-gray-200 rounded-lg p-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <InputTextOneLine label="Emp. Contratista" name="contrata" value={form?.contrata} disabled />
+              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa} disabled />
+            </div>
+          </div>
           {/* Funciones Vitales */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">F.C:</label>
-                <InputTextOneLine name="fc" value={form?.fc || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="fc" value={form?.fc} disabled />
                 <span className="text-gray-500">x min.</span>
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">P.A:</label>
-                <InputTextOneLine name="pa" value={form?.pa || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="pa" value={form?.pa} disabled />
                 <span className="text-gray-500">mmHg.</span>
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">F.R:</label>
-                <InputTextOneLine name="fr" value={form?.fr || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="fr" value={form?.fr} disabled />
                 <span className="text-gray-500">x min.</span>
               </div>
               <div className="flex items-center gap-2">
-                <label className="font-semibold text-gray-700 min-w-[30px]">IMC:</label>
-                <InputTextOneLine name="imc" value={form?.imc || ""} onChange={handleChangeNumber} />
+                <label className={`font-semibold text-gray-700 min-w-[30px] ${form?.imcRed ? 'text-red-500' : ''}`}>IMC:</label>
+                <InputTextOneLine name="imc" value={form?.imc} disabled />
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">Sat. O2:</label>
-                <InputTextOneLine name="satO2" value={form?.satO2 || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="satO2" value={form?.satO2} disabled />
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">T°:</label>
-                <InputTextOneLine name="temperatura" value={form?.temperatura || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="temperatura" value={form?.temperatura} disabled />
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">Peso:</label>
-                <InputTextOneLine name="peso" value={form?.peso || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="peso" value={form?.peso} disabled />
                 <span className="text-gray-500">kg.</span>
               </div>
               <div className="flex items-center gap-2">
                 <label className="font-semibold text-gray-700 min-w-[30px]">Talla:</label>
-                <InputTextOneLine name="talla" value={form?.talla || ""} onChange={handleChangeNumber} />
+                <InputTextOneLine name="talla" value={form?.talla} disabled />
                 <span className="text-gray-500">m.</span>
               </div>
             </div>
@@ -240,254 +277,206 @@ export default function Anexo16A({
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-3">Médico</h4>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-              <InputTextOneLine label="Nombre completo" name="medicoNombre" value={form?.medicoNombre || ""} onChange={handleChange} />
-              <InputTextOneLine label="CMP" name="medicoCmp" value={form?.medicoCmp || ""} onChange={handleChange} />
-              <InputTextOneLine label="Dirección" name="medicoDireccion" value={form?.medicoDireccion || ""} onChange={handleChange} />
-        </div>
-      </div>
+              <InputTextOneLine label="Nombre completo" name="medicoNombre" value={form?.medicoNombre} disabled className="uppercase" />
+              <InputTextOneLine label="CMP" name="medicoCmp" value={form?.medicoCmp} disabled className="uppercase" />
+              <InputTextOneLine label="Dirección" name="medicoDireccion" value={form?.medicoDireccion} disabled className="uppercase" />
+            </div>
+          </div>
 
           {/* Antecedentes Médicos */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-3">El/la presenta o ha presentado en los 6 últimos meses</h4>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* Columna Izquierda */}
-            <div className="space-y-2">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className={form?.cirugiaMayor ? "text-red-500" : ""}>Cirugía Mayor Reciente</span>
+                  <span >Cirugía Mayor Reciente</span>
                   <InputsBooleanRadioGroup
                     name="cirugiaMayor"
                     value={form?.cirugiaMayor}
-                    onChange={(e, value) => handleSiNoChange("cirugiaMayor", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.desordenesCoagulacion ? "text-red-500" : ""}>Desórdenes de la coagulación, trombosis, etc</span>
+                  <span  >Desórdenes de la coagulación, trombosis, etc</span>
                   <InputsBooleanRadioGroup
                     name="desordenesCoagulacion"
                     value={form?.desordenesCoagulacion}
-                    onChange={(e, value) => handleSiNoChange("desordenesCoagulacion", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.diabetes ? "text-red-500" : ""}>Diabetes Mellitus</span>
+                  <span >Diabetes Mellitus</span>
                   <InputsBooleanRadioGroup
                     name="diabetes"
                     value={form?.diabetes}
-                    onChange={(e, value) => handleSiNoChange("diabetes", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.hipertension ? "text-red-500" : ""}>Hipertensión Arterial</span>
+                  <span className={`${form?.hipertensionRed ? 'text-red-500' : ''}`}>Hipertensión Arterial</span>
                   <InputsBooleanRadioGroup
                     name="hipertension"
                     value={form?.hipertension}
-                    onChange={(e, value) => handleSiNoChange("hipertension", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, hipertensionRed: false })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.embarazo ? "text-red-500" : ""}>Embarazo</span>
+                  <span  >Embarazo</span>
                   <InputsBooleanRadioGroup
                     name="embarazo"
                     value={form?.embarazo}
-                    onChange={(e, value) => handleSiNoChange("embarazo", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, furDescripcion: "" })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
+                <InputTextOneLine label="FUR" name="furDescripcion" value={form?.furDescripcion} onChange={handleChange} disabled={!form.embarazo} />
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className={form?.fur ? "text-red-500" : ""}>FUR:</span>
-                    <InputTextOneLine name="furFecha" value={form?.furFecha || ""} onChange={handleChange} />
-                  </div>
-                  <InputsBooleanRadioGroup
-                    name="fur"
-                    value={form?.fur}
-                    onChange={(e, value) => handleSiNoChange("fur", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className={form?.problemasNeurologicos ? "text-red-500" : ""}>Problemas Neurológicos: Epilepsia, vértigo, etc</span>
+                  <span>Problemas Neurológicos: Epilepsia, vértigo, etc</span>
                   <InputsBooleanRadioGroup
                     name="problemasNeurologicos"
                     value={form?.problemasNeurologicos}
-                    onChange={(e, value) => handleSiNoChange("problemasNeurologicos", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.infeccionesRecientes ? "text-red-500" : ""}>Infecciones recientes (especialmente oídos, nariz, garganta)</span>
+                  <span  >Infecciones recientes (especialmente oídos, nariz, garganta)</span>
                   <InputsBooleanRadioGroup
                     name="infeccionesRecientes"
                     value={form?.infeccionesRecientes}
-                    onChange={(e, value) => handleSiNoChange("infeccionesRecientes", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
-          </div>
-        </div>
+                </div>
+              </div>
 
               {/* Columna Derecha */}
-            <div className="space-y-2">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className={form?.obesidadMorbida ? "text-red-500" : ""}>Obesidad Mórbida (IMC mayor a 35 m/Kg 2)</span>
+                  <span className={`${form?.obesidadMorbidaRed ? 'text-red-500' : ''}`}>Obesidad Mórbida (IMC mayor a 35 m/Kg 2)</span>
                   <InputsBooleanRadioGroup
                     name="obesidadMorbida"
                     value={form?.obesidadMorbida}
-                    onChange={(e, value) => handleSiNoChange("obesidadMorbida", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, obesidadMorbidaRed: false })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.problemasCardiacos ? "text-red-500" : ""}>Problemas Cardiacos: marca pasos, coronariopatías, etc</span>
+                  <span >Problemas Cardiacos: marca pasos, coronariopatías, etc</span>
                   <InputsBooleanRadioGroup
                     name="problemasCardiacos"
                     value={form?.problemasCardiacos}
-                    onChange={(e, value) => handleSiNoChange("problemasCardiacos", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.problemasRespiratorios ? "text-red-500" : ""}>Problemas respiratorios: Asma, EPOC etc</span>
+                  <span  >Problemas respiratorios: Asma, EPOC etc</span>
                   <InputsBooleanRadioGroup
                     name="problemasRespiratorios"
                     value={form?.problemasRespiratorios}
-                    onChange={(e, value) => handleSiNoChange("problemasRespiratorios", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.problemasOftalmologicos ? "text-red-500" : ""}>Problemas Oftalmológicos: Retinopatía, glaucoma, etc</span>
+                  <span className={`${form?.problemasOftalmologicosRed ? 'text-red-500' : ''}`}>Problemas Oftalmológicos: Retinopatía, glaucoma, etc</span>
                   <InputsBooleanRadioGroup
                     name="problemasOftalmologicos"
                     value={form?.problemasOftalmologicos}
-                    onChange={(e, value) => handleSiNoChange("problemasOftalmologicos", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={(e, value) => { if (value == false) setForm(prev => ({ ...prev, problemasOftalmologicosRed: false })); handleRadioButtonBoolean(e, value) }}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.problemasDigestivos ? "text-red-500" : ""}>Problemas Digestivos: Úlcera péptica, hepatitis, etc</span>
+                  <span >Problemas Digestivos: Úlcera péptica, hepatitis, etc</span>
                   <InputsBooleanRadioGroup
                     name="problemasDigestivos"
                     value={form?.problemasDigestivos}
-                    onChange={(e, value) => handleSiNoChange("problemasDigestivos", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.apneaSueño ? "text-red-500" : ""}>Apnea del Sueño</span>
+                  <span>Apnea del Sueño</span>
                   <InputsBooleanRadioGroup
                     name="apneaSueño"
                     value={form?.apneaSueño}
-                    onChange={(e, value) => handleSiNoChange("apneaSueño", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.otraCondicion ? "text-red-500" : ""}>Otra condición Médica Importante</span>
+                  <span >Otra condición Médica Importante</span>
                   <InputsBooleanRadioGroup
                     name="otraCondicion"
                     value={form?.otraCondicion}
-                    onChange={(e, value) => handleSiNoChange("otraCondicion", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.alergias ? "text-red-500" : ""}>Alergias</span>
+                  <span >Alergias</span>
                   <InputsBooleanRadioGroup
                     name="alergias"
-                    value={form?.alergias}
-                    onChange={(e, value) => handleSiNoChange("alergias", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    value={form?.alergias} onChange={handleRadioButtonBoolean}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className={form?.usoMedicacion ? "text-red-500" : ""}>Uso de Medicación Actual</span>
+                  <span  >Uso de Medicación Actual</span>
                   <InputsBooleanRadioGroup
                     name="usoMedicacion"
                     value={form?.usoMedicacion}
-                    onChange={(e, value) => handleSiNoChange("usoMedicacion", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={(e, value) => {
+                      if (value == false)
+                        setForm(prev => ({ ...prev, medicacionActual: "" }));
+                      handleRadioButtonBoolean(e, value)
+                    }}
                   />
                 </div>
+                <InputTextOneLine label="Medicación Actual" name="medicacionActual" value={form?.medicacionActual} onChange={handleChange} disabled={!form.usoMedicacion} />
+
               </div>
             </div>
           </div>
 
-          {/* Recomendaciones */}
+          {/* Recomendaciones y Observaciones en columnas */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-3">Recomendaciones</h4>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-              <InputCheckbox 
+              <InputCheckbox
                 label="Corregir Agudeza Visual"
-                checked={!!form?.corregirAgudeza} 
-                name="corregirAgudeza" 
-                onChange={handleCheckBoxChange} 
+                checked={form?.corregirAgudeza}
+                name="corregirAgudeza"
+                onChange={handleCheckBoxChangeWithObservations}
               />
-              <InputCheckbox 
+              <InputCheckbox
                 label="Obesidad I. Dieta Hipocalórica y Ejercicios"
-                checked={!!form?.obesidadDieta} 
-                name="obesidadDieta" 
-                onChange={handleCheckBoxChange} 
+                checked={form?.obesidadDieta}
+                name="obesidadDieta"
+                onChange={handleCheckBoxChangeWithObservations}
               />
-              <InputCheckbox 
+              <InputCheckbox
                 label="D m II controlado, tto con:....."
-                checked={!!form?.diabetesControlado} 
-                name="diabetesControlado" 
-                onChange={handleCheckBoxChange} 
+                checked={form?.diabetesControlado}
+                name="diabetesControlado"
+                onChange={handleCheckBoxChangeWithObservations}
               />
-              <InputCheckbox 
+              <InputCheckbox
                 label="Sobrepeso. Dieta Hipocalórica y Ejercicios"
-                checked={!!form?.sobrepeso} 
-                name="sobrepeso" 
-                onChange={handleCheckBoxChange} 
+                checked={form?.sobrepeso}
+                name="sobrepeso"
+                onChange={handleCheckBoxChangeWithObservations}
               />
-              <InputCheckbox 
+              <InputCheckbox
                 label="HTA Controlada, en tto con:..."
-                checked={!!form?.htaControlada} 
-                name="htaControlada" 
-                onChange={handleCheckBoxChange} 
+                checked={form?.htaControlada}
+                name="htaControlada"
+                onChange={handleCheckBoxChangeWithObservations}
               />
-              <InputCheckbox 
+              <InputCheckbox
                 label="Uso de Lentes Correct. Lectura de Cerca"
-                checked={!!form?.lentesCorrectivos} 
-                name="lentesCorrectivos" 
-                onChange={handleCheckBoxChange} 
+                checked={form?.lentesCorrectivos}
+                name="lentesCorrectivos"
+                onChange={handleCheckBoxChangeWithObservations}
               />
-            </div>
-      </div>
-
-          {/* Empresa Contratista */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-              <InputTextOneLine label="Emp. Contratista" name="empresaContratista" value={form?.empresaContratista || ""} onChange={handleChange} />
-              <InputTextOneLine label="Empresa" name="empresa" value={form?.empresa || ""} onChange={handleChange} />
             </div>
           </div>
-
           {/* Observaciones */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
-            <InputTextArea rows={4} name="observaciones" value={form?.observaciones || ""} onChange={handleChange} />
+            <InputTextArea rows={4} name="observaciones" value={form?.observaciones} onChange={handleChange} />
           </div>
         </div>
 
@@ -495,7 +484,7 @@ export default function Anexo16A({
         <div className="lg:col-span-1 flex flex-col">
           <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1 flex flex-col">
             <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
-            
+
             {/* Sin Corregir */}
             <div className="mb-4">
               <h5 className="font-semibold text-gray-700 mb-2">Sin Corregir</h5>
@@ -505,11 +494,11 @@ export default function Anexo16A({
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                      <InputTextOneLine name="vcOD" value={form?.vcOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vcOD" value={form?.vcOD} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                      <InputTextOneLine name="vlOD" value={form?.vlOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vlOD" value={form?.vlOD} disabled />
                     </div>
                   </div>
                 </div>
@@ -518,11 +507,11 @@ export default function Anexo16A({
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                      <InputTextOneLine name="vcOI" value={form?.vcOI || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vcOI" value={form?.vcOI} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                      <InputTextOneLine name="vlOI" value={form?.vlOI || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vlOI" value={form?.vlOI} disabled />
                     </div>
                   </div>
                 </div>
@@ -538,23 +527,23 @@ export default function Anexo16A({
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                      <InputTextOneLine name="vcCorregidaOD" value={form?.vcCorregidaOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vcCorregidaOD" value={form?.vcCorregidaOD} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                      <InputTextOneLine name="vlCorregidaOD" value={form?.vlCorregidaOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vlCorregidaOD" value={form?.vlCorregidaOD} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.Clrs:</span>
-                      <InputTextOneLine name="vclrsOD" value={form?.vclrsOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vclrs" value={form?.vclrs} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.B.:</span>
-                      <InputTextOneLine name="vbOD" value={form?.vbOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vb" value={form?.vb} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">R.P.:</span>
-                      <InputTextOneLine name="rpOD" value={form?.rpOD || ""} onChange={handleChange} />
+                      <InputTextOneLine name="rp" value={form?.rp} disabled />
                     </div>
                   </div>
                 </div>
@@ -563,23 +552,23 @@ export default function Anexo16A({
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                      <InputTextOneLine name="vcCorregidaOI" value={form?.vcCorregidaOI || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vcCorregidaOI" value={form?.vcCorregidaOI} disabled />
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                      <InputTextOneLine name="vlCorregidaOI" value={form?.vlCorregidaOI || ""} onChange={handleChange} />
+                      <InputTextOneLine name="vlCorregidaOI" value={form?.vlCorregidaOI} disabled />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.Clrs:</span>
-                      <InputTextOneLine name="vclrsOI" value={form?.vclrsOI || ""} onChange={handleChange} />
+                      <span className="text-[11px] min-w-[30px]">:</span>
+                      {/* <InputTextOneLine name="vclrs" value={form?.vclrs} disabled /> */}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.B.:</span>
-                      <InputTextOneLine name="vbOI" value={form?.vbOI || ""} onChange={handleChange} />
+                      <span className="text-[11px] min-w-[30px]">:</span>
+                      {/* <InputTextOneLine name="vbOI" value={form?.vbOI} disabled /> */}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">R.P.:</span>
-                      <InputTextOneLine name="rpOI" value={form?.rpOI || ""} onChange={handleChange} />
+                      <span className="text-[11px] min-w-[30px]">:</span>
+                      {/* <InputTextOneLine name="rpOI" value={form?.rpOI} disabled /> */}
                     </div>
                   </div>
                 </div>
@@ -589,7 +578,7 @@ export default function Anexo16A({
             {/* Enfermedades Oculares */}
             <div className="mb-4 flex-1">
               <h5 className="font-semibold text-gray-700 mb-2">Enfermedades Oculares</h5>
-              <InputTextArea rows={3} name="enfermedadesOculares" value={form?.enfermedadesOculares || ""} onChange={handleChange} />
+              <InputTextArea rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
             </div>
 
             {/* Botones de Acción dentro de la columna derecha */}
@@ -611,12 +600,12 @@ export default function Anexo16A({
                   <FontAwesomeIcon icon={faBroom} /> Limpiar
                 </button>
               </div>
-              
+
               {/* Fila 2: Input y Botón lado a lado */}
               <div className="flex gap-2">
                 <input
                   name="norden"
-                  value={form?.norden || ""}
+                  value={form?.norden}
                   onChange={handleChange}
                   className="flex-1 border rounded px-2 py-1"
                   placeholder="N° Orden"
