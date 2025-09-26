@@ -8,7 +8,9 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { useState } from "react";
 import { getToday } from "../../../../utils/helpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
 
+const tabla="antecedentes_patologicos"
 const today = getToday();
 
 // Tab Normal de Antecedentes Patológicos
@@ -16,9 +18,11 @@ export default function AntecedentesPatologicos({ listas }) {
   const { MedicosMulti } = listas;
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
+
   const initialFormState = {
     //PRIMERA TAB==========================================================================
     norden: "",
+    codigoAntecedentesPatologicos_cod_ap: null,
     fechaExam: today,
     nombres: "",
     sexo: "",
@@ -86,6 +90,7 @@ export default function AntecedentesPatologicos({ listas }) {
     trastornosNerviosos: false,
     traumatismoEncefalocraneano: false,
     tuberculosis: false,
+    vertigos: false,
     tumoresQuistes: false,
     ulceraPeptica: false,
     varicela: false,
@@ -197,8 +202,6 @@ export default function AntecedentesPatologicos({ listas }) {
     rabia: false,
     papilomaHumano: false,
 
-    covidNumero: "",
-
     drogas: false,
     tipoDrogas: "",
     frecuenciaDrogas: "",
@@ -248,6 +251,7 @@ export default function AntecedentesPatologicos({ listas }) {
     esposaConyuge: "",
     carnetConadis: "",
 
+    dniUsuario: userCompleto?.datos?.dni_user ?? "",
     // Médico que Certifica //BUSCADOR
     nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
   };
@@ -288,22 +292,20 @@ export default function AntecedentesPatologicos({ listas }) {
   ];
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
   const handlePrint = () => {
     handlePrintDefault(() => {
-      // PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
-
-
   return (
     <div className="space-y-4">
       <div className="bg-white border border-gray-200 rounded-lg p-3">

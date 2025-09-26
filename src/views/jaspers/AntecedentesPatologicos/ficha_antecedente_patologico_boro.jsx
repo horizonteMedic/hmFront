@@ -1,9 +1,10 @@
 import jsPDF from "jspdf";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
 
 export default function FichaAntecedentePatologicoBoro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
@@ -110,26 +111,26 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     numeroDosisCovid: "10",
     // Datos de antecedentes quirúrgicos
     antecedentesQuirurgicos: [
-      { 
-        fecha: "2022", 
-        hospital: "Hospital Nacional de Especialidades", 
-        operacion: "Apendicectomían ", 
-        diasHospitalizacion: "3", 
-        complicaciones: "Ninguna" 
+      {
+        fecha: "2022",
+        hospital: "Hospital Nacional de Especialidades",
+        operacion: "Apendicectomían ",
+        diasHospitalizacion: "3",
+        complicaciones: "Ninguna"
       },
-      { 
-        fecha: "2022", 
-        hospital: "Hospital Nacional de Especialidades", 
-        operacion: "Apendicectomía laparoscópica", 
-        diasHospitalizacion: "3", 
-        complicaciones: "Ninguna complicación postoperatoria" 
+      {
+        fecha: "2022",
+        hospital: "Hospital Nacional de Especialidades",
+        operacion: "Apendicectomía laparoscópica",
+        diasHospitalizacion: "3",
+        complicaciones: "Ninguna complicación postoperatoria"
       },
-      { 
-        fecha: "2022", 
-        hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
-        operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
-        diasHospitalizacion: "3", 
-        complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+      {
+        fecha: "2022",
+        hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
+        operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
+        diasHospitalizacion: "3",
+        complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
       }
     ],
     // Datos de hábitos
@@ -158,54 +159,154 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
       carnetConadis: "ESTO ES UNA PRUEBA EFEEEEEEEE"
     }
   };
+  const datosReales = {
+    // Datos personales básicos
+    apellidosNombres: String((data.apellidos_apellidos_pa ?? "") + " " + (data.nombres_nombres_pa ?? "")).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaAntecedentesPatologicos_fecha_ap ?? ""),
+    sexo: String(data.sexo_sexo_pa ?? ""),
+    documentoIdentidad: String(data.dni_cod_pa ?? ""),
+    edad: String(data.edad_edad ?? ""),
+    areaTrabajo: String(data.area_area_o ?? ""),
+    puestoTrabajo: String(data.cargo_cargo_de ?? ""),
+    tiempoExperiencia: "", //revisar - no encontrado en JSON
+    empresa: String(data.empresa_razon_empresa ?? ""),
+    contrata: String(data.contrata_razon_contrata ?? ""),
+    sede: String(data.sede ?? ""),
+
+    // Datos de accidentes
+    accidenteTrabajo: Boolean(data.accidenteTrabajoBoro_accitrabajo ?? false),
+    fechaAccidente: String(data.accidenteTrabajoFechaBoro_accit_fecha ?? ""),
+    tiempoPerdido: Boolean(data.descansoMedicoBoro_accit_descanso ?? false),
+    tiempoIncapacidad: String(data.tiempoIncapacidadBoro_timeincapacidad ?? ""),
+    causaBasica: String(data.descansoMedicoEspecifiqueBoro_accit_descanso_detal ?? ""),
+
+    // Datos de enfermedad profesional
+    enfermedadProfesional: Boolean(data.enfermedadesProfesionalesBoro_enfe_prof ?? false),
+    evaluacionEnfermedad: Boolean(data.enfermedadesLaboralesCalificacionBoro_enfe_lab_calif ?? false),
+    fechaEvaluacion: String(data.enfermedadesProfesionalesFechaBoro_enfe_profecha ?? ""),
+    especifiqueCual: String(data.enfermedadesLaboralesEspecifiqueBoro_enfe_lab_califdetal ?? ""),
+
+    // Datos de factores de riesgo - mapeo completo
+    factoresRiesgo: {
+      ruido: Boolean(data.ruidoAnexo7c_chkruido ?? false),
+      polvo: Boolean(data.polvoAnexo7c_chkpolvo ?? false),
+      cargas: Boolean(data.cargasAnexo7c_chkcargas ?? false),
+      metales: Boolean(data.metalesAnexo7c_chkmetales ?? false),
+      vibraciones: Boolean(data.vibracionesAnexo7c_vibraciones ?? false),
+      alturaEstructura: Boolean(data.alturaEstructuraAnexo7c_altura_estructura ?? false),
+      alturaGeografica: Boolean(data.alturaGeograficaAnexo7c_altura_geog ?? false),
+      temperatura: Boolean(data.temperaturaAnexo7c_chktemperatura ?? false),
+      cancerigenos: Boolean(data.cancerigenosAnexo7c_chkcancerigenos ?? false),
+      biologicos: Boolean(data.biologicosAnexo7c_chkbiologicos ?? false),
+      quimicos: Boolean(data.quimicosAnexo7c_quimicos ?? false),
+      posturas: Boolean(data.posturasAnexo7c_chkposturas ?? false),
+      electricos: Boolean(data.electricosAnexo7c_electricos ?? false),
+      otros: String(data.otrosAnexo7c_chkotros ?? "")
+    },
+
+    // Datos de patologías - mapeo completo
+    patologias: {
+      ima: Boolean(data.imaBoro_ima ?? false),
+      hta: Boolean(data.hipertencionArterial_chk27 ?? false),
+      acv: Boolean(data.acvBoro_acv ?? false),
+      tbc: Boolean(data.tbcBoro_tbc ?? false),
+      ets: Boolean(data.etsBoro_ets ?? false),
+      vih: Boolean(data.vihBoro_vih ?? false),
+      tec: Boolean(data.traumatismoEncefalocraneano_chk54 ?? false),
+      fobias: Boolean(data.fobiasBoro_fobias ?? false),
+      alergias: Boolean(data.alergias_chk1 ?? false),
+      asma: Boolean(data.asma_chk4 ?? false),
+      bronquitis: Boolean(data.bronquitisARepeticion_chk7 ?? false),
+      diabetes: Boolean(data.diabetes_chk11 ?? false),
+      hepatitis: Boolean(data.hepatitis_chk25 ?? false),
+      hernias: Boolean(data.hernias_chk26 ?? false),
+      vertigos: Boolean(data.vertigosBoro_vertigos ?? false),
+      tifoidea: Boolean(data.tifoideaBoro_tifoidea ?? false),
+      neoplasias: Boolean(data.neoplasiasBoro_neoplasias ?? false),
+      quemaduras: Boolean(data.quemadurasBoro_quemaduras ?? false),
+      discopatias: Boolean(data.discopatiasBoro_discopatias ?? false),
+      columna: Boolean(data.columnaBoro_columna ?? false),
+      convulsiones: Boolean(data.epilsepsiaOConvulsiones_chk15 ?? false),
+      gastritis: Boolean(data.gastritisCronica_chk21 ?? false),
+      ulceras: Boolean(data.ulceraPeptica_chk57 ?? false),
+      migranas: Boolean(data.migranaBoro_migrana ?? false),
+      enfPsiquiatricas: Boolean(data.enfermedadesPsiquiatricasBoro_enf_psiquiatricas ?? false),
+      enfCardiovasculares: Boolean(data.enfermedadesCorazon_chk13 ?? false),
+      enfOculares: Boolean(data.enfermedadesOculares_chk14 ?? false),
+      enfReumatica: Boolean(data.enfermedadesReumaticasBoro_enf_reumatica ?? false),
+      enfPulmonares: Boolean(data.enfermedadesPulmonaresBoro_enf_pulmonares ?? false),
+      enfPiel: Boolean(data.enfermedadesPielBoro_enf_piel ?? false),
+      tendinitis: Boolean(data.tendinitisBoro_tendinitis ?? false),
+      onicomicosis: Boolean(data.onicomicosisBoro_onicomicosis ?? false),
+      fracturas: Boolean(data.fracturasBoro_fracturas ?? false),
+      anemia: Boolean(data.anemiaBoro_anemia ?? false),
+      obesidad: Boolean(data.obesidadBoro_obesidad ?? false),
+      dislipidemia: Boolean(data.dislipidemiaBoro_dislipidemia ?? false),
+      intoxicaciones: Boolean(data.intoxicacionesBoro_intoxicaciones ?? false),
+      amputacion: Boolean(data.amputacionBoro_amputacion ?? false),
+      sordera: Boolean(data.sorderaBoro_sordera ?? false),
+      otros: String(data.especifiqueTratamientoBoro_especifique_detalleenfermedades ?? "")
+    },
+
+    // Datos de alergias
+    alergiasMedicamentos: Boolean(data.alergiasAlimentosBoro_alergias_medic_alim ?? false),
+    especifiqueAlergias: String(data.alergiasAlimentosEspecifiqueBoro_alergias_medic_alimdetall ?? ""),
+
+    // Datos de vacunas
+    vacunas: {
+      antitetanica: Boolean(data.antitetanicaBoro_antitetanica ?? false),
+      fiebreAmarilla: Boolean(data.fiebreAmarillaBoro_fiebre_amarilla ?? false),
+      influenza: Boolean(data.influenzaBoro_influenza ?? false),
+      hepatitisA: Boolean(data.hepatitisABoro_hepatitisa ?? false),
+      hepatitisB: Boolean(data.hepatitisBBoro_hepatitisb ?? false),
+      gripeInfluenza: Boolean(data.gripeInfluenzaBoro_gripe_influenza ?? false),
+      neumococo: Boolean(data.neumococoBoro_neumococo ?? false),
+      rabia: Boolean(data.rabiaBoro_rabia ?? false),
+      papilomaHumano: Boolean(data.papilomaHumanoBoro_papiloma_humano ?? false),
+      covid19: Boolean(data.covid_chkcovid ?? false)
+    },
+    numeroDosisCovid: String(data.dosisVacunas_txtdosis ?? ""),
+
+    // Datos de antecedentes quirúrgicos
+    antecedentesQuirurgicos: (data.antecedentesPatologicosQuirurjicos || []).map(item => ({
+      fecha: String(item.fechaAntecedentesPatologicosQuirurgicos ?? ""),
+      hospital: String(item.hospitalOperacion ?? ""),
+      operacion: String(item.operacion ?? ""),
+      diasHospitalizacion: String(item.diasHospitalizado ?? ""),
+      complicaciones: String(item.complicaciones ?? "")
+    })),
+
+    // Datos de hábitos
+    habitos: {
+      alcohol: Boolean(data.licorSi_rblicorsi ?? false),
+      especifiqueAlcohol: String(data.licorFrecuencia_txtlicorfrecuencia ?? "") + " " + String(data.licorTipoFrecuente_txtlicortipofrecuente ?? ""),
+      tabaco: Boolean(data.fumarSi_rbfumarsi ?? false),
+      especifiqueTabaco: String(data.numeroCigarrillos_txtncigarrillos ?? ""),
+      drogas: Boolean(data.drogasSi_rbdrogassi ?? false),
+      especifiqueDrogas: String(data.drogasFrecuencia_txtdrogasfrecuencia ?? "") + " " + String(data.drogasTipo_txtdrogastipo ?? ""),
+      medicamentos: Boolean(data.medicamentoBoro_medicamento ?? false),
+      especifiqueMedicamentos: String(data.medicamentoEspecifiqueBoro_medicamento_detal ?? ""),
+      actividadFisica: Boolean(data.actividadFisicaBoro_activ_fisic ?? false),
+      especifiqueActividadFisica: String(data.actividadFisicaEspecifiqueBoro_activ_fisic_detal ?? "")
+    },
+
+    // Datos de antecedentes patológicos familiares
+    antecedentesFamiliares: {
+      padre: String(data.padreEspecifiqueBoro_padre_detall ?? ""),
+      madre: String(data.madreEspecifiqueBoro_madre_detall ?? ""),
+      hermanos: String(data.hermanosEspecifiqueBoro_hermanos_detall ?? ""),
+      hijos: String(data.hijosEspecifiqueBoro_hijos_detall ?? ""),
+      esposaConyuge: String(data.esposConyEspecifiqueBoro_espos_cony_detall ?? "")
+    },
+
+    // Datos de condición médica especial o discapacidad
+    condicionMedica: {
+      carnetConadis: String(data.conadisEspecifiqueBoro_conadisdetalle ?? "")
+    }
+  };
 
   // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? {
-    apellidosNombres: data.nombres || datosPrueba.apellidosNombres,
-    fechaExamen: data.fechaExamen || datosPrueba.fechaExamen,
-    sexo: data.sexo || datosPrueba.sexo,
-    documentoIdentidad: data.dni || datosPrueba.documentoIdentidad,
-    edad: data.edad || datosPrueba.edad,
-    areaTrabajo: data.areaTrabajo || datosPrueba.areaTrabajo,
-    puestoTrabajo: data.puestoTrabajo || datosPrueba.puestoTrabajo,
-    tiempoExperiencia: data.tiempoExperiencia || datosPrueba.tiempoExperiencia,
-    empresa: data.empresa || datosPrueba.empresa,
-    contrata: data.contrata || datosPrueba.contrata,
-    numeroFicha: data.numeroFicha || "99164",
-    sede: data.sede || datosPrueba.sede,
-    // Datos de accidentes
-    accidenteTrabajo: data.accidenteTrabajo !== undefined ? data.accidenteTrabajo : datosPrueba.accidenteTrabajo,
-    fechaAccidente: data.fechaAccidente || datosPrueba.fechaAccidente,
-    tiempoPerdido: data.tiempoPerdido !== undefined ? data.tiempoPerdido : datosPrueba.tiempoPerdido,
-    tiempoIncapacidad: data.tiempoIncapacidad || datosPrueba.tiempoIncapacidad,
-    causaBasica: data.causaBasica || datosPrueba.causaBasica,
-    // Datos de enfermedad profesional
-    enfermedadProfesional: data.enfermedadProfesional !== undefined ? data.enfermedadProfesional : datosPrueba.enfermedadProfesional,
-    evaluacionEnfermedad: data.evaluacionEnfermedad !== undefined ? data.evaluacionEnfermedad : datosPrueba.evaluacionEnfermedad,
-    fechaEvaluacion: data.fechaEvaluacion || datosPrueba.fechaEvaluacion,
-    especifiqueCual: data.especifiqueCual || datosPrueba.especifiqueCual,
-    // Datos de factores de riesgo - mapeo completo
-    factoresRiesgo: data.factoresRiesgo || datosPrueba.factoresRiesgo,
-    // Datos de patologías - mapeo completo
-    patologias: data.patologias || datosPrueba.patologias,
-    // Datos de alergias
-    alergiasMedicamentos: data.alergiasMedicamentos !== undefined ? data.alergiasMedicamentos : datosPrueba.alergiasMedicamentos,
-    especifiqueAlergias: data.especifiqueAlergias || datosPrueba.especifiqueAlergias,
-    // Datos de vacunas
-    vacunas: data.vacunas || datosPrueba.vacunas,
-    numeroDosisCovid: data.numeroDosisCovid || datosPrueba.numeroDosisCovid,
-    // Datos de antecedentes quirúrgicos
-    antecedentesQuirurgicos: data.antecedentesQuirurgicos || datosPrueba.antecedentesQuirurgicos,
-    // Datos de hábitos
-    habitos: data.habitos || datosPrueba.habitos,
-    // Datos de antecedentes patológicos familiares
-    antecedentesFamiliares: data.antecedentesFamiliares || datosPrueba.antecedentesFamiliares,
-    // Datos de condición médica especial o discapacidad
-    condicionMedica: data.condicionMedica || datosPrueba.condicionMedica
-  } : {
-    ...datosPrueba,
-    numeroFicha: "99164"
-  };
+  const datosFinales = data && data.n_orden ? datosReales : datosPrueba;
 
   // === HEADER ===
   doc.setFont("helvetica", "bold").setFontSize(12);
@@ -259,15 +360,15 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // Pregunta sobre accidentes de trabajo - TODO EN UNA LÍNEA
   const accidenteY = puestoY + 10;
-  
+
   // Pregunta
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Ha sufrido algún accidente relacionado al trabajo:", 20, accidenteY);
-  
+
   // Checkboxes SI/NO en la misma línea
   const checkboxSiX = 97;
   const checkboxNoX = 112;
-  
+
   // Checkbox SI con paréntesis - ANCHO FIJO
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxSiX, accidenteY);
@@ -285,7 +386,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(")", checkboxSiX + 10, accidenteY);
-  
+
   // Checkbox NO con paréntesis - ANCHO MÁS GRANDE
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("NO (", checkboxNoX, accidenteY);
@@ -314,15 +415,15 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // Tiempo perdido - TODO EN UNA LÍNEA
   const tiempoPerdidoY = accidenteY + 10;
-  
+
   // Pregunta
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("Hubo tiempo perdido (descanso médico)", 30, tiempoPerdidoY);
-  
+
   // Checkboxes SI/NO en la misma línea
   const checkboxTiempoSiX = 97;
   const checkboxTiempoNoX = 112;
-  
+
   // Checkbox SI para tiempo perdido con paréntesis - ANCHO FIJO
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxTiempoSiX, tiempoPerdidoY);
@@ -340,7 +441,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(")", checkboxTiempoSiX + 10, tiempoPerdidoY);
-  
+
   // Checkbox NO para tiempo perdido con paréntesis - ANCHO MÁS GRANDE
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("NO (", checkboxTiempoNoX, tiempoPerdidoY);
@@ -365,7 +466,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // Causa básica - con ajuste automático de texto
   const causaBasicaY = tiempoPerdidoY + 5;
-  
+
   // Solo dibujar el texto completo con ajuste automático y justificado
   const textoCompleto = "Especifique la causa básica (o describa el evento): " + datosFinales.causaBasica;
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -375,15 +476,15 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === NUEVA SECCIÓN: ENFERMEDAD PROFESIONAL ===
   const enfermedadY = causaBasicaY + causaBasicaHeight + 5; // Espacio dinámico basado en la altura del texto
-  
+
   // Pregunta sobre enfermedad profesional - TODO EN UNA LÍNEA
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Ha sido declarado con alguna enfermedad profesional o relacionada al trabajo:", 20, enfermedadY);
-  
+
   // Checkboxes SI/NO para enfermedad profesional - EN LA MISMA LÍNEA
   const checkboxEnfermedadSiX = 145;
   const checkboxEnfermedadNoX = 160;
-  
+
   // Checkbox SI para enfermedad profesional con paréntesis - ANCHO FIJO
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxEnfermedadSiX, enfermedadY);
@@ -401,7 +502,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(")", checkboxEnfermedadSiX + 10, enfermedadY);
-  
+
   // Checkbox NO para enfermedad profesional con paréntesis - ANCHO MÁS GRANDE
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("NO (", checkboxEnfermedadNoX, enfermedadY);
@@ -426,15 +527,15 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === SEGUNDA PREGUNTA: EVALUACIÓN DE ENFERMEDAD LABORAL ===
   const evaluacionY = enfermedadY + 10;
-  
+
   // Pregunta sobre evaluación de enfermedad laboral - TODO EN UNA LÍNEA
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("Ha sido evaluado para calificación de enfermedad laboral", 30, evaluacionY);
-  
+
   // Checkboxes SI/NO para evaluación - EN LA MISMA LÍNEA
   const checkboxEvaluacionSiX = 115;
   const checkboxEvaluacionNoX = 130;
-  
+
   // Checkbox SI para evaluación con paréntesis - ANCHO FIJO
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxEvaluacionSiX, evaluacionY);
@@ -452,7 +553,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   }
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(")", checkboxEvaluacionSiX + 10, evaluacionY);
-  
+
   // Checkbox NO para evaluación con paréntesis - ANCHO MÁS GRANDE
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("NO (", checkboxEvaluacionNoX, evaluacionY);
@@ -485,7 +586,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === NUEVA SECCIÓN: FACTORES DE RIESGO ===
   const factoresY = especifiqueY + especifiqueHeight + 5; // Espacio dinámico basado en la altura del texto
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Que factores de Riesgos ha estado expuesto durante su historia ocupacional:", 20, factoresY);
@@ -497,18 +598,18 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     { nombre: "Polvo", marcado: datosFinales.factoresRiesgo.polvo, x: 25, y: factoresY + 14, checkboxX: 20, checkboxY: factoresY + 11 },
     { nombre: "Cargas", marcado: datosFinales.factoresRiesgo.cargas, x: 25, y: factoresY + 20, checkboxX: 20, checkboxY: factoresY + 17 },
     { nombre: "Metales", marcado: datosFinales.factoresRiesgo.metales, x: 25, y: factoresY + 26, checkboxX: 20, checkboxY: factoresY + 23 },
-    
+
     // Columna 2
     { nombre: "Vibraciones", marcado: datosFinales.factoresRiesgo.vibraciones, x: 80, y: factoresY + 8, checkboxX: 75, checkboxY: factoresY + 5 },
     { nombre: "Altura Estructura", marcado: datosFinales.factoresRiesgo.alturaEstructura, x: 80, y: factoresY + 14, checkboxX: 75, checkboxY: factoresY + 11 },
     { nombre: "Altura Geografica", marcado: datosFinales.factoresRiesgo.alturaGeografica, x: 80, y: factoresY + 20, checkboxX: 75, checkboxY: factoresY + 17 },
     { nombre: "Otros:", marcado: false, x: 50, y: factoresY + 26, checkboxX: null, checkboxY: null },
-    
+
     // Columna 3
     { nombre: "Temperatura", marcado: datosFinales.factoresRiesgo.temperatura, x: 120, y: factoresY + 8, checkboxX: 115, checkboxY: factoresY + 5 },
     { nombre: "Cancerigenos", marcado: datosFinales.factoresRiesgo.cancerigenos, x: 120, y: factoresY + 14, checkboxX: 115, checkboxY: factoresY + 11 },
     { nombre: "Biologicos", marcado: datosFinales.factoresRiesgo.biologicos, x: 120, y: factoresY + 20, checkboxX: 115, checkboxY: factoresY + 17 },
-    
+
     // Columna 4
     { nombre: "Quimicos", marcado: datosFinales.factoresRiesgo.quimicos, x: 165, y: factoresY + 8, checkboxX: 160, checkboxY: factoresY + 5 },
     { nombre: "Posturas", marcado: datosFinales.factoresRiesgo.posturas, x: 165, y: factoresY + 14, checkboxX: 160, checkboxY: factoresY + 11 },
@@ -521,7 +622,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     if (factor.nombre !== "OTROS:") {
       // Dibujar el checkbox cuadrado (a la izquierda) - coordenadas individuales
       doc.rect(factor.checkboxX, factor.checkboxY, 4, 4);
-      
+
       // Si está marcado, dibujar la X
       if (factor.marcado) {
         doc.setFont("helvetica", "bold").setFontSize(12);
@@ -533,7 +634,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
         doc.setTextColor(0, 0, 0); // reset
       }
     }
-    
+
     // Dibujar el nombre del factor (a la derecha del checkbox)
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(factor.nombre, factor.x, factor.y);
@@ -543,7 +644,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   const otrosY = factoresY + 26;
   doc.setFont("helvetica", "normal").setFontSize(9);
 
-  
+
   // Si hay texto para "OTROS", mostrarlo
   if (datosFinales.factoresRiesgo.otros) {
     doc.text(datosFinales.factoresRiesgo.otros, 62, otrosY);
@@ -551,11 +652,11 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === NUEVA SECCIÓN: ANTECEDENTES PATOLÓGICOS PERSONALES ===
   const antecedentesPatologicosY = otrosY + 8;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("2- ANTECEDENTES PATOLÓGICOS PERSONALES:", 20, antecedentesPatologicosY);
-  
+
   // Instrucción
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Marque \"X\" si posee o tuvo alguna enfermedad diagnosticada con o sin tratamiento:", 20, antecedentesPatologicosY + 6);
@@ -573,7 +674,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     { nombre: "Fobias", marcado: datosFinales.patologias.fobias, x: 25, y: antecedentesPatologicosY + 46, checkboxX: 20, checkboxY: antecedentesPatologicosY + 43.5 },
     { nombre: "Alergias", marcado: datosFinales.patologias.alergias, x: 25, y: antecedentesPatologicosY + 51, checkboxX: 20, checkboxY: antecedentesPatologicosY + 48.5 },
     { nombre: "Asma", marcado: datosFinales.patologias.asma, x: 25, y: antecedentesPatologicosY + 56, checkboxX: 20, checkboxY: antecedentesPatologicosY + 53.5 },
-    
+
     // Columna 2
     { nombre: "Bronquitis", marcado: datosFinales.patologias.bronquitis, x: 80, y: antecedentesPatologicosY + 11, checkboxX: 75, checkboxY: antecedentesPatologicosY + 8.5 },
     { nombre: "Diabetes", marcado: datosFinales.patologias.diabetes, x: 80, y: antecedentesPatologicosY + 16, checkboxX: 75, checkboxY: antecedentesPatologicosY + 13.5 },
@@ -585,7 +686,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     { nombre: "Quemaduras", marcado: datosFinales.patologias.quemaduras, x: 80, y: antecedentesPatologicosY + 46, checkboxX: 75, checkboxY: antecedentesPatologicosY + 43.5 },
     { nombre: "Discopatías", marcado: datosFinales.patologias.discopatias, x: 80, y: antecedentesPatologicosY + 51, checkboxX: 75, checkboxY: antecedentesPatologicosY + 48.5 },
     { nombre: "Columna", marcado: datosFinales.patologias.columna, x: 80, y: antecedentesPatologicosY + 56, checkboxX: 75, checkboxY: antecedentesPatologicosY + 53.5 },
-    
+
     // Columna 3
     { nombre: "Convulsiones", marcado: datosFinales.patologias.convulsiones, x: 120, y: antecedentesPatologicosY + 11, checkboxX: 115, checkboxY: antecedentesPatologicosY + 8.5 },
     { nombre: "Gastritis", marcado: datosFinales.patologias.gastritis, x: 120, y: antecedentesPatologicosY + 16, checkboxX: 115, checkboxY: antecedentesPatologicosY + 13.5 },
@@ -597,7 +698,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     { nombre: "Enf Reumática", marcado: datosFinales.patologias.enfReumatica, x: 120, y: antecedentesPatologicosY + 46, checkboxX: 115, checkboxY: antecedentesPatologicosY + 43.5 },
     { nombre: "Enf Pulmonares", marcado: datosFinales.patologias.enfPulmonares, x: 120, y: antecedentesPatologicosY + 51, checkboxX: 115, checkboxY: antecedentesPatologicosY + 48.5 },
     { nombre: "Enf de la Piel", marcado: datosFinales.patologias.enfPiel, x: 120, y: antecedentesPatologicosY + 56, checkboxX: 115, checkboxY: antecedentesPatologicosY + 53.5 },
-    
+
     // Columna 4
     { nombre: "Tendinitis", marcado: datosFinales.patologias.tendinitis, x: 165, y: antecedentesPatologicosY + 11, checkboxX: 160, checkboxY: antecedentesPatologicosY + 8.5 },
     { nombre: "Onicomicosis", marcado: datosFinales.patologias.onicomicosis, x: 165, y: antecedentesPatologicosY + 16, checkboxX: 160, checkboxY: antecedentesPatologicosY + 13.5 },
@@ -614,7 +715,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   patologias.forEach(patologia => {
     // Dibujar el checkbox cuadrado (a la izquierda)
     doc.rect(patologia.checkboxX, patologia.checkboxY, 4, 3);
-    
+
     // Si está marcado, dibujar la X
     if (patologia.marcado) {
       doc.setFont("helvetica", "bold").setFontSize(11);
@@ -625,7 +726,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
       doc.text("X", xPatologiaX, xPatologiaY);
       doc.setTextColor(0, 0, 0); // reset
     }
-    
+
     // Dibujar el nombre de la patología (a la derecha del checkbox)
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(patologia.nombre, patologia.x, patologia.y);
@@ -633,12 +734,12 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === SECCIÓN "OTROS" Y "PATOLOGÍAS" ===
   const otrosPatologiasY = antecedentesPatologicosY + 62; // Después de la última fila de patologías
-  
+
   // Línea 1: "Otros: texto" en la misma línea
   doc.setFont("helvetica", "normal").setFontSize(9);
   const otrosTexto = "Otros: " + (datosFinales.factoresRiesgo.otros || "");
   doc.text(otrosTexto, 20, otrosPatologiasY);
-  
+
   // Línea 2: "Patologías: texto" en la misma línea
   const patologiasY = otrosPatologiasY + 4;
   const patologiasTexto = "Patologías: " + (datosFinales.patologias.otros || "");
@@ -646,15 +747,15 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === SECCIÓN "ALERGIAS A MEDICAMENTOS / ALIMENTOS" ===
   const alergiasY = patologiasY + 5;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Alergias a Medicamentos / Alimentos", 20, alergiasY);
-  
+
   // Checkboxes SI/NO en la misma línea
   const checkboxAlergiasSiX = 120;
   const checkboxAlergiasNoX = 135;
-  
+
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxAlergiasSiX, alergiasY);
   if (datosFinales.alergiasMedicamentos) {
@@ -693,11 +794,11 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === SECCIÓN "ANTECEDENTES INMUNOLÓGICOS / VACUNAS" ===
   const vacunasY = especifiqueAlergiasY + 8;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("3- ANTECEDENTES INMUNOLÓGICOS / VACUNAS:", 20, vacunasY);
-  
+
   // Instrucción
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Marque \"X\" si ha recibido las siguientes vacunas:", 20, vacunasY + 6);
@@ -709,13 +810,13 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     { nombre: "Fiebre Amarilla", marcado: datosFinales.vacunas.fiebreAmarilla, x: 25, y: vacunasY + 17, checkboxX: 20, checkboxY: vacunasY + 14.5 },
     { nombre: "Influenza", marcado: datosFinales.vacunas.influenza, x: 25, y: vacunasY + 23, checkboxX: 20, checkboxY: vacunasY + 20.5 },
     { nombre: "Hepatitis A", marcado: datosFinales.vacunas.hepatitisA, x: 25, y: vacunasY + 29, checkboxX: 20, checkboxY: vacunasY + 26.5 },
-    
+
     // Columna 2
     { nombre: "Hepatitis B", marcado: datosFinales.vacunas.hepatitisB, x: 80, y: vacunasY + 11, checkboxX: 75, checkboxY: vacunasY + 8.5 },
     { nombre: "Gripe/Influenza", marcado: datosFinales.vacunas.gripeInfluenza, x: 80, y: vacunasY + 17, checkboxX: 75, checkboxY: vacunasY + 14.5 },
     { nombre: "Neumococo", marcado: datosFinales.vacunas.neumococo, x: 80, y: vacunasY + 23, checkboxX: 75, checkboxY: vacunasY + 20.5 },
     { nombre: "Rabia", marcado: datosFinales.vacunas.rabia, x: 80, y: vacunasY + 29, checkboxX: 75, checkboxY: vacunasY + 26.5 },
-    
+
     // Columna 3
     { nombre: "Papiloma Humano", marcado: datosFinales.vacunas.papilomaHumano, x: 120, y: vacunasY + 11, checkboxX: 115, checkboxY: vacunasY + 8.5 },
     { nombre: "Covid-19", marcado: datosFinales.vacunas.covid19, x: 120, y: vacunasY + 17, checkboxX: 115, checkboxY: vacunasY + 14.5 }
@@ -725,7 +826,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   vacunas.forEach(vacuna => {
     // Dibujar el checkbox cuadrado (a la izquierda)
     doc.rect(vacuna.checkboxX, vacuna.checkboxY, 4, 3);
-    
+
     // Si está marcado, dibujar la X
     if (vacuna.marcado) {
       doc.setFont("helvetica", "bold").setFontSize(11);
@@ -736,7 +837,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
       doc.text("X", xVacunaX, xVacunaY);
       doc.setTextColor(0, 0, 0); // reset
     }
-    
+
     // Dibujar el nombre de la vacuna (a la derecha del checkbox)
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(vacuna.nombre, vacuna.x, vacuna.y);
@@ -747,12 +848,12 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     const dosisY = vacunasY + 17; // Misma línea que Covid-19
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text("N° de Dosis:", 140, dosisY);
-    
+
     // Número de dosis entre paréntesis
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text(datosFinales.numeroDosisCovid || "10", 160, dosisY);
-    
-  
+
+
   }
 
 
@@ -760,7 +861,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   // === PÁGINA 2 ===
   doc.addPage();
   numeroPagina++; // Incrementar contador de página
-  
+
   // === HEADER PÁGINA 2 ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
@@ -788,13 +889,13 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // Usar los datos de antecedentes quirúrgicos de datosFinales
   const antecedentesQuirurgicos = datosFinales.antecedentesQuirurgicos || [];
-  
+
   // Filtrar solo los registros que tienen al menos un campo con datos
-  const antecedentesConDatos = antecedentesQuirurgicos.filter(antecedente => 
-    antecedente.fecha || antecedente.hospital || antecedente.operacion || 
+  const antecedentesConDatos = antecedentesQuirurgicos.filter(antecedente =>
+    antecedente.fecha || antecedente.hospital || antecedente.operacion ||
     antecedente.diasHospitalizacion || antecedente.complicaciones
   );
-  
+
 
   // Encabezados de la tabla con coordenadas individuales
   const encabezados = [
@@ -814,11 +915,11 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   // Dibujar líneas de la tabla
   // Línea horizontal superior (arriba de los encabezados)
   doc.line(tablaInicioX, tablaInicioY - 2, tablaInicioX + tablaAncho, tablaInicioY - 2);
-  
+
   // Función para calcular la altura necesaria de una fila
   const calcularAlturaFila = (fila, colWidths, doc) => {
     let maxLineas = 1;
-    
+
     // Calcular líneas necesarias para cada campo
     const campos = [
       { texto: fila.fecha || "", ancho: colWidths[0] - 2 },
@@ -827,7 +928,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
       { texto: fila.diasHospitalizacion || "", ancho: colWidths[3] - 2 },
       { texto: fila.complicaciones || "", ancho: colWidths[4] - 2 }
     ];
-    
+
     campos.forEach(campo => {
       if (campo.texto) {
         const lineas = doc.getTextWidth(campo.texto) / campo.ancho;
@@ -835,7 +936,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
         maxLineas = Math.max(maxLineas, lineasNecesarias);
       }
     });
-    
+
     // Altura completamente dinámica basada en el contenido real + márgenes superior e inferior
     const alturaContenido = maxLineas * 4; // 4mm por línea
     const margenSuperior = 1.5; // 1.5mm margen superior (aumentado para mejor visualización)
@@ -850,7 +951,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   // Líneas horizontales para filas con alturas dinámicas
   let lineY = tablaInicioY + 2;
   doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea superior (debajo de encabezados)
-  
+
   // Dibujar líneas horizontales entre filas
   alturasFilas.forEach((alturaFila) => {
     lineY += alturaFila;
@@ -875,34 +976,34 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     const margenSuperior = 1.5;
     const rowY = currentY + margenSuperior + 2; // 1.5mm margen + 1mm para centrar el texto
     let colX = tablaInicioX + 2;
-    
+
     // Fecha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(fila.fecha || "", colX, rowY, { maxWidth: colWidths[0] - 2 });
     colX += colWidths[0];
-    
+
     // Hospital
     doc.text(fila.hospital || "", colX, rowY, { maxWidth: colWidths[1] - 2 });
     colX += colWidths[1];
-    
+
     // Operación
     doc.text(fila.operacion || "", colX, rowY, { maxWidth: colWidths[2] - 2 });
     colX += colWidths[2];
-    
+
     // Días Hospitalización
     doc.text(fila.diasHospitalizacion || "", colX, rowY, { maxWidth: colWidths[3] - 2 });
     colX += colWidths[3];
-    
+
     // Complicaciones
     doc.text(fila.complicaciones || "", colX, rowY, { maxWidth: colWidths[4] - 2 });
-    
+
     // Actualizar currentY para la siguiente fila
     currentY += alturaFila;
   });
 
   // === SECCIÓN HÁBITOS ===
   const habitosY = currentY + 10; // Espacio después de la tabla
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("5- HÁBITOS:", 15, habitosY);
@@ -920,7 +1021,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     }
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(")", x + 10, y);
-    
+
     // Checkbox NO - siempre con el mismo ancho
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text("NO (", x + 20, y);
@@ -972,11 +1073,11 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === SECCIÓN 6: ANTECEDENTES PATOLÓGICOS FAMILIARES ===
   const familiaresY = currentHabitY + 10;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("6- ANTECEDENTES PATOLÓGICOS FAMILIARES:", 15, familiaresY);
-  
+
   // Instrucción
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Detallar si el familiar posee alguna patología o enfermedad, si ha fallecido indique la causa:", 15, familiaresY + 6);
@@ -1014,15 +1115,15 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === SECCIÓN 7: CONDICIÓN MÉDICA ESPECIAL O DISCAPACIDAD ===
   const condicionY = currentFamiliarY + 10;
-  
+
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("7- ALGUNA CONDICION MÉDICA ESPECIAL O DISCAPACIDAD:", 15, condicionY);
-  
+
   // Instrucción
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("Si posee Carné de CONADIS, especifique:", 15, condicionY + 6);
-  
+
   // Campo de especificación
   const condicionEspecifiqueY = condicionY + 12;
   doc.setFont("helvetica", "normal").setFontSize(9);
@@ -1030,41 +1131,41 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
 
   // === DECLARACIÓN Y FIRMAS ===
   const declaracionFirmasY = condicionEspecifiqueY + 15; // Espacio después de la sección 7
-  
+
   // Texto de declaración centrado
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,", pageW / 2, declaracionFirmasY, { align: "center" });
   doc.text("ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.", pageW / 2, declaracionFirmasY + 4, { align: "center" });
-  
+
   // Fecha centrada
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("FECHA: " + datosFinales.fechaExamen, pageW / 2, declaracionFirmasY + 10, { align: "center" });
-  
+
   // Sección de firmas con más margen
   const firmasY = declaracionFirmasY + 23;
-  
+
   // Firma del paciente - CENTRADA con coordenadas individuales
   const firmaPacienteX = pageW / 4; // 1/4 del ancho de página
   const firmaPacienteTextoY = firmasY + 22; // Bajar el texto 40mm
   const firmaPacienteLineaY = firmaPacienteTextoY - 5; // Línea 5mm ANTES del texto
-  
+
   // Línea para firma del paciente (ARRIBA del texto)
   doc.line(firmaPacienteX - 30, firmaPacienteLineaY, firmaPacienteX + 30, firmaPacienteLineaY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("FIRMA DEL POSTULANTE", firmaPacienteX, firmaPacienteTextoY, { align: "center" });
-  
+
   // Firma del médico - CENTRADA con coordenadas individuales
   const firmaMedicoX = (pageW / 4) * 3; // 3/4 del ancho de página
   const firmaMedicoTextoY = firmasY + 22; // Bajar el texto 40mm
   const firmaMedicoLineaY = firmaMedicoTextoY - 5; // Línea 5mm ANTES del texto
-  
+
   // Línea para firma del médico (ARRIBA del texto)
   doc.line(firmaMedicoX - 30, firmaMedicoLineaY, firmaMedicoX + 30, firmaMedicoLineaY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("MÉDICO MEDICINA OCUPACIONAL", firmaMedicoX, firmaMedicoTextoY, { align: "center" });
-  
+
   // Agregar imágenes de firmas y huella
   try {
     // Firma del paciente - centrada
@@ -1075,7 +1176,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
       'PNG',
       firmaPacienteX - 30, firmasY - 8, 40, 25
     );
-    
+
     // Huella digital - centrada
     // Tamaño: 15mm ancho x 21mm alto
     // Posición: X = firmaPacienteX + 5, Y = firmasY - 8
@@ -1084,7 +1185,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
       'PNG',
       firmaPacienteX + 10, firmasY - 5, 15, 21
     );
-    
+
     // Firma/sello del médico - centrada
     // Tamaño: 40mm ancho x 25mm alto
     // Posición: X = firmaMedicoX - 12, Y = firmasY - 8

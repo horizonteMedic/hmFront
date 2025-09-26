@@ -11,7 +11,8 @@ export default function AntecedentesPatologicosTab({
   handleCheckBoxChange,
   handleChangeSimple,
   handleRadioButton,
-  handleRadioButtonBoolean
+  handleRadioButtonBoolean,
+  handleSearch
 }) {
   return (
     <div className="space-y-4">
@@ -20,7 +21,7 @@ export default function AntecedentesPatologicosTab({
 
         {/* Barra de información del paciente */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-4">
-          <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onChange={handleChangeNumber} labelWidth="70px" />
+          <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onKeyUp={handleSearch} onChange={handleChangeNumber} labelWidth="70px" />
           <InputTextOneLine label="Fecha" name="fechaExam" type="date" value={form?.fechaExam} onChange={handleChangeSimple} labelWidth="50px" />
           <InputTextOneLine label="Nombres" name="nombres" value={form?.nombres} disabled labelWidth="70px" />
           <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled labelWidth="40px" />

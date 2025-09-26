@@ -1,10 +1,11 @@
 import jsPDF from "jspdf";
 import drawColorBox from '../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 
 export default function FichaAntecedentePatologico(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
-  
+
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
@@ -21,51 +22,46 @@ export default function FichaAntecedentePatologico(data = {}) {
     puestoTrabajo: "INGENIERO DE SEGURIDAD",
     empresa: "MINERA BOROO MISQUICHILCA S.A.",
     contrata: "CONTRATA",
-    sede: "Trujillo-Pierola"
-  };
-
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? {
-    // Mapeo individual y editable para cada campo
-    apellidosNombres: data.nombres || data.apellidosNombres || datosPrueba.apellidosNombres,
-    fechaExamen: data.fechaExamen || data.fecha || datosPrueba.fechaExamen,
-    sexo: (() => {
-      const sexoValue = data.sexo || data.genero || datosPrueba.sexo;
-      if (sexoValue === "F" || sexoValue === "f") return "Femenino";
-      if (sexoValue === "M" || sexoValue === "m") return "Masculino";
-      return sexoValue || datosPrueba.sexo;
-    })(),
-    documentoIdentidad: data.dni || data.documentoIdentidad || data.cedula || datosPrueba.documentoIdentidad,
-    edad: data.edad || data.edadAnos || datosPrueba.edad,
-    fechaNacimiento: data.fechaNacimiento || data.fechaNac || data.nacimiento || datosPrueba.fechaNacimiento,
-    domicilio: data.domicilio || data.direccion || data.residencia || datosPrueba.domicilio,
-    areaTrabajo: data.areaTrabajo || data.area || data.departamento || datosPrueba.areaTrabajo,
-    puestoTrabajo: data.puestoTrabajo || data.puesto || data.cargo || datosPrueba.puestoTrabajo,
-    empresa: data.empresa || data.empresaNombre || data.organizacion || datosPrueba.empresa,
-    contrata: data.contrata || data.tipoContrato || data.contratista || datosPrueba.contrata,
-    antecedentesQuirurgicos: data.antecedentesQuirurgicos || data.quirurgicos || [],
-    numeroFicha: data.numeroFicha || data.ficha || data.numero || "99164",
-    sede: data.sede || data.ubicacion || data.ciudad || datosPrueba.sede,
-    // Mapeo de observaciones para cada sección
-    observacionesAntecedentes: data.observacionesAntecedentes || data.obsAntecedentes || data.observaciones1 || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    observacionesSintomas: data.observacionesSintomas || data.obsSintomas || data.observaciones2 || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    observacionesHabitos: data.observacionesHabitos || data.obsHabitos || data.observaciones3 || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    // Mapeo de datos de color
-    color: data.color || data.informacionSede?.color || 1,
-    codigoColor: data.codigoColor || data.informacionSede?.codigoColor || "#008f39",
-    textoColor: data.textoColor || data.informacionSede?.textoColor || "F"
-  } : {
-    ...datosPrueba,
+    sede: "Trujillo-Pierola",
     numeroFicha: "99164",
-    // Observaciones de prueba
+    // Mapeo de observaciones para cada sección
     observacionesAntecedentes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    observacionesSintomas: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    observacionesHabitos: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    // Datos de color de prueba
+    observacionesSintomas: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    observacionesHabitos: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    // Mapeo de datos de color
     color: 1,
     codigoColor: "#008f39",
     textoColor: "F"
   };
+  const datosReales = {
+    // Datos personales básicos
+    apellidosNombres: String((data.apellidos_apellidos_pa ?? "") + " " + (data.nombres_nombres_pa ?? "")).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaAntecedentesPatologicos_fecha_ap ?? ""), 
+    sexo: String(data.sexo_sexo_pa ?? ""),
+    documentoIdentidad: String(data.dni_cod_pa ?? ""),
+    edad: String(data.edad_edad ?? ""),
+    fechaNacimiento: formatearFechaCorta(data.fechanacimientopaciente_fecha_nacimiento_pa ?? ""), 
+    domicilio: String(data.direccionpaciente_direccion_pa ?? ""),
+    areaTrabajo: String(data.area_area_o ?? ""),
+    puestoTrabajo: String(data.cargo_cargo_de ?? ""),
+    empresa: String(data.empresa_razon_empresa ?? ""),
+    contrata: String(data.contrata_razon_contrata ?? ""),
+    sede: String(data.sede ?? ""),
+    numeroFicha: String(data.n_orden ?? ""),
+    
+    // Mapeo de observaciones para cada sección
+    observacionesAntecedentes: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
+    observacionesSintomas: String(data.otrosDescripcionIndicarEnfermedades_txtotros1ap ?? ""),
+    observacionesHabitos: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""), //revisar - verificar correspondencia
+    
+    // Mapeo de datos de color
+    color: Number(data.color ?? 0),
+    codigoColor: String(data.codigoColor ?? ""),
+    textoColor: String(data.textoColor ?? "")
+  };
+
+  // Usar datos reales si existen, sino usar datos de prueba
+  const datosFinales = data && data.n_orden ? datosReales : datosPrueba;
 
   // === HEADER ===
   doc.setFont("helvetica", "bold").setFontSize(12);
@@ -101,82 +97,82 @@ export default function FichaAntecedentePatologico(data = {}) {
   // === DATOS PERSONALES ===
   // Configuración individual y editable para cada campo
   const datosPersonales = [
-    { 
-      label: "Apellidos y Nombres:", 
-      value: datosFinales.apellidosNombres, 
-      x: 15, 
+    {
+      label: "Apellidos y Nombres:",
+      value: datosFinales.apellidosNombres,
+      x: 15,
       y: 40,
       labelOffset: 0,
       valueOffset: 35
     },
-    { 
-      label: "DNI:", 
-      value: datosFinales.documentoIdentidad, 
-      x: 130, 
+    {
+      label: "DNI:",
+      value: datosFinales.documentoIdentidad,
+      x: 130,
       y: 40,
       labelOffset: 0,
       valueOffset: 8
     },
-    { 
-      label: "Sexo:", 
-      value: datosFinales.sexo, 
-      x: 163, 
+    {
+      label: "Sexo:",
+      value: datosFinales.sexo,
+      x: 163,
       y: 45,
       labelOffset: 0,
       valueOffset: 10
     },
-    { 
-      label: "Edad:", 
-      value: datosFinales.edad, 
-      x: 130, 
+    {
+      label: "Edad:",
+      value: datosFinales.edad,
+      x: 130,
       y: 45,
       labelOffset: 0,
       valueOffset: 10
     },
-    { 
-      label: "Fecha Nac.:", 
-      value: datosFinales.fechaNacimiento, 
-      x: 163, 
+    {
+      label: "Fecha Nac.:",
+      value: datosFinales.fechaNacimiento,
+      x: 163,
       y: 40,
       labelOffset: 0,
       valueOffset: 20
     },
-    { 
-      label: "Domicilio:", 
-      value: datosFinales.domicilio, 
-      x: 15, 
+    {
+      label: "Domicilio:",
+      value: datosFinales.domicilio,
+      x: 15,
       y: 45,
       labelOffset: 0,
       valueOffset: 20
     },
-    { 
-      label: "Área de Trabajo:", 
-      value: datosFinales.areaTrabajo, 
-      x: 130, 
+    {
+      label: "Área de Trabajo:",
+      value: datosFinales.areaTrabajo,
+      x: 130,
       y: 50,
       labelOffset: 0,
       valueOffset: 27
     },
-    { 
-      label: "Puesto de Trabajo:", 
-      value: datosFinales.puestoTrabajo, 
-      x: 15, 
+    {
+      label: "Puesto de Trabajo:",
+      value: datosFinales.puestoTrabajo,
+      x: 15,
       y: 50,
       labelOffset: 0,
       valueOffset: 30
     },
-    { 
-      label: "Empresa:", 
-      value: datosFinales.empresa, 
-      x: 15, 
+    {
+      label: "Empresa:",
+      value: datosFinales.empresa,
+      x: 15,
       y: 55,
       labelOffset: 0,
       valueOffset: 20
     },
-    { 
-      label: "Contrata:", 
-      value: datosFinales.contrata, 
-      x: 15, 
+    {
+      label: "Contrata:",
+      value: datosFinales.contrata,
+      x: 15,
       y: 60,
       labelOffset: 0,
       valueOffset: 20
@@ -188,7 +184,7 @@ export default function FichaAntecedentePatologico(data = {}) {
     // Label
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(item.label, item.x + item.labelOffset, item.y);
-    
+
     // Valor
     doc.setFont("helvetica", "normal").setFontSize(9);
     doc.text(item.value || "", item.x + item.valueOffset, item.y);
@@ -200,13 +196,13 @@ export default function FichaAntecedentePatologico(data = {}) {
   const marcoFinY = 171;
   const marcoInicioX = 15;
   const marcoFinX = 200;
-  
+
   // Marco rectangular principal que encierra todo
   doc.rect(marcoInicioX, marcoInicioY, marcoFinX - marcoInicioX, marcoFinY - marcoInicioY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("1. Antecedentes Patologicos Personales:", 15, 70);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Marcar con una X las Enfermedades que han tenido o tienen:", 20, 75);
 
@@ -346,46 +342,46 @@ export default function FichaAntecedentePatologico(data = {}) {
       doc.setTextColor(0, 0, 0);   // reset
     }
   });
-// === SEVERIDAD Y FECHA ===
-doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("Fecha :", 80, 160);
-doc.setFont("helvetica", "normal").setFontSize(9);
-doc.text("15/12/2024", 95, 160);
-
-// LEVE
-doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("LEVE (   )", 120, 160);
-if (severidadCovid.leve) {
+  // === SEVERIDAD Y FECHA ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.setTextColor(255, 0, 0);
-  doc.text("X", 130.5, 160.2); // coordenada dentro del paréntesis
-  doc.setTextColor(0, 0, 0);
-}
+  doc.text("Fecha :", 80, 160);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("15/12/2024", 95, 160);
 
-// MODERADO
-doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("MODERADO (   )", 140, 160);
-if (severidadCovid.moderado) {
+  // LEVE
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.setTextColor(255, 0, 0);
-  doc.text("X",161, 160.2); // ajustar dentro del (   )
-  doc.setTextColor(0, 0, 0);
-}
+  doc.text("LEVE (   )", 120, 160);
+  if (severidadCovid.leve) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(255, 0, 0);
+    doc.text("X", 130.5, 160.2); // coordenada dentro del paréntesis
+    doc.setTextColor(0, 0, 0);
+  }
 
-// SEVERO
-doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("SEVERO (   )", 172, 160);
-if (severidadCovid.severo) {
+  // MODERADO
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.setTextColor(255, 0, 0);
-  doc.text("X", 187.4, 160.2); // dentro del (   )
-  doc.setTextColor(0, 0, 0);
-}
+  doc.text("MODERADO (   )", 140, 160);
+  if (severidadCovid.moderado) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(255, 0, 0);
+    doc.text("X", 161, 160.2); // ajustar dentro del (   )
+    doc.setTextColor(0, 0, 0);
+  }
+
+  // SEVERO
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("SEVERO (   )", 172, 160);
+  if (severidadCovid.severo) {
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.setTextColor(255, 0, 0);
+    doc.text("X", 187.4, 160.2); // dentro del (   )
+    doc.setTextColor(0, 0, 0);
+  }
 
   // === OBSERVACIONES ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Observaciones:", 20, 165);
-  
+
   // Texto de observaciones (comienza después de "Observaciones:" en la misma línea)
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observacionesAntecedentes, 45, 165, { maxWidth: 155 });
@@ -396,101 +392,101 @@ if (severidadCovid.severo) {
   const sintomasMarcoFinY = 230;
   const sintomasMarcoInicioX = 15;
   const sintomasMarcoFinX = 200;
-  
+
   // Marco rectangular para síntomas
   doc.rect(sintomasMarcoInicioX, sintomasMarcoInicioY, sintomasMarcoFinX - sintomasMarcoInicioX, sintomasMarcoFinY - sintomasMarcoInicioY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Indicar las enfermedades que ha tenido o tiene, con mucha frecuencia:", 20, 178);
 
-// Listas de síntomas por columna
-const sintomasCol1 = [
-  { texto: "Pérdida de Memoria", campo: "perdidaMemoria" },
-  { texto: "Preocupaciones o Angustia", campo: "preocupacionesAngustia" },
-  { texto: "Dolores Articulares y/o Huesos", campo: "doloresArticulares" },
-  { texto: "Aumento o Disminución de Peso", campo: "aumentoDisminucionPeso" },
-  { texto: "Dolor de Cabeza", campo: "dolorCabeza" },
-  { texto: "Diarrea", campo: "diarrea" },
-  { texto: "Agitación al Hacer Ejercicios", campo: "agitacionEjercicios" },
-  { texto: "Dolor Ocular", campo: "dolorOcular" },
-  { texto: "Dolor opresivo Tórax", campo: "dolorOpresivoTorax" },
-  { texto: "Hinchazón de pies o manos", campo: "hinchazonPiesManos" },
-];
+  // Listas de síntomas por columna
+  const sintomasCol1 = [
+    { texto: "Pérdida de Memoria", campo: "perdidaMemoria" },
+    { texto: "Preocupaciones o Angustia", campo: "preocupacionesAngustia" },
+    { texto: "Dolores Articulares y/o Huesos", campo: "doloresArticulares" },
+    { texto: "Aumento o Disminución de Peso", campo: "aumentoDisminucionPeso" },
+    { texto: "Dolor de Cabeza", campo: "dolorCabeza" },
+    { texto: "Diarrea", campo: "diarrea" },
+    { texto: "Agitación al Hacer Ejercicios", campo: "agitacionEjercicios" },
+    { texto: "Dolor Ocular", campo: "dolorOcular" },
+    { texto: "Dolor opresivo Tórax", campo: "dolorOpresivoTorax" },
+    { texto: "Hinchazón de pies o manos", campo: "hinchazonPiesManos" },
+  ];
 
-const sintomasCol2 = [
-  { texto: "Estreñimiento", campo: "estrenimiento" },
-  { texto: "Vómitos con Sangre", campo: "vomitosSangre" },
-  { texto: "Sangrado por Orina", campo: "sangradoOrina" },
-  { texto: "Tos con Sangre", campo: "tosSangre" },
-  { texto: "Coloración Amarilla de la Piel", campo: "coloracionAmarilla" },
-  { texto: "Indigestión Frecuente", campo: "indigestionFrecuente" },
-  { texto: "Insomnio", campo: "insomnio" },
-  { texto: "Lumbalgias o Dolor de Cintura", campo: "lumbalgias" },
-  { texto: "Mareos - Desmayos - Vértigo", campo: "mareosDesmayos" },
-  { texto: "Heces Negras", campo: "hecesNegras" },
-];
+  const sintomasCol2 = [
+    { texto: "Estreñimiento", campo: "estrenimiento" },
+    { texto: "Vómitos con Sangre", campo: "vomitosSangre" },
+    { texto: "Sangrado por Orina", campo: "sangradoOrina" },
+    { texto: "Tos con Sangre", campo: "tosSangre" },
+    { texto: "Coloración Amarilla de la Piel", campo: "coloracionAmarilla" },
+    { texto: "Indigestión Frecuente", campo: "indigestionFrecuente" },
+    { texto: "Insomnio", campo: "insomnio" },
+    { texto: "Lumbalgias o Dolor de Cintura", campo: "lumbalgias" },
+    { texto: "Mareos - Desmayos - Vértigo", campo: "mareosDesmayos" },
+    { texto: "Heces Negras", campo: "hecesNegras" },
+  ];
 
-const sintomasCol3 = [
-  { texto: "Orina con Dolor o Ardor", campo: "orinaDolorArdor" },
-  { texto: "Orina Involuntaria", campo: "orinaInvoluntaria" },
-  { texto: "Dolor de Oído", campo: "dolorOido" },
-  { texto: "Secreciones por el Oído", campo: "secrecionesOido" },
-  { texto: "Palpitaciones", campo: "palpitaciones" },
-  { texto: "Adormecimiento", campo: "adormecimiento" },
-  { texto: "Pesadillas", campo: "pesadillas" },
-  { texto: "Dolores Musculares", campo: "doloresMusculares" },
-  { texto: "Tos Crónica", campo: "tosCronica" },
-  { texto: "Sangrado por Encías", campo: "sangradoEncias" },
-];
+  const sintomasCol3 = [
+    { texto: "Orina con Dolor o Ardor", campo: "orinaDolorArdor" },
+    { texto: "Orina Involuntaria", campo: "orinaInvoluntaria" },
+    { texto: "Dolor de Oído", campo: "dolorOido" },
+    { texto: "Secreciones por el Oído", campo: "secrecionesOido" },
+    { texto: "Palpitaciones", campo: "palpitaciones" },
+    { texto: "Adormecimiento", campo: "adormecimiento" },
+    { texto: "Pesadillas", campo: "pesadillas" },
+    { texto: "Dolores Musculares", campo: "doloresMusculares" },
+    { texto: "Tos Crónica", campo: "tosCronica" },
+    { texto: "Sangrado por Encías", campo: "sangradoEncias" },
+  ];
 
-// Configuración de posiciones para síntomas
-const sintomasStartY = 183;
-const sintomasStepY = 4;
-const sintomasPosicionesX = [20, 80, 140]; // 3 columnas
+  // Configuración de posiciones para síntomas
+  const sintomasStartY = 183;
+  const sintomasStepY = 4;
+  const sintomasPosicionesX = [20, 80, 140]; // 3 columnas
 
-// Generar lista con coordenadas automáticas
-const sintomasFrecuentes = [];
-[sintomasCol1, sintomasCol2, sintomasCol3].forEach((col, colIndex) => {
-  col.forEach((sintoma, i) => {
-    sintomasFrecuentes.push({
-      ...sintoma,
-      x: sintomasPosicionesX[colIndex],
-      y: sintomasStartY + i * sintomasStepY
+  // Generar lista con coordenadas automáticas
+  const sintomasFrecuentes = [];
+  [sintomasCol1, sintomasCol2, sintomasCol3].forEach((col, colIndex) => {
+    col.forEach((sintoma, i) => {
+      sintomasFrecuentes.push({
+        ...sintoma,
+        x: sintomasPosicionesX[colIndex],
+        y: sintomasStartY + i * sintomasStepY
+      });
     });
   });
-});
 
-// Datos de prueba para algunos síntomas marcados
-const sintomasMarcados = {
-  dolorCabeza: true,
-  lumbalgias: true,
-  insomnio: true
-};
+  // Datos de prueba para algunos síntomas marcados
+  const sintomasMarcados = {
+    dolorCabeza: true,
+    lumbalgias: true,
+    insomnio: true
+  };
 
-// Renderizar en PDF
-sintomasFrecuentes.forEach(sintoma => {
-  // Texto
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(sintoma.texto, sintoma.x, sintoma.y);
+  // Renderizar en PDF
+  sintomasFrecuentes.forEach(sintoma => {
+    // Texto
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(sintoma.texto, sintoma.x, sintoma.y);
 
-  // Checkbox
-  const checkboxX = sintoma.x + 50;
-  const checkboxY = sintoma.y - 2;
-  doc.rect(checkboxX, checkboxY, 3, 3);
+    // Checkbox
+    const checkboxX = sintoma.x + 50;
+    const checkboxY = sintoma.y - 2;
+    doc.rect(checkboxX, checkboxY, 3, 3);
 
-  // Marcar si corresponde
-  if (sintomasMarcados[sintoma.campo]) {
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.setTextColor(255, 0, 0); // rojo
-    doc.text("X", checkboxX + 0.4, checkboxY + 2.73);
-    doc.setTextColor(0, 0, 0);   // reset
-  }
-});
+    // Marcar si corresponde
+    if (sintomasMarcados[sintoma.campo]) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.setTextColor(255, 0, 0); // rojo
+      doc.text("X", checkboxX + 0.4, checkboxY + 2.73);
+      doc.setTextColor(0, 0, 0);   // reset
+    }
+  });
 
   // === OBSERVACIONES SÍNTOMAS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Observaciones:", 20, 223);
-  
+
   // Texto de observaciones de síntomas
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observacionesSintomas, 45, 223, { maxWidth: 155 });
@@ -501,84 +497,92 @@ sintomasFrecuentes.forEach(sintoma => {
   const habitosMarcoFinY = 289;
   const habitosMarcoInicioX = 15;
   const habitosMarcoFinX = 200;
-  
+
   // Marco rectangular para hábitos nocivos
   doc.rect(habitosMarcoInicioX, habitosMarcoInicioY, habitosMarcoFinX - habitosMarcoInicioX, habitosMarcoFinY - habitosMarcoInicioY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Habitos Nosivos:", 20, 235.5);
 
-const habitosNosivosItems = [
-  { label: "Fumar", campo: "fumar", y: 240.5, subFields: [
-    { label: "Numeros de Cigarrillos", campo: "numeroCigarrillos", x: 80, y: 240.5, valorX: 125, valorY: 240.5 }
-  ]},
-  { label: "Licor", campo: "licor", y: 247.5, subFields: [
-    { label: "Tipo mas Frecuente", campo: "tipoLicor", x: 80, y: 247.5, valorX: 125, valorY: 247.5 },
-    { label: "Frecuencia", campo: "frecuenciaLicor", x: 80, y: 252.5, valorX: 125, valorY: 252.5 }
-  ]},
-  { label: "Drogas", campo: "drogas", y: 258.5, subFields: [
-    { label: "Tipo Probado o que Usa", campo: "tipoDrogas", x: 80, y: 258.5, valorX: 125, valorY: 258.5 },
-    { label: "Frecuencia", campo: "frecuenciaDrogas", x: 80, y: 263.5, valorX: 125, valorY: 263.5 }
-  ]},
-  { label: "Otros", campo: "otros", y: 269.5, subFields: [
-    { label: "Tipo", campo: "tipoOtros", x: 80, y: 269.5, valorX: 125, valorY: 269.5 },
-    { label: "Frecuencia", campo: "frecuenciaOtros", x: 80, y: 274.5, valorX: 125, valorY: 274.5 }
-  ]}
-];
+  const habitosNosivosItems = [
+    {
+      label: "Fumar", campo: "fumar", y: 240.5, subFields: [
+        { label: "Numeros de Cigarrillos", campo: "numeroCigarrillos", x: 80, y: 240.5, valorX: 125, valorY: 240.5 }
+      ]
+    },
+    {
+      label: "Licor", campo: "licor", y: 247.5, subFields: [
+        { label: "Tipo mas Frecuente", campo: "tipoLicor", x: 80, y: 247.5, valorX: 125, valorY: 247.5 },
+        { label: "Frecuencia", campo: "frecuenciaLicor", x: 80, y: 252.5, valorX: 125, valorY: 252.5 }
+      ]
+    },
+    {
+      label: "Drogas", campo: "drogas", y: 258.5, subFields: [
+        { label: "Tipo Probado o que Usa", campo: "tipoDrogas", x: 80, y: 258.5, valorX: 125, valorY: 258.5 },
+        { label: "Frecuencia", campo: "frecuenciaDrogas", x: 80, y: 263.5, valorX: 125, valorY: 263.5 }
+      ]
+    },
+    {
+      label: "Otros", campo: "otros", y: 269.5, subFields: [
+        { label: "Tipo", campo: "tipoOtros", x: 80, y: 269.5, valorX: 125, valorY: 269.5 },
+        { label: "Frecuencia", campo: "frecuenciaOtros", x: 80, y: 274.5, valorX: 125, valorY: 274.5 }
+      ]
+    }
+  ];
 
-habitosNosivosItems.forEach(item => {
-  const labelX = 20;
-  const checkboxSiX = labelX + 20;
-  const checkboxNoX = labelX + 40;
-  const checkboxY = item.y - 2.5;
+  habitosNosivosItems.forEach(item => {
+    const labelX = 20;
+    const checkboxSiX = labelX + 20;
+    const checkboxNoX = labelX + 40;
+    const checkboxY = item.y - 2.5;
 
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(item.label, labelX, item.y);
-
-  // SI con paréntesis de ancho fijo
-  doc.text("SI (", checkboxSiX, item.y);
-  if (habitosNosivosMarcados[item.campo]) {
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.setTextColor(255, 0, 0);
-    doc.text("X", checkboxSiX + 7.2, item.y + 0.5);
-    doc.setTextColor(0, 0, 0);
-  } else {
-    // Espacio vacío para mantener el ancho
-    doc.text(" ", checkboxSiX + 7.2, item.y + 0.5);
-  }
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(")", checkboxSiX + 12, item.y);
-
-  // NO con paréntesis de ancho fijo
-  doc.text("NO (", checkboxNoX, item.y);
-  if (!habitosNosivosMarcados[item.campo]) {
-    doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.setTextColor(255, 0, 0);
-    doc.text("X", checkboxNoX + 8, item.y + 0.5);
-    doc.setTextColor(0, 0, 0);
-  } else {
-    // Espacio vacío para mantener el ancho
-    doc.text(" ", checkboxNoX + 7.2, item.y + 0.5);
-  }
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(")", checkboxNoX + 12, item.y);
-
-  // Sub-campos (aquí ya NO hay líneas, solo texto de prueba)
-  item.subFields.forEach(subField => {
-    doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(subField.label + ":", subField.x, subField.y);
     doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(item.label, labelX, item.y);
 
-    // Mostrar el valor del campo correspondiente en sus coordenadas independientes
-    let valor = habitosNosivosMarcados[subField.campo] || "—";
-    doc.text(valor, subField.valorX, subField.valorY);
+    // SI con paréntesis de ancho fijo
+    doc.text("SI (", checkboxSiX, item.y);
+    if (habitosNosivosMarcados[item.campo]) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.setTextColor(255, 0, 0);
+      doc.text("X", checkboxSiX + 7.2, item.y + 0.5);
+      doc.setTextColor(0, 0, 0);
+    } else {
+      // Espacio vacío para mantener el ancho
+      doc.text(" ", checkboxSiX + 7.2, item.y + 0.5);
+    }
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(")", checkboxSiX + 12, item.y);
+
+    // NO con paréntesis de ancho fijo
+    doc.text("NO (", checkboxNoX, item.y);
+    if (!habitosNosivosMarcados[item.campo]) {
+      doc.setFont("helvetica", "bold").setFontSize(10);
+      doc.setTextColor(255, 0, 0);
+      doc.text("X", checkboxNoX + 8, item.y + 0.5);
+      doc.setTextColor(0, 0, 0);
+    } else {
+      // Espacio vacío para mantener el ancho
+      doc.text(" ", checkboxNoX + 7.2, item.y + 0.5);
+    }
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text(")", checkboxNoX + 12, item.y);
+
+    // Sub-campos (aquí ya NO hay líneas, solo texto de prueba)
+    item.subFields.forEach(subField => {
+      doc.setFont("helvetica", "bold").setFontSize(9);
+      doc.text(subField.label + ":", subField.x, subField.y);
+      doc.setFont("helvetica", "normal").setFontSize(9);
+
+      // Mostrar el valor del campo correspondiente en sus coordenadas independientes
+      let valor = habitosNosivosMarcados[subField.campo] || "—";
+      doc.text(valor, subField.valorX, subField.valorY);
+    });
   });
-});
 
   // === OBSERVACIONES HÁBITOS NOCIVOS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Observaciones:", 20, 280);
-  
+
   // Texto de observaciones de hábitos nocivos
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.observacionesHabitos, 45, 280, { maxWidth: 155 });
@@ -586,7 +590,7 @@ habitosNosivosItems.forEach(item => {
   // === PÁGINA 2 ===
   doc.addPage();
   numeroPagina++; // Incrementar contador de página
-  
+
   // === HEADER PÁGINA 2 ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
@@ -625,35 +629,35 @@ habitosNosivosItems.forEach(item => {
 
   // Datos de antecedentes quirúrgicos (dinámicos) - solo los que tienen datos
   const antecedentesQuirurgicos = datosFinales.antecedentesQuirurgicos || [
-    { 
-      fecha: "2022", 
-      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
-      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
-      diasHospitalizacion: "3", 
-      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+    {
+      fecha: "2022",
+      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
+      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
+      diasHospitalizacion: "3",
+      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
     },
-    { 
-      fecha: "2022", 
-      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
-      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
-      diasHospitalizacion: "3", 
-      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+    {
+      fecha: "2022",
+      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
+      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
+      diasHospitalizacion: "3",
+      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
     },
-    { 
-      fecha: "2022", 
-      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica", 
-      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal", 
-      diasHospitalizacion: "3", 
-      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones" 
+    {
+      fecha: "2022",
+      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
+      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
+      diasHospitalizacion: "3",
+      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
     }
   ];
-  
+
   // Filtrar solo los registros que tienen al menos un campo con datos
-  const antecedentesConDatos = antecedentesQuirurgicos.filter(antecedente => 
-    antecedente.fecha || antecedente.hospital || antecedente.operacion || 
+  const antecedentesConDatos = antecedentesQuirurgicos.filter(antecedente =>
+    antecedente.fecha || antecedente.hospital || antecedente.operacion ||
     antecedente.diasHospitalizacion || antecedente.complicaciones
   );
-  
+
 
   // Encabezados de la tabla con coordenadas individuales
   const encabezados = [
@@ -673,14 +677,14 @@ habitosNosivosItems.forEach(item => {
   // Dibujar líneas de la tabla
   // Línea horizontal superior (arriba de los encabezados)
   doc.line(tablaInicioX, tablaInicioY - 2, tablaInicioX + tablaAncho, tablaInicioY - 2);
-  
+
   // Líneas verticales - se dibujarán después de calcular las alturas dinámicas
 
 
   // Función para calcular la altura necesaria de una fila
   const calcularAlturaFila = (fila, colWidths, doc) => {
     let maxLineas = 1;
-    
+
     // Calcular líneas necesarias para cada campo
     const campos = [
       { texto: fila.fecha || "", ancho: colWidths[0] - 2 },
@@ -689,7 +693,7 @@ habitosNosivosItems.forEach(item => {
       { texto: fila.diasHospitalizacion || "", ancho: colWidths[3] - 2 },
       { texto: fila.complicaciones || "", ancho: colWidths[4] - 2 }
     ];
-    
+
     campos.forEach(campo => {
       if (campo.texto) {
         const lineas = doc.getTextWidth(campo.texto) / campo.ancho;
@@ -697,7 +701,7 @@ habitosNosivosItems.forEach(item => {
         maxLineas = Math.max(maxLineas, lineasNecesarias);
       }
     });
-    
+
     // Altura completamente dinámica basada en el contenido real + márgenes superior e inferior
     const alturaContenido = maxLineas * 4; // 4mm por línea
     const margenSuperior = 1.5; // 1.5mm margen superior (aumentado para mejor visualización)
@@ -712,7 +716,7 @@ habitosNosivosItems.forEach(item => {
   // Líneas horizontales para filas con alturas dinámicas
   let lineY = tablaInicioY + 2;
   doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea superior
-  
+
   alturasFilas.forEach((alturaFila, index) => {
     lineY += alturaFila;
     doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea inferior de cada fila
@@ -736,38 +740,38 @@ habitosNosivosItems.forEach(item => {
     const margenSuperior = 1.5;
     const rowY = currentY + margenSuperior + 2; // 1.5mm margen + 2mm para centrar el texto
     let colX = tablaInicioX + 2;
-    
+
     // Fecha
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(fila.fecha || "", colX, rowY, { maxWidth: colWidths[0] - 2 });
     colX += colWidths[0];
-    
+
     // Hospital
     doc.text(fila.hospital || "", colX, rowY, { maxWidth: colWidths[1] - 2 });
     colX += colWidths[1];
-    
+
     // Operación
     doc.text(fila.operacion || "", colX, rowY, { maxWidth: colWidths[2] - 2 });
     colX += colWidths[2];
-    
+
     // Días Hospitalización
     doc.text(fila.diasHospitalizacion || "", colX, rowY, { maxWidth: colWidths[3] - 2 });
     colX += colWidths[3];
-    
+
     // Complicaciones
     doc.text(fila.complicaciones || "", colX, rowY, { maxWidth: colWidths[4] - 2 });
-    
+
     currentY += alturaFila;
   });
 
   // === ANTECEDENTES DE REPRODUCCIÓN ===
   const reproY = tablaInicioY + 2 + alturaTotalFilas + 10;
-  
+
   // Datos de prueba para antecedentes de reproducción
   const datosReproduccion = {
     damas: {
       inicioMenstruacion: "12 años",
-      inicioVidaSexual: "18 años", 
+      inicioVidaSexual: "18 años",
       numeroParejas: "2",
       hijosVivos: "1",
       hijosFallecidos: "0",
@@ -776,7 +780,7 @@ habitosNosivosItems.forEach(item => {
     },
     varones: {
       hijosVivos: "2",
-      hijosFallecidos: "0", 
+      hijosFallecidos: "0",
       abortosParejas: "1",
       causasAbortos: "Complicaciones médicas"
     }
@@ -795,7 +799,7 @@ habitosNosivosItems.forEach(item => {
 
   // Dibujar marco rectangular
   doc.rect(marcoReproInicioX, marcoReproInicioY, marcoReproFinX - marcoReproInicioX, marcoReproFinY - marcoReproInicioY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Antecedentes de Reproducción:", 16, reproY);
 
@@ -838,41 +842,41 @@ habitosNosivosItems.forEach(item => {
 
   // === DECLARACIÓN Y FIRMAS ===
   const declaracionY = reproY + alturaTotalRepro + 8; // Más margen
-  
+
   // Texto de declaración centrado
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("TODA LA INFORMACIÓN QUE HE PROPORCIONADO AL SERVICIO DE MEDICINA OCUPACIONAL,", pageW / 2, declaracionY, { align: "center" });
   doc.text("ES VERDADERA NO HABIENDO OMITIDO NINGÚN DATO VOLUNTARIAMENTE.", pageW / 2, declaracionY + 4, { align: "center" });
-  
+
   // Fecha centrada
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("FECHA: " + datosFinales.fechaExamen, pageW / 2, declaracionY + 10, { align: "center" });
-  
+
   // Sección de firmas con más margen
   const firmasY = declaracionY + 23;
-  
+
   // Firma del paciente - CENTRADA con coordenadas individuales
   const firmaPacienteX = pageW / 4; // 1/4 del ancho de página
   const firmaPacienteTextoY = firmasY + 22; // Bajar el texto 40mm
   const firmaPacienteLineaY = firmaPacienteTextoY - 5; // Línea 5mm ANTES del texto
-  
+
   // Línea para firma del paciente (ARRIBA del texto)
   doc.line(firmaPacienteX - 30, firmaPacienteLineaY, firmaPacienteX + 30, firmaPacienteLineaY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("FIRMA DEL POSTULANTE", firmaPacienteX, firmaPacienteTextoY, { align: "center" });
-  
+
   // Firma del médico - CENTRADA con coordenadas individuales
   const firmaMedicoX = (pageW / 4) * 3; // 3/4 del ancho de página
   const firmaMedicoTextoY = firmasY + 22; // Bajar el texto 40mm
   const firmaMedicoLineaY = firmaMedicoTextoY - 5; // Línea 5mm ANTES del texto
-  
+
   // Línea para firma del médico (ARRIBA del texto)
   doc.line(firmaMedicoX - 30, firmaMedicoLineaY, firmaMedicoX + 30, firmaMedicoLineaY);
-  
+
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("MÉDICO MEDICINA OCUPACIONAL", firmaMedicoX, firmaMedicoTextoY, { align: "center" });
-  
+
   // Agregar imágenes de firmas y huella
   try {
     // Firma del paciente - centrada
@@ -883,7 +887,7 @@ habitosNosivosItems.forEach(item => {
       'PNG',
       firmaPacienteX - 30, firmasY - 8, 40, 25
     );
-    
+
     // Huella digital - centrada
     // Tamaño: 15mm ancho x 21mm alto
     // Posición: X = firmaPacienteX + 5, Y = firmasY - 8
@@ -892,7 +896,7 @@ habitosNosivosItems.forEach(item => {
       'PNG',
       firmaPacienteX + 10, firmasY - 5, 15, 21
     );
-    
+
     // Firma/sello del médico - centrada
     // Tamaño: 40mm ancho x 25mm alto
     // Posición: X = firmaMedicoX - 12, Y = firmasY - 8
@@ -923,4 +927,3 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-  

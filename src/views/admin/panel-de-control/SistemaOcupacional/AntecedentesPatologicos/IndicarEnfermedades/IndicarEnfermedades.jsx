@@ -150,8 +150,8 @@ export default function IndicarEnfermedades({
                     {form?.covid19 && (
                       <InputTextOneLine
                         label="N° Dosis"
-                        name="covidNumero"
-                        value={form?.covidNumero}
+                        name="dosisVacunas"
+                        value={form?.dosisVacunas}
                         onChange={handleChangeNumber}
                         labelWidth="50px"
                         className="ml-8"
@@ -264,7 +264,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " RON"
+                        tipoLicor: prev.tipoLicor + " RON,"
                       }))
                     }}>
                     RON
@@ -274,7 +274,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " CERVEZA"
+                        tipoLicor: prev.tipoLicor + " CERVEZA,"
                       }))
                     }}>
                     CERVEZA
@@ -284,7 +284,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " VINO"
+                        tipoLicor: prev.tipoLicor + " VINO,"
                       }))
                     }}>
                     VINO
@@ -294,7 +294,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " WISKY"
+                        tipoLicor: prev.tipoLicor + " WISKY,"
                       }))
                     }}>
                     WISKY
@@ -302,7 +302,6 @@ export default function IndicarEnfermedades({
                 </div>
               </div>
             </div>
-
             {/* Fila 2: Frecuencia */}
             <div className="w-full">
               <InputTextOneLine

@@ -56,10 +56,11 @@ export default function Antecedentes({
     setForm({
       ...form,
       antecedentes: [...form.antecedentes, {
-        fechaAntecedente: form.fechaAntecedente,
-        hospital: form.hospital,
+        codAntecedentesPatologicosQuirurgicos: 0,
+        fecha: form.fechaAntecedente,
+        hospitalOperacion: form.hospital,
         operacion: form.operacion,
-        diasHospitalizacion: form.diasHospitalizacion,
+        diasHospitalizado: form.diasHospitalizacion,
         complicaciones: form.complicaciones,
       }],
       fechaAntecedente: "",
@@ -166,10 +167,10 @@ export default function Antecedentes({
               ) : (
                 form.antecedentes.map((antecedente) => (
                   <tr key={antecedente.id} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.fechaAntecedente}</td>
-                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.hospital}</td>
+                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.fecha}</td>
+                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.hospitalOperacion}</td>
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.operacion}</td>
-                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.diasHospitalizacion}</td>
+                    <td className="px-4 py-3 border-r border-gray-200">{antecedente.diasHospitalizado}</td>
                     <td className="px-4 py-3">{antecedente.complicaciones}</td>
                   </tr>
                 ))
