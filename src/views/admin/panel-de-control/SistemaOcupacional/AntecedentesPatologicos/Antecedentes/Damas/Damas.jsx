@@ -10,7 +10,6 @@ export default function Damas({
     <div className="space-y-4">
       <div className="bg-white border border-gray-200 rounded-lg p-3">
         <h4 className="font-semibold mb-4">Antecedentes de Reproducción - Damas</h4>
-
         <div className="space-y-4">
           <div className="flex items-center gap-4">
             <InputTextOneLine

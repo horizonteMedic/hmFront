@@ -134,11 +134,91 @@ export default function AntecedentesPatologicos({ listas }) {
     especifiqueCalificacion: "",
     fechaCalificacion: today,
 
-
-
     //LATERAL TAB==========================================================================
+    vcOD: "",
+    vlOD: "",
+    vcOI: "",
+    vlOI: "",
+    vcCorregidaOD: "",
+    vlCorregidaOD: "",
+    vcCorregidaOI: "",
+    vlCorregidaOI: "",
+    vclrs: "",
+    vb: "",
+    rp: "",
+    enfermedadesOculares: "",
+    dosisVacunas: "",
+    cocaina: "",
+    marihuana: "",
 
     //SEGUNDA TAB==========================================================================
+
+    perdidaMemoria: false,
+    preocupacionesAngustia: false,
+    doloresArticulares: false,
+    aumentoDisminucionPeso: false,
+    dolorCabeza: false,
+    diarrea: false,
+    agitacionEjercicios: false,
+    dolorOcular: false,
+    dolorOpresivoTorax: false,
+    hinchazonPiesManos: false,
+
+    estrenimiento: false,
+    vomitosSangre: false,
+    sangradoOrina: false,
+    tosSangre: false,
+    coloracionAmarilla: false,
+    indigestionFrecuente: false,
+    insomnio: false,
+    lumbalgias: false,
+    mareosDesmayos: false,
+    hecesNegras: false,
+
+    orinaDolorArdor: false,
+    orinaInvoluntaria: false,
+    dolorOido: false,
+    secrecionesOido: false,
+    palpitaciones: false,
+    adormecimientos: false,
+    pesadillasFrecuentes: false,
+    doloresMusculares: false,
+    tosCronica: false,
+    sangradoEncias: false,
+
+    antitetanica: false,
+    fiebreAmarilla: false,
+    influenza: false,
+    hepatitisA: false,
+    hepatitisB: false,
+
+    gripeInfluenza: false,
+    neumococo: false,
+    rabia: false,
+    papilomaHumano: false,
+
+    covidNumero: "",
+
+    drogas: false,
+    tipoDrogas: "",
+    frecuenciaDrogas: "",
+
+    licor: false,
+    tipoLicor: "",
+    frecuenciaLicor: "",
+
+    fumar: false,
+    numeroCigarrillos: "",
+
+    otros: false,
+    tipoOtros: "",
+    frecuenciaOtros: "",
+
+    medicamentos: false,
+    especifiqueMedicamentos: "",
+
+    actividadFisica: false,
+    especifiqueActividadFisica: "",
 
     //TERCERA TAB==========================================================================
     fechaAntecedente: "",
@@ -147,6 +227,26 @@ export default function AntecedentesPatologicos({ listas }) {
     diasHospitalizacion: "",
     complicaciones: "",
     antecedentes: [],
+
+    hijosVivos: "",
+    hijosFallecidos: "",
+    abortosParejas: "",
+    causasAbortos: "",
+
+    inicioMenstruacion: "",
+    inicioVidaSexual: "",
+    parejasSexuales: "",
+    hijosVivosDamas: "",
+    hijosFallecidosDamas: "",
+    abortosDamas: "",
+    causasAbortosDamas: "",
+
+    padre: "",
+    madre: "",
+    hermanos: "",
+    hijos: "",
+    esposaConyuge: "",
+    carnetConadis: "",
 
     // Médico que Certifica //BUSCADOR
     nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
@@ -254,12 +354,10 @@ export default function AntecedentesPatologicos({ listas }) {
               })}
             </div>
           </div>
-
           {/* Columna 2 - Pequeña con formulario ocular */}
           <div className="lg:col-span-1">
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 h-full">
               <h5 className="font-semibold mb-3">Examen Ocular</h5>
-
               {/* Sin Corregir */}
               <div className="mb-4">
                 <h6 className="font-semibold mb-2">Sin Corregir</h6>
@@ -269,11 +367,11 @@ export default function AntecedentesPatologicos({ listas }) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="vcOD" value={form?.vcOD || "00"} onChange={() => { }} />
+                        <InputTextOneLine name="vcOD" value={form?.vcOD} disabled />
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="vlOD" value={form?.vlOD || ""} onChange={() => { }} />
+                        <InputTextOneLine name="vlOD" value={form?.vlOD} disabled />
                       </div>
                     </div>
                   </div>
@@ -282,17 +380,16 @@ export default function AntecedentesPatologicos({ listas }) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="vcOI" value={form?.vcOI || "00"} onChange={() => { }} />
+                        <InputTextOneLine name="vcOI" value={form?.vcOI} disabled />
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="vlOI" value={form?.vlOI || ""} onChange={() => { }} />
+                        <InputTextOneLine name="vlOI" value={form?.vlOI} disabled />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
               {/* Corregida */}
               <div className="mb-4">
                 <h6 className="font-semibold mb-2">Corregida</h6>
@@ -302,11 +399,11 @@ export default function AntecedentesPatologicos({ listas }) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="vcCorregidaOD" value={form?.vcCorregidaOD || "00"} onChange={() => { }} />
+                        <InputTextOneLine name="vcCorregidaOD" value={form?.vcCorregidaOD} disabled />
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="vlCorregidaOD" value={form?.vlCorregidaOD || "00"} onChange={() => { }} />
+                        <InputTextOneLine name="vlCorregidaOD" value={form?.vlCorregidaOD} disabled />
                       </div>
                     </div>
                   </div>
@@ -315,51 +412,37 @@ export default function AntecedentesPatologicos({ listas }) {
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="vcCorregidaOI" value={form?.vcCorregidaOI || "00"} onChange={() => { }} />
+                        <InputTextOneLine name="vcCorregidaOI" value={form?.vcCorregidaOI} disabled />
                       </div>
                       <div className="flex items-center gap-2">
                         <span className="min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="vlCorregidaOI" value={form?.vlCorregidaOI || "00"} onChange={() => { }} />
+                        <InputTextOneLine name="vlCorregidaOI" value={form?.vlCorregidaOI} disabled />
                       </div>
                     </div>
                   </div>
                 </div>
-
                 {/* Campos adicionales de Corregida */}
                 <div className="mt-3 space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="min-w-[50px]">V.Clrs:</span>
-                    <InputTextOneLine name="vclrs" value={form?.vclrs || "NORMAL"} onChange={() => { }} />
+                    <InputTextOneLine name="vclrs" value={form?.vclrs} disabled />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="min-w-[50px]">V.B.:</span>
-                    <InputTextOneLine name="vb" value={form?.vb || "00"} onChange={() => { }} />
+                    <InputTextOneLine name="vb" value={form?.vb} disabled />
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="min-w-[50px]">R.P.:</span>
-                    <InputTextOneLine name="rp" value={form?.rp || ""} onChange={() => { }} />
+                    <InputTextOneLine name="rp" value={form?.rp} disabled />
                   </div>
                 </div>
               </div>
-
               {/* Campos de texto */}
               <div className="space-y-3">
-                <div>
-                  <label className="block font-semibold mb-1">Enfermedades Oculares:</label>
-                  <InputTextArea rows={1} name="enfermedadesOculares" value={form?.enfermedadesOculares || ""} onChange={() => { }} />
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">Dosis de vacunas:</label>
-                  <InputTextArea rows={1} name="dosisVacunas" value={form?.dosisVacunas || ""} onChange={() => { }} />
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">Cocaína:</label>
-                  <InputTextArea rows={1} name="cocaina" value={form?.cocaina || ""} onChange={() => { }} />
-                </div>
-                <div>
-                  <label className="block font-semibold mb-1">Marihuana:</label>
-                  <InputTextArea rows={1} name="marihuana" value={form?.marihuana || ""} onChange={() => { }} />
-                </div>
+                <InputTextArea rows={3} label="Enfermedades Oculares" name="enfermedadesOculares" value={form?.enfermedadesOculares} disabled />
+                <InputTextOneLine label="Dosis de vacunas" labelOnTop name="dosisVacunas" value={form?.dosisVacunas} disabled />
+                <InputTextOneLine label="Cocaína" labelOnTop name="cocaina" value={form?.cocaina} disabled />
+                <InputTextOneLine label="Marihuana" labelOnTop name="marihuana" value={form?.marihuana} disabled />
               </div>
             </div>
           </div>

@@ -4,11 +4,10 @@ import { faPlus, faTrash, faMale, faFemale, faBroom, faPrint, faUserPlus } from 
 import Varones from "./Varones/Varones";
 import Damas from "./Damas/Damas";
 import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
-import MedicoSearch from "./MedicoSearch";
+import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
 import { useState } from "react";
 import Swal from "sweetalert2";
 
-// Componente Antecedentes Quirúrgicos
 export default function Antecedentes({
   form,
   setForm,
@@ -125,7 +124,6 @@ export default function Antecedentes({
               value={form.complicaciones}
               onChange={handleChange}
             />
-
           </div>
 
           <div className="flex items-center gap-4">
@@ -185,7 +183,6 @@ export default function Antecedentes({
       {!form?.boroo && (
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold mb-4">Antecedentes de Reproducción</h4>
-
           {/* Tab Navigation */}
           <nav className="flex bg-white border-b border-gray-200 mb-4">
             {tabsReproduccion.map((tab) => (

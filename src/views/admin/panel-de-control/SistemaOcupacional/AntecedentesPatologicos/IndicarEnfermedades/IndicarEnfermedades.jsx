@@ -1,7 +1,5 @@
-/* eslint-disable react/prop-types */
 import { InputCheckbox, InputTextOneLine, InputsBooleanRadioGroup } from "../../../../../components/reusableComponents/ResusableComponents";
 
-// Componente Indicar Enfermedades
 export default function IndicarEnfermedades({
   form,
   setForm,
@@ -423,13 +421,19 @@ export default function IndicarEnfermedades({
                   <InputsBooleanRadioGroup
                     name="medicamentos"
                     value={form?.medicamentos}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => {
+                      if (value == false)
+                        setForm(prev => ({ ...prev, especifiqueMedicamentos: "" }));
+                      handleRadioButtonBoolean(e, value)
+                    }
+                    }
                   />
                 </div>
                 <InputTextOneLine
                   label="Especifique"
                   name="especifiqueMedicamentos"
                   value={form?.especifiqueMedicamentos}
+                  disabled={!form?.medicamentos}
                   onChange={handleChange}
                 />
               </div>
@@ -441,13 +445,18 @@ export default function IndicarEnfermedades({
                   <InputsBooleanRadioGroup
                     name="actividadFisica"
                     value={form?.actividadFisica}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={(e, value) => {
+                      if (value == false)
+                        setForm(prev => ({ ...prev, especifiqueActividadFisica: "" }));
+                      handleRadioButtonBoolean(e, value)
+                    }}
                   />
                 </div>
                 <InputTextOneLine
                   label="Especifique"
                   name="especifiqueActividadFisica"
                   value={form?.especifiqueActividadFisica}
+                  disabled={!form?.actividadFisica}
                   onChange={handleChange}
                 />
               </div>
