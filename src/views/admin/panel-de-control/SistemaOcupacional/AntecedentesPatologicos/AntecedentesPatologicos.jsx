@@ -2,17 +2,154 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faStethoscope, faFileMedical } from "@fortawesome/free-solid-svg-icons";
 import AntecedentesPatologicosTab from "./AntecedentesPatologicosTab/AntecedentesPatologicosTab"
 import IndicarEnfermedades from "./IndicarEnfermedades/IndicarEnfermedades"
+import Antecedentes from "./Antecedentes/Antecedentes";
 import { InputTextOneLine, InputTextArea } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
 import { useState } from "react";
+import { getToday } from "../../../../utils/helpers";
+
+const today = getToday();
 
 // Tab Normal de Antecedentes Patológicos
-export default function Normal() {
+export default function AntecedentesPatologicos({ listas }) {
+  const { MedicosMulti } = listas;
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
   const initialFormState = {
+    //PRIMERA TAB==========================================================================
     norden: "",
+    fechaExam: today,
+    nombres: "",
+    sexo: "",
+    edad: "",
+    boroo: false,
+
+    covid19: false,
+    fechaCovid: today,
+    severidadCovid: "",
+
+    alergias: false,
+    amigdalitisCronica: false,
+    arritmiasCardiacas: false,
+    asma: false,
+    bocio: false,
+    bronconeumonia: false,
+    bronquitisRepeticion: false,
+    cariesGingivitis: false,
+    colecistitis: false,
+    dermatitis: false,
+    diabetes: false,
+    disenteria: false,
+    enfCorazon: false,
+    enfOculares: false,
+    epilepsiaConvulsiones: false,
+    faringitisCronica: false,
+    fiebreMalta: false,
+    fiebreTifoidea: false,
+    fiebreReumatica: false,
+    forunculosis: false,
+
+    gastritisCronica: false,
+    gonorrea: false,
+    gota: false,
+    hemorroides: false,
+    hepatitis: false,
+    hernias: false,
+    hipertensionArterial: false,
+    infUrinariasRepetidas: false,
+    intoxicaciones: false,
+    insuficienciaCardiaca: false,
+    insuficienciaCoronariaCronica: false,
+    insuficienciaRenalCronica: false,
+    litiasisUrinaria: false,
+    meningitis: false,
+    neuritisRepeticion: false,
+    otitisMedia: false,
+    presionAltaBaja: false,
+    paludismoMalaria: false,
+    parasitosisIntestinal: false,
+    parotiditis: false,
+
+    pleuresia: false,
+    plumbismo: false,
+    poliomielitis: false,
+    portadorMarcapaso: false,
+    protesisCardiacasValvulares: false,
+    resfriosFrecuentes: false,
+    reumatismoRepeticion: false,
+    sarampion: false,
+    sifilis: false,
+    silicosis: false,
+    sinusitisCronica: false,
+    tosConvulsiva: false,
+    trastornosNerviosos: false,
+    traumatismoEncefalocraneano: false,
+    tuberculosis: false,
+    tumoresQuistes: false,
+    ulceraPeptica: false,
+    varicela: false,
+    varices: false,
+    varicocele: false,
+
+    ima: false,
+    acv: false,
+    tbc: false,
+    ets: false,
+    vih: false,
+    fobias: false,
+
+    neoplasias: false,
+    quemaduras: false,
+    discopatias: false,
+    columna: false,
+    enfPsiquiatricas: false,
+
+    enfReumatica: false,
+    enfPulmonares: false,
+    enfPiel: false,
+    tendinitis: false,
+    onicomicosis: false,
+    fracturas: false,
+    anemia: false,
+    obesidad: false,
+    dislipidemia: false,
+    amputacion: false,
+    sordera: false,
+    migrana: false,
+
+    otrasPatologias: "",
+    detallesTratamiento: "",
+    alergiasMedicamentos: false,
+    especifiqueAlergias: "",
+
+    accidenteTrabajo: false,
+    fechaAccidente: today,
+    tiempoPerdido: false,
+    especifiqueTiempoPerdido: "",
+    tipoIncapacidad: "",
+
+    enfermedadProfesional: false,
+    evaluadoCalificacion: false,
+    especifiqueCalificacion: "",
+    fechaCalificacion: today,
+
+
+
+    //LATERAL TAB==========================================================================
+
+    //SEGUNDA TAB==========================================================================
+
+    //TERCERA TAB==========================================================================
+    fechaAntecedente: "",
+    hospital: "",
+    operacion: "",
+    diasHospitalizacion: "",
+    complicaciones: "",
+    antecedentes: [],
+
+    // Médico que Certifica //BUSCADOR
+    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
   };
   const {
     form,
@@ -42,13 +179,30 @@ export default function Normal() {
       icon: faStethoscope,
       component: IndicarEnfermedades,
     },
-    // {
-    //   id: 2,
-    //   name: "Antecedentes",
-    //   icon: faFileMedical,
-    //   component: Antecedentes,
-    // },
+    {
+      id: 2,
+      name: "Antecedentes",
+      icon: faFileMedical,
+      component: Antecedentes,
+    },
   ];
+
+  const handleSave = () => {
+    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      // PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+
 
   return (
     <div className="space-y-4">
@@ -89,6 +243,11 @@ export default function Normal() {
                       handleCheckBoxChange={handleCheckBoxChange}
                       handleChangeSimple={handleChangeSimple}
                       handleRadioButtonBoolean={handleRadioButtonBoolean}
+                      MedicosMulti={MedicosMulti}
+                      handleSave={handleSave}
+                      handleSearch={handleSearch}
+                      handlePrint={handlePrint}
+                      handleClear={handleClear}
                     />
                   )
                 );
