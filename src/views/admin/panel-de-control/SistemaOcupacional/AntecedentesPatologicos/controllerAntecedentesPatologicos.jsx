@@ -37,7 +37,7 @@ export const GetInfoServicio = async (
             nombres: res.nombres_nombres_pa,
             sexo: res.sexo_sexo_pa,
             edad: res.edad_edad + " años",
-            boroo: false, //revisar
+            boroo: res.esBoro ?? false,
 
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
             vcOD: res.visioncercasincorregirod_v_cerca_s_od,
@@ -82,7 +82,7 @@ export const GetInfoServicioEditar = async (
             nombres: res.nombres_nombres_pa,
             sexo: res.sexo_sexo_pa,
             edad: res.edad_edad + " años",
-            boroo: false, //revisar
+            boroo: res.esBoro ?? false,
 
             covid19: res.covid_chkcovid,
             fechaCovid: res.fechaCovid_fechacovid,
