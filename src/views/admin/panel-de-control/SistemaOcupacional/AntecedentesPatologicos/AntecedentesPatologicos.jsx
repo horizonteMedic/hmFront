@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faStethoscope, faFileMedical } from "@fortawesome/free-solid-svg-icons";
 import AntecedentesPatologicosTab from "./AntecedentesPatologicosTab/AntecedentesPatologicosTab"
-// import Antecedentes from "./Normal/Antecedentes/Antecedentes";
+import IndicarEnfermedades from "./IndicarEnfermedades/IndicarEnfermedades"
 import { InputTextOneLine, InputTextArea } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { useForm } from "../../../../hooks/useForm";
@@ -36,12 +36,12 @@ export default function Normal() {
       icon: faUser,
       component: AntecedentesPatologicosTab,
     },
-    // {
-    //   id: 1,
-    //   name: "Indicar Enfermedades",
-    //   icon: faStethoscope,
-    //   component: IndicarEnfermedades,
-    // },
+    {
+      id: 1,
+      name: "Indicar Enfermedades",
+      icon: faStethoscope,
+      component: IndicarEnfermedades,
+    },
     // {
     //   id: 2,
     //   name: "Antecedentes",
