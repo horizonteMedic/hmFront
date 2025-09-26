@@ -52,12 +52,121 @@ export default function FichaAntecedentePatologico(data = {}) {
     // Mapeo de observaciones para cada sección
     observacionesAntecedentes: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
     observacionesSintomas: String(data.otrosDescripcionIndicarEnfermedades_txtotros1ap ?? ""),
-    observacionesHabitos: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""), //revisar - verificar correspondencia
+    observacionesHabitos: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
     
     // Mapeo de datos de color
     color: Number(data.color ?? 0),
     codigoColor: String(data.codigoColor ?? ""),
-    textoColor: String(data.textoColor ?? "")
+    textoColor: String(data.textoColor ?? ""),
+    
+    // Mapeo completo de enfermedades/antecedentes patológicos
+    enfermedades: {
+      alergias: Boolean(data.alergias_chk1 ?? false),
+      amigdalitisCronica: Boolean(data.amigdalitisCronica_chk2 ?? false),
+      arritmiasCardiacas: Boolean(data.arritmiasCardiacas_chk3 ?? false),
+      asma: Boolean(data.asma_chk4 ?? false),
+      bocio: Boolean(data.bocio_chk5 ?? false),
+      bronconeumonia: Boolean(data.bronconeumonia_chk6 ?? false),
+      bronquitisRepeticion: Boolean(data.bronquitisARepeticion_chk7 ?? false),
+      cariesGingivitis: Boolean(data.cariesGingivitis_chk8 ?? false),
+      colecistitis: Boolean(data.colecistitis_chk9 ?? false),
+      dermatitis: Boolean(data.dermatitis_chk10 ?? false),
+      diabetes: Boolean(data.diabetes_chk11 ?? false),
+      disenteria: Boolean(data.disenteria_chk12 ?? false),
+      enfermedadesCorazon: Boolean(data.enfermedadesCorazon_chk13 ?? false),
+      enfermedadesOculares: Boolean(data.enfermedadesOculares_chk14 ?? false),
+      epilepsiaConvulsiones: Boolean(data.epilsepsiaOConvulsiones_chk15 ?? false),
+      faringitisCronica: Boolean(data.faringitisCronica_chk16 ?? false),
+      fiebreAlta: Boolean(data.fiebreAlta_chk17 ?? false),
+      fiebreTifoidea: Boolean(data.fiebreTifoidea_chk18 ?? false),
+      fiebreReumatica: Boolean(data.fiebreReumatica_chk19 ?? false),
+      forunculosis: Boolean(data.forunculosis_chk20 ?? false),
+      covid19: Boolean(data.covid_chkcovid ?? false)
+    },
+    
+    // Mapeo de síntomas frecuentes
+    sintomas: {
+      perdidaMemoria: Boolean(data.perdidaMemoria_chk21 ?? false),
+      preocupacionesAngustia: Boolean(data.preocupacionesAngustia_chk22 ?? false),
+      doloresArticulares: Boolean(data.doloresArticulares_chk23 ?? false),
+      aumentoDisminucionPeso: Boolean(data.aumentoDisminucionPeso_chk24 ?? false),
+      dolorCabeza: Boolean(data.dolorCabeza_chk25 ?? false),
+      diarrea: Boolean(data.diarrea_chk26 ?? false),
+      agitacionEjercicios: Boolean(data.agitacionEjercicios_chk27 ?? false),
+      dolorOcular: Boolean(data.dolorOcular_chk28 ?? false),
+      dolorOpresivoTorax: Boolean(data.dolorOpresivoTorax_chk29 ?? false),
+      hinchazonPiesManos: Boolean(data.hinchazonPiesManos_chk30 ?? false),
+      estrenimiento: Boolean(data.estrenimiento_chk31 ?? false),
+      vomitosSangre: Boolean(data.vomitosSangre_chk32 ?? false),
+      sangradoOrina: Boolean(data.sangradoOrina_chk33 ?? false),
+      tosSangre: Boolean(data.tosSangre_chk34 ?? false),
+      coloracionAmarilla: Boolean(data.coloracionAmarilla_chk35 ?? false),
+      indigestionFrecuente: Boolean(data.indigestionFrecuente_chk36 ?? false),
+      insomnio: Boolean(data.insomnio_chk37 ?? false),
+      lumbalgias: Boolean(data.lumbalgias_chk38 ?? false),
+      mareosDesmayos: Boolean(data.mareosDesmayos_chk39 ?? false),
+      hecesNegras: Boolean(data.hecesNegras_chk40 ?? false),
+      orinaDolorArdor: Boolean(data.orinaDolorArdor_chk41 ?? false),
+      orinaInvoluntaria: Boolean(data.orinaInvoluntaria_chk42 ?? false),
+      dolorOido: Boolean(data.dolorOido_chk43 ?? false),
+      secrecionesOido: Boolean(data.secrecionesOido_chk44 ?? false),
+      palpitaciones: Boolean(data.palpitaciones_chk45 ?? false),
+      adormecimiento: Boolean(data.adormecimiento_chk46 ?? false),
+      pesadillas: Boolean(data.pesadillas_chk47 ?? false),
+      doloresMusculares: Boolean(data.doloresMusculares_chk48 ?? false),
+      tosCronica: Boolean(data.tosCronica_chk49 ?? false),
+      sangradoEncias: Boolean(data.sangradoEncias_chk50 ?? false)
+    },
+    
+    // Mapeo de hábitos nocivos
+    habitos: {
+      fumar: Boolean(data.fumarSi_rbfumarsi ?? false),
+      numeroCigarrillos: String(data.numeroCigarrillos_txtncigarrillos ?? ""),
+      licor: Boolean(data.licorSi_rblicorsi ?? false),
+      tipoLicor: String(data.licorTipoFrecuente_txtlicortipofrecuente ?? ""),
+      frecuenciaLicor: String(data.licorFrecuencia_txtlicorfrecuencia ?? ""),
+      drogas: Boolean(data.drogasSi_rbdrogassi ?? false),
+      tipoDrogas: String(data.drogasTipo_txtdrogastipo ?? ""),
+      frecuenciaDrogas: String(data.drogasFrecuencia_txtdrogasfrecuencia ?? ""),
+      otros: Boolean(data.otrosHabitNosivos_chk51 ?? false),
+      tipoOtros: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
+      frecuenciaOtros: String(data.otrosFrecuenciaIndicarEnfermedades_txtotros ?? "")
+    },
+    
+    // Mapeo de antecedentes quirúrgicos
+    antecedentesQuirurgicos: (data.antecedentesPatologicosQuirurjicos || []).map(item => ({
+      fecha: String(item.fechaAntecedentesPatologicosQuirurgicos ?? ""),
+      hospital: String(item.hospitalOperacion ?? ""),
+      operacion: String(item.operacion ?? ""),
+      diasHospitalizacion: String(item.diasHospitalizado ?? ""),
+      complicaciones: String(item.complicaciones ?? "")
+    })),
+    
+    // Mapeo de antecedentes de reproducción
+    antecedentesReproduccion: {
+      damas: {
+        inicioMenstruacion: String(data.inicioMenstruacion_txtiniciomestruacion ?? ""),
+        inicioVidaSexual: String(data.inicioVidaSexual_txtiniciovidasexual ?? ""),
+        numeroParejas: String(data.numeroParejas_txtnumeroparejas ?? ""),
+        hijosVivos: String(data.hijosVivos_txthijosvivos ?? ""),
+        hijosFallecidos: String(data.hijosFallecidos_txthijosfallecidos ?? ""),
+        numeroAbortos: String(data.numeroAbortos_txtnumeroabortos ?? ""),
+        causasAbortos: String(data.causasAbortos_txtcausasabortos ?? "")
+      },
+      varones: {
+        hijosVivos: String(data.hijosVivosVarones_txthijosvivosvarones ?? ""),
+        hijosFallecidos: String(data.hijosFallecidosVarones_txthijosfallecidosvarones ?? ""),
+        abortosParejas: String(data.abortosParejas_txtabortosparejas ?? ""),
+        causasAbortos: String(data.causasAbortosVarones_txtcausasabortosvarones ?? "")
+      }
+    },
+    
+    // Mapeo de severidad COVID-19
+    severidadCovid: {
+      leve: Boolean(data.covidLeve_chkcovidleve ?? false),
+      moderado: Boolean(data.covidModerado_chkcovidmoderado ?? false),
+      severo: Boolean(data.covidSevero_chkcovidsevero ?? false)
+    }
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
@@ -294,34 +403,10 @@ export default function FichaAntecedentePatologico(data = {}) {
     });
   });
 
-  // Datos de prueba para algunas enfermedades marcadas
-  const enfermedadesMarcadas = {
-    hepatitis: true,
-    meningitis: true,
-    covid19: true
-  };
-
-  // Datos de severidad para COVID 19
-  const severidadCovid = {
-    leve: true,
-    moderado: true,
-    severo: true
-  };
-
-  // Datos de prueba para hábitos nocivos
-  const habitosNosivosMarcados = {
-    fumar: true,
-    numeroCigarrillos: "20 cigarrillos diarios",
-    licor: true,
-    tipoLicor: "Cerveza y Whisky",
-    frecuenciaLicor: "3-4 veces por semana",
-    drogas: true,
-    tipoDrogas: "Marihuana y Cocaína",
-    frecuenciaDrogas: "Ocasionalmente (fines de semana)",
-    otros: false,
-    tipoOtros: "—",
-    frecuenciaOtros: "—"
-  };
+  // Usar datos reales mapeados
+  const enfermedadesMarcadas = datosFinales.enfermedades || {};
+  const severidadCovid = datosFinales.severidadCovid || {};
+  const habitosNosivosMarcados = datosFinales.habitos || {};
 
   // Renderizar en PDF
   enfermedades.forEach(enfermedad => {
@@ -346,7 +431,7 @@ export default function FichaAntecedentePatologico(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Fecha :", 80, 160);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("15/12/2024", 95, 160);
+  doc.text(datosFinales.fechaExamen || "", 95, 160);
 
   // LEVE
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -456,12 +541,8 @@ export default function FichaAntecedentePatologico(data = {}) {
     });
   });
 
-  // Datos de prueba para algunos síntomas marcados
-  const sintomasMarcados = {
-    dolorCabeza: true,
-    lumbalgias: true,
-    insomnio: true
-  };
+  // Usar datos reales de síntomas
+  const sintomasMarcados = datosFinales.sintomas || {};
 
   // Renderizar en PDF
   sintomasFrecuentes.forEach(sintoma => {
@@ -574,7 +655,8 @@ export default function FichaAntecedentePatologico(data = {}) {
       doc.setFont("helvetica", "normal").setFontSize(9);
 
       // Mostrar el valor del campo correspondiente en sus coordenadas independientes
-      let valor = habitosNosivosMarcados[subField.campo] || "—";
+      let valor = habitosNosivosMarcados[subField.campo] || "";
+      if (!valor) valor = "—";
       doc.text(valor, subField.valorX, subField.valorY);
     });
   });
@@ -627,30 +709,8 @@ export default function FichaAntecedentePatologico(data = {}) {
   const colWidths = [20, 55, 40, 17, 53]; // Anchos de columnas ajustados
   const tablaAncho = colWidths.reduce((a, b) => a + b, 0);
 
-  // Datos de antecedentes quirúrgicos (dinámicos) - solo los que tienen datos
-  const antecedentesQuirurgicos = datosFinales.antecedentesQuirurgicos || [
-    {
-      fecha: "2022",
-      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
-      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
-      diasHospitalizacion: "3",
-      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
-    },
-    {
-      fecha: "2022",
-      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
-      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
-      diasHospitalizacion: "3",
-      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
-    },
-    {
-      fecha: "2022",
-      hospital: "Hospital Nacional de Especialidades Médicas de Alta Complejidad y Centro de Investigación Clínica",
-      operacion: "Apendicectomía laparoscópica con resección de apéndice cecal y anastomosis ileocecal",
-      diasHospitalizacion: "3",
-      complicaciones: "Ninguna complicación postoperatoria, evolución satisfactoria, alta médica sin observaciones"
-    }
-  ];
+  // Usar datos reales de antecedentes quirúrgicos
+  const antecedentesQuirurgicos = datosFinales.antecedentesQuirurgicos || [];
 
   // Filtrar solo los registros que tienen al menos un campo con datos
   const antecedentesConDatos = antecedentesQuirurgicos.filter(antecedente =>
@@ -767,22 +827,22 @@ export default function FichaAntecedentePatologico(data = {}) {
   // === ANTECEDENTES DE REPRODUCCIÓN ===
   const reproY = tablaInicioY + 2 + alturaTotalFilas + 10;
 
-  // Datos de prueba para antecedentes de reproducción
-  const datosReproduccion = {
+  // Usar datos reales de antecedentes de reproducción
+  const datosReproduccion = datosFinales.antecedentesReproduccion || {
     damas: {
-      inicioMenstruacion: "12 años",
-      inicioVidaSexual: "18 años",
-      numeroParejas: "2",
-      hijosVivos: "1",
-      hijosFallecidos: "0",
-      numeroAbortos: "1",
-      causasAbortos: "Complicaciones médicas"
+      inicioMenstruacion: "",
+      inicioVidaSexual: "",
+      numeroParejas: "",
+      hijosVivos: "",
+      hijosFallecidos: "",
+      numeroAbortos: "",
+      causasAbortos: ""
     },
     varones: {
-      hijosVivos: "2",
-      hijosFallecidos: "0",
-      abortosParejas: "1",
-      causasAbortos: "Complicaciones médicas"
+      hijosVivos: "",
+      hijosFallecidos: "",
+      abortosParejas: "",
+      causasAbortos: ""
     }
   };
 
