@@ -106,6 +106,7 @@ export const GetInfoServicioEditar = async (
             faringitisCronica: res.faringitisCronica_chk16,
             fiebreMalta: res.fiebreMalta_chk17,
             fiebreTifoidea: res.fiebreTifoidea_chk18,
+            tifoidea: res.tifoideaBoro_tifoidea,
             vertigos: res.vertigosBoro_vertigos,
             fiebreReumatica: res.fiebreReumatica_chk19,
             forunculosis: res.foruncolois_chk20,
@@ -212,7 +213,6 @@ export const GetInfoServicioEditar = async (
             marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
 
             //SEGUNDA TAB==========================================================================
-
             perdidaMemoria: res.perdidaMemoria_chk61,
             preocupacionesAngustia: res.preocupacionesAngustia_chk62,
             doloresArticulares: res.doloresArticulares_chk63,
@@ -279,7 +279,15 @@ export const GetInfoServicioEditar = async (
             especifiqueActividadFisica: res.actividadFisicaEspecifiqueBoro_activ_fisic_detal,
 
             //TERCERA TAB==========================================================================
-            antecedentes: res.antecedentesPatologicosQuirurjicos || [],
+            // antecedentes: res.antecedentesPatologicosQuirurjicos || [],
+            antecedentes: res.antecedentesPatologicosQuirurjicos.map((item) => ({
+                codAntecedentesPatologicosQuirurgicos: item.codigoAntecedentesPatologicosQuirurgicos,
+                fecha: item.fechaAntecedentesPatologicosQuirurgicos,
+                hospitalOperacion: item.hospitalOperacion,
+                operacion: item.operacion,
+                diasHospitalizado: item.diasHospitalizado,
+                complicaciones: item.complicaciones,
+            })) || [],
 
             hijosVivos: res.hijosVivosVarones_txtvhijosvivos,
             hijosFallecidos: res.hijosFallecidosVarones_txtvhijosfallecidos,
@@ -453,7 +461,7 @@ export const SubmitDataService = async (
         vihBoro: form.vih,
         fobiasBoro: form.fobias,
         vertigosBoro: form.vertigos,
-        tifoideaBoro: form.fiebreTifoidea,
+        tifoideaBoro: form.tifoidea,
         neoplasiasBoro: form.neoplasias,
         quemadurasBoro: form.quemaduras,
         discopatiasBoro: form.discopatias,

@@ -165,8 +165,8 @@ export default function Antecedentes({
                   </td>
                 </tr>
               ) : (
-                form.antecedentes.map((antecedente) => (
-                  <tr key={antecedente.id} className="border-b border-gray-200 hover:bg-gray-50">
+                form.antecedentes.map((antecedente,index) => (
+                  <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.fecha}</td>
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.hospitalOperacion}</td>
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.operacion}</td>

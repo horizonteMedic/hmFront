@@ -264,7 +264,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " RON,"
+                        tipoLicor: (prev.tipoLicor??"") + " RON,"
                       }))
                     }}>
                     RON
@@ -274,7 +274,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " CERVEZA,"
+                        tipoLicor: (prev.tipoLicor??"") + " CERVEZA,"
                       }))
                     }}>
                     CERVEZA
@@ -284,7 +284,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " VINO,"
+                        tipoLicor: (prev.tipoLicor??"") + " VINO,"
                       }))
                     }}>
                     VINO
@@ -294,7 +294,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: prev.tipoLicor + " WISKY,"
+                        tipoLicor: (prev.tipoLicor??"") + " WISKY,"
                       }))
                     }}>
                     WISKY

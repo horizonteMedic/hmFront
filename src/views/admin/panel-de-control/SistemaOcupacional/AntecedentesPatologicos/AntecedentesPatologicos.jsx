@@ -10,7 +10,7 @@ import { useState } from "react";
 import { getToday } from "../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerAntecedentesPatologicos";
 
-const tabla="antecedentes_patologicos"
+const tabla = "antecedentes_patologicos"
 const today = getToday();
 
 // Tab Normal de Antecedentes Patológicos
@@ -104,6 +104,7 @@ export default function AntecedentesPatologicos({ listas }) {
     vih: false,
     fobias: false,
 
+    tifoidea: false,
     neoplasias: false,
     quemaduras: false,
     discopatias: false,

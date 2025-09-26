@@ -5,6 +5,7 @@ import { InputTextOneLine, InputTextArea } from "../../../../../../components/re
 export default function Damas({
   form,
   handleChangeNumber,
+  handleChange,
 }) {
   return (
     <div className="space-y-4">
@@ -48,7 +49,7 @@ export default function Damas({
               label="Número de hijos vivos"
               name="hijosVivosDamas"
               value={form?.hijosVivosDamas}
-              onChange={(e) => handleSiNoChange("hijosVivosDamas", e, e.target.value)}
+              onChange={handleChangeNumber}
               labelWidth="250px"
             />
           </div>
@@ -57,7 +58,7 @@ export default function Damas({
               label="Número de hijos fallecidos"
               name="hijosFallecidosDamas"
               value={form?.hijosFallecidosDamas}
-              onChange={(e) => handleSiNoChange("hijosFallecidosDamas", e, e.target.value)}
+              onChange={handleChangeNumber}
               labelWidth="250px"
             />
           </div>
@@ -66,7 +67,7 @@ export default function Damas({
               label="Número de Abortos"
               name="abortosDamas"
               value={form?.abortosDamas}
-              onChange={(e) => handleSiNoChange("abortosDamas", e, e.target.value)}
+              onChange={handleChangeNumber}
               labelWidth="250px"
             />
           </div>
@@ -75,7 +76,7 @@ export default function Damas({
             rows={4}
             name="causasAbortosDamas"
             value={form?.causasAbortosDamas}
-            onChange={(e) => handleSiNoChange("causasAbortosDamas", e, e.target.value)}
+            onChange={handleChange}
           />
         </div>
       </div>

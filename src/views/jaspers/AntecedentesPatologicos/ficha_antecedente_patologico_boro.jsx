@@ -1,7 +1,8 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
+import { getSign } from "../../utils/helpers";
 
-export default function FichaAntecedentePatologicoBoro(data = {}) {
+export default function ficha_antecedente_patologico_boro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -161,6 +162,7 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
   };
   const datosReales = {
     // Datos personales básicos
+    numeroFicha: String(data.n_orden ?? ""),
     apellidosNombres: String((data.apellidos_apellidos_pa ?? "") + " " + (data.nombres_nombres_pa ?? "")).trim(),
     fechaExamen: formatearFechaCorta(data.fechaAntecedentesPatologicos_fecha_ap ?? ""),
     sexo: String(data.sexo_sexo_pa ?? ""),
@@ -1171,8 +1173,9 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     // Firma del paciente - centrada
     // Tamaño: 40mm ancho x 25mm alto
     // Posición: X = firmaPacienteX - 12, Y = firmasY - 8
+    const firmaPaciente = getSign(data, "FIRMAP")
     doc.addImage(
-      '/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png',
+      firmaPaciente,
       'PNG',
       firmaPacienteX - 30, firmasY - 8, 40, 25
     );
@@ -1180,8 +1183,9 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     // Huella digital - centrada
     // Tamaño: 15mm ancho x 21mm alto
     // Posición: X = firmaPacienteX + 5, Y = firmasY - 8
+    const huellaDigital = getSign(data, "HUELLA")
     doc.addImage(
-      '/img/firmas_sellos_prueba/HUELLA_DIGITAL.png',
+      huellaDigital,
       'PNG',
       firmaPacienteX + 10, firmasY - 5, 15, 21
     );
@@ -1189,8 +1193,9 @@ export default function FichaAntecedentePatologicoBoro(data = {}) {
     // Firma/sello del médico - centrada
     // Tamaño: 40mm ancho x 25mm alto
     // Posición: X = firmaMedicoX - 12, Y = firmasY - 8
+    const firmaMedico = getSign(data, "SELLOFIRMA")
     doc.addImage(
-      '/img/firmas_sellos_prueba/firma_sello.png',
+      firmaMedico,
       'PNG',
       firmaMedicoX - 19, firmasY - 8, 40, 25
     );

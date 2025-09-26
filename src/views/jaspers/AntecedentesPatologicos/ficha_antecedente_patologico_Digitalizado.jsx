@@ -1,8 +1,9 @@
 import jsPDF from "jspdf";
 import drawColorBox from '../components/ColorBox.jsx';
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { getSign } from "../../utils/helpers.js";
 
-export default function FichaAntecedentePatologico(data = {}) {
+export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -68,7 +69,7 @@ export default function FichaAntecedentePatologico(data = {}) {
       bocio: Boolean(data.bocio_chk5 ?? false),
       bronconeumonia: Boolean(data.bronconeumonia_chk6 ?? false),
       bronquitisRepeticion: Boolean(data.bronquitisARepeticion_chk7 ?? false),
-      cariesGingivitis: Boolean(data.cariesGingivitis_chk8 ?? false),
+      cariesGingivitis: Boolean(data.cariesOGingivitis_chk8 ?? false),
       colecistitis: Boolean(data.colecistitis_chk9 ?? false),
       dermatitis: Boolean(data.dermatitis_chk10 ?? false),
       diabetes: Boolean(data.diabetes_chk11 ?? false),
@@ -77,45 +78,86 @@ export default function FichaAntecedentePatologico(data = {}) {
       enfermedadesOculares: Boolean(data.enfermedadesOculares_chk14 ?? false),
       epilepsiaConvulsiones: Boolean(data.epilsepsiaOConvulsiones_chk15 ?? false),
       faringitisCronica: Boolean(data.faringitisCronica_chk16 ?? false),
-      fiebreAlta: Boolean(data.fiebreAlta_chk17 ?? false),
+      fiebreAlta: Boolean(data.fiebreMalta_chk17 ?? false),
       fiebreTifoidea: Boolean(data.fiebreTifoidea_chk18 ?? false),
       fiebreReumatica: Boolean(data.fiebreReumatica_chk19 ?? false),
-      forunculosis: Boolean(data.forunculosis_chk20 ?? false),
+      forunculosis: Boolean(data.foruncolois_chk20 ?? false),
+      // Enfermedades adicionales del JSON que no estaban mapeadas
+      gastritisCronica: Boolean(data.gastritisCronica_chk21 ?? false),
+      gonorrea: Boolean(data.gonorrea_chk22 ?? false),
+      gota: Boolean(data.gota_chk23 ?? false),
+      hemorroides: Boolean(data.hemorroides_chk24 ?? false),
+      hepatitis: Boolean(data.hepatitis_chk25 ?? false),
+      hernias: Boolean(data.hernias_chk26 ?? false),
+      hipertencionArterial: Boolean(data.hipertencionArterial_chk27 ?? false),
+      urinariasRepetidas: Boolean(data.urinariasRepetidas_chk28 ?? false),
+      intoxicaciones: Boolean(data.intoxicaciones_chk29 ?? false),
+      insuficienciaCardiaca: Boolean(data.insuficienciaCardiaca_chk30 ?? false),
+      insuficienciaCoronariaCronica: Boolean(data.insuficienciaCoronariaCronica_chk31 ?? false),
+      insuficienciaRenalCronica: Boolean(data.insuficienciaRenalCronica_chk32 ?? false),
+      litiasisUrinaria: Boolean(data.litiasisUrinaria_chk33 ?? false),
+      meningitis: Boolean(data.meningitis_chk34 ?? false),
+      neuritis: Boolean(data.neuritis_chk35 ?? false),
+      otitisMedia: Boolean(data.otitisMedia_chk36 ?? false),
+      presionAltaOBaja: Boolean(data.presionAltaOBaja_chk37 ?? false),
+      paludismoOMalaria: Boolean(data.paludismoOMalaria_chk38 ?? false),
+      parasitosisIntestinal: Boolean(data.parasitosisIntestinal_chk39 ?? false),
+      paratiditis: Boolean(data.paratiditis_chk40 ?? false),
+      pleuresia: Boolean(data.pleuresia_chk41 ?? false),
+      plumbismo: Boolean(data.plumbismo_chk42 ?? false),
+      poliomielitis: Boolean(data.poliomielitis_chk43 ?? false),
+      portadorMarcapasos: Boolean(data.portadorMarcapasos_chk44 ?? false),
+      protesisCardiacasValvulares: Boolean(data.protesisCardiacasValvulares_chk45 ?? false),
+      resfriosFrecuentes: Boolean(data.resfriosFrecuentes_chk46 ?? false),
+      reumatismo: Boolean(data.reumatismo_chk47 ?? false),
+      sarampion: Boolean(data.sarampion_chk48 ?? false),
+      sifilis: Boolean(data.sifilis_chk49 ?? false),
+      silicosis: Boolean(data.silicosis_chk50 ?? false),
+      sinusitisCronica: Boolean(data.sinusitisCronica_chk51 ?? false),
+      tosConvulsiva: Boolean(data.tosConvulsiva_chk52 ?? false),
+      transtornosNerviosos: Boolean(data.transtornosNerviosos_chk53 ?? false),
+      traumatismoEncefalocraneano: Boolean(data.traumatismoEncefalocraneano_chk54 ?? false),
+      tuberculosis: Boolean(data.tuberculosis_chk55 ?? false),
+      tumoresQuistes: Boolean(data.tumoresQuistes_chk56 ?? false),
+      ulceraPeptica: Boolean(data.ulceraPeptica_chk57 ?? false),
+      varicela: Boolean(data.varicela_chk58 ?? false),
+      varices: Boolean(data.varices_chk59 ?? false),
+      varicocele: Boolean(data.varicocele_chk60 ?? false),
       covid19: Boolean(data.covid_chkcovid ?? false)
     },
     
     // Mapeo de síntomas frecuentes
     sintomas: {
-      perdidaMemoria: Boolean(data.perdidaMemoria_chk21 ?? false),
-      preocupacionesAngustia: Boolean(data.preocupacionesAngustia_chk22 ?? false),
-      doloresArticulares: Boolean(data.doloresArticulares_chk23 ?? false),
-      aumentoDisminucionPeso: Boolean(data.aumentoDisminucionPeso_chk24 ?? false),
-      dolorCabeza: Boolean(data.dolorCabeza_chk25 ?? false),
-      diarrea: Boolean(data.diarrea_chk26 ?? false),
-      agitacionEjercicios: Boolean(data.agitacionEjercicios_chk27 ?? false),
-      dolorOcular: Boolean(data.dolorOcular_chk28 ?? false),
-      dolorOpresivoTorax: Boolean(data.dolorOpresivoTorax_chk29 ?? false),
-      hinchazonPiesManos: Boolean(data.hinchazonPiesManos_chk30 ?? false),
-      estrenimiento: Boolean(data.estrenimiento_chk31 ?? false),
-      vomitosSangre: Boolean(data.vomitosSangre_chk32 ?? false),
-      sangradoOrina: Boolean(data.sangradoOrina_chk33 ?? false),
-      tosSangre: Boolean(data.tosSangre_chk34 ?? false),
-      coloracionAmarilla: Boolean(data.coloracionAmarilla_chk35 ?? false),
-      indigestionFrecuente: Boolean(data.indigestionFrecuente_chk36 ?? false),
-      insomnio: Boolean(data.insomnio_chk37 ?? false),
-      lumbalgias: Boolean(data.lumbalgias_chk38 ?? false),
-      mareosDesmayos: Boolean(data.mareosDesmayos_chk39 ?? false),
-      hecesNegras: Boolean(data.hecesNegras_chk40 ?? false),
-      orinaDolorArdor: Boolean(data.orinaDolorArdor_chk41 ?? false),
-      orinaInvoluntaria: Boolean(data.orinaInvoluntaria_chk42 ?? false),
-      dolorOido: Boolean(data.dolorOido_chk43 ?? false),
-      secrecionesOido: Boolean(data.secrecionesOido_chk44 ?? false),
-      palpitaciones: Boolean(data.palpitaciones_chk45 ?? false),
-      adormecimiento: Boolean(data.adormecimiento_chk46 ?? false),
-      pesadillas: Boolean(data.pesadillas_chk47 ?? false),
-      doloresMusculares: Boolean(data.doloresMusculares_chk48 ?? false),
-      tosCronica: Boolean(data.tosCronica_chk49 ?? false),
-      sangradoEncias: Boolean(data.sangradoEncias_chk50 ?? false)
+      perdidaMemoria: Boolean(data.perdidaMemoria_chk61 ?? false),
+      preocupacionesAngustia: Boolean(data.preocupacionesAngustia_chk62 ?? false),
+      doloresArticulares: Boolean(data.doloresArticulares_chk63 ?? false),
+      aumentoDisminucionPeso: Boolean(data.aumentoDisminucionPeso_chk64 ?? false),
+      dolorCabeza: Boolean(data.dolorCabeza_chk65 ?? false),
+      diarrea: Boolean(data.diarrea_chk66 ?? false),
+      agitacionEjercicios: Boolean(data.agitacionEjercicio_chk67 ?? false),
+      dolorOcular: Boolean(data.dolorOcular_chk68 ?? false),
+      dolorOpresivoTorax: Boolean(data.dolorOpresivoTorax_chk69 ?? false),
+      hinchazonPiesManos: Boolean(data.hinchazonPiesOManos_chk70 ?? false),
+      estrenimiento: Boolean(data.estrenimiento_chk71 ?? false),
+      vomitosSangre: Boolean(data.vomitosConSangre_chk72 ?? false),
+      sangradoOrina: Boolean(data.sangradoPorOrina_chk73 ?? false),
+      tosSangre: Boolean(data.tosConSangre_chk74 ?? false),
+      coloracionAmarilla: Boolean(data.coloracionAmarrillaPiel_chk75 ?? false),
+      indigestionFrecuente: Boolean(data.indigestionFrecuente_chk76 ?? false),
+      insomnio: Boolean(data.insomnio_chk77 ?? false),
+      lumbalgias: Boolean(data.lumbalgiaODolorCintura_chk78 ?? false),
+      mareosDesmayos: Boolean(data.mareos_chk79 ?? false),
+      hecesNegras: Boolean(data.hecesNegras_chk80 ?? false),
+      orinaDolorArdor: Boolean(data.orinaConDolor_chk81 ?? false),
+      orinaInvoluntaria: Boolean(data.orinaInvoluntaria_chk82 ?? false),
+      dolorOido: Boolean(data.dolorOido_chk83 ?? false),
+      secrecionesOido: Boolean(data.secrecionesOido_chk84 ?? false),
+      palpitaciones: Boolean(data.palpitaciones_chk85 ?? false),
+      adormecimiento: Boolean(data.adormecimientos_chk86 ?? false),
+      pesadillas: Boolean(data.pesadillasFrecuentes_chk87 ?? false),
+      doloresMusculares: Boolean(data.doloresMusculares_chk88 ?? false),
+      tosCronica: Boolean(data.tosCronica_chk89 ?? false),
+      sangradoEncias: Boolean(data.sangradoEncias_chk90 ?? false)
     },
     
     // Mapeo de hábitos nocivos
@@ -128,9 +170,9 @@ export default function FichaAntecedentePatologico(data = {}) {
       drogas: Boolean(data.drogasSi_rbdrogassi ?? false),
       tipoDrogas: String(data.drogasTipo_txtdrogastipo ?? ""),
       frecuenciaDrogas: String(data.drogasFrecuencia_txtdrogasfrecuencia ?? ""),
-      otros: Boolean(data.otrosHabitNosivos_chk51 ?? false),
+      otros: Boolean(data.otrosSiIndicarEnfermedades_rbotrossi ?? false), //revisar - campo no claro en el mapeo original
       tipoOtros: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
-      frecuenciaOtros: String(data.otrosFrecuenciaIndicarEnfermedades_txtotros ?? "")
+      frecuenciaOtros: String(data.otrosFrecuenciaIndicarEnfermedades_txtotrosfrecuencia ?? "")
     },
     
     // Mapeo de antecedentes quirúrgicos
@@ -145,27 +187,27 @@ export default function FichaAntecedentePatologico(data = {}) {
     // Mapeo de antecedentes de reproducción
     antecedentesReproduccion: {
       damas: {
-        inicioMenstruacion: String(data.inicioMenstruacion_txtiniciomestruacion ?? ""),
-        inicioVidaSexual: String(data.inicioVidaSexual_txtiniciovidasexual ?? ""),
-        numeroParejas: String(data.numeroParejas_txtnumeroparejas ?? ""),
-        hijosVivos: String(data.hijosVivos_txthijosvivos ?? ""),
-        hijosFallecidos: String(data.hijosFallecidos_txthijosfallecidos ?? ""),
-        numeroAbortos: String(data.numeroAbortos_txtnumeroabortos ?? ""),
-        causasAbortos: String(data.causasAbortos_txtcausasabortos ?? "")
+        inicioMenstruacion: String(data.inicioMestruacionDamas_txtdiniciomestruacion ?? ""),
+        inicioVidaSexual: String(data.inicioVidaSexualDamas_txtdiniciovidasexual ?? ""),
+        numeroParejas: String(data.numeroParejasSexActualidadDamas_txtdnumparejassexactualidad ?? ""),
+        hijosVivos: String(data.hijosVivosDamas_txtdhijosvivos ?? ""),
+        hijosFallecidos: String(data.hijosFallecidosDamas_txtdhijosfallecidos ?? ""),
+        numeroAbortos: String(data.numerosDeAbortosDamas_txtdnumerosdeabortos ?? ""),
+        causasAbortos: String(data.precisarCausasDamas_txtdcausas ?? "")
       },
       varones: {
-        hijosVivos: String(data.hijosVivosVarones_txthijosvivosvarones ?? ""),
-        hijosFallecidos: String(data.hijosFallecidosVarones_txthijosfallecidosvarones ?? ""),
-        abortosParejas: String(data.abortosParejas_txtabortosparejas ?? ""),
-        causasAbortos: String(data.causasAbortosVarones_txtcausasabortosvarones ?? "")
+        hijosVivos: String(data.hijosVivosVarones_txtvhijosvivos ?? ""),
+        hijosFallecidos: String(data.hijosFallecidosVarones_txtvhijosfallecidos ?? ""),
+        abortosParejas: String(data.abortosParejasVarones_txtvnabortosparejas ?? ""),
+        causasAbortos: String(data.precisarCausasVarones_txtvcausas ?? "")
       }
     },
     
     // Mapeo de severidad COVID-19
     severidadCovid: {
-      leve: Boolean(data.covidLeve_chkcovidleve ?? false),
-      moderado: Boolean(data.covidModerado_chkcovidmoderado ?? false),
-      severo: Boolean(data.covidSevero_chkcovidsevero ?? false)
+      leve: Boolean(data.covidLevel_chkcovidl ?? false),
+      moderado: Boolean(data.covidModerado_chkcovidm ?? false),
+      severo: Boolean(data.covidSevero_chkcovids ?? false)
     }
   };
 
@@ -942,8 +984,9 @@ export default function FichaAntecedentePatologico(data = {}) {
     // Firma del paciente - centrada
     // Tamaño: 40mm ancho x 25mm alto
     // Posición: X = firmaPacienteX - 12, Y = firmasY - 8
+    const firmaPaciente = getSign(data, "FIRMAP")
     doc.addImage(
-      '/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png',
+      firmaPaciente,
       'PNG',
       firmaPacienteX - 30, firmasY - 8, 40, 25
     );
@@ -951,8 +994,9 @@ export default function FichaAntecedentePatologico(data = {}) {
     // Huella digital - centrada
     // Tamaño: 15mm ancho x 21mm alto
     // Posición: X = firmaPacienteX + 5, Y = firmasY - 8
+    const huellaDigital = getSign(data, "HUELLA")
     doc.addImage(
-      '/img/firmas_sellos_prueba/HUELLA_DIGITAL.png',
+      huellaDigital,
       'PNG',
       firmaPacienteX + 10, firmasY - 5, 15, 21
     );
@@ -960,8 +1004,9 @@ export default function FichaAntecedentePatologico(data = {}) {
     // Firma/sello del médico - centrada
     // Tamaño: 40mm ancho x 25mm alto
     // Posición: X = firmaMedicoX - 12, Y = firmasY - 8
+    const firmaMedico = getSign(data, "SELLOFIRMA")
     doc.addImage(
-      '/img/firmas_sellos_prueba/firma_sello.png',
+      firmaMedico,
       'PNG',
       firmaMedicoX - 19, firmasY - 8, 40, 25
     );
