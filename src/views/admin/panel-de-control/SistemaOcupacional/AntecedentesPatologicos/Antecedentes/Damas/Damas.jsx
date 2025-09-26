@@ -1,94 +1,83 @@
-/* eslint-disable react/prop-types */
-import { InputTextOneLine, InputTextArea } from "../../../../../../../components/reusableComponents/ResusableComponents";
+
+import { InputTextOneLine, InputTextArea } from "../../../../../../components/reusableComponents/ResusableComponents";
 
 // Componente Antecedentes de Reproducción - Damas
-export default function Damas({ form, handleSiNoChange }) {
-  const handleKeyUp = (e, nextFieldName) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      const nextField = document.querySelector(`input[name="${nextFieldName}"]`);
-      if (nextField) {
-        nextField.focus();
-      }
-    }
-  };
+export default function Damas({
+  form,
+  handleChangeNumber,
+}) {
   return (
     <div className="space-y-4">
       <div className="bg-white border border-gray-200 rounded-lg p-3">
         <h4 className="font-semibold mb-4">Antecedentes de Reproducción - Damas</h4>
-        
+
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <span className="font-medium min-w-[250px]">Inicio de mestruación:</span>
             <InputTextOneLine
+              label="Inicio de mestruación"
               name="inicioMenstruacion"
-              value={form?.inicioMenstruacion || ""}
-              onChange={(e) => handleSiNoChange("inicioMenstruacion", e, e.target.value)}
-              onKeyUp={(e) => handleKeyUp(e, "inicioVidaSexual")}
+              value={form?.inicioMenstruacion}
+              onChange={handleChangeNumber}
+              labelWidth="250px"
             />
             <span className="font-medium">Años</span>
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <span className="font-medium min-w-[250px]">Inicio de vida sexual:</span>
             <InputTextOneLine
+              label="Inicio de vida sexual"
               name="inicioVidaSexual"
-              value={form?.inicioVidaSexual || ""}
-              onChange={(e) => handleSiNoChange("inicioVidaSexual", e, e.target.value)}
-              onKeyUp={(e) => handleKeyUp(e, "parejasSexuales")}
+              value={form?.inicioVidaSexual}
+              onChange={handleChangeNumber}
+              labelWidth="250px"
             />
             <span className="font-medium">Años</span>
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <span className="font-medium min-w-[250px]">Número de parejas sexuales a la actualidad:</span>
             <InputTextOneLine
+              label="Número de parejas sexuales a la actualidad"
               name="parejasSexuales"
-              value={form?.parejasSexuales || ""}
-              onChange={(e) => handleSiNoChange("parejasSexuales", e, e.target.value)}
-              onKeyUp={(e) => handleKeyUp(e, "hijosVivosDamas")}
+              value={form?.parejasSexuales}
+              onChange={handleChangeNumber}
+              labelWidth="250px"
             />
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <span className="font-medium min-w-[250px]">Número de hijos vivos:</span>
             <InputTextOneLine
+              label="Número de hijos vivos"
               name="hijosVivosDamas"
-              value={form?.hijosVivosDamas || ""}
+              value={form?.hijosVivosDamas}
               onChange={(e) => handleSiNoChange("hijosVivosDamas", e, e.target.value)}
-              onKeyUp={(e) => handleKeyUp(e, "hijosFallecidosDamas")}
+              labelWidth="250px"
             />
           </div>
-          
           <div className="flex items-center gap-4">
-            <span className="font-medium min-w-[250px]">Número de hijos fallecidos:</span>
             <InputTextOneLine
+              label="Número de hijos fallecidos"
               name="hijosFallecidosDamas"
-              value={form?.hijosFallecidosDamas || ""}
+              value={form?.hijosFallecidosDamas}
               onChange={(e) => handleSiNoChange("hijosFallecidosDamas", e, e.target.value)}
-              onKeyUp={(e) => handleKeyUp(e, "abortosDamas")}
+              labelWidth="250px"
             />
           </div>
-          
           <div className="flex items-center gap-4">
-            <span className="font-medium min-w-[250px]">Número de Abortos:</span>
             <InputTextOneLine
+              label="Número de Abortos"
               name="abortosDamas"
-              value={form?.abortosDamas || ""}
+              value={form?.abortosDamas}
               onChange={(e) => handleSiNoChange("abortosDamas", e, e.target.value)}
-              onKeyUp={(e) => handleKeyUp(e, "causasAbortosDamas")}
+              labelWidth="250px"
             />
           </div>
-          
-          <div className="space-y-2">
-            <span className="font-medium">Precisar causas:</span>
-            <InputTextArea
-              rows={4}
-              name="causasAbortosDamas"
-              value={form?.causasAbortosDamas || ""}
-              onChange={(e) => handleSiNoChange("causasAbortosDamas", e, e.target.value)}
-            />
-          </div>
+          <InputTextArea
+            label="Precisar causas"
+            rows={4}
+            name="causasAbortosDamas"
+            value={form?.causasAbortosDamas}
+            onChange={(e) => handleSiNoChange("causasAbortosDamas", e, e.target.value)}
+          />
         </div>
       </div>
     </div>

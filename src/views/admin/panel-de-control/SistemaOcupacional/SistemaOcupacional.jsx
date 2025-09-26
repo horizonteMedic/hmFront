@@ -1285,7 +1285,7 @@ const TabComponent = () => {
                   Antecedentes Patológicos
                 </h2>
               </div>
-              <AntecedentesPatologicos/>
+              <AntecedentesPatologicos listas={listasCombos}/>
             </div>
           )}
         </div>

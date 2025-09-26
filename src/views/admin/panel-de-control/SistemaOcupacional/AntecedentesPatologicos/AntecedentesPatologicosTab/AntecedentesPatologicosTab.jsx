@@ -51,9 +51,9 @@ export default function AntecedentesPatologicosTab({
             </div>
             <InputTextOneLine
               label="Fecha"
-              name="fechaEnfermedades"
+              name="fechaCovid"
               type="date"
-              value={form?.fechaEnfermedades}
+              value={form?.fechaCovid}
               onChange={handleChangeSimple}
               disabled={!form?.covid19}
             />
@@ -194,7 +194,7 @@ export default function AntecedentesPatologicosTab({
                   ["alergias", "Alergias"],
                   ["asma", "Asma"],
                   ["bronquitisRepeticion", "Bronquitis a repetición"],
-                  ["diabetes1", "Diabetes1"],
+                  ["diabetes", "Diabetes"],
                   ["enfCorazon", "Enfermedades del corazón"],
                   ["enfOculares", "Enf. Oculares"],
                   ["epilepsiaConvulsiones", "Epilepsia o convulsiones"],
@@ -353,7 +353,7 @@ export default function AntecedentesPatologicosTab({
                         onChange={handleChange}
                       />
                       <InputTextOneLine
-                        label="T.Incapci."
+                        label="Tipo de Incapacidad"
                         name="tipoIncapacidad"
                         value={form?.tipoIncapacidad}
                         onChange={handleChange}

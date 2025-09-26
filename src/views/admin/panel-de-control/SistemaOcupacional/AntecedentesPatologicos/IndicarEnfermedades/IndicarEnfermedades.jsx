@@ -4,7 +4,13 @@ import { InputCheckbox, InputTextOneLine, InputsBooleanRadioGroup } from "../../
 // Componente Indicar Enfermedades
 export default function IndicarEnfermedades({
   form,
-  handleSiNoChange,
+  setForm,
+  handleChange,
+  handleChangeNumber,
+  handleCheckBoxChange,
+  handleChangeSimple,
+  handleRadioButton,
+  handleRadioButtonBoolean
 }) {
   return (
     <div className="space-y-4">
@@ -12,7 +18,7 @@ export default function IndicarEnfermedades({
       {!form?.boroo && (
         <div className="bg-white border border-gray-200 rounded-lg p-3">
           <h4 className="font-semibold mb-3">Indicar las enfermedades que ha tenido o tiene, con cierta frecuencia</h4>
-          
+
           {/* Lista de síntomas en 3 columnas */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             {/* Columna 1 */}
@@ -29,17 +35,13 @@ export default function IndicarEnfermedades({
                 ["dolorOpresivoTorax", "Dolor Opresivo Tórax"],
                 ["hinchazonPiesManos", "Hinchazón de pies o manos"],
               ].map(([name, label]) => (
-                <div key={name} className="flex justify-between items-center">
-                  <span>{label}</span>
-                  <div className="mr-5">
-                    <InputCheckbox
-                      label=""
-                      name={name}
-                      checked={!!form?.[name]}
-                      onChange={(e) => handleSiNoChange(name, e, e.target.checked)}
-                    />
-                  </div>
-                </div>
+                <InputCheckbox
+                  key={name}
+                  label={label}
+                  name={name}
+                  checked={form?.[name]}
+                  onChange={handleCheckBoxChange}
+                />
               ))}
             </div>
 
@@ -57,17 +59,13 @@ export default function IndicarEnfermedades({
                 ["mareosDesmayos", "Mareos-Desmayos-Vértigos"],
                 ["hecesNegras", "Heces negras"],
               ].map(([name, label]) => (
-                <div key={name} className="flex justify-between items-center">
-                  <span>{label}</span>
-                  <div className="mr-5">
-                    <InputCheckbox
-                      label=""
-                      name={name}
-                      checked={!!form?.[name]}
-                      onChange={(e) => handleSiNoChange(name, e, e.target.checked)}
-                    />
-                  </div>
-                </div>
+                <InputCheckbox
+                  key={name}
+                  label={label}
+                  name={name}
+                  checked={form?.[name]}
+                  onChange={handleCheckBoxChange}
+                />
               ))}
             </div>
 
@@ -85,17 +83,13 @@ export default function IndicarEnfermedades({
                 ["tosCronica", "Tos crónica"],
                 ["sangradoEncias", "Sangrado por encías"],
               ].map(([name, label]) => (
-                <div key={name} className="flex justify-between items-center">
-                  <span>{label}</span>
-                  <div className="mr-5">
-                    <InputCheckbox
-                      label=""
-                      name={name}
-                      checked={!!form?.[name]}
-                      onChange={(e) => handleSiNoChange(name, e, e.target.checked)}
-                    />
-                  </div>
-                </div>
+                <InputCheckbox
+                  key={name}
+                  label={label}
+                  name={name}
+                  checked={form?.[name]}
+                  onChange={handleCheckBoxChange}
+                />
               ))}
             </div>
           </div>
@@ -108,7 +102,7 @@ export default function IndicarEnfermedades({
           {/* Antecedentes Inmunológicos / Vacunas */}
           <div className="bg-white border border-gray-200 rounded-lg p-3">
             <h4 className="font-semibold mb-4">ANTECEDENTES INMUNOLÓGICOS / VACUNAS:</h4>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Columna 1 - Vacunas */}
               <div className="space-y-1">
@@ -119,67 +113,55 @@ export default function IndicarEnfermedades({
                   ["hepatitisA", "Hepatitis A"],
                   ["hepatitisB", "Hepatitis B"],
                 ].map(([name, label]) => (
-                  <div key={name} className="flex justify-between items-center">
-                    <span>{label}</span>
-                    <div className="mr-5">
-                      <InputCheckbox
-                        label=""
-                        name={name}
-                        checked={!!form?.[name]}
-                        onChange={(e) => handleSiNoChange(name, e, e.target.checked)}
-                      />
-                    </div>
-                  </div>
+                  <InputCheckbox
+                    key={name}
+                    label={label}
+                    name={name}
+                    checked={form?.[name]}
+                    onChange={handleCheckBoxChange}
+                  />
                 ))}
               </div>
 
-                {/* Columna 2 - Vacunas */}
-                <div className="space-y-1">
-                  {[
-                    ["gripeInfluenza", "Gripe/Influenza"],
-                    ["neumococo", "Neumococo"],
-                    ["rabia", "Rabia"],
-                    ["papilomaHumano", "Papiloma Humano"],
-                  ].map(([name, label]) => (
-                    <div key={name} className="flex justify-between items-center">
-                      <span>{label}</span>
-                      <div className="mr-5">
-                        <InputCheckbox
-                          label=""
-                          name={name}
-                          checked={!!form?.[name]}
-                          onChange={(e) => handleSiNoChange(name, e, e.target.checked)}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {/* COVID 19 con campos especiales */}
-                  <div className="flex justify-between items-center">
-                    <span>COVID 19</span>
-                    <div className="flex items-center gap-2 mr-5">
-                      <InputCheckbox
-                        label=""
-                        name="covid19"
-                        checked={!!form?.covid19}
-                        onChange={(e) => handleSiNoChange("covid19", e, e.target.checked)}
+              {/* Columna 2 - Vacunas */}
+              <div className="space-y-1">
+                {[
+                  ["gripeInfluenza", "Gripe/Influenza"],
+                  ["neumococo", "Neumococo"],
+                  ["rabia", "Rabia"],
+                  ["papilomaHumano", "Papiloma Humano"],
+                ].map(([name, label]) => (
+                  <InputCheckbox
+                    key={name}
+                    label={label}
+                    name={name}
+                    checked={form?.[name]}
+                    onChange={handleCheckBoxChange}
+                  />
+                ))}
+
+                {/* COVID 19 con campos especiales */}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2 mr-5">
+                    <InputCheckbox
+                      label="COVID 19"
+                      name="covid19"
+                      checked={form?.covid19}
+                      onChange={handleCheckBoxChange}
+                    />
+                    {form?.covid19 && (
+                      <InputTextOneLine
+                        label="N° Dosis"
+                        name="covidNumero"
+                        value={form?.covidNumero}
+                        onChange={handleChangeNumber}
+                        labelWidth="50px"
+                        className="ml-8"
                       />
-                      {form?.covid19 && (
-                        <>
-                          <span className="font-semibold">N°</span>
-                          <InputTextOneLine
-                            name="covidNumero"
-                            value={form?.covidNumero || ""}
-                            onChange={(e) => handleSiNoChange("covidNumero", e, e.target.value)}
-                            className="w-20"
-                            placeholder=""
-                          />
-                          <span className="font-semibold">Dosis</span>
-                        </>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
+              </div>
             </div>
           </div>
         </>
@@ -188,203 +170,246 @@ export default function IndicarEnfermedades({
       {/* Hábitos Nocivos */}
       <div className="bg-white border border-gray-200 rounded-lg p-3">
         <h4 className="font-semibold mb-4">Hábitos Nocivos</h4>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Fumar */}
+
+          {/* Drogas */}
           <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-            {/* Fila 1 */}
-            <div className="flex items-center gap-6">
-              <InputCheckbox
-                label="CIGARRILLOS X MES"
-                name="cigarrillosMes"
-                checked={!!form?.cigarrillosMes}
-                onChange={(e) => handleSiNoChange("cigarrillosMes", e, e.target.checked)}
+            {/* Fila 1: Drogas SI/NO */}
+            <div className="grid grid-cols-2 gap-4">
+              <span className="font-semibold">Drogas</span>
+              <InputsBooleanRadioGroup
+                name="drogas"
+                value={form?.drogas}
+                onChange={(e, value) => {
+                  if (value == false) {
+                    setForm(prev => ({ ...prev, tipoDrogas: "", frecuenciaDrogas: "" }));
+                  }
+                  handleRadioButtonBoolean(e, value)
+                }}
               />
+              <div className="w-full col-span-2">
+                <InputTextOneLine
+                  label="Tipo más frecuente"
+                  name="tipoDrogas"
+                  value={form?.tipoDrogas}
+                  onChange={handleChange}
+                  disabled={!form?.drogas}
+                />
+                {/* Botón de tipo de droga */}
+                <div className="w-full flex justify-end mt-2">
+                  <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                    disabled={!form?.drogas}
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        tipoDrogas: prev.tipoDrogas + " CHACCHA HOJA DE COCA"
+                      }))
+                    }}>
+                    CHACCHA HOJA DE COCA
+                  </button>
+                </div>
+              </div>
             </div>
 
+            {/* Fila 2: Frecuencia */}
+            <div className="w-full">
+              <InputTextOneLine
+                label="Frecuencia"
+                name="frecuenciaDrogas"
+                value={form?.frecuenciaDrogas}
+                onChange={handleChange}
+                disabled={!form?.drogas}
+              />
+              <div className="w-full flex justify-end mt-2">
+                <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                  disabled={!form?.drogas}
+                  onClick={() => {
+                    setForm(prev => ({
+                      ...prev,
+                      frecuenciaDrogas: prev.frecuenciaDrogas + " 15 DÍAS X MES"
+                    }))
+                  }}>
+                  15 DÍAS X MES
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Licor */}
+          <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+            {/* Fila 1: Licor SI/NO */}
+            <div className="grid grid-cols-2 gap-4">
+              <span className="font-semibold">Licor</span>
+              <InputsBooleanRadioGroup
+                name="licor"
+                value={form?.licor}
+                onChange={(e, value) => {
+                  if (value == false) {
+                    setForm(prev => ({ ...prev, tipoLicor: "", frecuenciaLicor: "" }));
+                  }
+                  handleRadioButtonBoolean(e, value)
+                }}
+              />
+              <div className="w-full col-span-2">
+                <InputTextOneLine
+                  label="Tipo más frecuente"
+                  name="tipoLicor"
+                  value={form?.tipoLicor}
+                  onChange={handleChange}
+                  disabled={!form?.licor}
+                />
+                {/* Botones de tipos de licor */}
+                <div className="w-full flex justify-end mt-2 gap-2">
+                  <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                    disabled={!form?.licor}
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        tipoLicor: prev.tipoLicor + " RON"
+                      }))
+                    }}>
+                    RON
+                  </button>
+                  <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                    disabled={!form?.licor}
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        tipoLicor: prev.tipoLicor + " CERVEZA"
+                      }))
+                    }}>
+                    CERVEZA
+                  </button>
+                  <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                    disabled={!form?.licor}
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        tipoLicor: prev.tipoLicor + " VINO"
+                      }))
+                    }}>
+                    VINO
+                  </button>
+                  <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                    disabled={!form?.licor}
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        tipoLicor: prev.tipoLicor + " WISKY"
+                      }))
+                    }}>
+                    WISKY
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Fila 2: Frecuencia */}
+            <div className="w-full">
+              <InputTextOneLine
+                label="Frecuencia"
+                name="frecuenciaLicor"
+                value={form?.frecuenciaLicor}
+                onChange={handleChange}
+                disabled={!form?.licor}
+              />
+              <div className="w-full flex justify-end mt-2">
+                <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                  disabled={!form?.licor}
+                  onClick={() => {
+                    setForm(prev => ({
+                      ...prev,
+                      frecuenciaLicor: prev.frecuenciaLicor + " 1 VEZ X MES"
+                    }))
+                  }}>
+                  1 VEZ X MES
+                </button>
+              </div>
+            </div>
+          </div>
+
+
+
+          {/* Fumar */}
+          <div className="border border-gray-200 rounded-lg p-4 space-y-3">
             {/* Fila 2 */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="grid grid-cols-2 gap-4">
               <span className="font-semibold">Fumar</span>
               <InputsBooleanRadioGroup
                 name="fumar"
                 value={form?.fumar}
-                onChange={(e, value) => handleSiNoChange("fumar", e, value)}
-                trueLabel="SI"
-                falseLabel="NO"
+                onChange={(e, value) => {
+                  if (value == false) {
+                    setForm(prev => ({ ...prev, numeroCigarrillos: "" }));
+                  }
+                  handleRadioButtonBoolean(e, value)
+                }}
               />
-              <span className="font-medium">Número de cigarrillos:</span>
-              <InputTextOneLine
-                name="numeroCigarrillos"
-                value={form?.numeroCigarrillos || ""}
-                onChange={(e) => handleSiNoChange("numeroCigarrillos", e, e.target.value)}
-                disabled={form?.fumar === false}
-              />
+              <div className="w-full col-span-2">
+                <InputTextOneLine
+                  label="Número de cigarrillos"
+                  name="numeroCigarrillos"
+                  value={form?.numeroCigarrillos}
+                  onChange={handleChange}
+                  disabled={!form?.fumar}
+                />
+                {/* Fila 1 */}
+                <div className="w-full flex justify-end mt-2">
+                  <button className={`px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition-all disabled:bg-gray-500`}
+                    disabled={!form?.fumar}
+                    onClick={() => {
+                      setForm(prev => ({
+                        ...prev,
+                        numeroCigarrillos: prev.numeroCigarrillos + " CIGARRILLOS X MES"
+                      }))
+                    }}>
+                    CIGARRILLOS X MES
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-
-         {/* Licor */}
+          {/* Otros */}
           <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-            {/* Fila 1: Tipos de licor */}
-            <div className="flex items-center gap-6">
-              <InputCheckbox
-                label="RON"
-                name="ron"
-                checked={!!form?.ron}
-                onChange={(e) => handleSiNoChange("ron", e, e.target.checked)}
-              />
-              <InputCheckbox
-                label="CERVEZA"
-                name="cerveza"
-                checked={!!form?.cerveza}
-                onChange={(e) => handleSiNoChange("cerveza", e, e.target.checked)}
-              />
-              <InputCheckbox
-                label="VINO"
-                name="vino"
-                checked={!!form?.vino}
-                onChange={(e) => handleSiNoChange("vino", e, e.target.checked)}
-              />
-              <InputCheckbox
-                label="WISKY"
-                name="wisky"
-                checked={!!form?.wisky}
-                onChange={(e) => handleSiNoChange("wisky", e, e.target.checked)}
-              />
-            </div>
-
-            {/* Fila 2: Licor SI/NO y Tipo más frecuente */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="font-semibold">Licor:</span>
+            {/* Fila 1: Otros SI/NO */}
+            <div className="grid grid-cols-2 gap-4">
+              <span className="font-semibold">Otros</span>
               <InputsBooleanRadioGroup
-                name="licor"
-                value={form?.licor}
-                onChange={(e, value) => handleSiNoChange("licor", e, value)}
-                trueLabel="SI"
-                falseLabel="NO"
+                name="otros"
+                value={form?.otros}
+                onChange={(e, value) => {
+                  if (value == false) {
+                    setForm(prev => ({ ...prev, tipoOtros: "", frecuenciaOtros: "" }));
+                  }
+                  handleRadioButtonBoolean(e, value)
+                }}
               />
-              <span className="font-medium col-span-1 text-right">
-                Tipo más frecuente:
-              </span>
-              <InputTextOneLine
-                name="tipoLicor"
-                value={form?.tipoLicor || ""}
-                onChange={(e) => handleSiNoChange("tipoLicor", e, e.target.value)}
-                disabled={form?.licor === false}
-              />
+              <div className="w-full col-span-2">
+                <InputTextOneLine
+                  label="Tipo más frecuente"
+                  name="tipoOtros"
+                  value={form?.tipoOtros}
+                  onChange={handleChange}
+                  disabled={!form?.otros}
+                />
+              </div>
             </div>
 
-            {/* Fila 3: 1 VEZ X MES y Frecuencia */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="font-medium">1 VEZ X MES:</span>
-              <InputCheckbox
-                name="unaVezMes"
-                checked={!!form?.unaVezMes}
-                onChange={(e) => handleSiNoChange("unaVezMes", e, e.target.checked)}
-                disabled={form?.licor === false}
-              />
-              <span className="font-medium col-span-1 text-right">Frecuencia:</span>
+            {/* Fila 2: Frecuencia */}
+            <div className="w-full">
               <InputTextOneLine
-                name="frecuenciaLicor"
-                value={form?.frecuenciaLicor || ""}
-                onChange={(e) => handleSiNoChange("frecuenciaLicor", e, e.target.value)}
-                disabled={form?.licor === false}
+                label="Frecuencia"
+                name="frecuenciaOtros"
+                value={form?.frecuenciaOtros}
+                onChange={handleChange}
+                disabled={!form?.otros}
               />
             </div>
           </div>
-
-
-
-          {/* Drogas */}
-          <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-            {/* Fila 1: Tipos de drogas */}
-            <div className="flex items-center gap-6">
-              <InputCheckbox
-                label="CHACCHA HOJA DE COCA"
-                name="chacchaHojaCoca"
-                checked={!!form?.chacchaHojaCoca}
-                onChange={(e) => handleSiNoChange("chacchaHojaCoca", e, e.target.checked)}
-              />
-            </div>
-
-            {/* Fila 2: Drogas SI/NO y Tipo más frecuente */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="font-semibold">Drogas:</span>
-              <InputsBooleanRadioGroup
-                name="drogas"
-                value={form?.drogas}
-                onChange={(e, value) => handleSiNoChange("drogas", e, value)}
-                trueLabel="SI"
-                falseLabel="NO"
-              />
-              <span className="font-medium col-span-1 text-right">
-                Tipo más frecuente:
-              </span>
-              <InputTextOneLine
-                name="tipoDrogas"
-                value={form?.tipoDrogas || ""}
-                onChange={(e) => handleSiNoChange("tipoDrogas", e, e.target.value)}
-                disabled={form?.drogas === false}
-              />
-            </div>
-
-            {/* Fila 3: 15 DÍAS X MES y Frecuencia */}
-            <div className="grid grid-cols-4 items-center gap-4">
-              <span className="font-medium">15 DÍAS X MES:</span>
-              <InputCheckbox
-                name="quinceDiasMes"
-                checked={!!form?.quinceDiasMes}
-                onChange={(e) => handleSiNoChange("quinceDiasMes", e, e.target.checked)}
-                disabled={form?.drogas === false}
-              />
-              <span className="font-medium col-span-1 text-right">Frecuencia:</span>
-              <InputTextOneLine
-                name="frecuenciaDrogas"
-                value={form?.frecuenciaDrogas || ""}
-                onChange={(e) => handleSiNoChange("frecuenciaDrogas", e, e.target.value)}
-                disabled={form?.drogas === false}
-              />
-            </div>
-          </div>
-
-         {/* Otros */}
-        <div className="border border-gray-200 rounded-lg p-4 space-y-3">
-          {/* Fila 1: Otros SI/NO y Tipo más frecuente */}
-          <div className="grid grid-cols-4 items-center gap-4">
-            <span className="font-semibold">Otros:</span>
-            <InputsBooleanRadioGroup
-              name="otros"
-              value={form?.otros}
-              onChange={(e, value) => handleSiNoChange("otros", e, value)}
-              trueLabel="SI"
-              falseLabel="NO"
-            />
-            <span className="font-medium col-span-1 text-right">
-              Tipo más frecuente:
-            </span>
-            <InputTextOneLine
-              name="tipoOtros"
-              value={form?.tipoOtros || ""}
-              onChange={(e) => handleSiNoChange("tipoOtros", e, e.target.value)}
-              disabled={form?.otros === false}
-            />
-          </div>
-
-           {/* Fila 2: Frecuencia */}
-           <div className="grid grid-cols-4 items-center gap-4">
-             <span className="col-span-2"></span>
-             <span className="font-medium col-span-1 text-right">Frecuencia:</span>
-             <InputTextOneLine
-               name="frecuenciaOtros"
-               value={form?.frecuenciaOtros || ""}
-               onChange={(e) => handleSiNoChange("frecuenciaOtros", e, e.target.value)}
-               disabled={form?.otros === false}
-             />
-           </div>
-        </div>
         </div>
       </div>
-
       {/* Secciones adicionales cuando BOROO está activado - Solo Medicamentos y Actividad Física */}
       {form?.boroo && (
         <>
@@ -398,21 +423,15 @@ export default function IndicarEnfermedades({
                   <InputsBooleanRadioGroup
                     name="medicamentos"
                     value={form?.medicamentos}
-                    onChange={(e, value) => handleSiNoChange("medicamentos", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold">Especifique:</span>
-                  <InputTextOneLine
-                    name="especifiqueMedicamentos"
-                    value={form?.especifiqueMedicamentos || ""}
-                    onChange={() => {}}
-                    className="flex-1"
-                    placeholder="Especifique medicamentos..."
-                  />
-                </div>
+                <InputTextOneLine
+                  label="Especifique"
+                  name="especifiqueMedicamentos"
+                  value={form?.especifiqueMedicamentos}
+                  onChange={handleChange}
+                />
               </div>
 
               {/* Actividad Física */}
@@ -422,21 +441,15 @@ export default function IndicarEnfermedades({
                   <InputsBooleanRadioGroup
                     name="actividadFisica"
                     value={form?.actividadFisica}
-                    onChange={(e, value) => handleSiNoChange("actividadFisica", e, value)}
-                    trueLabel="SI"
-                    falseLabel="NO"
+                    onChange={handleRadioButtonBoolean}
                   />
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold">Especifique:</span>
-                  <InputTextOneLine
-                    name="especifiqueActividadFisica"
-                    value={form?.especifiqueActividadFisica || ""}
-                    onChange={() => {}}
-                    className="flex-1"
-                    placeholder="Especifique actividad física..."
-                  />
-                </div>
+                <InputTextOneLine
+                  label="Especifique"
+                  name="especifiqueActividadFisica"
+                  value={form?.especifiqueActividadFisica}
+                  onChange={handleChange}
+                />
               </div>
             </div>
           </div>
