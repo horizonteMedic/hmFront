@@ -1,4 +1,5 @@
 import jsPDF from "jspdf";
+import drawColorBox from '../components/ColorBox.jsx';
 
 export default function FichaAntecedentePatologico(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -11,11 +12,13 @@ export default function FichaAntecedentePatologico(data = {}) {
   const datosPrueba = {
     apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
     fechaExamen: "04/11/2024",
-    sexo: "F",
+    sexo: "Femenino",
     documentoIdentidad: "72384273",
     edad: "31 años",
+    fechaNacimiento: "15/03/1993",
+    domicilio: "Av. Los Olivos 123, Urbanización San Miguel, Trujillo",
     areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
+    puestoTrabajo: "INGENIERO DE SEGURIDAD",
     empresa: "MINERA BOROO MISQUICHILCA S.A.",
     contrata: "CONTRATA",
     sede: "Trujillo-Pierola"
@@ -23,21 +26,45 @@ export default function FichaAntecedentePatologico(data = {}) {
 
   // Usar datos reales si existen, sino usar datos de prueba
   const datosFinales = data && data.norden ? {
-    apellidosNombres: data.nombres || datosPrueba.apellidosNombres,
-    fechaExamen: data.fechaExamen || datosPrueba.fechaExamen,
-    sexo: data.sexo || datosPrueba.sexo,
-    documentoIdentidad: data.dni || datosPrueba.documentoIdentidad,
-    edad: data.edad || datosPrueba.edad,
-    areaTrabajo: data.areaTrabajo || datosPrueba.areaTrabajo,
-    puestoTrabajo: data.puestoTrabajo || datosPrueba.puestoTrabajo,
-    empresa: data.empresa || datosPrueba.empresa,
-    contrata: data.contrata || datosPrueba.contrata,
-    antecedentesQuirurgicos: data.antecedentesQuirurgicos || [],
-    numeroFicha: data.numeroFicha || "99164",
-    sede: data.sede || datosPrueba.sede
+    // Mapeo individual y editable para cada campo
+    apellidosNombres: data.nombres || data.apellidosNombres || datosPrueba.apellidosNombres,
+    fechaExamen: data.fechaExamen || data.fecha || datosPrueba.fechaExamen,
+    sexo: (() => {
+      const sexoValue = data.sexo || data.genero || datosPrueba.sexo;
+      if (sexoValue === "F" || sexoValue === "f") return "Femenino";
+      if (sexoValue === "M" || sexoValue === "m") return "Masculino";
+      return sexoValue || datosPrueba.sexo;
+    })(),
+    documentoIdentidad: data.dni || data.documentoIdentidad || data.cedula || datosPrueba.documentoIdentidad,
+    edad: data.edad || data.edadAnos || datosPrueba.edad,
+    fechaNacimiento: data.fechaNacimiento || data.fechaNac || data.nacimiento || datosPrueba.fechaNacimiento,
+    domicilio: data.domicilio || data.direccion || data.residencia || datosPrueba.domicilio,
+    areaTrabajo: data.areaTrabajo || data.area || data.departamento || datosPrueba.areaTrabajo,
+    puestoTrabajo: data.puestoTrabajo || data.puesto || data.cargo || datosPrueba.puestoTrabajo,
+    empresa: data.empresa || data.empresaNombre || data.organizacion || datosPrueba.empresa,
+    contrata: data.contrata || data.tipoContrato || data.contratista || datosPrueba.contrata,
+    antecedentesQuirurgicos: data.antecedentesQuirurgicos || data.quirurgicos || [],
+    numeroFicha: data.numeroFicha || data.ficha || data.numero || "99164",
+    sede: data.sede || data.ubicacion || data.ciudad || datosPrueba.sede,
+    // Mapeo de observaciones para cada sección
+    observacionesAntecedentes: data.observacionesAntecedentes || data.obsAntecedentes || data.observaciones1 || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    observacionesSintomas: data.observacionesSintomas || data.obsSintomas || data.observaciones2 || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    observacionesHabitos: data.observacionesHabitos || data.obsHabitos || data.observaciones3 || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    // Mapeo de datos de color
+    color: data.color || data.informacionSede?.color || 1,
+    codigoColor: data.codigoColor || data.informacionSede?.codigoColor || "#008f39",
+    textoColor: data.textoColor || data.informacionSede?.textoColor || "F"
   } : {
     ...datosPrueba,
-    numeroFicha: "99164"
+    numeroFicha: "99164",
+    // Observaciones de prueba
+    observacionesAntecedentes: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    observacionesSintomas: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    observacionesHabitos: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    // Datos de color de prueba
+    color: 1,
+    codigoColor: "#008f39",
+    textoColor: "F"
   };
 
   // === HEADER ===
@@ -47,12 +74,24 @@ export default function FichaAntecedentePatologico(data = {}) {
 
   // Número de Ficha y Página - Página 1 (tipo lista)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 50, 20);
+  doc.text("Nro de ficha: ", pageW - 53, 20);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 53, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 53, 30);
+
+  // === BLOQUE DE COLOR ===
+  drawColorBox(doc, {
+    color: datosFinales.codigoColor,           // Color de la letra y línea
+    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
+    x: pageW - 30,                             // Posición X (30mm del borde derecho)
+    y: 15,                                     // Posición Y (alineado con header)
+    size: 22,                                  // Tamaño del área total (22x22mm)
+    showLine: true,                            // Mostrar línea de color
+    fontSize: 30,                              // Tamaño de la letra
+    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
+  });
 
 
   // === FECHA DE EXAMEN ===
@@ -60,29 +99,105 @@ export default function FichaAntecedentePatologico(data = {}) {
   doc.text("Fecha Examen: " + datosFinales.fechaExamen, 15, 35);
 
   // === DATOS PERSONALES ===
+  // Configuración individual y editable para cada campo
   const datosPersonales = [
-    { label: "Apellidos y Nombres:", value: datosFinales.apellidosNombres, x: 15, y: 40 },
-    { label: "Fecha de Examen:", value: datosFinales.fechaExamen, x: 15, y: 45 },
-    { label: "Sexo:", value: datosFinales.sexo, x: 15, y: 50 },
-    { label: "DNI:", value: datosFinales.documentoIdentidad, x: 15, y: 55 },
-    { label: "Edad:", value: datosFinales.edad, x: 15, y: 60 },
-    { label: "Área de Trabajo:", value: datosFinales.areaTrabajo, x: 15, y: 65 },
-    { label: "Puesto de Trabajo:", value: datosFinales.puestoTrabajo, x: 15, y: 70 },
-    { label: "Empresa:", value: datosFinales.empresa, x: 15, y: 75 },
-    { label: "Contrata:", value: datosFinales.contrata, x: 15, y: 80 }
+    { 
+      label: "Apellidos y Nombres:", 
+      value: datosFinales.apellidosNombres, 
+      x: 15, 
+      y: 40,
+      labelOffset: 0,
+      valueOffset: 35
+    },
+    { 
+      label: "DNI:", 
+      value: datosFinales.documentoIdentidad, 
+      x: 130, 
+      y: 40,
+      labelOffset: 0,
+      valueOffset: 8
+    },
+    { 
+      label: "Sexo:", 
+      value: datosFinales.sexo, 
+      x: 163, 
+      y: 45,
+      labelOffset: 0,
+      valueOffset: 10
+    },
+    { 
+      label: "Edad:", 
+      value: datosFinales.edad, 
+      x: 130, 
+      y: 45,
+      labelOffset: 0,
+      valueOffset: 10
+    },
+    { 
+      label: "Fecha Nac.:", 
+      value: datosFinales.fechaNacimiento, 
+      x: 163, 
+      y: 40,
+      labelOffset: 0,
+      valueOffset: 20
+    },
+    { 
+      label: "Domicilio:", 
+      value: datosFinales.domicilio, 
+      x: 15, 
+      y: 45,
+      labelOffset: 0,
+      valueOffset: 20
+    },
+    { 
+      label: "Área de Trabajo:", 
+      value: datosFinales.areaTrabajo, 
+      x: 130, 
+      y: 50,
+      labelOffset: 0,
+      valueOffset: 27
+    },
+    { 
+      label: "Puesto de Trabajo:", 
+      value: datosFinales.puestoTrabajo, 
+      x: 15, 
+      y: 50,
+      labelOffset: 0,
+      valueOffset: 30
+    },
+    { 
+      label: "Empresa:", 
+      value: datosFinales.empresa, 
+      x: 15, 
+      y: 55,
+      labelOffset: 0,
+      valueOffset: 20
+    },
+    { 
+      label: "Contrata:", 
+      value: datosFinales.contrata, 
+      x: 15, 
+      y: 60,
+      labelOffset: 0,
+      valueOffset: 20
+    }
   ];
 
+  // Renderizar datos personales con configuración individual
   datosPersonales.forEach(item => {
+    // Label
     doc.setFont("helvetica", "bold").setFontSize(9);
-    doc.text(item.label, item.x, item.y);
+    doc.text(item.label, item.x + item.labelOffset, item.y);
+    
+    // Valor
     doc.setFont("helvetica", "normal").setFontSize(9);
-    doc.text(item.value, item.x + 60, item.y);
+    doc.text(item.value || "", item.x + item.valueOffset, item.y);
   });
 
   // === ANTECEDENTES PATOLÓGICOS PERSONALES ===
   // Marco único para toda la sección
-  const marcoInicioY = 92;
-  const marcoFinY = 182;
+  const marcoInicioY = 72;
+  const marcoFinY = 171;
   const marcoInicioX = 15;
   const marcoFinX = 200;
   
@@ -90,10 +205,10 @@ export default function FichaAntecedentePatologico(data = {}) {
   doc.rect(marcoInicioX, marcoInicioY, marcoFinX - marcoInicioX, marcoFinY - marcoInicioY);
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("1. Antecedentes Patologicos Personales:", 15, 90);
+  doc.text("1. Antecedentes Patologicos Personales:", 15, 70);
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Marcar con una X las Enfermedades que han tenido o tienen:", 20, 95);
+  doc.text("Marcar con una X las Enfermedades que han tenido o tienen:", 20, 75);
 
   // Listas de enfermedades por columna
   const col1 = [
@@ -167,7 +282,7 @@ export default function FichaAntecedentePatologico(data = {}) {
   ];
 
   // Configuración de posiciones
-  const startY = 100;
+  const startY = 80;
   const stepY = 4;
   const posicionesX = [20, 80, 140]; // 3 columnas
 
@@ -233,43 +348,51 @@ export default function FichaAntecedentePatologico(data = {}) {
   });
 // === SEVERIDAD Y FECHA ===
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("Fecha :", 80, 180);
+doc.text("Fecha :", 80, 160);
 doc.setFont("helvetica", "normal").setFontSize(9);
-doc.text("15/12/2024", 95, 180);
+doc.text("15/12/2024", 95, 160);
 
 // LEVE
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("LEVE (   )", 120, 180);
+doc.text("LEVE (   )", 120, 160);
 if (severidadCovid.leve) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.setTextColor(255, 0, 0);
-  doc.text("X", 130.5, 180.2); // coordenada dentro del paréntesis
+  doc.text("X", 130.5, 160.2); // coordenada dentro del paréntesis
   doc.setTextColor(0, 0, 0);
 }
 
 // MODERADO
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("MODERADO (   )", 140, 180);
+doc.text("MODERADO (   )", 140, 160);
 if (severidadCovid.moderado) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.setTextColor(255, 0, 0);
-  doc.text("X",161, 180.2); // ajustar dentro del (   )
+  doc.text("X",161, 160.2); // ajustar dentro del (   )
   doc.setTextColor(0, 0, 0);
 }
 
 // SEVERO
 doc.setFont("helvetica", "bold").setFontSize(9);
-doc.text("SEVERO (   )", 172, 180);
+doc.text("SEVERO (   )", 172, 160);
 if (severidadCovid.severo) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.setTextColor(255, 0, 0);
-  doc.text("X", 187.4, 180.2); // dentro del (   )
+  doc.text("X", 187.4, 160.2); // dentro del (   )
   doc.setTextColor(0, 0, 0);
 }
 
+  // === OBSERVACIONES ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Observaciones:", 20, 165);
+  
+  // Texto de observaciones (comienza después de "Observaciones:" en la misma línea)
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.observacionesAntecedentes, 45, 165, { maxWidth: 155 });
+
   // === SÍNTOMAS FRECUENTES ===
   // Marco para la sección de síntomas
-  const sintomasMarcoInicioY = 183.5;
+  const sintomasMarcoInicioY = 173;
   const sintomasMarcoFinY = 230;
   const sintomasMarcoInicioX = 15;
   const sintomasMarcoFinX = 200;
@@ -278,7 +401,7 @@ if (severidadCovid.severo) {
   doc.rect(sintomasMarcoInicioX, sintomasMarcoInicioY, sintomasMarcoFinX - sintomasMarcoInicioX, sintomasMarcoFinY - sintomasMarcoInicioY);
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Indicar las enfermedades que ha tenido o tiene, con mucha frecuencia:", 20, 187);
+  doc.text("Indicar las enfermedades que ha tenido o tiene, con mucha frecuencia:", 20, 178);
 
 // Listas de síntomas por columna
 const sintomasCol1 = [
@@ -321,7 +444,7 @@ const sintomasCol3 = [
 ];
 
 // Configuración de posiciones para síntomas
-const sintomasStartY = 192;
+const sintomasStartY = 183;
 const sintomasStepY = 4;
 const sintomasPosicionesX = [20, 80, 140]; // 3 columnas
 
@@ -364,11 +487,18 @@ sintomasFrecuentes.forEach(sintoma => {
   }
 });
 
+  // === OBSERVACIONES SÍNTOMAS ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Observaciones:", 20, 223);
+  
+  // Texto de observaciones de síntomas
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.observacionesSintomas, 45, 223, { maxWidth: 155 });
 
   // === HABITOS NOSIVOS ===
   // Marco para la sección de hábitos nocivos
-  const habitosMarcoInicioY = 231.5;
-  const habitosMarcoFinY = 290;
+  const habitosMarcoInicioY = 232;
+  const habitosMarcoFinY = 289;
   const habitosMarcoInicioX = 15;
   const habitosMarcoFinX = 200;
   
@@ -376,23 +506,23 @@ sintomasFrecuentes.forEach(sintoma => {
   doc.rect(habitosMarcoInicioX, habitosMarcoInicioY, habitosMarcoFinX - habitosMarcoInicioX, habitosMarcoFinY - habitosMarcoInicioY);
   
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Habitos Nosivos:", 20, 235);
+  doc.text("Habitos Nosivos:", 20, 235.5);
 
 const habitosNosivosItems = [
-  { label: "Fumar", campo: "fumar", y: 240, subFields: [
-    { label: "Numeros de Cigarrillos", campo: "numeroCigarrillos", x: 80, y: 240, valorX: 125, valorY: 240 }
+  { label: "Fumar", campo: "fumar", y: 240.5, subFields: [
+    { label: "Numeros de Cigarrillos", campo: "numeroCigarrillos", x: 80, y: 240.5, valorX: 125, valorY: 240.5 }
   ]},
-  { label: "Licor", campo: "licor", y: 247, subFields: [
-    { label: "Tipo mas Frecuente", campo: "tipoLicor", x: 80, y: 247, valorX: 125, valorY: 247 },
-    { label: "Frecuencia", campo: "frecuenciaLicor", x: 80, y: 252, valorX: 125, valorY: 252 }
+  { label: "Licor", campo: "licor", y: 247.5, subFields: [
+    { label: "Tipo mas Frecuente", campo: "tipoLicor", x: 80, y: 247.5, valorX: 125, valorY: 247.5 },
+    { label: "Frecuencia", campo: "frecuenciaLicor", x: 80, y: 252.5, valorX: 125, valorY: 252.5 }
   ]},
-  { label: "Drogas", campo: "drogas", y: 258, subFields: [
-    { label: "Tipo Probado o que Usa", campo: "tipoDrogas", x: 80, y: 258, valorX: 125, valorY: 258 },
-    { label: "Frecuencia", campo: "frecuenciaDrogas", x: 80, y: 263, valorX: 125, valorY: 263 }
+  { label: "Drogas", campo: "drogas", y: 258.5, subFields: [
+    { label: "Tipo Probado o que Usa", campo: "tipoDrogas", x: 80, y: 258.5, valorX: 125, valorY: 258.5 },
+    { label: "Frecuencia", campo: "frecuenciaDrogas", x: 80, y: 263.5, valorX: 125, valorY: 263.5 }
   ]},
-  { label: "Otros", campo: "otros", y: 269, subFields: [
-    { label: "Tipo", campo: "tipoOtros", x: 80, y: 269, valorX: 125, valorY: 269 },
-    { label: "Frecuencia", campo: "frecuenciaOtros", x: 80, y: 274, valorX: 125, valorY: 274 }
+  { label: "Otros", campo: "otros", y: 269.5, subFields: [
+    { label: "Tipo", campo: "tipoOtros", x: 80, y: 269.5, valorX: 125, valorY: 269.5 },
+    { label: "Frecuencia", campo: "frecuenciaOtros", x: 80, y: 274.5, valorX: 125, valorY: 274.5 }
   ]}
 ];
 
@@ -445,6 +575,13 @@ habitosNosivosItems.forEach(item => {
   });
 });
 
+  // === OBSERVACIONES HÁBITOS NOCIVOS ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Observaciones:", 20, 280);
+  
+  // Texto de observaciones de hábitos nocivos
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.observacionesHabitos, 45, 280, { maxWidth: 155 });
 
   // === PÁGINA 2 ===
   doc.addPage();
@@ -457,12 +594,24 @@ habitosNosivosItems.forEach(item => {
 
   // Número de Ficha y Página (tipo lista)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 50, 20);
+  doc.text("Nro de ficha: ", pageW - 53, 20);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 53, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 53, 30);
+
+  // === BLOQUE DE COLOR PÁGINA 2 ===
+  drawColorBox(doc, {
+    color: datosFinales.codigoColor,           // Color de la letra y línea
+    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
+    x: pageW - 30,                             // Posición X (30mm del borde derecho)
+    y: 15,                                     // Posición Y (alineado con header)
+    size: 22,                                  // Tamaño del área total (22x22mm)
+    showLine: true,                            // Mostrar línea de color
+    fontSize: 30,                              // Tamaño de la letra
+    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
+  });
 
   // === ANTECEDENTES QUIRÚRGICOS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
