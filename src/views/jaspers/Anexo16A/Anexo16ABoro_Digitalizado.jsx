@@ -130,19 +130,19 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Número de Ficha y Página
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 53, 20);
+  doc.text("Nro de ficha: ", pageW - 53, 15);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
+  doc.text(datosFinales.numeroFicha, pageW - 33, 15);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 53, 25);
-  doc.text("Pag. 01", pageW - 53, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 53, 20);
+  doc.text("Pag. 01", pageW - 53, 25);
 
   // === BLOQUE DE COLOR ===
   drawColorBox(doc, {
     color: datosFinales.codigoColor,           // Color de la letra y línea
     text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
     x: pageW - 30,                             // Posición X (30mm del borde derecho)
-    y: 15,                                     // Posición Y (alineado con header)
+    y: 10,                                     // Posición Y (alineado con header)
     size: 22,                                  // Tamaño del área total (22x22mm)
     showLine: true,                            // Mostrar línea de color
     fontSize: 30,                              // Tamaño de la letra
@@ -152,7 +152,6 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // === FECHA DE EXAMEN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Fecha Examen: " + datosFinales.fechaExamen, 15, 40);
-
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -179,15 +178,15 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // === SECCIÓN 2: FUNCIONES VITALES ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("2. Funciones Vitales:", 15, 98.5);
+  doc.text("2. Funciones Vitales:", 15, 93.5);
 
   // Signos vitales en fila
   const signosVitales = [
-    { label: "FC:", value: datosFinales.vitalSigns.fc + " x min", x: 60, y: 96 },
-    { label: "FR:", value: datosFinales.vitalSigns.fr + " x min", x: 100, y: 96 },
-    { label: "PA:", value: datosFinales.vitalSigns.pa + " mmHg", x: 130, y: 96 },
-    { label: "Sat. O2:", value: datosFinales.vitalSigns.satO2 + " %", x: 60, y: 100 },
-    { label: "IMC:", value: datosFinales.vitalSigns.imc + " kg/m2", x: 100, y: 100 }
+    { label: "FC:", value: datosFinales.vitalSigns.fc + " x min", x: 60, y: 91 },
+    { label: "FR:", value: datosFinales.vitalSigns.fr + " x min", x: 100, y: 91 },
+    { label: "PA:", value: datosFinales.vitalSigns.pa + " mmHg", x: 130, y: 91 },
+    { label: "Sat. O2:", value: datosFinales.vitalSigns.satO2 + " %", x: 60, y: 95 },
+    { label: "IMC:", value: datosFinales.vitalSigns.imc + " kg/m2", x: 100, y: 95 }
   ];
 
   signosVitales.forEach((signo) => {
@@ -206,30 +205,30 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // === SECCIÓN 3: CONDICIONES MÉDICAS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("3. El / La presenta o ha presentado en los últimos 6 meses:", 15, 105);
+  doc.text("3. El / La presenta o ha presentado en los últimos 6 meses:", 15, 100);
 
   // Encabezados SI y NO
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("SI", 130.5, 105);
-  doc.text("NO", 144.5, 105);
+  doc.text("SI", 130.5, 100);
+  doc.text("NO", 144.5, 100);
 
   // Lista de condiciones médicas
   const condiciones = [
-    { texto: "Cirugía mayor reciente", campo: "cirugiaMayor", x: 30, y: 110 },
-    { texto: "Desórdenes de la coagulación, trombosis, etc.", campo: "desordenesCoagulacion", x: 30, y: 115 },
-    { texto: "Diabetes Mellitus", campo: "diabetes", x: 30, y: 120 },
-    { texto: "Hipertensión Arterial", campo: "hipertension", x: 30, y: 125 },
-    { texto: "Embarazo", campo: "embarazo", x: 30, y: 130 },
-    { texto: "Problemas neurológicos: epilepsia, vértigo, etc.", campo: "problemasNeurologicos", x: 30, y: 135 },
-    { texto: "Infecciones recientes (especialmente oídos, nariz, garganta)", campo: "infeccionesRecientes", x: 30, y: 140 },
-    { texto: "Obesidad Mórbida (IMC mayor a 35 m/kg2)", campo: "obesidadMorbida", x: 30, y: 145 },
-    { texto: "Problemas Cardíacos: marcapasos, coronariopatía, etc.", campo: "problemasCardiacos", x: 30, y: 150 },
-    { texto: "Problemas Respiratorios: asma, EPOC, etc.", campo: "problemasRespiratorios", x: 30, y: 155 },
-    { texto: "Problemas Oftalmológicos: retinopatía, glaucoma, etc.", campo: "problemasOftalmologicos", x: 30, y: 160 },
-    { texto: "Problemas Digestivos: úlcera péptica, hepatitis, etc.", campo: "problemasDigestivos", x: 30, y: 165 },
-    { texto: "Apnea del Sueño", campo: "apneaSueño", x: 30, y: 170 },
-    { texto: "Alergias", campo: "alergias", x: 30, y: 175 },
-    { texto: "Otra condición médica importante", campo: "otraCondicion", x: 30, y: 180 }
+    { texto: "Cirugía mayor reciente", campo: "cirugiaMayor", x: 30, y: 105 },
+    { texto: "Desórdenes de la coagulación, trombosis, etc.", campo: "desordenesCoagulacion", x: 30, y: 110 },
+    { texto: "Diabetes Mellitus", campo: "diabetes", x: 30, y: 115 },
+    { texto: "Hipertensión Arterial", campo: "hipertension", x: 30, y: 120 },
+    { texto: "Embarazo", campo: "embarazo", x: 30, y: 125 },
+    { texto: "Problemas neurológicos: epilepsia, vértigo, etc.", campo: "problemasNeurologicos", x: 30, y: 130 },
+    { texto: "Infecciones recientes (especialmente oídos, nariz, garganta)", campo: "infeccionesRecientes", x: 30, y: 135 },
+    { texto: "Obesidad Mórbida (IMC mayor a 35 m/kg2)", campo: "obesidadMorbida", x: 30, y: 140 },
+    { texto: "Problemas Cardíacos: marcapasos, coronariopatía, etc.", campo: "problemasCardiacos", x: 30, y: 145 },
+    { texto: "Problemas Respiratorios: asma, EPOC, etc.", campo: "problemasRespiratorios", x: 30, y: 150 },
+    { texto: "Problemas Oftalmológicos: retinopatía, glaucoma, etc.", campo: "problemasOftalmologicos", x: 30, y: 155 },
+    { texto: "Problemas Digestivos: úlcera péptica, hepatitis, etc.", campo: "problemasDigestivos", x: 30, y: 160 },
+    { texto: "Apnea del Sueño", campo: "apneaSueño", x: 30, y: 165 },
+    { texto: "Alergias", campo: "alergias", x: 30, y: 170 },
+    { texto: "Otra condición médica importante", campo: "otraCondicion", x: 30, y: 175 }
   ];
 
   condiciones.forEach(condicion => {
@@ -262,24 +261,24 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     // Si es embarazo y está marcado como SI, mostrar campo FUR en la misma línea
     if (condicion.campo === "embarazo" && datosFinales.condiciones[condicion.campo]) {
       doc.setFont("helvetica", "normal").setFontSize(9);
-      doc.text("FUR:", 160, 131); // Posición X e Y específica para FUR
-      doc.text(datosFinales.fur || "00/00/0000", 170, 131);
+      doc.text("FUR:", 160, 126); // Posición X e Y específica para FUR
+      doc.text(datosFinales.fur || "00/00/0000", 170, 126);
     }
   });
 
   // === USO DE MEDICACIÓN ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Uso de medicación Actual:", 30, 185);
+  doc.text("Uso de medicación Actual:", 30, 180);
 
   // Texto con guiones para simular línea
   doc.setFont("helvetica", "normal").setFontSize(9);
   if (datosFinales.medicacionActual) {
-    doc.text(datosFinales.medicacionActual, 84, 185);
+    doc.text(datosFinales.medicacionActual, 84, 180);
   }
 
   // === DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Declaro que las respuestas dadas en el presente documento son verdaderas y estoy consciente que el ocultar o falsear información me puede causar daño por lo que asumo total responsabilidad de ello.", 15, 190, { maxWidth: 180 });
+  doc.text("Declaro que las respuestas dadas en el presente documento son verdaderas y estoy consciente que el ocultar o falsear información me puede causar daño por lo que asumo total responsabilidad de ello.", 15, 185, { maxWidth: 180 });
 
   // === FIRMA Y HUELLA DIGITAL ===
   // Centrar horizontalmente en la página (A4 = 210mm)
@@ -294,25 +293,25 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   try {
     const firmaImg = getSign(data, "FIRMAP");
     console.log("firmaImg", firmaImg);
-    doc.addImage(firmaImg, "PNG", startX, 195, 45, 25); // Imagen arriba
+    doc.addImage(firmaImg, "PNG", startX, 190, 45, 25); // Imagen arriba
   } catch (e) {
-    doc.text("[Firma]", startX + 5, 245);
+    doc.text("[Firma]", startX + 5, 240);
   }
-  doc.line(startX, 219, startX + firmaWidth, 219); // Línea debajo de la imagen
+  doc.line(startX, 214, startX + firmaWidth, 214); // Línea debajo de la imagen
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("firma", startX + 15, 222); // Texto centrado debajo de la línea
+  doc.text("firma", startX + 15, 217); // Texto centrado debajo de la línea
 
   // Huella dactilar (lado derecho) - recuadro, texto abajo
   const huellaX = startX + firmaWidth + gap;
-  doc.rect(huellaX, 195, 25, 25); // Recuadro
+  doc.rect(huellaX, 190, 25, 25); // Recuadro
   try {
     const huellaImg = getSign(data, "HUELLA");
-    doc.addImage(huellaImg, "PNG", huellaX + 3, 195, 18, 25); // Huella dentro del recuadro
+    doc.addImage(huellaImg, "PNG", huellaX + 3, 190, 18, 25); // Huella dentro del recuadro
   } catch (e) {
-    doc.text("[Huella]", huellaX + 5, 250);
+    doc.text("[Huella]", huellaX + 5, 245);
   }
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("huella paciente", huellaX + 2, 222.2); // Texto centrado debajo del recuadro
+  doc.text("huella paciente", huellaX + 2, 217.2); // Texto centrado debajo del recuadro
 
 
 
@@ -359,7 +358,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Dividir el texto en líneas
   const certificacionLineas = doc.splitTextToSize(textoAntes + estadoTexto + textoDespues, 175);
-  let yPos = 227;
+  let yPos = 228;
 
   certificacionLineas.forEach(linea => {
     // Verificar si la línea contiene el estado
@@ -394,7 +393,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // === OBSERVACIONES MÉDICAS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Observaciones:", 15, 239);
+  doc.text("Observaciones:", 15, 240);
 
   // Observaciones dinámicas - puede recibir array o string
   let observacionesLista = [];
@@ -413,7 +412,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   }
 
   // Dibujar cada observación
-  let observacionY = 244;
+  let observacionY = 245;
   observacionesLista.forEach((observacion) => {
     doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(`${observacion}`, 15, observacionY);
