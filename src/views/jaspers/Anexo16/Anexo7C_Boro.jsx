@@ -606,9 +606,9 @@ export default function Anexo16Boroo(data = {}) {
         descripcion: data.pulmonesDescripcionAnexo7c_txtpulmones ?? ""
       },
       piel: {
-        normal: data.pielNormalAnexo7c_rbnormal ?? false,
-        anormal: data.pielAnormalAnexo7c_rbanormal ?? false,
-        descripcion: data.pielDescripcionAnexo7c_txtpiel ?? ""
+        normal: data.pielAnexo7c_piel ?? false,
+        anormal: !(data.pielAnexo7c_piel ?? false),
+        descripcion: data.pielDescripcionAnexo7c_piel_descripcion ?? ""
       },
       miembrosSuperiores: data.miembrosSuperioresAnexo7c_txtmiembrossuperiores ?? "",
       miembrosInferiores: data.miembrosInferioresAnexo7c_txtmiembrosinferiores ?? ""

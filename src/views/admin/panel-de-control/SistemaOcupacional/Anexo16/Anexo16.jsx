@@ -181,6 +181,9 @@ export default function Anexo16({ listas }) {
     cuello: "CENTRAL, MOVIL",
     perimetro: "",
     bocaAmigdalasFaringeLaringe: "HUMECTADA, NO HIPERTROFICAS, NO CONGESTIVAS",
+
+    piel:"NORMAL",
+    pielObservaciones:"",
     //Miembros y reflejos
     miembrosSuperiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",
     miembrosInferiores: "SIMETRICOS, NO DEFORMIDADES, MOTRICIDAD CONSERVADA.",

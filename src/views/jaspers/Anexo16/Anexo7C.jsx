@@ -5,26 +5,26 @@ import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 // Función para formatear fecha a DD/MM/YYYY
 function formatearFechaDDMMYYYY(fecha) {
   if (!fecha) return "";
-  
+
   try {
     // Si ya está en formato DD/MM/YYYY, devolverlo tal como está
     if (typeof fecha === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(fecha)) {
       return fecha;
     }
-    
+
     // Crear objeto Date
     const fechaObj = new Date(fecha);
-    
+
     // Verificar si la fecha es válida
     if (isNaN(fechaObj.getTime())) {
       return "";
     }
-    
+
     // Formatear a DD/MM/YYYY
     const dia = fechaObj.getDate().toString().padStart(2, '0');
     const mes = (fechaObj.getMonth() + 1).toString().padStart(2, '0');
     const año = fechaObj.getFullYear();
-    
+
     return `${dia}/${mes}/${año}`;
   } catch (error) {
     console.error('Error formateando fecha:', error);
@@ -337,7 +337,7 @@ export default function Anexo16(data = {}) {
     },
     // Textos de Neumoconiosis
     textoNeumoconiosis1: "Texto de prueba 2 largo para ver como se ve",
-    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve", 
+    textoNeumoconiosis2: "Texto de prueba 2 largo para ver como se ve",
     textoNeumoconiosis3: "Texto de prueba 3 largo para ver como se ve",
     // Reacciones serológicas
     reaccionesSerologicas: {
@@ -398,7 +398,7 @@ export default function Anexo16(data = {}) {
     ]
   };
   const datosReales = {
-    fechaExamen: formatearFechaCorta(formatearFechaDDMMYYYY(data.fechaAnexo7c_fecha)),
+    fechaExamen: formatearFechaCorta(data.fechaAnexo7c_fecha),
     mineralesExplotados: data.mineral_mineral_po ?? "",
     lugarFechaNacimiento: `${data.lugarNacimientoPaciente_lugar_nac_pa ?? ""}\n${formatearFechaCorta(data.fechaNacimientoPaciente_fecha_nacimiento_pa ?? "")}`,
     domicilioHabitual: data.direccionPaciente_direccion ?? "",
@@ -617,9 +617,9 @@ export default function Anexo16(data = {}) {
         descripcion: data.pulmonesDescripcionAnexo7c_txtpulmones ?? ""
       },
       piel: {
-        normal: data.pielNormalAnexo7c_rbnormal ?? false,
-        anormal: data.pielAnormalAnexo7c_rbanormal ?? false,
-        descripcion: data.pielDescripcionAnexo7c_txtpiel ?? ""
+        normal: data.pielAnexo7c_piel ?? false,
+        anormal: !(data.pielAnexo7c_piel ?? false),
+        descripcion: data.pielDescripcionAnexo7c_piel_descripcion ?? ""
       },
       miembrosSuperiores: data.miembrosSuperioresAnexo7c_txtmiembrossuperiores ?? "",
       miembrosInferiores: data.miembrosInferioresAnexo7c_txtmiembrosinferiores ?? ""

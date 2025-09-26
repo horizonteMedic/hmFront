@@ -304,12 +304,7 @@ export default function Examenes({
                 <InputsRadioGroup
                   name="piel"
                   value={form.piel}
-                  onChange={(e, value) => {
-                    handleRadioButton(e, value)
-                    if (value == "ANORMAL") {
-                      setForm(prev => ({ ...prev, pielObservaciones: "" }));
-                    }
-                  }}
+                  onChange={handleRadioButton}
                   options={[
                     { label: "Normal", value: "NORMAL" },
                     { label: "Anormal", value: "ANORMAL" },
@@ -320,7 +315,6 @@ export default function Examenes({
                   name="pielObservaciones"
                   value={form.pielObservaciones}
                   onChange={handleChange}
-                  placeholder="Descripción de la evaluación de la piel..."
                 />
               </div>
             </div>

@@ -345,7 +345,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
   let observacionY = 239;
   observacionesLista.forEach((observacion) => {
     doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(`- ${observacion}`, 15, observacionY);
+    doc.text(`${observacion}`, 15, observacionY);
     observacionY += 4; // Espacio entre observaciones
   });
 

@@ -76,6 +76,8 @@ export const SubmitDataService = async (
     cuello: form.cuello,
     perimetro: form.perimetro,
     bocaAmigdalasFaringeLaringe: form.bocaAmigdalasFaringeLaringe,
+    piel: form.piel == "NORMAL",
+    pielDescripcion: form.pielObservaciones,
     visionColores: form.visionColores,
     enfermedadesOculares: form.enfermedadOculares,
     reflejosPupilares: form.reflejosPupilares,
@@ -1374,6 +1376,8 @@ export const GetInfoServicioEditar = (
             codigoAnexo: res.codigoAnexo7c_cod_anexo,
             codigoExamenRadiograficoSanguineo: res.codigoExamenRadiograficoSanguineo_cod_exra,
             imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
+            piel: res.pielAnexo7c_piel?"NORMAL":"ANORMAL",
+            pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
           };
 
           // Build observacionesGenerales from different medical areas
