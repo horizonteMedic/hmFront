@@ -20,7 +20,7 @@ export default function AntecedentesPatologicosTab({
         <h4 className="font-semibold mb-3">Ingresar Información</h4>
 
         {/* Barra de información del paciente */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
           <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onKeyUp={handleSearch} onChange={handleChangeNumber} labelWidth="70px" />
           <InputTextOneLine label="Fecha" name="fechaExam" type="date" value={form?.fechaExam} onChange={handleChangeSimple} labelWidth="50px" />
           <InputTextOneLine label="Nombres" name="nombres" value={form?.nombres} disabled labelWidth="70px" />
@@ -35,7 +35,7 @@ export default function AntecedentesPatologicosTab({
               label="BOROO"
               name="boroo"
               checked={form?.boroo}
-              onChange={handleCheckBoxChange}
+              disabled
             />
           </div>
         </div>
@@ -61,7 +61,6 @@ export default function AntecedentesPatologicosTab({
             />
             <div className="flex items-center gap-4">
               <InputsRadioGroup
-                label="Severidad"
                 name="severidadCovid"
                 value={form?.severidadCovid}
                 disabled={!form?.covid19}
@@ -73,6 +72,7 @@ export default function AntecedentesPatologicosTab({
                 onChange={handleRadioButton}
               />
             </div>
+            <InputTextOneLine label="Dosis de vacunas" name="dosisVacunas" value={form?.dosisVacunas} onChange={handleChangeNumber} labelWidth="120px" />
           </div>)}
 
         <div className="mb-2 font-semibold text-red-600">
@@ -193,6 +193,7 @@ export default function AntecedentesPatologicosTab({
               {/* Columna 1 - BOROO */}
               <div className="space-y-1">
                 {[
+                  ["gastritisCronica", "Gastritis crónica"],
                   ["alergias", "Alergias"],
                   ["asma", "Asma"],
                   ["bronquitisRepeticion", "Bronquitis a repetición"],
