@@ -1,4 +1,4 @@
-import { addYears, format } from "date-fns";
+import { addYears, format, parse } from "date-fns";
 
 export function fixEncodingModern(str) {
     const bytes = new Uint8Array([...str].map((c) => c.charCodeAt(0)));
@@ -10,6 +10,10 @@ export function getToday() {
 export function getTodayPlusOneYear() {
     return format(addYears(new Date(), 1), "yyyy-MM-dd");
 }
+export function getDatePlusOneYear(fechaStr) {//INPUT 2025-01-28 //OUTPUT 2026-01-28
+    return fechaStr ? format(addYears(parse(fechaStr, "yyyy-MM-dd", new Date()), 1), "yyyy-MM-dd") : "";
+}
+
 export function getSign(data, name) { //HUELLA // FIRMAP // SELLOFIRMA
     return data.digitalizacion?.find(
         item => item.nombreDigitalizacion === name

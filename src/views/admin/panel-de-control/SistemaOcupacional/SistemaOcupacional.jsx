@@ -94,7 +94,7 @@ import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSele
 import InformePsicologico from "./Psicologia/InformePsicologico/InformePsicologico.jsx";
 import Anexo16A from "./Anexo16A/Anexo16A.jsx";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos.jsx";
-import FichasAptitud from "./FichasAptitud/FichasAptitud.jsx";
+import FichasAptitudTabSelector from "./FichasAptitud/FichasAptitudTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -1317,7 +1317,7 @@ const TabComponent = () => {
                   Fichas Aptitud
                 </h2>
               </div>
-              <FichasAptitud listas={listasCombos} />
+              <FichasAptitudTabSelector listas={listasCombos} />
             </div>
           )}
         </div>

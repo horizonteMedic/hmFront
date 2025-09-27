@@ -6,7 +6,6 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../utils/functionUtils";
-import { formatearFechaCorta } from "../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
     "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos";

@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import FichaAptitudAnexo2 from "./FichaAptitudAnexo2/FichaAptitudAnexo2";
 import FichaAptitudAnexo16 from "./FichaAptitudAnexo16/FichaAptitudAnexo16";
 import { useSessionData } from "../../../../hooks/useSessionData";
@@ -9,7 +8,7 @@ import { getToday } from "../../../../utils/helpers";
 const today = getToday();
 
 // Tab Normal de Fichas Aptitud
-export default function FichasAptitud({ listas }) {
+export default function FichasAptitudTabSelector({ listas }) {
   const { MedicosMulti } = listas;
   const { userCompleto } = useSessionData();
   const initialFormState = {
@@ -20,7 +19,7 @@ export default function FichasAptitud({ listas }) {
     sexo: "",
     edad: "",
     boroo: false,
-    
+
     // Datos específicos para Fichas Aptitud Anexo 2
     numeroHistoria: "",
     tipoExamen: "",
@@ -41,7 +40,7 @@ export default function FichasAptitud({ listas }) {
     medicoCertifica: "",
     recomendaciones: "",
     restricciones: "",
-    
+
     // Checkboxes de recomendaciones
     corregirAgudezaVisualTotal: false,
     corregirAgudezaVisual: false,
@@ -55,10 +54,10 @@ export default function FichasAptitud({ listas }) {
     usoLentesTrabajoSobre18: false,
     ninguno: false,
     noConducirVehiculos: false,
-    
+
     // Campo de búsqueda
     busqueda: "",
-    
+
     // Datos médicos - Visión
     visionCercaOd: "",
     visionCercaOi: "",
@@ -72,17 +71,17 @@ export default function FichasAptitud({ listas }) {
     visionBinocular: "",
     reflejosPupilares: "",
     enfermedadOculares: "",
-    
+
     // Datos médicos - Laboratorio
     hemoglobinaHematocrito: "",
     vsg: "",
     glucosa: "",
     creatinina: "",
-    
+
     // Médico que Certifica
     nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
   };
-  
+
   const {
     form,
     setForm,
@@ -121,7 +120,7 @@ export default function FichasAptitud({ listas }) {
       // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
-  
+
   const handlePrint = () => {
     handlePrintDefault(() => {
       // PrintHojaR(form.norden, token, tabla, datosFooter);
@@ -136,11 +135,10 @@ export default function FichasAptitud({ listas }) {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${
-                activeTab === tab.id
-                  ? "border-[#233245] font-semibold"
-                  : "border-transparent"
-              }`}
+              className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === tab.id
+                ? "border-[#233245] font-semibold"
+                : "border-transparent"
+                }`}
               onClick={() => setActiveTab(tab.id)}
             >
               {tab.name}
@@ -156,6 +154,8 @@ export default function FichasAptitud({ listas }) {
               activeTab === tab.id && (
                 <Component
                   key={tab.id}
+                  MedicosMulti={MedicosMulti}
+
                   form={form}
                   setForm={setForm}
                   handleChange={handleChange}
@@ -164,7 +164,7 @@ export default function FichasAptitud({ listas }) {
                   handleCheckBoxChange={handleCheckBoxChange}
                   handleChangeSimple={handleChangeSimple}
                   handleRadioButtonBoolean={handleRadioButtonBoolean}
-                  MedicosMulti={MedicosMulti}
+
                   handleSave={handleSave}
                   handleSearch={handleSearch}
                   handlePrint={handlePrint}
