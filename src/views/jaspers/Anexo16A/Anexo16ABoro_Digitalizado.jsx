@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import { getSign } from "../../utils/helpers";
+import drawColorBox from '../components/ColorBox.jsx';
 
 export default function Anexo16ABoro_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -53,7 +54,14 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       direccion: "Av. Nicolas de Piérola N°1106 Urb. San Fernando",
       cmp: "80135",
       fecha: "04/11/2024"
-    }
+    },
+    // Datos de color
+    color: 1,
+    codigoColor: "#008f39",
+    textoColor: "F",
+    // Datos adicionales para header
+    numeroFicha: "99164",
+    sede: "Trujillo-Pierola"
   };
   const datosReales = {
     apellidosNombres: String((data.apellidos_apellidos_pa || "") + " " + (data.nombres_nombres_pa || "")),
@@ -98,7 +106,14 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       direccion: data.direccionSede || "",
       cmp: data.cmpUsuario_cmp_user || "",
       fecha: ""
-    }
+    },
+    // Datos de color
+    color: data.color || data.informacionSede?.color || 1,
+    codigoColor: data.codigoColor || data.informacionSede?.codigoColor || "#008f39",
+    textoColor: data.textoColor || data.informacionSede?.textoColor || "F",
+    // Datos adicionales para header
+    numeroFicha: data.numeroFicha || data.ficha || data.numero || "99164",
+    sede: data.sede || data.ubicacion || data.ciudad || "Trujillo-Pierola"
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
@@ -113,15 +128,38 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   doc.text("EVALUACION MÉDICA PARA ASCENSO A GRANDES ALTITUDES", pageW / 2, 30, { align: "center" });
   doc.text("(mayor de 2,500 m.s.n.m.)", pageW / 2, 34, { align: "center" });
 
+  // Número de Ficha y Página
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("Nro de ficha: ", pageW - 53, 15);
+  doc.setFont("helvetica", "bold").setFontSize(18);
+  doc.text(datosFinales.numeroFicha, pageW - 33, 15);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text("Sede: " + datosFinales.sede, pageW - 53, 20);
+  doc.text("Pag. 01", pageW - 53, 25);
+
+  // === BLOQUE DE COLOR ===
+  drawColorBox(doc, {
+    color: datosFinales.codigoColor,           // Color de la letra y línea
+    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
+    x: pageW - 30,                             // Posición X (30mm del borde derecho)
+    y: 10,                                     // Posición Y (alineado con header)
+    size: 22,                                  // Tamaño del área total (22x22mm)
+    showLine: true,                            // Mostrar línea de color
+    fontSize: 30,                              // Tamaño de la letra
+    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
+  });
+
+  // === FECHA DE EXAMEN ===
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Fecha Examen: " + datosFinales.fechaExamen, 15, 40);
 
   // === SECCIÓN 1: DATOS PERSONALES ===
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("1. Datos Personales", 15, 40);
+  doc.text("1. Datos Personales", 15, 45);
 
   // Datos personales
   const datosPersonales = [
-    { label: "Apellidos y Nombres:", value: datosFinales.apellidosNombres, x: 15, y: 45 },
-    { label: "Fecha de Examen:", value: datosFinales.fechaExamen, x: 15, y: 50 },
+    { label: "Apellidos y Nombres:", value: datosFinales.apellidosNombres, x: 15, y: 50 },
     { label: "Sexo:", value: datosFinales.sexo, x: 15, y: 55 },
     { label: "DNI:", value: datosFinales.documentoIdentidad, x: 15, y: 60 },
     { label: "Edad:", value: datosFinales.edad, x: 15, y: 65 },
@@ -377,7 +415,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   let observacionY = 245;
   observacionesLista.forEach((observacion) => {
     doc.setFont("helvetica", "normal").setFontSize(7);
-    doc.text(`- ${observacion}`, 15, observacionY);
+    doc.text(`${observacion}`, 15, observacionY);
     observacionY += 4; // Espacio entre observaciones
   });
 

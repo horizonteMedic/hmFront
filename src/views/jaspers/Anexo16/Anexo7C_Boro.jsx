@@ -256,6 +256,11 @@ export default function Anexo16Boroo(data = {}) {
         anormal: true,
         descripcion: "AUSCULTACIÓN PULMONAR NORMAL, SIN SIBILANCIAS NI RONCUS"
       },
+      piel: {
+        normal: true,
+        anormal: true,
+        descripcion: "PIEL NORMAL, SIN ALTERACIONES"
+      },
       miembrosSuperiores: "MOVILIDAD COMPLETA, FUERZA MUSCULAR NORMAL, SIN DEFORMIDADES",
       miembrosInferiores: "MARCHA NORMAL, FUERZA MUSCULAR ADECUADA, SIN EDEMAS"
     },
@@ -599,6 +604,11 @@ export default function Anexo16Boroo(data = {}) {
         normal: data.pulmonesNormalAnexo7c_rbnormal ?? false,
         anormal: data.pulmonesAnormalAnexo7c_rbanormal ?? false,
         descripcion: data.pulmonesDescripcionAnexo7c_txtpulmones ?? ""
+      },
+      piel: {
+        normal: data.pielAnexo7c_piel ?? false,
+        anormal: !(data.pielAnexo7c_piel ?? false),
+        descripcion: data.pielDescripcionAnexo7c_piel_descripcion ?? ""
       },
       miembrosSuperiores: data.miembrosSuperioresAnexo7c_txtmiembrossuperiores ?? "",
       miembrosInferiores: data.miembrosInferioresAnexo7c_txtmiembrosinferiores ?? ""
@@ -1461,13 +1471,41 @@ export default function Anexo16Boroo(data = {}) {
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
 
+  // PIEL - Checkboxes
+  const pielPosiciones = [
+    { tipo: "normal", x: 144.5, y: 259.5, texto: "Normal" },
+    { tipo: "anormal", x: 175.4, y: 259.5, texto: "Anormal" }
+  ];
+
+  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.piel) {
+    doc.setTextColor(0, 0, 255); // Color azul para las X
+    doc.setFont("helvetica", "bold").setFontSize(12);
+
+    pielPosiciones.forEach(pos => {
+      if (datosFinales.evaluacionFisicaAdicional.piel[pos.tipo]) {
+        doc.text("X", pos.x, pos.y);
+      }
+    });
+
+    doc.setTextColor(0, 0, 0); // Resetear a negro
+  }
+
   // PULMONES - Descripción
   const xPulmonesDescripcion = 30;
   const yPulmonesDescripcion = 264;
   if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.pulmones && datosFinales.evaluacionFisicaAdicional.pulmones.descripcion) {
-    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    doc.setFont("helvetica", "normal").setFontSize(6);
     doc.setTextColor(0, 0, 0);
-    doc.text(datosFinales.evaluacionFisicaAdicional.pulmones.descripcion.toUpperCase(), xPulmonesDescripcion, yPulmonesDescripcion, { maxWidth: 160 });
+    doc.text(datosFinales.evaluacionFisicaAdicional.pulmones.descripcion.toUpperCase(), xPulmonesDescripcion, yPulmonesDescripcion, { maxWidth: 80 });
+  }
+
+  // PIEL - Descripción
+  const xPielDescripcion = 132;
+  const yPielDescripcion = 264;
+  if (datosFinales.evaluacionFisicaAdicional && datosFinales.evaluacionFisicaAdicional.piel && datosFinales.evaluacionFisicaAdicional.piel.descripcion) {
+    doc.setFont("helvetica", "normal").setFontSize(6);
+    doc.setTextColor(0, 0, 0);
+    doc.text(datosFinales.evaluacionFisicaAdicional.piel.descripcion.toUpperCase(), xPielDescripcion, yPielDescripcion, { maxWidth: 80 });
   }
 
   // === SECCIÓN: MIEMBROS SUPERIORES ===

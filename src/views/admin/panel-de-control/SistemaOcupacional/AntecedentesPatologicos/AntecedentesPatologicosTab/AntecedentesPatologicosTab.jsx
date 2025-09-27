@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
 import { InputCheckbox, InputsBooleanRadioGroup, InputsRadioGroup, InputTextOneLine, } from "../../../../../components/reusableComponents/ResusableComponents";
+import { getToday } from "../../../../../utils/helpers";
 
 // Componente Antecedentes Patológicos - usa componentes reusables
 export default function AntecedentesPatologicosTab({
@@ -10,7 +11,8 @@ export default function AntecedentesPatologicosTab({
   handleCheckBoxChange,
   handleChangeSimple,
   handleRadioButton,
-  handleRadioButtonBoolean
+  handleRadioButtonBoolean,
+  handleSearch
 }) {
   return (
     <div className="space-y-4">
@@ -19,7 +21,7 @@ export default function AntecedentesPatologicosTab({
 
         {/* Barra de información del paciente */}
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-4">
-          <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onChange={handleChangeNumber} labelWidth="70px" />
+          <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onKeyUp={handleSearch} onChange={handleChangeNumber} labelWidth="70px" />
           <InputTextOneLine label="Fecha" name="fechaExam" type="date" value={form?.fechaExam} onChange={handleChangeSimple} labelWidth="50px" />
           <InputTextOneLine label="Nombres" name="nombres" value={form?.nombres} disabled labelWidth="70px" />
           <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled labelWidth="40px" />
@@ -51,9 +53,9 @@ export default function AntecedentesPatologicosTab({
             </div>
             <InputTextOneLine
               label="Fecha"
-              name="fechaEnfermedades"
+              name="fechaCovid"
               type="date"
-              value={form?.fechaEnfermedades}
+              value={form?.fechaCovid}
               onChange={handleChangeSimple}
               disabled={!form?.covid19}
             />
@@ -194,7 +196,7 @@ export default function AntecedentesPatologicosTab({
                   ["alergias", "Alergias"],
                   ["asma", "Asma"],
                   ["bronquitisRepeticion", "Bronquitis a repetición"],
-                  ["diabetes1", "Diabetes1"],
+                  ["diabetes", "Diabetes"],
                   ["enfCorazon", "Enfermedades del corazón"],
                   ["enfOculares", "Enf. Oculares"],
                   ["epilepsiaConvulsiones", "Epilepsia o convulsiones"],
@@ -298,13 +300,19 @@ export default function AntecedentesPatologicosTab({
               <InputsBooleanRadioGroup
                 name="alergiasMedicamentos"
                 value={form?.alergiasMedicamentos}
-                onChange={handleRadioButtonBoolean}
+                onChange={(e, value) => {
+                  if (value == false)
+                    setForm(prev => ({ ...prev, especifiqueAlergias: "" }));
+                  handleRadioButtonBoolean(e, value)
+                }
+                }
               />
               <InputTextOneLine
                 label="Especifique"
                 name="especifiqueAlergias"
                 value={form?.especifiqueAlergias}
                 onChange={handleChange}
+                disabled={!form?.alergiasMedicamentos}
                 className="w-full"
               />
             </div>
@@ -321,7 +329,17 @@ export default function AntecedentesPatologicosTab({
                     <InputsBooleanRadioGroup
                       name="accidenteTrabajo"
                       value={form?.accidenteTrabajo}
-                      onChange={handleRadioButtonBoolean}
+                      onChange={(e, value) => {
+                        const today = getToday();
+                        if (value == false)
+                          setForm(prev => ({
+                            ...prev,
+                            fechaAccidente: today, tiempoPerdido: false,
+                            especifiqueTiempoPerdido: "",
+                            tipoIncapacidad: "",
+                          }));
+                        handleRadioButtonBoolean(e, value)
+                      }}
                     />
                   </div>
 
@@ -353,7 +371,7 @@ export default function AntecedentesPatologicosTab({
                         onChange={handleChange}
                       />
                       <InputTextOneLine
-                        label="T.Incapci."
+                        label="Tipo de Incapacidad"
                         name="tipoIncapacidad"
                         value={form?.tipoIncapacidad}
                         onChange={handleChange}
@@ -371,7 +389,12 @@ export default function AntecedentesPatologicosTab({
                     <InputsBooleanRadioGroup
                       name="enfermedadProfesional"
                       value={form?.enfermedadProfesional}
-                      onChange={handleRadioButtonBoolean}
+                      onChange={(e, value) => {
+                        const today = getToday();
+                        if (value == false)
+                          setForm(prev => ({ ...prev, fechaCalificacion: today }));
+                        handleRadioButtonBoolean(e, value)
+                      }}
                     />
                   </div>
                 </div>

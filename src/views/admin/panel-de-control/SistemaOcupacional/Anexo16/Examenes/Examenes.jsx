@@ -297,6 +297,28 @@ export default function Examenes({
               onChange={handleChange}
             />
 
+            {/* Piel integrada */}
+            <div className="border-t pt-2 mt-3">
+              <h5 className="font-semibold text-gray-800 mb-2">Piel</h5>
+              <div className="space-y-2">
+                <InputsRadioGroup
+                  name="piel"
+                  value={form.piel}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Normal", value: "NORMAL" },
+                    { label: "Anormal", value: "ANORMAL" },
+                  ]}
+                />
+                <InputTextArea
+                  rows={3}
+                  name="pielObservaciones"
+                  value={form.pielObservaciones}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
             {/* Miembros y Reflejos integrados */}
             <div className="border-t pt-2 mt-3">
               <h5 className="font-semibold text-gray-800 mb-2">

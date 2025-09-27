@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/AntecedentesPatologicos/ficha_antecedente_patologico_boro.jsx"
+import Ficha from "./views/jaspers/Ficha_Anexo2/Aptitud_AgroindustrialH.jsx"
 
 const App = () => {
   return (

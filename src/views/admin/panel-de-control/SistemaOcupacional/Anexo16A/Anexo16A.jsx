@@ -15,6 +15,7 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./Anexo16AController";
+import Swal from "sweetalert2";
 
 const tabla = "anexo16a";
 const today = getToday();
@@ -27,7 +28,7 @@ export default function Anexo16A() {
     norden: "",
     fechaExam: today,
     codigoAnexo: null,
-    apto: false,
+    apto: undefined,
     actividadRealizar: "",
     dni: "",
     nombres: "",
@@ -105,6 +106,10 @@ export default function Anexo16A() {
   } = useForm(initialFormState);
 
   const handleSave = () => {
+    if (form.apto === undefined) {
+      Swal.fire("Alerta", "Por favor, marque si es apto.", "warning")
+      return;
+    }
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 

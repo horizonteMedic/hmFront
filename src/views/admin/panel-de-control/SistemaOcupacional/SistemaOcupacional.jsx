@@ -69,6 +69,7 @@ import {
   fa6,
   faA,
   faBacterium,
+  faFileMedical,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -93,6 +94,7 @@ import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSele
 import InformePsicologico from "./Psicologia/InformePsicologico/InformePsicologico.jsx";
 import Anexo16A from "./Anexo16A/Anexo16A.jsx";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos.jsx";
+import FichasAptitudTabSelector from "./FichasAptitud/FichasAptitudTabSelector.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -524,6 +526,18 @@ const TabComponent = () => {
                     <FontAwesomeIcon icon={faBacterium} />
                   </span>
                   <span className={styles.title}>Antecedentes Patológicos</span>
+                </div>
+              )}
+              {tieneVista("Fichas Aptitud") && (
+                <div
+                  className={`${styles.gridItem} ${activeTab === 30 ? styles.active : ""
+                    }`}
+                  onClick={() => setActiveTab(30)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faFileMedical} />
+                  </span>
+                  <span className={styles.title}>Fichas Aptitud</span>
                 </div>
               )}
               {tieneVista("Playground") && (
@@ -1285,7 +1299,25 @@ const TabComponent = () => {
                   Antecedentes Patológicos
                 </h2>
               </div>
-              <AntecedentesPatologicos/>
+              <AntecedentesPatologicos listas={listasCombos}/>
+            </div>
+          )}
+          {activeTab === 30 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Fichas Aptitud
+                </h2>
+              </div>
+              <FichasAptitudTabSelector listas={listasCombos} />
             </div>
           )}
         </div>
@@ -1378,6 +1410,10 @@ const TabComponent = () => {
               break;
             case "Antecedentes Patologicos":
               setActiveTab(29);
+              setSubTab(0);
+              break;
+            case "Fichas Aptitud":
+              setActiveTab(30);
               setSubTab(0);
               break;
           }
