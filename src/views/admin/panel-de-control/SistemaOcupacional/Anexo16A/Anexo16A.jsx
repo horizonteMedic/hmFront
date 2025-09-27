@@ -436,52 +436,56 @@ export default function Anexo16A() {
             </div>
           </div>
 
-          {/* Recomendaciones y Observaciones en columnas */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-3">Recomendaciones</h4>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-              <InputCheckbox
-                label="Corregir Agudeza Visual"
-                checked={form?.corregirAgudeza}
-                name="corregirAgudeza"
-                onChange={handleCheckBoxChangeWithObservations}
-              />
-              <InputCheckbox
-                label="Obesidad I. Dieta Hipocalórica y Ejercicios"
-                checked={form?.obesidadDieta}
-                name="obesidadDieta"
-                onChange={handleCheckBoxChangeWithObservations}
-              />
-              <InputCheckbox
-                label="D m II controlado, tto con:....."
-                checked={form?.diabetesControlado}
-                name="diabetesControlado"
-                onChange={handleCheckBoxChangeWithObservations}
-              />
-              <InputCheckbox
-                label="Sobrepeso. Dieta Hipocalórica y Ejercicios"
-                checked={form?.sobrepeso}
-                name="sobrepeso"
-                onChange={handleCheckBoxChangeWithObservations}
-              />
-              <InputCheckbox
-                label="HTA Controlada, en tto con:..."
-                checked={form?.htaControlada}
-                name="htaControlada"
-                onChange={handleCheckBoxChangeWithObservations}
-              />
-              <InputCheckbox
-                label="Uso de Lentes Correct. Lectura de Cerca"
-                checked={form?.lentesCorrectivos}
-                name="lentesCorrectivos"
-                onChange={handleCheckBoxChangeWithObservations}
-              />
+          {/* Recomendaciones y Observaciones en dos columnas */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* Columna 1: Recomendaciones */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <h4 className="font-semibold text-gray-800 mb-3">Recomendaciones</h4>
+              <div className="space-y-2">
+                <InputCheckbox
+                  label="Corregir Agudeza Visual"
+                  checked={form?.corregirAgudeza}
+                  name="corregirAgudeza"
+                  onChange={handleCheckBoxChangeWithObservations}
+                />
+                <InputCheckbox
+                  label="Obesidad I. Dieta Hipocalórica y Ejercicios"
+                  checked={form?.obesidadDieta}
+                  name="obesidadDieta"
+                  onChange={handleCheckBoxChangeWithObservations}
+                />
+                <InputCheckbox
+                  label="D m II controlado, tto con:....."
+                  checked={form?.diabetesControlado}
+                  name="diabetesControlado"
+                  onChange={handleCheckBoxChangeWithObservations}
+                />
+                <InputCheckbox
+                  label="Sobrepeso. Dieta Hipocalórica y Ejercicios"
+                  checked={form?.sobrepeso}
+                  name="sobrepeso"
+                  onChange={handleCheckBoxChangeWithObservations}
+                />
+                <InputCheckbox
+                  label="HTA Controlada, en tto con:..."
+                  checked={form?.htaControlada}
+                  name="htaControlada"
+                  onChange={handleCheckBoxChangeWithObservations}
+                />
+                <InputCheckbox
+                  label="Uso de Lentes Correct. Lectura de Cerca"
+                  checked={form?.lentesCorrectivos}
+                  name="lentesCorrectivos"
+                  onChange={handleCheckBoxChangeWithObservations}
+                />
+              </div>
             </div>
-          </div>
-          {/* Observaciones */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
-            <InputTextArea rows={4} name="observaciones" value={form?.observaciones} onChange={handleChange} />
+            
+            {/* Columna 2: Observaciones */}
+            <div className="bg-white border border-gray-200 rounded-lg p-3">
+              <h4 className="font-semibold text-gray-800 mb-3">Observaciones</h4>
+              <InputTextArea rows={7} name="observaciones" value={form?.observaciones} onChange={handleChange} />
+            </div>
           </div>
         </div>
 
@@ -524,61 +528,87 @@ export default function Anexo16A() {
             </div>
 
             {/* Corregida */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-gray-700 mb-2">Corregida</h5>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="text-center">
-                  <div className="font-semibold mb-2 ">O.D</div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                      <InputTextOneLine name="vcCorregidaOD" value={form?.vcCorregidaOD} disabled />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                      <InputTextOneLine name="vlCorregidaOD" value={form?.vlCorregidaOD} disabled />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.Clrs:</span>
-                      <InputTextOneLine name="vclrs" value={form?.vclrs} disabled />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.B.:</span>
-                      <InputTextOneLine name="vb" value={form?.vb} disabled />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">R.P.:</span>
-                      <InputTextOneLine name="rp" value={form?.rp} disabled />
-                    </div>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="font-semibold mb-2">O.I</div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                      <InputTextOneLine name="vcCorregidaOI" value={form?.vcCorregidaOI} disabled />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                      <InputTextOneLine name="vlCorregidaOI" value={form?.vlCorregidaOI} disabled />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">:</span>
-                      {/* <InputTextOneLine name="vclrs" value={form?.vclrs} disabled /> */}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">:</span>
-                      {/* <InputTextOneLine name="vbOI" value={form?.vbOI} disabled /> */}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] min-w-[30px]">:</span>
-                      {/* <InputTextOneLine name="rpOI" value={form?.rpOI} disabled /> */}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Corregida */}
+<div className="mb-4">
+  <h5 className="font-semibold text-gray-700 mb-2">Corregida</h5>
+
+  {/* Fila OD y OI */}
+  <div className="grid grid-cols-2 gap-6">
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] min-w-[35px]">V.C.</span>
+        <InputTextOneLine
+          name="vcCorregidaOD"
+          value={form?.vcCorregidaOD}
+          disabled
+          className="flex-1 w-full"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] min-w-[35px]">V.L.</span>
+        <InputTextOneLine
+          name="vlCorregidaOD"
+          value={form?.vlCorregidaOD}
+          disabled
+          className="flex-1 w-full"
+        />
+      </div>
+    </div>
+
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] min-w-[35px]">V.C.</span>
+        <InputTextOneLine
+          name="vcCorregidaOI"
+          value={form?.vcCorregidaOI}
+          disabled
+          className="flex-1 w-full"
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <span className="text-[11px] min-w-[35px]">V.L.</span>
+        <InputTextOneLine
+          name="vlCorregidaOI"
+          value={form?.vlCorregidaOI}
+          disabled
+          className="flex-1 w-full"
+        />
+      </div>
+    </div>
+  </div>
+
+  {/* Fila extra (ancho completo) */}
+  <div className="mt-4 space-y-2">
+    <div className="flex items-center gap-2">
+      <span className="text-[11px] min-w-[45px]">V.Clrs</span>
+      <InputTextOneLine
+        name="vclrs"
+        value={form?.vclrs}
+        disabled
+        className="flex-1 w-full"
+      />
+    </div>
+    <div className="flex items-center gap-2">
+      <span className="text-[11px] min-w-[45px]">V.B.</span>
+      <InputTextOneLine
+        name="vb"
+        value={form?.vb}
+        disabled
+        className="flex-1 w-full"
+      />
+    </div>
+    <div className="flex items-center gap-2">
+      <span className="text-[11px] min-w-[45px]">R.P.</span>
+      <InputTextOneLine
+        name="rp"
+        value={form?.rp}
+        disabled
+        className="flex-1 w-full"
+      />
+    </div>
+  </div>
+</div>
+
 
             {/* Enfermedades Oculares */}
             <div className="mb-4 flex-1">

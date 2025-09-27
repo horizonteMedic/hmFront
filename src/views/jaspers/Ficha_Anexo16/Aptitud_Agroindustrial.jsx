@@ -5,7 +5,7 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 
-export default function Aptitud_AgroindustrialH(data = {}) {
+export default function Aptitud_Agroindustrial(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
@@ -470,8 +470,8 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   doc.rect(tablaAptitudInicioX, tablaAptitudInicioY, tablaAptitudAncho, alturaTablaAptitud);
   
   // Líneas verticales
-  doc.line(tablaAptitudInicioX + 85, tablaAptitudInicioY, tablaAptitudInicioX + 85, tablaAptitudInicioY + (filaAptitudAltura * 3)); // División principal solo hasta NO APTO
-  doc.line(tablaAptitudInicioX + 95, tablaAptitudInicioY, tablaAptitudInicioX + 95, tablaAptitudInicioY + (filaAptitudAltura * 3)); // División para checkboxes solo hasta NO APTO
+  doc.line(tablaAptitudInicioX + 85, tablaAptitudInicioY, tablaAptitudInicioY + (filaAptitudAltura * 3)); // División principal solo hasta NO APTO
+  doc.line(tablaAptitudInicioX + 95, tablaAptitudInicioY, tablaAptitudInicioY + (filaAptitudAltura * 3)); // División para checkboxes solo hasta NO APTO
   
   // Línea vertical en el medio de la fila de recomendaciones
   const yRecomendaciones = tablaAptitudInicioY + (3 * filaAptitudAltura);
