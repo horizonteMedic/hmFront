@@ -334,7 +334,7 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
             />
             <MedicoSearch
               value={form.nombre_medico}
-              onChange={handleChange}
+              onChange={handleChangeSimple}
               MedicosMulti={MedicosMulti}
             />
 

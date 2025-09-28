@@ -13,9 +13,11 @@ export function getTodayPlusOneYear() {
 export function getDatePlusOneYear(fechaStr) {//INPUT 2025-01-28 //OUTPUT 2026-01-28
     return fechaStr ? format(addYears(parse(fechaStr, "yyyy-MM-dd", new Date()), 1), "yyyy-MM-dd") : "";
 }
-
 export function getSign(data, name) { //HUELLA // FIRMAP // SELLOFIRMA
     return data.digitalizacion?.find(
         item => item.nombreDigitalizacion === name
     )?.url ?? ""
+}
+export function getHoraActual() { //devuelve la hora con el formato correcto para guardar 09:05:08
+    return new Date().toLocaleTimeString('es-PE', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }

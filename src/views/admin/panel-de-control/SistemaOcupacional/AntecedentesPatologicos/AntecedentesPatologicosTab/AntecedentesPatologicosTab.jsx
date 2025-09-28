@@ -90,8 +90,145 @@ export default function AntecedentesPatologicosTab({
               labelWidth="120px" />
           </div>)}
 
+
+
         <div className="mb-2 font-semibold text-red-600">
           Marcar todas las enfermedades que ha tenido o tiene
+        </div>
+        <div className="space-y-3 mb-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Agentes presentes en Trabajo Actual
+            </h4>
+            <div className="grid grid-cols-3 gap-2">
+              <InputCheckbox
+                label="Ruido"
+                checked={form.ruido}
+                name="ruido"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Polvo"
+                checked={form.polvo}
+                name="polvo"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Vid Segmentario"
+                checked={form.vidSegmentario}
+                name="vidSegmentario"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Vid Total"
+                checked={form.vidTotal}
+                name="vidTotal"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Altura Estruct."
+                checked={form.alturaEstruct}
+                name="alturaEstruct"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Vibraciones"
+                checked={form.vibraciones}
+                name="vibraciones"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Cancerígenos"
+                checked={form.cancerigenos}
+                name="cancerigenos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Mutagenicos"
+                checked={form.mutagenicos}
+                name="mutagenicos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Solventes"
+                checked={form.solventes}
+                name="solventes"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Metales"
+                checked={form.metales}
+                name="metales"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Altura Geograf."
+                checked={form.alturaGeograf}
+                name="alturaGeograf"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Temperatura"
+                checked={form.temperaturaAgente}
+                name="temperaturaAgente"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Biológicos"
+                checked={form.biologicos}
+                name="biologicos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Posturas"
+                checked={form.posturas}
+                name="posturas"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Turnos"
+                checked={form.turnos}
+                name="turnos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Químicos"
+                checked={form.quimicos}
+                name="quimicos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Cargas"
+                checked={form.cargas}
+                name="cargas"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Mov. Repet"
+                checked={form.movRepet}
+                name="movRepet"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="PVD"
+                checked={form.pvd}
+                name="pvd"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Electricos"
+                checked={form.electricos}
+                name="electricos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Otros"
+                checked={form.otrosAgentes}
+                name="otrosAgentes"
+                onChange={handleCheckBoxChange}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

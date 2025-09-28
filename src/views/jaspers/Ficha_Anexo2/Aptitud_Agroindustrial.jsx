@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { getSign } from "../../utils/helpers.js";
+import { formatearFechaCorta } from "../../utils/formatDateUtils";
+import { getSign } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
@@ -217,7 +217,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   };
 
   // Función para dibujar texto pegado sin espacios extra
-  const dibujarTextoPegado = (texto, x, y, anchoMaximo, fontSize = 7) => {
+  const dibujarTextoPegado = (texto, x, y, anchoMaximo, fontSize = 9) => {
     if (!texto || texto.trim() === '') return y;
 
     doc.setFontSize(fontSize);
@@ -425,7 +425,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
       const alturaConclusion = calcularAlturaTexto(conclusion, 170, 9);
       alturaTotalConclusiones += alturaConclusion;
     });
-    alturaTotalConclusiones += 10; // Espacio extra para el marco (aumentado)
+    alturaTotalConclusiones += 15; // Espacio extra para el marco (aumentado)
 
     // Dibujar marco
     doc.rect(marcoInicioX, marcoInicioY, marcoAncho, alturaTotalConclusiones);
@@ -438,8 +438,8 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     // Dibujar cada conclusión pegada
     let yPosConclusiones = yTexto;
     datosFinales.conclusiones.forEach((conclusion) => {
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      yPosConclusiones = dibujarTextoPegado(conclusion, marcoInicioX + 5, yPosConclusiones, 170, 7);
+      doc.setFont("helvetica", "normal").setFontSize(9);
+      yPosConclusiones = dibujarTextoPegado(conclusion, marcoInicioX + 5, yPosConclusiones, 170, 9);
     });
 
     // Actualizar yTexto con la posición final del marco
@@ -452,7 +452,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   const tablaAptitudInicioX = 15;
   const tablaAptitudInicioY = yTexto;
   const tablaAptitudAncho = 180;
-  const filaAptitudAltura = 6; //revisaaaaaaaaaaaaaaaaaaaaaaaaaa
+  const filaAptitudAltura = 6; // Altura reducida
 
   // Calcular altura necesaria para recomendaciones
   let alturaRecomendaciones = filaAptitudAltura; // Altura base de la fila
@@ -460,9 +460,9 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     let recomendacionesArray = Array.isArray(datosFinales.recomendaciones)
       ? datosFinales.recomendaciones
       : [datosFinales.recomendaciones];
-    // recomendacionesArray = recomendacionesArray.slice(0, 14);
+    recomendacionesArray = recomendacionesArray.slice(0, 10);
     // Calcular altura basada en número de recomendaciones (6 puntos por recomendación)
-    alturaRecomendaciones = Math.max(filaAptitudAltura, (recomendacionesArray.length * 3.5) + 2);
+    alturaRecomendaciones = Math.max(filaAptitudAltura, (recomendacionesArray.length * 6) + 4);
   }
 
   // Calcular altura de la tabla de aptitud (más compacta)
@@ -528,14 +528,13 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   }
   yAptitud += filaAptitudAltura;
 
-
   // Cuarta fila: RECOMENDACIONES
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("RECOMENDACIONES:", tablaAptitudInicioX + 5, yRecomendaciones + 4);
 
   // Mostrar recomendaciones dinámicamente si existen
   if (datosFinales.recomendaciones && datosFinales.recomendaciones.length > 0) {
-    doc.setFont("helvetica", "normal").setFontSize(6);
+    doc.setFont("helvetica", "normal").setFontSize(8);
 
     // Convertir a array si es string
     let recomendacionesArray = Array.isArray(datosFinales.recomendaciones)
@@ -543,7 +542,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
       : [datosFinales.recomendaciones];
 
     // Limitar a 10 recomendaciones máximo
-    // recomendacionesArray = recomendacionesArray.slice(0, 14);
+    recomendacionesArray = recomendacionesArray.slice(0, 10);
 
     let yPosicion = yRecomendaciones + 10;
     recomendacionesArray.forEach((recomendacion, index) => {
@@ -557,7 +556,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
         doc.text(textoRecomendacion, tablaAptitudInicioX + 5, yPosicion);
 
         // Incrementar posición para la siguiente fila
-        yPosicion += 3; // Espaciado mayor entre filas para mejor legibilidad
+        yPosicion += 5; // Espaciado mayor entre filas para mejor legibilidad
       }
     });
   }
@@ -577,10 +576,8 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     let yRestricciones = tablaAptitudInicioY + 9;
     restricciones.forEach((restriccion) => {
       if (restriccion.trim()) {
-        doc.setFont("helvetica", "normal").setFontSize(5);
-        doc.text(`- ${restriccion.trim()}`, tablaAptitudInicioX + 97, yRestricciones - 1);
+        doc.text(`- ${restriccion.trim()}`, tablaAptitudInicioX + 98, yRestricciones);
         yRestricciones += 3; // Espacio entre líneas
-        doc.setFont("helvetica", "normal").setFontSize(8);
       }
     });
   } else {
@@ -588,38 +585,6 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.text("- NINGUNO.", tablaAptitudInicioX + 98, tablaAptitudInicioY + 9);
   }
 
-  // Agregar firma en la sección de restricciones si existe
-  // const firmaUrl = getSign(data, "SELLOFIRMA");
-  // if (firmaUrl) {
-  //   try {
-  //     // Obtener la imagen de la firma
-  //     const img = new Image();
-  //     img.onload = function () {
-  //       // Calcular dimensiones para que la firma se ajuste al espacio disponible
-  //       const maxWidth = 70; // Ancho máximo disponible en la columna derecha
-  //       const maxHeight = 20; // Altura máxima
-  //       let imgWidth = img.width;
-  //       let imgHeight = img.height;
-
-  //       // Calcular escala para mantener proporción
-  //       const scaleX = maxWidth / imgWidth;
-  //       const scaleY = maxHeight / imgHeight;
-  //       const scale = Math.min(scaleX, scaleY);
-
-  //       const finalWidth = imgWidth * scale;
-  //       const finalHeight = imgHeight * scale;
-
-  //       // Posicionar la firma en la parte inferior derecha de la sección de restricciones
-  //       const xFirma = tablaAptitudInicioX + 98 + (maxWidth - finalWidth) / 2;
-  //       const yFirma = tablaAptitudInicioY + alturaRecomendaciones - finalHeight - 2;
-
-  //       doc.addImage(img, 'PNG', tablaAptitudInicioX + 123, yFechaTexto + 4, 50, 20);
-  //     };
-  //     img.src = firmaUrl;
-  //   } catch (error) {
-  //     console.error('Error al cargar la firma:', error);
-  //   }
-  // }
 
 
   // Fila de FECHA DE EXAMEN (después de recomendaciones) - 3 columnas
@@ -641,11 +606,44 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("SELLO Y FIRMA DE MEDICO QUE CERTIFICA", tablaAptitudInicioX + 123, yFechaTexto + 4);
 
+
+  // Agregar firma en la sección de restricciones si existe
+  // const firmaUrl = getSign(data, "SELLOFIRMA");
+  // if (firmaUrl) {
+  //   try {
+  //     // Obtener la imagen de la firma
+  //     const img = new Image();
+  //     img.onload = function () {
+  //       // Calcular dimensiones para que la firma se ajuste al espacio disponible
+  //       const maxWidth = 70;  // Ancho máximo disponible en la columna derecha
+  //       const maxHeight = 20;  // Altura máxima
+  //       let imgWidth = img.width;
+  //       let imgHeight = img.height;
+
+  //       // Calcular escala para mantener proporción
+  //       const scaleX = maxWidth / imgWidth;
+  //       const scaleY = maxHeight / imgHeight;
+  //       const scale = Math.min(scaleX, scaleY);
+
+  //       const finalWidth = imgWidth * scale;
+  //       const finalHeight = imgHeight * scale;
+
+  //       // Posicionar la firma en la parte inferior derecha de la sección de restricciones
+  //       const xFirma = tablaAptitudInicioX + 98 + (maxWidth - finalWidth) / 2;
+  //       const yFirma = tablaAptitudInicioY + alturaRecomendaciones - finalHeight - 2;
+
+
+  //     };
+  //     img.src = firmaUrl;
+  //   } catch (error) {
+  //     console.error('Error al cargar la firma:', error);
+  //   }
+  // }
   try {
     const firmaMedicoImg = getSign(data, "SELLOFIRMA");
-    doc.addImage(firmaMedicoImg, "PNG", tablaAptitudInicioX + 130, yFechaTexto - 40, 50 * 0.8, 40 * 0.8);
+    doc.addImage(firmaMedicoImg, 'PNG', tablaAptitudInicioX + 130, yFechaTexto -32, 50*0.8, 40*0.8);
   } catch (e) {
-    console.error('Error al cargar la firma:', e);
+    console.log("Error al agregar la firma:", e);
   }
 
   yTexto += alturaTablaAptitud + 3; // Espacio mínimo después de la tabla

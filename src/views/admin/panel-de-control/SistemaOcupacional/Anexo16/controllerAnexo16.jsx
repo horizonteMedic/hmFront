@@ -265,6 +265,32 @@ export const GetInfoServicio = (
           data = MapearDatosAdicionales(res, data, data.contador, false);
           data.antecedentesPersonales2 = "NINGUNO";
 
+
+          data.ruido = res.ruidoAnexo7c_chkruido ?? false;
+          data.polvo = res.polvoAnexo7c_chkpolvo ?? false;
+          data.vidSegmentario =
+            res.vidSegmentarioAnexo7c_chkvidsegmentario ?? false;
+          data.vidTotal = res.vidTotalAnexo7c_chkvidtotal ?? false;
+          data.alturaEstruct =
+            res.alturaEstructuraAnexo7c_altura_estructura ?? false;
+          data.vibraciones = res.vibracionesAnexo7c_vibraciones ?? false;
+          data.cancerigenos = res.cancerigenosAnexo7c_chkcancerigenos ?? false;
+          data.mutagenicos = res.mutagenicosAnexo7c_chkmutagenicos ?? false;
+          data.solventes = res.solventesAnexo7c_chksolventes ?? false;
+          data.metales = res.metalesAnexo7c_chkmetales ?? false;
+          data.alturaGeograf = res.alturaGeogAnexo7c_altura_geog ?? false;
+          data.temperaturaAgente =
+            res.temperaturaAnexo7c_chktemperatura ?? false;
+          data.biologicos = res.biologicosAnexo7c_chkbiologicos ?? false;
+          data.posturas = res.posturasAnexo7c_chkposturas ?? false;
+          data.turnos = res.turnosAnexo7c_chkturnos ?? false;
+          data.quimicos = res.quimicosAnexo7c_quimicos ?? false;
+          data.cargas = res.cargasAnexo7c_chkcargas ?? false;
+          data.movRepet = res.movRepetAnexo7c_chkmovrepet ?? false;
+          data.pvd = res.pvdAnexo7c_chkpvd ?? false;
+          data.electricos = res.electricosAnexo7c_electricos ?? false;
+          data.otros = res.otrosAnexo7c_chkotros ?? false;
+
           // Información radiográfica
           if (res.infoGeneralRadiografia_info_general != null) {
             data.observacionesGenerales +=
@@ -1376,7 +1402,7 @@ export const GetInfoServicioEditar = (
             codigoAnexo: res.codigoAnexo7c_cod_anexo,
             codigoExamenRadiograficoSanguineo: res.codigoExamenRadiograficoSanguineo_cod_exra,
             imagenRadiograficaPolvo: res.examenRadiograficoIrep_txtirep ?? "",
-            piel: res.pielAnexo7c_piel?"NORMAL":"ANORMAL",
+            piel: res.pielAnexo7c_piel ? "NORMAL" : "ANORMAL",
             pielObservaciones: res.pielDescripcionAnexo7c_piel_descripcion,
           };
 

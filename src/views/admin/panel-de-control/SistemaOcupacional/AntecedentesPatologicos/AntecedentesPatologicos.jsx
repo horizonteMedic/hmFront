@@ -33,6 +33,29 @@ export default function AntecedentesPatologicos({ listas }) {
     fechaCovid: today,
     severidadCovid: "",
 
+    //Agentes presentes en Trabajo Actual
+    ruido: true,
+    polvo: true,
+    vidSegmentario: true,
+    vidTotal: true,
+    alturaEstruct: true,
+    vibraciones: true,
+    cancerigenos: false,
+    mutagenicos: false,
+    solventes: false,
+    metales: false,
+    alturaGeograf: false,
+    temperaturaAgente: true,
+    biologicos: false,
+    posturas: true,
+    turnos: false,
+    quimicos: false,
+    cargas: true,
+    movRepet: true,
+    pvd: false,
+    electricos: false,
+    otrosAgentes: false,
+    //
     alergias: false,
     amigdalitisCronica: false,
     arritmiasCardiacas: false,
@@ -311,7 +334,7 @@ export default function AntecedentesPatologicos({ listas }) {
     });
   };
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 mb-28">
       <div className="bg-white border border-gray-200 rounded-lg p-3">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Columna 1 - Ancha con los 3 tabs */}

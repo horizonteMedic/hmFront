@@ -9,9 +9,9 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/anexos/fichaAnexo2/obtenerReporteFichaAnexo2";
+    "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16";
 const registrarUrl =
-    "/api/v01/ct/anexos/fichaAnexo2/registrarActualizarFichaAnexo2";
+    "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarFichaAnexo16";
 
 export const GetInfoServicio = async (
     nro,
@@ -46,6 +46,26 @@ export const GetInfoServicio = async (
 
             conclusiones: res.conclusiones,
             restricciones: res.restriccionesDescripcion,
+
+            visionCercaOd: res.visioncercasincorregirodVCercaSOd,
+            visionLejosOd: res.visionlejossincorregirodVLejosSOd,
+            visionCercaOi: res.visioncercasincorregiroiVCercaSOi,
+            visionLejosOi: res.visionlejossincorregiroiVLejosSOi,
+
+            visionCercaOdCorregida: res.oftalodccmologiaOdcc,
+            visionLejosOdCorregida: res.odlcoftalmologiaOdlc,
+            visionCercaOiCorregida: res.oiccoftalmologiaOicc,
+            visionLejosOiCorregida: res.oilcoftalmologiaOilc,
+
+            visionColores: res.vcoftalmologiaVc,
+            visionBinocular: res.vboftalmologiaVb,
+            reflejosPupilares: res.rpoftalmologiaRp,
+            enfermedadOculares: res.enfermedadesocularesoftalmoEOculares,
+
+            hemoglobina: res.hemoglobinaTxthemoglobina,
+            vsg: res.vsglabclinicoTxtvsg,
+            glucosa: res.glucosalabclinicoTxtglucosabio,
+            creatinina: res.creatininalabclinicoTxtcreatininabio,
         }));
     }
 };
@@ -101,10 +121,28 @@ export const GetInfoServicioEditar = async (
             usoLentesTrabajoSobre18: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
             ninguno: res.restriccionesDescripcion?.includes("NINGUNO") || res.restriccionesDescripcion === "NINGUNO." || false,
             noConducirVehiculos: res.restriccionesDescripcion?.includes("NO CONDUCIR VEHÍCULOS") || false,
-
             // Médico que Certifica
             nombre_medico: res.nombreMedico,
 
+            visionCercaOd: res.visioncercasincorregirodVCercaSOd,
+            visionLejosOd: res.visionlejossincorregirodVLejosSOd,
+            visionCercaOi: res.visioncercasincorregiroiVCercaSOi,
+            visionLejosOi: res.visionlejossincorregiroiVLejosSOi,
+
+            visionCercaOdCorregida: res.oftalodccmologiaOdcc,
+            visionLejosOdCorregida: res.odlcoftalmologiaOdlc,
+            visionCercaOiCorregida: res.oiccoftalmologiaOicc,
+            visionLejosOiCorregida: res.oilcoftalmologiaOilc,
+
+            visionColores: res.vcoftalmologiaVc,
+            visionBinocular: res.vboftalmologiaVb,
+            reflejosPupilares: res.rpoftalmologiaRp,
+            enfermedadOculares: res.enfermedadesocularesoftalmoEOculares,
+
+            hemoglobina: res.hemoglobinaTxthemoglobina,
+            vsg: res.vsglabclinicoTxtvsg,
+            glucosa: res.glucosalabclinicoTxtglucosabio,
+            creatinina: res.creatininalabclinicoTxtcreatininabio,
         }));
     }
 };
@@ -128,7 +166,7 @@ export const SubmitDataService = async (
         fecha: form.fechaExam,
         nombreMedico: form.nombre_medico,
         apto: form.apto === "APTO",
-        aptoConRestriccion: form.apto === "APTO CON RESTRICCION",
+        aptoRestriccion: form.apto === "APTO CON RESTRICCION",
         noApto: form.apto === "NO APTO",
         restriccionesDescripcion: form.restricciones,
         horaSalida: getHoraActual(),
@@ -150,7 +188,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo2/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -158,7 +196,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/Ficha_Anexo2"
+        "../../../../../jaspers/Ficha_Anexo16"
     );
 };
 
@@ -178,7 +216,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Aptitud Anexo 2.",
+                    "Este paciente ya cuenta con registros de Ficha Aptitud Anexo 16.",
                     "warning"
                 );
             });
@@ -187,7 +225,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Anexo 2 para poder registrarse.",
+                "El paciente necesita pasar por Anexo 16 para poder registrarse.",
                 "warning"
             );
         }

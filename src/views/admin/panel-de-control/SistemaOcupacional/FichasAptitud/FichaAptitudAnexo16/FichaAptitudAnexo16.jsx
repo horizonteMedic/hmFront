@@ -1,105 +1,122 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileMedical, faSearch, faSave, faPrint, faTrash, faCalendar } from "@fortawesome/free-solid-svg-icons";
-import { 
-  InputTextOneLine, 
-  InputTextArea, 
-  InputCheckbox, 
-  InputsRadioGroup 
+import { faSave, faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
+import {
+  InputTextOneLine,
+  InputTextArea,
+  InputCheckbox,
+  InputsRadioGroup
 } from "../../../../../components/reusableComponents/ResusableComponents";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { getDatePlusOneYear, getToday } from "../../../../../utils/helpers";
+import { useForm } from "../../../../../hooks/useForm";
+import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
+import useRealTime from "../../../../../hooks/useRealTime";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
 
-// Componente para Ficha Aptitud Anexo 16
-export default function FichaAptitudAnexo16({
-  form,
-  setForm,
-  handleChange,
-  handleChangeNumber,
-  handleRadioButton,
-  handleCheckBoxChange,
-  handleChangeSimple,
-  handleRadioButtonBoolean,
-  MedicosMulti,
-  handleSave,
-  handleSearch,
-  handlePrint,
-  handleClear,
-}) {
-  // Función para manejar cambios en aptitud
-  const handleAptitudChange = (e) => {
-    const name = e.target.name;
-    const checked = e.target.checked;
-    
-    setForm(prev => {
-      const newForm = { ...prev, [name]: checked };
-      
-      // Si se marca "apto", desmarcar los otros y aplicar lógica de APTO
-      if (name === "apto" && checked) {
-        newForm.apto_restriccion = false;
-        newForm.no_apto = false;
-        // APTO: NINGUNO marcado, restricciones "NINGUNA", recomendaciones "NINGUNA"
-        newForm.ninguno = true;
-        newForm.restricciones = "NINGUNA";
-        newForm.recomendaciones = "NINGUNA";
-        // Desmarcar todas las otras recomendaciones
-        newForm.corregirAgudezaVisualTotal = false;
-        newForm.corregirAgudezaVisual = false;
-        newForm.dietaHipocalorica = false;
-        newForm.evitarMovimientosDisergonomicos = false;
-        newForm.noHacerTrabajoAltoRiesgo = false;
-        newForm.noHacerTrabajoSobre18 = false;
-        newForm.usoEppAuditivo = false;
-        newForm.usoLentesConducir = false;
-        newForm.usoLentesTrabajo = false;
-        newForm.usoLentesTrabajoSobre18 = false;
-        newForm.noConducirVehiculos = false;
-      } else if (name === "apto_restriccion" && checked) {
-        newForm.apto = false;
-        newForm.no_apto = false;
-        // APTO CON RESTRICCIÓN: NINGUNO deshabilitado, restricciones "APTO CON RESTRICCIONES", recomendaciones libres
-        newForm.ninguno = false;
-        newForm.restricciones = "APTO CON RESTRICCIONES";
-        newForm.recomendaciones = "";
-        // Desmarcar todas las recomendaciones para que el usuario pueda elegir
-        newForm.corregirAgudezaVisualTotal = false;
-        newForm.corregirAgudezaVisual = false;
-        newForm.dietaHipocalorica = false;
-        newForm.evitarMovimientosDisergonomicos = false;
-        newForm.noHacerTrabajoAltoRiesgo = false;
-        newForm.noHacerTrabajoSobre18 = false;
-        newForm.usoEppAuditivo = false;
-        newForm.usoLentesConducir = false;
-        newForm.usoLentesTrabajo = false;
-        newForm.usoLentesTrabajoSobre18 = false;
-        newForm.noConducirVehiculos = false;
-      } else if (name === "no_apto" && checked) {
-        newForm.apto = false;
-        newForm.apto_restriccion = false;
-        // NO APTO: NINGUNO deshabilitado, restricciones vacías, recomendaciones libres
-        newForm.ninguno = false;
-        newForm.restricciones = "";
-        newForm.recomendaciones = "";
-        // Desmarcar todas las recomendaciones para que el usuario pueda elegir
-        newForm.corregirAgudezaVisualTotal = false;
-        newForm.corregirAgudezaVisual = false;
-        newForm.dietaHipocalorica = false;
-        newForm.evitarMovimientosDisergonomicos = false;
-        newForm.noHacerTrabajoAltoRiesgo = false;
-        newForm.noHacerTrabajoSobre18 = false;
-        newForm.usoEppAuditivo = false;
-        newForm.usoLentesConducir = false;
-        newForm.usoLentesTrabajo = false;
-        newForm.usoLentesTrabajoSobre18 = false;
-        newForm.noConducirVehiculos = false;
-      }
-      
-      return newForm;
+const tabla = "aptitud_medico_ocupacional_agro"
+const today = getToday();
+
+export default function FichaAptitudAnexo2({ MedicosMulti }) {
+  const hora = useRealTime();
+
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
+
+  const initialFormState = {
+    // Datos básicos
+    norden: "",
+    tipoExamen: "",
+    fechaExam: today,
+    nombres: "",
+    dni: "",
+    edad: "",
+    sexo: "",
+    empresa: "",
+    contrata: "",
+    puestoPostula: "",
+    areaTrabajo: "",
+    puestoActual: "",
+
+    conclusiones: "",
+    apto: "APTO",
+    fechaValido: today,
+    fechaVencimiento: getDatePlusOneYear(today),
+    recomendaciones: "",
+    restricciones: "NINGUNO.",
+
+    // Checkboxes de recomendaciones
+    corregirAgudezaVisualTotal: false,
+    corregirAgudezaVisual: false,
+    dietaHipocalorica: false,
+    evitarMovimientosDisergonomicos: false,
+    noHacerTrabajoAltoRiesgo: false,
+    noHacerTrabajoSobre18: false,
+    usoEppAuditivo: false,
+    usoLentesConducir: false,
+    usoLentesTrabajo: false,
+    usoLentesTrabajoSobre18: false,
+    ninguno: true,
+    noConducirVehiculos: false,
+
+    visionCercaOd: "",
+    visionLejosOd: "",
+    visionCercaOi: "",
+    visionLejosOi: "",
+
+    visionCercaOdCorregida: "",
+    visionLejosOdCorregida: "",
+    visionCercaOiCorregida: "",
+    visionLejosOiCorregida: "",
+
+    visionColores: "",
+    visionBinocular: "",
+    reflejosPupilares: "",
+    enfermedadOculares: "",
+
+    hemoglobina: "",
+    vsg: "",
+    glucosa: "",
+    creatinina: "",
+
+    // Médico que Certifica
+    nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+  };
+
+  const {
+    form,
+    setForm,
+    handleChange,
+    handleChangeNumber,
+    handleRadioButton,
+    handleChangeSimple,
+    handleCheckBoxChange,
+    handleRadioButtonBoolean,
+    handleClear,
+    handleClearnotO,
+    handlePrintDefault,
+  } = useForm(initialFormState);
+
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+    }
+  };
+
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
-  // Función para manejar cambios en checkboxes de recomendaciones
-  const handleRecomendacionChange = (name, checked) => {
+  // Función para manejar cambios en checkboxes de restricciones
+  const handleRestriccionesChange = (name, checked) => {
     setForm(prev => {
       const newForm = { ...prev, [name]: checked };
-      
       // Si se marca "NINGUNO", deshabilitar todos los otros
       if (name === "ninguno" && checked) {
         newForm.corregirAgudezaVisualTotal = false;
@@ -113,542 +130,464 @@ export default function FichaAptitudAnexo16({
         newForm.usoLentesTrabajo = false;
         newForm.usoLentesTrabajoSobre18 = false;
         newForm.noConducirVehiculos = false;
-        newForm.recomendaciones = "NINGUNO.";
+        newForm.restricciones = "NINGUNO.";
       } else if (name !== "ninguno" && checked) {
         // Si se marca cualquier otro, deshabilitar "NINGUNO"
         newForm.ninguno = false;
-        
+
         // Generar recomendaciones basadas en los checkboxes marcados
-        const recomendaciones = [];
-        if (newForm.corregirAgudezaVisualTotal) recomendaciones.push("CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
-        if (newForm.corregirAgudezaVisual) recomendaciones.push("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
-        if (newForm.dietaHipocalorica) recomendaciones.push("DIETA HIPOCALÓRICA Y EJERCICIOS");
-        if (newForm.evitarMovimientosDisergonomicos) recomendaciones.push("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS");
-        if (newForm.noHacerTrabajoAltoRiesgo) recomendaciones.push("NO HACER TRABAJO DE ALTO RIESGO");
-        if (newForm.noHacerTrabajoSobre18) recomendaciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
-        if (newForm.usoEppAuditivo) recomendaciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
-        if (newForm.usoLentesConducir) recomendaciones.push("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS");
-        if (newForm.usoLentesTrabajo) recomendaciones.push("USO DE LENTES CORRECTORES PARA TRABAJO.");
-        if (newForm.usoLentesTrabajoSobre18) recomendaciones.push("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
-        if (newForm.noConducirVehiculos) recomendaciones.push("NO CONDUCIR VEHÍCULOS");
-        
-        newForm.recomendaciones = recomendaciones.join("\n");
+        const restricciones = [];
+        if (newForm.corregirAgudezaVisualTotal) restricciones.push("CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
+        if (newForm.corregirAgudezaVisual) restricciones.push("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
+        if (newForm.dietaHipocalorica) restricciones.push("DIETA HIPOCALÓRICA Y EJERCICIOS");
+        if (newForm.evitarMovimientosDisergonomicos) restricciones.push("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS");
+        if (newForm.noHacerTrabajoAltoRiesgo) restricciones.push("NO HACER TRABAJO DE ALTO RIESGO");
+        if (newForm.noHacerTrabajoSobre18) restricciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
+        if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
+        if (newForm.usoLentesConducir) restricciones.push("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS");
+        if (newForm.usoLentesTrabajo) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO.");
+        if (newForm.usoLentesTrabajoSobre18) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
+        if (newForm.noConducirVehiculos) restricciones.push("NO CONDUCIR VEHÍCULOS");
+
+        newForm.restricciones = restricciones.join("\n");
       } else if (!checked) {
-        // Si se desmarca un checkbox, regenerar las recomendaciones sin ese elemento
+        // Si se desmarca un checkbox, regenerar las restricciones sin ese elemento
         if (name !== "ninguno") {
-          const recomendaciones = [];
-          if (newForm.corregirAgudezaVisualTotal) recomendaciones.push("CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
-          if (newForm.corregirAgudezaVisual) recomendaciones.push("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
-          if (newForm.dietaHipocalorica) recomendaciones.push("DIETA HIPOCALÓRICA Y EJERCICIOS");
-          if (newForm.evitarMovimientosDisergonomicos) recomendaciones.push("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS");
-          if (newForm.noHacerTrabajoAltoRiesgo) recomendaciones.push("NO HACER TRABAJO DE ALTO RIESGO");
-          if (newForm.noHacerTrabajoSobre18) recomendaciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
-          if (newForm.usoEppAuditivo) recomendaciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
-          if (newForm.usoLentesConducir) recomendaciones.push("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS");
-          if (newForm.usoLentesTrabajo) recomendaciones.push("USO DE LENTES CORRECTORES PARA TRABAJO.");
-        if (newForm.usoLentesTrabajoSobre18) recomendaciones.push("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
-        if (newForm.noConducirVehiculos) recomendaciones.push("NO CONDUCIR VEHÍCULOS");
-        
-          newForm.recomendaciones = recomendaciones.join("\n");
+          const restricciones = [];
+          if (newForm.corregirAgudezaVisualTotal) restricciones.push("CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
+          if (newForm.corregirAgudezaVisual) restricciones.push("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
+          if (newForm.dietaHipocalorica) restricciones.push("DIETA HIPOCALÓRICA Y EJERCICIOS");
+          if (newForm.evitarMovimientosDisergonomicos) restricciones.push("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS");
+          if (newForm.noHacerTrabajoAltoRiesgo) restricciones.push("NO HACER TRABAJO DE ALTO RIESGO");
+          if (newForm.noHacerTrabajoSobre18) restricciones.push("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO");
+          if (newForm.usoEppAuditivo) restricciones.push("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB");
+          if (newForm.usoLentesConducir) restricciones.push("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS");
+          if (newForm.usoLentesTrabajo) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO.");
+          if (newForm.usoLentesTrabajoSobre18) restricciones.push("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO");
+          if (newForm.noConducirVehiculos) restricciones.push("NO CONDUCIR VEHÍCULOS");
+
+          newForm.restricciones = restricciones.join("\n");
         }
       }
-      
+
       return newForm;
     });
   };
 
   return (
-    <div className="space-y-6">
-      {/* Layout principal con grid de 4 columnas desde arriba */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
-        {/* Columna principal (izquierda) - 3/4 del ancho */}
-        <div className="lg:col-span-3 space-y-4">
-      {/* Header */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-sm text-gray-500">
-            {new Date().toLocaleTimeString()}
-          </div>
-        </div>
+    <div className="grid grid-cols-4 gap-4">
+      <div className="space-y-6 col-span-3">
+        {/* Header */}
+        <section className="bg-white border border-gray-200 rounded-lg p-4 grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+          <InputTextOneLine
+            label="N° Orden"
+            name="norden"
+            value={form?.norden}
+            onChange={handleChangeNumber}
+            onKeyUp={handleSearch}
+          />
+          <InputTextOneLine
+            label="Tipo de Examen"
+            name="tipoExamen"
+            value={form?.tipoExamen}
+            disabled
+          />
+          <InputTextOneLine
+            label="Fecha Examen"
+            type="date"
+            name="fechaExam"
+            value={form?.fechaExam}
+            onChange={handleChangeSimple}
+          />
+          <InputTextOneLine
+            label="Hora"
+            name="hora"
+            value={hora}
+            inputClassName="font-bold"
+            disabled
+          />
+        </section>
 
-        {/* Primera fila */}
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold">Aptitud</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-semibold">N° Historia Clínica:</span>
-            <InputTextOneLine
-              name="numeroHistoria"
-              value={form?.numeroHistoria || ""}
-              onChange={handleChange}
-              className="w-32"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-semibold">Tipo de Examen:</span>
-            <InputTextOneLine
-              name="tipoExamen"
-              value={form?.tipoExamen || ""}
-              onChange={handleChange}
-              className="w-40"
-            />
-          </div>
-          <div className="flex items-center gap-2">
-                <span className="font-semibold">Tipo Dos:</span>
+
+        <div>
+          {/* Información del paciente */}
+          <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>
+            {/* Fila 1: Nombres, DNI, Edad, Género */}
+            <div className="grid grid-cols-1 md:grid-cols-2  gap-4 mb-3">
+              <InputTextOneLine
+                label="Nombres y Apellidos"
+                name="nombres"
+                value={form?.nombres}
+                disabled
+              />
+
+              <div className="grid grid-cols-3 gap-4">
                 <InputTextOneLine
-                  name="tipodos"
-                  value={form?.tipodos || ""}
-                  onChange={handleChange}
-                  className="w-40"
+                  label="DNI"
+                  name="dni"
+                  value={form?.dni}
+                  disabled
+                />
+                <InputTextOneLine
+                  label="Edad"
+                  name="edad"
+                  value={form?.edad}
+                  disabled
+                />
+                <InputTextOneLine
+                  label="Sexo"
+                  name="sexo"
+                  value={form?.sexo}
+                  disabled
                 />
               </div>
-              <div className="flex items-center gap-4">
-            <InputCheckbox
-              name="paraHuamachuco"
-              checked={form?.paraHuamachuco || false}
-              onChange={handleCheckBoxChange}
-              label="PARA HUAMACHUCO"
-            />
-                <InputCheckbox
-                  name="poderosa"
-                  checked={form?.poderosa || false}
-                  onChange={handleCheckBoxChange}
-                  label="PODEROSA"
-                />
-          </div>
-        </div>
-      </div>
-
-      {/* Información del paciente */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-        <h3 className="text-lg font-semibold mb-3">Certifica que el Sr.</h3>
-        
-        {/* Fila 1: Nombres, DNI, Edad, Género */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 mb-3">
-          <div className="md:col-span-2">
-            <InputTextOneLine
-              label="Nombres y Apellidos"
-              name="nombresApellidos"
-              value={form?.nombresApellidos || ""}
-              onChange={handleChange}
-            />
-          </div>
-          <InputTextOneLine
-            label="DNI"
-            name="dni"
-            value={form?.dni || ""}
-            onChange={handleChange}
-          />
-          <InputTextOneLine
-            label="Edad"
-            name="edad"
-            value={form?.edad || ""}
-            onChange={handleChange}
-          />
-          <InputTextOneLine
-            label="Género"
-            name="genero"
-            value={form?.genero || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Fila 2: Empresa y Contratista */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-          <InputTextOneLine
-            label="Empresa"
-            name="empresa"
-            value={form?.empresa || ""}
-            onChange={handleChange}
-          />
-          <InputTextOneLine
-            label="Contratista"
-            name="contratista"
-            value={form?.contratista || ""}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Fila 3: Puesto y Ocupación */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-          <InputTextOneLine
-            label="Puesto al que Postula"
-            name="puestoPostula"
-            value={form?.puestoPostula || ""}
-            onChange={handleChange}
-          />
-          <InputTextOneLine
-            label="Ocupación actual o Última Ocupación"
-            name="ocupacionActual"
-            value={form?.ocupacionActual || ""}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      {/* Conclusiones y Recomendaciones en dos columnas */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Columna 1: Conclusiones */}
-            <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h3 className="text-lg font-semibold mb-3">Conclusiones</h3>
-          
-          <InputTextArea
-            label=""
-            name="conclusiones"
-            value={form?.conclusiones || ""}
-            onChange={handleChange}
-            rows={3}
-            className="mb-3"
-          />
-
-          <div className="space-y-2">
-                <InputCheckbox
-                  name="apto"
-                  checked={form?.apto || false}
-                  onChange={handleAptitudChange}
-                  label="APTO (para el puesto en el que trabaja o postula)"
-                />
-                <InputCheckbox
-                  name="apto_restriccion"
-                  checked={form?.apto_restriccion || false}
-                  onChange={handleAptitudChange}
-                  label="APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)"
-                />
-                <InputCheckbox
-                  name="no_apto"
-                  checked={form?.no_apto || false}
-              onChange={handleAptitudChange}
-                  label="NO APTO (para el puesto en el que trabaja o postula)"
-                />
-                <div className="grid grid-cols-1 gap-4 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">Fecha:</span>
-                <InputTextOneLine
-                  name="fecha"
-                  type="date"
-                  value={form?.fecha || ""}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">Fecha Venc.:</span>
-                <InputTextOneLine
-                  name="fechaVencimiento"
-                  type="date"
-                  value={form?.fechaVencimiento || ""}
-                  onChange={handleChange}
-                />
-              </div>
+              <InputTextOneLine
+                label="Empresa"
+                name="empresa"
+                value={form?.empresa}
+                disabled
+              />
+              <InputTextOneLine
+                label="Contrata"
+                name="contrata"
+                value={form?.contrata}
+                disabled
+              />
+              <InputTextOneLine
+                label="Puesto al que Postula"
+                name="puestoPostula"
+                value={form?.puestoPostula}
+                disabled
+              />
+              <InputTextOneLine
+                label="Area de Trabajo"
+                name="puestoPostula"
+                value={form?.puestoPostula}
+                disabled
+              />
+              <InputTextOneLine
+                label="Puesto de Trabajo"
+                name="puestoActual"
+                value={form?.puestoActual}
+                disabled
+                className="col-span-2"
+              />
             </div>
           </div>
-        </div>
 
-        {/* Columna 2: Recomendaciones */}
-            <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h3 className="text-lg font-semibold mb-3">Recomendaciones</h3>
-          
-          <InputTextArea
-            label=""
-            name="recomendaciones"
-            value={form?.recomendaciones || ""}
-            onChange={handleChange}
-            rows={3}
-            className="mb-3"
-          />
-
-            <div className="space-y-2">
-              <InputCheckbox
-                name="corregirAgudezaVisualTotal"
-                checked={form?.corregirAgudezaVisualTotal || false}
-                onChange={(e) => handleRecomendacionChange("corregirAgudezaVisualTotal", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+          {/* Conclusiones y Recomendaciones en dos columnas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Columna 1: Conclusiones */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <InputTextArea
+                label="Conclusiones"
+                name="conclusiones"
+                value={form?.conclusiones}
+                onChange={handleChange}
+                rows={6}
+                className="mb-3"
               />
-              <InputCheckbox
-                name="corregirAgudezaVisual"
-                checked={form?.corregirAgudezaVisual || false}
-                onChange={(e) => handleRecomendacionChange("corregirAgudezaVisual", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
-              />
-              <InputCheckbox
-                name="dietaHipocalorica"
-                checked={form?.dietaHipocalorica || false}
-                onChange={(e) => handleRecomendacionChange("dietaHipocalorica", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="DIETA HIPOCALÓRICA Y EJERCICIOS"
-              />
-              <InputCheckbox
-                name="evitarMovimientosDisergonomicos"
-                checked={form?.evitarMovimientosDisergonomicos || false}
-                onChange={(e) => handleRecomendacionChange("evitarMovimientosDisergonomicos", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS"
-              />
-              <InputCheckbox
-                name="noHacerTrabajoAltoRiesgo"
-                checked={form?.noHacerTrabajoAltoRiesgo || false}
-                onChange={(e) => handleRecomendacionChange("noHacerTrabajoAltoRiesgo", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="NO HACER TRABAJO DE ALTO RIESGO"
-              />
-              <InputCheckbox
-                name="noHacerTrabajoSobre18"
-                checked={form?.noHacerTrabajoSobre18 || false}
-                onChange={(e) => handleRecomendacionChange("noHacerTrabajoSobre18", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO"
-              />
-              <InputCheckbox
-                name="usoEppAuditivo"
-                checked={form?.usoEppAuditivo || false}
-                onChange={(e) => handleRecomendacionChange("usoEppAuditivo", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB"
-              />
-              <InputCheckbox
-                name="usoLentesConducir"
-                checked={form?.usoLentesConducir || false}
-                onChange={(e) => handleRecomendacionChange("usoLentesConducir", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS"
-              />
-              <InputCheckbox
-                name="usoLentesTrabajo"
-                checked={form?.usoLentesTrabajo || false}
-                onChange={(e) => handleRecomendacionChange("usoLentesTrabajo", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="USO DE LENTES CORRECTORES PARA TRABAJO."
-              />
-              <InputCheckbox
-                name="usoLentesTrabajoSobre18"
-                checked={form?.usoLentesTrabajoSobre18 || false}
-                onChange={(e) => handleRecomendacionChange("usoLentesTrabajoSobre18", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
-              />
-              <InputCheckbox
-                name="ninguno"
-                checked={form?.ninguno || false}
-                onChange={(e) => handleRecomendacionChange("ninguno", e.target.checked)}
-                disabled={form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos || false}
-                className={(() => {
-                  const isDisabled = form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos;
-                  return isDisabled ? "opacity-50 text-gray-400 cursor-not-allowed" : "";
-                })()}
-                label="NINGUNO."
-              />
-              <InputCheckbox
-                name="noConducirVehiculos"
-                checked={form?.noConducirVehiculos || false}
-                onChange={(e) => handleRecomendacionChange("noConducirVehiculos", e.target.checked)}
-                disabled={form?.ninguno || false}
-                className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
-                label="NO CONDUCIR VEHÍCULOS"
-              />
-          </div>
-        </div>
-      </div>
-
-          {/* Médico que Certifica */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <InputTextOneLine
-            label="Médico que Certifica"
-            name="medicoCertifica"
-            value={form?.medicoCertifica || ""}
-            onChange={handleChange}
-              className="w-full"
-            />
-          </div>
-
-          {/* Restricciones */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h3 className="text-lg font-semibold mb-3">Restricciones</h3>
-            <InputTextArea
-              label=""
-              name="restricciones"
-              value={form?.restricciones || ""}
-              onChange={handleChange}
-              rows={6}
-              className="h-full"
-            />
-          </div>
-        </div>
-
-        {/* Columna de Datos Médicos (derecha) - 1/4 del ancho */}
-        <div className="lg:col-span-1 flex flex-col">
-          <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1 flex flex-col">
-            <h4 className="font-semibold text-gray-800 mb-3">Datos Médicos</h4>
-
-            {/* Sección de Visión */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-gray-700 mb-2">Visión</h5>
-              
-              {/* Sin Corregir */}
-              <div className="mb-4">
-                <h6 className="font-semibold text-gray-700 mb-2">Sin Corregir</h6>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center">
-                    <div className="font-semibold mb-2">O.D</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="visionCercaOd" value={form?.visionCercaOd || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="visionLejosOd" value={form?.visionLejosOd || ""} onChange={handleChange} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-semibold mb-2">O.I</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="visionCercaOi" value={form?.visionCercaOi || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="visionLejosOi" value={form?.visionLejosOi || ""} onChange={handleChange} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Corregida */}
-              <div className="mb-4">
-                <h6 className="font-semibold text-gray-700 mb-2">Corregida</h6>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center">
-                    <div className="font-semibold mb-2">O.D</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="visionCercaOdCorregida" value={form?.visionCercaOdCorregida || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="visionLejosOdCorregida" value={form?.visionLejosOdCorregida || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.Clrs:</span>
-                        <InputTextOneLine name="visionColores" value={form?.visionColores || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.B.:</span>
-                        <InputTextOneLine name="visionBinocular" value={form?.visionBinocular || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">R.P.:</span>
-                        <InputTextOneLine name="reflejosPupilares" value={form?.reflejosPupilares || ""} onChange={handleChange} />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-semibold mb-2">O.I</div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                        <InputTextOneLine name="visionCercaOiCorregida" value={form?.visionCercaOiCorregida || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                        <InputTextOneLine name="visionLejosOiCorregida" value={form?.visionLejosOiCorregida || ""} onChange={handleChange} />
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">:</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">:</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] min-w-[30px]">:</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Enfermedades Oculares */}
-              <div className="mb-4 flex-1">
-                <h6 className="font-semibold text-gray-700 mb-2">Enfermedades Oculares</h6>
-                <InputTextArea rows={3} name="enfermedadOculares" value={form?.enfermedadOculares || ""} onChange={handleChange} />
-              </div>
-            </div>
-
-            {/* Sección de Laboratorio */}
-            <div className="mb-4">
-              <h5 className="font-semibold text-gray-700 mb-2">Laboratorio</h5>
               <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] min-w-[60px]">Hemoglobina:</span>
-                  <InputTextOneLine name="hemoglobinaHematocrito" value={form?.hemoglobinaHematocrito || ""} onChange={handleChange} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] min-w-[60px]">V.S.G:</span>
-                  <InputTextOneLine name="vsg" value={form?.vsg || ""} onChange={handleChange} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] min-w-[60px]">Glucosa:</span>
-                  <InputTextOneLine name="glucosa" value={form?.glucosa || ""} onChange={handleChange} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] min-w-[60px]">Creatinina:</span>
-                  <InputTextOneLine name="creatinina" value={form?.creatinina || ""} onChange={handleChange} />
-                </div>
-              </div>
-            </div>
-
-            {/* Botones de Acción dentro de la columna derecha */}
-            <div className="mt-auto space-y-2">
-              {/* Fila 1: Botón 1 y Botón 2 lado a lado */}
-              <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={handleSave}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded flex items-center justify-center gap-2"
-              >
-                  <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
-              </button>
-              <button
-                type="button"
-                onClick={handleClear}
-                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-2 rounded flex items-center justify-center gap-2"
-              >
-                <FontAwesomeIcon icon={faTrash} /> Limpiar
-              </button>
-            </div>
-
-              {/* Fila 2: Input y Botón lado a lado */}
-              <div className="flex gap-2">
-                <input
-                  name="numeroHistoria"
-                  value={form?.numeroHistoria || ""}
-                  onChange={handleChange}
-                  className="flex-1 border rounded px-2 py-1"
-                  placeholder="N° Historia"
+                <InputsRadioGroup
+                  label="Aptitud"
+                  name="apto"
+                  value={form?.apto}
+                  onChange={(e, value) => {
+                    if (value == "APTO") {
+                      setForm(prev => ({
+                        ...prev,
+                        restricciones: "NINGUNO.",
+                        corregirAgudezaVisualTotal: false,
+                        corregirAgudezaVisual: false,
+                        dietaHipocalorica: false,
+                        evitarMovimientosDisergonomicos: false,
+                        noHacerTrabajoAltoRiesgo: false,
+                        noHacerTrabajoSobre18: false,
+                        usoEppAuditivo: false,
+                        usoLentesConducir: false,
+                        usoLentesTrabajo: false,
+                        usoLentesTrabajoSobre18: false,
+                        ninguno: true,
+                        noConducirVehiculos: false,
+                      }));
+                    }
+                    else if (value == "APTO CON RESTRICCION" || value == "NO APTO") {
+                      setForm(prev => ({
+                        ...prev,
+                        restricciones: prev.restricciones == "NINGUNO." ? "" : prev.restricciones,
+                        ninguno: false,
+                      }));
+                    }
+                    handleRadioButton(e, value)
+                  }}
+                  vertical
+                  options={[
+                    { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
+                    { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", value: "APTO CON RESTRICCION" },
+                    { label: "NO APTO (para el puesto en el que trabaja o postula)", value: "NO APTO" },
+                  ]}
                 />
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded flex items-center justify-center gap-2"
-                >
-                  <FontAwesomeIcon icon={faPrint} /> Imprimir
-                </button>
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-3">
+                  <InputTextOneLine
+                    label="Fecha"
+                    name="fechaValido"
+                    type="date"
+                    value={form?.fechaValido}
+                    onChange={(e) => {
+                      setForm(prev => ({ ...prev, fechaVencimiento: getDatePlusOneYear(e.target.value) }));
+                      handleChangeSimple(e)
+                    }}
+                  />
+                  <InputTextOneLine
+                    label="Fecha Venc."
+                    name="fechaVencimiento"
+                    type="date"
+                    value={form?.fechaVencimiento}
+                    disabled
+                  />
+                </div>
+                <InputTextArea
+                  label="Recomendaciones"
+                  name="recomendaciones"
+                  value={form?.recomendaciones}
+                  onChange={handleChange}
+                  rows={6}
+                  className="mb-3"
+                />
+                <MedicoSearch
+                  value={form.nombre_medico}
+                  onChange={handleChangeSimple}
+                  MedicosMulti={MedicosMulti}
+                />
               </div>
+            </div>
+
+            {/* Columna 2: Recomendaciones */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4">
+              <InputTextArea
+                label="Restricciones"
+                name="restricciones"
+                value={form?.restricciones}
+                onChange={handleChange}
+                rows={8}
+              />
+              <div className="grid grid-cols-1 gap-2">
+                <div className="space-y-2">
+                  <InputCheckbox
+                    name="corregirAgudezaVisualTotal"
+                    checked={form?.corregirAgudezaVisualTotal}
+                    onChange={(e) => handleRestriccionesChange("corregirAgudezaVisualTotal", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+                  />
+                  <InputCheckbox
+                    name="corregirAgudezaVisual"
+                    checked={form?.corregirAgudezaVisual}
+                    onChange={(e) => handleRestriccionesChange("corregirAgudezaVisual", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+                  />
+                  <InputCheckbox
+                    name="dietaHipocalorica"
+                    checked={form?.dietaHipocalorica}
+                    onChange={(e) => handleRestriccionesChange("dietaHipocalorica", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="DIETA HIPOCALÓRICA Y EJERCICIOS"
+                  />
+                  <InputCheckbox
+                    name="evitarMovimientosDisergonomicos"
+                    checked={form?.evitarMovimientosDisergonomicos}
+                    onChange={(e) => handleRestriccionesChange("evitarMovimientosDisergonomicos", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS"
+                  />
+                  <InputCheckbox
+                    name="noHacerTrabajoAltoRiesgo"
+                    checked={form?.noHacerTrabajoAltoRiesgo}
+                    onChange={(e) => handleRestriccionesChange("noHacerTrabajoAltoRiesgo", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="NO HACER TRABAJO DE ALTO RIESGO"
+                  />
+                  <InputCheckbox
+                    name="noHacerTrabajoSobre18"
+                    checked={form?.noHacerTrabajoSobre18}
+                    onChange={(e) => handleRestriccionesChange("noHacerTrabajoSobre18", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <InputCheckbox
+                    name="usoEppAuditivo"
+                    checked={form?.usoEppAuditivo}
+                    onChange={(e) => handleRestriccionesChange("usoEppAuditivo", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB"
+                  />
+                  <InputCheckbox
+                    name="usoLentesConducir"
+                    checked={form?.usoLentesConducir}
+                    onChange={(e) => handleRestriccionesChange("usoLentesConducir", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS"
+                  />
+                  <InputCheckbox
+                    name="usoLentesTrabajo"
+                    checked={form?.usoLentesTrabajo}
+                    onChange={(e) => handleRestriccionesChange("usoLentesTrabajo", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="USO DE LENTES CORRECTORES PARA TRABAJO."
+                  />
+                  <InputCheckbox
+                    name="usoLentesTrabajoSobre18"
+                    checked={form?.usoLentesTrabajoSobre18}
+                    onChange={(e) => handleRestriccionesChange("usoLentesTrabajoSobre18", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO"
+                  />
+                  <InputCheckbox
+                    name="ninguno"
+                    checked={form?.ninguno}
+                    onChange={(e) => handleRestriccionesChange("ninguno", e.target.checked)}
+                    disabled={form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos}
+                    className={(() => {
+                      const isDisabled = form?.corregirAgudezaVisualTotal || form?.corregirAgudezaVisual || form?.dietaHipocalorica || form?.evitarMovimientosDisergonomicos || form?.noHacerTrabajoAltoRiesgo || form?.noHacerTrabajoSobre18 || form?.usoEppAuditivo || form?.usoLentesConducir || form?.usoLentesTrabajo || form?.usoLentesTrabajoSobre18 || form?.noConducirVehiculos;
+                      return isDisabled ? "opacity-50 text-gray-400 cursor-not-allowed" : "";
+                    })()}
+                    label="NINGUNO."
+                  />
+                  <InputCheckbox
+                    name="noConducirVehiculos"
+                    checked={form?.noConducirVehiculos}
+                    onChange={(e) => handleRestriccionesChange("noConducirVehiculos", e.target.checked)}
+                    disabled={form?.ninguno}
+                    className={form?.ninguno ? "opacity-50 text-gray-400" : ""}
+                    label="NO CONDUCIR VEHÍCULOS"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Médico, Botones y Restricciones en dos columnas */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-2">
+              {/* Botones de acción */}
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 ">
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faSave} /> Grabar/Actualizar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleClear}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faTrash} /> Limpiar
+                  </button>
+                </div>
+                <div className="flex flex-col items-end">
+                  <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                  <div className="flex items-center gap-2">
+                    <InputTextOneLine
+                      name="norden"
+                      value={form?.norden}
+                      onChange={handleChangeNumber}
+                      className="w-24"
+                    />
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                    >
+                      <FontAwesomeIcon icon={faPrint} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      {/* Columna de Datos Médicos (derecha) - 1/4 del ancho */}
+      <div className="lg:col-span-1 flex flex-col">
+        <div className="bg-white border border-gray-200 rounded-lg p-3 flex-1 flex flex-col">
+          <h4 className="font-bold mb-4">Datos Médicos</h4>
+
+          {/* Sección de Visión */}
+          <div className="mb-4">
+            <h5 className="font-bold mb-3 text-center">Visión</h5>
+
+            {/* Sin Corregir */}
+            <div className="mb-4">
+              <h6 className="font-semibold texce">Sin Corregir</h6>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <div className="font-semibold text-center">O.D</div>
+                  <InputTextOneLine label="V.C." name="visionCercaOd" value={form?.visionCercaOd} disabled labelWidth="60px" />
+                  <InputTextOneLine label="V.L." name="visionLejosOd" value={form?.visionLejosOd} disabled labelWidth="60px" />
+                </div>
+                <div className="space-y-2">
+                  <div className="font-semibold  text-center">O.I</div>
+                  <InputTextOneLine label="V.C." name="visionCercaOi" value={form?.visionCercaOi} disabled labelWidth="60px" />
+                  <InputTextOneLine label="V.L." name="visionLejosOi" value={form?.visionLejosOi} disabled labelWidth="60px" />
+                </div>
+              </div>
+            </div>
+
+            {/* Corregida */}
+            <div className="mb-4">
+              <h6 className="font-semibold ">Corregida</h6>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <div className="font-semibold text-center">O.D</div>
+                  <InputTextOneLine label="V.C." name="visionCercaOdCorregida" value={form?.visionCercaOdCorregida} disabled labelWidth="60px" />
+                  <InputTextOneLine label="V.L." name="visionLejosOdCorregida" value={form?.visionLejosOdCorregida} disabled labelWidth="60px" />
+
+                </div>
+                <div className="space-y-2">
+                  <div className="font-semibold text-center">O.I</div>
+                  <InputTextOneLine label="V.C." name="visionCercaOiCorregida" value={form?.visionCercaOiCorregida} disabled labelWidth="60px" />
+                  <InputTextOneLine label="V.L." name="visionLejosOiCorregida" value={form?.visionLejosOiCorregida} disabled labelWidth="60px" />
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2 mb-4">
+              <InputTextOneLine label="V.Clrs" name="visionColores" value={form?.visionColores} disabled labelWidth="60px" />
+              <InputTextOneLine label="V.B. " name="visionBinocular" value={form?.visionBinocular} disabled labelWidth="60px" />
+              <InputTextOneLine label="R.P. " name="reflejosPupilares" value={form?.reflejosPupilares} disabled labelWidth="60px" />
+            </div>
+
+            {/* Enfermedades Oculares */}
+            <div className="mb-4 flex-1">
+              <InputTextArea label="Enfermedades Oculares" rows={5} name="enfermedadOculares" value={form?.enfermedadOculares} disabled />
+            </div>
+          </div>
+
+          {/* Sección de Laboratorio */}
+          <div className="mb-4">
+            <h5 className=" mb-2 font-bold">Laboratorio</h5>
+            <div className="space-y-2">
+              <InputTextOneLine label="Hemoglobina" name="hemoglobina" value={form?.hemoglobina} disabled />
+              <InputTextOneLine label="V.S.G" name="vsg" value={form?.vsg} disabled />
+              <InputTextOneLine label="Glucosa" name="glucosa" value={form?.glucosa} disabled />
+              <InputTextOneLine label="Creatinina" name="creatinina" value={form?.creatinina} disabled />
             </div>
           </div>
         </div>
