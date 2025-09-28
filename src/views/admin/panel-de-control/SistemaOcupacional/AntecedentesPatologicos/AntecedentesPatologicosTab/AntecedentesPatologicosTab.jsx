@@ -48,7 +48,16 @@ export default function AntecedentesPatologicosTab({
                 label="COVID 19"
                 name="covid19"
                 checked={form?.covid19}
-                onChange={(e) => { setForm(prev => ({ ...prev, severidadCovid: "" })); handleCheckBoxChange(e) }}
+                onChange={(e) => {
+                  const today = getToday();
+                  setForm(prev => ({
+                    ...prev,
+                    severidadCovid: "",
+                    fechaCovid: today,
+                    dosisVacunas: "",
+                  }));
+                  handleCheckBoxChange(e)
+                }}
               />
             </div>
             <InputTextOneLine
@@ -72,7 +81,13 @@ export default function AntecedentesPatologicosTab({
                 onChange={handleRadioButton}
               />
             </div>
-            <InputTextOneLine label="Dosis de vacunas" name="dosisVacunas" value={form?.dosisVacunas} onChange={handleChangeNumber} labelWidth="120px" />
+            <InputTextOneLine
+              label="Dosis de vacunas"
+              name="dosisVacunas"
+              value={form?.dosisVacunas}
+              onChange={handleChangeNumber}
+              disabled={!form?.covid19}
+              labelWidth="120px" />
           </div>)}
 
         <div className="mb-2 font-semibold text-red-600">
@@ -362,7 +377,11 @@ export default function AntecedentesPatologicosTab({
                         <InputsBooleanRadioGroup
                           name="tiempoPerdido"
                           value={form?.tiempoPerdido}
-                          onChange={handleRadioButtonBoolean}
+                          onChange={(e, value) => {
+                            if (value == false)
+                              setForm(prev => ({ ...prev, especifiqueTiempoPerdido: "", tipoIncapacidad: "" }));
+                            handleRadioButtonBoolean(e, value)
+                          }}
                         />
                       </div>
                       <InputTextOneLine
@@ -370,12 +389,14 @@ export default function AntecedentesPatologicosTab({
                         name="especifiqueTiempoPerdido"
                         value={form?.especifiqueTiempoPerdido}
                         onChange={handleChange}
+                        disabled={!form?.tiempoPerdido}
                       />
                       <InputTextOneLine
                         label="Tipo de Incapacidad"
                         name="tipoIncapacidad"
                         value={form?.tipoIncapacidad}
                         onChange={handleChange}
+                        disabled={!form?.tiempoPerdido}
                       />
                     </div>
                   </div>
@@ -393,7 +414,7 @@ export default function AntecedentesPatologicosTab({
                       onChange={(e, value) => {
                         const today = getToday();
                         if (value == false)
-                          setForm(prev => ({ ...prev, fechaCalificacion: today }));
+                          setForm(prev => ({ ...prev, evaluadoCalificacion: false, especifiqueCalificacion: "", fechaCalificacion: today }));
                         handleRadioButtonBoolean(e, value)
                       }}
                     />
@@ -409,7 +430,12 @@ export default function AntecedentesPatologicosTab({
                         <InputsBooleanRadioGroup
                           name="evaluadoCalificacion"
                           value={form?.evaluadoCalificacion}
-                          onChange={handleRadioButtonBoolean}
+                          onChange={(e, value) => {
+                            const today = getToday();
+                            if (value == false)
+                              setForm(prev => ({ ...prev, especifiqueCalificacion: "", fechaCalificacion: today }));
+                            handleRadioButtonBoolean(e, value)
+                          }}
                         />
                       </div>
                       <InputTextOneLine
@@ -417,6 +443,7 @@ export default function AntecedentesPatologicosTab({
                         name="especifiqueCalificacion"
                         value={form?.especifiqueCalificacion}
                         onChange={handleChange}
+                        disabled={!form?.evaluadoCalificacion}
                       />
                       <InputTextOneLine
                         label="Fecha"
@@ -424,6 +451,7 @@ export default function AntecedentesPatologicosTab({
                         type="date"
                         value={form?.fechaCalificacion}
                         onChange={handleChangeSimple}
+                        disabled={!form?.evaluadoCalificacion}
                       />
                     </div>
                   </div>

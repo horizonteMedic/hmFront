@@ -91,6 +91,13 @@ export default function IndicarEnfermedades({
               ))}
             </div>
           </div>
+          <InputTextOneLine
+            label="Otras enfermedades"
+            name="otrasEnfermedades"
+            value={form?.otrasEnfermedades}
+            onChange={handleChange}
+            labelWidth="120px"
+          />
         </div>
       )}
 

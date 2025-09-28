@@ -250,6 +250,7 @@ export const GetInfoServicioEditar = async (
             doloresMusculares: res.doloresMusculares_chk88,
             tosCronica: res.tosCronica_chk89,
             sangradoEncias: res.sangradoEncias_chk90,
+            otrasEnfermedades: res.otrosDescripcionIndicarEnfermedades_txtotros1ap,
 
             antitetanica: res.antitetanicaBoro_antitetanica,
             fiebreAmarilla: res.fiebreAmarillaBoro_fiebre_amarilla,
@@ -450,7 +451,7 @@ export const SubmitDataService = async (
         numerosDeAbortosDamas: form.abortosDamas,
         precisarCausasDamas: form.causasAbortosDamas,
         otrosDescripcionAntecedentesPatologicos: form.otrasPatologias,
-        otrosDescripcionIndicarEnfermedades: form.tipoOtros,
+        otrosDescripcionIndicarEnfermedades: form.otrasEnfermedades,
         covid: form.covid19,
         fechaCovid: form.fechaCovid,
         covidLevel: form.severidadCovid === "LEVE",

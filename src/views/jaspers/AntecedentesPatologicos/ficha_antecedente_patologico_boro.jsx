@@ -179,7 +179,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
 
     // Datos de accidentes
     accidenteTrabajo: Boolean(data.accidenteTrabajoBoro_accitrabajo ?? false),
-    fechaAccidente: String(data.accidenteTrabajoFechaBoro_accit_fecha ?? ""),
+    fechaAccidente: Boolean(data.accidenteTrabajoBoro_accitrabajo ?? false) ? formatearFechaCorta(String(data.accidenteTrabajoFechaBoro_accit_fecha ?? "")) : "",
     tiempoPerdido: Boolean(data.descansoMedicoBoro_accit_descanso ?? false),
     tiempoIncapacidad: String(data.tiempoIncapacidadBoro_timeincapacidad ?? ""),
     causaBasica: String(data.descansoMedicoEspecifiqueBoro_accit_descanso_detal ?? ""),
@@ -559,7 +559,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Checkbox SI para evaluación con paréntesis - ANCHO FIJO
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxEvaluacionSiX, evaluacionY);
-  if (datosFinales.evaluacionEnfermedad) {
+  if (datosFinales.enfermedadProfesional && datosFinales.evaluacionEnfermedad) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.setTextColor(255, 0, 0); // rojo
     // X del SI evaluación - coordenadas individuales
@@ -577,7 +577,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Checkbox NO para evaluación con paréntesis - ANCHO MÁS GRANDE
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("NO (", checkboxEvaluacionNoX, evaluacionY);
-  if (!datosFinales.evaluacionEnfermedad) {
+  if (datosFinales.enfermedadProfesional && !datosFinales.evaluacionEnfermedad) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.setTextColor(255, 0, 0); // rojo
     // X del NO evaluación - coordenadas individuales

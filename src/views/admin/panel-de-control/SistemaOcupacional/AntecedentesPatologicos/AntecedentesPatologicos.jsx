@@ -155,9 +155,9 @@ export default function AntecedentesPatologicos({ listas }) {
     enfermedadesOculares: "",
     dosisVacunas: "",
     cocaina: "",
-    cocainaRed:false,
+    cocainaRed: false,
     marihuana: "",
-    marihuanaRed:false,
+    marihuanaRed: false,
 
     //SEGUNDA TAB==========================================================================
 
@@ -193,6 +193,7 @@ export default function AntecedentesPatologicos({ listas }) {
     doloresMusculares: false,
     tosCronica: false,
     sangradoEncias: false,
+    otrasEnfermedades: "",
 
     antitetanica: false,
     fiebreAmarilla: false,
@@ -445,8 +446,8 @@ export default function AntecedentesPatologicos({ listas }) {
               {/* Campos de texto */}
               <div className="space-y-3">
                 <InputTextArea rows={3} label="Enfermedades Oculares" name="enfermedadesOculares" value={form?.enfermedadesOculares} disabled />
-                <InputTextOneLine label="Cocaína" labelOnTop name="cocaina" value={form?.cocaina} disabled  className={form?.cocainaRed ? "text-red-500" : ""}/>
-                <InputTextOneLine label="Marihuana" labelOnTop name="marihuana" value={form?.marihuana} disabled className={form?.marihuanaRed ? "text-red-500" : ""}/>
+                <InputTextOneLine label="Cocaína" labelOnTop name="cocaina" value={form?.cocaina} disabled className={form?.cocainaRed ? "text-red-500" : ""} />
+                <InputTextOneLine label="Marihuana" labelOnTop name="marihuana" value={form?.marihuana} disabled className={form?.marihuanaRed ? "text-red-500" : ""} />
               </div>
             </div>
           </div>
