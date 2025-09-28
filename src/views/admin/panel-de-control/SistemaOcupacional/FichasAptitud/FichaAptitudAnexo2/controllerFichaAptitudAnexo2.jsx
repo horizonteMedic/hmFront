@@ -130,7 +130,7 @@ export const SubmitDataService = async (
         aptoConRestriccion: form.apto === "APTO CON RESTRICCION",
         noApto: form.apto === "NO APTO",
         restriccionesDescripcion: form.restricciones,
-        horaSalida: new Date().toLocaleTimeString(),
+        horaSalida: new Date().toLocaleTimeString('es-PE', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
         fechaHasta: form.fechaVencimiento,
         recomendaciones: form.recomendaciones,
         conclusiones: form.conclusiones,
