@@ -1,7 +1,7 @@
 const CabeceraLogo = (doc, datos = {}) => {
   const pageW = doc.internal.pageSize.getWidth();
   const margin = 15;
-  const yOffset = 10;
+  const yOffset = datos.yOffset || 10;
 
   // Control interno para mostrar/ocultar logo
   const mostrarLogo = true; // Cambiar a false para ocultar el logo globalmente
