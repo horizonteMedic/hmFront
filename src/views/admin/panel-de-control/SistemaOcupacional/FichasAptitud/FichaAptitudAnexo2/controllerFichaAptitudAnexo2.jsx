@@ -30,10 +30,8 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
-            norden: res.n_orden,
+            norden: res.norden,
             tipoExamen: res.nombreExamen,
-            fechaExam: res.fechaDesde,
             nombres: res.nombresPaciente + " " + res.apellidosPaciente,
             dni: res.dniPaciente,
             edad: res.edadPaciente,
@@ -44,8 +42,7 @@ export const GetInfoServicio = async (
             areaTrabajo: res.areaPaciente,
             puestoActual: res.cargoPaciente,
 
-            conclusiones: res.conclusiones,
-            restricciones: res.restriccionesDescripcion,
+            conclusiones: res.observacionesFichaMedica,
         }));
     }
 };
@@ -67,7 +64,6 @@ export const GetInfoServicioEditar = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
             fechaExam: res.fechaDesde,

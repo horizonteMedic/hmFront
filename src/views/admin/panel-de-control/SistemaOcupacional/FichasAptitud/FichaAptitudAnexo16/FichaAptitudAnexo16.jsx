@@ -16,7 +16,7 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitu
 const tabla = "certificado_aptitud_medico_ocupacional"
 const today = getToday();
 
-export default function FichaAptitudAnexo2({ MedicosMulti }) {
+export default function FichaAptitudAnexo16({ MedicosMulti }) {
   const hora = useRealTime();
 
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =

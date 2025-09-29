@@ -28,12 +28,11 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
+        console.log("obtener no tiene")
         set((prev) => ({
             ...prev,
-            ...res,
-            norden: res.n_orden,
+            norden: res.norden,
             tipoExamen: res.nombreExamen,
-            fechaExam: res.fechaDesde,
             nombres: res.nombresPaciente + " " + res.apellidosPaciente,
             dni: res.dniPaciente,
             edad: res.edadPaciente,
@@ -44,8 +43,7 @@ export const GetInfoServicio = async (
             areaTrabajo: res.areaPaciente,
             puestoActual: res.cargoPaciente,
 
-            conclusiones: res.conclusiones,
-            restricciones: res.restriccionesDescripcion,
+            conclusiones: res.observacionesFichaMedica,
 
             visionCercaOd: res.visioncercasincorregirodVCercaSOd,
             visionLejosOd: res.visionlejossincorregirodVLejosSOd,
@@ -85,9 +83,9 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
+        console.log("editarr")
         set((prev) => ({
             ...prev,
-            ...res,
             norden: res.norden,
             tipoExamen: res.nombreExamen,
             fechaExam: res.fechaDesde,

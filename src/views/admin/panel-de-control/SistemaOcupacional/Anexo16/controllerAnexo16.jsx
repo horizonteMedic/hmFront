@@ -278,7 +278,7 @@ export const GetInfoServicio = (
           data.mutagenicos = res.mutagenicosAnexo7c_chkmutagenicos ?? false;
           data.solventes = res.solventesAnexo7c_chksolventes ?? false;
           data.metales = res.metalesAnexo7c_chkmetales ?? false;
-          data.alturaGeograf = res.alturaGeogAnexo7c_altura_geog ?? false;
+          data.alturaGeograf = res.alturaGeograficaAnexo7c_altura_geog ?? false;
           data.temperaturaAgente =
             res.temperaturaAnexo7c_chktemperatura ?? false;
           data.biologicos = res.biologicosAnexo7c_chkbiologicos ?? false;
@@ -1756,7 +1756,7 @@ export const GetInfoServicioEditar = (
           // Additional risk factors
           data.alturaEstruct =
             res.alturaEstructuraAnexo7c_altura_estructura ?? false;
-          data.alturaGeograf = res.alturaGeogAnexo7c_altura_geog ?? false;
+          data.alturaGeograf = res.alturaGeograficaAnexo7c_altura_geog ?? false;
           data.quimicos = res.quimicosAnexo7c_quimicos ?? false;
           data.electricos = res.electricosAnexo7c_electricos ?? false;
           data.vibraciones = res.vibracionesAnexo7c_vibraciones ?? false;
