@@ -19,7 +19,7 @@ export default function Antecedentes({
   handleRadioButtonBoolean,
   MedicosMulti,
   handleSave,
-  handlePrint, 
+  handlePrint,
   handleClear,
 }) {
   const [activeTabReproduccion, setActiveTabReproduccion] = useState(0);
@@ -165,7 +165,7 @@ export default function Antecedentes({
                   </td>
                 </tr>
               ) : (
-                form.antecedentes.map((antecedente,index) => (
+                form.antecedentes.map((antecedente, index) => (
                   <tr key={index} className="border-b border-gray-200 hover:bg-gray-50">
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.fecha}</td>
                     <td className="px-4 py-3 border-r border-gray-200">{antecedente.hospitalOperacion}</td>
@@ -278,12 +278,12 @@ export default function Antecedentes({
       )}
 
       {/* Fila de dos columnas: Médico e Imprimir */}
-      <div className="bg-white border border-gray-200 rounded-lg p-3">
+      <div className="bg-white border border-gray-200 rounded-lg p-3 ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Columna 1 - Campo Médico */}
           <MedicoSearch
             value={form.nombre_medico}
-            onChange={handleChange}
+            onChange={handleChangeSimple}
             MedicosMulti={MedicosMulti}
           />
           {/* Columna 2 - Sección de impresión */}
@@ -297,7 +297,7 @@ export default function Antecedentes({
                 Guardar/Actualizar
               </button>
               <button
-              onClick={handleClear}
+                onClick={handleClear}
                 className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2"
               >
                 <FontAwesomeIcon icon={faBroom} />
@@ -309,7 +309,7 @@ export default function Antecedentes({
               name="norden"
               value={form.norden}
               onChange={handleChangeNumber}
-            /> 
+            />
             <button
               onClick={handlePrint}
               className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded flex items-center gap-2"

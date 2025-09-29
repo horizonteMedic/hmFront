@@ -10,13 +10,18 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getDatePlusOneYear, getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
 import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
+import useRealTime from "../../../../../hooks/useRealTime";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo2";
 
 const tabla = "aptitud_medico_ocupacional_agro"
 const today = getToday();
 
 export default function FichaAptitudAnexo2({ MedicosMulti }) {
+  const hora = useRealTime();
+
   const { token, userlogued, selectedSede, datosFooter, userCompleto } =
     useSessionData();
+
   const initialFormState = {
     // Datos básicos
     norden: "",
@@ -72,19 +77,19 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
   } = useForm(initialFormState);
 
   const handleSave = () => {
-    // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
   };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       handleClearnotO();
-      // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
   const handlePrint = () => {
     handlePrintDefault(() => {
-      // PrintHojaR(form.norden, token, tabla, datosFooter);
+      PrintHojaR(form.norden, token, tabla, datosFooter);
     });
   };
 
@@ -172,6 +177,13 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
           name="fechaExam"
           value={form?.fechaExam}
           onChange={handleChangeSimple}
+        />
+        <InputTextOneLine
+          label="Hora"
+          name="hora"
+          value={hora}
+          inputClassName="font-bold"
+          disabled
         />
       </section>
 
@@ -277,7 +289,7 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
                     noConducirVehiculos: false,
                   }));
                 }
-                else if (value == "APTO CON RESTRICCIÓN" || value == "NO APTO") {
+                else if (value == "APTO CON RESTRICCION" || value == "NO APTO") {
                   setForm(prev => ({
                     ...prev,
                     restricciones: prev.restricciones == "NINGUNO." ? "" : prev.restricciones,
@@ -289,7 +301,7 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
               vertical
               options={[
                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
-                { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", value: "APTO CON RESTRICCIÓN" },
+                { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", value: "APTO CON RESTRICCION" },
                 { label: "NO APTO (para el puesto en el que trabaja o postula)", value: "NO APTO" },
               ]}
             />
@@ -322,7 +334,7 @@ export default function FichaAptitudAnexo2({ MedicosMulti }) {
             />
             <MedicoSearch
               value={form.nombre_medico}
-              onChange={handleChange}
+              onChange={handleChangeSimple}
               MedicosMulti={MedicosMulti}
             />
 

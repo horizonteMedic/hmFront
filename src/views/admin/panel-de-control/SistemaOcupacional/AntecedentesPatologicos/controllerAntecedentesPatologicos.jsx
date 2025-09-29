@@ -6,6 +6,7 @@ import {
     SubmitDataServiceDefault,
     VerifyTRDefault,
 } from "../../../../utils/functionUtils";
+import { getFetch } from "../../../../utils/apiHelpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/antecedentesPatologicos/obtenerReporteAntecedentesPatologicos";
@@ -32,13 +33,13 @@ export const GetInfoServicio = async (
             ...res,
             norden: res.n_orden,
             codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
-            fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
-            nombres: res.nombres_nombres_pa,
-            sexo: res.sexo_sexo_pa,
+            nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
+            sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
             edad: res.edad_edad + " años",
             boroo: res.esBoro ?? false,
 
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
+            enfOculares: (res.enfermedadesocularesoftalmo_e_oculares || "") != "" && !(res.enfermedadesocularesoftalmo_e_oculares || "").includes("NINGUNA"),
             vcOD: res.visioncercasincorregirod_v_cerca_s_od,
             vcOI: res.visioncercasincorregiroi_v_cerca_s_oi,
             vcCorregidaOD: res.oftalodccmologia_odcc,
@@ -51,7 +52,9 @@ export const GetInfoServicio = async (
             vb: res.vboftalmologia_vb,
             rp: res.rpoftalmologia_rp,
             cocaina: res.cocainaLaboratorioClinico_txtcocaina,
+            cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
             marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
+            marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
         }));
     }
 };
@@ -78,14 +81,36 @@ export const GetInfoServicioEditar = async (
             norden: res.n_orden,
             codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
             fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
-            nombres: res.nombres_nombres_pa,
-            sexo: res.sexo_sexo_pa,
+            nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
+            sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
             edad: res.edad_edad + " años",
             boroo: res.esBoro ?? false,
 
             covid19: res.covid_chkcovid,
             fechaCovid: res.fechaCovid_fechacovid,
-            severidadCovid: res.covidLevel_chkcovidl ? "LEVE" : res.covidModerado_chkcovidm ? "MODERADO" : res.covidSevero_chkcovids ? "SEVERO" : "", //revisar
+            severidadCovid: res.covidLevel_chkcovidl ? "LEVE" : res.covidModerado_chkcovidm ? "MODERADA" : res.covidSevero_chkcovids ? "SEVERA" : "",
+
+            ruido: res.ruidoAnexo7c_chkruido,
+            polvo: res.polvoAnexo7c_chkpolvo,
+            vidSegmentario: res.vidSegmentarioAnexo7c_chkvidsegmentario,
+            vidTotal: res.vidTotalAnexo7c_chkvidtotal,
+            alturaEstruct: res.alturaEstructuraAnexo7c_altura_estructura,
+            vibraciones: res.vibracionesAnexo7c_vibraciones,
+            cancerigenos: res.cancerigenosAnexo7c_chkcancerigenos,
+            mutagenicos: res.mutagenicosAnexo7c_chkmutagenicos,
+            solventes: res.solventesAnexo7c_chksolventes,
+            metales: res.metalesAnexo7c_chkmetales,
+            alturaGeograf: res.alturaGeograficaAnexo7c_altura_geog,
+            temperaturaAgente: res.temperaturaAnexo7c_chktemperatura,
+            biologicos: res.biologicosAnexo7c_chkbiologicos,
+            posturas: res.posturasAnexo7c_chkposturas,
+            turnos: res.turnosAnexo7c_chkturnos,
+            quimicos: res.quimicosAnexo7c_quimicos,      
+            cargas: res.cargasAnexo7c_chkcargas,
+            movRepet: res.movRepetAnexo7c_chkmovrepet,
+            pvd: res.pvdAnexo7c_chkpvd,
+            electricos: res.electricosAnexo7c_electricos,
+            otrosAgentes: res.otrosAnexo7c_chkotros,
 
             alergias: res.alergias_chk1,
             amigdalitisCronica: res.amigdalitisCronica_chk2,
@@ -101,6 +126,7 @@ export const GetInfoServicioEditar = async (
             disenteria: res.disenteria_chk12,
             enfCorazon: res.enfermedadesCorazon_chk13,
             enfOculares: res.enfermedadesOculares_chk14,
+
             epilepsiaConvulsiones: res.epilsepsiaOConvulsiones_chk15,
             faringitisCronica: res.faringitisCronica_chk16,
             fiebreMalta: res.fiebreMalta_chk17,
@@ -209,7 +235,9 @@ export const GetInfoServicioEditar = async (
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
             dosisVacunas: res.dosisVacunas_txtdosis,
             cocaina: res.cocainaLaboratorioClinico_txtcocaina,
+            cocainaRed: (res.cocainaLaboratorioClinico_txtcocaina ?? "") == "POSITIVO",
             marihuana: res.marihuanaLaboratorioClinico_txtmarihuana,
+            marihuanaRed: (res.marihuanaLaboratorioClinico_txtmarihuana ?? "") == "POSITIVO",
 
             //SEGUNDA TAB==========================================================================
             perdidaMemoria: res.perdidaMemoria_chk61,
@@ -244,6 +272,7 @@ export const GetInfoServicioEditar = async (
             doloresMusculares: res.doloresMusculares_chk88,
             tosCronica: res.tosCronica_chk89,
             sangradoEncias: res.sangradoEncias_chk90,
+            otrasEnfermedades: res.otrosDescripcionIndicarEnfermedades_txtotros1ap,
 
             antitetanica: res.antitetanicaBoro_antitetanica,
             fiebreAmarilla: res.fiebreAmarillaBoro_fiebre_amarilla,
@@ -323,6 +352,7 @@ export const SubmitDataService = async (
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
+    console.log({ ff: form.severidadCovid })
     const body = {
         norden: form.norden,
         codigoAntecedentesPatologicos: form.codigoAntecedentesPatologicos_cod_ap,
@@ -443,12 +473,12 @@ export const SubmitDataService = async (
         numerosDeAbortosDamas: form.abortosDamas,
         precisarCausasDamas: form.causasAbortosDamas,
         otrosDescripcionAntecedentesPatologicos: form.otrasPatologias,
-        otrosDescripcionIndicarEnfermedades: form.tipoOtros,
+        otrosDescripcionIndicarEnfermedades: form.otrasEnfermedades,
         covid: form.covid19,
         fechaCovid: form.fechaCovid,
         covidLevel: form.severidadCovid === "LEVE",
-        covidModerado: form.severidadCovid === "MODERADO",
-        covidSevero: form.severidadCovid === "SEVERO",
+        covidModerado: form.severidadCovid === "MODERADA",
+        covidSevero: form.severidadCovid === "SEVERA",
         dosisVacunas: form.dosisVacunas,
         otrosTipoIndicarEnfermedades: form.tipoOtros,
         otrosFrecuenciaIndicarEnfermedades: form.frecuenciaOtros,
@@ -512,9 +542,33 @@ export const SubmitDataService = async (
         etsBoro: form.ets,
         migranaBoro: form.migrana,
         tiempoIncapacidadBoro: form.tipoIncapacidad,
-        antecedentesPatologicosQuirurgicos: form.antecedentes,
+
+        ruido: form.ruido,
+        polvo: form.polvo,
+        vidSegmentario: form.vidSegmentario,
+        vidTotal: form.vidTotal,
+        alturaEstructura: form.alturaEstruct,
+        vibraciones: form.vibraciones,
+        cancerigenos: form.cancerigenos,
+        mutagenicos: form.mutagenicos,
+        solventes: form.solventes,
+        metales: form.metales,
+        alturaGeografica: form.alturaGeograf,
+        temperatura: form.temperaturaAgente,
+        biologicos: form.biologicos,
+        posturas: form.posturas,
+        turnos: form.turnos,
+        quimicos: form.quimicos,
+        cargas: form.cargas,
+        movRepet: form.movRepet,
+        pvd: form.pvd,
+        electricos: form.electricos,
+        otros: form.otrosAgentes,
+
+        antecedentesPatologicosQuirurgicos: form.antecedentes || null,
         userRegistro: user,
     };
+    console.log(body)
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);
@@ -535,8 +589,32 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     );
 };
 
+// export const VerifyTR = async (nro, tabla, token, set, sede) => {
+//     VerifyTRDefault(
+//         nro,
+//         tabla,
+//         token,
+//         set,
+//         sede,
+//         () => {
+//             //NO Tiene registro
+//             GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+//         },
+//         () => {
+//             //Tiene registro
+//             GetInfoServicioEditar(nro, tabla, set, token, () => {
+//                 Swal.fire(
+//                     "Alerta",
+//                     "Este paciente ya cuenta con registros de Antecedentes Patológicos.",
+//                     "warning"
+//                 );
+//             });
+//         }
+//     );
+// };
+
 export const VerifyTR = async (nro, tabla, token, set, sede) => {
-    VerifyTRDefault(
+    VerifyTRPerzonalizado(
         nro,
         tabla,
         token,
@@ -555,8 +633,42 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
                     "warning"
                 );
             });
+        },
+        () => {
+            //Necesita Agudeza visual 
+            Swal.fire(
+                "Alerta",
+                "El paciente necesita pasar por Agudeza visual para poder registrarse.",
+                "warning"
+            );
         }
     );
+};
+
+export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaExamen = () => { }) => {
+    if (!nro) {
+        await Swal.fire(
+            "Error",
+            "Debe Introducir un Nro de Historia Clínica válido",
+            "error"
+        );
+        return;
+    }
+    Loading("Validando datos");
+    getFetch(
+        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+        token
+    ).then((res) => {
+        console.log(res);
+        if (res.id === 0) {
+            //No tiene registro previo 
+            noTieneRegistro();//datos paciente
+        } else if (res.id === 2) {
+            necesitaExamen();
+        } else {
+            tieneRegistro();//obtener data servicio
+        }
+    });
 };
 
 

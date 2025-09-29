@@ -2,48 +2,62 @@ import React from "react";
  
  function footerTR(doc,datos) {
    const pageHeight = doc.internal.pageSize.getHeight();
+   const pageWidth = doc.internal.pageSize.getWidth();
    // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
    const marginBottom = 25;
    // Posición base para el footer
    const baseY = pageHeight - marginBottom;
-   const col1X = 15;
-   const col2X = 70;
-   const col3X = 120;
-   const col4X = 175;
- 
-   // Ajustamos la fuente a 8 y color a negro
-   doc.setFontSize(7);
+   
+   // Calcular el ancho total del contenido del footer para centrarlo
+   const contenidoAncho = 180; // Ancho aproximado del contenido
+   const inicioX = (pageWidth - contenidoAncho) / 2; // Centrar el contenido
+   
+   const col1X = inicioX;
+   const col2X = inicioX + 55;
+   const col3X = inicioX + 105;
+   const col4X = inicioX + 160;
+
+   // Línea divisora púrpura antes del footer (centrada)
+   const lineY = baseY - 5; // 5mm antes del contenido del footer
+   doc.setDrawColor(52, 2, 153); // Color #340299 en RGB
+   doc.setLineWidth(0.5); // Grosor de la línea
+   doc.line(inicioX, lineY, inicioX + contenidoAncho, lineY); // Línea horizontal centrada
+
+   // Datos de prueba para el footer (si no se pasan datos)
+   const datosFooter = datos || {
+     dir_tru_pierola: "- Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando",
+     dir_huamachuco: "- Sede Huamachuco: Jr. Leoncio Prado N°786",
+     dir_huancayo: "- Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
+     dir_trujillo: "Cl.Guillermo Prescott N°127 Urb. Sto. Dominguito",
+     cel_trujillo_pie: "964385075",
+     cel_huamachuco: "990094744-969603777",
+     email_tru_pierola: "admision@horizontemedic.com",
+     email_huancayo: "admision.huancayo@horizontemedic.com",
+     telf_tru_pierola: "044-666120",
+     telf_huamachuco: "044-348070",
+     telf_huancayo: "064-659554"
+   };
+
+   // Ajustamos la fuente a normal (no negrita) y color a negro
+   doc.setFont("helvetica", "normal").setFontSize(7);
    doc.setTextColor(0, 0, 0);
  
-   //       COLUMNA 1
-   let col1Y = baseY;
-   doc.text(`${datos?.dir_tru_pierola || ""}`, col1X, col1Y);
-   col1Y += 4;
-   doc.text(`${datos?.dir_huamachuco || ""}`, col1X, col1Y);
-   col1Y += 4;
-   doc.text(`${datos?.dir_huancayo || ""}`, col1X, col1Y);
-   col1Y += 4;
-   doc.text(`${datos?.dir_trujillo || ""}`, col1X, col1Y);
- 
-   //       COLUMNA 2
-   let col2Y = baseY;
-   doc.text(`Cel. ${datos?.cel_trujillo_pie || ""}`, col2X+29, col2Y);
-   col2Y += 4;
-   doc.text(`Cel. ${datos?.cel_huamachuco || ""}`, col2X+10, col2Y);
- 
-   //       COLUMNA 3
-   let col3Y = baseY;
-   doc.text(`${datos?.email_tru_pierola || ""}`, col3X+7, col3Y);
-   col3Y += 4;
-   doc.text(`${datos?.email_huancayo || ""}`, col3X, col3Y);
- 
-   //       COLUMNA 4
-   let col4Y = baseY;
-   doc.text(`Telf. ${datos?.telf_tru_pierola || ""}`, col4X, col4Y);
-   col4Y += 4;
-   doc.text(`Telf. ${datos?.telf_huamachuco || ""}`, col4X, col4Y);
-   col4Y += 4;
-   doc.text(`Telf. ${datos?.telf_huancayo || ""}`, col4X, col4Y);
+   // Crear líneas de texto centradas
+   const lineas = [
+     `${datosFooter?.dir_tru_pierola || ""} Cel. ${datosFooter?.cel_trujillo_pie || ""} ${datosFooter?.email_tru_pierola || ""} Telf. ${datosFooter?.telf_tru_pierola || ""}`,
+     `${datosFooter?.dir_huamachuco || ""} Cel. ${datosFooter?.cel_huamachuco || ""} ${datosFooter?.email_huancayo || ""} Telf. ${datosFooter?.telf_huamachuco || ""}`,
+     `${datosFooter?.dir_huancayo || ""} Telf. ${datosFooter?.telf_huancayo || ""}`,
+     `${datosFooter?.dir_trujillo || ""} Telf. 044-767608`
+   ];
+
+   // Dibujar cada línea centrada
+   let yPos = baseY;
+   lineas.forEach((linea) => {
+     if (linea.trim()) {
+       doc.text(linea, pageWidth / 2, yPos, { align: "center" });
+       yPos += 3;
+     }
+   });
  }
  
  export default footerTR;

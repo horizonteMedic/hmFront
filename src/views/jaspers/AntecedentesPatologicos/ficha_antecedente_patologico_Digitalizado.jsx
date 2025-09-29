@@ -37,11 +37,11 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   const datosReales = {
     // Datos personales básicos
     apellidosNombres: String((data.apellidos_apellidos_pa ?? "") + " " + (data.nombres_nombres_pa ?? "")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaAntecedentesPatologicos_fecha_ap ?? ""), 
+    fechaExamen: formatearFechaCorta(data.fechaAntecedentesPatologicos_fecha_ap ?? ""),
     sexo: String(data.sexo_sexo_pa ?? ""),
     documentoIdentidad: String(data.dni_cod_pa ?? ""),
     edad: String(data.edad_edad ?? ""),
-    fechaNacimiento: formatearFechaCorta(data.fechanacimientopaciente_fecha_nacimiento_pa ?? ""), 
+    fechaNacimiento: formatearFechaCorta(data.fechanacimientopaciente_fecha_nacimiento_pa ?? ""),
     domicilio: String(data.direccionpaciente_direccion_pa ?? ""),
     areaTrabajo: String(data.area_area_o ?? ""),
     puestoTrabajo: String(data.cargo_cargo_de ?? ""),
@@ -49,17 +49,17 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
     contrata: String(data.contrata_razon_contrata ?? ""),
     sede: String(data.sede ?? ""),
     numeroFicha: String(data.n_orden ?? ""),
-    
+
     // Mapeo de observaciones para cada sección
     observacionesAntecedentes: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
     observacionesSintomas: String(data.otrosDescripcionIndicarEnfermedades_txtotros1ap ?? ""),
     observacionesHabitos: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
-    
+
     // Mapeo de datos de color
     color: Number(data.color ?? 0),
     codigoColor: String(data.codigoColor ?? ""),
     textoColor: String(data.textoColor ?? ""),
-    
+
     // Mapeo completo de enfermedades/antecedentes patológicos
     enfermedades: {
       alergias: Boolean(data.alergias_chk1 ?? false),
@@ -89,43 +89,43 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       hemorroides: Boolean(data.hemorroides_chk24 ?? false),
       hepatitis: Boolean(data.hepatitis_chk25 ?? false),
       hernias: Boolean(data.hernias_chk26 ?? false),
-      hipertencionArterial: Boolean(data.hipertencionArterial_chk27 ?? false),
-      urinariasRepetidas: Boolean(data.urinariasRepetidas_chk28 ?? false),
+      hipertensionArterial: Boolean(data.hipertencionArterial_chk27 ?? false),
+      infeccionesUrinarias: Boolean(data.urinariasRepetidas_chk28 ?? false),
       intoxicaciones: Boolean(data.intoxicaciones_chk29 ?? false),
       insuficienciaCardiaca: Boolean(data.insuficienciaCardiaca_chk30 ?? false),
-      insuficienciaCoronariaCronica: Boolean(data.insuficienciaCoronariaCronica_chk31 ?? false),
-      insuficienciaRenalCronica: Boolean(data.insuficienciaRenalCronica_chk32 ?? false),
+      insuficienciaCoronaria: Boolean(data.insuficienciaCoronariaCronica_chk31 ?? false),
+      insuficienciaRenal: Boolean(data.insuficienciaRenalCronica_chk32 ?? false),
       litiasisUrinaria: Boolean(data.litiasisUrinaria_chk33 ?? false),
       meningitis: Boolean(data.meningitis_chk34 ?? false),
-      neuritis: Boolean(data.neuritis_chk35 ?? false),
+      neuritisRepeticion: Boolean(data.neuritis_chk35 ?? false),
       otitisMedia: Boolean(data.otitisMedia_chk36 ?? false),
-      presionAltaOBaja: Boolean(data.presionAltaOBaja_chk37 ?? false),
-      paludismoOMalaria: Boolean(data.paludismoOMalaria_chk38 ?? false),
+      presionAltaBaja: Boolean(data.presionAltaOBaja_chk37 ?? false),
+      paludismoMalaria: Boolean(data.paludismoOMalaria_chk38 ?? false),
       parasitosisIntestinal: Boolean(data.parasitosisIntestinal_chk39 ?? false),
-      paratiditis: Boolean(data.paratiditis_chk40 ?? false),
+      parotiditis: Boolean(data.paratiditis_chk40 ?? false),
       pleuresia: Boolean(data.pleuresia_chk41 ?? false),
-      plumbismo: Boolean(data.plumbismo_chk42 ?? false),
+      plunbismo: Boolean(data.plumbismo_chk42 ?? false),
       poliomielitis: Boolean(data.poliomielitis_chk43 ?? false),
-      portadorMarcapasos: Boolean(data.portadorMarcapasos_chk44 ?? false),
-      protesisCardiacasValvulares: Boolean(data.protesisCardiacasValvulares_chk45 ?? false),
+      portadorMarcapaso: Boolean(data.portadorMarcapasos_chk44 ?? false),
+      protesisCardiacas: Boolean(data.protesisCardiacasValvulares_chk45 ?? false),
       resfriosFrecuentes: Boolean(data.resfriosFrecuentes_chk46 ?? false),
-      reumatismo: Boolean(data.reumatismo_chk47 ?? false),
+      reumatismoRepeticion: Boolean(data.reumatismo_chk47 ?? false),
       sarampion: Boolean(data.sarampion_chk48 ?? false),
       sifilis: Boolean(data.sifilis_chk49 ?? false),
       silicosis: Boolean(data.silicosis_chk50 ?? false),
       sinusitisCronica: Boolean(data.sinusitisCronica_chk51 ?? false),
       tosConvulsiva: Boolean(data.tosConvulsiva_chk52 ?? false),
-      transtornosNerviosos: Boolean(data.transtornosNerviosos_chk53 ?? false),
+      transtornoNerviosos: Boolean(data.transtornosNerviosos_chk53 ?? false),
       traumatismoEncefalocraneano: Boolean(data.traumatismoEncefalocraneano_chk54 ?? false),
       tuberculosis: Boolean(data.tuberculosis_chk55 ?? false),
       tumoresQuistes: Boolean(data.tumoresQuistes_chk56 ?? false),
       ulceraPeptica: Boolean(data.ulceraPeptica_chk57 ?? false),
       varicela: Boolean(data.varicela_chk58 ?? false),
       varices: Boolean(data.varices_chk59 ?? false),
-      varicocele: Boolean(data.varicocele_chk60 ?? false),
+      varicoceles: Boolean(data.varicocele_chk60 ?? false),
       covid19: Boolean(data.covid_chkcovid ?? false)
     },
-    
+
     // Mapeo de síntomas frecuentes
     sintomas: {
       perdidaMemoria: Boolean(data.perdidaMemoria_chk61 ?? false),
@@ -159,7 +159,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       tosCronica: Boolean(data.tosCronica_chk89 ?? false),
       sangradoEncias: Boolean(data.sangradoEncias_chk90 ?? false)
     },
-    
+
     // Mapeo de hábitos nocivos
     habitos: {
       fumar: Boolean(data.fumarSi_rbfumarsi ?? false),
@@ -174,7 +174,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       tipoOtros: String(data.otrosTipoIndicarEnfermedades_txtotros ?? ""),
       frecuenciaOtros: String(data.otrosFrecuenciaIndicarEnfermedades_txtotrosfrecuencia ?? "")
     },
-    
+
     // Mapeo de antecedentes quirúrgicos
     antecedentesQuirurgicos: (data.antecedentesPatologicosQuirurjicos || []).map(item => ({
       fecha: String(item.fechaAntecedentesPatologicosQuirurgicos ?? ""),
@@ -183,7 +183,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
       diasHospitalizacion: String(item.diasHospitalizado ?? ""),
       complicaciones: String(item.complicaciones ?? "")
     })),
-    
+
     // Mapeo de antecedentes de reproducción
     antecedentesReproduccion: {
       damas: {
@@ -202,9 +202,10 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
         causasAbortos: String(data.precisarCausasVarones_txtvcausas ?? "")
       }
     },
-    
+
     // Mapeo de severidad COVID-19
     severidadCovid: {
+      fechaExamen: Boolean(data.covid_chkcovid ?? false) ? formatearFechaCorta(data.fechaCovid_fechacovid ?? "") : "",
       leve: Boolean(data.covidLevel_chkcovidl ?? false),
       moderado: Boolean(data.covidModerado_chkcovidm ?? false),
       severo: Boolean(data.covidSevero_chkcovids ?? false)
@@ -217,27 +218,25 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // === HEADER ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
-  doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", pageW / 2, 26, { align: "center" });
+  doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", (pageW / 2) - 35, 26, { align: "center" });
 
   // Número de Ficha y Página - Página 1 (tipo lista)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 53, 20);
+  doc.text("Nro de ficha: ", pageW - 80, 20);
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(datosFinales.numeroFicha, pageW - 33, 20);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 53, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 53, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 80, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 80, 30);
 
   // === BLOQUE DE COLOR ===
   drawColorBox(doc, {
     color: datosFinales.codigoColor,           // Color de la letra y línea
     text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
-    x: pageW - 30,                             // Posición X (30mm del borde derecho)
+    x: pageW - 25,                             // Posición X (30mm del borde derecho)
     y: 15,                                     // Posición Y (alineado con header)
     size: 22,                                  // Tamaño del área total (22x22mm)
     showLine: true,                            // Mostrar línea de color
-    fontSize: 30,                              // Tamaño de la letra
-    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
   });
 
 
@@ -473,7 +472,7 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Fecha :", 80, 160);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fechaExamen || "", 95, 160);
+  doc.text(datosFinales.severidadCovid.fechaExamen || "", 95, 160);
 
   // LEVE
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -704,12 +703,12 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   });
 
   // === OBSERVACIONES HÁBITOS NOCIVOS ===
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Observaciones:", 20, 280);
+  // doc.setFont("helvetica", "bold").setFontSize(9);
+  // doc.text("Observaciones:", 20, 280);
 
-  // Texto de observaciones de hábitos nocivos
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.observacionesHabitos, 45, 280, { maxWidth: 155 });
+  // // Texto de observaciones de hábitos nocivos
+  // doc.setFont("helvetica", "normal").setFontSize(8);
+  // doc.text(datosFinales.observacionesHabitos, 45, 280, { maxWidth: 155 });
 
   // === PÁGINA 2 ===
   doc.addPage();
@@ -718,27 +717,25 @@ export default function ficha_antecedente_patologico_Digitalizado(data = {}) {
   // === HEADER PÁGINA 2 ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
-  doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", pageW / 2, 26, { align: "center" });
+  doc.text("FICHA DE ANTECEDENTES PATOLOGICOS", (pageW / 2) - 35, 26, { align: "center" });
 
   // Número de Ficha y Página (tipo lista)
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 53, 20);
+  doc.text("Nro de ficha: ", pageW - 80, 20);
   doc.setFont("helvetica", "bold").setFontSize(18);
   doc.text(datosFinales.numeroFicha, pageW - 33, 20);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 53, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 53, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 80, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 80, 30);
 
   // === BLOQUE DE COLOR PÁGINA 2 ===
   drawColorBox(doc, {
     color: datosFinales.codigoColor,           // Color de la letra y línea
     text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
-    x: pageW - 30,                             // Posición X (30mm del borde derecho)
+    x: pageW - 25,                             // Posición X (30mm del borde derecho)
     y: 15,                                     // Posición Y (alineado con header)
     size: 22,                                  // Tamaño del área total (22x22mm)
     showLine: true,                            // Mostrar línea de color
-    fontSize: 30,                              // Tamaño de la letra
-    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
   });
 
   // === ANTECEDENTES QUIRÚRGICOS ===

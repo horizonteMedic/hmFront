@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import { getSign } from "../../utils/helpers";
+import drawColorBox from "../components/ColorBox";
 
 export default function ficha_antecedente_patologico_boro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -91,6 +92,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
       intoxicaciones: false,
       amputacion: false,
       sordera: false,
+      patologias: "pato",
       otros: "Problemas de visión y migrañas ocasionales"
     },
     // Datos de alergias
@@ -177,7 +179,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
 
     // Datos de accidentes
     accidenteTrabajo: Boolean(data.accidenteTrabajoBoro_accitrabajo ?? false),
-    fechaAccidente: String(data.accidenteTrabajoFechaBoro_accit_fecha ?? ""),
+    fechaAccidente: Boolean(data.accidenteTrabajoBoro_accitrabajo ?? false) ? formatearFechaCorta(String(data.accidenteTrabajoFechaBoro_accit_fecha ?? "")) : "",
     tiempoPerdido: Boolean(data.descansoMedicoBoro_accit_descanso ?? false),
     tiempoIncapacidad: String(data.tiempoIncapacidadBoro_timeincapacidad ?? ""),
     causaBasica: String(data.descansoMedicoEspecifiqueBoro_accit_descanso_detal ?? ""),
@@ -185,7 +187,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
     // Datos de enfermedad profesional
     enfermedadProfesional: Boolean(data.enfermedadesProfesionalesBoro_enfe_prof ?? false),
     evaluacionEnfermedad: Boolean(data.enfermedadesLaboralesCalificacionBoro_enfe_lab_calif ?? false),
-    fechaEvaluacion: String(data.enfermedadesProfesionalesFechaBoro_enfe_profecha ?? ""),
+    fechaEvaluacion: formatearFechaCorta(String(data.enfermedadesProfesionalesFechaBoro_enfe_profecha ?? "")),
     especifiqueCual: String(data.enfermedadesLaboralesEspecifiqueBoro_enfe_lab_califdetal ?? ""),
 
     // Datos de factores de riesgo - mapeo completo
@@ -203,7 +205,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
       quimicos: Boolean(data.quimicosAnexo7c_quimicos ?? false),
       posturas: Boolean(data.posturasAnexo7c_chkposturas ?? false),
       electricos: Boolean(data.electricosAnexo7c_electricos ?? false),
-      otros: String(data.otrosAnexo7c_chkotros ?? "")
+      otros: ""
     },
 
     // Datos de patologías - mapeo completo
@@ -247,7 +249,8 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
       intoxicaciones: Boolean(data.intoxicacionesBoro_intoxicaciones ?? false),
       amputacion: Boolean(data.amputacionBoro_amputacion ?? false),
       sordera: Boolean(data.sorderaBoro_sordera ?? false),
-      otros: String(data.especifiqueTratamientoBoro_especifique_detalleenfermedades ?? "")
+      patologias: String(data.otrosDescripcionAntecedentesPatologicos_txtotrosap ?? ""),
+      otros: String(data.especifiqueTratamientoBoro_especifique_detalleenfermedades ?? ""),
     },
 
     // Datos de alergias
@@ -313,17 +316,32 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // === HEADER ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
-  doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", pageW / 2, 26, { align: "center" });
-  doc.text("Y ANTECEDENTES", pageW / 2, 32, { align: "center" });
+  doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", (pageW / 2) - 35, 26, { align: "center" });
+  doc.text("Y ANTECEDENTES", (pageW / 2) - 35, 32, { align: "center" });
 
   // Número de Ficha y Página - Página 1 (tipo lista)
+  // doc.setFont("helvetica", "normal").setFontSize(9);
+  // doc.text("Nro de ficha: ", pageW - 50, 20);
+  // doc.setFont("helvetica", "bold").setFontSize(18);
+  // doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  // doc.setFont("helvetica", "normal").setFontSize(9);
+  // doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
+  // doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 50, 20);
+  doc.text("Nro de ficha: ", pageW - 80, 20);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 80, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 80, 30);
+  drawColorBox(doc, {
+    color: datosFinales.codigoColor,           // Color de la letra y línea
+    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
+    x: pageW - 25,                             // Posición X (30mm del borde derecho)
+    y: 15,                                     // Posición Y (alineado con header)
+    size: 22,                                  // Tamaño del área total (22x22mm)
+    showLine: true,                            // Mostrar línea de color
+  });
 
   // === EMPRESA Y FECHA ===
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -541,7 +559,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Checkbox SI para evaluación con paréntesis - ANCHO FIJO
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("SI (", checkboxEvaluacionSiX, evaluacionY);
-  if (datosFinales.evaluacionEnfermedad) {
+  if (datosFinales.enfermedadProfesional && datosFinales.evaluacionEnfermedad) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.setTextColor(255, 0, 0); // rojo
     // X del SI evaluación - coordenadas individuales
@@ -559,7 +577,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Checkbox NO para evaluación con paréntesis - ANCHO MÁS GRANDE
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text("NO (", checkboxEvaluacionNoX, evaluacionY);
-  if (!datosFinales.evaluacionEnfermedad) {
+  if (datosFinales.enfermedadProfesional && !datosFinales.evaluacionEnfermedad) {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.setTextColor(255, 0, 0); // rojo
     // X del NO evaluación - coordenadas individuales
@@ -605,7 +623,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
     { nombre: "Vibraciones", marcado: datosFinales.factoresRiesgo.vibraciones, x: 80, y: factoresY + 8, checkboxX: 75, checkboxY: factoresY + 5 },
     { nombre: "Altura Estructura", marcado: datosFinales.factoresRiesgo.alturaEstructura, x: 80, y: factoresY + 14, checkboxX: 75, checkboxY: factoresY + 11 },
     { nombre: "Altura Geografica", marcado: datosFinales.factoresRiesgo.alturaGeografica, x: 80, y: factoresY + 20, checkboxX: 75, checkboxY: factoresY + 17 },
-    { nombre: "Otros:", marcado: false, x: 50, y: factoresY + 26, checkboxX: null, checkboxY: null },
+    { nombre: "Otros:", marcado: "", x: 50, y: factoresY + 26, checkboxX: null, checkboxY: null },
 
     // Columna 3
     { nombre: "Temperatura", marcado: datosFinales.factoresRiesgo.temperatura, x: 120, y: factoresY + 8, checkboxX: 115, checkboxY: factoresY + 5 },
@@ -621,9 +639,9 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Dibujar los factores de riesgo con checkboxes
   factoresRiesgo.forEach(factor => {
     // Solo dibujar checkbox si no es "OTROS"
-    if (factor.nombre !== "OTROS:") {
+    if (factor.nombre !== "Otros:") {
       // Dibujar el checkbox cuadrado (a la izquierda) - coordenadas individuales
-      doc.rect(factor.checkboxX, factor.checkboxY, 4, 4);
+      doc.rect(factor.checkboxX, factor.checkboxY, 4, 4); //este es 
 
       // Si está marcado, dibujar la X
       if (factor.marcado) {
@@ -648,9 +666,9 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
 
 
   // Si hay texto para "OTROS", mostrarlo
-  if (datosFinales.factoresRiesgo.otros) {
-    doc.text(datosFinales.factoresRiesgo.otros, 62, otrosY);
-  }
+  // if (datosFinales.factoresRiesgo.otros) {
+  //   doc.text(datosFinales.factoresRiesgo.otros, 62, otrosY);
+  // }
 
   // === NUEVA SECCIÓN: ANTECEDENTES PATOLÓGICOS PERSONALES ===
   const antecedentesPatologicosY = otrosY + 8;
@@ -739,12 +757,12 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
 
   // Línea 1: "Otros: texto" en la misma línea
   doc.setFont("helvetica", "normal").setFontSize(9);
-  const otrosTexto = "Otros: " + (datosFinales.factoresRiesgo.otros || "");
+  const otrosTexto = "Otros: " + (datosFinales.patologias.otros || "");
   doc.text(otrosTexto, 20, otrosPatologiasY);
 
   // Línea 2: "Patologías: texto" en la misma línea
   const patologiasY = otrosPatologiasY + 4;
-  const patologiasTexto = "Patologías: " + (datosFinales.patologias.otros || "");
+  const patologiasTexto = "Patologías: " + (datosFinales.patologias.patologias || "");
   doc.text(patologiasTexto, 20, patologiasY);
 
   // === SECCIÓN "ALERGIAS A MEDICAMENTOS / ALIMENTOS" ===
@@ -867,17 +885,32 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // === HEADER PÁGINA 2 ===
   doc.setFont("helvetica", "bold").setFontSize(12);
   doc.setTextColor(0, 0, 0);
-  doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", pageW / 2, 26, { align: "center" });
-  doc.text("Y ANTECEDENTES", pageW / 2, 32, { align: "center" });
+  doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", (pageW / 2) - 35, 26, { align: "center" });
+  doc.text("Y ANTECEDENTES", (pageW / 2) - 35, 32, { align: "center" });
 
   // Número de Ficha y Página - Página 2 (tipo lista)
+  // doc.setFont("helvetica", "normal").setFontSize(9);
+  // doc.text("Nro de ficha: ", pageW - 50, 20);
+  // doc.setFont("helvetica", "bold").setFontSize(18);
+  // doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  // doc.setFont("helvetica", "normal").setFontSize(9);
+  // doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
+  // doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 50, 20);
+  doc.text("Nro de ficha: ", pageW - 80, 20);
   doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 30, 20);
+  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
+  doc.text("Sede: " + datosFinales.sede, pageW - 80, 25);
+  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 80, 30);
+  drawColorBox(doc, {
+    color: datosFinales.codigoColor,           // Color de la letra y línea
+    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
+    x: pageW - 25,                             // Posición X (30mm del borde derecho)
+    y: 15,                                     // Posición Y (alineado con header)
+    size: 22,                                  // Tamaño del área total (22x22mm)
+    showLine: true,                            // Mostrar línea de color
+  });
 
   // === ANTECEDENTES QUIRÚRGICOS ===
   doc.setFont("helvetica", "bold").setFontSize(9);

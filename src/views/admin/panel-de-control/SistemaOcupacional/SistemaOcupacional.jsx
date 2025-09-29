@@ -1299,7 +1299,7 @@ const TabComponent = () => {
                   Antecedentes Patológicos
                 </h2>
               </div>
-              <AntecedentesPatologicos listas={listasCombos}/>
+              <AntecedentesPatologicos listas={listasCombos} />
             </div>
           )}
           {activeTab === 30 && (
@@ -1317,7 +1317,7 @@ const TabComponent = () => {
                   Fichas Aptitud
                 </h2>
               </div>
-              <FichasAptitudTabSelector listas={listasCombos} />
+              <FichasAptitudTabSelector listas={listasCombos} tieneVista={tieneVista} />
             </div>
           )}
         </div>

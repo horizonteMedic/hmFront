@@ -20,7 +20,7 @@ export default function AntecedentesPatologicosTab({
         <h4 className="font-semibold mb-3">Ingresar Información</h4>
 
         {/* Barra de información del paciente */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
           <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onKeyUp={handleSearch} onChange={handleChangeNumber} labelWidth="70px" />
           <InputTextOneLine label="Fecha" name="fechaExam" type="date" value={form?.fechaExam} onChange={handleChangeSimple} labelWidth="50px" />
           <InputTextOneLine label="Nombres" name="nombres" value={form?.nombres} disabled labelWidth="70px" />
@@ -35,7 +35,7 @@ export default function AntecedentesPatologicosTab({
               label="BOROO"
               name="boroo"
               checked={form?.boroo}
-              onChange={handleCheckBoxChange}
+              disabled
             />
           </div>
         </div>
@@ -48,7 +48,16 @@ export default function AntecedentesPatologicosTab({
                 label="COVID 19"
                 name="covid19"
                 checked={form?.covid19}
-                onChange={(e) => { setForm(prev => ({ ...prev, severidadCovid: "" })); handleCheckBoxChange(e) }}
+                onChange={(e) => {
+                  const today = getToday();
+                  setForm(prev => ({
+                    ...prev,
+                    severidadCovid: "",
+                    fechaCovid: today,
+                    dosisVacunas: "",
+                  }));
+                  handleCheckBoxChange(e)
+                }}
               />
             </div>
             <InputTextOneLine
@@ -61,7 +70,6 @@ export default function AntecedentesPatologicosTab({
             />
             <div className="flex items-center gap-4">
               <InputsRadioGroup
-                label="Severidad"
                 name="severidadCovid"
                 value={form?.severidadCovid}
                 disabled={!form?.covid19}
@@ -73,10 +81,154 @@ export default function AntecedentesPatologicosTab({
                 onChange={handleRadioButton}
               />
             </div>
+            <InputTextOneLine
+              label="Dosis de vacunas"
+              name="dosisVacunas"
+              value={form?.dosisVacunas}
+              onChange={handleChangeNumber}
+              disabled={!form?.covid19}
+              labelWidth="120px" />
           </div>)}
+
+
 
         <div className="mb-2 font-semibold text-red-600">
           Marcar todas las enfermedades que ha tenido o tiene
+        </div>
+        <div className="space-y-3 mb-4">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 h-full">
+            <h4 className="font-semibold text-gray-800 mb-2">
+              Agentes presentes en Trabajo Actual
+            </h4>
+            <div className="grid grid-cols-3 gap-2">
+              <InputCheckbox
+                label="Ruido"
+                checked={form.ruido}
+                name="ruido"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Polvo"
+                checked={form.polvo}
+                name="polvo"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Vid Segmentario"
+                checked={form.vidSegmentario}
+                name="vidSegmentario"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Vid Total"
+                checked={form.vidTotal}
+                name="vidTotal"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Altura Estruct."
+                checked={form.alturaEstruct}
+                name="alturaEstruct"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Vibraciones"
+                checked={form.vibraciones}
+                name="vibraciones"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Cancerígenos"
+                checked={form.cancerigenos}
+                name="cancerigenos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Mutagenicos"
+                checked={form.mutagenicos}
+                name="mutagenicos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Solventes"
+                checked={form.solventes}
+                name="solventes"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Metales"
+                checked={form.metales}
+                name="metales"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Altura Geograf."
+                checked={form.alturaGeograf}
+                name="alturaGeograf"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Temperatura"
+                checked={form.temperaturaAgente}
+                name="temperaturaAgente"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Biológicos"
+                checked={form.biologicos}
+                name="biologicos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Posturas"
+                checked={form.posturas}
+                name="posturas"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Turnos"
+                checked={form.turnos}
+                name="turnos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Químicos"
+                checked={form.quimicos}
+                name="quimicos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Cargas"
+                checked={form.cargas}
+                name="cargas"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Mov. Repet"
+                checked={form.movRepet}
+                name="movRepet"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="PVD"
+                checked={form.pvd}
+                name="pvd"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Electricos"
+                checked={form.electricos}
+                name="electricos"
+                onChange={handleCheckBoxChange}
+              />
+              <InputCheckbox
+                label="Otros"
+                checked={form.otrosAgentes}
+                name="otrosAgentes"
+                onChange={handleCheckBoxChange}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -193,6 +345,7 @@ export default function AntecedentesPatologicosTab({
               {/* Columna 1 - BOROO */}
               <div className="space-y-1">
                 {[
+                  ["gastritisCronica", "Gastritis crónica"],
                   ["alergias", "Alergias"],
                   ["asma", "Asma"],
                   ["bronquitisRepeticion", "Bronquitis a repetición"],
@@ -361,7 +514,11 @@ export default function AntecedentesPatologicosTab({
                         <InputsBooleanRadioGroup
                           name="tiempoPerdido"
                           value={form?.tiempoPerdido}
-                          onChange={handleRadioButtonBoolean}
+                          onChange={(e, value) => {
+                            if (value == false)
+                              setForm(prev => ({ ...prev, especifiqueTiempoPerdido: "", tipoIncapacidad: "" }));
+                            handleRadioButtonBoolean(e, value)
+                          }}
                         />
                       </div>
                       <InputTextOneLine
@@ -369,12 +526,14 @@ export default function AntecedentesPatologicosTab({
                         name="especifiqueTiempoPerdido"
                         value={form?.especifiqueTiempoPerdido}
                         onChange={handleChange}
+                        disabled={!form?.tiempoPerdido}
                       />
                       <InputTextOneLine
                         label="Tipo de Incapacidad"
                         name="tipoIncapacidad"
                         value={form?.tipoIncapacidad}
                         onChange={handleChange}
+                        disabled={!form?.tiempoPerdido}
                       />
                     </div>
                   </div>
@@ -392,7 +551,7 @@ export default function AntecedentesPatologicosTab({
                       onChange={(e, value) => {
                         const today = getToday();
                         if (value == false)
-                          setForm(prev => ({ ...prev, fechaCalificacion: today }));
+                          setForm(prev => ({ ...prev, evaluadoCalificacion: false, especifiqueCalificacion: "", fechaCalificacion: today }));
                         handleRadioButtonBoolean(e, value)
                       }}
                     />
@@ -408,7 +567,12 @@ export default function AntecedentesPatologicosTab({
                         <InputsBooleanRadioGroup
                           name="evaluadoCalificacion"
                           value={form?.evaluadoCalificacion}
-                          onChange={handleRadioButtonBoolean}
+                          onChange={(e, value) => {
+                            const today = getToday();
+                            if (value == false)
+                              setForm(prev => ({ ...prev, especifiqueCalificacion: "", fechaCalificacion: today }));
+                            handleRadioButtonBoolean(e, value)
+                          }}
                         />
                       </div>
                       <InputTextOneLine
@@ -416,6 +580,7 @@ export default function AntecedentesPatologicosTab({
                         name="especifiqueCalificacion"
                         value={form?.especifiqueCalificacion}
                         onChange={handleChange}
+                        disabled={!form?.evaluadoCalificacion}
                       />
                       <InputTextOneLine
                         label="Fecha"
@@ -423,6 +588,7 @@ export default function AntecedentesPatologicosTab({
                         type="date"
                         value={form?.fechaCalificacion}
                         onChange={handleChangeSimple}
+                        disabled={!form?.evaluadoCalificacion}
                       />
                     </div>
                   </div>

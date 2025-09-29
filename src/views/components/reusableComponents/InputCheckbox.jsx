@@ -14,7 +14,7 @@ export default function InputCheckbox({
         type="checkbox"
         name={name}
         checked={!!checked}
-        disabled={disabled}
+        // disabled={disabled}
         onChange={(e) => disabled ? null : onChange(e)}
       />
       {labelRight && <span>{label}</span>}
