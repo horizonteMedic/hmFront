@@ -503,19 +503,19 @@ export default function DatosPersonales({
                 label="Tetano"
                 checked={form.tetano}
                 name="tetano"
-                disabled
+                onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Hepatitis - B"
                 checked={form.hepatitisB}
                 name="hepatitisB"
-                disabled
+                onChange={handleCheckBoxChange}
               />
               <InputCheckbox
                 label="Fiebre Amarilla"
                 checked={form.fiebreAmarilla}
                 name="fiebreAmarilla"
-                disabled
+                onChange={handleCheckBoxChange}
               />
             </div>
           </div>

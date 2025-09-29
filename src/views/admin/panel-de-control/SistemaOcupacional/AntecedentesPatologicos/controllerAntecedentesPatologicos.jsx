@@ -554,7 +554,7 @@ export const SubmitDataService = async (
         solventes: form.solventes,
         metales: form.metales,
         alturaGeografica: form.alturaGeograf,
-        temperaturaAgente: form.temperatura,
+        temperatura: form.temperaturaAgente,
         biologicos: form.biologicos,
         posturas: form.posturas,
         turnos: form.turnos,
@@ -568,6 +568,7 @@ export const SubmitDataService = async (
         antecedentesPatologicosQuirurgicos: form.antecedentes || null,
         userRegistro: user,
     };
+    console.log(body)
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
         PrintHojaR(form.norden, token, tabla, datosFooter);
