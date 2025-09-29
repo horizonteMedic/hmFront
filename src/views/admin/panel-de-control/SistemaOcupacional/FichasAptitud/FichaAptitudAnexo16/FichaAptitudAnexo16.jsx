@@ -13,7 +13,7 @@ import MedicoSearch from "../../../../../components/reusableComponents/MedicoSea
 import useRealTime from "../../../../../hooks/useRealTime";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
 
-const tabla = "aptitud_medico_ocupacional_agro"
+const tabla = "certificado_aptitud_medico_ocupacional"
 const today = getToday();
 
 export default function FichaAptitudAnexo2({ MedicosMulti }) {
