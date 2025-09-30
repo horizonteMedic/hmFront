@@ -95,6 +95,7 @@ import PsicologiaTabSelector from "./ModuloPsicologia/PsicologiaTabSelector.jsx"
 import Anexo16A from "./Anexo16A/Anexo16A.jsx";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos.jsx";
 import FichasAptitudTabSelector from "./FichasAptitud/FichasAptitudTabSelector.jsx";
+import FichaSas from "./FichaSAS/FichaSas.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -1234,7 +1235,8 @@ const TabComponent = () => {
                 </h2>
               </div>
               {/* <InformePsicologico /> */}
-              <h2>play</h2>
+              {/* <h2>play</h2> */}
+              <FichaSas listas={listasCombos} />
             </div>
           )}
           {activeTab === 25 && (
