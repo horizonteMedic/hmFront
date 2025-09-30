@@ -91,7 +91,7 @@ import EKG from "./EKG/ekg.jsx";
 import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.jsx";
 import Anexo2 from "./Anexo2/Anexo2.jsx";
 import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSelector.jsx";
-import InformePsicologico from "./Psicologia/InformePsicologico/InformePsicologico.jsx";
+import PsicologiaTabSelector from "./ModuloPsicologia/PsicologiaTabSelector.jsx";
 import Anexo16A from "./Anexo16A/Anexo16A.jsx";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos.jsx";
 import FichasAptitudTabSelector from "./FichasAptitud/FichasAptitudTabSelector.jsx";
@@ -307,6 +307,7 @@ const TabComponent = () => {
               )}
               {tieneVista("Psicologia") && (
                 <div
+                  onClick={() => setActiveTab(10)}
                   className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ""
                     }`}
                 >
@@ -937,6 +938,24 @@ const TabComponent = () => {
               />
             </div>
           )}
+          {activeTab === 10 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Modulo Psicologia
+                </h2>
+              </div>
+              <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> 
+            </div>
+          )}
           {activeTab === 14 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -1214,7 +1233,8 @@ const TabComponent = () => {
                   Playground
                 </h2>
               </div>
-              <InformePsicologico />
+              {/* <InformePsicologico /> */}
+              <h2>play</h2>
             </div>
           )}
           {activeTab === 25 && (
