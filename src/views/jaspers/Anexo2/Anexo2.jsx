@@ -7,7 +7,7 @@ export default function Anexo2(data = {}) {
   const margin = 0; // Sin márgenes
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
-  
+
   // Extraer accidentes directamente del JSON
   const accidentes = data.accidentes || [];
 
@@ -396,12 +396,12 @@ export default function Anexo2(data = {}) {
       hta: { si: data.hta ?? false, no: !data.hta ?? true },//revisar pedir
       diabetes: { si: data.diabetes ?? false, no: !data.diabetes ?? true },//revisar pedir
       otros: { si: data.antecedentesPersonalesOtros_chkapotros ?? false, no: !data.antecedentesPersonalesOtros_chkapotros ?? true },
-
+      otrosTextoAnte: data.antecedentesPersonalesOtrosDescripcion_txtotrosantecendetes ?? "",
       // Hábitos Nocivos
       habitosNocivos: {
-        alcohol: { si: data.alcohol ?? false, no: !data.alcohol ?? true, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholCantidad ?? "" },//revisar pedir
-        tabaco: { si: data.tabaco ?? false, no: !data.tabaco ?? true, tipo: data.tabacoTipo ?? "", cantidad: data.tabacoCantidad ?? "" },//revisar pedir
-        drogas: { si: data.drogas ?? false, no: !data.drogas ?? true, tipo: data.drogasTipo ?? "", cantidad: data.drogasCantidad ?? "" },//revisar pedir
+        alcohol: { si: data.alcohol ?? false, no: !data.alcohol ?? true, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholFrecuencia ?? "" },
+        tabaco: { si: data.tabaco ?? false, no: !data.tabaco ?? true, tipo: data.tabacoTipo ?? "", cantidad: "" },//revisar pedir
+        drogas: { si: data.drogas ?? false, no: !data.drogas ?? true, tipo: data.drogasTipo ?? "", cantidad: data.drogasFrecuencia ?? "" },//revisar pedir
         medicamento: { si: data.medicamentosSi_rbsimed ?? false, no: data.medicamentosNo_rbnomed ?? false, tipo: data.tipoMedicamento_txttipomedicamento ?? "", cantidad: data.frecuenciaMedicamentos_txtfrecuenciamed ?? "" }
       }
     },
@@ -421,9 +421,9 @@ export default function Anexo2(data = {}) {
       // Usar accidentes directamente del JSON
       enfermedades: accidentes?.map(accidente => ({
         enfermedad: accidente.enfermedad ?? "",
-        asociadoTrabajo: { 
-          si: accidente.asociadoTrabajo === "true" || accidente.asociadoTrabajo === true, 
-          no: accidente.asociadoTrabajo === "false" || accidente.asociadoTrabajo === false 
+        asociadoTrabajo: {
+          si: accidente.asociadoTrabajo === "true" || accidente.asociadoTrabajo === true,
+          no: accidente.asociadoTrabajo === "false" || accidente.asociadoTrabajo === false
         },
         año: accidente.anio ?? "",
         diasDescanso: accidente.diasDescanso ?? "",
@@ -440,10 +440,11 @@ export default function Anexo2(data = {}) {
         talla: data.talla_talla ?? "",
         peso: data.peso_peso ?? "",
         imc: data.imc_imc ?? "",
-        pulso: data.pulso ?? "",
+        pulso: data.cintura_cintura ?? "",
         frecuenciaRespiratoria: data.frespiratoria_f_respiratoria ?? "",
         frecuenciaCardiaca: data.fcardiaca_f_cardiaca ?? "",
         presionArterial: data.sistolica_sistolica ?? "",
+        presionDiastolica: data.diastolica_diastolica ?? "",
         temperatura: data.temperatura_temperatura ?? "",
         otros: `SAR O2 : ${data.sat02_sat_02 ?? ""}`
       },
@@ -491,7 +492,7 @@ export default function Anexo2(data = {}) {
 
     // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
     examenFisicoSistemas: {
-      oidos: data.oidos_txtoidos ?? "",
+      oidos: data.diagnosticoAudiometria_diagnostico ?? "",
       nariz: data.nariz_txtnariz ?? "",
       boca: data.boca_txtboca ?? "",
       faringe: data.faringe_txtfaringe ?? "",
@@ -1087,7 +1088,9 @@ export default function Anexo2(data = {}) {
     renderCheckbox(antecedentes.hta, xHtaSi, yHtaSi, xHtaNo, yHtaNo);
     renderCheckbox(antecedentes.diabetes, xDiabetesSi, yDiabetesSi, xDiabetesNo, yDiabetesNo);
     renderCheckbox(antecedentes.otros, xOtrosSi, yOtrosSi, xOtrosNo, yOtrosNo);
-
+    doc.setFont("helvetica", "normal").setFontSize(5);
+    doc.text(antecedentes.otrosTextoAnte.toUpperCase(), xOtrosSi + 10, yOtrosSi-2, { maxWidth: 45 });
+doc.setFont("helvetica", "normal").setFontSize(9);
     // Hábitos Nocivos
     if (antecedentes.habitosNocivos) {
       // Alcohol - Checkbox + campos de texto
@@ -1222,12 +1225,12 @@ export default function Anexo2(data = {}) {
     enfermedades.slice(0, 7).forEach((enfermedad, index) => {
       const pos = posicionesFilas[index];
       if (!pos) return; // Si no hay posición definida, saltar
-      
+
       // Nombre de la enfermedad/accidente
       if (enfermedad.enfermedad) {
         doc.text(enfermedad.enfermedad.toUpperCase(), pos.xEnfermedad, pos.yEnfermedad);
       }
-      
+
       // Checkbox SI/NO
       if (enfermedad.asociadoTrabajo) {
         doc.setTextColor(0, 0, 255); // Color azul para las X
@@ -1322,7 +1325,7 @@ export default function Anexo2(data = {}) {
         doc.text(examen.frecuenciaCardiaca.toUpperCase(), xFrecuenciaCardiaca, yFrecuenciaCardiaca);
       }
       if (examen.presionArterial) {
-        doc.text(examen.presionArterial.toUpperCase(), xPresionArterial, yPresionArterial);
+        doc.text(`${examen.presionArterial}/${examen.presionDiastolica}`, xPresionArterial, yPresionArterial);
       }
       if (examen.temperatura) {
         doc.text(examen.temperatura.toUpperCase(), xTemperatura, yTemperatura);

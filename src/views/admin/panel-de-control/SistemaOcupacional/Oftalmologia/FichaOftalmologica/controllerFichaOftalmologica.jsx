@@ -15,7 +15,7 @@ export const GetInfoServicio = (
   tabla,
   set,
   token,
-  onFinish = () => {}
+  onFinish = () => { }
 ) => {
   getFetch(`${obtenerReporteUrl}?nOrden=${nro}&nameService=${tabla}`, token)
     .then((res) => {
@@ -29,7 +29,7 @@ export const GetInfoServicio = (
           contrata: res.contrata,
           nomExam: res.nomExam,
           codOf: res.codOf,
-          edad:res.edad,
+          edad: res.edad,
           visionCercaOD: res.vcercaSOd,
           visionCercaOI: res.vcercaSOi,
           visionCercaODC: res.vcercaCOd,
@@ -43,7 +43,7 @@ export const GetInfoServicio = (
           reflejosPupilares: res.rpupilares,
           enfOculares: res.eoculares,
           fechaExamen: res.fechaOf,
-          presenciaPterigion: res.eoculares1,
+          presenciaPterigion: res.eoculares1 ?? "",
           agudezaLejos: res.agudezaVisualLejor,
         }));
       } else {
@@ -193,7 +193,7 @@ export const GetInfoPac = (nro, set, token, sede) => {
         ...res,
         fechaNac: convertirFecha(res.fechaNac),
         nombres: res.nombresApellidos,
-        edad:res.edad
+        edad: res.edad
       }));
     })
     .finally(() => {
@@ -269,8 +269,7 @@ export const PrintHojaCompleto = (nro, token, tabla) => {
 export const getInfoTabla = (nombreSearch, codigoSearch, setData, token) => {
   try {
     getFetch(
-      `/api/v01/ct/agudezaVisual/obtenerOftalmologiaPorFiltros?${
-        codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
+      `/api/v01/ct/agudezaVisual/obtenerOftalmologiaPorFiltros?${codigoSearch == "" ? "" : `nOrden=${codigoSearch}`
       }
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
       token

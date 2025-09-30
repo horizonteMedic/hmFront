@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
 import { getSign } from "../../utils/helpers";
 import drawColorBox from "../components/ColorBox";
+import CabeceraLogo from '../components/CabeceraLogo.jsx';
 
 export default function ficha_antecedente_patologico_boro(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
@@ -313,35 +314,41 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Usar datos reales si existen, sino usar datos de prueba
   const datosFinales = data && data.n_orden ? datosReales : datosPrueba;
 
-  // === HEADER ===
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", (pageW / 2) - 35, 26, { align: "center" });
-  doc.text("Y ANTECEDENTES", (pageW / 2) - 35, 32, { align: "center" });
+  // Función general para dibujar el header
+  const drawHeader = (pageNumber) => {
+    // === LOGO ===
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 12 });
 
-  // Número de Ficha y Página - Página 1 (tipo lista)
-  // doc.setFont("helvetica", "normal").setFontSize(9);
-  // doc.text("Nro de ficha: ", pageW - 50, 20);
-  // doc.setFont("helvetica", "bold").setFontSize(18);
-  // doc.text(datosFinales.numeroFicha, pageW - 30, 20);
-  // doc.setFont("helvetica", "normal").setFontSize(9);
-  // doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
-  // doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 80, 20);
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 80, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 80, 30);
-  drawColorBox(doc, {
-    color: datosFinales.codigoColor,           // Color de la letra y línea
-    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
-    x: pageW - 25,                             // Posición X (30mm del borde derecho)
-    y: 15,                                     // Posición Y (alineado con header)
-    size: 22,                                  // Tamaño del área total (22x22mm)
-    showLine: true,                            // Mostrar línea de color
-  });
+    // Header principal
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", pageW / 2, 18, { align: "center" });
+    doc.text("Y ANTECEDENTES", pageW / 2, 24, { align: "center" });
+
+    // Número de Ficha y Página
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text("Nro de ficha: ", pageW - 80, 25);
+    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 50, 25);
+    doc.setFont("helvetica", "normal").setFontSize(9);
+    doc.text("Sede: " + datosFinales.sede, pageW - 80, 30);
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 10);
+
+    // Bloque de color
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // === HEADER PÁGINA 1 ===
+  drawHeader(numeroPagina);
 
   // === EMPRESA Y FECHA ===
   doc.setFont("helvetica", "bold").setFontSize(9);
@@ -883,35 +890,8 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   numeroPagina++; // Incrementar contador de página
 
   // === HEADER PÁGINA 2 ===
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text("DECLARACIÓN JURADA DE DATOS MÉDICOS", (pageW / 2) - 35, 26, { align: "center" });
-  doc.text("Y ANTECEDENTES", (pageW / 2) - 35, 32, { align: "center" });
-
-  // Número de Ficha y Página - Página 2 (tipo lista)
-  // doc.setFont("helvetica", "normal").setFontSize(9);
-  // doc.text("Nro de ficha: ", pageW - 50, 20);
-  // doc.setFont("helvetica", "bold").setFontSize(18);
-  // doc.text(datosFinales.numeroFicha, pageW - 30, 20);
-  // doc.setFont("helvetica", "normal").setFontSize(9);
-  // doc.text("Sede: " + datosFinales.sede, pageW - 50, 25);
-  // doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 50, 30);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 80, 20);
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 33, 20);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 80, 25);
-  doc.text("Pag. " + numeroPagina.toString().padStart(2, '0'), pageW - 80, 30);
-  drawColorBox(doc, {
-    color: datosFinales.codigoColor,           // Color de la letra y línea
-    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
-    x: pageW - 25,                             // Posición X (30mm del borde derecho)
-    y: 15,                                     // Posición Y (alineado con header)
-    size: 22,                                  // Tamaño del área total (22x22mm)
-    showLine: true,                            // Mostrar línea de color
-  });
-
+  drawHeader(numeroPagina);
+  
   // === ANTECEDENTES QUIRÚRGICOS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("4. ANTECEDENTES QUIRÚRGICOS:", 15, 40);
@@ -931,6 +911,8 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
     antecedente.diasHospitalizacion || antecedente.complicaciones
   );
 
+  // Variables para manejar la altura de la tabla
+  let currentY = tablaInicioY + 2;
 
   // Encabezados de la tabla con coordenadas individuales
   const encabezados = [
@@ -950,6 +932,23 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   // Dibujar líneas de la tabla
   // Línea horizontal superior (arriba de los encabezados)
   doc.line(tablaInicioX, tablaInicioY - 2, tablaInicioX + tablaAncho, tablaInicioY - 2);
+
+  // Si no hay datos, mostrar mensaje informativo
+  if (antecedentesConDatos.length === 0) {
+    // Línea horizontal debajo de los encabezados
+    doc.line(tablaInicioX, tablaInicioY + 2, tablaInicioX + tablaAncho, tablaInicioY + 2);
+    
+    // Línea horizontal inferior para cerrar la fila
+    doc.line(tablaInicioX, tablaInicioY + 8, tablaInicioX + tablaAncho, tablaInicioY + 8);
+    
+    // Solo dibujar líneas verticales en los extremos (sin divisorias internas)
+    doc.line(tablaInicioX, tablaInicioY - 2, tablaInicioX, tablaInicioY + 8); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, tablaInicioY - 2, tablaInicioX + tablaAncho, tablaInicioY + 8); // Línea derecha
+    
+    // Mensaje centrado en la fila en negrita
+    doc.setFont("helvetica", "bold").setFontSize(9);
+    doc.text("No se registran antecedentes quirúrgicos", pageW / 2, tablaInicioY + 6, { align: "center" });
+  } else {
 
   // Función para calcular la altura necesaria de una fila
   const calcularAlturaFila = (fila, colWidths, doc) => {
@@ -1035,9 +1034,10 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
     // Actualizar currentY para la siguiente fila
     currentY += alturaFila;
   });
+  } // Cerrar el bloque else
 
   // === SECCIÓN HÁBITOS ===
-  const habitosY = currentY + 10; // Espacio después de la tabla
+  const habitosY = antecedentesConDatos.length === 0 ? tablaInicioY + 15 : currentY + 10; // Espacio después de la tabla
 
   // Título de la sección
   doc.setFont("helvetica", "bold").setFontSize(9);
