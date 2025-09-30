@@ -399,9 +399,9 @@ export default function Anexo2(data = {}) {
       otrosTextoAnte: data.antecedentesPersonalesOtrosDescripcion_txtotrosantecendetes ?? "",
       // Hábitos Nocivos
       habitosNocivos: {
-        alcohol: { si: data.alcohol ?? false, no: !data.alcohol ?? true, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholCantidad ?? "" },//revisar pedir
-        tabaco: { si: data.tabaco ?? false, no: !data.tabaco ?? true, tipo: data.tabacoTipo ?? "", cantidad: data.tabacoCantidad ?? "" },//revisar pedir
-        drogas: { si: data.drogas ?? false, no: !data.drogas ?? true, tipo: data.drogasTipo ?? "", cantidad: data.drogasCantidad ?? "" },//revisar pedir
+        alcohol: { si: data.alcohol ?? false, no: !data.alcohol ?? true, tipo: data.alcoholTipo ?? "", cantidad: data.alcoholFrecuencia ?? "" },
+        tabaco: { si: data.tabaco ?? false, no: !data.tabaco ?? true, tipo: data.tabacoTipo ?? "", cantidad: "" },//revisar pedir
+        drogas: { si: data.drogas ?? false, no: !data.drogas ?? true, tipo: data.drogasTipo ?? "", cantidad: data.drogasFrecuencia ?? "" },//revisar pedir
         medicamento: { si: data.medicamentosSi_rbsimed ?? false, no: data.medicamentosNo_rbnomed ?? false, tipo: data.tipoMedicamento_txttipomedicamento ?? "", cantidad: data.frecuenciaMedicamentos_txtfrecuenciamed ?? "" }
       }
     },
