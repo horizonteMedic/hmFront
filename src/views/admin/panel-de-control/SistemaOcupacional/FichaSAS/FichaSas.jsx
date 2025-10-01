@@ -1,5 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faPrint, faTrash, faBroom } from "@fortawesome/free-solid-svg-icons";
+import { useEffect } from "react";
 import {
     InputTextOneLine,
     InputTextArea,
@@ -91,6 +92,29 @@ export default function FichaSas({ listas }) {
         // Evaluación de vía aérea superior MALLAMPATI
         mallampati_grado: "1", // "1", "2", "3", "4"
 
+        // Conclusión de la Evaluación
+        // Requiere PSG antes de certificar aptitud para conducir
+        requiere_psg: false,
+        criterio_a: false,
+        criterio_b: false,
+
+        // Apto por 3 meses a renovar luego de PSG
+        apto_3_meses: false,
+        criterio_c: false,
+        criterio_d: false,
+        criterio_d_imc: false,
+        criterio_d_hta: false,
+        criterio_d_cuello: false,
+        criterio_d_epworth: false,
+        criterio_d_trastorno: false,
+        criterio_d_ahi: false,
+        criterio_e: false,
+
+        // Apto con bajo riesgo de Apnea del sueño
+        apto_bajo_riesgo: false,
+
+        observaciones: "",
+
         // Médico que Certifica
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     };
@@ -108,6 +132,7 @@ export default function FichaSas({ listas }) {
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState);
+
 
     const handleSave = () => {
         // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
@@ -757,49 +782,285 @@ export default function FichaSas({ listas }) {
                     </div>
                 </section>
             </section>
+            {/* CONCLUSION DE EVALUACIÓN */}
+            <section className="bg-white border border-gray-200 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-4">6. CONCLUSIÓN DE LA EVALUACIÓN</h3>
 
+                {/* Requiere PSG antes de certificar aptitud para conducir */}
+                <div className="mb-6">
+                    <div className="flex justify-between items-center mb-3 pl-3 pr-2 py-3 bg-gray-50 rounded">
+                        <div className="flex-1">
+                            <span className="font-semibold">Requiere PSG antes de certificar aptitud para conducir. (un criterio positivo)</span>
+                        </div>
+                        <InputsBooleanRadioGroup
+                            name="requiere_psg"
+                            value={form?.requiere_psg}
+                            onChange={(e, value) => {
+                                setForm(prev => ({
+                                    ...prev,
+                                    // Si es false, bloquear criterios A y B y ponerlos en false
+                                    ...(value === false && {
+                                        criterio_a: false,
+                                        criterio_b: false
+                                    })
+                                }));
+                                handleRadioButtonBoolean(e, value)
+                            }}
+                        />
+                    </div>
+
+                    {/* Criterio A */}
+                    <div className="ml-6 mb-3">
+                        <div className="flex justify-between items-center p-2 border-l-4 border-blue-300 bg-blue-50">
+                            <div className="flex-1">
+                                <span className="font-medium">Criterio A:</span>
+                                <span className="ml-2">Excesiva somnolencia determinada por ESS mayor de 15 cabeceo presenciado durante la evaluación (espera, antecedente de accidente por somnolencia o con alta sospecha por somnolencia)</span>
+                            </div>
+                            <InputsBooleanRadioGroup
+                                name="criterio_a"
+                                value={form?.criterio_a}
+                                onChange={handleRadioButtonBoolean}
+                                disabled={!form?.requiere_psg}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Criterio B */}
+                    <div className="ml-6 mb-4">
+                        <div className="flex justify-between items-center p-2 border-l-4 border-blue-300 bg-blue-50">
+                            <div className="flex-1">
+                                <span className="font-medium">Criterio B:</span>
+                                <span className="ml-2">Antecedentes de SAS sin control reciente o sin cumplimiento de tratamiento (con CPAP o cirugía)</span>
+                            </div>
+                            <InputsBooleanRadioGroup
+                                name="criterio_b"
+                                value={form?.criterio_b}
+                                onChange={handleRadioButtonBoolean}
+                                disabled={!form?.requiere_psg}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Apto por 3 meses a renovar luego de PSG */}
+                <div className="mb-6">
+                    <div className="flex justify-between items-center mb-3 pl-3 pr-2 py-3 bg-gray-50 rounded">
+                        <div className="flex-1">
+                            <span className="font-semibold">Apto por 3 meses a renovar luego de PSG (un criterio positivo)</span>
+                        </div>
+                        <InputsBooleanRadioGroup
+                            name="apto_3_meses"
+                            value={form?.apto_3_meses}
+                            onChange={(e, value) => {
+                                setForm(prev => ({
+                                    ...prev,
+                                    // Si es false, bloquear criterios C, D y E y ponerlos en false
+                                    ...(value === false && {
+                                        criterio_c: false,
+                                        criterio_d: false,
+                                        criterio_d_imc: false,
+                                        criterio_d_hta: false,
+                                        criterio_d_cuello: false,
+                                        criterio_d_epworth: false,
+                                        criterio_d_trastorno: false,
+                                        criterio_d_ahi: false,
+                                        criterio_e: false
+                                    })
+                                }));
+                                handleRadioButtonBoolean(e, value)
+                            }}
+                        />
+                    </div>
+                    {/* Criterio C */}
+                    <div className="ml-6 mb-3">
+                        <div className="flex justify-between items-center p-2 border-l-4 border-green-300 bg-green-50">
+                            <div className="flex-1">
+                                <span className="font-medium">Criterio C:</span>
+                                <span className="ml-2">Historia de higiene de sueño sugiere SAS (presencia de ronquidos, somnolencia excesiva durante la actividad, pausas respiratorias)</span>
+                            </div>
+                            <InputsBooleanRadioGroup
+                                name="criterio_c"
+                                value={form?.criterio_c}
+                                onChange={handleRadioButtonBoolean}
+                                disabled={!form?.apto_3_meses}
+                            />
+                        </div>
+                    </div>
+                    {/* Criterio D */}
+                    <div className="ml-6 mb-3">
+                        <div className="flex justify-between items-start p-2 border-l-4 border-green-300 bg-green-50">
+                            <div className="flex-1">
+                                <div className="flex justify-between">
+                                    <div>
+                                        <span className="font-medium">Criterio D:</span>
+                                        <span className="ml-2">Cumple con 2 o más de los siguientes:</span>
+                                    </div>
+                                    <InputsBooleanRadioGroup
+                                        name="criterio_d"
+                                        value={form?.criterio_d}
+
+                                        onChange={(e, value) => {
+                                            setForm(prev => ({
+                                                ...prev,
+                                                // Si es false, bloquear criterios C, D y E y ponerlos en false
+                                                ...(value === false && {
+                                                    criterio_d_imc: false,
+                                                    criterio_d_hta: false,
+                                                    criterio_d_cuello: false,
+                                                    criterio_d_epworth: false,
+                                                    criterio_d_trastorno: false,
+                                                    criterio_d_ahi: false,
+                                                })
+                                            }));
+                                            handleRadioButtonBoolean(e, value)
+                                        }}
+                                        disabled={!form?.apto_3_meses}
+                                    />
+                                </div>
+                                <div className="ml-6 mt-2 space-y-1">
+                                    <div className="flex justify-between items-center">
+                                        <span className="">IMC mayor o igual a 30</span>
+                                        <InputsBooleanRadioGroup
+                                            name="criterio_d_imc"
+                                            value={form?.criterio_d_imc}
+                                            onChange={handleRadioButtonBoolean}
+                                            disabled={!form?.criterio_d}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="">Hipertensión Arterial (nueva, no controlada con una sola medicación)</span>
+                                        <InputsBooleanRadioGroup
+                                            name="criterio_d_hta"
+                                            value={form?.criterio_d_hta}
+                                            onChange={handleRadioButtonBoolean}
+                                            disabled={!form?.criterio_d}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="">Circunferencia del cuello anormal</span>
+                                        <InputsBooleanRadioGroup
+                                            name="criterio_d_cuello"
+                                            value={form?.criterio_d_cuello}
+                                            onChange={handleRadioButtonBoolean}
+                                            disabled={!form?.criterio_d}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="">Puntuación de Epworth mayor de 10 y menor de 16</span>
+                                        <InputsBooleanRadioGroup
+                                            name="criterio_d_epworth"
+                                            value={form?.criterio_d_epworth}
+                                            onChange={handleRadioButtonBoolean}
+                                            disabled={!form?.criterio_d}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="">Antecedentes de trastorno del sueño (diagnosticado) sin seguimiento</span>
+                                        <InputsBooleanRadioGroup
+                                            name="criterio_d_trastorno"
+                                            value={form?.criterio_d_trastorno}
+                                            onChange={handleRadioButtonBoolean}
+                                            disabled={!form?.criterio_d}
+                                        />
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="">Índice de apnea-hipopnea (AHI) mayor de 5 y menor de 30</span>
+                                        <InputsBooleanRadioGroup
+                                            name="criterio_d_ahi"
+                                            value={form?.criterio_d_ahi}
+                                            onChange={handleRadioButtonBoolean}
+                                            disabled={!form?.criterio_d}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Criterio E */}
+                    <div className="ml-6 mb-4">
+                        <div className="flex justify-between items-center p-2 border-l-4 border-green-300 bg-green-50">
+                            <div className="flex-1">
+                                <span className="font-medium">Criterio E:</span>
+                                <span className="ml-2">Evaluación de vía aérea superior patológica*</span>
+                            </div>
+                            <InputsBooleanRadioGroup
+                                name="criterio_e"
+                                value={form?.criterio_e}
+                                onChange={handleRadioButtonBoolean}
+                                disabled={!form?.apto_3_meses}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Apto con bajo riesgo de Apnea del sueño */}
+                <div className="mb-4">
+                    <div className="flex justify-between items-center pl-3 pr-2 py-3 bg-gray-50 rounded">
+                        <div className="flex-1">
+                            <span className="font-semibold">Apto con bajo riesgo de Apnea del sueño (ningún criterio positivo)</span>
+                        </div>
+                        <InputsBooleanRadioGroup
+                            name="apto_bajo_riesgo"
+                            value={form?.apto_bajo_riesgo}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+                </div>
+            </section>
 
 
             {/* Médico y Botones */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white border border-gray-200 rounded-lg p-4">
+            <div className="grid grid-cols-1 gap-6">
+                <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
                     <MedicoSearch
                         value={form.nombre_medico}
                         onChange={handleChangeSimple}
                         MedicosMulti={MedicosMulti}
                     />
+                    <InputTextArea
+                        label="Observaciones"
+                        rows={6}
+                        name="observaciones"
+                        value={form?.observaciones}
+                        onChange={handleChange}
+                    />
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-2">
-                    {/* Botones de acción */}
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div className="flex gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
+                    <div className=" flex gap-4">
+                        <button
+                            type="button"
+                            onClick={handleSave}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleClear}
+                            className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                        >
+                            <FontAwesomeIcon icon={faBroom} /> Limpiar
+                        </button>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                        <div className="flex items-center gap-2">
+                            <input
+                                name="norden"
+                                value={form.norden}
+                                onChange={handleChange}
+                                className="border rounded px-2 py-1 text-base w-24"
+                            />
+
                             <button
                                 type="button"
-                                onClick={handleSave}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                onClick={handlePrint}
+                                className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
                             >
-                                <FontAwesomeIcon icon={faSave} /> Grabar/Actualizar
+                                <FontAwesomeIcon icon={faPrint} />
                             </button>
-                            <button
-                                type="button"
-                                onClick={handleClear}
-                                className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                            >
-                                <FontAwesomeIcon icon={faTrash} /> Limpiar
-                            </button>
-                        </div>
-                        <div className="flex flex-col items-end">
-                            <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
-                            <div className="flex items-center gap-2">
-                                <button
-                                    type="button"
-                                    onClick={handlePrint}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faPrint} /> Imprimir
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>
