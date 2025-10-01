@@ -11,22 +11,45 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import MedicoSearch from "../../../../components/reusableComponents/MedicoSearch";
+import Mallampati from "../../../../../../public/img/Mallampati.jpg"
 
 const tabla = "ficha_sas"
 const today = getToday();
 
-export default function FichaSas({ MedicosMulti }) {
-
+export default function FichaSas({ listas }) {
+    const { MedicosMulti } = listas
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
         useSessionData();
 
     const initialFormState = {
         // Header
+        norden: "",
+        fechaExam: today,
+        tipoExamen: "",
+        tipoLicencia: "",
         //datos personales
+        nombres: "",
+        dni: "",
+        edad: "",
+        sexo: "",
+        empresa: "",
+        contrata: "",
+        puestoPostula: "",
+        puestoActual: "",
         //trabaja noche
-
+        trabajoNoche: false,
+        diasTrabajoNoche: "",
+        diasDescansoNoche: "",
+        anosTrabajoNoche: "",
         // Antecedentes personales
-
+        apneaDelSueno: false,
+        ultimoControl: "",
+        hta: false,
+        medicacionRiesgo: "",
+        polisomnografiaRealizada: false,
+        fechaUltimaPolisomnografia: "",
+        accidenteEnLaMina: false,
+        accidenteFueraDeLaMina: false,
         // Antecedentes de choques
         criterio1_cabeceo: false,
         accidente_nocturno: false,
@@ -53,6 +76,20 @@ export default function FichaSas({ MedicosMulti }) {
         ruidos_respirar_durmiendo: false,
         deja_respirar_durmiendo: false,
         mas_sueno_cansancio: false,
+
+        // Examen Físico
+        peso_kg: "",
+        talla_mts: "",
+        imc_kg_m2: "",
+        circunferencia_cuello: "",
+        cuello_varon_normal: true, // true para SI, false para NO
+        cuello_mujer_normal: true, // true para SI, false para NO
+        presion_sistolica: "",
+        presion_diastolica: "",
+        hta_nueva: true, // true para SI, false para NO
+
+        // Evaluación de vía aérea superior MALLAMPATI
+        mallampati_grado: "1", // "1", "2", "3", "4"
 
         // Médico que Certifica
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
@@ -105,7 +142,7 @@ export default function FichaSas({ MedicosMulti }) {
                 <InputTextOneLine
                     label="Fecha Examen"
                     type="date"
-                    name="fecha"
+                    name="c"
                     value={form?.fechaExam}
                     onChange={handleChangeSimple}
                 />
@@ -556,9 +593,172 @@ export default function FichaSas({ MedicosMulti }) {
                         </div>
                     </div>
 
-                    
+
                 </div>
             </section>
+
+            {/* EXAMEN FISICO */}
+            <section className=" grid md:grid-cols-2 gap-8">
+                <section className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div>
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold mb-2">EXAMEN FÍSICO</h3>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            {/* Primera fila */}
+                            <InputTextOneLine
+                                label="Peso (Kg)"
+                                name="peso_kg"
+                                value={form?.peso_kg}
+                                disabled
+                            />
+                            <InputTextOneLine
+                                label="Talla (mts)"
+                                name="talla_mts"
+                                value={form?.talla_mts}
+                                disabled
+                            />
+                            <div className="flex items-center gap-2">
+                                <InputTextOneLine
+                                    label="IMC (Kg/m2)"
+                                    name="imc_kg_m2"
+                                    value={form?.imc_kg_m2}
+                                    disabled
+                                    className="flex-1"
+                                />
+                                <span className="text-red-600 text-sm whitespace-nowrap">(&gt; 35 es de alto riesgo)</span>
+                            </div>
+                            <InputTextOneLine
+                                label="P. Sistólica"
+                                name="presion_sistolica"
+                                value={form?.presion_sistolica}
+                                disabled
+                            />
+                            <InputTextOneLine
+                                label="P. Diastólica"
+                                name="presion_diastolica"
+                                value={form?.presion_diastolica}
+                                disabled
+                            />
+                            <div className="flex gap-4">
+                                <span className="font-semibold min-w-[80px] max-w-[80px]">HTA nueva:</span>
+                                <InputsBooleanRadioGroup
+                                    name="hta_nueva"
+                                    value={form?.hta_nueva}
+                                    onChange={handleRadioButtonBoolean}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 ">
+                            {/* Circunferencia de cuello */}
+                            <div className="space-y-4 border rounded p-4">
+                                <InputTextOneLine
+                                    label="Circunferencia de cuello"
+                                    name="circunferencia_cuello"
+                                    value={form?.circunferencia_cuello}
+                                    disabled
+                                />
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm">Varón (menor de 43.2 cm, es normal)</span>
+                                        <div className="flex items-center gap-4">
+                                            <span className="font-medium">Normal:</span>
+                                            <InputsBooleanRadioGroup
+                                                name="cuello_varon_normal"
+                                                value={form?.cuello_varon_normal}
+                                                onChange={handleRadioButtonBoolean}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-sm">Mujer (menor de 40.6 cm, es normal)</span>
+                                        <div className="flex items-center gap-4">
+                                            <span className="font-medium">Normal:</span>
+                                            <InputsBooleanRadioGroup
+                                                name="cuello_mujer_normal"
+                                                value={form?.cuello_mujer_normal}
+                                                onChange={handleRadioButtonBoolean}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {/* Evaluación de vía aérea superior MALLAMPATI */}
+                <section className="bg-white border border-gray-200 rounded-lg p-4">
+                    <div className="mb-4">
+                        <h3 className="text-lg font-semibold mb-2">Evaluación de vía aérea superior MALLAMPATI (Seleccione)</h3>
+                    </div>
+                    {/* Imágenes de los grados Mallampati */}
+                    <div className="flex flex-col items-center gap-4">
+                        <img
+                            src={Mallampati}
+                            alt="Evaluación Mallampati - Grados I, II, III, IV"
+                            className="w-[300px] md:w-[400px] xl:w-[550px]"
+                        />
+                        {/* Radio buttons alineados debajo de cada grado */}
+                        <div className="grid grid-cols-4 w-[300px] md:w-[400px] xl:w-[550px] ">
+                            <div className="flex justify-center">
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="mallampati_grado"
+                                        value="1"
+                                        checked={form.mallampati_grado === '1'}
+                                        onChange={(e) => handleRadioButton(e, '1')}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm font-medium">Grado I</span>
+                                </label>
+                            </div>
+                            <div className="flex justify-center">
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="mallampati_grado"
+                                        value="2"
+                                        checked={form.mallampati_grado === '2'}
+                                        onChange={(e) => handleRadioButton(e, '2')}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm font-medium">Grado II</span>
+                                </label>
+                            </div>
+                            <div className="flex justify-center">
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="mallampati_grado"
+                                        value="3"
+                                        checked={form.mallampati_grado === '3'}
+                                        onChange={(e) => handleRadioButton(e, '3')}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm font-medium">Grado III</span>
+                                </label>
+                            </div>
+                            <div className="flex justify-center">
+                                <label className="flex items-center gap-1 cursor-pointer">
+                                    <input
+                                        type="radio"
+                                        name="mallampati_grado"
+                                        value="4"
+                                        checked={form.mallampati_grado === '4'}
+                                        onChange={(e) => handleRadioButton(e, '4')}
+                                        className="w-4 h-4"
+                                    />
+                                    <span className="text-sm font-medium">Grado IV</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+
 
             {/* Médico y Botones */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

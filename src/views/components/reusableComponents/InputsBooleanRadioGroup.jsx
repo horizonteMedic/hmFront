@@ -14,7 +14,7 @@ export default function InputsBooleanRadioGroup({
           name={name}
           value="true"
           checked={value === true}
-          onChange={disabled ? null : (e) => onChange(e, true)}
+          onChange={(e) => disabled ? null : onChange(e, true)}
         // disabled={disabled}
         />
         <span>{trueLabel}</span>
@@ -26,7 +26,7 @@ export default function InputsBooleanRadioGroup({
           name={name}
           value="false"
           checked={value === false}
-          onChange={disabled ? null : (e) => onChange(e, false)}
+          onChange={(e) => disabled ? null : onChange(e, false)}
         // disabled={disabled}
         />
         <span>{falseLabel}</span>
