@@ -7,6 +7,14 @@ import { Loading } from '../../../../components/Loading';
 import { jsPDF } from "jspdf";
 import { getFetch } from '../../getFetch/getFetch';
 import { GetlistPDF } from '../model/getPDFlist';
+
+
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
 const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
   const [listarch, setListarch] = useState([])
   const [selectarch, setSelectarch] = useState('')
@@ -124,6 +132,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
     // Esperar 3 segundos antes de la sigui
     setSucred(true);
     setIsUploading(false);
+    generateErrorTablePDF()
     if (failedUploads.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -272,7 +281,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
       });
 
       // Guardar el PDF
-      doc.save('reporte_archivos.pdf');
+      doc.save(`Reporte_${today}.pdf`);
     })
     .catch(() => {
       console.error('Error al hacer la consulta:', error);

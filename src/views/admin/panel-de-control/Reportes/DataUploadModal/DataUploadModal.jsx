@@ -9,6 +9,13 @@ import NewIndex from '../model/newIndex';
 import { GetlistPDF } from '../model/getPDFlist';
 import autoTable from "jspdf-autotable";
 
+const date = new Date();
+const today = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  2,
+  "0"
+)}-${String(date.getDate()).padStart(2, "0")}`;
+
+
 const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   const [uparchFile, setUparchFile] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -129,7 +136,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setSucred(true);
     setIsUploading(false);
     setIsPDFAvailable(true); // Activa el botón de descarga PDF
-    
+    descargarPDF()
     if (failedUploads.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -374,7 +381,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
               doc.text(`Página ${i} de ${totalPages}`, 105, 290, { align: "center" });
             }
   
-            doc.save("reporte_archivos.pdf");
+            doc.save(`Reporte_${today}.pdf`);
             setIsDownloadingPDF(false); // Finalizar la simulación
           })
           .catch((error) => {
