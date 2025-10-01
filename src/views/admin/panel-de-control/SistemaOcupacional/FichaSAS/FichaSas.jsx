@@ -27,6 +27,33 @@ export default function FichaSas({ MedicosMulti }) {
 
         // Antecedentes personales
 
+        // Antecedentes de choques
+        criterio1_cabeceo: false,
+        accidente_nocturno: false,
+        accidente_tarde: false,
+        ausencia_evidencia_maniobra: false,
+        choque_vehiculo_contra_otro: false,
+        caida_precipicio: false,
+        vehiculo_invadio_carril: false,
+        conductor_no_recuerda: false,
+        tratamiento_medicinas_somnolencia: false,
+        conductor_encontraba_horas_extra: false,
+        accidente_confirmado_somnolencia: false,
+        accidente_alta_sospecha_somnolencia: false,
+        accidente_escasa_evidencia_somnolencia: false,
+        no_datos_suficientes: false,
+        accidente_no_debido_somnolencia: false,
+
+        // Antecedentes familiares de apnea del sueño
+        antec_familiar_apnea: false,
+        indique_familiar_apnea: "",
+
+        // Entrevista al paciente
+        ronca_al_dormir: false,
+        ruidos_respirar_durmiendo: false,
+        deja_respirar_durmiendo: false,
+        mas_sueno_cansancio: false,
+
         // Médico que Certifica
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     };
@@ -298,6 +325,240 @@ export default function FichaSas({ MedicosMulti }) {
                 </section>
             </section>
             {/* EN CASO CHOQUE */}
+            <section className="bg-white border border-gray-200 rounded-lg p-4">
+                <h3 className="text-lg font-semibold mb-4">Antecedentes del (los) choques (incidentes o accidente)</h3>
+
+                {/* Criterios principales */}
+                <div className="">
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <div className="flex items-center gap-4">
+                            <span className="font-semibold">Criterio 1:</span>
+                            <span>Se "cabeceó" y por ello ocurrió un accidente (incidente) con un vehículo (alguna vez)</span>
+                        </div>
+                        <InputsBooleanRadioGroup
+                            name="criterio1_cabeceo"
+                            value={form?.criterio1_cabeceo}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3">
+                        <div className="flex items-center gap-4">
+                            <span className="font-semibold">Criterio 2:</span>
+                            <span>2 o más es positivo</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Lista de condiciones */}
+                <div className="space-y-0 mb-6">
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>Accidente ocurrido entre las últimas 5 horas de un turno nocturno o entre las 14 y 17 horas (tarde)</span>
+                        <InputsBooleanRadioGroup
+                            name="accidente_nocturno"
+                            value={form?.accidente_nocturno}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>AUSENCIA DE evidencia de maniobra evasiva del chofer para evitar la colisión</span>
+                        <InputsBooleanRadioGroup
+                            name="ausencia_evidencia_maniobra"
+                            value={form?.ausencia_evidencia_maniobra}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>Choque del vehículo contra otro, cayó a un precipicio, no al choque contra un</span>
+                        <InputsBooleanRadioGroup
+                            name="choque_vehiculo_contra_otro"
+                            value={form?.choque_vehiculo_contra_otro}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>Vehículo que invadió el otro carril o se desvió sin causa aparente</span>
+                        <InputsBooleanRadioGroup
+                            name="vehiculo_invadio_carril"
+                            value={form?.vehiculo_invadio_carril}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>El conductor no recuerda claramente lo ocurrido 10 segundos antes del impacto</span>
+                        <InputsBooleanRadioGroup
+                            name="conductor_no_recuerda"
+                            value={form?.conductor_no_recuerda}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>Tratamiento con medicinas que causan somnolencia (benzodiazepinas, antihistamínicos, relajantes</span>
+                        <InputsBooleanRadioGroup
+                            name="tratamiento_medicinas_somnolencia"
+                            value={form?.tratamiento_medicinas_somnolencia}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3">
+                        <span>El conductor se encontraba en horas extra (excediendo sus horas habituales de trabajo) o realizando días adicionales de trabajo (sobretiempo)</span>
+                        <InputsBooleanRadioGroup
+                            name="conductor_encontraba_horas_extra"
+                            value={form?.conductor_encontraba_horas_extra}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+                </div>
+
+                {/* Clasificación del accidente */}
+                <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-3">Clasificación del <span className="font-semibold">(los) "choques" o accidentes vehiculares del postulante</span> (marque solo una categoría)</h4>
+                    <div className="space-y-0">
+                        <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                            <span>Accidente confirmado por Somnolencia (Criterio 1 positivo)</span>
+                            <InputsBooleanRadioGroup
+                                name="accidente_confirmado_somnolencia"
+                                value={form?.accidente_confirmado_somnolencia}
+                                onChange={handleRadioButtonBoolean}
+                            />
+                        </div>
+
+                        <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                            <span>Accidente con alta sospecha de somnolencia (Criterio 2 positivo)</span>
+                            <InputsBooleanRadioGroup
+                                name="accidente_alta_sospecha_somnolencia"
+                                value={form?.accidente_alta_sospecha_somnolencia}
+                                onChange={handleRadioButtonBoolean}
+                            />
+                        </div>
+
+                        <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                            <span>Accidente con escasa evidencia / sospecha por somnolencia (solo 1 ítem de Criterio 2)</span>
+                            <InputsBooleanRadioGroup
+                                name="accidente_escasa_evidencia_somnolencia"
+                                value={form?.accidente_escasa_evidencia_somnolencia}
+                                onChange={handleRadioButtonBoolean}
+                            />
+                        </div>
+
+                        <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                            <span>No se dispone de datos suficientes para clasificar el (los) incidentes</span>
+                            <InputsBooleanRadioGroup
+                                name="no_datos_suficientes"
+                                value={form?.no_datos_suficientes}
+                                onChange={handleRadioButtonBoolean}
+                            />
+                        </div>
+
+                        <div className="flex w-full justify-between items-center py-3">
+                            <span>Accidente no debido a somnolencia (información suficiente que descarta somnolencia)</span>
+                            <InputsBooleanRadioGroup
+                                name="accidente_no_debido_somnolencia"
+                                value={form?.accidente_no_debido_somnolencia}
+                                onChange={handleRadioButtonBoolean}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* ANTECEDENTES FAMILIARES DE APNEA DEL SUEÑO */}
+            <section className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center gap-8">
+                    <h3 className="text-lg font-semibold min-w-[250px] max-w-[250px]">3. ANTEC. FAMILIAR DE APNEA DEL SUEÑO:</h3>
+                    <div className="flex items-center gap-4 w-full">
+                        <InputsBooleanRadioGroup
+                            name="antec_familiar_apnea"
+                            value={form?.antec_familiar_apnea}
+                            onChange={handleRadioButtonBoolean}
+                            disabled
+                        />
+                        <InputTextOneLine
+                            label="Indique"
+                            name="indique_familiar_apnea"
+                            value={form?.indique_familiar_apnea}
+                            onChange={handleChange}
+                            className="w-full"
+                        />
+                    </div>
+                </div>
+            </section>
+
+            {/* ENTREVISTA AL PACIENTE */}
+            <section className="bg-white border border-gray-200 rounded-lg p-4">
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold mb-2">4. ENTREVISTA AL PACIENTE:</h3>
+                </div>
+
+                <div className="space-y-0">
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>En los últimos 5 años, su pareja o esposa le ha comentado que ronca al dormir</span>
+                        <InputsBooleanRadioGroup
+                            name="ronca_al_dormir"
+                            value={form?.ronca_al_dormir}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>En los últimos 5 años, su pareja o esposa le ah comentado que hace ruidos al respirar mientras duerme</span>
+                        <InputsBooleanRadioGroup
+                            name="ruidos_respirar_durmiendo"
+                            value={form?.ruidos_respirar_durmiendo}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>En los últimos 5 años, su pareja o esposa le ah comentado que deja de respirar cuando duerme (pausa respiratoria)</span>
+                        <InputsBooleanRadioGroup
+                            name="deja_respirar_durmiendo"
+                            value={form?.deja_respirar_durmiendo}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    <div className="flex w-full justify-between items-center py-3 border-b border-gray-200">
+                        <span>Comparado con sus compañeros, usted siente que tiene más sueño o cansancio que ellos mientras trabaja</span>
+                        <InputsBooleanRadioGroup
+                            name="mas_sueno_cansancio"
+                            value={form?.mas_sueno_cansancio}
+                            onChange={handleRadioButtonBoolean}
+                        />
+                    </div>
+
+                    {/* PUNTUACIÓN DE LA ESCALA DE EPWORTH - Integrada en la misma sección */}
+                    <div className="flex items-center justify-between py-4 mt-4 bg-gray-50 rounded">
+                        <div>
+                            <span className="font-semibold">PUNTUACIÓN DE LA ESCALA DE EPWORTH (ESS)</span>
+                            <br />
+                            <span className="text-sm">(NUNCA = 0, POCA = 1, MODERADA = 2, ALTA = 3)</span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span>Total puntos (sumatoria)</span>
+                            <input
+                                type="number"
+                                className="border border-gray-300 px-3 py-2 rounded w-20 text-center"
+                                value={
+                                    (form?.ronca_al_dormir === true ? 1 : 0) +
+                                    (form?.ruidos_respirar_durmiendo === true ? 1 : 0) +
+                                    (form?.deja_respirar_durmiendo === true ? 1 : 0) +
+                                    (form?.mas_sueno_cansancio === true ? 1 : 0)
+                                }
+                                disabled
+                            />
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </section>
 
             {/* Médico y Botones */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
