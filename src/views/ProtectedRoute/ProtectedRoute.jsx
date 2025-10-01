@@ -69,7 +69,6 @@ export function ProtectedRoute() {
     };
     
     const isAccessAllowed = isRouteAllowed(location.pathname);
-    console.log(isAccessAllowed)
     return isAccessAllowed ? <Outlet /> : <Navigate to="/panel-de-control" />;
 }
 
@@ -87,8 +86,6 @@ export function ProtectedLogin() {
 }
 
 export function ProtectedRegister() {
-    const listView = useAuthStore(state => state.listView)
-
-
+    // Función para registro protegido
 }
 

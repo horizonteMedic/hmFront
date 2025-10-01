@@ -20,8 +20,7 @@ const drawColorBox = (doc, options = {}) => {
     y = null,
     margin = 8,
     showLine = true,
-    fontSize = 18,
-    borderRadius = 2
+    fontSize = 18
   } = options;
 
   const pageW = doc.internal.pageSize.getWidth();
@@ -45,14 +44,21 @@ const drawColorBox = (doc, options = {}) => {
       doc.setLineCap("butt");
     }
     
-    // Texto en color (sin recuadro)
+    // Texto en color (sin recuadro) - mejor posicionamiento para 1 o 2 letras
     doc.setFontSize(fontSize);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(finalColor);
-    doc.text(finalText, boxX + size * 0.85, boxY + size / 2, {
+    
+    // Ajustar posición según la cantidad de caracteres
+    const textLength = finalText.length;
+    const textX = textLength === 1 
+      ? boxX + size * 0.75  // Una letra: más centrada
+      : boxX + size * 0.65; // Dos letras: más a la izquierda para dar espacio
+    
+    doc.text(finalText, textX, boxY + size / 2, {
       align: "center",
       baseline: "middle",
-      maxWidth: size - 1
+      maxWidth: size - 2
     });
     
     // Restaurar configuraciones
