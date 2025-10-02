@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1, faA, faBacterium, faMoon, faFileMedical } from '@fortawesome/free-solid-svg-icons';
+import { faUserCheck, faStethoscope, faVial, faUserMd, faXRay, faHeartbeat, faLungs, faDeaf, faTooth, faEye, faHome, faTimes, faFileWaveform, faSkull, faSkiingNordic, faBed, faMountain, fa2, fa6, fa1, faA, faBacterium, faMoon, faFileMedical, faTruckMedical, faSuitcaseMedical, faStairs, faCarSide } from '@fortawesome/free-solid-svg-icons';
 import styles from './DrawerOverlay.module.css';
 
 const accesos = [
@@ -26,6 +26,10 @@ const accesos = [
   { icon: faBacterium, label: "Antecedentes Patológicos", key: "Antecedentes Patologicos" },
   { icon: faFileMedical, label: "Fichas Aptitud", key: "Fichas Aptitud" },
   { icon: faMoon, label: "Ficha S.A.S.", key: "Ficha SAS" },
+  { icon: faCarSide, label: "Ficha Conduccion de Vehiculos", key: "Ficha Conduccion de Vehiculos" },
+  { icon: faStairs, label: "Ficha Certificado de Altura", key: "Ficha Certificado de Altura" },
+  { icon: faSuitcaseMedical, label: "Constancia Certificado Medico Ocupacional", key: "Constancia Certificado Medico Ocupacional" },
+  { icon: faTruckMedical, label: "Ficha Interconsulta", key: "Ficha Interconsulta" },
 ];
 
 const DrawerQuickAccess = ({ open, onClose, onNavigate, activeIndex, tieneVista }) => (
