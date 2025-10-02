@@ -1,7 +1,3 @@
-import React from "react";
-
-// Componente reutilizable de sección con botones de "Atrás" y título.
-// Soporta diferentes layouts en la barra superior y permite opcionalmente mostrar el botón inferior.
 const SectionWithBack = ({ title, onBack, children, topLayout = "double-between", showBottomBack = true }) => {
   const topClasses = (() => {
     switch (topLayout) {

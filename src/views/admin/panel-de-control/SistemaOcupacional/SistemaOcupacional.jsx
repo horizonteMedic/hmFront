@@ -256,36 +256,36 @@ const TabComponent = () => {
             <div className={styles.gridContainer}>
               {(() => {
                 const items = [
-                  { vista: "Admision", tab: 0, icons: [{ icon: faUserCheck }], label: "Admisión", clickable: true },
-                  { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje", clickable: true },
-                  { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio", clickable: true },
-                  { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional", clickable: true },
-                  { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico", clickable: true },
-                  { vista: "Psicologia", tab: 10, icons: [{ icon: faUserMd }], label: "Psicología", clickable: true },
-                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General", clickable: false },
-                  { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X", clickable: true },
-                  { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG", clickable: true },
-                  { vista: "Espirometria", tab: 14, icons: [{ icon: faLungs }], label: "Espirometría", clickable: true },
-                  { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría", clickable: true },
-                  { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología", clickable: true },
-                  { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología", clickable: true },
-                  { vista: "OIT", tab: 19, icons: [{ icon: faAnchor }], label: "OIT", clickable: true },
-                  { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos", clickable: true },
-                  { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico", clickable: true },
-                  { vista: "Evaluación Musculoesquelética", tab: 22, icons: [{ icon: faSkull }], label: "Evaluación Musculoesquelética", clickable: true },
-                  { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia", clickable: true },
-                  { vista: "Antecedentes de Altura", tab: 25, icons: [{ icon: faMountain }], label: "Antecedentes de Altura", clickable: true },
-                  { vista: "Anexo 2", tab: 26, icons: [{ icon: fa2 }], label: "Anexo 2", clickable: true },
-                  { vista: "Anexo 16", tab: 27, icons: [{ icon: fa1 }, { icon: fa6 }], label: "Anexo 16", clickable: true },
-                  { vista: "Anexo 16 A", tab: 28, icons: [{ icon: fa1 }, { icon: fa6 }, { icon: faA, className: "ml-2" }], label: "Anexo 16 A", clickable: true },
-                  { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos", clickable: true },
-                  { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud", clickable: true },
-                  { vista: "Ficha SAS", tab: 31, icons: [{ icon: faMoon }], label: "Ficha S.A.S.", clickable: true },
-                  { vista: "Ficha Conduccion de Vehiculos", tab: 32, icons: [{ icon: faCarSide }], label: "Ficha de Conducción de Vehiculos", clickable: true },
-                  { vista: "Ficha Certificado de Altura", tab: 33, icons: [{ icon: faStairs }], label: "Ficha Certificado de Trabajos en Altura", clickable: true },
-                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional", clickable: true },
-                  { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta", clickable: true },
-                  { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground", clickable: true },
+                  { vista: "Admision", tab: 0, icons: [{ icon: faUserCheck }], label: "Admisión" },
+                  { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
+                  { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio" },
+                  { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional" },
+                  { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
+                  { vista: "Psicologia", tab: 10, icons: [{ icon: faUserMd }], label: "Psicología" },
+                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
+                  { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X" },
+                  { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG" },
+                  { vista: "Espirometria", tab: 14, icons: [{ icon: faLungs }], label: "Espirometría" },
+                  { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
+                  { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología" },
+                  { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología" },
+                  { vista: "OIT", tab: 19, icons: [{ icon: faAnchor }], label: "OIT" },
+                  { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos" },
+                  { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
+                  { vista: "Evaluación Musculoesquelética", tab: 22, icons: [{ icon: faSkull }], label: "Evaluación Musculoesquelética" },
+                  { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
+                  { vista: "Antecedentes de Altura", tab: 25, icons: [{ icon: faMountain }], label: "Antecedentes de Altura" },
+                  { vista: "Anexo 2", tab: 26, icons: [{ icon: fa2 }], label: "Anexo 2" },
+                  { vista: "Anexo 16", tab: 27, icons: [{ icon: fa1 }, { icon: fa6 }], label: "Anexo 16" },
+                  { vista: "Anexo 16 A", tab: 28, icons: [{ icon: fa1 }, { icon: fa6 }, { icon: faA, className: "ml-2" }], label: "Anexo 16 A" },
+                  { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
+                  { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud" },
+                  { vista: "Ficha SAS", tab: 31, icons: [{ icon: faMoon }], label: "Ficha S.A.S." },
+                  { vista: "Ficha Conduccion de Vehiculos", tab: 32, icons: [{ icon: faCarSide }], label: "Ficha de Conducción de Vehiculos" },
+                  { vista: "Ficha Certificado de Altura", tab: 33, icons: [{ icon: faStairs }], label: "Ficha Certificado de Trabajos en Altura" },
+                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
+                  { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta" },
+                  { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                 ];
                 return items
                   .filter((item) => tieneVista(item.vista))
@@ -293,7 +293,7 @@ const TabComponent = () => {
                     <div
                       key={item.vista}
                       className={`${styles.gridItem} ${activeTab === item.tab ? styles.active : ""}`}
-                      {...(item.clickable ? { onClick: () => setActiveTab(item.tab) } : {})}
+                      onClick={() => setActiveTab(item.tab)}
                     >
                       <span className={styles.icon}>
                         {item.icons.map((ic, idx) => (
@@ -428,22 +428,6 @@ const TabComponent = () => {
                   )}
                 </div>
               </div>
-            </div>
-          )}
-          {activeTab === 1 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Triaje</h2>
-              </div>
-              <Triaje token={token} selectedSede={selectSede} />
             </div>
           )}
           {activeTab === 2 && (
@@ -612,170 +596,6 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-
-          {activeTab === 3 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Coproparasitológico
-                </h2>
-              </div>
-              <ParasitologiaCoprologico />
-            </div>
-          )}
-          {activeTab === 4 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Laboratorio Clínico
-                </h2>
-              </div>
-              <LaboratorioClinico />
-            </div>
-          )}
-          {activeTab === 5 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Análisis Bioquímicos
-                </h2>
-              </div>
-              <LaboratorioAnalisisBioquimicos />
-            </div>
-          )}
-          {activeTab === 6 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Consentimientos
-                </h2>
-              </div>
-              <Consentimientos
-                token={token}
-                selectedSede={selectSede}
-                userlogued={userlogued.sub}
-              />
-            </div>
-          )}
-          {activeTab === 10 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Modulo Psicologia
-                </h2>
-              </div>
-              <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 14 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Espirometría
-                </h2>
-              </div>
-              <div>
-                <div className={styles.tabHeader}>
-                  {/*Esto se va a mostrar por defecto */}
-                  <button
-                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(0)}
-                  >
-                    Espirometría
-                  </button>
-                </div>
-                <div>
-                  {subTab === 0 && (
-                    <Espirometria
-                      token={token}
-                      userlogued={userlogued.sub}
-                      selectedSede={selectSede}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-          {activeTab === 12 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
-              </div>
-              <RayosXTabSelector tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 13 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div>
-                <EKG />
-              </div>
-            </div>
-          )}
           {activeTab === 15 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -833,6 +653,31 @@ const TabComponent = () => {
           )}
           {(() => {
             const displayedInterfaces = {
+              1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
+              3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
+              4: { title: "Laboratorio Clínico", child: <LaboratorioClinico /> },
+              5: { title: "Análisis Bioquímicos", child: <LaboratorioAnalisisBioquimicos /> },
+              6: {
+                title: "Consentimientos", child: (
+                  <Consentimientos
+                    token={token}
+                    selectedSede={selectSede}
+                    userlogued={userlogued.sub}
+                  />
+                )
+              },
+              10: { title: "Modulo Psicologia", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
+              12: { title: "Rayos X", child: <RayosXTabSelector tieneVista={tieneVista} /> },
+              13: { title: undefined, child: <EKG /> },
+              14: {
+                title: undefined, child: (
+                  <Espirometria
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                  />
+                )
+              },
               16: {
                 title: undefined, child: (
                   <HistoriaOcupacional
