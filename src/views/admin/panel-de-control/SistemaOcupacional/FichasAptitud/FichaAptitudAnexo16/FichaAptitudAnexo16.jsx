@@ -36,6 +36,7 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
     puestoPostula: "",
     areaTrabajo: "",
     puestoActual: "",
+    esOhla: false,
 
     conclusiones: "",
     apto: "APTO",
@@ -289,6 +290,14 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                 className="mb-3"
               />
               <div className="space-y-2">
+                <div className="flex justify-end">
+                <InputCheckbox
+                  label="Formato OHLA"
+                  name="esOhla"
+                  checked={form?.esOhla}
+                  disabled
+                />
+                </div>
                 <InputsRadioGroup
                   label="Aptitud"
                   name="apto"
@@ -312,7 +321,7 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                         noConducirVehiculos: false,
                       }));
                     }
-                    else if (value == "APTO CON RESTRICCION" || value == "NO APTO") {
+                    else {
                       setForm(prev => ({
                         ...prev,
                         restricciones: prev.restricciones == "NINGUNO." ? "" : prev.restricciones,
@@ -326,7 +335,9 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                     { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                     { label: "APTO CON RESTRICCIÓN (para el puesto en el que trabaja o postula)", value: "APTO CON RESTRICCION" },
                     { label: "NO APTO (para el puesto en el que trabaja o postula)", value: "NO APTO" },
-                  ]}
+                    { label: "CON OBSERVACION", value: "CON OBSERVACION" },
+                    { label: "EVALUADO", value: "EVALUADO" },
+                  ].filter(item => (form.esOhla || (item.label != "CON OBSERVACION" && item.label != "EVALUADO")))}
                 />
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-3">
                   <InputTextOneLine

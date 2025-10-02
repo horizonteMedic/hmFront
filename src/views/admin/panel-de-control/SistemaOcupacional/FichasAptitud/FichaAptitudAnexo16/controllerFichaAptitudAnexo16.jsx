@@ -28,7 +28,6 @@ export const GetInfoServicio = async (
         onFinish
     );
     if (res) {
-        console.log("obtener no tiene")
         set((prev) => ({
             ...prev,
             norden: res.norden,
@@ -42,6 +41,7 @@ export const GetInfoServicio = async (
             puestoPostula: res.ocupacionPaciente,
             areaTrabajo: res.areaPaciente,
             puestoActual: res.cargoPaciente,
+            esOhla: res.esOhla ?? false,
 
             conclusiones: res.observacionesFichaMedica,
 
@@ -83,7 +83,6 @@ export const GetInfoServicioEditar = async (
         onFinish
     );
     if (res) {
-        console.log("editarr")
         set((prev) => ({
             ...prev,
             norden: res.norden,
@@ -98,9 +97,14 @@ export const GetInfoServicioEditar = async (
             puestoPostula: res.ocupacionPaciente,
             areaTrabajo: res.areaPaciente,
             puestoActual: res.cargoPaciente,
+            esOhla: res.esOhla ?? false,
 
             conclusiones: res.conclusiones,
-            apto: res.apto ? "APTO" : (res.aptoConRestriccion ? "APTO CON RESTRICCION" : res.noApto ? "NO APTO" : ""),
+            apto: res.apto ? "APTO" :
+                (res.aptoConRestriccion ? "APTO CON RESTRICCION" : res.noApto ?
+                    "NO APTO" : res.conObservacion ?
+                        "CON OBSERVACION" :
+                        res.evaluado ? "EVALUADO" : ""),
             fechaValido: res.fechaDesde,
             fechaVencimiento: res.fechaHasta,
             recomendaciones: res.recomendaciones,
@@ -166,6 +170,8 @@ export const SubmitDataService = async (
         apto: form.apto === "APTO",
         aptoRestriccion: form.apto === "APTO CON RESTRICCION",
         noApto: form.apto === "NO APTO",
+        conObservacion: form.apto === "CON OBSERVACION",
+        evaluado: form.apto === "EVALUADO",
         restriccionesDescripcion: form.restricciones,
         horaSalida: getHoraActual(),
         fechaHasta: form.fechaVencimiento,
@@ -244,7 +250,6 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
         `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
         token
     ).then((res) => {
-        console.log(res);
         if (res.id === 0) {
             //No tiene registro previo 
             noTieneRegistro();//datos paciente

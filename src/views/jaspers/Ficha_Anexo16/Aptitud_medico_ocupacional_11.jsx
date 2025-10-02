@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign } from "../../utils/helpers";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
@@ -33,7 +33,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     conclusiones: data.conclusiones ? 
       [...new Set(data.conclusiones.split('\n').filter(rec => rec.trim() !== ''))] : [],
     // Datos de aptitud
-    apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : "", //revisar - el JSON tiene boolean, necesita conversión
+    apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : data.conObservacion ? "CON OBSERVACION" : data.evaluado ? "EVALUADO" : "", //revisar - el JSON tiene boolean, necesita conversión
     restricciones: data.restriccionesDescripcion ? 
       [...new Set(data.restriccionesDescripcion.split('\n').filter(rec => rec.trim() !== ''))].join('\n') : "",
     recomendaciones: data.recomendaciones ? 

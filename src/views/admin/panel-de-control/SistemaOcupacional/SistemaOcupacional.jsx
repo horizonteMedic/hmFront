@@ -70,6 +70,7 @@ import {
   faA,
   faBacterium,
   faFileMedical,
+  faMoon,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -542,6 +543,18 @@ const TabComponent = () => {
                   <span className={styles.title}>Fichas Aptitud</span>
                 </div>
               )}
+              {tieneVista("Ficha SAS") && (
+                <div
+                  className={`${styles.gridItem} ${activeTab === 31 ? styles.active : ""
+                    }`}
+                  onClick={() => setActiveTab(31)}
+                >
+                  <span className={styles.icon}>
+                    <FontAwesomeIcon icon={faMoon} />
+                  </span>
+                  <span className={styles.title}>Ficha S.A.S.</span>
+                </div>
+              )}
               {tieneVista("Playground") && (
                 <div
                   className={`${styles.gridItem} ${activeTab === 24 ? styles.active : ""
@@ -954,7 +967,7 @@ const TabComponent = () => {
                   Modulo Psicologia
                 </h2>
               </div>
-              <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> 
+              <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} />
             </div>
           )}
           {activeTab === 14 && (
@@ -1342,6 +1355,24 @@ const TabComponent = () => {
               <FichasAptitudTabSelector listas={listasCombos} tieneVista={tieneVista} />
             </div>
           )}
+          {activeTab === 31 && (
+            <div>
+              <div className="w-full flex items-center justify-end gap-4 mb-2">
+                <button
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
+                  onClick={() => setActiveTab(null)}
+                >
+                  ← Atrás
+                </button>
+              </div>
+              <div className="w-full flex justify-center items-center mb-4">
+                <h2 className="text-2xl font-bold text-[#233245]">
+                  Ficha S.A.S.
+                </h2>
+              </div>
+              <FichaSas listas={listasCombos} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -1436,6 +1467,10 @@ const TabComponent = () => {
               break;
             case "Fichas Aptitud":
               setActiveTab(30);
+              setSubTab(0);
+              break;
+            case "Ficha SAS":
+              setActiveTab(31);
               setSubTab(0);
               break;
           }
