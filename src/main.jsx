@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/FichasSAS/B_FichaDetencionSAS_Digitalizado.jsx"
+import Ficha from "./views/jaspers/FichaConduccion/certificaciondeconduccion_Digitalizado.jsx"
 
 const App = () => {
   return (
