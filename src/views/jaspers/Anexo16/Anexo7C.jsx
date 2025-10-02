@@ -727,7 +727,7 @@ export default function Anexo16(data = {}) {
     revaluacionEmpresa: data.examenRadiograficoAptoRe_apto_re ?? false,
     // Observaciones
     observaciones: data.observacionesFichaMedicaAnexo7c_txtobservacionesfm
-      ? data.observacionesFichaMedicaAnexo7c_txtobservacionesfm.split('\n').filter(obs => obs.trim() !== '')
+      ? `${data.observacionesFichaMedicaAnexo7c_txtobservacionesfm ?? ""}\n ${data.diagnosticoAudiometricoCompleto_diagnostico ?? ""}`.split('\n').filter(obs => obs.trim() !== '')
       : []
   };
 
@@ -908,8 +908,9 @@ export default function Anexo16(data = {}) {
 
     doc.setTextColor(0, 0, 0); // Resetear a negro
   }
+  console.log("postura: ", datosReales.factoresRiesgo.posturas, " mov:", datosReales.factoresRiesgo.movRepet)
 
-  // === SECCIÓN: FACTORES DE RIESGO OCUPACIONAL ===
+  // === SECCIÓN: FACTORES DE RIESGO OCUPACIONAL ===ar
   const factoresRiesgoPosiciones = [
     // Primera columna
     { factor: "ruido", x: 34, y: 88.7, texto: "Ruido" },

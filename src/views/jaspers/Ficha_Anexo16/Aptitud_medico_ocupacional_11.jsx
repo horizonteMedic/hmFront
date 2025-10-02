@@ -30,17 +30,11 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     numeroFicha: String(data.norden ?? ""), //revisar - usando norden como numeroFicha
     sede: data.sede || data.nombreSede || "",
     // Datos de conclusiones - eliminar duplicados
-    conclusiones: data.conclusiones ? 
-      [...new Set(data.conclusiones.split('\n').filter(rec => rec.trim() !== ''))] : [],
+    conclusiones: data.conclusiones ? data.conclusiones.split('\n').filter(rec => rec.trim() !== '') : [],
     // Datos de aptitud
     apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : data.conObservacion ? "CON OBSERVACION" : data.evaluado ? "EVALUADO" : "", //revisar - el JSON tiene boolean, necesita conversión
-    restricciones: data.restriccionesDescripcion ? 
-      [...new Set(data.restriccionesDescripcion.split('\n').filter(rec => rec.trim() !== ''))].join('\n') : "",
-    recomendaciones: data.recomendaciones ? 
-      (Array.isArray(data.recomendaciones) ? 
-        [...new Set(data.recomendaciones.filter(rec => rec && rec.trim() !== ''))] : 
-        [...new Set(data.recomendaciones.split('\n').filter(rec => rec.trim() !== ''))]) : 
-      [],
+    restricciones: data.restriccionesDescripcion || "",
+    recomendaciones: data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : [],
     fechaDesde: formatearFechaCorta(data.fechaDesde ?? ""),
     fechaHasta: formatearFechaCorta(data.fechaHasta ?? ""),
   };
