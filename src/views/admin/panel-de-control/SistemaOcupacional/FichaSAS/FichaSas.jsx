@@ -25,6 +25,7 @@ export default function FichaSas({ listas }) {
     const initialFormState = {
         // Header
         norden: "",
+        codigoSas: null,
         fechaExam: today,
         tipoExamen: "",
         tipoLicencia: "",
@@ -51,22 +52,21 @@ export default function FichaSas({ listas }) {
         fechaUltimaPolisomnografia: "",
         accidenteEnLaMina: false,
         accidenteFueraDeLaMina: false,
+
         // Antecedentes de choques
-        criterio1_cabeceo: false,
-        accidente_nocturno: false,
-        accidente_tarde: false,
-        ausencia_evidencia_maniobra: false,
-        choque_vehiculo_contra_otro: false,
-        caida_precipicio: false,
-        vehiculo_invadio_carril: false,
-        conductor_no_recuerda: false,
-        tratamiento_medicinas_somnolencia: false,
-        conductor_encontraba_horas_extra: false,
-        accidente_confirmado_somnolencia: false,
-        accidente_alta_sospecha_somnolencia: false,
-        accidente_escasa_evidencia_somnolencia: false,
-        no_datos_suficientes: false,
-        accidente_no_debido_somnolencia: false,
+        criterio1_cabeceo: false, //1
+        accidente_nocturno: false, //2
+        ausencia_evidencia_maniobra: false, //3
+        choque_vehiculo_contra_otro: false, //4
+        vehiculo_invadio_carril: false, //5
+        conductor_no_recuerda: false, //6
+        tratamiento_medicinas_somnolencia: false, //7
+        conductor_encontraba_horas_extra: false, //8
+        accidente_confirmado_somnolencia: false, //9
+        accidente_alta_sospecha_somnolencia: false, //10
+        accidente_escasa_evidencia_somnolencia: false, //11
+        no_datos_suficientes: false, //12
+        accidente_no_debido_somnolencia: false, //13
 
         // Antecedentes familiares de apnea del sueño
         antec_familiar_apnea: false,
@@ -116,6 +116,7 @@ export default function FichaSas({ listas }) {
         observaciones: "",
 
         // Médico que Certifica
+        dniUsuario: userCompleto?.datos?.dni_user,
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     };
 
@@ -167,7 +168,7 @@ export default function FichaSas({ listas }) {
                 <InputTextOneLine
                     label="Fecha Examen"
                     type="date"
-                    name="c"
+                    name="fechaExam"
                     value={form?.fechaExam}
                     onChange={handleChangeSimple}
                 />
