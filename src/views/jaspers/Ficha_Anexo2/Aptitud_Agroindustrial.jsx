@@ -247,7 +247,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   // Calcular alturas dinámicas para cada fila
   const alturaFila1 = filaAltura; // Primera fila fija (N° Historia, Tipo de Examen)
   const alturaFila2 = filaAltura; // Segunda fila fija (CERTIFICA)
-  const alturaFila3 = filaAltura; // NOMBRES Y APELLIDOS (ancho disponible después de "NOMBRES Y APELLIDOS:")
+  const alturaFila3 = filaAltura; // NOMBRES Y APELLIDOS (ancho disponible después de "APELLIDOS Y NOMBRES:")
   const alturaFila4 = filaAltura; // Cuarta fila fija (DNI, GÉNERO, EDAD)
   // Nueva distribución: EMPRESA (fila 5) y CONTRATISTA (fila 6) ocupan cada una una fila completa
   const alturaFila5 = calcularAlturaTexto(datosFinales.empresa, 160); // EMPRESA a todo el ancho
@@ -365,7 +365,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
 
   // Tercera fila: Nombres y Apellidos
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("NOMBRES Y APELLIDOS:", tablaInicioX + 2, yTexto + 4);
+  doc.text("APELLIDOS Y NOMBRES:", tablaInicioX + 2, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 55, yTexto + 4, 130);
   yTexto += alturaFila3;
