@@ -104,6 +104,7 @@ import FichaConduccionVehiculos from "./FichaConduccionVehiculos/FichaConduccion
 import FichaCertificadoAltura from "./FichaCertificadoAltura/FichaCertificadoAltura.jsx";
 import CertificadoMedicoOcupacional from "./CertificadoMedicoOcupacional/CertificadoMedicoOcupacional.jsx";
 import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
+import SectionWithBack from "./SectionWithBack.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -830,355 +831,72 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-          {/*HISTORIA OCUPACIONL */}
-          {activeTab === 16 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div>
-                <HistoriaOcupacional
-                  token={token}
-                  userlogued={userlogued.sub}
-                  selectedSede={selectSede}
-                  listas={listasCombos}
-                  userDatos={userlogued}
-                />
-                <div></div>
-              </div>
-            </div>
-          )}
-          {activeTab === 17 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <OftalmologiaTabSelector
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-              />
-            </div>
-          )}
-          {activeTab === 18 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <Odontologia />
-            </div>
-          )}
-          {activeTab === 19 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <OIT
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-                userDatos={userlogued}
-              />
-            </div>
-          )}
-          {activeTab === 20 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Módulo de Consentimientos
-                </h2>
-              </div>
-              <ConsentimientosTabSelector tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 21 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <Cuestionario_Nordico
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-                userDatos={userlogued}
-              />
-            </div>
-          )}
-          {activeTab === 22 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Evaluación Musculoesquelética
-                </h2>
-              </div>
-              <MusculoEsqueleticoTabSelector tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 23 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <Test_fatiga />
-            </div>
-          )}
-          {activeTab === 24 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Playground
-                </h2>
-              </div>
-              <h2>play</h2>
-            </div>
-          )}
-          {activeTab === 25 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <AntecedentesDeAltura />
-            </div>
-          )}
-          {activeTab === 26 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Anexo 2
-                </h2>
-              </div>
-              <Anexo2 listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 27 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Anexo 16
-                </h2>
-              </div>
-              <Anexo16 listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 28 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Anexo 16 A
-                </h2>
-              </div>
-              <Anexo16A />
-            </div>
-          )}
-          {activeTab === 29 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Antecedentes Patológicos
-                </h2>
-              </div>
-              <AntecedentesPatologicos listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 30 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Fichas Aptitud
-                </h2>
-              </div>
-              <FichasAptitudTabSelector listas={listasCombos} tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 31 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Ficha S.A.S.
-                </h2>
-              </div>
-              <FichaSas listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 32 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Ficha Conduccion de Vehiculos
-                </h2>
-              </div>
-              <FichaConduccionVehiculos />
-            </div>
-          )}
-          {activeTab === 33 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Ficha Certificado de Altura
-                </h2>
-              </div>
-              <FichaCertificadoAltura />
-            </div>
-          )}
-          {activeTab === 34 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Constancia Certificado Medico Ocupacional
-                </h2>
-              </div>
-              <CertificadoMedicoOcupacional />
-            </div>
-          )}
-          {activeTab === 35 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Ficha Interconsulta
-                </h2>
-              </div>
-              <FichaInterconsulta />
-            </div>
-          )}
+          {(() => {
+            const displayedInterfaces = {
+              16: {
+                title: undefined, child: (
+                  <HistoriaOcupacional
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    listas={listasCombos}
+                    userDatos={userlogued}
+                  />
+                )
+              },
+              17: {
+                title: undefined, child: (
+                  <OftalmologiaTabSelector
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                  />
+                )
+              },
+              18: { title: undefined, child: <Odontologia /> },
+              19: {
+                title: undefined, child: (
+                  <OIT
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    userDatos={userlogued}
+                  />
+                )
+              },
+              20: { title: "Módulo de Consentimientos", child: <ConsentimientosTabSelector tieneVista={tieneVista} /> },
+              21: {
+                title: undefined, child: (
+                  <Cuestionario_Nordico
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    userDatos={userlogued}
+                  />
+                )
+              },
+              22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
+              23: { title: undefined, child: <Test_fatiga /> },
+              24: { title: "Playground", child: <h2>play</h2> },
+              25: { title: undefined, child: <AntecedentesDeAltura /> },
+              26: { title: "Anexo 2", child: <Anexo2 listas={listasCombos} /> },
+              27: { title: "Anexo 16", child: <Anexo16 listas={listasCombos} /> },
+              28: { title: "Anexo 16 A", child: <Anexo16A /> },
+              29: { title: "Antecedentes Patológicos", child: <AntecedentesPatologicos listas={listasCombos} /> },
+              30: { title: "Fichas Aptitud", child: <FichasAptitudTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
+              31: { title: "Ficha S.A.S.", child: <FichaSas listas={listasCombos} /> },
+              32: { title: "Ficha Conduccion de Vehiculos", child: <FichaConduccionVehiculos /> },
+              33: { title: "Ficha Certificado de Altura", child: <FichaCertificadoAltura /> },
+              34: { title: "Constancia Certificado Medico Ocupacional", child: <CertificadoMedicoOcupacional /> },
+              35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
+            };
+            const section = displayedInterfaces[activeTab];
+            return section ? (
+              <SectionWithBack title={section.title} onBack={() => setActiveTab(null)}>
+                {section.child}
+              </SectionWithBack>
+            ) : null;
+          })()}
 
         </div>
       </div>
