@@ -316,7 +316,7 @@ export default function Anexo2({ listas }) {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "anexo_2" });
 
   const [activeTab, setActiveTab] = useState(0);
 

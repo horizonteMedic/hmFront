@@ -64,7 +64,7 @@ export default function EKG() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "ekg" });
 
   const [dataTabla, setDataTabla] = useState([]);
 
@@ -117,40 +117,6 @@ export default function EKG() {
   useEffect(() => {
     obtenerInfoTabla();
   }, []);
-
-  // const [ip, setIp] = useState("");
-
-  // useEffect(() => {
-  //   fetch("https://api.ipify.org?format=json")
-  //     .then((res) => res.json())
-  //     .then((data) => setIp(data.ip))
-  //     .catch((err) => console.error(err));
-  // }, []);
-
-  // useEffect(() => {
-  //   fetch("https://ipapi.co/json/")
-  //     .then((res) => res.json())
-  //     .then((data) => {
-  //       console.log("IP:", data.ip);
-  //       console.log("Ciudad:", data.city);
-  //       console.log("Región:", data.region);
-  //       console.log("País:", data.country_name);
-  //       console.log("Lat:", data.latitude, "Lng:", data.longitude);
-  //     })
-  //     .catch((err) => console.error(err));
-  // }, []);
-
-  // import FingerprintJS from "@fingerprintjs/fingerprintjs";
-
-  // // Inicializar y obtener el ID único
-  // async function getDeviceId() {
-  //   const fp = await FingerprintJS.load();
-  //   const result = await fp.get();
-  //   console.log("Device ID:", result.visitorId);
-  //   return result.visitorId;
-  // }
-
-  // getDeviceId();
 
   return (
     <div className="w-full   p-4 text-[11px]">
