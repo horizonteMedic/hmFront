@@ -12,7 +12,8 @@ import {
     InputTextOneLine,
     InputTextArea,
     InputsBooleanRadioGroup,
-    InputsRadioGroup
+    InputsRadioGroup,
+    InputCheckbox
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
@@ -349,94 +350,62 @@ export default function FichaConduccionVehiculos() {
 
                                 {/* Columna Central - Observaciones */}
                                 <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Observaciones y Recomendaciones:
-                                        </label>
-                                        <InputTextArea
-                                            name="observacionesRecomendaciones"
-                                            value={form?.observacionesRecomendaciones}
-                                            onChange={handleChange}
-                                            rows={6}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Nombre y Apellidos del Médico - N° de Colegiatura:
-                                        </label>
-                                        <InputTextOneLine
-                                            name="nombreMedicoColegiatura"
-                                            value={form?.nombreMedicoColegiatura}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
+                                    <InputTextArea
+                                        label="Observaciones y Recomendaciones:"
+                                        name="observacionesRecomendaciones"
+                                        value={form?.observacionesRecomendaciones}
+                                        onChange={handleChange}
+                                        rows={6}
+                                    />
+                                    <InputTextOneLine
+                                        label="Nombre y Apellidos del Médico - N° de Colegiatura:"
+                                        name="nombreMedicoColegiatura"
+                                        labelOnTop
+                                        value={form?.nombreMedicoColegiatura}
+                                        onChange={handleChange}
+                                    />
                                 </div>
 
                                 {/* Columna Derecha - Recomendaciones */}
                                 <div className="space-y-2">
-                                    <h5 className="text-sm font-semibold text-gray-700 mb-3">Recomendaciones:</h5>
+                                    <h5 className="font-semibold text-gray-700 mb-3">Recomendaciones:</h5>
                                     <div className="space-y-2">
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                name="sobrepesoDietaHipocalorica"
-                                                checked={form?.sobrepesoDietaHipocalorica || false}
-                                                onChange={handleCheckBoxChange}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-xs">Sobrepeso.Dieta Hipocalórica y ejer.</span>
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                name="corregirAgudezaVisual"
-                                                checked={form?.corregirAgudezaVisual || false}
-                                                onChange={handleCheckBoxChange}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-xs">Corregir Agudeza Visual</span>
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                name="corregirAgudezaVisualTotal"
-                                                checked={form?.corregirAgudezaVisualTotal || false}
-                                                onChange={handleCheckBoxChange}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-xs">Corregir Agudeza Visual Total</span>
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                name="obesidadDietaHipocalorica"
-                                                checked={form?.obesidadDietaHipocalorica || false}
-                                                onChange={handleCheckBoxChange}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-xs">Obesidad I.Dieta Hipocalórica y ejer.</span>
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                name="usoLentesCorrectoresLectura"
-                                                checked={form?.usoLentesCorrectoresLectura || false}
-                                                onChange={handleCheckBoxChange}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-xs">Uso de Lentes Correctores lectura ce...</span>
-                                        </label>
-                                        <label className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                name="corregirAgudezaLectura"
-                                                checked={form?.corregirAgudezaLectura || false}
-                                                onChange={handleCheckBoxChange}
-                                                className="mr-2"
-                                            />
-                                            <span className="text-xs">Corregir Agudeza para lectura ce...</span>
-                                        </label>
+                                        <InputCheckbox
+                                            label="Sobrepeso.Dieta Hipocalórica y ejer."
+                                            name="sobrepesoDietaHipocalorica"
+                                            checked={form?.sobrepesoDietaHipocalorica}
+                                            onChange={handleCheckBoxChange}
+                                        />
+                                        <InputCheckbox
+                                            label="Corregir Agudeza Visual"
+                                            name="corregirAgudezaVisual"
+                                            checked={form?.corregirAgudezaVisual}
+                                            onChange={handleCheckBoxChange}
+                                        />
+                                        <InputCheckbox
+                                            label="Corregir Agudeza Visual Total"
+                                            name="corregirAgudezaVisualTotal"
+                                            checked={form?.corregirAgudezaVisualTotal}
+                                            onChange={handleCheckBoxChange}
+                                        />
+                                        <InputCheckbox
+                                            label="Obesidad I.Dieta Hipocalórica y ejer."
+                                            name="obesidadDietaHipocalorica"
+                                            checked={form?.obesidadDietaHipocalorica}
+                                            onChange={handleCheckBoxChange}
+                                        />
+                                        <InputCheckbox
+                                            label="Uso de Lentes Correctores lectura ce..."
+                                            name="usoLentesCorrectoresLectura"
+                                            checked={form?.usoLentesCorrectoresLectura}
+                                            onChange={handleCheckBoxChange}
+                                        />
+                                        <InputCheckbox
+                                            label="Corregir Agudeza para lectura ce..."
+                                            name="corregirAgudezaLectura"
+                                            checked={form?.corregirAgudezaLectura}
+                                            onChange={handleCheckBoxChange}
+                                        />
                                     </div>
                                 </div>
                             </div>
