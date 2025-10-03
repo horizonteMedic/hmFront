@@ -88,7 +88,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
     const index = await NewIndex(user, uploadedFiles.length, token);
     let uploadedCount = 0; // Contador de archivos procesados
-
+    
     for (const folder of uparchFile) {
       try {
           const fileBase64 = await toBase64(folder);
@@ -136,7 +136,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     setSucred(true);
     setIsUploading(false);
     setIsPDFAvailable(true); // Activa el botón de descarga PDF
-    descargarPDF()
+    descargarPDF(index.id)
     if (failedUploads.length > 0) {
       Swal.fire({
         icon: 'error',
@@ -202,7 +202,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
   };
 
 
-  const generateErrorTablePDF = () => {
+  const generateErrorTablePDF = (indice) => {
     // Iniciar simulación de descarga
     setIsDownloadingPDF(true);
     setDownloadProgressPDF(0);
@@ -214,7 +214,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
         if (nextVal >= 100) {
           clearInterval(interval);
           // Una vez alcanzado el 100%, generar el PDF
-          descargarPDF();
+          descargarPDF(indice);
           return 100;
         }
         return nextVal;
@@ -222,7 +222,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
     }, 200); // cada 200ms aumenta un 10%
   };
   
-  const descargarPDF = () => {
+  const descargarPDF = (indice) => {
     const doc = new jsPDF();
     const imgUrl = "/img/logo-color.png";
   
@@ -405,6 +405,8 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       });
   };
   
+  
+  console.log(indice)
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-50">
@@ -520,7 +522,7 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
                 <div className="flex flex-col items-center mt-4">
                   <button
                     className="px-4 py-2 rounded bg-red-500 text-white"
-                    onClick={generateErrorTablePDF}
+                    onClick={() =>{generateErrorTablePDF(indice)}}
                     disabled={isDownloadingPDF}
                   >
                     <FontAwesomeIcon icon={faDownload} className="mr-2" />
