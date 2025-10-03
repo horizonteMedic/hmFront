@@ -149,9 +149,9 @@ export default function GenerarDatosPaciente(data = {}) {
     otrosDescripcion:data?.antecedentes?.otrosDescripcion??"",
     esApto: data?.antecedentes?.esApto,
     //doctor
-    apellidosUsuario: data?.apellidosUsuario??"",
-    nombresUsuario: data?.nombresUsuario??"",
-    cmpUsuario: String(data?.cmpUsuario??""),
+    apellidosUsuario: "",//data?.apellidosUsuario??""
+    nombresUsuario: "",//data?.nombresUsuario??""
+    cmpUsuario:"",// String(data?.cmpUsuario??""),
     fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? ""),
 
   };
