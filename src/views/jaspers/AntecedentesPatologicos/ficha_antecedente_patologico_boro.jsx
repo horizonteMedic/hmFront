@@ -188,7 +188,8 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
     // Datos de enfermedad profesional
     enfermedadProfesional: Boolean(data.enfermedadesProfesionalesBoro_enfe_prof ?? false),
     evaluacionEnfermedad: Boolean(data.enfermedadesLaboralesCalificacionBoro_enfe_lab_calif ?? false),
-    fechaEvaluacion: formatearFechaCorta(String(data.enfermedadesProfesionalesFechaBoro_enfe_profecha ?? "")),
+    fechaEvaluacion: Boolean(data.enfermedadesProfesionalesBoro_enfe_prof ?? false) ?
+      formatearFechaCorta(String(data.enfermedadesProfesionalesFechaBoro_enfe_profecha ?? "")) : "",
     especifiqueCual: String(data.enfermedadesLaboralesEspecifiqueBoro_enfe_lab_califdetal ?? ""),
 
     // Datos de factores de riesgo - mapeo completo
@@ -891,7 +892,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
 
   // === HEADER PÁGINA 2 ===
   drawHeader(numeroPagina);
-  
+
   // === ANTECEDENTES QUIRÚRGICOS ===
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("4. ANTECEDENTES QUIRÚRGICOS:", 15, 40);
@@ -937,103 +938,103 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
   if (antecedentesConDatos.length === 0) {
     // Línea horizontal debajo de los encabezados
     doc.line(tablaInicioX, tablaInicioY + 2, tablaInicioX + tablaAncho, tablaInicioY + 2);
-    
+
     // Línea horizontal inferior para cerrar la fila
     doc.line(tablaInicioX, tablaInicioY + 8, tablaInicioX + tablaAncho, tablaInicioY + 8);
-    
+
     // Solo dibujar líneas verticales en los extremos (sin divisorias internas)
     doc.line(tablaInicioX, tablaInicioY - 2, tablaInicioX, tablaInicioY + 8); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, tablaInicioY - 2, tablaInicioX + tablaAncho, tablaInicioY + 8); // Línea derecha
-    
+
     // Mensaje centrado en la fila en negrita
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text("No se registran antecedentes quirúrgicos", pageW / 2, tablaInicioY + 6, { align: "center" });
   } else {
 
-  // Función para calcular la altura necesaria de una fila
-  const calcularAlturaFila = (fila, colWidths, doc) => {
-    let maxLineas = 1;
+    // Función para calcular la altura necesaria de una fila
+    const calcularAlturaFila = (fila, colWidths, doc) => {
+      let maxLineas = 1;
 
-    // Calcular líneas necesarias para cada campo
-    const campos = [
-      { texto: fila.fecha || "", ancho: colWidths[0] - 2 },
-      { texto: fila.hospital || "", ancho: colWidths[1] - 2 },
-      { texto: fila.operacion || "", ancho: colWidths[2] - 2 },
-      { texto: fila.diasHospitalizacion || "", ancho: colWidths[3] - 2 },
-      { texto: fila.complicaciones || "", ancho: colWidths[4] - 2 }
-    ];
+      // Calcular líneas necesarias para cada campo
+      const campos = [
+        { texto: fila.fecha || "", ancho: colWidths[0] - 2 },
+        { texto: fila.hospital || "", ancho: colWidths[1] - 2 },
+        { texto: fila.operacion || "", ancho: colWidths[2] - 2 },
+        { texto: fila.diasHospitalizacion || "", ancho: colWidths[3] - 2 },
+        { texto: fila.complicaciones || "", ancho: colWidths[4] - 2 }
+      ];
 
-    campos.forEach(campo => {
-      if (campo.texto) {
-        const lineas = doc.getTextWidth(campo.texto) / campo.ancho;
-        const lineasNecesarias = Math.ceil(lineas);
-        maxLineas = Math.max(maxLineas, lineasNecesarias);
-      }
+      campos.forEach(campo => {
+        if (campo.texto) {
+          const lineas = doc.getTextWidth(campo.texto) / campo.ancho;
+          const lineasNecesarias = Math.ceil(lineas);
+          maxLineas = Math.max(maxLineas, lineasNecesarias);
+        }
+      });
+
+      // Altura completamente dinámica basada en el contenido real + márgenes superior e inferior
+      const alturaContenido = maxLineas * 4; // 4mm por línea
+      const margenSuperior = 1.5; // 1.5mm margen superior (aumentado para mejor visualización)
+      const margenInferior = 0.5; // 1.5mm margen inferior (aumentado para mejor visualización)
+      return alturaContenido + margenSuperior + margenInferior;
+    };
+
+    // Calcular alturas de filas dinámicamente
+    const alturasFilas = antecedentesConDatos.map(fila => calcularAlturaFila(fila, colWidths, doc));
+    const alturaTotalFilas = alturasFilas.reduce((sum, altura) => sum + altura, 0);
+
+    // Líneas horizontales para filas con alturas dinámicas
+    let lineY = tablaInicioY + 2;
+    doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea superior (debajo de encabezados)
+
+    // Dibujar líneas horizontales entre filas
+    alturasFilas.forEach((alturaFila) => {
+      lineY += alturaFila;
+      doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea inferior de cada fila
     });
 
-    // Altura completamente dinámica basada en el contenido real + márgenes superior e inferior
-    const alturaContenido = maxLineas * 4; // 4mm por línea
-    const margenSuperior = 1.5; // 1.5mm margen superior (aumentado para mejor visualización)
-    const margenInferior = 0.5; // 1.5mm margen inferior (aumentado para mejor visualización)
-    return alturaContenido + margenSuperior + margenInferior;
-  };
-
-  // Calcular alturas de filas dinámicamente
-  const alturasFilas = antecedentesConDatos.map(fila => calcularAlturaFila(fila, colWidths, doc));
-  const alturaTotalFilas = alturasFilas.reduce((sum, altura) => sum + altura, 0);
-
-  // Líneas horizontales para filas con alturas dinámicas
-  let lineY = tablaInicioY + 2;
-  doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea superior (debajo de encabezados)
-
-  // Dibujar líneas horizontales entre filas
-  alturasFilas.forEach((alturaFila) => {
-    lineY += alturaFila;
-    doc.line(tablaInicioX, lineY, tablaInicioX + tablaAncho, lineY); // Línea inferior de cada fila
-  });
-
-  // Líneas verticales dinámicas - se extienden hasta el final de la tabla
-  const alturaTotalTabla = alturaTotalFilas + 2; // +2 para el espacio de los encabezados
-  let currentX = tablaInicioX;
-  for (let i = 0; i <= encabezados.length; i++) {
-    doc.line(currentX, tablaInicioY - 2, currentX, tablaInicioY + alturaTotalTabla);
-    if (i < encabezados.length) {
-      currentX += colWidths[i];
+    // Líneas verticales dinámicas - se extienden hasta el final de la tabla
+    const alturaTotalTabla = alturaTotalFilas + 2; // +2 para el espacio de los encabezados
+    let currentX = tablaInicioX;
+    for (let i = 0; i <= encabezados.length; i++) {
+      doc.line(currentX, tablaInicioY - 2, currentX, tablaInicioY + alturaTotalTabla);
+      if (i < encabezados.length) {
+        currentX += colWidths[i];
+      }
     }
-  }
 
-  // Llenar datos en la tabla con alturas dinámicas
-  let currentY = tablaInicioY + 2;
-  antecedentesConDatos.forEach((fila, rowIndex) => {
-    const alturaFila = alturasFilas[rowIndex];
-    // Posición Y con margen superior de 1.5mm desde el inicio de la fila
-    const margenSuperior = 1.5;
-    const rowY = currentY + margenSuperior + 2; // 1.5mm margen + 1mm para centrar el texto
-    let colX = tablaInicioX + 2;
+    // Llenar datos en la tabla con alturas dinámicas
+    let currentY = tablaInicioY + 2;
+    antecedentesConDatos.forEach((fila, rowIndex) => {
+      const alturaFila = alturasFilas[rowIndex];
+      // Posición Y con margen superior de 1.5mm desde el inicio de la fila
+      const margenSuperior = 1.5;
+      const rowY = currentY + margenSuperior + 2; // 1.5mm margen + 1mm para centrar el texto
+      let colX = tablaInicioX + 2;
 
-    // Fecha
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(fila.fecha || "", colX, rowY, { maxWidth: colWidths[0] - 2 });
-    colX += colWidths[0];
+      // Fecha
+      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.text(fila.fecha || "", colX, rowY, { maxWidth: colWidths[0] - 2 });
+      colX += colWidths[0];
 
-    // Hospital
-    doc.text(fila.hospital || "", colX, rowY, { maxWidth: colWidths[1] - 2 });
-    colX += colWidths[1];
+      // Hospital
+      doc.text(fila.hospital || "", colX, rowY, { maxWidth: colWidths[1] - 2 });
+      colX += colWidths[1];
 
-    // Operación
-    doc.text(fila.operacion || "", colX, rowY, { maxWidth: colWidths[2] - 2 });
-    colX += colWidths[2];
+      // Operación
+      doc.text(fila.operacion || "", colX, rowY, { maxWidth: colWidths[2] - 2 });
+      colX += colWidths[2];
 
-    // Días Hospitalización
-    doc.text(fila.diasHospitalizacion || "", colX, rowY, { maxWidth: colWidths[3] - 2 });
-    colX += colWidths[3];
+      // Días Hospitalización
+      doc.text(fila.diasHospitalizacion || "", colX, rowY, { maxWidth: colWidths[3] - 2 });
+      colX += colWidths[3];
 
-    // Complicaciones
-    doc.text(fila.complicaciones || "", colX, rowY, { maxWidth: colWidths[4] - 2 });
+      // Complicaciones
+      doc.text(fila.complicaciones || "", colX, rowY, { maxWidth: colWidths[4] - 2 });
 
-    // Actualizar currentY para la siguiente fila
-    currentY += alturaFila;
-  });
+      // Actualizar currentY para la siguiente fila
+      currentY += alturaFila;
+    });
   } // Cerrar el bloque else
 
   // === SECCIÓN HÁBITOS ===

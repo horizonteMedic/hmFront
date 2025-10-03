@@ -525,7 +525,7 @@ export default function Anexo2(data = {}) {
       conclusionAudiometria: data.diagnosticoAudiometria_diagnostico ?? "",
 
       // X. CONCLUSIÓN DE ESPIROMETRÍA
-      conclusionEspirometria: data.conclusion_txtconclusion ?? "",
+      conclusionEspirometria: data.interpretacion_interpretacion ?? "",
 
       // XI. OTROS
       otros: data.otrosExamenes_txtotrosex ?? "",

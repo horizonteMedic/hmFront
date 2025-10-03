@@ -46,7 +46,7 @@ export default function GenerarDatosPaciente(data = {}) {
     ],
     esApto: true,
     observaciones: "comentario",
-    otrosDescripcion:"otrosObser",
+    otrosDescripcion: "otrosObser",
     apellidosUsuario: "Apellidos doctor",
     nombresUsuario: "Nombres doctor",
     cmpUsuario: "1234",
@@ -66,101 +66,153 @@ export default function GenerarDatosPaciente(data = {}) {
     empresa: data.empresa ?? "",
     actividadRealizar: data.cargo ?? "",
     antecedentes: [
-      { texto: "Accidente cerebrovascular", 
+      {
+        texto: "Accidente cerebrovascular",
         si: data?.antecedentes?.accidenteCerebroVascularSi,
-        no: data?.antecedentes?.accidenteCerebroVascularNo },
-      { texto: "Angina inestable", 
+        no: data?.antecedentes?.accidenteCerebroVascularNo
+      },
+      {
+        texto: "Angina inestable",
         si: data?.antecedentes?.anginaInestableSi,
-        no: data?.antecedentes?.anginaInestableNo },
-      { texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent", 
+        no: data?.antecedentes?.anginaInestableNo
+      },
+      {
+        texto: "Antecedente de Bypass arterial coronario/AngioplastÍa/Stent",
         si: data?.antecedentes?.antecedenteBypassArterialSi,
-        no: data?.antecedentes?.antecedenteBypassArterialNo },
-      { texto: "Antecedente de edema cerebral de altura", 
+        no: data?.antecedentes?.antecedenteBypassArterialNo
+      },
+      {
+        texto: "Antecedente de edema cerebral de altura",
         si: data?.antecedentes?.antecedenteEdemaCerebralSi,
-        no: data?.antecedentes?.antecedenteEdemaCerebralNo },
-      { texto: "Antecendente de edema pulmonar de altura", 
+        no: data?.antecedentes?.antecedenteEdemaCerebralNo
+      },
+      {
+        texto: "Antecendente de edema pulmonar de altura",
         si: data?.antecedentes?.antecedenteEdemaPulmonarSi,
-        no: data?.antecedentes?.antecedenteEdemaPulmonarNo },
-      { texto: "Antecedente de Neumotórax en los ultimos 6 meses", 
+        no: data?.antecedentes?.antecedenteEdemaPulmonarNo
+      },
+      {
+        texto: "Antecedente de Neumotórax en los ultimos 6 meses",
         si: data?.antecedentes?.antecedenteNeumotoraxSi,
-        no: data?.antecedentes?.antecedenteNeumotoraxNo },
-      { texto: "Arritmia cardiaca no controlada", 
+        no: data?.antecedentes?.antecedenteNeumotoraxNo
+      },
+      {
+        texto: "Arritmia cardiaca no controlada",
         si: data?.antecedentes?.arritmiaCardiacaSi,
-        no: data?.antecedentes?.arritmiaCardiacaNo },
-      { texto: "Cardiomiopatía hipertrófica idiopática", 
+        no: data?.antecedentes?.arritmiaCardiacaNo
+      },
+      {
+        texto: "Cardiomiopatía hipertrófica idiopática",
         si: data?.antecedentes?.cardiomiopatiaSi,
-        no: data?.antecedentes?.cardiomiopatiaNo },
-      { texto: "Cirugía mayor en los últimos 30 días", 
+        no: data?.antecedentes?.cardiomiopatiaNo
+      },
+      {
+        texto: "Cirugía mayor en los últimos 30 días",
         si: data?.antecedentes?.cirujiaMayorSi,
-        no: data?.antecedentes?.cirujiaMayorNo }, 
-      { texto: "Cualquier insuficiencia en la válvula aórtica", 
+        no: data?.antecedentes?.cirujiaMayorNo
+      },
+      {
+        texto: "Cualquier insuficiencia en la válvula aórtica",
         si: data?.antecedentes?.cualquierInsuficienciaSi,
-        no: data?.antecedentes?.cualquierInsuficienciaNo },
-      { texto: "Diabetes Mellitus", 
+        no: data?.antecedentes?.cualquierInsuficienciaNo
+      },
+      {
+        texto: "Diabetes Mellitus",
         si: data?.antecedentes?.diabetesMellitusSi,
-        no: data?.antecedentes?.diabetesMellitusNo },
-      { texto: "Embarazo", 
+        no: data?.antecedentes?.diabetesMellitusNo
+      },
+      {
+        texto: "Embarazo",
         si: data?.antecedentes?.embarazoSi,
-        no: data?.antecedentes?.embarazoNo },
-      { texto: "Epilepsia", 
+        no: data?.antecedentes?.embarazoNo
+      },
+      {
+        texto: "Epilepsia",
         si: data?.antecedentes?.epilepsiaSi,
-        no: data?.antecedentes?.epilepsiaNo },
-      { texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada", 
+        no: data?.antecedentes?.epilepsiaNo
+      },
+      {
+        texto: "EPOC - Enfermedad pulmonar obstructiva crónica confirmada",
         si: data?.antecedentes?.epocSi,
-        no: data?.antecedentes?.epocNo },
-      { texto: "Eritrocitosis excesiva (mal de montaña crónico)", 
+        no: data?.antecedentes?.epocNo
+      },
+      {
+        texto: "Eritrocitosis excesiva (mal de montaña crónico)",
         si: data?.antecedentes?.eritrocitosisSi,
-        no: data?.antecedentes?.eritrocitosisNo },
-      { texto: "Hipertensión arterial", 
+        no: data?.antecedentes?.eritrocitosisNo
+      },
+      {
+        texto: "Hipertensión arterial",
         si: data?.antecedentes?.hipertensionArterialSi,
-        no: data?.antecedentes?.hipertensionArterialNo },
-      { texto: "Hipertensión pulmonar", 
+        no: data?.antecedentes?.hipertensionArterialNo
+      },
+      {
+        texto: "Hipertensión pulmonar",
         si: data?.antecedentes?.hipertensionPulmonarSi,
-        no: data?.antecedentes?.hipertensionPulmonarNo },
-      { texto: "Infarto al miocardio en los últimos 6 meses", 
+        no: data?.antecedentes?.hipertensionPulmonarNo
+      },
+      {
+        texto: "Infarto al miocardio en los últimos 6 meses",
         si: data?.antecedentes?.infartoMiocardioSi,
-        no: data?.antecedentes?.infartoMiocardioNo },
-      { texto: "Insuficiencia cardíaca congestiva", 
+        no: data?.antecedentes?.infartoMiocardioNo
+      },
+      {
+        texto: "Insuficiencia cardíaca congestiva",
         si: data?.antecedentes?.insuficienciaCardiacaSi,
-        no: data?.antecedentes?.insuficienciaCardiacaNo },
-      { texto: "Patología hemorrágica de retina", 
+        no: data?.antecedentes?.insuficienciaCardiacaNo
+      },
+      {
+        texto: "Patología hemorrágica de retina",
         si: data?.antecedentes?.patologiaHemorragicaSi,
-        no: data?.antecedentes?.patologiaHemorragicaNo },
-      { texto: "Patología Valvular Cardiáca en tratamiento", 
+        no: data?.antecedentes?.patologiaHemorragicaNo
+      },
+      {
+        texto: "Patología Valvular Cardiáca en tratamiento",
         si: data?.antecedentes?.patologiaValvularSi,
-        no: data?.antecedentes?.patologiaValvularNo },
-      { texto: "Presencia de marcapasos", 
+        no: data?.antecedentes?.patologiaValvularNo
+      },
+      {
+        texto: "Presencia de marcapasos",
         si: data?.antecedentes?.presenciaMarcaPasosSi,
-        no: data?.antecedentes?.presenciaMarcaPasosNo },
-      { texto: "Presencia de riesgo cardiovascular alto", 
+        no: data?.antecedentes?.presenciaMarcaPasosNo
+      },
+      {
+        texto: "Presencia de riesgo cardiovascular alto",
         si: data?.antecedentes?.presenciaRiesgoCardioSi,
-        no: data?.antecedentes?.presenciaRiesgoCardioNo },
-      { texto: "Trastornos de la coagulación", 
+        no: data?.antecedentes?.presenciaRiesgoCardioNo
+      },
+      {
+        texto: "Trastornos de la coagulación",
         si: data?.antecedentes?.transtornoCoagulacionSi,
-        no: data?.antecedentes?.transtornoCoagulacionNo },
-      { texto: "Trombosis venosa cerebral", 
+        no: data?.antecedentes?.transtornoCoagulacionNo
+      },
+      {
+        texto: "Trombosis venosa cerebral",
         si: data?.antecedentes?.trombosisSi,
-        no: data?.antecedentes?.trombosisNo },
-      { texto: "Otros", 
+        no: data?.antecedentes?.trombosisNo
+      },
+      {
+        texto: "Otros",
         si: data?.antecedentes?.otrosSi,
-        no: data?.antecedentes?.otrosNo },
+        no: data?.antecedentes?.otrosNo
+      },
     ],
-    observaciones: data?.antecedentes?.observaciones??"",
-    otrosDescripcion:data?.antecedentes?.otrosDescripcion??"",
+    observaciones: data?.antecedentes?.observaciones ?? "",
+    otrosDescripcion: data?.antecedentes?.otrosDescripcion ?? "",
     esApto: data?.antecedentes?.esApto,
     //doctor
-    apellidosUsuario: "",//data?.apellidosUsuario??""
-    nombresUsuario: "",//data?.nombresUsuario??""
-    cmpUsuario:"",// String(data?.cmpUsuario??""),
+    apellidosUsuario: data?.apellidosUsuario ?? "",
+    nombresUsuario: data?.nombresUsuario ?? "",
+    cmpUsuario: String(data?.cmpUsuario ?? ""),
     fechaExamen: formatearFechaCorta(data?.antecedentes?.fechaAntecedente ?? ""),
 
   };
-   const datos =
+  const datos =
     data && Object.keys(data).length > 0 ? datosReales : datosPrueba;
 
 
   const doc = new jsPDF();
-  
+
   // Usar el header
   let y = Header_AnexoCB_Digitalizado(doc, data);
   const leftMargin = 10;
@@ -211,7 +263,7 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.setFont("helvetica", "bold");
   doc.text("Sexo :", leftMargin + colDNI + colFecha + colEdad + 2, y + 3);
   doc.setFont("helvetica", "normal");
-  
+
   // Convertir M/F a texto completo
   let sexoTexto = datos.sexo;
   if (sexoTexto === "M") {
@@ -219,7 +271,7 @@ export default function GenerarDatosPaciente(data = {}) {
   } else if (sexoTexto === "F") {
     sexoTexto = "FEMENINO";
   }
-  
+
   doc.text(sexoTexto, leftMargin + colDNI + colFecha + colEdad + 2, y + 6);
   y += row2Height;
 
@@ -269,10 +321,10 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.text("ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
 
   doc.rect(leftMargin + colTexto, y, colNo, 8);
-  doc.text("NO", leftMargin + colTexto + colNo/2, y + 5, { align: "center" });
+  doc.text("NO", leftMargin + colTexto + colNo / 2, y + 5, { align: "center" });
 
   doc.rect(leftMargin + colTexto + colNo, y, colSi, 8);
-  doc.text("SI", leftMargin + colTexto + colNo + colSi/2, y + 5, { align: "center" });
+  doc.text("SI", leftMargin + colTexto + colNo + colSi / 2, y + 5, { align: "center" });
 
   y += 8;
 
@@ -287,41 +339,41 @@ export default function GenerarDatosPaciente(data = {}) {
 
     // NO
     doc.rect(leftMargin + colTexto, y, colNo, altura);
-    if (item.no === true) doc.text("X", leftMargin + colTexto + colNo/2, y + 3, { align: "center" });
+    if (item.no === true) doc.text("X", leftMargin + colTexto + colNo / 2, y + 3, { align: "center" });
 
     // SI
     doc.rect(leftMargin + colTexto + colNo, y, colSi, altura);
-    if (item.si === true) doc.text("X", leftMargin + colTexto + colNo + colSi/2, y + 3, { align: "center" });
+    if (item.si === true) doc.text("X", leftMargin + colTexto + colNo + colSi / 2, y + 3, { align: "center" });
 
     y += altura;
   });
 
-    // ===== COMENTARIOS DEL MÉDICO =====
+  // ===== COMENTARIOS DEL MÉDICO =====
   // y += 1;
   doc.setFont("helvetica", "bold");
   doc.rect(leftMargin, y, 190, 8);
   doc.text("Comentarios del Médico :", leftMargin + 2, y + 4);
   doc.setFont("helvetica", "normal");
-  doc.text(datos.otrosDescripcion, leftMargin + 15, y-1.5,);
-  doc.text(datos.observaciones, leftMargin + 45, y + 4,{maxWidth:100});
+  doc.text(datos.otrosDescripcion, leftMargin + 15, y - 1.5,);
+  doc.text(datos.observaciones, leftMargin + 45, y + 4, { maxWidth: 100 });
   y += 8;
-   
+
   // Variables para firma de prueba en comentarios
   const firmaPruebaX = leftMargin + 58;
-  const firmaPruebaY = y -19;
+  const firmaPruebaY = y - 19;
   const firmaPruebaWidth = 45;
   const firmaPruebaHeight = 25;
-  
+
   // Variables para huella digital en comentarios
   const huellaDigitalX = leftMargin + 105;
   const huellaDigitalY = y - 19;
   const huellaDigitalWidth = 25;
   const huellaDigitalHeight = 18;
-  
+
   // Agregar firma de prueba y huella flotantes
   // doc.addImage("public/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png", "PNG", firmaPruebaX, firmaPruebaY, firmaPruebaWidth, firmaPruebaHeight);
   // doc.text("PRUEBA", leftMargin + 135, y);
-   
+
   // Agregar huella digital (ajustada para que salga vertical)
   // Intercambiamos width y height para que la huella salga vertical
   // doc.addImage("public/img/firmas_sellos_prueba/HUELLA_DIGITAL.png", "PNG", huellaDigitalX, huellaDigitalY, huellaDigitalHeight, huellaDigitalWidth);
@@ -374,7 +426,7 @@ export default function GenerarDatosPaciente(data = {}) {
   // Fila 3: Correo - Fax - Cel
   const colCorreo = 100, colFax = 45, colCel = 45; // Correo más ancho, Fax y Cel más estrechos
   const correoRowHeight = 12; // Altura aumentada para label arriba y valor abajo
-  
+
   // Correo: Label arriba, valor abajo
   doc.rect(leftMargin, y, colCorreo, correoRowHeight);
   doc.setFont("helvetica", "bold");
@@ -398,7 +450,7 @@ export default function GenerarDatosPaciente(data = {}) {
   // Fila 4: CMP - Fecha - Firma y Sello
   const colCMP = 40, colFechaMedico = 60, colFirma = 90;
   const firmaRowHeight = 12; // Altura aumentada para label arriba y valor abajo
-  
+
   // CMP: Label arriba, valor abajo
   doc.rect(leftMargin, y, colCMP, firmaRowHeight);
   doc.setFont("helvetica", "bold");
@@ -417,36 +469,36 @@ export default function GenerarDatosPaciente(data = {}) {
   doc.rect(leftMargin + colCMP + colFechaMedico, y, colFirma, firmaRowHeight);
   doc.setFont("helvetica", "bold");
   doc.text("Firma y sello :", leftMargin + colCMP + colFechaMedico + 2, y + 4);
-  
+
   // Variables para firma del médico flotante (puedes ajustar X e Y a tu gusto)
   const firmaMedicoX = leftMargin + colCMP + colFechaMedico + 35;
-  const firmaMedicoY = y -4; // Posición Y ajustable
+  const firmaMedicoY = y - 4; // Posición Y ajustable
   const firmaMedicoWidth = 45;
   const firmaMedicoHeight = 25; // Altura de la firma
-  
+
   // Agregar firma y sello médico (flotante, puedes mover X e Y)
   // doc.addImage("public/img/firmas_sellos_prueba/firma_sello.png", "PNG", firmaMedicoX, firmaMedicoY, firmaMedicoWidth, firmaMedicoHeight);
   y += firmaRowHeight + 5;
 
   // Imprimir / Preview
-   const firmasAPintar = [
+  const firmasAPintar = [
     {
       nombre: "FIRMAP",
       x: firmaPruebaX,
       y: firmaPruebaY,
-      maxw: 40,
+      maxw: 30,
     },
     {
       nombre: "HUELLA",
       x: huellaDigitalX,
       y: huellaDigitalY,
-      maxw: 24,
+      maxw: 14,
     },
     {
       nombre: "SELLOFIRMA",
       x: firmaMedicoX,
-      y: firmaMedicoY-10,
-      maxw: 50,
+      y: firmaMedicoY - 10,
+      maxw: 40,
     },
   ];
 

@@ -1345,7 +1345,7 @@ export default function Anexo16Boroo(data = {}) {
   // REFLEJOS PUPILARES
   const xReflejosPupilares = 135;
   const yReflejosPupilares = 210;
-  if (datosFinales.evaluacionOftalmologica && datosFinales.evaluacionOftalmologica.reflejosPupilares) {
+  if (datosFinales.evaluacionOftalmologica.reflejosPupilares) {
     doc.setFont("helvetica", "normal").setFontSize(7.5);
     doc.setTextColor(0, 0, 0);
     doc.text(datosFinales.evaluacionOftalmologica.reflejosPupilares.toUpperCase(), xReflejosPupilares, yReflejosPupilares, { maxWidth: 100 });
