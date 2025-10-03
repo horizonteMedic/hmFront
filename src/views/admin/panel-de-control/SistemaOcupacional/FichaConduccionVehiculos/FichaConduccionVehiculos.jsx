@@ -10,18 +10,27 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
-    InputTextArea
+    InputTextArea,
+    InputsBooleanRadioGroup,
+    InputsRadioGroup
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
+import { getToday } from "../../../../utils/helpers";
 
+const tabla = "";
+const today = getToday();
 export default function FichaConduccionVehiculos() {
     const [activeTab, setActiveTab] = useState(0);
-    
+
     const initialFormState = {
         // Datos personales
+        norden: "",
+        fechaExam: today,
+        tipoExamen: "",
+        razonVisita: "PRIMERA ACTITUD",
         nombres: "",
         dni: "",
         edad: "",
@@ -116,7 +125,7 @@ export default function FichaConduccionVehiculos() {
         usoLentesCorrectoresLectura: false,
         corregirAgudezaLectura: false,
         // Imprimir
-        nordenImprimir: "",
+        norden: "",
     };
 
     const {
@@ -124,10 +133,12 @@ export default function FichaConduccionVehiculos() {
         setForm,
         handleChange,
         handleChangeNumber,
+        handleRadioButton,
+        handleChangeSimple,
         handleRadioButtonBoolean,
         handleCheckBoxChange,
         handleClear,
-    } = useForm(initialFormState, { storageKey: "ficha_conduccion_form" });
+    } = useForm(initialFormState);//, { storageKey: "ficha_conduccion_form" }
 
     const tabs = [
         {
@@ -157,6 +168,37 @@ export default function FichaConduccionVehiculos() {
                 <div className="w-4/5">
                     <div className="w-full">
                         {/* Datos del trabajador */}
+                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                            <InputTextOneLine
+                                label="N° Orden"
+                                name="norden"
+                                value={form?.norden}
+                                onChange={handleChangeNumber}
+                            // onKeyUp={handleSearch}
+                            />
+                            <InputTextOneLine
+                                label="Fecha Examen"
+                                type="date"
+                                name="fechaExam"
+                                value={form?.fechaExam}
+                                onChange={handleChangeSimple}
+                            />
+                            <InputTextOneLine
+                                label="Tipo de Examen"
+                                name="tipoExamen"
+                                value={form?.tipoExamen}
+                                disabled
+                            />
+                            <InputsRadioGroup
+                                name="razonVisita"
+                                value={form?.razonVisita}
+                                onChange={handleRadioButton}
+                                options={[
+                                    { label: "1ra Actitud", value: "PRIMERA ACTITUD" },
+                                    { label: "Revalidación", value: "REVALIDACION" },
+                                ]}
+                            />
+                        </section>
                         <section className="bg-white border border-gray-200 rounded-lg p-4 m-4">
                             <h3 className="text-lg font-semibold mb-3">Datos del Paciente</h3>
                             {/* Fila 1: Nombres, DNI, Edad, Género */}
@@ -167,7 +209,7 @@ export default function FichaConduccionVehiculos() {
                                     value={form?.nombres}
                                     disabled
                                 />
-                                <div className="grid grid-cols-4 gap-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     <InputTextOneLine
                                         label="DNI"
                                         name="dni"
@@ -180,19 +222,19 @@ export default function FichaConduccionVehiculos() {
                                         value={form?.edad}
                                         disabled
                                     />
-                                    <InputTextOneLine
-                                        label="Sexo"
-                                        name="sexo"
-                                        value={form?.sexo}
-                                        disabled
-                                    />
-                                     <InputTextOneLine
-                                        label="T. Experiencia"
-                                        name="experienciaAnios"
-                                        value={form?.experienciaAnios}
-                                        disabled
-                                    />
                                 </div>
+                                <InputTextOneLine
+                                    label="Sexo"
+                                    name="sexo"
+                                    value={form?.sexo}
+                                    disabled
+                                />
+                                <InputTextOneLine
+                                    label="T. Experiencia"
+                                    name="experienciaAnios"
+                                    value={form?.experienciaAnios}
+                                    disabled
+                                />
                                 <InputTextOneLine
                                     label="Empresa"
                                     name="empresa"
@@ -225,11 +267,10 @@ export default function FichaConduccionVehiculos() {
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
-                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${
-                                        activeTab === tab.id
-                                            ? "border-[#233245] text-[#233245] font-semibold"
-                                            : "border-transparent"
-                                    }`}
+                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-gray-700 hover:bg-gray-100 ${activeTab === tab.id
+                                        ? "border-[#233245] text-[#233245] font-semibold"
+                                        : "border-transparent"
+                                        }`}
                                     onClick={() => setActiveTab(tab.id)}
                                 >
                                     <FontAwesomeIcon icon={tab.icon} className="mr-2" />
@@ -261,55 +302,48 @@ export default function FichaConduccionVehiculos() {
                         {/* Sección Estática - Conclusión y Comentarios */}
                         <div className="bg-white border border-gray-200 rounded-lg p-4 m-4">
                             <h4 className="text-lg font-semibold text-gray-800 mb-4">Conclusión y Comentarios</h4>
-                            
+
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {/* Columna Izquierda - Conclusión */}
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="font-semibold mb-2">
                                             Apto para conducción de vehículos:
                                         </label>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="block text-xs text-gray-600 mb-1">Desde:</label>
-                                                <InputTextOneLine
-                                                    name="aptoDesde"
-                                                    type="date"
-                                                    value={form?.aptoDesde || ""}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs text-gray-600 mb-1">Hasta:</label>
-                                                <InputTextOneLine
-                                                    name="aptoHasta"
-                                                    type="date"
-                                                    value={form?.aptoHasta || ""}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
+                                        <div className="grid grid-cols-1 gap-2">
+                                            <InputTextOneLine
+                                                label="Desde"
+                                                name="aptoDesde"
+                                                type="date"
+                                                value={form?.aptoDesde}
+                                                onChange={handleChangeSimple}
+                                            />
+                                            <InputTextOneLine
+                                                label="Hasta"
+                                                name="aptoHasta"
+                                                type="date"
+                                                value={form?.aptoHasta}
+                                                onChange={handleChangeSimple}
+                                            />
                                         </div>
                                     </div>
-
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        <label className="font-semibold mb-2">
                                             Conclusiones:
                                         </label>
-                                        <div className="space-y-2">
-                                            {["Apto", "Observado", "No Apto", "Apto con Restricción"].map((option) => (
-                                                <label key={option} className="flex items-center">
-                                                    <input
-                                                        type="radio"
-                                                        name="conclusion"
-                                                        value={option}
-                                                        checked={form?.conclusion === option}
-                                                        onChange={handleChange}
-                                                        className="mr-2"
-                                                    />
-                                                    <span className="text-sm">{option}</span>
-                                                </label>
-                                            ))}
-                                        </div>
+                                        <InputsRadioGroup
+                                            label="Restricción"
+                                            name="conclusion"
+                                            value={form?.conclusion}
+                                            onChange={handleRadioButton}
+                                            vertical
+                                            options={[
+                                                { label: "Apto", value: "APTO" },
+                                                { label: "Observado", value: "OBSERVADO" },
+                                                { label: "No Apto", value: "NO APTO" },
+                                                { label: "Apto con Restricción", value: "APTO CON RESTRICCION" },
+                                            ]}
+                                        />
                                     </div>
                                 </div>
 
@@ -321,7 +355,7 @@ export default function FichaConduccionVehiculos() {
                                         </label>
                                         <InputTextArea
                                             name="observacionesRecomendaciones"
-                                            value={form?.observacionesRecomendaciones || ""}
+                                            value={form?.observacionesRecomendaciones}
                                             onChange={handleChange}
                                             rows={6}
                                         />
@@ -333,7 +367,7 @@ export default function FichaConduccionVehiculos() {
                                         </label>
                                         <InputTextOneLine
                                             name="nombreMedicoColegiatura"
-                                            value={form?.nombreMedicoColegiatura || ""}
+                                            value={form?.nombreMedicoColegiatura}
                                             onChange={handleChange}
                                         />
                                     </div>
@@ -426,10 +460,9 @@ export default function FichaConduccionVehiculos() {
                                 </button>
                                 <div className="flex gap-2">
                                     <InputTextOneLine
-                                        name="nordenImprimir"
-                                        value={form?.nordenImprimir || ""}
+                                        name="norden"
+                                        value={form?.norden}
                                         onChange={handleChange}
-                                        placeholder="N° Orden"
                                         className="w-32"
                                     />
                                     <button

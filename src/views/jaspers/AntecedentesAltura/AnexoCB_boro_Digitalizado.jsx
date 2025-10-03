@@ -218,7 +218,7 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
       nombre: "FIRMAP",
       x: firmaTrabajadorX,
       y: firmaTrabajadorY,
-      maxw: 40,
+      maxw: 30,
     },
     {
       nombre: "HUELLA",
@@ -230,7 +230,7 @@ doc.text("2. ANTECEDENTES PATOLÓGICOS", leftMargin + 2, y + 5);
       nombre: "SELLOFIRMA",
       x: firmaMedicoX,
       y: firmaMedicoY-10,
-      maxw: 50,
+      maxw: 40,
     },
   ];
 

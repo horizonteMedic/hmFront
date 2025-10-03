@@ -68,7 +68,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     fechaExamen: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || ""),
     sexo: data.sexo_sexo_pa || "",
     documentoIdentidad: String(data.dni_cod_pa || ""),
-    edad: String(data.edad_edad ?? ""),
+    edad: `${String(data.edad_edad ?? "")} AÑOS`,
     areaTrabajo: data.area_area_o || "",
     puestoTrabajo: data.cargo_cargo_de || "",
     empresa: data.empresa_razon_empresa || "",
@@ -102,10 +102,16 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     fur: data.furDescripcionAnexo16a_txtfur || "",
     observaciones: data.observacionesAnexo16a_observaciones || "",
     medico: {
-      nombres: "",//String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
+      nombres: String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
       direccion: data.direccionSede || "",
-      cmp: "",//data.cmpUsuario_cmp_user || "",
-      fecha: ""
+      cmp: data.cmpUsuario_cmp_user || "",
+      fecha: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || "")
+    },
+    laboratorio: {
+      hemoglobina: String(data.hemoglobinaLaboratorioClinico_txthemoglobina ?? "") + " g/dl",
+      hematocrito: String(data.hematocritoLaboratorioClinico_txthematocrito ?? "") + "%",
+      glucosa: String(data.glucosaLaboratorioClinico_txtglucosabio ?? "") + " mg/dl",
+      ekg: String(data.hallazgosInformeElectroCardiograma_hallazgo ?? "N/A")
     },
 
     // Datos de color
@@ -322,10 +328,10 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Datos de laboratorio
   const datosLaboratorio = [
-    { label: "Hemoglobina:", value: "13 g%", x: 40, y: 222 },
-    { label: "Hematocrito:", value: "62%", x: 80, y: 222 },
-    { label: "Glucosa:", value: "N/A mg/dL", x: 118, y: 222 },
-    { label: "EKG (>= 45años):", value: "Normal", x: 155, y: 222 }
+    { label: "Hemoglobina:", value: datosReales.laboratorio.hemoglobina, x: 40, y: 222 },
+    { label: "Hematocrito:", value: datosReales.laboratorio.hematocrito, x: 80, y: 222 },
+    { label: "Glucosa:", value: datosReales.laboratorio.glucosa, x: 118, y: 222 },
+    { label: "EKG (>= 45años):", value: datosReales.laboratorio.ekg, x: 155, y: 222 }
   ];
 
   datosLaboratorio.forEach((item) => {

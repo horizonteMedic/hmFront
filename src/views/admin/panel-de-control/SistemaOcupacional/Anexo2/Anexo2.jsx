@@ -230,7 +230,7 @@ export default function Anexo2({ listas }) {
     nariz: "CENTRAL, PERMEABLE",
     oidos: "",
     marcha: "NORMAL",
-    piel: "NORMAL.NO  MANCHA, NO SPRESENCIA DE LUNARES SOSPECHOSOS DE MALIGNIDAD.",
+    piel: "NORMAL. NO MANCHA, NO PRESENTA LUNARES SOSPECHOSOS DE MALIGNIDAD.",
     aparatoRespiratorio:
       "RESPIRACION  NORMAL,EXPANSION TORACICA SIMETRICA, BPMV EN ACP, NO RALES.",
     apaCardiovascular:

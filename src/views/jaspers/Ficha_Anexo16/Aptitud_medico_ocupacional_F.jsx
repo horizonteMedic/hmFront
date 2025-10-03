@@ -59,7 +59,7 @@ export default function Aptitud_Agroindustrial(data = {}) {
     apellidosNombres: String((data.apellidosPaciente ?? "") + " " + (data.nombresPaciente ?? "")).trim(),
     documentoIdentidad: String(data.dniPaciente ?? ""),
     genero: data.sexoPaciente === "M" ? "MASCULINO" : data.sexoPaciente === "F" ? "FEMENINO" : String(data.sexoPaciente ?? ""),
-    edad: String(data.edadPaciente ?? ""),
+    edad: String(`${data.edadPaciente ?? ""} AÑOS`),
     empresa: String(data.empresa ?? ""),
     contratista: String(data.contrata ?? ""),
     puestoPostula: String(data.cargoPaciente ?? ""),
