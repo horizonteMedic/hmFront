@@ -14,7 +14,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     tipoExamen: String(data.nombreExamen ?? ""),
     apellidosNombres: String((data.apellidosPaciente ?? "") + " " + (data.nombresPaciente ?? "")).trim(),
     documentoIdentidad: String(data.dniPaciente ?? ""),
-    genero: String(data.sexoPaciente ?? ""),
+    genero: data.sexoPaciente === "M" ? "MASCULINO" : data.sexoPaciente === "F" ? "FEMENINO" : String(data.sexoPaciente ?? ""),
     edad: String(data.edadPaciente ?? ""),
     empresa: String(data.empresa ?? ""),
     contratista: String(data.contrata ?? ""),
@@ -61,54 +61,49 @@ export default function Aptitud_AgroindustrialH(data = {}) {
 
   const aptitudCheckboxes = getAptitudCheckbox(datosFinales.apto);
 
-  // Debug: Verificar los valores
-  console.log("Valor de apto:", datosFinales.apto);
-  console.log("Checkboxes resultantes:", aptitudCheckboxes);
-  console.log("Conclusiones:", datosFinales.conclusiones);
-  console.log("Recomendaciones:", datosFinales.recomendaciones);
 
-  // === LOGO ===
-  // Prueba: Simulando hoja con membrete (logo se oculta)
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  // Header reutilizable (mejorado basado en formatPsicologia)
+  const drawHeader = () => {
+    // Logo y membrete
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+
+    // Título principal
+    doc.setFont("helvetica", "bold").setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text("CERTIFICADO DE APTITUD MEDICO OCUPACIONAL", pageW / 2, 36, { align: "center" });
+
+    // Número de Ficha y Página (alineación automática mejorada)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
+
+    doc.setFont("helvetica", "bold").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
+    
+    doc.text("Pag. 01", pageW - 30, 10);
+
+    // Bloque de color (posición mejorada)
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
 
   // === HEADER ===
-  doc.setFont("helvetica", "bold").setFontSize(14);
-  doc.setTextColor(0, 0, 0);
-  doc.text("CERTIFICADO DE APTITUD MEDICO OCUPACIONAL", pageW / 2, 32, { align: "center" });
-
-  // Número de Ficha y Página
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Nro de ficha: ", pageW - 53, 15);
-
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 33, 15);
-  doc.setFont("helvetica", "normal").setFontSize(7);
-
-  // Calcular ancho del texto de sede para ajustar posición
-  const textoSede = "Sede: " + datosFinales.sede;
-  const anchoTextoSede = doc.getTextWidth(textoSede);
-  const posicionSede = Math.max(15, pageW - 16 - anchoTextoSede); // Termina justo antes del bloque de color (30mm del borde derecho)
-
-  doc.text(textoSede, posicionSede, 20);
-  doc.text("Pag. 01", pageW - 53, 25);
-
-  // === BLOQUE DE COLOR ===
-  drawColorBox(doc, {
-    color: datosFinales.codigoColor,           // Color de la letra y línea
-    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
-    x: pageW - 30,                             // Posición X (30mm del borde derecho)
-    y: 10,                                     // Posición Y (alineado con header)
-    size: 22,                                  // Tamaño del área total (22x22mm)
-    showLine: true,                            // Mostrar línea de color
-    fontSize: 30,                              // Tamaño de la letra
-    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
-  });
+  drawHeader();
 
   // === TABLA PRINCIPAL ===
   const tablaInicioX = 15;
-  const tablaInicioY = 35;
+  const tablaInicioY = 40;
   const tablaAncho = 180;
-  const filaAltura = 5;
+  const filaAltura = 6;
 
   // Función para calcular altura dinámica de texto
   const calcularAlturaTexto = (texto, anchoMaximo, fontSize = 9) => {
@@ -144,10 +139,11 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   };
 
   // Función para dibujar texto con salto de línea automático
-  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo, fontSize = 9) => {
+  const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
     if (!texto || texto.trim() === '') return;
 
-    doc.setFontSize(fontSize);
+    // No cambiar el fontSize, usar el que ya está establecido
+    const fontSize = doc.internal.getFontSize();
     const lineHeight = fontSize * 0.5;
     const palabras = texto.split(' ');
     let lineaActual = '';
@@ -181,10 +177,11 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   };
 
   // Función para dibujar texto pegado sin espacios extra
-  const dibujarTextoPegado = (texto, x, y, anchoMaximo, fontSize = 9) => {
+  const dibujarTextoPegado = (texto, x, y, anchoMaximo) => {
     if (!texto || texto.trim() === '') return y;
 
-    doc.setFontSize(fontSize);
+    // No cambiar el fontSize, usar el que ya está establecido
+    const fontSize = doc.internal.getFontSize();
     const palabras = texto.split(' ');
     let linea = '';
     let yActual = y;
@@ -215,10 +212,11 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   };
 
   // Función para simular dibujarTextoPegado sin dibujar (para calcular altura)
-  const simularDibujarTextoPegado = (texto, y, anchoMaximo, fontSize = 9) => {
+  const simularDibujarTextoPegado = (texto, y, anchoMaximo) => {
     if (!texto || texto.trim() === '') return y;
 
-    doc.setFontSize(fontSize);
+    // No cambiar el fontSize, usar el que ya está establecido
+    const fontSize = doc.internal.getFontSize();
     const palabras = texto.split(' ');
     let linea = '';
     let yActual = y;
@@ -249,16 +247,14 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   // Calcular alturas dinámicas para cada fila
   const alturaFila1 = filaAltura; // Primera fila fija (N° Historia, Tipo de Examen)
   const alturaFila2 = filaAltura; // Segunda fila fija (CERTIFICA)
-  const alturaFila3 = filaAltura; // NOMBRES Y APELLIDOS (ancho disponible después de "NOMBRES Y APELLIDOS:")
+  const alturaFila3 = filaAltura; // NOMBRES Y APELLIDOS (ancho disponible después de "APELLIDOS Y NOMBRES:")
   const alturaFila4 = filaAltura; // Cuarta fila fija (DNI, GÉNERO, EDAD)
-  const alturaFila5 = Math.max(
-    calcularAlturaTexto(datosFinales.empresa, 70), // Ancho disponible para EMPRESA (desde posición 20 hasta 90)
-    calcularAlturaTexto(datosFinales.contratista, 70) // Ancho disponible para CONTRATISTA (desde posición 110 hasta 180)
-  ); // EMPRESA y CONTRATISTA
-  const alturaFila6 = Math.max(
-    calcularAlturaTexto(datosFinales.puestoPostula, 70), // Ancho disponible para PUESTO
-    calcularAlturaTexto(datosFinales.ocupacionActual, 70) // Ancho disponible para OCUPACIÓN
-  ) + 1; // PUESTO y OCUPACIÓN (con 1mm de espacio extra)
+  // Nueva distribución: EMPRESA (fila 5) y CONTRATISTA (fila 6) ocupan cada una una fila completa
+  const alturaFila5 = calcularAlturaTexto(datosFinales.empresa, 160); // EMPRESA a todo el ancho
+  const alturaFila6 = calcularAlturaTexto(datosFinales.contratista, 160); // CONTRATISTA a todo el ancho
+  // PUESTO y OCUPACIÓN: cada uno en fila completa
+  const alturaFila7 = calcularAlturaTexto(datosFinales.puestoPostula, 160); // PUESTO a todo el ancho
+  const alturaFila8 = calcularAlturaTexto(datosFinales.ocupacionActual, 160); // OCUPACIÓN a todo el ancho
 
   // Dibujar líneas de la tabla con alturas dinámicas
   let yActual = tablaInicioY;
@@ -286,6 +282,14 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   // Línea después de fila 5
   doc.line(tablaInicioX, yActual, tablaInicioX + tablaAncho, yActual);
   yActual += alturaFila6;
+
+  // Línea después de fila 6
+  doc.line(tablaInicioX, yActual, tablaInicioX + tablaAncho, yActual);
+  yActual += alturaFila7;
+
+  // Línea después de fila 7
+  doc.line(tablaInicioX, yActual, tablaInicioX + tablaAncho, yActual);
+  yActual += alturaFila8;
 
   // Línea inferior
   doc.line(tablaInicioX, yActual, tablaInicioX + tablaAncho, yActual);
@@ -318,16 +322,24 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila4); // Línea derecha
   yPos += alturaFila4;
 
-  // Quinta fila (EMPRESA, CONTRATISTA) - 2 columnas
+  // Quinta fila (EMPRESA) - sin división vertical
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila5); // Línea izquierda
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + alturaFila5); // División central
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila5); // Línea derecha
   yPos += alturaFila5;
 
-  // Sexta fila (PUESTO, OCUPACIÓN) - 2 columnas
+  // Sexta fila (CONTRATISTA) - sin división vertical
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila6); // Línea izquierda
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + alturaFila6); // División central
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila6); // Línea derecha
+  yPos += alturaFila6;
+
+  // Séptima fila (PUESTO) - sin división vertical
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila7); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila7); // Línea derecha
+  yPos += alturaFila7;
+
+  // Octava fila (OCUPACIÓN) - sin división vertical
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila8); // Línea izquierda
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila8); // Línea derecha
 
   // === CONTENIDO DE LA TABLA ===
 
@@ -335,76 +347,80 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   let yTexto = tablaInicioY;
 
   // Primera fila: N° Historia Clínica y Tipo de Examen
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("N° HISTORIA CLINICA :", tablaInicioX + 2, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(10);
   doc.text(datosFinales.numeroHistoria, tablaInicioX + 47, yTexto + 4);
 
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("TIPO DE EXAMEN :", tablaInicioX + 92, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.tipoExamen, tablaInicioX + 137, yTexto + 4);
   yTexto += alturaFila1;
 
   // Segunda fila: Certifica que el Sr.(a) - ocupa toda la fila
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("CERTIFICA que el Sr.(a)", tablaInicioX + tablaAncho / 2, yTexto + 4, { align: "center" });
   yTexto += alturaFila2;
 
   // Tercera fila: Nombres y Apellidos
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("NOMBRES Y APELLIDOS:", tablaInicioX + 2, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 55, yTexto + 4, 130, 6);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("APELLIDOS Y NOMBRES:", tablaInicioX + 2, yTexto + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 55, yTexto + 4, 130);
   yTexto += alturaFila3;
 
   // Cuarta fila: DNI, Género, Edad (3 columnas iguales)
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI :", tablaInicioX + 2, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.documentoIdentidad, tablaInicioX + 15, yTexto + 4);
 
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("GENERO :", tablaInicioX + 62, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.genero, tablaInicioX + 80, yTexto + 4);
 
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("EDAD :", tablaInicioX + 122, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.edad, tablaInicioX + 135, yTexto + 4);
   yTexto += alturaFila4;
 
-  // Quinta fila: Empresa y Contratista
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  // Quinta fila: Empresa (fila completa)
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("EMPRESA :", tablaInicioX + 2, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 20, yTexto + 4, 70, 6);
-
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("CONTRATISTA :", tablaInicioX + 92, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  dibujarTextoConSaltoLinea(datosFinales.contratista, tablaInicioX + 117, yTexto + 4, 70, 6);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 20, yTexto + 4, 160);
   yTexto += alturaFila5;
 
-  // Sexta fila: Puesto al que Postula y Ocupación Actual
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("PUESTO POSTULA :", tablaInicioX + 2, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  dibujarTextoConSaltoLinea(datosFinales.puestoPostula, tablaInicioX + 35, yTexto + 4, 70, 6);
-
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("OCUPACION :", tablaInicioX + 92, yTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  dibujarTextoConSaltoLinea(datosFinales.ocupacionActual, tablaInicioX + 117, yTexto + 4, 70, 6);
+  // Sexta fila: Contratista (fila completa)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("CONTRATISTA :", tablaInicioX + 2, yTexto + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.contratista, tablaInicioX + 27, yTexto + 4, 160);
   yTexto += alturaFila6;
+
+  // Séptima fila: Puesto al que Postula (fila completa)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("PUESTO POSTULA :", tablaInicioX + 2, yTexto + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.puestoPostula, tablaInicioX + 35, yTexto + 4, 160);
+  yTexto += alturaFila7;
+
+  // Octava fila: Ocupación Actual (fila completa)
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("OCUPACIÓN :", tablaInicioX + 2, yTexto + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  dibujarTextoConSaltoLinea(datosFinales.ocupacionActual, tablaInicioX + 27, yTexto + 4, 160);
+  yTexto += alturaFila8;
 
 
   yTexto += 4; // Espacio después de la fecha
 
   // === TÍTULO PRINCIPAL ===
   if (datosFinales.conclusiones && datosFinales.conclusiones.length > 0) {
-    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("HE PASADO EXAMEN MÉDICO EN POLICLÍNICO HORIZONTE MEDIC, TENIENDO COMO:", 15, yTexto);
     yTexto += 2;
   }
@@ -414,23 +430,24 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     const marcoInicioX = 15;
     const marcoInicioY = yTexto;
     const marcoAncho = 180;
+    const alturaMinimaConclusiones = 65; // Altura mínima definida (25mm)
 
-    // Calcular altura total necesaria para todas las conclusiones
-    const alturaSubtitulo = 10; // espacio que ocupa el subtítulo "CONCLUSIONES:"
-    
     // Primero dibujar el subtítulo
-    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("CONCLUSIONES:", marcoInicioX + 2, yTexto + 5);
     let yPosConclusiones = yTexto + 10;
     
     // Dibujar cada conclusión y calcular la posición final real
     datosFinales.conclusiones.forEach((conclusion) => {
-      doc.setFont("helvetica", "normal").setFontSize(6.5);
-      yPosConclusiones = dibujarTextoPegado(conclusion, marcoInicioX + 2, yPosConclusiones, 170, 6.5);
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      yPosConclusiones = dibujarTextoPegado(conclusion, marcoInicioX + 2, yPosConclusiones, 170);
     });
     
     // Calcular altura total basada en la posición real del texto + 1mm de padding
-    const alturaTotalConclusiones = (yPosConclusiones - yTexto) + 1;
+    const alturaContenido = (yPosConclusiones - yTexto) + 1;
+    
+    // Usar la altura mayor entre la mínima definida y el contenido real
+    const alturaTotalConclusiones = Math.max(alturaMinimaConclusiones, alturaContenido);
 
     // Dibujar marco
     doc.rect(marcoInicioX, marcoInicioY, marcoAncho, alturaTotalConclusiones);
@@ -447,7 +464,8 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   const tablaAptitudAncho = 180;
   const filaAptitudAltura = 6; // Altura reducida
 
-  // Calcular altura necesaria para recomendaciones en la fila 4 - dinámico
+  // Calcular altura necesaria para recomendaciones en la fila 4 - dinámico con altura mínima
+  const alturaMinimaRecomendaciones = 40; // Altura mínima para recomendaciones
   let alturaRecomendaciones = filaAptitudAltura; // Altura base de la fila
   if (datosFinales.recomendaciones && datosFinales.recomendaciones.length > 0) {
     let recomendacionesArray = Array.isArray(datosFinales.recomendaciones)
@@ -464,16 +482,21 @@ export default function Aptitud_AgroindustrialH(data = {}) {
           ? `${index + 1}. ${recomendacion.trim()}`
           : recomendacion.trim();
         // Simular dibujarTextoPegado para obtener la posición final real
-        yPosicionSimulada = simularDibujarTextoPegado(textoRecomendacion, yPosicionSimulada, anchoMaximoRecomendaciones, 6);
+        yPosicionSimulada = simularDibujarTextoPegado(textoRecomendacion, yPosicionSimulada, anchoMaximoRecomendaciones);
       }
     });
     // Altura real = posición final + 1mm de padding
-    alturaRecomendaciones = Math.max(filaAptitudAltura, yPosicionSimulada + 1);
+    const alturaContenidoRecomendaciones = yPosicionSimulada + 1;
+    alturaRecomendaciones = Math.max(alturaMinimaRecomendaciones, alturaContenidoRecomendaciones);
+  } else {
+    // Si no hay recomendaciones, usar altura mínima
+    alturaRecomendaciones = alturaMinimaRecomendaciones;
   }
 
-  // Calcular altura dinámica para la sección de RESTRICCIONES (lado derecho) - igual que conclusiones
+  // Calcular altura dinámica para la sección de RESTRICCIONES (lado derecho) - con altura mínima
   const xRestriccionesDyn = tablaAptitudInicioX + 98;
   const anchoRestriccionesDyn = (tablaAptitudInicioX + tablaAptitudAncho) - xRestriccionesDyn - 5;
+  const alturaMinimaRestricciones = 40; // Altura mínima para restricciones
   let alturaRestricciones = 4; // incluye el título "RESTRICCIONES:" - reducido
   
   // Procesar restricciones una sola vez
@@ -482,17 +505,20 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     : [];
   
   if (datosFinales.apto === "APTO") {
-    alturaRestricciones += calcularAlturaTexto("- SIN RESTRICCIONES", anchoRestriccionesDyn, 6);
+    alturaRestricciones += calcularAlturaTexto("SIN RESTRICCIONES", anchoRestriccionesDyn, 6);
   } else if (restriccionesProcesadas.length > 0) {
     // Calcular altura total de todas las restricciones
     let alturaTotal = 0;
     restriccionesProcesadas.forEach(r => {
-      alturaTotal += calcularAlturaTexto(`- ${r.trim()}`, anchoRestriccionesDyn, 6);
+      alturaTotal += calcularAlturaTexto(r.trim(), anchoRestriccionesDyn, 6);
     });
     alturaRestricciones += alturaTotal; // Quitar espacio extra
   } else {
-    alturaRestricciones += calcularAlturaTexto("- NINGUNO.", anchoRestriccionesDyn, 6);
+    alturaRestricciones += calcularAlturaTexto("NINGUNO", anchoRestriccionesDyn, 6);
   }
+  
+  // Aplicar altura mínima a restricciones
+  alturaRestricciones = Math.max(alturaMinimaRestricciones, alturaRestricciones);
 
   // === VARIABLES DE FIRMA (declarar antes de usar) ===
   const firmaAncho = 50; // Ancho fijo para la firma
@@ -541,7 +567,7 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     // Calcular altura real de las conclusiones
     let yPosConclusionesSimulada = 10; // espacio del subtítulo
     datosFinales.conclusiones.forEach((conclusion) => {
-      yPosConclusionesSimulada = simularDibujarTextoPegado(conclusion, 0, yPosConclusionesSimulada, 170, 6);
+      yPosConclusionesSimulada = simularDibujarTextoPegado(conclusion, 0, yPosConclusionesSimulada, 170);
     });
     alturaConclusiones = yPosConclusionesSimulada + 1; // +1mm de padding
   }
@@ -569,13 +595,11 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(12); // 8.5 + 1.5 = 10
     doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4); // Checkbox marcado
     doc.setTextColor(0, 0, 0); // Restaurar color negro
-    console.log("Checkbox APTO marcado en azul");
   } else {
     // Si no es APTO, usar estilo normal
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("APTO (para el puesto en el que trabaja)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
-  console.log("Dibujando checkbox APTO:", aptitudCheckboxes.apto);
   yAptitud += filaAptitudAltura;
 
   // Segunda fila: APTO CON RESTRICCIÓN (para el puesto en el que trabaja)
@@ -587,10 +611,9 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(12); // 8.5 + 1.5 = 10
     doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4); // Checkbox marcado
     doc.setTextColor(0, 0, 0); // Restaurar color negro
-    console.log("Checkbox APTO CON RESTRICCIÓN marcado en verde");
   } else {
     // Si no es APTO CON RESTRICCIÓN, usar estilo normal
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("APTO CON RESTRICCIÓN (para el puesto en el que trabaja)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
   yAptitud += filaAptitudAltura;
@@ -604,41 +627,36 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(12); // 8.5 + 1.5 = 10
     doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4); // Checkbox marcado
     doc.setTextColor(0, 0, 0); // Restaurar color negro
-    console.log("Checkbox NO APTO marcado en rojo");
   } else {
     // Si no es NO APTO, usar estilo normal
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("NO APTO (para el puesto en el que trabaja o postula)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
   yAptitud += filaAptitudAltura;
 
   // Cuarta fila: RECOMENDACIONES
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("RECOMENDACIONES:", tablaAptitudInicioX + 2, yAptitud + 4);
 
     // Mostrar recomendaciones dinámicamente si existen
     if (datosFinales.recomendaciones && datosFinales.recomendaciones.length > 0) {
-      console.log("Dibujando recomendaciones:", datosFinales.recomendaciones);
-      doc.setFont("helvetica", "normal").setFontSize(6);
+      doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Ya está procesado como array en datosReales
     let recomendacionesArray = datosFinales.recomendaciones;
 
     // Limitar a 10 recomendaciones máximo
     recomendacionesArray = recomendacionesArray.slice(0, 10);
-    console.log("Array de recomendaciones para dibujar:", recomendacionesArray);
 
     let yPosicion = yAptitud + 10;
     const anchoMaximoRecomendaciones = 85; // MaxWidth para recomendaciones
-    recomendacionesArray.forEach((recomendacion, index) => {
+    recomendacionesArray.forEach((recomendacion) => {
       if (recomendacion && recomendacion.trim()) {
-        // Agregar numeración si hay más de una recomendación
-        const textoRecomendacion = recomendacionesArray.length > 1
-          ? `${index + 1}. ${recomendacion.trim()}`
-          : recomendacion.trim();
+        // Mostrar recomendación sin numeración ni guiones
+        const textoRecomendacion = recomendacion.trim();
 
         // Dibujar cada recomendación con maxWidth y obtener nueva posición
-        yPosicion = dibujarTextoPegado(textoRecomendacion, tablaAptitudInicioX + 2, yPosicion, anchoMaximoRecomendaciones, 6);
+        yPosicion = dibujarTextoPegado(textoRecomendacion, tablaAptitudInicioX + 2, yPosicion, anchoMaximoRecomendaciones);
 
         // Incrementar posición para la siguiente fila
         yPosicion += 0; // Sin espaciado extra entre filas
@@ -649,9 +667,9 @@ export default function Aptitud_AgroindustrialH(data = {}) {
 
 
   // Sección de RESTRICCIONES (en la parte derecha) - alineado con APTO y crecimiento dinámico
-  doc.setFont("helvetica", "bold").setFontSize(6.5);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("RESTRICCIONES:", tablaAptitudInicioX + 98, tablaAptitudInicioY + 3);
-  doc.setFont("helvetica", "normal").setFontSize(6);
+  doc.setFont("helvetica", "normal").setFontSize(7);
 
   // Mostrar restricciones dinámicamente
   const xRestricciones = tablaAptitudInicioX + 98;
@@ -659,17 +677,17 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   const anchoRestricciones = (tablaAptitudInicioX + tablaAptitudAncho) - xRestricciones - 5; // max width con margen
 
   if (datosFinales.apto === "APTO") {
-    // Si es APTO, mostrar "SIN RESTRICCIONES" con salto de línea si fuera necesario
-    dibujarTextoPegado("- SIN RESTRICCIONES", xRestricciones, yRestriccionesInicio, anchoRestricciones, 6);
+    // Si es APTO, mostrar "SIN RESTRICCIONES" sin guión
+    dibujarTextoPegado("SIN RESTRICCIONES", xRestricciones, yRestriccionesInicio, anchoRestricciones);
   } else if (restriccionesProcesadas.length > 0) {
-    // Si hay restricciones, mostrarlas pegadas (usar las ya procesadas)
+    // Si hay restricciones, mostrarlas sin guiones
     let yRestricciones = yRestriccionesInicio;
     restriccionesProcesadas.forEach((restriccion) => {
-      yRestricciones = dibujarTextoPegado(`- ${restriccion.trim()}`, xRestricciones, yRestricciones, anchoRestricciones, 6);
+      yRestricciones = dibujarTextoPegado(restriccion.trim(), xRestricciones, yRestricciones, anchoRestricciones);
     });
   } else {
-    // Si no hay restricciones o es "NINGUNO", mostrar "- NINGUNO." con ajuste de línea
-    dibujarTextoPegado("- NINGUNO.", xRestricciones, yRestriccionesInicio, anchoRestricciones, 6);
+    // Si no hay restricciones o es "NINGUNO", mostrar "NINGUNO" sin guión
+    dibujarTextoPegado("NINGUNO", xRestricciones, yRestriccionesInicio, anchoRestricciones);
   }
 
 
@@ -678,26 +696,26 @@ export default function Aptitud_AgroindustrialH(data = {}) {
   const yFechaTexto = tablaAptitudInicioY + alturaBloqueSuperior + alturaFirma;
 
   // Primera columna: Fecha desde
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha desde :", tablaAptitudInicioX + 2, yFechaTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.fechaDesde || "", tablaAptitudInicioX + 25, yFechaTexto + 4);
 
   // Segunda columna: Fecha hasta
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha hasta :", tablaAptitudInicioX + 50, yFechaTexto + 4);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.fechaHasta || "", tablaAptitudInicioX + 70, yFechaTexto + 4);
 
   // Tercera columna: Sello y firma
-  doc.setFont("helvetica", "bold").setFontSize(7);
-  doc.text("SELLO Y FIRMA DE MEDICO QUE CERTIFICA", tablaAptitudInicioX + 123, yFechaTexto + 4);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("SELLO Y FIRMA DE MEDICO QUE CERTIFICA", tablaAptitudInicioX + 105, yFechaTexto + 4);
 
   try {
     const firmaMedicoImg = getSign(data, "SELLOFIRMA");
     doc.addImage(firmaMedicoImg, 'PNG', firmaX, firmaY, 50 * 0.7, 30 * 0.7);
   } catch (e) {
-    console.log("Error al agregar la firma:", e);
+    // Error al agregar la firma
   }
 
   yTexto += alturaTablaAptitud; // Sin espacio extra después de la tabla

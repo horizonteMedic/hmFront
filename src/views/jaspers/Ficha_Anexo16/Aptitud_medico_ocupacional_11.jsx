@@ -5,66 +5,23 @@ import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 
-export default function Aptitud_Agroindustrial(data = {}) {
+export default function Aptitud_AgroindustrialH(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    numeroHistoria: "96639",
-    tipoExamen: "PRE-OCUPACIONAL",
-    apellidosNombres: "HADY KATHERINE CASTILLO PLASENCIA",
-    documentoIdentidad: "72384273",
-    genero: "FEMENINO",
-    edad: "31 AÑOS",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.C",
-    contratista: "LIMALA S.A.C MINERA BOROO MMINERA BOROO MMINERA",
-    puestoPostula: "ASISTENTE ADMINISTRATIVA",
-    ocupacionActual: "ADMINISTRACION",
-    fechaExamen: "04/11/2024",
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola Nicoldo de Pierola",
-    // Datos de conclusiones
-    conclusiones: [
-      "INFORME RADIOGRAFICO: Radiografía de tórax realizada en proyección posteroanterior.",
-      "CONCLUCIONES: RADIOAGRAFIA DE COLUMNA LUMBOSACRA AP-L",
-      "ODONTOGRAMA: Paciente con varias piezas tratadas. Se recomienda seguimiento. prueba Campos claros, sin alteraciones pruebaHilios normales, sin adenopatíasSenos costofrénicos libresCampos pulmonares bien aireadosMediastinos sin desplazamientoSilueta cardiaca normalEstructuras óseas conservadasRadiografía de tórax sin hallazgos patológicos evidentes-RADIOGRAFIA: Paciente sin síntomas respiratorios al momento del examen",
-    ],
-    // Datos de aptitud
-    apto: "APTO", // Caso APTO sin restricciones
-    restricciones: "NINGUNO.", // No se usa cuando es APTO, se muestra "SIN RESTRICCIONES"
-    recomendaciones: [
-      "Se recomienda seguimiento médico cada 6 meses.",
-      "Evitar exposición prolongada a ruidos superiores a 85 dB.",
-      "Usar equipo de protección personal según protocolo de seguridad.",
-      "Se recomienda seguimiento médico cada 6 meses.",
-      "Evitar exposición prolongada a ruidos superiores a 85 dB.",
-      "Usar equipo de protección personal según protocolo de seguridad.",
-      "Se recomienda seguimiento médico cada 6 meses.",
-      "Evitar exposición prolongada a ruidos superiores a 85 dB.",
-      "Usar equipo de protección personal según protocolo de seguridad.",
-    ],
-    fechaDesde: "",
-    fechaHasta: "",
-  };
-
-  const datosReales = {
+  const datosFinales = {
     numeroHistoria: String(data.norden ?? ""), //revisar - podría ser norden del JSON
     tipoExamen: String(data.nombreExamen ?? ""),
     apellidosNombres: String((data.apellidosPaciente ?? "") + " " + (data.nombresPaciente ?? "")).trim(),
     documentoIdentidad: String(data.dniPaciente ?? ""),
     genero: data.sexoPaciente === "M" ? "MASCULINO" : data.sexoPaciente === "F" ? "FEMENINO" : String(data.sexoPaciente ?? ""),
     edad: String(data.edadPaciente ?? ""),
+    grupoSanguineo: String(data.grupoSanguineo ?? ""),
     empresa: String(data.empresa ?? ""),
     contratista: String(data.contrata ?? ""),
     puestoPostula: String(data.cargoPaciente ?? ""),
     ocupacionActual: String(data.ocupacionPaciente ?? ""),
-    fechaExamen: formatearFechaCorta(data.fechaDesde ?? ""),
+    fechaExamen: formatearFechaCorta(data.fechaDesde ?? ""), //revisar - podría ser fechaHasta
     // Datos de color
     color: data.color || 1,
     codigoColor: data.codigoColor || "#008f39",
@@ -72,30 +29,32 @@ export default function Aptitud_Agroindustrial(data = {}) {
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""), //revisar - usando norden como numeroFicha
     sede: data.sede || data.nombreSede || "",
-    // Datos de conclusiones
+    // Datos de conclusiones - eliminar duplicados
     conclusiones: data.conclusiones ? data.conclusiones.split('\n').filter(rec => rec.trim() !== '') : [],
     // Datos de aptitud
-    apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : "", //revisar - el JSON tiene boolean, necesita conversión
+    apto: data.apto ? "APTO" : data?.noApto ? "NO APTO" : data.aptoConRestriccion ? "APTO CON RESTRICCIÓN" : data.conObservacion ? "CON OBSERVACION" : data.evaluado ? "EVALUADO" : "", //revisar - el JSON tiene boolean, necesita conversión
     restricciones: data.restriccionesDescripcion || "",
     recomendaciones: data.recomendaciones ? data.recomendaciones.split('\n').filter(rec => rec.trim() !== '') : [],
     fechaDesde: formatearFechaCorta(data.fechaDesde ?? ""),
     fechaHasta: formatearFechaCorta(data.fechaHasta ?? ""),
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
 
   // Función para determinar qué checkbox está marcado
   const getAptitudCheckbox = (apto) => {
     switch (apto) {
       case "APTO":
-        return { apto: true, aptoConRestriccion: false, noApto: false };
+        return { apto: true, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: false };
       case "APTO CON RESTRICCIÓN":
-        return { apto: false, aptoConRestriccion: true, noApto: false };
+        return { apto: false, aptoConRestriccion: true, noApto: false, conObservacion: false, evaluado: false };
       case "NO APTO":
-        return { apto: false, aptoConRestriccion: false, noApto: true };
+        return { apto: false, aptoConRestriccion: false, noApto: true, conObservacion: false, evaluado: false };
+      case "CON OBSERVACION":
+        return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: true, evaluado: false };
+      case "EVALUADO":
+        return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: true };
       default:
-        return { apto: false, aptoConRestriccion: true, noApto: false };
+        return { apto: false, aptoConRestriccion: false, noApto: false, conObservacion: false, evaluado: false };
     }
   };
 
@@ -119,8 +78,6 @@ export default function Aptitud_Agroindustrial(data = {}) {
     doc.setFont("helvetica", "bold").setFontSize(18);
     doc.text(datosFinales.numeroFicha, pageW - 50, 16);
     doc.setFont("helvetica", "normal").setFontSize(8);
-
-    // Sede alineada con "Nro de ficha:" (misma posición X)
     doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
     
     doc.text("Pag. 01", pageW - 30, 10);
@@ -289,7 +246,7 @@ export default function Aptitud_Agroindustrial(data = {}) {
   // Calcular alturas dinámicas para cada fila
   const alturaFila1 = filaAltura; // Primera fila fija (N° Historia, Tipo de Examen)
   const alturaFila2 = filaAltura; // Segunda fila fija (CERTIFICA)
-  const alturaFila3 = filaAltura; // NOMBRES Y APELLIDOS (ancho disponible después de "APELLIDOS Y NOMBRES:")
+  const alturaFila3 = filaAltura; // NOMBRES Y APELLIDOS (ancho disponible después de "NOMBRES Y APELLIDOS:")
   const alturaFila4 = filaAltura; // Cuarta fila fija (DNI, GÉNERO, EDAD)
   // Nueva distribución: EMPRESA (fila 5) y CONTRATISTA (fila 6) ocupan cada una una fila completa
   const alturaFila5 = calcularAlturaTexto(datosFinales.empresa, 160); // EMPRESA a todo el ancho
@@ -357,10 +314,11 @@ export default function Aptitud_Agroindustrial(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila3); // Línea derecha
   yPos += alturaFila3;
 
-  // Cuarta fila (DNI, GÉNERO, EDAD) - 3 columnas
+  // Cuarta fila (DNI, GÉNERO, EDAD, GRUPO SANGUÍNEO) - 4 columnas
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila4); // Línea izquierda
-  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + alturaFila4); // Primera división
-  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + alturaFila4); // Segunda división
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + alturaFila4); // Primera división
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + alturaFila4); // Segunda división
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + alturaFila4); // Tercera división
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila4); // Línea derecha
   yPos += alturaFila4;
 
@@ -407,26 +365,31 @@ export default function Aptitud_Agroindustrial(data = {}) {
 
   // Tercera fila: Nombres y Apellidos
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("APELLIDOS Y NOMBRES:", tablaInicioX + 2, yTexto + 4);
+  doc.text("NOMBRES Y APELLIDOS:", tablaInicioX + 2, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 55, yTexto + 4, 130);
   yTexto += alturaFila3;
 
-  // Cuarta fila: DNI, Género, Edad (3 columnas iguales)
+  // Cuarta fila: DNI, Género, Edad, Grupo Sanguíneo (4 columnas)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("DNI :", tablaInicioX + 2, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 15, yTexto + 4);
+  doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("GENERO :", tablaInicioX + 62, yTexto + 4);
+  doc.text("GENERO :", tablaInicioX + 47, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.genero, tablaInicioX + 80, yTexto + 4);
+  doc.text(datosFinales.genero, tablaInicioX + 60, yTexto + 4);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("EDAD :", tablaInicioX + 122, yTexto + 4);
+  doc.text("EDAD :", tablaInicioX + 92, yTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.edad, tablaInicioX + 135, yTexto + 4);
+  doc.text(datosFinales.edad, tablaInicioX + 105, yTexto + 4);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("GRUPO SANGUÍNEO :", tablaInicioX + 137, yTexto + 4);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.grupoSanguineo, tablaInicioX + 160, yTexto + 4);
   yTexto += alturaFila4;
 
   // Quinta fila: Empresa (fila completa)
@@ -461,42 +424,44 @@ export default function Aptitud_Agroindustrial(data = {}) {
   yTexto += 4; // Espacio después de la fecha
 
   // === TÍTULO PRINCIPAL ===
-  if (datosFinales.conclusiones && datosFinales.conclusiones.length > 0) {
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("HE PASADO EXAMEN MÉDICO EN POLICLÍNICO HORIZONTE MEDIC, TENIENDO COMO:", 15, yTexto);
-    yTexto += 2;
-  }
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("HE PASADO EXAMEN MÉDICO EN POLICLÍNICO HORIZONTE MEDIC, TENIENDO COMO:", 15, yTexto);
+  yTexto += 2;
 
   // === SECCIÓN DE CONCLUSIONES ===
-  if (datosFinales.conclusiones && datosFinales.conclusiones.length > 0) {
-    const marcoInicioX = 15;
-    const marcoInicioY = yTexto;
-    const marcoAncho = 180;
-    const alturaMinimaConclusiones = 65; // Altura mínima definida
+  const marcoInicioX = 15;
+  const marcoInicioY = yTexto;
+  const marcoAncho = 180;
+  const alturaMinimaConclusiones = 65; // Altura mínima definida (65mm)
 
-    // Primero dibujar el subtítulo
-    doc.setFont("helvetica", "bold").setFontSize(8);
-    doc.text("CONCLUSIONES:", marcoInicioX + 2, yTexto + 5);
-    let yPosConclusiones = yTexto + 10;
-    
-    // Dibujar cada conclusión y calcular la posición final real
+  // Primero dibujar el subtítulo
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("CONCLUSIONES:", marcoInicioX + 2, yTexto + 5);
+  let yPosConclusiones = yTexto + 10;
+  
+  // Dibujar cada conclusión y calcular la posición final real
+  if (datosFinales.conclusiones && datosFinales.conclusiones.length > 0) {
     datosFinales.conclusiones.forEach((conclusion) => {
       doc.setFont("helvetica", "normal").setFontSize(7);
       yPosConclusiones = dibujarTextoPegado(conclusion, marcoInicioX + 2, yPosConclusiones, 170);
     });
-    
-    // Calcular altura total basada en la posición real del texto + 1mm de padding
-    const alturaContenido = (yPosConclusiones - yTexto) + 1;
-    
-    // Usar la altura mayor entre la mínima definida y el contenido real
-    const alturaTotalConclusiones = Math.max(alturaMinimaConclusiones, alturaContenido);
-
-    // Dibujar marco
-    doc.rect(marcoInicioX, marcoInicioY, marcoAncho, alturaTotalConclusiones);
-
-    // Actualizar yTexto con la posición final del marco
-    yTexto = marcoInicioY + alturaTotalConclusiones;
+  } else {
+    // Si no hay conclusiones, mostrar texto vacío pero mantener la altura mínima
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    yPosConclusiones = dibujarTextoPegado("", marcoInicioX + 2, yPosConclusiones, 170);
   }
+  
+  // Calcular altura total basada en la posición real del texto + 1mm de padding
+  const alturaContenido = (yPosConclusiones - yTexto) + 1;
+  
+  // Usar la altura mayor entre la mínima definida y el contenido real
+  const alturaTotalConclusiones = Math.max(alturaMinimaConclusiones, alturaContenido);
+
+  // Dibujar marco
+  doc.rect(marcoInicioX, marcoInicioY, marcoAncho, alturaTotalConclusiones);
+
+  // Actualizar yTexto con la posición final del marco
+  yTexto = marcoInicioY + alturaTotalConclusiones;
 
   // === TABLA DE APTITUD ===
   yTexto += 3; // Pequeño espacio para no solaparse con el marco de conclusiones
@@ -518,10 +483,11 @@ export default function Aptitud_Agroindustrial(data = {}) {
     // Simular el dibujo para calcular la posición real final
     let yPosicionSimulada = 0; // Posición simulada
     const anchoMaximoRecomendaciones = 85;
-    recomendacionesArray.forEach((recomendacion) => {
+    recomendacionesArray.forEach((recomendacion, index) => {
       if (recomendacion && recomendacion.trim()) {
-        // Mostrar recomendación sin numeración ni guiones
-        const textoRecomendacion = recomendacion.trim();
+        const textoRecomendacion = recomendacionesArray.length > 1
+          ? `${index + 1}. ${recomendacion.trim()}`
+          : recomendacion.trim();
         // Simular dibujarTextoPegado para obtener la posición final real
         yPosicionSimulada = simularDibujarTextoPegado(textoRecomendacion, yPosicionSimulada, anchoMaximoRecomendaciones);
       }
@@ -565,10 +531,10 @@ export default function Aptitud_Agroindustrial(data = {}) {
   const firmaAncho = 50; // Ancho fijo para la firma
   const firmaAlto = 18;  // Alto fijo para la firma (aumentado de 12 a 18)
 
-  // Altura real del bloque superior (izquierda fija 4 filas vs restricciones dinámicas)
-  // La fila 4 incluye las recomendaciones, así que usamos su altura específica
-  const alturaFila4Aptitud = alturaRecomendaciones; // Usar altura exacta de recomendaciones
-  const alturaBloqueSuperior = Math.max((3 * filaAptitudAltura) + alturaFila4Aptitud, alturaRestricciones);
+  // Altura real del bloque superior (izquierda fija 6 filas vs restricciones dinámicas)
+  // La fila 6 incluye las recomendaciones, así que usamos su altura específica
+  const alturaFila6Aptitud = alturaRecomendaciones; // Usar altura exacta de recomendaciones
+  const alturaBloqueSuperior = Math.max((5 * filaAptitudAltura) + alturaFila6Aptitud, alturaRestricciones);
 
   // Calcular altura de la tabla de aptitud (incluyendo firma)
   const alturaFirma = firmaAlto; // Solo alto de la firma, sin espacio extra
@@ -578,8 +544,11 @@ export default function Aptitud_Agroindustrial(data = {}) {
   doc.rect(tablaAptitudInicioX, tablaAptitudInicioY, tablaAptitudAncho, alturaTablaAptitud);
 
   // Líneas verticales
-  doc.line(tablaAptitudInicioX + 85, tablaAptitudInicioY, tablaAptitudInicioX + 85, tablaAptitudInicioY + (3 * filaAptitudAltura)); // División principal solo hasta la tercera fila
+  doc.line(tablaAptitudInicioX + 85, tablaAptitudInicioY, tablaAptitudInicioX + 85, tablaAptitudInicioY + (5 * filaAptitudAltura)); // División principal hasta la quinta fila
   doc.line(tablaAptitudInicioX + 95, tablaAptitudInicioY, tablaAptitudInicioX + 95, tablaAptitudInicioY + alturaBloqueSuperior + alturaFirma); // División para checkboxes hasta la línea de fecha
+
+
+
 
   // Líneas horizontales
   for (let i = 1; i <= 2; i++) {
@@ -592,6 +561,14 @@ export default function Aptitud_Agroindustrial(data = {}) {
   const yTerceraFila = tablaAptitudInicioY + (3 * filaAptitudAltura);
   doc.line(tablaAptitudInicioX, yTerceraFila, tablaAptitudInicioX + 95, yTerceraFila);
   
+  // Cuarta línea horizontal (debajo de CON OBSERVACION) que llega hasta la división vertical
+  const yCuartaFila = tablaAptitudInicioY + (4 * filaAptitudAltura);
+  doc.line(tablaAptitudInicioX, yCuartaFila, tablaAptitudInicioX + 95, yCuartaFila);
+  
+  // Quinta línea horizontal (debajo de EVALUADO) que llega hasta la división vertical
+  const yQuintaFila = tablaAptitudInicioY + (5 * filaAptitudAltura);
+  doc.line(tablaAptitudInicioX, yQuintaFila, tablaAptitudInicioX + 95, yQuintaFila);
+  
   // Línea horizontal "mitad" - base para restricciones (se mueve dinámicamente según altura de restricciones)
   const yMitad = tablaAptitudInicioY + alturaRestricciones;
   doc.line(tablaAptitudInicioX + tablaAptitudAncho - 85, yMitad, tablaAptitudInicioX + tablaAptitudAncho, yMitad);
@@ -601,17 +578,17 @@ export default function Aptitud_Agroindustrial(data = {}) {
   
   // Calcular altura de conclusiones para ajustar posición de firma
   let alturaConclusiones = 0;
+  // Calcular altura real de las conclusiones
+  let yPosConclusionesSimulada = 10; // espacio del subtítulo
   if (datosFinales.conclusiones && datosFinales.conclusiones.length > 0) {
-    // Calcular altura real de las conclusiones
-    let yPosConclusionesSimulada = 10; // espacio del subtítulo
     datosFinales.conclusiones.forEach((conclusion) => {
-      yPosConclusionesSimulada = simularDibujarTextoPegado(conclusion, 0, yPosConclusionesSimulada, 170, 6);
+      yPosConclusionesSimulada = simularDibujarTextoPegado(conclusion, 0, yPosConclusionesSimulada, 170);
     });
-    alturaConclusiones = yPosConclusionesSimulada + 1; // +1mm de padding
   }
+  alturaConclusiones = Math.max(65, yPosConclusionesSimulada + 1); // Usar altura mínima de 65mm
   
-  // Ajustar posición Y de la firma: base + 15mm si las conclusiones crecen
-  const firmaY = yMitad + (alturaConclusiones > 20 ? 15 : 2); // +15mm si las conclusiones son altas, +2mm si son normales
+  // Ajustar posición Y de la firma: base + 5mm si las conclusiones crecen
+  const firmaY = yMitad + (alturaConclusiones > 20 ? 15 : 2); // +5mm si las conclusiones son altas, +2mm si son normales
   
   // Sin recuadro para la firma
   
@@ -635,7 +612,7 @@ export default function Aptitud_Agroindustrial(data = {}) {
     doc.setTextColor(0, 0, 0); // Restaurar color negro
   } else {
     // Si no es APTO, usar estilo normal
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("APTO (para el puesto en el que trabaja)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
   yAptitud += filaAptitudAltura;
@@ -651,7 +628,7 @@ export default function Aptitud_Agroindustrial(data = {}) {
     doc.setTextColor(0, 0, 0); // Restaurar color negro
   } else {
     // Si no es APTO CON RESTRICCIÓN, usar estilo normal
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("APTO CON RESTRICCIÓN (para el puesto en el que trabaja)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
   yAptitud += filaAptitudAltura;
@@ -667,12 +644,44 @@ export default function Aptitud_Agroindustrial(data = {}) {
     doc.setTextColor(0, 0, 0); // Restaurar color negro
   } else {
     // Si no es NO APTO, usar estilo normal
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("NO APTO (para el puesto en el que trabaja o postula)", tablaAptitudInicioX + 2, yAptitud + 4);
   }
   yAptitud += filaAptitudAltura;
 
-  // Cuarta fila: RECOMENDACIONES
+  // Cuarta fila: CON OBSERVACION
+  if (aptitudCheckboxes.conObservacion) {
+    // Si es CON OBSERVACION, usar color naranja y texto en negrita con fuente más grande
+    doc.setTextColor(255, 165, 0); // Color naranja
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("CON OBSERVACION", tablaAptitudInicioX + 2, yAptitud + 4);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4); // Checkbox marcado
+    doc.setTextColor(0, 0, 0); // Restaurar color negro
+  } else {
+    // Si no es CON OBSERVACION, usar estilo normal
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("CON OBSERVACION", tablaAptitudInicioX + 2, yAptitud + 4);
+  }
+  yAptitud += filaAptitudAltura;
+
+  // Quinta fila: EVALUADO
+  if (aptitudCheckboxes.evaluado) {
+    // Si es EVALUADO, usar color morado y texto en negrita con fuente más grande
+    doc.setTextColor(128, 0, 128); // Color morado
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("EVALUADO", tablaAptitudInicioX + 2, yAptitud + 4);
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.text("X", tablaAptitudInicioX + 89, yAptitud + 4); // Checkbox marcado
+    doc.setTextColor(0, 0, 0); // Restaurar color negro
+  } else {
+    // Si no es EVALUADO, usar estilo normal
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("EVALUADO", tablaAptitudInicioX + 2, yAptitud + 4);
+  }
+  yAptitud += filaAptitudAltura;
+
+  // Sexta fila: RECOMENDACIONES
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("RECOMENDACIONES:", tablaAptitudInicioX + 2, yAptitud + 4);
 
@@ -701,7 +710,8 @@ export default function Aptitud_Agroindustrial(data = {}) {
       }
     });
   }
-  yAptitud += alturaFila4Aptitud; // Usar altura dinámica de la fila 4
+  yAptitud += alturaFila6Aptitud; // Usar altura dinámica de la fila 6
+
 
   // Sección de RESTRICCIONES (en la parte derecha) - alineado con APTO y crecimiento dinámico
   doc.setFont("helvetica", "bold").setFontSize(8);
@@ -727,45 +737,14 @@ export default function Aptitud_Agroindustrial(data = {}) {
     dibujarTextoPegado("NINGUNO", xRestricciones, yRestriccionesInicio, anchoRestricciones);
   }
 
-  // Agregar firma en la sección de restricciones si existe
-  // const firmaUrl = getSign(data, "FIRMAP");
-  // if (firmaUrl) {
-  //   try {
-  //     // Obtener la imagen de la firma
-  //     const img = new Image();
-  //     img.onload = function () {
-  //       // Calcular dimensiones para que la firma se ajuste al espacio disponible
-  //       const maxWidth = 70; // Ancho máximo disponible en la columna derecha
-  //       const maxHeight = 20; // Altura máxima
-  //       let imgWidth = img.width;
-  //       let imgHeight = img.height;
 
-  //       // Calcular escala para mantener proporción
-  //       const scaleX = maxWidth / imgWidth;
-  //       const scaleY = maxHeight / imgHeight;
-  //       const scale = Math.min(scaleX, scaleY);
-
-  //       const finalWidth = imgWidth * scale;
-  //       const finalHeight = imgHeight * scale;
-
-  //       // Posicionar la firma en la parte inferior derecha de la sección de restricciones
-  //       const xFirma = tablaAptitudInicioX + 98 + (maxWidth - finalWidth) / 2;
-  //       const yFirma = tablaAptitudInicioY + alturaRecomendaciones - finalHeight - 2;
-
-  //       doc.addImage(img, 'PNG', xFirma, yFirma, finalWidth, finalHeight);
-  //     };
-  //     img.src = firmaUrl;
-  //   } catch (error) {
-  //     console.error('Error al cargar la firma:', error);
-  //   }
-  // }
 
   // Fila de FECHA DE EXAMEN (después de la firma) - 3 columnas
   const yFechaTexto = tablaAptitudInicioY + alturaBloqueSuperior + alturaFirma;
 
   // Primera columna: Fecha desde
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Fecha desde :", tablaAptitudInicioX + 5, yFechaTexto + 4);
+  doc.text("Fecha desde :", tablaAptitudInicioX + 2, yFechaTexto + 4);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.fechaDesde || "", tablaAptitudInicioX + 25, yFechaTexto + 4);
 
@@ -785,7 +764,6 @@ export default function Aptitud_Agroindustrial(data = {}) {
   } catch (e) {
     // Error al agregar la firma
   }
-
 
   yTexto += alturaTablaAptitud; // Sin espacio extra después de la tabla
 

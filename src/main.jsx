@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/Ficha_Anexo2/Aptitud_Agroindustrial.jsx"
+import Ficha from "./views/jaspers/FichaConduccion/certificaciondeconduccion_Digitalizado.jsx"
 
 const App = () => {
   return (
@@ -95,7 +95,7 @@ const AppContent = () => {
           setTotalView(res);
         })
         .catch(() => {
-          console.log("Ocurrió un Error al traer los datos");
+          // Error al traer los datos
         });
       return;
     }

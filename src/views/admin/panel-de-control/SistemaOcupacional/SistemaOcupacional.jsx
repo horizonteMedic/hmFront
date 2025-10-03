@@ -70,6 +70,11 @@ import {
   faA,
   faBacterium,
   faFileMedical,
+  faMoon,
+  faCarSide,
+  faStairs,
+  faSuitcaseMedical,
+  faTruckMedical,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -82,7 +87,6 @@ import AudiometriaTabSelector from "./Audiometria/AudiometriaTabSelector.jsx";
 import OIT from "./OIT/OIT.jsx";
 import Odontologia from "./Odontologia/Odontologia.jsx";
 import RayosXTabSelector from "./RayosX/RayosXTabSelector.jsx";
-import ConsentimientoInformadoOcupacional from "./Consentimientos/ConsentimientoInformado/Consentimiento_informado_digitalizado.jsx";
 import Cuestionario_Nordico from "./Cuestionario_Nordico/Cuestionario_Nordico.jsx";
 import MusculoEsqueleticoTabSelector from "./Musculoesqueletico/MusculoEsqueleticoTabSelector.jsx";
 import Test_fatiga from "./TestFatiga/TestFatiga_Somn.jsx";
@@ -91,10 +95,16 @@ import EKG from "./EKG/ekg.jsx";
 import AntecedentesDeAltura from "./AntecedentesDeAltura/AntecedentesDeAltura.jsx";
 import Anexo2 from "./Anexo2/Anexo2.jsx";
 import ConsentimientosTabSelector from "./Consentimientos/ConsentimientosTabSelector.jsx";
-import InformePsicologico from "./Psicologia/InformePsicologico/InformePsicologico.jsx";
+import PsicologiaTabSelector from "./ModuloPsicologia/PsicologiaTabSelector.jsx";
 import Anexo16A from "./Anexo16A/Anexo16A.jsx";
 import AntecedentesPatologicos from "./AntecedentesPatologicos/AntecedentesPatologicos.jsx";
 import FichasAptitudTabSelector from "./FichasAptitud/FichasAptitudTabSelector.jsx";
+import FichaSas from "./FichaSAS/FichaSas.jsx";
+import FichaConduccionVehiculos from "./FichaConduccionVehiculos/FichaConduccionVehiculos.jsx";
+import FichaCertificadoAltura from "./FichaCertificadoAltura/FichaCertificadoAltura.jsx";
+import CertificadoMedicoOcupacional from "./CertificadoMedicoOcupacional/CertificadoMedicoOcupacional.jsx";
+import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
+import SectionWithBack from "./SectionWithBack.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -244,314 +254,56 @@ const TabComponent = () => {
               </select>
             </div>
             <div className={styles.gridContainer}>
-              {tieneVista("Admision") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 0 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(0)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faUserCheck} />
-                  </span>
-                  <span className={styles.title}>Admisión</span>
-                </div>
-              )}
-              {tieneVista("Triaje") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 1 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(1)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faStethoscope} />
-                  </span>
-                  <span className={styles.title}>Triaje</span>
-                </div>
-              )}
-              {tieneVista("Laboratorio Clinico") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 2 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(2)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faVial} />
-                  </span>
-                  <span className={styles.title}>Laboratorio</span>
-                </div>
-              )}
-              {tieneVista("Historia Ocupacional") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 16 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(16)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faFileWaveform} />
-                  </span>
-                  <span className={styles.title}>Historia Ocupacional</span>
-                </div>
-              )}
-
-              {tieneVista("Coproparasitologico") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 3 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(3)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faClipboardList} />
-                  </span>
-                  <span className={styles.title}>Coproparasitológico</span>
-                </div>
-              )}
-              {tieneVista("Psicologia") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 10 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faUserMd} />
-                  </span>
-                  <span className={styles.title}>Psicología</span>
-                </div>
-              )}
-              {tieneVista("Medicina General") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 11 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faUserMd} />
-                  </span>
-                  <span className={styles.title}>Medicina General</span>
-                </div>
-              )}
-              {tieneVista("Rayos X") && (
-                <div
-                  onClick={() => setActiveTab(12)}
-                  className={`${styles.gridItem} ${activeTab === 12 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faXRay} />
-                  </span>
-                  <span className={styles.title}>Rayos X</span>
-                </div>
-              )}
-              {tieneVista("EKG") && (
-                <div
-                  onClick={() => setActiveTab(13)}
-                  className={`${styles.gridItem} ${activeTab === 13 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faHeartbeat} />
-                  </span>
-                  <span className={styles.title}>EKG</span>
-                </div>
-              )}
-              {tieneVista("Espirometria") && (
-                <div
-                  onClick={() => setActiveTab(14)}
-                  className={`${styles.gridItem} ${activeTab === 14 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faLungs} />
-                  </span>
-                  <span className={styles.title}>Espirometría</span>
-                </div>
-              )}
-              {tieneVista("Audiometria") && (
-                <div
-                  onClick={() => setActiveTab(15)}
-                  className={`${styles.gridItem} ${activeTab === 15 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faDeaf} />
-                  </span>
-                  <span className={styles.title}>Audiometría</span>
-                </div>
-              )}
-              {tieneVista("Odontologia") && (
-                <div
-                  onClick={() => setActiveTab(18)}
-                  className={`${styles.gridItem} ${activeTab === 18 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faTooth} />
-                  </span>
-                  <span className={styles.title}>Odontología</span>
-                </div>
-              )}
-              {tieneVista("Oftalmologia") && (
-                <div
-                  onClick={() => setActiveTab(17)}
-                  className={`${styles.gridItem} ${activeTab === 17 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faEye} />
-                  </span>
-                  <span className={styles.title}>Oftalmología</span>
-                </div>
-              )}
-              {tieneVista("OIT") && (
-                <div
-                  onClick={() => setActiveTab(19)}
-                  className={`${styles.gridItem} ${activeTab === 19 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faAnchor} />
-                  </span>
-                  <span className={styles.title}>OIT</span>
-                </div>
-              )}
-              {tieneVista("Modulo de Consentimientos") && (
-                <div
-                  onClick={() => setActiveTab(20)}
-                  className={`${styles.gridItem} ${activeTab === 20 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faCheckToSlot} />
-                  </span>
-                  <span className={styles.title}>
-                    Modulo de Consentimientos
-                  </span>
-                </div>
-              )}
-              {tieneVista("Cuestionario Nordico") && (
-                <div
-                  onClick={() => setActiveTab(21)}
-                  className={`${styles.gridItem} ${activeTab === 21 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faSkiingNordic} />
-                  </span>
-                  <span className={styles.title}>Cuestionario Nordico</span>
-                </div>
-              )}
-              {tieneVista("Evaluación Musculoesquelética") && (
-                <div
-                  onClick={() => setActiveTab(22)}
-                  className={`${styles.gridItem} ${activeTab === 22 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faSkull} />
-                  </span>
-                  <span className={styles.title}>
-                    Evaluación Musculoesquelética
-                  </span>
-                </div>
-              )}
-              {tieneVista("Test Fatiga") && (
-                <div
-                  onClick={() => setActiveTab(23)}
-                  className={`${styles.gridItem} ${activeTab === 23 ? styles.active : ""
-                    }`}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faBed} />
-                  </span>
-                  <span className={styles.title}>
-                    Test Fatiga y Somnolencia
-                  </span>
-                </div>
-              )}
-              {tieneVista("Antecedentes de Altura") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 25 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(25)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faMountain} />
-                  </span>
-                  <span className={styles.title}>Antecedentes de Altura</span>
-                </div>
-              )}
-              {tieneVista("Anexo 2") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 26 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(26)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={fa2} />
-                  </span>
-                  <span className={styles.title}>Anexo 2</span>
-                </div>
-              )}
-              {tieneVista("Anexo 16") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 27 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(27)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={fa1} />
-                    <FontAwesomeIcon icon={fa6} />
-                  </span>
-                  <span className={styles.title}>Anexo 16</span>
-                </div>
-              )}
-              {tieneVista("Anexo 16 A") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 28 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(28)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={fa1} />
-                    <FontAwesomeIcon icon={fa6} />
-                    <FontAwesomeIcon icon={faA} className="ml-2" />
-                  </span>
-                  <span className={styles.title}>Anexo 16 A</span>
-                </div>
-              )}
-              {tieneVista("Antecedentes Patologicos") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 29 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(29)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faBacterium} />
-                  </span>
-                  <span className={styles.title}>Antecedentes Patológicos</span>
-                </div>
-              )}
-              {tieneVista("Fichas Aptitud") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 30 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(30)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faFileMedical} />
-                  </span>
-                  <span className={styles.title}>Fichas Aptitud</span>
-                </div>
-              )}
-              {tieneVista("Playground") && (
-                <div
-                  className={`${styles.gridItem} ${activeTab === 24 ? styles.active : ""
-                    }`}
-                  onClick={() => setActiveTab(24)}
-                >
-                  <span className={styles.icon}>
-                    <FontAwesomeIcon icon={faGamepad} />
-                  </span>
-                  <span className={styles.title}>Playground</span>
-                </div>
-              )}
+              {(() => {
+                const items = [
+                  { vista: "Admision", tab: 0, icons: [{ icon: faUserCheck }], label: "Admisión" },
+                  { vista: "Triaje", tab: 1, icons: [{ icon: faStethoscope }], label: "Triaje" },
+                  { vista: "Laboratorio Clinico", tab: 2, icons: [{ icon: faVial }], label: "Laboratorio" },
+                  { vista: "Historia Ocupacional", tab: 16, icons: [{ icon: faFileWaveform }], label: "Historia Ocupacional" },
+                  { vista: "Coproparasitologico", tab: 3, icons: [{ icon: faClipboardList }], label: "Coproparasitológico" },
+                  { vista: "Psicologia", tab: 10, icons: [{ icon: faUserMd }], label: "Psicología" },
+                  { vista: "Medicina General", tab: 11, icons: [{ icon: faUserMd }], label: "Medicina General" },
+                  { vista: "Rayos X", tab: 12, icons: [{ icon: faXRay }], label: "Rayos X" },
+                  { vista: "EKG", tab: 13, icons: [{ icon: faHeartbeat }], label: "EKG" },
+                  { vista: "Espirometria", tab: 14, icons: [{ icon: faLungs }], label: "Espirometría" },
+                  { vista: "Audiometria", tab: 15, icons: [{ icon: faDeaf }], label: "Audiometría" },
+                  { vista: "Odontologia", tab: 18, icons: [{ icon: faTooth }], label: "Odontología" },
+                  { vista: "Oftalmologia", tab: 17, icons: [{ icon: faEye }], label: "Oftalmología" },
+                  { vista: "OIT", tab: 19, icons: [{ icon: faAnchor }], label: "OIT" },
+                  { vista: "Modulo de Consentimientos", tab: 20, icons: [{ icon: faCheckToSlot }], label: "Modulo de Consentimientos" },
+                  { vista: "Cuestionario Nordico", tab: 21, icons: [{ icon: faSkiingNordic }], label: "Cuestionario Nordico" },
+                  { vista: "Evaluación Musculoesquelética", tab: 22, icons: [{ icon: faSkull }], label: "Evaluación Musculoesquelética" },
+                  { vista: "Test Fatiga", tab: 23, icons: [{ icon: faBed }], label: "Test Fatiga y Somnolencia" },
+                  { vista: "Antecedentes de Altura", tab: 25, icons: [{ icon: faMountain }], label: "Antecedentes de Altura" },
+                  { vista: "Anexo 2", tab: 26, icons: [{ icon: fa2 }], label: "Anexo 2" },
+                  { vista: "Anexo 16", tab: 27, icons: [{ icon: fa1 }, { icon: fa6 }], label: "Anexo 16" },
+                  { vista: "Anexo 16 A", tab: 28, icons: [{ icon: fa1 }, { icon: fa6 }, { icon: faA, className: "ml-2" }], label: "Anexo 16 A" },
+                  { vista: "Antecedentes Patologicos", tab: 29, icons: [{ icon: faBacterium }], label: "Antecedentes Patológicos" },
+                  { vista: "Fichas Aptitud", tab: 30, icons: [{ icon: faFileMedical }], label: "Fichas Aptitud" },
+                  { vista: "Ficha SAS", tab: 31, icons: [{ icon: faMoon }], label: "Ficha S.A.S." },
+                  { vista: "Ficha Conduccion de Vehiculos", tab: 32, icons: [{ icon: faCarSide }], label: "Ficha de Conducción de Vehiculos" },
+                  { vista: "Ficha Certificado de Altura", tab: 33, icons: [{ icon: faStairs }], label: "Ficha Certificado de Trabajos en Altura" },
+                  { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
+                  { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta" },
+                  { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
+                ];
+                return items
+                  .filter((item) => tieneVista(item.vista))
+                  .map((item) => (
+                    <div
+                      key={item.vista}
+                      className={`${styles.gridItem} ${activeTab === item.tab ? styles.active : ""}`}
+                      onClick={() => setActiveTab(item.tab)}
+                    >
+                      <span className={styles.icon}>
+                        {item.icons.map((ic, idx) => (
+                          <FontAwesomeIcon key={idx} icon={ic.icon} className={ic.className} />
+                        ))}
+                      </span>
+                      <span className={styles.title}>{item.label}</span>
+                    </div>
+                  ));
+              })()}
             </div>
           </>
         )}
@@ -676,22 +428,6 @@ const TabComponent = () => {
                   )}
                 </div>
               </div>
-            </div>
-          )}
-          {activeTab === 1 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Triaje</h2>
-              </div>
-              <Triaje token={token} selectedSede={selectSede} />
             </div>
           )}
           {activeTab === 2 && (
@@ -860,152 +596,6 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-
-          {activeTab === 3 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Coproparasitológico
-                </h2>
-              </div>
-              <ParasitologiaCoprologico />
-            </div>
-          )}
-          {activeTab === 4 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Laboratorio Clínico
-                </h2>
-              </div>
-              <LaboratorioClinico />
-            </div>
-          )}
-          {activeTab === 5 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Análisis Bioquímicos
-                </h2>
-              </div>
-              <LaboratorioAnalisisBioquimicos />
-            </div>
-          )}
-          {activeTab === 6 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(2)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Consentimientos
-                </h2>
-              </div>
-              <Consentimientos
-                token={token}
-                selectedSede={selectSede}
-                userlogued={userlogued.sub}
-              />
-            </div>
-          )}
-          {activeTab === 14 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Espirometría
-                </h2>
-              </div>
-              <div>
-                <div className={styles.tabHeader}>
-                  {/*Esto se va a mostrar por defecto */}
-                  <button
-                    className={`${styles.tabButton} ${subTab === 0 ? styles.active : ""
-                      }`}
-                    onClick={() => setSubTab(0)}
-                  >
-                    Espirometría
-                  </button>
-                </div>
-                <div>
-                  {subTab === 0 && (
-                    <Espirometria
-                      token={token}
-                      userlogued={userlogued.sub}
-                      selectedSede={selectSede}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-          {activeTab === 12 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">Rayos X</h2>
-              </div>
-              <RayosXTabSelector tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 13 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div>
-                <EKG />
-              </div>
-            </div>
-          )}
           {activeTab === 15 && (
             <div>
               <div className="w-full flex items-center justify-end gap-4 mb-2">
@@ -1061,265 +651,98 @@ const TabComponent = () => {
               </div>
             </div>
           )}
-          {/*HISTORIA OCUPACIONL */}
-          {activeTab === 16 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div>
-                <HistoriaOcupacional
-                  token={token}
-                  userlogued={userlogued.sub}
-                  selectedSede={selectSede}
-                  listas={listasCombos}
-                  userDatos={userlogued}
-                />
-                <div></div>
-              </div>
-            </div>
-          )}
-          {activeTab === 17 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <OftalmologiaTabSelector
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-              />
-            </div>
-          )}
-          {activeTab === 18 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <Odontologia />
-            </div>
-          )}
-          {activeTab === 19 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <OIT
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-                userDatos={userlogued}
-              />
-            </div>
-          )}
-          {activeTab === 20 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Módulo de Consentimientos
-                </h2>
-              </div>
-              <ConsentimientosTabSelector tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 21 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <Cuestionario_Nordico
-                token={token}
-                userlogued={userlogued.sub}
-                selectedSede={selectSede}
-                userDatos={userlogued}
-              />
-            </div>
-          )}
-          {activeTab === 22 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Evaluación Musculoesquelética
-                </h2>
-              </div>
-              <MusculoEsqueleticoTabSelector tieneVista={tieneVista} />
-            </div>
-          )}
-          {activeTab === 23 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <Test_fatiga />
-            </div>
-          )}
-          {activeTab === 24 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Playground
-                </h2>
-              </div>
-              <InformePsicologico />
-            </div>
-          )}
-          {activeTab === 25 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <AntecedentesDeAltura />
-            </div>
-          )}
-          {activeTab === 26 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Anexo 2
-                </h2>
-              </div>
-              <Anexo2 listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 27 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Anexo 16
-                </h2>
-              </div>
-              <Anexo16 listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 28 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Anexo 16 A
-                </h2>
-              </div>
-              <Anexo16A />
-            </div>
-          )}
-          {activeTab === 29 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Antecedentes Patológicos
-                </h2>
-              </div>
-              <AntecedentesPatologicos listas={listasCombos} />
-            </div>
-          )}
-          {activeTab === 30 && (
-            <div>
-              <div className="w-full flex items-center justify-end gap-4 mb-2">
-                <button
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-4 py-2 rounded shadow border border-gray-300"
-                  onClick={() => setActiveTab(null)}
-                >
-                  ← Atrás
-                </button>
-              </div>
-              <div className="w-full flex justify-center items-center mb-4">
-                <h2 className="text-2xl font-bold text-[#233245]">
-                  Fichas Aptitud
-                </h2>
-              </div>
-              <FichasAptitudTabSelector listas={listasCombos} tieneVista={tieneVista} />
-            </div>
-          )}
+          {(() => {
+            const displayedInterfaces = {
+              1: { title: "Triaje", child: <Triaje token={token} selectedSede={selectSede} /> },
+              3: { title: "Coproparasitológico", child: <ParasitologiaCoprologico /> },
+              4: { title: "Laboratorio Clínico", child: <LaboratorioClinico /> },
+              5: { title: "Análisis Bioquímicos", child: <LaboratorioAnalisisBioquimicos /> },
+              6: {
+                title: "Consentimientos", child: (
+                  <Consentimientos
+                    token={token}
+                    selectedSede={selectSede}
+                    userlogued={userlogued.sub}
+                  />
+                )
+              },
+              10: { title: "Modulo Psicologia", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
+              12: { title: "Rayos X", child: <RayosXTabSelector tieneVista={tieneVista} /> },
+              13: { title: undefined, child: <EKG /> },
+              14: {
+                title: undefined, child: (
+                  <Espirometria
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                  />
+                )
+              },
+              16: {
+                title: undefined, child: (
+                  <HistoriaOcupacional
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    listas={listasCombos}
+                    userDatos={userlogued}
+                  />
+                )
+              },
+              17: {
+                title: undefined, child: (
+                  <OftalmologiaTabSelector
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                  />
+                )
+              },
+              18: { title: undefined, child: <Odontologia /> },
+              19: {
+                title: undefined, child: (
+                  <OIT
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    userDatos={userlogued}
+                  />
+                )
+              },
+              20: { title: "Módulo de Consentimientos", child: <ConsentimientosTabSelector tieneVista={tieneVista} /> },
+              21: {
+                title: undefined, child: (
+                  <Cuestionario_Nordico
+                    token={token}
+                    userlogued={userlogued.sub}
+                    selectedSede={selectSede}
+                    userDatos={userlogued}
+                  />
+                )
+              },
+              22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
+              23: { title: undefined, child: <Test_fatiga /> },
+              24: { title: "Playground", child: <h2>play</h2> },
+              25: { title: undefined, child: <AntecedentesDeAltura /> },
+              26: { title: "Anexo 2", child: <Anexo2 listas={listasCombos} /> },
+              27: { title: "Anexo 16", child: <Anexo16 listas={listasCombos} /> },
+              28: { title: "Anexo 16 A", child: <Anexo16A /> },
+              29: { title: "Antecedentes Patológicos", child: <AntecedentesPatologicos listas={listasCombos} /> },
+              30: { title: "Fichas Aptitud", child: <FichasAptitudTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
+              31: { title: "Ficha S.A.S.", child: <FichaSas listas={listasCombos} /> },
+              32: { title: "Ficha Conduccion de Vehiculos", child: <FichaConduccionVehiculos /> },
+              33: { title: "Ficha Certificado de Altura", child: <FichaCertificadoAltura /> },
+              34: { title: "Constancia Certificado Medico Ocupacional", child: <CertificadoMedicoOcupacional /> },
+              35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
+            };
+            const section = displayedInterfaces[activeTab];
+            return section ? (
+              <SectionWithBack title={section.title} onBack={() => setActiveTab(null)}>
+                {section.child}
+              </SectionWithBack>
+            ) : null;
+          })()}
+
         </div>
       </div>
 
@@ -1337,85 +760,40 @@ const TabComponent = () => {
         onNavigate={(idx) => {
           console.log("Navigating to tab:", idx);
           setDrawerOpen(false);
-          switch (idx) {
-            case "Inicio":
-              setActiveTab(null);
-              break;
-            case "Admision":
-              setActiveTab(0);
-              setSubTab(0);
-              break;
-            case "Triaje":
-              setActiveTab(1);
-              setSubTab(0);
-              break;
-            case "Laboratorio Clinico":
-              setActiveTab(2);
-              break;
-            case "Rayos X":
-              setActiveTab(12);
-              setSubTab(0);
-              break;
-            case "EKG":
-              setActiveTab(13);
-              setSubTab(0);
-              break;
-            case "Espirometria":
-              setActiveTab(14);
-              setSubTab(0);
-              break;
-            case "Audiometria":
-              setActiveTab(15);
-              setSubTab(0);
-              break;
-            case "Historia Ocupacional":
-              setActiveTab(16);
-              setSubTab(0);
-              break;
-            case "Oftalmologia":
-              setActiveTab(17);
-              setSubTab(0);
-              break;
-            case "Odontologia":
-              setActiveTab(18);
-              setSubTab(0);
-              break;
-            case "Evaluación Musculoesquelética":
-              setActiveTab(22);
-              setSubTab(0);
-              break;
-            case "Cuestionario Nordico":
-              setActiveTab(21);
-              setSubTab(0);
-              break;
-            case "Test Fatiga":
-              setActiveTab(23);
-              setSubTab(0);
-              break;
-            case "Antecedentes de Altura":
-              setActiveTab(25);
-              setSubTab(0);
-              break;
-            case "Anexo 2":
-              setActiveTab(26);
-              setSubTab(0);
-              break;
-            case "Anexo 16":
-              setActiveTab(27);
-              setSubTab(0);
-              break;
-            case "Anexo 16 A":
-              setActiveTab(28);
-              setSubTab(0);
-              break;
-            case "Antecedentes Patologicos":
-              setActiveTab(29);
-              setSubTab(0);
-              break;
-            case "Fichas Aptitud":
-              setActiveTab(30);
-              setSubTab(0);
-              break;
+
+          // Optimized navigation handling using a configuration map
+          const navConfig = {
+            Inicio: { activeTab: null },
+            Admision: { activeTab: 0, subTab: 0 },
+            Triaje: { activeTab: 1, subTab: 0 },
+            "Laboratorio Clinico": { activeTab: 2 },
+            "Rayos X": { activeTab: 12, subTab: 0 },
+            EKG: { activeTab: 13, subTab: 0 },
+            Espirometria: { activeTab: 14, subTab: 0 },
+            Audiometria: { activeTab: 15, subTab: 0 },
+            "Historia Ocupacional": { activeTab: 16, subTab: 0 },
+            Oftalmologia: { activeTab: 17, subTab: 0 },
+            Odontologia: { activeTab: 18, subTab: 0 },
+            "Evaluación Musculoesquelética": { activeTab: 22, subTab: 0 },
+            "Cuestionario Nordico": { activeTab: 21, subTab: 0 },
+            "Test Fatiga": { activeTab: 23, subTab: 0 },
+            "Antecedentes de Altura": { activeTab: 25, subTab: 0 },
+            "Anexo 2": { activeTab: 26, subTab: 0 },
+            "Anexo 16": { activeTab: 27, subTab: 0 },
+            "Anexo 16 A": { activeTab: 28, subTab: 0 },
+            "Antecedentes Patologicos": { activeTab: 29, subTab: 0 },
+            "Fichas Aptitud": { activeTab: 30, subTab: 0 },
+            "Ficha SAS": { activeTab: 31, subTab: 0 },
+            "Ficha Conduccion de Vehiculos": { activeTab: 32, subTab: 0 },
+            "Ficha Certificado de Altura": { activeTab: 33, subTab: 0 },
+            "Constancia Certificado Medico Ocupacional": { activeTab: 34, subTab: 0 },
+            "Ficha Interconsulta": { activeTab: 35, subTab: 0 },
+          };
+
+          const config = navConfig[idx];
+          if (config) {
+            setActiveTab(config.activeTab);
+            if (config.subTab !== undefined) setSubTab(config.subTab);
           }
         }}
         activeIndex={activeTab}

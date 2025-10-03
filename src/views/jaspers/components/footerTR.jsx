@@ -1,30 +1,24 @@
-import React from "react";
- 
- function footerTR(doc,datos) {
+function footerTR(doc,datos) {
    const pageHeight = doc.internal.pageSize.getHeight();
    const pageWidth = doc.internal.pageSize.getWidth();
    // Aumenta el margen inferior si hace falta (ej. 30 en lugar de 20)
-   const marginBottom = 25;
+  const marginBottom = 25; // default sin cambios
    // Posición base para el footer
-   const baseY = pageHeight - marginBottom;
+  const offsetY = Number((datos && typeof datos === 'object' ? datos.footerOffsetY : 0) ?? 0); // opcional
+  const baseY = pageHeight - marginBottom + offsetY;
    
-   // Calcular el ancho total del contenido del footer para centrarlo
-   const contenidoAncho = 180; // Ancho aproximado del contenido
-   const inicioX = (pageWidth - contenidoAncho) / 2; // Centrar el contenido
-   
-   const col1X = inicioX;
-   const col2X = inicioX + 55;
-   const col3X = inicioX + 105;
-   const col4X = inicioX + 160;
+  // Calcular el ancho total del contenido del footer para centrarlo
+  const contenidoAncho = 180; // Ancho aproximado del contenido
+  const inicioX = (pageWidth - contenidoAncho) / 2; // Centrar el contenido
 
    // Línea divisora púrpura antes del footer (centrada)
-   const lineY = baseY - 5; // 5mm antes del contenido del footer
+  const lineY = baseY - 3.6; // 5mm antes del contenido del footer
    doc.setDrawColor(52, 2, 153); // Color #340299 en RGB
    doc.setLineWidth(0.5); // Grosor de la línea
    doc.line(inicioX, lineY, inicioX + contenidoAncho, lineY); // Línea horizontal centrada
 
-   // Datos de prueba para el footer (si no se pasan datos)
-   const datosFooter = datos || {
+  // Datos de prueba para el footer (si no se pasan datos)
+  const defaultFooter = {
      dir_tru_pierola: "- Sede Trujillo: Av. Nicolas de Piérola N°1106 Urb. San Fernando",
      dir_huamachuco: "- Sede Huamachuco: Jr. Leoncio Prado N°786",
      dir_huancayo: "- Sede Huancayo: Av. Huancavelica N°2225 - Distrito El Tambo",
@@ -37,6 +31,10 @@ import React from "react";
      telf_huamachuco: "044-348070",
      telf_huancayo: "064-659554"
    };
+  const datosFooter = {
+    ...defaultFooter,
+    ...(datos && typeof datos === 'object' && datos.footerData ? datos.footerData : {})
+  };
 
    // Ajustamos la fuente a normal (no negrita) y color a negro
    doc.setFont("helvetica", "normal").setFontSize(7);

@@ -4,7 +4,7 @@ import { getFetch, SubmitData } from "./apiHelpers";
 export const LoadingDefault = (text) => {
     Swal.fire({
         title: `<span style="font-size:1.3em;font-weight:bold;">${text}</span>`,
-        html: `<div style=\"font-size:1.1em;\"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
+        html: `<div style="font-size:1.1em;"><span style='color:#0d9488;font-weight:bold;'></span></div><div class='mt-2'>Espere por favor...</div>`,
         icon: "info",
         background: "#f0f6ff",
         color: "#22223b",
@@ -37,11 +37,8 @@ export const GetInfoPacDefault = async (nro, token, sede) => {
             token
         );
 
-        console.log("pros", res);
-
         return res; // 🔹 ahora retorna la respuesta
     } catch (error) {
-        console.error("Error obteniendo info del paciente:", error);
         Swal.fire(
             "Error",
             "Paciente no encontrado",
@@ -62,19 +59,14 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
     )
         .then(async (res) => {
             if (res.norden || res.norden_n_orden|| res.n_orden) {
-                console.log(res);
                 const nombre = res.nameJasper;
-                console.log(nombre);
+                console.log(nombre)
                 const modulo = await jasperModules[
                     `${nombreCarpeta}/${nombre}.jsx`
                 ]();
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === "function") {
                     modulo.default({ ...res, ...datosFooter });
-                } else {
-                    console.error(
-                        `El archivo ${nombre}.jsx no exporta una función por defecto`
-                    );
                 }
             }
         })
@@ -91,11 +83,9 @@ export const getInfoTablaDefault = (nombreSearch, codigoSearch, setData, token, 
     ${nombreSearch == "" ? "" : `&nombres=${nombreSearch}`}`,
             token
         ).then((res) => {
-            console.log("pros", res);
             setData(res);
         });
     } catch (error) {
-        console.error("Error en al obtener los datos de la tabla:", error);
         Swal.fire(
             "Error",
             "Ocurrió un error al obtener los datos de la tabla",
@@ -118,7 +108,6 @@ export const VerifyTRDefault = async (nro, tabla, token, set, sede, noTieneRegis
         `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
         token
     ).then((res) => {
-        console.log(res);
         if (res.id === 0) {
             //No tiene registro previo 
             noTieneRegistro();//datos paciente
@@ -141,7 +130,6 @@ export const GetInfoServicioDefault = async (
             token
         );
         if (res?.norden || res?.norden_n_orden||res?.n_orden) {
-            console.log(res);
             return res;
         } else {
             Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
@@ -149,7 +137,6 @@ export const GetInfoServicioDefault = async (
         }
     } catch (error) {
         Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-        console.error(error);
         return null;
     } finally {
         onFinish();
@@ -166,7 +153,6 @@ export const SubmitDataServiceDefault = async (
 ) => {
     LoadingDefault("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
-        console.log(res);
         if (res.id === 1 || res.id === 0) {
             if (tienePrint) {
                 Swal.fire({
