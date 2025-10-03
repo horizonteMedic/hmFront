@@ -102,18 +102,19 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     fur: data.furDescripcionAnexo16a_txtfur || "",
     observaciones: data.observacionesAnexo16a_observaciones || "",
     medico: {
-      nombres: String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
+      nombres: "",//String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
       direccion: data.direccionSede || "",
-      cmp: data.cmpUsuario_cmp_user || "",
+      cmp: "",//data.cmpUsuario_cmp_user || "",
       fecha: ""
     },
+
     // Datos de color
     color: data.color || data.informacionSede?.color || 1,
     codigoColor: data.codigoColor || data.informacionSede?.codigoColor || "#008f39",
     textoColor: data.textoColor || data.informacionSede?.textoColor || "F",
     // Datos adicionales para header
-    numeroFicha: data.numeroFicha || data.ficha || data.numero || "99164",
-    sede: data.sede || data.ubicacion || data.ciudad || "Trujillo-Pierola"
+    numeroFicha: String(data.norden_n_orden || ""),
+    sede: data.nombreSede || ""
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
