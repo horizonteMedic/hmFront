@@ -134,6 +134,7 @@ export function FormLogin() {
   const handleSubmit = (event) => {
     event.preventDefault();
     setloadign(true);
+    localStorage.clear(); //AGREGADO NUEVO PV 02/10/2025
     SubmitLogin(username, password)
       .then((data) => {
         if (data.id === 1) {

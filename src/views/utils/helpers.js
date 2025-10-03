@@ -21,3 +21,17 @@ export function getSign(data, name) { //HUELLA // FIRMAP // SELLOFIRMA
 export function getHoraActual() { //devuelve la hora con el formato correcto para guardar 09:05:08
     return new Date().toLocaleTimeString('es-PE', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
+
+export function clearLocalStorageExceptAuth() { // Limpia localStorage excepto la llave 'auth'
+    try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+            const key = localStorage.key(i);
+            if (key !== 'auth') {
+                localStorage.removeItem(key);
+            }
+        }
+    } catch (error) {
+        console.error('Error al limpiar localStorage:', error);
+    }
+}
+

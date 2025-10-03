@@ -132,7 +132,7 @@ export default function FichaSas({ listas }) {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "ficha_sas_form" });
 
 
     const handleSave = () => {
