@@ -691,6 +691,7 @@ export default function FichaSas({ listas }) {
                                                 name="cuello_varon_normal"
                                                 value={form?.cuello_varon_normal}
                                                 onChange={handleRadioButtonBoolean}
+                                                disabled={form?.sexo === "F" || form?.sexo === "FEMENINO"}
                                             />
                                         </div>
                                     </div>
@@ -702,6 +703,7 @@ export default function FichaSas({ listas }) {
                                                 name="cuello_mujer_normal"
                                                 value={form?.cuello_mujer_normal}
                                                 onChange={handleRadioButtonBoolean}
+                                                disabled={form?.sexo === "M" || form?.sexo === "MASCULINO"}
                                             />
                                         </div>
                                     </div>
