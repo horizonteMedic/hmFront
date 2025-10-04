@@ -485,6 +485,10 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     const filaAltura = 5;
 
     // Primera fila: I.- FILIACION (fila completa)
+    // Fondo gris solo para el header de sección
+    doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+    
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -492,6 +496,7 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Segunda fila: Apellidos y Nombres (fila completa)
+    // Fondo blanco - no se aplica fondo
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -499,6 +504,7 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Tercera fila: DNI, Género, Edad, Tipo de Licencia (4 columnas)
+    // Fondo blanco - no se aplica fondo
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura); // Primera división
     doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // Segunda división
@@ -509,6 +515,7 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Cuarta fila: Empresa (fila completa)
+    // Fondo blanco - no se aplica fondo
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -516,6 +523,7 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Quinta fila: Contratista (fila completa)
+    // Fondo blanco - no se aplica fondo
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -523,6 +531,7 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Sexta fila: Trabajo nocturno (4 columnas)
+    // Fondo blanco para fila par (índice 5) - no se aplica fondo
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // Primera división
     doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // Segunda división
@@ -533,6 +542,7 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Séptima fila: Años trabajando en dicho horario (2 columnas)
+    // Fondo blanco - no se aplica fondo
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // División central
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
@@ -541,6 +551,10 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Octava fila: II.- ANTECEDENTES PERSONALES (fila completa)
+    // Fondo gris para el header de sección
+    doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+    
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -785,6 +799,10 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos += filaAltura;
 
     // Trigésima fila: Título Entrevista al paciente (fila completa)
+    // Fondo gris para el header de sección
+    doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+    
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
@@ -829,6 +847,11 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
 
     // Trigésima quinta fila: Puntuación de la Escala de Epworth (ESS) - Fila más alta
     const alturaFilaEpworth = filaAltura + 5; // Hacer la fila más alta
+    
+    // Fondo gris solo hasta la división (130mm)
+    doc.setFillColor(160, 160, 160); // Gris oscuro
+    doc.rect(tablaInicioX, yPos, 130, alturaFilaEpworth, 'F');
+    
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaEpworth); // Línea izquierda
     doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + alturaFilaEpworth); // División para puntuación
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaEpworth); // Línea derecha
@@ -1337,6 +1360,10 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     yPos = 30;
 
     // === FILA DE TÍTULO 4. EXÁMEN FÍSICO ===
+    // Fondo gris para el header de sección
+    doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+    doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+    
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -1468,10 +1495,10 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     }
     
     // Luego dibujar las X superpuestas encima de la imagen
-    const checkboxY = y + 4; // 2mm debajo del borde superior de la imagen (superpuesto)
+    const checkboxY = y + 32; // 2mm debajo del borde superior de la imagen (superpuesto)
     
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.setTextColor(0, 128, 0); // Color verde
+    doc.setTextColor(255, 0, 0); // Color verde
     
     // Grado I - posición independiente
     const gradoI = datosFinales.mallampatiGradoI ? "X" : " ";
@@ -1497,6 +1524,11 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     
     // Fila de título "5.- CONCLUSIÓN DE LA EVALUACIÓN" con ampliación en la misma línea
     const alturaTituloConclusión = filaAltura;
+    
+    // Fondo gris para el header de sección
+    doc.setFillColor(160, 160, 160); // Gris oscuro (igual que certificaciondeconduccion_Digitalizado.jsx)
+    doc.rect(tablaExamenInicioX, yTextoExamen, tablaExamenAncho, alturaTituloConclusión, 'F');
+    
     doc.line(tablaExamenInicioX, yTextoExamen, tablaExamenInicioX, yTextoExamen + alturaTituloConclusión);
     doc.line(tablaExamenInicioX + tablaExamenAncho, yTextoExamen, tablaExamenInicioX + tablaExamenAncho, yTextoExamen + alturaTituloConclusión);
     doc.line(tablaExamenInicioX, yTextoExamen, tablaExamenInicioX + tablaExamenAncho, yTextoExamen);
@@ -1596,8 +1628,8 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     // Fila: Acción Requerida para Riesgo Alto
     const alturaAccionRiesgoAlto = filaAltura + 2;
     
-    // Dibujar fondo gris claro
-    doc.setFillColor(240, 240, 240); // Gris claro
+    // Dibujar fondo naranja
+    doc.setFillColor(245, 174, 103); // Naranja personalizado (#f5ae67)
     doc.rect(tablaCriteriosInicioX, yCriterios, tablaCriteriosAncho, alturaAccionRiesgoAlto, 'F');
     
     // Dibujar líneas de la tabla
@@ -1689,6 +1721,8 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     subcriteriosD.forEach((subcriterio, index) => {
       const alturaSubcriterio = calcularAlturaDinamica(subcriterio, 145);
       
+      // No aplicar fondo gris - solo los headers de sección llevan fondo gris
+      
       doc.line(tablaCriteriosInicioX, yCriterios, tablaCriteriosInicioX, yCriterios + alturaSubcriterio);
       doc.line(tablaCriteriosInicioX + 150, yCriterios, tablaCriteriosInicioX + 150, yCriterios + alturaSubcriterio);
       doc.line(tablaCriteriosInicioX + 165, yCriterios, tablaCriteriosInicioX + 165, yCriterios + alturaSubcriterio);
@@ -1742,8 +1776,8 @@ export default function B_FichaDetencionSAS2({ data = {} }) {
     const yFinalDescripcion = dibujarTextoConSaltoLinea(textoDescripcion, tablaCriteriosInicioX + 2, yCriterios + 6, anchoDisponibleCriterios);
     const alturaAccionRiesgoMedio = Math.max(filaAltura + 2, (yFinalDescripcion - yCriterios) + 1);
     
-    // Dibujar fondo gris claro
-    doc.setFillColor(240, 240, 240); // Gris claro
+    // Dibujar fondo naranja
+    doc.setFillColor(245, 174, 103); // Naranja personalizado (#f5ae67)
     doc.rect(tablaCriteriosInicioX, yCriterios, tablaCriteriosAncho, alturaAccionRiesgoMedio, 'F');
     
     // Dibujar líneas de la tabla con altura calculada dinámicamente
