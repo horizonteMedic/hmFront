@@ -1,4 +1,4 @@
-import PropTypes from "prop-types";
+
 import {
     InputTextArea,
     InputsBooleanRadioGroup
@@ -9,7 +9,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
         <div className="p-4 space-y-4">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-lg font-semibold text-black-800 mb-4">Antecedentes</h4>
-                
+
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {/* Columna Izquierda */}
                     <div className="space-y-4">
@@ -23,7 +23,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Alcoholismo crónico y en general todas aquellas enfermedades que produzcan incapacidad de efectuar movimientos voluntarios y/o que limiten la capacidad de trabajo como conducción, manejo o control físico de un vehículo motorizado, subir y bajar escaleras, etc.
@@ -34,7 +34,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Todas aquellas enfermedades que se caractericen por movimientos involuntarios y que interfieran seriamente su capacidad de trabajar, independiente de su tratamiento farmacológico.
@@ -45,7 +45,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Pérdida recurrente de la consciencia, independiente de su tratamiento, tales como narcolepsia, epilepsia, etc.
@@ -56,7 +56,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Diabetes mellitus o hipoglicemia no controlada
@@ -67,7 +67,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Insuficiencia renal crónica grado IV.
@@ -92,7 +92,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Personas que consumen sustancias estupefacientes o psicotrópicas en niveles que no alteren su capacidad de trabajar, pero que se encuentran sin tratamiento o en tratamiento sin prescripción médica.
@@ -103,7 +103,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Personas que consumen sustancias estupefacientes o psicotrópicas en niveles que alteren su capacidad o trabajar como controlar un vehículo.
@@ -114,7 +114,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Síndrome Apnea Obstructiva del sueño. sospecha o confirmada (Ficha sas)
@@ -125,7 +125,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Obesidad (IMC &gt; o igual a 30)
@@ -136,7 +136,7 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                                 onChange={handleRadioButtonBoolean}
                             />
                         </div>
-                        
+
                         <div className="flex items-start justify-between">
                             <span className="text-[11px] pr-4">
                                 Anemia de cualquier grado, según criterios OMS 2011.
@@ -149,24 +149,18 @@ export default function Antecedentes({ form, handleChange, handleRadioButtonBool
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Comentarios - Ancho completo */}
                 <div className="mt-6">
                     <InputTextArea
                         label="Comentarios/Detalle"
                         name="comentariosDetalleAntecedentes"
-                        value={form?.comentariosDetalleAntecedentes || ""}
+                        value={form?.comentariosDetalleAntecedentes}
                         onChange={handleChange}
-                        rows={1}
+                        rows={4}
                     />
                 </div>
             </div>
         </div>
     );
 }
-
-Antecedentes.propTypes = {
-    form: PropTypes.object.isRequired,
-    handleChange: PropTypes.func.isRequired,
-    handleRadioButtonBoolean: PropTypes.func.isRequired,
-};

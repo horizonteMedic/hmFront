@@ -19,30 +19,33 @@ import { getToday } from "../../../../utils/helpers";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
+import { useSessionData } from "../../../../hooks/useSessionData";
 
+const tabla = "b_certificado_altura"
 const today = getToday();
 
 export default function FichaCertificadoAltura() {
     const [activeTab, setActiveTab] = useState(0);
 
+    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+        useSessionData();
+
     const initialFormState = {
-        // Datos personales
+        // Header
         norden: "",
         fechaExam: today,
-        tipoExamen: "CERTIFICADO DE ALTURA",
+        tipoExamen: "",
         razonVisita: "PRIMERA ACTITUD",
+        //datos personales
         nombres: "",
         dni: "",
         edad: "",
         sexo: "",
-        fecha: "",
         experienciaAnios: "",
         areaTrabajo: "",
         empresa: "",
         contrata: "",
-        primeraActitud: false,
-        revalidacion: false,
-        
+        //==========================TAB LATERAL===========================
         // Agudeza Visual
         vcOD: "",
         vlOD: "",
@@ -50,32 +53,61 @@ export default function FichaCertificadoAltura() {
         vlOI: "",
         vcCorregidaOD: "",
         vlCorregidaOD: "",
+        vcCorregidaOI: "",
+        vlCorregidaOI: "",
         vclrs: "",
         vb: "",
         rp: "",
-        vcCorregidaOI: "",
-        vlCorregidaOI: "",
         enfermedadesOculares: "",
-        
-        // Medidas Generales
-        fc: "",
-        fr: "",
-        pa: "",
-        talla: "",
-        peso: "",
-        imc: "",
-        
+
+        //==========================TAB ANTECEDENTES===========================
+        // Antecedentes - Columna Izquierda
+        alteracionConsciencia: false,
+        alcoholismoCronico: false,
+        movimientosInvoluntariosEnfermedades: false,
+        perdidaRecurrenteConsciencia: false,
+        diabetesHipoglicemiaNoControlada: false,
+        insuficienciaRenalCronicaGradoIV: false,
+
+        // Antecedentes - Columna Derecha
+        efectosEnfermedadTratamiento: false,
+        sustanciasEstupefacientesSinTratamiento: false,
+        sustanciasEstupefacientesConAlteracion: false,
+        sindromeApneaObstructivaSueño: false,
+        obesidadIMC30: false,
+        anemiaCriteriosOMS2011: false,
+        comentariosDetalleAntecedentes: "",
+
+        //==========================TAB PRUEBAS COMPLEMENTARIAS===========================
+        // Pruebas Complementarias
+        resfriadoCuadroRespiratorio: false,
+        vertigoMareos: false,
+        temorAlturas: false,
+        hipoacusiaFrecuenciasConversacionales: false,
+        alteracionAgudezaVisual: false,
+        campimetriaAnormal: false,
+        pruebaVisionProfundidadAlterada: false,
+        testSASAnormal: false,
+        evaluacionPsicosensometricaAlterada: false,
+
+        // Otros Datos de Relevancia
+        medicinasTomando: "",
+        otrosDatosRelevancia: "",
+        //==========================TAB EXAMEN FISICO===========================
         // Examen Médico - Medidas Antropométricas y Signos Vitales
         frecuenciaCardiaca: "",
         frecuenciaRespiratoria: "",
         presionArterial: "",
+        talla: "",
+        peso: "",
+        imc: "",
         perimetroCuello: "",
         perimetroCintura: "",
         perimetroCadera: "",
         icc: "",
         perimetroToracicoInspiracion: "",
         perimetroToracicoEspiracion: "",
-        
+
         // Examen Físico - Hallazgos del Examen Físico
         limitacionFuerzaExtremidades: false,
         alteracionEquilibrio: false,
@@ -88,50 +120,17 @@ export default function FichaCertificadoAltura() {
         pupilasNoCirla: false,
         anormalidadLenguaje: false,
         movimientosInvoluntarios: false,
-        
+
         // Examen Físico - Información Adicional
         detalleInformacionExamenFisico: "",
-        
-        // Antecedentes - Columna Izquierda
-        alteracionConsciencia: false,
-        alcoholismoCronico: false,
-        movimientosInvoluntariosEnfermedades: false,
-        perdidaRecurrenteConsciencia: false,
-        diabetesHipoglicemiaNoControlada: false,
-        insuficienciaRenalCronicaGradoIV: false,
-        
-        // Antecedentes - Columna Derecha
-        efectosEnfermedadTratamiento: false,
-        sustanciasEstupefacientesSinTratamiento: false,
-        sustanciasEstupefacientesConAlteracion: false,
-        sindromeApneaObstructivaSueño: false,
-        obesidadIMC30: false,
-        anemiaCriteriosOMS2011: false,
-        comentariosDetalleAntecedentes: "",
-        
-        // Pruebas Complementarias
-        resfriadoCuadroRespiratorio: false,
-        vertigoMareos: false,
-        temorAlturas: false,
-        hipoacusiaFrecuenciasConversacionales: false,
-        alteracionAgudezaVisual: false,
-        noReconocimientoColores: false,
-        campimetriaAnormal: false,
-        pruebaVisionProfundidadAlterada: false,
-        testSASAnormal: false,
-        evaluacionPsicosensometricaAlterada: false,
-        
-        // Otros Datos de Relevancia
-        medicinasTomando: "",
-        otrosDatosRelevancia: "",
-        
+        //===============PARTE INFERIOR=======================
         // Conclusión y Comentarios
-        aptoDesde: "",
-        aptoHasta: "",
-        conclusion: "Apto", // Apto, Observado, No Apto, Apto con Restricción
+        aptoDesde: today,
+        aptoHasta: today,
+        conclusion: "APTO",
         observacionesRecomendaciones: "",
         nombreMedicoColegiatura: "",
-        
+
         // Recomendaciones
         sobrepesoDietaHipocalorica: false,
         corregirAgudezaVisual: false,
@@ -174,7 +173,7 @@ export default function FichaCertificadoAltura() {
             .map(rec => rec.label);
 
         // Actualizar el campo de observaciones solo con las recomendaciones marcadas
-        const newObservations = selectedRecommendations.length > 0 
+        const newObservations = selectedRecommendations.length > 0
             ? selectedRecommendations.join('\n')
             : '';
 
@@ -244,7 +243,7 @@ export default function FichaCertificadoAltura() {
                                 ]}
                             />
                         </section>
-                        
+
                         <section className="bg-white border border-gray-200 rounded-lg p-4 m-4">
                             <h3 className="text-[11px] font-semibold mb-3">Datos del Paciente</h3>
                             {/* Fila 1: Nombres, DNI, Edad, Género */}
@@ -313,11 +312,10 @@ export default function FichaCertificadoAltura() {
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
-                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-black hover:bg-gray-100 ${
-                                        activeTab === tab.id
-                                            ? "border-[#233245] text-[#233245] font-semibold"
-                                            : "border-transparent"
-                                    }`}
+                                    className={`flex-1 px-4 py-3 uppercase tracking-wider text=[11px] border-b-4 transition-colors duration-200 cursor-pointer text-black hover:bg-gray-100 ${activeTab === tab.id
+                                        ? "border-[#233245] text-[#233245] font-semibold"
+                                        : "border-transparent"
+                                        }`}
                                     onClick={() => setActiveTab(tab.id)}
                                 >
                                     <FontAwesomeIcon icon={tab.icon} className="mr-2" />
@@ -330,7 +328,7 @@ export default function FichaCertificadoAltura() {
                         <div className="max-w-full">
                             {tabs.map((tab) => {
                                 const Component = tab.component;
-    return (
+                                return (
                                     activeTab === tab.id && (
                                         <Component
                                             key={tab.id}
@@ -480,8 +478,7 @@ export default function FichaCertificadoAltura() {
                                     <InputTextOneLine
                                         name="norden"
                                         value={form?.norden}
-                                        onChange={handleChange}
-                                        className="w-32"
+                                        onChange={handleChangeNumber}
                                     />
                                     <button
                                         type="button"
@@ -616,48 +613,7 @@ export default function FichaCertificadoAltura() {
                         </div>
 
                         {/* Enfermedades Oculares */}
-                        <div className="mb-4 flex-1">
-                            <h5 className="font-semibold text-black mb-2 text-[11px]">Enfermedades Oculares</h5>
-                            <InputTextArea rows={1} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
-                        </div>
-
-                        {/* Medidas Generales - Solo visible en tab 3 (Examen Físico) */}
-                        {activeTab === 2 && (
-                            <div className="mt-4">
-                                <h5 className="font-semibold text-black mb-3 text-[11px]">Medidas Generales</h5>
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <label className="font-semibold text-black min-w-[30px] text-[11px]">FC:</label>
-                                        <InputTextOneLine name="fc" value={form?.fc} disabled className="flex-1" />
-                                        <span className="text-black text-[11px]">x min</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <label className="font-semibold text-black min-w-[30px] text-[11px]">FR:</label>
-                                        <InputTextOneLine name="fr" value={form?.fr} disabled className="flex-1" />
-                                        <span className="text-black text-[11px]">x min</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <label className="font-semibold text-black min-w-[30px] text-[11px]">PA:</label>
-                                        <InputTextOneLine name="pa" value={form?.pa} disabled className="flex-1" />
-                                        <span className="text-black text-[11px]">mmHg</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <label className="font-semibold text-black min-w-[30px] text-[11px]">TALLA:</label>
-                                        <InputTextOneLine name="talla" value={form?.talla} disabled className="flex-1" />
-                                        <span className="text-black text-[11px]">m</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <label className="font-semibold text-black min-w-[30px] text-[11px]">PESO:</label>
-                                        <InputTextOneLine name="peso" value={form?.peso} disabled className="flex-1" />
-                                        <span className="text-black text-[11px]">kg</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <label className="font-semibold text-black min-w-[30px] text-[11px]">IMC:</label>
-                                        <InputTextOneLine name="imc" value={form?.imc} disabled className="flex-1" />
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                        <InputTextArea label="Enfermedades Oculares" rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
                     </div>
                 </div>
             </div>

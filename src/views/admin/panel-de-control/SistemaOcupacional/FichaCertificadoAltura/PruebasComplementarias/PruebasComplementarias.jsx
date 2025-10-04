@@ -1,6 +1,5 @@
-import PropTypes from "prop-types";
 import {
-    InputTextOneLine,
+    InputTextArea,
     InputsBooleanRadioGroup
 } from "../../../../../components/reusableComponents/ResusableComponents";
 
@@ -9,7 +8,7 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
         <div className="p-4 space-y-4">
             <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-lg font-semibold text-black mb-4">Pruebas Complementarias</h4>
-                
+
                 <div className="space-y-3">
                     {/* Lista vertical de pruebas - una por fila */}
                     <div className="flex items-start justify-between">
@@ -80,31 +79,22 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
 
                     {/* Sección de Otros Datos de Relevancia */}
                     <div className="mt-8 pt-6 border-t border-gray-200">
-                        
+
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-[11px] font-medium text-black mb-2">
-                                    Detalle las medicinas que están tomando:
-                                </label>
-                                <InputTextOneLine
-                                    name="medicinasTomando"
-                                    value={form?.medicinasTomando || ""}
-                                    onChange={handleChange}
-                                    className="w-full"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label className="block text-[11px] font-medium text-black mb-2">
-                                    Comentarios/Detalles Antecedentes:
-                                </label>
-                                <InputTextOneLine
-                                    name="otrosDatosRelevancia"
-                                    value={form?.otrosDatosRelevancia || ""}
-                                    onChange={handleChange}
-                                    className="w-full"
-                                />
-                            </div>
+                            <InputTextArea
+                                label="Detalle las medicinas que están tomando"
+                                rows={4}
+                                name="medicinasTomando"
+                                value={form?.medicinasTomando}
+                                onChange={handleChange}
+                            />
+                            <InputTextArea
+                                label="Comentarios/Detalles Antecedentes"
+                                rows={4}
+                                name="otrosDatosRelevancia"
+                                value={form?.otrosDatosRelevancia}
+                                onChange={handleChange}
+                            />
                         </div>
                     </div>
                 </div>
@@ -112,9 +102,3 @@ export default function PruebasComplementarias({ form, handleChange, handleRadio
         </div>
     );
 }
-
-PruebasComplementarias.propTypes = {
-    form: PropTypes.object.isRequired,
-    handleChange: PropTypes.func.isRequired,
-    handleRadioButtonBoolean: PropTypes.func.isRequired,
-};

@@ -1,11 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
-
 import {
     InputTextOneLine,
     InputTextArea,
-    InputCheckbox,
-    InputsRadioGroup,
     InputsBooleanRadioGroup
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../hooks/useSessionData";

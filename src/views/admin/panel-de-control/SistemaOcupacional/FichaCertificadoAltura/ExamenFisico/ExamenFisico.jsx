@@ -11,142 +11,103 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
             {/* Medidas Antropométricas y Signos Vitales */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-lg font-semibold text-black mb-4">Medidas Antropométricas y Signos Vitales</h4>
-                
                 {/* Primera fila */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">FC:</label>
-                        <InputTextOneLine
-                            name="frecuenciaCardiaca"
-                            value={form?.frecuenciaCardiaca || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">x min</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">FR:</label>
-                        <InputTextOneLine
-                            name="frecuenciaRespiratoria"
-                            value={form?.frecuenciaRespiratoria || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">x min</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">PA:</label>
-                        <InputTextOneLine
-                            name="presionArterial"
-                            value={form?.presionArterial || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">mmHg</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">TALLA:</label>
-                        <InputTextOneLine
-                            name="talla"
-                            value={form?.talla || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">m</span>
-                    </div>
+                    <InputTextOneLine
+                        label="Frecuencia Cardiaca (x min)"
+                        name="frecuenciaCardiaca"
+                        value={form?.frecuenciaCardiaca}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Frecuencia Respiratoria (x min)"
+                        name="frecuenciaRespiratoria"
+                        value={form?.frecuenciaRespiratoria}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Presión Arterial (mmHg)"
+                        name="presionArterial"
+                        value={form?.presionArterial}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Talla (m)"
+                        name="talla"
+                        value={form?.talla}
+                        disabled
+                        labelWidth="120px"
+                    />
                 </div>
-
                 {/* Segunda fila */}
                 <div className="grid grid-cols-4 gap-4 mb-4">
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">PESO:</label>
-                        <InputTextOneLine
-                            name="peso"
-                            value={form?.peso || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">kg</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">IMC:</label>
-                        <InputTextOneLine
-                            name="imc"
-                            value={form?.imc || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">Perímetro Cuello:</label>
-                        <InputTextOneLine
-                            name="perimetroCuello"
-                            value={form?.perimetroCuello || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">cm</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">Perímetro de cintura:</label>
-                        <InputTextOneLine
-                            name="perimetroCintura"
-                            value={form?.perimetroCintura || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">cm</span>
-                    </div>
+                    <InputTextOneLine
+                        label="Peso (kg)"
+                        name="peso"
+                        value={form?.peso}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="IMC"
+                        name="imc"
+                        value={form?.imc}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Perímetro Cuello (cm)"
+                        name="perimetroCuello"
+                        value={form?.perimetroCuello}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="Perímetro de cintura (cm)"
+                        name="perimetroCintura"
+                        value={form?.perimetroCintura}
+                        disabled
+                        labelWidth="120px"
+                    />
                 </div>
-
                 {/* Tercera fila */}
                 <div className="grid grid-cols-4 gap-4">
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">Perímetro de Cadera:</label>
-                        <InputTextOneLine
-                            name="perimetroCadera"
-                            value={form?.perimetroCadera || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">cm</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">ICC:</label>
-                        <InputTextOneLine
-                            name="icc"
-                            value={form?.icc || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">P. Torácico Inspiración:</label>
-                        <InputTextOneLine
-                            name="perimetroToracicoInspiracion"
-                            value={form?.perimetroToracicoInspiracion || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">cm</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <label className="font-semibold text-black min-w-[60px]">P. Torácico Espiración:</label>
-                        <InputTextOneLine
-                            name="perimetroToracicoEspiracion"
-                            value={form?.perimetroToracicoEspiracion || ""}
-                            onChange={handleChange}
-                            className="flex-1"
-                        />
-                        <span className="text-black text-[11px]">cm</span>
-                    </div>
+                    <InputTextOneLine
+                        label="Perímetro de cadera (cm)"
+                        name="perimetroCadera"
+                        value={form?.perimetroCadera}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="ICC"
+                        name="icc"
+                        value={form?.icc}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="P. Torácico Inspiración (cm)"
+                        name="perimetroToracicoInspiracion"
+                        value={form?.perimetroToracicoInspiracion}
+                        disabled
+                        labelWidth="120px"
+                    />
+                    <InputTextOneLine
+                        label="P. Torácico Espiración (cm)"
+                        name="perimetroToracicoEspiracion"
+                        value={form?.perimetroToracicoEspiracion}
+                        disabled
+                        labelWidth="120px"
+                    />
                 </div>
             </div>
-
             {/* Hallazgos del Examen Físico */}
             <div className="bg-white border border-gray-200 rounded-lg p-4">
                 <h4 className="text-lg font-semibold text-black mb-4">Hallazgos del Examen Físico</h4>
-                
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Columna Izquierda */}
                     <div className="space-y-4">
@@ -199,7 +160,6 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                             />
                         </div>
                     </div>
-
                     {/* Columna Derecha */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
@@ -244,15 +204,14 @@ export default function ExamenFisico({ form, handleChange, handleRadioButtonBool
                         </div>
                     </div>
                 </div>
-                
                 {/* Información Adicional - Dentro del mismo cuadro */}
                 <div className="mt-6">
                     <InputTextArea
-                        label="Detalle información:"
+                        label="Detalle información"
                         name="detalleInformacionExamenFisico"
-                        value={form?.detalleInformacionExamenFisico || ""}
+                        value={form?.detalleInformacionExamenFisico}
                         onChange={handleChange}
-                        rows={1}
+                        rows={4}
                     />
                 </div>
             </div>
