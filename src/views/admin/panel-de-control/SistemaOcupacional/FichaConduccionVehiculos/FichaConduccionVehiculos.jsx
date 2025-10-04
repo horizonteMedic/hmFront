@@ -21,7 +21,7 @@ import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import { getToday } from "../../../../utils/helpers";
 
-const tabla = "";
+const tabla = "b_certificado_conduccion";
 const today = getToday();
 export default function FichaConduccionVehiculos() {
     const [activeTab, setActiveTab] = useState(0);
@@ -36,30 +36,29 @@ export default function FichaConduccionVehiculos() {
         dni: "",
         edad: "",
         sexo: "",
-        fecha: "",
         experienciaAnios: "",
-        areaTrabajo: "",
+
         empresa: "",
-        primeraActitud: false,
-        revalidacion: false,
+        contrata: "",
+        puestoPostula: "",
+        puestoActual: "",
+        //=====================TAB LATERAL=====================
         // Agudeza Visual
         vcOD: "",
         vlOD: "",
         vcOI: "",
         vlOI: "",
+
         vcCorregidaOD: "",
         vlCorregidaOD: "",
+        vcCorregidaOI: "",
+        vlCorregidaOI: "",
+
         vclrs: "",
         vb: "",
         rp: "",
-        vcCorregidaOI: "",
-        vlCorregidaOI: "",
         enfermedadesOculares: "",
-        // Medidas Generales
-        fc: "",
-        fr: "",
-        pa: "",
-        // Examen Médico - Medidas Antropométricas y Signos Vitales
+        //=====================TAB EXAMEN MEDICO=====================
         frecuenciaCardiaca: "",
         frecuenciaRespiratoria: "",
         presionArterial: "",
@@ -86,7 +85,8 @@ export default function FichaConduccionVehiculos() {
         movimientosInvoluntarios: false,
         // Examen Médico - Información Adicional
         detalleInformacionExamenMedico: "",
-        // Antecedentes - Columna Izquierda
+
+        //=====================TAB ANTECEDENTES=====================
         alteracionConsciencia: false,
         alcoholismoCronico: false,
         movimientosInvoluntariosEnfermedades: false,
@@ -101,6 +101,8 @@ export default function FichaConduccionVehiculos() {
         obesidadIMC30: false,
         anemiaCriteriosOMS2011: false,
         comentariosDetalleAntecedentes: "",
+
+        //=====================TAB PRUEBAS COMPLEMENTARIAS=====================
         // Pruebas Complementarias
         hipoacusiaFrecuenciasConversacionales: false,
         alteracionAgudezaVisual: false,
@@ -112,10 +114,12 @@ export default function FichaConduccionVehiculos() {
         // Otros Datos de Relevancia
         medicinasTomando: "",
         otrosDatosRelevancia: "",
+
+        //PARTE INFERIOR
         // Conclusión y Comentarios
-        aptoDesde: "",
-        aptoHasta: "",
-        conclusion: "Apto", // Apto, Observado, No Apto, Apto con Restricción
+        aptoDesde: today,
+        aptoHasta: today,
+        conclusion: "APTO", // Apto, Observado, No Apto, Apto con Restricción
         observacionesRecomendaciones: "",
         nombreMedicoColegiatura: "",
         // Recomendaciones
@@ -125,8 +129,6 @@ export default function FichaConduccionVehiculos() {
         obesidadDietaHipocalorica: false,
         usoLentesCorrectoresLectura: false,
         corregirAgudezaLectura: false,
-        // Imprimir
-        norden: "",
     };
 
     const {
@@ -161,7 +163,6 @@ export default function FichaConduccionVehiculos() {
             component: PruebasComplementarias,
         },
     ];
-
     return (
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
@@ -303,7 +304,6 @@ export default function FichaConduccionVehiculos() {
                         {/* Sección Estática - Conclusión y Comentarios */}
                         <div className="bg-white border border-gray-200 rounded-lg p-4 m-4">
                             <h4 className="text-lg font-semibold text-gray-800 mb-4">Conclusión y Comentarios</h4>
-
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 {/* Columna Izquierda - Conclusión */}
                                 <div className="space-y-4">
@@ -432,7 +432,6 @@ export default function FichaConduccionVehiculos() {
                                         name="norden"
                                         value={form?.norden}
                                         onChange={handleChange}
-                                        className="w-32"
                                     />
                                     <button
                                         type="button"
@@ -451,35 +450,22 @@ export default function FichaConduccionVehiculos() {
                 <div className="w-1/5">
                     <div className="bg-white border border-gray-200 rounded-lg p-3 m-4 flex-1 flex flex-col">
                         <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
-
                         {/* Sin Corregir */}
                         <div className="mb-4">
                             <h5 className="font-semibold text-gray-700 mb-2">Sin Corregir</h5>
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="text-center">
-                                    <div className="font-semibold mb-2">O.D</div>
+                                <div className="">
+                                    <div className="font-semibold mb-2 text-center">O.D</div>
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                                            <InputTextOneLine name="vcOD" value={form?.vcOD} disabled />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                                            <InputTextOneLine name="vlOD" value={form?.vlOD} disabled />
-                                        </div>
+                                        <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled />
+                                        <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled />
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="font-semibold mb-2">O.I</div>
+                                <div className="">
+                                    <div className="font-semibold mb-2 text-center">O.I</div>
                                     <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                                            <InputTextOneLine name="vcOI" value={form?.vcOI} disabled />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                                            <InputTextOneLine name="vlOI" value={form?.vlOI} disabled />
-                                        </div>
+                                        <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled />
+                                        <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled />
                                     </div>
                                 </div>
                             </div>
@@ -488,125 +474,64 @@ export default function FichaConduccionVehiculos() {
                         {/* Corregida */}
                         <div className="mb-4">
                             <h5 className="font-semibold text-gray-700 mb-2">Corregida</h5>
-
                             {/* Fila OD y OI */}
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.C.</span>
-                                        <InputTextOneLine
-                                            name="vcCorregidaOD"
-                                            value={form?.vcCorregidaOD}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.L.</span>
-                                        <InputTextOneLine
-                                            name="vlCorregidaOD"
-                                            value={form?.vlCorregidaOD}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
+                                    <InputTextOneLine
+                                        label="V.C."
+                                        name="vcCorregidaOD"
+                                        value={form?.vcCorregidaOD}
+                                        disabled
+                                    />
+                                    <InputTextOneLine
+                                        label="V.L."
+                                        name="vlCorregidaOD"
+                                        value={form?.vlCorregidaOD}
+                                        disabled
+                                    />
                                 </div>
-
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.C.</span>
-                                        <InputTextOneLine
-                                            name="vcCorregidaOI"
-                                            value={form?.vcCorregidaOI}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.L.</span>
-                                        <InputTextOneLine
-                                            name="vlCorregidaOI"
-                                            value={form?.vlCorregidaOI}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
+                                    <InputTextOneLine
+                                        label="V.C."
+                                        name="vcCorregidaOI"
+                                        value={form?.vcCorregidaOI}
+                                        disabled
+                                    />
+                                    <InputTextOneLine
+                                        label="V.L."
+                                        name="vlCorregidaOI"
+                                        value={form?.vlCorregidaOI}
+                                        disabled
+                                    />
                                 </div>
                             </div>
-
                             {/* Fila extra (ancho completo) */}
                             <div className="mt-4 space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[11px] min-w-[45px]">V.Clrs</span>
-                                    <InputTextOneLine
-                                        name="vclrs"
-                                        value={form?.vclrs}
-                                        disabled
-                                        className="flex-1 w-full"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[11px] min-w-[45px]">V.B.</span>
-                                    <InputTextOneLine
-                                        name="vb"
-                                        value={form?.vb}
-                                        disabled
-                                        className="flex-1 w-full"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[11px] min-w-[45px]">R.P.</span>
-                                    <InputTextOneLine
-                                        name="rp"
-                                        value={form?.rp}
-                                        disabled
-                                        className="flex-1 w-full"
-                                    />
-                                </div>
+                                <InputTextOneLine
+                                    label="V.Clrs"
+                                    name="vclrs"
+                                    value={form?.vclrs}
+                                    disabled
+                                    className="flex-1 w-full"
+                                />
+                                <InputTextOneLine
+                                    name="vb"
+                                    label="V.B."
+                                    value={form?.vb}
+                                    disabled
+                                    className="flex-1 w-full"
+                                />
+                                <InputTextOneLine
+                                    label="R.P."
+                                    name="rp"
+                                    value={form?.rp}
+                                    disabled
+                                    className="flex-1 w-full"
+                                />
                             </div>
                         </div>
-
                         {/* Enfermedades Oculares */}
-                        <div className="mb-4 flex-1">
-                            <h5 className="font-semibold text-gray-700 mb-2">Enfermedades Oculares</h5>
-                            <InputTextArea rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
-                        </div>
-
-                        {/* Medidas Generales */}
-                        <div className="mt-4">
-                            <h5 className="font-semibold text-gray-700 mb-3">Medidas Generales</h5>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700 min-w-[30px]">FC:</label>
-                                    <InputTextOneLine name="fc" value={form?.fc} disabled className="flex-1" />
-                                    <span className="text-gray-500 text-xs">x min</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700 min-w-[30px]">FR:</label>
-                                    <InputTextOneLine name="fr" value={form?.fr} disabled className="flex-1" />
-                                    <span className="text-gray-500 text-xs">x min</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700 min-w-[30px]">PA:</label>
-                                    <InputTextOneLine name="pa" value={form?.pa} disabled className="flex-1" />
-                                    <span className="text-gray-500 text-xs">mmHg</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700 min-w-[30px]">TALLA:</label>
-                                    <InputTextOneLine name="talla" value={form?.talla} disabled className="flex-1" />
-                                    <span className="text-gray-500 text-xs">m</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700 min-w-[30px]">PESO:</label>
-                                    <InputTextOneLine name="peso" value={form?.peso} disabled className="flex-1" />
-                                    <span className="text-gray-500 text-xs">kg</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <label className="font-semibold text-gray-700 min-w-[30px]">IMC:</label>
-                                    <InputTextOneLine name="imc" value={form?.imc} disabled className="flex-1" />
-                                </div>
-                            </div>
-                        </div>
+                        <InputTextArea label="Enfermedades Oculares" rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
                     </div>
                 </div>
             </div>

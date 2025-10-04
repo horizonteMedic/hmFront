@@ -6,8 +6,6 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
-import { getHoraActual } from "../../../../utils/helpers";
-
 const obtenerReporteUrl =
     "/api/v01/ct/fichaApneaSueno/obtenerReporteFichaSas";
 const registrarUrl =
@@ -30,40 +28,27 @@ export const GetInfoServicio = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            norden: res.norden,
-            tipoExamen: res.nombreExamen,
-            nombres: res.nombresPaciente + " " + res.apellidosPaciente,
-            dni: res.dniPaciente,
-            edad: res.edadPaciente,
-            sexo: res.sexoPaciente,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            puestoPostula: res.ocupacionPaciente,
-            areaTrabajo: res.areaPaciente,
-            puestoActual: res.cargoPaciente,
-            esOhla: res.esOhla ?? false,
+            norden: res.norden ?? "",
+            tipoExamen: res.nombreExamen ?? "",
+            //datos personales
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            dni: res.dniPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            sexo: res.sexoPaciente ?? "",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            puestoPostula: res.ocupacionPaciente ?? "",
+            puestoActual: res.cargoPaciente ?? "",
 
-            conclusiones: res.observacionesFichaMedica,
+            // Examen Físico
+            peso_kg: res.pesoTriaje ?? "",
+            talla_mts: res.tallaTriaje ?? "",
+            imc_kg_m2: res.imcTriaje ?? "",
+            circunferencia_cuello: res.perimetroCuelloTriaje ?? "",
+            presion_sistolica: res.sistolicaTriaje ?? "",
+            presion_diastolica: res.diastolicaTriaje ?? "",
 
-            visionCercaOd: res.visioncercasincorregirodVCercaSOd,
-            visionLejosOd: res.visionlejossincorregirodVLejosSOd,
-            visionCercaOi: res.visioncercasincorregiroiVCercaSOi,
-            visionLejosOi: res.visionlejossincorregiroiVLejosSOi,
-
-            visionCercaOdCorregida: res.oftalodccmologiaOdcc,
-            visionLejosOdCorregida: res.odlcoftalmologiaOdlc,
-            visionCercaOiCorregida: res.oiccoftalmologiaOicc,
-            visionLejosOiCorregida: res.oilcoftalmologiaOilc,
-
-            visionColores: res.vcoftalmologiaVc,
-            visionBinocular: res.vboftalmologiaVb,
-            reflejosPupilares: res.rpoftalmologiaRp,
-            enfermedadOculares: res.enfermedadesocularesoftalmoEOculares,
-
-            hemoglobina: res.hemoglobinaTxthemoglobina,
-            vsg: res.vsglabclinicoTxtvsg,
-            glucosa: res.glucosalabclinicoTxtglucosabio,
-            creatinina: res.creatininalabclinicoTxtcreatininabio,
+            observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
         }));
     }
 };
@@ -85,66 +70,104 @@ export const GetInfoServicioEditar = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            norden: res.norden,
-            tipoExamen: res.nombreExamen,
-            fechaExam: res.fechaDesde,
-            nombres: res.nombresPaciente + " " + res.apellidosPaciente,
-            dni: res.dniPaciente,
-            edad: res.edadPaciente,
-            sexo: res.sexoPaciente,
-            empresa: res.empresa,
-            contrata: res.contrata,
-            puestoPostula: res.ocupacionPaciente,
-            areaTrabajo: res.areaPaciente,
-            puestoActual: res.cargoPaciente,
-            esOhla: res.esOhla ?? false,
+            // Header
+            norden: res.norden ?? "",
+            codigoSas: res.codigoSas_cod_sas ?? "",
+            fechaExam: res.fechaSas_fecha_sas ?? "", //revisar
+            tipoExamen: res.nombreExamen ?? "",
+            tipoLicencia: res.tipoLicencia_licencia_sas ?? "",
+            //datos personales
+            nombres: `${res.nombresPaciente ?? ""} ${res.apellidosPaciente ?? ""}`,
+            dni: res.dniPaciente ?? "",
+            edad: res.edadPaciente ?? "",
+            sexo: res.sexoPaciente ?? "",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            puestoPostula: res.ocupacionPaciente ?? "",
+            puestoActual: res.cargoPaciente ?? "",
+            //trabaja noche
+            trabajoNoche: res.trabajaNocheSi_tbtrabajanochesi ?? false,
+            diasTrabajoNoche: res.diasTrabajo_txtdiastrabajo ?? "",
+            diasDescansoNoche: res.descanso_txtdescanso ?? "",
+            anosTrabajoNoche: res.anosTrabajo_txtanostrabajo ?? "",
+            // Antecedentes personales
+            apneaDelSueno: res.apneaSi_rbapneasi ?? false,
+            ultimoControl: res.ultimoControl_txtultimocontrol ?? "",
+            hta: res.htaSi_rbhtasi ?? false,
+            medicacionRiesgo: res.riesgo_txtriesgo ?? "",
+            polisomnografiaRealizada: res.psgSi_rbpsgsi ?? false,
+            fechaUltimaPolisomnografia: res.fechaPsg_fechapsg ?? "",  //revisar
+            accidenteEnLaMina: res.enMinaSi_rbenminasi ?? false,
+            accidenteFueraDeLaMina: res.fueraMinaSi_rbfueraminasi ?? false,
+            // Antecedentes de choques
+            criterio1_cabeceo: res.casoChoquePregunta1Si_chk1_sassi ?? false, //1
+            accidente_nocturno: res.casoChoquePregunta2Si_chk2_sassi ?? false, //2
+            ausencia_evidencia_maniobra: res.casoChoquePregunta3Si_chk3_sassi ?? false, //3
+            choque_vehiculo_contra_otro: res.casoChoquePregunta4Si_chk4_sassi ?? false, //4
+            vehiculo_invadio_carril: res.casoChoquePregunta5Si_chk5_sassi ?? false, //5
+            conductor_no_recuerda: res.casoChoquePregunta6Si_chk6_sassi ?? false, //6
+            tratamiento_medicinas_somnolencia: res.casoChoquePregunta7Si_chk7_sassi ?? false, //7
+            conductor_encontraba_horas_extra: res.casoChoquePregunta8Si_chk8_sassi ?? false, //8
+            accidente_confirmado_somnolencia: res.casoChoquePregunta9Si_chk9_sassi ?? false, //9
+            accidente_alta_sospecha_somnolencia: res.casoChoquePregunta10Si_chk10_sassi ?? false, //10
+            accidente_escasa_evidencia_somnolencia: res.casoChoquePregunta11Si_chk11_sassi ?? false, //11
+            no_datos_suficientes: res.casoChoquePregunta12Si_chk12_sassi ?? false, //12
+            accidente_no_debido_somnolencia: res.casoChoquePregunta13Si_chk13_sassi ?? false, //13
 
-            conclusiones: res.conclusiones,
-            apto: res.apto ? "APTO" :
-                (res.aptoConRestriccion ? "APTO CON RESTRICCION" : res.noApto ?
-                    "NO APTO" : res.conObservacion ?
-                        "CON OBSERVACION" :
-                        res.evaluado ? "EVALUADO" : ""),
-            fechaValido: res.fechaDesde,
-            fechaVencimiento: res.fechaHasta,
-            recomendaciones: res.recomendaciones,
-            restricciones: res.restriccionesDescripcion,
+            // Antecedentes familiares de apnea del sueño
+            antec_familiar_apnea: res.entrevistaAnteFamiliarApneaSi_chkantsi ?? false,
+            indique_familiar_apnea: res.entrevistaAnteFamiliarApneaDescrip_txtantecedentefamiliar ?? "",
 
-            // Checkboxes de recomendaciones - mapeados basados en restriccionesDescripcion
-            corregirAgudezaVisualTotal: res.restriccionesDescripcion?.includes("CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            corregirAgudezaVisual: res.restriccionesDescripcion?.includes("CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            dietaHipocalorica: res.restriccionesDescripcion?.includes("DIETA HIPOCALÓRICA Y EJERCICIOS") || false,
-            evitarMovimientosDisergonomicos: res.restriccionesDescripcion?.includes("EVITAR MOVIMIENTOS Y POSICIONES DISERGONÓMICAS") || false,
-            noHacerTrabajoAltoRiesgo: res.restriccionesDescripcion?.includes("NO HACER TRABAJO DE ALTO RIESGO") || false,
-            noHacerTrabajoSobre18: res.restriccionesDescripcion?.includes("NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            usoEppAuditivo: res.restriccionesDescripcion?.includes("USO DE EPP AUDITIVO ANTE EXPOSICIÓN A RUIDO >=80 DB") || false,
-            usoLentesConducir: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS") || false,
-            usoLentesTrabajo: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO.") || false,
-            usoLentesTrabajoSobre18: res.restriccionesDescripcion?.includes("USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO") || false,
-            ninguno: res.restriccionesDescripcion?.includes("NINGUNO") || res.restriccionesDescripcion === "NINGUNO." || false,
-            noConducirVehiculos: res.restriccionesDescripcion?.includes("NO CONDUCIR VEHÍCULOS") || false,
-            // Médico que Certifica
-            nombre_medico: res.nombreMedico,
+            // Entrevista al paciente
+            ronca_al_dormir: res.entrevistaPregunta1Si_chk1_esi ?? false,
+            ruidos_respirar_durmiendo: res.entrevistaPregunta2Si_chk2_esi ?? false,
+            deja_respirar_durmiendo: res.entrevistaPregunta3Si_chk3_esi ?? false,
+            mas_sueno_cansancio: res.entrevistaPregunta4Si_chk4_esi ?? false,
 
-            visionCercaOd: res.visioncercasincorregirodVCercaSOd,
-            visionLejosOd: res.visionlejossincorregirodVLejosSOd,
-            visionCercaOi: res.visioncercasincorregiroiVCercaSOi,
-            visionLejosOi: res.visionlejossincorregiroiVLejosSOi,
+            // Examen Físico
+            peso_kg: res.pesoTriaje ?? "",
+            talla_mts: res.tallaTriaje ?? "",
+            imc_kg_m2: res.imcTriaje ?? "",
+            circunferencia_cuello: res.perimetroCuelloTriaje ?? "",
+            cuello_varon_normal: res.examenFisicoVaronSi_chkvaronsi ?? false,
+            cuello_mujer_normal: res.examenFisicoMujerSi_chkmujersi ?? false,
+            presion_sistolica: res.sistolicaTriaje ?? "",
+            presion_diastolica: res.diastolicaTriaje ?? "",
+            hta_nueva: res.examenFisicoHtaNuevaSi_chkhtanuevasi ?? false,
 
-            visionCercaOdCorregida: res.oftalodccmologiaOdcc,
-            visionLejosOdCorregida: res.odlcoftalmologiaOdlc,
-            visionCercaOiCorregida: res.oiccoftalmologiaOicc,
-            visionLejosOiCorregida: res.oilcoftalmologiaOilc,
+            // Evaluación de vía aérea superior MALLAMPATI
+            mallampati_grado:
+                res.examenFisicoGradoI_chkgradoi
+                    ? "1"
+                    : res.examenFisicoGradoII_chkgradoii
+                        ? "2"
+                        : res.examenFisicoGradoIII_chkgradoiii
+                            ? "3"
+                            : res.examenFisicoGradoIV_chkgradoiiii
+                                ? "4"
+                                : "",
 
-            visionColores: res.vcoftalmologiaVc,
-            visionBinocular: res.vboftalmologiaVb,
-            reflejosPupilares: res.rpoftalmologiaRp,
-            enfermedadOculares: res.enfermedadesocularesoftalmoEOculares,
+            // Conclusión de la Evaluación
+            // Requiere PSG antes de certificar aptitud para conducir
+            requiere_psg: res.conclusionRequierePsgSi_chk1_psg_si ?? false,
+            criterio_a: res.conclusionRequierePsgASi_chk1_psg_sia ?? false,
+            criterio_b: res.conclusionRequierePsgBSi_chk1_psg_sib ?? false,
 
-            hemoglobina: res.hemoglobinaTxthemoglobina,
-            vsg: res.vsglabclinicoTxtvsg,
-            glucosa: res.glucosalabclinicoTxtglucosabio,
-            creatinina: res.creatininalabclinicoTxtcreatininabio,
+            // Apto por 3 meses a renovar luego de PSG
+            apto_3_meses: res.conclusionAptoPsgSi_chk1_apto_si ?? false,
+            criterio_c: res.conclusionAptoCriterioCSi_chk1_apto_sic ?? false,
+            criterio_d: res.conclusionAptoCriterioDSi_chk1_apto_sid ?? false,
+            criterio_d_imc: res.conclusionAptoCriterioD1Si_chk1_apto_sid1 ?? false,
+            criterio_d_hta: res.conclusionAptoCriterioD2Si_chk1_apto_sid2 ?? false,
+            criterio_d_cuello: res.conclusionAptoCriterioD3Si_chk1_apto_sid3 ?? false,
+            criterio_d_epworth: res.conclusionAptoCriterioD4Si_chk1_apto_sid4 ?? false,
+            criterio_d_trastorno: res.conclusionAptoCriterioD5Si_chk1_apto_sid5 ?? false,
+            criterio_d_ahi: res.conclusionAptoCriterioD6Si_chk1_apto_sid6 ?? false,
+            criterio_e: res.conclusionAptoCriterioESi_chk1_apto_sie ?? false,
+
+            // Apto con bajo riesgo de Apnea del sueño
+            apto_bajo_riesgo: res.conclusionAptoBajoRiesgoSi_chkaptobajosi ?? false,
+            observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
         }));
     }
 };
@@ -224,11 +247,11 @@ export const SubmitDataService = async (
         entrevistaPregunta2No: !form.ruidos_respirar_durmiendo,
         entrevistaPregunta3No: !form.deja_respirar_durmiendo,
         entrevistaPregunta4No: !form.mas_sueno_cansancio,
-        entrevistaPuntuacion: (form.ronca_al_dormir ? 1 : 0) + (form.ruidos_respirar_durmiendo ? 1 : 0) + (form.deja_respirar_durmiendo ? 1 : 0) + (form.mas_sueno_cansancio ? 1 : 0).toString(),
-        examenFisicoVaronSi: form.cuello_varon_normal, 
-        examenFisicoVaronNo: !form.cuello_varon_normal, 
-        examenFisicoMujerSi: form.cuello_mujer_normal, 
-        examenFisicoMujerNo: !form.cuello_mujer_normal, 
+        entrevistaPuntuacion: ((form.ronca_al_dormir ? 1 : 0) + (form.ruidos_respirar_durmiendo ? 1 : 0) + (form.deja_respirar_durmiendo ? 1 : 0)+ (form.mas_sueno_cansancio ? 1 : 0)).toString(),
+        examenFisicoVaronSi: form.cuello_varon_normal,
+        examenFisicoVaronNo: !form.cuello_varon_normal,
+        examenFisicoMujerSi: form.cuello_mujer_normal,
+        examenFisicoMujerNo: !form.cuello_mujer_normal,
         examenFisicoHtaNuevaSi: form.hta_nueva,
         examenFisicoHtaNuevaNo: !form.hta_nueva,
         examenFisicoGradoI: form.mallampati_grado === "1",
@@ -238,12 +261,12 @@ export const SubmitDataService = async (
         conclusionAptoBajoRiesgoSi: form.apto_bajo_riesgo,
         conclusionAptoBajoRiesgoNo: !form.apto_bajo_riesgo,
         conclusionObservaciones: form.observaciones,
-        dniUsuario: form.dniUsuario, 
+        dniUsuario: form.dniUsuario,
         fechaSas: form.fechaExam,
         conclusionRequierePsgSi: form.requiere_psg,
         conclusionRequierePsgNo: !form.requiere_psg,
-        conclusionAptoPsgSi: form.apto_3_meses, 
-        conclusionAptoPsgNo: !form.apto_3_meses, 
+        conclusionAptoPsgSi: form.apto_3_meses,
+        conclusionAptoPsgNo: !form.apto_3_meses,
         conclusionRequierePsgASi: form.criterio_a,
         conclusionRequierePsgANo: !form.criterio_a,
         conclusionRequierePsgBSi: form.criterio_b,
@@ -251,19 +274,19 @@ export const SubmitDataService = async (
 
         conclusionAptoCriterioDSi: form.criterio_d,
         conclusionAptoCriterioDNo: !form.criterio_d,
-        conclusionAptoCriterioD1Si: form.criterio_d_imc, 
-        conclusionAptoCriterioD1No: !form.criterio_d_imc, 
-        conclusionAptoCriterioD2Si: form.criterio_d_hta, 
-        conclusionAptoCriterioD2No: !form.criterio_d_hta, 
-        conclusionAptoCriterioD3Si: form.criterio_d_cuello, 
-        conclusionAptoCriterioD3No: !form.criterio_d_cuello, 
-        conclusionAptoCriterioD4Si: form.criterio_d_epworth, 
-        conclusionAptoCriterioD4No: !form.criterio_d_epworth, 
-        conclusionAptoCriterioD5Si: form.criterio_d_trastorno, 
-        conclusionAptoCriterioD5No: !form.criterio_d_trastorno, 
-        conclusionAptoCriterioD6Si: form.criterio_d_ahi, 
-        conclusionAptoCriterioD6No: !form.criterio_d_ahi, 
-        
+        conclusionAptoCriterioD1Si: form.criterio_d_imc,
+        conclusionAptoCriterioD1No: !form.criterio_d_imc,
+        conclusionAptoCriterioD2Si: form.criterio_d_hta,
+        conclusionAptoCriterioD2No: !form.criterio_d_hta,
+        conclusionAptoCriterioD3Si: form.criterio_d_cuello,
+        conclusionAptoCriterioD3No: !form.criterio_d_cuello,
+        conclusionAptoCriterioD4Si: form.criterio_d_epworth,
+        conclusionAptoCriterioD4No: !form.criterio_d_epworth,
+        conclusionAptoCriterioD5Si: form.criterio_d_trastorno,
+        conclusionAptoCriterioD5No: !form.criterio_d_trastorno,
+        conclusionAptoCriterioD6Si: form.criterio_d_ahi,
+        conclusionAptoCriterioD6No: !form.criterio_d_ahi,
+
         conclusionAptoCriterioESi: form.criterio_e,
         conclusionAptoCriterioENo: !form.criterio_e,
         conclusionAptoCriterioCSi: form.criterio_c,
@@ -283,7 +306,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/*.jsx");
+    const jasperModules = import.meta.glob("../../../../jaspers/FichasSAS/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -291,7 +314,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/Ficha_Anexo16"
+        "../../../../jaspers/FichasSAS"
     );
 };
 
@@ -311,7 +334,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Aptitud Anexo 16.",
+                    "Este paciente ya cuenta con registros de Ficha SAS",
                     "warning"
                 );
             });
@@ -320,7 +343,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Anexo 16 para poder registrarse.",
+                "El paciente necesita pasar por Triaje.",
                 "warning"
             );
         }

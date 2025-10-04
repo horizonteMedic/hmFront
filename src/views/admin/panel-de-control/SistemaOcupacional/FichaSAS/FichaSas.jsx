@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave, faPrint, faTrash, faBroom } from "@fortawesome/free-solid-svg-icons";
-import { useEffect } from "react";
+import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
+
 import {
     InputTextOneLine,
     InputTextArea,
@@ -13,6 +13,7 @@ import { getToday } from "../../../../utils/helpers";
 import { useForm } from "../../../../hooks/useForm";
 import MedicoSearch from "../../../../components/reusableComponents/MedicoSearch";
 import Mallampati from "../../../../../../public/img/Mallampati.jpg"
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaSas";
 
 const tabla = "ficha_sas"
 const today = getToday();
@@ -136,21 +137,20 @@ export default function FichaSas({ listas }) {
 
 
     const handleSave = () => {
-        // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            // PrintHojaR(form.norden, token, tabla, datosFooter);
-            console.log("Imprimiendo:", form.norden);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
