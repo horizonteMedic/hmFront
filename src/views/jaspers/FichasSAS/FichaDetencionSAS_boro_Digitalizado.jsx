@@ -1301,43 +1301,37 @@ export default function B_FichaDetencionSAS2(data = {}) {
   dibujarTextoJustificado(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55);
 
   // Columna 2: Firma
-  const firmaUrl = getSign(data, "FIRMAP");
-  if (firmaUrl) {
-    try {
-      const img = new Image();
-      img.onload = function () {
-        const imgWidth = 50;
-        const imgHeight = 15;
-        const x = tablaInicioX + 65;
-        const y = yPos + 2;
-        doc.addImage(img, 'PNG', x, y, imgWidth, imgHeight);
-      };
-      img.src = firmaUrl;
-    } catch (error) {
-      console.log("Error cargando firma:", error);
-    }
+  try {
+    const x = tablaInicioX + 65;
+    const y = yPos + 2;
+    const firmaPaciente = getSign(data, "FIRMAP")
+    doc.addImage(
+      firmaPaciente,
+      'PNG',
+      x + 7, y - 5, 34, 25
+    );
+  } catch (error) {
+    console.log("Error cargando firma:", error);
   }
+
+
 
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma del trabajador o postulante", tablaInicioX + 90, yPos + 16.5, { align: "center" });
   doc.text("DNI : " + datosFinales.documentoIdentidad, tablaInicioX + 90, yPos + 19, { align: "center" });
 
   // Columna 3: Huella digital
-  const huellaUrl = getSign(data, "HUELLA");
-  if (huellaUrl) {
-    try {
-      const img = new Image();
-      img.onload = function () {
-        const imgWidth = 50;
-        const imgHeight = 15;
-        const x = tablaInicioX + 125;
-        const y = yPos + 2;
-        doc.addImage(img, 'PNG', x, y, imgWidth, imgHeight);
-      };
-      img.src = huellaUrl;
-    } catch (error) {
-      console.log("Error cargando huella:", error);
-    }
+  try {
+    const x = tablaInicioX + 125;
+    const y = yPos + 2;
+    const huellaDigital = getSign(data, "HUELLA")
+    doc.addImage(
+      huellaDigital,
+      'PNG',
+      x + 20, y - 5, 15, 21
+    );
+  } catch (error) {
+    console.log("Error cargando huella:", error);
   }
 
   doc.setFont("helvetica", "normal").setFontSize(7);
@@ -1843,21 +1837,17 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.text("CMP", tablaCriteriosInicioX + 2, yFirmaMedica + 13);
 
   // Columna 2: Firma del médico
-  const firmaMedicoUrl = getSign(data, "FIRMA_MEDICO");
-  if (firmaMedicoUrl) {
-    try {
-      const img = new Image();
-      img.onload = function () {
-        const imgWidth = 80;
-        const imgHeight = 20;
-        const x = tablaCriteriosInicioX + tablaCriteriosAncho / 2 + 10;
-        const y = yFirmaMedica + 2;
-        doc.addImage(img, 'PNG', x, y, imgWidth, imgHeight);
-      };
-      img.src = firmaMedicoUrl;
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
+  try {
+    const x = tablaCriteriosInicioX + tablaCriteriosAncho / 2 + 10;
+    const y = yFirmaMedica + 2;
+    const firmaMedicoUrl = getSign(data, "SELLOFIRMA")
+    doc.addImage(
+      firmaMedicoUrl,
+      'PNG',
+      x + 7, y - 5, 34, 25
+    );
+  } catch (error) {
+    console.log("Error cargando firma del médico:", error);
   }
 
   // Fila 2: Observaciones/Recomendaciones (fila dinámica)
@@ -1885,44 +1875,40 @@ export default function B_FichaDetencionSAS2(data = {}) {
   dibujarTextoJustificado(textoDeclaracionP2, tablaCriteriosInicioX + 2, yDeclaracion + 3, 55);
 
   // Columna 2: Firma
-  const firmaUrlP2 = getSign(data, "FIRMAP");
-  if (firmaUrlP2) {
-    try {
-      const img = new Image();
-      img.onload = function () {
-        const imgWidth = 50;
-        const imgHeight = 15;
-        const x = tablaCriteriosInicioX + 65;
-        const y = yDeclaracion + 2;
-        doc.addImage(img, 'PNG', x, y, imgWidth, imgHeight);
-      };
-      img.src = firmaUrlP2;
-    } catch (error) {
-      console.log("Error cargando firma:", error);
-    }
+  try {
+    const x = tablaCriteriosInicioX + 65;
+    const y = yDeclaracion + 2;
+    const firmaPaciente = getSign(data, "FIRMAP")
+    doc.addImage(
+      firmaPaciente,
+      'PNG',
+      x + 7, y - 5, 34, 25
+    );
+  } catch (error) {
+    console.log("Error cargando firma:", error);
   }
+
+
 
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Firma del trabajador o postulante", tablaCriteriosInicioX + 90, yDeclaracion + 16.5, { align: "center" });
   doc.text("DNI : " + datosFinales.documentoIdentidad, tablaCriteriosInicioX + 90, yDeclaracion + 19, { align: "center" });
 
   // Columna 3: Huella digital
-  const huellaUrlP2 = getSign(data, "HUELLA");
-  if (huellaUrlP2) {
-    try {
-      const img = new Image();
-      img.onload = function () {
-        const imgWidth = 50;
-        const imgHeight = 15;
-        const x = tablaCriteriosInicioX + 125;
-        const y = yDeclaracion + 2;
-        doc.addImage(img, 'PNG', x, y, imgWidth, imgHeight);
-      };
-      img.src = huellaUrlP2;
-    } catch (error) {
-      console.log("Error cargando huella:", error);
-    }
+  try {
+    const x = tablaCriteriosInicioX + 125;
+    const y = yDeclaracion + 2;
+    const huellaDigital = getSign(data, "HUELLA")
+    doc.addImage(
+      huellaDigital,
+      'PNG',
+      x + 20, y - 5, 15, 21
+    );
+  } catch (error) {
+    console.log("Error cargando huella:", error);
   }
+
+
 
   doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Indice Derecho", tablaCriteriosInicioX + 150, yDeclaracion + 16.5, { align: "center" });
