@@ -1119,7 +1119,7 @@ export default function Anexo16Boroo(data = {}) {
 
   // === SECCIÓN: FUNCIÓN RESPIRATORIA ===
   // FVC
-  const xFvc = 120;
+  const xFvc = 118;
   const yFvc = 148;
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fvc) {
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -1128,7 +1128,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // FEV1
-  const xFev1 = 120;
+  const xFev1 = 118;
   const yFev1 = 154;
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fev1) {
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -1137,7 +1137,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // FEV1/FVC
-  const xFev1Fvc = 160;
+  const xFev1Fvc = 151;
   const yFev1Fvc = 148;
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fev1Fvc) {
     doc.setFont("helvetica", "normal").setFontSize(9);
@@ -1146,7 +1146,7 @@ export default function Anexo16Boroo(data = {}) {
   }
 
   // FEF 25-75%
-  const xFef2575 = 160;
+  const xFef2575 = 151;
   const yFef2575 = 154;
   if (datosFinales.funcionRespiratoria && datosFinales.funcionRespiratoria.fef2575) {
     doc.setFont("helvetica", "normal").setFontSize(9);
