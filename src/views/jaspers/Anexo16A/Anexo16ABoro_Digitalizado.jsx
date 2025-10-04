@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign } from "../../utils/helpers";
+import { getSign, convertirGenero } from "../../utils/helpers";
 import { normalizeList } from "../../utils/listUtils";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
@@ -10,13 +10,17 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   const pageW = doc.internal.pageSize.getWidth();
 
+  // Contador de páginas dinámico
+  let numeroPagina = 1;
+
   // Datos de prueba por defecto
   const datosPrueba = {
     apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
     fechaExamen: "04/11/2024",
-    sexo: "F",
+    tipoExamen: "PRE-OCUPACIONAL",
+    sexo: "Femenino",
     documentoIdentidad: "72384273",
-    edad: "31 años",
+    edad: "31",
     areaTrabajo: "MINERÍA",
     puestoTrabajo: "DAD",
     empresa: "MINERA BOROO MISQUICHILCA S.A.",
@@ -26,7 +30,10 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       fr: "19",
       pa: "120/60",
       satO2: "99",
-      imc: "23.48"
+      imc: "23.48",
+      temperatura: "36.5",
+      peso: "70",
+      talla: "1.75"
     },
     condiciones: {
       cirugiaMayor: false,
@@ -69,9 +76,10 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   const datosReales = {
     apellidosNombres: String((data.apellidos_apellidos_pa || "") + " " + (data.nombres_nombres_pa || "")),
     fechaExamen: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || ""),
-    sexo: data.sexo_sexo_pa || "",
+    tipoExamen: String(data.nombreExamen || ""),
+    sexo: convertirGenero(data.sexo_sexo_pa) || "",
     documentoIdentidad: String(data.dni_cod_pa || ""),
-    edad: `${String(data.edad_edad ?? "")} AÑOS`,
+    edad: String(data.edad_edad ?? ""),
     areaTrabajo: data.area_area_o || "",
     puestoTrabajo: data.cargo_cargo_de || "",
     empresa: data.empresa_razon_empresa || "",
@@ -82,7 +90,10 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
       fr: String(data.frecuenciaRespiratoriaTriaje_f_respiratoria || ""),
       pa: String(data.sistolicaTriaje_sistolica || "") + "/" + String(data.diastolicaTriaje_diastolica || ""), //revisar - combinación de sistólica y diastólica
       satO2: String(data.saturacionOxigenoTriaje_sat_02 || ""),
-      imc: String(data.imcTriaje_imc || "")
+      imc: String(data.imcTriaje_imc || ""),
+      temperatura: String(data.temperaturaTriaje_temperatura || ""),
+      peso: String(data.pesoTriaje_peso || ""),
+      talla: String(data.tallaTriaje_talla || "")
     },
     condiciones: {
       cirugiaMayor: data.cirujiaMayorRecienteSiAnexo16a_si1 === true,
@@ -129,43 +140,50 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   // Usar datos reales si existen, sino usar datos de prueba
   const datosFinales = data && data.norden_n_orden ? datosReales : datosPrueba;
 
-  // === HEADER ===
-  // Logo y membrete
-  CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
+  // Header reutilizable (similar a FichaDetencionSAS_boro_Digitalizado.jsx)
+  const drawHeader = (pageNumber) => {
+    // Logo y membrete
+    CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false });
 
-  // Título principal
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.setTextColor(0, 0, 0);
-  doc.text("ANEXO N° 16 - A", pageW / 2, 30, { align: "center" });
+    // Título principal (solo en página 1)
+    if (pageNumber === 1) {
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text("ANEXO N° 16 - A", pageW / 2, 30, { align: "center" });
 
-  doc.setFont("helvetica", "bold").setFontSize(12);
-  doc.text("EVALUACION MÉDICA PARA ASCENSO A GRANDES ALTITUDES", pageW / 2, 34, { align: "center" });
-  doc.text("(mayor de 2,500 m.s.n.m.)", pageW / 2, 38, { align: "center" });
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.text("EVALUACION MÉDICA PARA ASCENSO A GRANDES ALTITUDES", pageW / 2, 34, { align: "center" });
+      doc.text("(mayor de 2,500 m.s.n.m.)", pageW / 2, 38, { align: "center" });
+    }
 
-  // Número de Ficha y Página
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Nro de ficha: ", pageW - 53, 15);
-  doc.setFont("helvetica", "bold").setFontSize(18);
-  doc.text(datosFinales.numeroFicha, pageW - 33, 15);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sede: " + datosFinales.sede, pageW - 53, 20);
-  doc.text("Pag. 01", pageW - 53, 25);
+    // Número de Ficha y Página (alineación automática mejorada)
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Nro de ficha: ", pageW - 80, 15);
 
-  // === BLOQUE DE COLOR ===
-  drawColorBox(doc, {
-    color: datosFinales.codigoColor,           // Color de la letra y línea
-    text: datosFinales.textoColor,             // Letra a mostrar (ej: "F")
-    x: pageW - 30,                             // Posición X (30mm del borde derecho)
-    y: 10,                                     // Posición Y (alineado con header)
-    size: 22,                                  // Tamaño del área total (22x22mm)
-    showLine: true,                            // Mostrar línea de color
-    fontSize: 30,                              // Tamaño de la letra
-    textPosition: 0.9                          // Posición de la letra (0.9 = cerca de la línea)
-  });
+    doc.setFont("helvetica", "normal").setFontSize(18);
+    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
+    doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 25);
 
-  // === FECHA DE EXAMEN ===
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Fecha Examen: " + datosFinales.fechaExamen, 10, 40);
+    doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 10);
+
+    // Bloque de color (posición mejorada)
+    drawColorBox(doc, {
+      color: datosFinales.codigoColor,
+      text: datosFinales.textoColor,
+      x: pageW - 30,
+      y: 10,
+      size: 22,
+      showLine: true,
+      fontSize: 30,
+      textPosition: 0.9
+    });
+  };
+
+  // === DIBUJAR HEADER ===
+  drawHeader(numeroPagina);
+
 
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
@@ -255,6 +273,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
+
   // Tercera fila: Área de Trabajo, Puesto de Trabajo (2 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
@@ -282,60 +301,61 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
 
   // Primera fila: Apellidos y Nombres
   yTexto += filaAltura;
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 35, yTexto + 2, tablaAncho - 60);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 2, tablaAncho - 40);
   yTexto += filaAltura;
 
   // Segunda fila: DNI, Edad, Sexo
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 2);
 
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Edad:", tablaInicioX + 62, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.edad, tablaInicioX + 75, yTexto + 2);
+  doc.text(datosFinales.edad + " Años", tablaInicioX + 75, yTexto + 2);
 
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Sexo:", tablaInicioX + 122, yTexto + 2);
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Género:", tablaInicioX + 122, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.sexo, tablaInicioX + 135, yTexto + 2);
   yTexto += filaAltura;
 
+
   // Tercera fila: Área de Trabajo, Puesto de Trabajo
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Área de Trabajo:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 27, yTexto + 2, 50);
+  dibujarTextoConSaltoLinea(datosFinales.areaTrabajo, tablaInicioX + 30, yTexto + 2, 50);
 
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Puesto de Trabajo:", tablaInicioX + 92, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
   dibujarTextoConSaltoLinea(datosFinales.puestoTrabajo, tablaInicioX + 122, yTexto + 2, 65);
   yTexto += filaAltura;
 
   // Cuarta fila: Empresa
-  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 20, yTexto + 2, tablaAncho - 25);
+  dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 25, yTexto + 2, tablaAncho - 25);
   yTexto += filaAltura;
 
   // Quinta fila: Contrata
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Contratista:", tablaInicioX + 2, yTexto + 2);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text("Contrata:", tablaInicioX + 2, yTexto + 2);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 20, yTexto + 2, tablaAncho - 30);
+  dibujarTextoConSaltoLinea(datosFinales.contrata, tablaInicioX + 25, yTexto + 2, tablaAncho - 30);
   yTexto += filaAltura;
 
   // === SECCIÓN 2: FUNCIONES VITALES ===
   // Header de funciones vitales (solo título)
-  yPos = dibujarHeaderSeccion("2. FUNCIONES VITALES", yPos, filaAltura);
+  yPos = dibujarHeaderSeccion("2. SIGNOS VITALES", yPos, filaAltura);
 
-  // Fila de funciones vitales con 5 columnas (datos van aquí)
+  // Primera fila de funciones vitales con 5 columnas (datos van aquí)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
   doc.line(tablaInicioX + 38, yPos, tablaInicioX + 38, yPos + filaAltura); // Primera división
   doc.line(tablaInicioX + 76, yPos, tablaInicioX + 76, yPos + filaAltura); // Segunda división
@@ -344,37 +364,70 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
+  yPos += filaAltura;
+
+  // Segunda fila de funciones vitales con 3 columnas (Temperatura, Peso, Talla)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
+  doc.line(tablaInicioX + 63, yPos, tablaInicioX + 63, yPos + filaAltura); // Primera división
+  doc.line(tablaInicioX + 126, yPos, tablaInicioX + 126, yPos + filaAltura); // Segunda división
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
 
   // === CONTENIDO DE FUNCIONES VITALES ===
+  // Primera fila: FC, FR, PA, Sat. O2, IMC
+  const yPrimeraFila = yPos - filaAltura; // Ajustar para la primera fila
+  
   // FC (Frecuencia Cardíaca)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("FC:", tablaInicioX + 2, yPos + 3);
+  doc.text("FC:", tablaInicioX + 2, yPrimeraFila + 3);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.vitalSigns.fc + " x min", tablaInicioX + 8, yPos + 3);
+  doc.text(datosFinales.vitalSigns.fc + " x min", tablaInicioX + 8, yPrimeraFila + 3);
 
   // FR (Frecuencia Respiratoria)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("FR:", tablaInicioX + 40, yPos + 3);
+  doc.text("FR:", tablaInicioX + 40, yPrimeraFila + 3);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.vitalSigns.fr + " x min", tablaInicioX + 46, yPos + 3);
+  doc.text(datosFinales.vitalSigns.fr + " x min", tablaInicioX + 46, yPrimeraFila + 3);
 
   // PA (Presión Arterial)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("PA:", tablaInicioX + 78, yPos + 3);
+  doc.text("PA:", tablaInicioX + 78, yPrimeraFila + 3);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.vitalSigns.pa + " mmHg", tablaInicioX + 84, yPos + 3);
+  doc.text(datosFinales.vitalSigns.pa + " mmHg", tablaInicioX + 84, yPrimeraFila + 3);
 
   // Sat. O2 (Saturación de Oxígeno)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Sat. O2:", tablaInicioX + 116, yPos + 3);
+  doc.text("Sat. O2:", tablaInicioX + 116, yPrimeraFila + 3);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.vitalSigns.satO2 + " %", tablaInicioX + 130, yPos + 3);
+  doc.text(datosFinales.vitalSigns.satO2 + " %", tablaInicioX + 130, yPrimeraFila + 3);
 
   // IMC (Índice de Masa Corporal)
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("IMC:", tablaInicioX + 154, yPos + 3);
+  doc.text("IMC:", tablaInicioX + 154, yPrimeraFila + 3);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.vitalSigns.imc + " kg/m2", tablaInicioX + 162, yPos + 3);
+  doc.text(datosFinales.vitalSigns.imc + " kg/m2", tablaInicioX + 162, yPrimeraFila + 3);
+
+  // Segunda fila: T°, Peso, Talla
+  const ySegundaFila = yPos; // La segunda fila está en la posición actual de yPos
+  
+  // Temperatura
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("T°:", tablaInicioX + 2, ySegundaFila + 3);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.vitalSigns.temperatura + " °C", tablaInicioX + 8, ySegundaFila + 3);
+
+  // Peso
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Peso:", tablaInicioX + 65, ySegundaFila + 3);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.vitalSigns.peso + " kg", tablaInicioX + 75, ySegundaFila + 3);
+
+  // Talla
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Talla:", tablaInicioX + 128, ySegundaFila + 3);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.vitalSigns.talla + " cm", tablaInicioX + 140, ySegundaFila + 3);
 
   yPos += filaAltura;
 
