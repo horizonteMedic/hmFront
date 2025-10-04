@@ -41,6 +41,9 @@ export default function UsoRespiradores({ data = {} }) {
       // Datos adicionales para header
       numeroFicha: "99164",
       sede: "Trujillo-Pierola",
+      otros: "Condiciones especiales adicionales",
+      otrosPulmon: "Otras condiciones pulmonares específicas",
+      otrosCardiovascular: "Otras condiciones cardiovasculares específicas",
     };
 
     // Datos reales mapeados desde la estructura de datos
@@ -68,6 +71,9 @@ export default function UsoRespiradores({ data = {} }) {
       // Datos adicionales para header
       numeroFicha: String(data.n_orden ?? ""),
       sede: data.sede || data.nombreSede || "",
+      otros: String(data.otros ?? ""),
+      otrosPulmon: String(data.otrosPulmon ?? ""),
+      otrosCardiovascular: String(data.otrosCardiovascular ?? ""),
     };
 
     // Usar datos reales si existen, sino usar datos de prueba
@@ -88,12 +94,12 @@ export default function UsoRespiradores({ data = {} }) {
       }
 
       // Número de Ficha y Página (alineación automática mejorada) - Subidos 3.5 puntos
-      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text("Nro de ficha: ", pageW - 80, 12); // 15 - 3.5 = 11.5
 
       doc.setFont("helvetica", "bold").setFontSize(18);
       doc.text(datosFinales.numeroFicha, pageW - 50, 13); // 16 - 3.5 = 12.5
-      doc.setFont("helvetica", "normal").setFontSize(8);
+      doc.setFont("helvetica", "normal").setFontSize(7);
       doc.text("Sede: " + datosFinales.sede, pageW - 80, 17); // 20 - 3.5 = 16.5
       
       doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 7); // 10 - 3.5 = 6.5
@@ -153,7 +159,7 @@ export default function UsoRespiradores({ data = {} }) {
     let yPos = tablaInicioY;
 
     // Altura general para todas las filas
-    const filaAltura = 5;
+    const filaAltura = 4; // Reducida de 5 a 3.5
 
     // Función general para dibujar header de sección con fondo gris
     const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
@@ -252,64 +258,64 @@ export default function UsoRespiradores({ data = {} }) {
     yTexto += filaAltura;
 
     // Segunda fila: Apellidos y Nombres
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 55, yTexto + 1, 130);
     yTexto += filaAltura;
 
     // Tercera fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.edad, tablaInicioX + 58, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.genero, tablaInicioX + 105, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1);
     yTexto += filaAltura;
 
     // Cuarta fila: Domicilio
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1, 150);
     yTexto += filaAltura;
 
     // Quinta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.puestoTrabajo, tablaInicioX + 40, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.areaTrabajo, tablaInicioX + 125, yTexto + 1);
     yTexto += filaAltura;
 
     // Sexta fila: Empresa
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 20, yTexto + 1, 160);
     yTexto += filaAltura;
 
     // Séptima fila: Contrata
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Contrata:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text(datosFinales.contratista, tablaInicioX + 25, yTexto + 1);
     yTexto += filaAltura;
 
@@ -334,9 +340,9 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la fila con división central
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Marcar el tipo de respirador(es) a utilizar :", tablaInicioX + 2, yPos - 1.5);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     doc.text("Frecuencia de uso :", tablaInicioX + tablaAncho/2 + 2, yPos - 1.5);
 
     // Fila con 4 divisiones usando medidas fijas
@@ -351,7 +357,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
   
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     
     // Primer elemento - Máscara de polvo
     const x1 = 15; // Posición X independiente
@@ -385,7 +391,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     
     // Primer texto de la nueva fila
     const x5 = 15; // Posición X independiente
@@ -408,7 +414,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la nueva fila
     const x7 = 15; // Posición X independiente
@@ -431,7 +437,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la nueva fila
     const x9 = 15; // Posición X independiente
@@ -458,7 +464,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la fila 7 - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la fila 7
     const x11 = 15; // Posición X independiente
@@ -483,7 +489,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la fila 8
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Texto izquierda - Respirador de Flujo Continuo
     const x13 = 15; // Posición X independiente
@@ -513,7 +519,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la fila 9
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     const x16 = 15; 
     const y16 = yPos - 1.5; // Posición Y independiente
@@ -541,7 +547,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la fila 10
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     const x19 = 15; // Posición X independiente
     const y19 = yPos - 1.5; // Posición Y independiente
     doc.text("SCBA de circuito abierto", x19, y19);
@@ -566,7 +572,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la fila 11
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     const x22 = 15; // Posición X independiente
     const y22 = yPos - 1.5; // Posición Y independiente
     doc.text("SCBA de circuito cerrado", x22, y22);
@@ -598,7 +604,7 @@ export default function UsoRespiradores({ data = {} }) {
    
 
      // Contenido de la fila 11
-     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.setFont("helvetica", "normal").setFontSize(7);
      const x25 = 12; // Posición X independiente
      const y25 = yPos - 1.5; // Posición Y independiente
      doc.text("Tipo de Protección :", x25, y25);
@@ -620,7 +626,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la nueva fila
     const x28 = 15; // Posición X independiente
@@ -643,7 +649,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la nueva fila
     const x30 = 15; // Posición X independiente
@@ -667,7 +673,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la nueva fila
     const x32 = 15; // Posición X independiente
@@ -689,7 +695,7 @@ export default function UsoRespiradores({ data = {} }) {
      yPos += filaAltura;
  
      // Contenido de la nueva fila - dos textos con coordenadas independientes
-     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.setFont("helvetica", "normal").setFontSize(7);
  
      // Primer texto de la nueva fila
      const x34 = 15; // Posición X independiente
@@ -712,7 +718,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
     // Contenido de la nueva fila - dos textos con coordenadas independientes
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
 
     // Primer texto de la nueva fila
     const x36 = 15; // Posición X independiente
@@ -735,7 +741,7 @@ export default function UsoRespiradores({ data = {} }) {
      yPos += filaAltura;
  
      // Contenido de la nueva fila - dos textos con coordenadas independientes
-     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.setFont("helvetica", "normal").setFontSize(7);
  
      // Primer texto de la nueva fila
      const x38 = 12; // Posición X independiente
@@ -760,7 +766,7 @@ export default function UsoRespiradores({ data = {} }) {
     yPos += filaAltura;
 
   
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7);
     
     // Primer elemento - Máscara de polvo
     const x40 = 15; // Posición X independiente
@@ -782,75 +788,454 @@ export default function UsoRespiradores({ data = {} }) {
     const y43 = yPos - 1.5; // Posición Y independiente
     doc.text("Atmosferas Húmedas", x43, y43);
 
-    // Fila 20
-     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-     doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + filaAltura); // Línea divisoria central
+    // Fila 20 - Solo la parte izquierda se extiende verticalmente
+    const alturaExtendida = filaAltura * 4; // Cuadruplicar la altura para alinearse con las 4 filas de la derecha
+    
+    // Líneas de la celda izquierda (extendida)
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaExtendida); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + alturaExtendida); // Línea divisoria central
+    
+    // Líneas de la celda derecha (altura normal)
      doc.line(tablaInicioX + 175, yPos, tablaInicioX + 175, yPos + filaAltura); // Segunda división
      doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    
+    // Líneas horizontales
      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
-     yPos += filaAltura;
+    doc.line(tablaInicioX + tablaAncho/2, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior de la celda derecha
+    doc.line(tablaInicioX, yPos + alturaExtendida, tablaInicioX + tablaAncho/2, yPos + alturaExtendida); // Línea inferior de la celda izquierda
+    
+    yPos += alturaExtendida;
  
-     // Contenido de la nueva fila - dos textos con coordenadas independientes
-     doc.setFont("helvetica", "normal").setFontSize(8);
- 
-      // Primer texto de la nueva fila
+     // Contenido de la nueva fila - tres textos con coordenadas independientes
+     doc.setFont("helvetica", "normal").setFontSize(7); // Font size 7 para todos los textos
+
+      // Ancho disponible para el texto dentro de la celda izquierda
+      const anchoDisponible = (tablaInicioX + tablaAncho/2) - 12 - 2; // Ancho de la celda izquierda menos padding
+      
+      // Primer texto de la nueva fila - Ligero
       const x44 = 12; // Posición X independiente
-      const y44 = yPos - 1.5; // Posición Y independiente
-      doc.setFont("helvetica", "normal").setFontSize(6); // Font size 6 solo para este texto
-      doc.text("Ligero: Sentado mientras escribe, tipea, manejo, manual de cargas ligero (<3 mets)", x44, y44);
+      let yActual = yPos - alturaExtendida + 3; // Posición Y inicial
+      const textoLigero = "Ligero: Sentado mientras escribe, tipea, manejo, manual de cargas ligero (<3 mets)";
+      const lineasLigero = doc.splitTextToSize(textoLigero, anchoDisponible);
+      doc.text(lineasLigero, x44, yActual);
+      yActual += lineasLigero.length * 2.5 + 1; // Espaciado entre textos
 
-     // Segundo texto de la nueva fila
-     const x45 = 110; // Posición X independiente
-     const y45 = yPos - 1.5; // Posición Y independiente
-     doc.setFont("helvetica", "normal").setFontSize(8);
-     doc.text("Espacios confirmados", x45, y45);
+      // Segundo texto de la nueva fila - Moderado
+      const x45 = 12; // Posición X independiente
+      const textoModerado = "Moderado: Manejo manual de cargas menos de 15 Kg, operando equipos (<5 mets)";
+      const lineasModerado = doc.splitTextToSize(textoModerado, anchoDisponible);
+      doc.text(lineasModerado, x45, yActual);
+      yActual += lineasModerado.length * 2.5 + 1; // Espaciado entre textos
 
-     // Fila 21 - Moderado
-     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-     doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + filaAltura); // Línea divisoria central
-     doc.line(tablaInicioX + 175, yPos, tablaInicioX + 175, yPos + filaAltura); // Segunda división
-     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
-     yPos += filaAltura;
+      // Tercer texto de la nueva fila - Pesado
+      const x46 = 12; // Posición X independiente
+      const textoPesado = "Pesado: manejo de cargas encima de 25 Kg, subiendo escaleras con carga, palaneando (>5 mets)";
+      const lineasPesado = doc.splitTextToSize(textoPesado, anchoDisponible);
+      doc.text(lineasPesado, x46, yActual);
+
+     // Segundo texto de la nueva fila (celda derecha con altura normal)
+     const x47 = 110; // Posición X independiente
+     const y47 = yPos - alturaExtendida + 3; // Posición Y para la celda derecha (altura normal)
+     doc.setFont("helvetica", "normal").setFontSize(7);
+     doc.text("Espacios confirmados", x47, y47);
+
+    // Fila 21 - Solo parte derecha
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura, tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura + filaAltura); // Línea divisoria central
+    doc.line(tablaInicioX + 175, yPos - alturaExtendida + filaAltura, tablaInicioX + 175, yPos - alturaExtendida + filaAltura + filaAltura); // Segunda división
+    doc.line(tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura + filaAltura); // Línea derecha
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura); // Línea superior
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura + filaAltura, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura + filaAltura); // Línea inferior
 
      // Contenido de la fila 21
-     doc.setFont("helvetica", "normal").setFontSize(8);
+     doc.setFont("helvetica", "normal").setFontSize(7);
+    const x48 = 110; // Posición X independiente
+    const y48 = yPos - alturaExtendida + filaAltura + 3; // Posición Y para la celda derecha
+    doc.text("Atmosferas IDLH", x48, y48);
 
-     // Primer texto de la fila 21
-     const x46 = 12; // Posición X independiente
-     const y46 = yPos - 1.5; // Posición Y independiente
-     doc.setFont("helvetica", "normal").setFontSize(6); // Font size 6 para texto largo
-     doc.text("Moderado: Manejo manual de cargas menos de 15 Kg, operando equipos (<5 mets)", x46, y46);
+    // Fila 22 - Solo parte derecha
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 2, tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 2 + filaAltura); // Línea divisoria central
+    doc.line(tablaInicioX + 175, yPos - alturaExtendida + filaAltura * 2, tablaInicioX + 175, yPos - alturaExtendida + filaAltura * 2 + filaAltura); // Segunda división
+    doc.line(tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 2, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 2 + filaAltura); // Línea derecha
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 2, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 2); // Línea superior
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 2 + filaAltura, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 2 + filaAltura); // Línea inferior
 
-     // Segundo texto de la fila 21
-     const x47 = 110; // Posición X independiente
-     const y47 = yPos - 1.5; // Posición Y independiente
-     doc.setFont("helvetica", "normal").setFontSize(8); // Restablecer font size 8
-     doc.text("Atmosferas IDLH", x47, y47);
+    // Contenido de la fila 22
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const x49 = 110; // Posición X independiente
+    const y49 = yPos - alturaExtendida + filaAltura * 2 + 3; // Posición Y para la celda derecha
+    doc.text("Hazmat / Fuego / Rescate Mina", x49, y49);
 
-     // Fila 22 - Pesado
-     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-     doc.line(tablaInicioX + tablaAncho/2, yPos, tablaInicioX + tablaAncho/2, yPos + filaAltura); // Línea divisoria central
-     doc.line(tablaInicioX + 175, yPos, tablaInicioX + 175, yPos + filaAltura); // Segunda división
-     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
+    // Fila 23 - Solo parte derecha
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 3, tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 3 + filaAltura); // Línea divisoria central
+    doc.line(tablaInicioX + 175, yPos - alturaExtendida + filaAltura * 3, tablaInicioX + 175, yPos - alturaExtendida + filaAltura * 3 + filaAltura); // Segunda división
+    doc.line(tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 3, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 3 + filaAltura); // Línea derecha
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 3, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 3); // Línea superior
+    doc.line(tablaInicioX + tablaAncho/2, yPos - alturaExtendida + filaAltura * 3 + filaAltura, tablaInicioX + tablaAncho, yPos - alturaExtendida + filaAltura * 3 + filaAltura); // Línea inferior
+
+    // Contenido de la fila 23
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const x50 = 110; // Posición X independiente
+    const y50 = yPos - alturaExtendida + filaAltura * 3 + 3; // Posición Y para la celda derecha
+    doc.text("Temperaturas Extremas", x50, y50);
+
+    // Fila 24 - Fila completa de borde a borde (sin divisiones) - DINÁMICA
+    const textoOtros = "Otros: " + (datosFinales.otros || "");
+    const anchoDisponibleOtros = tablaAncho - 24; // Ancho total menos padding
+    const lineasOtros = doc.splitTextToSize(textoOtros, anchoDisponibleOtros);
+    const alturaDinamicaOtros = Math.max(filaAltura, lineasOtros.length * 2.5 + 2); // Altura mínima de fila o según contenido
+    
+    // Dibujar líneas de la fila dinámica
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaDinamicaOtros); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtros); // Línea derecha
      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
-     doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
-     yPos += filaAltura;
+    doc.line(tablaInicioX, yPos + alturaDinamicaOtros, tablaInicioX + tablaAncho, yPos + alturaDinamicaOtros); // Línea inferior
+    yPos += alturaDinamicaOtros;
 
-     // Contenido de la fila 22
-     doc.setFont("helvetica", "normal").setFontSize(8);
+    // Contenido de la fila 24
+     doc.setFont("helvetica", "normal").setFontSize(7);
+    const x51 = 12; // Posición X independiente
+    const y51 = yPos - alturaDinamicaOtros + 3; // Posición Y ajustada para la fila dinámica
+    doc.text(lineasOtros, x51, y51);
 
-     // Primer texto de la fila 22
-     const x48 = 12; // Posición X independiente
-     const y48 = yPos - 1.5; // Posición Y independiente
-     doc.setFont("helvetica", "normal").setFontSize(6); // Font size 6 para texto largo
-     doc.text("Pesado: manejo de cargas encima de 25 Kg, subiendo escaleras con carga, palaneando (>5 mets)", x48, y48);
+    // === SECCIÓN 7.2: EVALUACIÓN PERSONAL DEL EMPLEADO ===
+    yPos = dibujarHeaderSeccion("7.2 Ficha: Evaluación Personal del Empleado (llenado por el trabajador)", yPos, filaAltura);
 
-     // Segundo texto de la fila 22
-     const x49 = 110; // Posición X independiente
-     const y49 = yPos - 1.5; // Posición Y independiente
-     doc.setFont("helvetica", "normal").setFontSize(8); // Restablecer font size 8
-     doc.text("Hazmat / Fuego / Rescate Mina", x49, y49);
+    // === SECCIÓN CON FONDO NARANJA ===
+    const textoInstrucciones = "Sección 1: Las Preguntas de la 1 a 8 deben ser respondidas por los empleados que usarán cualquier respirador. Por favor colocar \"SI\" o \"No\"";
+    
+    // Calcular altura dinámica para las instrucciones
+    const calcularAlturaInstrucciones = (texto, anchoMaximo, fontSize) => {
+      const lineasDivididas = doc.splitTextToSize(texto, anchoMaximo);
+      
+      // Altura muy reducida: mínima de 4mm, máxima de 8mm
+      return Math.max(lineasDivididas.length * fontSize * 0.25 + 1.5, 4);
+    };
+
+    const anchoMaximoInstrucciones = tablaAncho - 8;
+    const alturaFilaInstrucciones = calcularAlturaInstrucciones(textoInstrucciones, anchoMaximoInstrucciones, 8);
+
+    // Dibujar fondo naranja para las instrucciones
+    doc.setFillColor(245, 174, 103); // Color naranja (mismo que Anexo16A)
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaInstrucciones, 'F');
+
+    // Dibujar líneas de las instrucciones
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaInstrucciones); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaInstrucciones); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFilaInstrucciones, tablaInicioX + tablaAncho, yPos + alturaFilaInstrucciones); // Línea inferior
+
+    // Dibujar el texto de las instrucciones
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const lineasDivididas = doc.splitTextToSize(textoInstrucciones, anchoMaximoInstrucciones);
+    let yInstrucciones = yPos + 3;
+    
+    lineasDivididas.forEach(linea => {
+      doc.text(linea, tablaInicioX + 4, yInstrucciones);
+      yInstrucciones += 3.5;
+    });
+
+    yPos += alturaFilaInstrucciones;
+
+    // === HEADER SI/NO ===
+    // Fila header con SI/NO (similar a Anexo16A)
+    const dibujarHeaderSiNo = (yPos, alturaFila = 3.5) => { // Altura reducida de 5 a 3.5
+      const leftMargin = tablaInicioX;
+      const colTexto = 170;
+      const colNo = 10;
+      const colSi = 10;
+      
+      // Configurar líneas con grosor consistente
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+      
+      // Dibujar fondo gris para el header
+      doc.setFillColor(160, 160, 160);
+      doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaFila, 'F');
+      
+      // Líneas del header
+      doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
+      doc.line(leftMargin, yPos + alturaFila, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Inferior
+      doc.line(leftMargin, yPos, leftMargin, yPos + alturaFila); // Izquierda
+      doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaFila); // División texto/opciones
+      doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaFila); // División NO/SI
+      doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Derecha
+
+      // Texto SI y NO centrados con font size 7
+      doc.setFont("helvetica", "bold").setFontSize(7);
+      doc.setTextColor(0, 0, 0);
+      doc.text("SI", leftMargin + colTexto + colNo/2, yPos + 2.5, { align: "center" }); // Ajustado para altura reducida
+      doc.text("NO", leftMargin + colTexto + colNo + colSi/2, yPos + 2.5, { align: "center" }); // Ajustado para altura reducida
+
+      return yPos + alturaFila;
+    };
+
+    // Dibujar header SI/NO
+    yPos = dibujarHeaderSiNo(yPos);
+
+    // === FILAS SI/NO ===
+    // Función para dibujar filas con SI/NO (similar a Anexo16A)
+    const dibujarFilaSiNo = (texto, yPos, alturaFila = 3.5) => { // Altura reducida de 5 a 3.5
+      const leftMargin = tablaInicioX;
+      const colTexto = 170;
+      const colNo = 10;
+      const colSi = 10;
+      
+      // Configurar líneas con grosor consistente
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.2);
+      
+      // Líneas de la fila
+      doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
+      doc.line(leftMargin, yPos + alturaFila, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Inferior
+      doc.line(leftMargin, yPos, leftMargin, yPos + alturaFila); // Izquierda
+      doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaFila); // División texto/opciones
+      doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaFila); // División NO/SI
+      doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Derecha
+
+      // Texto con font size 7
+      doc.setTextColor(0, 0, 0);
+      doc.setFont("helvetica", "normal").setFontSize(7);
+      doc.text(texto, leftMargin + 2, yPos + 2.5); // Ajustado para la altura reducida
+
+      return yPos + alturaFila;
+    };
+
+    // Fila 1: ¿Fuma o fumó en el último mes?
+    yPos = dibujarFilaSiNo("¿Fuma o fumó en el último mes?", yPos);
+
+    // === PREGUNTA 2 ===
+    // Header de pregunta 2 con fondo gris
+    yPos = dibujarHeaderSeccion("2. ¿Ha tenido alguna vez cualquiera de las siguientes condiciones?", yPos, filaAltura);
+
+    // Opciones de la pregunta 2
+    yPos = dibujarFilaSiNo("Palpitaciones.", yPos);
+    yPos = dibujarFilaSiNo("Convulsiones.", yPos);
+    yPos = dibujarFilaSiNo("Diabetes.", yPos);
+    yPos = dibujarFilaSiNo("Reacciones.", yPos);
+    yPos = dibujarFilaSiNo("Claustrofobia.", yPos);
+
+    // === PREGUNTA 3 ===
+    // Header de pregunta 3 con fondo gris
+    yPos = dibujarHeaderSeccion("3. ¿Ha tenido alguna vez algunas de los siguientes problemas pulmonares o de pulmón?", yPos, filaAltura);
+
+    // Opciones de la pregunta 3
+    yPos = dibujarFilaSiNo("Asbestosis", yPos);
+    yPos = dibujarFilaSiNo("Asma", yPos);
+    yPos = dibujarFilaSiNo("Bronquitis Crónica", yPos);
+    yPos = dibujarFilaSiNo("Enfisema.", yPos);
+    yPos = dibujarFilaSiNo("Neumonía", yPos);
+    yPos = dibujarFilaSiNo("Tuberculosis.", yPos);
+    yPos = dibujarFilaSiNo("Silicosis.", yPos);
+    yPos = dibujarFilaSiNo("Neumotórax (pulmón colapsado).", yPos);
+    yPos = dibujarFilaSiNo("Cáncer al pulmón.", yPos);
+    yPos = dibujarFilaSiNo("Costillas fracturadas.", yPos);
+    yPos = dibujarFilaSiNo("Cualquier lesión al pulmón o cirugías al pulmón.", yPos);
+    // Fila Otros para condiciones pulmonares
+    yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosPulmon || ""), yPos);
+
+    yPos = dibujarHeaderSeccion("4. ¿Tiene algunos de los siguientes síntomas pulmonares o de enfermedades al pulmón?", yPos, filaAltura);
+      
+    yPos = dibujarFilaSiNo("Dificultad para respirar en reposos", yPos);
+    yPos = dibujarFilaSiNo("Dificultad para respirar cuando camina a nivel del suelo.", yPos);
+    yPos = dibujarFilaSiNo("Dificultad para respirar cuando camina en un inclinado.", yPos);
+    yPos = dibujarFilaSiNo("Dificultad para respirar cuando realiza alguna tarea.", yPos);
+    yPos = dibujarFilaSiNo("Tos que le produce expectoración.", yPos);
+    
+    // === FOOTER PÁGINA 1 ===
+    footerTR(doc, { footerOffsetY: 8});
+    
+    // === CREAR SEGUNDA PÁGINA ===
+    // Forzar creación de segunda página para las preguntas adicionales
+    doc.addPage();
+    numeroPagina = 2;
+    yPos = 25; // Posición inicial de la nueva página
+    
+    // Dibujar header en la nueva página
+    drawHeader(numeroPagina);
+
+    // === CONTENIDO DE LA SEGUNDA PÁGINA ===
+    // === PREGUNTA 4 ===
+   
+      yPos = dibujarFilaSiNo("Tos que lo despierta temprano por la mañana.", yPos);
+      yPos = dibujarFilaSiNo("Tos que ocurre cuando se encuentra echado", yPos);
+      yPos = dibujarFilaSiNo("Tos con sangre.", yPos);
+      yPos = dibujarFilaSiNo("Silbidos del pecho cuando respira.", yPos);
+      yPos = dibujarFilaSiNo("Dolor en el pecho cuando respira profundamente.", yPos);
+      // Fila Otros para síntomas pulmonares
+      yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosPulmon || ""), yPos);
+
+      // === PREGUNTA 5 ===
+      yPos = dibujarHeaderSeccion("5. ¿Ha tenido alguna vez cualquiera de los siguientes problemas cardiovasculares?", yPos, filaAltura);
+      
+      yPos = dibujarFilaSiNo("Infarto.", yPos);
+      yPos = dibujarFilaSiNo("Angina.", yPos);
+      yPos = dibujarFilaSiNo("Insuficiencia cardiaca.", yPos);
+      yPos = dibujarFilaSiNo("Hinchazón en las piernas/pies (no causado por caminar).", yPos);
+      yPos = dibujarFilaSiNo("Arritmia al corazón.", yPos);
+      yPos = dibujarFilaSiNo("Reflujo gastroesofágico (no relacionado con la comida).", yPos);
+      // Fila Otros para problemas cardiovasculares
+      yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosCardiovascular || ""), yPos);
+
+
+      // === PREGUNTA 6 ===
+      yPos = dibujarHeaderSeccion("6. ¿Ha tenido alguna vez cualquiera de los siguientes síntomas cardiovasculares?", yPos, filaAltura);
+      
+      yPos = dibujarFilaSiNo("Dolor o presión en su pecho", yPos);
+      yPos = dibujarFilaSiNo("Dolor/presión en su pecho durante actividad física.", yPos);
+      yPos = dibujarFilaSiNo("Dolor/presión en su pecho durante su actividad de trabajo.", yPos);
+      yPos = dibujarFilaSiNo("Palpitaciones.", yPos);
+      yPos = dibujarFilaSiNo("Acidez estomacal o indigestión (no relacionado con la comida).", yPos);
+      // Fila Otros para síntomas cardiovasculares
+      yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosCardiovascular || ""), yPos);
+
+
+      // === PREGUNTA 7 ===
+      yPos = dibujarHeaderSeccion("7. ¿Toma actualmente medicinas para cualquiera de las siguientes condiciones?", yPos, filaAltura);
+      yPos = dibujarFilaSiNo("Problema respiratorio", yPos);
+      yPos = dibujarFilaSiNo("Problemas al corazón.", yPos);
+      yPos = dibujarFilaSiNo("Presión Sanguínea.", yPos);
+      yPos = dibujarFilaSiNo("Convulsiones.", yPos);
+
+       // === PREGUNTA 8 ===
+       yPos = dibujarHeaderSeccion("8. ¿Si ha utilizado un respirador, ha tenido usted alguno de los siguientes problemas?", yPos, filaAltura);
+       yPos = dibujarFilaSiNo("Irritación a los ojos.", yPos);
+       yPos = dibujarFilaSiNo("Alergias a la piel o erupciones.", yPos);
+       yPos = dibujarFilaSiNo("Ansiedad", yPos);
+       yPos = dibujarFilaSiNo("Fatiga o debilidad.", yPos);
+       yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+
+      
+
+        // === SECCIÓN 2 CON FONDO NARANJA ===
+        const textoInstruccionesSeccion2 = "Sección 2 (Discrecional): Las preguntas de la 9 a la 14 deben ser contestadas por empleados que han sido seleccionados para usar un respirador de cara completa o un aparato de respiración autónomo (SCBA); para los empleados que han sido seleccionados para utilizar otros tipos de respiradores, contestar a estas preguntas de manera voluntaria; por favor, marque \"SI\" o \"NO\".";
+        
+        // Calcular altura dinámica para las instrucciones de la sección 2
+        const calcularAlturaInstruccionesSeccion2 = (texto, anchoMaximo, fontSize) => {
+          const lineasDivididas = doc.splitTextToSize(texto, anchoMaximo);
+          
+          // Altura aumentada para evitar que se corte el texto
+          return Math.max(lineasDivididas.length * fontSize * 0.4 + 3, 8);
+        };
+
+        const anchoMaximoInstruccionesSeccion2 = tablaAncho - 8;
+        const alturaFilaInstruccionesSeccion2 = calcularAlturaInstruccionesSeccion2(textoInstruccionesSeccion2, anchoMaximoInstruccionesSeccion2, 8);
+
+        // Dibujar fondo naranja para las instrucciones de la sección 2
+        doc.setFillColor(245, 174, 103); // Color naranja (mismo que Anexo16A)
+        doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaInstruccionesSeccion2, 'F');
+
+        // Dibujar líneas de las instrucciones de la sección 2
+        doc.setDrawColor(0, 0, 0);
+        doc.setLineWidth(0.2);
+        doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaInstruccionesSeccion2); // Línea izquierda
+        doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaInstruccionesSeccion2); // Línea derecha
+        doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+        doc.line(tablaInicioX, yPos + alturaFilaInstruccionesSeccion2, tablaInicioX + tablaAncho, yPos + alturaFilaInstruccionesSeccion2); // Línea inferior
+
+        // Dibujar el texto de las instrucciones de la sección 2
+        doc.setFont("helvetica", "normal").setFontSize(7);
+        const lineasDivididasSeccion2 = doc.splitTextToSize(textoInstruccionesSeccion2, anchoMaximoInstruccionesSeccion2);
+        let yInstruccionesSeccion2 = yPos + 3;
+        
+        lineasDivididasSeccion2.forEach(linea => {
+          doc.text(linea, tablaInicioX + 4, yInstruccionesSeccion2);
+          yInstruccionesSeccion2 += 3.5;
+        });
+
+        yPos += alturaFilaInstruccionesSeccion2;
+
+        // === PREGUNTA 9 ===
+        yPos = dibujarHeaderSeccion("9. ¿Ha perdido la visión en cualquier ojo(temporal o permanente)?", yPos, filaAltura);
+        
+        // Fila vacía para pregunta 9 con columnas SI/NO
+        yPos = dibujarFilaSiNo("", yPos);
+
+        // === PREGUNTA 10 ===
+        yPos = dibujarHeaderSeccion("10. ¿Usa actualmente lentes de contacto?", yPos, filaAltura);
+        yPos = dibujarFilaSiNo("Usa lentes de contacto", yPos);
+        yPos = dibujarFilaSiNo("Usa lentes.", yPos);
+        yPos = dibujarFilaSiNo("Daltonismo", yPos);
+        yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+
+        // === PREGUNTA 11 ===
+        yPos = dibujarHeaderSeccion("11. ¿Ha tenido alguna lesión a sus oídos, incluyendo un tímpano roto?", yPos, filaAltura);
+        
+        // Fila vacía para pregunta 11 con columnas SI/NO
+        yPos = dibujarFilaSiNo("", yPos);
+
+        // === PREGUNTA 12 ===
+        yPos = dibujarHeaderSeccion("12. ¿Tiene actualmente algunos de los siguientes problemas de audición?", yPos, filaAltura);
+        yPos = dibujarFilaSiNo("Dificultad para escuchar.", yPos);
+        yPos = dibujarFilaSiNo("Usa un audífono.", yPos);
+        yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+
+        // === PREGUNTA 13 ===
+        yPos = dibujarHeaderSeccion("13. ¿Ha tenido alguna lesión a la espalda?", yPos, filaAltura);
+        
+        // Fila vacía para pregunta 13 con columnas SI/NO
+        yPos = dibujarFilaSiNo("", yPos);
+        
+        // === PREGUNTA 14 ===
+        yPos = dibujarHeaderSeccion("14. ¿Tiene actualmente algunos de los siguientes problemas musculoesqueléticos?", yPos, filaAltura);
+        yPos = dibujarFilaSiNo("Debilidad en los brazos, manos, piernas o pies.", yPos);
+        yPos = dibujarFilaSiNo("Dolor de espalda", yPos);
+        yPos = dibujarFilaSiNo("Dificultad para mover sus brazos y piernas.", yPos);
+        yPos = dibujarFilaSiNo("Dolor o rigidez cuando se inclina hacia adelante o atrás en la cintura", yPos);
+        yPos = dibujarFilaSiNo("Dificultad para mover su cabeza de arriba o abajo.", yPos);
+        yPos = dibujarFilaSiNo("Dificultad para mover su cabeza de lado a lado.", yPos);
+        yPos = dibujarFilaSiNo("Dificultad al doblar las rodillas", yPos);
+        yPos = dibujarFilaSiNo("Dificultad en ponerse en cuclillas.", yPos);
+        yPos = dibujarFilaSiNo("Subir las escaleras o una escalera", yPos);
+         yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+
+    // === CREAR TERCERA PÁGINA ===
+    // Forzar creación de tercera página para la sección 3
+    doc.addPage();
+    numeroPagina = 3;
+    yPos = 25; // Posición inicial de la nueva página
+    
+    // Dibujar header en la nueva página
+    drawHeader(numeroPagina);
+
+    // === SECCIÓN 3 CON FONDO NARANJA ===
+    const textoInstruccionesSeccion3 = "Sección 3: (Confidencial) El profesional de la salud que va a revisar este cuestionario determinara si esta parte debe ser completada por el empleado. Por favor, marque \"SI\" o \"NO\"";
+    
+    // Calcular altura dinámica para las instrucciones de la sección 3
+    const calcularAlturaInstruccionesSeccion3 = (texto, anchoMaximo, fontSize) => {
+      const lineasDivididas = doc.splitTextToSize(texto, anchoMaximo);
+      
+      // Altura muy reducida: mínima de 4mm, máxima de 6mm
+      return Math.max(lineasDivididas.length * fontSize * 0.2 + 1.5, 4);
+    };
+
+    const anchoMaximoInstruccionesSeccion3 = tablaAncho - 8;
+    const alturaFilaInstruccionesSeccion3 = calcularAlturaInstruccionesSeccion3(textoInstruccionesSeccion3, anchoMaximoInstruccionesSeccion3, 8);
+
+    // Dibujar fondo naranja para las instrucciones de la sección 3
+    doc.setFillColor(245, 174, 103); // Color naranja (mismo que Anexo16A)
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaFilaInstruccionesSeccion3, 'F');
+
+    // Dibujar líneas de las instrucciones de la sección 3
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaInstruccionesSeccion3); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaInstruccionesSeccion3); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFilaInstruccionesSeccion3, tablaInicioX + tablaAncho, yPos + alturaFilaInstruccionesSeccion3); // Línea inferior
+
+    // Dibujar el texto de las instrucciones de la sección 3
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    const lineasDivididasSeccion3 = doc.splitTextToSize(textoInstruccionesSeccion3, anchoMaximoInstruccionesSeccion3);
+    let yInstruccionesSeccion3 = yPos + 3;
+    
+    lineasDivididasSeccion3.forEach(linea => {
+      doc.text(linea, tablaInicioX + 4, yInstruccionesSeccion3);
+      yInstruccionesSeccion3 += 3.5;
+    });
+
+    yPos += alturaFilaInstruccionesSeccion3;
 
     // === FOOTER ===
     footerTR(doc, { footerOffsetY: 8});

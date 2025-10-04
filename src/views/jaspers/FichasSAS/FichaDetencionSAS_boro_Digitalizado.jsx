@@ -1675,8 +1675,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(textoCriterioC, tablaCriteriosInicioX + 2, yTextoCriterios + 1, 145);
 
-  const criterioCSi = datosFinales.riesgoMedio?.criterioC?.si || false;
-  const criterioCNo = datosFinales.riesgoMedio?.criterioC?.no || true;
+  const criterioCSi = datosFinales.riesgoMedio?.criterioC?.si;
+  const criterioCNo = datosFinales.riesgoMedio?.criterioC?.no;
   const criterioCSiTexto = criterioCSi ? "X" : "";
   const criterioCNoTexto = criterioCNo ? "X" : "";
   doc.text(criterioCSiTexto, tablaCriteriosInicioX + 157, yTextoCriterios + 1);
@@ -1698,8 +1698,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(textoCriterioD, tablaCriteriosInicioX + 2, yTextoCriterios + 1, 145);
 
-  const criterioDSi = datosFinales.riesgoMedio?.criterioD?.si || false;
-  const criterioDNo = datosFinales.riesgoMedio?.criterioD?.no || true;
+  const criterioDSi = datosFinales.riesgoMedio?.criterioD?.si;
+  const criterioDNo = datosFinales.riesgoMedio?.criterioD?.no;
   const criterioDSiTexto = criterioDSi ? "X" : "";
   const criterioDNoTexto = criterioDNo ? "X" : "";
   doc.text(criterioDSiTexto, tablaCriteriosInicioX + 157, yTextoCriterios + 1);
@@ -1732,8 +1732,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
     doc.setFont("helvetica", "normal").setFontSize(8);
     dibujarTextoConSaltoLinea(subcriterio, tablaCriteriosInicioX + 2, yTextoCriterios + 1, 145);
 
-    const subcriterioSi = datosFinales.riesgoMedio?.criterioD?.subcriterios?.[index]?.si || false;
-    const subcriterioNo = datosFinales.riesgoMedio?.criterioD?.subcriterios?.[index]?.no || true;
+    const subcriterioSi = datosFinales.riesgoMedio?.criterioD?.subcriterios?.[index]?.si;
+    const subcriterioNo = datosFinales.riesgoMedio?.criterioD?.subcriterios?.[index]?.no;
     const subcriterioSiTexto = subcriterioSi ? "X" : "";
     const subcriterioNoTexto = subcriterioNo ? "X" : "";
     doc.text(subcriterioSiTexto, tablaCriteriosInicioX + 157, yTextoCriterios + 1);
@@ -1757,8 +1757,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   dibujarTextoConSaltoLinea(textoCriterioE, tablaCriteriosInicioX + 2, yTextoCriterios + 1, 145);
 
-  const criterioESi = datosFinales.riesgoMedio?.criterioE?.si || false;
-  const criterioENo = datosFinales.riesgoMedio?.criterioE?.no || true;
+  const criterioESi = datosFinales.riesgoMedio?.criterioE?.si;
+  const criterioENo = datosFinales.riesgoMedio?.criterioE?.no;
   const criterioESiTexto = criterioESi ? "X" : "";
   const criterioENoTexto = criterioENo ? "X" : "";
   doc.text(criterioESiTexto, tablaCriteriosInicioX + 157, yTextoCriterios + 1);
@@ -1806,8 +1806,8 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("RIESGO BAJO: APTO para conducir vehículos (ningún criterio positivo)", tablaCriteriosInicioX + 2, yCriterios + 3.5);
 
-  const riesgoBajoSi = datosFinales.riesgoBajo?.si || false;
-  const riesgoBajoNo = datosFinales.riesgoBajo?.no || true;
+  const riesgoBajoSi = datosFinales.riesgoBajo?.si;
+  const riesgoBajoNo = datosFinales.riesgoBajo?.no;
   const riesgoBajoSiTexto = riesgoBajoSi ? "X" : "";
   const riesgoBajoNoTexto = riesgoBajoNo ? "X" : "";
   doc.text(riesgoBajoSiTexto, tablaCriteriosInicioX + 157, yCriterios + 3.5);
