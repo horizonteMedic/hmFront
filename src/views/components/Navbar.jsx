@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature, faHeartbeat, faKey } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature, faHeartbeat, faKey, faRotate } from '@fortawesome/free-solid-svg-icons';
 import { URLAzure } from '../config/config';
+import { clearLocalStorageExceptAuth } from '../utils/helpers';
+import Swal from 'sweetalert2';
 
 const Navbar = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -11,6 +13,28 @@ const Navbar = () => {
   const setToken = useAuthStore((state) => state.setToken);
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
   const listView = useAuthStore(state => state.listView);
+
+  const [spinning, setSpinning] = useState(false);
+
+  const handleClickReload = () => {
+    // Activa el giro
+    setSpinning(true);
+
+    // Ejecuta tu función
+    clearLocalStorageExceptAuth();
+
+    // Detiene la animación después de 1000ms aprox
+    setTimeout(() => setSpinning(false), 1000);
+    Swal.fire({
+      toast: true,
+      position: "bottom-end", 
+      icon: "success", 
+      title: "Datos limpiados correctamente",
+      showConfirmButton: false,
+      timer: 2000, // desaparece en 2s
+      timerProgressBar: true,
+    });
+  };
 
   const toggleMenu = () => {
     setShowMenu(!showMenu);
@@ -70,12 +94,17 @@ const Navbar = () => {
     <nav className="bg-[#233245] px-4 py-3 flex justify-between items-center text-white shadow-md">
       <div className="flex items-center">
         <Link to="/panel-de-control" onClick={handleLogoClick}>
-        <img src="img/logo-blanco.png" alt="Logo" className="w-full h-[40px]  mr-4" />
+          <img src="img/logo-blanco.png" alt="Logo" className="w-full h-[40px]  mr-4" />
         </Link>
       </div>
 
       <div className="hidden md:flex items-center">
-        {URLAzure=="https://testbackendhm.azurewebsites.net" && <p className='font-bold'>DEVELOPER</p>}
+        {URLAzure == "https://testbackendhm.azurewebsites.net" && <p className='font-bold mr-5'>DEVELOPER</p>}
+        <button className='bg-white text-[#233245] p-2 rounded-full flex items-center justify-center'
+          onClick={handleClickReload}
+        >
+          <FontAwesomeIcon icon={faRotate} className={`w-5 h-5 ${spinning ? 'animate-spin ease-in-out' : ''}`} />
+        </button>
         <CustomNavLink
           to="/panel-de-control"
           label="Inicio"

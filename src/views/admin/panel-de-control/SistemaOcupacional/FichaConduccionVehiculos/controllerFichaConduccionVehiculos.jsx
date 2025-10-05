@@ -86,7 +86,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoAltura/*.jsx");
+    const jasperModules = import.meta.glob("../../../../jaspers/FichaConduccion/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -94,7 +94,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/CertificadoAltura"
+        "../../../../jaspers/FichaConduccion"
     );
 };
 
@@ -114,7 +114,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Certificado de Altura",
+                    "Este paciente ya cuenta con registros de Ficha de Conducción de Vehículos",
                     "warning"
                 );
             });
@@ -154,6 +154,7 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
         }
     });
 };
+
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };

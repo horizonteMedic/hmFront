@@ -7,10 +7,9 @@ import {
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
-const obtenerReporteUrl =
-    "";
-const registrarUrl =
-    "";
+// Endpoints (configurados por backend). Mantener cadena vacía si aún no existen
+const obtenerReporteUrl = "";
+const registrarUrl = "";
 
 export const GetInfoServicio = async (
     nro,
@@ -30,6 +29,14 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
+            nombres: res.nombres ?? prev.nombres ?? "",
+            dni: res.dni ?? prev.dni ?? "",
+            edad: res.edad ?? prev.edad ?? "",
+            sexo: res.sexo ?? prev.sexo ?? "",
+            empresa: res.empresa ?? prev.empresa ?? "",
+            contrata: res.contrata ?? prev.contrata ?? "",
+            areaTrabajo: res.areaTrabajo ?? prev.areaTrabajo ?? "",
+            puestoTrabajo: res.puestoTrabajo ?? prev.puestoTrabajo ?? "",
         }));
     }
 };
@@ -51,7 +58,6 @@ export const GetInfoServicioEditar = async (
     if (res) {
         set((prev) => ({
             ...prev,
-            // Header
             norden: res.norden ?? "",
         }));
     }
@@ -72,6 +78,7 @@ export const SubmitDataService = async (
     const body = {
         norden: form.norden,
         usuarioRegistrar: user,
+        // Enviar campos clave del formulario si backend lo requiere más adelante
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -86,7 +93,8 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoAltura/*.jsx");
+    // Ruta de jaspers (si se agregan en el futuro). No bloquea si no existen.
+    const jasperModules = import.meta.glob("../../../../jaspers/UsoRespiradores/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -94,7 +102,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/CertificadoAltura"
+        "../../../../jaspers/UsoRespiradores"
     );
 };
 
@@ -106,21 +114,21 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         set,
         sede,
         () => {
-            //NO Tiene registro
+            // NO tiene registro
             GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
         },
         () => {
-            //Tiene registro
+            // Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Certificado de Altura",
+                    "Este paciente ya cuenta con registros de Uso de Respiradores",
                     "warning"
                 );
             });
         },
         () => {
-            //Necesita Agudeza visual 
+            // Necesita agudeza visual / triaje
             Swal.fire(
                 "Alerta",
                 "El paciente necesita pasar por Triaje.",
@@ -145,15 +153,15 @@ export const VerifyTRPerzonalizado = async (nro, tabla, token, set, sede, noTien
         token
     ).then((res) => {
         if (res.id === 0) {
-            //No tiene registro previo 
-            noTieneRegistro();//datos paciente
+            noTieneRegistro();
         } else if (res.id === 2) {
             necesitaExamen();
         } else {
-            tieneRegistro();//obtener data servicio
+            tieneRegistro();
         }
     });
 };
+
 export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };

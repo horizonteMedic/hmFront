@@ -94,9 +94,9 @@ export const GetInfoServicioEditar = async (
             apneaDelSueno: res.apneaSi_rbapneasi ?? false,
             ultimoControl: res.ultimoControl_txtultimocontrol ?? "",
             hta: res.htaSi_rbhtasi ?? false,
-            medicacionRiesgo: res.riesgo_txtriesgo ?? "",
-            polisomnografiaRealizada: res.psgSi_rbpsgsi ?? false,
-            fechaUltimaPolisomnografia: res.fechaPsg_fechapsg ?? "",  //revisar
+            medicacionRiesgo: res.medicacionRiesgo_txtriesgo ?? "",
+            polisomnografiaRealizada: res.polisomnografiaSi_rbpsgsi ?? false,
+            fechaUltimaPolisomnografia: res.fechaUltimaPolisomnografia_fechapsg ?? "",
             accidenteEnLaMina: res.enMinaSi_rbenminasi ?? false,
             accidenteFueraDeLaMina: res.fueraMinaSi_rbfueraminasi ?? false,
             // Antecedentes de choques
@@ -116,7 +116,7 @@ export const GetInfoServicioEditar = async (
 
             // Antecedentes familiares de apnea del sueño
             antec_familiar_apnea: res.entrevistaAnteFamiliarApneaSi_chkantsi ?? false,
-            indique_familiar_apnea: res.entrevistaAnteFamiliarApneaDescrip_txtantecedentefamiliar ?? "",
+            indique_familiar_apnea: res.entrevistaApneaDescripcion_txtantecedentefamiliar ?? "",
 
             // Entrevista al paciente
             ronca_al_dormir: res.entrevistaPregunta1Si_chk1_esi ?? false,
@@ -129,8 +129,8 @@ export const GetInfoServicioEditar = async (
             talla_mts: res.tallaTriaje ?? "",
             imc_kg_m2: res.imcTriaje ?? "",
             circunferencia_cuello: res.perimetroCuelloTriaje ?? "",
-            cuello_varon_normal: res.sexoPaciente === "F" ? res.examenFisicoVaronSi_chkvaronsi ?? false : false,
-            cuello_mujer_normal: res.sexoPaciente === "M" ? res.examenFisicoMujerSi_chkmujersi ?? false : false,
+            cuello_varon_normal: res.sexoPaciente != "F" ? res.examenFisicoVaronSi_chkvaronsi ?? false : false,
+            cuello_mujer_normal: res.sexoPaciente != "M" ? res.examenFisicoMujerSi_chkmujersi ?? false : false,
             presion_sistolica: res.sistolicaTriaje ?? "",
             presion_diastolica: res.diastolicaTriaje ?? "",
             hta_nueva: res.examenFisicoHtaNuevaSi_chkhtanuevasi ?? false,
@@ -168,6 +168,7 @@ export const GetInfoServicioEditar = async (
             // Apto con bajo riesgo de Apnea del sueño
             apto_bajo_riesgo: res.conclusionAptoBajoRiesgoSi_chkaptobajosi ?? false,
             observaciones: res.conclusionObservaciones_txtobservaciones ?? "",
+            nombre_medico: res.nombreMedico ?? "",
         }));
     }
 };

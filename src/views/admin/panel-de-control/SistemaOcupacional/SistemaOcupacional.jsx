@@ -75,6 +75,7 @@ import {
   faStairs,
   faSuitcaseMedical,
   faTruckMedical,
+  faMaskVentilator,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -105,6 +106,7 @@ import FichaCertificadoAltura from "./FichaCertificadoAltura/FichaCertificadoAlt
 import CertificadoMedicoOcupacional from "./CertificadoMedicoOcupacional/CertificadoMedicoOcupacional.jsx";
 import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
 import SectionWithBack from "./SectionWithBack.jsx";
+import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -285,6 +287,7 @@ const TabComponent = () => {
                   { vista: "Ficha Certificado de Altura", tab: 33, icons: [{ icon: faStairs }], label: "Ficha Certificado de Trabajos en Altura" },
                   { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
                   { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta" },
+                  { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
                   { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                 ];
                 return items
@@ -734,6 +737,7 @@ const TabComponent = () => {
               33: { title: "Ficha Certificado de Altura", child: <FichaCertificadoAltura /> },
               34: { title: "Constancia Certificado Medico Ocupacional", child: <CertificadoMedicoOcupacional /> },
               35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
+              36: { title: "Uso de Respiradores", child: <UsoRespiradores /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
@@ -788,6 +792,7 @@ const TabComponent = () => {
             "Ficha Certificado de Altura": { activeTab: 33, subTab: 0 },
             "Constancia Certificado Medico Ocupacional": { activeTab: 34, subTab: 0 },
             "Ficha Interconsulta": { activeTab: 35, subTab: 0 },
+            "Uso de Respiradores": { activeTab: 36, subTab: 0 },
           };
 
           const config = navConfig[idx];

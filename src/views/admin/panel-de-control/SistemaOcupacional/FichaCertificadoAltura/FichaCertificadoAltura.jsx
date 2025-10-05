@@ -7,6 +7,7 @@ import {
     faCheck,
     faBroom,
     faPrint,
+    faSave,
 } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
@@ -20,6 +21,8 @@ import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
 import { useSessionData } from "../../../../hooks/useSessionData";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaCertificadoAltura";
+import Swal from "sweetalert2";
 
 const tabla = "b_certificado_altura"
 const today = getToday();
@@ -127,9 +130,9 @@ export default function FichaCertificadoAltura() {
         // Conclusión y Comentarios
         aptoDesde: today,
         aptoHasta: today,
-        conclusion: "APTO",
+        conclusion: null,
         observacionesRecomendaciones: "",
-        nombreMedicoColegiatura: "",
+        nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
 
         // Recomendaciones
         sobrepesoDietaHipocalorica: false,
@@ -152,37 +155,40 @@ export default function FichaCertificadoAltura() {
         handleClear,
     } = useForm(initialFormState);
 
-    // Función para manejar cambios en recomendaciones y actualizar observaciones
-    const handleRecommendationChange = (name, checked) => {
-        // Obtener todas las recomendaciones marcadas después del cambio
-        const recommendations = [
-            { key: 'sobrepesoDietaHipocalorica', label: 'Sobrepeso.Dieta Hipocalórica y ejer.' },
-            { key: 'corregirAgudezaVisual', label: 'Corregir Agudeza Visual' },
-            { key: 'corregirAgudezaVisualTotal', label: 'Corregir Agudeza Visual Total' },
-            { key: 'obesidadDietaHipocalorica', label: 'Obesidad I.Dieta Hipocalórica y ejer.' },
-            { key: 'usoLentesCorrectoresLectura', label: 'Uso de Lentes Correctores lectura ce...' },
-            { key: 'corregirAgudezaLectura', label: 'Corregir Agudeza para lectura ce...' }
-        ];
-
-        // Crear lista de recomendaciones marcadas (incluyendo el cambio actual)
-        const selectedRecommendations = recommendations
-            .filter(rec => {
-                if (rec.key === name) return checked;
-                return form[rec.key];
-            })
-            .map(rec => rec.label);
-
-        // Actualizar el campo de observaciones solo con las recomendaciones marcadas
-        const newObservations = selectedRecommendations.length > 0
-            ? selectedRecommendations.join('\n')
-            : '';
-
-        // Actualizar el estado del checkbox y las observaciones en una sola operación
-        setForm(prev => ({
-            ...prev,
-            [name]: checked,
-            observacionesRecomendaciones: newObservations
-        }));
+    // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
+    const recomendacionesTextMap = {
+        sobrepesoDietaHipocalorica: "SOBREPESO. DIETA HIPOCALÓRICA Y EJERCICIO.",
+        corregirAgudezaVisual: "CORREGIR AGUDEZA VISUAL.",
+        corregirAgudezaVisualTotal: "CORREGIR AGUDEZA VISUAL TOTAL.",
+        obesidadDietaHipocalorica: "OBESIDAD I. DIETA HIPOCALÓRICA Y EJERCICIO.",
+        usoLentesCorrectoresLectura: "USO DE LENTES CORRECTORES LECTURA.",
+        corregirAgudezaLectura: "CORREGIR AGUDEZA PARA LECTURA.",
+    };
+    // Handler para checkboxes de Recomendaciones: agrega/quita texto en observacionesRecomendaciones
+    const handleRecomendacionCheckboxChange = (e) => {
+        const { name, checked } = e.target;
+        setForm((prev) => {
+            const next = { ...prev, [name]: checked };
+            // Obtenemos las líneas existentes
+            const existentes = (prev.observacionesRecomendaciones || "")
+                .split(/\n/)
+                .map((l) => l.trim())
+                .filter((l) => l.length > 0);
+            // Texto asociado al checkbox
+            const texto = recomendacionesTextMap[name];
+            let nuevasLineas = [...existentes];
+            if (checked) {
+                // Si se marca y aún no está, lo agregamos al final
+                if (!nuevasLineas.includes(texto)) {
+                    nuevasLineas.push(texto);
+                }
+            } else {
+                // Si se desmarca, lo quitamos
+                nuevasLineas = nuevasLineas.filter((l) => l !== texto);
+            }
+            const nuevoObs = nuevasLineas.join("\n");
+            return { ...next, observacionesRecomendaciones: nuevoObs };
+        });
     };
 
     const tabs = [
@@ -206,6 +212,30 @@ export default function FichaCertificadoAltura() {
         },
     ];
 
+    const handleSave = () => {
+        if (form.conclusion == null) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Por favor, seleccione la aptitud.",
+            })
+            return
+        }
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+    };
+
+    const handleSearch = (e) => {
+        if (e.key === "Enter") {
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
+    };
+
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
+    };
     return (
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
@@ -219,6 +249,7 @@ export default function FichaCertificadoAltura() {
                                 name="norden"
                                 value={form?.norden}
                                 onChange={handleChangeNumber}
+                                onKeyUp={handleSearch}
                             />
                             <InputTextOneLine
                                 label="Fecha Examen"
@@ -254,6 +285,18 @@ export default function FichaCertificadoAltura() {
                                     value={form?.nombres}
                                     disabled
                                 />
+                                <InputTextOneLine
+                                    label="T. Experiencia"
+                                    name="experienciaAnios"
+                                    value={form?.experienciaAnios}
+                                    onChange={handleChange}
+                                />
+                                <InputTextOneLine
+                                    label="Sexo"
+                                    name="sexo"
+                                    value={form?.sexo}
+                                    disabled
+                                />
                                 <div className="grid grid-cols-2 gap-2">
                                     <InputTextOneLine
                                         label="DNI"
@@ -268,18 +311,6 @@ export default function FichaCertificadoAltura() {
                                         disabled
                                     />
                                 </div>
-                                <InputTextOneLine
-                                    label="Sexo"
-                                    name="sexo"
-                                    value={form?.sexo}
-                                    disabled
-                                />
-                                <InputTextOneLine
-                                    label="T. Experiencia"
-                                    name="experienciaAnios"
-                                    value={form?.experienciaAnios}
-                                    disabled
-                                />
                                 <InputTextOneLine
                                     label="Empresa"
                                     name="empresa"
@@ -394,7 +425,6 @@ export default function FichaCertificadoAltura() {
                                         />
                                     </div>
                                 </div>
-
                                 {/* Columna Central - Observaciones */}
                                 <div className="space-y-4 text-[11px]">
                                     <InputTextArea
@@ -405,14 +435,13 @@ export default function FichaCertificadoAltura() {
                                         rows={5}
                                     />
                                     <InputTextOneLine
-                                        label="Nombre y Apellidos del Médico - N° de Colegiatura"
+                                        label="Nombre y Apellidos del Médico"
                                         name="nombreMedicoColegiatura"
                                         labelOnTop
                                         value={form?.nombreMedicoColegiatura}
-                                        onChange={handleChange}
+                                        disabled
                                     />
                                 </div>
-
                                 {/* Columna Derecha - Recomendaciones */}
                                 <div className="space-y-2 text-[11px]">
                                     <h5 className="font-semibold text-black mb-3 text-[11px]">Recomendaciones:</h5>
@@ -421,74 +450,80 @@ export default function FichaCertificadoAltura() {
                                             label="Sobrepeso.Dieta Hipocalórica y ejer."
                                             name="sobrepesoDietaHipocalorica"
                                             checked={form?.sobrepesoDietaHipocalorica}
-                                            onChange={handleRecommendationChange}
+                                            onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
                                             label="Corregir Agudeza Visual"
                                             name="corregirAgudezaVisual"
                                             checked={form?.corregirAgudezaVisual}
-                                            onChange={handleRecommendationChange}
+                                            onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
                                             label="Corregir Agudeza Visual Total"
                                             name="corregirAgudezaVisualTotal"
                                             checked={form?.corregirAgudezaVisualTotal}
-                                            onChange={handleRecommendationChange}
+                                            onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
                                             label="Obesidad I.Dieta Hipocalórica y ejer."
                                             name="obesidadDietaHipocalorica"
                                             checked={form?.obesidadDietaHipocalorica}
-                                            onChange={handleRecommendationChange}
+                                            onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
                                             label="Uso de Lentes Correctores lectura ce..."
                                             name="usoLentesCorrectoresLectura"
                                             checked={form?.usoLentesCorrectoresLectura}
-                                            onChange={handleRecommendationChange}
+                                            onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
                                             label="Corregir Agudeza para lectura ce..."
                                             name="corregirAgudezaLectura"
                                             checked={form?.corregirAgudezaLectura}
-                                            onChange={handleRecommendationChange}
+                                            onChange={handleRecomendacionCheckboxChange}
                                         />
                                     </div>
                                 </div>
                             </div>
 
                             {/* Botones de Acción */}
-                            <div className="flex justify-end gap-4 mt-6 pt-4 border-t border-gray-200">
-                                <button
-                                    type="button"
-                                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faCheck} />
-                                    Agregar/Actualizar
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleClear}
-                                    className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faBroom} />
-                                    Limpiar
-                                </button>
-                                <div className="flex gap-2">
-                                    <InputTextOneLine
-                                        name="norden"
-                                        value={form?.norden}
-                                        onChange={handleChangeNumber}
-                                    />
+                            <section className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6 pt-4 border-t border-gray-200">
+                                <div className=" flex gap-4">
                                     <button
                                         type="button"
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                                        onClick={handleSave}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                     >
-                                        <FontAwesomeIcon icon={faPrint} />
-                                        Imprimir
+                                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleClear}
+                                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                    >
+                                        <FontAwesomeIcon icon={faBroom} /> Limpiar
                                     </button>
                                 </div>
-                            </div>
+                                <div className="flex flex-col items-end">
+                                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            name="norden"
+                                            value={form.norden}
+                                            onChange={handleChange}
+                                            className="border rounded px-2 py-1 text-base w-24"
+                                        />
+
+                                        <button
+                                            type="button"
+                                            onClick={handlePrint}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                                        >
+                                            <FontAwesomeIcon icon={faPrint} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
                 </div>

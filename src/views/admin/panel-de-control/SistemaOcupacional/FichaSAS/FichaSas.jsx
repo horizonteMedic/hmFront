@@ -11,6 +11,7 @@ import { useForm } from "../../../../hooks/useForm";
 import MedicoSearch from "../../../../components/reusableComponents/MedicoSearch";
 import Mallampati from "../../../../../../public/img/Mallampati.jpg"
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaSas";
+import Swal from "sweetalert2";
 
 const tabla = "ficha_sas"
 const today = getToday();
@@ -113,7 +114,6 @@ export default function FichaSas({ listas }) {
 
         observaciones: "",
 
-        // Médico que Certifica
         dniUsuario: userCompleto?.datos?.dni_user,
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     };
@@ -134,6 +134,14 @@ export default function FichaSas({ listas }) {
 
 
     const handleSave = () => {
+        if (form.tipoLicencia === "") {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Por favor, ingrese el tipo de licencia",
+            })
+            return
+        }
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
@@ -1013,10 +1021,12 @@ export default function FichaSas({ listas }) {
             {/* Médico y Botones */}
             <div className="grid grid-cols-1 gap-6">
                 <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-                    <MedicoSearch
+                    <InputTextOneLine
+                        label="Médico que Certifica"
+                        labelOnTop
                         value={form.nombre_medico}
-                        onChange={handleChangeSimple}
-                        MedicosMulti={MedicosMulti}
+                        name="nombre_medico"
+                        disabled
                     />
                     <InputTextArea
                         label="Observaciones"
@@ -1027,7 +1037,7 @@ export default function FichaSas({ listas }) {
                     />
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
+                <section className="flex flex-col md:flex-row justify-between items-center gap-4  px-4 pt-4">
                     <div className=" flex gap-4">
                         <button
                             type="button"
@@ -1063,7 +1073,7 @@ export default function FichaSas({ listas }) {
                             </button>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
     );
