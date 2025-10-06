@@ -103,7 +103,7 @@ export default function Anexo16A() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "anexo_16a" });
 
   const handleSave = () => {
     if (form.apto === undefined) {

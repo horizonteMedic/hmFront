@@ -68,7 +68,7 @@ export default function Anexo16A_Digitalizado(data = {}) {
     fechaExamen: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || ""),
     sexo: data.sexo_sexo_pa || "",
     documentoIdentidad: String(data.dni_cod_pa || ""),
-    edad: String(data.edad_edad ?? ""),
+    edad: String(data.edad_edad ?? "") + " AÑOS",
     areaTrabajo: data.area_area_o || "",
     puestoTrabajo: data.cargo_cargo_de || "",
     empresa: data.empresa_razon_empresa || "",
@@ -102,10 +102,10 @@ export default function Anexo16A_Digitalizado(data = {}) {
     fur: data.furDescripcionAnexo16a_txtfur || "",
     observaciones: data.observacionesAnexo16a_observaciones || "",
     medico: {
-      nombres: "",//String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
+      nombres: String((data.apellidoUsuario_apellido_user || "") + " " + (data.nombreUsuario_nombre_user || "")),
       direccion: data.direccionSede || "",
-      cmp: "",//data.cmpUsuario_cmp_user || "",
-      fecha: ""
+      cmp: data.cmpUsuario_cmp_user || "",
+      fecha: formatearFechaCorta(data.fechaAnexo16a_fecha_anexo || "")
     },
     // Datos de color
     color: data.color || data.informacionSede?.color || 1,

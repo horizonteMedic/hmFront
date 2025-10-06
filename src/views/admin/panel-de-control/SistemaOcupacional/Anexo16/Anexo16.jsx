@@ -333,7 +333,7 @@ export default function Anexo16({ listas }) {
     handleRadioButtonBoolean,
     handleClear,
     handleClearnotO,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "anexo_16" });
 
   const [activeTab, setActiveTab] = useState(0);
 

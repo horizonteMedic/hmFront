@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSearch, faSyncAlt, faChevronLeft, faChevronRight, faExpand, faCompress, faUpload, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { ComboboxSedes, ComboboxEmpresas, ComboboxContratas } from './Modal/Combobox';
 import { GetListREport } from './model/getlistreport';
 import { useAuthStore } from '../../../../store/auth';
 import Modal from './Modal/Modal';
 import DataUploadModal from './DataUploadModal/DataUploadModal'; 
 import DataUploadModal2 from './Dataupload2/DataUploadModal2'; 
+import Historial from './Historial/Historial';
 
 const HistorialPaciente = () => {
   const [showDataUploadModal, setShowDataUploadModal] = useState(false);
   const [showDataUploadModal2, setShowDataUploadModal2] = useState(false);
+  const [showHistorial, setShowHistorial] = useState(false);
 
   const ListSedes = ComboboxSedes();
   const ListEmpresa = ComboboxEmpresas();
@@ -291,8 +293,17 @@ const HistorialPaciente = () => {
           <FontAwesomeIcon icon={faUpload} className="mr-2" />
           Subir Carpeta 2
         </button>}
+
+        {tienePermisoEnVista("Reportes","Historial Masivo") && <button
+          onClick={() => setShowHistorial(true)}
+          className="verde-btn px-4 py-1 rounded flex items-center mr-3"
+        >
+          <FontAwesomeIcon icon={faClockRotateLeft} className="mr-2" />
+          Historial
+        </button>}
         
-        <button onClick={reloadTable} className="focus:outline-none relative">
+          <button 
+          onClick={reloadTable} className="focus:outline-none relative">
           {loading && <div className="absolute inset-0 opacity-50 rounded-md"></div>}
           <FontAwesomeIcon icon={faSyncAlt} className={`text-white cursor-pointer tamañouno ${loading ? 'opacity-50' : ''}`} />
         </button> 
@@ -472,7 +483,7 @@ const HistorialPaciente = () => {
       {/* Modal de carga de datos */}
       {showDataUploadModal && <DataUploadModal closeModal={() => setShowDataUploadModal(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
       {showDataUploadModal2 && <DataUploadModal2 closeModal={() => setShowDataUploadModal2(false)} Sedes={ListSedes} user={userlogued.sub} token={token} />}
-
+      {showHistorial && <Historial closeModal={() => setShowHistorial(false)} token={token} user={userlogued.sub} />}
     </div>
   );
 };

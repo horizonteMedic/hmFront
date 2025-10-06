@@ -294,7 +294,7 @@ export default function AntecedentesPatologicos({ listas }) {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "antecedentes_patologicos" });
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = [

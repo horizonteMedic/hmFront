@@ -83,7 +83,7 @@ export default function AntecedentesDeAltura() {
     handlePrintDefault,
     handleRadioButton,
     handleRadioButtonBoolean,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "antecedentes_altura" });
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
