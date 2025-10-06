@@ -484,15 +484,15 @@ export default function GenerarDatosPaciente(data = {}) {
   const firmasAPintar = [
     {
       nombre: "FIRMAP",
-      x: firmaPruebaX,
-      y: firmaPruebaY,
+      x: firmaPruebaX+45,
+      y: firmaPruebaY-10,
       maxw: 30,
     },
     {
       nombre: "HUELLA",
-      x: huellaDigitalX,
-      y: huellaDigitalY,
-      maxw: 14,
+      x: huellaDigitalX+40,
+      y: huellaDigitalY-5,
+      maxw: 20,
     },
     {
       nombre: "SELLOFIRMA",
