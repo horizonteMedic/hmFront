@@ -530,37 +530,24 @@ export default function FichaCertificadoAltura() {
 
                 {/* Panel lateral de Agudeza Visual - 20% */}
                 <div className="w-1/5">
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 m-4 flex-1 flex flex-col">
-                        <h4 className="font-semibold text-black mb-3 text-[11px]">Agudeza Visual</h4>
-
+                    <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
+                        <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
                         {/* Sin Corregir */}
                         <div className="mb-4">
-                            <h5 className="font-semibold text-black mb-2 text-[11px]">Sin Corregir</h5>
+                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="text-center">
-                                    <div className="font-semibold mb-2 text-[11px]">O.D</div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                                            <InputTextOneLine name="vcOD" value={form?.vcOD} disabled />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                                            <InputTextOneLine name="vlOD" value={form?.vlOD} disabled />
-                                        </div>
+                                <div className="">
+                                    <div className="font-semibold mb-2 text-center">O.D</div>
+                                    <div className="space-y-3">
+                                        <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
+                                        <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
                                     </div>
                                 </div>
-                                <div className="text-center">
-                                    <div className="font-semibold mb-2 text-[11px]">O.I</div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.C.:</span>
-                                            <InputTextOneLine name="vcOI" value={form?.vcOI} disabled />
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[11px] min-w-[30px]">V.L.:</span>
-                                            <InputTextOneLine name="vlOI" value={form?.vlOI} disabled />
-                                        </div>
+                                <div className="">
+                                    <div className="font-semibold mb-2 text-center">O.I</div>
+                                    <div className="space-y-3">
+                                        <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
+                                        <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
                                     </div>
                                 </div>
                             </div>
@@ -568,85 +555,72 @@ export default function FichaCertificadoAltura() {
 
                         {/* Corregida */}
                         <div className="mb-4">
-                            <h5 className="font-semibold text-black mb-2 text-[11px]">Corregida</h5>
-
+                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
                             {/* Fila OD y OI */}
                             <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.C.</span>
-                                        <InputTextOneLine
-                                            name="vcCorregidaOD"
-                                            value={form?.vcCorregidaOD}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.L.</span>
-                                        <InputTextOneLine
-                                            name="vlCorregidaOD"
-                                            value={form?.vlCorregidaOD}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
+                                <div className="space-y-3">
+                                    <div className="font-semibold mb-2 text-center">O.D</div>
+                                    <InputTextOneLine
+                                        label="V.C."
+                                        name="vcCorregidaOD"
+                                        value={form?.vcCorregidaOD}
+                                        disabled
+                                        labelWidth="35px"
+                                    />
+                                    <InputTextOneLine
+                                        label="V.L."
+                                        name="vlCorregidaOD"
+                                        value={form?.vlCorregidaOD}
+                                        disabled
+                                        labelWidth="35px"
+                                    />
                                 </div>
-
-                                <div className="space-y-2">
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.C.</span>
-                                        <InputTextOneLine
-                                            name="vcCorregidaOI"
-                                            value={form?.vcCorregidaOI}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[11px] min-w-[35px]">V.L.</span>
-                                        <InputTextOneLine
-                                            name="vlCorregidaOI"
-                                            value={form?.vlCorregidaOI}
-                                            disabled
-                                            className="flex-1 w-full"
-                                        />
-                                    </div>
+                                <div className="space-y-3">
+                                    <div className="font-semibold mb-2 text-center">O.I</div>
+                                    <InputTextOneLine
+                                        label="V.C."
+                                        name="vcCorregidaOI"
+                                        value={form?.vcCorregidaOI}
+                                        disabled
+                                        labelWidth="35px"
+                                    />
+                                    <InputTextOneLine
+                                        label="V.L."
+                                        name="vlCorregidaOI"
+                                        value={form?.vlCorregidaOI}
+                                        disabled
+                                        labelWidth="35px"
+                                    />
                                 </div>
                             </div>
-
                             {/* Fila extra (ancho completo) */}
-                            <div className="mt-4 space-y-2">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[11px] min-w-[45px]">V.Clrs</span>
-                                    <InputTextOneLine
-                                        name="vclrs"
-                                        value={form?.vclrs}
-                                        disabled
-                                        className="flex-1 w-full"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[11px] min-w-[45px]">V.B.</span>
-                                    <InputTextOneLine
-                                        name="vb"
-                                        value={form?.vb}
-                                        disabled
-                                        className="flex-1 w-full"
-                                    />
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[11px] min-w-[45px]">R.P.</span>
-                                    <InputTextOneLine
-                                        name="rp"
-                                        value={form?.rp}
-                                        disabled
-                                        className="flex-1 w-full"
-                                    />
-                                </div>
+                            <div className="mt-4 space-y-3">
+                                <InputTextOneLine
+                                    label="V.Clrs"
+                                    name="vclrs"
+                                    value={form?.vclrs}
+                                    disabled
+                                    className="flex-1 w-full"
+                                    labelWidth="35px"
+                                />
+                                <InputTextOneLine
+                                    name="vb"
+                                    label="V.B."
+                                    value={form?.vb}
+                                    disabled
+                                    className="flex-1 w-full"
+                                    labelWidth="35px"
+                                />
+                                <InputTextOneLine
+                                    label="R.P."
+                                    name="rp"
+                                    value={form?.rp}
+                                    disabled
+                                    className="flex-1 w-full"
+                                    labelWidth="35px"
+                                />
                             </div>
                         </div>
-
                         {/* Enfermedades Oculares */}
                         <InputTextArea label="Enfermedades Oculares" rows={5} name="enfermedadesOculares" value={form?.enfermedadesOculares} onChange={handleChange} disabled />
                     </div>

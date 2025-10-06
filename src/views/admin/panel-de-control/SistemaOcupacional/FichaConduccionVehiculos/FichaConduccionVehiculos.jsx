@@ -528,24 +528,24 @@ export default function FichaConduccionVehiculos() {
 
                 {/* Panel lateral de Agudeza Visual - 20% */}
                 <div className="w-1/5">
-                    <div className="bg-white border border-gray-200 rounded-lg p-3 m-4 flex-1 flex flex-col">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
                         <h4 className="font-semibold text-gray-800 mb-3">Agudeza Visual</h4>
                         {/* Sin Corregir */}
                         <div className="mb-4">
-                            <h5 className="font-semibold text-gray-700 mb-2">Sin Corregir</h5>
+                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="">
                                     <div className="font-semibold mb-2 text-center">O.D</div>
-                                    <div className="space-y-2">
-                                        <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled />
-                                        <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled />
+                                    <div className="space-y-3">
+                                        <InputTextOneLine label="V.C." name="vcOD" value={form?.vcOD} disabled labelWidth="35px" />
+                                        <InputTextOneLine label="V.L." name="vlOD" value={form?.vlOD} disabled labelWidth="35px" />
                                     </div>
                                 </div>
                                 <div className="">
                                     <div className="font-semibold mb-2 text-center">O.I</div>
-                                    <div className="space-y-2">
-                                        <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled />
-                                        <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled />
+                                    <div className="space-y-3">
+                                        <InputTextOneLine label="V.C." name="vcOI" value={form?.vcOI} disabled labelWidth="35px" />
+                                        <InputTextOneLine label="V.L." name="vlOI" value={form?.vlOI} disabled labelWidth="35px" />
                                     </div>
                                 </div>
                             </div>
@@ -553,46 +553,53 @@ export default function FichaConduccionVehiculos() {
 
                         {/* Corregida */}
                         <div className="mb-4">
-                            <h5 className="font-semibold text-gray-700 mb-2">Corregida</h5>
+                            <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
                             {/* Fila OD y OI */}
                             <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
+                                <div className="space-y-3">
+                                    <div className="font-semibold mb-2 text-center">O.D</div>
                                     <InputTextOneLine
                                         label="V.C."
                                         name="vcCorregidaOD"
                                         value={form?.vcCorregidaOD}
                                         disabled
+                                        labelWidth="35px"
                                     />
                                     <InputTextOneLine
                                         label="V.L."
                                         name="vlCorregidaOD"
                                         value={form?.vlCorregidaOD}
                                         disabled
+                                        labelWidth="35px"
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
+                                    <div className="font-semibold mb-2 text-center">O.I</div>
                                     <InputTextOneLine
                                         label="V.C."
                                         name="vcCorregidaOI"
                                         value={form?.vcCorregidaOI}
                                         disabled
+                                        labelWidth="35px"
                                     />
                                     <InputTextOneLine
                                         label="V.L."
                                         name="vlCorregidaOI"
                                         value={form?.vlCorregidaOI}
                                         disabled
+                                        labelWidth="35px"
                                     />
                                 </div>
                             </div>
                             {/* Fila extra (ancho completo) */}
-                            <div className="mt-4 space-y-2">
+                            <div className="mt-4 space-y-3">
                                 <InputTextOneLine
                                     label="V.Clrs"
                                     name="vclrs"
                                     value={form?.vclrs}
                                     disabled
                                     className="flex-1 w-full"
+                                    labelWidth="35px"
                                 />
                                 <InputTextOneLine
                                     name="vb"
@@ -600,6 +607,7 @@ export default function FichaConduccionVehiculos() {
                                     value={form?.vb}
                                     disabled
                                     className="flex-1 w-full"
+                                    labelWidth="35px"
                                 />
                                 <InputTextOneLine
                                     label="R.P."
@@ -607,6 +615,7 @@ export default function FichaConduccionVehiculos() {
                                     value={form?.rp}
                                     disabled
                                     className="flex-1 w-full"
+                                    labelWidth="35px"
                                 />
                             </div>
                         </div>
