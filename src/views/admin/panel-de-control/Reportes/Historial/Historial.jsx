@@ -167,7 +167,7 @@ const Historial = ({closeModal,token,user}) => {
 
             const errorTable = errores.map((file, index) => [
             index + 1,
-            file.nombre || "Nombre no disponible",
+            file.mensaje || "Nombre no disponible",
             "Error",
             ]);
 
