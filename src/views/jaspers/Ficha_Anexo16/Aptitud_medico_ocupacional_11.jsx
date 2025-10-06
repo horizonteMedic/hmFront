@@ -79,6 +79,8 @@ export default function Aptitud_AgroindustrialH(data = {}) {
     doc.text(datosFinales.numeroFicha, pageW - 50, 16);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
+    // Fecha de examen (alineado como SAS/Altura/Conduccion)
+    doc.text("Fecha de examen: " + (datosFinales.fechaExamen || ""), pageW - 80, 25);
     
     doc.text("Pag. 01", pageW - 30, 10);
 

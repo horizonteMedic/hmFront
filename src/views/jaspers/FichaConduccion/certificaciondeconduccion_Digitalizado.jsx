@@ -136,28 +136,30 @@ export default function Certificaciondeconduccion_Digitalizado({ data = {} }) {
         doc.text("CERTIFICACION DE SUFICIENCIA MEDICA PARA CONDUCCIÓN DE VEHÍCULOS", pageW / 2, 28, { align: "center" });
       }
 
-      // Número de Ficha y Página (alineación automática mejorada) - Subidos 3.5 puntos
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      doc.text("Nro de ficha: ", pageW - 80, 12); // 15 - 3.5 = 11.5
-
-      doc.setFont("helvetica", "bold").setFontSize(18);
-      doc.text(datosFinales.numeroFicha, pageW - 50, 13); // 16 - 3.5 = 12.5
-      doc.setFont("helvetica", "normal").setFontSize(8);
-      doc.text("Sede: " + datosFinales.sede, pageW - 80, 17); // 20 - 3.5 = 16.5
+       // Número de Ficha y Página (alineación automática mejorada)
+       doc.setFont("helvetica", "normal").setFontSize(8);
       
-      doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 7); // 10 - 3.5 = 6.5
-
-      // Bloque de color (posición mejorada) - Subido 3.5 puntos
-      drawColorBox(doc, {
-        color: datosFinales.codigoColor,
-        text: datosFinales.textoColor,
-        x: pageW - 30,
-        y: 7, // 10 - 3.5 = 6.5
-        size: 22,
-        showLine: true,
-        fontSize: 30,
-        textPosition: 0.9
-      });
+       doc.text("Nro de ficha: ", pageW - 80, 13);
+ 
+       doc.setFont("helvetica", "normal").setFontSize(18);
+       doc.text(datosFinales.numeroFicha, pageW - 60, 13);
+ 
+       doc.setFont("helvetica", "normal").setFontSize(8);
+       doc.text("Pag. " + pageNumber.toString().padStart(2, '0'), pageW - 30, 8);
+       doc.text("Sede: " + datosFinales.sede, pageW - 80, 18);
+       doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 23);
+ 
+       // Bloque de color (posición mejorada)
+       drawColorBox(doc, {
+         color: datosFinales.codigoColor,
+         text: datosFinales.textoColor,
+         x: pageW - 30,
+         y: 10,
+         size: 22,
+         showLine: true,
+         fontSize: 30,
+         textPosition: 0.9
+       });
     };
 
     // Función para texto con salto de línea
@@ -288,81 +290,81 @@ export default function Certificaciondeconduccion_Digitalizado({ data = {} }) {
     yTexto += filaAltura;
 
     // Segunda fila: Apellidos y Nombres
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 55, yTexto + 1, 130);
+    dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 35, yTexto + 1, 130);
     yTexto += filaAltura;
 
     // Tercera fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.edad, tablaInicioX + 58, yTexto + 1);
+    doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.genero, tablaInicioX + 105, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1);
     yTexto += filaAltura;
 
     // Cuarta fila: Domicilio
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1, 150);
+    dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 24, yTexto + 1, 150);
     yTexto += filaAltura;
 
     // Quinta fila: Puesto de Trabajo, Área de Trabajo (2 columnas)
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.puestoTrabajo, tablaInicioX + 40, yTexto + 1);
+    doc.text(datosFinales.puestoTrabajo, tablaInicioX + 30, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.areaTrabajo, tablaInicioX + 125, yTexto + 1);
+    doc.text(datosFinales.areaTrabajo, tablaInicioX + 120, yTexto + 1);
     yTexto += filaAltura;
 
     // Sexta fila: Empresa
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 20, yTexto + 1, 160);
+    dibujarTextoConSaltoLinea(datosFinales.empresa, tablaInicioX + 24, yTexto + 1, 160);
     yTexto += filaAltura;
 
     // Séptima fila: Contrata
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Contrata:", tablaInicioX + 2, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.contratista, tablaInicioX + 25, yTexto + 1);
+    doc.text(datosFinales.contratista, tablaInicioX + 24, yTexto + 1);
     yTexto += filaAltura;
 
     // Octava fila: Años de experiencia, Primera aptitud, Revalidación (3 columnas)
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("Años de experiencia:", tablaInicioX + 2, yTexto + 1);
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text(datosFinales.anosExperiencia || "", tablaInicioX + 45, yTexto + 1);
+    doc.text(datosFinales.anosExperiencia + " Años", tablaInicioX + 45, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);
     doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.primeraAptitud ? "X" : "", tablaInicioX + 95, yTexto + 1);
 
-    doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("Revalidación:", tablaInicioX + 122, yTexto + 1);
     doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("Revalidación:", tablaInicioX + 122, yTexto + 1);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.revalidacion ? "X" : "", tablaInicioX + 145, yTexto + 1);
     yTexto += filaAltura;
 
@@ -422,7 +424,7 @@ export default function Certificaciondeconduccion_Digitalizado({ data = {} }) {
     };
 
     // Función para calcular posición Y centrada para texto corto
-    const calcularPosicionYCentrada = (alturaFila, fontSize) => {
+    const calcularPosicionYCentrada = (alturaFila) => {
       return alturaFila / 2 + 0.5; // Centrado vertical con pequeño ajuste
     };
 
@@ -524,7 +526,7 @@ export default function Certificaciondeconduccion_Digitalizado({ data = {} }) {
 
     // === DIBUJAR TODAS LAS FILAS ===
     // Ahora es súper fácil cambiar cualquier fila
-    configuracionFilas.forEach((config, index) => {
+    configuracionFilas.forEach((config) => {
       const alturaFila = dibujarFila(config, yPos);
       yPos += alturaFila;
     });
@@ -636,7 +638,7 @@ export default function Certificaciondeconduccion_Digitalizado({ data = {} }) {
     ];
 
     // Dibujar todas las filas de pruebas complementarias
-    configuracionFilasPruebas.forEach((config, index) => {
+    configuracionFilasPruebas.forEach((config) => {
       const alturaFila = dibujarFila(config, yPos);
       yPos += alturaFila;
     });
@@ -790,7 +792,7 @@ export default function Certificaciondeconduccion_Digitalizado({ data = {} }) {
     ];
 
     // Dibujar todas las filas de la nueva sección
-    configuracionFilasNuevaSeccion.forEach((config, index) => {
+    configuracionFilasNuevaSeccion.forEach((config) => {
       const alturaFila = dibujarFila(config, yPos);
       yPos += alturaFila;
     });

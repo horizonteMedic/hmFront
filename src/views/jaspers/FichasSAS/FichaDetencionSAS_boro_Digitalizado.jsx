@@ -308,12 +308,12 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
     // Título principal (solo en página 1)
     if (pageNumber === 1) {
-      doc.setFont("helvetica", "normal").setFontSize(13);
+      doc.setFont("helvetica", "bold").setFontSize(13);
       doc.setTextColor(0, 0, 0);
       doc.text("FICHA DE DETECCIÓN DE SÍNDROME DE APNEA SUEÑO (S.A.S)", pageW / 2, 38, { align: "center" });
 
       // Subtítulo
-      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.setFont("helvetica", "bold").setFontSize(10);
       doc.text("(Conductores de maquinaria pesada, transporte de personal, transporte de materiales peligrosos)", pageW / 2, 43, { align: "center" });
     }
 
