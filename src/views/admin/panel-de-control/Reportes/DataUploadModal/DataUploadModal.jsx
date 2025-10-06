@@ -248,94 +248,84 @@ const DataUploadModal = ({ closeModal, Sedes, user, token }) => {
       .then((logoData) => {
         GetlistPDF(token, indice)
           .then((res) => {
-            const errores = res.filter((item) => item.id === 0); // Archivos con error
-            const subidos = res.filter((item) => item.id === 1); // Archivos correctos
-  
-            const erroresNombres = errores.map((item) => item.nombre);
-  
-            const listaFinal = Object.entries(uploadStatus)
-              .filter(
-                ([nombre, estado]) =>
-                  estado === "error" &&
-                  nombre.toLowerCase() !== "desktop.ini" &&
-                  nombre.trim() !== ""
-              )
-              .map(([nombre]) => nombre)
-              .concat(erroresNombres)
-              .filter((nombre) => nombre && nombre.trim() !== "");
-  
-            doc.addImage(logoData, "PNG", 10, 10, 50, 15);
-  
-            let yPos = 30;
-            const fechaActual = new Date();
-            const fecha = fechaActual.toLocaleDateString();
-            const hora = fechaActual.toLocaleTimeString();
-  
-            // Título en negrita
-            doc.setFontSize(14);
-            doc.setFont("helvetica", "bold");
-            doc.text("Reporte de Datos Cargados", 10, yPos);
-            yPos += 10;
-  
-            doc.setFontSize(10);
-            const leftColX = 10;
-            const rightColX = 100;
-  
-            // ÍNDICE en negrita
-            doc.setFont("helvetica", "bold");
-            doc.text("Índice:", leftColX, yPos);
-            doc.setFont("helvetica", "normal");
-            doc.text(`${indice}`, leftColX + 20, yPos);
-  
-            // FECHA en negrita
-            doc.setFont("helvetica", "bold");
-            doc.text("Fecha:", rightColX, yPos);
-            doc.setFont("helvetica", "normal");
-            doc.text(`${fecha}`, rightColX + 15, yPos);
-            yPos += 10;
-  
-            // USUARIO en negrita
-            doc.setFont("helvetica", "bold");
-            doc.text("Usuario:", leftColX, yPos);
-            doc.setFont("helvetica", "normal");
-            doc.text(`${user}`, leftColX + 25, yPos);
-  
-            // HORA en negrita
-            doc.setFont("helvetica", "bold");
-            doc.text("Hora:", rightColX, yPos);
-            doc.setFont("helvetica", "normal");
-            doc.text(`${hora}`, rightColX + 12, yPos);
-            yPos += 10;
-  
-            // Cantidad Total de Archivos en negrita y color rojo
-            doc.setFont("helvetica", "bold");
-            doc.setTextColor(255,0,0);
-            doc.text(`Cantidad Total de Archivos: ${uparchFile.length}`, leftColX, yPos);
-            doc.setFont("helvetica", "normal");
-            doc.setTextColor(0,0,0);
-            yPos += 10;
-  
-            // Título de la tabla de errores en negrita
-            doc.setFontSize(12);
-            doc.setFont("helvetica", "bold");
-            doc.text("Archivos subidos con error:", leftColX, yPos);
-            doc.setFont("helvetica", "normal");
-            yPos += 5;
-  
-            const errorTable = listaFinal.map((file, index) => [
-              index + 1,
-              file,
-              "Error",
-            ]);
-  
-            autoTable(doc, {
-              startY: yPos + 5,
-              head: [["#", "Nombre del Archivo", "Estado"]],
-              body: errorTable,
-              theme: "grid",
-              styles: { fontSize: 10, cellPadding: 2 },
-              headStyles: { fillColor: [255, 99, 132], textColor: 255 },
-            });
+              const errores = res.filter((item) => item.id === 0); // Archivos con error
+              const subidos = res.filter((item) => item.id === 1); // Archivos correctos
+              console.log(res)
+              console.log("Subidos =",subidos)
+              console.log("Errores =",errores)
+    
+              doc.addImage(logoData, "PNG", 10, 10, 50, 15);
+    
+              let yPos = 30;
+              const fechaActual = new Date();
+              const fecha = fechaActual.toLocaleDateString();
+              const hora = fechaActual.toLocaleTimeString();
+    
+              // Título en negrita
+              doc.setFontSize(14);
+              doc.setFont("helvetica", "bold");
+              doc.text("Reporte de Datos Cargados", 10, yPos);
+              yPos += 10;
+    
+              doc.setFontSize(10);
+              const leftColX = 10;
+              const rightColX = 100;
+    
+              // ÍNDICE en negrita
+              doc.setFont("helvetica", "bold");
+              doc.text("Índice:", leftColX, yPos);
+              doc.setFont("helvetica", "normal");
+              doc.text(`${indice}`, leftColX + 20, yPos);
+    
+              // FECHA en negrita
+              doc.setFont("helvetica", "bold");
+              doc.text("Fecha:", rightColX, yPos);
+              doc.setFont("helvetica", "normal");
+              doc.text(`${fecha}`, rightColX + 15, yPos);
+              yPos += 10;
+    
+              // USUARIO en negrita
+              doc.setFont("helvetica", "bold");
+              doc.text("Usuario:", leftColX, yPos);
+              doc.setFont("helvetica", "normal");
+              doc.text(`${user}`, leftColX + 25, yPos);
+    
+              // HORA en negrita
+              doc.setFont("helvetica", "bold");
+              doc.text("Hora:", rightColX, yPos);
+              doc.setFont("helvetica", "normal");
+              doc.text(`${hora}`, rightColX + 12, yPos);
+              yPos += 10;
+    
+              // Cantidad Total de Archivos en negrita y color rojo
+              doc.setFont("helvetica", "bold");
+              doc.setTextColor(255,0,0);
+              doc.text(`Cantidad Total de Archivos: ${uparchFile.length}`, leftColX, yPos);
+              doc.setFont("helvetica", "normal");
+              doc.setTextColor(0,0,0);
+              yPos += 10;
+    
+              // Título de la tabla de errores en negrita
+              doc.setFontSize(12);
+              doc.setFont("helvetica", "bold");
+              doc.text("Archivos subidos con error:", leftColX, yPos);
+              doc.setFont("helvetica", "normal");
+              yPos += 5;
+    
+              const errorTable = errores.map((file, index) => [
+                index + 1,
+                file.mensaje || "Nombre no disponible",
+                "Error",
+              ]);
+              console.log(errorTable)
+              autoTable(doc, {
+                startY: yPos + 5,
+                head: [["#", "Nombre del Archivo", "Estado"]],
+                body: errorTable,
+                theme: "grid",
+                styles: { fontSize: 10, cellPadding: 2 },
+                headStyles: { fillColor: [255, 99, 132], textColor: 255 },
+              });
   
             yPos = doc.lastAutoTable.finalY + 10;
   
