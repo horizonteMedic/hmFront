@@ -48,9 +48,11 @@ export default function B_FichaDetencionSAS2(data = {}) {
       no: false,
       aplica: true
     },
+    medicacionRiesgo: "",
     polisomnografia: {
-      si: false,
-      no: true,
+      si: true,
+      no: false,
+      fecha: "17/10/2025",
       aplica: false
     },
     choqueVehiculo: {
@@ -189,6 +191,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
       no: Boolean(data.htaNo_rbhtano ?? false),
       aplica: false //revisar
     },
+    medicacionRiesgo: String(data.medicacionRiesgo_txtriesgo ?? ""),
     polisomnografia: {
       si: Boolean(data.polisomnografiaSi_rbpsgsi ?? false),
       no: Boolean(data.polisomnografiaNo_rbpsgno ?? false),
@@ -600,11 +603,15 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
   yPos += filaAltura;
 
-  // Décima fila: HTA (4 columnas)
+  // Décima fila: HTA (4 columnas) - Divisiones independientes movidas 15 puntos a la izquierda
+  const htaDiv1 = tablaInicioX + 15;  // 40 - 15 = 25
+  const htaDiv2 = tablaInicioX + 40;  // 90 - 15 = 75
+  const htaDiv3 = tablaInicioX + 80; // 132 - 15 = 117
+  
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-  doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // Primera división
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // Segunda división
-  doc.line(tablaInicioX + 132, yPos, tablaInicioX + 132, yPos + filaAltura); // Tercera división
+  doc.line(htaDiv1, yPos, htaDiv1, yPos + filaAltura); // Primera división
+  doc.line(htaDiv2, yPos, htaDiv2, yPos + filaAltura); // Segunda división
+  doc.line(htaDiv3, yPos, htaDiv3, yPos + filaAltura); // Tercera división
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
@@ -1015,17 +1022,19 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   const htaSiTexto = crearCheckboxFijo(datosFinales.hta.si, "Si");
   const htaNoTexto = crearCheckboxFijo(datosFinales.hta.no, "No");
-  doc.text(htaSiTexto, tablaInicioX + 47, yTexto + 1);
-  doc.text(htaNoTexto, tablaInicioX + 70, yTexto + 1);
+  doc.text(htaSiTexto, htaDiv1 + 2, yTexto + 1);
+  doc.text(htaNoTexto, htaDiv1 + 12, yTexto + 1);
 
-  // Tercera columna: "Medicación:"
+  // Tercera columna: "Medicación:" con texto dinámico
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Medicación :", tablaInicioX + 94, yTexto + 1);
+  doc.text("Medicación (Riesgo >2):", htaDiv2 + 2, yTexto + 1);
 
-  // Cuarta columna: Aplica/No Aplica
+  // Cuarta columna: Texto de medicación de riesgo
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const htaAplicaTexto = datosFinales.hta.aplica ? "APLICA" : "NO APLICA";
-  doc.text(htaAplicaTexto, tablaInicioX + 135, yTexto + 1);
+  const medicacionRiesgoTexto = datosFinales.medicacionRiesgo || "";
+  if (medicacionRiesgoTexto) {
+    doc.text(medicacionRiesgoTexto, htaDiv3 + 2, yTexto + 1);
+  }
   yTexto += filaAltura;
 
   // Duodécima fila: Polisomnografía (4 columnas con divisiones diferentes)
@@ -1044,10 +1053,12 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha de última PSG", tablaInicioX + 103, yTexto + 1);
 
-  // Cuarta columna: Aplica/No Aplica
+  // Cuarta columna: Mostrar fecha real si polisomnografia.si es true, sino mostrar "NO APLICA"
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const polisomnografiaAplicaTexto = datosFinales.polisomnografia.aplica ? "APLICA" : "NO APLICA";
-  doc.text(polisomnografiaAplicaTexto, tablaInicioX + 142.5, yTexto + 1);
+  const fechaPolisomnografia = datosFinales.polisomnografia.si 
+    ? datosFinales.polisomnografia.fecha 
+    : "NO APLICA";
+  doc.text(fechaPolisomnografia, tablaInicioX + 142.5, yTexto + 1);
   yTexto += filaAltura;
 
   // Decimotercera fila: Antecedente de Choque de vehículo (4 columnas con divisiones diferentes)
