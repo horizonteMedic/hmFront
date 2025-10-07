@@ -355,7 +355,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Años de experiencia:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.anosExperiencia + " Años", tablaInicioX + 45, yTexto + 1);
+  doc.text(datosFinales.anosExperiencia , tablaInicioX + 45, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);
