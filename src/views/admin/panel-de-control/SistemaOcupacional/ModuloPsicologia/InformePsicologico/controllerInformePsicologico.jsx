@@ -10,10 +10,10 @@ import {
 import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/electroCardiograma/obtenerReporteInformeElectroCardiograma";
+    "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
 const registrarUrl =
-    "/api/v01/ct/electroCardiograma/registrarActualizarInformeElectroCardiograma";
-    
+    "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
+
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -33,29 +33,73 @@ export const GetInfoServicio = async (
             ...prev,
             ...res,
             norden: res.norden,
-            codigoElectroCardiograma: res.codigoElectroCardiograma,
-            nombre: res.nombres,
-            edad: res.edad + " años",
-            fechaNac: formatearFechaCorta(res.fechaNac), //necesito
+            codigoInforme: res.codigoInforme,
+            fechaEntrevista: res.fechaEntrevista || "",
+            nombres: res.nombresPaciente,
+            apellidos: res.apellidosPaciente,
+            fechaNacimiento: res.fechaNacimientoPaciente,
+            lugarNacimiento: res.lugarNacimientoPaciente,
+            domicilioActual: res.direccionPaciente,
+            edad: res.edadPaciente,
+            estadoCivil: res.estadoCivilPaciente,
+            nivelEstudios: res.nivelEstudioPaciente,
 
-            fechaExam: res.fechaInforme,
-            contrata: res.contrata,
-            empresa: res.empresa,
+            // Datos Laborales
+            ocupacion: res.ocupacionPaciente,
+            cargoDesempenar: res.cargoPaciente,
 
-            ritmo: res.mensajeRitmo ?? "",
-            fc: res.mensajeFC ?? "",
-            eje: res.mensajeEje ?? "",
-            pr: res.mensajePr ?? "",
-            qrs: res.mensajeQrs ?? "",
-            ondaP: res.mensajeOndaP ?? "",
-            st: res.mensajeSt ?? "",
-            ondaT: res.mensajeOndaT ?? "",
-            qtc: res.mensajeQtC ?? "",
+            // Área Intelectual
+            areaIntelectual: res.areaIntelectual || "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
+            promedio: false, //revisar - no hay mapeo directo en JSON
+            superior: false, //revisar - no hay mapeo directo en JSON
+            nInferior: false, //revisar - no hay mapeo directo en JSON
+            alto: false, //revisar - no hay mapeo directo en JSON
 
-            informeCompleto: res.informeCompleto ?? "", //necesito
-            conclusiones: res.conclusion ?? "",
-            hallazgos: res.hallazgo ?? "",
-            recomendaciones: res.recomendaciones ?? "",
+            pSuperior: false, //revisar - no hay mapeo directo en JSON
+            pMedio: false, //revisar - no hay mapeo directo en JSON
+            pBajo: false, //revisar - no hay mapeo directo en JSON
+            bajo: false, //revisar - no hay mapeo directo en JSON
+
+            facilidad: false, //revisar - no hay mapeo directo en JSON
+            dificultad: false, //revisar - no hay mapeo directo en JSON
+
+            pnAdecuado: false, //revisar - no hay mapeo directo en JSON
+            nAlto: false, //revisar - no hay mapeo directo en JSON
+            nBajo: false, //revisar - no hay mapeo directo en JSON
+
+            yNumerica: false, //revisar - no hay mapeo directo en JSON
+            yCalculo: false, //revisar - no hay mapeo directo en JSON
+
+            adecuadaR: false, //revisar - no hay mapeo directo en JSON
+            inadecuada: false, //revisar - no hay mapeo directo en JSON
+
+            // Área de Personalidad
+            areaPersonalidad: res.areaPersonalidad,
+
+            // Área de Psicomotricidad
+            areaPsicomotricidad: res.areaPsicomotricidad,
+            nivelAltoPs: false, //revisar - no hay mapeo directo en JSON
+            nivelAdecuadoPs: false, //revisar - no hay mapeo directo en JSON
+            nivelBajoPs: false, //revisar - no hay mapeo directo en JSON
+
+            facilidadPs: false, //revisar - no hay mapeo directo en JSON
+            dificultadPs: false, //revisar - no hay mapeo directo en JSON
+
+            // Área de Organicidad
+            areaOrganicidad: res.areaOrganicidad,
+            orientadoEnTiempo: false, //revisar - no hay mapeo directo en JSON
+
+            poseeAltoManejo: false, //revisar - no hay mapeo directo en JSON
+            pAdecuadoManejo: false, //revisar - no hay mapeo directo en JSON
+            pBajoManejo: false, //revisar - no hay mapeo directo en JSON
+
+            noSeEnvidencia: false, //revisar - no hay mapeo directo en JSON
+
+            // Recomendaciones
+            recomendaciones: res.recomendaciones,
+
+            // Aprobó Test
+            aproboTest: res.aprobo ?? false,
         }));
     }
 };
@@ -73,24 +117,18 @@ export const SubmitDataService = async (
         return;
     }
     const body = {
-        codigoElectroCardiograma: form.codigoElectroCardiograma,
+        codigoInforme: form.codigoInforme,
         norden: form.norden,
-        fechaInforme: form.fechaExam,
-        informeCompleto: form.informeCompleto,
-        mensajeRitmo: form.ritmo,
-        mensajePr: form.pr,
-        mensajeFC: form.fc,
-        mensajeQtC: form.qtc,
-        mensajeQrs: form.qrs,
-        mensajeOndaP: form.ondaP,
-        mensajeSt: form.st,
-        mensajeOndaT: form.ondaT,
-        mensajeEje: form.eje,
-        hallazgo: form.hallazgos,
-        conclusion: form.conclusiones,
+        fechaEntrevista: form.fechaEntrevista,
+        edad: form.edad.replace(" AÑOS", ""),
+        areaIntelectual: form.areaIntelectual,
+        areaPersonalidad: form.areaPersonalidad,
+        areaOrganicidad: form.areaOrganicidad,
+        areaPsicomotricidad: form.areaPsicomotricidad,
         recomendaciones: form.recomendaciones,
-        edadPaciente: form.edad?.replace(" años", ""),
-        userRegistro: user,
+        aproboTest: form.aproboTest ?? false,
+        desaproboTest: form.aproboTest ?? false,
+        usuarioRegistro: user,
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -99,7 +137,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/EKG/*.jsx");
+    const jasperModules = import.meta.glob("../../../../jaspers/ModuloPsicologia/InformePsicologico/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -107,7 +145,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/EKG"
+        "../../../../jaspers/ModuloPsicologia/InformePsicologico"
     );
 };
 
@@ -127,7 +165,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de EKG.",
+                    "Este paciente ya cuenta con registros de Informe Psicologico.",
                     "warning"
                 );
             });

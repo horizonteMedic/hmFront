@@ -12,6 +12,7 @@ import {
     InputsRadioGroup,
     InputTextArea,
     InputCheckbox,
+    InputsBooleanRadioGroup,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
@@ -27,6 +28,7 @@ export default function InformePsicologico() {
 
     const initialFormState = {
         norden: "",
+        codigoInforme: null,
         fechaEntrevista: today,
         nombres: "",
         apellidos: "",
@@ -92,7 +94,7 @@ export default function InformePsicologico() {
         recomendaciones: "",
 
         // Aprobó Test
-        aproboTest: "",
+        aproboTest: undefined,
     };
 
     const {
@@ -102,6 +104,7 @@ export default function InformePsicologico() {
         handleChangeNumber,
         handleRadioButton,
         handleClear,
+        handleRadioButtonBoolean,
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState);
@@ -326,11 +329,10 @@ export default function InformePsicologico() {
                                     />
                                     <div className="flex gap-4 items-center">
                                         <h4 className="font-semibold min-w-[120px] max-w-[120px]">Aprobó Test :</h4>
-                                        <InputsRadioGroup
-                                            options={[{ value: "SI", label: "Sí" }, { value: "NO", label: "No" }]}
+                                        <InputsBooleanRadioGroup
                                             name="aproboTest"
                                             value={form.aproboTest}
-                                            onChange={(e, value) => { handleRadioButton(e, value) }}
+                                            onChange={handleRadioButtonBoolean}
                                         />
                                     </div>
                                 </div>

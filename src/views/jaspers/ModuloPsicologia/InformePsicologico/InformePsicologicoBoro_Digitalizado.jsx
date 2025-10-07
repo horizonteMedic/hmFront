@@ -1,11 +1,11 @@
 import jsPDF from "jspdf";
-import drawColorBox from '../components/ColorBox.jsx';
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { normalizeList } from "../../utils/listUtils.js";
-import CabeceraLogo from '../components/CabeceraLogo.jsx';
-import { getSign } from "../../utils/helpers";
-import footerTR from '../components/footerTR.jsx';
-import { formatDateLongEs } from "../../utils/formatDateLongEs.js";
+import drawColorBox from '../../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import { normalizeList } from "../../../utils/listUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import { getSign } from "../../../utils/helpers.js";
+import footerTR from '../../components/footerTR.jsx';
+import { formatDateLongEs } from "../../../utils/formatDateLongEs.js";
 
 export default function InformePsicologico_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
