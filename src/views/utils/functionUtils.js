@@ -153,6 +153,7 @@ export const SubmitDataServiceDefault = async (
 ) => {
     LoadingDefault("Registrando Datos");
     SubmitData(body, registrarUrl, token).then((res) => {
+        console.log(res)
         if (res.id === 1 || res.id === 0) {
             if (tienePrint) {
                 Swal.fire({
