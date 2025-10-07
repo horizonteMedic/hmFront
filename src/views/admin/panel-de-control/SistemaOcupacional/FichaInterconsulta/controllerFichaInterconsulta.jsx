@@ -117,7 +117,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, especialidad, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/FichasSAS/*.jsx");
+    const jasperModules = import.meta.glob("../../../../jaspers/FichaInterconsulta/*.jsx");
     PrintHojaRFichaInterconsulta(
         nro,
         especialidad,
@@ -126,7 +126,7 @@ export const PrintHojaR = (nro, especialidad, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/FichasSAS"
+        "../../../../jaspers/FichaInterconsulta"
     );
 };
 
