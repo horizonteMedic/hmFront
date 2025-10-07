@@ -123,6 +123,7 @@ export const GetInfoServicioEditar = async (
             ruidos_respirar_durmiendo: res.entrevistaPregunta2Si_chk2_esi ?? false,
             deja_respirar_durmiendo: res.entrevistaPregunta3Si_chk3_esi ?? false,
             mas_sueno_cansancio: res.entrevistaPregunta4Si_chk4_esi ?? false,
+            entrevistaPuntuacion: res.entrevistaPuntuacion_txtpuntuacion ?? "0",
 
             // Examen Físico
             peso_kg: res.pesoTriaje ?? "",
@@ -248,7 +249,7 @@ export const SubmitDataService = async (
         entrevistaPregunta2No: !form.ruidos_respirar_durmiendo,
         entrevistaPregunta3No: !form.deja_respirar_durmiendo,
         entrevistaPregunta4No: !form.mas_sueno_cansancio,
-        entrevistaPuntuacion: ((form.ronca_al_dormir ? 1 : 0) + (form.ruidos_respirar_durmiendo ? 1 : 0) + (form.deja_respirar_durmiendo ? 1 : 0) + (form.mas_sueno_cansancio ? 1 : 0)).toString(),
+        entrevistaPuntuacion: form.entrevistaPuntuacion,
         examenFisicoVaronSi: form.cuello_varon_normal,
         examenFisicoVaronNo: !form.cuello_varon_normal,
         examenFisicoMujerSi: form.cuello_mujer_normal,
