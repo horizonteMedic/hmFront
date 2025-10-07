@@ -151,7 +151,7 @@ export default function FichaConduccionVehiculos() {
         handlePrintDefault,
         handleCheckBoxChange,
         handleClear,
-    } = useForm(initialFormState);//, { storageKey: "ficha_conduccion_form" }
+    } = useForm(initialFormState, { storageKey: "fichaConduccionVehiculos" });
 
     // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
     const recomendacionesTextMap = {

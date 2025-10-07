@@ -12,6 +12,24 @@ const obtenerReporteUrl =
 const registrarUrl =
     "/api/v01/ct/certificadoTrabajoAltura/registrarActualizarCertificadoTrabajoAltura";
 
+const recomendacionesTextMap = {
+    sobrepesoDietaHipocalorica: "SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS.",
+    corregirAgudezaVisual: "CORREGIR AGUDEZA VISUAL.",
+    corregirAgudezaVisualTotal: "CORREGIR AGUDEZA VISUAL TOTAL.",
+    obesidadDietaHipocalorica: "OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS.",
+    usoLentesCorrectoresLectura: "USO DE LENTES CORRECTORES PARA LECTURA DE CERCA.",
+    corregirAgudezaLectura: "CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA.",
+};
+
+const validarContenidoTieneChecks = (texto, grupoAValidar) => {
+    const textoLimpio = texto ?? "";
+    const mapedados = {};
+    Object.keys(grupoAValidar).forEach(key => {
+        mapedados[key] = textoLimpio.includes(grupoAValidar[key]);
+    });
+    return mapedados;
+};
+
 export const GetInfoServicio = async (
     nro,
     tabla,
@@ -30,6 +48,29 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
+            tipoExamen: res.nombreExamen ?? "",
+            //datos personales
+            nombres: res.nombresPaciente ?? "",
+            dni: res.dniPaciente ?? "",
+            edad: String((res.edadPaciente ?? "") + " AÑOS"),
+            sexo: res.sexoPaciente ?? "",
+            areaTrabajo: res.areaPaciente ?? "",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            //==========================TAB LATERAL===========================
+            // Agudeza Visual
+            vcOD: res.visioncercasincorregirod_v_cerca_s_od ?? "",
+            vlOD: res.visionlejossincorregirod_v_lejos_s_od ?? "",
+            vcOI: res.visioncercasincorregiroi_v_cerca_s_oi ?? "",
+            vlOI: res.visionlejossincorregiroi_v_lejos_s_oi ?? "",
+            vcCorregidaOD: res.oftalodccmologia_odcc ?? "",
+            vlCorregidaOD: res.odlcoftalmologia_odlc ?? "",
+            vcCorregidaOI: res.oiccoftalmologia_oicc ?? "",
+            vlCorregidaOI: res.oilcoftalmologia_oilc ?? "",
+            vclrs: res.vcoftalmologia_vc ?? "",
+            vb: res.vboftalmologia_vb ?? "",
+            rp: res.rpoftalmologia_rp ?? "",
+            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
         }));
     }
 };
@@ -53,6 +94,108 @@ export const GetInfoServicioEditar = async (
             ...prev,
             // Header
             norden: res.norden ?? "",
+            codigoCertificado: res.codigoCertificado_cod_certificado ?? null,
+            fechaExam: res.fechaExamen_f_examen ?? "",
+            tipoExamen: res.nombreExamen ?? "",
+            razonVisita: res.primeraAptitud_chk_primera ? "PRIMERA ACTITUD" : (res.revalidacion_chk_revalidacion ? "REVALIDACION" : ""),
+            //datos personales
+            nombres: res.nombresPaciente ?? "",
+            dni: res.dniPaciente ?? "",
+            edad: String((res.edadPaciente ?? "") + " AÑOS"),
+            sexo: res.sexoPaciente ?? "",
+            experienciaAnios: res.tiempoExperiencia_t_experiencia ?? "",
+            areaTrabajo: res.areaPaciente ?? "",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            //==========================TAB LATERAL===========================
+            // Agudeza Visual
+            vcOD: res.visioncercasincorregirod_v_cerca_s_od ?? "",
+            vlOD: res.visionlejossincorregirod_v_lejos_s_od ?? "",
+            vcOI: res.visioncercasincorregiroi_v_cerca_s_oi ?? "",
+            vlOI: res.visionlejossincorregiroi_v_lejos_s_oi ?? "",
+            vcCorregidaOD: res.oftalodccmologia_odcc ?? "",
+            vlCorregidaOD: res.odlcoftalmologia_odlc ?? "",
+            vcCorregidaOI: res.oiccoftalmologia_oicc ?? "",
+            vlCorregidaOI: res.oilcoftalmologia_oilc ?? "",
+            vclrs: res.vcoftalmologia_vc ?? "",
+            vb: res.vboftalmologia_vb ?? "",
+            rp: res.rpoftalmologia_rp ?? "",
+            enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+
+            //==========================TAB ANTECEDENTES===========================
+            // Antecedentes - Columna Izquierda
+            alteracionConsciencia: res.antecedentesTodasEnfermedadesSi_chk_1_si ?? false,
+            alcoholismoCronico: res.antecedentesAlcoholismoCronicoSi_chk_2_si ?? false,
+            movimientosInvoluntariosEnfermedades: res.antecedentesEnfermedadesInvoluntariosSi_chk_3_si ?? false,
+            perdidaRecurrenteConsciencia: res.antecedentesPerdidaConcienciaSi_chk_4_si ?? false,
+            diabetesHipoglicemiaNoControlada: res.antecedentesDiabetesMellitusSi_chk_29_si ?? false,
+            insuficienciaRenalCronicaGradoIV: res.chk30Si_chk_30_si ?? false,
+
+            // Antecedentes - Columna Derecha
+            efectosEnfermedadTratamiento: res.antecedentesVariosEfectosSi_chk_9_si ?? false,
+            sustanciasEstupefacientesSinTratamiento: res.antecedentesConsumeSustanciasNoAltereSi_chk_8_si ?? false,
+            sustanciasEstupefacientesConAlteracion: res.antecedentesConsumeSustanciasSiAltereSi_chk_7_si ?? false,
+            sindromeApneaObstructivaSueño: res.antecedentesApneaSi_chk_10_si ?? false,
+            obesidadIMC30: res.antecedentesObesidadSi_chk_11_si ?? false,
+            anemiaCriteriosOMS2011: res.chk5Si_chk_5_si ?? false,
+            comentariosDetalleAntecedentes: res.antecedentesComentariosDetalles_comentariosdetalleantecedent ?? "",
+
+            //==========================TAB PRUEBAS COMPLEMENTARIAS===========================
+            // Pruebas Complementarias
+            resfriadoCuadroRespiratorio: res.pcomplementariasResfriadoSi_chk_16_si ?? false,
+            vertigoMareos: res.pcomplementariasVertigoSi_chk_17_si ?? false,
+            temorAlturas: res.pcomplementariasTemorAlturasSi_chk_15_si ?? false,
+            hipoacusiaFrecuenciasConversacionales: res.pcomplementariasHipoacusiaSi_chk_13_si ?? false,
+            alteracionAgudezaVisual: res.pcomplementariasAlteracionAgudezaVisualSi_chk_14_si ?? false,
+            campimetriaAnormal: res.pcomplementariaCampimetriaSi_chk_18_si ?? false,
+
+            // Otros Datos de Relevancia
+            medicinasTomando: res.detalleMedicina_d_medicina ?? "",
+            otrosDatosRelevancia: res.detalleInformacion_d_informacion ?? "",
+            //==========================TAB EXAMEN FISICO===========================
+            // Examen Médico - Medidas Antropométricas y Signos Vitales
+            frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",
+            frecuenciaRespiratoria: res.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
+            presionArterial: `${res.sistolica ?? ""}/${res.diastolica ?? ""}`, //revisar - combinando sistólica y diastólica
+            talla: res.tallaTriaje ?? "",
+            peso: res.pesoTriaje ?? "",
+            imc: res.imcTriaje ?? "",
+            perimetroCuello: res.perimetroCuelloTriaje ?? "",
+            perimetroCintura: res.cinturaTriaje ?? "",
+            perimetroCadera: res.caderaTriaje ?? "",
+            icc: res.iccTriaje ?? "",
+            perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
+            perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
+
+            // Examen Físico - Hallazgos del Examen Físico
+            limitacionFuerzaExtremidades: res.examenFisicoLimitacionFuerzaSi_chk_19_si ?? false,
+            alteracionEquilibrio: res.examenFisicoAlteracionEquilibrioSi_chk_20_si ?? false,
+            anormalidadMarcha: res.examenFisicoAnormalidadMarchaSi_chk_21_si ?? false,
+            alteracionCoordinacionDedoNariz: res.examenFisicoAlteracionCoordinacionSi_chk_22_si ?? false,
+            asimetriaFacial: res.examenFisicoAsimetriaFacialSi_chk_23_si ?? false,
+            sustentacionPie1: res.examenFisicoSustentacionPie_suste_pie_15 ?? false,
+            presenciaNistagmus: res.exameFisicoNistagmusSi_chk_24_si ?? false,
+            anormalidadMovimientosOculares: res.examenFisicoAnormalidadMovimientoSi_chk_25_si ?? false,
+            pupilasNoCirla: res.examenFisicoCirlaSi_chk_26_si ?? false,
+            anormalidadLenguaje: res.examenFisicoAnormalidadLenguajeSi_chk_27_si ?? false,
+            movimientosInvoluntarios: res.examenFisicoMovimientoInvoluntarioSi_chk_28_si ?? false,
+
+            // Examen Físico - Información Adicional
+            detalleInformacionExamenFisico: res.detalleInformacion_d_informacion ?? "",
+            //===============PARTE INFERIOR=======================
+            // Conclusión y Comentarios
+            aptoDesde: res.fechaDesde_f_desde ?? today,
+            aptoHasta: res.fechaHasta_f_hasta ?? getTodayPlusOneYear(),
+            conclusion: res.apto_chk_si ? "APTO" :
+                (res.noApto_chk_no_apto ? "NO APTO" :
+                    (res.aptoConRestriccion_chk_apto_r ? "APTO CON RESTRICCION" :
+                        res.observado_chk_observado ? "OBSERVADO" : null)),
+            observacionesRecomendaciones: res.observacionesRecomendaciones_b_c_observaciones ?? "",
+            // nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
+            // dniUsuario: userCompleto?.datos?.dni_user,
+
+            // Recomendaciones
+            ...validarContenidoTieneChecks(res.observacionesRecomendaciones_b_c_observaciones, recomendacionesTextMap),
         }));
     }
 };
@@ -74,7 +217,7 @@ export const SubmitDataService = async (
         codigoCertificado: form.codigoCertificado,
         dniPaciente: form.dni,
         tiempoExperiencia: form.experienciaAnios,
-        edad: form.edad.replace(" años", ""),
+        edad: form.edad.replace(" AÑOS", ""),
         primeraAptitud: form.razonVisita === "PRIMERA ACTITUD",
         revalidacion: form.razonVisita === "REVALIDACION",
         fechaExamen: form.fechaExam,
@@ -122,8 +265,8 @@ export const SubmitDataService = async (
         exameFisicoNistagmusNo: !form.presenciaNistagmus,
         examenFisicoAnormalidadMovimientoSi: form.anormalidadMovimientosOculares,
         examenFisicoAnormalidadMovimientoNo: !form.anormalidadMovimientosOculares,
-        examenFisicoCirlaSi: !form.pupilasNoCirla,
-        examenFisicoCirlaNo: form.pupilasNoCirla,
+        examenFisicoCirlaSi: form.pupilasNoCirla,
+        examenFisicoCirlaNo: !form.pupilasNoCirla,
         examenFisicoAnormalidadLenguajeSi: form.anormalidadLenguaje,
         examenFisicoAnormalidadLenguajeNo: !form.anormalidadLenguaje,
         examenFisicoMovimientoInvoluntarioSi: form.movimientosInvoluntarios,
@@ -141,6 +284,11 @@ export const SubmitDataService = async (
         aptoConRestriccion: form.conclusion === "APTO CON RESTRICCION",
         observacionesRecomendaciones: form.observacionesRecomendaciones,
         antecedentesComentariosDetalles: form.comentariosDetalleAntecedentes,
+        examenFisicoSustentacionPie: form.sustentacionPie1,
+        antecedentesInsuficienciaRenalCronicaSi: form.insuficienciaRenalCronicaGradoIV,
+        antecedentesInsuficienciaRenalCronicaNo: !form.insuficienciaRenalCronicaGradoIV,
+        antecedentesAnemiaCualquierGradoSi: form.anemiaCriteriosOMS2011,
+        antecedentesAnemiaCualquierGradoNo: !form.anemiaCriteriosOMS2011,
         usuarioRegistrar: user,
     };
 
