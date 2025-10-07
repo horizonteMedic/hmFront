@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import { useEffect } from "react";
 import PropTypes from "prop-types";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
+import { normalizeList } from "../../utils/listUtils";
 import CabeceraLogo from "../components/CabeceraLogo.jsx";
 import drawColorBox from "../components/ColorBox.jsx";
 import footerTR from "../components/footerTR.jsx";
@@ -27,7 +28,23 @@ export default function Aptitud_medico_resumen_Digitalizado({ data = {} }) {
       empresa: "EMPRESA S.A.C.",
       contratista: "CONTRATA S.A.C.",
       tipoExamen: "PRE-OCUPACIONAL",
-      examenesRealizados: ["Audiometría", "Oftalmología", "Laboratorio"],
+      examenesRealizados: [
+        "Radiografía de tórax",
+        "Oftalmología",
+        "Audiometría",
+        "Electrocardiograma",
+        "Laboratorio completo",
+        "Espirometría",
+        "Examen neurológico",
+        "Examen cardiovascular",
+        "Examen osteomuscular",
+        "Examen dermatológico",
+        "Examen psiquiátrico",
+        "Tomografía computada",
+        "Resonancia magnética",
+        "Ultrasonido abdominal",
+        "Pruebas de función hepática"
+      ],
       resultadosResumen: "APTO",
       color: 1,
       codigoColor: "#008f39",
@@ -50,12 +67,7 @@ export default function Aptitud_medico_resumen_Digitalizado({ data = {} }) {
       empresa: String(data.empresa ?? data.empresa_razon_empresa ?? ""),
       contratista: String(data.contrata ?? data.contrata_razon_contrata ?? ""),
       tipoExamen: String(data.nombreExamen ?? data.tipoExamen ?? ""),
-      examenesRealizados: Array.isArray(data.examenesRealizados)
-        ? data.examenesRealizados
-        : String(data.examenesRealizados ?? "")
-            .split('\n')
-            .map(s => s.trim())
-            .filter(Boolean),
+      examenesRealizados: normalizeList(data.examenesRealizados),
       resultadosResumen: String(
         data.resultadosResumen ?? data.resultados ?? data.resultado ?? ""
       ),
@@ -216,7 +228,7 @@ export default function Aptitud_medico_resumen_Digitalizado({ data = {} }) {
     // Columna derecha: Tipo de examen
     doc.setFont("helvetica", "bold").setFontSize(8);
     doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1);
-    doc.setFont("helvetica", "normal").setFontSize(7);
+    doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1);
     yTexto += filaAltura;
 
@@ -291,35 +303,111 @@ export default function Aptitud_medico_resumen_Digitalizado({ data = {} }) {
     doc.text("EXAMENES REALIZADOS", tablaInicioX + 2, yPos + 3);
     yPos += alturaTituloExamenes;
 
-    // Lista dinámica de exámenes
-    const examenesLista = Array.isArray(datosFinales.examenesRealizados)
-      ? datosFinales.examenesRealizados
-      : [];
+    // Lista dinámica de exámenes - todos en una sola fila
+    const examenesLista = datosFinales.examenesRealizados || [];
 
-    const calcularAlturaFilaLista = (texto, anchoMaximo) => {
-      doc.setFont("helvetica", "normal").setFontSize(7);
-      const lineas = doc.splitTextToSize(texto, anchoMaximo);
-      const numLineas = Math.max(1, Array.isArray(lineas) ? lineas.length : 1);
-      // 2.5 mm por línea + 1 mm de margen mínimo
-      return Math.max(4, numLineas * 2.5 + 1);
+    // Crear texto con todos los exámenes sin numeración y con saltos de línea
+    const textoExamenes = examenesLista.length > 0 
+      ? examenesLista.map((item) => String(item)).join('\n')
+      : "Sin exámenes registrados";
+
+    // Calcular altura dinámica para el texto de exámenes
+    const calcularAlturaExamenes = (texto, anchoMaximo) => {
+      // Primero dividir por saltos de línea para contar las líneas base
+      const lineasBase = texto.split('\n');
+      let totalLineas = 0;
+
+      lineasBase.forEach(linea => {
+        if (linea.trim() === '') {
+          totalLineas += 1; // Línea vacía
+          return;
+        }
+
+        const palabras = linea.split(' ');
+        let lineaActual = '';
+        let lineasEnEstaSeccion = 1;
+
+        palabras.forEach(palabra => {
+          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+          const anchoTexto = doc.getTextWidth(textoPrueba);
+
+          if (anchoTexto <= anchoMaximo) {
+            lineaActual = textoPrueba;
+          } else {
+            if (lineaActual) {
+              lineasEnEstaSeccion++;
+              lineaActual = palabra;
+            } else {
+              lineasEnEstaSeccion++;
+            }
+          }
+        });
+
+        totalLineas += lineasEnEstaSeccion;
+      });
+
+      // Altura mínima de 8mm, con interlineado de 3.5mm para fuente 7
+      const alturaCalculada = totalLineas * 3.5 + 4; // 3mm arriba + 1mm abajo de margen
+      return Math.max(alturaCalculada, 8);
     };
 
-    const anchoMaximoLista = tablaAncho - 6; // márgenes
-    doc.setFont("helvetica", "normal").setFontSize(7);
-    examenesLista.forEach((item, idx) => {
-      const textoItem = `${idx + 1}. ${String(item)}`;
-      const alturaFila = calcularAlturaFilaLista(textoItem, anchoMaximoLista);
+    const anchoMaximoExamenes = tablaAncho - 4; // Ancho total menos márgenes
+    const alturaFilaExamenes = calcularAlturaExamenes(textoExamenes, anchoMaximoExamenes);
 
-      // Marco de la fila
-      doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFila);
-      doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFila);
-      doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-      doc.line(tablaInicioX, yPos + alturaFila, tablaInicioX + tablaAncho, yPos + alturaFila);
+    // Dibujar líneas de la fila de exámenes (sin divisiones internas)
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaExamenes); // Línea izquierda
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaExamenes); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaFilaExamenes, tablaInicioX + tablaAncho, yPos + alturaFilaExamenes); // Línea inferior
 
-      // Texto del item
-      dibujarTextoConSaltoLinea(textoItem, tablaInicioX + 2, yPos + 2.5, anchoMaximoLista);
-      yPos += alturaFila;
-    });
+    // Contenido de la fila de exámenes
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    
+    // Función específica para dibujar texto con fuente 7 y interlineado correcto
+    const dibujarTextoConSaltoLineaFuente7 = (texto, x, y, anchoMaximo) => {
+      // Primero dividir por saltos de línea para manejar cada línea numerada por separado
+      const lineasBase = texto.split('\n');
+      let yPos = y;
+
+      lineasBase.forEach(linea => {
+        if (linea.trim() === '') {
+          yPos += 2.5; // Espacio para línea vacía
+          return;
+        }
+
+        const palabras = linea.split(' ');
+        let lineaActual = '';
+
+        palabras.forEach(palabra => {
+          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+          const anchoTexto = doc.getTextWidth(textoPrueba);
+
+          if (anchoTexto <= anchoMaximo) {
+            lineaActual = textoPrueba;
+          } else {
+            if (lineaActual) {
+              doc.text(lineaActual, x, yPos);
+              yPos += 3.5; // Interlineado específico para fuente 7
+              lineaActual = palabra;
+            } else {
+              doc.text(palabra, x, yPos);
+              yPos += 3.5;
+            }
+          }
+        });
+
+        if (lineaActual) {
+          doc.text(lineaActual, x, yPos);
+          yPos += 3.5; // Interlineado después de cada línea
+        }
+      });
+
+      return yPos;
+    };
+    
+    dibujarTextoConSaltoLineaFuente7(textoExamenes, tablaInicioX + 2, yPos + 3, anchoMaximoExamenes);
+
+    yPos += alturaFilaExamenes;
 
     // Fila final: Resultados
     const alturaResultados = 5;
@@ -352,9 +440,9 @@ function imprimir(doc) {
   document.body.appendChild(iframe);
   iframe.onload = () => iframe.contentWindow.print();
 }
-
 Aptitud_medico_resumen_Digitalizado.propTypes = {
   data: PropTypes.object
 };
+
 
 

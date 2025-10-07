@@ -1086,13 +1086,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   // Calcular centro de la columna 2 para centrar las imágenes
   const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
   
-  // Agregar firma del trabajador (lado izquierdo) con fallback
+  // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(data, "FIRMAP");
-  if (!firmaTrabajadorUrl) {
-    try {
-      firmaTrabajadorUrl = window.location.origin + '/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png';
-    } catch (_) { /* noop en SSR */ }
-  }
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 30;
@@ -1105,13 +1100,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
     }
   }
 
-  // Agregar huella del trabajador (lado derecho, vertical) con fallback
+  // Agregar huella del trabajador (lado derecho, vertical)
   let huellaTrabajadorUrl = getSign(data, "HUELLA");
-  if (!huellaTrabajadorUrl) {
-    try {
-      huellaTrabajadorUrl = window.location.origin + '/img/firmas_sellos_prueba/HUELLA_DIGITAL.png';
-    } catch (_) { /* noop en SSR */ }
-  }
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 12;
@@ -1132,14 +1122,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   const firmaMedicoX = tablaInicioX + 125;
   const firmaMedicoY = yPos + 3;
   
-  // Agregar firma y sello médico con fallback
+  // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
-  if (!firmaMedicoUrl) {
-    try {
-      // Usa un sello/firma de prueba si no hay datos
-      firmaMedicoUrl = window.location.origin + '/img/firmas_sellos_prueba/firma_sello.png';
-    } catch (_) { /* noop en SSR */ }
-  }
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
