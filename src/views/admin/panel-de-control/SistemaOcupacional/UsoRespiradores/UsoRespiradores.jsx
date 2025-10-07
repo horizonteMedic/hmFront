@@ -17,7 +17,6 @@ import {
 import { useForm } from "../../../../hooks/useForm";
 import { getToday } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import Swal from "sweetalert2";
 import LugarDeTrabajo from "./TabsUsoRespiradores/LugarDeTrabajo";
 import PersonalEmpleadoI from "./TabsUsoRespiradores/PersonalEmpleadoI";
 import PersonalEmpleadoII from "./TabsUsoRespiradores/PersonalEmpleadoII";
@@ -67,34 +66,19 @@ export default function UsoRespiradores() {
 
     // ====================== LUGAR DE TRABAJO ======================
     // Tipo de respirador(es) a utilizar
-    respiradorMascaraPolvo: false,
-    respiradorMediaCara: false,
+    respiradorMascaraPolvo: true,
+    respiradorMediaCara: true,
     respiradorCaraCompleta: false,
-    respiradorPurificadorSinEnergia: false,
-    respiradorPurificadorConEnergia: false,
-    respiradorSuministroAtmosfera: false,
-    respiradorCombinacionLineaAireSCBA: false,
-    respiradorFlujoContinuo: false,
-    respiradorSuministroAire: false,
-    respiradorScbaCircuitoAbierto: false,
-    respiradorScbaCircuitoCerrado: false,
+    tipoRespiradorTipo: "PURIFICADOR_SIN_ENERGIA",
 
     // Tipo de Protección
-    proteccionFiltroHepa: false,
-    proteccionCartuchoGasAcido: false,
-    proteccionCartuchoVaporOrganico: false,
-    proteccionCartuchoAmoniaco: false,
-    proteccionCartuchoMercurio: false,
+    tipoProteccion: "FILTRO_HEPA",
 
     // Esfuerzo físico esperado requerido
-    esfuerzoLigero: false,
-    esfuerzoModerado: false,
-    esfuerzoPesado: false,
+    esfuerzoFisico: "MODERADO",
 
     // Frecuencia de uso
-    usoDiario: false,
-    usoOcasionalMenosDosVeces: false,
-    usoRaraVezEmergencia: false,
+    frecuenciaUso: "DIARIO",
     promedioHorasDia: "",
 
     // Exposición de Materiales Peligros
@@ -412,7 +396,7 @@ export default function UsoRespiradores() {
             </nav>
 
             {/* Contenido de la pestaña activa */}
-            <div className="px-4 pt-4">	
+            <div className="px-4 pt-4">
               <ActiveComponent
                 form={form}
                 setForm={setForm}

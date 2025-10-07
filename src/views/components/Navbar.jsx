@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faChartBar, faList, faLock, faSignOutAlt, faNotesMedical, faHome, faTooth, faXRay, faFileSignature, faHeartbeat, faKey, faRotate } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faNotesMedical, faHome, faRetweet, faBroom } from '@fortawesome/free-solid-svg-icons';
 import { URLAzure } from '../config/config';
 import { clearLocalStorageExceptAuth } from '../utils/helpers';
 import Swal from 'sweetalert2';
@@ -27,8 +27,8 @@ const Navbar = () => {
     setTimeout(() => setSpinning(false), 1000);
     Swal.fire({
       toast: true,
-      position: "bottom-end", 
-      icon: "success", 
+      position: "bottom-end",
+      icon: "success",
       title: "Datos limpiados correctamente",
       showConfirmButton: false,
       timer: 2000, // desaparece en 2s
@@ -100,10 +100,18 @@ const Navbar = () => {
 
       <div className="hidden md:flex items-center">
         {URLAzure == "https://testbackendhm.azurewebsites.net" && <p className='font-bold mr-5'>DEVELOPER</p>}
-        <button className='bg-white text-[#233245] p-2 rounded-full flex items-center justify-center'
+        <button className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-6'
+          onClick={() => { window.location.reload(); }}
+          title="Recargar página"
+        >
+          <FontAwesomeIcon icon={faRetweet} className="w-5 h-5 " />
+        </button>
+        <button
+          className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-5'
+          title="Limpiar datos"
           onClick={handleClickReload}
         >
-          <FontAwesomeIcon icon={faRotate} className={`w-5 h-5 ${spinning ? 'animate-spin ease-in-out' : ''}`} />
+          <FontAwesomeIcon icon={faBroom} className='w-5 h-5' />
         </button>
         <CustomNavLink
           to="/panel-de-control"

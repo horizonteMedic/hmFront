@@ -699,8 +699,8 @@ export default function GenerarDatosPacienteBoro(data = {}) {
     try {
       const imgWidth = 30; // Reducido para que quepa al lado de la huella
       const imgHeight = 20;
-      const x = centroColumna2X - 20; // Posicionado a la izquierda del centro
-      const y = firmaTrabajadorY;
+      const x = centroColumna2X - 20+25; // Posicionado a la izquierda del centro
+      const y = firmaTrabajadorY-13;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
       console.log("Firma trabajador agregada exitosamente");
     } catch (error) {
@@ -715,10 +715,10 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   console.log("Huella trabajador URL:", huellaTrabajadorUrl);
   if (huellaTrabajadorUrl) {
     try {
-      const imgWidth = 12; // Vertical
-      const imgHeight = 20; // Ajustado para que coincida con la altura de la firma
-      const x = centroColumna2X + 8; // Posicionado a la derecha del centro
-      const y = firmaTrabajadorY;
+      const imgWidth = 14; // Vertical
+      const imgHeight = 22; // Ajustado para que coincida con la altura de la firma
+      const x = centroColumna2X + 8+25; // Posicionado a la derecha del centro
+      const y = firmaTrabajadorY -13;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
       console.log("Huella trabajador agregada exitosamente");
     } catch (error) {
