@@ -1,4 +1,4 @@
-ñimport jsPDF from "jspdf";
+import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
 import { getSign } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
