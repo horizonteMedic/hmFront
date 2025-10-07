@@ -614,8 +614,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       alturaFila: 8.5,
       posicionY: 2.5,
       // Variables del JSON para marcas X
-      siIzquierdo: data.chk6Si_chk_6_si || false,
-      noIzquierdo: data.chk6No_chk_6_no || false,
+      siIzquierdo: data.pcomplementariasPsicosensometricaAlteradaSi_chk_19_si || false,
+      noIzquierdo: data.pcomplementariasPsicosensometricaAlteradaNo_chk_19_no || false,
       siDerecho: data.pcomplementariasHipoacusiaSi_chk_13_si || false,
       noDerecho: data.pcomplementariasHipoacusiaNo_chk_13_no || false
     },
@@ -626,8 +626,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       alturaFila: 8.5,
       posicionY: 2.5,
       // Variables del JSON para marcas X
-      siIzquierdo: data.chk12Si_chk_12_si || false,
-      noIzquierdo: data.chk12No_chk_12_no || false,
+      siIzquierdo: data.pcomplementariasPsicosensometricaAlteradaSi_chk_19_si || false,
+      noIzquierdo: data.pcomplementariasPsicosensometricaAlteradaNo_chk_19_no || false,
       siDerecho: data.pcomplementariasAlteracionAgudezaVisualSi_chk_14_si || false,
       noDerecho: data.pcomplementariasAlteracionAgudezaVisualNo_chk_14_no || false
     },
@@ -638,8 +638,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       alturaFila: 3.5,
       posicionY: 2.5,
       // Variables del JSON para marcas X
-      siIzquierdo: data.chk16Si_chk_16_si || false,
-      noIzquierdo: data.chk16No_chk_16_no || false,
+      siIzquierdo: data.pcomplementariasPsicosensometricaAlteradaSi_chk_19_si || false,
+      noIzquierdo: data.pcomplementariasPsicosensometricaAlteradaNo_chk_19_no || false,
       siDerecho: data.pcomplementariasNoColorSi_chk_17_si || false,
       noDerecho: data.pcomplementariasNoColorNo_chk_17_no || false
     },
@@ -654,18 +654,6 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       noIzquierdo: !data.pcomplementariasTestSas_testSAS || false,
       siDerecho: data.pcomplementariasPruebaVisionSi_chk_18_si || false,
       noDerecho: data.pcomplementariasPruebaVisionNo_chk_18_no || false
-    },
-    {
-      numero: 5,
-      textoIzquierdo: "Test de Ampliometría : Anormal",
-      textoDerecho: "Psicosensométrica Alterada",
-      alturaFila: 3.5,
-      posicionY: 2.5,
-      // Variables del JSON para marcas X
-      siIzquierdo: data.pcomplementariasAmpliometriaAnormalSi_chk_15_si || false,
-      noIzquierdo: data.pcomplementariasAmpliometriaAnormalNo_chk_15_no || false,
-      siDerecho: data.pcomplementariasPsicosensometricaAlteradaSi_chk_19_si || false,
-      noDerecho: data.pcomplementariasPsicosensometricaAlteradaNo_chk_19_no || false
     }
 
   ];
@@ -808,8 +796,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       // Variables del JSON para marcas X
       siIzquierdo: data.examenFisicoAleracionPresenteSi_chk_22_si || false,
       noIzquierdo: data.examenFisicoAleracionPresenteNo_chk_22_no || false,
-      siDerecho: data.chk20Si_chk_20_si || false,
-      noDerecho: data.chk20No_chk_20_no || false
+      siDerecho: data.examenFisicoAnormalidadMovimientoSi_chk_26_si || false,
+      noDerecho: data.examenFisicoAnormalidadMovimientoNo_chk_26_no || false
     },
     {
       numero: 3,
@@ -847,18 +835,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       siDerecho: data.examenFisicoMovimientoInvoluntarioSi_chk_29_si || false,
       noDerecho: data.examenFisicoMovimientoInvoluntarioNo_chk_29_no || false
     },
-    {
-      numero: 6,
-      textoIzquierdo: "Anormalidad en movimientos",
-      textoDerecho: "Asimetría facial",
-      alturaFila: 4.0,
-      posicionY: 2.5,
-      // Variables del JSON para marcas X
-      siIzquierdo: data.examenFisicoAnormalidadMovimientoSi_chk_26_si || false,
-      noIzquierdo: data.examenFisicoAnormalidadMovimientoNo_chk_26_no || false,
-      siDerecho: data.examenFisicoAsimetriaFacialSi_chk_30_si || false,
-      noDerecho: data.examenFisicoAsimetriaFacialNo_chk_30_no || false
-    }
+    
   ];
 
   // Dibujar todas las filas de la nueva sección
