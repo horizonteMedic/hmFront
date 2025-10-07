@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { normalizeList } from "../../utils/listUtils";
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import drawColorBox from '../components/ColorBox.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -114,6 +115,7 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     conclusionApto: Boolean(data.apto_chk_si ?? false),
     conclusionNoApto: Boolean(data.noApto_chk_no_apto ?? false),
     conclusionObservado: Boolean(data.observado_chk_observado ?? false),
+    conclusionAptoConRestriccion: Boolean(data.aptoConRestriccion_chk_apto_r ?? false),
     // Detalle nueva sección
     detalleNuevaSeccion: String(data.antecedentesComentariosDetalles_comentariosdetalleantecedent ?? ""), //revisar - mapeo incierto
     // Campos adicionales específicos del certificado de altura
@@ -919,40 +921,44 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   const alturaHeaderConclusion = 4;
   yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
 
-  // === Fila de conclusión con divisiones ===
-  // Estructura: [Apto para conducción] | [Desde dd/mm/aaaa] | [Hasta dd/mm/aaaa] | [Apto][X] | [No apto][ ] | [Observado]
+  // === Fila de conclusión con 4 columnas ===
+  // Estructura: [Apto] | [Observado] | [No Apto] | [Apto con Restricción]
   const alturaFilaConclusion = 4.5;
-  // Líneas
+  const anchoColumna = tablaAncho / 4; // Dividir en 4 columnas iguales
+  
+  // Líneas verticales
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaConclusion); // izquierda
-  doc.line(tablaInicioX + 50, yPos, tablaInicioX + 50, yPos + alturaFilaConclusion); // col 1 -> col 2
-  doc.line(tablaInicioX + 82.5, yPos, tablaInicioX + 82.5, yPos + alturaFilaConclusion); // col 2 -> col 3
-  doc.line(tablaInicioX + 115, yPos, tablaInicioX + 115, yPos + alturaFilaConclusion); // col 3 -> col 4 (estado)
-
-  doc.line(tablaInicioX + 128, yPos, tablaInicioX + 128, yPos + alturaFilaConclusion); // entre Apto label y X
-  doc.line(tablaInicioX + 137, yPos, tablaInicioX + 137, yPos + alturaFilaConclusion); // entre X y No apto label
-  doc.line(tablaInicioX + 153, yPos, tablaInicioX + 153, yPos + alturaFilaConclusion); // entre No apto y Observado
-  doc.line(tablaInicioX + 162, yPos, tablaInicioX + 162, yPos + alturaFilaConclusion); // entre No apto y Observado
-  doc.line(tablaInicioX + 178, yPos, tablaInicioX + 178, yPos + alturaFilaConclusion); // entre No apto y Observado
-
-
+  doc.line(tablaInicioX + anchoColumna, yPos, tablaInicioX + anchoColumna, yPos + alturaFilaConclusion); // col 1 -> col 2
+  doc.line(tablaInicioX + anchoColumna * 2, yPos, tablaInicioX + anchoColumna * 2, yPos + alturaFilaConclusion); // col 2 -> col 3
+  doc.line(tablaInicioX + anchoColumna * 3, yPos, tablaInicioX + anchoColumna * 3, yPos + alturaFilaConclusion); // col 3 -> col 4
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaConclusion); // derecha
+  
+  // Líneas horizontales
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
   doc.line(tablaInicioX, yPos + alturaFilaConclusion, tablaInicioX + tablaAncho, yPos + alturaFilaConclusion); // inferior
 
-  // Contenido
+  // Contenido de las 4 columnas
   doc.setFont("helvetica", "normal").setFontSize(8);
-  // Col 1: texto
-  dibujarTextoConSaltoLinea("Apto para conducción de vehículos", tablaInicioX + 2, yPos + 3, 66);
-  // Col 2: Desde
-  dibujarTextoConSaltoLinea("Desde: " + (datosFinales.conclusionDesde || "__/__/____"), tablaInicioX + 53, yPos + 3, 32);
-  // Col 3: Hasta
-  dibujarTextoConSaltoLinea("Hasta: " + (datosFinales.conclusionHasta || "__/__/____"), tablaInicioX + 87, yPos + 3, 32);
-  // Col 4: Estado (Apto | X | No apto |  | Observado)
-  doc.text("Apto", tablaInicioX + 118, yPos + 3);
-  doc.text(datosFinales.conclusionApto ? "X" : "", tablaInicioX + 131, yPos + 3);
-  doc.text("No apto", tablaInicioX + 140, yPos + 3);
-  doc.text(datosFinales.conclusionNoApto ? "X" : "", tablaInicioX + 153, yPos + 3);
-  doc.text("Observado", tablaInicioX + 163, yPos + 3);
+  
+  // Columna 1: Apto
+  const inicioCol1 = tablaInicioX + 2;
+  doc.text("Apto", inicioCol1 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionApto ? "X" : "", inicioCol1 + 30, yPos + 3.5);
+  
+  // Columna 2: Observado
+  const inicioCol2 = tablaInicioX + anchoColumna + 2;
+  doc.text("Observado", inicioCol2 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionObservado ? "X" : "", inicioCol2 + 25, yPos + 3.5);
+  
+  // Columna 3: No Apto
+  const inicioCol3 = tablaInicioX + (anchoColumna * 2) + 2;
+  doc.text("No Apto", inicioCol3 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionNoApto ? "X" : "", inicioCol3 + 20, yPos + 3.5);
+  
+  // Columna 4: Apto con Restricción
+  const inicioCol4 = tablaInicioX + (anchoColumna * 3) + 2;
+  doc.text("Apto con Restricción", inicioCol4 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "", inicioCol4 + 35, yPos + 3.5);
 
   yPos += alturaFilaConclusion;
 
@@ -960,82 +966,98 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   const alturaHeaderObservaciones = 4;
   yPos = dibujarHeaderSeccion("6.- OBSERVACIONES Y RECOMENDACIONES", yPos, alturaHeaderObservaciones);
 
-  // === Fila de observaciones y recomendaciones (sin divisiones internas) ===
-  const textoObservacionesRecomendaciones = `Observaciones y Recomendaciones: ${datosFinales.observacionesRecomendaciones || "Sin observaciones adicionales"}`;
-  const alturaFilaObservaciones = Math.max(6, calcularAlturaTexto(textoObservacionesRecomendaciones, tablaAncho - 4, 8));
+  // Procesar observaciones usando normalizeList
+  let observacionesLista = normalizeList(datosFinales.observacionesRecomendaciones);
+  
+  // Si no hay observaciones, usar observación por defecto
+  if (observacionesLista.length === 0) {
+    observacionesLista = ["Sin observaciones adicionales"];
+  }
+  
+  // Crear texto con formato de lista (cada item en una línea)
+  const observacionesTexto = observacionesLista.map(item => `${item}`).join('\n');
 
-  // Dibujar líneas de la fila de observaciones (sin divisiones internas)
+  // Calcular altura dinámica para la lista de observaciones
+  // Contar las líneas del texto (cada observación es una línea)
+  const lineasObservaciones = observacionesLista.length;
+  const alturaPorLinea = 2.5; // Altura por línea en mm (reducida para fuente 6)
+  const alturaFilaObservaciones = Math.max(lineasObservaciones * alturaPorLinea + 2, 8); // Mínimo 8mm
+
+  // Dibujar la fila de observaciones con altura dinámica
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaObservaciones); // Línea izquierda
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaObservaciones); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + alturaFilaObservaciones, tablaInicioX + tablaAncho, yPos + alturaFilaObservaciones); // Línea inferior
 
-  // Contenido de la fila de observaciones y recomendaciones
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(textoObservacionesRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+  // Dibujar el texto de las observaciones en formato de lista con fuente 6
+  doc.setFont("helvetica", "normal").setFontSize(6);
+  
+  // Función específica para dibujar texto con fuente 6 y interlineado correcto
+  const dibujarTextoConSaltoLineaFuente6 = (texto, x, y, anchoMaximo) => {
+    // Primero dividir por saltos de línea para manejar cada línea numerada por separado
+    const lineasBase = texto.split('\n');
+    let yPos = y;
 
+    lineasBase.forEach(linea => {
+      if (linea.trim() === '') {
+        yPos += 2.5; // Espacio para línea vacía
+        return;
+      }
+
+      const palabras = linea.split(' ');
+      let lineaActual = '';
+
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
+        } else {
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += 2.5; // Interlineado específico para fuente 6
+            lineaActual = palabra;
+          } else {
+            doc.text(palabra, x, yPos);
+            yPos += 2.5;
+          }
+        }
+      });
+
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        yPos += 2.5; // Interlineado después de cada línea
+      }
+    });
+
+    return yPos;
+  };
+  
+  dibujarTextoConSaltoLineaFuente6(observacionesTexto, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+  
   yPos += alturaFilaObservaciones;
 
-  // === CONFIGURACIÓN DE SECCIÓN DE FIRMA MÉDICA ===
-  const configuracionFirmaMedica = {
-    alturaSeccionFirma: 20,
-    alturaNotaAlPie: 5, // Altura fija compacta
-    textoNotaAlPie: "NOTA AL PIE: La presente certificación tiene una validez igual a la señalada en CONCLUSION. La aparición de alguna enfermedad NUEVA durante la duración de esta certificación invalida este permiso y deberá ser reevaluado medicamente. Antes de continuar conduciendo u operando algún tipo de vehículo.",
-    colorAdvertencia: [245, 174, 103], // #f5ae67 - Naranja personalizado
-    fuenteNota: { tipo: "helvetica", estilo: "normal", tamaño: 6 }
-  };
 
-  // === SECCIÓN DE FIRMA MÉDICA ===
-  const yFirmaMedica = yPos;
-  const alturaTotalTabla = configuracionFirmaMedica.alturaSeccionFirma + configuracionFirmaMedica.alturaNotaAlPie;
-
-  // Dibujar tabla completa (una sola tabla con dos filas)
-  // Líneas verticales
-  doc.line(tablaInicioX, yFirmaMedica, tablaInicioX, yFirmaMedica + alturaTotalTabla);
-  doc.line(tablaInicioX + tablaAncho / 2, yFirmaMedica, tablaInicioX + tablaAncho / 2, yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma);
-  doc.line(tablaInicioX + tablaAncho, yFirmaMedica, tablaInicioX + tablaAncho, yFirmaMedica + alturaTotalTabla);
-
-  // Líneas horizontales
-  doc.line(tablaInicioX, yFirmaMedica, tablaInicioX + tablaAncho, yFirmaMedica);
-  doc.line(tablaInicioX, yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma, tablaInicioX + tablaAncho, yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma);
-  doc.line(tablaInicioX, yFirmaMedica + alturaTotalTabla, tablaInicioX + tablaAncho, yFirmaMedica + alturaTotalTabla);
-
-  // Fila 1: Información del médico y firma (2 columnas)
-  // Columna 1: Información del médico
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Nombre y Apellidos del Médico - N° de Colegiatura", tablaInicioX + 2, yFirmaMedica + 5);
-  doc.text("Firma y Sello", tablaInicioX + 2, yFirmaMedica + 9);
-  doc.text("CMP", tablaInicioX + 2, yFirmaMedica + 13);
-
-  // Columna 2: Firma del médico
-  const firmaMedicoUrl = getSign(data, "SELLOFIRMA");
-  if (firmaMedicoUrl) {
-    try {
-      const imgWidth = 45;
-      const imgHeight = 20;
-      const x = tablaInicioX + tablaAncho / 2 + 10;
-      const y = yFirmaMedica + 2;
-      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del médico:", error);
-    }
-  }
-
-  // Fila 2: Nota al pie (fila dinámica con fondo naranja personalizado)
-  const yNotaAlPie = yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma;
+  // === NOTA AL PIE ===
+  const yNotaAlPie = yPos;
+  const alturaNotaAlPie = 5; // Altura fija compacta
 
   // Dibujar fondo naranja personalizado
-  doc.setFillColor(...configuracionFirmaMedica.colorAdvertencia);
-  doc.rect(tablaInicioX, yNotaAlPie, tablaAncho, configuracionFirmaMedica.alturaNotaAlPie, 'F');
+  doc.setFillColor(245, 174, 103); // #f5ae67 - Naranja personalizado
+  doc.rect(tablaInicioX, yNotaAlPie, tablaAncho, alturaNotaAlPie, 'F');
 
   // Dibujar texto de nota al pie
-  doc.setFont(configuracionFirmaMedica.fuenteNota.tipo, configuracionFirmaMedica.fuenteNota.estilo).setFontSize(configuracionFirmaMedica.fuenteNota.tamaño);
+  doc.setFont("helvetica", "normal").setFontSize(6);
   doc.setTextColor(0, 0, 0);
-  dibujarTextoConSaltoLinea(configuracionFirmaMedica.textoNotaAlPie, tablaInicioX + 2, yNotaAlPie + 2, tablaAncho - 4);
+  const textoNotaAlPie = "NOTA AL PIE: La presente certificación tiene una validez igual a la señalada en CONCLUSION. La aparición de alguna enfermedad NUEVA durante la duración de esta certificación invalida este permiso y deberá ser reevaluado medicamente. Antes de continuar conduciendo u operando algún tipo de vehículo.";
+  dibujarTextoConSaltoLinea(textoNotaAlPie, tablaInicioX + 2, yNotaAlPie + 2, tablaAncho - 4);
+
+  yPos += alturaNotaAlPie;
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
-  const yDeclaracion = yFirmaMedica + alturaTotalTabla; // Continuar directamente desde la firma médica
-  const alturaSeccionDeclaracion = 20; // Altura para la sección de declaración
+  const yDeclaracion = yPos; // Continuar directamente desde la nota al pie
+  const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
 
   // Dibujar las líneas de la sección de declaración (3 columnas)
   doc.line(tablaInicioX, yDeclaracion, tablaInicioX, yDeclaracion + alturaSeccionDeclaracion); // Línea izquierda
@@ -1045,45 +1067,106 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.line(tablaInicioX, yDeclaracion, tablaInicioX + tablaAncho, yDeclaracion); // Línea superior
   doc.line(tablaInicioX, yDeclaracion + alturaSeccionDeclaracion, tablaInicioX + tablaAncho, yDeclaracion + alturaSeccionDeclaracion); // Línea inferior
 
-  // Columna 1: Declaración
+  // === COLUMNA 1: DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(6);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
-  dibujarTextoConSaltoLinea(textoDeclaracion, tablaInicioX + 2, yDeclaracion + 3, 55);
+  
+  // Función para justificar texto
+  const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    let yActual = y;
+    
+    lineas.forEach((linea, index) => {
+      // Solo justificar si no es la última línea y tiene más de una palabra
+      if (index < lineas.length - 1 && linea.includes(' ')) {
+        const palabras = linea.split(' ');
+        if (palabras.length > 1) {
+          const anchoTexto = doc.getTextWidth(linea);
+          const espacioDisponible = anchoMaximo - anchoTexto;
+          const espaciosEntrePalabras = palabras.length - 1;
+          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
+          
+          let xActual = x;
+          palabras.forEach((palabra, i) => {
+            doc.text(palabra, xActual, yActual);
+            if (i < palabras.length - 1) {
+              const anchoPalabra = doc.getTextWidth(palabra);
+              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
+            }
+          });
+        } else {
+          doc.text(linea, x, yActual);
+        }
+      } else {
+        doc.text(linea, x, yActual);
+      }
+      yActual += interlineado;
+    });
+  };
+  
+  // Dibujar texto justificado
+  justificarTexto(textoDeclaracion, tablaInicioX + 2, yDeclaracion + 3, 55, 2.5);
 
-  // Columna 2: Firma del trabajador
-  const firmaTrabajadorUrl = getSign(data, "FIRMAP");
+  // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
+  const firmaTrabajadorY = yDeclaracion + 3;
+  
+  // Calcular centro de la columna 2 para centrar las imágenes
+  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  
+  // Agregar firma del trabajador (lado izquierdo)
+  let firmaTrabajadorUrl = getSign(data, "FIRMAP");
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 30;
       const imgHeight = 20;
-      const x = tablaInicioX + 65;
-      const y = yDeclaracion + 2;
+      const x = centroColumna2X - 20;
+      const y = firmaTrabajadorY;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando firma del trabajador:", error);
     }
   }
 
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma del trabajador o postulante", tablaInicioX + 90, yDeclaracion + 16.5, { align: "center" });
-  doc.text("DNI : " + datosFinales.documentoIdentidad, tablaInicioX + 90, yDeclaracion + 19, { align: "center" });
-
-  // Columna 3: Huella digital
+  // Agregar huella del trabajador (lado derecho, vertical)
   let huellaTrabajadorUrl = getSign(data, "HUELLA");
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 12;
       const imgHeight = 20;
-      const x = tablaInicioX + 125;
-      const y = yDeclaracion + 2;
+      const x = centroColumna2X + 8;
+      const y = firmaTrabajadorY;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
       console.log("Error cargando huella del trabajador:", error);
     }
   }
-
+  
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Indice Derecho", tablaInicioX + 150, yDeclaracion + 16.5, { align: "center" });
+  const centroColumna2 = tablaInicioX + 60 + (60 / 2);
+  doc.text("Firma y Huella del trabajador", centroColumna2, yDeclaracion + 26, { align: "center" });
+
+  // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
+  const firmaMedicoX = tablaInicioX + 125;
+  const firmaMedicoY = yDeclaracion + 3;
+  
+  // Agregar firma y sello médico
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      const x = firmaMedicoX + 10;
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+  
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const centroColumna3 = tablaInicioX + 120 + (70 / 2);
+  doc.text("Sello y Firma del Médico", centroColumna3, yDeclaracion + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumna3, yDeclaracion + 28.5, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
