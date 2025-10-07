@@ -15,7 +15,7 @@ import {
   InputTextArea,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import LugarDeTrabajo from "./TabsUsoRespiradores/LugarDeTrabajo";
 import PersonalEmpleadoI from "./TabsUsoRespiradores/PersonalEmpleadoI";
@@ -235,12 +235,10 @@ export default function UsoRespiradores() {
     equipoMatpelEmergencias: false,
 
     // ====================== TAB 6 FINAL AUTORIZACION======================
+    supervisor: "DESCONOCIDO",
     claseAutorizacion: "CLASE_I",
-    claseIIEmergenciaEscape: false,
-    claseIISoloPAPR: false,
-    claseIINoSBCA: false,
-    claseIIOtros: false,
-    fechaExpiraAutorizacion: today,
+    claseIIOpcion: "",
+    fechaExpiraAutorizacion: getTodayPlusOneYear(),
   };
 
   const {

@@ -76,6 +76,7 @@ export default function FichaSas({ listas }) {
         ruidos_respirar_durmiendo: false,
         deja_respirar_durmiendo: false,
         mas_sueno_cansancio: false,
+        entrevistaPuntuacion: "0",
 
         // Examen Físico
         peso_kg: "",
@@ -610,16 +611,10 @@ export default function FichaSas({ listas }) {
                         </div>
                         <div className="flex items-center gap-4">
                             <span>Total puntos (sumatoria)</span>
-                            <input
-                                type="number"
-                                className="border border-gray-300 px-3 py-2 rounded w-20 text-center"
-                                value={
-                                    (form?.ronca_al_dormir === true ? 1 : 0) +
-                                    (form?.ruidos_respirar_durmiendo === true ? 1 : 0) +
-                                    (form?.deja_respirar_durmiendo === true ? 1 : 0) +
-                                    (form?.mas_sueno_cansancio === true ? 1 : 0)
-                                }
-                                disabled
+                            <InputTextOneLine
+                                name="entrevistaPuntuacion"
+                                value={form?.entrevistaPuntuacion}
+                                onChange={handleChangeNumber}
                             />
                         </div>
                     </div>
