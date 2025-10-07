@@ -36,8 +36,11 @@ const Historial = ({closeModal,token,user}) => {
     useEffect(() => {
         getFetch(`/api/v01/ct/archivos/listadoArchivosPorFechas?fechaInicio=${form.fechaInicio}&fechaFin=${form.fechaFin}`,token)
         .then((res) => {
-            setData(res)
-            console.log(res)
+            if (Array.isArray(res)) {
+                setData(res)    
+            } else {
+                //Swal.fire('Error','No hay registros','error')
+            }
         })
     },[form])
 
