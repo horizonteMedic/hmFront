@@ -59,6 +59,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
     conclusionDesde: "04/11/2000",
     conclusionHasta: "04/11/2025",
     conclusionApto: true,
+    conclusionAptoConRestriccion: false,
     conclusionNoApto: false,
     conclusionObservado: false,
     // Detalle nueva sección
@@ -112,6 +113,7 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
     conclusionDesde: formatearFechaCorta(data.fechaDesde_f_desde ?? ""),
     conclusionHasta: formatearFechaCorta(data.fechaHasta_f_hasta ?? ""),
     conclusionApto: Boolean(data.apto_chk_si ?? false),
+    conclusionAptoConRestriccion: Boolean(data.aptoConRestriccion_chk_apto_r ?? false),
     conclusionNoApto: Boolean(data.noApto_chk_no ?? false),
     conclusionObservado: Boolean(data.observado_chk_observado ?? false),
     // Detalle nueva sección
@@ -391,35 +393,6 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
   yPos += alturaFilaAntecedentes;
 
-  // Función para calcular altura necesaria para texto (específica por fila)
-  const calcularAlturaTexto = (texto, anchoMaximo, fontSize, esFilaCompacta = false) => {
-    const palabras = texto.split(' ');
-    let lineaActual = '';
-    let lineas = 1;
-
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          lineas++;
-          lineaActual = palabra;
-        } else {
-          lineas++;
-        }
-      }
-    });
-
-    // Configuración específica según el tipo de fila
-    if (esFilaCompacta) {
-      return Math.max(lineas * fontSize * 0.2 + 0.2, 2); // Fila ultra compacta
-    } else {
-      return Math.max(lineas * fontSize * 0.35 + 1.5, 4); // Fila normal
-    }
-  };
 
   // Función para calcular posición Y centrada para texto corto
   const calcularPosicionYCentrada = (alturaFila) => {
@@ -434,42 +407,72 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       textoIzquierdo: "Todas las enfermedades que produzcan alteración de la consciencia sin importar su causa e independiente de su tratamiento",
       textoDerecho: "Personas que consumen sustancias estupefacientes o psicotrópicas en niveles que alteren su capacidad o trabajar como controlar un vehículo.",
       alturaFila: 6,    // Altura exacta en mm que quieres para esta fila
-      posicionY: 2.5        // Posición vertical del texto
+      posicionY: 2.5,        // Posición vertical del texto
+      // Variables del JSON para marcas X
+      siIzquierdo: data.antecedentesTodasEnfermedadesSi_chk_1_si || false,
+      noIzquierdo: data.antecedentesTodasEnfermedadesNo_chk_1_no || false,
+      siDerecho: data.antecedentesConsumeSustanciasSiAltereSi_chk_9_si || false,
+      noDerecho: data.antecedentesConsumeSustanciasSiAltereNo_chk_9_no || false
     },
     {
       numero: 2,
       textoIzquierdo: "Alcoholismo crónico y en general todas aquellas enfermedades que produzcan incapacidad de efectuar movimientos voluntarios y/o que limiten la capacidad de trabajo como conducción, manejo o control físico de un vehículo motorizado, subir y bajar escaleras, etc.",
       textoDerecho: "Personas que consumen sustancias estupefacientes o psicotrópicas en niveles que no alteren su capacidad de trabajar, pero que se encuentran sin tratamiento o en tratamiento sin prescripción médica.",
       alturaFila: 11,    // Altura exacta en mm
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.antecedentesAlcoholismoCronicoSi_chk_2_si || false,
+      noIzquierdo: data.antecedentesAlcoholismoCronicoNo_chk_2_no || false,
+      siDerecho: data.antecedentesConsumeSustanciasNoAltereSi_chk_8_si || false,
+      noDerecho: data.antecedentesConsumeSustanciasNoAltereNo_chk_8_no || false
     },
     {
       numero: 3,
       textoIzquierdo: "Todas aquellas enfermedades que se caractericen por movimientos involuntarios y que interfieran seriamente su capacidad de trabajar, independiente de su tratamiento farmacológico.",
       textoDerecho: "Personas que como consecuencia de una enfermedad o su tratamiento, sufran uno o varios de los siguientes efectos: alteración del estado de consciencia, alteración del equilibrio, en la percepción, en la habilidad motriz, en la estabilidad emocional y en el juicio.",
       alturaFila: 11,    // Altura exacta en mm
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.antecedentesEnfermedadesInvoluntariosSi_chk_3_si || false,
+      noIzquierdo: data.antecedentesEnfermedadesInvoluntariosNo_chk_3_no || false,
+      siDerecho: data.antecedentesVariosEfectosSi_chk_7_si || false,
+      noDerecho: data.antecedentesVariosEfectosNo_chk_7_no || false
     },
     {
       numero: 4,
       textoIzquierdo: "Perdida recurrente de la consciencia, independiente de su tratamiento, tales como narcolepsia, epilepsia, etc.",
       textoDerecho: "Síndrome Apnea Obstructiva del sueño.",
       alturaFila: 5.5,    // Altura exacta en mm
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.antecedentesPerdidaConcienciaSi_chk_4_si || false,
+      noIzquierdo: data.antecedentesPerdidaConcienciaNo_chk_4_no || false,
+      siDerecho: data.antecedentesApneaSi_chk_10_si || false,
+      noDerecho: data.antecedentesApneaNo_chk_10_no || false
     },
     {
       numero: 5,
       textoIzquierdo: "Diabetes mellitus o hipoglicemia no controlada",
       textoDerecho: "Obesidad (IMC > o igual a 30)",
       alturaFila: 3.5,    // Altura exacta en mm (normal)
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.antecedentesDiabetesMellitus_diabete_mellitus || false,
+      noIzquierdo: !data.antecedentesDiabetesMellitus_diabete_mellitus || false,
+      siDerecho: data.antecedentesObesidadSi_chk_11_si || false,
+      noDerecho: data.antecedentesObesidadNo_chk_11_no || false
     },
     {
       numero: 6,
       textoIzquierdo: "Insuficiencia renal crónica grado IV",
       textoDerecho: "Anemia de cualquier grado, según criterios OMS 2011.",
       alturaFila: 3.5,    // Altura exacta en mm (normal)
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.antecedentesInsuficienciaRenal_insuficiencia_renalIV || false,
+      noIzquierdo: !data.antecedentesInsuficienciaRenal_insuficiencia_renalIV || false,
+      siDerecho: data.antecedentesAnemiaGradoSi_chk_5_si || false,
+      noDerecho: data.antecedentesAnemiaGradoNo_chk_5_no || false
     }
   ];
 
@@ -504,8 +507,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
     // Marca X izquierda
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("X", tablaInicioX + 86.3, yPos + alturaFila / 2 + 1);
-    doc.text("", tablaInicioX + 91.5, yPos + alturaFila / 2 + 1);
+    doc.text(config.siIzquierdo ? "X" : "", tablaInicioX + 86.3, yPos + alturaFila / 2 + 1);
+    doc.text(config.noIzquierdo ? "X" : "", tablaInicioX + 91.5, yPos + alturaFila / 2 + 1);
 
     // Contenido texto derecho
     doc.setFont("helvetica", "normal").setFontSize(7);
@@ -516,8 +519,8 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
     // Marca X derecha
     doc.setFont("helvetica", "normal").setFontSize(8);
-    doc.text("", tablaInicioX + 181.3, yPos + alturaFila / 2 + 1);
-    doc.text("X", tablaInicioX + 186.5, yPos + alturaFila / 2 + 1);
+    doc.text(config.siDerecho ? "X" : "", tablaInicioX + 181.3, yPos + alturaFila / 2 + 1);
+    doc.text(config.noDerecho ? "X" : "", tablaInicioX + 186.5, yPos + alturaFila / 2 + 1);
 
     return alturaFila;
   };
@@ -607,31 +610,63 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
     {
       numero: 1,
       textoIzquierdo: "Test de Palanca: Alterado.",
-      textoDerecho: "Hipoacusia con compromiso de frecuencias conversacionales (500, 1000 y 2000 Hz) con promedio mayor de 40 db uni o bilateral (no incluye audífonos)",
+      textoDerecho: "Hipoacusia con compromiso de frecuencias conversacionales (500, 1000 y 2000 Hz) con promedio mayor de 40 db uni o bilateral (no incluye audífonos)",
       alturaFila: 8.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.chk6Si_chk_6_si || false,
+      noIzquierdo: data.chk6No_chk_6_no || false,
+      siDerecho: data.pcomplementariasHipoacusiaSi_chk_13_si || false,
+      noDerecho: data.pcomplementariasHipoacusiaNo_chk_13_no || false
     },
     {
       numero: 2,
       textoIzquierdo: "Test de Punteo : Alterado",
       textoDerecho: "Alteración de la agudeza visual de lejos diferente a 20/20 en cada ojo para vehículos profesionales y hasta 20/30 en vehículos no profesionales y/o de la visión de profundidad incluso con lentes correctores",
       alturaFila: 8.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.chk12Si_chk_12_si || false,
+      noIzquierdo: data.chk12No_chk_12_no || false,
+      siDerecho: data.pcomplementariasAlteracionAgudezaVisualSi_chk_14_si || false,
+      noDerecho: data.pcomplementariasAlteracionAgudezaVisualNo_chk_14_no || false
     },
     {
       numero: 3,
       textoIzquierdo: "Test de Reactimetría : Alterado",
       textoDerecho: "No reconocimiento de colores Rojo, Amarillo",
       alturaFila: 3.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.chk16Si_chk_16_si || false,
+      noIzquierdo: data.chk16No_chk_16_no || false,
+      siDerecho: data.pcomplementariasNoColorSi_chk_17_si || false,
+      noDerecho: data.pcomplementariasNoColorNo_chk_17_no || false
     },
     {
       numero: 4,
       textoIzquierdo: "Test de SAS : Anormal",
       textoDerecho: "Campimetría Anormal (Test de confrontación alterada)",
       alturaFila: 3.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.pcomplementariasTestSas_testSAS || false,
+      noIzquierdo: !data.pcomplementariasTestSas_testSAS || false,
+      siDerecho: data.pcomplementariasPruebaVisionSi_chk_18_si || false,
+      noDerecho: data.pcomplementariasPruebaVisionNo_chk_18_no || false
     },
+    {
+      numero: 5,
+      textoIzquierdo: "Test de Ampliometría : Anormal",
+      textoDerecho: "Psicosensométrica Alterada",
+      alturaFila: 3.5,
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.pcomplementariasAmpliometriaAnormalSi_chk_15_si || false,
+      noIzquierdo: data.pcomplementariasAmpliometriaAnormalNo_chk_15_no || false,
+      siDerecho: data.pcomplementariasPsicosensometricaAlteradaSi_chk_19_si || false,
+      noDerecho: data.pcomplementariasPsicosensometricaAlteradaNo_chk_19_no || false
+    }
 
   ];
 
@@ -757,35 +792,72 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
       textoIzquierdo: "Limitación en fuerza y/o movilidad de extremidades (Mayor a 5Kg / fuerza cada mano)",
       textoDerecho: "Presencia de nistagmus",
       alturaFila: 5.5,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.examenFisicoLimitacionSi_chk_21_si || false,
+      noIzquierdo: data.examenFisicoLimitacionNo_chk_21_no || false,
+      siDerecho: data.examenFisicoNistagmusSi_chk_25_si || false,
+      noDerecho: data.examenFisicoNistagmusNo_chk_25_no || false
     },
     {
       numero: 2,
       textoIzquierdo: "Alteración presente del equilibrio. (Romberg)",
       textoDerecho: "Anormalidad en movimientos oculares",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.examenFisicoAleracionPresenteSi_chk_22_si || false,
+      noIzquierdo: data.examenFisicoAleracionPresenteNo_chk_22_no || false,
+      siDerecho: data.chk20Si_chk_20_si || false,
+      noDerecho: data.chk20No_chk_20_no || false
     },
     {
       numero: 3,
       textoIzquierdo: "Anormalidad en la marcha con ojos cerrados",
       textoDerecho: "Pupilas no CIRLA",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.examenFisicoAnormalidadMarchaSi_chk_23_si || false,
+      noIzquierdo: data.examenFisicoAnormalidadMarchaNo_chk_23_no || false,
+      siDerecho: data.examenFisicoCirlaSi_chk_27_si || false,
+      noDerecho: data.examenFisicoCirlaNo_chk_27_no || false
     },
     {
       numero: 4,
       textoIzquierdo: "Alteración de la coordinación (dedo índice nariz)",
       textoDerecho: "Anormalidad del lenguaje",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.examenFisicoAlteracionCoordinacionSi_chk_24_si || false,
+      noIzquierdo: data.examenFisicoAlteracionCoordinacionNo_chk_24_no || false,
+      siDerecho: data.examenFisicoAnormalidadLenguajeSi_chk_28_si || false,
+      noDerecho: data.examenFisicoAnormalidadLenguajeNo_chk_28_no || false
     },
     {
       numero: 5,
       textoIzquierdo: "Sustentación en 1 pie > 15",
       textoDerecho: "Movimientos involuntarios",
       alturaFila: 4.0,
-      posicionY: 2.5
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.examenFisicoSustentacionPie_sustentacionpie || false,
+      noIzquierdo: !data.examenFisicoSustentacionPie_sustentacionpie || false,
+      siDerecho: data.examenFisicoMovimientoInvoluntarioSi_chk_29_si || false,
+      noDerecho: data.examenFisicoMovimientoInvoluntarioNo_chk_29_no || false
+    },
+    {
+      numero: 6,
+      textoIzquierdo: "Anormalidad en movimientos",
+      textoDerecho: "Asimetría facial",
+      alturaFila: 4.0,
+      posicionY: 2.5,
+      // Variables del JSON para marcas X
+      siIzquierdo: data.examenFisicoAnormalidadMovimientoSi_chk_26_si || false,
+      noIzquierdo: data.examenFisicoAnormalidadMovimientoNo_chk_26_no || false,
+      siDerecho: data.examenFisicoAsimetriaFacialSi_chk_30_si || false,
+      noDerecho: data.examenFisicoAsimetriaFacialNo_chk_30_no || false
     }
   ];
 
@@ -814,42 +886,47 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
 
   // === SECCIÓN 5: CONCLUSIÓN DE LA PRESENTE EVALUACIÓN ===
   const alturaHeaderConclusion = 4;
-  yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
+  yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN (Apto para conducción de vehículos)", yPos, alturaHeaderConclusion);
 
-  // === Fila de conclusión con divisiones ===
-  // Estructura: [Apto para conducción] | [Desde dd/mm/aaaa] | [Hasta dd/mm/aaaa] | [Apto][X] | [No apto][ ] | [Observado]
+  // === Fila de conclusión con 4 columnas ===
+  // Estructura: [Apto] | [Observado] | [No Apto] | [Apto con Restricción]
   const alturaFilaConclusion = 4.5;
-  // Líneas
+  const anchoColumna = tablaAncho / 4; // Dividir en 4 columnas iguales
+  
+  // Líneas verticales
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaConclusion); // izquierda
-  doc.line(tablaInicioX + 50, yPos, tablaInicioX + 50, yPos + alturaFilaConclusion); // col 1 -> col 2
-  doc.line(tablaInicioX + 82.5, yPos, tablaInicioX + 82.5, yPos + alturaFilaConclusion); // col 2 -> col 3
-  doc.line(tablaInicioX + 115, yPos, tablaInicioX + 115, yPos + alturaFilaConclusion); // col 3 -> col 4 (estado)
-
-  doc.line(tablaInicioX + 128, yPos, tablaInicioX + 128, yPos + alturaFilaConclusion); // entre Apto label y X
-  doc.line(tablaInicioX + 137, yPos, tablaInicioX + 137, yPos + alturaFilaConclusion); // entre X y No apto label
-  doc.line(tablaInicioX + 153, yPos, tablaInicioX + 153, yPos + alturaFilaConclusion); // entre No apto y Observado
-  doc.line(tablaInicioX + 162, yPos, tablaInicioX + 162, yPos + alturaFilaConclusion); // entre No apto y Observado
-  doc.line(tablaInicioX + 178, yPos, tablaInicioX + 178, yPos + alturaFilaConclusion); // entre No apto y Observado
-
-
+  doc.line(tablaInicioX + anchoColumna, yPos, tablaInicioX + anchoColumna, yPos + alturaFilaConclusion); // col 1 -> col 2
+  doc.line(tablaInicioX + anchoColumna * 2, yPos, tablaInicioX + anchoColumna * 2, yPos + alturaFilaConclusion); // col 2 -> col 3
+  doc.line(tablaInicioX + anchoColumna * 3, yPos, tablaInicioX + anchoColumna * 3, yPos + alturaFilaConclusion); // col 3 -> col 4
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaConclusion); // derecha
+  
+  // Líneas horizontales
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
   doc.line(tablaInicioX, yPos + alturaFilaConclusion, tablaInicioX + tablaAncho, yPos + alturaFilaConclusion); // inferior
 
-  // Contenido
+  // Contenido de las 4 columnas
   doc.setFont("helvetica", "normal").setFontSize(8);
-  // Col 1: texto
-  dibujarTextoConSaltoLinea("Apto para conducción de vehículos", tablaInicioX + 2, yPos + 3, 66);
-  // Col 2: Desde
-  dibujarTextoConSaltoLinea("Desde: " + (datosFinales.conclusionDesde || "__/__/____"), tablaInicioX + 53, yPos + 3, 32);
-  // Col 3: Hasta
-  dibujarTextoConSaltoLinea("Hasta: " + (datosFinales.conclusionHasta || "__/__/____"), tablaInicioX + 87, yPos + 3, 32);
-  // Col 4: Estado (Apto | X | No apto |  | Observado)
-  doc.text("Apto", tablaInicioX + 118, yPos + 3);
-  doc.text(datosFinales.conclusionApto ? "X" : "", tablaInicioX + 131, yPos + 3);
-  doc.text("No apto", tablaInicioX + 140, yPos + 3);
-  doc.text(datosFinales.conclusionNoApto ? "X" : "", tablaInicioX + 153, yPos + 3);
-  doc.text("Observado", tablaInicioX + 163, yPos + 3);
+  
+  // Columna 1: Apto
+  const inicioCol1 = tablaInicioX + 2;
+  doc.text("Apto", inicioCol1 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionApto ? "X" : "", inicioCol1 + 30, yPos + 3.5);
+  
+  // Columna 2: Observado
+  const inicioCol2 = tablaInicioX + anchoColumna + 2;
+  doc.text("Observado", inicioCol2 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionObservado ? "X" : "", inicioCol2 + 25, yPos + 3.5);
+  
+  // Columna 3: No Apto
+  const inicioCol3 = tablaInicioX + (anchoColumna * 2) + 2;
+  doc.text("No Apto", inicioCol3 + 5, yPos + 3.5);
+  
+  doc.text(datosFinales.conclusionNoApto ? "X" : "", inicioCol3 + 20, yPos + 3.5);
+  
+  // Columna 4: Apto con Restricción
+  const inicioCol4 = tablaInicioX + (anchoColumna * 3) + 2;
+  doc.text("Apto con Restricción", inicioCol4 + 5, yPos + 3.5);
+  doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "", inicioCol4 + 35, yPos + 3.5);
 
   yPos += alturaFilaConclusion;
 
@@ -857,9 +934,68 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   const alturaHeaderObservaciones = 4;
   yPos = dibujarHeaderSeccion("6.- OBSERVACIONES Y RECOMENDACIONES", yPos, alturaHeaderObservaciones);
 
+  // === Función para procesar recomendaciones con numeración ===
+  const procesarRecomendaciones = (texto) => {
+    if (!texto || texto.trim() === "") {
+      return "Sin observaciones adicionales";
+    }
+    
+    // Dividir por saltos de línea y filtrar líneas vacías
+    const lineas = texto.split('\n').filter(linea => linea.trim() !== '');
+    
+    // Numerar cada línea
+    const lineasNumeradas = lineas.map((linea, index) => {
+      const numero = index + 1;
+      return `${numero}. ${linea.trim()}`;
+    });
+    
+    return lineasNumeradas.join('\n');
+  };
+
   // === Fila de observaciones y recomendaciones (sin divisiones internas) ===
-  const textoObservacionesRecomendaciones = `Observaciones y Recomendaciones: ${datosFinales.observacionesRecomendaciones || "Sin observaciones adicionales"}`;
-  const alturaFilaObservaciones = Math.max(6, calcularAlturaTexto(textoObservacionesRecomendaciones, tablaAncho - 4, 8));
+  const textoObservacionesRecomendaciones = procesarRecomendaciones(datosFinales.observacionesRecomendaciones);
+  
+  // Función específica para calcular altura con fuente 6
+  const calcularAlturaTextoFuente6 = (texto, anchoMaximo) => {
+    // Primero dividir por saltos de línea para contar las líneas base
+    const lineasBase = texto.split('\n');
+    let totalLineas = 0;
+
+    lineasBase.forEach(linea => {
+      if (linea.trim() === '') {
+        totalLineas += 1; // Línea vacía
+        return;
+      }
+
+      const palabras = linea.split(' ');
+      let lineaActual = '';
+      let lineasEnEstaSeccion = 1;
+
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
+        } else {
+          if (lineaActual) {
+            lineasEnEstaSeccion++;
+            lineaActual = palabra;
+          } else {
+            lineasEnEstaSeccion++;
+          }
+        }
+      });
+
+      totalLineas += lineasEnEstaSeccion;
+    });
+
+    // Altura mínima de 8mm, con interlineado de 2.5mm para fuente 6
+    const alturaCalculada = totalLineas * 2.5 + 4; // 3mm arriba + 1mm abajo de margen
+    return Math.max(alturaCalculada, 8);
+  };
+  
+  const alturaFilaObservaciones = calcularAlturaTextoFuente6(textoObservacionesRecomendaciones, tablaAncho - 4);
 
   // Dibujar líneas de la fila de observaciones (sin divisiones internas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaObservaciones); // Línea izquierda
@@ -868,119 +1004,183 @@ export default function Certificaciondeconduccion_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaObservaciones, tablaInicioX + tablaAncho, yPos + alturaFilaObservaciones); // Línea inferior
 
   // Contenido de la fila de observaciones y recomendaciones
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(textoObservacionesRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
+  doc.setFont("helvetica", "normal").setFontSize(6.5);
+  
+  // Función específica para dibujar texto con fuente 6 y interlineado correcto
+  const dibujarTextoConSaltoLineaFuente6 = (texto, x, y, anchoMaximo) => {
+    // Primero dividir por saltos de línea para manejar cada línea numerada por separado
+    const lineasBase = texto.split('\n');
+    let yPos = y;
+
+    lineasBase.forEach(linea => {
+      if (linea.trim() === '') {
+        yPos += 2.5; // Espacio para línea vacía
+        return;
+      }
+
+      const palabras = linea.split(' ');
+      let lineaActual = '';
+
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        const anchoTexto = doc.getTextWidth(textoPrueba);
+
+        if (anchoTexto <= anchoMaximo) {
+          lineaActual = textoPrueba;
+        } else {
+          if (lineaActual) {
+            doc.text(lineaActual, x, yPos);
+            yPos += 2.5; // Interlineado específico para fuente 6
+            lineaActual = palabra;
+          } else {
+            doc.text(palabra, x, yPos);
+            yPos += 2.5;
+          }
+        }
+      });
+
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        yPos += 2.5; // Interlineado después de cada línea
+      }
+    });
+
+    return yPos;
+  };
+  
+  dibujarTextoConSaltoLineaFuente6(textoObservacionesRecomendaciones, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
 
   yPos += alturaFilaObservaciones;
 
-  // === CONFIGURACIÓN DE SECCIÓN DE FIRMA MÉDICA ===
-  const configuracionFirmaMedica = {
-    alturaSeccionFirma: 20,
-    alturaNotaAlPie: 5, // Altura fija compacta
-    textoNotaAlPie: "NOTA AL PIE: La presente certificación tiene una validez igual a la señalada en CONCLUSION. La aparición de alguna enfermedad NUEVA durante la duración de esta certificación invalida este permiso y deberá ser reevaluado medicamente. Antes de continuar conduciendo u operando algún tipo de vehículo.",
-    colorAdvertencia: [245, 174, 103], // #f5ae67 - Naranja personalizado
-    fuenteNota: { tipo: "helvetica", estilo: "normal", tamaño: 6 }
-  };
-
-  // === SECCIÓN DE FIRMA MÉDICA ===
-  const yFirmaMedica = yPos;
-  const alturaTotalTabla = configuracionFirmaMedica.alturaSeccionFirma + configuracionFirmaMedica.alturaNotaAlPie;
-
-  // Dibujar tabla completa (una sola tabla con dos filas)
-  // Líneas verticales
-  doc.line(tablaInicioX, yFirmaMedica, tablaInicioX, yFirmaMedica + alturaTotalTabla);
-  doc.line(tablaInicioX + tablaAncho / 2, yFirmaMedica, tablaInicioX + tablaAncho / 2, yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma);
-  doc.line(tablaInicioX + tablaAncho, yFirmaMedica, tablaInicioX + tablaAncho, yFirmaMedica + alturaTotalTabla);
-
-  // Líneas horizontales
-  doc.line(tablaInicioX, yFirmaMedica, tablaInicioX + tablaAncho, yFirmaMedica);
-  doc.line(tablaInicioX, yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma, tablaInicioX + tablaAncho, yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma);
-  doc.line(tablaInicioX, yFirmaMedica + alturaTotalTabla, tablaInicioX + tablaAncho, yFirmaMedica + alturaTotalTabla);
-
-  // Fila 1: Información del médico y firma (2 columnas)
-  // Columna 1: Información del médico
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Nombre y Apellidos del Médico - N° de Colegiatura", tablaInicioX + 2, yFirmaMedica + 5);
-  doc.text("Firma y Sello", tablaInicioX + 2, yFirmaMedica + 9);
-  doc.text("CMP", tablaInicioX + 2, yFirmaMedica + 13);
-
-  // Columna 2: Firma del médico
-  try {
-    const x = tablaInicioX + tablaAncho / 2 + 10;
-    const y = yFirmaMedica + 2;
-    const firmaMedicoUrl = getSign(data, "SELLOFIRMA")
-    doc.addImage(
-      firmaMedicoUrl,
-      'PNG',
-      x + 7, y - 5, 34, 25
-    );
-  } catch (error) {
-    console.log("Error cargando firma del médico:", error);
-  }
-
-  // Fila 2: Nota al pie (fila dinámica con fondo naranja personalizado)
-  const yNotaAlPie = yFirmaMedica + configuracionFirmaMedica.alturaSeccionFirma;
-
-  // Dibujar fondo naranja personalizado
-  doc.setFillColor(...configuracionFirmaMedica.colorAdvertencia);
-  doc.rect(tablaInicioX, yNotaAlPie, tablaAncho, configuracionFirmaMedica.alturaNotaAlPie, 'F');
-
-  // Dibujar texto de nota al pie
-  doc.setFont(configuracionFirmaMedica.fuenteNota.tipo, configuracionFirmaMedica.fuenteNota.estilo).setFontSize(configuracionFirmaMedica.fuenteNota.tamaño);
-  doc.setTextColor(0, 0, 0);
-  dibujarTextoConSaltoLinea(configuracionFirmaMedica.textoNotaAlPie, tablaInicioX + 2, yNotaAlPie + 2, tablaAncho - 4);
-
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
-  const yDeclaracion = yFirmaMedica + alturaTotalTabla; // Continuar directamente desde la firma médica
-  const alturaSeccionDeclaracion = 20; // Altura para la sección de declaración
-
+  const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
+  
   // Dibujar las líneas de la sección de declaración (3 columnas)
-  doc.line(tablaInicioX, yDeclaracion, tablaInicioX, yDeclaracion + alturaSeccionDeclaracion); // Línea izquierda
-  doc.line(tablaInicioX + 60, yDeclaracion, tablaInicioX + 60, yDeclaracion + alturaSeccionDeclaracion); // Primera división
-  doc.line(tablaInicioX + 120, yDeclaracion, tablaInicioX + 120, yDeclaracion + alturaSeccionDeclaracion); // Segunda división
-  doc.line(tablaInicioX + tablaAncho, yDeclaracion, tablaInicioX + tablaAncho, yDeclaracion + alturaSeccionDeclaracion); // Línea derecha
-  doc.line(tablaInicioX, yDeclaracion, tablaInicioX + tablaAncho, yDeclaracion); // Línea superior
-  doc.line(tablaInicioX, yDeclaracion + alturaSeccionDeclaracion, tablaInicioX + tablaAncho, yDeclaracion + alturaSeccionDeclaracion); // Línea inferior
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaSeccionDeclaracion); // Línea izquierda
+  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + alturaSeccionDeclaracion); // Primera división
+  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + alturaSeccionDeclaracion); // Segunda división
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaSeccionDeclaracion); // Línea derecha
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+  doc.line(tablaInicioX, yPos + alturaSeccionDeclaracion, tablaInicioX + tablaAncho, yPos + alturaSeccionDeclaracion); // Línea inferior
 
-  // Columna 1: Declaración
+  // === COLUMNA 1: DECLARACIÓN ===
   doc.setFont("helvetica", "normal").setFontSize(6);
   const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
-  dibujarTextoConSaltoLinea(textoDeclaracion, tablaInicioX + 2, yDeclaracion + 3, 55);
+  
+  // Función para justificar texto
+  const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
+    const lineas = doc.splitTextToSize(texto, anchoMaximo);
+    let yActual = y;
+    
+    lineas.forEach((linea, index) => {
+      // Solo justificar si no es la última línea y tiene más de una palabra
+      if (index < lineas.length - 1 && linea.includes(' ')) {
+        const palabras = linea.split(' ');
+        if (palabras.length > 1) {
+          const anchoTexto = doc.getTextWidth(linea);
+          const espacioDisponible = anchoMaximo - anchoTexto;
+          const espaciosEntrePalabras = palabras.length - 1;
+          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
+          
+          let xActual = x;
+          palabras.forEach((palabra, i) => {
+            doc.text(palabra, xActual, yActual);
+            if (i < palabras.length - 1) {
+              const anchoPalabra = doc.getTextWidth(palabra);
+              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
+            }
+          });
+        } else {
+          doc.text(linea, x, yActual);
+        }
+      } else {
+        doc.text(linea, x, yActual);
+      }
+      yActual += interlineado;
+    });
+  };
+  
+  // Dibujar texto justificado
+  justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
 
-  // Columna 2: Firma del trabajador
-  try {
-    const x = tablaInicioX + 65;
-    const y = yDeclaracion + 2;
-    const firmaPaciente = getSign(data, "FIRMAP")
-    doc.addImage(
-      firmaPaciente,
-      'PNG',
-      x + 7, y - 5, 34, 25
-    );
-  } catch (error) {
-    console.log("Error cargando firma:", error);
+  // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
+  const firmaTrabajadorY = yPos + 3;
+  
+  // Calcular centro de la columna 2 para centrar las imágenes
+  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  
+  // Agregar firma del trabajador (lado izquierdo) con fallback
+  let firmaTrabajadorUrl = getSign(data, "FIRMAP");
+  if (!firmaTrabajadorUrl) {
+    try {
+      firmaTrabajadorUrl = window.location.origin + '/img/firmas_sellos_prueba/firma_de_prueba_jaspers.png';
+    } catch (_) { /* noop en SSR */ }
+  }
+  if (firmaTrabajadorUrl) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroColumna2X - 20;
+      const y = firmaTrabajadorY;
+      doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del trabajador:", error);
+    }
   }
 
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma del trabajador o postulante", tablaInicioX + 90, yDeclaracion + 16.5, { align: "center" });
-  doc.text("DNI : " + datosFinales.documentoIdentidad, tablaInicioX + 90, yDeclaracion + 19, { align: "center" });
-
-  // Columna 3: Huella digital
-  try {
-    const x = tablaInicioX + 125;
-    const y = yDeclaracion + 2;
-    const huellaDigital = getSign(data, "HUELLA")
-    doc.addImage(
-      huellaDigital,
-      'PNG',
-      x + 20, y - 5, 15, 21
-    );
-  } catch (error) {
-    console.log("Error cargando huella:", error);
+  // Agregar huella del trabajador (lado derecho, vertical) con fallback
+  let huellaTrabajadorUrl = getSign(data, "HUELLA");
+  if (!huellaTrabajadorUrl) {
+    try {
+      huellaTrabajadorUrl = window.location.origin + '/img/firmas_sellos_prueba/HUELLA_DIGITAL.png';
+    } catch (_) { /* noop en SSR */ }
   }
-
+  if (huellaTrabajadorUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroColumna2X + 8;
+      const y = firmaTrabajadorY;
+      doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del trabajador:", error);
+    }
+  }
+  
   doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Indice Derecho", tablaInicioX + 150, yDeclaracion + 16.5, { align: "center" });
+  const centroColumna2 = tablaInicioX + 60 + (60 / 2);
+  doc.text("Firma y Huella del trabajador", centroColumna2, yPos + 26, { align: "center" });
+
+  // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
+  const firmaMedicoX = tablaInicioX + 125;
+  const firmaMedicoY = yPos + 3;
+  
+  // Agregar firma y sello médico con fallback
+  let firmaMedicoUrl = getSign(data, "SELLOFIRMA");
+  if (!firmaMedicoUrl) {
+    try {
+      // Usa un sello/firma de prueba si no hay datos
+      firmaMedicoUrl = window.location.origin + '/img/firmas_sellos_prueba/firma_sello.png';
+    } catch (_) { /* noop en SSR */ }
+  }
+  if (firmaMedicoUrl) {
+    try {
+      const imgWidth = 45;
+      const imgHeight = 20;
+      const x = firmaMedicoX + 10;
+      const y = firmaMedicoY;
+      doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del médico:", error);
+    }
+  }
+  
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  const centroColumna3 = tablaInicioX + 120 + (70 / 2);
+  doc.text("Sello y Firma del Médico", centroColumna3, yPos + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumna3, yPos + 28.5, { align: "center" });
+
+  yPos += alturaSeccionDeclaracion;
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8 });
