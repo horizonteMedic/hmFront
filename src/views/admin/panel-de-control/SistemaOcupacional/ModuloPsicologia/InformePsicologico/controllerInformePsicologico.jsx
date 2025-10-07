@@ -49,51 +49,51 @@ export const GetInfoServicio = async (
             cargoDesempenar: res.cargoPaciente,
 
             // Área Intelectual
-            areaIntelectual: res.areaIntelectual || "EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO.",
-            promedio: false, //revisar - no hay mapeo directo en JSON
-            superior: false, //revisar - no hay mapeo directo en JSON
-            nInferior: false, //revisar - no hay mapeo directo en JSON
-            alto: false, //revisar - no hay mapeo directo en JSON
+            areaIntelectual: res.areaIntelectual ?? "",
+            promedio: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL PROMEDIO."),
+            superior: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL SUPERIOR."),
+            nInferior: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL NORMAL INFERIOR."),
+            alto: (res.areaIntelectual ?? "").includes("EL EVALUADO POSEE UN NIVEL INTELECTUAL ALTO."),
 
-            pSuperior: false, //revisar - no hay mapeo directo en JSON
-            pMedio: false, //revisar - no hay mapeo directo en JSON
-            pBajo: false, //revisar - no hay mapeo directo en JSON
-            bajo: false, //revisar - no hay mapeo directo en JSON
+            pSuperior: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR SUPERIOR."),
+            pMedio: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR MEDIO."),
+            pBajo: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR BAJO."),
+            bajo: (res.areaIntelectual ?? "").includes("POSEE UN NIVEL PSICOMOTOR BAJO."),
 
-            facilidad: false, //revisar - no hay mapeo directo en JSON
-            dificultad: false, //revisar - no hay mapeo directo en JSON
+            facilidad: (res.areaIntelectual ?? "").includes("PRESENTA FACILIDAD EN EL PROCESAMIENTO DE LA INFORMACIÓN."),
+            dificultad: (res.areaIntelectual ?? "").includes("PRESENTA DIFICULTAD EN EL PROCESAMIENTO DE LA INFORMACIÓN."),
 
-            pnAdecuado: false, //revisar - no hay mapeo directo en JSON
-            nAlto: false, //revisar - no hay mapeo directo en JSON
-            nBajo: false, //revisar - no hay mapeo directo en JSON
+            pnAdecuado: (res.areaIntelectual ?? "").includes("PRESENTA UN NIVEL DE ATENCIÓN ADECUADO."),
+            nAlto: (res.areaIntelectual ?? "").includes("PRESENTA UN NIVEL DE ATENCIÓN ALTO."),
+            nBajo: (res.areaIntelectual ?? "").includes("PRESENTA UN NIVEL DE ATENCIÓN BAJO."),
 
-            yNumerica: false, //revisar - no hay mapeo directo en JSON
-            yCalculo: false, //revisar - no hay mapeo directo en JSON
+            yNumerica: (res.areaIntelectual ?? "").includes("Y EN CAPACIDAD NUMÉRICA."),
+            yCalculo: (res.areaIntelectual ?? "").includes("Y EN CAPACIDAD DE CÁLCULO."),
 
-            adecuadaR: false, //revisar - no hay mapeo directo en JSON
-            inadecuada: false, //revisar - no hay mapeo directo en JSON
+            adecuadaR: (res.areaIntelectual ?? "").includes("PRESENTA ADECUADA RETENCIÓN DE DÍGITOS."),
+            inadecuada: (res.areaIntelectual ?? "").includes("PRESENTA INADECUADA RETENCIÓN DE DÍGITOS."),
 
             // Área de Personalidad
-            areaPersonalidad: res.areaPersonalidad,
+            areaPersonalidad: res.areaPersonalidad ?? "",
 
             // Área de Psicomotricidad
-            areaPsicomotricidad: res.areaPsicomotricidad,
-            nivelAltoPs: false, //revisar - no hay mapeo directo en JSON
-            nivelAdecuadoPs: false, //revisar - no hay mapeo directo en JSON
-            nivelBajoPs: false, //revisar - no hay mapeo directo en JSON
+            areaPsicomotricidad: res.areaPsicomotricidad ?? "",
+            nivelAltoPs: (res.areaPsicomotricidad ?? "").includes("POSEE UN NIVEL PSICOMOTOR ALTO."),
+            nivelAdecuadoPs: (res.areaPsicomotricidad ?? "").includes("POSEE UN NIVEL PSICOMOTOR ADECUADO."),
+            nivelBajoPs: (res.areaPsicomotricidad ?? "").includes("POSEE UN NIVEL PSICOMOTOR BAJO."),
 
-            facilidadPs: false, //revisar - no hay mapeo directo en JSON
-            dificultadPs: false, //revisar - no hay mapeo directo en JSON
+            facilidadPs: (res.areaPsicomotricidad ?? "").includes("PRESENTA FACILIDAD EN PSICOMOTRICIDAD."),
+            dificultadPs: (res.areaPsicomotricidad ?? "").includes("PRESENTA DIFICULTAD EN PSICOMOTRICIDAD."),
 
             // Área de Organicidad
-            areaOrganicidad: res.areaOrganicidad,
-            orientadoEnTiempo: false, //revisar - no hay mapeo directo en JSON
+            areaOrganicidad: res.areaOrganicidad ?? "",
+            orientadoEnTiempo: (res.areaOrganicidad ?? "").includes("ORIENTADO EN TIEMPO, ESPACIO Y PERSONA."),
 
-            poseeAltoManejo: false, //revisar - no hay mapeo directo en JSON
-            pAdecuadoManejo: false, //revisar - no hay mapeo directo en JSON
-            pBajoManejo: false, //revisar - no hay mapeo directo en JSON
+            poseeAltoManejo: (res.areaOrganicidad ?? "").includes("POSEE ALTO MANEJO DE FACULTADES MENTALES."),
+            pAdecuadoManejo: (res.areaOrganicidad ?? "").includes("POSEE ADECUADO MANEJO DE FACULTADES MENTALES."),
+            pBajoManejo: (res.areaOrganicidad ?? "").includes("POSEE BAJO MANEJO DE FACULTADES MENTALES."),
 
-            noSeEnvidencia: false, //revisar - no hay mapeo directo en JSON
+            noSeEnvidencia: (res.areaOrganicidad ?? "").includes("NO SE EVIDENCIA DAÑO ORGÁNICO."),
 
             // Recomendaciones
             recomendaciones: res.recomendaciones,
