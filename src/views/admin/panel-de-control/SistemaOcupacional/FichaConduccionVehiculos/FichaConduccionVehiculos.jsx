@@ -19,7 +19,7 @@ import { useForm } from "../../../../hooks/useForm";
 import ExamenMedico from "./ExamenMedico/ExamenMedico";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import Swal from "sweetalert2";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaConduccionVehiculos";
@@ -125,7 +125,7 @@ export default function FichaConduccionVehiculos() {
         //PARTE INFERIOR
         // Conclusión y Comentarios
         aptoDesde: today,
-        aptoHasta: today,
+        aptoHasta: getTodayPlusOneYear(),
         conclusion: null,
         observacionesRecomendaciones: "",
         nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase() ?? "",

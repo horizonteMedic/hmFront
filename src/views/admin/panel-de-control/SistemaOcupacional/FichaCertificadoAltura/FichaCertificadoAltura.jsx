@@ -16,7 +16,7 @@ import {
     InputCheckbox
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import Antecedentes from "./Antecedentes/Antecedentes";
 import PruebasComplementarias from "./PruebasComplementarias/PruebasComplementarias";
 import ExamenFisico from "./ExamenFisico/ExamenFisico";
@@ -36,6 +36,7 @@ export default function FichaCertificadoAltura() {
     const initialFormState = {
         // Header
         norden: "",
+        codigoCertificado: null,
         fechaExam: today,
         tipoExamen: "",
         razonVisita: "PRIMERA ACTITUD",
@@ -129,10 +130,11 @@ export default function FichaCertificadoAltura() {
         //===============PARTE INFERIOR=======================
         // Conclusión y Comentarios
         aptoDesde: today,
-        aptoHasta: today,
+        aptoHasta: getTodayPlusOneYear(),
         conclusion: null,
         observacionesRecomendaciones: "",
         nombreMedicoColegiatura: userCompleto?.datos?.nombres_user?.toUpperCase(),
+        dniUsuario: userCompleto?.datos?.dni_user,
 
         // Recomendaciones
         sobrepesoDietaHipocalorica: false,
@@ -157,12 +159,12 @@ export default function FichaCertificadoAltura() {
 
     // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
     const recomendacionesTextMap = {
-        sobrepesoDietaHipocalorica: "SOBREPESO. DIETA HIPOCALÓRICA Y EJERCICIO.",
+        sobrepesoDietaHipocalorica: "SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS.",
         corregirAgudezaVisual: "CORREGIR AGUDEZA VISUAL.",
         corregirAgudezaVisualTotal: "CORREGIR AGUDEZA VISUAL TOTAL.",
-        obesidadDietaHipocalorica: "OBESIDAD I. DIETA HIPOCALÓRICA Y EJERCICIO.",
-        usoLentesCorrectoresLectura: "USO DE LENTES CORRECTORES LECTURA.",
-        corregirAgudezaLectura: "CORREGIR AGUDEZA PARA LECTURA.",
+        obesidadDietaHipocalorica: "OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS.",
+        usoLentesCorrectoresLectura: "USO DE LENTES CORRECTORES PARA LECTURA DE CERCA.",
+        corregirAgudezaLectura: "CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA.",
     };
     // Handler para checkboxes de Recomendaciones: agrega/quita texto en observacionesRecomendaciones
     const handleRecomendacionCheckboxChange = (e) => {
@@ -447,37 +449,37 @@ export default function FichaCertificadoAltura() {
                                     <h5 className="font-semibold text-black mb-3 text-[11px]">Recomendaciones:</h5>
                                     <div className="space-y-2">
                                         <InputCheckbox
-                                            label="Sobrepeso.Dieta Hipocalórica y ejer."
+                                            label="SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."
                                             name="sobrepesoDietaHipocalorica"
                                             checked={form?.sobrepesoDietaHipocalorica}
                                             onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
-                                            label="Corregir Agudeza Visual"
+                                            label="CORREGIR AGUDEZA VISUAL."
                                             name="corregirAgudezaVisual"
                                             checked={form?.corregirAgudezaVisual}
                                             onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
-                                            label="Corregir Agudeza Visual Total"
+                                            label="CORREGIR AGUDEZA VISUAL TOTAL."
                                             name="corregirAgudezaVisualTotal"
                                             checked={form?.corregirAgudezaVisualTotal}
                                             onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
-                                            label="Obesidad I.Dieta Hipocalórica y ejer."
+                                            label="OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS."
                                             name="obesidadDietaHipocalorica"
                                             checked={form?.obesidadDietaHipocalorica}
                                             onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
-                                            label="Uso de Lentes Correctores lectura ce..."
+                                            label="USO DE LENTES CORRECTORES PARA LECTURA DE CERCA"
                                             name="usoLentesCorrectoresLectura"
                                             checked={form?.usoLentesCorrectoresLectura}
                                             onChange={handleRecomendacionCheckboxChange}
                                         />
                                         <InputCheckbox
-                                            label="Corregir Agudeza para lectura ce..."
+                                            label="CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA."
                                             name="corregirAgudezaLectura"
                                             checked={form?.corregirAgudezaLectura}
                                             onChange={handleRecomendacionCheckboxChange}

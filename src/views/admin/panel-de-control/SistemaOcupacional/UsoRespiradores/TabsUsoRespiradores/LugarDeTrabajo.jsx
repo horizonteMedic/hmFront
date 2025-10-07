@@ -1,6 +1,7 @@
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import { InputCheckbox, InputTextArea, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 
-export default function LugarDeTrabajo({ form, handleCheckBoxChange, handleChange, handleChangeNumber,setForm }) {
+export default function LugarDeTrabajo({ form, handleCheckBoxChange, handleChange, handleChangeNumber, setForm, handleRadioButton }) {
   return (
     <div className="space-y-6">
       <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -18,14 +19,22 @@ export default function LugarDeTrabajo({ form, handleCheckBoxChange, handleChang
               </div>
 
               <div className="grid grid-cols-1 gap-3">
-                <InputCheckbox label="Purificador de aire (sin energía)" name="respiradorPurificadorSinEnergia" checked={form?.respiradorPurificadorSinEnergia} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Purificador de aire (con energía)" name="respiradorPurificadorConEnergia" checked={form?.respiradorPurificadorConEnergia} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Respirador suministrador de atmósfera" name="respiradorSuministroAtmosfera" checked={form?.respiradorSuministroAtmosfera} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Combinación línea de aire SCBA" name="respiradorCombinacionLineaAireSCBA" checked={form?.respiradorCombinacionLineaAireSCBA} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Respirador de Flujo Continuo" name="respiradorFlujoContinuo" checked={form?.respiradorFlujoContinuo} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Respirador suministrador de aire" name="respiradorSuministroAire" checked={form?.respiradorSuministroAire} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="SCBA de circuito abierto" name="respiradorScbaCircuitoAbierto" checked={form?.respiradorScbaCircuitoAbierto} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="SCBA de circuito cerrado" name="respiradorScbaCircuitoCerrado" checked={form?.respiradorScbaCircuitoCerrado} onChange={handleCheckBoxChange} />
+                <InputsRadioGroup
+                  name="tipoRespiradorTipo"
+                  vertical
+                  value={form?.tipoRespiradorTipo}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Purificador de aire (sin energía)", value: "PURIFICADOR_SIN_ENERGIA" },
+                    { label: "Purificador de aire (con energía)", value: "PURIFICADOR_CON_ENERGIA" },
+                    { label: "Respirador suministrador de atmósfera", value: "SUMINISTRADOR_ATMOSFERA" },
+                    { label: "Combinación línea de aire SCBA", value: "COMBINACION_LINEA_AIRE_SCBA" },
+                    { label: "Respirador de Flujo Continuo", value: "FLUJO_CONTINUO" },
+                    { label: "Respirador suministrador de aire", value: "SUMINISTRO_AIRE" },
+                    { label: "SCBA de circuito abierto", value: "SCBA_CIRCUITO_ABIERTO" },
+                    { label: "SCBA de circuito cerrado", value: "SCBA_CIRCUITO_CERRADO" },
+                  ]}
+                />
               </div>
             </div>
 
@@ -33,11 +42,19 @@ export default function LugarDeTrabajo({ form, handleCheckBoxChange, handleChang
             <div>
               <h5 className="font-bold mb-4">Tipo de Protección</h5>
               <div className="grid grid-cols-1 gap-3">
-                <InputCheckbox label="Filtro HEPA (partículas)" name="proteccionFiltroHepa" checked={form?.proteccionFiltroHepa} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Cartuchos (Gas ácido)" name="proteccionCartuchoGasAcido" checked={form?.proteccionCartuchoGasAcido} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Cartuchos (Vapor Orgánico)" name="proteccionCartuchoVaporOrganico" checked={form?.proteccionCartuchoVaporOrganico} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Cartuchos (amoniaco)" name="proteccionCartuchoAmoniaco" checked={form?.proteccionCartuchoAmoniaco} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Cartuchos (Mercurio)" name="proteccionCartuchoMercurio" checked={form?.proteccionCartuchoMercurio} onChange={handleCheckBoxChange} />
+                <InputsRadioGroup
+                  name="tipoProteccion"
+                  vertical
+                  value={form?.tipoProteccion}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Filtro HEPA (partículas)", value: "FILTRO_HEPA" },
+                    { label: "Cartuchos (Gas ácido)", value: "CARTUCHO_GAS_ACIDO" },
+                    { label: "Cartuchos (Vapor Orgánico)", value: "CARTUCHO_VAPOR_ORGANICO" },
+                    { label: "Cartuchos (amoniaco)", value: "CARTUCHO_AMONIACO" },
+                    { label: "Cartuchos (Mercurio)", value: "CARTUCHO_MERCURIO" },
+                  ]}
+                />
               </div>
             </div>
 
@@ -45,9 +62,16 @@ export default function LugarDeTrabajo({ form, handleCheckBoxChange, handleChang
             <div>
               <h5 className="font-bold mb-4">Esfuerzo físico esperado requerido</h5>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
-                <InputCheckbox label="Ligero" name="esfuerzoLigero" checked={form?.esfuerzoLigero} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Moderado" name="esfuerzoModerado" checked={form?.esfuerzoModerado} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Pesado" name="esfuerzoPesado" checked={form?.esfuerzoPesado} onChange={handleCheckBoxChange} />
+                <InputsRadioGroup
+                  name="esfuerzoFisico"
+                  value={form?.esfuerzoFisico}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "Ligero", value: "LIGERO" },
+                    { label: "Moderado", value: "MODERADO" },
+                    { label: "Pesado", value: "PESADO" },
+                  ]}
+                />
               </div>
               <div className="mt-2 space-y-2">
                 <p><span className="font-semibold">Ligero:</span> Sentado mientras escribe, tipea, manejo manual de cargas ligero (3 mets)</p>
@@ -63,9 +87,17 @@ export default function LugarDeTrabajo({ form, handleCheckBoxChange, handleChang
             <div>
               <h5 className="font-bold mb-4">Frecuencia de uso</h5>
               <div className="space-y-2">
-                <InputCheckbox label="De manera diaria" name="usoDiario" checked={form?.usoDiario} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Ocasional – pero no más de dos veces por semana: hrs" name="usoOcasionalMenosDosVeces" checked={form?.usoOcasionalMenosDosVeces} onChange={handleCheckBoxChange} />
-                <InputCheckbox label="Rara vez – uso de emergencia solamente" name="usoRaraVezEmergencia" checked={form?.usoRaraVezEmergencia} onChange={handleCheckBoxChange} />
+                <InputsRadioGroup
+                  name="frecuenciaUso"
+                  vertical
+                  value={form?.frecuenciaUso}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "De manera diaria", value: "DIARIO" },
+                    { label: "Ocasional – pero no más de dos veces por semana: hrs", value: "OCASIONAL" },
+                    { label: "Rara vez – uso de emergencia solamente", value: "EMERGENCIA" },
+                  ]}
+                />
                 <InputTextOneLine label="Promedio de horas de uso por Día (Hrs.)" name="promedioHorasDia" value={form?.promedioHorasDia} onChange={handleChangeNumber} labelWidth="220px" />
               </div>
             </div>

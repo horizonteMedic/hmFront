@@ -161,7 +161,7 @@ export default function Anexo16ABoro_Digitalizado(data = {}) {
     doc.text("Nro de ficha: ", pageW - 80, 15);
 
     doc.setFont("helvetica", "normal").setFontSize(18);
-    doc.text(datosFinales.numeroFicha, pageW - 50, 16);
+    doc.text(datosFinales.numeroFicha, pageW - 60, 16);
     doc.setFont("helvetica", "normal").setFontSize(8);
     doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
     doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 25);
