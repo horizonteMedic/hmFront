@@ -9,7 +9,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
-    InputsRadioGroup,
     InputTextArea,
     InputCheckbox,
     InputsBooleanRadioGroup,
@@ -17,7 +16,7 @@ import {
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-// import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
 
 const tabla = "informe_psicologico";
 const today = getToday();
@@ -282,19 +281,21 @@ export default function InformePsicologico() {
 
     // Funciones temporales sin funcionalidad del controller
     const handleSave = () => {
-        console.log("Función de guardar comentada");
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            console.log("Función de búsqueda comentada");
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
     const handlePrint = () => {
-        console.log("Función de impresión comentada");
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
     };
-
     return (
         <div className="mx-auto bg-white overflow-hidden ">
             <div className="flex h-full">

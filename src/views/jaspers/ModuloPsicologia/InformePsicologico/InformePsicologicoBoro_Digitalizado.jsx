@@ -16,45 +16,33 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
-    const resultadoTexto = String(
-      raw?.resultado ?? raw?.resultadoPsicologico ?? raw?.aptoTexto ?? raw?.apto_resultado ?? ''
-    ).toUpperCase();
 
     const datosReales = {
-      apellidosNombres: String((((raw?.apellidos_apellidos_pa ?? '') + ' ' + (raw?.nombres_nombres_pa ?? '')).trim())),
-      fechaExamen: formatDateLongEs(raw?.fechaInformePsicologico ?? raw?.fecha_examen ?? ''),
-      sexo: String(raw?.sexo_sexo_pa ?? raw?.sexo ?? ''),
-      documentoIdentidad: String(raw?.dni_cod_pa ?? raw?.documento ?? ''),
-      edad: String(raw?.edad_edad ?? raw?.edad ?? ''),
-      fechaNacimiento: formatearFechaCorta(raw?.fechanacimientopaciente_fecha_nacimiento_pa ?? raw?.fecha_nacimiento ?? ''),
-      domicilio: String(raw?.direccionpaciente_direccion_pa ?? raw?.domicilio ?? ''),
-      areaTrabajo: String(raw?.area_area_o ?? raw?.area_trabajo ?? ''),
-      puestoTrabajo: String(raw?.cargo_cargo_de ?? raw?.puesto_trabajo ?? ''),
-      empresa: String(raw?.empresa_razon_empresa ?? raw?.empresa ?? ''),
-      contrata: String(
-        raw?.contrata_razon_contrata ?? raw?.contrata ?? raw?.contratista_razon_contratista ?? raw?.contratista ?? ''
-      ),
+      apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
+      fechaExamen: formatDateLongEs(raw?.fechaEntrevista ?? ''),
+      sexo: String(raw?.sexoPaciente ?? ''),
+      documentoIdentidad: String(raw?.dniPaciente ?? ''),
+      edad: String(raw?.edadPaciente ?? ''),
+      fechaNacimiento: formatearFechaCorta(raw?.fechaNacimientoPaciente ?? ''),
+      domicilio: String(raw?.direccionPaciente ?? ''),
+      areaTrabajo: String(raw?.areaPaciente ?? ''),
+      puestoTrabajo: String(raw?.cargoPaciente ?? ''),
+      empresa: String(raw?.empresa ?? ''),
+      contrata: String(raw?.contrata ?? ''),
       sede: String(raw?.sede ?? ''),
-      numeroFicha: String(raw?.n_orden ?? raw?.numero_ficha ?? ''),
-      codigoEntrevista: String(
-        raw?.codEntrevista ?? raw?.cod_entrevista ?? raw?.codigoEntrevista ?? raw?.codigo_entrevista ?? ''
-      ),
+      numeroFicha: String(raw?.norden ?? ''),
+      codigoEntrevista: String(raw?.codigoInforme ?? ''), //revisar
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
       cuerpo: {
-        areaIntelectual: raw?.cuerpo?.areaIntelectual,
-        areaPersonalidad: raw?.cuerpo?.areaPersonalidad,
-        areaOrganicidad: raw?.cuerpo?.areaOrganicidad,
-        areaPsicomotricidad: raw?.cuerpo?.areaPsicomotricidad,
-        recomendaciones: raw?.cuerpo?.recomendaciones
+        areaIntelectual: raw?.areaIntelectual,
+        areaPersonalidad: raw?.areaPersonalidad,
+        areaOrganicidad: raw?.areaOrganicidad,
+        areaPsicomotricidad: raw?.areaPsicomotricidad,
+        recomendaciones: raw?.recomendaciones
       },
-      apto: (typeof raw?.apto === 'boolean') ? raw.apto
-        : (typeof raw?.aptoPsicologico === 'boolean') ? raw.aptoPsicologico
-        : (typeof raw?.aptoInforme === 'boolean') ? raw.aptoInforme
-        : resultadoTexto.includes('NO APTO') ? false
-        : resultadoTexto.includes('APTO') ? true
-        : false
+      apto: raw?.aprobo ?? false
     };
 
     const datosPrueba = {
@@ -86,7 +74,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       apto: true
     };
 
-    const selected = (raw && (raw.n_orden || raw.numero_ficha)) ? datosReales : datosPrueba;
+    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
     // Asegurar que las secciones de cuerpo sean arrays listables
     selected.cuerpo = {
       areaIntelectual: normalizeList(selected.cuerpo.areaIntelectual),
@@ -295,7 +283,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   placeSignatures();
 
-   // === FOOTER ===
+  // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });
 
   // Imprimir

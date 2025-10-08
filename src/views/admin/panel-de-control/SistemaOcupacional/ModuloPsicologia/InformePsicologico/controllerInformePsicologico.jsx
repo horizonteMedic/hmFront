@@ -12,7 +12,7 @@ import { formatearFechaCorta } from "../../../../../utils/formatDateUtils";
 const obtenerReporteUrl =
     "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
 const registrarUrl =
-    "/api/v01/ct/informePsicologico/obtenerReporteInformePsicologico";
+    "/api/v01/ct/informePsicologico/registrarActualizarInformePsicologico";
 
 export const GetInfoServicio = async (
     nro,
@@ -126,8 +126,8 @@ export const SubmitDataService = async (
         areaOrganicidad: form.areaOrganicidad,
         areaPsicomotricidad: form.areaPsicomotricidad,
         recomendaciones: form.recomendaciones,
-        aproboTest: form.aproboTest ?? false,
-        desaproboTest: form.aproboTest ?? false,
+        aprobo: form.aproboTest ?? false,
+        desaprobo: !(form.aproboTest ?? false),
         usuarioRegistro: user,
     };
 
@@ -179,9 +179,10 @@ const GetInfoPac = async (nro, set, token, sede) => {
         set((prev) => ({
             ...prev,
             ...res,
-            fechaNac: formatearFechaCorta(res.fechaNac ?? ""),
+            fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad + " años",
-            nombres: res.nombresApellidos,
+            ocupacion: res.areaO ?? "",
+            cargoDesempenar: res.cargo ?? "",
         }));
     }
 };
