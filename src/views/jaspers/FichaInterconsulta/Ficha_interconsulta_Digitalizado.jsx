@@ -75,7 +75,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     codigoFichaInterconsulta: String(data.codigoFichaInterconsulta || ""),
     especialidad: String(data.especialidad || ""),
     motivoInterconsulta: String(data.motivo || ""),
-    fechaAtencion: formatearFechaCorta(data.fechaExamen || ""),
+    fechaAtencion: formatearFechaCorta(data.fechaApertura || ""),
     hallazgosRelevantes: String(data.hallazgo || ""),
     diagnostico: String(data.diagnostico || ""),
     tratamientoRecomendaciones: String(data.tratamiento || ""),
@@ -115,7 +115,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     if (pageNumber === 1) {
       doc.setFont("helvetica", "bold").setFontSize(12);
       doc.setTextColor(0, 0, 0);
-      doc.text("FICHA DE INTERCONSULTA", pageW / 2, 30, { align: "center" });
+      doc.text("FICHA DE INTERCONSULTA", pageW / 2, 35, { align: "center" });
     }
 
     // Número de Ficha y Página (alineación automática mejorada)
@@ -208,7 +208,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   // === SECCIÓN 1: DATOS PERSONALES ===
   const tablaInicioX = 10;
   const tablaAncho = 190;
-  let yPos = 45;
+  let yPos = 40;
   const filaAltura = 5;
 
   // Header de datos personales
@@ -257,7 +257,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yPos += filaAltura;
 
   // === CONTENIDO DE LA TABLA ===
-  let yTexto = 45 + 2; // Ajustar para el header
+  let yTexto = 40 + 2; // Ajustar para el header
 
   // Primera fila: Apellidos y Nombres
   yTexto += filaAltura;
@@ -501,63 +501,10 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
 
   yPos += oftalmoAlturaFila * 4;
 
-  // === SECCIÓN 4: MOTIVO DE INTERCONSULTA ===
-  // Header de motivo de interconsulta
-  yPos = dibujarHeaderSeccion("4. MOTIVO DE INTERCONSULTA", yPos, filaAltura);
-
-  // Fila "Motivo de Interconsulta:" (fila completa)
-  doc.setDrawColor(0, 0, 0);
-  doc.setLineWidth(0.2);
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Motivo de Interconsulta:", tablaInicioX + 2, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.motivoInterconsulta || "", tablaInicioX + 50, yPos + 3);
-  yPos += filaAltura;
-
-  // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
-  doc.setFillColor(160, 160, 160);
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("EVALUACIÓN DE ESPECIALISTA (medicina interna)", tablaInicioX + 2, yPos + 3);
-  yPos += filaAltura;
-
-  // Fila "Fecha atención" (fila completa)
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Fecha atención:", tablaInicioX + 2, yPos + 3);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  //doc.text(formatearFechaCorta(datosFinales.fechaAtencion || ""), tablaInicioX + 30, yPos + 3);
-  yPos += filaAltura;
-
-  // Fila "Hallazgos relevantes:" (fila gris)
-  doc.setFillColor(160, 160, 160);
-  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
-  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Hallazgos relevantes:", tablaInicioX + 2, yPos + 3);
-  yPos += filaAltura;
-
-  // Fila de hallazgos relevantes (fila completa con altura dinámica)
-  const hallazgosTexto = datosFinales.hallazgosRelevantes || "";
-  const calcularAlturaHallazgos = (texto, anchoMaximo, fontSize) => {
+  // === FUNCIÓN PARA CALCULAR ALTURA DINÁMICA ===
+  const calcularAlturaHallazgos = (texto, anchoMaximo) => {
+    if (!texto || texto.trim() === "") return 20; // Altura fija mínima si no hay texto
+    
     const palabras = texto.split(' ');
     let lineaActual = '';
     let lineas = 1;
@@ -578,11 +525,90 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
       }
     });
     
-    return Math.max(lineas * fontSize * 0.35 + 1.5, filaAltura);
+    // Altura fija mínima de 25mm, altura por línea de 3mm
+    const alturaCalculada = lineas * 3 + 2;
+    return Math.max(alturaCalculada, 20); // Altura fija mínima de 25mm
   };
 
+  // === SECCIÓN 4: MOTIVO DE INTERCONSULTA ===
+  // Header de motivo de interconsulta
+  yPos = dibujarHeaderSeccion("4. MOTIVO DE INTERCONSULTA", yPos, filaAltura);
+
+  // Fila "Motivo de Interconsulta:" (fila celeste)
+  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Motivo de Interconsulta:", tablaInicioX + 2, yPos + 3);
+  yPos += filaAltura;
+
+  // Fila de contenido del motivo (fila completa con altura dinámica)
+  const motivoTexto = datosFinales.motivoInterconsulta || "";
+  const alturaFilaMotivo = calcularAlturaHallazgos(motivoTexto, tablaAncho - 4);
+
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaMotivo);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + alturaFilaMotivo, tablaInicioX + tablaAncho, yPos + alturaFilaMotivo);
+
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  // Dividir el texto en líneas y agregar guión a cada una
+  const lineasMotivo = motivoTexto.split('\n').filter(linea => linea.trim() !== '');
+  let yTextoMotivo = yPos + 5;
+  
+  lineasMotivo.forEach(linea => {
+    const textoConGuion = `- ${linea.trim()}`;
+    dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoMotivo, tablaAncho - 4);
+    yTextoMotivo += 3; // Espaciado entre líneas
+  });
+  
+  yPos += alturaFilaMotivo;
+
+  // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
+  doc.setFillColor(160, 160, 160);
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("EVALUACIÓN DE ESPECIALISTA (medicina interna)", tablaInicioX + tablaAncho/2, yPos + 3, { align: "center" });
+  yPos += filaAltura;
+
+  // Fila "Fecha atención" (fila completa)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Fecha atención:", tablaInicioX + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaAtencion, tablaInicioX + 30, yPos + 3);
+  yPos += filaAltura;
+
+  // Fila "Hallazgos relevantes:" (fila celeste)
+  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Hallazgos relevantes:", tablaInicioX + 2, yPos + 3);
+  yPos += filaAltura;
+
+  // Fila de hallazgos relevantes (fila completa con altura dinámica)
+  const hallazgosTexto = datosFinales.hallazgosRelevantes || "";
+
   const anchoMaximoHallazgos = tablaAncho - 4;
-  const alturaFilaHallazgos = calcularAlturaHallazgos(hallazgosTexto, anchoMaximoHallazgos, 8);
+  const alturaFilaHallazgos = calcularAlturaHallazgos(hallazgosTexto, anchoMaximoHallazgos);
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaHallazgos);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaHallazgos);
@@ -590,10 +616,21 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaHallazgos, tablaInicioX + tablaAncho, yPos + alturaFilaHallazgos);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(hallazgosTexto, tablaInicioX + 2, yPos + 3, anchoMaximoHallazgos);
+  // Dividir el texto en líneas y agregar guión a cada una
+  const lineasHallazgos = hallazgosTexto.split('\n').filter(linea => linea.trim() !== '');
+  let yTextoHallazgos = yPos + 5;
+  
+  lineasHallazgos.forEach(linea => {
+    const textoConGuion = `- ${linea.trim()}`;
+    dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoHallazgos, anchoMaximoHallazgos);
+    yTextoHallazgos += 3; // Espaciado entre líneas
+  });
+  
   yPos += alturaFilaHallazgos;
 
-  // Fila "Diagnóstico:" (fila completa)
+  // Fila "Diagnóstico:" (fila celeste)
+  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -605,7 +642,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // Fila de diagnóstico (fila completa con altura dinámica)
   const diagnosticoTexto = datosFinales.diagnostico || "";
-  const alturaFilaDiagnostico = calcularAlturaHallazgos(diagnosticoTexto, anchoMaximoHallazgos, 8);
+  const alturaFilaDiagnostico = calcularAlturaHallazgos(diagnosticoTexto, anchoMaximoHallazgos);
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaDiagnostico);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaDiagnostico);
@@ -613,10 +650,21 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaDiagnostico, tablaInicioX + tablaAncho, yPos + alturaFilaDiagnostico);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(diagnosticoTexto, tablaInicioX + 2, yPos + 3, anchoMaximoHallazgos);
+  // Dividir el texto en líneas y agregar guión a cada una
+  const lineasDiagnostico = diagnosticoTexto.split('\n').filter(linea => linea.trim() !== '');
+  let yTextoDiagnostico = yPos + 5;
+  
+  lineasDiagnostico.forEach(linea => {
+    const textoConGuion = `- ${linea.trim()}`;
+    dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoDiagnostico, anchoMaximoHallazgos);
+    yTextoDiagnostico += 3; // Espaciado entre líneas
+  });
+  
   yPos += alturaFilaDiagnostico;
 
-  // Fila "Tratamiento y recomendaciones vinculadas a la actividad laboral:" (fila completa)
+  // Fila "Tratamiento y recomendaciones vinculadas a la actividad laboral:" (fila celeste)
+  doc.setFillColor(173, 216, 230); // Color celeste claro
+  doc.rect(tablaInicioX, yPos, tablaAncho, filaAltura, 'F');
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
@@ -628,7 +676,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
 
   // Fila de tratamiento y recomendaciones (fila completa con altura dinámica)
   const tratamientoTexto = datosFinales.tratamientoRecomendaciones || "";
-  const alturaFilaTratamiento = calcularAlturaHallazgos(tratamientoTexto, anchoMaximoHallazgos, 8);
+  const alturaFilaTratamiento = calcularAlturaHallazgos(tratamientoTexto, anchoMaximoHallazgos);
 
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaTratamiento);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaTratamiento);
@@ -636,66 +684,34 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaTratamiento, tablaInicioX + tablaAncho, yPos + alturaFilaTratamiento);
 
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(tratamientoTexto, tablaInicioX + 2, yPos + 3, anchoMaximoHallazgos);
+  // Dividir el texto en líneas y agregar guión a cada una
+  const lineasTratamiento = tratamientoTexto.split('\n').filter(linea => linea.trim() !== '');
+  let yTextoTratamiento = yPos + 5;
+  
+  lineasTratamiento.forEach(linea => {
+    const textoConGuion = `- ${linea.trim()}`;
+    dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoTratamiento, anchoMaximoHallazgos);
+    yTextoTratamiento += 3; // Espaciado entre líneas
+  });
+  
   yPos += alturaFilaTratamiento;
 
-  // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
-  const yDeclaracion = yPos; // Continuar directamente desde la sección anterior
-  const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
+  // === SECCIÓN DE FIRMAS ===
+  const yFirmas = yPos; // Continuar directamente desde la sección anterior
+  const alturaSeccionFirmas = 30; // Altura para la sección de firmas
 
-  // Dibujar las líneas de la sección de declaración (3 columnas)
-  doc.line(tablaInicioX, yDeclaracion, tablaInicioX, yDeclaracion + alturaSeccionDeclaracion); // Línea izquierda
-  doc.line(tablaInicioX + 60, yDeclaracion, tablaInicioX + 60, yDeclaracion + alturaSeccionDeclaracion); // Primera división
-  doc.line(tablaInicioX + 120, yDeclaracion, tablaInicioX + 120, yDeclaracion + alturaSeccionDeclaracion); // Segunda división
-  doc.line(tablaInicioX + tablaAncho, yDeclaracion, tablaInicioX + tablaAncho, yDeclaracion + alturaSeccionDeclaracion); // Línea derecha
-  doc.line(tablaInicioX, yDeclaracion, tablaInicioX + tablaAncho, yDeclaracion); // Línea superior
-  doc.line(tablaInicioX, yDeclaracion + alturaSeccionDeclaracion, tablaInicioX + tablaAncho, yDeclaracion + alturaSeccionDeclaracion); // Línea inferior
+  // Dibujar las líneas de la sección de firmas (2 columnas)
+  doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
+  doc.line(tablaInicioX + 95, yFirmas, tablaInicioX + 95, yFirmas + alturaSeccionFirmas); // División central
+  doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
+  doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
+  doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
-  // === COLUMNA 1: DECLARACIÓN ===
-  doc.setFont("helvetica", "normal").setFontSize(6);
-  const textoDeclaracion = "Declaro que las respuestas son ciertas según mi leal saber y entender. En caso de ser requeridos, los resultados del examen médico pueden ser revelados, en términos generales, al departamento de salud Ocupacional de la compañía. Los resultados pueden ser enviados a mi médico particular de ser considerado necesario.";
+  // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
+  const firmaTrabajadorY = yFirmas + 3;
   
-  // Función para justificar texto
-  const justificarTexto = (texto, x, y, anchoMaximo, interlineado) => {
-    const lineas = doc.splitTextToSize(texto, anchoMaximo);
-    let yActual = y;
-    
-    lineas.forEach((linea, index) => {
-      // Solo justificar si no es la última línea y tiene más de una palabra
-      if (index < lineas.length - 1 && linea.includes(' ')) {
-        const palabras = linea.split(' ');
-        if (palabras.length > 1) {
-          const anchoTexto = doc.getTextWidth(linea);
-          const espacioDisponible = anchoMaximo - anchoTexto;
-          const espaciosEntrePalabras = palabras.length - 1;
-          const espacioExtra = espacioDisponible / espaciosEntrePalabras;
-          
-          let xActual = x;
-          palabras.forEach((palabra, i) => {
-            doc.text(palabra, xActual, yActual);
-            if (i < palabras.length - 1) {
-              const anchoPalabra = doc.getTextWidth(palabra);
-              xActual += anchoPalabra + (doc.getTextWidth(' ') + espacioExtra);
-            }
-          });
-        } else {
-          doc.text(linea, x, yActual);
-        }
-      } else {
-        doc.text(linea, x, yActual);
-      }
-      yActual += interlineado;
-    });
-  };
-  
-  // Dibujar texto justificado
-  justificarTexto(textoDeclaracion, tablaInicioX + 2, yDeclaracion + 3, 55, 2.5);
-
-  // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
-  const firmaTrabajadorY = yDeclaracion + 3;
-  
-  // Calcular centro de la columna 2 para centrar las imágenes
-  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  // Calcular centro de la columna 1 para centrar las imágenes
+  const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
   
   // Agregar firma del trabajador (lado izquierdo)
   let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
@@ -703,7 +719,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 30;
       const imgHeight = 20;
-      const x = centroColumna2X - 20;
+      const x = centroColumna1X - 20;
       const y = firmaTrabajadorY;
       doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -717,7 +733,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 12;
       const imgHeight = 20;
-      const x = centroColumna2X + 8;
+      const x = centroColumna1X + 8;
       const y = firmaTrabajadorY;
       doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -726,12 +742,11 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   }
   
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const centroColumna2 = tablaInicioX + 60 + (60 / 2);
-  doc.text("Firma y Huella del trabajador", centroColumna2, yDeclaracion + 26, { align: "center" });
+  doc.text("Firma y Huella del trabajador", centroColumna1X, yFirmas + 26, { align: "center" });
 
-  // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===
-  const firmaMedicoX = tablaInicioX + 125;
-  const firmaMedicoY = yDeclaracion + 3;
+  // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
+  const firmaMedicoX = tablaInicioX + 95 + 10;
+  const firmaMedicoY = yFirmas + 3;
   
   // Agregar firma y sello médico
   let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
@@ -739,7 +754,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     try {
       const imgWidth = 45;
       const imgHeight = 20;
-      const x = firmaMedicoX + 10;
+      const x = firmaMedicoX;
       const y = firmaMedicoY;
       doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -748,9 +763,9 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   }
   
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const centroColumna3 = tablaInicioX + 120 + (70 / 2);
-  doc.text("Sello y Firma del Médico", centroColumna3, yDeclaracion + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumna3, yDeclaracion + 28.5, { align: "center" });
+  const centroColumna2 = tablaInicioX + 95 + ((tablaAncho - 95) / 2);
+  doc.text("Sello y Firma del Médico", centroColumna2, yFirmas + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroColumna2, yFirmas + 28.5, { align: "center" });
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
