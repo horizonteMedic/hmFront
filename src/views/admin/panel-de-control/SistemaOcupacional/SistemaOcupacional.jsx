@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import RegistroClientes from "./Admision/RegistroClientes.jsx";
 import AperturaExamenesPreOcup from "./Admision/AperturaExamenes/AperturaExamenesPreOcup.jsx";
 import ImportacionModal from "./Admision/ImportacionMasiva.jsx";
@@ -7,7 +7,6 @@ import ReservaPacientes from "./Admision/ReservaPacientes.jsx";
 import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx";
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
-import ExamenesLaboratorio from "./Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
 import LaboratorioClinico from "./Laboratorio/LaboratorioClinico/LaboratorioClinico";
 import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos";
@@ -64,7 +63,6 @@ import {
   faMountain,
   fa2,
   faCheckToSlot,
-  faFileMedicalAlt,
   fa1,
   fa6,
   faA,
@@ -669,7 +667,7 @@ const TabComponent = () => {
                   />
                 )
               },
-              10: { title: "Modulo Psicologia", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
+              10: { title: "Modulo Psicología", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
               12: { title: "Rayos X", child: <RayosXTabSelector tieneVista={tieneVista} /> },
               13: { title: undefined, child: <EKG /> },
               14: {

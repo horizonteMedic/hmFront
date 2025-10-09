@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
 import InformePsicologico from "./InformePsicologico/InformePsicologico";
+import FichaPsicologica2 from "./FichaPsicologica2/FichaPsicologica2";
 
-export default function PsicologiaTabSelector({ listas, tieneVista }) {
-    const { MedicosMulti } = listas;
+export default function PsicologiaTabSelector({ tieneVista }) {
     const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
         if (tieneVista("Informe Psicologico")) {
             setActiveTab(0);
         }
-        // else if (tieneVista("Ficha Aptitud Anexo 16")) {
-        //     setActiveTab(1);
-        // }
+        else if (tieneVista("Ficha Psicologica 2")) {
+            setActiveTab(1);
+        }
         else {
             setActiveTab(-1); // -1 significa que no tiene permisos
         }
@@ -34,7 +34,7 @@ export default function PsicologiaTabSelector({ listas, tieneVista }) {
                             Informe Psicologico
                         </button>
                     )}
-                    {/* {tieneVista("Ficha Aptitud Anexo 16") && (
+                    {tieneVista("Ficha Psicologica 2") && (
                         <button
                             className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 1
                                 ? "border-[#233245] font-semibold"
@@ -42,15 +42,15 @@ export default function PsicologiaTabSelector({ listas, tieneVista }) {
                                 }`}
                             onClick={() => setActiveTab(1)}
                         >
-                            Ficha Aptitud Anexo 16
+                            Ficha Psicológica 2
                         </button>
-                    )} */}
+                    )}
                 </nav>
 
                 {/* Tab Content */}
                 <div className="max-w-full">
-                    {activeTab === 0 && <InformePsicologico  />}
-                    {/* {activeTab === 1 && <FichaAptitudAnexo16 MedicosMulti={MedicosMulti} />} */}
+                    {activeTab === 0 && <InformePsicologico />}
+                    {activeTab === 1 && <FichaPsicologica2 />}
                     {activeTab === -1 && (
                         <div className="text-center text-gray-500">
                             No tiene permisos para ver ningún examen.
