@@ -6,18 +6,19 @@ import {
     InputTextArea,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 
-export default function DatosPersonales({ 
-    form, 
-    handleChange, 
-    handleChangeNumber, 
-    agregarEmpresa, 
-    limpiarCamposEmpresa 
+export default function DatosPersonales({
+    form,
+    handleChange,
+    handleChangeNumber,
+    handleChangeSimple,
+    agregarEmpresa,
+    limpiarCamposEmpresa
 }) {
 
     return (
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
-                <div className="w-full space-y-3 p-4">
+                <div className="w-full space-y-3 pt-4 px-3">
                     {/*==========================Datos Personales Section==========================*/}
                     <div>
                         <div className="flex items-center px-6">
@@ -29,100 +30,104 @@ export default function DatosPersonales({
                             {/* Header con información básica */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h3 className="font-semibold mb-2">Información General</h3>
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                     <InputTextOneLine
                                         label="N° Orden"
-                                        name="nOrden"
-                                        value={form.nOrden}
+                                        name="norden"
+                                        value={form.norden}
+                                        // onKeyUp={handleSearch}
                                         onChange={handleChangeNumber}
                                         labelWidth="120px"
                                     />
                                     <InputTextOneLine
-                                        label="DNI"
-                                        name="dni"
-                                        value={form.dni}
-                                        onChange={handleChange}
+                                        label="Fecha Examen"
+                                        name="fechaExamen"
+                                        type="date"
+                                        value={form.fechaExamen}
+                                        onChange={handleChangeSimple}
                                         labelWidth="120px"
                                     />
                                     <InputTextOneLine
-                                        label="Sexo"
-                                        name="sexo"
-                                        value={form.sexo}
-                                        onChange={handleChange}
+                                        label="Nombre Examen"
+                                        name="nombreExamen"
+                                        type="text"
+                                        value={form.nombreExamen}
+                                        disabled
                                         labelWidth="120px"
                                     />
                                 </div>
                             </div>
-
                             {/* Contenido principal - Datos Personales */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-2">Datos Personales</h4>
-
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-                                    {/* Columna Izquierda */}
-                                    <div className="space-y-3">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 space-y-2">
+                                    <InputTextOneLine
+                                        label="Nombres"
+                                        name="nombres"
+                                        value={form.nombres}
+                                        onChange={handleChange}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <div className="grid grid-cols-2 gap-4">
                                         <InputTextOneLine
-                                            label="Nombres"
-                                            name="nombres"
-                                            value={form.nombres}
-                                            onChange={handleChange}
+                                            label="DNI"
+                                            name="dni"
+                                            value={form.dni}
                                             disabled
                                             labelWidth="120px"
                                         />
                                         <InputTextOneLine
-                                            label="Apellidos"
-                                            name="apellidos"
-                                            value={form.apellidos}
-                                            onChange={handleChange}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Fecha Nacimiento"
-                                            name="fechaNacimiento"
-                                            type="date"
-                                            value={form.fechaNacimiento}
-                                            onChange={handleChange}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Lugar Nacimiento"
-                                            name="lugarNacimiento"
-                                            value={form.lugarNacimiento}
-                                            onChange={handleChange}
+                                            label="Sexo"
+                                            name="sexo"
+                                            value={form.sexo}
                                             disabled
                                             labelWidth="120px"
                                         />
                                     </div>
-
-                                    {/* Columna Derecha */}
-                                    <div className="space-y-3">
-                                        <InputTextOneLine
-                                            label="Edad"
-                                            name="edad"
-                                            value={form.edad}
-                                            onChange={handleChangeNumber}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Estado Civil"
-                                            name="estadoCivil"
-                                            value={form.estadoCivil}
-                                            onChange={handleChange}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                        <InputTextOneLine
-                                            label="Grado Instrucción"
-                                            name="gradoInstruccion"
-                                            value={form.gradoInstruccion}
-                                            onChange={handleChange}
-                                            disabled
-                                            labelWidth="120px"
-                                        />
-                                    </div>
+                                    <InputTextOneLine
+                                        label="Apellidos"
+                                        name="apellidos"
+                                        value={form.apellidos}
+                                        onChange={handleChange}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Fecha Nacimiento"
+                                        name="fechaNacimiento"
+                                        value={form.fechaNacimiento}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Lugar Nacimiento"
+                                        name="lugarNacimiento"
+                                        value={form.lugarNacimiento}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Edad"
+                                        name="edad"
+                                        value={form.edad}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Estado Civil"
+                                        name="estadoCivil"
+                                        value={form.estadoCivil}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Grado Instrucción"
+                                        name="gradoInstruccion"
+                                        value={form.gradoInstruccion}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
                                 </div>
                             </div>
 
@@ -130,13 +135,20 @@ export default function DatosPersonales({
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-3">Datos Laborales</h4>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-4 space-y-2">
                                     <InputTextOneLine
                                         label="Empresa"
                                         name="empresa"
                                         value={form.empresa}
                                         onChange={handleChange}
                                         disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Tiempo de Experiencia"
+                                        name="tiempoExperiencia"
+                                        value={form.tiempoExperiencia}
+                                        onChange={handleChange}
                                         labelWidth="120px"
                                     />
                                     <InputTextOneLine
@@ -190,39 +202,15 @@ export default function DatosPersonales({
                                 </div>
                             </div>
 
-                            {/* ===== SECCIÓN: DATOS MÉDICOS ===== */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-3">Datos Médicos</h4>
-
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-                                    <InputTextOneLine
-                                        label="Ex-Médico"
-                                        name="exMedico"
-                                        value={form.exMedico}
-                                        onChange={handleChange}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="T. Laboratorio"
-                                        name="tLaboratorio"
-                                        value={form.tLaboratorio}
-                                        onChange={handleChange}
-                                        disabled
-                                        labelWidth="120px"
-                                    />
-                                </div>
-                            </div>
-
                             {/* ===== SECCIÓN: EVALUACIÓN Y RIESGOS ===== */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-3">Evaluación y Riesgos</h4>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4">
                                     <div>
                                         <h5 className="font-semibold mb-2">Motivo Evaluación</h5>
                                         <InputTextArea
-                                            rows={4}
+                                            rows={5}
                                             name="motivoEvaluacion"
                                             value={form.motivoEvaluacion}
                                             onChange={handleChange}
@@ -231,7 +219,7 @@ export default function DatosPersonales({
                                     <div>
                                         <h5 className="font-semibold mb-2">Principales Riesgos</h5>
                                         <InputTextArea
-                                            rows={4}
+                                            rows={5}
                                             name="principalesRiesgos"
                                             value={form.principalesRiesgos}
                                             onChange={handleChange}
@@ -240,7 +228,7 @@ export default function DatosPersonales({
                                     <div>
                                         <h5 className="font-semibold mb-2">Medidas de Seguridad</h5>
                                         <InputTextArea
-                                            rows={4}
+                                            rows={5}
                                             name="medidasSeguridad"
                                             value={form.medidasSeguridad}
                                             onChange={handleChange}
@@ -253,11 +241,11 @@ export default function DatosPersonales({
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-3">Historia y Observaciones</h4>
 
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-4">
                                     <div>
                                         <h5 className="font-semibold mb-2">Historia Familiar</h5>
                                         <InputTextArea
-                                            rows={4}
+                                            rows={5}
                                             name="historiaFamiliar"
                                             value={form.historiaFamiliar}
                                             onChange={handleChange}
@@ -266,7 +254,7 @@ export default function DatosPersonales({
                                     <div>
                                         <h5 className="font-semibold mb-2">Hábitos</h5>
                                         <InputTextArea
-                                            rows={4}
+                                            rows={5}
                                             name="habitos"
                                             value={form.habitos}
                                             onChange={handleChange}
@@ -275,7 +263,7 @@ export default function DatosPersonales({
                                     <div>
                                         <h5 className="font-semibold mb-2">Otras Observaciones</h5>
                                         <InputTextArea
-                                            rows={4}
+                                            rows={5}
                                             name="otrasObservaciones"
                                             value={form.otrasObservaciones}
                                             onChange={handleChange}
@@ -292,68 +280,66 @@ export default function DatosPersonales({
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
                                     {/* Columna Izquierda */}
                                     <div className="space-y-2">
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 gap-4">
                                             <InputTextOneLine
                                                 label="Fecha"
                                                 name="fechaEmpresa"
                                                 type="date"
                                                 value={form.fechaEmpresa}
-                                                onChange={handleChange}
-                                                labelWidth="60px"
+                                                onChange={handleChangeSimple}
+                                                labelWidth="100px"
                                             />
                                             <InputTextOneLine
-                                                label="Nombre Empresa"
+                                                label="Empresa"
                                                 name="nombreEmpresa"
                                                 value={form.nombreEmpresa}
                                                 onChange={handleChange}
                                                 labelWidth="100px"
                                             />
                                         </div>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 gap-4">
                                             <InputTextOneLine
                                                 label="Act. Empresa"
                                                 name="actividadEmpresa"
                                                 value={form.actividadEmpresa}
                                                 onChange={handleChange}
-                                                labelWidth="80px"
+                                                labelWidth="100px"
                                             />
                                             <InputTextOneLine
                                                 label="Puesto"
                                                 name="puestoEmpresa"
                                                 value={form.puestoEmpresa}
                                                 onChange={handleChange}
-                                                labelWidth="60px"
+                                                labelWidth="100px"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Columna Derecha */}
                                     <div className="space-y-2">
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div className="grid grid-cols-2 gap-4">
                                             <InputTextOneLine
                                                 label="T. Sup"
                                                 name="tSup"
                                                 value={form.tSup}
                                                 onChange={handleChange}
-                                                labelWidth="50px"
+                                                labelWidth="100px"
                                             />
                                             <InputTextOneLine
                                                 label="T. Sub"
                                                 name="tSub"
                                                 value={form.tSub}
                                                 onChange={handleChange}
-                                                labelWidth="50px"
+                                                labelWidth="100px"
                                             />
                                         </div>
-                                        <div className="grid grid-cols-1 gap-2">
-                                            <InputTextOneLine
-                                                label="Causa retiro"
-                                                name="causaRetiro"
-                                                value={form.causaRetiro}
-                                                onChange={handleChange}
-                                                labelWidth="80px"
-                                            />
-                                        </div>
+                                        <InputTextOneLine
+                                            label="Causa retiro"
+                                            name="causaRetiro"
+                                            value={form.causaRetiro}
+                                            onChange={handleChange}
+                                            labelWidth="100px"
+                                        />
                                     </div>
                                 </div>
 
@@ -383,8 +369,8 @@ export default function DatosPersonales({
                                         <thead>
                                             <tr className="bg-blue-100">
                                                 <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">Fecha</th>
-                                                <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">NombreEmpr...</th>
-                                                <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">ActividadEm...</th>
+                                                <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">Empresa</th>
+                                                <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">Actividad Empresa</th>
                                                 <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">Puesto</th>
                                                 <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">Sup</th>
                                                 <th className="border border-gray-300 px-2 py-1 text-left text-[11px] font-semibold">Sub</th>

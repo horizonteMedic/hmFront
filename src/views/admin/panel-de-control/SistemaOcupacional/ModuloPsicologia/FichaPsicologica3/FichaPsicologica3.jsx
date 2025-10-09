@@ -111,6 +111,7 @@ const FichaPsicologica3 = () => {
   const {
     form,
     handleChange,
+    handleChangeSimple,
     handleChangeNumber,
     setForm,
   } = useForm(initialFormState);
@@ -165,6 +166,7 @@ const FichaPsicologica3 = () => {
         form={form}
         handleChange={handleChange}
         handleChangeNumber={handleChangeNumber}
+        handleChangeSimple={handleChangeSimple}
         setForm={setForm}
         agregarEmpresa={agregarEmpresa}
         limpiarCamposEmpresa={limpiarCamposEmpresa}
@@ -201,7 +203,7 @@ const FichaPsicologica3 = () => {
       </div>
 
       {/* Active Content */}
-      <div className="border border-gray-200 border-t-0 p-4 bg-white rounded-b-lg text-lg">
+      <div className="border border-gray-200 border-t-0  bg-white rounded-b-lg text-lg">
         {tabs[activeTab].component}
       </div>
     </div>

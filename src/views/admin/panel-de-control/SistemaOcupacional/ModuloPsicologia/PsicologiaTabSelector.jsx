@@ -25,7 +25,7 @@ export default function PsicologiaTabSelector({ tieneVista }) {
 
     return (
         <div className="space-y-4">
-            <div className="bg-white border border-gray-200 rounded-lg p-3">
+            <div className="bg-white border-t border-gray-200 rounded-lg p-3">
                 {/* Tab Navigation */}
                 <nav className="flex bg-white border-b border-gray-200 mb-4">
                     {tieneVista("Informe Psicologico") && (
