@@ -1,51 +1,52 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faPrint, faBroom } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
     InputTextArea,
-    InputCheckbox,
     InputsBooleanRadioGroup,
+    InputsRadioGroup,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { getToday } from "../../../../../utils/helpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaPsicologica2";
+
+const tabla = "ficha_psicologica_anexo02"
+const today = getToday()
 
 export default function FichaPsicologica2() {
+    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+        useSessionData();
     const initialFormState = {
         // Datos personales
         norden: "",
-        fechaExamen: "",
-        edad: "",
+        fechaExamen: today,
+        esApto: undefined,
+        nombres: "",
+        apellidos: "",
+        fechaNacimiento: "",
         lugarNacimiento: "",
-        lugarResidencia: "",
-        puestoTrabajo: "",
-        empresa: "",
+        domicilioActual: "",
+        edad: "",
+        estadoCivil: "",
+        nivelEstudios: "",
+
+        // Datos laborales
+        ocupacion: "",
+        cargoDesempenar: "",
 
         // Motivo de evaluación
         motivoEvaluacion: "",
 
         // Observación de Conductas
-        presentacionAdecuado: false,
-        presentacionInadecuado: false,
-
-        posturaErguida: false,
-        posturaEncorvada: false,
-
-        discursoRitmoLento: false,
-        discursoRitmoRapido: false,
-        discursoRitmoFluido: false,
-
-        discursoTonoBajo: false,
-        discursoTonoModerado: false,
-        discursoTonoAlto: false,
-
-        discursoArtConDificultad: false,
-        discursoArtSinDificultad: false,
-
-        orientacionTiempoOrientado: false,
-        orientacionTiempoDesorientado: false,
-        orientacionEspacioOrientado: false,
-        orientacionEspacioDesorientado: false,
-        orientacionPersonaOrientado: false,
-        orientacionPersonaDesorientado: false,
+        presentacion: "",
+        postura: "",
+        discursoRitmo: "",
+        discursoTono: "",
+        discursoArticulacion: "",
+        orientacionTiempo: "",
+        orientacionEspacio: "",
+        orientacionPersona: "",
 
         // Resultados de evaluación
         nivelIntelectual: "",
@@ -58,322 +59,361 @@ export default function FichaPsicologica2() {
         recomendaciones: "",
         areaCognitiva: "",
         areaEmocional: "",
-
-        // Apto/No Apto
-        esApto: undefined,
-
-        // Imprimir
-        nOrdenImprimir: "",
     };
 
     const {
         form,
+        setForm,
         handleChange,
+        handleClearnotO,
+        handlePrintDefault,
         handleChangeNumber,
+        handleChangeSimple,
         handleClear,
         handleRadioButtonBoolean,
+        handleRadioButton,
     } = useForm(initialFormState);
 
-    const handleGuardar = () => {
-        // En esta versión solo mostramos en consola.
-        // La integración con servicios se puede conectar luego.
-        // eslint-disable-next-line no-console
-        console.log("Datos guardados FichaPsicologica2:", form);
+    const handleSave = () => {
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
+    const handleSearch = (e) => {
+        if (e.key === "Enter") {
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+        }
+    };
+
+    const handlePrint = () => {
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
+    };
     return (
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
-                <div className="w-full space-y-3 p-4">
+                <div className="w-full space-y-3 px-4">
                     {/* Datos Personales */}
                     <div>
-                        <div className="flex items-center px-6">
-                            <FontAwesomeIcon icon={faUser} className="mr-2 text-[#233245]" />
-                            <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">
-                                Datos Personales
-                            </h2>
-                        </div>
-
                         <div className="p-4 text-[10px] space-y-3">
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
+                            {/* Header con información del examen */}
+                            <div className="bg-white border border-gray-200 rounded-lg p-3 ">
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                                     <InputTextOneLine
                                         label="N° Orden"
                                         name="norden"
                                         value={form.norden}
+                                        onKeyUp={handleSearch}
                                         onChange={handleChangeNumber}
                                         labelWidth="120px"
                                     />
                                     <InputTextOneLine
-                                        label="Fecha Examen"
+                                        label="Fecha Entrevista"
                                         name="fechaExamen"
                                         type="date"
                                         value={form.fechaExamen}
-                                        onChange={handleChange}
+                                        onChange={handleChangeSimple}
                                         labelWidth="120px"
                                     />
-                                    <InputTextOneLine
-                                        label="Edad"
-                                        name="edad"
-                                        value={form.edad}
-                                        onChange={handleChange}
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Lugar Nacimiento"
-                                        name="lugarNacimiento"
-                                        value={form.lugarNacimiento}
-                                        onChange={handleChange}
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Lugar de Residencia"
-                                        name="lugarResidencia"
-                                        value={form.lugarResidencia}
-                                        onChange={handleChange}
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Puesto de Trabajo"
-                                        name="puestoTrabajo"
-                                        value={form.puestoTrabajo}
-                                        onChange={handleChange}
-                                        labelWidth="120px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Empresa donde labora"
-                                        name="empresa"
-                                        value={form.empresa}
-                                        onChange={handleChange}
-                                        labelWidth="120px"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Motivo Evaluación */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-2">Motivo Evaluación</h4>
-                                <InputTextArea
-                                    rows={4}
-                                    name="motivoEvaluacion"
-                                    value={form.motivoEvaluacion}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            {/* Observación de Conductas */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-2">Observación de Conductas</h4>
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                                    {/* Presentación */}
-                                    <div className="border rounded p-3">
-                                        <h5 className="font-semibold mb-2">Presentación</h5>
-                                        <div className="space-y-2">
-                                            <InputCheckbox
-                                                name="presentacionAdecuado"
-                                                label="Adecuado"
-                                                checked={form.presentacionAdecuado}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="presentacionInadecuado"
-                                                label="Inadecuado"
-                                                checked={form.presentacionInadecuado}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Postura */}
-                                    <div className="border rounded p-3">
-                                        <h5 className="font-semibold mb-2">Postura</h5>
-                                        <div className="space-y-2">
-                                            <InputCheckbox
-                                                name="posturaErguida"
-                                                label="Erguida"
-                                                checked={form.posturaErguida}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="posturaEncorvada"
-                                                label="Encorvada"
-                                                checked={form.posturaEncorvada}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Discurso - Ritmo */}
-                                    <div className="border rounded p-3">
-                                        <h5 className="font-semibold mb-2">Discurso: Ritmo</h5>
-                                        <div className="space-y-2">
-                                            <InputCheckbox
-                                                name="discursoRitmoLento"
-                                                label="Lento"
-                                                checked={form.discursoRitmoLento}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="discursoRitmoRapido"
-                                                label="Rápido"
-                                                checked={form.discursoRitmoRapido}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="discursoRitmoFluido"
-                                                label="Fluido"
-                                                checked={form.discursoRitmoFluido}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Discurso - Tono */}
-                                    <div className="border rounded p-3">
-                                        <h5 className="font-semibold mb-2">Discurso: Tono</h5>
-                                        <div className="space-y-2">
-                                            <InputCheckbox
-                                                name="discursoTonoBajo"
-                                                label="Bajo"
-                                                checked={form.discursoTonoBajo}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="discursoTonoModerado"
-                                                label="Moderado"
-                                                checked={form.discursoTonoModerado}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="discursoTonoAlto"
-                                                label="Alto"
-                                                checked={form.discursoTonoAlto}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Discurso - Articulación */}
-                                    <div className="border rounded p-3">
-                                        <h5 className="font-semibold mb-2">Discurso: Articulación</h5>
-                                        <div className="space-y-2">
-                                            <InputCheckbox
-                                                name="discursoArtConDificultad"
-                                                label="Con dificultad"
-                                                checked={form.discursoArtConDificultad}
-                                                onChange={handleChange}
-                                            />
-                                            <InputCheckbox
-                                                name="discursoArtSinDificultad"
-                                                label="Sin dificultad"
-                                                checked={form.discursoArtSinDificultad}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Orientación */}
-                                    <div className="border rounded p-3 col-span-1 lg:col-span-2">
-                                        <h5 className="font-semibold mb-2">Orientación</h5>
-                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                            <div className="space-y-1">
-                                                <p className="font-semibold">Tiempo</p>
-                                                <InputCheckbox
-                                                    name="orientacionTiempoOrientado"
-                                                    label="Orientado"
-                                                    checked={form.orientacionTiempoOrientado}
-                                                    onChange={handleChange}
-                                                />
-                                                <InputCheckbox
-                                                    name="orientacionTiempoDesorientado"
-                                                    label="Desorientado"
-                                                    checked={form.orientacionTiempoDesorientado}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-semibold">Espacio</p>
-                                                <InputCheckbox
-                                                    name="orientacionEspacioOrientado"
-                                                    label="Orientado"
-                                                    checked={form.orientacionEspacioOrientado}
-                                                    onChange={handleChange}
-                                                />
-                                                <InputCheckbox
-                                                    name="orientacionEspacioDesorientado"
-                                                    label="Desorientado"
-                                                    checked={form.orientacionEspacioDesorientado}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="font-semibold">Persona</p>
-                                                <InputCheckbox
-                                                    name="orientacionPersonaOrientado"
-                                                    label="Orientado"
-                                                    checked={form.orientacionPersonaOrientado}
-                                                    onChange={handleChange}
-                                                />
-                                                <InputCheckbox
-                                                    name="orientacionPersonaDesorientado"
-                                                    label="Desorientado"
-                                                    checked={form.orientacionPersonaDesorientado}
-                                                    onChange={handleChange}
-                                                />
-                                            </div>
-                                        </div>
+                                    <div className="flex gap-4 items-center">
+                                        <h4 className="font-semibold min-w-[120px] max-w-[120px]">Aptitud:</h4>
+                                        <InputsBooleanRadioGroup
+                                            name="esApto"
+                                            value={form.esApto}
+                                            trueLabel="APTO"
+                                            falseLabel="NO APTO"
+                                            onChange={handleRadioButtonBoolean}
+                                        />
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Resultados de Evaluación */}
+                            {/* Contenido principal */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <h4 className="font-semibold mb-2">Resultados de Evaluación</h4>
+                                <h4 className="font-semibold mb-2">Datos Necesarios</h4>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                    {/* Columna Izquierda */}
+                                    <div className="space-y-3">
+                                        <InputTextOneLine
+                                            label="Nombres"
+                                            name="nombres"
+                                            value={form.nombres}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Apellidos"
+                                            name="apellidos"
+                                            value={form.apellidos}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Fecha Nacimiento"
+                                            name="fechaNacimiento"
+                                            value={form.fechaNacimiento}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Lugar Nacimiento"
+                                            name="lugarNacimiento"
+                                            value={form.lugarNacimiento}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                    </div>
+
+                                    {/* Columna Derecha */}
+                                    <div className="space-y-3">
+                                        <InputTextOneLine
+                                            label="Domicilio Actual"
+                                            name="domicilioActual"
+                                            value={form.domicilioActual}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Edad"
+                                            name="edad"
+                                            value={form.edad}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Estado Civil"
+                                            name="estadoCivil"
+                                            value={form.estadoCivil}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Nivel Estudios"
+                                            name="nivelEstudios"
+                                            value={form.nivelEstudios}
+                                            onChange={handleChange}
+                                            disabled
+                                            labelWidth="120px"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                <h4 className="font-semibold mb-3">Datos Laborales</h4>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <InputTextOneLine
-                                        label="Nivel Intelectual"
-                                        name="nivelIntelectual"
-                                        value={form.nivelIntelectual}
+                                        label="Ocupación"
+                                        name="ocupacion"
+                                        value={form.ocupacion}
                                         onChange={handleChange}
-                                        labelWidth="160px"
+                                        disabled
+                                        labelWidth="120px"
                                     />
                                     <InputTextOneLine
-                                        label="Coordinación Visomotriz"
-                                        name="coordinacionVisomotriz"
-                                        value={form.coordinacionVisomotriz}
+                                        label="Cargo Desempeñar"
+                                        name="cargoDesempenar"
+                                        value={form.cargoDesempenar}
                                         onChange={handleChange}
-                                        labelWidth="160px"
-                                    />
-                                    <InputTextOneLine
-                                        label="Nivel de Memoria"
-                                        name="nivelMemoria"
-                                        value={form.nivelMemoria}
-                                        onChange={handleChange}
-                                        labelWidth="160px"
-                                    />
-                                    <InputTextArea
-                                        rows={4}
-                                        label="Personalidad"
-                                        name="personalidad"
-                                        value={form.personalidad}
-                                        onChange={handleChange}
-                                    />
-                                    <InputTextArea
-                                        rows={3}
-                                        label="Afectividad"
-                                        name="afectividad"
-                                        value={form.afectividad}
-                                        onChange={handleChange}
+                                        disabled
+                                        labelWidth="120px"
                                     />
                                 </div>
                             </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="grid gap-3">
+                                    {/* Motivo Evaluación */}
+                                    <section className="bg-white border border-gray-200 rounded-lg p-3">
+                                        <InputTextArea
+                                            label="Motivo Evaluación"
+                                            rows={4}
+                                            name="motivoEvaluacion"
+                                            value={form.motivoEvaluacion}
+                                            onChange={handleChange}
+                                        />
+                                    </section>
 
+                                    {/* Observación de Conductas */}
+                                    <section className="bg-white border border-gray-200 rounded-lg p-3">
+                                        <h4 className="font-semibold mb-2">Observación de Conductas</h4>
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                            {/* Presentación */}
+                                            <div className="border rounded p-3">
+                                                <h5 className="font-semibold mb-2">Presentación</h5>
+                                                <InputsRadioGroup
+                                                    name="presentacion"
+                                                    value={form.presentacion}
+                                                    vertical
+                                                    onChange={handleRadioButton}
+                                                    options={[
+                                                        { label: "Adecuado", value: "ADECUADO" },
+                                                        { label: "Inadecuado", value: "INADECUADO" },
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            {/* Postura */}
+                                            <div className="border rounded p-3">
+                                                <h5 className="font-semibold mb-2">Postura</h5>
+                                                <InputsRadioGroup
+                                                    name="postura"
+                                                    value={form.postura}
+                                                    vertical
+                                                    onChange={handleRadioButton}
+                                                    options={[
+                                                        { label: "Erguida", value: "ERGUIDA" },
+                                                        { label: "Encorvada", value: "ENCORVADA" },
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            {/* Discurso - Ritmo */}
+                                            <div className="border rounded p-3">
+                                                <h5 className="font-semibold mb-2">Discurso: Ritmo</h5>
+                                                <InputsRadioGroup
+                                                    name="discursoRitmo"
+                                                    value={form.discursoRitmo}
+                                                    onChange={handleRadioButton}
+                                                    vertical
+                                                    options={[
+                                                        { label: "Lento", value: "LENTO" },
+                                                        { label: "Rápido", value: "RAPIDO" },
+                                                        { label: "Fluido", value: "FLUIDO" },
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            {/* Discurso - Tono */}
+                                            <div className="border rounded p-3">
+                                                <h5 className="font-semibold mb-2">Discurso: Tono</h5>
+                                                <InputsRadioGroup
+                                                    name="discursoTono"
+                                                    value={form.discursoTono}
+                                                    onChange={handleRadioButton}
+                                                    vertical
+                                                    options={[
+                                                        { label: "Bajo", value: "BAJO" },
+                                                        { label: "Moderado", value: "MODERADO" },
+                                                        { label: "Alto", value: "ALTO" },
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            {/* Discurso - Articulación */}
+                                            <div className="border rounded p-3">
+                                                <h5 className="font-semibold mb-2">Discurso: Articulación</h5>
+                                                <InputsRadioGroup
+                                                    name="discursoArticulacion"
+                                                    value={form.discursoArticulacion}
+                                                    onChange={handleRadioButton}
+                                                    vertical
+                                                    options={[
+                                                        { label: "Con dificultad", value: "CON_DIFICULTAD" },
+                                                        { label: "Sin dificultad", value: "SIN_DIFICULTAD" },
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            {/* Orientación */}
+                                            <div className="border rounded p-3 ">
+                                                <h5 className="font-semibold mb-2">Orientación</h5>
+                                                <div className="grid  gap-3">
+                                                    <div className="space-y-1">
+                                                        <p className="font-semibold">Tiempo</p>
+                                                        <InputsRadioGroup
+                                                            name="orientacionTiempo"
+                                                            value={form.orientacionTiempo}
+                                                            onChange={handleRadioButton}
+                                                            options={[
+                                                                { label: "Orientado", value: "ORIENTADO" },
+                                                                { label: "Desorientado", value: "DESORIENTADO" },
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <p className="font-semibold">Espacio</p>
+                                                        <InputsRadioGroup
+                                                            name="orientacionEspacio"
+                                                            value={form.orientacionEspacio}
+                                                            onChange={handleRadioButton}
+                                                            options={[
+                                                                { label: "Orientado", value: "ORIENTADO" },
+                                                                { label: "Desorientado", value: "DESORIENTADO" },
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                    <div className="space-y-1">
+                                                        <p className="font-semibold">Persona</p>
+                                                        <InputsRadioGroup
+                                                            name="orientacionPersona"
+                                                            value={form.orientacionPersona}
+                                                            onChange={handleRadioButton}
+                                                            options={[
+                                                                { label: "Orientado", value: "ORIENTADO" },
+                                                                { label: "Desorientado", value: "DESORIENTADO" },
+                                                            ]}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                                {/* Resultados de Evaluación */}
+                                <section className="bg-white border border-gray-200 rounded-lg p-3">
+                                    <h4 className="font-semibold mb-2">Resultados de Evaluación</h4>
+                                    <div className="grid gap-4">
+                                        <InputTextOneLine
+                                            label="Nivel Intelectual"
+                                            name="nivelIntelectual"
+                                            value={form.nivelIntelectual}
+                                            onChange={handleChange}
+                                            labelWidth="160px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Coordinación Visomotriz"
+                                            name="coordinacionVisomotriz"
+                                            value={form.coordinacionVisomotriz}
+                                            onChange={handleChange}
+                                            labelWidth="160px"
+                                        />
+                                        <InputTextOneLine
+                                            label="Nivel de Memoria"
+                                            name="nivelMemoria"
+                                            value={form.nivelMemoria}
+                                            onChange={handleChange}
+                                            labelWidth="160px"
+                                        />
+                                        <InputTextArea
+                                            rows={8}
+                                            label="Personalidad"
+                                            name="personalidad"
+                                            value={form.personalidad}
+                                            onChange={handleChange}
+                                        />
+                                        <InputTextArea
+                                            rows={5}
+                                            label="Afectividad"
+                                            name="afectividad"
+                                            value={form.afectividad}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </section>
+                            </div>
                             {/* Recomendaciones y Conclusiones */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                 <div className="bg-white border border-gray-200 rounded-lg p-3">
                                     <h4 className="font-semibold mb-2">Recomendaciones</h4>
                                     <InputTextArea
-                                        rows={6}
+                                        rows={9}
                                         name="recomendaciones"
                                         value={form.recomendaciones}
                                         onChange={handleChange}
@@ -383,14 +423,14 @@ export default function FichaPsicologica2() {
                                     <h4 className="font-semibold mb-2">Conclusiones</h4>
                                     <div className="space-y-3">
                                         <InputTextArea
-                                            rows={3}
+                                            rows={4}
                                             label="Área Cognitiva"
                                             name="areaCognitiva"
                                             value={form.areaCognitiva}
                                             onChange={handleChange}
                                         />
                                         <InputTextArea
-                                            rows={3}
+                                            rows={4}
                                             label="Área Emocional"
                                             name="areaEmocional"
                                             value={form.areaEmocional}
@@ -399,66 +439,43 @@ export default function FichaPsicologica2() {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* APTO / NO APTO */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <div className="flex items-center gap-4">
-                                    <p className="font-semibold">Resultado:</p>
-                                    <InputsBooleanRadioGroup
-                                        name="esApto"
-                                        value={form.esApto}
-                                        onChange={handleRadioButtonBoolean}
-                                        trueLabel="APTO"
-                                        falseLabel="NO APTO"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Imprimir N° Orden */}
-                            <div className="bg-white border border-gray-200 rounded-lg p-3">
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 items-end">
-                                    <InputTextOneLine
-                                        label="Imprimir N° Orden"
-                                        name="nOrdenImprimir"
-                                        value={form.nOrdenImprimir}
-                                        onChange={handleChange}
-                                        labelWidth="160px"
-                                    />
+                            <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-3">
+                                <div className="flex gap-4">
                                     <button
                                         type="button"
-                                        className="h-8 px-3 rounded bg-blue-600 text-white flex items-center gap-2 justify-center"
-                                        onClick={() => window.print()}
+                                        onClick={handleSave}
+                                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                     >
-                                        <FontAwesomeIcon icon={faPrint} />
-                                        Imprimir
+                                        <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleClear}
+                                        className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                                    >
+                                        <FontAwesomeIcon icon={faBroom} /> Limpiar
                                     </button>
                                 </div>
-                            </div>
+                                <div className="flex flex-col items-end">
+                                    <span className="font-bold italic text-base mb-1">IMPRIMIR</span>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            name="norden"
+                                            value={form.norden}
+                                            onChange={handleChange}
+                                            className="border rounded px-2 py-1 text-base w-24"
+                                        />
 
-                            {/* Acciones */}
-                            <div className="flex flex-wrap gap-3">
-                                <button
-                                    type="button"
-                                    className="h-8 px-3 rounded bg-green-600 text-white flex items-center gap-2"
-                                    onClick={handleGuardar}
-                                >
-                                    <FontAwesomeIcon icon={faSave} /> Guardar
-                                </button>
-                                <button
-                                    type="button"
-                                    className="h-8 px-3 rounded bg-gray-600 text-white flex items-center gap-2"
-                                    onClick={() => { /* Placeholder para actualizar */ }}
-                                >
-                                    Actualizar
-                                </button>
-                                <button
-                                    type="button"
-                                    className="h-8 px-3 rounded bg-orange-600 text-white flex items-center gap-2"
-                                    onClick={handleClear}
-                                >
-                                    <FontAwesomeIcon icon={faBroom} /> Limpiar
-                                </button>
-                            </div>
+                                        <button
+                                            type="button"
+                                            onClick={handlePrint}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                                        >
+                                            <FontAwesomeIcon icon={faPrint} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
                 </div>

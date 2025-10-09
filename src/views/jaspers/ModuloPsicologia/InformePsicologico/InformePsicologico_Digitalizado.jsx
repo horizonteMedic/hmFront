@@ -14,45 +14,32 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
-    const resultadoTexto = String(
-      raw?.resultado ?? raw?.resultadoPsicologico ?? raw?.aptoTexto ?? raw?.apto_resultado ?? ''
-    ).toUpperCase();
-
     const datosReales = {
-      apellidosNombres: String((((raw?.apellidos_apellidos_pa ?? '') + ' ' + (raw?.nombres_nombres_pa ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaInformePsicologico ?? raw?.fecha_examen ?? ''),
-      sexo: convertirGenero(raw?.sexo_sexo_pa ?? raw?.sexo ?? ''),
-      documentoIdentidad: String(raw?.dni_cod_pa ?? raw?.documento ?? ''),
-      edad: String(raw?.edad_edad ?? raw?.edad ?? ''),
-      fechaNacimiento: formatearFechaCorta(raw?.fechanacimientopaciente_fecha_nacimiento_pa ?? raw?.fecha_nacimiento ?? ''),
-      domicilio: String(raw?.direccionpaciente_direccion_pa ?? raw?.domicilio ?? ''),
-      areaTrabajo: String(raw?.area_area_o ?? raw?.area_trabajo ?? ''),
-      puestoTrabajo: String(raw?.cargo_cargo_de ?? raw?.puesto_trabajo ?? ''),
-      empresa: String(raw?.empresa_razon_empresa ?? raw?.empresa ?? ''),
-      contrata: String(
-        raw?.contrata_razon_contrata ?? raw?.contrata ?? raw?.contratista_razon_contratista ?? raw?.contratista ?? ''
-      ),
+      apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
+      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
+      sexo: convertirGenero(raw?.sexoPaciente ?? ''),
+      documentoIdentidad: String(raw?.dniPaciente ?? ''),
+      edad: String(raw?.edadPaciente ?? ''),
+      fechaNacimiento: formatearFechaCorta(raw?.fechaNacimientoPaciente ?? ''),
+      domicilio: String(raw?.direccionPaciente ?? ''),
+      areaTrabajo: String(raw?.areaPaciente ?? ''),
+      puestoTrabajo: String(raw?.cargoPaciente ?? ''),
+      empresa: String(raw?.empresa ?? ''),
+      contrata: String(raw?.contrata ?? ''),
       sede: String(raw?.sede ?? ''),
-      numeroFicha: String(raw?.n_orden ?? raw?.numero_ficha ?? ''),
-      codigoEntrevista: String(
-        raw?.codEntrevista ?? raw?.cod_entrevista ?? raw?.codigoEntrevista ?? raw?.codigo_entrevista ?? ''
-      ),
+      numeroFicha: String(raw?.norden ?? ""),
+      codigoEntrevista: String(raw?.codigoInforme ?? ''), 
       color: Number(raw?.color ?? 0),
       codigoColor: String(raw?.codigoColor ?? ''),
       textoColor: String(raw?.textoColor ?? ''),
       cuerpo: {
-        areaIntelectual: raw?.cuerpo?.areaIntelectual,
-        areaPersonalidad: raw?.cuerpo?.areaPersonalidad,
-        areaOrganicidad: raw?.cuerpo?.areaOrganicidad,
-        areaPsicomotricidad: raw?.cuerpo?.areaPsicomotricidad,
-        recomendaciones: raw?.cuerpo?.recomendaciones
+        areaIntelectual: raw?.areaIntelectual,
+        areaPersonalidad: raw?.areaPersonalidad,
+        areaOrganicidad: raw?.areaOrganicidad,
+        areaPsicomotricidad: raw?.areaPsicomotricidad,
+        recomendaciones: raw?.recomendaciones
       },
-      apto: (typeof raw?.apto === 'boolean') ? raw.apto
-        : (typeof raw?.aptoPsicologico === 'boolean') ? raw.aptoPsicologico
-        : (typeof raw?.aptoInforme === 'boolean') ? raw.aptoInforme
-        : resultadoTexto.includes('NO APTO') ? false
-        : resultadoTexto.includes('APTO') ? true
-        : false
+      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false 
     };
 
     const datosPrueba = {
@@ -84,7 +71,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
       apto: true
     };
 
-    const selected = (raw && (raw.n_orden || raw.numero_ficha)) ? datosReales : datosPrueba;
+    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
     // Asegurar que las secciones de cuerpo sean arrays listables
     selected.cuerpo = {
       areaIntelectual: normalizeList(selected.cuerpo.areaIntelectual),
@@ -140,11 +127,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     const palabras = texto.split(' ');
     let lineaActual = '';
     let yPos = y;
-    
+
     palabras.forEach(palabra => {
       const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
       const anchoTexto = doc.getTextWidth(textoPrueba);
-      
+
       if (anchoTexto <= anchoMaximo) {
         lineaActual = textoPrueba;
       } else {
@@ -158,11 +145,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
         }
       }
     });
-    
+
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
     }
-    
+
     return yPos;
   };
 
@@ -170,25 +157,25 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
     const tablaInicioX = 10;
     const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo gris más oscuro
     doc.setFillColor(160, 160, 160);
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del header
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del título
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -328,25 +315,25 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   const dibujarSubHeaderCeleste = (titulo, yPos, alturaHeader = 5) => {
     const tablaInicioX = 10;
     const tablaAncho = 190;
-    
+
     // Configurar líneas con grosor consistente
     doc.setDrawColor(0, 0, 0);
     doc.setLineWidth(0.2);
-    
+
     // Dibujar fondo celeste
     doc.setFillColor(173, 216, 230); // Color celeste claro
     doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
-    
+
     // Dibujar líneas del subheader
     doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader);
     doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader);
     doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
     doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader);
-    
+
     // Dibujar texto del subtítulo
     doc.setFont("helvetica", "bold").setFontSize(9);
     doc.text(titulo, tablaInicioX + 2, yPos + 3.5);
-    
+
     return yPos + alturaHeader;
   };
 
@@ -356,16 +343,16 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   // Calcular altura dinámica para la lista de datos
   const calcularAlturaLista = (items, anchoMaximo) => {
     if (!items || items.length === 0) return 30; // Altura fija mínima si no hay items
-    
+
     let lineas = 0;
     items.forEach(item => {
       const palabras = item.split(' ');
       let lineaActual = '';
-      
+
       palabras.forEach(palabra => {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
         const anchoTexto = doc.getTextWidth(textoPrueba);
-        
+
         if (anchoTexto <= anchoMaximo) {
           lineaActual = textoPrueba;
         } else {
@@ -377,12 +364,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
           }
         }
       });
-      
+
       if (lineaActual) {
         lineas++;
       }
     });
-    
+
     // Altura fija mínima de 40mm, altura por línea de 3mm
     const alturaCalculada = lineas * 3 + 2;
     return Math.max(alturaCalculada, 30); // Altura fija mínima de 40mm
@@ -418,12 +405,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("b.- Área de Personalidad(Test de la figura humana de machover / Inventario Multifásico de personalidad)", yPos, filaAltura);
   const areaPersonalidad = cuerpo.areaPersonalidad || [];
   const alturaFilaPersonalidad = calcularAlturaLista(areaPersonalidad, anchoMaximoLista);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaPersonalidad);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaPersonalidad);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaPersonalidad, tablaInicioX + tablaAncho, yPos + alturaFilaPersonalidad);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaPersonalidad = yPos + 3;
   areaPersonalidad.forEach(item => {
@@ -436,12 +423,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("c.- Área de Organicidad(Test de Bender para adultos / test de Benton Forma C)", yPos, filaAltura);
   const areaOrganicidad = cuerpo.areaOrganicidad || [];
   const alturaFilaOrganicidad = calcularAlturaLista(areaOrganicidad, anchoMaximoLista);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaOrganicidad);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaOrganicidad);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaOrganicidad, tablaInicioX + tablaAncho, yPos + alturaFilaOrganicidad);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaOrganicidad = yPos + 3;
   areaOrganicidad.forEach(item => {
@@ -454,12 +441,12 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("d.- Área de Psicomotricidad (Prueba de Laberintos de Weschler)", yPos, filaAltura);
   const areaPsicomotricidad = cuerpo.areaPsicomotricidad || [];
   const alturaFilaPsicomotricidad = calcularAlturaLista(areaPsicomotricidad, anchoMaximoLista);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaPsicomotricidad);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaPsicomotricidad);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaPsicomotricidad, tablaInicioX + tablaAncho, yPos + alturaFilaPsicomotricidad);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaPsicomotricidad = yPos + 3;
   areaPsicomotricidad.forEach(item => {
@@ -472,19 +459,19 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   yPos = dibujarSubHeaderCeleste("e.- Recomendaciones", yPos, filaAltura);
   const recomendaciones = cuerpo.recomendaciones || [];
   const alturaFilaRecomendaciones = calcularAlturaLista(recomendaciones, anchoMaximoLista);
-  
+
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaRecomendaciones);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaRecomendaciones);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaRecomendaciones, tablaInicioX + tablaAncho, yPos + alturaFilaRecomendaciones);
-  
+
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaRecomendaciones = yPos + 3;
   recomendaciones.forEach(item => {
     doc.text("  " + item, tablaInicioX + 2, yListaRecomendaciones);
     yListaRecomendaciones += 3;
   });
-  
+
   // Firma dentro de la fila de recomendaciones
   const placeSignaturesInRecomendaciones = () => {
     // Calcular posición dentro de la fila de recomendaciones
@@ -492,7 +479,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
     const firmaY = yPos + (alturaFilaRecomendaciones / 2) - 10; // Centrada verticalmente
     const firmaW = 40;
     const firmaH = 20;
-    
+
     let imagenPintada = false;
     try {
       const firma = getSign(data, "SELLOFIRMA") || getSign(data, "FIRMAP");
@@ -511,7 +498,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
 
   // Llamar a la función después de dibujar la fila de recomendaciones
   placeSignaturesInRecomendaciones();
-  
+
   yPos += alturaFilaRecomendaciones;
 
   // === SECCIÓN 3: APTO PARA EL CARGO ===
@@ -531,7 +518,7 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   yPos += filaAltura;
 
 
-   // === FOOTER ===
+  // === FOOTER ===
   footerTR(doc, { footerOffsetY: 5 });
 
   // Imprimir

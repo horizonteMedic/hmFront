@@ -13,9 +13,12 @@ export default function PsicologiaTabSelector({ tieneVista }) {
         else if (tieneVista("Ficha Psicologica 2")) {
             setActiveTab(1);
         }
+        else if (tieneVista("Ficha Psicologica 3")) {
+            setActiveTab(2);
+        }
         else {
             // Temporalmente mostrar FichaPsicologica3 por defecto si no tiene otros permisos
-            setActiveTab(2);
+            setActiveTab(-1);
         }
     }, []);
 
@@ -47,16 +50,17 @@ export default function PsicologiaTabSelector({ tieneVista }) {
                             Ficha Psicológica 2
                         </button>
                     )}
-                    {/* Temporalmente sin verificación de permisos para testing */}
-                    <button
-                        className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 2
-                            ? "border-[#233245] font-semibold"
-                            : "border-transparent"
-                            }`}
-                        onClick={() => setActiveTab(2)}
-                    >
-                        Ficha Psicológica 3
-                    </button>
+                    {tieneVista("Ficha Psicologica 3") && (
+                        <button
+                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 2
+                                ? "border-[#233245] font-semibold"
+                                : "border-transparent"
+                                }`}
+                            onClick={() => setActiveTab(2)}
+                        >
+                            Ficha Psicológica 3
+                        </button>
+                    )}
                 </nav>
 
                 {/* Tab Content */}
