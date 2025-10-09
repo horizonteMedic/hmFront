@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import InformePsicologico from "./InformePsicologico/InformePsicologico";
 import FichaPsicologica2 from "./FichaPsicologica2/FichaPsicologica2";
+import FichaPsicologica3 from "./FichaPsicologica3/FichaPsicologica3";
 
 export default function PsicologiaTabSelector({ tieneVista }) {
     const [activeTab, setActiveTab] = useState(0);
@@ -13,7 +14,8 @@ export default function PsicologiaTabSelector({ tieneVista }) {
             setActiveTab(1);
         }
         else {
-            setActiveTab(-1); // -1 significa que no tiene permisos
+            // Temporalmente mostrar FichaPsicologica3 por defecto si no tiene otros permisos
+            setActiveTab(2);
         }
     }, []);
 
@@ -45,12 +47,23 @@ export default function PsicologiaTabSelector({ tieneVista }) {
                             Ficha Psicológica 2
                         </button>
                     )}
+                    {/* Temporalmente sin verificación de permisos para testing */}
+                    <button
+                        className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 2
+                            ? "border-[#233245] font-semibold"
+                            : "border-transparent"
+                            }`}
+                        onClick={() => setActiveTab(2)}
+                    >
+                        Ficha Psicológica 3
+                    </button>
                 </nav>
 
                 {/* Tab Content */}
                 <div className="max-w-full">
                     {activeTab === 0 && <InformePsicologico />}
                     {activeTab === 1 && <FichaPsicologica2 />}
+                    {activeTab === 2 && <FichaPsicologica3 />}
                     {activeTab === -1 && (
                         <div className="text-center text-gray-500">
                             No tiene permisos para ver ningún examen.
