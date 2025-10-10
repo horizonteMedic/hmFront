@@ -70,6 +70,8 @@ export const GetInfoServicio = async (
             icc: res.iccTriaje ?? "",
             perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
             perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
+
+            obesidadIMC30: parseFloat(res.imcTriaje) >= 30 ,
         }));
     }
 };
