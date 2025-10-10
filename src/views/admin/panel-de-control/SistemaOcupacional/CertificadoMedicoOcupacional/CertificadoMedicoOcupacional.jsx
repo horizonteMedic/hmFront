@@ -7,9 +7,11 @@ import useRealTime from "../../../../hooks/useRealTime";
 import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
 import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import { VerifyTR } from "./ControllerCMO";
-
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerCMO";
+import { getToday } from "../../../../utils/helpers";
+import { valores } from "./ControllerCMO";
 const tabla = "certificado_aptitud_medico_resumen"
+const today = getToday();
 
 export default function CertificadoMedicoOcupacional() {
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -28,52 +30,57 @@ export default function CertificadoMedicoOcupacional() {
         cargoPaciente: "",
         ocupacionPaciente: "",
         //Izquierda
-        apto: true,
-        aptoConRestriccion: false,
-        noApto: false,
+        apto: "APTO",
 
-        fechaDesde: "",
-        fechahasta: "",
-
+        fechaDesde: today,
+        fechahasta: today,
+        conclusiones: "",
+        nombreMedico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+        
         //Cuadrito feo
         visionCercaSincorregirOd_v_cerca_s_od: "",
         visionLejosSincorregirOd_v_lejos_s_od: "",
         visionCercaSincorregirOi_v_cerca_s_oi: "",
         visionLejosSincorregirOi_v_lejos_s_oi: "",
-        
-        enfermedadesOcularesOftalmologia_e_oculares:""
 
+        oftalodccmologia_odcc: "",
+        oiccoftalmologia_oicc: "",
+        odlcOftalmologia_odlc: "",
+        oilcOftalmologia_oilc: "",
+        vcOftalmologia_vc: "",
+        vbOftalmologia_vb: "",
+        rpOftalmologia_rp: "",
+         
+        enfermedadesOcularesOftalmologia_e_oculares:"",
+        hemoglobina_txthemoglobina: "",
+        vsgLabClinico_txtvsg: "",
+        glucosaLabClinico_txtglucosabio: "",
+        leucocitoSematologiaLabClinico: ""
     }
 
-    const { form, setForm, handleChangeNumber,handleChange, handleClearnotO, handleRadioButton } = useForm(InitialForm)
-
-    const handleRadioButtonPerso = (e, value) => {
-        const { name } = e.target;
-
-        // Reinicia todos a false, pero activa solo el que se seleccionó
-        setForm((prev) => ({
-            ...prev,
-            apto: false,
-            aptoConRestriccion: false,
-            noApto: false,
-            [name]: true,
-        }));
+    const { form, setForm, handleChangeNumber,handleChange, handleClearnotO, handleRadioButton, handleClear, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
+    
+    const handleClearnotOandEspecialidad = () => {
+        setForm((prev) => ({ ...InitialForm, norden: prev.norden, fechaDesde: today, fechahasta: today }));
+        if (typeof window !== "undefined" && "Certificado_Medico_Ocupacional_form") {
+        try {
+            localStorage.setItem("Certificado_Medico_Ocupacional_form", JSON.stringify({ ...InitialForm, norden: form.norden, fechaDesde: today, fechahasta: today }));
+        } catch (err) {
+            console.warn("useForm: error guardando localStorage en clearnotO", err);
+        }
+        }
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            handleClearnotO();
+            handleClearnotOandEspecialidad();
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
     const handlePrint = () => {
-        if (!form.especialidad) {
-            Swal.fire("Error","Debe seleccionar una especialidad",'error')
-            return
-        }
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, form.especialidad, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
@@ -81,7 +88,7 @@ export default function CertificadoMedicoOcupacional() {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
-
+    
     return (
         <div className="mx-auto bg-white overflow-hidden">
             {/* Header */}
@@ -137,11 +144,13 @@ export default function CertificadoMedicoOcupacional() {
                                 <InputTextOneLine
                                 label="Nombres y Apellidos"
                                 name="nombres"
+                                disabled
                                 value={form?.nombres}
                                 onChange={handleChange}
                                 />
                                 <InputTextOneLine
                                 label="DNI"
+                                disabled
                                 labelWidth="50px"
                                 name="dniPaciente"
                                 value={form?.dniPaciente}
@@ -149,6 +158,7 @@ export default function CertificadoMedicoOcupacional() {
                                 />
                                 <InputTextOneLine
                                 label="Edad"
+                                disabled
                                 labelWidth="50px"
                                 name="edadPaciente"
                                 value={form?.edadPaciente}
@@ -156,6 +166,7 @@ export default function CertificadoMedicoOcupacional() {
                                 />
                                 <InputTextOneLine
                                 label="Género"
+                                disabled
                                 labelWidth="60px"
                                 name="sexo"
                                 value={form?.sexo}
@@ -168,11 +179,13 @@ export default function CertificadoMedicoOcupacional() {
                                 <InputTextOneLine
                                 label="Empresa"
                                 name="empresa"
+                                disabled
                                 value={form?.empresa}
                                 onChange={handleChange}
                                 />
                                 <InputTextOneLine
                                 label="Contratista"
+                                disabled
                                 name="contratista"
                                 value={form?.contrata}
                                 onChange={handleChange}
@@ -184,12 +197,14 @@ export default function CertificadoMedicoOcupacional() {
                                 <InputTextOneLine
                                 label="Puesto al que Postula"
                                 name="cargoPaciente"
+                                disabled
                                 value={form?.cargoPaciente}
                                 onChange={handleChange}
                                 />
                                 <InputTextOneLine
                                 label="Ocupación Actual o Última Ocupación"
                                 name="ocupacionPaciente"
+                                disabled
                                 value={form?.ocupacionPaciente}
                                 onChange={handleChange}
                                 />
@@ -198,14 +213,15 @@ export default function CertificadoMedicoOcupacional() {
                         <div className="flex w-full">
                             <div className="w-1/2">
                                 <section className="bg-white border border-gray-200 rounded-lg p-4 gap-4 mt-0 m-4">
-                                    <InputsRadioGroup
-                                    name="apto" value={form.apto} className="py-2"
-                                    onChange={handleRadioButtonPerso} options={[
-                                        { label: "APTO (para el puesto en el que trabaja o postula)", value: "Apto" },
-                                        { label: "APTO (para el puesto en el que trabaja o postula)", value: "aptoConRestriccion" },
-                                        { label: "APTO (para el puesto en el que trabaja o postula)", value: "noApto" }
-                                    ]}
-                                    />
+                                        <InputsRadioGroup
+                                        vertical
+                                        name="apto" value={form?.apto} className="py-2"
+                                        onChange={handleRadioButton} options={[
+                                            { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
+                                            { label: "APTO con RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
+                                            { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
+                                        ]}
+                                        />
                                     
                                     <div className="w-full flex justify-between items-center pt-4 pb-2 px-2">
                                         <InputTextOneLine
@@ -228,56 +244,61 @@ export default function CertificadoMedicoOcupacional() {
                                 </section>
                                 <section className="bg-white rounded-lg p-4 pt-1 gap-4 mt-0 m-4">
                                     <InputsRadioGroup
-                                    name="especialidad" value={form.especialidad} className="py-2"
-                                    onChange={handleRadioButton} options={[{ label: "1. MARSA - OPERATIVA, SUPERVISOR, AYUDANTE", value: "OFTALMOLOGÍA" }]}
+                                    name="conclusiones" value={form.conclusiones} className="py-2"
+                                    onChange={handleRadioButton} options={[
+                                        { label: "1. MARSA - OPERATIVA, SUPERVISOR, AYUDANTE", value: valores.Check1 }
+                                    ]}
                                     />
                                     <InputsRadioGroup
-                                    name="especialidad" value={form.especialidad} className="py-2"
-                                    onChange={handleRadioButton} options={[{ label: "2. MARSA - CONDUCTOR u OPERADOR MAQUINARIA", value: "OFTALMOLOGÍA" }]}
+                                    name="conclusiones" value={form.conclusiones} className="py-2"
+                                    onChange={handleRadioButton} options={[
+                                        { label: "2. MARSA - CONDUCTOR u OPERADOR MAQUINARIA", value: valores.Check2 }
+                                    ]}
                                     />
                                     <div className="w-full grid grid-cols-2">
                                         <InputsRadioGroup
-                                        name="especialidad" value={form.especialidad} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "3. MARSA - RETIRO ", value: "OFTALMOLOGÍA" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton} options={[{ label: "3. MARSA - RETIRO ", value: valores.Check3 }]}
                                         />
                                         <InputsRadioGroup
-                                        name="especialidad" value={form.especialidad} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "6. PROTOCOLO PODEROSA RETIRO", value: "OFTALMOLOGÍA" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton} options={[{ label: "6. PROTOCOLO PODEROSA RETIRO", value: valores.Check6}]}
                                         />
                                     </div>
                                     <div className="w-full grid grid-cols-2">
                                         <InputsRadioGroup
-                                        name="especialidad" value={form.especialidad} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "4. RETIRO BOROO", value: "OFTALMOLOGÍA" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton} options={[{ label: "4. RETIRO BOROO", value: valores.Check4 }]}
                                         />
                                         <InputsRadioGroup
-                                        name="especialidad" value={form.especialidad} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "7. PROTOCOLO PODEROSA", value: "OFTALMOLOGÍA" }]}
+                                        name="conclusiones" value={form.conclusiones} className="py-2"
+                                        onChange={handleRadioButton} options={[{ label: "7. PROTOCOLO PODEROSA", value: valores.Check7 }]}
                                         />
                                     </div>
                                     <InputsRadioGroup
-                                    name="especialidad" value={form.especialidad} className="py-2"
-                                    onChange={handleRadioButton} options={[{ label: "5. BOROO - PSICONSENSOMETRICO Y ALTURA   Perfil Lipidico. ", value: "OFTALMOLOGÍA" }]}
+                                    name="conclusiones" value={form.conclusiones} className="py-2"
+                                    onChange={handleRadioButton} options={[{ label: "5. BOROO - PSICONSENSOMETRICO Y ALTURA   Perfil Lipidico. ", value: valores.Check5 }]}
                                     />
                                     <InputTextOneLine
                                     label="Medico que Certifica"
-                                    name="nombres"
+                                    name="nombreMedico"
+                                    disabled
                                     className="mt-2"
-                                    value={form?.nombres}
+                                    value={form?.nombreMedico}
                                     onChange={handleChange}
                                     />
                                     <div className="w-full flex justify-between items-center gap-1 mt-4">
                                         <div className="flex gap-1">
                                             <button
                                                 type="button"
-                                                //onClick={handleSave}
+                                                onClick={handleSave}
                                                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                             >
                                                 <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
                                             </button>
                                             <button
                                                 type="button"
-                                                //onClick={handleClear}
+                                                onClick={handleClear}
                                                 className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
                                             >
                                                 <FontAwesomeIcon icon={faBroom} /> Limpiar
@@ -294,7 +315,7 @@ export default function CertificadoMedicoOcupacional() {
 
                                             <button
                                                 type="button"
-                                                //onClick={handlePrint}
+                                                onClick={handlePrint}
                                                 className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
                                             >
                                                 <FontAwesomeIcon icon={faPrint} />
@@ -306,11 +327,11 @@ export default function CertificadoMedicoOcupacional() {
                             <div className="w-1/2">
                                 <InputTextArea
                                     label="Examenes"
-                                    value={form.tratamiento}
+                                    value={form.conclusiones}
                                     onChange={handleChange}
                                     classNameLabel="text-blue-600"
                                     rows={20}
-                                    name="tratamiento"
+                                    name="conclusiones"
                                 />
                             </div>
                         </div>
@@ -351,15 +372,15 @@ export default function CertificadoMedicoOcupacional() {
                                     <div className="font-semibold mb-2 text-center">O.D</div>
                                     <InputTextOneLine
                                         label="V.C."
-                                        name="vcCorregidaOD"
-                                        value={form?.vcCorregidaOD}
+                                        name="oftalodccmologia_odcc"
+                                        value={form?.oftalodccmologia_odcc}
                                         disabled
                                         labelWidth="35px"
                                     />
                                     <InputTextOneLine
                                         label="V.L."
-                                        name="vlCorregidaOD"
-                                        value={form?.vlCorregidaOD}
+                                        name="odlcOftalmologia_odlc"
+                                        value={form?.odlcOftalmologia_odlc}
                                         disabled
                                         labelWidth="35px"
                                     />
@@ -368,15 +389,15 @@ export default function CertificadoMedicoOcupacional() {
                                     <div className="font-semibold mb-2 text-center">O.I</div>
                                     <InputTextOneLine
                                         label="V.C."
-                                        name="vcCorregidaOI"
-                                        value={form?.vcCorregidaOI}
+                                        name="oiccoftalmologia_oicc"
+                                        value={form?.oiccoftalmologia_oicc}
                                         disabled
                                         labelWidth="35px"
                                     />
                                     <InputTextOneLine
                                         label="V.L."
-                                        name="vlCorregidaOI"
-                                        value={form?.vlCorregidaOI}
+                                        name="oilcOftalmologia_oilc"
+                                        value={form?.oilcOftalmologia_oilc}
                                         disabled
                                         labelWidth="35px"
                                     />
@@ -386,24 +407,24 @@ export default function CertificadoMedicoOcupacional() {
                             <div className="mt-4 space-y-3">
                                 <InputTextOneLine
                                     label="V.Clrs"
-                                    name="vclrs"
-                                    value={form?.vclrs}
+                                    name="vcOftalmologia_vc"
+                                    value={form?.vcOftalmologia_vc}
                                     disabled
                                     className="flex-1 w-full"
                                     labelWidth="35px"
                                 />
                                 <InputTextOneLine
-                                    name="vb"
+                                    name="vbOftalmologia_vb"
                                     label="V.B."
-                                    value={form?.vb}
+                                    value={form?.vbOftalmologia_vb}
                                     disabled
                                     className="flex-1 w-full"
                                     labelWidth="35px"
                                 />
                                 <InputTextOneLine
                                     label="R.P."
-                                    name="rp"
-                                    value={form?.rp}
+                                    name="rpOftalmologia_rp"
+                                    value={form?.rpOftalmologia_rp}
                                     disabled
                                     className="flex-1 w-full"
                                     labelWidth="35px"
@@ -416,29 +437,29 @@ export default function CertificadoMedicoOcupacional() {
                 <div className="bg-white  rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
                     <InputTextOneLine
                         label="Hemoglobina"
-                        name="vcCorregidaOD"
-                        value={form?.vcCorregidaOD}
+                        name="hemoglobina_txthemoglobina"
+                        value={form?.hemoglobina_txthemoglobina}
                         disabled
                         labelWidth="80px"
                     />
                     <InputTextOneLine
                         label="V.S.G"
-                        name="vcCorregidaOD"
-                        value={form?.vcCorregidaOD}
+                        name="vsgLabClinico_txtvsg"
+                        value={form?.vsgLabClinico_txtvsg}
                         disabled
                         labelWidth="80px"
                     />
                     <InputTextOneLine
                         label="Glucosa"
-                        name="vcCorregidaOD"
-                        value={form?.vcCorregidaOD}
+                        name="glucosaLabClinico_txtglucosabio"
+                        value={form?.glucosaLabClinico_txtglucosabio}
                         disabled
                         labelWidth="80px"
                     />
                     <InputTextOneLine
                         label="Creatina"
-                        name="vcCorregidaOD"
-                        value={form?.vcCorregidaOD}
+                        name="leucocitoSematologiaLabClinico"
+                        value={form?.leucocitoSematologiaLabClinico}
                         disabled
                         labelWidth="80px"
                     />
