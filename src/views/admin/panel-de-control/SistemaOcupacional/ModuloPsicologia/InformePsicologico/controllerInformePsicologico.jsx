@@ -45,6 +45,8 @@ export const GetInfoServicio = async (
             nivelEstudios: res.nivelEstudioPaciente,
 
             // Datos Laborales
+            empresa: res.empresa,
+            contrata: res.contrata,
             ocupacion: res.ocupacionPaciente,
             cargoDesempenar: res.cargoPaciente,
 

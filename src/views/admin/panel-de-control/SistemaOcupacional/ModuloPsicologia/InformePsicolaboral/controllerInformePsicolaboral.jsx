@@ -61,7 +61,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloPsicologia/FichaPsicologica2/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloPsicologia/InformePsicolaboral/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -69,7 +69,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/FichaPsicologica2"
+        "../../../../../jaspers/ModuloPsicologia/InformePsicolaboral"
     );
 };
 
@@ -89,7 +89,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Ficha Psicológica 2.",
+                    "Este paciente ya cuenta con registros de Informe Psicolaboral.",
                     "warning"
                 );
             });
@@ -105,8 +105,6 @@ const GetInfoPac = async (nro, set, token, sede) => {
             ...res,
             fechaNacimiento: formatearFechaCorta(res.fechaNac ?? ""),
             edad: res.edad + " AÑOS",
-            ocupacion: res.areaO ?? "",
-            cargoDesempenar: res.cargo ?? "",
         }));
     }
 };

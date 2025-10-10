@@ -39,6 +39,8 @@ export default function InformePsicologico() {
         nivelEstudios: "",
 
         // Datos Laborales
+        empresa: "",
+        contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
 
@@ -341,7 +343,6 @@ export default function InformePsicologico() {
                             {/* Contenido principal */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-2">Datos Necesarios</h4>
-
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     {/* Columna Izquierda */}
                                     <div className="space-y-3">
@@ -349,7 +350,6 @@ export default function InformePsicologico() {
                                             label="Nombres"
                                             name="nombres"
                                             value={form.nombres}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -357,7 +357,6 @@ export default function InformePsicologico() {
                                             label="Apellidos"
                                             name="apellidos"
                                             value={form.apellidos}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -365,7 +364,6 @@ export default function InformePsicologico() {
                                             label="Fecha Nacimiento"
                                             name="fechaNacimiento"
                                             value={form.fechaNacimiento}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -373,7 +371,6 @@ export default function InformePsicologico() {
                                             label="Lugar Nacimiento"
                                             name="lugarNacimiento"
                                             value={form.lugarNacimiento}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -385,7 +382,6 @@ export default function InformePsicologico() {
                                             label="Domicilio Actual"
                                             name="domicilioActual"
                                             value={form.domicilioActual}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -393,7 +389,6 @@ export default function InformePsicologico() {
                                             label="Edad"
                                             name="edad"
                                             value={form.edad}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -401,7 +396,6 @@ export default function InformePsicologico() {
                                             label="Estado Civil"
                                             name="estadoCivil"
                                             value={form.estadoCivil}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -409,7 +403,6 @@ export default function InformePsicologico() {
                                             label="Nivel Estudios"
                                             name="nivelEstudios"
                                             value={form.nivelEstudios}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -422,10 +415,23 @@ export default function InformePsicologico() {
 
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <InputTextOneLine
+                                        label="Empresa"
+                                        name="empresa"
+                                        value={form.empresa}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Contrata"
+                                        name="contrata"
+                                        value={form.contrata}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
                                         label="Ocupación"
                                         name="ocupacion"
                                         value={form.ocupacion}
-                                        onChange={handleChange}
                                         disabled
                                         labelWidth="120px"
                                     />
@@ -433,7 +439,6 @@ export default function InformePsicologico() {
                                         label="Cargo Desempeñar"
                                         name="cargoDesempenar"
                                         value={form.cargoDesempenar}
-                                        onChange={handleChange}
                                         disabled
                                         labelWidth="120px"
                                     />
