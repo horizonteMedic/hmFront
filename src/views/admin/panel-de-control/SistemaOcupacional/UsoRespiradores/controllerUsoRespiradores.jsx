@@ -7,7 +7,6 @@ import {
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
 
-// Endpoints (configurados por backend). Mantener cadena vacía si aún no existen
 const obtenerReporteUrl = "/api/v01/ct/respiradores/obtenerReporteRespiradores";
 const registrarUrl = "/api/v01/ct/respiradores/registrarActualizarRespiradores";
 
@@ -52,8 +51,8 @@ export const GetInfoServicioEditar = async (
             ...prev,
             // Header
             norden: res.norden ?? "",
-            codigoRespiradores: res.datosRespiradores?.codigoRespiradores_cod_respiradores ?? null,
-            fechaExam: res.datosRespiradores?.fechaExamen_fecha_examen ?? today,
+            codigoRespiradores: res.datosRespiradores?.codigoRespiradores_cod_respiradores,
+            fechaExam: res.datosRespiradores?.fechaExamen_fecha_examen ?? "",
             tipoExamen: res.nombreExamen ?? "",
             // Datos personales
             nombres: res.nombresPaciente ?? "",
@@ -63,10 +62,8 @@ export const GetInfoServicioEditar = async (
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
             // Campos usados por la interfaz principal
-            puestoPostula: res.cargoPaciente ?? "", //revisar
-            puestoActual: res.cargoPaciente ?? "", //revisar
-
-            dniUsuario: userCompleto?.datos?.dni_user ?? "",
+            puestoPostula: res.cargoPaciente ?? "",
+            puestoActual: res.ocupacionPaciente ?? "",
 
             // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
             vcOD: res.visioncercasincorregirodVCercaSOd ?? "",
@@ -84,10 +81,19 @@ export const GetInfoServicioEditar = async (
 
             // ====================== LUGAR DE TRABAJO ======================
             // Tipo de respirador(es) a utilizar
-            respiradorMascaraPolvo: res.datosRespiradores?.mascaraPolvo_chk_1 ?? true,
-            respiradorMediaCara: res.datosRespiradores?.mediaCara_chk_2 ?? true,
+            respiradorMascaraPolvo: res.datosRespiradores?.mascaraPolvo_chk_1 ?? false,
+            respiradorMediaCara: res.datosRespiradores?.mediaCara_chk_2 ?? false,
             respiradorCaraCompleta: res.datosRespiradores?.caraCompleta_chk_3 ?? false,
-            tipoRespiradorTipo: "PURIFICADOR_SIN_ENERGIA", //revisar - mapear según checkboxes de purificador
+            tipoRespiradorTipo:
+                res.datosRespiradores?.purificadorAireSinEnergia_chk_4 ? "PURIFICADOR_SIN_ENERGIA" :
+                    res.datosRespiradores?.purificadorAireConEnergia_chk_5 ? "PURIFICADOR_CON_ENERGIA" :
+                        res.datosRespiradores?.respiradorSuministradorAtmosfera_chk_6 ? "SUMINISTRADOR_ATMOSFERA" :
+                            res.datosRespiradores?.combinacionScba_chk_7 ? "COMBINACION_LINEA_AIRE_SCBA" :
+                                res.datosRespiradores?.respiradorFlujoContinuo_chk_8 ? "FLUJO_CONTINUO" :
+                                    res.datosRespiradores?.respiradorSuministradorAire_chk_9 ? "SUMINISTRO_AIRE" :
+                                        res.datosRespiradores?.scbaCircuitoAbierto_chk_10 ? "SCBA_CIRCUITO_ABIERTO" :
+                                            res.datosRespiradores?.scbaCircuitoCerrado_chk_11 ? "SCBA_CIRCUITO_CERRADO" :
+                                                "",
 
             // Tipo de Protección
             tipoProteccion: "FILTRO_HEPA", //revisar - mapear según filtroHepa_chk_12 y otros cartuchos
@@ -377,8 +383,7 @@ export const SubmitDataService = async (
         tosSangreSi: form.sintTosConSangre,
         tosSangreNo: !form.sintTosConSangre,
         silbidoPechoRespiraSi: form.sintSilbidosPecho,
-        silbidoPechoRespiraNo: !form.sintSilbidosPecho,
-        dolorPechoRespiraProfundamenteSi: form.sintDolorPechoRespira,
+        silbidoPechoRespiraNo: !form.sintSilbidosPecho, dolorPechoRespiraProfundamenteSi: form.sintDolorPechoRespira,
         dolorPechoRespiraProfundamenteNo: !form.sintDolorPechoRespira,
         personalEmpleado1Otros4Si: form.sintOtros,
         personalEmpleado1Otros4No: !form.sintOtros,

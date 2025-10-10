@@ -21,6 +21,7 @@
     "mascaraPolvo_chk_1": true,
     "mediaCara_chk_2": true,
     "caraCompleta_chk_3": true,
+    
     "purificadorAireSinEnergia_chk_4": true,
     "purificadorAireConEnergia_chk_5": true,
     "respiradorSuministradorAtmosfera_chk_6": true,
@@ -29,6 +30,7 @@
     "respiradorSuministradorAire_chk_9": true,
     "scbaCircuitoAbierto_chk_10": true,
     "scbaCircuitoCerrado_chk_11": true,
+
     "filtroHepa_chk_12": true,
     "cartuchosGasAcido_chk_13": true,
     "cartuchosVaporOrganico_chk_14": true,
