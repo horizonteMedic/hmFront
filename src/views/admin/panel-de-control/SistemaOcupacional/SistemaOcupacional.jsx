@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import RegistroClientes from "./Admision/RegistroClientes.jsx";
 import AperturaExamenesPreOcup from "./Admision/AperturaExamenes/AperturaExamenesPreOcup.jsx";
 import ImportacionModal from "./Admision/ImportacionMasiva.jsx";
@@ -7,7 +7,6 @@ import ReservaPacientes from "./Admision/ReservaPacientes.jsx";
 import ConsentimientoDigitalizacion from "./Admision/ConsentimientoDigitalizacion/ConsentimientoDigitalizacion.jsx";
 import Triaje from "./Triaje/Triaje";
 import Consentimientos from "./Laboratorio/Consentimientos/Consentimientos.jsx";
-import ExamenesLaboratorio from "./Laboratorio/ExamenesLaboratorio/ExamenesLaboratorio";
 import ParasitologiaCoprologico from "./Parasitologia/ParasitologiaCoprologico";
 import LaboratorioClinico from "./Laboratorio/LaboratorioClinico/LaboratorioClinico";
 import LaboratorioAnalisisBioquimicos from "./Laboratorio/laboratorio_analisis_bioquimicos/LaboratorioAnalisisBioquimicos";
@@ -64,7 +63,6 @@ import {
   faMountain,
   fa2,
   faCheckToSlot,
-  faFileMedicalAlt,
   fa1,
   fa6,
   faA,
@@ -107,6 +105,7 @@ import CertificadoMedicoOcupacional from "./CertificadoMedicoOcupacional/Certifi
 import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
 import SectionWithBack from "./SectionWithBack.jsx";
 import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
+import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicologica3.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -669,7 +668,7 @@ const TabComponent = () => {
                   />
                 )
               },
-              10: { title: "Modulo Psicologia", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
+              10: { title: "Modulo Psicología", child: <PsicologiaTabSelector listas={listasCombos} tieneVista={tieneVista} /> },
               12: { title: "Rayos X", child: <RayosXTabSelector tieneVista={tieneVista} /> },
               13: { title: undefined, child: <EKG /> },
               14: {
@@ -725,7 +724,7 @@ const TabComponent = () => {
               },
               22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
               23: { title: undefined, child: <Test_fatiga /> },
-              24: { title: "Playground", child: <h2>play</h2> },
+              24: { title: "FichaPsicologica3", child:  <FichaPsicologica3 /> },
               25: { title: undefined, child: <AntecedentesDeAltura /> },
               26: { title: "Anexo 2", child: <Anexo2 listas={listasCombos} /> },
               27: { title: "Anexo 16", child: <Anexo16 listas={listasCombos} /> },

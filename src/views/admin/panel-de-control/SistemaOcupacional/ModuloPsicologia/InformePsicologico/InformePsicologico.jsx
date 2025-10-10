@@ -9,14 +9,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
     InputTextOneLine,
-    InputsRadioGroup,
     InputTextArea,
     InputCheckbox,
+    InputsBooleanRadioGroup,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
-// import { GetExamenesRealizados, PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerInformePsicologico";
 
 const tabla = "informe_psicologico";
 const today = getToday();
@@ -27,6 +27,7 @@ export default function InformePsicologico() {
 
     const initialFormState = {
         norden: "",
+        codigoInforme: null,
         fechaEntrevista: today,
         nombres: "",
         apellidos: "",
@@ -92,7 +93,7 @@ export default function InformePsicologico() {
         recomendaciones: "",
 
         // Aprobó Test
-        aproboTest: "",
+        aproboTest: undefined,
     };
 
     const {
@@ -102,6 +103,7 @@ export default function InformePsicologico() {
         handleChangeNumber,
         handleRadioButton,
         handleClear,
+        handleRadioButtonBoolean,
         handleClearnotO,
         handlePrintDefault,
     } = useForm(initialFormState);
@@ -279,19 +281,21 @@ export default function InformePsicologico() {
 
     // Funciones temporales sin funcionalidad del controller
     const handleSave = () => {
-        console.log("Función de guardar comentada");
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            console.log("Función de búsqueda comentada");
+            handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
     const handlePrint = () => {
-        console.log("Función de impresión comentada");
+        handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
+        });
     };
-
     return (
         <div className="mx-auto bg-white overflow-hidden ">
             <div className="flex h-full">
@@ -326,11 +330,10 @@ export default function InformePsicologico() {
                                     />
                                     <div className="flex gap-4 items-center">
                                         <h4 className="font-semibold min-w-[120px] max-w-[120px]">Aprobó Test :</h4>
-                                        <InputsRadioGroup
-                                            options={[{ value: "SI", label: "Sí" }, { value: "NO", label: "No" }]}
+                                        <InputsBooleanRadioGroup
                                             name="aproboTest"
                                             value={form.aproboTest}
-                                            onChange={(e, value) => { handleRadioButton(e, value) }}
+                                            onChange={handleRadioButtonBoolean}
                                         />
                                     </div>
                                 </div>

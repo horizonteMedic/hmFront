@@ -48,9 +48,11 @@ export default function B_FichaDetencionSAS2(data = {}) {
       no: false,
       aplica: true
     },
+    medicacionRiesgo: "",
     polisomnografia: {
-      si: false,
-      no: true,
+      si: true,
+      no: false,
+      fecha: "17/10/2025",
       aplica: false
     },
     choqueVehiculo: {
@@ -189,9 +191,11 @@ export default function B_FichaDetencionSAS2(data = {}) {
       no: Boolean(data.htaNo_rbhtano ?? false),
       aplica: false //revisar
     },
+    medicacionRiesgo: String(data.medicacionRiesgo_txtriesgo ?? ""),
     polisomnografia: {
-      si: Boolean(data.psgSi_rbpsgsi ?? false),
-      no: Boolean(data.psgNo_rbpsgno ?? false),
+      si: Boolean(data.polisomnografiaSi_rbpsgsi ?? false),
+      no: Boolean(data.polisomnografiaNo_rbpsgno ?? false),
+      fecha: formatearFechaCorta(data.fechaUltimaPolisomnografia_fechapsg ?? ""),
       aplica: false //revisar
     },
     choqueVehiculo: {
@@ -474,15 +478,15 @@ export default function B_FichaDetencionSAS2(data = {}) {
     const match = texto.match(/^(Criterio [A-Z0-9]+:)(.*)$/);
     if (match) {
       const [, criterio, restoTexto] = match;
-      
+
       // Dibujar criterio en negrita
       doc.setFont("helvetica", "bold").setFontSize(8);
       doc.text(criterio, x, y);
-      
+
       // Calcular posición para el resto del texto
       const anchoCriterio = doc.getTextWidth(criterio);
       const xResto = x + anchoCriterio;
-      
+
       // Dibujar resto del texto en normal
       doc.setFont("helvetica", "normal").setFontSize(8);
       dibujarTextoConSaltoLinea(restoTexto.trim(), xResto, y, anchoMaximo - anchoCriterio);
@@ -599,11 +603,15 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
   yPos += filaAltura;
 
-  // Décima fila: HTA (4 columnas)
+  // Décima fila: HTA (4 columnas) - Divisiones independientes movidas 15 puntos a la izquierda
+  const htaDiv1 = tablaInicioX + 15;  // 40 - 15 = 25
+  const htaDiv2 = tablaInicioX + 40;  // 90 - 15 = 75
+  const htaDiv3 = tablaInicioX + 80; // 132 - 15 = 117
+  
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-  doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // Primera división
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura); // Segunda división
-  doc.line(tablaInicioX + 132, yPos, tablaInicioX + 132, yPos + filaAltura); // Tercera división
+  doc.line(htaDiv1, yPos, htaDiv1, yPos + filaAltura); // Primera división
+  doc.line(htaDiv2, yPos, htaDiv2, yPos + filaAltura); // Segunda división
+  doc.line(htaDiv3, yPos, htaDiv3, yPos + filaAltura); // Tercera división
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
@@ -917,7 +925,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.text("Edad :", tablaInicioX + 94, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text(datosFinales.edad + " Años", tablaInicioX + 105, yTexto + 1);
-  
+
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tipo de licencia :", tablaInicioX + 135, yTexto + 1);
@@ -1014,17 +1022,19 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   const htaSiTexto = crearCheckboxFijo(datosFinales.hta.si, "Si");
   const htaNoTexto = crearCheckboxFijo(datosFinales.hta.no, "No");
-  doc.text(htaSiTexto, tablaInicioX + 47, yTexto + 1);
-  doc.text(htaNoTexto, tablaInicioX + 70, yTexto + 1);
+  doc.text(htaSiTexto, htaDiv1 + 2, yTexto + 1);
+  doc.text(htaNoTexto, htaDiv1 + 12, yTexto + 1);
 
-  // Tercera columna: "Medicación:"
+  // Tercera columna: "Medicación:" con texto dinámico
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Medicación :", tablaInicioX + 94, yTexto + 1);
+  doc.text("Medicación (Riesgo >2):", htaDiv2 + 2, yTexto + 1);
 
-  // Cuarta columna: Aplica/No Aplica
+  // Cuarta columna: Texto de medicación de riesgo
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const htaAplicaTexto = datosFinales.hta.aplica ? "APLICA" : "NO APLICA";
-  doc.text(htaAplicaTexto, tablaInicioX + 135, yTexto + 1);
+  const medicacionRiesgoTexto = datosFinales.medicacionRiesgo || "";
+  if (medicacionRiesgoTexto) {
+    doc.text(medicacionRiesgoTexto, htaDiv3 + 2, yTexto + 1);
+  }
   yTexto += filaAltura;
 
   // Duodécima fila: Polisomnografía (4 columnas con divisiones diferentes)
@@ -1043,10 +1053,12 @@ export default function B_FichaDetencionSAS2(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Fecha de última PSG", tablaInicioX + 103, yTexto + 1);
 
-  // Cuarta columna: Aplica/No Aplica
+  // Cuarta columna: Mostrar fecha real si polisomnografia.si es true, sino mostrar "NO APLICA"
   doc.setFont("helvetica", "normal").setFontSize(8);
-  const polisomnografiaAplicaTexto = datosFinales.polisomnografia.aplica ? "APLICA" : "NO APLICA";
-  doc.text(polisomnografiaAplicaTexto, tablaInicioX + 142.5, yTexto + 1);
+  const fechaPolisomnografia = datosFinales.polisomnografia.si 
+    ? datosFinales.polisomnografia.fecha 
+    : "NO APLICA";
+  doc.text(fechaPolisomnografia, tablaInicioX + 142.5, yTexto + 1);
   yTexto += filaAltura;
 
   // Decimotercera fila: Antecedente de Choque de vehículo (4 columnas con divisiones diferentes)
@@ -1265,7 +1277,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Vigésima novena fila: Accidente no debido a somnolencia
   doc.setFont("helvetica", "normal").setFontSize(8);
-    dibujarTextoConSaltoLinea("Accidente no debido a somnolencia (información suficiente que descarta somnolencia)", tablaInicioX + 7, yTexto + 1, anchoDisponibleCriterio2);
+  dibujarTextoConSaltoLinea("Accidente no debido a somnolencia (información suficiente que descarta somnolencia)", tablaInicioX + 7, yTexto + 1, anchoDisponibleCriterio2);
   const clasificacion5SiTexto = datosFinales.clasificacionChoques.accidenteNoDebidoSomnolencia ? "X" : "";
   const clasificacion5NoTexto = !datosFinales.clasificacionChoques.accidenteNoDebidoSomnolencia ? "X" : "";
   doc.text(clasificacion5SiTexto, tablaInicioX + 160, yTexto + 1);
@@ -1507,7 +1519,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
   // Tercera fila: Presión arterial (mapeada)
   doc.setFont("helvetica", "normal").setFontSize(8);
   doc.text("P. Sistólica :", tablaExamenInicioX + 2, yTextoExamen + 1);
-  doc.text(datosFinales.presionSistolica, tablaExamenInicioX + 20, yTextoExamen + 1);
+  doc.text(datosFinales.presionSistolica + " mmHg.", tablaExamenInicioX + 20, yTextoExamen + 1);
 
   doc.text("P. Diastólica :", tablaExamenInicioX + 52, yTextoExamen + 1);
   doc.text(datosFinales.presionDiastolica + " mmHg.", tablaExamenInicioX + 70, yTextoExamen + 1);
@@ -1602,11 +1614,11 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Primera fila: RIESGO ALTO (Criterio A o B positivo) con SI/NO
   const alturaFilaRiesgoAlto = filaAltura; // Fila compacta
-  
+
   // Fondo rojo para RIESGO ALTO
   doc.setFillColor(255, 200, 200); // Rojo claro
   doc.rect(tablaCriteriosInicioX, yCriterios, tablaCriteriosAncho, alturaFilaRiesgoAlto, 'F');
-  
+
   doc.line(tablaCriteriosInicioX, yCriterios, tablaCriteriosInicioX, yCriterios + alturaFilaRiesgoAlto);
   doc.line(tablaCriteriosInicioX + 155, yCriterios, tablaCriteriosInicioX + 155, yCriterios + alturaFilaRiesgoAlto); // División para SI/NO
   doc.line(tablaCriteriosInicioX + 167.5, yCriterios, tablaCriteriosInicioX + 167.5, yCriterios + alturaFilaRiesgoAlto); // División entre SI y NO
@@ -1648,7 +1660,7 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Labels SI/NO
   doc.setFont("helvetica", "normal").setFontSize(8);
-  
+
   doc.text("SI", tablaCriteriosInicioX + 160, yTextoCriterios + 2);
   doc.text("NO", tablaCriteriosInicioX + 172, yTextoCriterios + 2);
   yTextoCriterios += alturaFilaRiesgoAlto;
@@ -1703,11 +1715,11 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Fila: RIESGO MEDIO (Criterio C, D o E positivo)
   const alturaFilaRiesgoMedio = filaAltura;
-  
+
   // Fondo amarillo para RIESGO MEDIO
   doc.setFillColor(255, 255, 200); // Amarillo claro
   doc.rect(tablaCriteriosInicioX, yCriterios, tablaCriteriosAncho, alturaFilaRiesgoMedio, 'F');
-  
+
   doc.line(tablaCriteriosInicioX, yCriterios, tablaCriteriosInicioX, yCriterios + alturaFilaRiesgoMedio);
   doc.line(tablaCriteriosInicioX + 155, yCriterios, tablaCriteriosInicioX + 155, yCriterios + alturaFilaRiesgoMedio);
   doc.line(tablaCriteriosInicioX + 167.5, yCriterios, tablaCriteriosInicioX + 167.5, yCriterios + alturaFilaRiesgoMedio);
@@ -1855,11 +1867,11 @@ export default function B_FichaDetencionSAS2(data = {}) {
 
   // Fila: RIESGO BAJO
   const alturaFilaRiesgoBajo = filaAltura;
-  
+
   // Fondo verde para RIESGO BAJO
   doc.setFillColor(200, 255, 200); // Verde claro
   doc.rect(tablaCriteriosInicioX, yCriterios, tablaCriteriosAncho, alturaFilaRiesgoBajo, 'F');
-  
+
   doc.line(tablaCriteriosInicioX, yCriterios, tablaCriteriosInicioX, yCriterios + alturaFilaRiesgoBajo);
   doc.line(tablaCriteriosInicioX + 155, yCriterios, tablaCriteriosInicioX + 155, yCriterios + alturaFilaRiesgoBajo);
   doc.line(tablaCriteriosInicioX + 167.5, yCriterios, tablaCriteriosInicioX + 167.5, yCriterios + alturaFilaRiesgoBajo);

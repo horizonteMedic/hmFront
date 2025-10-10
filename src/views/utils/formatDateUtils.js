@@ -2,7 +2,18 @@ import { parse, format } from "date-fns";
 import { es } from "date-fns/locale";
 
 export function formatearFechaCorta(fechaStr) {//INPUT 2025-01-28 //OUTPUT 28/01/2025
-    return fechaStr ? format(parse(fechaStr, "yyyy-MM-dd", new Date()), "dd/MM/yyyy") : "";
+    if (!fechaStr || fechaStr.trim() === "") return "";
+    
+    try {
+        const parsedDate = parse(fechaStr, "yyyy-MM-dd", new Date());
+        if (isNaN(parsedDate.getTime())) {
+            return "";
+        }
+        return format(parsedDate, "dd/MM/yyyy");
+    } catch (error) {
+        console.warn("Error formateando fecha:", fechaStr, error);
+        return "";
+    }
 }
 export function formatearFechaLarga(fechaStr) {//INPUT 2025-01-28 //OUTPUT 28 de enero de 2025
     return fechaStr

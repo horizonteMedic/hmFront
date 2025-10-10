@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/UsoRespiradores/UsoRespiradores.jsx"
+import Ficha from "./views/jaspers/ModuloPsicologia/FichaAnexo3/FichaPsicologicaOcupacional_Digitalizado"
 
 const App = () => {
   return (

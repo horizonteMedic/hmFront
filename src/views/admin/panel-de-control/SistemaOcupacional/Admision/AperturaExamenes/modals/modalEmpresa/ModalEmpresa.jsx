@@ -206,6 +206,7 @@ const ModalEmpresa = ({
               className={`border rounded px-2 py-1 flex-1 ${
                 habilitar ? "bg-slate-300" : "bg-white"
               }`}
+              onPaste={(e) => {Swal.fire("Error", "No se permite pegar el RUC, DEBE DIGITARSE", "error");e.preventDefault()}} // 🔒 Evita pegar texto
               maxLength={11}
               disabled={habilitar}
               required

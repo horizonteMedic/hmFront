@@ -15,7 +15,7 @@ import {
   InputTextArea,
 } from "../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../hooks/useForm";
-import { getToday } from "../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear } from "../../../../utils/helpers";
 import { useSessionData } from "../../../../hooks/useSessionData";
 import LugarDeTrabajo from "./TabsUsoRespiradores/LugarDeTrabajo";
 import PersonalEmpleadoI from "./TabsUsoRespiradores/PersonalEmpleadoI";
@@ -37,6 +37,7 @@ export default function UsoRespiradores() {
   const initialFormState = {
     // Header
     norden: "",
+    codigoRespiradores: null,
     fechaExam: today,
     tipoExamen: "",
     // Datos personales
@@ -49,6 +50,8 @@ export default function UsoRespiradores() {
     // Campos usados por la interfaz principal
     puestoPostula: "",
     puestoActual: "",
+
+    dniUsuario: userCompleto?.datos?.dni_user ?? "",
 
     // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
     vcOD: "",
@@ -205,6 +208,7 @@ export default function UsoRespiradores() {
     probGenDificultadMoverBrazosPiernas: false,
     probGenDolorRigidezCintura: false,
     probGenDificultadMoverCabezaArribaAbajo: false,
+    probGenDificultadMoverCabezaLadoALado: false,
     probGenDificultadDoblarRodillas: false,
     probGenDificultadCuclillas: false,
     probGenSubirEscaleras: false,
@@ -235,12 +239,10 @@ export default function UsoRespiradores() {
     equipoMatpelEmergencias: false,
 
     // ====================== TAB 6 FINAL AUTORIZACION======================
+    supervisor: "DESCONOCIDO",
     claseAutorizacion: "CLASE_I",
-    claseIIEmergenciaEscape: false,
-    claseIISoloPAPR: false,
-    claseIINoSBCA: false,
-    claseIIOtros: false,
-    fechaExpiraAutorizacion: today,
+    claseIIOpcion: "",
+    fechaExpiraAutorizacion: getTodayPlusOneYear(),
   };
 
   const {

@@ -1,15 +1,21 @@
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
-import { InputCheckbox, InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
+import { InputTextOneLine } from "../../../../../components/reusableComponents/ResusableComponents";
 
 export default function FinalAutorizacion({ form, setForm, handleChange, handleCheckBoxChange, handleRadioButton, handleChangeSimple }) {
   return (
     <div className="space-y-6 text-[11px]">
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h4 className="text-lg font-semibold text-gray-800 mb-2">Autorización para el uso de Respiradores</h4>
-        <p className=" text-gray-600 mb-4">
-          Seleccione la clase de autorización y, si corresponde, las restricciones para el uso del respirador.
-        </p>
-
+        <div className="bg-orange-100 border border-orange-300 text-orange-900 rounded-md p-3 mb-4">
+           El trabajador mencionado ha sido examinado en el ajuste del respirador de conformidad con el Estándar de Barrick de Protección Respiratoria. Esta evaluación limitada es especificada para el uso del respirador solamente. Basado en mis hallazgos he determinado que la persona:
+       </div>
+        <InputTextOneLine
+          label="Supervisor"
+          name="supervisor"
+          value={form?.supervisor}
+          onChange={handleChange}
+          className="mb-4"
+        />
         <div className="grid grid-cols-2">
           {/* Clasificación por clases */}
           <div className="mb-6">
@@ -25,6 +31,7 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleC
                   claseIISoloPAPR: false,
                   claseIINoSBCA: false,
                   claseIIOtros: false,
+                  claseIIOpcion: "",
                 }));
                 handleRadioButton(e, value)
               }}
@@ -42,30 +49,19 @@ export default function FinalAutorizacion({ form, setForm, handleChange, handleC
             <div className="mb-6">
               <p className=" font-bold mb-3">Uso condicional (seleccione las restricciones específicas):</p>
               <div className="grid grid-cols-1 gap-3">
-                <InputCheckbox
-                  label="A ser utilizados en respuestas a emergencia o para escape solamente"
-                  name="claseIIEmergenciaEscape"
-                  checked={form?.claseIIEmergenciaEscape}
-                  onChange={handleCheckBoxChange}
+                <InputsRadioGroup
+                  name="claseIIOpcion"
+                  vertical
+                  value={form?.claseIIOpcion}
+                  onChange={handleRadioButton}
+                  options={[
+                    { label: "A ser utilizados en respuestas a emergencia o para escape solamente", value: "EMERGENCIA" },
+                    { label: "Solo PAPR", value: "PAPR" },
+                    { label: "No SBCA", value: "NO_SBCA" },
+                    { label: "Otros", value: "OTROS" },
+                  ]}
                 />
-                <InputCheckbox
-                  label="Solo PAPR"
-                  name="claseIISoloPAPR"
-                  checked={form?.claseIISoloPAPR}
-                  onChange={handleCheckBoxChange}
-                />
-                <InputCheckbox
-                  label="No SBCA"
-                  name="claseIINoSBCA"
-                  checked={form?.claseIINoSBCA}
-                  onChange={handleCheckBoxChange}
-                />
-                <InputCheckbox
-                  label="Otros"
-                  name="claseIIOtros"
-                  checked={form?.claseIIOtros}
-                  onChange={handleCheckBoxChange}
-                />
+
               </div>
             </div>
           )}

@@ -90,9 +90,6 @@ export default function FichaCertificadoAltura() {
         hipoacusiaFrecuenciasConversacionales: false,
         alteracionAgudezaVisual: false,
         campimetriaAnormal: false,
-        pruebaVisionProfundidadAlterada: false,
-        testSASAnormal: false,
-        evaluacionPsicosensometricaAlterada: false,
 
         // Otros Datos de Relevancia
         medicinasTomando: "",
@@ -150,12 +147,14 @@ export default function FichaCertificadoAltura() {
         setForm,
         handleChange,
         handleChangeNumber,
+        handlePrintDefault,
+        handleClearnotO,
         handleRadioButton,
         handleChangeSimple,
         handleRadioButtonBoolean,
         handleCheckBoxChange,
         handleClear,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "fichaCertificadoAltura" });
 
     // Mapeo de textos para Recomendaciones vinculadas a los checkboxes
     const recomendacionesTextMap = {

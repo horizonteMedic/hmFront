@@ -1,0 +1,41 @@
+{
+  "dniPaciente": 0,
+  "nombresPaciente": "string",
+  "apellidosPaciente": "string",
+  "direccionPaciente": "string",
+  "sexoPaciente": "string",
+  "fechaNacimientoPaciente": "2025-10-07",
+  "ocupacionPaciente": "string",
+  "lugarNacimientoPaciente": "string",
+  "nivelEstudioPaciente": "string",
+  "estadoCivilPaciente": "string",
+  "cargoPaciente": "string",
+  "areaPaciente": "string",
+  "contrata": "string",
+  "norden": 0,
+  "empresa": "string",
+  "nombreExamen": "string",
+  "codigoClinica": "string",
+  "edadPaciente": "string",
+  "fechaEntrevista": "2025-10-07",
+  "areaIntelectual": "string",
+  "areaPersonalidad": "string",
+  "areaOrganicidad": "string",
+  "areaPsicomotricidad": "string",
+  "recomendaciones": "string",
+  "aprobo": true,
+  "desaprobo": true,
+  "codigoInforme": 0,
+  "nombreSede": "string",
+  "sede": "string",
+  "color": 0,
+  "nameJasper": "string",
+  "textoColor": "string",
+  "codigoColor": "string",
+  "digitalizacion": [
+    {
+      "nombreDigitalizacion": "string",
+      "url": "string"
+    }
+  ]
+}
