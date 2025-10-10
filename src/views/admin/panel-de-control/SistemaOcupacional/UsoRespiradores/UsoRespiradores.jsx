@@ -37,6 +37,7 @@ export default function UsoRespiradores() {
   const initialFormState = {
     // Header
     norden: "",
+    codigoRespiradores: null,
     fechaExam: today,
     tipoExamen: "",
     // Datos personales
@@ -49,6 +50,8 @@ export default function UsoRespiradores() {
     // Campos usados por la interfaz principal
     puestoPostula: "",
     puestoActual: "",
+
+    dniUsuario: userCompleto?.datos?.dni_user ?? "",
 
     // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
     vcOD: "",
@@ -205,6 +208,7 @@ export default function UsoRespiradores() {
     probGenDificultadMoverBrazosPiernas: false,
     probGenDolorRigidezCintura: false,
     probGenDificultadMoverCabezaArribaAbajo: false,
+    probGenDificultadMoverCabezaLadoALado: false,
     probGenDificultadDoblarRodillas: false,
     probGenDificultadCuclillas: false,
     probGenSubirEscaleras: false,
