@@ -28,6 +28,31 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             norden: res.norden ?? "",
+            tipoExamen: res.nombreExamen ?? "",
+            // Datos personales
+            nombres: res.nombresPaciente ?? "",
+            dni: res.dniPaciente ?? "",
+            edad: String((res.edadPaciente ?? "") + " AÑOS"),
+            sexo: res.sexoPaciente ?? "",
+            empresa: res.empresa ?? "",
+            contrata: res.contrata ?? "",
+            // Campos usados por la interfaz principal
+            puestoPostula: res.cargoPaciente ?? "",
+            puestoActual: res.ocupacionPaciente ?? "",
+
+            // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
+            vcOD: res.visioncercasincorregirodVCercaSOd ?? "",
+            vlOD: res.visionlejossincorregirodVLejosSOd ?? "",
+            vcOI: res.visioncercasincorregiroiVCercaSOi ?? "",
+            vlOI: res.visionlejossincorregiroiVLejosSOi ?? "",
+            vcCorregidaOD: res.oftalodccmologiaOdcc ?? "",
+            vlCorregidaOD: res.odlcoftalmologiaOdlc ?? "",
+            vcCorregidaOI: res.oiccoftalmologiaOicc ?? "",
+            vlCorregidaOI: res.oilcoftalmologiaOilc ?? "",
+            vclrs: res.vcoftalmologiaVc ?? "",
+            vb: res.vboftalmologiaVb ?? "",
+            rp: res.rpoftalmologiaRp ?? "",
+            enfermedadesOculares: res.enfermedadesocularesoftalmoEOculares ?? "",
         }));
     }
 };
@@ -57,7 +82,7 @@ export const GetInfoServicioEditar = async (
             // Datos personales
             nombres: res.nombresPaciente ?? "",
             dni: res.dniPaciente ?? "",
-            edad: res.edadPaciente ?? "",
+            edad: String((res.edadPaciente ?? "") + " AÑOS"),
             sexo: res.sexoPaciente ?? "",
             empresa: res.empresa ?? "",
             contrata: res.contrata ?? "",
@@ -94,15 +119,27 @@ export const GetInfoServicioEditar = async (
                                         res.datosRespiradores?.scbaCircuitoAbierto_chk_10 ? "SCBA_CIRCUITO_ABIERTO" :
                                             res.datosRespiradores?.scbaCircuitoCerrado_chk_11 ? "SCBA_CIRCUITO_CERRADO" :
                                                 "",
-
             // Tipo de Protección
-            tipoProteccion: "FILTRO_HEPA", //revisar - mapear según filtroHepa_chk_12 y otros cartuchos
+            tipoProteccion:
+                res.datosRespiradores?.filtroHepa_chk_12 ? "FILTRO_HEPA" :
+                    res.datosRespiradores?.cartuchosGasAcido_chk_13 ? "CARTUCHO_GAS_ACIDO" :
+                        res.datosRespiradores?.cartuchosVaporOrganico_chk_14 ? "CARTUCHO_VAPOR_ORGANICO" :
+                            res.datosRespiradores?.cartuchosAmoniaco_chk_15 ? "CARTUCHO_AMONIACO" :
+                                res.datosRespiradores?.cartuchosMercurio_chk_16 ? "CARTUCHO_MERCURIO" : "",
 
             // Esfuerzo físico esperado requerido
-            esfuerzoFisico: "MODERADO", //revisar - mapear según esfuerzoFisicoLigero_chk_17, esfuerzoFisicoModerado_chk_18, esfuerzoFisicoPesado_chk_19
+            esfuerzoFisico:
+                res.datosRespiradores?.esfuerzoFisicoLigero_chk_17 ? "LIGERO" :
+                    res.datosRespiradores?.esfuerzoFisicoModerado_chk_18 ? "MODERADO" :
+                        res.datosRespiradores?.esfuerzoFisicoPesado_chk_19 ? "PESADO" : "",
 
             // Frecuencia de uso
-            frecuenciaUso: "DIARIO", //revisar - mapear según maneraDia_chk_20, ocasional_chk_21, raraVez_chk_22
+            frecuenciaUso:
+                res.datosRespiradores?.maneraDia_chk_20 ? "DIARIO" :
+                    res.datosRespiradores?.ocasional_chk_21 ? "OCASIONAL" :
+                        res.datosRespiradores?.raraVez_chk_22 ? "EMERGENCIA" : "",
+
+
             promedioHorasDia: res.datosRespiradores?.tiempoPromedioHoras_t_prom_horas ?? "",
 
             // Exposición de Materiales Peligros
@@ -260,9 +297,20 @@ export const GetInfoServicioEditar = async (
             equipoMatpelEmergencias: res.datosRespiradores?.equipoMatpelSi_chk_87_si ?? false,
 
             // ====================== TAB 6 FINAL AUTORIZACION======================
-            supervisor: res.datosRespiradores?.supervisor_m_supervisor ?? "DESCONOCIDO",
-            claseAutorizacion: "CLASE_I", //revisar - mapear según autorizacionClase1_chk_f_1, autorizacionClase2_chk_f_2, etc.
-            claseIIOpcion: "", //revisar
+            supervisor: res.datosRespiradores?.supervisor_m_supervisor ?? "",
+            claseAutorizacion:
+                res.datosRespiradores?.autorizacionClase1_chk_f_1 ? "CLASE_I" :
+                    res.datosRespiradores?.autorizacionClase2_chk_f_2 ? "CLASE_II" :
+                        res.datosRespiradores?.autorizacionClase3_chk_f_7 ? "CLASE_III" :
+                            res.datosRespiradores?.autorizacionClase4_chk_f_8 ? "CLASE_IV" :
+                                res.datosRespiradores?.autorizacionClase5_chk_f_9 ? "CLASE_V" : "",
+
+            claseIIOpcion:
+                res.datosRespiradores?.utilizadosRespuestaEmergencia_chk_f_3 ? "EMERGENCIA" :
+                    res.datosRespiradores?.soloPapr_chk_f_4 ? "PAPR" :
+                        res.datosRespiradores?.noSbca_chk_f_5 ? "NO_SBCA" :
+                            res.datosRespiradores?.autorizacionOtros_chk_f_6 ? "OTROS" : "",
+
             fechaExpiraAutorizacion: res.datosRespiradores?.fechaExpira_fecha_expira ?? getTodayPlusOneYear(),
         }));
     }
@@ -284,7 +332,7 @@ export const SubmitDataService = async (
         norden: form.norden,
         codigoRespiradores: form.codigoRespiradores,
         dniPaciente: form.dni,
-        edad: form.edad,
+        edad: form.edad.replace(" AÑOS", ""),
         fechaExamen: form.fechaExam,
         tiempoPromedioHoras: form.promedioHorasDia,
         mascaraPolvo: form.respiradorMascaraPolvo,
@@ -521,10 +569,10 @@ export const SubmitDataService = async (
         supervisor: form.supervisor,
         autorizacionClase1: form.claseAutorizacion === "CLASE_I",
         autorizacionClase2: form.claseAutorizacion === "CLASE_II",
-        utilizadosRespuestaEmergencia: form.claseAutorizacion === "EMERGENCIA",
+        utilizadosRespuestaEmergencia: form.claseIIOpcion === "EMERGENCIA",
         soloPapr: form.claseIIOpcion === "PAPR",
         noSbca: form.claseIIOpcion === "NO_SBCA",
-        autorizacionOtros: form.claseAutorizacion === "OTROS",
+        autorizacionOtros: form.claseIIOpcion === "OTROS",
         autorizacionClase3: form.claseAutorizacion === "CLASE_III",
         autorizacionClase4: form.claseAutorizacion === "CLASE_IV",
         autorizacionClase5: form.claseAutorizacion === "CLASE_V",
