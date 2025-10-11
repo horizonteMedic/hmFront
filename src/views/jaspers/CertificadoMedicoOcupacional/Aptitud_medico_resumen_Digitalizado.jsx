@@ -8,7 +8,7 @@ import drawColorBox from "../components/ColorBox.jsx";
 import footerTR from "../components/footerTR.jsx";
 
 export default function Aptitud_medico_resumen_Digitalizado({ data = {} }) {
-  useEffect(() => {
+  
     const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
     const pageW = doc.internal.pageSize.getWidth();
 
@@ -426,7 +426,6 @@ export default function Aptitud_medico_resumen_Digitalizado({ data = {} }) {
 
     // Imprimir
     imprimir(doc);
-  }, [data]);
 
   return null;
 }

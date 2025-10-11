@@ -177,55 +177,65 @@ export default function FichaInterconsulta() {
                     </div>
 
                     <div className="grid gap-4 mt-4 pt-4 border-t-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] items-center">
-                    {/* DNI */}
-                    <InputTextOneLine
-                        label="DNI:"
-                        labelWidth="40px"
-                        value={form.dniPaciente}
-                        disabled
-                        name="dniPaciente"
-                    />
+                        {/* DNI */}
+                        <InputTextOneLine
+                            label="DNI:"
+                            labelWidth="40px"
+                            value={form.dniPaciente}
+                            disabled
+                            name="dniPaciente"
+                        />
 
-                    {/* Nombres (debe expandirse más) */}
-                    <InputTextOneLine
-                        label="Nombres:"
-                        labelWidth="70px"
-                        value={form.nombres}
-                        name="nombres"
-                        disabled
-                        className="lg:col-span-2"
-                    />
+                        {/* Nombres (debe expandirse más) */}
+                        <InputTextOneLine
+                            label="Nombres:"
+                            labelWidth="70px"
+                            value={form.nombres}
+                            name="nombres"
+                            disabled
+                            className="lg:col-span-2"
+                        />
 
-                    {/* Sexo (campo pequeño) */}
-                    <InputTextOneLine
-                        label="Sexo:"
-                        labelWidth="40px"
-                        value={form.sexo}
-                        name="sexo"
-                        disabled
-                        className="max-w-[120px]"
-                        inputClassName="!w-[80px] text-center"
-                    />
+                        {/* Sexo (campo pequeño) */}
+                        <InputTextOneLine
+                            label="Sexo:"
+                            labelWidth="40px"
+                            value={form.sexo}
+                            name="sexo"
+                            disabled
+                            className="max-w-[120px]"
+                            inputClassName="!w-[80px] text-center"
+                        />
 
-                    {/* Fecha de nacimiento */}
-                    <InputTextOneLine
-                        label="Fecha de Nacimiento"
-                        value={form.fechaNacimientoPaciente}
-                        disabled
-                        name="fechaNacimientoPaciente"
-                    />
+                        {/* Fecha de nacimiento */}
+                        <InputTextOneLine
+                            label="Fecha de Nacimiento"
+                            value={form.fechaNacimientoPaciente}
+                            disabled
+                            name="fechaNacimientoPaciente"
+                        />
 
-                    {/* Edad (campo pequeño) */}
-                    <InputTextOneLine
-                        label="Edad:"
-                        labelWidth="40px"
-                        value={form.edadPaciente}
-                        disabled
-                        name="edadPaciente"
-                        className="max-w-[100px]"
-                        inputClassName="!w-[70px] text-center"
-                    />
+                        {/* Edad (campo pequeño) */}
+                        <InputTextOneLine
+                            label="Edad:"
+                            labelWidth="40px"
+                            value={form.edadPaciente}
+                            disabled
+                            name="edadPaciente"
+                            className="max-w-[100px]"
+                            inputClassName="!w-[70px] text-center"
+                        />
+                        
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                        <InputTextOneLine label="Emp. Contratista" value={form.contrata} disabled name="contrata" />
+                        <InputTextOneLine label="Empresa" value={form.empresa} disabled name="empresa" />
+                    </div>
+                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                        <InputTextOneLine label="Area de Trabajo" value={form.areaPaciente} disabled name="contrata" />
+                        <InputTextOneLine label="Puesto de Trabajo" value={form.cargoPaciente} disabled name="empresa" />
+                    </div>
+
                 </section>
                 <h1 className="text-blue-600 font-semibold ">Funciones Vitales</h1>
                 <section className="bg-white border border-gray-200 rounded-lg mt-0 p-4 w-full">
@@ -327,10 +337,6 @@ export default function FichaInterconsulta() {
                         </div>
                     </div>
                 </section>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-                    <InputTextOneLine label="Emp. Contratista" value={form.contrata} disabled name="contrata" />
-                    <InputTextOneLine label="Empresa" value={form.empresa} disabled name="empresa" />
-                </div>
 
                 <h1 className="text-blue-600 font-semibold ">Médico</h1>
                 <section className="bg-white border border-gray-200 rounded-lg mt-0 p-4 w-full">

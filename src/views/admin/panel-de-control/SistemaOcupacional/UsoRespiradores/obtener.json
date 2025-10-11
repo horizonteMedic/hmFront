@@ -21,7 +21,7 @@
     "mascaraPolvo_chk_1": true,
     "mediaCara_chk_2": true,
     "caraCompleta_chk_3": true,
-    
+
     "purificadorAireSinEnergia_chk_4": true,
     "purificadorAireConEnergia_chk_5": true,
     "respiradorSuministradorAtmosfera_chk_6": true,
@@ -36,12 +36,15 @@
     "cartuchosVaporOrganico_chk_14": true,
     "cartuchosAmoniaco_chk_15": true,
     "cartuchosMercurio_chk_16": true,
+
     "esfuerzoFisicoLigero_chk_17": true,
     "esfuerzoFisicoModerado_chk_18": true,
     "esfuerzoFisicoPesado_chk_19": true,
+
     "maneraDia_chk_20": true,
     "ocasional_chk_21": true,
     "raraVez_chk_22": true,
+
     "humoMetal_chk_23": true,
     "arsenico_chk_24": true,
     "plomo_chk_25": true,
@@ -255,10 +258,12 @@
     "supervisor_m_supervisor": "string",
     "autorizacionClase1_chk_f_1": true,
     "autorizacionClase2_chk_f_2": true,
+
     "utilizadosRespuestaEmergencia_chk_f_3": true,
     "soloPapr_chk_f_4": true,
-    "noSbca_chk_f_5": true,
+    "noSbca_chk_f_5": true,    
     "autorizacionOtros_chk_f_6": true,
+    
     "autorizacionClase3_chk_f_7": true,
     "autorizacionClase4_chk_f_8": true,
     "autorizacionClase5_chk_f_9": true,

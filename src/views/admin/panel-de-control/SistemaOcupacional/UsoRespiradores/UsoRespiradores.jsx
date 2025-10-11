@@ -304,7 +304,7 @@ export default function UsoRespiradores() {
                 name="norden"
                 value={form?.norden}
                 onChange={handleChangeNumber}
-                onKeyDown={handleSearch}
+                onKeyUp={handleSearch}
               />
               <InputTextOneLine
                 label="Fecha"

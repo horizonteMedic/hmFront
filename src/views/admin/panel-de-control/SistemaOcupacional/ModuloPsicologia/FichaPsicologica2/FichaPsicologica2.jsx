@@ -10,6 +10,7 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaPsicologica2";
+import Swal from "sweetalert2";
 
 const tabla = "ficha_psicologica_anexo02"
 const today = getToday()
@@ -32,6 +33,8 @@ export default function FichaPsicologica2() {
         nivelEstudios: "",
 
         // Datos laborales
+        empresa: "",
+        contrata: "",
         ocupacion: "",
         cargoDesempenar: "",
 
@@ -75,6 +78,14 @@ export default function FichaPsicologica2() {
     } = useForm(initialFormState);
 
     const handleSave = () => {
+        if (form.esApto === undefined) {
+            Swal.fire({
+                icon: "warning",
+                title: "Advertencia",
+                text: "Por favor, marque si es apto o no apto.",
+            });
+            return;
+        }
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
@@ -139,7 +150,6 @@ export default function FichaPsicologica2() {
                                             label="Nombres"
                                             name="nombres"
                                             value={form.nombres}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -147,7 +157,6 @@ export default function FichaPsicologica2() {
                                             label="Apellidos"
                                             name="apellidos"
                                             value={form.apellidos}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -155,7 +164,6 @@ export default function FichaPsicologica2() {
                                             label="Fecha Nacimiento"
                                             name="fechaNacimiento"
                                             value={form.fechaNacimiento}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -163,7 +171,6 @@ export default function FichaPsicologica2() {
                                             label="Lugar Nacimiento"
                                             name="lugarNacimiento"
                                             value={form.lugarNacimiento}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -175,7 +182,6 @@ export default function FichaPsicologica2() {
                                             label="Domicilio Actual"
                                             name="domicilioActual"
                                             value={form.domicilioActual}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -183,7 +189,6 @@ export default function FichaPsicologica2() {
                                             label="Edad"
                                             name="edad"
                                             value={form.edad}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -191,7 +196,6 @@ export default function FichaPsicologica2() {
                                             label="Estado Civil"
                                             name="estadoCivil"
                                             value={form.estadoCivil}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -199,7 +203,6 @@ export default function FichaPsicologica2() {
                                             label="Nivel Estudios"
                                             name="nivelEstudios"
                                             value={form.nivelEstudios}
-                                            onChange={handleChange}
                                             disabled
                                             labelWidth="120px"
                                         />
@@ -210,10 +213,23 @@ export default function FichaPsicologica2() {
                                 <h4 className="font-semibold mb-3">Datos Laborales</h4>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                                     <InputTextOneLine
+                                        label="Empresa"
+                                        name="empresa"
+                                        value={form.empresa}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
+                                        label="Contrata"
+                                        name="contrata"
+                                        value={form.contrata}
+                                        disabled
+                                        labelWidth="120px"
+                                    />
+                                    <InputTextOneLine
                                         label="Ocupación"
                                         name="ocupacion"
                                         value={form.ocupacion}
-                                        onChange={handleChange}
                                         disabled
                                         labelWidth="120px"
                                     />
@@ -221,7 +237,6 @@ export default function FichaPsicologica2() {
                                         label="Cargo Desempeñar"
                                         name="cargoDesempenar"
                                         value={form.cargoDesempenar}
-                                        onChange={handleChange}
                                         disabled
                                         labelWidth="120px"
                                     />

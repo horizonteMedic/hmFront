@@ -6,24 +6,23 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
-import { getToday } from "../../../../utils/helpers";
+import { getHoraActual, getToday } from "../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional";
 const registrarUrl =
     "/api/v01/ct/certificadoAptitudMedicoOcupacional/registrarActualizarCertificadoAptitudMedicoOcupacional";
 const today = getToday();
+
 export const GetInfoServicio = async (
     nro,
-    especialidad,
     tabla,
     set,
     token,
     onFinish = () => { }
 ) => {
-    const res = await GetInfoNoRegisterInterconsulta(
+    const res = await GetInfoServicioDefault(
         nro,
-        especialidad,
         tabla,
         token,
         obtenerReporteUrl,
@@ -35,12 +34,21 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
+            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: `${res.edadPaciente} AÑOS`,
+            dniPaciente: res.dniPaciente,
+            edadPaciente: res.edadPaciente,
+            nombreExamen: res.nombreExamen,
+            empresa: res.empresa,
+            contrata: res.contrata,
+            cargoPaciente: res.cargoPaciente,
+            ocupacionPaciente: res.ocupacionPaciente,
+            apto: "APTO",
             fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
-            apto: res.apto ? res.apto : false
+            fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
+            fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
+            nombreMedico: res.nombreMedico ? res.nombreMedico : prev.nombreMedico
+
         }));
     }
 };
@@ -69,8 +77,8 @@ export const GetInfoServicioEditar = async (
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: `${res.edadPaciente} AÑOS`,
-            dniUser: res.dniUsuario
-            
+            dniUser: res.dniUsuario,
+            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO"
         }));
     }
 };
@@ -89,22 +97,21 @@ export const SubmitDataService = async (
         return;
     }
     const body = {
-        "codigoFichaInterconsulta": form.codigoFichaInterconsulta ? form.codigoFichaInterconsulta : null,
         "norden": form.norden,
-        "fechaExamen": form.fechaExamen,
-        "edadPaciente": form.edadPaciente,
-        "dniUsuario": form.dniUser,
-        "especialidad": form.especialidad,
-        "motivo": form.motivo,
-        "hallazgo": form.hallazgo,
-        "diagnostico": form.diagnostico,
-        "tratamiento": form.tratamiento,
-        "apto": form.apto ? true : false,
-        "noApto": form.apto ? false : true
+        "dniPaciente": form.dniPaciente,
+        "fecha": form.fechaDesde,
+        "nombreMedico": form.nombreMedico,
+        "apto": form.apto === "APTO" ? true : false,
+        "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
+        "noApto": form.apto === "NOAPTO" ? true : false,
+        "horaSalida": getHoraActual(),
+        "fechaHasta": form.fechahasta,
+        "conclusiones": form.conclusiones,
+        "usuarioRegistro": user
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, form.especialidad, token, tabla, datosFooter);
+        PrintHojaR(form.norden, token, tabla, datosFooter);
     });
 };
 
@@ -114,17 +121,16 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, especialidad, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/FichaInterconsulta/*.jsx");
-    PrintHojaRFichaInterconsulta(
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
+    PrintHojaRDefault(
         nro,
-        especialidad,
         token,
         tabla,
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/FichaInterconsulta"
+        "../../../../jaspers/CertificadoMedicoOcupacional"
     );
 };
 
@@ -190,84 +196,149 @@ export const Loading = (mensaje) => {
     LoadingDefault(mensaje);
 };
 
-export const GetInfoServicioInterconsulta = async (
-    nro,
-    especialidad,
-    tabla,
-    token,
-    obtenerReporteUrl,
-    onFinish = () => { }
-) => {
-    try {
-        console.log('llegue a consultar causam',especialidad)
-        const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=false`,
-            token
-        );
-        if (res?.norden || res?.norden_n_orden||res?.n_orden) {
-            return res;
-        } else {
-            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
-            return null;
-        }
-    } catch (error) {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-        return null;
-    } finally {
-        onFinish();
-    }
-};
+export const valores = {
+  Check1: `- APTITUD
+- ANEXO 16
+- ANTECEDENTES ENFERMEDADES EN ALTURA
+- ANEXO 16-A
+- USO DE RESPIRADORES
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- MUSCULO ESQUELETICO
+- OIT
+- ESPIROMETRIA
+- AUDIOMETRIA
+- ODONTOLOGIA
+- PSICOLOGIA
+- AG. VISUAL
+- CONSENTIMIENTO INFORMADO
+- DECLARACION DE BUENA SALUD
+- COPIA DE DNI
 
-export const GetInfoNoRegisterInterconsulta = async (
-    nro,
-    especialidad,
-    tabla,
-    token,
-    obtenerReporteUrl,
-    onFinish = () => { }
-) => {
-    try {
-        const res = await getFetch(
-            `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=false`,
-            token
-        );
-        if (res?.norden || res?.norden_n_orden||res?.n_orden) {
-            return res;
-        } else {
-            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
-            return null;
-        }
-    } catch (error) {
-        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
-        return null;
-    } finally {
-        onFinish();
-    }
-};
+`,
 
-export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
+  Check2: `- APTITUD MÉDICA
+- ANEXO 16
+- ANTECEDENTES ENFERMEDADES EN ALTURA
+- ANEXO 16-A
+- PSICOSENSOMETRIA
+- CERTIFICADO DE CONDUCCION
+- FICHA SAS
+- USO DE RESPIRADORES
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- FICHA MUSCULO ESQUELETICO
+- OIT
+- ESPIROMETRIA
+- AUDIOMETRIA
+- ODONTOLOGIA
+- INFORME PSICOLOGICO
+- AGUDEZA VISUAL
+- DECLARACION DE BUENA SALUD
+- CONSENTIMIENTO INFORMADO
+- COPIA DE DNI
+- COPIA DE LICENCIA DE CONDUCIR
 
-    LoadingDefault("Cargando Formato a Imprimir");
+`,
 
-    getFetch(
-        `${obtenerReporteUrl}?nOrden=${nro}&especialidad=${especialidad}&nameService=${tabla}&esJasper=true`,
-        token
-    )
-        .then(async (res) => {
-            console.log(res)
-            if (res.norden || res.norden_n_orden|| res.n_orden) {
-                const nombre = res.nameJasper;
-                console.log(nombre)
-                const modulo = await jasperModules[
-                    `${nombreCarpeta}/${nombre}.jsx`
-                ]();
-                // Ejecuta la función exportada por default con los datos
-                if (typeof modulo.default === "function") {
-                    modulo.default({ ...res, ...datosFooter });
-                }
-            }
-        })
-        .finally(() => {
-            Swal.close();
-        });
+  Check3: `- APTITUD MÉDICA
+- ANEXO 16
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- FICHA MUSCULO ESQUELETICO
+- OIT
+- ESPIROMETRIA
+- AUDIOMETRIA
+- ODONTOLOGIA
+- AGUDEZA VISUAL
+- DECLARACION DE BUENA SALUD
+- CONSENTIMIENTO INFORMADO
+- COPIA DE DNI
+
+`,
+
+  Check4: `- APTITUD MÉDICA
+- ANEXO 16
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- FICHA MUSCULO ESQUELETICO
+- OIT
+- ESPIROMETRIA
+- AUDIOMETRIA
+- PSICOLOGIA
+- OFTALMOLOGIA
+- CONSENTIMIENTO INFORMADO
+- COPIA DE DNI
+
+`,
+
+  Check5: `- TEST CUALITATIVO: COLESTEROL Y TRIGLICÉRIDOS
+- APTITUD MÉDICA
+- ANEXO 16
+- ANT. ENFERMEDADES ALTURA
+- ANEXO 16 – A
+- CERT. DE SUFICIENCIA MEDICA PARA TRABAJO EN ALTURA
+- PSICOSENSOMETRICO
+- CERT. DE SUFICIENCIA MEDICA PARA CONDUCCION DE VEHICULO
+- FICHA S.A.S.
+- USO DE RESPIRADORES
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- FICHA MUSCULO ESQUELETICO
+- OIT
+- ESPIROMETRIA
+- EKG
+- ODONTOLOGIA
+- AUDIOMETRIA
+- OFTALMOLOGIA
+- PSICOLOGIA
+- CONSENTIMIENTO INFORMADO
+- COPIA DE DNI
+
+`,
+
+  Check6: `- APTITUD MÉDICA
+- ANEXO 16
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- FICHA MUSCULO ESQUELETICO
+- OIT
+- AUDIOMETRIA
+- OFTALMOLOGIA
+- CONSENTIMIENTO INFORMADO
+- COPIA DE DNI
+
+`,
+
+  Check7: `- TEST CUALITATIVO: COLESTEROL Y TRIGLICÉRIDOS
+- APTITUD MÉDICA
+- ANEXO 16
+- ANT. ENFERMEDADES ALTURA
+- ANEXO 16 – A
+- CERT. DE SUFICIENCIA MEDICA PARA TRABAJO EN ALTURA
+- PSICOSENSOMETRICO
+- CERT. DE CONDUCCION DE VEHICULOS
+- USO DE RESPIRADORES
+- HISTORIA OCUPACIONAL
+- ANTECEDENTES PATOLOGICOS
+- CUESTIONARIO NORDICO
+- FICHA MUSCULO ESQUELETICO
+- OIT
+- ESPIROMETRIA
+- EKG
+- AUDIOMETRIA
+- ODONTOLOGIA
+- OFTALMOLOGIA
+- PSICOLOGIA
+- CONSENTIMIENTO INFORMADO
+- COPIA DE DNI
+- COPIA DE LICENCIA DE CONDUCIR
+
+`,
 };

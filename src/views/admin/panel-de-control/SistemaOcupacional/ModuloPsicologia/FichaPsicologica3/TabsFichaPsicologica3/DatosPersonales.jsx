@@ -1,6 +1,3 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faPlus, faBroom } from "@fortawesome/free-solid-svg-icons";
-import PropTypes from 'prop-types';
 import {
     InputTextOneLine,
     InputTextArea,
@@ -11,20 +8,14 @@ export default function DatosPersonales({
     handleChange,
     handleChangeNumber,
     handleChangeSimple,
-    agregarEmpresa,
-    limpiarCamposEmpresa
+    handleSearch
 }) {
-
     return (
         <div className="mx-auto bg-white overflow-hidden">
             <div className="flex h-full">
-                <div className="w-full space-y-3 pt-4 px-3">
+                <div className="w-full space-y-3 px-3">
                     {/*==========================Datos Personales Section==========================*/}
                     <div>
-                        <div className="flex items-center px-6">
-                            <FontAwesomeIcon icon={faUser} className="mr-2 text-[#233245]" />
-                            <h2 className="text-lg font-semibold text-[#233245] uppercase tracking-wider">Datos Personales</h2>
-                        </div>
                         {/* ===== SECCIÓN: DATOS PERSONALES ===== */}
                         <div className="p-4 text-[10px] space-y-2">
                             {/* Header con información básica */}
@@ -35,7 +26,7 @@ export default function DatosPersonales({
                                         label="N° Orden"
                                         name="norden"
                                         value={form.norden}
-                                        // onKeyUp={handleSearch}
+                                        onKeyUp={handleSearch}
                                         onChange={handleChangeNumber}
                                         labelWidth="120px"
                                     />
@@ -271,98 +262,9 @@ export default function DatosPersonales({
                                     </div>
                                 </div>
                             </div>
-
                             {/* ===== SECCIÓN: ANTERIORES EMPRESAS ===== */}
                             <div className="bg-white border border-gray-200 rounded-lg p-3">
                                 <h4 className="font-semibold mb-3 text-[11px]">ANTERIORES EMPRESAS (experiencia laboral)</h4>
-
-                                {/* Campos de entrada en 2 columnas */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                                    {/* Columna Izquierda */}
-                                    <div className="space-y-2">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <InputTextOneLine
-                                                label="Fecha"
-                                                name="fechaEmpresa"
-                                                type="date"
-                                                value={form.fechaEmpresa}
-                                                onChange={handleChangeSimple}
-                                                labelWidth="100px"
-                                            />
-                                            <InputTextOneLine
-                                                label="Empresa"
-                                                name="nombreEmpresa"
-                                                value={form.nombreEmpresa}
-                                                onChange={handleChange}
-                                                labelWidth="100px"
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <InputTextOneLine
-                                                label="Act. Empresa"
-                                                name="actividadEmpresa"
-                                                value={form.actividadEmpresa}
-                                                onChange={handleChange}
-                                                labelWidth="100px"
-                                            />
-                                            <InputTextOneLine
-                                                label="Puesto"
-                                                name="puestoEmpresa"
-                                                value={form.puestoEmpresa}
-                                                onChange={handleChange}
-                                                labelWidth="100px"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Columna Derecha */}
-                                    <div className="space-y-2">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <InputTextOneLine
-                                                label="T. Sup"
-                                                name="tSup"
-                                                value={form.tSup}
-                                                onChange={handleChange}
-                                                labelWidth="100px"
-                                            />
-                                            <InputTextOneLine
-                                                label="T. Sub"
-                                                name="tSub"
-                                                value={form.tSub}
-                                                onChange={handleChange}
-                                                labelWidth="100px"
-                                            />
-                                        </div>
-                                        <InputTextOneLine
-                                            label="Causa retiro"
-                                            name="causaRetiro"
-                                            value={form.causaRetiro}
-                                            onChange={handleChange}
-                                            labelWidth="100px"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Botones de acción */}
-                                <div className="flex gap-2 mb-4">
-                                    <button
-                                        type="button"
-                                        onClick={agregarEmpresa}
-                                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded flex items-center gap-2 text-[11px]"
-                                    >
-                                        <FontAwesomeIcon icon={faPlus} />
-                                        Agregar
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={limpiarCamposEmpresa}
-                                        className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded flex items-center gap-2 text-[11px]"
-                                    >
-                                        <FontAwesomeIcon icon={faBroom} />
-                                        Limpiar
-                                    </button>
-                                </div>
-
                                 {/* Tabla de empresas anteriores */}
                                 <div className="overflow-x-auto">
                                     <table className="w-full border-collapse border border-gray-300 text-[11px]">
@@ -405,15 +307,6 @@ export default function DatosPersonales({
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
-
-DatosPersonales.propTypes = {
-    form: PropTypes.object.isRequired,
-    handleChange: PropTypes.func.isRequired,
-    handleChangeNumber: PropTypes.func.isRequired,
-    agregarEmpresa: PropTypes.func.isRequired,
-    limpiarCamposEmpresa: PropTypes.func.isRequired,
-};
-

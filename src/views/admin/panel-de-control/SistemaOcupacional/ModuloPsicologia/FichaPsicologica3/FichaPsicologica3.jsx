@@ -2,80 +2,82 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faBrain } from '@fortawesome/free-solid-svg-icons';
 import { useForm } from '../../../../../hooks/useForm';
-import DatosPersonales from './DatosPersonales/DatosPersonales';
-import ExamenMental from './ExamenMental/ExamenMental';
+import DatosPersonales from './TabsFichaPsicologica3/DatosPersonales';
+import ExamenMental from './TabsFichaPsicologica3/ExamenMental';
+import { getToday } from '../../../../../utils/helpers';
+import { useSessionData } from '../../../../../hooks/useSessionData';
+import { PrintHojaR, SubmitDataService, VerifyTR } from './controllerFichaPsicologica3';
 
-const FichaPsicologica3 = () => {
+const tabla = "ficha_psicologica_anexo03";
+const today = getToday();
+
+export default function FichaPsicologica3() {
   const [activeTab, setActiveTab] = useState(0);
 
-  // Estado inicial unificado del formulario
+  const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    useSessionData();
+
   const initialFormState = {
-    // Datos personales básicos
-    nOrden: "",
-    dni: "",
+    // ===== TAB: DATOS PERSONALES =====
+    // Información General
+    norden: "",
+    fechaExamen: today,
+    nombreExamen: "",
+
+    // Datos Personales
     nombres: "",
+    dni: "",
+    sexo: "",
     apellidos: "",
     fechaNacimiento: "",
-    sexo: "",
-    edad: "",
     lugarNacimiento: "",
+    edad: "",
     estadoCivil: "",
     gradoInstruccion: "",
-    
-    // Datos laborales
+
+    // Datos Laborales
     empresa: "",
+    tiempoExperiencia: "",
     contrata: "",
     puesto: "",
     area: "",
     mineralExp: "",
     explotacionEn: "",
     alturaLabor: "",
-    
-    // Datos adicionales
-    exMedico: "",
-    tLaboratorio: "",
-    
-    // Evaluación y riesgos
+
+    // Evaluación y Riesgos
     motivoEvaluacion: "",
     principalesRiesgos: "",
     medidasSeguridad: "",
-    
-    // Historia y observaciones
+
+    // Historia y Observaciones
     historiaFamiliar: "",
     habitos: "",
     otrasObservaciones: "",
-    
-    // Experiencia laboral - campos de entrada
-    fechaEmpresa: "",
-    nombreEmpresa: "",
-    actividadEmpresa: "",
-    puestoEmpresa: "",
-    tSup: "",
-    tSub: "",
-    causaRetiro: "",
-    
-    // Lista de empresas anteriores
+
+    // Anteriores Empresas - Lista almacenada
     empresasAnteriores: [],
 
-    // Examen Mental - Presentación
+    // ===== TAB: EXAMEN MENTAL =====
+    // Observación de Conductas - Presentación
     presentacion: null,
-    
-    // Postura
+
+    // Observación de Conductas - Postura
     postura: null,
-    
-    // Discurso
+
+    // Observación de Conductas - Discurso
     ritmo: null,
     tono: null,
     articulacion: null,
-    
-    // Orientación
+
+    // Observación de Conductas - Orientación
     orientacionTiempo: null,
     orientacionEspacio: null,
     orientacionPersona: null,
-    
-    // Área Cognitiva
+
+    // Observación de Conductas - Área Cognitiva
     areaCognitiva: "",
-    
+
     // Procesos Cognitivos
     lucidoAtento: "",
     pensamiento: "",
@@ -87,8 +89,8 @@ const FichaPsicologica3 = () => {
     personalidad: "",
     afectividad: "",
     conductaSexual: "",
-    
-    // Pruebas Psicológicas
+
+    // Pruebas Psicológicas - Ptje Nombre
     mips: false,
     mps: false,
     luria: false,
@@ -103,81 +105,65 @@ const FichaPsicologica3 = () => {
     zungDepresion: false,
     wechsler: false,
     otrasPruebas: false,
-    
-    // Área Emocional
+
+    // Pruebas Psicológicas - Área Emocional
     areaEmocional: "",
   };
 
   const {
     form,
     handleChange,
+    handleRadioButton,
     handleChangeSimple,
+    handleCheckBoxChange,
     handleChangeNumber,
+    handleClearnotO,
+    handlePrintDefault,
+    handleClear,
     setForm,
   } = useForm(initialFormState);
 
-  // Función para agregar empresa a la lista
-  const agregarEmpresa = () => {
-    if (form.nombreEmpresa && form.fechaEmpresa) {
-      const nuevaEmpresa = {
-        fecha: form.fechaEmpresa,
-        nombreEmpresa: form.nombreEmpresa,
-        actividadEmpresa: form.actividadEmpresa,
-        puestoEmpresa: form.puestoEmpresa,
-        tSup: form.tSup,
-        tSub: form.tSub,
-        causaRetiro: form.causaRetiro,
-      };
+  const handleSave = () => {
+    SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+  };
 
-      setForm(prevForm => ({
-        ...prevForm,
-        empresasAnteriores: [...prevForm.empresasAnteriores, nuevaEmpresa],
-        // Limpiar campos de entrada
-        fechaEmpresa: "",
-        nombreEmpresa: "",
-        actividadEmpresa: "",
-        puestoEmpresa: "",
-        tSup: "",
-        tSub: "",
-        causaRetiro: "",
-      }));
+  const handleSearch = (e) => {
+    if (e.key === "Enter") {
+      handleClearnotO();
+      VerifyTR(form.norden, tabla, token, setForm, selectedSede);
     }
   };
 
-  // Función para limpiar campos de empresa
-  const limpiarCamposEmpresa = () => {
-    setForm(prevForm => ({
-      ...prevForm,
-      fechaEmpresa: "",
-      nombreEmpresa: "",
-      actividadEmpresa: "",
-      puestoEmpresa: "",
-      tSup: "",
-      tSub: "",
-      causaRetiro: "",
-    }));
+  const handlePrint = () => {
+    handlePrintDefault(() => {
+      PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
   };
 
   const tabs = [
     {
       label: 'Datos Personales',
       icon: faUser,
-      component: <DatosPersonales 
+      component: <DatosPersonales
         form={form}
         handleChange={handleChange}
         handleChangeNumber={handleChangeNumber}
         handleChangeSimple={handleChangeSimple}
         setForm={setForm}
-        agregarEmpresa={agregarEmpresa}
-        limpiarCamposEmpresa={limpiarCamposEmpresa}
+        handleSearch={handleSearch}
       />
     },
     {
       label: 'Examen Mental',
       icon: faBrain,
-      component: <ExamenMental 
+      component: <ExamenMental
         form={form}
         handleChange={handleChange}
+        handleRadioButton={handleRadioButton}
+        handleCheckBoxChange={handleCheckBoxChange}
+        handleSave={handleSave}
+        handlePrint={handlePrint}
+        handleClear={handleClear}
       />
     }
   ];
@@ -190,11 +176,10 @@ const FichaPsicologica3 = () => {
           <button
             key={idx}
             onClick={() => setActiveTab(idx)}
-            className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${
-              activeTab === idx
-                ? 'bg-[#233245] text-white font-bold'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className={`px-6 py-2 border rounded-t-lg transition duration-150 text-base font-semibold focus:outline-none flex items-center whitespace-nowrap ${activeTab === idx
+              ? 'bg-[#233245] text-white font-bold'
+              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
           >
             <FontAwesomeIcon icon={tab.icon} className="mr-2" />
             {tab.label}
@@ -210,4 +195,3 @@ const FichaPsicologica3 = () => {
   );
 };
 
-export default FichaPsicologica3;

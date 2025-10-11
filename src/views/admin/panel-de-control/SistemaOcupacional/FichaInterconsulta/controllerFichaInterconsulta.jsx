@@ -6,7 +6,7 @@ import {
     SubmitDataServiceDefault,
 } from "../../../../utils/functionUtils";
 import { getFetch } from "../../../../utils/apiHelpers";
-import { getToday } from "../../../../utils/helpers";
+import { getHoraActual, getToday } from "../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte";
@@ -70,7 +70,7 @@ export const GetInfoServicioEditar = async (
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: `${res.edadPaciente} AÑOS`,
+            edadPaciente: `${res.edadPaciente}`,
             dniUser: res.dniUsuario
             
         }));
@@ -102,7 +102,8 @@ export const SubmitDataService = async (
         "diagnostico": form.diagnostico,
         "tratamiento": form.tratamiento,
         "apto": form.apto ? true : false,
-        "noApto": form.apto ? false : true
+        "noApto": form.apto ? false : true,
+        "horaSalida": getHoraActual(),
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -143,16 +144,25 @@ export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {
         },
         () => {
             //Tiene registro
-            GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
+            if (!especialidad) {
+                Swal.fire(
+                    "Error",
+                    "Seleccione una especialidad.",
+                    "warning"
+                );
+            } else {
+                GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Ficha Interconsulta",
                     "warning"
                 );
             });
+            }
+            
         },
         () => {
-            //Necesita Agudeza visual 
+            //Necesita Agudeza visual Triaje
             Swal.fire(
                 "Alerta",
                 "El paciente necesita pasar por Triaje.",

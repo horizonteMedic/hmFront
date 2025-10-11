@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import InformePsicologico from "./InformePsicologico/InformePsicologico";
 import FichaPsicologica2 from "./FichaPsicologica2/FichaPsicologica2";
 import FichaPsicologica3 from "./FichaPsicologica3/FichaPsicologica3";
+import InformePsicolaboral from "./InformePsicolaboral/InformePsicolaboral";
 
 export default function PsicologiaTabSelector({ tieneVista }) {
     const [activeTab, setActiveTab] = useState(0);
@@ -15,6 +16,9 @@ export default function PsicologiaTabSelector({ tieneVista }) {
         }
         else if (tieneVista("Ficha Psicologica 3")) {
             setActiveTab(2);
+        }
+        else if (tieneVista("Informe Psicolaboral")) {
+            setActiveTab(3);
         }
         else {
             // Temporalmente mostrar FichaPsicologica3 por defecto si no tiene otros permisos
@@ -61,6 +65,17 @@ export default function PsicologiaTabSelector({ tieneVista }) {
                             Ficha Psicológica 3
                         </button>
                     )}
+                    {tieneVista("Informe Psicolaboral") && (
+                        <button
+                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 3
+                                ? "border-[#233245] font-semibold"
+                                : "border-transparent"
+                                }`}
+                            onClick={() => setActiveTab(3)}
+                        >
+                            Informe Psicolaboral
+                        </button>
+                    )}
                 </nav>
 
                 {/* Tab Content */}
@@ -68,6 +83,7 @@ export default function PsicologiaTabSelector({ tieneVista }) {
                     {activeTab === 0 && <InformePsicologico />}
                     {activeTab === 1 && <FichaPsicologica2 />}
                     {activeTab === 2 && <FichaPsicologica3 />}
+                    {activeTab === 3 && <InformePsicolaboral />}
                     {activeTab === -1 && (
                         <div className="text-center text-gray-500">
                             No tiene permisos para ver ningún examen.
