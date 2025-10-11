@@ -1,11 +1,8 @@
-import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDownload, faUserLock, faCodeBranch, faFileLines, faGears, faBusinessTime, faNotesMedical, faList, faTentArrowDownToLine, faBuilding, faHandshake, faNetworkWired } from '@fortawesome/free-solid-svg-icons';
 import { useAuthStore } from '../../../store/auth';
-import Swal from 'sweetalert2';
 import "./Dashboard.css";
-import useAppVersionChecker from '../../hooks/useAppVersionChecker';
 
 const Card = ({ to, id, icon, color, hoverColor, iconColor, hoverIconColor }) => {
   return (
@@ -20,7 +17,7 @@ const Card = ({ to, id, icon, color, hoverColor, iconColor, hoverIconColor }) =>
 };
 
 const Dashboard = ({ TotalView }) => {
-  useAppVersionChecker();
+  // useAppVersionChecker();
   const userLogued = useAuthStore(state => state.userlogued);
   const listView = useAuthStore(state => state.listView);
 
