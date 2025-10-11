@@ -29,7 +29,6 @@ export default function PsicologiaTabSelector({ tieneVista }) {
             setActiveTab(5);
         }
         else {
-            // Temporalmente mostrar FichaPsicologica3 por defecto si no tiene otros permisos
             setActiveTab(-1);
         }
     }, []);
