@@ -713,9 +713,9 @@ export default function UsoRespiradores(data = {}) {
   yPos += filaAltura;
 
   // Contenido de la fila con división central
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Marcar el tipo de respirador(es) a utilizar :", tablaInicioX + 2, yPos - 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Frecuencia de uso :", tablaInicioX + tablaAncho / 2 + 2, yPos - 1.5 + 0.5);
 
   // Fila con 4 divisiones usando medidas fijas
@@ -881,7 +881,7 @@ export default function UsoRespiradores(data = {}) {
   // Segundo texto de la fila 7
   const x12 = 107; // Posición X independiente
   const y12 = yPos - 1.5; // Posición Y independiente
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Exposición de Materiales Peligros:", x12, y12);
 
   // Fila 8 - Respirador de Flujo Continuo | (div central) | Humo de Metal | Amoniaco
@@ -1048,18 +1048,20 @@ export default function UsoRespiradores(data = {}) {
 
 
   // Contenido de la fila 11
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   const x25 = 12; // Posición X independiente
   const y25 = yPos - 1.5; // Posición Y independiente
   doc.text("Tipo de Protección :", x25, y25);
   const x26 = 110; // Posición X independiente
   const y26 = yPos - 1.5; // Posición Y independiente
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("DPM", x26, y26);
   if (datosFinales.materialesPeligrosos.dpm) {
     dibujarX(x26 + 36.5, y26);
   }
   const x27 = 160; // Posición X independiente
   const y27 = yPos - 1.5; // Posición Y independiente
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Otros", x27, y27);
   if (datosFinales.materialesPeligrosos.otros) {
     dibujarX(x27 + 31.5, y27);
@@ -1188,7 +1190,7 @@ export default function UsoRespiradores(data = {}) {
   // Segundo texto de la nueva fila
   const x35 = 107; // Posición X independiente
   const y35 = yPos - 1; // Posición Y independiente
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Condiciones Especiales de Trabajo :", x35, y35);
 
   // Fila 17
@@ -1243,7 +1245,7 @@ export default function UsoRespiradores(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea inferior
 
   // Contenido de la nueva fila - dos textos con coordenadas independientes
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
 
   // Primer texto de la nueva fila
   const x38 = 12; // Posición X independiente
@@ -1251,6 +1253,7 @@ export default function UsoRespiradores(data = {}) {
   doc.text("Esfuerzo Físico Esperado Requerido :", x38, y38);
 
   // Segundo texto de la nueva fila
+  doc.setFont("helvetica", "normal").setFontSize(7);
   const x39 = 110; // Posición X independiente
   const y39 = yPos - 1; // Posición Y independiente
   doc.text("Temperaturas Extremas", x39, y39);
