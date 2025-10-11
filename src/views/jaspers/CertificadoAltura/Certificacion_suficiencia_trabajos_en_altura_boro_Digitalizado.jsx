@@ -56,6 +56,9 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     perimetroCuello: "44",
     perimetroCintura: "75",
     perimetroCadera: "80",
+    icc: "0.85",
+    ptInspiracion: "95",
+    ptAspiracion: "90",
     // Conclusión de la evaluación (demo)
     conclusionDesde: "04/11/2000",
     conclusionHasta: "04/11/2025",
@@ -109,6 +112,9 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     perimetroCuello: String(data.perimetroCuelloTriaje ?? ""),
     perimetroCintura: String(data.cinturaTriaje ?? ""),
     perimetroCadera: String(data.caderaTriaje ?? ""),
+    icc: String(data.iccTriaje ?? ""),
+    ptInspiracion: String(data.maximaInspiracionPtoracico ?? ""),
+    ptAspiracion: String(data.forazadaPtoracico ?? ""),
     // Conclusión evaluación
     conclusionDesde: formatearFechaCorta(data.fechaDesde_f_desde ?? ""),
     conclusionHasta: formatearFechaCorta(data.fechaHasta_f_hasta ?? ""),
@@ -122,7 +128,6 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
     codigoCertificado: String(data.codigoCertificado_cod_certificado ?? ""),
     temperatura: String(data.temperatura ?? ""),
     saturacionOxigeno: String(data.saturacionOxigenoTriaje_sat_02 ?? ""),
-    icc: String(data.iccTriaje ?? ""),
     conclusionTriaje: String(data.conclusionTriaje ?? ""),
     // Antecedentes médicos - checkboxes
     antecedentesTodasEnfermedadesSi: Boolean(data.antecedentesTodasEnfermedadesSi_chk_1_si ?? false),
@@ -458,17 +463,25 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Años de experiencia:", tablaInicioX + 2, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.anosExperiencia + " Años", tablaInicioX + 45, yTexto + 1);
+  doc.text(datosFinales.anosExperiencia, tablaInicioX + 45, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", tablaInicioX + 95, yTexto + 1);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.primeraAptitud ? "X" : "", tablaInicioX + 95, yTexto + 1);
+  doc.text(datosFinales.primeraAptitud ? "X" : "   ", tablaInicioX + 97, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", tablaInicioX + 100, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Revalidación:", tablaInicioX + 122, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", tablaInicioX + 145, yTexto + 1);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.revalidacion ? "X" : "", tablaInicioX + 145, yTexto + 1);
+  doc.text(datosFinales.revalidacion ? "X" : "   ", tablaInicioX + 147, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", tablaInicioX + 150, yTexto + 1);
   yTexto += filaAltura;
 
 
@@ -495,36 +508,6 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   doc.text("No", tablaInicioX + 186, yPos + 2.5);
 
   yPos += alturaFilaAntecedentes;
-
-  // Función para calcular altura necesaria para texto (específica por fila)
-  const calcularAlturaTexto = (texto, anchoMaximo, fontSize, esFilaCompacta = false) => {
-    const palabras = texto.split(' ');
-    let lineaActual = '';
-    let lineas = 1;
-
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
-      } else {
-        if (lineaActual) {
-          lineas++;
-          lineaActual = palabra;
-        } else {
-          lineas++;
-        }
-      }
-    });
-
-    // Configuración específica según el tipo de fila
-    if (esFilaCompacta) {
-      return Math.max(lineas * fontSize * 0.2 + 0.2, 2); // Fila ultra compacta
-    } else {
-      return Math.max(lineas * fontSize * 0.35 + 1.5, 4); // Fila normal
-    }
-  };
 
   // Función para calcular posición Y centrada para texto corto
   const calcularPosicionYCentrada = (alturaFila) => {
@@ -770,64 +753,97 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   const filaAltura4 = 4;
   yPos = dibujarHeaderSeccion("4.- EXAMEN FISICO (actual)", yPos, filaAltura4);
 
-  // === FILA 1: SIGNOS VITALES (6 divisiones) ===
+  // === FILA 1: SIGNOS VITALES (7 divisiones) ===
   const alturaFilaSignos = 4;
 
-  // Dibujar líneas de la fila con 6 divisiones
+  // Dibujar líneas de la fila con 7 divisiones
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaSignos); // Línea izquierda
-  doc.line(tablaInicioX + 32, yPos, tablaInicioX + 32, yPos + alturaFilaSignos); // División 1
-  doc.line(tablaInicioX + 64, yPos, tablaInicioX + 64, yPos + alturaFilaSignos); // División 2
-  doc.line(tablaInicioX + 96, yPos, tablaInicioX + 96, yPos + alturaFilaSignos); // División 3
-  doc.line(tablaInicioX + 128, yPos, tablaInicioX + 128, yPos + alturaFilaSignos); // División 4
-  doc.line(tablaInicioX + 160, yPos, tablaInicioX + 160, yPos + alturaFilaSignos); // División 5
+  doc.line(tablaInicioX + 24, yPos, tablaInicioX + 24, yPos + alturaFilaSignos); // División 1
+  doc.line(tablaInicioX + 47.5, yPos, tablaInicioX + 47.5, yPos + alturaFilaSignos); // División 2
+  doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + alturaFilaSignos); // División 3
+  doc.line(tablaInicioX + 108, yPos, tablaInicioX + 108, yPos + alturaFilaSignos); // División 4
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + alturaFilaSignos); // División 5
+  doc.line(tablaInicioX + 162, yPos, tablaInicioX + 162, yPos + alturaFilaSignos); // División 6
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaSignos); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + alturaFilaSignos, tablaInicioX + tablaAncho, yPos + alturaFilaSignos); // Línea inferior
 
   // Contenido de la fila de signos vitales
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("FC :", tablaInicioX + 2, yPos + 3);
-  doc.text((datosFinales.fc || "60") + " lpm", tablaInicioX + 10, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.fc || "60") + " lpm", tablaInicioX + 8, yPos + 3);
+  
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("FR :", tablaInicioX + 25, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.fr || "60") + " rpm", tablaInicioX + 32, yPos + 3);
 
-  doc.text("FR :", tablaInicioX + 34, yPos + 3);
-  doc.text((datosFinales.fr || "60") + " rpm", tablaInicioX + 42, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("PA :", tablaInicioX + 49.5, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.pa || "50/60") + " mmHg", tablaInicioX + 56.5, yPos + 3);
 
-  doc.text("PA :", tablaInicioX + 66, yPos + 3);
-  doc.text((datosFinales.pa || "50/60") + " mmHg", tablaInicioX + 75, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Talla :", tablaInicioX + 82, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.talla || "170") + " cm", tablaInicioX + 92, yPos + 3);
 
-  doc.text("Talla :", tablaInicioX + 98, yPos + 3);
-  doc.text((datosFinales.talla || "170") + " cm", tablaInicioX + 110, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Peso :", tablaInicioX + 110, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.peso || "65") + " kg", tablaInicioX + 120, yPos + 3);
 
-  doc.text("Peso :", tablaInicioX + 130, yPos + 3);
-  doc.text((datosFinales.peso || "65") + " kg", tablaInicioX + 140, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("IMC :", tablaInicioX + 137, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.imc || "0.00") + " kg/m²", tablaInicioX + 145, yPos + 3);
 
-  doc.text("IMC :", tablaInicioX + 162, yPos + 3);
-  doc.text((datosFinales.imc || "0.00") + " kg/m²", tablaInicioX + 170, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("P. Cuello :", tablaInicioX + 164, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.perimetroCuello || "44") + " cm", tablaInicioX + 178, yPos + 3);
 
   yPos += alturaFilaSignos;
 
-  // === FILA 2: PERÍMETROS (2 divisiones) ===
+  // === FILA 2: PERÍMETROS E ICC (5 divisiones) ===
   const alturaFilaPerimetros = 4;
 
-  // Dibujar líneas de la fila con 2 divisiones
+  // Dibujar líneas de la fila con 5 divisiones
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaPerimetros); // Línea izquierda
-  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + alturaFilaPerimetros); // 1ra central
-  doc.line(tablaInicioX + 130, yPos, tablaInicioX + 130, yPos + alturaFilaPerimetros); // 2da central
-
+  doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + alturaFilaPerimetros); // División 1
+  doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + alturaFilaPerimetros); // División 2
+  doc.line(tablaInicioX + 110, yPos, tablaInicioX + 110, yPos + alturaFilaPerimetros); // División 3
+  doc.line(tablaInicioX + 148, yPos, tablaInicioX + 148, yPos + alturaFilaPerimetros); // División 4
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaPerimetros); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + alturaFilaPerimetros, tablaInicioX + tablaAncho, yPos + alturaFilaPerimetros); // Línea inferior
 
-  // Contenido de la fila de perímetros
+  // Contenido de la fila con todos los campos
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("P. Cintura:", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("Perímetro de Cuello :", tablaInicioX + 2, yPos + 3);
-  doc.text((datosFinales.perimetroCuello || "44") + " cm", tablaInicioX + 34, yPos + 3);
+  doc.text((datosFinales.perimetroCintura || "75") + " cm", tablaInicioX + 20, yPos + 3);
 
-  doc.text("Perímetro de Cintura :", tablaInicioX + 62, yPos + 3);
-  doc.text((datosFinales.perimetroCintura || "75") + " cm", tablaInicioX + 98, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("P. Cadera:", tablaInicioX + 42, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.perimetroCadera || "80") + " cm", tablaInicioX + 60, yPos + 3);
 
-  doc.text("Perímetro de Cadera :", tablaInicioX + 132, yPos + 3);
-  doc.text((datosFinales.perimetroCadera || "80") + " cm", tablaInicioX + 165, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("ICC:", tablaInicioX + 82, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.icc || "0.85", tablaInicioX + 95, yPos + 3);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("P.T Inspiración:", tablaInicioX + 113, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.ptInspiracion || "95") + " cm", tablaInicioX + 135, yPos + 3);
+
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("P.T Aspiración:", tablaInicioX + 150, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text((datosFinales.ptAspiracion || "90") + " cm", tablaInicioX + 175, yPos + 3);
 
   yPos += alturaFilaPerimetros;
 
@@ -921,46 +937,85 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   const alturaHeaderConclusion = 4;
   yPos = dibujarHeaderSeccion("5.- CONCLUSIÓN DE LA PRESENTE EVALUACIÓN", yPos, alturaHeaderConclusion);
 
-  // === Fila de conclusión con 4 columnas ===
-  // Estructura: [Apto] | [Observado] | [No Apto] | [Apto con Restricción]
-  const alturaFilaConclusion = 4.5;
-  const anchoColumna = tablaAncho / 4; // Dividir en 4 columnas iguales
+  // === Fila única: Fechas + Opciones de Aptitud (6 columnas con anchos variables) ===
+  const alturaFilaCombinada = 4.5;
   
-  // Líneas verticales
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaConclusion); // izquierda
-  doc.line(tablaInicioX + anchoColumna, yPos, tablaInicioX + anchoColumna, yPos + alturaFilaConclusion); // col 1 -> col 2
-  doc.line(tablaInicioX + anchoColumna * 2, yPos, tablaInicioX + anchoColumna * 2, yPos + alturaFilaConclusion); // col 2 -> col 3
-  doc.line(tablaInicioX + anchoColumna * 3, yPos, tablaInicioX + anchoColumna * 3, yPos + alturaFilaConclusion); // col 3 -> col 4
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaConclusion); // derecha
+  // Definir anchos de columnas proporcionales al contenido
+  const anchoDesde = 35;      // "Desde:" + fecha
+  const anchoHasta = 35;      // "Hasta:" + fecha  
+  const anchoApto = 25;       // "Apto" (más estrecho)
+  const anchoObservado = 30;   // "Observado"
+  const anchoNoApto = 25;     // "No Apto"
   
-  // Líneas horizontales
+  // Calcular posiciones de las divisiones
+  const posDesde = tablaInicioX;
+  const posHasta = posDesde + anchoDesde;
+  const posApto = posHasta + anchoHasta;
+  const posObservado = posApto + anchoApto;
+  const posNoApto = posObservado + anchoObservado;
+  const posRestriccion = posNoApto + anchoNoApto;
+  
+  // Líneas verticales para la fila combinada
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaCombinada); // izquierda
+  doc.line(posHasta, yPos, posHasta, yPos + alturaFilaCombinada); // división 1
+  doc.line(posApto, yPos, posApto, yPos + alturaFilaCombinada); // división 2
+  doc.line(posObservado, yPos, posObservado, yPos + alturaFilaCombinada); // división 3
+  doc.line(posNoApto, yPos, posNoApto, yPos + alturaFilaCombinada); // división 4
+  doc.line(posRestriccion, yPos, posRestriccion, yPos + alturaFilaCombinada); // división 5
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // derecha
+  
+  // Líneas horizontales para la fila combinada
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // superior
-  doc.line(tablaInicioX, yPos + alturaFilaConclusion, tablaInicioX + tablaAncho, yPos + alturaFilaConclusion); // inferior
+  doc.line(tablaInicioX, yPos + alturaFilaCombinada, tablaInicioX + tablaAncho, yPos + alturaFilaCombinada); // inferior
 
-  // Contenido de las 4 columnas
+  // Contenido de la fila combinada
   doc.setFont("helvetica", "normal").setFontSize(8);
   
-  // Columna 1: Apto
-  const inicioCol1 = tablaInicioX + 2;
-  doc.text("Apto", inicioCol1 + 5, yPos + 3.5);
-  doc.text(datosFinales.conclusionApto ? "X" : "", inicioCol1 + 30, yPos + 3.5);
+  // Columna 1: Desde
+  doc.text("Desde:", posDesde + 2, yPos + 3);
+  doc.text(datosFinales.conclusionDesde || "", posDesde + 15, yPos + 3);
   
-  // Columna 2: Observado
-  const inicioCol2 = tablaInicioX + anchoColumna + 2;
-  doc.text("Observado", inicioCol2 + 5, yPos + 3.5);
-  doc.text(datosFinales.conclusionObservado ? "X" : "", inicioCol2 + 25, yPos + 3.5);
+  // Columna 2: Hasta
+  doc.text("Hasta:", posHasta + 2, yPos + 3);
+  doc.text(datosFinales.conclusionHasta || "", posHasta + 15, yPos + 3);
   
-  // Columna 3: No Apto
-  const inicioCol3 = tablaInicioX + (anchoColumna * 2) + 2;
-  doc.text("No Apto", inicioCol3 + 5, yPos + 3.5);
-  doc.text(datosFinales.conclusionNoApto ? "X" : "", inicioCol3 + 20, yPos + 3.5);
+  // Columna 3: Apto (más estrecho)
+  doc.text("Apto", posApto + 3, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posApto + 15, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionApto ? "X" : "   ", posApto + 17, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posApto + 20, yPos + 3);
   
-  // Columna 4: Apto con Restricción
-  const inicioCol4 = tablaInicioX + (anchoColumna * 3) + 2;
-  doc.text("Apto con Restricción", inicioCol4 + 5, yPos + 3.5);
-  doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "", inicioCol4 + 35, yPos + 3.5);
+  // Columna 4: Observado
+  doc.text("Observado", posObservado + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posObservado + 20, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionObservado ? "X" : "   ", posObservado + 22, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posObservado + 25, yPos + 3);
+  
+  // Columna 5: No Apto
+  doc.text("No Apto", posNoApto + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posNoApto + 16, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionNoApto ? "X" : "   ", posNoApto + 18, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posNoApto + 21, yPos + 3);
+  
+  // Columna 6: Apto con Restricción (más ancho)
+  doc.text("Apto c/Restricción", posRestriccion + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("(", posRestriccion + 30, yPos + 3);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text(datosFinales.conclusionAptoConRestriccion ? "X" : "   ", posRestriccion + 32, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(")", posRestriccion + 35, yPos + 3);
 
-  yPos += alturaFilaConclusion;
+  yPos += alturaFilaCombinada;
 
   // === SECCIÓN 6: OBSERVACIONES Y RECOMENDACIONES ===
   const alturaHeaderObservaciones = 4;
