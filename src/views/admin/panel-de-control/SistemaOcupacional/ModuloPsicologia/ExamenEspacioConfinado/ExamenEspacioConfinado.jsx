@@ -97,7 +97,7 @@ export default function ExamenEspacioConfinado() {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
-    };
+    }; 
 
     // Opciones para los radio groups
     const criteriosOptions = [
