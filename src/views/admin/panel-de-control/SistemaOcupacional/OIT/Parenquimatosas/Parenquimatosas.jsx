@@ -54,8 +54,21 @@ const Parenquimatosas = ({form,setForm}) => {
         });
     };
 
+      // const handleInputChange = (e) => {
+    //     setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+    // };
     const handleInputChange = (e) => {
-        setForm({ ...form, [e.target.name]: e.target.value.toUpperCase() });
+        const { name, value, selectionStart, selectionEnd } = e.target;
+
+        setForm((f) => {
+            const upper = value.toUpperCase();
+            return { ...f, [name]: upper };
+        });
+
+        // Restaurar posición del cursor en el próximo ciclo
+        requestAnimationFrame(() => {
+            e.target.setSelectionRange(selectionStart, selectionEnd);
+        });
     };
 
     const handleInputChangeChecked = (e) => {
