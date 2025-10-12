@@ -45,7 +45,8 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/ModuloPsicologia/FichaAnexo3/FichaPsicologicaOcupacional_Digitalizado"
+import Ficha from "./views/jaspers/UsoRespiradores/UsoRespiradores.jsx"
+import useAppVersionChecker from "./views/hooks/useAppVersionChecker.jsx";
 
 const App = () => {
   return (
@@ -58,6 +59,7 @@ const App = () => {
 };
 
 const AppContent = () => {
+  useAppVersionChecker();
   const token = useAuthStore((state) => state.token);
   const userLogued = useAuthStore((state) => state.userlogued);
   const setToken = useAuthStore((state) => state.setToken);

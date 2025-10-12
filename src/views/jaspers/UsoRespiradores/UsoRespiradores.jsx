@@ -168,6 +168,12 @@ export default function UsoRespiradores(data = {}) {
     medicacionCardiaca: true,
     medicacionHipertension: false,
     medicacionConvulsiones: false,
+    // Campos específicos para pregunta 8 - Problemas con respirador
+    problemasRespiradorIrritacionOjos: false,
+    problemasRespiradorAlergiasPiel: false,
+    problemasRespiradorAnsiedad: false,
+    problemasRespiradorFatiga: false,
+    // Campos existentes (mantener para compatibilidad)
     irritacionOjos: true,
     alergiaPielErupciones: false,
     ansiedadConRespirador: true,
@@ -214,9 +220,18 @@ export default function UsoRespiradores(data = {}) {
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""),
     sede: data.sede || data.nombreSede || "",
-    otros: String(data.datosRespiradores?.otrosCondicionesEspecialesDescripcion_t_otros0 ?? ""),
-    otrosPulmon: String(data.datosRespiradores?.personalEmpleado1Otros3Descripcion_t_otros1 ?? ""),
-    otrosCardiovascular: String(data.datosRespiradores?.personalEmpleado2Otros5Descripcion_t_otros3 ?? ""),
+    // Mapeo específico de campos "Otros:" según contexto (solo campos que existen en el JSON)
+    otrosCondicionesEspecialesTrabajo: String(data.datosRespiradores?.otrosCondicionesEspecialesDescripcion_t_otros0 ?? ""),
+    otrosProblemasPulmonares: String(data.datosRespiradores?.personalEmpleado1Otros3Descripcion_t_otros1 ?? ""),
+    otrosSintomasPulmonares: String(data.datosRespiradores?.personalEmpleado1Otros4Descripcion_t_otros2 ?? ""),
+    otrosProblemasCardiovasculares: String(data.datosRespiradores?.personalEmpleado2Otros5Descripcion_t_otros3 ?? ""),
+    otrosSintomasCardiovasculares: String(data.datosRespiradores?.personalEmpleado2Otros6Descripcion_t_otros4 ?? ""),
+    otrosProblemasRespirador: String(data.datosRespiradores?.personalEmpleado2Otros8Descripcion_t_otros5 ?? ""),
+    otrosVision: String(data.datosRespiradores?.personalEmpleado3Otros10Descripcion_t_otros6 ?? ""),
+    otrosAudicion: String(data.datosRespiradores?.personalEmpleado3Otros12Descripcion_t_otros7 ?? ""),
+    otrosAltura: String(data.datosRespiradores?.personalEmpleado4Otros1Descripcion_t_otros9 ?? ""),
+    otrosMusculoesqueletico: String(data.datosRespiradores?.personalEmpleado3Otros14Descripcion_t_otros8 ?? ""),
+    otrosMateriales: String(data.datosRespiradores?.personalEmpleado4Otros2Descripcion_t_otros10 ?? ""),
     // Datos para sección 7.1 - Evaluación del Lugar de Trabajo
     respiradores: {
       mascaraPolvo: Boolean(data.datosRespiradores?.mascaraPolvo_chk_1 ?? false),
@@ -341,6 +356,12 @@ export default function UsoRespiradores(data = {}) {
     medicacionCardiaca: Boolean(data.datosRespiradores?.problemasCorazonSi_chk_44_si ?? false),
     medicacionHipertension: Boolean(data.datosRespiradores?.presionSanguineaSi_chk_45_si ?? false),
     medicacionConvulsiones: Boolean(data.datosRespiradores?.convulsionesSi_chk_46_si ?? false),
+    // Campos específicos para pregunta 8 - Problemas con respirador
+    problemasRespiradorIrritacionOjos: Boolean(data.datosRespiradores?.irritacionOjosSi_chk_47_si ?? false),
+    problemasRespiradorAlergiasPiel: Boolean(data.datosRespiradores?.alergiasPielSi_chk_48_si ?? false),
+    problemasRespiradorAnsiedad: Boolean(data.datosRespiradores?.ansiedadSi_chk_49_si ?? false),
+    problemasRespiradorFatiga: Boolean(data.datosRespiradores?.fatigaDebilidadSi_chk_50_si ?? false),
+    // Campos existentes (mantener para compatibilidad)
     irritacionOjos: Boolean(data.datosRespiradores?.irritacionOjosSi_chk_47_si ?? false),
     alergiaPielErupciones: Boolean(data.datosRespiradores?.alergiasPielSi_chk_48_si ?? false),
     ansiedadConRespirador: Boolean(data.datosRespiradores?.ansiedadSi_chk_49_si ?? false),
@@ -369,14 +390,12 @@ export default function UsoRespiradores(data = {}) {
     // Logo y membrete - Subido 3.5 puntos
     CabeceraLogo(doc, { ...datosFinales, tieneMembrete: false, yOffset: 6.5 }); // 10 - 3.5 = 6.5
 
-    // Título principal (solo en página 1)
-    if (pageNumber === 1) {
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.setTextColor(0, 0, 0);
-      doc.text("CERTIFICACION DE SUFICIENCIA MEDICA PARA USO DE RESPIRADORES", pageW / 2, 28, { align: "center" });
-      doc.setFont("helvetica", "bold").setFontSize(10);
-      doc.text("(Protección Respiratoria)", pageW / 2, 32, { align: "center" });
-    }
+    // Título principal (en todas las páginas)
+    doc.setFont("helvetica", "bold").setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text("USO DE RESPIRADORES", pageW / 2, 28, { align: "center" });
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("(Protección Respiratoria)", pageW / 2, 32, { align: "center" });
 
     // Número de Ficha y Página (alineación automática mejorada) - Subidos 3.5 puntos
     doc.setFont("helvetica", "normal").setFontSize(7);
@@ -467,12 +486,92 @@ export default function UsoRespiradores(data = {}) {
     return yPos + alturaHeader; // Retorna la nueva posición Y
   };
 
+  // Función para dibujar header de pregunta con SI/NO integrado
+  const dibujarHeaderPreguntaConSiNo = (titulo, yPos, alturaHeader = 4) => {
+    const colTexto = 170;
+    const colNo = 10;
+    const colSi = 10;
+
+    // Dibujar fondo gris más oscuro
+    doc.setFillColor(160, 160, 160); // Gris más oscuro
+    doc.rect(tablaInicioX, yPos, tablaAncho, alturaHeader, 'F');
+
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+
+    // Dibujar líneas del header con divisiones SI/NO
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaHeader); // Línea izquierda
+    doc.line(tablaInicioX + colTexto, yPos, tablaInicioX + colTexto, yPos + alturaHeader); // División texto/opciones
+    doc.line(tablaInicioX + colTexto + colNo, yPos, tablaInicioX + colTexto + colNo, yPos + alturaHeader); // División NO/SI
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaHeader); // Línea derecha
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
+    doc.line(tablaInicioX, yPos + alturaHeader, tablaInicioX + tablaAncho, yPos + alturaHeader); // Línea inferior
+
+    // Dibujar texto del título
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text(titulo, tablaInicioX + 2, yPos + 3);
+
+    // Dibujar texto SI y NO centrados
+    doc.setFont("helvetica", "bold").setFontSize(7);
+    doc.text("SI", tablaInicioX + colTexto + colNo / 2, yPos + 3, { align: "center" });
+    doc.text("NO", tablaInicioX + colTexto + colNo + colSi / 2, yPos + 3, { align: "center" });
+
+    return yPos + alturaHeader; // Retorna la nueva posición Y
+  };
+
   // Función para dibujar X en casilleros
   const dibujarX = (x, y) => {
     const previousFontSize = doc.internal.getFontSize();
     doc.setFontSize(8);
     doc.text("X", x, y);
     doc.setFontSize(previousFontSize);
+  };
+
+  // Función especial para dibujar filas "Otros:" con lógica condicional
+  const dibujarFilaOtros = (textoOtros, yPos, datosOtros) => {
+    const leftMargin = tablaInicioX;
+    const colTexto = 170;
+    const colNo = 10;
+    const colSi = 10;
+    const alturaFila = 3.5;
+
+    // Configurar líneas con grosor consistente
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.2);
+
+    // Líneas de la fila
+    doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
+    doc.line(leftMargin, yPos + alturaFila, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Inferior
+    doc.line(leftMargin, yPos, leftMargin, yPos + alturaFila); // Izquierda
+    doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaFila); // División texto/opciones
+    doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaFila); // División NO/SI
+    doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Derecha
+
+    // Determinar si hay datos para mostrar
+    const tieneDatos = datosOtros && datosOtros.trim().length > 0;
+    
+    // Texto con font size 7
+    doc.setTextColor(0, 0, 0);
+    doc.setFont("helvetica", "normal").setFontSize(7);
+    
+    if (tieneDatos) {
+      // Si hay datos, mostrar "Otros: [datos]"
+      doc.text(textoOtros, leftMargin + 2, yPos + 2.5);
+      // Marcar X en SI
+      const xSi = leftMargin + colTexto + (colNo / 2) - 1;
+      const yCentro = yPos + 2.5;
+      dibujarX(xSi, yCentro);
+    } else {
+      // Si no hay datos, mostrar solo "Otros:"
+      doc.text("Otros:", leftMargin + 2, yPos + 2.5);
+      // Marcar X en NO
+      const xNo = leftMargin + colTexto + colNo + (colSi / 2) - 1;
+      const yCentro = yPos + 2.5;
+      dibujarX(xNo, yCentro);
+    }
+
+    return yPos + alturaFila;
   };
 
   // Primera fila: AFILIACION usando función general
@@ -614,9 +713,9 @@ export default function UsoRespiradores(data = {}) {
   yPos += filaAltura;
 
   // Contenido de la fila con división central
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Marcar el tipo de respirador(es) a utilizar :", tablaInicioX + 2, yPos - 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Frecuencia de uso :", tablaInicioX + tablaAncho / 2 + 2, yPos - 1.5 + 0.5);
 
   // Fila con 4 divisiones usando medidas fijas
@@ -751,7 +850,7 @@ export default function UsoRespiradores(data = {}) {
   doc.text("Promedio de horas de uso por Día:", x10, y10);
   // Mostrar las horas promedio si están definidas
   if (datosFinales.frecuenciaUso.promedioHoras) {
-    doc.text(datosFinales.frecuenciaUso.promedioHoras, x10 + 81.5, y10);
+    doc.text(datosFinales.frecuenciaUso.promedioHoras + " hrs", x10 + 78, y10);
   }
 
   // Fila 7 - Solo dos textos con fondo de color solo en la parte derecha
@@ -782,7 +881,7 @@ export default function UsoRespiradores(data = {}) {
   // Segundo texto de la fila 7
   const x12 = 107; // Posición X independiente
   const y12 = yPos - 1.5; // Posición Y independiente
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Exposición de Materiales Peligros:", x12, y12);
 
   // Fila 8 - Respirador de Flujo Continuo | (div central) | Humo de Metal | Amoniaco
@@ -949,18 +1048,20 @@ export default function UsoRespiradores(data = {}) {
 
 
   // Contenido de la fila 11
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   const x25 = 12; // Posición X independiente
   const y25 = yPos - 1.5; // Posición Y independiente
   doc.text("Tipo de Protección :", x25, y25);
   const x26 = 110; // Posición X independiente
   const y26 = yPos - 1.5; // Posición Y independiente
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("DPM", x26, y26);
   if (datosFinales.materialesPeligrosos.dpm) {
     dibujarX(x26 + 36.5, y26);
   }
   const x27 = 160; // Posición X independiente
   const y27 = yPos - 1.5; // Posición Y independiente
+  doc.setFont("helvetica", "normal").setFontSize(7);
   doc.text("Otros", x27, y27);
   if (datosFinales.materialesPeligrosos.otros) {
     dibujarX(x27 + 31.5, y27);
@@ -1089,7 +1190,7 @@ export default function UsoRespiradores(data = {}) {
   // Segundo texto de la nueva fila
   const x35 = 107; // Posición X independiente
   const y35 = yPos - 1; // Posición Y independiente
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
   doc.text("Condiciones Especiales de Trabajo :", x35, y35);
 
   // Fila 17
@@ -1144,7 +1245,7 @@ export default function UsoRespiradores(data = {}) {
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea inferior
 
   // Contenido de la nueva fila - dos textos con coordenadas independientes
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(7);
 
   // Primer texto de la nueva fila
   const x38 = 12; // Posición X independiente
@@ -1152,6 +1253,7 @@ export default function UsoRespiradores(data = {}) {
   doc.text("Esfuerzo Físico Esperado Requerido :", x38, y38);
 
   // Segundo texto de la nueva fila
+  doc.setFont("helvetica", "normal").setFontSize(7);
   const x39 = 110; // Posición X independiente
   const y39 = yPos - 1; // Posición Y independiente
   doc.text("Temperaturas Extremas", x39, y39);
@@ -1310,7 +1412,7 @@ export default function UsoRespiradores(data = {}) {
   }
 
   // Fila 24 - Fila completa de borde a borde (sin divisiones) - DINÁMICA
-  const textoOtros = "Otros: " + (datosFinales.otros || "");
+  const textoOtros = "Otros: " + (datosFinales.otrosCondicionesEspecialesTrabajo || "");
   const anchoDisponibleOtros = tablaAncho - 24; // Ancho total menos padding
   const lineasOtros = doc.splitTextToSize(textoOtros, anchoDisponibleOtros);
   const alturaDinamicaOtros = Math.max(filaAltura, lineasOtros.length * 2.5 + 2); // Altura mínima de fila o según contenido
@@ -1385,19 +1487,22 @@ export default function UsoRespiradores(data = {}) {
     doc.setFillColor(160, 160, 160);
     doc.rect(leftMargin, yPos, colTexto + colNo + colSi, alturaFila, 'F');
 
-    // Líneas del header
-    doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Superior
-    doc.line(leftMargin, yPos + alturaFila, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Inferior
-    doc.line(leftMargin, yPos, leftMargin, yPos + alturaFila); // Izquierda
+    // Dibujar líneas del header
+    doc.line(leftMargin, yPos, leftMargin, yPos + alturaFila); // Línea izquierda
     doc.line(leftMargin + colTexto, yPos, leftMargin + colTexto, yPos + alturaFila); // División texto/opciones
     doc.line(leftMargin + colTexto + colNo, yPos, leftMargin + colTexto + colNo, yPos + alturaFila); // División NO/SI
-    doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Derecha
+    doc.line(leftMargin + colTexto + colNo + colSi, yPos, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Línea derecha
+    doc.line(leftMargin, yPos, leftMargin + colTexto + colNo + colSi, yPos); // Línea superior
+    doc.line(leftMargin, yPos + alturaFila, leftMargin + colTexto + colNo + colSi, yPos + alturaFila); // Línea inferior
 
-    // Texto SI y NO centrados con font size 7
+    // Dibujar texto SI y NO centrados
     doc.setFont("helvetica", "bold").setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text("SI", leftMargin + colTexto + colNo / 2, yPos + 2.5, { align: "center" }); // Ajustado para altura reducida
-    doc.text("NO", leftMargin + colTexto + colNo + colSi / 2, yPos + 2.5, { align: "center" }); // Ajustado para altura reducida
+    doc.text("SI", leftMargin + colTexto + colNo / 2, yPos + 2.5, { align: "center" });
+    doc.text("NO", leftMargin + colTexto + colNo + colSi / 2, yPos + 2.5, { align: "center" });
+
+    // Dibujar la pregunta "1. ¿Fuma o fumó en el último mes?" en el header
+    doc.setFont("helvetica", "bold").setFontSize(8);
+    doc.text("1. ¿Fuma o fumó en el último mes?", leftMargin + 2, yPos + 2.5);
 
     return yPos + alturaFila;
   };
@@ -1446,12 +1551,12 @@ export default function UsoRespiradores(data = {}) {
     return yPos + alturaFila;
   };
 
-  // Fila 1: ¿Fuma o fumó en el último mes?
-  yPos = dibujarFilaSiNo("¿Fuma o fumó en el último mes?", yPos, datosFinales.fumaUltimoMes);
+  // Fila 1: Fila en blanco (la pregunta ya está en el header)
+  yPos = dibujarFilaSiNo("", yPos, datosFinales.fumaUltimoMes);
 
   // === PREGUNTA 2 ===
-  // Header de pregunta 2 con fondo gris
-  yPos = dibujarHeaderSeccion("2. ¿Ha tenido alguna vez cualquiera de las siguientes condiciones?", yPos, filaAltura);
+  // Header de pregunta 2 con fondo gris y SI/NO integrado
+  yPos = dibujarHeaderPreguntaConSiNo("2. ¿Ha tenido alguna vez cualquiera de las siguientes condiciones?", yPos, filaAltura);
 
   // Opciones de la pregunta 2
   yPos = dibujarFilaSiNo("Palpitaciones.", yPos, datosFinales.palpitaciones);
@@ -1461,8 +1566,8 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Claustrofobia.", yPos, datosFinales.claustrofobia);
 
   // === PREGUNTA 3 ===
-  // Header de pregunta 3 con fondo gris
-  yPos = dibujarHeaderSeccion("3. ¿Ha tenido alguna vez algunas de los siguientes problemas pulmonares o de pulmón?", yPos, filaAltura);
+  // Header de pregunta 3 con fondo gris y SI/NO integrado
+  yPos = dibujarHeaderPreguntaConSiNo("3. ¿Ha tenido alguna vez algunas de los siguientes problemas pulmonares o de pulmón?", yPos, filaAltura);
 
   // Opciones de la pregunta 3
   yPos = dibujarFilaSiNo("Asbestosis", yPos, datosFinales.asbestosisAntecedente);
@@ -1477,9 +1582,9 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Costillas fracturadas.", yPos, datosFinales.costillasFracturadasAntecedente);
   yPos = dibujarFilaSiNo("Cualquier lesión al pulmón o cirugías al pulmón.", yPos, datosFinales.lesionOCirugiaPulmonAntecedente);
   // Fila Otros para condiciones pulmonares
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosPulmon || ""), yPos);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosProblemasPulmonares || ""), yPos, datosFinales.otrosProblemasPulmonares);
 
-  yPos = dibujarHeaderSeccion("4. ¿Tiene algunos de los siguientes síntomas pulmonares o de enfermedades al pulmón?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("4. ¿Tiene algunos de los siguientes síntomas pulmonares o de enfermedades al pulmón?", yPos, filaAltura);
 
   yPos = dibujarFilaSiNo("Dificultad para respirar en reposos", yPos, datosFinales.disneaReposo);
   yPos = dibujarFilaSiNo("Dificultad para respirar cuando camina a nivel del suelo.", yPos, datosFinales.disneaEsfuerzoLeve);
@@ -1494,7 +1599,7 @@ export default function UsoRespiradores(data = {}) {
   // Forzar creación de segunda página para las preguntas adicionales
   doc.addPage();
   numeroPagina = 2;
-  yPos = 30; // Posición inicial de la nueva página
+  yPos = 35; // Posición inicial de la nueva página
 
   // Dibujar header en la nueva página
   drawHeader(numeroPagina);
@@ -1508,10 +1613,10 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Silbidos del pecho cuando respira.", yPos, datosFinales.sibilancias);
   yPos = dibujarFilaSiNo("Dolor en el pecho cuando respira profundamente.", yPos, datosFinales.dolorToracicoProfundo);
   // Fila Otros para síntomas pulmonares
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosPulmon || ""), yPos, undefined);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosSintomasPulmonares || ""), yPos, datosFinales.otrosSintomasPulmonares);
 
   // === PREGUNTA 5 ===
-  yPos = dibujarHeaderSeccion("5. ¿Ha tenido alguna vez cualquiera de los siguientes problemas cardiovasculares?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("5. ¿Ha tenido alguna vez cualquiera de los siguientes problemas cardiovasculares?", yPos, filaAltura);
 
   yPos = dibujarFilaSiNo("Infarto.", yPos, datosFinales.infartoAntecedente);
   yPos = dibujarFilaSiNo("Angina.", yPos, datosFinales.anginaAntecedente);
@@ -1520,11 +1625,11 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Arritmia al corazón.", yPos, datosFinales.arritmiaAntecedente);
   yPos = dibujarFilaSiNo("Reflujo gastroesofágico (no relacionado con la comida).", yPos, datosFinales.reflujoGastroesofagico);
   // Fila Otros para problemas cardiovasculares
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosCardiovascular || ""), yPos, undefined);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosProblemasCardiovasculares || ""), yPos, datosFinales.otrosProblemasCardiovasculares);
 
 
   // === PREGUNTA 6 ===
-  yPos = dibujarHeaderSeccion("6. ¿Ha tenido alguna vez cualquiera de los siguientes síntomas cardiovasculares?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("6. ¿Ha tenido alguna vez cualquiera de los siguientes síntomas cardiovasculares?", yPos, filaAltura);
 
   yPos = dibujarFilaSiNo("Dolor o presión en su pecho", yPos, datosFinales.dolorPresionPecho);
   yPos = dibujarFilaSiNo("Dolor/presión en su pecho durante actividad física.", yPos, datosFinales.dolorPechoActividadFisica);
@@ -1532,25 +1637,23 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Palpitaciones.", yPos, datosFinales.palpitacionesSintoma);
   yPos = dibujarFilaSiNo("Acidez estomacal o indigestión (no relacionado con la comida).", yPos, datosFinales.indigestionNoComida);
   // Fila Otros para síntomas cardiovasculares
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otrosCardiovascular || ""), yPos, undefined);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosSintomasCardiovasculares || ""), yPos, datosFinales.otrosSintomasCardiovasculares);
 
 
   // === PREGUNTA 7 ===
-  yPos = dibujarHeaderSeccion("7. ¿Toma actualmente medicinas para cualquiera de las siguientes condiciones?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("7. ¿Toma actualmente medicinas para cualquiera de las siguientes condiciones?", yPos, filaAltura);
   yPos = dibujarFilaSiNo("Problema respiratorio", yPos, datosFinales.medicacionRespiratoria);
   yPos = dibujarFilaSiNo("Problemas al corazón.", yPos, datosFinales.medicacionCardiaca);
   yPos = dibujarFilaSiNo("Presión Sanguínea.", yPos, datosFinales.medicacionHipertension);
   yPos = dibujarFilaSiNo("Convulsiones.", yPos, datosFinales.medicacionConvulsiones);
 
   // === PREGUNTA 8 ===
-  yPos = dibujarHeaderSeccion("8. ¿Si ha utilizado un respirador, ha tenido usted alguno de los siguientes problemas?", yPos, filaAltura);
-  yPos = dibujarFilaSiNo("Irritación a los ojos.", yPos, datosFinales.irritacionOjos);
-  yPos = dibujarFilaSiNo("Alergias a la piel o erupciones.", yPos, datosFinales.alergiaPielErupciones);
-  yPos = dibujarFilaSiNo("Ansiedad", yPos, datosFinales.ansiedadConRespirador);
-  yPos = dibujarFilaSiNo("Fatiga o debilidad.", yPos, datosFinales.fatigaDebilidadConRespirador);
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos, undefined);
-
-
+  yPos = dibujarHeaderPreguntaConSiNo("8. ¿Si ha utilizado un respirador, ha tenido usted alguno de los siguientes problemas?", yPos, filaAltura);
+  yPos = dibujarFilaSiNo("Irritación a los ojos.", yPos, datosFinales.problemasRespiradorIrritacionOjos);
+  yPos = dibujarFilaSiNo("Alergias a la piel o erupciones.", yPos, datosFinales.problemasRespiradorAlergiasPiel);
+  yPos = dibujarFilaSiNo("Ansiedad", yPos, datosFinales.problemasRespiradorAnsiedad);
+  yPos = dibujarFilaSiNo("Fatiga o debilidad.", yPos, datosFinales.problemasRespiradorFatiga);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosProblemasRespirador || ""), yPos, datosFinales.otrosProblemasRespirador);
 
   // === SECCIÓN 2 CON FONDO NARANJA ===
   const textoInstruccionesSeccion2 = "Sección 2 (Discrecional): Las preguntas de la 9 a la 14 deben ser contestadas por empleados que han sido seleccionados para usar un respirador de cara completa o un aparato de respiración autónomo (SCBA); para los empleados que han sido seleccionados para utilizar otros tipos de respiradores, contestar a estas preguntas de manera voluntaria; por favor, marque \"SI\" o \"NO\".";
@@ -1591,38 +1694,38 @@ export default function UsoRespiradores(data = {}) {
   yPos += alturaFilaInstruccionesSeccion2;
 
   // === PREGUNTA 9 ===
-  yPos = dibujarHeaderSeccion("9. ¿Ha perdido la visión en cualquier ojo(temporal o permanente)?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("9. ¿Ha perdido la visión en cualquier ojo(temporal o permanente)?", yPos, filaAltura);
 
   // Fila con SI/NO mapeado
   yPos = dibujarFilaSiNo("", yPos, datosFinales.perdioVision);
 
   // === PREGUNTA 10 ===
-  yPos = dibujarHeaderSeccion("10. ¿Usa actualmente lentes de contacto?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("10. ¿Usa actualmente lentes de contacto?", yPos, filaAltura);
   yPos = dibujarFilaSiNo("Usa lentes de contacto", yPos, datosFinales.lentesContacto);
   yPos = dibujarFilaSiNo("Usa lentes.", yPos, datosFinales.usaLentes);
   yPos = dibujarFilaSiNo("Daltonismo", yPos, datosFinales.daltonismo);
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosVision || ""), yPos, datosFinales.otrosVision);
 
   // === PREGUNTA 11 ===
-  yPos = dibujarHeaderSeccion("11. ¿Ha tenido alguna lesión a sus oídos, incluyendo un tímpano roto?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("11. ¿Ha tenido alguna lesión a sus oídos, incluyendo un tímpano roto?", yPos, filaAltura);
 
   // Fila con SI/NO mapeado
   yPos = dibujarFilaSiNo("", yPos, datosFinales.lesionOidos);
 
   // === PREGUNTA 12 ===
-  yPos = dibujarHeaderSeccion("12. ¿Tiene actualmente algunos de los siguientes problemas de audición?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("12. ¿Tiene actualmente algunos de los siguientes problemas de audición?", yPos, filaAltura);
   yPos = dibujarFilaSiNo("Dificultad para escuchar.", yPos, datosFinales.dificultadEscuchar);
   yPos = dibujarFilaSiNo("Usa un audífono.", yPos, datosFinales.usaAudifono);
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosAudicion || ""), yPos, datosFinales.otrosAudicion);
 
   // === PREGUNTA 13 ===
-  yPos = dibujarHeaderSeccion("13. ¿Ha tenido alguna lesión a la espalda?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("13. ¿Ha tenido alguna lesión a la espalda?", yPos, filaAltura);
 
   // Fila con SI/NO mapeado
   yPos = dibujarFilaSiNo("", yPos, datosFinales.lesionEspalda);
 
   // === PREGUNTA 14 ===
-  yPos = dibujarHeaderSeccion("14. ¿Tiene actualmente algunos de los siguientes problemas musculoesqueléticos?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("14. ¿Tiene actualmente algunos de los siguientes problemas musculoesqueléticos?", yPos, filaAltura);
   yPos = dibujarFilaSiNo("Debilidad en los brazos, manos, piernas o pies.", yPos, datosFinales.debilidadExtremidades);
   yPos = dibujarFilaSiNo("Dolor de espalda", yPos, datosFinales.dolorEspalda);
   yPos = dibujarFilaSiNo("Dificultad para mover sus brazos y piernas.", yPos, datosFinales.dificultadMoverBrazosPiernas);
@@ -1632,7 +1735,7 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Dificultad al doblar las rodillas", yPos, datosFinales.dificultadDoblarRodillas);
   yPos = dibujarFilaSiNo("Dificultad en ponerse en cuclillas.", yPos, datosFinales.dificultadPonerseCuclillas);
   yPos = dibujarFilaSiNo("Subir las escaleras o una escalera", yPos, datosFinales.subirEscalerasEscalera);
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosMusculoesqueletico || ""), yPos, datosFinales.otrosMusculoesqueletico);
 
   // Agregar footer para la segunda página antes de pasar a la tercera
   footerTR(doc, { footerOffsetY: 8 });
@@ -1641,7 +1744,7 @@ export default function UsoRespiradores(data = {}) {
   // Forzar creación de tercera página para la sección 3
   doc.addPage();
   numeroPagina = 3;
-  yPos = 30; // Posición inicial de la nueva página
+  yPos = 35; // Posición inicial de la nueva página
 
   // Dibujar header en la nueva página
   drawHeader(numeroPagina);
@@ -1718,10 +1821,10 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Mareos.", yPos, datosFinales.mareosAltura);
   yPos = dibujarFilaSiNo("Dificultad para respirar.", yPos, datosFinales.disneaAltura);
   yPos = dibujarFilaSiNo("Palpitaciones.", yPos, datosFinales.palpitacionesAltura);
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos, undefined);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosAltura || ""), yPos, datosFinales.otrosAltura);
 
   // === PREGUNTA 2 DE LA SECCIÓN 3 ===
-  yPos = dibujarHeaderSeccion("2. Ha trabajado con alguno de los siguientes materiales listados a continuación:", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("2. Ha trabajado con alguno de los siguientes materiales listados a continuación:", yPos, filaAltura);
 
   // Opciones de la pregunta 2
   yPos = dibujarFilaSiNo("Asbestos.", yPos, datosFinales.expuestoAsbesto);
@@ -1733,13 +1836,13 @@ export default function UsoRespiradores(data = {}) {
   yPos = dibujarFilaSiNo("Hierro.", yPos, datosFinales.expuestoHierro);
   yPos = dibujarFilaSiNo("Latón.", yPos, datosFinales.expuestoLaton);
   yPos = dibujarFilaSiNo("Ambientes con exceso de polvo.", yPos, datosFinales.excesoPolvoAmbiente);
-  yPos = dibujarFilaSiNo("Otros: " + (datosFinales.otros || ""), yPos, undefined);
+  yPos = dibujarFilaOtros("Otros: " + (datosFinales.otrosMateriales || ""), yPos, datosFinales.otrosMateriales);
 
   // === PREGUNTA 3 DE LA SECCIÓN 3 ===
   yPos = dibujarHeaderSeccion("3. Liste cualquier trabajo previo/pasatiempo en los que haya sido expuestos a peligros respiratorios:", yPos, filaAltura);
 
   // Fila dinámica para la pregunta 3
-  const textoPregunta3 = "Trabajos previos/pasatiempos con exposición a peligros respiratorios: " + (datosFinales.otros || "");
+  const textoPregunta3 = "Trabajos previos/pasatiempos con exposición a peligros respiratorios: " + (datosFinales.otrosCondicionesEspeciales || "");
   const anchoDisponiblePregunta3 = tablaAncho - 24;
   const lineasPregunta3 = doc.splitTextToSize(textoPregunta3, anchoDisponiblePregunta3);
   const alturaDinamicaPregunta3 = Math.max(filaAltura, lineasPregunta3.length * 2.5 + 2);
@@ -1758,13 +1861,13 @@ export default function UsoRespiradores(data = {}) {
   doc.text(lineasPregunta3, xPregunta3, yPregunta3);
 
   // === PREGUNTA 4 DE LA SECCIÓN 3 ===
-  yPos = dibujarHeaderSeccion("4. ¿Has hecho alguna vez Servicio Militar?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("4. ¿Has hecho alguna vez Servicio Militar?", yPos, filaAltura);
 
   // Fila vacía para pregunta 4 con columnas SI/NO
   yPos = dibujarFilaSiNo("", yPos, datosFinales.servicioMilitar);
 
   // === PREGUNTA 5 DE LA SECCIÓN 3 ===
-  yPos = dibujarHeaderSeccion("5. ¿Has estado alguna vez en un equipo de MATPEL o Respuesta De Emergencias?", yPos, filaAltura);
+  yPos = dibujarHeaderPreguntaConSiNo("5. ¿Has estado alguna vez en un equipo de MATPEL o Respuesta De Emergencias?", yPos, filaAltura);
 
   // Fila vacía para pregunta 5 con columnas SI/NO
   yPos = dibujarFilaSiNo("", yPos, datosFinales.equipoMATPEL);
@@ -1924,11 +2027,14 @@ export default function UsoRespiradores(data = {}) {
   yPos += filaAltura;
 
   // Contenido de la fila de fechas
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("FECHA DEL EXAMEN:", tablaInicioX + 2, yPos - 1.5);
-  doc.text(datosFinales.fechaExamen, tablaInicioX + 35, yPos - 1.5);
-  doc.text("EXPIRA EN:", tablaInicioX + tablaAncho / 2 + 2, yPos - 1.5);
-  doc.text(datosFinales.expiraEn || datosFinales.fechaExamen, tablaInicioX + tablaAncho / 2 + 25, yPos - 1.5);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("FECHA DEL EXAMEN:", tablaInicioX + 2, yPos - 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.fechaExamen, tablaInicioX + 35, yPos - 1);
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("EXPIRA EN:", tablaInicioX + tablaAncho / 2 + 2, yPos - 1);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text(datosFinales.expiraEn || datosFinales.fechaExamen, tablaInicioX + tablaAncho / 2 + 25, yPos - 1);
 
   // === SECCIÓN DE DECLARACIÓN, FIRMA Y HUELLA DEL TRABAJADOR ===
   const alturaSeccionDeclaracion = 30; // Altura para la sección de declaración
@@ -1982,10 +2088,10 @@ export default function UsoRespiradores(data = {}) {
   justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
-  const firmaTrabajadorY = yPos + 3;
+  // const firmaTrabajadorY = yPos + 3;
 
   // Calcular centro de la columna 2 para centrar las imágenes
-  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  // const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
 
   // Agregar firma del trabajador (lado izquierdo) con fallback
   // let firmaTrabajadorUrl = getSign(data, "FIRMAP");
