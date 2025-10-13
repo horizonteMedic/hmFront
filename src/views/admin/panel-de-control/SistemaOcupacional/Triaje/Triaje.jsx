@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import { format } from 'date-fns';
 import { InputTextArea, InputCheckbox, InputTextOneLine } from '../../../../components/reusableComponents/ResusableComponents';
 import { getToday } from '../../../../utils/helpers';
+import { faBroom, faPencil, faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const Triaje = ({ token, selectedSede }) => {
   const today = getToday();
@@ -53,7 +55,7 @@ const Triaje = ({ token, selectedSede }) => {
   const [tablehc, setTablehc] = useState([])
   const [loadingInputs, setLoadingInputs] = useState(false);
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [resumenFecha, setResumenFecha] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [resumenFecha, setResumenFecha] = useState(today);
 
   useEffect(() => {
     if (busqueda.codigo === "" && busqueda.nombres === "") {
@@ -134,35 +136,39 @@ const Triaje = ({ token, selectedSede }) => {
   };
   console.log(triaje)
   return (
-    <div className="flex flex-col md:flex-row gap-4 w-full">
+    <div className="flex flex-col md:flex-row w-full">
       {/* Columna 1 */}
-      <div className="bg-white rounded shadow p-4 min-w-[400px]  w-full md:w-[45%]">
+      <div className="bg-white rounded p-4 min-w-[400px]  w-full md:w-[45%]">
         {/* Contenido de Tab principal */}
         <form className="space-y-3 text-md">
-          <div className="flex gap-3 items-center">
-            <InputCheckbox label="Ocupacional" name="ocupacional" checked={form.ocupacional} onChange={handleFormChange} />
-            <InputCheckbox label="Asistencial" name="asistencial" checked={form.asistencial} onChange={handleFormChange} />
-          </div>
-          <div className="flex gap-2 items-center">
-            <InputTextOneLine label="Norden" name="nro" value={form.nro} onChange={handleFormChange} onKeyUp={(event) => { if (event.key === 'Enter') handleTR(), VerifyTR(form, getFetch, token, setForm, setTriaje, selectedSede, setHabilitarTR, setHabilitar)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/ }} />
-            <label className="font-medium ml-2"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({ ...f, recibo: true, nOrden: false }))} /> Recibo</label>
-            <label className="font-medium ml-2"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({ ...f, nOrden: true, recibo: false }))} /> N° Orden</label>
-          </div>
-          {/* {form.nroHistorial && (
+          <div className='space-y-3 mb-3 border p-4 rounded'>
+            <div className="flex gap-3 items-center">
+              <InputCheckbox label="Ocupacional" name="ocupacional" checked={form.ocupacional} onChange={handleFormChange} />
+              <InputCheckbox label="Asistencial" name="asistencial" checked={form.asistencial} onChange={handleFormChange} />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <InputTextOneLine label="Norden" name="nro" value={form.nro} onChange={handleFormChange} onKeyUp={(event) => { if (event.key === 'Enter') handleTR(), VerifyTR(form, getFetch, token, setForm, setTriaje, selectedSede, setHabilitarTR, setHabilitar)/*GetInfoPac(form,setForm,getFetch,token,selectedSede)*/ }} />
+              <div className='flex gap-4'>
+                <label className="font-semibold flex justify-center gap-2 items-center"><input type="radio" name="recibo" checked={form.recibo} onChange={() => setForm(f => ({ ...f, recibo: true, nOrden: false }))} /> Recibo</label>
+                <label className="font-semibold flex justify-center gap-2 items-center"><input type="radio" name="nOrden" checked={form.nOrden} onChange={() => setForm(f => ({ ...f, nOrden: true, recibo: false }))} /> N° Orden</label>
+              </div>
+            </div>
+            {/* {form.nroHistorial && (
             <div className="bg-blue-50 text-gray-500 rounded px-4 py-2 mb-2 w-fit mx-auto border border-blue-100 shadow-sm flex items-center justify-center">
               <span style={{ fontSize: '2.5rem', fontWeight: 800, color: '#222' }}> {form.nroHistorial} </span>
             </div>
           )} */}
-          <InputTextOneLine label="Ex.Médico" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled />
-          <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} onChange={handleFormChange} disabled />
-          <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} onChange={handleFormChange} disabled />
-          <InputTextOneLine label="N° Historial" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled />
-          <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} onChange={handleFormChange} disabled />
-          <InputTextOneLine label="Edad" name="edad" value={form.edad} onChange={handleFormChange} disabled />
-          <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled />
-          <div className='grid grid-cols-2 gap-4'>
-            <InputTextOneLine label="Fecha Nac" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled />
-            <InputTextOneLine label="Fecha Triaje" type="date" name="fechaExamen" value={form.fechaExamen} onChange={handleFormChange} disabled={!habilitarEdicion} />
+            <InputTextOneLine label="Ex.Médico" name="nomExam" value={form.nomExam} onChange={handleFormChange} disabled />
+            <InputTextOneLine label="Empresa" name="empresa" value={form.empresa} onChange={handleFormChange} disabled />
+            <InputTextOneLine label="Contrata" name="contrata" value={form.contrata} onChange={handleFormChange} disabled />
+            <InputTextOneLine label="N° Historial" name="nroHistorial" value={form.nroHistorial} onChange={handleFormChange} disabled />
+            <InputTextOneLine label="Nombres" name="nombres" value={form.nombres} onChange={handleFormChange} disabled />
+            <InputTextOneLine label="Apellidos" name="apellidos" value={form.apellidos} onChange={handleFormChange} disabled />
+            <InputTextOneLine label="Edad" name="edad" value={form.edad} onChange={handleFormChange} disabled />
+            <div className='grid grid-cols-2 gap-4'>
+              <InputTextOneLine label="Fecha Nac" type="date" name="fechaNac" value={form.fechaNac} onChange={handleFormChange} disabled />
+              <InputTextOneLine label="Fecha Triaje" type="date" name="fechaExamen" value={form.fechaExamen} onChange={handleFormChange} disabled={!habilitarEdicion} />
+            </div>
           </div>
           {/* Tabs internos para Triaje/Espirometría */}
           <fieldset className="border rounded p-4 mt-2 ">
@@ -197,29 +203,45 @@ const Triaje = ({ token, selectedSede }) => {
                 rows={7}
                 onChange={(e) => { setTriaje(d => ({ ...d, diagnostico: e.target.value.toUpperCase() })); }}
               />
-              <div className="flex gap-3 mt-2">
-                <button type="button" onClick={() => { setHabilitarEdicion(true), setHabilitarTR(false) }} className="bg-blue-500 text-white px-3 py-1 rounded text-md">
-                  <i className="fa fa-pencil mr-2"></i>Editar
-                </button>
-                <button type="button" onClick={() => { handleSubmit(triaje, form.edad, form.nro, form.fechaExamen, Swal, token, setForm, setTriaje, refreshtable, getFetch, setHabilitar) }} id='registrarTR' className="bg-green-500 text-white px-3 py-1 rounded text-md">
-                  <i className="fa fa-save mr-2"></i>Registrar/Actualizar
-                </button>
-                <button type="button" onClick={() => { Clean(setForm, setTriaje), setHabilitarEdicion(false) }} id='cleanTR' className="bg-yellow-400 text-white px-3 py-1 rounded text-md">
-                  <i className="fa fa-eraser mr-2"></i>Limpiar/Cancelar
-                </button>
-              </div>
+              <section className="flex flex-col md:flex-row justify-between items-center gap-4  pt-4">
+                <div className=" flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => { setHabilitarEdicion(true), setHabilitarTR(false) }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faPencil} /> Editar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { handleSubmit(triaje, form.edad, form.nro, form.fechaExamen, Swal, token, setForm, setTriaje, refreshtable, getFetch, setHabilitar) }}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faSave} /> Guardar/Actualizar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { Clean(setForm, setTriaje), setHabilitarEdicion(false) }}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-white text-base px-6 py-2 rounded flex items-center gap-2"
+                  >
+                    <FontAwesomeIcon icon={faBroom} /> Limpiar/Cancelar
+                  </button>
+                </div>
+              </section>
             </div>
           </fieldset>
         </form>
       </div>
       {/* Columna 2 */}
-      <div className="bg-white rounded shadow p-4 min-w-[400px]  w-full md:w-[55%]">
+      <div className="bg-white rounded  p-4 min-w-[400px]  w-full md:w-[55%]">
         {/* Filtro de pacientes/código/nombres */}
-        <div className="border rounded p-2 mb-2">
-          <div className="flex gap-3 items-center mb-2 text-md">
-            <label className="font-medium"><input type="checkbox" name="tipoPaciente" checked={busqueda.tipoPaciente} onChange={handleBusquedaChange} /> Pacientes</label>
-            <label className="font-medium"><input type="checkbox" name="tipoOcupacional" checked={busqueda.tipoOcupacional} onChange={handleBusquedaChange} /> Ocupacional</label>
-            <label className="ml-2 font-medium">Código: <input autoComplete='off' className="border rounded px-1 w-24 text-md" name="codigo" value={busqueda.codigo} onKeyUp={(event) => { SearchHC(event, busqueda, setTablehc, selectedSede, token) }}
+
+        {/* Resumen de pacientes y fecha */}
+        <div className="mb-2 border p-4 rounded">
+          <div className="font-bold mb-3">Últimos Agregados & Hojas de Ruta</div>
+          <div className='grid grid-cols-2 gap-4'>
+            <InputTextOneLine label="Código" name="codigo" value={busqueda.codigo}
+              onKeyUp={(event) => { SearchHC(event, busqueda, setTablehc, selectedSede, token) }}
               onChange={(e) => {
                 const value = e.target.value;
                 if (/^\d{0,7}$/.test(value)) { // máximo 7 dígitos numéricos
@@ -229,39 +251,42 @@ const Triaje = ({ token, selectedSede }) => {
                     nombres: ""
                   }));
                 }
-              }} /></label>
-          </div>
-          <input className="border rounded px-1 w-full mb-2 text-md" placeholder="Nombres" name="nombres" value={busqueda.nombres} onChange={(e) => { handleNombreChange(e, setBusqueda, setTablehc, selectedSede, token, debounceTimeout) }} />
-        </div>
-        {/* Resumen de pacientes y fecha */}
-        <div className="mb-2">
-          <div className="font-bold mb-1">Últimos Agregados & Hojas de Ruta</div>
-          <div className="flex flex-col md:flex-row items-center justify-between bg-blue-50 rounded-lg px-4 py-3 border border-blue-100">
-            <div className="flex items-center gap-2 mb-2 md:mb-0">
-              <span className="font-semibold">Fecha:</span>
-              <input
-                type="date"
-                className="border rounded px-2 py-1 text-md"
-                value={resumenFecha}
-                onChange={e => setResumenFecha(e.target.value)}
-                style={{ minWidth: '120px' }}
-              />
-            </div>
-            <div className="flex gap-6 text-lg font-semibold">
-              <span className="text-gray-700">Pacientes completados: <span className="text-green-600">{completados}</span></span>
-              <span className="text-gray-700">Pacientes faltantes: <span className="text-red-600">{faltantes}</span></span>
+              }}
+            />
+            <InputTextOneLine label="Nombres" name="nombres" value={busqueda.nombres} onChange={(e) => { handleNombreChange(e, setBusqueda, setTablehc, selectedSede, token, debounceTimeout) }} />
+            <InputTextOneLine
+              label='Fecha'
+              type="date"
+              value={resumenFecha}
+              onChange={e => setResumenFecha(e.target.value)
+              }
+            />
+            <div className="flex gap-3 items-center ">
+              <InputCheckbox label="Pacientes" name="tipoPaciente" checked={busqueda.tipoPaciente} onChange={handleBusquedaChange} />
+              <InputCheckbox label="Ocupacional" name="tipoOcupacional" checked={busqueda.tipoOcupacional} onChange={handleBusquedaChange} />
             </div>
           </div>
         </div>
+        {/* <div className="flex flex-col md:flex-row items-center justify-between bg-blue-50 rounded-lg px-4 py-3 border border-blue-100 mb-2">
+          <div className="flex gap-6  font-semibold">
+            <span className="text-gray-700">Pacientes completados: <span className="text-green-600">{completados}</span></span>
+            <span className="text-gray-700">Pacientes faltantes: <span className="text-red-600">{faltantes}</span></span>
+          </div>
+        </div> */}
         {/* Número de historia clínica destacado */}
         {form.nroHistorial && (
           <div className="bg-blue-50 text-gray-500 text-2xl font-extrabold rounded px-4 py-2 mb-2 w-fit mx-auto border border-blue-100 shadow-sm flex items-center justify-center">
             <span style={{ fontSize: '2.5rem', fontWeight: 800, color: '#222' }}> {form.nroHistorial} </span>
           </div>
         )}
-        <div className="border rounded">
+        <div className="">
           {/* Texto informativo arriba de la tabla */}
-          <div className="bg-blue-50 text-blue-700 px-2 py-1 text-sm font-medium border-b border-blue-200 mb-1">(Click izquierdo para importar datos  |  Click derecho para imprimir)</div>
+          <div className='bg-blue-50  flex justify-between  p-4 mb-2 '>
+            <div className="bg-blue-50 text-gray-500  ">(Click izquierdo para importar datos  |  Click derecho para imprimir)</div>
+            <div className="flex gap-6 font-semibold">
+              <span className="text-gray-700">Pacientes completados: <span className="text-green-600">{completados}</span></span>
+              <span className="text-gray-700">Pacientes faltantes: <span className="text-red-600">{faltantes}</span></span></div>
+          </div>
           <div className="overflow-x-auto overflow-y-auto" style={{ maxHeight: '535px' }}> {/* SCROLL VERTICAL Y HORIZONTAL */}
             <table className="w-full text-md border border-gray-300 rounded-lg overflow-hidden">
               <thead>
