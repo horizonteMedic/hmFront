@@ -100,12 +100,12 @@ const Navbar = () => {
 
       <div className="hidden md:flex items-center">
         {URLAzure == "https://testbackendhm.azurewebsites.net" && <p className='font-bold mr-5'>DEVELOPER</p>}
-        <button className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-6'
+        {/* <button className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-6'
           onClick={() => { window.location.reload(); }}
           title="Recargar página"
         >
           <FontAwesomeIcon icon={faRetweet} className="w-5 h-5 " />
-        </button>
+        </button> */}
         <button
           className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-5'
           title="Limpiar datos"
