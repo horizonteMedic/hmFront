@@ -164,6 +164,7 @@ export default function FichaInterconsulta() {
         }
     };
 
+    
     const ReadFileBase64 = (response) => {
         const fileType = response.nombreArchivo.split('.').pop();
         const byteCharacters = atob(response.fileBase64);
