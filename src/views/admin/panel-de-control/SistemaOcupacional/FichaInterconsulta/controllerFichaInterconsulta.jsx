@@ -8,12 +8,25 @@ import {
 import { getFetch } from "../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../utils/helpers";
 
+const obtenerEspecialidad =
+    "/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesFichaInterconsulta";
 const obtenerReporteUrl =
     "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte";
 const registrarUrl =
     "/api/v01/ct/fichaInterconsulta/registrarActualizarFichaInterconsulta";
 const today = getToday();
+
 export const GetInfoServicio = async (
+    nro,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    
+};
+
+export const GetInfoEspecialidad = async (
     nro,
     especialidad,
     tabla,
@@ -21,7 +34,7 @@ export const GetInfoServicio = async (
     token,
     onFinish = () => { }
 ) => {
-    const res = await GetInfoNoRegisterInterconsulta(
+    const res = await GetInfoServicioInterconsulta(
         nro,
         especialidad,
         tabla,
@@ -29,18 +42,18 @@ export const GetInfoServicio = async (
         obtenerReporteUrl,
         onFinish
     );
-    console.log(res)
     if (res) {
         console.log(res)
         set((prev) => ({
             ...prev,
             ...res,
+            // Header
             nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: `${res.edadPaciente} AÑOS`,
-            fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
-            apto: res.apto ? res.apto : false
+            edadPaciente: `${res.edadPaciente}`,
+            dniUser: res.dniUsuario
+            
         }));
     }
 };
@@ -144,22 +157,13 @@ export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {
         },
         () => {
             //Tiene registro
-            if (!especialidad) {
-                Swal.fire(
-                    "Error",
-                    "Seleccione una especialidad.",
-                    "warning"
-                );
-            } else {
-                GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
+                GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); })
+                /*GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Ficha Interconsulta",
                     "warning"
-                );
-            });
-            }
-            
+                );*/  
         },
         () => {
             //Necesita Agudeza visual Triaje
@@ -256,6 +260,30 @@ export const GetInfoNoRegisterInterconsulta = async (
         onFinish();
     }
 };
+
+export const GetInfoEspecialidadInterconsulta = async (
+    nro,
+    token,
+    onFinish = () => { }
+) => {
+    try {
+        const res = await getFetch(
+            `${obtenerEspecialidad}?nOrden=${nro}`,
+            token
+        );
+        if (res?.id || res?.mensaje||res?.n_orden) {
+            return res;
+        } else {
+            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
+            return null;
+        }
+    } catch (error) {
+        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        return null;
+    } finally {
+        onFinish();
+    }
+}
 
 export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
 

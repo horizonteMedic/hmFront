@@ -324,7 +324,7 @@ export default function CertificadoMedicoOcupacional() {
                                     </div>
                                 </section>
                             </div>
-                            <div className="w-1/2">
+                            <div className="w-1/2 h-auto">
                                 <InputTextArea
                                     label="Examenes"
                                     value={form.conclusiones}
