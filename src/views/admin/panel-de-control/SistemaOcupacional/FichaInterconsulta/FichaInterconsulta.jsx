@@ -1,4 +1,4 @@
-import { faSave, faBroom, faPrint } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faBroom, faPrint, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputCheckbox from "../../../../components/reusableComponents/InputCheckbox";
 import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
@@ -8,13 +8,37 @@ import useRealTime from "../../../../hooks/useRealTime";
 import { useForm } from "../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterconsulta";
 import { useSessionData } from "../../../../hooks/useSessionData";
-import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
 import { getToday } from "../../../../utils/helpers";
 import Swal from "sweetalert2";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
 
+const Especialidades = [
+  "Neurología del Sueño",
+  "Neurocirugia",
+  "Alergología",
+  "Neurología",
+  "Cirugía General",
+  "Cirugía Cardiologo",
+  "Cirugía Cabeza y Cuello",
+  "Gastroenterología",
+  "Fisiatria",
+  "Medicina Fisica",
+  "Oncologia",
+  "Cirugía Oncológica",
+  "Hematología",
+  "Ginecologia",
+  "Oftalmología",
+  "Cardiología",
+  "Neumología",
+  "Medicina Interna",
+  "Endocrinología",
+  "Traumatología",
+  "Reumatología",
+  "Nutrición",
+  "Otorrinolaringología"
+]
 
 export default function FichaInterconsulta() {
 
@@ -103,7 +127,17 @@ export default function FichaInterconsulta() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
                         <InputTextOneLine label="N° Orden" value={form.norden} name="norden" onKeyUp={handleSearch} onChange={handleChangeNumber}  />
                         <InputTextOneLine label="Fecha de Examen" value={form.fechaExamen} onChange={handleChangeSimple} type="date" name="fechaExamen" />
-                        <InputTextOneLine label="Especialidad" value={form.especialidad} onChange={handleChange} name="especialidad" />
+                        <div className="flex items-center gap-4 w-full">
+                            <label htmlFor="">Especialidades</label>
+                            <select value={form.especialidad} name="especialidad" onChange={handleChange} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" >
+                                {Especialidades?.map((option, index) => (
+                                    <option key={index} value={option.toUpperCase()}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        {/*<InputTextOneLine label="Especialidad" value={form.especialidad} onChange={handleChange} name="especialidad" />*/}
                         <InputTextOneLine label="Puesto de Trabajo" value={form.cargoPaciente} disabled onChange={handleChange} name="cargoPaciente" />
                     </div>
 
@@ -112,7 +146,13 @@ export default function FichaInterconsulta() {
                         <h1 className="text-lg font-bold">{useRealTime()}</h1>
                     </div>
 
-                    {/* Checkboxes en grid responsivo */}
+                    <div className="flex justify-center items-center">
+                        <button className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                            <FontAwesomeIcon icon={faUpload} />
+                            Subir Archivo
+                        </button>
+                    </div>           
+                    {/* Checkboxes en grid responsivo 
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-4 xl:flex justify-center mt-4">
                         <InputsRadioGroup
                             name="especialidad" value={form.especialidad}
@@ -163,18 +203,7 @@ export default function FichaInterconsulta() {
                             name="especialidad" value={form.especialidad}
                             onChange={handleRadioButton} options={[{ label: "Otorrinolaringología", value: "OTORRINOLARINGOLOGIA" }]}
                             />
-                        
-                        {/*<InputCheckbox label="Oftalmología" labelRight />
-                        <InputCheckbox label="Cardiología" labelRight />
-                        <InputCheckbox label="Neumología" labelRight />
-                        <InputCheckbox label="Medicina Interna" labelRight />
-                        <InputCheckbox label="Endocrinología" labelRight />
-                        <InputCheckbox label="Traumatología" labelRight />
-                        <InputCheckbox label="Reumatología" labelRight />
-                        <InputCheckbox label="Hematología" labelRight />
-                        <InputCheckbox label="Nutrición" labelRight />
-                        <InputCheckbox label="Otorrinolaringologia" labelRight />*/}
-                    </div>
+                    </div>*/}
 
                     <div className="grid gap-4 mt-4 pt-4 border-t-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] items-center">
                         {/* DNI */}
@@ -244,7 +273,7 @@ export default function FichaInterconsulta() {
                         {/* F.C */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="F.C:"
+                            label="F.C"
                             labelWidth="30px"
                             disabled
                             value={form.frecuenciaCardiaca}
@@ -257,7 +286,7 @@ export default function FichaInterconsulta() {
                         {/* P.A */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="P.A:"
+                            label="P.A"
                             labelWidth="30px"
                             value={form.PA}
                             disabled
@@ -270,7 +299,7 @@ export default function FichaInterconsulta() {
                         {/* F.R */}
                         <div className="flex items-center gap-1">
                             <InputTextOneLine
-                            label="F.R:"
+                            label="F.R"
                             labelWidth="30px"
                             disabled
                             value={form.frecuenciaRespiratoriaTriaje}
