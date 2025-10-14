@@ -71,6 +71,20 @@ export const GetInfoServicio = async (
             vb: res.vboftalmologia_vb ?? "",
             rp: res.rpoftalmologia_rp ?? "",
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares ?? "",
+            //==========================TAB EXAMEN FISICO===========================
+            // Examen Médico - Medidas Antropométricas y Signos Vitales
+            frecuenciaCardiaca: res.frecuenciaCardiaca ?? "",
+            frecuenciaRespiratoria: res.frecuenciaRespiratoriaTriaje_f_respiratoria ?? "",
+            presionArterial: `${res.sistolica ?? ""}/${res.diastolica ?? ""}`, //revisar - combinando sistólica y diastólica
+            talla: res.tallaTriaje ?? "",
+            peso: res.pesoTriaje ?? "",
+            imc: res.imcTriaje ?? "",
+            perimetroCuello: res.perimetroCuelloTriaje ?? "",
+            perimetroCintura: res.cinturaTriaje ?? "",
+            perimetroCadera: res.caderaTriaje ?? "",
+            icc: res.iccTriaje ?? "",
+            perimetroToracicoInspiracion: res.maximaInspiracionPtoracico_p_max_inspiracion ?? "",
+            perimetroToracicoEspiracion: res.forazadaPtoracico_p_ex_forzada ?? "",
         }));
     }
 };
