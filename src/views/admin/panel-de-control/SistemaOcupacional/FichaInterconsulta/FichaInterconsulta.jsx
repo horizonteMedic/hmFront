@@ -40,7 +40,7 @@ const Especialidades = [
   "Traumatología",
   "Reumatología",
   "Nutrición",
-  "Otorrinolaringología"
+  "Otorrinolaringologia"
 ]
 
 export default function FichaInterconsulta() {
@@ -150,7 +150,8 @@ export default function FichaInterconsulta() {
                 nombre: file.name,
                 sede: selectedSede,
                 base64:  base64WithoutHeader,
-                nomenclatura: `INTERCONSULTA ${form.nomenclatura === "1" ? "" : form.nomenclatura}`
+                nomenclatura: `INTERCONSULTA${form.nomenclatura === 1 ? "" : ` ${form.nomenclatura}`}`,
+                norden: form.norden
             };
             const response = await SubirInterconsulta(datos, userlogued, token);
             if (response.id === 1) {
@@ -163,37 +164,22 @@ export default function FichaInterconsulta() {
         reader.readAsDataURL(file);
         }
     };
-
     
-    const ReadFileBase64 = (response) => {
-        const fileType = response.nombreArchivo.split('.').pop();
-        const byteCharacters = atob(response.fileBase64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: `application/${fileType}` });
-    
-        const fileDataUri = URL.createObjectURL(blob);
-        setVisualerOpen({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` })
-        //setCurrentFile({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` });
-        
-    };
-
     const ReadArchivosForm = async () => {
-        ReadArchivos(form.norden, `INTERCONSULTA ${form.nomenclatura === "1" ? "" : form.nomenclatura}`, token)
+        LoadingDefault("Cargando Interconsulta")
+        ReadArchivos(form.norden, `INTERCONSULTA ${form.nomenclatura === 1 ? "" : form.nomenclatura}`)
         .then(response => {
-            ReadFileBase64(response);
+            if (response.id === 1) {
+                setVisualerOpen(response)
+            }
+            Swal.close()
         })
         .catch(error => {
+            Swal.fire("Error","Ocurrio un Error al visualizar la interconsulta","error")
             throw new Error('Network response was not ok.', error);
         })
-        .finally(() =>{
-            setOpenview(false)
-        })
     }
-    
+   
     return (
         <>
             <div className="space-y-6 max-w-[95%] mx-auto">
@@ -510,14 +496,14 @@ export default function FichaInterconsulta() {
                     <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
                         <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
                         <div className="px-4 py-2 naranjabackgroud flex justify-between">
-                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.name}</h2>
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.nombreArchivo}</h2>
                             <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
                         </div>
                         <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
-                            <embed src={visualerOpen.uri} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                            <iframe src={`https://docs.google.com/gview?url=${encodeURIComponent(`${visualerOpen.mensaje}`)}&embedded=true`}  type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
                         </div>
                         <div className="flex justify-center">
-                            <a href={visualerOpen.uri} download={visualerOpen.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                            <a href={visualerOpen.mensaje} download={visualerOpen.nombreArchivo} className="azul-btn font-bold py-2 px-4 rounded mb-4">
                             <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
                             </a>
                         </div>

@@ -10,8 +10,13 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerCMO";
 import { getToday } from "../../../../utils/helpers";
 import { valores } from "./ControllerCMO";
+
 const tabla = "certificado_aptitud_medico_resumen"
 const today = getToday();
+const fecha = new Date(today);
+fecha.setFullYear(fecha.getFullYear() + 1);
+
+const nextYearDate = fecha.toISOString().split("T")[0];
 
 export default function CertificadoMedicoOcupacional() {
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -33,7 +38,7 @@ export default function CertificadoMedicoOcupacional() {
         apto: "APTO",
 
         fechaDesde: today,
-        fechahasta: today,
+        fechahasta: nextYearDate,
         conclusiones: "",
         nombreMedico: userCompleto?.datos?.nombres_user?.toUpperCase(),
         

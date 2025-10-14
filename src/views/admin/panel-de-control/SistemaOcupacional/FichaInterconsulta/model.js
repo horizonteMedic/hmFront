@@ -14,7 +14,7 @@ export function SubirInterconsulta(datos,user,token) {
         codigoSede: datos.sede,
         dni: null,
         historiaClinica:null,
-        orden: null,
+        orden: datos.norden,
         servidor: "azure",
         estado: true,
         fechaRegistro: `${year}-${month}-${day}`,
@@ -40,17 +40,16 @@ export function SubirInterconsulta(datos,user,token) {
         
     }
 
-export function ReadArchivos(historia,id_archivo,token) {
+export function ReadArchivos(norden,nomenclatura,token) {
 
     const options = {
         method: 'GET', 
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
         }
     }
 
-    return fetch(`${URLAzure}/api/v01/ct/archivos/detalleArchivo/${historia}/${id_archivo}`,options)
+    return fetch(`${URLAzure}/api/v01/st/registros/detalleUrlArchivos/${norden}/${nomenclatura}`,options)
     .then(res => res.json()).then(response => response)
 }
 
