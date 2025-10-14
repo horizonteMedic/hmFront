@@ -1049,7 +1049,7 @@ export const MapearDatosAdicionales = (
     data.visionColores = res.visionColoresAnexo7c_txtvisioncolores ?? "";
     data.visionBinocular = res.visionBinocular_v_binocular ?? "";
     data.reflejosPupilares =
-      res.reflejosPupilaresAnexo7c_txtreflejospupilares ?? "";
+      res.rp_rp ?? "";
     data.enfermedadOculares = res.enfermedadesOcularesOftalmo_e_oculares ?? "";
     data.enfermedadOtros =
       res.enfermedadesOcularesOtrosOftalmo_e_oculares1 ?? "";
