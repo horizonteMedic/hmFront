@@ -8,44 +8,95 @@ import {
 import { getFetch } from "../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../utils/helpers";
 
+const obtenerEspecialidad =
+    "/api/v01/ct/fichaInterconsulta/obtenerEspecialidadesFichaInterconsulta";
 const obtenerReporteUrl =
     "/api/v01/ct/fichaInterconsulta/obtenerFichaInterconsultaReporte";
 const registrarUrl =
     "/api/v01/ct/fichaInterconsulta/registrarActualizarFichaInterconsulta";
 const today = getToday();
+
+//Para ver uno registrado y ver sus especialidades
 export const GetInfoServicio = async (
     nro,
-    especialidad,
     tabla,
     set,
     token,
     onFinish = () => { }
 ) => {
-    const res = await GetInfoNoRegisterInterconsulta(
+    const res = await GetInfoEspecialidadInterconsulta(
         nro,
-        especialidad,
-        tabla,
         token,
-        obtenerReporteUrl,
         onFinish
     );
-    console.log(res)
     if (res) {
         console.log(res)
-        set((prev) => ({
-            ...prev,
-            ...res,
-            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
-            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: `${res.edadPaciente} AÑOS`,
-            fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
-            apto: res.apto ? res.apto : false
-        }));
+        //por index
+        const inputOptions = res.reduce((acc, item) => {
+            acc[item.id] = item.mensaje; // usa el ID real del backend
+            return acc;
+        }, {});
+
+        //por mensaje
+        /*const inputOptions = res.reduce((acc, item) => {
+        acc[item.mensaje] = item.mensaje;
+        return acc;
+        }, {}); */
+        console.log(inputOptions)
+        // Mostrar SweetAlert con radios
+        const { value: seleccion } = await Swal.fire({
+            title: "Selecciona una especialidad",
+            input: "radio",
+            inputOptions,
+            inputValidator: (value) => {
+            if (!value) {
+                return "Debes seleccionar una opción o crear una nueva.";
+            }
+            },
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: "Buscar",
+            denyButtonText: "Nuevo registro",
+            cancelButtonText: "Cancelar",
+            allowOutsideClick: false,
+            customClass: {
+            popup: "swal-wide",
+            },
+        });
+
+        // Si seleccionó una opción
+        if (seleccion) {
+            console.log(seleccion)
+            const especialidadSeleccionada = res.find(
+                (item) => item.id === parseInt(seleccion, 10)
+            );
+            GetInfoServicioEditar(nro, especialidadSeleccionada, tabla, set, token, () => {
+            Swal.fire(
+                "Alerta",
+                "Este paciente ya cuenta con registros de Ficha Interconsulta",
+                "warning"
+            )})
+
+            console.log("✅ Especialidad seleccionada:", especialidadSeleccionada);
+            // Aquí puedes retornar o usar especialidadSeleccionada.mensaje
+        }
+
+        // Si presiona "Nuevo registro"
+        else if (Swal.getDenyButton()) {
+            // Detecta el botón de "Nuevo registro"
+            const isDenied = Swal.isVisible() && Swal.getDenyButton().classList.contains("swal2-deny");
+            if (isDenied) {
+                GetInfoServicioNewEditar(nro, Object.values(inputOptions)[0], tabla, set, token, () => { Swal.close(); })
+            }
+        }
+        
     }
 };
 
-export const GetInfoServicioEditar = async (
+
+
+//Sin registros
+export const GetInfoEspecialidad = async (
     nro,
     especialidad,
     tabla,
@@ -76,7 +127,79 @@ export const GetInfoServicioEditar = async (
         }));
     }
 };
+//para ver uno ya registrado
+export const GetInfoServicioEditar = async (
+    nro,
+    especialidad,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioInterconsulta(
+        nro,
+        especialidad.mensaje,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        console.log(res)
+        set((prev) => ({
+            ...prev,
+            ...res,
+            // Header
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
+            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+            PA: `${res.sistolica}/${res.diastolica}`,
+            edadPaciente: `${res.edadPaciente}`,
+            dniUser: res.dniUsuario,
+            SubirDoc: true,
+            nomenclatura: especialidad.id
+            
+        }));
+    }
+};
 
+//Uno con registro, pero desea agregar uno mas
+export const GetInfoServicioNewEditar = async (
+    nro,
+    especialidad,
+    tabla,
+    set,
+    token,
+    onFinish = () => { }
+) => {
+    const res = await GetInfoServicioInterconsulta(
+        nro,
+        especialidad,
+        tabla,
+        token,
+        obtenerReporteUrl,
+        onFinish
+    );
+    if (res) {
+        console.log(res)
+        set((prev) => ({
+            ...prev,
+             ...res,
+            codigoFichaInterconsulta: null,
+            especialidad: "",
+            // Header
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
+            sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
+            PA: `${res.sistolica}/${res.diastolica}`,
+            edadPaciente: `${res.edadPaciente}`,
+            dniUser: res.dniUsuario,
+            motivo: "",
+            hallazgo: "",
+            diagnostico: "",
+            tratamiento: "",
+            apto: false
+        }));
+    }
+};
 
 export const SubmitDataService = async (
     form,
@@ -140,26 +263,17 @@ export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, especialidad, tabla, set, token, () => { Swal.close(); });
+            GetInfoEspecialidad(nro, especialidad, tabla, set, token, () => { Swal.close(); });
         },
         () => {
             //Tiene registro
-            if (!especialidad) {
-                Swal.fire(
-                    "Error",
-                    "Seleccione una especialidad.",
-                    "warning"
-                );
-            } else {
-                GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
+                GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); })
+                /*GetInfoServicioEditar(nro, especialidad, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
                     "Este paciente ya cuenta con registros de Ficha Interconsulta",
                     "warning"
-                );
-            });
-            }
-            
+                );*/  
         },
         () => {
             //Necesita Agudeza visual Triaje
@@ -257,6 +371,8 @@ export const GetInfoNoRegisterInterconsulta = async (
     }
 };
 
+
+
 export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, datosFooter, obtenerReporteUrl, jasperModules, nombreCarpeta) => {
 
     LoadingDefault("Cargando Formato a Imprimir");
@@ -283,3 +399,29 @@ export const PrintHojaRFichaInterconsulta = (nro, especialidad, token, tabla, da
             Swal.close();
         });
 };
+
+
+//para ver las especialidadses registradas
+export const GetInfoEspecialidadInterconsulta = async (
+    nro,
+    token,
+    onFinish = () => { }
+) => {
+    try {
+        const res = await getFetch(
+            `${obtenerEspecialidad}?nOrden=${nro}`,
+            token
+        );
+        if (Array.isArray(res) && res.length > 0) {
+            return res;
+        } else {
+            Swal.fire("Error", "Ocurrió un error al traer los datos", "error");
+            return null;
+        }
+    } catch (error) {
+        Swal.fire("Error", "Ocurrio un error al traer los datos", "error");
+        return null;
+    } finally {
+        onFinish();
+    }
+}

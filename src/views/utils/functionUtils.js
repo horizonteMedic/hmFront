@@ -61,6 +61,7 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
             if (res.norden || res.norden_n_orden|| res.n_orden) {
                 const nombre = res.nameJasper;
                 console.log(nombre)
+                console.log(res)
                 const modulo = await jasperModules[
                     `${nombreCarpeta}/${nombre}.jsx`
                 ]();

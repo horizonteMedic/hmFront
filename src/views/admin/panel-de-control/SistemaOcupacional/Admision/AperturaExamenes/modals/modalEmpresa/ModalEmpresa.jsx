@@ -11,6 +11,7 @@ import {
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { SubmitNewEmpresa } from "./CRUD";
+import InputTextOneLine from "../../../../../../../components/reusableComponents/InputTextOneLine";
 
 const ModalEmpresa = ({
   isOpen,
@@ -25,6 +26,9 @@ const ModalEmpresa = ({
     ruc: "",
     razonSocial: "",
     direccion: "",
+    distrito: "",
+    provincia: "",
+    departamento: "",
     telefonos: "",
     responsable: "",
     email: "",
@@ -57,8 +61,9 @@ const ModalEmpresa = ({
           setPuedeHabilitar(false);
           Swal.fire("Error", "El RUC ya existe", "error");
         } else {
-          setExisteRUC(false);
-          setPuedeHabilitar(true);
+          buscarEmpresaenLinea(ruc);
+          // setExisteRUC(false);
+          // setPuedeHabilitar(true);
         }
       })
       .catch((error) => {
@@ -66,6 +71,36 @@ const ModalEmpresa = ({
         setExisteRUC(false);
         setPuedeHabilitar(true);
         // Swal.fire("Error", "Error al verificar el RUC", "error");
+      });
+  };
+
+  const buscarEmpresaenLinea = (ruc) => {
+    Get(
+      `/api/v01/ct/infoAdmisionEmpresa/datosEmpresa/${ruc}`,
+      token
+    )
+      .then((res) => {
+        if (res.ruc == ruc) {
+          setFormData((prev) => ({
+            ...prev,
+            ruc: res.ruc || "",
+            razonSocial: res.razonSocial || "",
+            direccion: res.direccion || "",
+            distrito: res.distrito || "",
+            provincia: res.provincia || "",
+            departamento: res.departamento || "",
+            responsable: res.responsable || "",
+          }));
+          Swal.fire("Success", "Empresa no registrada. Datos encontrados en Línea", "success");
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking RUC existence:", error);
+        // Swal.fire("Error", "Error al verificar el RUC", "error");
+      })
+      .finally(() => {
+        setExisteRUC(false);
+        setPuedeHabilitar(true);
       });
   };
 
@@ -99,6 +134,14 @@ const ModalEmpresa = ({
       });
     }
   };
+  const handleRucPaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData('text').trim();
+    setFormData((prev) => ({
+      ...prev,
+      ruc: pastedText.toUpperCase(),
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -112,6 +155,9 @@ const ModalEmpresa = ({
       razonEmpresa: formData.razonSocial,
       direccionEmpresa: formData.direccion,
       telefonoEmpresa: formData.telefonos,
+      distritoEmpresa: formData.distrito,
+      provinciaEmpresa: formData.provincia,
+      departamentoEmpresa: formData.departamento,
       responsableEmpresa: formData.responsable,
       emailEmpresa: formData.email,
       apiToken: null,
@@ -146,6 +192,9 @@ const ModalEmpresa = ({
       ruc: "",
       razonSocial: "",
       direccion: "",
+      distrito: "",
+      provincia: "",
+      departamento: "",
       telefonos: "",
       responsable: "",
       email: "",
@@ -160,6 +209,9 @@ const ModalEmpresa = ({
       ruc: "",
       razonSocial: "",
       direccion: "",
+      distrito: "",
+      provincia: "",
+      departamento: "",
       telefonos: "",
       responsable: "",
       email: "",
@@ -203,10 +255,9 @@ const ModalEmpresa = ({
               name="ruc"
               value={formData.ruc}
               onChange={handleChange}
-              className={`border rounded px-2 py-1 flex-1 ${
-                habilitar ? "bg-slate-300" : "bg-white"
-              }`}
-              onPaste={(e) => {Swal.fire("Error", "No se permite pegar el RUC, DEBE DIGITARSE", "error");e.preventDefault()}} // 🔒 Evita pegar texto
+              onPaste={handleRucPaste}
+              className={`border rounded px-2 py-1 flex-1 ${habilitar ? "bg-slate-300" : "bg-white"
+                }`}
               maxLength={11}
               disabled={habilitar}
               required
@@ -240,9 +291,8 @@ const ModalEmpresa = ({
             value={formData.razonSocial}
             onChange={handleChange}
             disabled={habilitar || existeRUC}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
             required
           />
           <button
@@ -262,9 +312,8 @@ const ModalEmpresa = ({
             disabled={habilitar || existeRUC}
             value={formData.direccion}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
           <button
             type="button"
@@ -273,17 +322,14 @@ const ModalEmpresa = ({
           >
             <FontAwesomeIcon icon={faBroom} /> Limpiar
           </button>
-
-          <label className="text-right">Teléfonos:</label>
-          <input
-            type="text"
-            disabled={habilitar || existeRUC}
-            name="telefonos"
-            value={formData.telefonos}
+          <label className="text-right">Distrito:</label>
+          <InputTextOneLine
+            name="distrito"
+            value={formData.distrito}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            disabled={habilitar || existeRUC}
+            inputClassName={` ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
           <button
             type="button"
@@ -291,17 +337,14 @@ const ModalEmpresa = ({
           >
             <FontAwesomeIcon icon={faFileExport} /> Exportar
           </button>
-
-          <label className="text-right">Responsable:</label>
-          <input
-            type="text"
-            disabled={habilitar || existeRUC}
-            name="responsable"
-            value={formData.responsable}
+          <label className="text-right">Provincia:</label>
+          <InputTextOneLine
+            name="provincia"
+            value={formData.provincia}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            disabled={habilitar || existeRUC}
+            inputClassName={` ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
           <button
             type="button"
@@ -311,16 +354,14 @@ const ModalEmpresa = ({
             <FontAwesomeIcon icon={faTimes} /> Cerrar
           </button>
 
-          <label className="text-right">Email:</label>
-          <input
-            type="email"
-            disabled={habilitar || existeRUC}
-            name="email"
-            value={formData.email}
+          <label className="text-right">Departamento:</label>
+          <InputTextOneLine
+            name="departamento"
+            value={formData.departamento}
             onChange={handleChange}
-            className={`border rounded px-2 py-1 ${
-              habilitar || existeRUC ? "bg-slate-300" : "bg-white"
-            }`}
+            disabled={habilitar || existeRUC}
+            inputClassName={` ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
           />
           <button
             type="button"
@@ -333,6 +374,41 @@ const ModalEmpresa = ({
           >
             <FontAwesomeIcon icon={faUnlock} /> Habilitar
           </button>
+          <label className="text-right">Teléfonos:</label>
+          <input
+            type="text"
+            disabled={habilitar || existeRUC}
+            name="telefonos"
+            value={formData.telefonos}
+            onChange={handleChange}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
+          />
+          <div />
+
+          <label className="text-right">Responsable:</label>
+          <input
+            type="text"
+            disabled={habilitar || existeRUC}
+            name="responsable"
+            value={formData.responsable}
+            onChange={handleChange}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
+          />
+          <div />
+
+          <label className="text-right">Email:</label>
+          <input
+            type="email"
+            disabled={habilitar || existeRUC}
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`border rounded px-2 py-1 ${habilitar || existeRUC ? "bg-slate-300" : "bg-white"
+              }`}
+          />
+          <div />
         </div>
 
         {/* Search Razón Social input */}
@@ -395,11 +471,14 @@ const ModalEmpresa = ({
                           ruc: item.rucEmpresa || "",
                           razonSocial: item.razonEmpresa || "",
                           direccion: item.direccionEmpresa || "",
+                          distrito: item.distritoEmpresa || "",
+                          provincia: item.provinciaEmpresa || "",
+                          departamento: item.departamentoEmpresa || "",
                           telefonos: item.telefonoEmpresa || "",
                           responsable: item.responsableEmpresa || "",
                           email: item.emailEmpresa || "",
                         }),
-                        setHabilitar(true);
+                          setHabilitar(true);
                         setPuedeHabilitar(true);
                         setExisteRUC(false);
                       }}

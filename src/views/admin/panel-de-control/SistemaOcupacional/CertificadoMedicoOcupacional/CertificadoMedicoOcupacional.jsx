@@ -58,7 +58,7 @@ export default function CertificadoMedicoOcupacional() {
         leucocitoSematologiaLabClinico: ""
     }
 
-    const { form, setForm, handleChangeNumber,handleChange, handleClearnotO, handleRadioButton, handleClear, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
+    const { form, setForm, handleChangeNumber,handleChange, handleClearnotO, handleClear, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Medico_Ocupacional_form" })
     
     const handleClearnotOandEspecialidad = () => {
         setForm((prev) => ({ ...InitialForm, norden: prev.norden, fechaDesde: today, fechahasta: today }));
@@ -88,6 +88,76 @@ export default function CertificadoMedicoOcupacional() {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
+
+    const handleRadioButton = (e) => {
+        const { name, value } = e.target;
+
+        // value ya trae el texto del Check seleccionado (por ejemplo valores.Check1)
+        const textoFinal = generarConclusiones(form, valores, value);
+
+        setForm((prev) => ({
+            ...prev,
+            [name]: textoFinal,
+        }));
+
+        console.log("Texto generado:\n", textoFinal);
+    };
+
+    function generarConclusiones(form, valores, textoSeleccionado) {
+        let conclusiones = "";
+
+        // ==============================
+        // 🔹 1. TRIAJE
+        // ==============================
+        const { pesoTriaje, tallaTriaje } = form;
+
+        if (pesoTriaje && tallaTriaje) {
+            conclusiones += `- TRIAJE ( PESO: ${pesoTriaje} KG ; TALLA: ${tallaTriaje} CM )\n`;
+        }
+
+        // ==============================
+        // 🔹 2. LABORATORIO
+        // ==============================
+        const {
+            leucocitoSematologiaLabClinico,
+            hemoglobina_txthemoglobina,
+            hematocritoLabClinico_txthematocrito,
+            grupoFactor,
+            glucosaLabClinico_txtglucosabio,
+            creatininaLabClinico_txtcreatininabio,
+            densidadLabClinico_txtdensidadef,
+            bacteriaLabClinico_txtbacteriassu,
+            vsgLabClinico_txtvsg,
+            cocainaLabClinico_txtcocaina,
+            marihuanaLabClinico_txtmarihuana,
+        } = form;
+
+        const labItems = [];
+
+        if (leucocitoSematologiaLabClinico) labItems.push("HMA");
+        if (hemoglobina_txthemoglobina) labItems.push("HB");
+        if (hematocritoLabClinico_txthematocrito) labItems.push("HTO");
+        if (grupoFactor) labItems.push(`GRUPO SANGUÍNEO Y FACTOR (${grupoFactor})`);
+        if (glucosaLabClinico_txtglucosabio && glucosaLabClinico_txtglucosabio !== "N/A") labItems.push("GLUCOSA");
+        if (creatininaLabClinico_txtcreatininabio && creatininaLabClinico_txtcreatininabio !== "N/A") labItems.push("CREATININA");
+        if (densidadLabClinico_txtdensidadef) labItems.push("EX. ORINA");
+        if (bacteriaLabClinico_txtbacteriassu && bacteriaLabClinico_txtbacteriassu !== "NO SE OBSERVAN") labItems.push("BRAM s/c");
+        if (vsgLabClinico_txtvsg) labItems.push("VSG");
+        if (cocainaLabClinico_txtcocaina && cocainaLabClinico_txtcocaina !== "N/A") labItems.push("TEST COCAÍNA");
+        if (marihuanaLabClinico_txtmarihuana && marihuanaLabClinico_txtmarihuana !== "N/A") labItems.push("MARIHUANA");
+
+        if (labItems.length > 0) {
+            conclusiones += `- LABORATORIO: ${labItems.join(", ")}\n`;
+        }
+
+        // ==============================
+        // 🔹 3. BLOQUE FINAL (SEGÚN CHECKBOX)
+        // ==============================
+         // --- Concatenar con el texto del Check seleccionado ---
+        conclusiones += textoSeleccionado || "";
+
+        return conclusiones.trim();
+        }
     
     return (
         <div className="mx-auto bg-white overflow-hidden">
@@ -324,7 +394,7 @@ export default function CertificadoMedicoOcupacional() {
                                     </div>
                                 </section>
                             </div>
-                            <div className="w-1/2">
+                            <div className="w-1/2 h-auto">
                                 <InputTextArea
                                     label="Examenes"
                                     value={form.conclusiones}
