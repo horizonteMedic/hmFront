@@ -453,7 +453,7 @@ const ModalEmpresa = ({
         {/* Table section */}
         <div className="mt-2">
           <div className="border rounded">
-            <div className="max-h-[300px] overflow-y-auto">
+            <div className="max-h-[200px] overflow-y-auto">
               <table className="w-full">
                 <thead className="bg-gray-100 sticky top-0">
                   <tr>
