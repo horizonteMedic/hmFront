@@ -101,7 +101,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
               base64: base64WithoutHeader,
               nomenclatura: selectarch.nomenclatura
           };
-
+          console
           const response = await ArchivosMasivos(datos, user, token);
 
           if (response.id) {
@@ -203,6 +203,7 @@ const DataUploadModal2 = ({ closeModal, Sedes, user, token }) => {
 
   const handleExamenChange = (e) => {
     const selectedOption = JSON.parse(e.target.value);
+    console.log(selectedOption)
     setSelectarch(selectedOption);
     setIsFolderUploadEnabled(true);
   };

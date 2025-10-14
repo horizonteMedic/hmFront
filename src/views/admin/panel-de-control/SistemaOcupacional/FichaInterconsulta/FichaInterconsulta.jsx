@@ -1,4 +1,4 @@
-import { faSave, faBroom, faPrint, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faBroom, faPrint, faUpload, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputCheckbox from "../../../../components/reusableComponents/InputCheckbox";
 import InputsBooleanRadioGroup from "../../../../components/reusableComponents/InputsBooleanRadioGroup";
@@ -10,6 +10,9 @@ import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaInterc
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { getToday } from "../../../../utils/helpers";
 import Swal from "sweetalert2";
+import {SubirInterconsulta, ReadArchivos} from "./model";
+import { LoadingDefault } from "../../../../utils/functionUtils";
+import { useState } from "react";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
@@ -44,7 +47,7 @@ export default function FichaInterconsulta() {
 
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
         useSessionData();
-    
+    const [visualerOpen, setVisualerOpen] = useState(null)
     const Initialform = {
         norden: "",
         fechaExamen: today,
@@ -78,7 +81,9 @@ export default function FichaInterconsulta() {
         hallazgo: "",
         diagnostico: "",
         tratamiento: "",
-        apto: false
+        apto: false,
+        SubirDoc: false,
+        nomenclatura: ""
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
@@ -117,6 +122,77 @@ export default function FichaInterconsulta() {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
+
+    const handleSubirArchivo = async () => {
+        const { value: file } = await Swal.fire({
+        title: "Selecciona un archivo PDF",
+        input: "file",
+        inputAttributes: {
+            accept: "application/pdf", // solo PDF
+            "aria-label": "Sube tu archivo en formato PDF"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Subir",
+        cancelButtonText: "Cancelar",
+        inputValidator: (file) => {
+            if (!file) return "Debes seleccionar un archivo.";
+            if (file.type !== "application/pdf") return "Solo se permiten archivos PDF.";
+        },
+        });
+
+        if (file) {
+        // Puedes convertirlo a Base64 si lo necesitas
+        const reader = new FileReader();
+        reader.onload = async (e)  => {
+            LoadingDefault("Subiendo documento")
+            const base64WithoutHeader = e.target.result.split(',')[1];
+            const datos = {
+                nombre: file.name,
+                sede: selectedSede,
+                base64:  base64WithoutHeader,
+                nomenclatura: `INTERCONSULTA ${form.nomenclatura === "1" ? "" : form.nomenclatura}`
+            };
+            const response = await SubirInterconsulta(datos, userlogued, token);
+            if (response.id === 1) {
+                Swal.fire("Exito", "Archivo Subido con exto","success")
+            } else {
+                Swal.fire("Error", "No se pudo subir","error")
+            }
+            console.log(response)
+        };
+        reader.readAsDataURL(file);
+        }
+    };
+
+    
+    const ReadFileBase64 = (response) => {
+        const fileType = response.nombreArchivo.split('.').pop();
+        const byteCharacters = atob(response.fileBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: `application/${fileType}` });
+    
+        const fileDataUri = URL.createObjectURL(blob);
+        setVisualerOpen({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` })
+        //setCurrentFile({ uri: fileDataUri, name: response.nombreArchivo, type: `application/${fileType}` });
+        
+    };
+
+    const ReadArchivosForm = async () => {
+        ReadArchivos(form.norden, `INTERCONSULTA ${form.nomenclatura === "1" ? "" : form.nomenclatura}`, token)
+        .then(response => {
+            ReadFileBase64(response);
+        })
+        .catch(error => {
+            throw new Error('Network response was not ok.', error);
+        })
+        .finally(() =>{
+            setOpenview(false)
+        })
+    }
     
     return (
         <>
@@ -129,7 +205,7 @@ export default function FichaInterconsulta() {
                         <InputTextOneLine label="Fecha de Examen" value={form.fechaExamen} onChange={handleChangeSimple} type="date" name="fechaExamen" />
                         <div className="flex items-center gap-4 w-full">
                             <label htmlFor="">Especialidades</label>
-                            <select value={form.especialidad} name="especialidad" onChange={handleChange} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" >
+                            <select value={form.especialidad} name="especialidad" onChange={handleChangeSimple} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" >
                                 {Especialidades?.map((option, index) => (
                                     <option key={index} value={option.toUpperCase()}>
                                         {option}
@@ -146,64 +222,18 @@ export default function FichaInterconsulta() {
                         <h1 className="text-lg font-bold">{useRealTime()}</h1>
                     </div>
 
-                    <div className="flex justify-center items-center">
-                        <button className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                    {form.SubirDoc && <div className="flex justify-center items-center gap-3">
+                        <button onClick={handleSubirArchivo} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
                             <FontAwesomeIcon icon={faUpload} />
                             Subir Archivo
                         </button>
-                    </div>           
-                    {/* Checkboxes en grid responsivo 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-4 xl:flex justify-center mt-4">
-                        <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Oftalmología", value: "OFTALMOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Cardiología", value: "CARDIOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Neumología", value: "NEUMOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Medicina Interna", value: "MEDICINA INTERNA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Endocrinología", value: "ENDOCRINOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Traumatología", value: "TRAUMATOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Reumatología", value: "REUMATOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Hematología", value: "HEMATOLOGÍA" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Nutrición", value: "NUTRICIÓN" }]}
-                            />
-
-                            <InputsRadioGroup
-                            name="especialidad" value={form.especialidad}
-                            onChange={handleRadioButton} options={[{ label: "Otorrinolaringología", value: "OTORRINOLARINGOLOGIA" }]}
-                            />
-                    </div>*/}
+                         <button onClick={ReadArchivosForm} className="bg-emerald-600 hover:bg-emerald-700 text-white text-base px-6 py-2 rounded flex items-center gap-2">
+                            <FontAwesomeIcon icon={faDownload} />
+                            Ver Archivo
+                        </button>
+                    </div>}   
+  
+                    
 
                     <div className="grid gap-4 mt-4 pt-4 border-t-2 grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] items-center">
                         {/* DNI */}
@@ -476,6 +506,24 @@ export default function FichaInterconsulta() {
                         
                     </div>
                 </section>
+                {visualerOpen && (
+                    <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-800 bg-opacity-50 z-50">
+                        <div className="bg-white rounded-lg overflow-hidden overflow-y-auto shadow-xl w-[700px] h-[auto] max-h-[90%]">
+                        <div className="px-4 py-2 naranjabackgroud flex justify-between">
+                            <h2 className="text-lg font-bold color-blanco">{visualerOpen.name}</h2>
+                            <button onClick={() => setVisualerOpen(null)} className="text-xl text-white" style={{ fontSize: '23px' }}>×</button>
+                        </div>
+                        <div className="px-6 py-4  overflow-y-auto flex h-auto justify-center items-center">
+                            <embed src={visualerOpen.uri} type="application/pdf" className="h-[500px] w-[500px] max-w-full" />
+                        </div>
+                        <div className="flex justify-center">
+                            <a href={visualerOpen.uri} download={visualerOpen.name} className="azul-btn font-bold py-2 px-4 rounded mb-4">
+                            <FontAwesomeIcon icon={faDownload} className="mr-2" /> Descargar
+                            </a>
+                        </div>
+                        </div>
+                    </div>
+                    )}
             </div>
         </>
     )
