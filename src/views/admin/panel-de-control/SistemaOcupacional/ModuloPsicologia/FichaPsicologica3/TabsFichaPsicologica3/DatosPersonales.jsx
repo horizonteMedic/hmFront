@@ -290,11 +290,11 @@ export default function DatosPersonales({
                                                 form.empresasAnteriores.map((empresa, index) => (
                                                     <tr key={index}>
                                                         <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.fecha}</td>
-                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.nombreEmpresa}</td>
-                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.actividadEmpresa}</td>
-                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.puestoEmpresa}</td>
-                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.tSup}</td>
-                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.tSub}</td>
+                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.empresa}</td>
+                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.actividad}</td>
+                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.ocupacion}</td>
+                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.superficie}</td>
+                                                        <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.socavon}</td>
                                                         <td className="border border-gray-300 px-2 py-1 text-[11px]">{empresa.causaRetiro}</td>
                                                     </tr>
                                                 ))

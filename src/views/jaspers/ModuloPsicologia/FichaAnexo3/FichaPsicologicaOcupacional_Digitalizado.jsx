@@ -17,217 +17,146 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   const TABLA_ANCHO = 200;
 
   // Normalizador único de datos de entrada
-  function buildDatosFinales(raw) {
-    const resultadoTexto = String(
-      raw?.resultado ?? raw?.resultadoPsicologico ?? raw?.aptoTexto ?? raw?.apto_resultado ?? ''
-    ).toUpperCase();
-
+  function buildDatosFinales(payload) {
     const datosReales = {
-      apellidosNombres: String((((raw?.apellidos_apellidos_pa ?? '') + ' ' + (raw?.nombres_nombres_pa ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaInformePsicologico ?? raw?.fecha_examen ?? ''),
-      sexo: convertirGenero(raw?.sexo_sexo_pa ?? raw?.sexo ?? ''),
-      documentoIdentidad: String(raw?.dni_cod_pa ?? raw?.documento ?? ''),
-      edad: String(raw?.edad_edad ?? raw?.edad ?? ''),
-      fechaNacimiento: formatearFechaCorta(raw?.fechanacimientopaciente_fecha_nacimiento_pa ?? raw?.fecha_nacimiento ?? ''),
-      domicilio: String(raw?.direccionpaciente_direccion_pa ?? raw?.domicilio ?? ''),
-      evaluacion: String(raw?.evaluacion ?? raw?.tipo_evaluacion ?? ''),
-      estadoCivil: String(raw?.estadoCivil ?? raw?.estado_civil ?? ''),
-      motivoEvaluacion: String(raw?.motivoEvaluacion ?? raw?.motivo_evaluacion ?? ''),
-      nombreEmpresa: String(raw?.nombreEmpresa ?? raw?.nombre_empresa ?? ''),
-      actividadEmpresa: String(raw?.actividadEmpresa ?? raw?.actividad_empresa ?? ''),
-      areaTrabajoEmpresa: String(raw?.areaTrabajoEmpresa ?? raw?.area_trabajo_empresa ?? ''),
-      superficie: String((raw?.superficie ?? false) ? 'X' : ''),
-      subsuelo: String((raw?.subsuelo ?? false) ? 'X' : ''),
-      tiempoLaborando: String(raw?.tiempoLaborando ?? raw?.tiempo_laborando ?? ''),
-      puestoEmpresa: String(raw?.puestoEmpresa ?? raw?.puesto_empresa ?? ''),
-      principalesRiesgos: String(raw?.principalesRiesgos ?? raw?.principales_riesgos ?? ''),
-      medidasSeguridad: String(raw?.medidasSeguridad ?? raw?.medidas_seguridad ?? ''),
-      anterioresEmpresas: raw?.anterioresEmpresas ?? raw?.anteriores_empresas ?? [],
-      areaTrabajo: String(raw?.area_area_o ?? raw?.area_trabajo ?? ''),
-      puestoTrabajo: String(raw?.cargo_cargo_de ?? raw?.puesto_trabajo ?? ''),
-      empresa: String(raw?.empresa_razon_empresa ?? raw?.empresa ?? ''),
-      contrata: String(
-        raw?.contrata_razon_contrata ?? raw?.contrata ?? raw?.contratista_razon_contratista ?? raw?.contratista ?? ''
-      ),
-      sede: String(raw?.sede ?? ''),
-      numeroFicha: String(raw?.n_orden ?? raw?.numero_ficha ?? ''),
-      codigoEntrevista: String(
-        raw?.codEntrevista ?? raw?.cod_entrevista ?? raw?.codigoEntrevista ?? raw?.codigo_entrevista ?? ''
-      ),
-      color: Number(raw?.color ?? 0),
-      codigoColor: String(raw?.codigoColor ?? ''),
-      textoColor: String(raw?.textoColor ?? ''),
+      apellidosNombres: String(((payload?.apellidosPaciente ?? '') + ' ' + (payload?.nombresPaciente ?? '')).trim()),
+      fechaExamen: formatearFechaCorta(payload?.fechaExamen_fecha ?? ''),
+      sexo: convertirGenero(payload?.sexoPaciente ?? ''),
+      documentoIdentidad: String(payload?.dniPaciente ?? ''),
+      edad: String(payload?.edadPaciente ?? ''),
+      fechaNacimiento: formatearFechaCorta(payload?.fechaNacimientoPaciente ?? ''),
+      domicilio: String(payload?.direccionPaciente ?? ''),
+      evaluacion: String(payload?.nombreExamen ?? ''),
+      estadoCivil: String(payload?.estadoCivilPaciente ?? ''),
+      motivoEvaluacion: String(payload?.motivoEvaluacion_motivo_eval ?? ''),
+      nombreEmpresa: String(payload?.empresa ?? ''),
+      actividadEmpresa: String(payload?.mineralExp ?? ''),
+      areaTrabajoEmpresa: String(payload?.areaPaciente ?? ''),
+      superficie: String((String(payload?.explotacionEn ?? '').toUpperCase() === 'SUPERFICIE') ? 'X' : ''),
+      subsuelo: String((String(payload?.explotacionEn ?? '').toUpperCase() === 'SUBSUELO') ? 'X' : ''),
+      tiempoLaborando: String(payload?.tiempoTrabajo_timpo_trab ?? ''),
+      puestoEmpresa: String(payload?.cargoPaciente ?? ''),
+      principalesRiesgos: String(payload?.principalRiesgo_princ_riesgo ?? ''),
+      medidasSeguridad: String(payload?.medidasSeguridad_med_seguridad ?? ''),
+      anterioresEmpresas: payload?.detalles ?? [],
+      areaTrabajo: String(payload?.areaPaciente ?? ''),
+      puestoTrabajo: String(payload?.ocupacionPaciente ?? ''),
+      empresa: String(payload?.empresa ?? ''),
+      contrata: String(payload?.contrata ?? ''),
+      sede: String(payload?.sede ?? payload?.nombreSede ?? ''),
+      numeroFicha: String(payload?.norden ?? ''),
+      codigoEntrevista: String(payload?.codigoAnexo_cod_anexo03 ?? ''),
+      color: Number(payload?.color ?? 0),
+      codigoColor: String(payload?.codigoColor ?? ''),
+      textoColor: String(payload?.textoColor ?? ''),
+      // Secciones libres de página 1
+      historiaFamiliar: String(payload?.historialFamiliar_hist_familiar ?? ''),
+      habitos: String(payload?.habitos_habitos ?? ''),
+      otrasObservaciones: String(payload?.otrasObservaciones_otras_observ ?? ''),
       cuerpo: {
-        areaIntelectual: raw?.cuerpo?.areaIntelectual,
-        areaPersonalidad: raw?.cuerpo?.areaPersonalidad,
-        areaOrganicidad: raw?.cuerpo?.areaOrganicidad,
-        areaPsicomotricidad: raw?.cuerpo?.areaPsicomotricidad,
-        recomendaciones: raw?.cuerpo?.recomendaciones
+        areaIntelectual: payload?.cuerpo?.areaIntelectual,
+        areaPersonalidad: payload?.cuerpo?.areaPersonalidad,
+        areaOrganicidad: payload?.cuerpo?.areaOrganicidad,
+        areaPsicomotricidad: payload?.cuerpo?.areaPsicomotricidad,
+        recomendaciones: payload?.cuerpo?.recomendaciones
       },
-      apto: (typeof raw?.apto === 'boolean') ? raw.apto
-        : (typeof raw?.aptoPsicologico === 'boolean') ? raw.aptoPsicologico
-        : (typeof raw?.aptoInforme === 'boolean') ? raw.aptoInforme
-        : resultadoTexto.includes('NO APTO') ? false
-        : resultadoTexto.includes('APTO') ? true
-        : false
+      apto: true // Por defecto apto, se puede ajustar según lógica de negocio
     };
 
-    const datosPrueba = {
-      apellidosNombres: 'PÉREZ QUISPE, JUAN CARLOS',
-      fechaExamen: '30/09/2025',
-      sexo: 'Masculino',
-      documentoIdentidad: '12345678',
-      edad: '32',
-      fechaNacimiento: '15/04/1993',
-      domicilio: 'Av. Los Olivos 123 - Lima',
-      evaluacion: 'Preocupacional',
-      estadoCivil: 'Soltero',
-      motivoEvaluacion: 'Evaluación psicológica para determinar aptitud psicofísica del trabajador para el puesto de Operador de Volquete en el área de Planta Concentradora.',
-      nombreEmpresa: 'MINERA ANDINA S.A.C.',
-      actividadEmpresa: 'Extracción y procesamiento de minerales',
-      areaTrabajoEmpresa: 'Planta Concentradora',
-      superficie: 'X', // Trabaja en superficie
-      subsuelo: '', // No trabaja en subsuelo
-      tiempoLaborando: '5',
-      puestoEmpresa: 'Operador de Volquete',
-      principalesRiesgos: 'Exposición a polvo mineral, ruido industrial, vibraciones, riesgo de accidentes con maquinaria pesada, exposición a productos químicos en el proceso de concentración.',
-      medidasSeguridad: 'Uso obligatorio de EPP (casco, lentes, guantes, botas de seguridad), sistema de ventilación, monitoreo de ruido, capacitación en seguridad, protocolos de emergencia, inspecciones regulares de equipos.',
-      anterioresEmpresas: [
-        {
-          fecha: '2018-2020',
-          empresa: 'CONSTRUCTORA SAN MARTIN S.A.C.',
-          actividad: 'Construcción civil',
-          puesto: 'Operador de Excavadora',
-          tiempoSup: '2',
-          tiempoSub: '0',
-          causaRetiro: 'Fin de contrato'
+    // Mapear estructura de Examen Mental desde los campos planos recibidos
+    const examenMental = {
+      presentacion: {
+        adecuado: Boolean(payload?.presentacionAdecuado_rb_adecuado),
+        inadecuado: Boolean(payload?.presentacionIndecuado_rb_indecuado)
+      },
+      postura: {
+        erguida: Boolean(payload?.posturaErguida_rb_erguida),
+        encorvada: Boolean(payload?.posturaEncorvada_rb_encorvada)
+      },
+      ritmo: {
+        lento: Boolean(payload?.ritmoLento_rb_lento),
+        rapido: Boolean(payload?.ritmoRapido_rb_rapido),
+        fluido: Boolean(payload?.ritmoFluido_rb_fluido)
+      },
+      tono: {
+        bajo: Boolean(payload?.tonoBajo_rb_bajo),
+        moderado: Boolean(payload?.tonoModerado_rb_moderado),
+        alto: Boolean(payload?.tonoAlto_rb_alto)
+      },
+      articulacion: {
+        conDificultad: Boolean(payload?.articulacionConDificultad_rb_condificultad),
+        sinDificultad: Boolean(payload?.articulacionSinDificultad_rb_sindificultad)
+      },
+      orientacion: {
+        tiempo: {
+          orientado: Boolean(payload?.tiempoOrientado_rb_torientado),
+          desorientado: Boolean(payload?.tiempoDesorientado_rb_tdesorientado)
         },
-        {
-          fecha: '2020-2023',
-          empresa: 'MINERA CERRO VERDE',
-          actividad: 'Extracción de cobre',
-          puesto: 'Operador de Cargador Frontal',
-          tiempoSup: '1',
-          tiempoSub: '2',
-          causaRetiro: 'Mejor oportunidad laboral'
-        }
-      ],
-      areaTrabajo: 'Planta Concentradora',
-      puestoTrabajo: 'Operador de Volquete',
-      empresa: 'MINERA ANDINA S.A.C.',
-      contrata: 'SERVICIOS INTEGRALES S.R.L.',
-      sede: 'Trujillo Nicolas de Pierola',
-      numeroFicha: '000123',
-      codigoEntrevista: '63183',
-      color: 2,
-      codigoColor: '#2E7D32',
-      textoColor: 'L',
-      // Datos adicionales para las secciones de la primera página
-      historiaFamiliar: 'El paciente refiere antecedentes familiares de hipertensión arterial en el padre. No hay antecedentes de enfermedades mentales o neurológicas en la familia.',
-      habitos: 'El paciente refiere tener hábitos saludables. No consume tabaco ni alcohol. Practica deporte ocasionalmente y mantiene una dieta balanceada.',
-      otrasObservaciones: 'El paciente presenta un perfil psicológico adecuado para el puesto solicitado / Se observa buena capacidad de concentración y atención durante la evaluación / Muestra actitud colaborativa y disposición para el trabajo en equipo / No se evidencian signos de ansiedad o estrés significativo / Se recomienda seguimiento psicológico periódico según protocolo de la empresa',
-      // Datos de examen mental para la página 2
-      examenMental: {
-        presentacion: {
-          adecuado: true,
-          inadecuado: false
+        espacio: {
+          orientado: Boolean(payload?.espacioOrientado_rb_eorientado),
+          desorientado: Boolean(payload?.espacioDesorientado_rb_edesorientado)
         },
-        postura: {
-          erguida: true,
-          encorvada: false
-        },
-        ritmo: {
-          lento: false,
-          rapido: false,
-          fluido: true
-        },
-        tono: {
-          bajo: true,
-          moderado: false,
-          alto: false
-        },
-        articulacion: {
-          conDificultad: true,
-          sinDificultad: false
-        },
-        orientacion: {
-          tiempo: {
-            orientado: true,
-            desorientado: false
-          },
-          espacio: {
-            orientado: true,
-            desorientado: false
-          },
-          persona: {
-            orientado: true,
-            desorientado: false
-          }
-        },
-        procesosCognitivos: {
-          lucidoAtento: 'Adecuado',
-          pensamiento: 'Coherente y lógico',
-          percepcion: 'Normal',
-          memoria: {
-            cortoPlazo: false,
-            medianoPlazo: false,
-            largoPlazo: true
-          },
-          inteligencia: {
-            muySuperior: false,
-            superior: false,
-            normalBrillante: true,
-            promedio: false,
-            nTorpe: false,
-            fronterizo: false,
-            rmLeve: false
-          }
-        },
-        evaluacionAdicional: {
-          apetito: 'ADECUADO',
-          sueno: 'SIN DIFICULTAD',
-          personalidad: 'CUENTA CON RECURSOS PERSONALES',
-          afectividad: 'EUTIMICO',
-          conductaSexual: 'NORMAL'
-        },
-        // Datos para la tabla de inventarios
-        inventarios: {
-          'Inventario Millón de Estilos de Personalidad - MIPS': false,
-          'Escala de Motivaciones Psicosociales - MPS': true,
-          'Luria - DNA Diagnóstico neuropsicológico de Adultos': true,
-          'Escala de Apreciación del Estrés EAE': true,
-          'Inventario de Burnout de Maslach': false,
-          'Clima laboral': false,
-          'Batería de Conductores': true,
-          'WAIS': true,
-          'Test BENTON': true,
-          'Test Bender': true,
-          'Inventario de la ansiedad ZUNG': true,
-          'Inventario de Depresión ZUNG': true,
-          'Escala de Memoria de Wechsler': true
-        },
-        // Datos para Otras Pruebas
-        otrasPruebas: [
-          'Test de Personalidad MMPI-2',
-          'Escala de Inteligencia Wechsler WAIS-IV'
-        ],
-        // Datos para Diagnóstico Final
-        diagnosticoFinal: {
-          areaCognitiva: 'El paciente presenta capacidades cognitivas preservadas con atención y concentración adecuadas. Se observa memoria inmediata y diferida dentro de parámetros normales, funciones ejecutivas eficientes y procesamiento de información adecuado para las demandas del puesto.',
-          areaEmocional: 'El paciente presenta un estado emocional estable con capacidad de regulación emocional adecuada. Se observa un nivel de ansiedad dentro de parámetros normales y habilidades sociales preservadas que le permiten mantener relaciones interpersonales satisfactorias.'
+        persona: {
+          orientado: Boolean(payload?.personaOrientado_rb_porientado),
+          desorientado: Boolean(payload?.personaDesorientado_rb_pdesorientado)
         }
       },
-      cuerpo: {
-        areaIntelectual: raw?.cuerpo?.areaIntelectual,
-        areaPersonalidad: raw?.cuerpo?.areaPersonalidad,
-        areaOrganicidad: raw?.cuerpo?.areaOrganicidad,
-        areaPsicomotricidad: raw?.cuerpo?.areaPsicomotricidad,
-        recomendaciones: raw?.cuerpo?.recomendaciones
+      procesosCognitivos: {
+        lucidoAtento: String(payload?.lucido_lucido ?? ''),
+        pensamiento: String(payload?.pensamiento_pensamiento ?? ''),
+        percepcion: String(payload?.percepcion_percepcion ?? ''),
+        memoria: {
+          cortoPlazo: Boolean(payload?.memoriaCortoPlazo_rb_cortoplazo),
+          medianoPlazo: Boolean(payload?.memoriaMedianoPlazo_rb_medianoplazo),
+          largoPlazo: Boolean(payload?.memoriaLargoPlazo_rb_largoplazo)
+        },
+        inteligencia: {
+          muySuperior: Boolean(payload?.inteligenciaMuySuperior_rb_muysuperior),
+          superior: Boolean(payload?.inteligenciaSuperior_rb_superior),
+          normalBrillante: Boolean(payload?.inteligenciaNormal_rb_normal),
+          promedio: Boolean(payload?.inteligenciaPromedio_rb_promedio),
+          nTorpe: Boolean(payload?.inteligenciaTorpe_rb_torpe),
+          fronterizo: Boolean(payload?.inteligenciaFronterizo_rb_fronterizo),
+          rmLeve: Boolean(payload?.inteligenciaRMLeve_rb_rleve),
+          rmModerado: Boolean(payload?.inteligenciaRMModerado_rb_rmoderado),
+          rmSevero: Boolean(payload?.inteligenciaRMSevero_rb_rsevero),
+          rmProfundo: Boolean(payload?.inteligenciaRMProfundo_rb_rprofundo)
+        }
       },
-      apto: true
+      evaluacionAdicional: {
+        apetito: String(payload?.apetito_apetito ?? ''),
+        sueno: String(payload?.sueno_sueno ?? ''),
+        personalidad: String(payload?.personalidad_personalidad ?? ''),
+        afectividad: String(payload?.afectividad_afectividad ?? ''),
+        conductaSexual: String(payload?.conductaSexual_conducta_sexual ?? '')
+      },
+      inventarios: {
+        'Inventario Millón de Estilos de Personalidad - MIPS': String(payload?.puntajeMips_puntaje1 ?? '').toUpperCase() === 'X',
+        'Escala de Motivaciones Psicosociales - MPS': String(payload?.puntajeMps_puntaje2 ?? '').toUpperCase() === 'X',
+        'Luria - DNA Diagnóstico neuropsicológico de Adultos': String(payload?.puntajeDna_puntaje3 ?? '').toUpperCase() === 'X',
+        'Escala de Apreciación del Estrés EAE': String(payload?.puntajeEAE_puntaje4 ?? '').toUpperCase() === 'X',
+        'Inventario de Burnout de Maslach': String(payload?.puntajeInventarioBormout_puntaje5 ?? '').toUpperCase() === 'X',
+        'Clima laboral': String(payload?.puntajeClimaLaboral_puntaje6 ?? '').toUpperCase() === 'X',
+        'Batería de Conductores': String(payload?.puntajeBacteriaConductores_puntaje7 ?? '').toUpperCase() === 'X',
+        'WAIS': String(payload?.puntajeWais_puntaje8 ?? '').toUpperCase() === 'X',
+        'Test BENTON': String(payload?.puntajeBenton_puntaje9 ?? '').toUpperCase() === 'X',
+        'Test Bender': String(payload?.puntajeBender_puntaje10 ?? '').toUpperCase() === 'X',
+        'Inventario de la ansiedad ZUNG': String(payload?.puntajeAnsiedadZung_puntaje11 ?? '').toUpperCase() === 'X',
+        'Inventario de Depresión ZUNG': String(payload?.puntajeDepresionZung_puntaje12 ?? '').toUpperCase() === 'X',
+        'Escala de Memoria de Wechsler': String(payload?.puntajeEscalaMemoriaWechsler_puntaje13 ?? '').toUpperCase() === 'X'
+      },
+      otrasPruebas: []
     };
 
-    const selected = (raw && (raw.n_orden || raw.numero_ficha)) ? datosReales : datosPrueba;
+    // Diagnóstico final
+    examenMental.diagnosticoFinal = {
+      areaCognitiva: String(payload?.areaCognitiva_area_cognitiva ?? ''),
+      areaEmocional: String(payload?.areaEmocional_area_emocional ?? '')
+    };
+
+    datosReales.examenMental = examenMental;
+
+    const selected = datosReales;
     // Asegurar que las secciones de cuerpo sean arrays listables
     selected.cuerpo = {
       areaIntelectual: normalizeList(selected.cuerpo.areaIntelectual),
@@ -674,7 +603,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Tiempo Total Laborando:", tablaInicioX + 122, yPos + 3.5);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.tiempoLaborando + " Años", tablaInicioX + 170, yPos + 3.5);
+  doc.text(datosFinales.tiempoLaborando , tablaInicioX + 170, yPos + 3.5);
   yPos += filaAltura;
 
   // Quinta fila: Puesto
@@ -802,45 +731,8 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   yPos += headerAltura;
 
   // === FILAS DE DATOS ===
-  // Datos de ejemplo para mostrar el formato (puede venir de datosFinales.anterioresEmpresas)
-  const datosEjemplo = [
-    {
-      fecha: "2018-2020",
-      nombreEmpresa: "CONSTRUCTORA SAN MARTIN S.A.C.",
-      actividadEmpresa: "Construcción civil y obras públicas",
-      puesto: "Operador de Excavadora",
-      tiempoSup: "2",
-      tiempoSub: "0",
-      causaRetiro: "Fin de contrato por término de obra"
-    },
-    {
-      fecha: "2020-2023",
-      nombreEmpresa: "MINERA CERRO VERDE",
-      actividadEmpresa: "Extracción de cobre",
-      puesto: "Operador de Cargador Frontal",
-      tiempoSup: "1",
-      tiempoSub: "2",
-      causaRetiro: "Mejor oportunidad laboral"
-    },
-    {
-      fecha: "2020-2023",
-      nombreEmpresa: "MINERA CERRO VERDE",
-      actividadEmpresa: "Extracción de cobre",
-      puesto: "Operador de Cargador Frontal",
-      tiempoSup: "1",
-      tiempoSub: "2",
-      causaRetiro: "Mejor oportunidad laboral"
-    },
-    {
-      fecha: "2020-2023",
-      nombreEmpresa: "MINERA CERRO VERDE",
-      actividadEmpresa: "Extracción de cobre",
-      puesto: "Operador de Cargador Frontal",
-      tiempoSup: "1",
-      tiempoSub: "2",
-      causaRetiro: "Mejor oportunidad laboral"
-    },
-  ];
+  // Usar datos reales de anterioresEmpresas (detalles)
+  const datosEjemplo = datosFinales.anterioresEmpresas || [];
 
   // Dibujar todas las filas de datos
   const filaDatosAltura = 8; // Altura suficiente para texto con salto de línea
@@ -878,26 +770,26 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     let xPosTexto = tablaInicioX;
     
     // FECHA (centrada)
-    const fechaTextoAncho = doc.getTextWidth(fila.fecha);
+    const fechaTextoAncho = doc.getTextWidth(fila.fecha || '');
     const fechaXCentrado = xPosTexto + (columnasAnterioresEmpresas[0].ancho - fechaTextoAncho) / 2;
-    doc.text(fila.fecha, fechaXCentrado, yPos + 3);
+    doc.text(fila.fecha || '', fechaXCentrado, yPos + 3);
     xPosTexto += columnasAnterioresEmpresas[0].ancho;
     
     // NOMBRE DE LA EMPRESA (con salto de línea)
-    dibujarTextoConSaltoLinea(fila.nombreEmpresa, xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[1].ancho - 2);
+    dibujarTextoConSaltoLinea(fila.empresa || '', xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[1].ancho - 2);
     xPosTexto += columnasAnterioresEmpresas[1].ancho;
     
     // ACT. EMPRESA (con salto de línea)
-    dibujarTextoConSaltoLinea(fila.actividadEmpresa, xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[2].ancho - 2);
+    dibujarTextoConSaltoLinea(fila.actividad || '', xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[2].ancho - 2);
     xPosTexto += columnasAnterioresEmpresas[2].ancho;
     
-    // PUESTO (con salto de línea)
-    dibujarTextoConSaltoLinea(fila.puesto, xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[3].ancho - 2);
+    // PUESTO (mostrar ocupación del detalle)
+    dibujarTextoConSaltoLinea((fila.ocupacion || fila.puesto || ''), xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[3].ancho - 2);
     xPosTexto += columnasAnterioresEmpresas[3].ancho;
     
     // TIEMPO - SUP y SUB (con "años" y centrados)
-    const tiempoSupTexto = fila.tiempoSup + " años";
-    const tiempoSubTexto = fila.tiempoSub + " años";
+    const tiempoSupTexto = (fila.tiempoSup || '0') + " años";
+    const tiempoSubTexto = (fila.tiempoSub || '0') + " años";
     const tiempoColAncho = columnasAnterioresEmpresas[4].ancho;
     
     // SUP (centrado en su sub-celda)
@@ -913,7 +805,7 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
     xPosTexto += columnasAnterioresEmpresas[4].ancho;
     
     // CAUSA DEL RETIRO (con salto de línea)
-    dibujarTextoConSaltoLinea(fila.causaRetiro, xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[5].ancho - 2);
+    dibujarTextoConSaltoLinea(fila.causaRetiro || '', xPosTexto + 1, yPos + 3, columnasAnterioresEmpresas[5].ancho - 2);
     
     yPos += filaDatosAltura;
   });
@@ -1371,6 +1263,16 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
         examenMental.procesosCognitivos?.inteligencia?.fronterizo || false,
         examenMental.procesosCognitivos?.inteligencia?.rmLeve || false
       ]
+    },
+    {
+      titulo: "",
+      opciones: ["RM Moderado", "RM Severo", "RM Profundo"],
+      tipo: "opciones",
+      valores: [
+        examenMental.procesosCognitivos?.inteligencia?.rmModerado || false,
+        examenMental.procesosCognitivos?.inteligencia?.rmSevero || false,
+        examenMental.procesosCognitivos?.inteligencia?.rmProfundo || false
+      ]
     }
   ];
 
@@ -1568,8 +1470,19 @@ export default function FichaPsicologicaOcupacional_Digitalizado(data = {}) {
   // Dibujar campo de texto para otras pruebas debajo del label (como lista)
   doc.setFont("helvetica", "normal").setFontSize(8);
   
-  // Dibujar cada item de la lista por separado usando datos mapeados
-  const itemsOtrasPruebas = (examenMental.otrasPruebas || []).map(item => `• ${item}`);
+  // Usar otrasObservaciones_otras_observ del payload
+  const otrasPruebasTexto = datosFinales.otrasObservaciones || '';
+  
+  // Procesar si viene como lista separada por "/"
+  let itemsOtrasPruebas;
+  if (typeof otrasPruebasTexto === 'string' && otrasPruebasTexto.includes('/')) {
+    // Convertir lista separada por "/" en texto con viñetas
+    const listaItems = otrasPruebasTexto.split('/').map(item => item.trim()).filter(item => item);
+    itemsOtrasPruebas = listaItems.map(item => `• ${item}`);
+  } else {
+    // Es texto normal, convertir en lista de un solo item
+    itemsOtrasPruebas = otrasPruebasTexto ? [`• ${otrasPruebasTexto}`] : [];
+  }
   
   let yPosTexto = yPos + 8;
   itemsOtrasPruebas.forEach(item => {
