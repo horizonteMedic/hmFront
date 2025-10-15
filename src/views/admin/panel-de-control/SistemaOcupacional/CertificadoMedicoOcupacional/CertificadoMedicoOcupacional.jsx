@@ -10,8 +10,13 @@ import { useSessionData } from "../../../../hooks/useSessionData";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerCMO";
 import { getToday } from "../../../../utils/helpers";
 import { valores } from "./ControllerCMO";
+
 const tabla = "certificado_aptitud_medico_resumen"
 const today = getToday();
+const fecha = new Date(today);
+fecha.setFullYear(fecha.getFullYear() + 1);
+
+const nextYearDate = fecha.toISOString().split("T")[0];
 
 export default function CertificadoMedicoOcupacional() {
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -33,7 +38,7 @@ export default function CertificadoMedicoOcupacional() {
         apto: "APTO",
 
         fechaDesde: today,
-        fechahasta: today,
+        fechahasta: nextYearDate,
         conclusiones: "",
         nombreMedico: userCompleto?.datos?.nombres_user?.toUpperCase(),
         
@@ -184,23 +189,6 @@ export default function CertificadoMedicoOcupacional() {
                                 labelWidth="100px"
                                 onChange={handleChange}
                             />
-                            <div className="flex gap-2 justify-center items-center w-full">
-                                <InputTextOneLine
-                                    label="Imprimir Resumen Medico"
-                                    labelWidth="140px"
-                                    name="norden"
-                                    value={form?.norden}
-                                    onChange={handleChange}
-                                />
-                                <button
-                                    type="button"
-                                    //onClick={handlePrint}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
-                                >
-                                    <FontAwesomeIcon icon={faPrint} />
-                                </button>
-                            </div>
-                            
                             <div className="flex justify-end mt-3">
                                 <h1 className="text-lg font-bold">{useRealTime()}</h1>
                             </div>
