@@ -153,35 +153,36 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   // === FUNCIONES AUXILIARES ===
   // Función para texto con salto de línea
   const dibujarTextoConSaltoLinea = (texto, x, y, anchoMaximo) => {
-    const fontSize = doc.internal.getFontSize();
-    const palabras = texto.split(' ');
-    let lineaActual = '';
-    let yPos = y;
+  const fontSize = doc.internal.getFontSize();
+  const palabras = texto.split(' ');
+  let lineaActual = '';
+  let yPos = y;
+  
+  palabras.forEach(palabra => {
+    const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+    const anchoTexto = doc.getTextWidth(textoPrueba);
     
-    palabras.forEach(palabra => {
-      const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-      const anchoTexto = doc.getTextWidth(textoPrueba);
-      
-      if (anchoTexto <= anchoMaximo) {
-        lineaActual = textoPrueba;
+    if (anchoTexto <= anchoMaximo) {
+      lineaActual = textoPrueba;
+    } else {
+      if (lineaActual) {
+        doc.text(lineaActual, x, yPos);
+        yPos += fontSize * 0.35; // salto real entre líneas
+        lineaActual = palabra;
       } else {
-        if (lineaActual) {
-          doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35;
-          lineaActual = palabra;
-        } else {
-          doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
-        }
+        doc.text(palabra, x, yPos);
+        yPos += fontSize * 0.35;
       }
-    });
-    
-    if (lineaActual) {
-      doc.text(lineaActual, x, yPos);
     }
-    
-    return yPos;
-  };
+  });
+  
+  if (lineaActual) {
+    doc.text(lineaActual, x, yPos);
+    yPos += fontSize * 0.35;
+  }
+  
+  return yPos; // Devuelve la nueva posición final
+};
 
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
@@ -566,11 +567,11 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   let yTextoMotivo = yPos + 5;
   
   lineasMotivo.forEach(linea => {
-    const textoConGuion = `- ${linea.trim()}`;
-    dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoMotivo, tablaAncho - 4);
-    yTextoMotivo += 3; // Espaciado entre líneas
-  });
-  
+  const textoConGuion = `- ${linea.trim()}`;
+  yTextoMotivo = dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoMotivo, tablaAncho - 4);
+  yTextoMotivo += 1; // pequeño margen entre párrafos (opcional)
+});
+  console.log(lineasMotivo)
   yPos += alturaFilaMotivo;
 
   // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
