@@ -74,6 +74,9 @@ import {
   faSuitcaseMedical,
   faTruckMedical,
   faMaskVentilator,
+  faFireFlameCurved,
+  faIdCard,
+  faP,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -106,6 +109,9 @@ import FichaInterconsulta from "./FichaInterconsulta/FichaInterconsulta.jsx";
 import SectionWithBack from "./SectionWithBack.jsx";
 import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
 import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicologica3.jsx";
+import CertificadoTrabajosCaliente from "./CertificadoTrabajosCaliente/CertificadoTrabajosCaliente.jsx";
+import LicenciaInterna from "./LicenciaInterna/LicenciaInterna.jsx";
+import CertificadoAlturaPoderosa from "./CertificadoAlturaPoderosa/CertificadoAlturaPoderosa.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -287,6 +293,9 @@ const TabComponent = () => {
                   { vista: "Constancia Certificado Medico Ocupacional", tab: 34, icons: [{ icon: faSuitcaseMedical }], label: "Certificado Medico Ocupacional" },
                   { vista: "Ficha Interconsulta", tab: 35, icons: [{ icon: faTruckMedical }], label: "Ficha Interconsulta" },
                   { vista: "Uso de Respiradores", tab: 36, icons: [{ icon: faMaskVentilator }], label: "Uso de Respiradores" },
+                  { vista: "Certificado Trabajos en Caliente", tab: 37, icons: [{ icon: faFireFlameCurved }], label: "Certificado Trabajos en Caliente" },
+                  { vista: "Licencia Interna", tab: 38, icons: [{ icon: faIdCard }], label: "Licencia Interna" },
+                  { vista: "Certificado Altura Poderosa", tab: 39, icons: [{ icon: faP }], label: "Certificado Altura Poderosa" },
                   { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                 ];
                 return items
@@ -737,6 +746,9 @@ const TabComponent = () => {
               34: { title: "Constancia Certificado Medico Ocupacional", child: <CertificadoMedicoOcupacional /> },
               35: { title: "Ficha Interconsulta", child: <FichaInterconsulta /> },
               36: { title: "Uso de Respiradores", child: <UsoRespiradores /> },
+              37: { title: "Certificado Trabajos en Caliente", child: <CertificadoTrabajosCaliente /> },
+              38: { title: "Licencia Interna", child: <LicenciaInterna /> },
+              39: { title: "Certificado Altura Poderosa", child: <CertificadoAlturaPoderosa /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
@@ -792,6 +804,9 @@ const TabComponent = () => {
             "Constancia Certificado Medico Ocupacional": { activeTab: 34, subTab: 0 },
             "Ficha Interconsulta": { activeTab: 35, subTab: 0 },
             "Uso de Respiradores": { activeTab: 36, subTab: 0 },
+            "Certificado Trabajos en Caliente": { activeTab: 37, subTab: 0 },
+            "Licencia Interna": { activeTab: 38, subTab: 0 },
+            "Certificado Altura Poderosa": { activeTab: 39, subTab: 0 },
           };
 
           const config = navConfig[idx];
