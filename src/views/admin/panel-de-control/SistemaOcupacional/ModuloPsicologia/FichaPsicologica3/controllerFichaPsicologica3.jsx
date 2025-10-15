@@ -124,6 +124,8 @@ export const GetInfoServicio = async (
             afectividad: res.afectividad_afectividad,
             conductaSexual: res.conductaSexual_conducta_sexual,
 
+            empresasAnteriores: res.detalles ?? [],
+
             // Pruebas Psicológicas - Ptje Nombre
             mips: res.puntajeMips_puntaje1 == "X" ? true : false,
             mps: res.puntajeMps_puntaje2 == "X" ? true : false,
@@ -227,7 +229,6 @@ export const SubmitDataService = async (
 
         areaCognitiva: form.areaCognitiva,
         areaEmocional: form.areaEmocional,
-        empresas: [],
         usuarioRegistro: user,
     };
 
@@ -259,7 +260,6 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         () => {
             //NO Tiene registro
             GetInfoPac(nro, set, token, sede);
-            getInfoTabla(nro, set, token);
         },
         () => {
             //Tiene registro
@@ -270,34 +270,8 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
                     "warning"
                 );
             });
-            getInfoTabla(nro, set, token);
         }
     );
-};
-export const getInfoTabla = (
-    norden,
-    set,
-    token
-) => {
-    try {
-        getFetch(
-            `${obtenerReporteInfoTablaUrl}?nOrden=${norden}`,
-            token
-        ).then((res) => {
-            console.log(res)
-            set((prev) => ({
-                ...prev,
-                empresasAnteriores: res ?? [],
-            }));
-        });
-    } catch (error) {
-        console.error("Error en getInfoTabla:", error);
-        Swal.fire(
-            "Error",
-            "Ocurrió un error al obtener los datos de la Historia Ocupacional",
-            "error"
-        );
-    }
 };
 
 const GetInfoPac = async (nro, set, token, sede) => {
