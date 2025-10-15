@@ -23,6 +23,7 @@ export default function FichaPsicologica3() {
     norden: "",
     fechaExamen: today,
     nombreExamen: "",
+    codigoAnexo: null,
 
     // Datos Personales
     nombres: "",
