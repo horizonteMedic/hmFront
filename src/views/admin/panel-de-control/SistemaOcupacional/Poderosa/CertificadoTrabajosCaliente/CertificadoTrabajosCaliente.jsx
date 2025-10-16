@@ -1,10 +1,10 @@
-import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine"
-import { useForm } from "../../../../hooks/useForm"
-import { getToday } from "../../../../utils/helpers";
-import useRealTime from "../../../../hooks/useRealTime";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
+import { useForm } from "../../../../../hooks/useForm"
+import { getToday } from "../../../../../utils/helpers";
+import useRealTime from "../../../../../hooks/useRealTime";
 import { PrintHojaR, VerifyTR } from "./ControllerCertCaliente";
-import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
-import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
