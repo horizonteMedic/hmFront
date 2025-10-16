@@ -1,18 +1,22 @@
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine"
+import { useForm } from "../../../../../hooks/useForm"
+import { getToday } from "../../../../../utils/helpers";
+import useRealTime from "../../../../../hooks/useRealTime";
+import { PrintHojaR, VerifyTR } from "./ControllerCertCaliente";
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
-import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { useForm } from "../../../../hooks/useForm"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
-import useRealTime from "../../../../hooks/useRealTime";
 
-const CertificadoAptitudPoderosa = () => {
+const today = getToday();
+const tabla = "aptitud_trabajos_encaliente"
+const CertificadoTrabajosCaliente = () => {
 
-    const { form,handleChangeNumber,handleChange, handleRadioButton, handleClear } = useForm()
+    const { form, setForm, handleChangeNumber, handleChange, handleClearnotO, handleClear, handleRadioButton, handlePrintDefault } = useForm()
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            handleClearnotOandEspecialidad();
+            handleClearnotO();
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
@@ -35,7 +39,7 @@ const CertificadoAptitudPoderosa = () => {
                 <h1 className="text-blue-600 font-semibold p-4 pb-0 mb-0 m-4">Aptitud</h1>
                 <div className="flex h-full">
                 {/* Contenido principal - 80% */}
-                    <div className="w-4/5">
+                    <div className="w-full">
                         <div className="w-full">
                             {/* Datos del trabajador */}
                             <section className="bg-white border border-gray-200 rounded-lg p-4  mt-0 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -141,8 +145,8 @@ const CertificadoAptitudPoderosa = () => {
                                             name="apto" value={form?.apto} className="py-2"
                                             onChange={handleRadioButton} options={[
                                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
-                                                { label: "APTO con RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
-                                                { label: "NO APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
+                                                { label: "APTO CON RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
+                                                { label: "No APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "NOAPTO" },
                                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
                                             ]}
                                             />
@@ -165,9 +169,6 @@ const CertificadoAptitudPoderosa = () => {
                                                 onChange={handleChange}
                                             />
                                         </div>
-                                    </section>
-                                    <section className="bg-white rounded-lg p-4 pt-1 gap-4 mt-0 m-4">
-                                        
                                         <InputTextOneLine
                                         label="Medico que Certifica"
                                         name="nombreMedico"
@@ -212,174 +213,21 @@ const CertificadoAptitudPoderosa = () => {
                                             </div>
                                         </div>
                                     </section>
+                                    
                                 </div>
                                 <div className="w-1/2 h-auto">
-                                    <InputsRadioGroup
-                                    name="conclusiones"
-                                    vertical
-                                    value={form?.conclusiones}
-                                    className="py-2"
-                                    onChange={handleRadioButton}
-                                    options={[
-                                        { label: "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check1" },
-                                        { label: "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check2" },
-                                        { label: "CORREGIR AGUDEZA VISUAL PARA LECTURA CERCA", value: "Check3" },
-                                        { label: "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS", value: "Check4" },
-                                        { label: "NO HACER TRABAJO DE ALTO RIESGO", value: "Check5" },
-                                        { label: "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check6" },
-                                        { label: "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=80 DB", value: "Check7" },
-                                        { label: "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS", value: "Check8" },
-                                        { label: "USO DE LENTES CORRECTORES PARA TRABAJO", value: "Check9" },
-                                        { label: "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check10" },
-                                        { label: "USO DE LENTES CORRECTORES LECTURA DE CERCA", value: "Check11" },
-                                        { label: "NO CONDUCIR VEHÍCULOS", value: "Check12" },
-                                        { label: "NO HACER TRABAJO CON CÓDIGO COLORES", value: "Check13" },
-                                        { label: "DIETA HIPOCALÓRICA Y EJERCICIOS", value: "Check14" },
-                                        { label: "NINGUNO", value: "Check15" },
-                                    ]}
-                                    />
-                                </div>
-                            </div>
-                            <div className="w-full p-4 gap-4 mt-0 m-4">
-                                 <InputTextArea
+                                    <InputTextArea
                                         label="Observaciones"
                                         value={form?.conclusiones}
                                         onChange={handleChange}
                                         classNameLabel="text-blue-600"
-                                        rows={5}
+                                        rows={20}
                                         name="conclusiones"
-                                    />               
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
-    
-                {/* Panel lateral de Agudeza Visual - 20% */}
-                <div className="w-1/5">
-                    <div className="bg-white border border-gray-200 rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-                        <h4 className="font-bold text-lg text-gray-800 mb-3 text-center">Sin Corregir</h4>
-                        {/* Sin Corregir */}
-                            <div className="mb-4">
-                                <h5 className="font-semibold text-gray-700 mb-2 text-center">Sin Corregir</h5>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="">
-                                        <div className="font-semibold mb-2 text-center">O.D</div>
-                                        <div className="space-y-3">
-                                            <InputTextOneLine label="V.C." name="visionCercaSincorregirOd_v_cerca_s_od" value={form?.visionCercaSincorregirOd_v_cerca_s_od} disabled labelWidth="35px" />
-                                            <InputTextOneLine label="V.L." name="visionLejosSincorregirOd_v_lejos_s_od" value={form?.visionLejosSincorregirOd_v_lejos_s_od} disabled labelWidth="35px" />
-                                        </div>
-                                    </div>
-                                    <div className="">
-                                        <div className="font-semibold mb-2 text-center">O.I</div>
-                                        <div className="space-y-3">
-                                            <InputTextOneLine label="V.C." name="visionCercaSincorregirOi_v_cerca_s_oi" value={form?.visionCercaSincorregirOi_v_cerca_s_oi} disabled labelWidth="35px" />
-                                            <InputTextOneLine label="V.L." name="visionLejosSincorregirOi_v_lejos_s_oi" value={form?.visionLejosSincorregirOi_v_lejos_s_oi} disabled labelWidth="35px" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-    
-                            {/* Corregida */}
-                            <div className="mb-4">
-                                <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
-                                {/* Fila OD y OI */}
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="space-y-3">
-                                        <div className="font-semibold mb-2 text-center">O.D</div>
-                                        <InputTextOneLine
-                                            label="V.C."
-                                            name="oftalodccmologia_odcc"
-                                            value={form?.oftalodccmologia_odcc}
-                                            disabled
-                                            labelWidth="35px"
-                                        />
-                                        <InputTextOneLine
-                                            label="V.L."
-                                            name="odlcOftalmologia_odlc"
-                                            value={form?.odlcOftalmologia_odlc}
-                                            disabled
-                                            labelWidth="35px"
-                                        />
-                                    </div>
-                                    <div className="space-y-3">
-                                        <div className="font-semibold mb-2 text-center">O.I</div>
-                                        <InputTextOneLine
-                                            label="V.C."
-                                            name="oiccoftalmologia_oicc"
-                                            value={form?.oiccoftalmologia_oicc}
-                                            disabled
-                                            labelWidth="35px"
-                                        />
-                                        <InputTextOneLine
-                                            label="V.L."
-                                            name="oilcOftalmologia_oilc"
-                                            value={form?.oilcOftalmologia_oilc}
-                                            disabled
-                                            labelWidth="35px"
-                                        />
-                                    </div>
-                                </div>
-                                {/* Fila extra (ancho completo) */}
-                                <div className="mt-4 space-y-3">
-                                    <InputTextOneLine
-                                        label="V.Clrs"
-                                        name="vcOftalmologia_vc"
-                                        value={form?.vcOftalmologia_vc}
-                                        disabled
-                                        className="flex-1 w-full"
-                                        labelWidth="35px"
-                                    />
-                                    <InputTextOneLine
-                                        name="vbOftalmologia_vb"
-                                        label="V.B."
-                                        value={form?.vbOftalmologia_vb}
-                                        disabled
-                                        className="flex-1 w-full"
-                                        labelWidth="35px"
-                                    />
-                                    <InputTextOneLine
-                                        label="R.P."
-                                        name="rpOftalmologia_rp"
-                                        value={form?.rpOftalmologia_rp}
-                                        disabled
-                                        className="flex-1 w-full"
-                                        labelWidth="35px"
-                                    />
-                                </div>
-                            </div>
-                            {/* Enfermedades Oculares */}
-                            <InputTextArea label="Enfermedades Oculares" rows={2    } name="enfermedadesOcularesOftalmologia_e_oculares" value={form?.enfermedadesOcularesOftalmologia_e_oculares} onChange={handleChange} disabled />
-                    </div>
-                    <div className="bg-white  rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
-                        <InputTextOneLine
-                            label="Hemoglobina"
-                            name="hemoglobina_txthemoglobina"
-                            value={form?.hemoglobina_txthemoglobina}
-                            disabled
-                            labelWidth="80px"
-                        />
-                        <InputTextOneLine
-                            label="V.S.G"
-                            name="vsgLabClinico_txtvsg"
-                            value={form?.vsgLabClinico_txtvsg}
-                            disabled
-                            labelWidth="80px"
-                        />
-                        <InputTextOneLine
-                            label="Glucosa"
-                            name="glucosaLabClinico_txtglucosabio"
-                            value={form?.glucosaLabClinico_txtglucosabio}
-                            disabled
-                            labelWidth="80px"
-                        />
-                        <InputTextOneLine
-                            label="Creatina"
-                            name="leucocitoSematologiaLabClinico"
-                            value={form?.leucocitoSematologiaLabClinico}
-                            disabled
-                            labelWidth="80px"
-                        />
-                    </div>
-                </div>
             </div>
                 
             </div>
@@ -387,4 +235,4 @@ const CertificadoAptitudPoderosa = () => {
     )
 }
 
-export default CertificadoAptitudPoderosa
+export default CertificadoTrabajosCaliente
