@@ -9,7 +9,7 @@ import InputTextArea from "../../../../components/reusableComponents/InputTextAr
 import { useSessionData } from "../../../../hooks/useSessionData";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerCMO";
 import { getToday } from "../../../../utils/helpers";
-import { valores } from "./ControllerCMO";
+import { Valores } from "./ControllerCMO";
 
 const tabla = "certificado_aptitud_medico_resumen"
 const today = getToday();
@@ -98,17 +98,16 @@ export default function CertificadoMedicoOcupacional() {
         const { name, value } = e.target;
 
         // value ya trae el texto del Check seleccionado (por ejemplo valores.Check1)
-        const textoFinal = generarConclusiones(form, valores, value);
+        const textoFinal = generarConclusiones(form, Valores, value);
 
         setForm((prev) => ({
             ...prev,
             [name]: textoFinal,
         }));
 
-        console.log("Texto generado:\n", textoFinal);
     };
 
-    function generarConclusiones(form, valores, textoSeleccionado) {
+    /*function generarConclusiones(form, valores, textoSeleccionado) {
         let conclusiones = "";
 
         // ==============================
@@ -162,8 +161,59 @@ export default function CertificadoMedicoOcupacional() {
         conclusiones += textoSeleccionado || "";
 
         return conclusiones.trim();
-        }
+        }*/
     
+    function generarConclusiones(form, valores, textoSeleccionado) {
+        let conclusiones = "";
+
+        // ==============================
+        // 🔹 1. TRIAJE
+        // ==============================
+        const { pesoTriaje, tallaTriaje } = form;
+
+        if (pesoTriaje && tallaTriaje) {
+            conclusiones += `- TRIAJE ( PESO: ${pesoTriaje} KG ; TALLA: ${tallaTriaje} CM )\n`;
+        }
+
+        // ==============================
+        // 🔹 2. OBTENER PLANTILLA SEGÚN RADIO
+        // ==============================
+        let plantillaTexto = "";
+
+  if (typeof textoSeleccionado === "string" && valores.hasOwnProperty(textoSeleccionado)) {
+    plantillaTexto = valores[textoSeleccionado];
+  } else {
+    // buscar si es exactamente igual a algún Valores[clave]
+    const keyMatch = Object.keys(valores).find(k => valores[k] === textoSeleccionado);
+    if (keyMatch) {
+      plantillaTexto = valores[keyMatch];
+    } else {
+      // sino asumimos que textoSeleccionado es ya el texto de plantilla
+      plantillaTexto = textoSeleccionado || "";
+    }
+  }
+
+  const plantillaLineas = plantillaTexto
+    ? plantillaTexto.split("\n").map(l => l.trim()).filter(Boolean)
+    : [];
+
+  const grupoFactor = form.grupoFactor && form.grupoFactor !== "N/A" ? form.grupoFactor : null;
+
+  const lineasProcesadas = plantillaLineas.map(linea => {
+    if (linea.includes("{grupoFactor}")) {
+      if (grupoFactor) {
+        return linea.replace("{grupoFactor}", grupoFactor);
+      } else {
+        return linea.replace(/,?\s*Grupo Sangu[ií]neo y Factor\s*\(\{grupoFactor\}\)/i, "").trim();
+      }
+    }
+    return linea;
+  });
+
+  conclusiones += lineasProcesadas.join("\n");
+  return conclusiones.trim();
+    }
+
     return (
         <div className="mx-auto bg-white overflow-hidden">
             {/* Header */}
@@ -304,38 +354,38 @@ export default function CertificadoMedicoOcupacional() {
                                     <InputsRadioGroup
                                     name="conclusiones" value={form.conclusiones} className="py-2"
                                     onChange={handleRadioButton} options={[
-                                        { label: "1. MARSA - OPERATIVA, SUPERVISOR, AYUDANTE", value: valores.Check1 }
+                                        { label: "1. MARSA - OPERATIVA, SUPERVISOR, AYUDANTE", value: "Check1" }
                                     ]}
                                     />
                                     <InputsRadioGroup
                                     name="conclusiones" value={form.conclusiones} className="py-2"
                                     onChange={handleRadioButton} options={[
-                                        { label: "2. MARSA - CONDUCTOR u OPERADOR MAQUINARIA", value: valores.Check2 }
+                                        { label: "2. MARSA - CONDUCTOR u OPERADOR MAQUINARIA", value: "Check2" }
                                     ]}
                                     />
                                     <div className="w-full grid grid-cols-2">
                                         <InputsRadioGroup
                                         name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "3. MARSA - RETIRO ", value: valores.Check3 }]}
+                                        onChange={handleRadioButton} options={[{ label: "3. MARSA - RETIRO ", value: "Check3" }]}
                                         />
                                         <InputsRadioGroup
                                         name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "6. PROTOCOLO PODEROSA RETIRO", value: valores.Check6}]}
+                                        onChange={handleRadioButton} options={[{ label: "6. PROTOCOLO PODEROSA RETIRO", value: "Check6"}]}
                                         />
                                     </div>
                                     <div className="w-full grid grid-cols-2">
                                         <InputsRadioGroup
                                         name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "4. RETIRO BOROO", value: valores.Check4 }]}
+                                        onChange={handleRadioButton} options={[{ label: "4. RETIRO BOROO", value: "Check4" }]}
                                         />
                                         <InputsRadioGroup
                                         name="conclusiones" value={form.conclusiones} className="py-2"
-                                        onChange={handleRadioButton} options={[{ label: "7. PROTOCOLO PODEROSA", value: valores.Check7 }]}
+                                        onChange={handleRadioButton} options={[{ label: "7. PROTOCOLO PODEROSA", value: "Check7" }]}
                                         />
                                     </div>
                                     <InputsRadioGroup
                                     name="conclusiones" value={form.conclusiones} className="py-2"
-                                    onChange={handleRadioButton} options={[{ label: "5. BOROO - PSICONSENSOMETRICO Y ALTURA   Perfil Lipidico. ", value: valores.Check5 }]}
+                                    onChange={handleRadioButton} options={[{ label: "5. BOROO - PSICONSENSOMETRICO Y ALTURA   Perfil Lipidico. ", value: "Check5" }]}
                                     />
                                     <InputTextOneLine
                                     label="Medico que Certifica"

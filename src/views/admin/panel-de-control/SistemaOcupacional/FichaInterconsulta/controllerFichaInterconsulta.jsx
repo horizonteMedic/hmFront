@@ -42,16 +42,24 @@ export const GetInfoServicio = async (
         acc[item.mensaje] = item.mensaje;
         return acc;
         }, {}); */
-        console.log(inputOptions)
+        const totalRadios = Object.keys(inputOptions).length;
+
+        // Altura estimada por cantidad (ajusta a gusto)
+        let height = 300; // base
+        let width;
+        if (totalRadios <= 2) width = "400px";
+        else if (totalRadios <= 5) width = "550px";
+        else if (totalRadios <= 8) width = "700px";
+        else width = "900px";
+        if (totalRadios > 5) height += (totalRadios - 5) * 30; // suma 40px por cada extra
+        console.log(height)
         // Mostrar SweetAlert con radios
         const { value: seleccion } = await Swal.fire({
-            title: "Selecciona una especialidad",
+             title: "Selecciona una especialidad",
             input: "radio",
             inputOptions,
             inputValidator: (value) => {
-            if (!value) {
-                return "Debes seleccionar una opción o crear una nueva.";
-            }
+                if (!value) return "Debes seleccionar una opción o crear una nueva.";
             },
             showCancelButton: true,
             showDenyButton: true,
@@ -60,8 +68,13 @@ export const GetInfoServicio = async (
             cancelButtonText: "Cancelar",
             allowOutsideClick: false,
             customClass: {
-            popup: "swal-wide",
+                popup: "swal-dinamico",
             },
+            didOpen: () => {
+                const popup = Swal.getPopup();
+                popup.style.maxHeight = `${height}px`;
+                popup.style.width = width; // ← se aplica el ancho dinámico aquí
+            }
         });
 
         // Si seleccionó una opción
@@ -225,8 +238,8 @@ export const SubmitDataService = async (
         "hallazgo": form.hallazgo,
         "diagnostico": form.diagnostico,
         "tratamiento": form.tratamiento,
-        "apto": form.apto ? true : false,
-        "noApto": form.apto ? false : true,
+        "apto":  false,
+        "noApto":  false,
         "horaSalida": getHoraActual(),
     };
 
