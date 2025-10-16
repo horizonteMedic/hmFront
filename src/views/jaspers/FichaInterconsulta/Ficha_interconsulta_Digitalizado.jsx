@@ -455,20 +455,20 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     body: [
       [
         { content: "Agudeza Visual", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: "Cerca", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: "Lejos", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
+        { content: "Sin correctores", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
+        { content: "Con correctores", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
         { content: "V. Binocular", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
         { content: "E. Oculares", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
       ],
       [
-        { content: "Sin correctores", styles: { valign: "middle", fontStyle: "bold" } },
+        { content: "Cerca", styles: { valign: "middle", fontStyle: "bold" } },
         { content: `${datosCerca.sinCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosLejos.sinCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosCerca.binocular}`, styles: { valign: "middle" } },
         { content: `${datosFinales.enfermedadesOculares}`, rowSpan:2, styles: { valign: "middle", halign: "center" } },
       ],
       [
-        { content: "Con correctores", styles: { valign: "middle", fontStyle: "bold" } },
+        { content: "Lejos", styles: { valign: "middle", fontStyle: "bold" } },
         { content: `${datosCerca.conCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosLejos.conCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosLejos.binocular}`, styles: { valign: "middle" } },
@@ -763,9 +763,9 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
     body: [
       [
         { content: "Apto:", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: `${datosFinales.conclusionApto ? "X" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
+        { content: `${datosFinales.conclusionApto ? "" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
         { content: "No Apto:", styles: { valign: "middle", fontStyle: "bold", halign: "center" } },
-        { content: `${datosFinales.conclusionNoApto ? "X" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } }
+        { content: `${datosFinales.conclusionNoApto ? "" : ""}`, styles: { valign: "middle", fontStyle: "bold", halign: "center" } }
       ]
     ],
     theme: "grid",

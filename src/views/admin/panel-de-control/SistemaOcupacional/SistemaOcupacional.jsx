@@ -112,6 +112,7 @@ import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicolo
 import CertificadoTrabajosCaliente from "./CertificadoTrabajosCaliente/CertificadoTrabajosCaliente.jsx";
 import LicenciaInterna from "./LicenciaInterna/LicenciaInterna.jsx";
 import CertificadoAlturaPoderosa from "./CertificadoAlturaPoderosa/CertificadoAlturaPoderosa.jsx";
+import CertificadoAptitudPoderosa from "./CertificadoAptitudPoderosa/CertificadoAptitudPoderosa.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -296,6 +297,7 @@ const TabComponent = () => {
                   { vista: "Certificado Trabajos en Caliente", tab: 37, icons: [{ icon: faFireFlameCurved }], label: "Certificado Trabajos en Caliente" },
                   { vista: "Licencia Interna", tab: 38, icons: [{ icon: faIdCard }], label: "Licencia Interna" },
                   { vista: "Certificado Altura Poderosa", tab: 39, icons: [{ icon: faP }], label: "Certificado Altura Poderosa" },
+                  { vista: "Certificado Aptitud Poderosa", tab: 40, icons: [{ icon: faP }], label: "Certificado Aptitud Poderosa" },
                   { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                 ];
                 return items
@@ -749,6 +751,7 @@ const TabComponent = () => {
               37: { title: "Certificado Trabajos en Caliente", child: <CertificadoTrabajosCaliente /> },
               38: { title: "Licencia Interna", child: <LicenciaInterna /> },
               39: { title: "Certificado Altura Poderosa", child: <CertificadoAlturaPoderosa /> },
+              40: { title: "Certificado Aptitud Poderosa", child: <CertificadoAptitudPoderosa /> },
             };
             const section = displayedInterfaces[activeTab];
             return section ? (
@@ -807,6 +810,7 @@ const TabComponent = () => {
             "Certificado Trabajos en Caliente": { activeTab: 37, subTab: 0 },
             "Licencia Interna": { activeTab: 38, subTab: 0 },
             "Certificado Altura Poderosa": { activeTab: 39, subTab: 0 },
+            "Certificado Aptitud Poderosa": { activeTab: 40, subTab: 0 },
           };
 
           const config = navConfig[idx];
