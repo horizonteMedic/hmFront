@@ -424,8 +424,8 @@ export default function FichaInterconsulta() {
                     </div>
                 </section>
                 <section className="bg-white rounded-lg my-2 w-full">
-                    <div className="w-full flex justify-around items-center gap-4">
-                        <div className="flex flex-col items-end w-full">
+                    <div className="w-full flex justify-around items-start gap-4">
+                        <div className="flex flex-col items-start w-full">
                             <InputTextArea
                                 label="Diagnostico"
                                 value={form.diagnostico}
@@ -435,9 +435,6 @@ export default function FichaInterconsulta() {
                                 name="diagnostico"
                                 classNameArea="bg-[#99FFFF]"
                             />
-                            <div className="flex p-3 mt-4 text-lg items-center font-bold border rounded-lg justify-between">
-                                <InputsBooleanRadioGroup trueLabel="Apto" value={form.apto} name="apto" onChange={handleRadioButtonBoolean} falseLabel="Inapto" />
-                            </div>
                         </div>
                         
                         <div className="flex flex-col w-full">

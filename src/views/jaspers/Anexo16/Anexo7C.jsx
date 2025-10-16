@@ -409,10 +409,10 @@ export default function Anexo16(data = {}) {
     },
     alturaLabor: {
       debajo2500: data.altura_altura_po == "DEBAJO 2500",
-      rango2501_4000: data.altura_altura_po == "2501 A 4000",
+      rango2501_4000: data.altura_altura_po == "3501 A 4000",
       rango2501_3000: data.altura_altura_po == "2501 A 3000",
       rango4001_4500: data.altura_altura_po == "4001 A 4500",
-      rango2001_3500: data.altura_altura_po == "2001 A 3500",
+      rango2001_3500: data.altura_altura_po == "3001 A 3500",
       mas4501: data.altura_altura_po == "MAS DE 4501"
     },
     // Datos personales
