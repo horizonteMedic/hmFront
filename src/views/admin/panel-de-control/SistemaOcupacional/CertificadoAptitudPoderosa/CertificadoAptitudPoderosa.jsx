@@ -133,6 +133,7 @@ const CertificadoAptitudPoderosa = () => {
                                     />
                                 </div>
                             </section>
+                            
                             <div className="flex w-full">
                                 <div className="w-1/2">
                                     <section className="bg-white border border-gray-200 rounded-lg p-4 gap-4 mt-0 m-4">
