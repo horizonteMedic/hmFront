@@ -2,17 +2,41 @@ import InputTextOneLine from "../../../../../components/reusableComponents/Input
 import { useForm } from "../../../../../hooks/useForm"
 import { getToday } from "../../../../../utils/helpers";
 import useRealTime from "../../../../../hooks/useRealTime";
-import { PrintHojaR, VerifyTR } from "./ControllerCertCaliente";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerCertCaliente";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSessionData } from "../../../../../hooks/useSessionData";
 
 const today = getToday();
+const fecha = new Date(today);
+fecha.setFullYear(fecha.getFullYear() + 1);
+
+const nextYearDate = fecha.toISOString().split("T")[0];
+
 const tabla = "aptitud_trabajos_encaliente"
 const CertificadoTrabajosCaliente = () => {
+    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+            useSessionData();
 
-    const { form, setForm, handleChangeNumber, handleChange, handleClearnotO, handleClear, handleRadioButton, handlePrintDefault } = useForm()
+    const InitialForm = {
+        norden: "",
+        nombreExamen: "",
+        nombres: "",
+        dniPaciente: "",
+        edadPaciente: "",
+        sexo: "",
+        empresa: "",
+        apto: "",
+        fechaExamen: today,
+        fechaHasta: nextYearDate,
+        observaciones: "",
+        nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+        userlogued: userlogued
+    }
+    
+    const { form, setForm, handleChangeNumber, handleChange, handleClearnotO, handleClear, handleRadioButton, handlePrintDefault } = useForm(InitialForm, { storageKey: "Certificado_Trabajos_Hot_form" })
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -54,6 +78,7 @@ const CertificadoTrabajosCaliente = () => {
                                 <InputTextOneLine
                                     label="Tipo de Examen"
                                     name="nombreExamen"
+                                    disabled
                                     value={form?.nombreExamen}
                                     labelWidth="100px"
                                     onChange={handleChange}
@@ -146,7 +171,7 @@ const CertificadoTrabajosCaliente = () => {
                                             onChange={handleRadioButton} options={[
                                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                                                 { label: "APTO CON RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
-                                                { label: "No APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "NOAPTO" },
+                                                { label: "No APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "NOAPTOTEMPORAL" },
                                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
                                             ]}
                                             />
@@ -154,27 +179,27 @@ const CertificadoTrabajosCaliente = () => {
                                         <div className="w-full flex justify-between items-center pt-4 pb-2 px-2">
                                             <InputTextOneLine
                                                 label="Fecha"
-                                                name="fechaDesde"
+                                                name="fechaExamen"
                                                 type="date"
-                                                value={form?.fechaDesde}
+                                                value={form?.fechaExamen}
                                                 labelWidth="50px"
                                                 onChange={handleChange}
                                             />
                                             <InputTextOneLine
                                                 label="Fecha Venc"
-                                                name="fechahasta"
+                                                name="fechaHasta"
                                                 type="date"
-                                                value={form?.fechahasta}
+                                                value={form?.fechaHasta}
                                                 labelWidth="65px"
                                                 onChange={handleChange}
                                             />
                                         </div>
                                         <InputTextOneLine
                                         label="Medico que Certifica"
-                                        name="nombreMedico"
+                                        name="nombre_medico"
                                         disabled
                                         className="mt-2"
-                                        value={form?.nombreMedico}
+                                        value={form?.nombre_medico}
                                         onChange={handleChange}
                                         />
                                         <div className="w-full flex justify-between items-center gap-1 mt-4">
@@ -218,11 +243,11 @@ const CertificadoTrabajosCaliente = () => {
                                 <div className="w-1/2 h-auto">
                                     <InputTextArea
                                         label="Observaciones"
-                                        value={form?.conclusiones}
+                                        value={form?.observaciones}
                                         onChange={handleChange}
                                         classNameLabel="text-blue-600"
                                         rows={20}
-                                        name="conclusiones"
+                                        name="observaciones"
                                     />
                                 </div>
                             </div>

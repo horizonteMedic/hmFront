@@ -37,7 +37,7 @@ const HojaConsultaExterna = () => {
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     }
 
-    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton} = useForm(InitialForm)
+    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton} = useForm(InitialForm, { storageKey: "Hoja_Consulta_Externa_form" })
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
