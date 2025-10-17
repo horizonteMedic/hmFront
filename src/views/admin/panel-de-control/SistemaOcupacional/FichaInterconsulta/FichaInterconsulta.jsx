@@ -119,6 +119,7 @@ export default function FichaInterconsulta() {
     };
 
     const handleSave = () => {
+        if (!form.especialidad) return Swal.fire("Error","Debe solucionar al menos una especialidad","error")
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
     };
@@ -192,6 +193,7 @@ export default function FichaInterconsulta() {
                         <div className="flex items-center gap-4 w-full">
                             <label htmlFor="">Especialidades</label>
                             <select value={form.especialidad} name="especialidad" onChange={handleChangeSimple} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" >
+                                <option value="">Selecione una Especialidad...</option>
                                 {Especialidades?.map((option, index) => (
                                     <option key={index} value={option.toUpperCase()}>
                                         {option}
