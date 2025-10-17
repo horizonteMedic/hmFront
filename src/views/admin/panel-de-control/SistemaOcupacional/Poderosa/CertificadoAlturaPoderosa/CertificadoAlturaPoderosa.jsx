@@ -12,6 +12,7 @@ import {
 import {
     InputTextOneLine,
     InputTextArea,
+    InputsBooleanRadioGroup,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { getToday } from "../../../../../utils/helpers";
@@ -237,7 +238,7 @@ export default function CertificadoAlturaPoderosa() {
                 <div className="w-4/5">
                     <div className="w-full">
                         {/* Datos del trabajador */}
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
                             <InputTextOneLine
                                 label="N° Orden"
                                 name="norden"
@@ -258,6 +259,14 @@ export default function CertificadoAlturaPoderosa() {
                                 type="date"
                                 value={form?.fechaHasta}
                                 onChange={handleChangeSimple}
+                            />
+                            <InputsBooleanRadioGroup
+                                label="Aptitud"
+                                name="esApto"
+                                value={form.esApto}
+                                trueLabel="APTO"
+                                falseLabel="NO APTO"
+                                onChange={handleRadioButtonBoolean}
                             />
                         </section>
 
@@ -353,7 +362,6 @@ export default function CertificadoAlturaPoderosa() {
                                 />
                             </div>
                         </section>
-
                         {/* Navegación de pestañas */}
                         <nav className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
                             {tabs.map((tab) => (

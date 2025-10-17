@@ -3,6 +3,7 @@ import CertificadoAptitudPoderosa from "./CertificadoAptitudPoderosa/Certificado
 import CertificadoTrabajosCaliente from "./CertificadoTrabajosCaliente/CertificadoTrabajosCaliente";
 import LicenciaInterna from "./LicenciaInterna/LicenciaInterna";
 import CertificadoAlturaPoderosa from "./CertificadoAlturaPoderosa/CertificadoAlturaPoderosa";
+import HojaConsultaExterna from "./HojaConsultaExterna/HojaConsultaExterna";
 
 export default function PoderosaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -29,6 +30,12 @@ export default function PoderosaTabSelector({ tieneVista }) {
             permission: "Certificado Aptitud Poderosa",
             label: "Certificado Aptitud Poderosa",
             component: CertificadoAptitudPoderosa
+        },
+        {
+            id: 4,
+            permission: "Hoja Consulta Externa",
+            label: "Hoja Consulta Externa",
+            component: HojaConsultaExterna
         },
     ];
     return (

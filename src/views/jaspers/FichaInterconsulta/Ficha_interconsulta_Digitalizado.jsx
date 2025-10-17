@@ -463,13 +463,13 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
       [
         { content: "Cerca", styles: { valign: "middle", fontStyle: "bold" } },
         { content: `${datosCerca.sinCorrectores}`, styles: { valign: "middle" } },
-        { content: `${datosLejos.sinCorrectores}`, styles: { valign: "middle" } },
+        { content: `${datosCerca.conCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosCerca.binocular}`, styles: { valign: "middle" } },
         { content: `${datosFinales.enfermedadesOculares}`, rowSpan:2, styles: { valign: "middle", halign: "center" } },
       ],
       [
         { content: "Lejos", styles: { valign: "middle", fontStyle: "bold" } },
-        { content: `${datosCerca.conCorrectores}`, styles: { valign: "middle" } },
+        { content: `${datosLejos.sinCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosLejos.conCorrectores}`, styles: { valign: "middle" } },
         { content: `${datosLejos.binocular}`, styles: { valign: "middle" } },
       ],

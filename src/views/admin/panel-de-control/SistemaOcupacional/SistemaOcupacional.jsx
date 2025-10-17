@@ -77,6 +77,7 @@ import {
   faFireFlameCurved,
   faIdCard,
   faP,
+  faPersonRifle,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
 import { useAuthStore } from "../../../../store/auth";
@@ -295,7 +296,7 @@ const TabComponent = () => {
                   // { vista: "Licencia Interna", tab: 38, icons: [{ icon: faIdCard }], label: "Licencia Interna" },
                   // { vista: "Certificado Altura Poderosa", tab: 39, icons: [{ icon: faP }], label: "Certificado Altura Poderosa" },
                   // { vista: "Certificado Aptitud Poderosa", tab: 40, icons: [{ icon: faP }], label: "Certificado Aptitud Poderosa" },
-                  { vista: "Poderosa", tab: 37, icons: [{ icon: faP }], label: "Poderosa" },
+                  { vista: "Poderosa", tab: 37, icons: [{ icon: faPersonRifle }], label: "Poderosa" },
                   { vista: "Playground", tab: 24, icons: [{ icon: faGamepad }], label: "Playground" },
                 ];
                 return items
