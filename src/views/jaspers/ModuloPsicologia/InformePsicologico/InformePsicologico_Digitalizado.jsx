@@ -202,18 +202,18 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Segunda fila: DNI, Edad, Sexo (3 columnas)
+  // Segunda fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura);
-  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura);
+  doc.line(tablaInicioX + 45, yPos, tablaInicioX + 45, yPos + filaAltura);
+  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
+  doc.line(tablaInicioX + 135, yPos, tablaInicioX + 135, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Tercera fila: Fecha Nacimiento, Domicilio (2 columnas)
+  // Tercera fila: Domicilio (completa)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
-  doc.line(tablaInicioX + 90, yPos, tablaInicioX + 90, yPos + filaAltura);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
@@ -252,33 +252,33 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   dibujarTextoConSaltoLinea(datosFinales.apellidosNombres, tablaInicioX + 40, yTexto + 1.5, tablaAncho - 40);
   yTexto += filaAltura;
 
-  // Segunda fila: DNI, Edad, Sexo
+  // Tercera fila: DNI, Edad, Sexo, Fecha Nac. (4 columnas)
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
   doc.text(datosFinales.documentoIdentidad, tablaInicioX + 12, yTexto + 1.5);
 
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Edad:", tablaInicioX + 62, yTexto + 1.5);
+  doc.setFont("helvetica", "bold").setFontSize(9);    
+  doc.text("Edad:", tablaInicioX + 47, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.edad + " Años", tablaInicioX + 75, yTexto + 1.5);
+  doc.text(datosFinales.edad + " Años", tablaInicioX + 58, yTexto + 1.5);
 
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Sexo:", tablaInicioX + 122, yTexto + 1.5);
+  doc.text("Sexo:", tablaInicioX + 92, yTexto + 1.5 );
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.sexo, tablaInicioX + 135, yTexto + 1.5);
+  doc.text(datosFinales.sexo, tablaInicioX + 105, yTexto + 1.5);
+
+  doc.setFont("helvetica", "bold").setFontSize(9);
+  doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1.5);
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 165, yTexto + 1.5);
   yTexto += filaAltura;
 
-  // Tercera fila: Fecha Nacimiento, Domicilio
+  // Tercera fila: Domicilio
   doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Fecha Nac.:", tablaInicioX + 2, yTexto + 1.5);
+  doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1.5);
   doc.setFont("helvetica", "normal").setFontSize(9);
-  doc.text(datosFinales.fechaNacimiento, tablaInicioX + 20, yTexto + 1.5);
-
-  doc.setFont("helvetica", "bold").setFontSize(9);
-  doc.text("Domicilio:", tablaInicioX + 92, yTexto + 1.5);
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 122, yTexto + 1.5, 65);
+  dibujarTextoConSaltoLinea(datosFinales.domicilio, tablaInicioX + 25, yTexto + 1.5, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Cuarta fila: Área de Trabajo, Puesto de Trabajo
@@ -390,8 +390,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yLista = yPos + 3;
   areaIntelectual.forEach(item => {
-    doc.text("- " + item, tablaInicioX + 2, yLista);
-    yLista += 3;
+    const lineas = doc.splitTextToSize(String(item), anchoMaximoLista - 4);
+    lineas.forEach(linea => {
+      doc.text(linea, tablaInicioX + 2, yLista);
+      yLista += 3;
+    });
   });
 
   yPos += alturaFilaLista;
@@ -414,8 +417,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaPersonalidad = yPos + 3;
   areaPersonalidad.forEach(item => {
-    doc.text("  " + item, tablaInicioX + 2, yListaPersonalidad);
-    yListaPersonalidad += 3;
+    const lineas = doc.splitTextToSize(String(item), anchoMaximoLista - 4);
+    lineas.forEach(linea => {
+      doc.text(linea, tablaInicioX + 2, yListaPersonalidad);
+      yListaPersonalidad += 3;
+    });
   });
   yPos += alturaFilaPersonalidad;
 
@@ -432,8 +438,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaOrganicidad = yPos + 3;
   areaOrganicidad.forEach(item => {
-    doc.text("- " + item, tablaInicioX + 2, yListaOrganicidad);
-    yListaOrganicidad += 3;
+    const lineas = doc.splitTextToSize(String(item), anchoMaximoLista - 4);
+    lineas.forEach(linea => {
+      doc.text(linea, tablaInicioX + 2, yListaOrganicidad);
+      yListaOrganicidad += 3;
+    });
   });
   yPos += alturaFilaOrganicidad;
 
@@ -450,8 +459,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaPsicomotricidad = yPos + 3;
   areaPsicomotricidad.forEach(item => {
-    doc.text("- " + item, tablaInicioX + 2, yListaPsicomotricidad);
-    yListaPsicomotricidad += 3;
+    const lineas = doc.splitTextToSize(String(item), anchoMaximoLista - 4);
+    lineas.forEach(linea => {
+      doc.text(linea, tablaInicioX + 2, yListaPsicomotricidad);
+      yListaPsicomotricidad += 3;
+    });
   });
   yPos += alturaFilaPsicomotricidad;
 
@@ -468,8 +480,11 @@ export default function InformePsicologico_Digitalizado(data = {}) {
   doc.setFont("helvetica", "normal").setFontSize(8);
   let yListaRecomendaciones = yPos + 3;
   recomendaciones.forEach(item => {
-    doc.text("  " + item, tablaInicioX + 2, yListaRecomendaciones);
-    yListaRecomendaciones += 3;
+    const lineas = doc.splitTextToSize(String(item), anchoMaximoLista - 4);
+    lineas.forEach(linea => {
+      doc.text(linea, tablaInicioX + 2, yListaRecomendaciones);
+      yListaRecomendaciones += 3;
+    });
   });
 
   // Firma dentro de la fila de recomendaciones

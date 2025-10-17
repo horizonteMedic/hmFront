@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import TabSelector from "../../../../components/reusableComponents/TabSelector";
 import InformePsicologico from "./InformePsicologico/InformePsicologico";
 import FichaPsicologica2 from "./FichaPsicologica2/FichaPsicologica2";
 import FichaPsicologica3 from "./FichaPsicologica3/FichaPsicologica3";
@@ -7,121 +7,48 @@ import InformePsicologicoADECO from "./InformePsicologicoADECO/InformePsicologic
 import ExamenEspacioConfinado from "./ExamenEspacioConfinado/ExamenEspacioConfinado";
 
 export default function PsicologiaTabSelector({ tieneVista }) {
-    const [activeTab, setActiveTab] = useState(0);
-
-    useEffect(() => {
-        if (tieneVista("Informe Psicologico")) {
-            setActiveTab(0);
+    const tabsConfig = [
+        {
+            id: 0,
+            permission: "Informe Psicologico",
+            label: "Informe Psicologico",
+            component: InformePsicologico
+        },
+        {
+            id: 1,
+            permission: "Ficha Psicologica 2",
+            label: "Ficha Psicológica 2",
+            component: FichaPsicologica2
+        },
+        {
+            id: 2,
+            permission: "Ficha Psicologica 3",
+            label: "Ficha Psicológica 3",
+            component: FichaPsicologica3
+        },
+        {
+            id: 3,
+            permission: "Informe Psicolaboral",
+            label: "Informe Psicolaboral",
+            component: InformePsicolaboral
+        },
+        {
+            id: 4,
+            permission: "Informe Psicologico ADECO",
+            label: "Informe Psicológico ADECO",
+            component: InformePsicologicoADECO
+        },
+        {
+            id: 5,
+            permission: "Examen Espacio Confinado",
+            label: "Examen Espacio Confinado",
+            component: ExamenEspacioConfinado
         }
-        else if (tieneVista("Ficha Psicologica 2")) {
-            setActiveTab(1);
-        }
-        else if (tieneVista("Ficha Psicologica 3")) {
-            setActiveTab(2);
-        }
-        else if (tieneVista("Informe Psicolaboral")) {
-            setActiveTab(3);
-        }
-        else if (tieneVista("Informe Psicologico ADECO")) {
-            setActiveTab(4);
-        }
-        else if (tieneVista("Examen Espacio Confinado")) {
-            setActiveTab(5);
-        }
-        else {
-            setActiveTab(-1);
-        }
-    }, []);
-
-
+    ];
     return (
-        <div className="space-y-4">
-            <div className="bg-white border-t border-gray-200 rounded-lg p-3">
-                {/* Tab Navigation */}
-                <nav className="flex bg-white border-b border-gray-200 mb-4">
-                    {tieneVista("Informe Psicologico") && (
-                        <button
-                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 0
-                                ? "border-[#233245] font-semibold"
-                                : "border-transparent"
-                                }`}
-                            onClick={() => setActiveTab(0)}
-                        >
-                            Informe Psicologico
-                        </button>
-                    )}
-                    {tieneVista("Ficha Psicologica 2") && (
-                        <button
-                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 1
-                                ? "border-[#233245] font-semibold"
-                                : "border-transparent"
-                                }`}
-                            onClick={() => setActiveTab(1)}
-                        >
-                            Ficha Psicológica 2
-                        </button>
-                    )}
-                    {tieneVista("Ficha Psicologica 3") && (
-                        <button
-                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 2
-                                ? "border-[#233245] font-semibold"
-                                : "border-transparent"
-                                }`}
-                            onClick={() => setActiveTab(2)}
-                        >
-                            Ficha Psicológica 3
-                        </button>
-                    )}
-                    {tieneVista("Informe Psicolaboral") && (
-                        <button
-                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 3
-                                ? "border-[#233245] font-semibold"
-                                : "border-transparent"
-                                }`}
-                            onClick={() => setActiveTab(3)}
-                        >
-                            Informe Psicolaboral
-                        </button>
-                    )}
-                    {tieneVista("Informe Psicologico ADECO") && (
-                        <button
-                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 4
-                                ? "border-[#233245] font-semibold"
-                                : "border-transparent"
-                                }`}
-                            onClick={() => setActiveTab(4)}
-                        >
-                            Informe Psicológico ADECO
-                        </button>
-                    )}
-                    {tieneVista("Examen Espacio Confinado") && (
-                        <button
-                            className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTab === 5
-                                ? "border-[#233245] font-semibold"
-                                : "border-transparent"
-                                }`}
-                            onClick={() => setActiveTab(5)}
-                        >
-                            Examen Espacio Confinado
-                        </button>
-                    )}
-                </nav>
-
-                {/* Tab Content */}
-                <div className="max-w-full">
-                    {activeTab === 0 && <InformePsicologico />}
-                    {activeTab === 1 && <FichaPsicologica2 />}
-                    {activeTab === 2 && <FichaPsicologica3 />}
-                    {activeTab === 3 && <InformePsicolaboral />}
-                    {activeTab === 4 && <InformePsicologicoADECO />}
-                    {activeTab === 5 && <ExamenEspacioConfinado />}
-                    {activeTab === -1 && (
-                        <div className="text-center text-gray-500">
-                            No tiene permisos para ver ningún examen.
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+        <TabSelector
+            tieneVista={tieneVista}
+            tabsConfig={tabsConfig}
+        />
     );
 }

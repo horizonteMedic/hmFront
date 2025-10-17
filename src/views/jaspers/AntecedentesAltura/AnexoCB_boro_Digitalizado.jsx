@@ -687,21 +687,30 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   doc.text(datosFinales.fechaExamen || "No especificado", tablaInicioX + 12, yPos + 15);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
-  const firmaTrabajadorY = yPos + 3; // Subido 5 puntos más arriba
-  
-  // Calcular centro de la columna 2 para centrar las imágenes
-  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
-  
-  // Agregar firma del trabajador (lado izquierdo)
+  // Posicionar firma y huella como un bloque centrado dentro de la columna 2
+  const col2Left = tablaInicioX + 60; // inicio columna 2
+  const col2Width = 60; // ancho columna 2
   const firmaTrabajadorUrl = getSign(data, "FIRMAP");
+  const huellaTrabajadorUrl = getSign(data, "HUELLA");
   console.log("Firma trabajador URL:", firmaTrabajadorUrl);
+  console.log("Huella trabajador URL:", huellaTrabajadorUrl);
+
+  // Dimensiones y separación
+  const firmaW = 36; // más ancha que la huella
+  const firmaH = 20;
+  const huellaW = 14;
+  const huellaH = 22;
+  const gap = 4; // espacio entre firma y huella
+
+  // Calcular posición inicial para centrar el conjunto dentro de la celda
+  const groupWidth = firmaW + gap + huellaW;
+  const startXCol2 = col2Left + (col2Width - groupWidth) / 2;
+  const imageY = yPos + Math.max(2, (alturaSeccionFirmas - Math.max(firmaH, huellaH)) / 2 - 1);
+
+  // Render de firma (izquierda del bloque)
   if (firmaTrabajadorUrl) {
     try {
-      const imgWidth = 30; // Reducido para que quepa al lado de la huella
-      const imgHeight = 20;
-      const x = centroColumna2X - 20+25; // Posicionado a la izquierda del centro
-      const y = firmaTrabajadorY-13;
-      doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+      doc.addImage(firmaTrabajadorUrl, 'PNG', startXCol2, imageY, firmaW, firmaH);
       console.log("Firma trabajador agregada exitosamente");
     } catch (error) {
       console.log("Error cargando firma del trabajador:", error);
@@ -710,16 +719,11 @@ export default function GenerarDatosPacienteBoro(data = {}) {
     console.log("No se encontró URL de firma del trabajador");
   }
 
-  // Agregar huella del trabajador (lado derecho, vertical)
-  const huellaTrabajadorUrl = getSign(data, "HUELLA");
-  console.log("Huella trabajador URL:", huellaTrabajadorUrl);
+  // Render de huella (derecha del bloque)
   if (huellaTrabajadorUrl) {
     try {
-      const imgWidth = 14; // Vertical
-      const imgHeight = 22; // Ajustado para que coincida con la altura de la firma
-      const x = centroColumna2X + 8+25; // Posicionado a la derecha del centro
-      const y = firmaTrabajadorY -13;
-      doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+      const huellaX = startXCol2 + firmaW + gap;
+      doc.addImage(huellaTrabajadorUrl, 'PNG', huellaX, imageY, huellaW, huellaH);
       console.log("Huella trabajador agregada exitosamente");
     } catch (error) {
       console.log("Error cargando huella del trabajador:", error);
@@ -727,10 +731,10 @@ export default function GenerarDatosPacienteBoro(data = {}) {
   } else {
     console.log("No se encontró URL de huella del trabajador");
   }
-  
+
   doc.setFont("helvetica", "normal").setFontSize(7);
-  // Centrar en la columna 2 (ancho de columna: 60px, desde tablaInicioX + 60 hasta tablaInicioX + 120)
-  const centroColumna2 = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  // Centrar leyenda de la columna 2
+  const centroColumna2 = col2Left + (col2Width / 2);
   doc.text("Firma y Huella del trabajador", centroColumna2, yPos + 26, { align: "center" }); // Texto debajo de las imágenes
 
   // === COLUMNA 3: SELLO Y FIRMA DEL MÉDICO ===

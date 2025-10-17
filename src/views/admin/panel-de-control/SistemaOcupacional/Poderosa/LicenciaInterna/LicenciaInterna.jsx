@@ -1,10 +1,10 @@
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
-import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { useForm } from "../../../../hooks/useForm"
-import useRealTime from "../../../../hooks/useRealTime";
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import { useForm } from "../../../../../hooks/useForm"
+import useRealTime from "../../../../../hooks/useRealTime";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerLicenciaInterna";
-import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const LicenciaInterna = () => {

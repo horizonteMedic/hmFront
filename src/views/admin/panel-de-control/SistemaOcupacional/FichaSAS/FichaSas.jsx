@@ -16,8 +16,7 @@ import Swal from "sweetalert2";
 const tabla = "ficha_sas"
 const today = getToday();
 
-export default function FichaSas({ listas }) {
-    const { MedicosMulti } = listas
+export default function FichaSas() {
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
         useSessionData();
 

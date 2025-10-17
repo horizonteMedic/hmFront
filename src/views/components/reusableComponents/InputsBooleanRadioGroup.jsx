@@ -5,32 +5,57 @@ export default function InputsBooleanRadioGroup({
   trueLabel = "SÍ",
   falseLabel = "NO",
   disabled = false,
+  //nuevo opcional
+  label = "",
+  labelOnTop = false,
+  labelWidth = "80px",
+  className = "",
+  labelClassName = "",
+  groupClassName = "",
+  vertical = false,
 }) {
-  return (
-    <div className="flex gap-4">
-      <label className="flex items-center gap-1">
-        <input
-          type="radio"
-          name={name}
-          value="true"
-          checked={value === true}
-          onChange={(e) => disabled ? null : onChange(e, true)}
-        // disabled={disabled}
-        />
-        <span>{trueLabel}</span>
-      </label>
+  const trueId = `${name}-true`;
+  const falseId = `${name}-false`;
 
-      <label className="flex items-center gap-1">
-        <input
-          type="radio"
-          name={name}
-          value="false"
-          checked={value === false}
-          onChange={(e) => disabled ? null : onChange(e, false)}
-        // disabled={disabled}
-        />
-        <span>{falseLabel}</span>
-      </label>
+  return (
+    <div className={`${labelOnTop ? "flex flex-col gap-2" : "flex items-center gap-4"} ${className}`}>
+      {label && (
+        <label
+          className={`font-semibold ${labelClassName}`}
+          style={labelOnTop ? {} : { minWidth: labelWidth, maxWidth: labelWidth }}
+          htmlFor={trueId}
+        >
+          {label} :
+        </label>
+      )}
+
+      <div className={`flex ${vertical ? "flex-col gap-y-2" : "flex-row gap-4"} ${groupClassName}`}>
+        <label className="flex items-center gap-1" htmlFor={trueId}>
+          <input
+            id={trueId}
+            type="radio"
+            name={name}
+            value="true"
+            checked={value === true}
+            onChange={(e) => (disabled ? null : onChange(e, true))}
+          // disabled={disabled}
+          />
+          <span>{trueLabel}</span>
+        </label>
+
+        <label className="flex items-center gap-1" htmlFor={falseId}>
+          <input
+            id={falseId}
+            type="radio"
+            name={name}
+            value="false"
+            checked={value === false}
+            onChange={(e) => (disabled ? null : onChange(e, false))}
+          // disabled={disabled}
+          />
+          <span>{falseLabel}</span>
+        </label>
+      </div>
     </div>
   );
 }

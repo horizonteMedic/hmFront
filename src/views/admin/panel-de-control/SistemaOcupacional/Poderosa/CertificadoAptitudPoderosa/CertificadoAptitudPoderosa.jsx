@@ -1,10 +1,10 @@
 import { faBroom, faPrint, faSave } from "@fortawesome/free-solid-svg-icons";
-import InputsRadioGroup from "../../../../components/reusableComponents/InputsRadioGroup";
-import InputTextOneLine from "../../../../components/reusableComponents/InputTextOneLine";
-import { useForm } from "../../../../hooks/useForm"
+import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import InputTextOneLine from "../../../../../components/reusableComponents/InputTextOneLine";
+import { useForm } from "../../../../../hooks/useForm"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import InputTextArea from "../../../../components/reusableComponents/InputTextArea";
-import useRealTime from "../../../../hooks/useRealTime";
+import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
+import useRealTime from "../../../../../hooks/useRealTime";
 
 const CertificadoAptitudPoderosa = () => {
 

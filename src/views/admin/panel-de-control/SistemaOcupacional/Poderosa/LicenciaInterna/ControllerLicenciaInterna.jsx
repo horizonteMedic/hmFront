@@ -4,9 +4,9 @@ import {
     LoadingDefault,
     PrintHojaRDefault,
     SubmitDataServiceDefault,
-} from "../../../../utils/functionUtils";
-import { getFetch } from "../../../../utils/apiHelpers";
-import { getHoraActual, getToday } from "../../../../utils/helpers";
+} from "../../../../../utils/functionUtils";
+import { getFetch } from "../../../../../utils/apiHelpers";
+import { getHoraActual, getToday } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional";
