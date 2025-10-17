@@ -14,6 +14,7 @@ const registrarUrl =
     "/api/v01/ct/hojaConsultaExterna/registrarActualizarHojaConsultaExterna";
 const today = getToday();
 
+
 export const GetInfoServicio = async (
     nro,
     tabla,
