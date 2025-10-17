@@ -17,10 +17,10 @@ export default function Antecedentes({
   return (
     <div className="space-y-6">
       {/* Accidentes de Trabajo o Enfermedades Profesionales */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4 ">
-        <h3 className="font-bold mb-3 text-gray-800">
+      <fieldset className="bg-white border border-gray-200 rounded-lg p-4 ">
+        <legend className="font-bold mb-2 text-gray-800 text-[10px]">
           Historial
-        </h3>
+        </legend>
         <div className="grid grid-cols-2 gap-4">
           <InputTextArea
             label="Accidentes de Trabajo o Enfermedades Profesionales"
@@ -37,12 +37,12 @@ export default function Antecedentes({
             rows={6}
           />
         </div>
-      </section>
+      </fieldset>
       {/* Antecedentes Psiconeuroológicos */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="font-bold mb-3">
+      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+        <legend className="font-bold mb-2 text-gray-800 text-[10px]">
           Antecedentes Psiconeuroológicos
-        </h3>
+        </legend>
         <div className="grid grid-cols-1 gap-3">
           {/* TEC Moderado/Grave */}
           <div className="flex gap-4">
@@ -190,13 +190,13 @@ export default function Antecedentes({
             />
           </div>
         </div>
-      </section>
+      </fieldset>
 
       {/* Consumo de Sustancias */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold  text-gray-800">
+      <fieldset className="bg-white border border-gray-200 rounded-lg p-4">
+        <legend className="font-bold text-gray-800 text-[10px]">
           Consumo de Sustancias
-        </h3>
+        </legend>
         <table className="w-full">
           <thead>
             <tr className="">
@@ -297,79 +297,7 @@ export default function Antecedentes({
             </tr>
           </tbody>
         </table>
-      </section>
-
-      {/* Diagnóstico */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="font-bold mb-3">
-          Conclusiones Finales
-        </h3>
-        <InputTextArea
-          label="Diagnóstico"
-          name="diagnostico"
-          value={form?.diagnostico}
-          onChange={handleChange}
-          rows={4}
-        />
-        <div className="mb-4 gap-4 grid grid-cols-3 mt-3">
-          <InputTextArea
-            label="Conclusiones y Recomendaciones"
-            name="conclusionesRecomendaciones"
-            value={form?.conclusionesRecomendaciones}
-            onChange={handleChange}
-            className="col-span-2"
-            rows={4}
-          />
-          {/* Recomendaciones específicas */}
-          <div className="grid grid-cols-1 gap-2">
-            <InputCheckbox
-              label="Sobrepeso/Obesidad - Dieta Hipocalórica"
-              name="sobrepesoObesidadHipocalorica"
-              checked={form?.sobrepesoObesidadHipocalorica}
-              onChange={handleCheckBoxChange}
-            />
-            <InputCheckbox
-              label="Corregir Agudeza Visual"
-              name="corregirAgudezaVisual"
-              checked={form?.corregirAgudezaVisual}
-              onChange={handleCheckBoxChange}
-            />
-            <InputCheckbox
-              label="Corregir Agudeza Visual Total"
-              name="corregirAgudezaVisualTotal"
-              checked={form?.corregirAgudezaVisualTotal}
-              onChange={handleCheckBoxChange}
-            />
-            <InputCheckbox
-              label="Obesidad - Dieta Hipocalórica"
-              name="obesidadDietaHipocalorica"
-              checked={form?.obesidadDietaHipocalorica}
-              onChange={handleCheckBoxChange}
-            />
-            <InputCheckbox
-              label="Uso de Lentes Correctores para Lectura de Cerca"
-              name="usoLentesCorrectoresLecturaCerca"
-              checked={form?.usoLentesCorrectoresLecturaCerca}
-              onChange={handleCheckBoxChange}
-            />
-            <InputCheckbox
-              label="Corregir Agudeza para Lectura de Cerca"
-              name="corregirAgudezaLecturaCerca"
-              checked={form?.corregirAgudezaLecturaCerca}
-              onChange={handleCheckBoxChange}
-            />
-          </div>
-        </div>
-
-        {/* Médico */}
-        <InputTextOneLine
-          label="Médico que Certifica"
-          name="nombre_medico"
-          value={form?.nombre_medico}
-          labelOnTop
-          disabled
-        />
-      </section>
+      </fieldset>
     </div>
   );
 }
