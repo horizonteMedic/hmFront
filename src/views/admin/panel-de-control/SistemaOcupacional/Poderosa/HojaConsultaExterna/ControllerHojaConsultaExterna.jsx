@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import {
+    GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
@@ -7,6 +8,7 @@ import {
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../../utils/helpers";
+import Hoja_Consulta_Externa from "../../../../../jaspers/HojaConsultaExterna/Hoja_Consulta_Externa";
 
 const obtenerReporteUrl =
     "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna";
@@ -16,17 +18,14 @@ const today = getToday();
 
 export const GetInfoServicio = async (
     nro,
-    tabla,
     set,
     token,
-    onFinish = () => { }
+    sede
 ) => {
-    const res = await GetInfoServicioDefault(
+    const res = await GetInfoPacDefault(
         nro,
-        tabla,
         token,
-        obtenerReporteUrl,
-        onFinish
+        sede
     );
     console.log(res)
     if (res) {
@@ -34,16 +33,16 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            nombres: res.nombresApellidos,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniPaciente: res.dniPaciente,
-            edadPaciente: res.edadPaciente,
-            nombreExamen: res.nombreExamen,
+            dniPaciente: res.dni,
+            edadPaciente: res.edad,
+            nombreExamen: res.nomExam,
             empresa: res.empresa,
             contrata: res.contrata,
-            cargoPaciente: res.cargoPaciente,
-            ocupacionPaciente: res.ocupacionPaciente,
-            nombreMedico: res.nombreMedico ? res.nombreMedico : prev.nombreMedico
+            cargoPaciente: res.cargo,
+            ocupacionPaciente: res.areaO,
+            fechaExamen: prev.fechaExamen
 
         }));
     }
@@ -73,7 +72,8 @@ export const GetInfoServicioEditar = async (
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             edadPaciente: `${res.edadPaciente} AÑOS`,
             dniUser: res.dniUsuario,
-            cajon: res.paraiso ? "PARAISO" : res.postaVijus ? "POSTA VIJUS" : res.cedro ? "CEDRO" : res.otros ? "OTROS" : ""
+            cajon: res.paraiso ? "PARAISO" : res.postaVijus ? "POSTA VIJUS" : res.cedro ? "CEDRO" : res.otros ? "OTROS" : "",
+            nombre_medico: res.nombreMedico
         }));
     }
 };
@@ -117,7 +117,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
+    const jasperModules = import.meta.glob("../../../../jaspers/HojaConsultaExterna/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -125,7 +125,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/CertificadoMedicoOcupacional"
+        "../../../../jaspers/HojaConsultaExterna"
     );
 };
 
@@ -138,7 +138,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+            GetInfoServicio(nro, set, token, sede);
         },
         () => {
             //Tiene registro
