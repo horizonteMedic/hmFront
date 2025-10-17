@@ -119,6 +119,31 @@ export const VerifyTRDefault = async (nro, tabla, token, set, sede, noTieneRegis
     });
 };
 
+export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaExamen = () => { }) => {
+    if (!nro) {
+        await Swal.fire(
+            "Error",
+            "Debe Introducir un Nro de Historia Clínica válido",
+            "error"
+        );
+        return;
+    }
+    LoadingDefault("Validando datos");
+    getFetch(
+        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+        token
+    ).then((res) => {
+        if (res.id === 0) {
+            //No tiene registro previo 
+            noTieneRegistro();//datos paciente
+        } else if (res.id === 2) {
+            necesitaExamen();
+        } else {
+            tieneRegistro();//obtener data servicio
+        }
+    });
+};
+
 export const GetInfoServicioDefault = async (
     nro,
     tabla,

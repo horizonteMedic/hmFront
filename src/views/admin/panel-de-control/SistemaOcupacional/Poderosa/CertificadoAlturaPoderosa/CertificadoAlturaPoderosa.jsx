@@ -22,6 +22,8 @@ import Antecedentes from "./TabsCertificadoAlturaPoderosa/Antecedentes";
 import TestDeCage from "./TabsCertificadoAlturaPoderosa/TestDeCage";
 import ExamenFisico from "./TabsCertificadoAlturaPoderosa/ExamenFisico";
 import Neurologico from "./TabsCertificadoAlturaPoderosa/Neurologico";
+import Swal from "sweetalert2";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCertificadoAlturaPoderosa";
 
 const tabla = "certificado_altura_poderosa";
 const today = getToday();
@@ -29,12 +31,13 @@ const today = getToday();
 export default function CertificadoAlturaPoderosa() {
     const [activeTab, setActiveTab] = useState(0);
 
-    const { token, userlogued, selectedSede, datosFooter, userName } =
+    const { token, userlogued, selectedSede, datosFooter, userName, userDNI } =
         useSessionData();
 
     const initialFormState = {
         // Header - Campos principales
         norden: "",
+        codigoCertificado: null,
         fechaExam: today,
         nombreExamen: "",
         fechaHasta: getTodayPlusOneYear(),
@@ -71,8 +74,8 @@ export default function CertificadoAlturaPoderosa() {
 
         // ====================== ANTECEDENTES ======================
         // Historial
-        accidentesTrabajoEnfermedades: "Niego accidentes de trabajo",
-        antecedentesFamiliares: "Niego antecedentes familiares",
+        accidentesTrabajoEnfermedades: "NIEGO ACCIDENTES DE TRABAJO",
+        antecedentesFamiliares: "NIEGO ANTECEDENTES FAMILIARES",
 
         // Antecedentes Psiconeuroológicos
         tecModeradoGrave: false,
@@ -116,6 +119,7 @@ export default function CertificadoAlturaPoderosa() {
 
         // Médico
         nombre_medico: userName,
+        dni_medico: userDNI,
 
         // ====================== TEST DE CAGE ======================
         // Preguntas del test CAGE
@@ -164,17 +168,17 @@ export default function CertificadoAlturaPoderosa() {
 
         // Examen físico detallado
         apreciacionGeneral: "",
-        cabeza: "Normocéfalo, central, móvil",
-        piel: "Trigueño, turgente, hidratado",
-        movilidadOcular: "Conservada",
-        otoscopiaOD: "Normal",
-        otoscopiaOI: "Normal",
-        nariz: "Central, fosas nasales permeables",
-        aparatoRespiratorio: "BPmv en ACP, ( no estertores)",
-        aparatoCardiovascular: "RCRR, no soplos",
-        abdomen: "Plano, RHA(+), B.D, No doloroso",
-        musculoEsqueletico: "Motricidad conservada",
-        columna: "Curvaturas conservadas",
+        cabeza: "NORMOCÉFALO, CENTRAL, MÓVIL",
+        piel: "TRIGUEÑO, TURGENTE, HIDRATADO",
+        movilidadOcular: "CONSERVADA",
+        otoscopiaOD: "NORMAL",
+        otoscopiaOI: "NORMAL",
+        nariz: "CENTRAL, FOSAS NASALES PERMEABLES",
+        aparatoRespiratorio: "BPMV EN ACP, ( NO ESTERTORES)",
+        aparatoCardiovascular: "RCRR, NO SOPLOS",
+        abdomen: "PLANO, RHA(+), B.D, NO DOLOROSO",
+        musculoEsqueletico: "MOTRICIDAD CONSERVADA",
+        columna: "CURVATURAS CONSERVADAS",
         testEpworth: "",
         otrosExaLaboratorio: "",
 
@@ -226,19 +230,19 @@ export default function CertificadoAlturaPoderosa() {
             })
             return
         }
-        // SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
-            // VerifyTR(form.norden, tabla, token, setForm, selectedSede);
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
-            // PrintHojaR(form.norden, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
