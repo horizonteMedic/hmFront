@@ -1,18 +1,14 @@
 import {
   InputTextOneLine,
   InputTextArea,
-  InputCheckbox,
   InputsBooleanRadioGroup,
-  InputsRadioGroup,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 
 export default function Antecedentes({
   form,
   setForm,
   handleChange,
-  handleCheckBoxChange,
   handleRadioButtonBoolean,
-  handleRadioButton,
 }) {
   return (
     <div className="space-y-6">
@@ -21,7 +17,7 @@ export default function Antecedentes({
         <legend className="font-bold mb-2 text-gray-800 text-[10px]">
           Historial
         </legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <InputTextArea
             label="Accidentes de Trabajo o Enfermedades Profesionales"
             name="accidentesTrabajoEnfermedades"

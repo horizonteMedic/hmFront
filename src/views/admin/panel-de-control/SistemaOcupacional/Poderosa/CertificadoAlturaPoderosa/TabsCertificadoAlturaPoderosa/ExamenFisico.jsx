@@ -6,14 +6,13 @@ import {
 export default function ExamenFisico({
   form,
   handleChange,
-  handleChangeNumber,
 }) {
   return (
     <div className="space-y-6">
       {/* Perímetros */}
       <section className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-4 text-gray-800">
-          Perímetros
+          Triaje
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <InputTextOneLine
@@ -21,54 +20,43 @@ export default function ExamenFisico({
             name="perimetroCadera"
             value={form?.perimetroCadera}
             disabled
+            labelWidth="84px"
           />
           <InputTextOneLine
             label="Perímetro de Cuello (cm)"
             name="perimetroCuello"
             value={form?.perimetroCuello}
             disabled
+            labelWidth="84px"
           />
           <InputTextOneLine
             label="Perímetro de Cintura (cm)"
             name="perimetroCintura"
             value={form?.perimetroCintura}
             disabled
+            labelWidth="84px"
           />
-        </div>
-      </section>
-
-      {/* Medidas Corporales */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">
-          Medidas Corporales
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <InputTextOneLine
             label="Talla (m)"
             name="talla"
             value={form?.talla}
             disabled
+            labelWidth="84px"
           />
           <InputTextOneLine
             label="Peso (kg)"
             name="peso"
             value={form?.peso}
             disabled
+            labelWidth="84px"
           />
           <InputTextOneLine
             label="IMC"
             name="imc"
             value={form?.imc}
             disabled
+            labelWidth="84px"
           />
-        </div>
-      </section>
-      {/* Medidas Corporales */}
-      <section className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">
-          Medidas Extra
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <InputTextOneLine
             label="Frecuencia Cardiaca"
             name="fc"
@@ -201,7 +189,7 @@ export default function ExamenFisico({
               name="columna"
               value={form?.columna}
               onChange={handleChange}
-              labelWidth="120px" 
+              labelWidth="120px"
             />
             <InputTextArea
               label="Test de Epworth"

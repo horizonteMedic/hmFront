@@ -44,7 +44,7 @@ export default function Neurologico({
         <legend className="font-bold mb-3 text-gray-800 text-[10px]">
           Pruebas Neurológicas
         </legend>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           {/* Columna izquierda */}
           <div className="space-y-3">
             {leftColumnTests.map((test) => (

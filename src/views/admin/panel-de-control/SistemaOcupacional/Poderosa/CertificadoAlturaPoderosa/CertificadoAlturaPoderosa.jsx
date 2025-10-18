@@ -145,7 +145,7 @@ export default function CertificadoAlturaPoderosa() {
         doloresEspaldaLevantarsePuntaje: "",
 
         // Anamnesis Test de Cage
-        anamnesisTestDeCage: "",
+        anamnesisTestDeCage: "REFIERE NO TENER MOLESTIA ALGUNA.",
 
         // ====================== EXAMEN FISICO ======================
         // Perímetros
@@ -167,7 +167,7 @@ export default function CertificadoAlturaPoderosa() {
         pToracicoEspiracion: "",
 
         // Examen físico detallado
-        apreciacionGeneral: "",
+        apreciacionGeneral: "ABEB, DESPIERTO, OTEP",
         cabeza: "NORMOCÉFALO, CENTRAL, MÓVIL",
         piel: "TRIGUEÑO, TURGENTE, HIDRATADO",
         movilidadOcular: "CONSERVADA",
@@ -184,7 +184,7 @@ export default function CertificadoAlturaPoderosa() {
 
         // ====================== NEUROLOGICO ======================
         // Reflejos
-        reflejos: "",
+        reflejos: "CONSERVADOS",
 
         // Pruebas neurológicas
         pruebaDedoNariz: false,
@@ -268,7 +268,7 @@ export default function CertificadoAlturaPoderosa() {
                 <div className="w-4/5">
                     <div className="w-full">
                         {/* Datos del trabajador */}
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             <InputTextOneLine
                                 label="N° Orden"
                                 name="norden"
@@ -318,7 +318,7 @@ export default function CertificadoAlturaPoderosa() {
                                     disabled
                                     labelWidth="60px"
                                 />
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 ">
                                     <InputTextOneLine
                                         label="DNI"
                                         name="dni"
@@ -443,7 +443,7 @@ export default function CertificadoAlturaPoderosa() {
                                 onChange={handleChange}
                                 rows={4}
                             />
-                            <div className="mb-4 gap-4 grid grid-cols-3 mt-3">
+                            <div className="mb-4 gap-4 grid md:grid-cols-3 mt-3">
                                 <InputTextArea
                                     label="Conclusiones y Recomendaciones"
                                     name="conclusionesRecomendaciones"
@@ -548,7 +548,7 @@ export default function CertificadoAlturaPoderosa() {
                         <h4 className="font-semibold text-gray-800 mb-3 text-center">Sin Corregir</h4>
                         {/* Sin Corregir */}
                         <div className="mb-4">
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid md:grid-cols-2 gap-3">
                                 <div className="">
                                     <div className="font-semibold mb-2 text-center">O.D</div>
                                     <div className="space-y-3">
@@ -570,7 +570,7 @@ export default function CertificadoAlturaPoderosa() {
                         <div className="mb-4">
                             <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
                             {/* Fila OD y OI */}
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                     <div className="font-semibold mb-2 text-center">O.D</div>
                                     <InputTextOneLine

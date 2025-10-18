@@ -31,11 +31,7 @@ export const GetInfoServicio = async (
             ...prev,
             // Header
             norden: res.norden ?? "",
-            codigoCertificado: res.codigoCertificado_cod_certificado,
-            fechaExam: res.fechaExamen_f_examen ?? "",
             nombreExamen: res.nombreExamen ?? "",
-            fechaHasta: res.fechaCaducidad_f_caducidad ?? "",
-            esApto: res.apto_chk_apto ?? false,
 
             // Datos personales
             nombres: res.nombresPaciente ?? "",
@@ -46,11 +42,6 @@ export const GetInfoServicio = async (
             contrata: res.contrata ?? "",
             cargo: res.cargoPaciente ?? "",
             areaTrabajo: res.areaPaciente ?? "",
-
-            // Datos extra
-            tiempoExperiencia: res.tiempoExperiencia_t_experiencia ?? "",
-            lugarTrabajo: res.lugarExperiencia_lugar_expe ?? "",
-            altura: res.altura_txtaltura ?? "",
 
             // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
             vcOD: res.visioncercasincorregirod_v_cerca_s_od ?? "",

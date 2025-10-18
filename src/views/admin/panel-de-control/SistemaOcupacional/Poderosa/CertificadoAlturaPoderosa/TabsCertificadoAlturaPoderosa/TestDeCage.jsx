@@ -71,14 +71,14 @@ export default function TestDeCage({
         <p className="text-gray-600 mb-3">
           Por favor, responda las siguientes preguntas con honestidad. Este cuestionario ayuda a evaluar posibles problemas relacionados con el consumo de alcohol.
         </p>
-        <div className="grid grid-cols-2">
+        <div className="grid 2xl:grid-cols-2">
           {cageQuestions.map((question, index) => (
-            <div key={question.name} className="bg-gray-50 p-4 rounded-lg">
+            <div key={question.name} className="p-4 rounded-lg">
               <div className="flex items-start gap-3">
                 <span className="bg-blue-100 text-blue-800 font-medium px-2.5 py-0.5 rounded-full min-w-[2rem] text-center">
                   {index + 1}
                 </span>
-                <div className="w-full flex flex-row gap-8">
+                <div className="w-full flex flex-col md:flex-row gap-8">
                   <InputsBooleanRadioGroup
                     label={question.label}
                     name={question.name}
@@ -90,7 +90,7 @@ export default function TestDeCage({
                     label="Puntaje"
                     name={question.namePuntaje}
                     value={form?.[question.namePuntaje]}
-                    onChange={handleRadioButtonBoolean}
+                    onChange={handleChange}
                     className="w-full"
                   />
                 </div>
