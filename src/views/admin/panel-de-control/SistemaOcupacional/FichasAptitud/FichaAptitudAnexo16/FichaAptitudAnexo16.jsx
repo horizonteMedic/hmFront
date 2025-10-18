@@ -11,7 +11,7 @@ import { getDatePlusOneYear, getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
 import MedicoSearch from "../../../../../components/reusableComponents/MedicoSearch";
 import useRealTime from "../../../../../hooks/useRealTime";
-import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
+import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
 
 const tabla = "certificado_aptitud_medico_ocupacional"
 const today = getToday();
@@ -111,6 +111,11 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
   const handlePrint = () => {
     handlePrintDefault(() => {
       PrintHojaR(form.norden, token, tabla, datosFooter);
+    });
+  };
+  const handlePrint2 = () => {
+    handlePrintDefault(() => {
+      PrintHojaR2(form.norden, token, tabla, datosFooter);
     });
   };
 
@@ -289,12 +294,12 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
               />
               <div className="space-y-2">
                 <div className="flex justify-end">
-                <InputCheckbox
-                  label="Formato OHLA"
-                  name="esOhla"
-                  checked={form?.esOhla}
-                  disabled
-                />
+                  <InputCheckbox
+                    label="Formato OHLA"
+                    name="esOhla"
+                    checked={form?.esOhla}
+                    disabled
+                  />
                 </div>
                 <InputsRadioGroup
                   label="Aptitud"
@@ -523,6 +528,13 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                       type="button"
                       onClick={handlePrint}
                       className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                    >
+                      <FontAwesomeIcon icon={faPrint} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrint2}
+                      className="bg-green-600 hover:bg-green-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
                     >
                       <FontAwesomeIcon icon={faPrint} />
                     </button>

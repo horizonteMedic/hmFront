@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuthStore } from '../../store/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt, faNotesMedical, faHome, faRetweet, faBroom } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faNotesMedical, faHome, faRetweet, faBroom, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { URLAzure } from '../config/config';
 import { clearLocalStorageExceptAuth } from '../utils/helpers';
 import Swal from 'sweetalert2';
@@ -107,11 +107,11 @@ const Navbar = () => {
           <FontAwesomeIcon icon={faRetweet} className="w-5 h-5 " />
         </button> */}
         <button
-          className='bg-white text-[#233245] hover:scale-110 ease-in-out p-2 rounded-full flex items-center justify-center duration-300 mr-5'
+          className='bg-white text-[#233245] hover:scale-110 ease-in-out py-2 px-3 rounded-full flex items-center justify-center duration-300 mr-5'
           title="Limpiar datos"
           onClick={handleClickReload}
         >
-          <FontAwesomeIcon icon={faBroom} className='w-5 h-5' />
+          <FontAwesomeIcon icon={faTrash} className='w-5 h-5' /> <span className='font-bold ml-2'>Limpiar</span>
         </button>
         <CustomNavLink
           to="/panel-de-control"

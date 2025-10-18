@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
-import drawColorBox from '../components/ColorBox.jsx';
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import CabeceraLogo from '../components/CabeceraLogo.jsx';
-import { getSign, convertirGenero } from "../../utils/helpers.js";
-import footerTR from '../components/footerTR.jsx';
+import drawColorBox from '../../components/ColorBox.jsx';
+import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import { getSign, convertirGenero } from "../../../utils/helpers.js";
+import footerTR from '../../components/footerTR.jsx';
 
 export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });

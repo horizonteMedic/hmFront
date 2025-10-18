@@ -1,9 +1,9 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
-import { convertirGenero, getSign } from "../../utils/helpers.js";
-import drawColorBox from '../components/ColorBox.jsx';
-import CabeceraLogo from '../components/CabeceraLogo.jsx';
-import footerTR from '../components/footerTR.jsx';
+import { formatearFechaCorta } from "../../../utils/formatDateUtils.js";
+import { convertirGenero, getSign } from "../../../utils/helpers.js";
+import drawColorBox from '../../components/ColorBox.jsx';
+import CabeceraLogo from '../../components/CabeceraLogo.jsx';
+import footerTR from '../../components/footerTR.jsx';
 
 export default function ResumenAnexo7CP_Digitalizado(data = {}) {
   const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
