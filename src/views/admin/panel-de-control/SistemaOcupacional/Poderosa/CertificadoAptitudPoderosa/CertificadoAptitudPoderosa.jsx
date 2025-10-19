@@ -5,14 +5,60 @@ import { useForm } from "../../../../../hooks/useForm"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputTextArea from "../../../../../components/reusableComponents/InputTextArea";
 import useRealTime from "../../../../../hooks/useRealTime";
+import { useSessionData } from "../../../../../hooks/useSessionData";
+import { getToday } from "../../../../../utils/helpers";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./ControllerAptitudPoderosa";
+
+const tabla = "aptitud_altura_poderosa"
+const today = getToday();
+const fecha = new Date(today);
+fecha.setFullYear(fecha.getFullYear() + 1);
+
+const nextYearDate = fecha.toISOString().split("T")[0];
+
+const opcionesConclusiones = [
+  { label: "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check1" },
+  { label: "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check2" },
+  { label: "CORREGIR AGUDEZA VISUAL PARA LECTURA CERCA", value: "Check3" },
+  { label: "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS", value: "Check4" },
+  { label: "NO HACER TRABAJO DE ALTO RIESGO", value: "Check5" },
+  { label: "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check6" },
+  { label: "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=80 DB", value: "Check7" },
+  { label: "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS", value: "Check8" },
+  { label: "USO DE LENTES CORRECTORES PARA TRABAJO", value: "Check9" },
+  { label: "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check10" },
+  { label: "USO DE LENTES CORRECTORES LECTURA DE CERCA", value: "Check11" },
+  { label: "NO CONDUCIR VEHÍCULOS", value: "Check12" },
+  { label: "NO HACER TRABAJO CON CÓDIGO COLORES", value: "Check13" },
+  { label: "DIETA HIPOCALÓRICA Y EJERCICIOS", value: "Check14" },
+  { label: "NINGUNO", value: "Check15" },
+];
 
 const CertificadoAptitudPoderosa = () => {
+    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+            useSessionData();
+    
+    const InitialForm = {
+        norden: "",
+        nombreExamen: "",
+        nombres: "",
+        dniPaciente: "",
+        edadPaciente: "",
+        sexo: "",
+        empresa: "",
+        apto: "",
+        fechaExamen: today,
+        fechaHasta: nextYearDate,
+        observaciones: "",
+        nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
+        userlogued: userlogued
+    }
 
-    const { form,handleChangeNumber,handleChange, handleRadioButton, handleClear } = useForm()
+    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault} = useForm(InitialForm, { storageKey: "Certificado_Aptitud_Poderosa_form" })
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
-            handleClearnotOandEspecialidad();
+            handleClearnotO();
             VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
@@ -26,6 +72,28 @@ const CertificadoAptitudPoderosa = () => {
     const handleSave = () => {
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
         console.log("Guardando datos:", form);
+    };
+
+    const handleRadioButton = (e) => {
+        const { name, value } = e.target;
+
+        // Busca el label correspondiente al valor seleccionado
+        const selectedOption = opcionesConclusiones.find(opt => opt.value === value);
+
+        if (selectedOption) {
+            const textoAgregar = `- ${selectedOption.label}`;
+
+            // Si ya existe texto previo en observaciones, agregamos un salto de línea
+            const nuevasObservaciones = form.observaciones
+            ? `${form.observaciones}\n${textoAgregar}`
+            : textoAgregar;
+
+            setForm({
+            ...form,
+            [name]: value, // actualiza la selección del radio
+            observaciones: nuevasObservaciones // agrega el texto con salto
+            });
+        }
     };
 
     return(
@@ -50,6 +118,7 @@ const CertificadoAptitudPoderosa = () => {
                                 <InputTextOneLine
                                     label="Tipo de Examen"
                                     name="nombreExamen"
+                                    disabled
                                     value={form?.nombreExamen}
                                     labelWidth="100px"
                                     onChange={handleChange}
@@ -142,7 +211,7 @@ const CertificadoAptitudPoderosa = () => {
                                             onChange={handleRadioButton} options={[
                                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
                                                 { label: "APTO con RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
-                                                { label: "NO APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
+                                                { label: "NO APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "NOAPTOTEMPORAL" },
                                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
                                             ]}
                                             />
@@ -150,17 +219,17 @@ const CertificadoAptitudPoderosa = () => {
                                         <div className="w-full flex justify-between items-center pt-4 pb-2 px-2">
                                             <InputTextOneLine
                                                 label="Fecha"
-                                                name="fechaDesde"
+                                                name="fechaExamen"
                                                 type="date"
-                                                value={form?.fechaDesde}
+                                                value={form?.fechaExamen}
                                                 labelWidth="50px"
                                                 onChange={handleChange}
                                             />
                                             <InputTextOneLine
                                                 label="Fecha Venc"
-                                                name="fechahasta"
+                                                name="fechaHasta"
                                                 type="date"
-                                                value={form?.fechahasta}
+                                                value={form?.fechaHasta}
                                                 labelWidth="65px"
                                                 onChange={handleChange}
                                             />
@@ -170,10 +239,10 @@ const CertificadoAptitudPoderosa = () => {
                                         
                                         <InputTextOneLine
                                         label="Medico que Certifica"
-                                        name="nombreMedico"
+                                        name="nombre_medico"
                                         disabled
                                         className="mt-2"
-                                        value={form?.nombreMedico}
+                                        value={form?.nombre_medico}
                                         onChange={handleChange}
                                         />
                                         <div className="w-full flex justify-between items-center gap-1 mt-4">
@@ -220,34 +289,18 @@ const CertificadoAptitudPoderosa = () => {
                                     value={form?.conclusiones}
                                     className="py-2"
                                     onChange={handleRadioButton}
-                                    options={[
-                                        { label: "CORREGIR AGUDEZA VISUAL TOTAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check1" },
-                                        { label: "CORREGIR AGUDEZA VISUAL PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check2" },
-                                        { label: "CORREGIR AGUDEZA VISUAL PARA LECTURA CERCA", value: "Check3" },
-                                        { label: "EVITAR MOVIMIENTOS Y POSICIONES DISERGONOMICAS", value: "Check4" },
-                                        { label: "NO HACER TRABAJO DE ALTO RIESGO", value: "Check5" },
-                                        { label: "NO HACER TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check6" },
-                                        { label: "USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=80 DB", value: "Check7" },
-                                        { label: "USO DE LENTES CORRECTORES PARA CONDUCIR Y/O OPERAR VEHÍCULOS MOTORIZADOS", value: "Check8" },
-                                        { label: "USO DE LENTES CORRECTORES PARA TRABAJO", value: "Check9" },
-                                        { label: "USO DE LENTES CORRECTORES PARA TRABAJO SOBRE 1.8 M.S.N.PISO", value: "Check10" },
-                                        { label: "USO DE LENTES CORRECTORES LECTURA DE CERCA", value: "Check11" },
-                                        { label: "NO CONDUCIR VEHÍCULOS", value: "Check12" },
-                                        { label: "NO HACER TRABAJO CON CÓDIGO COLORES", value: "Check13" },
-                                        { label: "DIETA HIPOCALÓRICA Y EJERCICIOS", value: "Check14" },
-                                        { label: "NINGUNO", value: "Check15" },
-                                    ]}
+                                    options={opcionesConclusiones}
                                     />
                                 </div>
                             </div>
                             <div className="w-full p-4 gap-4 mt-0 m-4">
                                  <InputTextArea
                                         label="Observaciones"
-                                        value={form?.conclusiones}
+                                        value={form?.observaciones}
                                         onChange={handleChange}
                                         classNameLabel="text-blue-600"
                                         rows={5}
-                                        name="conclusiones"
+                                        name="observaciones"
                                     />               
                             </div>
                         </div>
@@ -347,7 +400,7 @@ const CertificadoAptitudPoderosa = () => {
                                 </div>
                             </div>
                             {/* Enfermedades Oculares */}
-                            <InputTextArea label="Enfermedades Oculares" rows={2    } name="enfermedadesOcularesOftalmologia_e_oculares" value={form?.enfermedadesOcularesOftalmologia_e_oculares} onChange={handleChange} disabled />
+                            <InputTextArea label="Enfermedades Oculares" rows={2    } name="enfermedadesOcularesOftalmo_e_oculares" value={form?.enfermedadesOcularesOftalmo_e_oculares} onChange={handleChange} disabled />
                     </div>
                     <div className="bg-white  rounded-lg p-4 m-4 flex-1 flex flex-col space-y-3">
                         <InputTextOneLine
