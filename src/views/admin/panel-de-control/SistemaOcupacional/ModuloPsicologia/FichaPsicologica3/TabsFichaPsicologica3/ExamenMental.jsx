@@ -117,54 +117,82 @@ export default function ExamenMental({
                 </div>
 
                 {/* Orientación */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Orientación</h4>
-
-                  {/* Tiempo */}
-                  <div className="mb-3">
-                    <h5 className="font-semibold text-[11px] mb-1">Tiempo</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="orientacionTiempo"
-                        value={form.orientacionTiempo}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Orientado", value: "ORIENTADO" },
-                          { label: "Desorientado", value: "DESORIENTADO" }
-                        ]}
-                      />
+                <div className="border rounded p-3 ">
+                  <h5 className="font-semibold mb-4">Orientación</h5>
+                  {/* Tabla de orientación */}
+                  <div className="bg-gray-50 rounded-lg overflow-hidden">
+                    {/* Encabezados de columna */}
+                    <div className="grid grid-cols-3 bg-gray-100 border-b">
+                      <div className="p-3"></div>
+                      <div className="p-3 text-center font-semibold text-gray-700">Desorientado</div>
+                      <div className="p-3 text-center font-semibold text-gray-700">Orientado</div>
                     </div>
-                  </div>
-
-                  {/* Espacio */}
-                  <div className="mb-3">
-                    <h5 className="font-semibold text-[11px] mb-1">Espacio</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="orientacionEspacio"
-                        value={form.orientacionEspacio}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Orientado", value: "ORIENTADO" },
-                          { label: "Desorientado", value: "DESORIENTADO" }
-                        ]}
-                      />
+                    {/* Fila Tiempo */}
+                    <div className="grid grid-cols-3 border-b border-gray-200 hover:bg-gray-50">
+                      <div className="p-3 font-semibold text-gray-700 bg-gray-50">Tiempo</div>
+                      <div className="p-3 flex justify-center">
+                        <input
+                          type="radio"
+                          name="orientacionTiempo"
+                          value="DESORIENTADO"
+                          checked={form.orientacionTiempo === "DESORIENTADO"}
+                          onChange={(e) => handleRadioButton(e, "DESORIENTADO")}
+                        />
+                      </div>
+                      <div className="p-3 flex justify-center">
+                        <input
+                          type="radio"
+                          name="orientacionTiempo"
+                          value="ORIENTADO"
+                          checked={form.orientacionTiempo === "ORIENTADO"}
+                          onChange={(e) => handleRadioButton(e, "ORIENTADO")}
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Persona */}
-                  <div>
-                    <h5 className="font-semibold text-[11px] mb-1">Persona</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="orientacionPersona"
-                        value={form.orientacionPersona}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Orientado", value: "ORIENTADO" },
-                          { label: "Desorientado", value: "DESORIENTADO" }
-                        ]}
-                      />
+                    {/* Fila Espacio */}
+                    <div className="grid grid-cols-3 border-b border-gray-200 hover:bg-gray-50">
+                      <div className="p-3 font-semibold text-gray-700 bg-gray-50">Espacio</div>
+                      <div className="p-3 flex justify-center">
+                        <input
+                          type="radio"
+                          name="orientacionEspacio"
+                          value="DESORIENTADO"
+                          checked={form.orientacionEspacio === "DESORIENTADO"}
+                          onChange={(e) => handleRadioButton(e, "DESORIENTADO")}
+                        />
+                      </div>
+                      <div className="p-3 flex justify-center">
+                        <input
+                          type="radio"
+                          name="orientacionEspacio"
+                          value="ORIENTADO"
+                          checked={form.orientacionEspacio === "ORIENTADO"}
+                          onChange={(e) => handleRadioButton(e, "ORIENTADO")}
+                        />
+                      </div>
+                    </div>
+                    {/* Fila Persona */}
+                    <div className="grid grid-cols-3 hover:bg-gray-50">
+                      <div className="p-3 font-semibold text-gray-700 bg-gray-50">Persona</div>
+                      <div className="p-3 flex justify-center">
+                        <input
+                          type="radio"
+                          name="orientacionPersona"
+                          value="DESORIENTADO"
+                          checked={form.orientacionPersona === "DESORIENTADO"}
+                          onChange={(e) => handleRadioButton(e, "DESORIENTADO")}
+                        />
+                      </div>
+                      <div className="p-3 flex justify-center">
+                        <input
+                          type="radio"
+                          name="orientacionPersona"
+                          value="ORIENTADO"
+                          checked={form.orientacionPersona === "ORIENTADO"}
+                          onChange={(e) => handleRadioButton(e, "ORIENTADO")}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
