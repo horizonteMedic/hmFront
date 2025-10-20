@@ -22,7 +22,9 @@ export const GetInfoServicio = async (
     tabla,
     set,
     token,
-    onFinish = () => { }
+    onFinish = () => { },
+    jasperModules = "",
+    datosFooter = ""
 ) => {
     const res = await GetInfoEspecialidadInterconsulta(
         nro,
@@ -83,15 +85,31 @@ export const GetInfoServicio = async (
             const especialidadSeleccionada = res.find(
                 (item) => item.id === parseInt(seleccion, 10)
             );
-            GetInfoServicioEditar(nro, especialidadSeleccionada, tabla, set, token, () => {
-            Swal.fire(
-                "Alerta",
-                "Este paciente ya cuenta con registros de Ficha Interconsulta",
-                "warning"
-            )})
-
             console.log("✅ Especialidad seleccionada:", especialidadSeleccionada);
-            // Aquí puedes retornar o usar especialidadSeleccionada.mensaje
+            if (jasperModules) {
+                PrintHojaRFichaInterconsulta(
+                    nro,
+                    especialidadSeleccionada.mensaje,
+                    token,
+                    tabla,
+                    datosFooter,
+                    obtenerReporteUrl,
+                    jasperModules,
+                    "../../../../jaspers/FichaInterconsulta"
+                );
+                
+            } else {
+                GetInfoServicioEditar(nro, especialidadSeleccionada, tabla, set, token, () => {
+                Swal.fire(
+                    "Alerta",
+                    "Este paciente ya cuenta con registros de Ficha Interconsulta",
+                    "warning"
+                )})
+
+                
+                // Aquí puedes retornar o usar especialidadSeleccionada.mensaje
+            }   
+            
         }
 
         // Si presiona "Nuevo registro"
@@ -136,7 +154,8 @@ export const GetInfoEspecialidad = async (
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: `${res.edadPaciente}`,
             dniUser: res.dniUsuario,
-            fechaExamen: prev.fechaExamen
+            fechaExamen: prev.fechaExamen,
+            motivo: prev.motivo
             
         }));
     }
@@ -244,7 +263,7 @@ export const SubmitDataService = async (
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, form.especialidad, token, tabla, datosFooter);
+        PrintHojaR(form.norden,  token, tabla, datosFooter);
     });
 };
 
@@ -254,18 +273,9 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, especialidad, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../jaspers/FichaInterconsulta/*.jsx");
-    PrintHojaRFichaInterconsulta(
-        nro,
-        especialidad,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../jaspers/FichaInterconsulta"
-    );
+    GetInfoServicio(nro, tabla, null, token, () => { Swal.close() }, jasperModules, datosFooter);
 };
 
 export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {

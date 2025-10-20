@@ -77,7 +77,7 @@ export default function FichaInterconsulta() {
         cmpUsuario: "",
         direccionClinica: "",
         //Cuadros
-        motivo: "",
+        motivo: "SE SOLICITA EVALUACION POR ESPECIALIDAD PARA DIAGNOSTICO, TRATAMIENTO, CONTROLES POSTERIORES Y DEFINIR APTITUD PARA ELABORAR",
         hallazgo: "",
         diagnostico: "",
         tratamiento: "",
@@ -91,10 +91,10 @@ export default function FichaInterconsulta() {
     
 
     const handleClearnotOandEspecialidad = () => {
-        setForm((prev) => ({ ...Initialform, norden: prev.norden, especialidad: prev.especialidad }));
+        setForm((prev) => ({ ...Initialform, norden: prev.norden }));
         if (typeof window !== "undefined" && "ficha_interconsultas_form") {
         try {
-            localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden, especialidad: form.especialidad }));
+            localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden }));
         } catch (err) {
             console.warn("useForm: error guardando localStorage en clearnotO", err);
         }
@@ -109,12 +109,12 @@ export default function FichaInterconsulta() {
     };
 
     const handlePrint = () => {
-        if (!form.especialidad) {
-            Swal.fire("Error","Debe seleccionar una especialidad",'error')
+        if (!form.norden) {
+            Swal.fire("Error","Debe colocar un Numero de Orden",'error')
             return
         }
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, form.especialidad, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
