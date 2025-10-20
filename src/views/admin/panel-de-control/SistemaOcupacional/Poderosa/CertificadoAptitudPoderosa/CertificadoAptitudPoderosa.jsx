@@ -76,16 +76,25 @@ const CertificadoAptitudPoderosa = () => {
 
     const handleRadioButtonConclusiones = (e) => {
         const { name, value } = e.target;
-
+        
         // Busca el label correspondiente al valor seleccionado
         const selectedOption = opcionesConclusiones.find(opt => opt.value === value);
-
+        if (value === "Check15") {
+            setForm({
+            [name]: value, // actualiza la selección del radio
+            observaciones: "- NINGUNO" // agrega el texto con salto
+            });
+            return
+        }
         if (selectedOption) {
             const textoAgregar = `- ${selectedOption.label}`;
-
+            let nuevasObservaciones = form.observaciones || "";
+            if (nuevasObservaciones.includes("- NINGUNO")) {
+                nuevasObservaciones = nuevasObservaciones.replace("- NINGUNO", "").trim();
+            }
             // Si ya existe texto previo en observaciones, agregamos un salto de línea
-            const nuevasObservaciones = form.observaciones
-            ? `${form.observaciones}\n${textoAgregar}`
+            nuevasObservaciones = nuevasObservaciones
+            ? `${nuevasObservaciones}\n${textoAgregar}`
             : textoAgregar;
 
             setForm({
