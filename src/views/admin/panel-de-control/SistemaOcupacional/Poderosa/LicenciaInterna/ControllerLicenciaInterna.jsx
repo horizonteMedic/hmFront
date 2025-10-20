@@ -145,7 +145,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de C. Medico Ocupacional",
+                    "Este paciente ya cuenta con registros de Aptitud Licencia Interna",
                     "warning"
                 );
             });
