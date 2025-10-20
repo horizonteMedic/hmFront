@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { convertirGenero } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -12,62 +12,36 @@ export default function Hoja_Consulta_Externa(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    tipoExamen: "CONSULTA EXTERNA",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31",
-    fechaNacimiento: "01/01/1993",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA EJEMPLO S.A.C.",
-    // Datos de ubicación
-    ubicacion: "CEDRO", // POSTA, CEDRO, PARAIS
-    // Datos adicionales
-    observaciones: "Paciente presenta síntomas de resfriado común. Se recomienda reposo y medicación sintomática. Control en 3 días si persisten los síntomas.",
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola",
-    horaSalida: "9:33:43 PM"
-  };
 
   const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente || "") + " " + (data.nombresPaciente || "")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaExamen || ""),
-    tipoExamen: String(data.nombreExamen || "CONSULTA EXTERNA"),
-    sexo: convertirGenero(data.sexoPaciente) || "",
-    documentoIdentidad: String(data.dniPaciente || ""),
-    edad: String(data.edadPaciente ?? ""),
-    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento || ""),
-    areaTrabajo: data.areaPaciente || "",
-    puestoTrabajo: data.cargoPaciente || "",
-    empresa: data.empresa || "",
-    contrata: data.contrata || "",
+    apellidosNombres: String((data.apellidosPaciente) + " " + (data.nombresPaciente)).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaExamen),
+    tipoExamen: String(data.nombreExamen),
+    sexo: convertirGenero(data.sexoPaciente),
+    documentoIdentidad: String(data.dniPaciente),
+    edad: String(data.edadPaciente),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento),
+    areaTrabajo: data.areaPaciente,
+    puestoTrabajo: data.cargoPaciente,
+    empresa: data.empresa,
+    contrata: data.contrata,
     // Datos de ubicación
-    ubicacion: data.ubicacion || data.sede || "",
+    ubicacion: data.postaVijus ? "POSTA" : data.cedro ? "CEDRO" : data.paraiso ? "PARAIS" : data.otros ? data.otrosDescripcion : "",
     // Datos adicionales
-    observaciones: data.observaciones || data.diagnostico || data.notas || "",
+    observaciones: data.observaciones,
     // Datos de color
-    color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    color: data.color,
+    codigoColor: data.codigoColor,
+    textoColor: data.textoColor,
     // Datos adicionales para header
-    numeroFicha: String(data.norden || ""),
-    sede: data.sede || data.nombreSede || "",
-    horaSalida: String(data.horaSalida || ""),
-    direccionPaciente: String(data.direccionPaciente || "")
+    numeroFicha: String(data.norden),
+    sede: data.sede || data.nombreSede,
+    horaSalida: String(data.horaSalida),
+    direccionPaciente: String(data.direccionPaciente)
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  // Usar solo datos reales
+  const datosFinales = datosReales;
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {
@@ -147,6 +121,71 @@ export default function Hoja_Consulta_Externa(data = {}) {
     }
     
     return yPos; // Devuelve la nueva posición final
+  };
+
+  // Función para procesar texto con saltos de línea numerados
+  const procesarTextoConSaltosLinea = (texto) => {
+    if (!texto) return [];
+    
+    // Dividir por saltos de línea reales (\n, \r\n) y otros separadores
+    const partes = texto.split(/\r\n|\r|\n|\\n|\/n/g);
+    
+    // Procesar cada parte y mantener el formato original
+    return partes
+      .map(parte => parte.trim())
+      .filter(parte => parte.length > 0);
+  };
+
+  // Función mejorada para manejar textos con saltos de línea numerados
+  const dibujarTextoConSaltosLinea = (texto, x, y, anchoMaximo) => {
+    const fontSize = doc.internal.getFontSize();
+    let yPos = y;
+    
+    // Procesar el texto manteniendo el formato original
+    const lineasProcesadas = procesarTextoConSaltosLinea(texto);
+    
+    lineasProcesadas.forEach((linea, index) => {
+      // Verificar si es una línea numerada (empieza con número seguido de punto)
+      const esLineaNumerada = /^\d+\./.test(linea);
+      
+      // Si la línea es muy larga, usar la función de salto de línea por palabras
+      if (doc.getTextWidth(linea) > anchoMaximo) {
+        yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximo);
+        
+        // Espacio moderado después de una línea numerada que hizo salto
+        if (esLineaNumerada) {
+          yPos += fontSize * 0.25; // Espacio moderado después de línea numerada con salto
+        }
+        
+        // Si hay una siguiente línea numerada, agregar espacio adicional moderado
+        if (index < lineasProcesadas.length - 1) {
+          const siguienteLinea = lineasProcesadas[index + 1];
+          if (/^\d+\./.test(siguienteLinea)) {
+            yPos += fontSize * 0.2; // Espacio moderado antes de la siguiente línea numerada
+          }
+        }
+      } else {
+        // Si la línea cabe, dibujarla directamente
+        doc.text(linea, x, yPos);
+        
+        // Espaciado equilibrado para líneas numeradas
+        if (esLineaNumerada) {
+          yPos += fontSize * 0.4; // Espacio equilibrado para líneas numeradas
+        } else {
+          yPos += fontSize * 0.35; // Espacio normal
+        }
+      }
+      
+      // Espacio adicional entre líneas numeradas consecutivas (solo si no hizo salto)
+      if (index < lineasProcesadas.length - 1 && doc.getTextWidth(linea) <= anchoMaximo) {
+        const siguienteLinea = lineasProcesadas[index + 1];
+        if (esLineaNumerada && /^\d+\./.test(siguienteLinea)) {
+          yPos += fontSize * 0.15; // Espacio moderado entre líneas numeradas
+        }
+      }
+    });
+    
+    return yPos;
   };
 
   // Función general para dibujar header de sección con fondo gris
@@ -243,15 +282,54 @@ export default function Hoja_Consulta_Externa(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Fila creciente para datos adicionales
-  const alturaMinima = 180; // Altura mínima de 120mm como solicitaste
+  // Fila creciente para datos adicionales con altura dinámica
+  // Primero calcular la altura necesaria para el texto SIN dibujarlo
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const textoObservaciones = datosFinales.observaciones;
   
-  // Fila con altura dinámica
-  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaMinima);
-  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaMinima);
+  // Calcular altura necesaria simulando el texto
+  const alturaMinima = 150; // Altura mínima de la fila (100mm)
+  const paddingSuperior = 4; // Padding superior 
+  
+  // Simular el texto para calcular altura sin dibujarlo
+  const lineasProcesadas = procesarTextoConSaltosLinea(textoObservaciones);
+  let alturaSimulada = 0;
+  const fontSize = 8;
+  
+  lineasProcesadas.forEach((linea) => {
+    const esLineaNumerada = /^\d+\./.test(linea);
+    if (doc.getTextWidth(linea) > (tablaAncho - 4)) {
+      // Si necesita salto de línea, calcular altura aproximada
+      const palabras = linea.split(' ');
+      let lineasNecesarias = 1;
+      let lineaActual = '';
+      
+      palabras.forEach(palabra => {
+        const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+        if (doc.getTextWidth(textoPrueba) > (tablaAncho - 4)) {
+          lineasNecesarias++;
+          lineaActual = palabra;
+        } else {
+          lineaActual = textoPrueba;
+        }
+      });
+      
+      alturaSimulada += lineasNecesarias * fontSize * 0.35;
+      if (esLineaNumerada) alturaSimulada += fontSize * 0.25;
+    } else {
+      alturaSimulada += fontSize * 0.35;
+      if (esLineaNumerada) alturaSimulada += fontSize * 0.05;
+    }
+  });
+  
+  const alturaFilaFinal = Math.max(alturaMinima, alturaSimulada + paddingSuperior + 2);
+
+  // Dibujar la fila con la altura calculada
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaFinal);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
-  doc.line(tablaInicioX, yPos + alturaMinima, tablaInicioX + tablaAncho, yPos + alturaMinima);
-  yPos += alturaMinima;
+  doc.line(tablaInicioX, yPos + alturaFilaFinal, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
+  yPos += alturaFilaFinal;
 
   // === CONTENIDO DE LA TABLA ===
   let yTexto = 45 + filaAltura + 2.5; // Ajustar para el header
@@ -361,7 +439,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
 
   // Fila creciente para datos adicionales
   doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.observaciones || "", tablaInicioX + 2, yTexto + 1, 180);
+  dibujarTextoConSaltosLinea(datosFinales.observaciones, tablaInicioX + 2, yTexto + 1, 180);
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});

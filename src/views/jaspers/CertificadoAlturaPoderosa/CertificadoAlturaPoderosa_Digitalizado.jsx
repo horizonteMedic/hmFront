@@ -770,6 +770,473 @@ yPos += filaAlturaCage;
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
 
+  // === PÁGINA 2 ===
+  doc.addPage();
+  numeroPagina = 2;
+  
+  // Dibujar header para página 2
+  drawHeader(numeroPagina);
+  
+  // Resetear posición Y para página 2
+  yPos = 40;
+ 
+  // Fila normal para OJOS
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Contenido de la fila OJOS
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("OJOS:", tablaInicioX + 2, yPos + 3.5);
+
+  yPos += filaAltura;
+  
+  // Fila para Motilidad
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Contenido de la fila Motilidad
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("Motilidad:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const motilidadData = data.motilidad || "Movimientos oculares normales en todas las direcciones";
+  dibujarTextoConSaltoLinea(motilidadData, tablaInicioX + 25, yPos + 3.5, tablaAncho - 30);
+  
+  yPos += filaAltura;
+  
+  // === TABLA DE AGUDEZA VISUAL ===
+  const filaAlturaAgudeza = 5;
+  const colAgudezaAncho = 50; // AGUDEZA VISUAL
+  const colSinCorregirAncho = 40; // SIN CORREGIR
+  const colCorregidaAncho = 40; // CORREGIDA
+  const colObservacionesAncho = 70; // OBSERVACIONES
+  
+  // Posiciones de columnas
+  let xAgudeza = tablaInicioX;
+  let xSinCorregir = xAgudeza + colAgudezaAncho;
+  let xCorregida = xSinCorregir + colSinCorregirAncho;
+  let xObservaciones = xCorregida + colCorregidaAncho;
+  
+  // Dibujar header de la tabla de agudeza visual
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Contenido del header
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("AGUDEZA VISUAL", xAgudeza + 2, yPos + 3.5);
+  doc.text("SIN CORREGIR", xSinCorregir + 2, yPos + 3.5);
+  doc.text("CORREGIDA", xCorregida + 2, yPos + 3.5);
+  doc.text("OBSERVACIONES", xObservaciones + 2, yPos + 3.5);
+  yPos += filaAlturaAgudeza;
+  
+  // Dibujar subheader con O.D y O.I
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Dibujar líneas verticales para dividir O.D y O.I
+  const mitadSinCorregir = xSinCorregir + (colSinCorregirAncho / 2);
+  const mitadCorregida = xCorregida + (colCorregidaAncho / 2);
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  
+  // Contenido del subheader
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("O.D", xSinCorregir + 2, yPos + 3.5);
+  doc.text("O.I", mitadSinCorregir + 2, yPos + 3.5);
+  doc.text("O.D", xCorregida + 2, yPos + 3.5);
+  doc.text("O.I", mitadCorregida + 2, yPos + 3.5);
+  yPos += filaAlturaAgudeza;
+  
+  // Dibujar fila de datos para Visión de Cerca
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  
+  // Contenido de la fila Visión de Cerca
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Visión de Cerca :", xAgudeza + 2, yPos + 3.5);
+  doc.text(data.visionCercaODSinCorregir || "20/30", xSinCorregir + 2, yPos + 3.5);
+  doc.text(data.visionCercaOISinCorregir || "20/30", mitadSinCorregir + 2, yPos + 3.5);
+  doc.text(data.visionCercaODCorregida || "00", xCorregida + 2, yPos + 3.5);
+  doc.text(data.visionCercaOICorregida || "", mitadCorregida + 2, yPos + 3.5);
+  dibujarTextoConSaltoLinea(data.observacionesVisionCerca || "HIPERMETROPIA PTERIGIÓN OJO", xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
+  
+  yPos += filaAlturaAgudeza;
+
+  // Dibujar fila de datos para Visión de Lejos
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(xSinCorregir, yPos, xSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(xCorregida, yPos, xCorregida, yPos + filaAlturaAgudeza);
+  doc.line(xObservaciones, yPos, xObservaciones, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Dibujar líneas verticales para dividir O.D y O.I en la fila de datos
+  doc.line(mitadSinCorregir, yPos, mitadSinCorregir, yPos + filaAlturaAgudeza);
+  doc.line(mitadCorregida, yPos, mitadCorregida, yPos + filaAlturaAgudeza);
+  
+  // Contenido de la fila Visión de Lejos
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Visión de Lejos :", xAgudeza + 2, yPos + 3.5);
+  doc.text(data.visionLejosODSinCorregir || "20/30", xSinCorregir + 2, yPos + 3.5);
+  doc.text(data.visionLejosOISinCorregir || "20/70", mitadSinCorregir + 2, yPos + 3.5);
+  doc.text(data.visionLejosODCorregida || "", xCorregida + 2, yPos + 3.5);
+  doc.text(data.visionLejosOICorregida || "", mitadCorregida + 2, yPos + 3.5);
+  dibujarTextoConSaltoLinea(data.observacionesVisionLejos || "AMETROPIA LEVE OJO DERECHO Y", xObservaciones + 2, yPos + 3.5, colObservacionesAncho - 4);
+  
+  yPos += filaAlturaAgudeza;
+
+  // Dibujar fila de datos para Visión Crómatica (una sola fila sin divisiones)
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAgudeza, tablaInicioX + tablaAncho, yPos + filaAlturaAgudeza);
+  
+  // Contenido de la fila Visión Crómatica
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("Visión Crómatica :", xAgudeza + 2, yPos + 3.5);
+  doc.text(data.visionCromaticaCorregida || "NORMAL", xCorregida + colCorregidaAncho/2 - 5, yPos + 3.5);
+  
+  yPos += filaAlturaAgudeza;
+  
+  // === TABLA DE EXAMEN FÍSICO DETALLADO ===
+  const filaAlturaExamenDetallado = 5;
+  const colSistemaAncho = 60; // SISTEMA
+  const colHallazgosAncho = 140; // HALLAZGOS
+  
+  // Dibujar fila para OJOS
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila OJOS
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("OJOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const odData = data.examenOD || "NORMAL";
+  const oiData = data.examenOI || "NORMAL";
+  const ojosData = `OTOSCOPIA     O.D: ${odData} O.I: ${oiData}`;
+  dibujarTextoConSaltoLinea(ojosData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // Dibujar fila para NARIZ
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila NARIZ
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("NARIZ:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const narizData = data.examenNariz || "Central, fosas nasales permeables";
+  dibujarTextoConSaltoLinea(narizData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // Dibujar fila para AP. RESPIRATORIO
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila AP. RESPIRATORIO
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("AP. RESPIRATORIO:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const respiratorioData = data.examenRespiratorio || "BPmv en ACP, (no estertores)";
+  dibujarTextoConSaltoLinea(respiratorioData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // Dibujar fila para AP. CARDIOVASCULAR
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila AP. CARDIOVASCULAR
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("AP. CARDIOVASCULAR:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const cardiovascularData = data.examenCardiovascular || "RCRR, no soplos";
+  dibujarTextoConSaltoLinea(cardiovascularData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // Dibujar fila para ABDOMEN
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila ABDOMEN
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("ABDOMEN:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const abdomenData = data.examenAbdomen || "Plano, RHA(+), B/D, No doloroso";
+  dibujarTextoConSaltoLinea(abdomenData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // Dibujar fila para MUSCULO ESQUELETICO
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila MUSCULO ESQUELETICO
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("MUSCULO ESQUELETICO:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const musculoEsqueleticoData = data.examenMusculoEsqueletico || "Motricidad conservada";
+  dibujarTextoConSaltoLinea(musculoEsqueleticoData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // Dibujar fila para COLUMNA
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + colSistemaAncho, yPos, tablaInicioX + colSistemaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaExamenDetallado, tablaInicioX + tablaAncho, yPos + filaAlturaExamenDetallado);
+  
+  // Contenido de la fila COLUMNA
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("COLUMNA:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const columnaData = data.examenColumna || "Curvaturas conservadas";
+  dibujarTextoConSaltoLinea(columnaData, tablaInicioX + colSistemaAncho + 2, yPos + 3.5, colHallazgosAncho - 4);
+  
+  yPos += filaAlturaExamenDetallado;
+  
+  // === SECCIÓN NEUROLÓGICO ===
+  yPos = dibujarHeaderSeccion("NEUROLÓGICO", yPos, filaAltura);
+  
+  // Fila para REFLEJOS
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
+  
+  // Contenido de la fila REFLEJOS
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("REFLEJOS:", tablaInicioX + 2, yPos + 3.5);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  const reflejosData = data.reflejos || "Conservados";
+  doc.text(reflejosData, tablaInicioX + 25, yPos + 3.5);
+  
+  yPos += filaAltura;
+  
+  // === TABLA DE COORDINACIÓN - EQUILIBRIO - MARCHA ===
+  const filaAlturaNeurologico = 4;
+  const colPruebasAncho = 100; // PRUEBAS
+  const colNegativoAncho = 50; // NEGATIVO
+  const colPositivoAncho = 50; // POSITIVO
+  
+  // Posiciones de columnas
+  let xPruebas = tablaInicioX;
+  let xNegativo = xPruebas + colPruebasAncho;
+  let xPositivo = xNegativo + colNegativoAncho;
+  
+  // Dibujar header de la tabla neurológica
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaNeurologico);
+  doc.line(xNegativo, yPos, xNegativo, yPos + filaAlturaNeurologico);
+  doc.line(xPositivo, yPos, xPositivo, yPos + filaAlturaNeurologico);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaNeurologico);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaNeurologico, tablaInicioX + tablaAncho, yPos + filaAlturaNeurologico);
+  
+  // Contenido del header
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("COORDINACION - EQUILIBRIO - MARCHA", xPruebas + 2, yPos + 3);
+  doc.text("NEGATIVO", xNegativo + 2, yPos + 3);
+  doc.text("POSITIVO", xPositivo + 2, yPos + 3);
+  yPos += filaAlturaNeurologico;
+  
+  // Lista de pruebas neurológicas
+  const pruebasNeurologicas = [
+    "DEDO-NARIZ:",
+    "INDICE DE BARANY:",
+    "DIADOCOCINESIA:",
+    "ROMBERG",
+    "ROMBERG SENSIBILIZADO:",
+    "MARCHA EN TANDEM:",
+    "UNTERBERG:",
+    "BABINSKI - WEIL:",
+    "DIX - HALLPIKE:",
+    "MARCHA:"
+  ];
+  
+  // Dibujar filas de datos para pruebas neurológicas
+  pruebasNeurologicas.forEach((prueba) => {
+    // Dibujar líneas de la fila
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaNeurologico);
+    doc.line(xNegativo, yPos, xNegativo, yPos + filaAlturaNeurologico);
+    doc.line(xPositivo, yPos, xPositivo, yPos + filaAlturaNeurologico);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaNeurologico);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + filaAlturaNeurologico, tablaInicioX + tablaAncho, yPos + filaAlturaNeurologico);
+    
+    // Contenido de la fila
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text(prueba, xPruebas + 2, yPos + 3);
+    
+    // Marcar X en NEGATIVO (por defecto todas son negativas)
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", xNegativo + 20, yPos + 3);
+    
+    // POSITIVO queda vacío
+    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.text("", xPositivo + 2, yPos + 3);
+    
+    yPos += filaAlturaNeurologico;
+  });
+  
+  // === SECCIÓN EXAMENES COMPLEMENTARIOS ===
+  yPos = dibujarHeaderSeccion("EXAMENES COMPLEMENTARIOS", yPos, filaAltura);
+  
+  // === TABLA DE AUDIOMETRÍA ===
+  const filaAlturaAudiometria = 4;
+  const colAudiometriaAncho = 30; // AUDIOMETRÍA
+  const colFrecuenciaAncho = 20; // Cada frecuencia
+  const colObservacionesAudiometriaAncho = 50; // OBSERVACIONES
+  
+  // Posiciones de columnas para audiometría
+  let xAudiometria = tablaInicioX;
+  let x500 = xAudiometria + colAudiometriaAncho;
+  let x1000 = x500 + colFrecuenciaAncho;
+  let x2000 = x1000 + colFrecuenciaAncho;
+  let x3000 = x2000 + colFrecuenciaAncho;
+  let x4000 = x3000 + colFrecuenciaAncho;
+  let x6000 = x4000 + colFrecuenciaAncho;
+  let x8000 = x6000 + colFrecuenciaAncho;
+  let xObservacionesAudiometria = x8000 + colFrecuenciaAncho;
+  
+  // Dibujar header de la tabla de audiometría
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAudiometria);
+  doc.line(x500, yPos, x500, yPos + filaAlturaAudiometria);
+  doc.line(x1000, yPos, x1000, yPos + filaAlturaAudiometria);
+  doc.line(x2000, yPos, x2000, yPos + filaAlturaAudiometria);
+  doc.line(x3000, yPos, x3000, yPos + filaAlturaAudiometria);
+  doc.line(x4000, yPos, x4000, yPos + filaAlturaAudiometria);
+  doc.line(x6000, yPos, x6000, yPos + filaAlturaAudiometria);
+  doc.line(x8000, yPos, x8000, yPos + filaAlturaAudiometria);
+  doc.line(xObservacionesAudiometria, yPos, xObservacionesAudiometria, yPos + filaAlturaAudiometria);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAudiometria);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAudiometria, tablaInicioX + tablaAncho, yPos + filaAlturaAudiometria);
+  
+  // Contenido del header de frecuencias
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("500", x500 + 5, yPos + 3);
+  doc.text("1000", x1000 + 3, yPos + 3);
+  doc.text("2000", x2000 + 3, yPos + 3);
+  doc.text("3000", x3000 + 3, yPos + 3);
+  doc.text("4000", x4000 + 3, yPos + 3);
+  doc.text("6000", x6000 + 3, yPos + 3);
+  doc.text("8000", x8000 + 3, yPos + 3);
+  yPos += filaAlturaAudiometria;
+  
+  // Dibujar fila para AUDIOMETRÍA con OD
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAudiometria);
+  doc.line(x500, yPos, x500, yPos + filaAlturaAudiometria);
+  doc.line(x1000, yPos, x1000, yPos + filaAlturaAudiometria);
+  doc.line(x2000, yPos, x2000, yPos + filaAlturaAudiometria);
+  doc.line(x3000, yPos, x3000, yPos + filaAlturaAudiometria);
+  doc.line(x4000, yPos, x4000, yPos + filaAlturaAudiometria);
+  doc.line(x6000, yPos, x6000, yPos + filaAlturaAudiometria);
+  doc.line(x8000, yPos, x8000, yPos + filaAlturaAudiometria);
+  doc.line(xObservacionesAudiometria, yPos, xObservacionesAudiometria, yPos + filaAlturaAudiometria);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAudiometria);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAudiometria, tablaInicioX + tablaAncho, yPos + filaAlturaAudiometria);
+  
+  // Contenido de la fila AUDIOMETRÍA OD
+  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.text("AUDIOMETRÍA", xAudiometria + 2, yPos + 3);
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("OD", xAudiometria + 2, yPos + 3);
+  
+  // Valores de audiometría para OD
+  const audiometriaOD = data.audiometriaOD || {};
+  doc.text(audiometriaOD.f500 || "", x500 + 5, yPos + 3);
+  doc.text(audiometriaOD.f1000 || "", x1000 + 5, yPos + 3);
+  doc.text(audiometriaOD.f2000 || "", x2000 + 5, yPos + 3);
+  doc.text(audiometriaOD.f3000 || "", x3000 + 5, yPos + 3);
+  doc.text(audiometriaOD.f4000 || "", x4000 + 5, yPos + 3);
+  doc.text(audiometriaOD.f6000 || "", x6000 + 5, yPos + 3);
+  doc.text(audiometriaOD.f8000 || "", x8000 + 5, yPos + 3);
+  
+  yPos += filaAlturaAudiometria;
+  
+  // Dibujar fila para OI
+  doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAlturaAudiometria);
+  doc.line(x500, yPos, x500, yPos + filaAlturaAudiometria);
+  doc.line(x1000, yPos, x1000, yPos + filaAlturaAudiometria);
+  doc.line(x2000, yPos, x2000, yPos + filaAlturaAudiometria);
+  doc.line(x3000, yPos, x3000, yPos + filaAlturaAudiometria);
+  doc.line(x4000, yPos, x4000, yPos + filaAlturaAudiometria);
+  doc.line(x6000, yPos, x6000, yPos + filaAlturaAudiometria);
+  doc.line(x8000, yPos, x8000, yPos + filaAlturaAudiometria);
+  doc.line(xObservacionesAudiometria, yPos, xObservacionesAudiometria, yPos + filaAlturaAudiometria);
+  doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAlturaAudiometria);
+  doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+  doc.line(tablaInicioX, yPos + filaAlturaAudiometria, tablaInicioX + tablaAncho, yPos + filaAlturaAudiometria);
+  
+  // Contenido de la fila OI
+  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.text("OI", xAudiometria + 2, yPos + 3);
+  
+  // Valores de audiometría para OI
+  const audiometriaOI = data.audiometriaOI || {};
+  doc.text(audiometriaOI.f500 || "", x500 + 5, yPos + 3);
+  doc.text(audiometriaOI.f1000 || "", x1000 + 5, yPos + 3);
+  doc.text(audiometriaOI.f2000 || "", x2000 + 5, yPos + 3);
+  doc.text(audiometriaOI.f3000 || "", x3000 + 5, yPos + 3);
+  doc.text(audiometriaOI.f4000 || "", x4000 + 5, yPos + 3);
+  doc.text(audiometriaOI.f6000 || "", x6000 + 5, yPos + 3);
+  doc.text(audiometriaOI.f8000 || "", x8000 + 5, yPos + 3);
+  
+  // Observaciones de audiometría
+  const observacionesAudiometria = data.observacionesAudiometria || "";
+  dibujarTextoConSaltoLinea(observacionesAudiometria, xObservacionesAudiometria + 2, yPos + 3, colObservacionesAudiometriaAncho - 4);
+  
+  yPos += filaAlturaAudiometria;
+  
+  // === FOOTER PÁGINA 2 ===
+  footerTR(doc, { footerOffsetY: 8});
+
   // === IMPRIMIR ===
   imprimir(doc);
 }
