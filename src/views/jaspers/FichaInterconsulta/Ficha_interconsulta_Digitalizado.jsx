@@ -571,7 +571,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   yTextoMotivo = dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoMotivo, tablaAncho - 4);
   yTextoMotivo += 1; // pequeño margen entre párrafos (opcional)
 });
-  console.log(lineasMotivo)
+  
   yPos += alturaFilaMotivo;
 
   // Fila "EVALUACIÓN DE ESPECIALISTA (medicina interna)" (fila gris)
@@ -595,7 +595,7 @@ export default function Ficha_interconsulta_Digitalizado(data = {}) {
   doc.setFont("helvetica", "bold").setFontSize(9);
   doc.text("Fecha atención:", tablaInicioX + 2, yPos + 3);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.fechaAtencion, tablaInicioX + 30, yPos + 3);
+  
   yPos += filaAltura;
 
   // Fila "Hallazgos relevantes:" (fila celeste)

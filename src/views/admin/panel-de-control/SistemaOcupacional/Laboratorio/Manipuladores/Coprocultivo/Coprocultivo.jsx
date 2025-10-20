@@ -483,7 +483,9 @@ export default function Coprocultivo({ token, selectedSede, userlogued }) {
                 <input
                   name="parasitos"
                   value={form.parasitos}
-                  readOnly
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, [e.target.name]: e.target.value }))
+                  }
                   placeholder="—"
                   className="border rounded px-2 py-1 text-base w-full mb-1"
                 />
