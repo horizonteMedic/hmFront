@@ -54,7 +54,7 @@ const CertificadoAptitudPoderosa = () => {
         userlogued: userlogued
     }
 
-    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault} = useForm(InitialForm, { storageKey: "Certificado_Aptitud_Poderosa_form" })
+    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton} = useForm(InitialForm, { storageKey: "Certificado_Aptitud_Poderosa_form" })
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -74,7 +74,7 @@ const CertificadoAptitudPoderosa = () => {
         console.log("Guardando datos:", form);
     };
 
-    const handleRadioButton = (e) => {
+    const handleRadioButtonConclusiones = (e) => {
         const { name, value } = e.target;
 
         // Busca el label correspondiente al valor seleccionado
@@ -288,7 +288,7 @@ const CertificadoAptitudPoderosa = () => {
                                     vertical
                                     value={form?.conclusiones}
                                     className="py-2"
-                                    onChange={handleRadioButton}
+                                    onChange={handleRadioButtonConclusiones}
                                     options={opcionesConclusiones}
                                     />
                                 </div>
