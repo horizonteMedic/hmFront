@@ -212,7 +212,7 @@ export default function CertificadoAlturaPoderosa() {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "CertificadoAlturaPoderosa" });
 
     const tabs = [
         { id: 0, name: "Antecedentes", icon: faClipboardList, component: Antecedentes },

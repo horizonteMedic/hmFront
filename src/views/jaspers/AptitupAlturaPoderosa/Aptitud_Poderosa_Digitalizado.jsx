@@ -87,11 +87,16 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
     // Datos para tipo de trabajo
     tipoTrabajo: data.tipoTrabajo || "superficie", // "superficie", "planta", "subsuelo"
     // Datos para resultado de evaluación
-    resultadoEvaluacion: data.resultadoEvaluacion || "apto", // "apto", "aptoConRestriccion", "noAptoTemporal", "noApto"
+    resultadoEvaluacion: (() => {
+      if (data.apto) return "apto";
+      if (data.aptoRestriccion) return "aptoConRestriccion";
+      if (data.aptoTemporal) return "noAptoTemporal";
+      return "noApto";
+    })(),
     // Datos para observaciones
     observaciones: data.observaciones || "",
     // Datos para fechas
-    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad || "")
+    fechaCaducidad: formatearFechaCorta(data.fechaHasta || "")
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
@@ -503,7 +508,7 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   
   if (lineasObservaciones.length > 0) {
     lineasObservaciones.forEach(linea => {
-      const textoConGuion = `- ${linea.trim()}`;
+      const textoConGuion = `${linea.trim()}`;
       yTextoObservaciones = dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoObservaciones, anchoMaximoObservaciones);
       yTextoObservaciones += 3; // Espaciado entre líneas
     });
