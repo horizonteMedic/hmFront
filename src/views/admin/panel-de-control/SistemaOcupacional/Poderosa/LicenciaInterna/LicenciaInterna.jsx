@@ -172,8 +172,6 @@ const LicenciaInterna = () => {
                                             name="apto" value={form?.apto} className="py-2"
                                             onChange={handleRadioButton} options={[
                                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
-                                                { label: "APTO CON RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
-                                                { label: "No APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "NOAPTOTEMPORAL" },
                                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
                                             ]}
                                             />

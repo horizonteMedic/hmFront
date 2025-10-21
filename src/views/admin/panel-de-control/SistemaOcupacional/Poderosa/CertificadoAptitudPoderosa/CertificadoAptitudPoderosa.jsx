@@ -81,6 +81,7 @@ const CertificadoAptitudPoderosa = () => {
         const selectedOption = opcionesConclusiones.find(opt => opt.value === value);
         if (value === "Check15") {
             setForm({
+                ...form,
             [name]: value, // actualiza la selección del radio
             observaciones: "- NINGUNO" // agrega el texto con salto
             });
@@ -219,8 +220,6 @@ const CertificadoAptitudPoderosa = () => {
                                             name="apto" value={form?.apto} className="py-2"
                                             onChange={handleRadioButton} options={[
                                                 { label: "APTO (para el puesto en el que trabaja o postula)", value: "APTO" },
-                                                { label: "APTO con RESTRICCION (para el puesto en el que trabaja o postula)", value: "APTOCONRESTRICCION" },
-                                                { label: "NO APTO TEMPORAL (para el puesto en el que trabaja o postula)", value: "NOAPTOTEMPORAL" },
                                                 { label: "No APTO (para el puesto en el que trabaja o postula)", value: "NOAPTO" }
                                             ]}
                                             />
@@ -244,7 +243,7 @@ const CertificadoAptitudPoderosa = () => {
                                             />
                                         </div>
                                     </section>
-                                    <section className="bg-white rounded-lg p-4 pt-1 gap-4 mt-0 m-4">
+                                    <section className="bg-white rounded-lg p-4 pb-1 pt-1 gap-4 mt-0 m-4">
                                         
                                         <InputTextOneLine
                                         label="Medico que Certifica"
@@ -290,6 +289,16 @@ const CertificadoAptitudPoderosa = () => {
                                             </div>
                                         </div>
                                     </section>
+                                    <div className="w-full p-4 pb-1 ml-2">
+                                        <InputTextArea
+                                            label="Observaciones"
+                                            value={form?.observaciones}
+                                            onChange={handleChange}
+                                            classNameLabel="text-blue-600"
+                                            rows={5}
+                                            name="observaciones"
+                                        />               
+                                    </div>
                                 </div>
                                 <div className="w-1/2 h-auto">
                                     <InputsRadioGroup
@@ -302,16 +311,7 @@ const CertificadoAptitudPoderosa = () => {
                                     />
                                 </div>
                             </div>
-                            <div className="w-full p-4 gap-4 mt-0 m-4">
-                                 <InputTextArea
-                                        label="Observaciones"
-                                        value={form?.observaciones}
-                                        onChange={handleChange}
-                                        classNameLabel="text-blue-600"
-                                        rows={5}
-                                        name="observaciones"
-                                    />               
-                            </div>
+                            
                         </div>
                     </div>
     
