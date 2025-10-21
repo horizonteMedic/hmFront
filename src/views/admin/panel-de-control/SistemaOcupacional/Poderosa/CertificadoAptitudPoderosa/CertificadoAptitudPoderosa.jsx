@@ -434,9 +434,9 @@ const CertificadoAptitudPoderosa = () => {
                             labelWidth="80px"
                         />
                         <InputTextOneLine
-                            label="Creatina"
-                            name="leucocitoSematologiaLabClinico"
-                            value={form?.leucocitoSematologiaLabClinico}
+                            label="Creatinina"
+                            name="creatininaLabClinico_txtcreatininabio"
+                            value={form?.creatininaLabClinico_txtcreatininabio}
                             disabled
                             labelWidth="80px"
                         />
