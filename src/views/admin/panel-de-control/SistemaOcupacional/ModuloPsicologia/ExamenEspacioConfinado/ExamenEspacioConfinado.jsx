@@ -5,6 +5,7 @@ import {
     InputTextArea,
     InputsBooleanRadioGroup,
     InputsRadioGroup,
+    RadioTable,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
@@ -97,10 +98,28 @@ export default function ExamenEspacioConfinado() {
         handlePrintDefault(() => {
             PrintHojaR(form.norden, token, tabla, datosFooter);
         });
-    }; 
+    };
 
     // Opciones para los radio groups
     const criteriosOptions = [
+        { label: "I", value: "I" },
+        { label: "NPI", value: "NPI" },
+        { label: "NP", value: "NP" },
+        { label: "NPS", value: "NPS" },
+        { label: "S", value: "S" },
+    ];
+
+    // Arrays para RadioTable - Aspecto Intelectual
+    const aspectoIntelectualItems = [
+        { name: "razonamiento", label: "1.- RAZONAMIENTO:" },
+        { name: "memoria", label: "2.- MEMORIA:" },
+        { name: "atencionConcentracion", label: "3.- ATENCIÓN Y CONCENTRACIÓN:" },
+        { name: "coordinacionVisoMotora", label: "4.- COORDINACIÓN VISO-MOTORA:" },
+        { name: "orientacionEspacial", label: "5.- ORIENTACIÓN ESPACIAL:" }
+    ];
+
+
+    const aspectoIntelectualOptions = [
         { label: "I", value: "I" },
         { label: "NPI", value: "NPI" },
         { label: "NP", value: "NP" },
@@ -277,58 +296,12 @@ export default function ExamenEspacioConfinado() {
                     {/* Aspecto Intelectual */}
                     <div>
                         <h4 className="font-semibold mb-3 text-blue-600">ASPECTO INTELECTUAL:</h4>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block font-medium mb-2">1.- RAZONAMIENTO:</label>
-                                <InputsRadioGroup
-                                    name="razonamiento"
-                                    value={form.razonamiento}
-                                    onChange={handleRadioButton}
-                                    options={criteriosOptions}
-                                    vertical={false}
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-2">2.- MEMORIA:</label>
-                                <InputsRadioGroup
-                                    name="memoria"
-                                    value={form.memoria}
-                                    onChange={handleRadioButton}
-                                    options={criteriosOptions}
-                                    vertical={false}
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-2">3.- ATENCIÓN Y CONCENTRACIÓN:</label>
-                                <InputsRadioGroup
-                                    name="atencionConcentracion"
-                                    value={form.atencionConcentracion}
-                                    onChange={handleRadioButton}
-                                    options={criteriosOptions}
-                                    vertical={false}
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-2">4.- COORDINACIÓN VISO-MOTORA:</label>
-                                <InputsRadioGroup
-                                    name="coordinacionVisoMotora"
-                                    value={form.coordinacionVisoMotora}
-                                    onChange={handleRadioButton}
-                                    options={criteriosOptions}
-                                    vertical={false}
-                                />
-                            </div>
-                            <div>
-                                <label className="block font-medium mb-2">5.- ORIENTACIÓN ESPACIAL:</label>
-                                <InputsRadioGroup
-                                    name="orientacionEspacial"
-                                    value={form.orientacionEspacial}
-                                    onChange={handleRadioButton}
-                                    options={criteriosOptions}
-                                    vertical={false}
-                                />
-                            </div>
-                        </div>
+                        <RadioTable
+                            items={aspectoIntelectualItems}
+                            options={aspectoIntelectualOptions}
+                            form={form}
+                            handleRadioButton={handleRadioButton}
+                        />
                     </div>
 
                     {/* Aspectos Personalidad */}

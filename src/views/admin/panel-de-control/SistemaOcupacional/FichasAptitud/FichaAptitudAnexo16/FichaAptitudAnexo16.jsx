@@ -527,16 +527,16 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
                     <button
                       type="button"
                       onClick={handlePrint}
-                      className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                      className="bg-blue-600 hover:bg-blue-700 text-white text-base px-4 h-[21px] rounded flex items-center gap-2"
                     >
                       <FontAwesomeIcon icon={faPrint} />
                     </button>
                     <button
                       type="button"
                       onClick={handlePrint2}
-                      className="bg-green-600 hover:bg-green-700 text-white text-base px-4 py-2 rounded flex items-center gap-2"
+                      className="bg-green-600 hover:bg-green-700 text-white text-base px-4 h-[21px] rounded flex items-center gap-2"
                     >
-                      <FontAwesomeIcon icon={faPrint} />
+                      RM<FontAwesomeIcon icon={faPrint} />
                     </button>
                   </div>
                 </div>
