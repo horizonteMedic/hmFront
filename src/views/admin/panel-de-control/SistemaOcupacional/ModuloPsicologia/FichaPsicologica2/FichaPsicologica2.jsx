@@ -5,6 +5,7 @@ import {
     InputTextArea,
     InputsBooleanRadioGroup,
     InputsRadioGroup,
+    RadioTable,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
@@ -14,6 +15,18 @@ import Swal from "sweetalert2";
 
 const tabla = "ficha_psicologica_anexo02"
 const today = getToday()
+
+// Arrays para RadioTable de Orientación
+const orientacionItems = [
+    { name: "orientacionTiempo", label: "Tiempo" },
+    { name: "orientacionEspacio", label: "Espacio" },
+    { name: "orientacionPersona", label: "Persona" }
+];
+
+const orientacionOptions = [
+    { value: "DESORIENTADO", label: "Desorientado" },
+    { value: "ORIENTADO", label: "Orientado" }
+];
 
 export default function FichaPsicologica2() {
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -339,84 +352,13 @@ export default function FichaPsicologica2() {
                                             {/* Orientación */}
                                             <div className="border rounded p-3">
                                                 <h5 className="font-semibold mb-4">Orientación</h5>
-                                                {/* Tabla de orientación */}
-                                                <div className="bg-gray-50 rounded-lg overflow-hidden">
-                                                    {/* Encabezados de columna */}
-                                                    <div className="grid grid-cols-3 bg-gray-100 border-b">
-                                                        <div className="p-3"></div>
-                                                        <div className="p-3 text-center font-semibold text-gray-700">Desorientado</div>
-                                                        <div className="p-3 text-center font-semibold text-gray-700">Orientado</div>
-                                                    </div>
-                                                    {/* Fila Tiempo */}
-                                                    <div className="grid grid-cols-3 border-b border-gray-200 hover:bg-gray-50">
-                                                        <div className="p-3 font-semibold text-gray-700 bg-gray-50">Tiempo</div>
-                                                        <div className="p-3 flex justify-center">
-                                                            <input
-                                                                type="radio"
-                                                                name="orientacionTiempo"
-                                                                value="DESORIENTADO"
-                                                                checked={form.orientacionTiempo === "DESORIENTADO"}
-                                                                onChange={(e) => handleRadioButton(e, "DESORIENTADO")}
-                                                            />
-                                                        </div>
-
-                                                        <div className="p-3 flex justify-center">
-                                                            <input
-                                                                type="radio"
-                                                                name="orientacionTiempo"
-                                                                value="ORIENTADO"
-                                                                checked={form.orientacionTiempo === "ORIENTADO"}
-                                                                onChange={(e) => handleRadioButton(e, "ORIENTADO")}
-                                                                
-                                                            />
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Fila Espacio */}
-                                                    <div className="grid grid-cols-3 border-b border-gray-200 hover:bg-gray-50">
-                                                        <div className="p-3 font-semibold text-gray-700 bg-gray-50">Espacio</div>
-                                                        <div className="p-3 flex justify-center">
-                                                            <input
-                                                                type="radio"
-                                                                name="orientacionEspacio"
-                                                                value="DESORIENTADO"
-                                                                checked={form.orientacionEspacio === "DESORIENTADO"}
-                                                                onChange={(e) => handleRadioButton(e, "DESORIENTADO")}
-                                                            />
-                                                        </div>
-                                                        <div className="p-3 flex justify-center">
-                                                            <input
-                                                                type="radio"
-                                                                name="orientacionEspacio"
-                                                                value="ORIENTADO"
-                                                                checked={form.orientacionEspacio === "ORIENTADO"}
-                                                                onChange={(e) => handleRadioButton(e, "ORIENTADO")}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    {/* Fila Persona */}
-                                                    <div className="grid grid-cols-3 hover:bg-gray-50">
-                                                        <div className="p-3 font-semibold text-gray-700 bg-gray-50">Persona</div>
-                                                        <div className="p-3 flex justify-center">
-                                                            <input
-                                                                type="radio"
-                                                                name="orientacionPersona"
-                                                                value="DESORIENTADO"
-                                                                checked={form.orientacionPersona === "DESORIENTADO"}
-                                                                onChange={(e) => handleRadioButton(e, "DESORIENTADO")}
-                                                            />
-                                                        </div>
-                                                        <div className="p-3 flex justify-center">
-                                                            <input
-                                                                type="radio"
-                                                                name="orientacionPersona"
-                                                                value="ORIENTADO"
-                                                                checked={form.orientacionPersona === "ORIENTADO"}
-                                                                onChange={(e) => handleRadioButton(e, "ORIENTADO")}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <RadioTable
+                                                    items={orientacionItems}
+                                                    options={orientacionOptions}
+                                                    form={form}
+                                                    handleRadioButton={handleRadioButton}
+                                                    labelColumns={1}
+                                                />
                                             </div>
                                         </div>
                                     </section>

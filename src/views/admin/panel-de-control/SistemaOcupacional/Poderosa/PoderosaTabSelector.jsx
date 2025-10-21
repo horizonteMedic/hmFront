@@ -4,6 +4,8 @@ import CertificadoTrabajosCaliente from "./CertificadoTrabajosCaliente/Certifica
 import LicenciaInterna from "./LicenciaInterna/LicenciaInterna";
 import CertificadoAlturaPoderosa from "./CertificadoAlturaPoderosa/CertificadoAlturaPoderosa";
 import HojaConsultaExterna from "./HojaConsultaExterna/HojaConsultaExterna";
+import CMManipuladoresAlimentos from "./CMManipuladoresAlimentos/CMManipuladoresAlimentos";
+import CAHerramientasManuales from "./CAHerramientasManuales/CAHerramientasManuales";
 
 export default function PoderosaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -36,6 +38,18 @@ export default function PoderosaTabSelector({ tieneVista }) {
             permission: "Hoja Consulta Externa",
             label: "Hoja Consulta Externa",
             component: HojaConsultaExterna
+        },
+        {
+            id: 5,
+            permission: "Certificado Medico Manipuladores de Alimentos",
+            label: "Certificado Manipuladores de Alimentos",
+            component: CMManipuladoresAlimentos
+        },
+        {
+            id: 6,
+            permission: "Certificado Aptitud Para Herramientas Manuales",
+            label: "Aptitud Herramientas Manuales",
+            component: CAHerramientasManuales
         },
     ];
     return (
