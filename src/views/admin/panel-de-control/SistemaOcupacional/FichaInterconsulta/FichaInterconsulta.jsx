@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import {SubirInterconsulta, ReadArchivos} from "./model";
 import { LoadingDefault } from "../../../../utils/functionUtils";
 import { useState } from "react";
+import { SubmitData } from "../../../../utils/apiHelpers";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
@@ -84,12 +85,13 @@ export default function FichaInterconsulta() {
         apto: false,
         SubirDoc: false,
         nomenclatura: "",
-        orden: ""
+        orden: "",
+        NewNomenclatura: ""
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
-
-    
+    console.log(form.codigoFichaInterconsulta)
+                   
 
     const handleClearnotOandEspecialidad = () => {
         setForm((prev) => ({ ...Initialform, norden: prev.norden }));
@@ -152,11 +154,17 @@ export default function FichaInterconsulta() {
                 nombre: file.name,
                 sede: selectedSede,
                 base64:  base64WithoutHeader,
-                nomenclatura: `INTERCONSULTA${form.nomenclatura === 1 ? "" : ` ${form.nomenclatura}`}`,
+                nomenclatura: form.nomenclatura,
                 norden: form.norden
             };
             const response = await SubirInterconsulta(datos, userlogued, token);
             if (response.id === 1) {
+                const body = {
+                    "codigoFichaInterconsulta": form.codigoFichaInterconsulta,
+                    "nomenclatura": form.nomenclatura
+                }
+                const response = await SubmitData(body,'/api/v01/ct/fichaInterconsulta/actualizarNomenclaturaFichaInterconsulta',token)
+                console.log(response)
                 Swal.fire("Exito", "Archivo Subido con exto","success")
             } else {
                 Swal.fire("Error", "No se pudo subir","error")
@@ -169,7 +177,7 @@ export default function FichaInterconsulta() {
     
     const ReadArchivosForm = async () => {
         LoadingDefault("Cargando Interconsulta")
-        ReadArchivos(form.norden, `INTERCONSULTA ${form.nomenclatura === 1 ? "" : form.nomenclatura}`)
+        ReadArchivos(form.norden, form.nomenclatura)
         .then(response => {
             if (response.id === 1) {
                 setVisualerOpen(response)
