@@ -16,16 +16,43 @@ const registrarUrl =
     "/api/v01/ct/hojaConsultaExterna/registrarActualizarHojaConsultaExterna";
 const today = getToday();
 
+const generarObservaciones = (res) => {
+  return [
+`1- ANAMNESIS: COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.
+2- ANTECEDENTES PERSONALES: ${res.anexo16AntecedentesPersonales2 || "SIN DATOS."}
+3- ANTECEDENTES FAMILIARES: ${res.anexo16AntecedentesFamiliares || "JALARLO DEL ANEXO 16."},
+4- EXAMEN FISICO:
+- ABEG, LOTEP, CAMINANDO NORMALMENTE. VENTILANDO ESPONTANEAMENTE
+- CABEZA: NORMOCÉFALO, CENTRAL, MÓVIL, PUPILAS ISOCÓRICAS, FOTO REACTIVAS. NO SE PALPA MASAS NI DEPRESIONES. 
+- BOCA: HUMEDA, LENGUA MÓVIL, CENTRAL, NO SE EVIDENCIA LESIONES,
+- CUELLO: CENTRAL, MÓVIL, NO TUMORACIONES.
+- TÓRAX: BPMV EN ACP, NO RALES.
+- CARDIOVASCULAR: RCRR, NO SOPLOS. PULSOS PERIFERICOS PALPABLES
+- ABDOMEN: PLANO, RHA PRESENTES, NO DOLOR A LA PALPACIÓN SUPERFICIAL NI PROFUNDA, NO SE PALPA MASAS NI TUMORACIONES.
+- RENAL: SIGNO PUÑO PERCUSIÓN BILATERAL NEGATIVO, 
+- UROLÓGICO: PUNTOS RENOURETERALES NEGATIVOS.
+- COLUMNA VERTEBRAL: CENTRAL, CURVATURAS CONSERVADAS, MOVILIDAD CONSERVADA.
+- SISTEMA OSTEOMUSCULAR: MOTRICIDAD CONSERVADA. EXTREMIDADES SIMÉTRICAS. FUERZA MUSCULAR 5/5.
+- GENITALES: DIFERIDO
+- SISTEMA NERVIOSO: SENSIBILIDAD, MOTRICIDAD CONSERVADA, ROTS CONSERVADOS, BIPEDESTACIÓN CONSERVADA, EQUILIBRIO CONSERVADO, ROMBERG NEGATIVO. NO SIGNOS MENÍNGEOS. NO SIGNOS DE FOCALIZACION, NERVIOS CRANEALES CONSERVADOS, GLASGLOW 15 PTOS.
+5- EXÁMENES AUXILIARES: \n${res.anexo16OtrosExamenes || "JALARLO DE LOS EXÁMENES DE LABORATORIO."}\n
+6- DIAGNÓSTICOS: \n${res.anexo16ObservacionesGenerales || "JALARLO DE LOS DIAGNÓSTICOS DEL ANEXO 16."}`
+  ].join("\n\n");
+};
+
 export const GetInfoServicio = async (
     nro,
+    tabla,
     set,
     token,
-    sede
+    onFinish = () => { }
 ) => {
-    const res = await GetInfoPacDefault(
+    const res = await GetInfoServicioDefault(
         nro,
+        tabla,
         token,
-        sede
+        obtenerReporteUrl,
+        onFinish
     );
     console.log(res)
     if (res) {
@@ -33,17 +60,17 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: res.nombresApellidos,
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniPaciente: res.dni,
-            edadPaciente: res.edad,
-            nombreExamen: res.nomExam,
+            dniUser: res.dniUsuario,            
+            edadPaciente: res.edadPaciente,
+            nombreExamen: res.nombreExamen,
             empresa: res.empresa,
             contrata: res.contrata,
-            cargoPaciente: res.cargo,
-            ocupacionPaciente: res.areaO,
-            fechaExamen: prev.fechaExamen
-
+            cargoPaciente: res.cargoPaciente,
+            ocupacionPaciente: res.ocupacionPaciente,
+            fechaExamen: prev.fechaExamen,
+            observaciones: generarObservaciones(res)
         }));
     }
 };
@@ -138,7 +165,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, set, token, sede);
+            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
         },
         () => {
             //Tiene registro
@@ -154,7 +181,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por ANEXO 16 primero (OBLIGATORIO)",
                 "warning"
             );
         }
