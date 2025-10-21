@@ -399,7 +399,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/AptitupAlturaPoderosa/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/CertificadoAlturaPoderosa/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -407,7 +407,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/AptitupAlturaPoderosa"
+        "../../../../../jaspers/CertificadoAlturaPoderosa"
     );
 };
 
