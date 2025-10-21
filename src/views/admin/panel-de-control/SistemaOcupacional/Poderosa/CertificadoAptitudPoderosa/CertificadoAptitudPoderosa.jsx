@@ -81,6 +81,7 @@ const CertificadoAptitudPoderosa = () => {
         const selectedOption = opcionesConclusiones.find(opt => opt.value === value);
         if (value === "Check15") {
             setForm({
+                ...form,
             [name]: value, // actualiza la selección del radio
             observaciones: "- NINGUNO" // agrega el texto con salto
             });
