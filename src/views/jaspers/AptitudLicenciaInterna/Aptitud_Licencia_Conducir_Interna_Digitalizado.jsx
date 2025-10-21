@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { convertirGenero } from "../../utils/helpers";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -12,90 +12,53 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
-  // Datos de prueba por defecto
-  const datosPrueba = {
-    apellidosNombres: "CASTILLO PLASENCIA HADY KATHERINE",
-    fechaExamen: "04/11/2024",
-    tipoExamen: "APTITUD PODEROSA",
-    sexo: "Femenino",
-    documentoIdentidad: "72384273",
-    edad: "31",
-    fechaNacimiento: "01/01/1993",
-    areaTrabajo: "MINERÍA",
-    puestoTrabajo: "DAD",
-    empresa: "MINERA BOROO MISQUICHILCA S.A.",
-    contrata: "CONTRATA EJEMPLO S.A.C.",
-    vitalSigns: {
-      fc: "64",
-      fr: "19",
-      pa: "120/60",
-      satO2: "99",
-      imc: "23.48",
-      temperatura: "36.5",
-      peso: "70",
-      talla: "1.75"
-    },
-    // Datos de color
-    color: 1,
-    codigoColor: "#008f39",
-    textoColor: "F",
-    // Datos adicionales para header
-    numeroFicha: "99164",
-    sede: "Trujillo-Pierola",
-    horaSalida: "9:33:43 PM",
-    // Datos para tipo de trabajo
-    tipoTrabajo: "subsuelo", // "superficie", "planta", "subsuelo"
-    // Datos para resultado de evaluación
-    resultadoEvaluacion: "noApto", // "apto", "aptoConRestriccion", "noAptoTemporal", "noApto"
-    // Datos para observaciones
-    observaciones: "El trabajador presenta condiciones adecuadas para realizar trabajos en altura.\nSe recomienda seguimiento médico periódico.\nCumple con los requisitos de seguridad establecidos.",
-    // Datos para fechas
-    fechaCaducidad: "13/10/2026"
-  };
 
   const datosReales = {
-    apellidosNombres: String((data.apellidosPaciente || "") + " " + (data.nombresPaciente || "")).trim(),
-    fechaExamen: formatearFechaCorta(data.fechaExamen || ""),
-    tipoExamen: String(data.nombreExamen || "APTITUD PODEROSA"),
-    sexo: convertirGenero(data.sexoPaciente) || "",
-    documentoIdentidad: String(data.dniPaciente || ""),
-    edad: String(data.edadPaciente ?? ""),
-    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento || ""),
-    areaTrabajo: data.areaPaciente || "",
-    puestoTrabajo: data.cargoPaciente || "",
-    empresa: data.empresa || "",
-    contrata: data.contrata || "",
+    apellidosNombres: String((data.apellidosPaciente) + " " + (data.nombresPaciente)).trim(),
+    fechaExamen: formatearFechaCorta(data.fechaExamen),
+    tipoExamen: String(data.nombreExamen),
+    sexo: convertirGenero(data.sexoPaciente),
+    documentoIdentidad: String(data.dniPaciente),
+    edad: String(data.edadPaciente),
+    fechaNacimiento: formatearFechaCorta(data.fechaNacimientoPaciente || data.fechaNacimiento),
+    areaTrabajo: data.areaPaciente,
+    puestoTrabajo: data.cargoPaciente,
+    empresa: data.empresa,
+    contrata: data.contrata,
     vitalSigns: {
-      fc: String(data.frecuenciaCardiaca || ""),
-      fr: String(data.frecuenciaRespiratoriaTriaje || ""),
-      pa: String(data.sistolica || "") + "/" + String(data.diastolica || ""),
-      satO2: String(data.saturacionOxigenoTriaje || ""),
-      imc: String(data.imcTriaje || ""),
-      temperatura: String(data.temperatura || ""),
-      peso: String(data.peso || ""),
-      talla: String(data.tallaTriaje || "")
+      fc: String(data.frecuenciaCardiaca),
+      fr: String(data.frecuenciaRespiratoriaTriaje),
+      pa: String(data.sistolica) + "/" + String(data.diastolica),
+      satO2: String(data.saturacionOxigenoTriaje),
+      imc: String(data.imcTriaje),
+      temperatura: String(data.temperatura),
+      peso: String(data.peso),
+      talla: String(data.tallaTriaje)
     },
     // Datos de color
-    color: data.color || 1,
-    codigoColor: data.codigoColor || "#008f39",
-    textoColor: data.textoColor || "F",
+    color: data.color,
+    codigoColor: data.codigoColor,
+    textoColor: data.textoColor,
     // Datos adicionales para header
-    numeroFicha: String(data.norden || ""),
-    sede: data.sede || data.nombreSede || "",
-    horaSalida: String(data.horaSalida || ""),
-    direccionPaciente: String(data.direccionPaciente || ""),
+    numeroFicha: String(data.norden),
+    sede: data.sede || data.nombreSede,
+    horaSalida: String(data.horaSalida),
+    direccionPaciente: String(data.direccionPaciente),
     // Datos para tipo de trabajo
-    tipoTrabajo: data.tipoTrabajo || "superficie", // "superficie", "planta", "subsuelo"
+    tipoTrabajo: data.tipoTrabajo,
     // Datos para resultado de evaluación
-    resultadoEvaluacion: data.resultadoEvaluacion || "apto", // "apto", "aptoConRestriccion", "noAptoTemporal", "noApto"
+    resultadoEvaluacion: data.noApto ? "noApto" : 
+                        data.aptoTemporal ? "noAptoTemporal" : 
+                        data.aptoRestriccion ? "aptoConRestriccion" : 
+                        data.apto ? "apto" : "apto",
     // Datos para observaciones
-    observaciones: data.observaciones || "",
+    observaciones: data.observaciones,
     // Datos para fechas
-    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad || "")
+    fechaCaducidad: formatearFechaCorta(data.fechaHasta)
   };
 
-  // Usar datos reales si existen, sino usar datos de prueba
-  const datosFinales = data && data.norden ? datosReales : datosPrueba;
+  // Usar solo datos reales
+  const datosFinales = datosReales;
 
   // Header reutilizable
   const drawHeader = (pageNumber) => {
@@ -563,8 +526,16 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   // Calcular centro de la columna 1 para centrar las imágenes
   const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
   
+  // Función para obtener URL de digitalización por nombre
+  const getDigitalizacionUrl = (digitalizaciones, nombre) => {
+    if (!digitalizaciones || !Array.isArray(digitalizaciones)) return null;
+    const item = digitalizaciones.find(d => d.nombreDigitalizacion === nombre);
+    return item ? item.url : null;
+  };
+
   // Agregar firma del trabajador (lado izquierdo)
-  let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
+  let firmaTrabajadorUrl = getDigitalizacionUrl(data.digitalizacion, "FIRMAP");
+  
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 30;
@@ -578,7 +549,8 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   }
 
   // Agregar huella del trabajador (lado derecho, vertical)
-  let huellaTrabajadorUrl = getSign(datosFinales, "HUELLA");
+  let huellaTrabajadorUrl = getDigitalizacionUrl(data.digitalizacion, "HUELLA");
+  
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 12;
@@ -599,7 +571,8 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   const firmaMedicoY = yFirmas + 3;
   
   // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
+  let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
+  
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;

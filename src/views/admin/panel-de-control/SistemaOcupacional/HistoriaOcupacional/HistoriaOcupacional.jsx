@@ -124,9 +124,9 @@ const HistoriaOcupacional = ({
   userDatos,
 }) => {
   function fixEncodingModern(str) {
-  const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
-  return new TextDecoder('utf-8').decode(bytes);
-}
+    const bytes = new Uint8Array([...str].map(c => c.charCodeAt(0)));
+    return new TextDecoder('utf-8').decode(bytes);
+  }
 
   const [form, setForm] = useState({
     norden: "",
@@ -149,6 +149,7 @@ const HistoriaOcupacional = ({
     socavon: "",
     riesgo: "",
     proteccion: "",
+    causaRetiro: ""
   });
 
   const [registros, setRegistros] = useState([]);
@@ -231,6 +232,7 @@ const HistoriaOcupacional = ({
       socavon: "",
       riesgo: "",
       proteccion: "",
+      causaRetiro: ""
     });
     setSearchEmpresa("");
     setSearchCargoOcupacion("");
@@ -259,6 +261,7 @@ const HistoriaOcupacional = ({
       socavon: "",
       riesgo: "",
       proteccion: "",
+      causaRetiro: ""
     });
     setRegistros([]);
     setSearchEmpresa("");
@@ -430,6 +433,7 @@ const HistoriaOcupacional = ({
               </th>
               <th rowSpan={2}>Riesgos</th>
               <th rowSpan={2}>Protección</th>
+              <th rowSpan={2}>Causa de Retiro</th>
             </tr>
             <tr>
               <th>Socavon</th>
@@ -772,6 +776,14 @@ const HistoriaOcupacional = ({
                   }}
                 />
               </td>
+              <td>
+                <AutoResizeInput
+                  value={rowData.causaRetiro}
+                  onChange={(e) => {
+                    handleRowChange("causaRetiro", e.target.value.toUpperCase());
+                  }}
+                />
+              </td>
             </tr>
           </tbody>
         </table>
@@ -1108,7 +1120,7 @@ const HistoriaOcupacional = ({
       {/* Tabla de registros */}
       {registros.length > 0 && (
         <div style={{ marginTop: 32 }}>
-          <h3 style={{ fontSize: 15, color: "#000", fontWeight: "bold" , marginBottom:"1em"}}>
+          <h3 style={{ fontSize: 15, color: "#000", fontWeight: "bold", marginBottom: "1em" }}>
             Lista de Registros
           </h3>
           <div className={styles.tableWrapper}>
@@ -1128,6 +1140,7 @@ const HistoriaOcupacional = ({
                   <th>Socavón</th>
                   <th>Riesgos</th>
                   <th>Protección</th>
+                  <th>Causa de Retiro</th>
                 </tr>
               </thead>
               <tbody>
@@ -1255,6 +1268,18 @@ const HistoriaOcupacional = ({
                           handleEditChange(
                             idx,
                             "proteccion",
+                            e.target.value.toUpperCase()
+                          )
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeInput
+                        value={reg.causaRetiro}
+                        onChange={(e) =>
+                          handleEditChange(
+                            idx,
+                            "causaRetiro",
                             e.target.value.toUpperCase()
                           )
                         }
