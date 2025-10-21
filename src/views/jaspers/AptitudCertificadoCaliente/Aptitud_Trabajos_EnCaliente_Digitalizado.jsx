@@ -45,7 +45,7 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
     horaSalida: String(data.horaSalida),
     direccionPaciente: String(data.direccionPaciente),
     // Datos para tipo de trabajo
-    tipoTrabajo: data.tipoTrabajo,
+    tipoTrabajo: data.explotacion,
     // Datos para resultado de evaluación
     resultadoEvaluacion: (() => {
       if (data.apto) return "apto";
@@ -313,30 +313,30 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
 
   // Superficie
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Superficie", tablaInicioX + 2, yTexto2 + 1);
+  doc.text("SUPERFICIE", tablaInicioX + 2, yTexto2 + 1);
   
   // Marcar X en Superficie si es el tipo seleccionado
-  if (datosFinales.tipoTrabajo === "superficie") {
+  if (datosFinales.tipoTrabajo === "SUPERFICIE") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 49, yTexto2 + 1);
   }
 
   // PLANTA (centrado en la tercera columna)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Planta", tablaInicioX + 63, yTexto2 + 1);
+  doc.text("PLANTA", tablaInicioX + 63, yTexto2 + 1);
   
   // Marcar X en Planta si es el tipo seleccionado
-  if (datosFinales.tipoTrabajo === "planta") {
+  if (datosFinales.tipoTrabajo === "PLANTA") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 109, yTexto2 + 1);
   }
 
   // SUBSUELO (centrado en la cuarta columna)
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Subsuelo", tablaInicioX + 130, yTexto2 + 1);
+  doc.text("SUBSUELO", tablaInicioX + 130, yTexto2 + 1);
   
   // Marcar X en Subsuelo si es el tipo seleccionado
-  if (datosFinales.tipoTrabajo === "subsuelo") {
+  if (datosFinales.tipoTrabajo === "SUBSUELO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
     doc.text("X", tablaInicioX + 178.5, yTexto2 + 1);
   }
@@ -507,18 +507,14 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   const yFirmas = yPos; // Continuar directamente desde la sección anterior
   const alturaSeccionFirmas = 30; // Altura para la sección de firmas
 
-  // Dibujar las líneas de la sección de firmas (2 columnas)
+  // Dibujar las líneas de la sección de firmas (una sola columna centrada)
   doc.line(tablaInicioX, yFirmas, tablaInicioX, yFirmas + alturaSeccionFirmas); // Línea izquierda
-  doc.line(tablaInicioX + 95, yFirmas, tablaInicioX + 95, yFirmas + alturaSeccionFirmas); // División central
   doc.line(tablaInicioX + tablaAncho, yFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea derecha
   doc.line(tablaInicioX, yFirmas, tablaInicioX + tablaAncho, yFirmas); // Línea superior
   doc.line(tablaInicioX, yFirmas + alturaSeccionFirmas, tablaInicioX + tablaAncho, yFirmas + alturaSeccionFirmas); // Línea inferior
 
-  // === COLUMNA 1: FIRMA Y HUELLA DEL TRABAJADOR ===
-  const firmaTrabajadorY = yFirmas + 3;
-  
-  // Calcular centro de la columna 1 para centrar las imágenes
-  const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
+  // === FIRMA DEL MÉDICO CENTRADA ===
+  const firmaMedicoY = yFirmas + 3;
   
   // Función para obtener URL de digitalización por nombre
   const getDigitalizacionUrl = (digitalizaciones, nombre) => {
@@ -527,48 +523,16 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
     return item ? item.url : null;
   };
 
-  // Agregar firma del trabajador (lado izquierdo)
-  let firmaTrabajadorUrl = getDigitalizacionUrl(data.digitalizacion, "FIRMAP");
-  if (firmaTrabajadorUrl) {
-    try {
-      const imgWidth = 30;
-      const imgHeight = 20;
-      const x = centroColumna1X - 20;
-      const y = firmaTrabajadorY;
-      doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando firma del trabajador:", error);
-    }
-  }
-
-  // Agregar huella del trabajador (lado derecho, vertical)
-  let huellaTrabajadorUrl = getDigitalizacionUrl(data.digitalizacion, "HUELLA");
-  if (huellaTrabajadorUrl) {
-    try {
-      const imgWidth = 12;
-      const imgHeight = 20;
-      const x = centroColumna1X + 8;
-      const y = firmaTrabajadorY;
-      doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
-    } catch (error) {
-      console.log("Error cargando huella del trabajador:", error);
-    }
-  }
+  // Calcular centro de la fila para centrar la firma
+  const centroFilaX = tablaInicioX + (tablaAncho / 2);
   
-  doc.setFont("helvetica", "normal").setFontSize(7);
-  doc.text("Firma y Huella del trabajador", centroColumna1X, yFirmas + 26, { align: "center" });
-
-  // === COLUMNA 2: SELLO Y FIRMA DEL MÉDICO ===
-  const firmaMedicoX = tablaInicioX + 127;
-  const firmaMedicoY = yFirmas + 3;
-  
-  // Agregar firma y sello médico
+  // Agregar firma y sello médico centrada
   let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
       const imgHeight = 20;
-      const x = firmaMedicoX;
+      const x = centroFilaX - (imgWidth / 2); // Centrar horizontalmente
       const y = firmaMedicoY;
       doc.addImage(firmaMedicoUrl, 'PNG', x, y, imgWidth, imgHeight);
     } catch (error) {
@@ -577,9 +541,8 @@ export default function Aptitud_Trabajos_EnCaliente_Digitalizado(data = {}) {
   }
 
   doc.setFont("helvetica", "normal").setFontSize(7);
-  const centroColumna2 = tablaInicioX + 95 + ((tablaAncho - 95) / 2);
-  doc.text("Sello y Firma del Médico", centroColumna2, yFirmas + 26, { align: "center" });
-  doc.text("Responsable de la Evaluación", centroColumna2, yFirmas + 28.5, { align: "center" });
+  doc.text("Sello y Firma del Médico", centroFilaX, yFirmas + 26, { align: "center" });
+  doc.text("Responsable de la Evaluación", centroFilaX, yFirmas + 28.5, { align: "center" });
 
   yPos += alturaSeccionFirmas;
 

@@ -26,7 +26,8 @@ export default function Hoja_Consulta_Externa(data = {}) {
     empresa: data.empresa,
     contrata: data.contrata,
     // Datos de ubicación
-    ubicacion: data.postaVijus ? "POSTA" : data.cedro ? "CEDRO" : data.paraiso ? "PARAIS" : data.otros ? data.otrosDescripcion : "",
+    ubicacion: data.postaVijus ? "POSTA" : data.cedro ? "CEDRO" : data.paraiso ? "PARAIS" : data.otros ? "OTROS" : "",
+    otrosDescripcion: data.otrosDescripcion || "",
     // Datos adicionales
     observaciones: data.observaciones,
     // Datos de color
@@ -56,12 +57,12 @@ export default function Hoja_Consulta_Externa(data = {}) {
     }
 
     // Número de Ficha y Página (alineación automática mejorada)
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
     doc.text("Nro de ficha: ", pageW - 80, 15);
 
     doc.setFont("helvetica", "normal").setFontSize(18);
     doc.text(datosFinales.numeroFicha, pageW - 60, 16);
-    doc.setFont("helvetica", "normal").setFontSize(8);
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
     doc.text("Sede: " + datosFinales.sede, pageW - 80, 20);
     doc.text("Fecha de examen: " + datosFinales.fechaExamen, pageW - 80, 25);
     doc.text("Hora: " + datosFinales.horaSalida, pageW - 80, 30);
@@ -106,18 +107,18 @@ export default function Hoja_Consulta_Externa(data = {}) {
       } else {
         if (lineaActual) {
           doc.text(lineaActual, x, yPos);
-          yPos += fontSize * 0.35; // salto real entre líneas
+          yPos += fontSize * 0.5; // salto mejorado entre líneas
           lineaActual = palabra;
         } else {
           doc.text(palabra, x, yPos);
-          yPos += fontSize * 0.35;
+          yPos += fontSize * 0.5;
         }
       }
     });
     
     if (lineaActual) {
       doc.text(lineaActual, x, yPos);
-      yPos += fontSize * 0.35;
+      yPos += fontSize * 0.5;
     }
     
     return yPos; // Devuelve la nueva posición final
@@ -152,27 +153,27 @@ export default function Hoja_Consulta_Externa(data = {}) {
       if (doc.getTextWidth(linea) > anchoMaximo) {
         yPos = dibujarTextoConSaltoLinea(linea, x, yPos, anchoMaximo);
         
-        // Espacio moderado después de una línea numerada que hizo salto
+        // Espacio mejorado después de una línea numerada que hizo salto
         if (esLineaNumerada) {
-          yPos += fontSize * 0.25; // Espacio moderado después de línea numerada con salto
+          yPos += fontSize * 0.4; // Espacio mejorado después de línea numerada con salto
         }
         
-        // Si hay una siguiente línea numerada, agregar espacio adicional moderado
+        // Si hay una siguiente línea numerada, agregar espacio adicional
         if (index < lineasProcesadas.length - 1) {
           const siguienteLinea = lineasProcesadas[index + 1];
           if (/^\d+\./.test(siguienteLinea)) {
-            yPos += fontSize * 0.2; // Espacio moderado antes de la siguiente línea numerada
+            yPos += fontSize * 0.3; // Espacio mejorado antes de la siguiente línea numerada
           }
         }
       } else {
         // Si la línea cabe, dibujarla directamente
         doc.text(linea, x, yPos);
         
-        // Espaciado equilibrado para líneas numeradas
+        // Espaciado mejorado para líneas numeradas
         if (esLineaNumerada) {
-          yPos += fontSize * 0.4; // Espacio equilibrado para líneas numeradas
+          yPos += fontSize * 0.6; // Espacio mejorado para líneas numeradas
         } else {
-          yPos += fontSize * 0.35; // Espacio normal
+          yPos += fontSize * 0.5; // Espacio mejorado para líneas normales
         }
       }
       
@@ -180,7 +181,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
       if (index < lineasProcesadas.length - 1 && doc.getTextWidth(linea) <= anchoMaximo) {
         const siguienteLinea = lineasProcesadas[index + 1];
         if (esLineaNumerada && /^\d+\./.test(siguienteLinea)) {
-          yPos += fontSize * 0.15; // Espacio moderado entre líneas numeradas
+          yPos += fontSize * 0.25; // Espacio mejorado entre líneas numeradas
         }
       }
     });
@@ -270,21 +271,62 @@ export default function Hoja_Consulta_Externa(data = {}) {
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
-  // Fila: Ubicación - POSTA | CEDRO | PARAIS (3 columnas con espacios para X)
+  // Fila: Ubicación - POSTA | CEDRO | PARAIS | OTROS (4 columnas con espacios para X)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura);
   doc.line(tablaInicioX + 40, yPos, tablaInicioX + 40, yPos + filaAltura); // División 1
-  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // División 2
-  doc.line(tablaInicioX + 100, yPos, tablaInicioX + 100, yPos + filaAltura); // División 3
-  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura); // División 4
-  doc.line(tablaInicioX + 170, yPos, tablaInicioX + 170, yPos + filaAltura); // División 5
+  doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + filaAltura); // División 2
+  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura); // División 3
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura);
   yPos += filaAltura;
 
+  // Fila para descripción de "Otros" (solo si se seleccionó Otros)
+  if (datosFinales.ubicacion === "OTROS" && datosFinales.otrosDescripcion) {
+    // Calcular altura necesaria para el texto de descripción
+    const textoOtros = datosFinales.otrosDescripcion;
+    const lineasProcesadasOtros = procesarTextoConSaltosLinea(textoOtros);
+    let alturaSimuladaOtros = 0;
+    const fontSizeOtros = 8;
+    
+    lineasProcesadasOtros.forEach((linea) => {
+      if (doc.getTextWidth(linea) > (tablaAncho - 4)) {
+        const palabras = linea.split(' ');
+        let lineasNecesarias = 1;
+        let lineaActual = '';
+        
+        palabras.forEach(palabra => {
+          const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
+          if (doc.getTextWidth(textoPrueba) > (tablaAncho - 4)) {
+            lineasNecesarias++;
+            lineaActual = palabra;
+          } else {
+            lineaActual = textoPrueba;
+          }
+        });
+        
+        alturaSimuladaOtros += lineasNecesarias * fontSizeOtros * 0.5; // Interlineado mejorado
+      } else {
+        alturaSimuladaOtros += fontSizeOtros * 0.5; // Interlineado mejorado
+      }
+    });
+    
+    const alturaFilaOtros = Math.max(filaAltura, alturaSimuladaOtros + 4);
+    
+    // Dibujar la fila para descripción de Otros
+    doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaOtros);
+    doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaOtros);
+    doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
+    doc.line(tablaInicioX, yPos + alturaFilaOtros, tablaInicioX + tablaAncho, yPos + alturaFilaOtros);
+    yPos += alturaFilaOtros;
+  }
+
+  // Header para observaciones
+  yPos = dibujarHeaderSeccion("2. OBSERVACIONES", yPos, filaAltura);
+
   // Fila creciente para datos adicionales con altura dinámica
   // Primero calcular la altura necesaria para el texto SIN dibujarlo
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   const textoObservaciones = datosFinales.observaciones;
   
   // Calcular altura necesaria simulando el texto
@@ -298,7 +340,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
   
   lineasProcesadas.forEach((linea) => {
     const esLineaNumerada = /^\d+\./.test(linea);
-    if (doc.getTextWidth(linea) > (tablaAncho - 4)) {
+    if (doc.getTextWidth(linea) > 160) {
       // Si necesita salto de línea, calcular altura aproximada
       const palabras = linea.split(' ');
       let lineasNecesarias = 1;
@@ -306,7 +348,7 @@ export default function Hoja_Consulta_Externa(data = {}) {
       
       palabras.forEach(palabra => {
         const textoPrueba = lineaActual ? `${lineaActual} ${palabra}` : palabra;
-        if (doc.getTextWidth(textoPrueba) > (tablaAncho - 4)) {
+        if (doc.getTextWidth(textoPrueba) > 160) {
           lineasNecesarias++;
           lineaActual = palabra;
         } else {
@@ -314,132 +356,151 @@ export default function Hoja_Consulta_Externa(data = {}) {
         }
       });
       
-      alturaSimulada += lineasNecesarias * fontSize * 0.35;
-      if (esLineaNumerada) alturaSimulada += fontSize * 0.25;
+      alturaSimulada += lineasNecesarias * fontSize * 0.5; // Interlineado mejorado
+      if (esLineaNumerada) alturaSimulada += fontSize * 0.1; // Espacio adicional para líneas numeradas
     } else {
-      alturaSimulada += fontSize * 0.35;
-      if (esLineaNumerada) alturaSimulada += fontSize * 0.05;
+      alturaSimulada += fontSize * 0.5; // Interlineado mejorado
+      if (esLineaNumerada) alturaSimulada += fontSize * 0.1; // Espacio adicional para líneas numeradas
     }
   });
   
-  const alturaFilaFinal = Math.max(alturaMinima, alturaSimulada + paddingSuperior + 2);
+  const alturaFilaFinal = Math.max(alturaMinima, alturaSimulada + paddingSuperior + 5); // Incluir margen de 3mm
 
   // Dibujar la fila con la altura calculada
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + alturaFilaFinal);
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos);
   doc.line(tablaInicioX, yPos + alturaFilaFinal, tablaInicioX + tablaAncho, yPos + alturaFilaFinal);
+  
+  // DIBUJAR EL TEXTO DE OBSERVACIONES INMEDIATAMENTE DESPUÉS DE DIBUJAR LA FILA
+  const yObservaciones = yPos + 2.5; // Después del header de observaciones + margen
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
+  dibujarTextoConSaltosLinea(datosFinales.observaciones, tablaInicioX + 2, yObservaciones + 1, 160);
+  
   yPos += alturaFilaFinal;
 
   // === CONTENIDO DE LA TABLA ===
   let yTexto = 45 + filaAltura + 2.5; // Ajustar para el header
 
   // Apellidos y Nombres
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Apellidos y Nombres:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   // Ajustar ancho para la nueva división (hasta x = tablaInicioX + 140)
-  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres || "", tablaInicioX + 35, yTexto + 1, 95);
+  dibujarTextoConSaltoLinea(datosFinales.apellidosNombres || "", tablaInicioX + 35, yTexto + 1, 100);
 
   // Columna derecha: Tipo de examen
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("T. Examen:", tablaInicioX + 137, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.tipoExamen || "", tablaInicioX + 155, yTexto + 1);
   yTexto += filaAltura;
 
   // DNI, Edad, Sexo, Fecha Nac.
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("DNI:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.documentoIdentidad || "", tablaInicioX + 12, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Edad:", tablaInicioX + 47, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text((datosFinales.edad ? (datosFinales.edad + " Años") : ""), tablaInicioX + 58, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Sexo:", tablaInicioX + 92, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.sexo || "", tablaInicioX + 105, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Fecha Nac.:", tablaInicioX + 137, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.fechaNacimiento || "", tablaInicioX + 155, yTexto + 1);
   yTexto += filaAltura;
 
   // Domicilio
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Domicilio:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1, 160);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
+  dibujarTextoConSaltoLinea(datosFinales.direccionPaciente || "", tablaInicioX + 25, yTexto + 1, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Puesto de Trabajo, Área de Trabajo
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Puesto de Trabajo:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.puestoTrabajo || "", tablaInicioX + 30, yTexto + 1);
 
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Área de Trabajo:", tablaInicioX + 92, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.areaTrabajo || "", tablaInicioX + 118, yTexto + 1);
   yTexto += filaAltura;
 
   // Empresa
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Empresa:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 24, yTexto + 1, 160);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
+  dibujarTextoConSaltoLinea(datosFinales.empresa || "", tablaInicioX + 24, yTexto + 1, tablaAncho - 30);
   yTexto += filaAltura;
 
   // Contratista
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("Contratista:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
+  doc.setFont("helvetica", "normal").setFontSize(7.5);
   doc.text(datosFinales.contrata || "", tablaInicioX + 24, yTexto + 1);
   yTexto += filaAltura;
 
-  // Ubicación - POSTA | CEDRO | PARAIS
+  // Ubicación - POSTA | CEDRO | PARAIS | OTROS
   let yTexto2 = yTexto;
   
   // POSTA
-  doc.setFont("helvetica", "bold").setFontSize(8);
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
   doc.text("POSTA", tablaInicioX + 2, yTexto2 + 1);
   
   // Marcar X en POSTA si es la ubicación seleccionada
   if (datosFinales.ubicacion === "POSTA") {
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("X", tablaInicioX + 49, yTexto2 + 1);
+    doc.text("X", tablaInicioX + 35, yTexto2 + 1);
   }
 
-  // CEDRO (centrado en la tercera columna)
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("CEDRO", tablaInicioX + 63, yTexto2 + 1);
+  // CEDRO
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
+  doc.text("CEDRO", tablaInicioX + 42, yTexto2 + 1);
   
   // Marcar X en CEDRO si es la ubicación seleccionada
   if (datosFinales.ubicacion === "CEDRO") {
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("X", tablaInicioX + 109, yTexto2 + 1);
+    doc.text("X", tablaInicioX + 75, yTexto2 + 1);
   }
 
-  // PARAIS (centrado en la cuarta columna)
-  doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("PARAIS", tablaInicioX + 130, yTexto2 + 1);
+  // PARAIS
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
+  doc.text("PARAIS", tablaInicioX + 82, yTexto2 + 1);
   
   // Marcar X en PARAIS si es la ubicación seleccionada
   if (datosFinales.ubicacion === "PARAIS") {
     doc.setFont("helvetica", "bold").setFontSize(10);
-    doc.text("X", tablaInicioX + 178.5, yTexto2 + 1);
+    doc.text("X", tablaInicioX + 115, yTexto2 + 1);
+  }
+
+  // OTROS
+  doc.setFont("helvetica", "bold").setFontSize(7.5);
+  doc.text("OTROS", tablaInicioX + 122, yTexto2 + 1);
+  
+  // Marcar X en OTROS si es la ubicación seleccionada
+  if (datosFinales.ubicacion === "OTROS") {
+    doc.setFont("helvetica", "bold").setFontSize(10);
+    doc.text("X", tablaInicioX + 155, yTexto2 + 1);
   }
   yTexto += filaAltura;
 
-  // Fila creciente para datos adicionales
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  dibujarTextoConSaltosLinea(datosFinales.observaciones, tablaInicioX + 2, yTexto + 1, 180);
+  // Mostrar descripción de "Otros" si está seleccionado
+  if (datosFinales.ubicacion === "OTROS" && datosFinales.otrosDescripcion) {
+    doc.setFont("helvetica", "normal").setFontSize(7.5);
+    dibujarTextoConSaltosLinea(datosFinales.otrosDescripcion, tablaInicioX + 2, yTexto + 1, tablaAncho - 4);
+    yTexto += filaAltura; // Incrementar para mantener consistencia
+  }
 
   // === FOOTER ===
   footerTR(doc, { footerOffsetY: 8});
