@@ -384,8 +384,8 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
 
   // Octava fila: Años de experiencia, Primera aptitud, Revalidación (3 columnas)
   doc.line(tablaInicioX, yPos, tablaInicioX, yPos + filaAltura); // Línea izquierda
-  doc.line(tablaInicioX + 60, yPos, tablaInicioX + 60, yPos + filaAltura); // Primera división
-  doc.line(tablaInicioX + 120, yPos, tablaInicioX + 120, yPos + filaAltura); // Segunda división
+  doc.line(tablaInicioX + 80, yPos, tablaInicioX + 80, yPos + filaAltura); // Primera división
+  doc.line(tablaInicioX + 140, yPos, tablaInicioX + 140, yPos + filaAltura); // Segunda división
   doc.line(tablaInicioX + tablaAncho, yPos, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea derecha
   doc.line(tablaInicioX, yPos, tablaInicioX + tablaAncho, yPos); // Línea superior
   doc.line(tablaInicioX, yPos + filaAltura, tablaInicioX + tablaAncho, yPos + filaAltura); // Línea inferior
@@ -462,26 +462,26 @@ export default function Certificacion_suficiencia_trabajos_en_altura_boro_Digita
   // Octava fila: Años de experiencia, Primera aptitud, Revalidación (3 columnas)
   doc.setFont("helvetica", "bold").setFontSize(8);
   doc.text("Años de experiencia:", tablaInicioX + 2, yTexto + 1);
-  doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(datosFinales.anosExperiencia, tablaInicioX + 45, yTexto + 1);
+  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.text(datosFinales.anosExperiencia, tablaInicioX + 34, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Primera aptitud:", tablaInicioX + 62, yTexto + 1);
+  doc.text("Primera aptitud:", tablaInicioX + 92, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(", tablaInicioX + 95, yTexto + 1);
+  doc.text("(", tablaInicioX + 125, yTexto + 1);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.primeraAptitud ? "X" : "   ", tablaInicioX + 97, yTexto + 1);
+  doc.text(datosFinales.primeraAptitud ? "X" : "   ", tablaInicioX + 127, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(")", tablaInicioX + 100, yTexto + 1);
+  doc.text(")", tablaInicioX + 130, yTexto + 1);
 
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text("Revalidación:", tablaInicioX + 122, yTexto + 1);
+  doc.text("Revalidación:", tablaInicioX + 152, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text("(", tablaInicioX + 145, yTexto + 1);
+  doc.text("(", tablaInicioX + 175, yTexto + 1);
   doc.setFont("helvetica", "bold").setFontSize(8);
-  doc.text(datosFinales.revalidacion ? "X" : "   ", tablaInicioX + 147, yTexto + 1);
+  doc.text(datosFinales.revalidacion ? "X" : "   ", tablaInicioX + 177, yTexto + 1);
   doc.setFont("helvetica", "normal").setFontSize(8);
-  doc.text(")", tablaInicioX + 150, yTexto + 1);
+  doc.text(")", tablaInicioX + 180, yTexto + 1);
   yTexto += filaAltura;
 
 

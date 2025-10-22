@@ -65,8 +65,6 @@ const CelebrationAnimation = ({ show }) => {
             <div className="text-4xl font-black mb-2 text-shadow-lg" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.5)'}}>
               HOY PAGAN GENTE!!
             </div>
-            <div className="text-2xl font-bold animate-pulse">🎉 ¡FELICITACIONES! 🎊</div>
-            <div className="text-lg mt-2">💸 ¡Dinero en el bolsillo! 💸</div>
           </div>
         </div>
       </div>
