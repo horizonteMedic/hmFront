@@ -108,6 +108,7 @@ import SectionWithBack from "./SectionWithBack.jsx";
 import UsoRespiradores from "./UsoRespiradores/UsoRespiradores.jsx";
 import FichaPsicologica3 from "./ModuloPsicologia/FichaPsicologica3/FichaPsicologica3.jsx";
 import PoderosaTabSelector from "./Poderosa/PoderosaTabSelector.jsx";
+import AversionRiesgo from "./ModuloPsicologia/AversionRiesgo/AversionRiesgo.jsx";
 
 const hiddenExamTabs = [
   { key: 6, label: "Anexo 16 A" },
@@ -731,7 +732,7 @@ const TabComponent = () => {
               },
               22: { title: "Evaluación Musculoesquelética", child: <MusculoEsqueleticoTabSelector tieneVista={tieneVista} /> },
               23: { title: undefined, child: <Test_fatiga /> },
-              24: { title: "FichaPsicologica3", child: <FichaPsicologica3 /> },
+              24: { title: "AversionRiesgo", child: <AversionRiesgo /> },
               25: { title: undefined, child: <AntecedentesDeAltura /> },
               26: { title: "Anexo 2", child: <Anexo2 listas={listasCombos} /> },
               27: { title: "Anexo 16", child: <Anexo16 listas={listasCombos} /> },

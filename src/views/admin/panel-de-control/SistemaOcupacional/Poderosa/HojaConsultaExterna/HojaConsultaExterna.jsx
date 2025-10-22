@@ -199,16 +199,16 @@ const HojaConsultaExterna = () => {
                                         name="observaciones"
                                     />
                                 </section>
-                                <div className="w-full flex justify-around items-center gap-1 p-4 mt-0 m-4">
+                                <div className="w-auto flex flex-col justify-center items-center gap-1 p-4 pt-0 m-4 mt-0">
                                     <InputTextOneLine
                                         label="Medico que Certifica"
                                         name="nombre_medico"
                                         disabled
-                                        className="mt-2 w-full"
+                                        className=" w-[400px]"
                                         value={form?.nombre_medico}
                                         onChange={handleChange}
                                         />
-                                    <div className="flex gap-1">
+                                    <div className="flex gap-1 items-center">
                                         <button
                                             type="button"
                                             onClick={handleSave}
@@ -223,9 +223,7 @@ const HojaConsultaExterna = () => {
                                         >
                                             <FontAwesomeIcon icon={faBroom} /> Limpiar
                                         </button>
-                                    </div>
-                                    <div className="flex gap-1 items-center">
-                                        <span className="font-bold italic text-base mb-1 mx-4">IMPRIMIR</span>
+                                        <span className="font-bold italic text-center text-base  mx-4">IMPRIMIR</span>
                                         <input
                                             name="norden"
                                             value={form?.norden}
@@ -240,6 +238,9 @@ const HojaConsultaExterna = () => {
                                         >
                                             <FontAwesomeIcon icon={faPrint} />
                                         </button>
+                                    </div>
+                                    <div className="flex gap-1 items-center">
+                                        
                                     </div>
                                 </div>
                             </div>

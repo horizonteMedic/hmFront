@@ -173,7 +173,7 @@ export default function ficha_antecedente_patologico_boro(data = {}) {
     edad: String(data.edad_edad ?? ""),
     areaTrabajo: String(data.area_area_o ?? ""),
     puestoTrabajo: String(data.cargo_cargo_de ?? ""),
-    tiempoExperiencia: "", //revisar - no encontrado en JSON
+    tiempoExperiencia: String(data.tiempoExperiencia ?? ""), //revisar - no encontrado en JSON
     empresa: String(data.empresa_razon_empresa ?? ""),
     contrata: String(data.contrata_razon_contrata ?? ""),
     sede: String(data.sede ?? ""),
