@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import {SubirInterconsulta, ReadArchivos} from "./model";
 import { LoadingDefault } from "../../../../utils/functionUtils";
 import { useState } from "react";
+import { SubmitData } from "../../../../utils/apiHelpers";
 
 const tabla = "ficha_interconsulta"
 const today = getToday();
@@ -77,24 +78,26 @@ export default function FichaInterconsulta() {
         cmpUsuario: "",
         direccionClinica: "",
         //Cuadros
-        motivo: "",
+        motivo: "SE SOLICITA EVALUACION POR ESPECIALIDAD PARA DIAGNOSTICO, TRATAMIENTO, CONTROLES POSTERIORES Y DEFINIR APTITUD PARA ELABORAR",
         hallazgo: "",
         diagnostico: "",
         tratamiento: "",
         apto: false,
         SubirDoc: false,
-        nomenclatura: ""
+        nomenclatura: "",
+        orden: "",
+        NewNomenclatura: ""
     }
 
     const { form, setForm, handleChangeSimple, handleChange, handleClear, handleClearnotO, handleChangeNumber, handleRadioButtonBoolean, handleRadioButton, handlePrintDefault } = useForm(Initialform, { storageKey: "ficha_interconsultas_form" })
-
-    
+    console.log(form.codigoFichaInterconsulta)
+                   
 
     const handleClearnotOandEspecialidad = () => {
-        setForm((prev) => ({ ...Initialform, norden: prev.norden, especialidad: prev.especialidad }));
+        setForm((prev) => ({ ...Initialform, norden: prev.norden }));
         if (typeof window !== "undefined" && "ficha_interconsultas_form") {
         try {
-            localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden, especialidad: form.especialidad }));
+            localStorage.setItem("ficha_interconsultas_form", JSON.stringify({ ...Initialform, norden: form.norden }));
         } catch (err) {
             console.warn("useForm: error guardando localStorage en clearnotO", err);
         }
@@ -109,12 +112,12 @@ export default function FichaInterconsulta() {
     };
 
     const handlePrint = () => {
-        if (!form.especialidad) {
-            Swal.fire("Error","Debe seleccionar una especialidad",'error')
+        if (!form.norden) {
+            Swal.fire("Error","Debe colocar un Numero de Orden",'error')
             return
         }
         handlePrintDefault(() => {
-            PrintHojaR(form.norden, form.especialidad, token, tabla, datosFooter);
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
 
@@ -151,11 +154,17 @@ export default function FichaInterconsulta() {
                 nombre: file.name,
                 sede: selectedSede,
                 base64:  base64WithoutHeader,
-                nomenclatura: `INTERCONSULTA${form.nomenclatura === 1 ? "" : ` ${form.nomenclatura}`}`,
+                nomenclatura: form.nomenclatura,
                 norden: form.norden
             };
             const response = await SubirInterconsulta(datos, userlogued, token);
             if (response.id === 1) {
+                const body = {
+                    "codigoFichaInterconsulta": form.codigoFichaInterconsulta,
+                    "nomenclatura": form.nomenclatura
+                }
+                const response = await SubmitData(body,'/api/v01/ct/fichaInterconsulta/actualizarNomenclaturaFichaInterconsulta',token)
+                console.log(response)
                 Swal.fire("Exito", "Archivo Subido con exto","success")
             } else {
                 Swal.fire("Error", "No se pudo subir","error")
@@ -168,7 +177,7 @@ export default function FichaInterconsulta() {
     
     const ReadArchivosForm = async () => {
         LoadingDefault("Cargando Interconsulta")
-        ReadArchivos(form.norden, `INTERCONSULTA ${form.nomenclatura === 1 ? "" : form.nomenclatura}`)
+        ReadArchivos(form.norden, form.nomenclatura)
         .then(response => {
             if (response.id === 1) {
                 setVisualerOpen(response)

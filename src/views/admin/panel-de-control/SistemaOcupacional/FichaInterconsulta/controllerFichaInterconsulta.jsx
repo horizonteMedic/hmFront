@@ -22,7 +22,9 @@ export const GetInfoServicio = async (
     tabla,
     set,
     token,
-    onFinish = () => { }
+    onFinish = () => { },
+    jasperModules = "",
+    datosFooter = ""
 ) => {
     const res = await GetInfoEspecialidadInterconsulta(
         nro,
@@ -43,7 +45,7 @@ export const GetInfoServicio = async (
         return acc;
         }, {}); */
         const totalRadios = Object.keys(inputOptions).length;
-
+        console.log(totalRadios)
         // Altura estimada por cantidad (ajusta a gusto)
         let height = 300; // base
         let width;
@@ -52,7 +54,6 @@ export const GetInfoServicio = async (
         else if (totalRadios <= 8) width = "700px";
         else width = "900px";
         if (totalRadios > 5) height += (totalRadios - 5) * 30; // suma 40px por cada extra
-        console.log(height)
         // Mostrar SweetAlert con radios
         const { value: seleccion } = await Swal.fire({
              title: "Selecciona una especialidad",
@@ -83,15 +84,31 @@ export const GetInfoServicio = async (
             const especialidadSeleccionada = res.find(
                 (item) => item.id === parseInt(seleccion, 10)
             );
-            GetInfoServicioEditar(nro, especialidadSeleccionada, tabla, set, token, () => {
-            Swal.fire(
-                "Alerta",
-                "Este paciente ya cuenta con registros de Ficha Interconsulta",
-                "warning"
-            )})
-
             console.log("✅ Especialidad seleccionada:", especialidadSeleccionada);
-            // Aquí puedes retornar o usar especialidadSeleccionada.mensaje
+            if (jasperModules) {
+                PrintHojaRFichaInterconsulta(
+                    nro,
+                    especialidadSeleccionada.mensaje,
+                    token,
+                    tabla,
+                    datosFooter,
+                    obtenerReporteUrl,
+                    jasperModules,
+                    "../../../../jaspers/FichaInterconsulta"
+                );
+                
+            } else {
+                GetInfoServicioEditar(nro, especialidadSeleccionada, tabla, set, token, () => {
+                Swal.fire(
+                    "Alerta",
+                    "Este paciente ya cuenta con registros de Ficha Interconsulta",
+                    "warning"
+                )})
+
+                
+                // Aquí puedes retornar o usar especialidadSeleccionada.mensaje
+            }   
+            
         }
 
         // Si presiona "Nuevo registro"
@@ -99,7 +116,7 @@ export const GetInfoServicio = async (
             // Detecta el botón de "Nuevo registro"
             const isDenied = Swal.isVisible() && Swal.getDenyButton().classList.contains("swal2-deny");
             if (isDenied) {
-                GetInfoServicioNewEditar(nro, Object.values(inputOptions)[0], tabla, set, token, () => { Swal.close(); })
+                GetInfoServicioNewEditar(nro, Object.values(inputOptions)[0], tabla, set, token, () => { Swal.close(); }, totalRadios + 1)
             }
         }
         
@@ -136,7 +153,8 @@ export const GetInfoEspecialidad = async (
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: `${res.edadPaciente}`,
             dniUser: res.dniUsuario,
-            fechaExamen: prev.fechaExamen
+            fechaExamen: prev.fechaExamen,
+            motivo: prev.motivo
             
         }));
     }
@@ -170,7 +188,6 @@ export const GetInfoServicioEditar = async (
             edadPaciente: `${res.edadPaciente}`,
             dniUser: res.dniUsuario,
             SubirDoc: true,
-            nomenclatura: especialidad.id
             
         }));
     }
@@ -183,7 +200,8 @@ export const GetInfoServicioNewEditar = async (
     tabla,
     set,
     token,
-    onFinish = () => { }
+    onFinish = () => { },
+    NewNomenclatura = ""
 ) => {
     const res = await GetInfoServicioInterconsulta(
         nro,
@@ -206,11 +224,12 @@ export const GetInfoServicioNewEditar = async (
             PA: `${res.sistolica}/${res.diastolica}`,
             edadPaciente: `${res.edadPaciente}`,
             dniUser: res.dniUsuario,
-            motivo: "",
+            motivo: prev.motivo,
             hallazgo: "",
             diagnostico: "",
             tratamiento: "",
-            apto: false
+            apto: false,
+            NewNomenclatura: NewNomenclatura
         }));
     }
 };
@@ -241,10 +260,12 @@ export const SubmitDataService = async (
         "apto":  false,
         "noApto":  false,
         "horaSalida": getHoraActual(),
+        "orden": null,
+        "nomenclatura": `INTERCONSULTA${form.NewNomenclatura ? ` ${form.NewNomenclatura}` : ""}`
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
-        PrintHojaR(form.norden, form.especialidad, token, tabla, datosFooter);
+        PrintHojaR(form.norden,  token, tabla, datosFooter);
     });
 };
 
@@ -254,18 +275,9 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
     });
 };
 
-export const PrintHojaR = (nro, especialidad, token, tabla, datosFooter) => {
+export const PrintHojaR = (nro, token, tabla, datosFooter) => {
     const jasperModules = import.meta.glob("../../../../jaspers/FichaInterconsulta/*.jsx");
-    PrintHojaRFichaInterconsulta(
-        nro,
-        especialidad,
-        token,
-        tabla,
-        datosFooter,
-        obtenerReporteUrl,
-        jasperModules,
-        "../../../../jaspers/FichaInterconsulta"
-    );
+    GetInfoServicio(nro, tabla, null, token, () => { Swal.close() }, jasperModules, datosFooter);
 };
 
 export const VerifyTR = async (nro, especialidad, tabla, token, set, sede) => {

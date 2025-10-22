@@ -3,6 +3,7 @@ import {
   InputsRadioGroup,
   InputTextOneLine,
 } from "../../../../../../components/reusableComponents/ResusableComponents";
+import RadioTable from "../../../../../../components/reusableComponents/RadioTable";
 
 export default function CriteriosPsicologicosII({
   form,
@@ -14,15 +15,6 @@ export default function CriteriosPsicologicosII({
     { value: "PROMEDIO", label: "PROMEDIO" },
     { value: "ALTO", label: "ALTO" },
   ];
-
-  const aspectosPsicolaboralesOptions = [
-    { value: "PD", label: "PD" },
-    { value: "NM", label: "NM" },
-    { value: "A", label: "A" },
-    { value: "D", label: "D" },
-    { value: "E", label: "E" },
-  ];
-
   return (
     <div className="bg-white">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -75,110 +67,40 @@ export default function CriteriosPsicologicosII({
             ASPECTOS PSICOLABORALES
           </h3>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                1. Capacidad de influencia
-              </label>
-              <InputsRadioGroup
-                name="capacidadInfluencia"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.capacidadInfluencia}
-                onChange={handleRadioButton}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                2. Adaptación a los cambios
-              </label>
-              <InputsRadioGroup
-                name="adaptacionCambios"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.adaptacionCambios}
-                onChange={handleRadioButton}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                3. Trabajo en equipo y colaboración
-              </label>
-              <InputsRadioGroup
-                name="trabajoEquipoColaboracion"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.trabajoEquipoColaboracion}
-                onChange={handleRadioButton}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                4. Orientación a la acción y mejora de procesos
-              </label>
-              <InputsRadioGroup
-                name="orientacionAccionMejoraProcesos"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.orientacionAccionMejoraProcesos}
-                onChange={handleRadioButton}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                5. Autonomía y proactividad
-              </label>
-              <InputsRadioGroup
-                name="autonomiaProactividad"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.autonomiaProactividad}
-                onChange={handleRadioButton}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                6. Toma de decisiones
-              </label>
-              <InputsRadioGroup
-                name="tomaDecisiones"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.tomaDecisiones}
-                onChange={handleRadioButton}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                7. Crecimiento personal
-              </label>
-              <InputsRadioGroup
-                name="crecimientoPersonal"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.crecimientoPersonal}
-                onChange={handleRadioButton}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                8. Motivación
-              </label>
-              <InputsRadioGroup
-                name="motivacion"
-                options={aspectosPsicolaboralesOptions}
-                value={form?.motivacion}
-                onChange={handleRadioButton}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                9. Estrés laboral
-              </label>
-              <InputTextOneLine
-                name="estresLaboral"
-                value={form?.estresLaboral}
-                onChange={handleChange}
-              />
+          {/* Tabla de aspectos psicolaborales */}
+          <RadioTable
+            items={[
+              { name: "capacidadInfluencia", label: "1. Capacidad de influencia" },
+              { name: "adaptacionCambios", label: "2. Adaptación a los cambios" },
+              { name: "trabajoEquipoColaboracion", label: "3. Trabajo en equipo y colaboración" },
+              { name: "orientacionAccionMejoraProcesos", label: "4. Orientación a la acción y mejora de procesos" },
+              { name: "autonomiaProactividad", label: "5. Autonomía y proactividad" },
+              { name: "tomaDecisiones", label: "6. Toma de decisiones" },
+              { name: "crecimientoPersonal", label: "7. Crecimiento personal" },
+              { name: "motivacion", label: "8. Motivación" }
+            ]}
+            options={[
+              { value: "PD", label: "PD" },
+              { value: "NM", label: "NM" },
+              { value: "A", label: "A" },
+              { value: "D", label: "D" },
+              { value: "E", label: "E" }
+            ]}
+            form={form}
+            handleRadioButton={handleRadioButton}
+          />
+          
+          {/* Estrés laboral - mantiene el input de texto */}
+          <div className="bg-gray-50 rounded-lg overflow-hidden mt-4">
+            <div className="grid grid-cols-7 hover:bg-gray-50">
+              <div className="p-3 font-semibold text-gray-700 bg-gray-50 col-span-2">9. Estrés laboral</div>
+              <div className="p-3 col-span-5">
+                <InputTextOneLine
+                  name="estresLaboral"
+                  value={form?.estresLaboral}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
           </div>
         </div>

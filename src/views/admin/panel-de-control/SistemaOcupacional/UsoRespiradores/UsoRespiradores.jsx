@@ -314,10 +314,10 @@ export default function UsoRespiradores() {
                 onChange={handleChange}
               />
               <InputTextOneLine
-                label="Tipo de Examen"
+                label="Nombre Examen"
                 name="tipoExamen"
                 value={form?.tipoExamen}
-                onChange={handleChange}
+                disabled
               />
 
             </section>

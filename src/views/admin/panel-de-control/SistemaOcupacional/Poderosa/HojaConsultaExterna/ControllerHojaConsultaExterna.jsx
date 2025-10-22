@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import {
+    GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
@@ -7,6 +8,7 @@ import {
 } from "../../../../../utils/functionUtils";
 import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../../utils/helpers";
+import Hoja_Consulta_Externa from "../../../../../jaspers/HojaConsultaExterna/Hoja_Consulta_Externa";
 
 const obtenerReporteUrl =
     "/api/v01/ct/hojaConsultaExterna/obtenerReporteHojaConsultaExterna";
@@ -14,6 +16,29 @@ const registrarUrl =
     "/api/v01/ct/hojaConsultaExterna/registrarActualizarHojaConsultaExterna";
 const today = getToday();
 
+const generarObservaciones = (res) => {
+  return [
+`A- ANAMNESIS: COLABORADOR REFIERE SENTIRSE BIEN, SIN PROBLEMAS DE SALUD, NO practica deporte o deporte de alto rendimiento.
+B- ANTECEDENTES PERSONALES: ${res.anexo16AntecedentesPersonales2 || "SIN DATOS."}
+C- ANTECEDENTES FAMILIARES: ${res.anexo16AntecedentesFamiliares || "JALARLO DEL ANEXO 16."},
+D- EXAMEN FISICO:
+- ABEG, LOTEP, CAMINANDO NORMALMENTE. VENTILANDO ESPONTANEAMENTE
+- CABEZA: NORMOCÉFALO, CENTRAL, MÓVIL, PUPILAS ISOCÓRICAS, FOTO REACTIVAS. NO SE PALPA MASAS NI DEPRESIONES. 
+- BOCA: HUMEDA, LENGUA MÓVIL, CENTRAL, NO SE EVIDENCIA LESIONES,
+- CUELLO: CENTRAL, MÓVIL, NO TUMORACIONES.
+- TÓRAX: BPMV EN ACP, NO RALES.
+- CARDIOVASCULAR: RCRR, NO SOPLOS. PULSOS PERIFERICOS PALPABLES
+- ABDOMEN: PLANO, RHA PRESENTES, NO DOLOR A LA PALPACIÓN SUPERFICIAL NI PROFUNDA, NO SE PALPA MASAS NI TUMORACIONES.
+- RENAL: SIGNO PUÑO PERCUSIÓN BILATERAL NEGATIVO, 
+- UROLÓGICO: PUNTOS RENOURETERALES NEGATIVOS.
+- COLUMNA VERTEBRAL: CENTRAL, CURVATURAS CONSERVADAS, MOVILIDAD CONSERVADA.
+- SISTEMA OSTEOMUSCULAR: MOTRICIDAD CONSERVADA. EXTREMIDADES SIMÉTRICAS. FUERZA MUSCULAR 5/5.
+- GENITALES: DIFERIDO
+- SISTEMA NERVIOSO: SENSIBILIDAD, MOTRICIDAD CONSERVADA, ROTS CONSERVADOS, BIPEDESTACIÓN CONSERVADA, EQUILIBRIO CONSERVADO, ROMBERG NEGATIVO. NO SIGNOS MENÍNGEOS. NO SIGNOS DE FOCALIZACION, NERVIOS CRANEALES CONSERVADOS, GLASGLOW 15 PTOS.
+E- EXÁMENES AUXILIARES: \n${res.anexo16OtrosExamenes || "JALARLO DE LOS EXÁMENES DE LABORATORIO."}\n
+F- DIAGNÓSTICOS: \n${res.anexo16ObservacionesGenerales || "JALARLO DE LOS DIAGNÓSTICOS DEL ANEXO 16."}`
+  ].join("\n\n");
+};
 
 export const GetInfoServicio = async (
     nro,
@@ -35,17 +60,17 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniPaciente: res.dniPaciente,
+            dniUser: res.dniUsuario,            
             edadPaciente: res.edadPaciente,
             nombreExamen: res.nombreExamen,
             empresa: res.empresa,
             contrata: res.contrata,
             cargoPaciente: res.cargoPaciente,
             ocupacionPaciente: res.ocupacionPaciente,
-            nombreMedico: res.nombreMedico ? res.nombreMedico : prev.nombreMedico
-
+            fechaExamen: prev.fechaExamen,
+            observaciones: generarObservaciones(res)
         }));
     }
 };
@@ -74,7 +99,8 @@ export const GetInfoServicioEditar = async (
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
             edadPaciente: `${res.edadPaciente} AÑOS`,
             dniUser: res.dniUsuario,
-            cajon: res.paraiso ? "PARAISO" : res.postaVijus ? "POSTA VIJUS" : res.cedro ? "CEDRO" : res.otros ? "OTROS" : ""
+            cajon: res.paraiso ? "PARAISO" : res.postaVijus ? "POSTA VIJUS" : res.cedro ? "CEDRO" : res.otros ? "OTROS" : "",
+            nombre_medico: res.nombreMedico
         }));
     }
 };
@@ -118,7 +144,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/HojaConsultaExterna/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -126,7 +152,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/CertificadoMedicoOcupacional"
+        "../../../../../jaspers/HojaConsultaExterna"
     );
 };
 
@@ -146,7 +172,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de C. Medico Ocupacional",
+                    "Este paciente ya cuenta con registros de Consulta Externa",
                     "warning"
                 );
             });
@@ -155,7 +181,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             //Necesita Agudeza visual 
             Swal.fire(
                 "Alerta",
-                "El paciente necesita pasar por Triaje.",
+                "El paciente necesita pasar por ANEXO 16 primero (OBLIGATORIO)",
                 "warning"
             );
         }

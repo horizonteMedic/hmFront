@@ -13,30 +13,35 @@ import {
     InputTextOneLine,
     InputTextArea,
     InputsBooleanRadioGroup,
+    InputCheckbox,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
-import { getToday } from "../../../../../utils/helpers";
+import { getToday, getTodayPlusOneYear } from "../../../../../utils/helpers";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import Antecedentes from "./TabsCertificadoAlturaPoderosa/Antecedentes";
 import TestDeCage from "./TabsCertificadoAlturaPoderosa/TestDeCage";
 import ExamenFisico from "./TabsCertificadoAlturaPoderosa/ExamenFisico";
 import Neurologico from "./TabsCertificadoAlturaPoderosa/Neurologico";
+import Swal from "sweetalert2";
+import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerCertificadoAlturaPoderosa";
 
-const tabla = "";
+const tabla = "certificado_altura_poderosa";
 const today = getToday();
 
 export default function CertificadoAlturaPoderosa() {
     const [activeTab, setActiveTab] = useState(0);
 
-    const { token, userlogued, selectedSede, datosFooter, userCompleto } =
+    const { token, userlogued, selectedSede, datosFooter, userName, userDNI } =
         useSessionData();
 
     const initialFormState = {
-        // Header
+        // Header - Campos principales
         norden: "",
         codigoCertificado: null,
         fechaExam: today,
-        tipoExamen: "",
+        nombreExamen: "",
+        fechaHasta: getTodayPlusOneYear(),
+        esApto: undefined,
 
         // Datos personales
         nombres: "",
@@ -46,13 +51,12 @@ export default function CertificadoAlturaPoderosa() {
         empresa: "",
         contrata: "",
         cargo: "",
+        areaTrabajo: "",
+
+        // Datos extra
+        tiempoExperiencia: "",
+        lugarTrabajo: "",
         altura: "",
-
-        // Campos usados por la interfaz principal
-        puestoPostula: "",
-        puestoActual: "",
-
-        dniUsuario: userCompleto?.datos?.dni_user ?? "",
 
         // ====================== TAB LATERAL: AGUDEZA VISUAL ======================
         vcOD: "",
@@ -69,11 +73,9 @@ export default function CertificadoAlturaPoderosa() {
         enfermedadesOculares: "",
 
         // ====================== ANTECEDENTES ======================
-        // Accidentes de Trabajo o Enfermedades Profesionales
-        accidentesTrabajoEnfermedades: "Niego accidentes de trabajo",
-
-        // Antecedentes Familiares
-        antecedentesFamiliares: "Niego antecedentes familiares",
+        // Historial
+        accidentesTrabajoEnfermedades: "NIEGO ACCIDENTES DE TRABAJO",
+        antecedentesFamiliares: "NIEGO ANTECEDENTES FAMILIARES",
 
         // Antecedentes Psiconeuroológicos
         tecModeradoGrave: false,
@@ -93,18 +95,19 @@ export default function CertificadoAlturaPoderosa() {
 
         // Consumo de sustancias
         tabaco: "",
+        tabacoFrecuencia: "",
         alcohol: "",
-        drogas: "NO",
-        hojaCoca: "20 g",
-        cafe: "1 taza",
+        alcoholFrecuencia: "",
+        drogas: "",
+        drogasFrecuencia: "",
+        hojaCoca: "",
+        hojaCocaFrecuencia: "",
+        cafe: "",
+        cafeFrecuencia: "",
 
-        // Diagnóstico
+        // Conclusiones Finales
         diagnostico: "",
-
-        // Conclusiones y Recomendaciones
-        apto: true,
-        noApto: false,
-        aptoConRestriccion: false,
+        conclusionesRecomendaciones: "",
 
         // Recomendaciones específicas
         sobrepesoObesidadHipocalorica: false,
@@ -112,26 +115,37 @@ export default function CertificadoAlturaPoderosa() {
         corregirAgudezaVisualTotal: false,
         obesidadDietaHipocalorica: false,
         usoLentesCorrectoresLecturaCerca: false,
+        corregirAgudezaLecturaCerca: false,
 
         // Médico
-        nombreApellidosMedico: "",
-        nroColegiaturaDoctor: "",
-
-        // Corrección de agudeza para lectura cerca
-        corregirAgudezaLecturaCerca: false,
+        nombre_medico: userName,
+        dni_medico: userDNI,
 
         // ====================== TEST DE CAGE ======================
         // Preguntas del test CAGE
-        gustaDejarDivertirse: false,
-        molestaTardaAlgunCompromiso: false,
-        molestadoAlgunaVezGenteCriticaBeber: false,
-        sentidoEstarReunionDivirtiendose: false,
-        tenidoAlgunaVezImpresionDeberiaBeberMenos: false,
-        quermeBien: false,
-        sentidoAlgunaVezMalCulpableBeber: false,
-        pondeNerviosoMenudo: false,
-        algunaVezPrimeroHechoMananaBeberPara: false,
-        sufreDolorEspaldaLevantarse: false,
+        gustaSalirDivertirse: false,
+        gustaSalirDivertirsePuntaje: "",
+        molestaLlegaTardeCompromiso: false,
+        molestaLlegaTardeCompromisoPuntaje: "",
+        molestadoGenteCriticaBeber: false,
+        molestadoGenteCriticaBeberPuntaje: "",
+        sentidoEstarReunionDivirtiendoseReanima: false,
+        sentidoEstarReunionDivirtiendoseReanimaPuntaje: "",
+        impresionDeberiaBeberMenos: false,
+        impresionDeberiaBeberMenosPuntaje: "",
+        duermeBien: false,
+        duermeBienPuntaje: "",
+        sentidoCulpablePorBeber: false,
+        sentidoCulpablePorBeberPuntaje: "",
+        poneNerviosoMenudo: false,
+        poneNerviosoMenudoPuntaje: "",
+        bebeMananaParaCalmarNervios: false,
+        bebeMananaParaCalmarNerviosPuntaje: "",
+        doloresEspaldaLevantarse: false,
+        doloresEspaldaLevantarsePuntaje: "",
+
+        // Anamnesis Test de Cage
+        anamnesisTestDeCage: "REFIERE NO TENER MOLESTIA ALGUNA.",
 
         // ====================== EXAMEN FISICO ======================
         // Perímetros
@@ -140,57 +154,49 @@ export default function CertificadoAlturaPoderosa() {
         perimetroCintura: "",
 
         // Medidas corporales
-        fc: "",
-        fr: "",
-        pa: "",
         talla: "",
         peso: "",
         imc: "",
 
-        // Inspección General
-        inspeccionGeneral: "ABEG, Despierto, OTEP",
+        // Medidas Extra
+        fc: "",
+        fr: "",
+        pa: "",
+        icc: "",
+        pToracicoInspiracion: "",
+        pToracicoEspiracion: "",
 
         // Examen físico detallado
-        cabeza: "Normocéfalo, central, móvil",
-        piel: "Trigueño, turgente, hidratado",
-        movilidadOcular: "Conservada",
-        otoscopiaOD: "Normal",
-        otoscopiaOI: "Normal",
-        nariz: "Central, fosas nasales permeables",
-        aparatoRespiratorio: "BPmv en ACP, ( no estertores)",
-
-        // Aparato Cardiovascular
-        aparatoCardiovascular: "RCRR, no soplos",
-        abdomen: "Plano, RHA(+), B.D, No doloroso",
-        musculoEsqueletico: "Motricidad conservada",
-        columna: "Curvaturas conservadas",
-
-        // Test de Epworth
+        apreciacionGeneral: "ABEB, DESPIERTO, OTEP",
+        cabeza: "NORMOCÉFALO, CENTRAL, MÓVIL",
+        piel: "TRIGUEÑO, TURGENTE, HIDRATADO",
+        movilidadOcular: "CONSERVADA",
+        otoscopiaOD: "NORMAL",
+        otoscopiaOI: "NORMAL",
+        nariz: "CENTRAL, FOSAS NASALES PERMEABLES",
+        aparatoRespiratorio: "BPMV EN ACP, ( NO ESTERTORES)",
+        aparatoCardiovascular: "RCRR, NO SOPLOS",
+        abdomen: "PLANO, RHA(+), B.D, NO DOLOROSO",
+        musculoEsqueletico: "MOTRICIDAD CONSERVADA",
+        columna: "CURVATURAS CONSERVADAS",
         testEpworth: "",
         otrosExaLaboratorio: "",
 
         // ====================== NEUROLOGICO ======================
         // Reflejos
-        reflejosConservados: false,
+        reflejos: "CONSERVADOS",
 
-        // Pruebas específicas
-        pruebas: "",
-        dedoNariz: "",
-        indiceBanany: "",
-        disdiadococinesia: "",
-        rombergSimple: "",
-        rombergSensibilizado: "",
-        marchaEnTandem: "",
-
-        // Pruebas adicionales
-        pruebasNegativo: false,
-        pruebasPositivo: false,
-        pruebasUntenberg: false,
-        pruebasNegativoUntenberg: false,
-        pruebasPositivoUntenberg: false,
-        pruebasBabinski: false,
-        pruebasDixHallpike: false,
-        pruebasMarcha: false,
+        // Pruebas neurológicas
+        pruebaDedoNariz: false,
+        indiceBarany: false,
+        diadococinesia: false,
+        rombergSimple: false,
+        rombergSensibilizado: false,
+        marchaEnTandem: false,
+        unterberg: false,
+        babinskiWeil: false,
+        dixHallpike: false,
+        marcha: false,
     };
 
     const {
@@ -202,10 +208,11 @@ export default function CertificadoAlturaPoderosa() {
         handleChangeSimple,
         handleRadioButtonBoolean,
         handleCheckBoxChange,
+        handleCheckBoxWriteOnText,
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "CertificadoAlturaPoderosa" });
 
     const tabs = [
         { id: 0, name: "Antecedentes", icon: faClipboardList, component: Antecedentes },
@@ -215,19 +222,42 @@ export default function CertificadoAlturaPoderosa() {
     ];
 
     const handleSave = () => {
-        // Implementar lógica de guardado
+        if (form.esApto == undefined) {
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Por favor, seleccione la aptitud.",
+            })
+            return
+        }
+        SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
             handleClearnotO();
+            VerifyTR(form.norden, tabla, token, setForm, selectedSede);
         }
     };
 
     const handlePrint = () => {
         handlePrintDefault(() => {
+            PrintHojaR(form.norden, token, tabla, datosFooter);
         });
     };
+
+    const recomendacionesTextMap = {
+        sobrepesoObesidadHipocalorica: "SOBREPESO. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS.",
+        corregirAgudezaVisual: "CORREGIR AGUDEZA VISUAL.",
+        corregirAgudezaVisualTotal: "CORREGIR AGUDEZA VISUAL TOTAL.",
+        obesidadDietaHipocalorica: "OBESIDAD I. BAJAR DE PESO. DIETA HIPOCALÓRICA Y EJERCICIOS.",
+        usoLentesCorrectoresLecturaCerca: "USO DE LENTES CORRECTORES PARA LECTURA DE CERCA.",
+        corregirAgudezaLecturaCerca: "CORREGIR AGUDEZA VISUAL PARA LECTURA DE CERCA.",
+    };
+
+    const handleCheckboxRecomendaciones = (e) => {
+        handleCheckBoxWriteOnText(e, "conclusionesRecomendaciones", recomendacionesTextMap);
+    }
 
     const ActiveComponent = tabs[activeTab]?.component || (() => null);
 
@@ -238,13 +268,19 @@ export default function CertificadoAlturaPoderosa() {
                 <div className="w-4/5">
                     <div className="w-full">
                         {/* Datos del trabajador */}
-                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <section className="bg-white border border-gray-200 rounded-lg p-4 m-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                             <InputTextOneLine
                                 label="N° Orden"
                                 name="norden"
                                 value={form?.norden}
                                 onChange={handleChangeNumber}
                                 onKeyUp={handleSearch}
+                            />
+                            <InputTextOneLine
+                                label="Nombre Examen"
+                                name="nombreExamen"
+                                value={form?.nombreExamen}
+                                disabled
                             />
                             <InputTextOneLine
                                 label="Fecha Examen "
@@ -282,7 +318,7 @@ export default function CertificadoAlturaPoderosa() {
                                     disabled
                                     labelWidth="60px"
                                 />
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 ">
                                     <InputTextOneLine
                                         label="DNI"
                                         name="dni"
@@ -395,6 +431,77 @@ export default function CertificadoAlturaPoderosa() {
                                 handleChangeSimple={handleChangeSimple}
                             />
                         </div>
+                        {/* Conclusiones Finales */}
+                        <fieldset className="bg-white border border-gray-200 rounded-lg p-4 mx-4 mt-4">
+                            <legend className="font-bold mb-2 text-gray-800 text-[10px]">
+                                Conclusiones Finales
+                            </legend>
+                            <InputTextArea
+                                label="Diagnóstico"
+                                name="diagnostico"
+                                value={form?.diagnostico}
+                                onChange={handleChange}
+                                rows={4}
+                            />
+                            <div className="mb-4 gap-4 grid md:grid-cols-3 mt-3">
+                                <InputTextArea
+                                    label="Conclusiones y Recomendaciones"
+                                    name="conclusionesRecomendaciones"
+                                    value={form?.conclusionesRecomendaciones}
+                                    onChange={handleChange}
+                                    className="col-span-2"
+                                    rows={4}
+                                />
+                                {/* Recomendaciones específicas */}
+                                <div className="grid grid-cols-1 gap-2">
+                                    <InputCheckbox
+                                        label="Sobrepeso/Obesidad - Dieta Hipocalórica"
+                                        name="sobrepesoObesidadHipocalorica"
+                                        checked={form?.sobrepesoObesidadHipocalorica}
+                                        onChange={handleCheckboxRecomendaciones}
+                                    />
+                                    <InputCheckbox
+                                        label="Corregir Agudeza Visual"
+                                        name="corregirAgudezaVisual"
+                                        checked={form?.corregirAgudezaVisual}
+                                        onChange={handleCheckboxRecomendaciones}
+                                    />
+                                    <InputCheckbox
+                                        label="Corregir Agudeza Visual Total"
+                                        name="corregirAgudezaVisualTotal"
+                                        checked={form?.corregirAgudezaVisualTotal}
+                                        onChange={handleCheckboxRecomendaciones}
+                                    />
+                                    <InputCheckbox
+                                        label="Obesidad - Dieta Hipocalórica"
+                                        name="obesidadDietaHipocalorica"
+                                        checked={form?.obesidadDietaHipocalorica}
+                                        onChange={handleCheckboxRecomendaciones}
+                                    />
+                                    <InputCheckbox
+                                        label="Uso de Lentes Correctores para Lectura de Cerca"
+                                        name="usoLentesCorrectoresLecturaCerca"
+                                        checked={form?.usoLentesCorrectoresLecturaCerca}
+                                        onChange={handleCheckboxRecomendaciones}
+                                    />
+                                    <InputCheckbox
+                                        label="Corregir Agudeza para Lectura de Cerca"
+                                        name="corregirAgudezaLecturaCerca"
+                                        checked={form?.corregirAgudezaLecturaCerca}
+                                        onChange={handleCheckboxRecomendaciones}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Médico */}
+                            <InputTextOneLine
+                                label="Médico que Certifica"
+                                name="nombre_medico"
+                                value={form?.nombre_medico}
+                                labelOnTop
+                                disabled
+                            />
+                        </fieldset>
 
                         <section className="flex flex-col md:flex-row justify-between items-center gap-4 px-4 pt-4">
                             <div className="flex gap-4">
@@ -441,7 +548,7 @@ export default function CertificadoAlturaPoderosa() {
                         <h4 className="font-semibold text-gray-800 mb-3 text-center">Sin Corregir</h4>
                         {/* Sin Corregir */}
                         <div className="mb-4">
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid md:grid-cols-2 gap-3">
                                 <div className="">
                                     <div className="font-semibold mb-2 text-center">O.D</div>
                                     <div className="space-y-3">
@@ -463,7 +570,7 @@ export default function CertificadoAlturaPoderosa() {
                         <div className="mb-4">
                             <h5 className="font-semibold text-gray-700 mb-2 text-center">Corregida</h5>
                             {/* Fila OD y OI */}
-                            <div className="grid grid-cols-2 gap-6">
+                            <div className="grid md:grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                     <div className="font-semibold mb-2 text-center">O.D</div>
                                     <InputTextOneLine

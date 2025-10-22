@@ -35,7 +35,7 @@ export function SubirInterconsulta(datos,user,token) {
         },
         body: JSON.stringify(data)
     }
-    return fetch(`${URLAzure}/api/v01/ct/archivos/cargaMasivaHM`,options)
+    return fetch(`${URLAzure}/api/v01/ct/archivos/archivoInterconsulta`,options)
     .then(res => res.json()).then(response => response)
         
     }
