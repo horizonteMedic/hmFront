@@ -228,7 +228,7 @@ export default function Anexo2({ listas }) {
     faringe:
       "HUMECTADA, SONROSADA, AMIGADALAS NO HIPERTROFICAS, NO CONGESTIVAS.",
     nariz: "CENTRAL, PERMEABLE",
-    oidos: "",
+    oidos: "CONDUCTO AUDITIVO EXTERNO. PERMEABLE",
     marcha: "NORMAL",
     piel: "NORMAL. NO MANCHA, NO PRESENTA LUNARES SOSPECHOSOS DE MALIGNIDAD.",
     aparatoRespiratorio:

@@ -107,206 +107,211 @@ function evaluarObservacionesObtener(res, set) {
     let problemasOftalmologicosRed = false;
 
     // Verificar lentes correctores usando las variables del objeto res
-    if (
-        (res.odccOftalmologia_odcc && res.odccOftalmologia_odcc !== "00" && res.odccOftalmologia_odcc !== "") ||
-        (res.oiccOftalmologia_oicc && res.oiccOftalmologia_oicc !== "00" && res.oiccOftalmologia_oicc !== "") ||
-        (res.odlcOftalmologia_odlc && res.odlcOftalmologia_odlc !== "00" && res.odlcOftalmologia_odlc !== "") ||
-        (res.oilcOftalmologia_oilc && res.oilcOftalmologia_oilc !== "00" && res.oilcOftalmologia_oilc !== "")
-    ) {
+    // if (
+    //     (res.odccOftalmologia_odcc && res.odccOftalmologia_odcc !== "00" && res.odccOftalmologia_odcc !== "") ||
+    //     (res.oiccOftalmologia_oicc && res.oiccOftalmologia_oicc !== "00" && res.oiccOftalmologia_oicc !== "") ||
+    //     (res.odlcOftalmologia_odlc && res.odlcOftalmologia_odlc !== "00" && res.odlcOftalmologia_odlc !== "") ||
+    //     (res.oilcOftalmologia_oilc && res.oilcOftalmologia_oilc !== "00" && res.oilcOftalmologia_oilc !== "")
+    // ) {
+    //     problemasOftalmologicos = true;
+    //     problemasOftalmologicosRed = true;
+    //     nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
+    // } else if (res.visionCercaSinCorregirOd_v_cerca_s_od && res.visionCercaSinCorregirOd_v_cerca_s_od !== "") {
+    //     // Obtener valores de los campos de visión (asumiendo que son referencias a elementos del DOM o estado)
+    //     //****************************************************************
+    //     if (vcercacod === "00" && vcercacoi === "00") {
+    //         if ((vcercasod === "20/20" && vcercasoi === "20/20")
+    //             || (vcercasod === "20/20-1" && vcercasoi === "20/20-1")
+    //             || (vcercasod === "20/20-2" && vcercasoi === "20/20-2")
+    //             || (vcercasod === "20/20-3" && vcercasoi === "20/20-3")
+    //             || (vcercasod === "20/20-1" && vcercasoi === "20/20")
+    //             || (vcercasod === "20/20" && vcercasoi === "20/20-1")
+    //             || (vcercasod === "20/20" && vcercasoi === "20/20-2")
+    //             || (vcercasod === "20/20-2" && vcercasoi === "20/20")
+    //             || (vcercasod === "20/20" && vcercasoi === "20/20-3")
+    //             || (vcercasod === "20/20-3" && vcercasoi === "20/20")
+    //             || (vcercasod === "20/20-1" && vcercasoi === "20/20-2")
+    //             || (vcercasod === "20/20-2" && vcercasoi === "20/20-1")
+    //             || (vcercasod === "20/20-1" && vcercasoi === "20/20-3")
+    //             || (vcercasod === "20/20-3" && vcercasoi === "20/20-1")
+    //             || (vcercasod === "20/20-2" && vcercasoi === "20/20-3")
+    //             || (vcercasod === "20/20-3" && vcercasoi === "20/20-2")) {
+    //             if (vlejoscod === "00" && vlejoscoi === "00") {
+    //                 if ((vlejossod === "20/20" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
+    //                     // Establecer estado para "no11" como seleccionado y color negro para "jLabel28"
+    //                     // no11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.black);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = false;
+    //                 } else {
+    //                     // Establecer estado para "si11" como seleccionado y color rojo para "jLabel28"
+    //                     // si11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.red);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = true;
+    //                     nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //                 }
+    //             } else {
+    //                 if ((vlejossod === "20/20" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
+    //                     // no11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.black);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = false;
+    //                 } else if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
+    //                     // no11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.black);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = false;
+    //                 } else {
+    //                     // si11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.red);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = true;
+    //                     nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //                 }
+    //             }
+    //         } else {
+    //             // si11.setSelected(true);
+    //             // jLabel28.setForeground(Color.red);
+    //             problemasOftalmologicos = true;
+    //             problemasOftalmologicosRed = true;
+    //             nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //         }
+
+    //     } else {
+    //         if ((vcercacod === "20/20" && vcercacoi === "20/20")
+    //             || (vcercacod === "20/20-1" && vcercacoi === "20/20-1")
+    //             || (vcercacod === "20/20-2" && vcercacoi === "20/20-2")
+    //             || (vcercacod === "20/20-3" && vcercacoi === "20/20-3")
+    //             || (vcercacod === "20/20-1" && vcercacoi === "20/20")
+    //             || (vcercacod === "20/20" && vcercacoi === "20/20-1")
+    //             || (vcercacod === "20/20" && vcercacoi === "20/20-2")
+    //             || (vcercacod === "20/20-2" && vcercacoi === "20/20")
+    //             || (vcercacod === "20/20" && vcercacoi === "20/20-3")
+    //             || (vcercacod === "20/20-3" && vcercacoi === "20/20")
+    //             || (vcercacod === "20/20-1" && vcercacoi === "20/20-2")
+    //             || (vcercacod === "20/20-2" && vcercacoi === "20/20-1")
+    //             || (vcercacod === "20/20-1" && vcercacoi === "20/20-3")
+    //             || (vcercacod === "20/20-3" && vcercacoi === "20/20-1")
+    //             || (vcercacod === "20/20-2" && vcercacoi === "20/20-3")
+    //             || (vcercacod === "20/20-3" && vcercacoi === "20/20-2")) {
+    //             if (vlejoscod === "00" && vlejoscoi === "00") {
+    //                 if ((vlejossod === "20/20" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
+    //                     || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
+    //                     || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
+    //                     // no11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.black);
+    //                     problemasOftalmologicos = false;
+    //                     problemasOftalmologicosRed = false;
+    //                 } else {
+    //                     // si11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.red);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = true;
+    //                     nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //                 }
+    //             } else {
+    //                 if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
+    //                     || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
+    //                     || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
+    //                     // no11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.black);
+    //                     problemasOftalmologicos = false;
+    //                     problemasOftalmologicosRed = false;
+    //                 } else {
+    //                     // si11.setSelected(true);
+    //                     // jLabel28.setForeground(Color.red);
+    //                     problemasOftalmologicos = true;
+    //                     problemasOftalmologicosRed = true;
+    //                     nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //                 }
+    //             }
+    //         } else {
+    //             // si11.setSelected(true); 
+    //             // jLabel28.setForeground(Color.red); 
+    //             problemasOftalmologicos = true;
+    //             problemasOftalmologicosRed = true;
+    //             nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //         }
+    //     }
+    // } else {
+    //     problemasOftalmologicos = false;
+    // }
+    if (res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") || res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
         problemasOftalmologicos = true;
         problemasOftalmologicosRed = true;
         nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
-    } else if (res.visionCercaSinCorregirOd_v_cerca_s_od && res.visionCercaSinCorregirOd_v_cerca_s_od !== "") {
-        // Obtener valores de los campos de visión (asumiendo que son referencias a elementos del DOM o estado)
-        //****************************************************************
-        if (vcercacod === "00" && vcercacoi === "00") {
-            if ((vcercasod === "20/20" && vcercasoi === "20/20")
-                || (vcercasod === "20/20-1" && vcercasoi === "20/20-1")
-                || (vcercasod === "20/20-2" && vcercasoi === "20/20-2")
-                || (vcercasod === "20/20-3" && vcercasoi === "20/20-3")
-                || (vcercasod === "20/20-1" && vcercasoi === "20/20")
-                || (vcercasod === "20/20" && vcercasoi === "20/20-1")
-                || (vcercasod === "20/20" && vcercasoi === "20/20-2")
-                || (vcercasod === "20/20-2" && vcercasoi === "20/20")
-                || (vcercasod === "20/20" && vcercasoi === "20/20-3")
-                || (vcercasod === "20/20-3" && vcercasoi === "20/20")
-                || (vcercasod === "20/20-1" && vcercasoi === "20/20-2")
-                || (vcercasod === "20/20-2" && vcercasoi === "20/20-1")
-                || (vcercasod === "20/20-1" && vcercasoi === "20/20-3")
-                || (vcercasod === "20/20-3" && vcercasoi === "20/20-1")
-                || (vcercasod === "20/20-2" && vcercasoi === "20/20-3")
-                || (vcercasod === "20/20-3" && vcercasoi === "20/20-2")) {
-                if (vlejoscod === "00" && vlejoscoi === "00") {
-                    if ((vlejossod === "20/20" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
-                        // Establecer estado para "no11" como seleccionado y color negro para "jLabel28"
-                        // no11.setSelected(true);
-                        // jLabel28.setForeground(Color.black);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = false;
-                    } else {
-                        // Establecer estado para "si11" como seleccionado y color rojo para "jLabel28"
-                        // si11.setSelected(true);
-                        // jLabel28.setForeground(Color.red);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = true;
-                        nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                    }
-                } else {
-                    if ((vlejossod === "20/20" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
-                        // no11.setSelected(true);
-                        // jLabel28.setForeground(Color.black);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = false;
-                    } else if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
-                        // no11.setSelected(true);
-                        // jLabel28.setForeground(Color.black);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = false;
-                    } else {
-                        // si11.setSelected(true);
-                        // jLabel28.setForeground(Color.red);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = true;
-                        nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                    }
-                }
-            } else {
-                // si11.setSelected(true);
-                // jLabel28.setForeground(Color.red);
-                problemasOftalmologicos = true;
-                problemasOftalmologicosRed = true;
-                nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-            }
-
-        } else {
-            if ((vcercacod === "20/20" && vcercacoi === "20/20")
-                || (vcercacod === "20/20-1" && vcercacoi === "20/20-1")
-                || (vcercacod === "20/20-2" && vcercacoi === "20/20-2")
-                || (vcercacod === "20/20-3" && vcercacoi === "20/20-3")
-                || (vcercacod === "20/20-1" && vcercacoi === "20/20")
-                || (vcercacod === "20/20" && vcercacoi === "20/20-1")
-                || (vcercacod === "20/20" && vcercacoi === "20/20-2")
-                || (vcercacod === "20/20-2" && vcercacoi === "20/20")
-                || (vcercacod === "20/20" && vcercacoi === "20/20-3")
-                || (vcercacod === "20/20-3" && vcercacoi === "20/20")
-                || (vcercacod === "20/20-1" && vcercacoi === "20/20-2")
-                || (vcercacod === "20/20-2" && vcercacoi === "20/20-1")
-                || (vcercacod === "20/20-1" && vcercacoi === "20/20-3")
-                || (vcercacod === "20/20-3" && vcercacoi === "20/20-1")
-                || (vcercacod === "20/20-2" && vcercacoi === "20/20-3")
-                || (vcercacod === "20/20-3" && vcercacoi === "20/20-2")) {
-                if (vlejoscod === "00" && vlejoscoi === "00") {
-                    if ((vlejossod === "20/20" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
-                        || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
-                        || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
-                        // no11.setSelected(true);
-                        // jLabel28.setForeground(Color.black);
-                        problemasOftalmologicos = false;
-                        problemasOftalmologicosRed = false;
-                    } else {
-                        // si11.setSelected(true);
-                        // jLabel28.setForeground(Color.red);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = true;
-                        nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                    }
-                } else {
-                    if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
-                        || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
-                        || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
-                        // no11.setSelected(true);
-                        // jLabel28.setForeground(Color.black);
-                        problemasOftalmologicos = false;
-                        problemasOftalmologicosRed = false;
-                    } else {
-                        // si11.setSelected(true);
-                        // jLabel28.setForeground(Color.red);
-                        problemasOftalmologicos = true;
-                        problemasOftalmologicosRed = true;
-                        nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                    }
-                }
-            } else {
-                // si11.setSelected(true); 
-                // jLabel28.setForeground(Color.red); 
-                problemasOftalmologicos = true;
-                problemasOftalmologicosRed = true;
-                nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-            }
-        }
-    } else {
-        problemasOftalmologicos = false;
     }
 
     // Evaluación de presión arterial - Convertido desde Java (líneas 176-181)
@@ -363,191 +368,198 @@ function evaluarObservacionesEditar(res, set) {
     let vlejoscod = res.odlcOftalmologia_odlc || "";
     let vlejoscoi = res.oilcOftalmologia_oilc || "";
 
-    if (vcercacod === "00" && vcercacoi === "00") {
-        if ((vcercasod === "20/20" && vcercasoi === "20/20")
-            || (vcercasod === "20/20-1" && vcercasoi === "20/20-1")
-            || (vcercasod === "20/20-2" && vcercasoi === "20/20-2")
-            || (vcercasod === "20/20-3" && vcercasoi === "20/20-3")
-            || (vcercasod === "20/20-1" && vcercasoi === "20/20")
-            || (vcercasod === "20/20" && vcercasoi === "20/20-1")
-            || (vcercasod === "20/20" && vcercasoi === "20/20-2")
-            || (vcercasod === "20/20-2" && vcercasoi === "20/20")
-            || (vcercasod === "20/20" && vcercasoi === "20/20-3")
-            || (vcercasod === "20/20-3" && vcercasoi === "20/20")
-            || (vcercasod === "20/20-1" && vcercasoi === "20/20-2")
-            || (vcercasod === "20/20-2" && vcercasoi === "20/20-1")
-            || (vcercasod === "20/20-1" && vcercasoi === "20/20-3")
-            || (vcercasod === "20/20-3" && vcercasoi === "20/20-1")
-            || (vcercasod === "20/20-2" && vcercasoi === "20/20-3")
-            || (vcercasod === "20/20-3" && vcercasoi === "20/20-2")) {
-            if (vlejoscod === "00" && vlejoscoi === "00") {
-                if ((vlejossod === "20/20" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
-                    // Establecer estado para "no11" como seleccionado y color negro para "jLabel28"
-                    // no11.setSelected(true);
-                    // jLabel28.setForeground(Color.black);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = false;
-                } else {
-                    // Establecer estado para "si11" como seleccionado y color rojo para "jLabel28"
-                    // si11.setSelected(true);
-                    // jLabel28.setForeground(Color.red);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = true;
-                    nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                }
-            } else {
-                if ((vlejossod === "20/20" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
-                    // no11.setSelected(true);
-                    // jLabel28.setForeground(Color.black);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = false;
-                } else if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
-                    // no11.setSelected(true);
-                    // jLabel28.setForeground(Color.black);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = false;
-                } else {
-                    // si11.setSelected(true);
-                    // jLabel28.setForeground(Color.red);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = true;
-                    nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                }
-            }
-        } else {
-            // si11.setSelected(true);
-            // jLabel28.setForeground(Color.red);
-            problemasOftalmologicos = true;
-            problemasOftalmologicosRed = true;
-            nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-        }
+    // if (vcercacod === "00" && vcercacoi === "00") {
+    //     if ((vcercasod === "20/20" && vcercasoi === "20/20")
+    //         || (vcercasod === "20/20-1" && vcercasoi === "20/20-1")
+    //         || (vcercasod === "20/20-2" && vcercasoi === "20/20-2")
+    //         || (vcercasod === "20/20-3" && vcercasoi === "20/20-3")
+    //         || (vcercasod === "20/20-1" && vcercasoi === "20/20")
+    //         || (vcercasod === "20/20" && vcercasoi === "20/20-1")
+    //         || (vcercasod === "20/20" && vcercasoi === "20/20-2")
+    //         || (vcercasod === "20/20-2" && vcercasoi === "20/20")
+    //         || (vcercasod === "20/20" && vcercasoi === "20/20-3")
+    //         || (vcercasod === "20/20-3" && vcercasoi === "20/20")
+    //         || (vcercasod === "20/20-1" && vcercasoi === "20/20-2")
+    //         || (vcercasod === "20/20-2" && vcercasoi === "20/20-1")
+    //         || (vcercasod === "20/20-1" && vcercasoi === "20/20-3")
+    //         || (vcercasod === "20/20-3" && vcercasoi === "20/20-1")
+    //         || (vcercasod === "20/20-2" && vcercasoi === "20/20-3")
+    //         || (vcercasod === "20/20-3" && vcercasoi === "20/20-2")) {
+    //         if (vlejoscod === "00" && vlejoscoi === "00") {
+    //             if ((vlejossod === "20/20" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
+    //                 // Establecer estado para "no11" como seleccionado y color negro para "jLabel28"
+    //                 // no11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.black);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = false;
+    //             } else {
+    //                 // Establecer estado para "si11" como seleccionado y color rojo para "jLabel28"
+    //                 // si11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.red);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = true;
+    //                 nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //             }
+    //         } else {
+    //             if ((vlejossod === "20/20" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
+    //                 // no11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.black);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = false;
+    //             } else if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
+    //                 // no11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.black);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = false;
+    //             } else {
+    //                 // si11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.red);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = true;
+    //                 nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //             }
+    //         }
+    //     } else {
+    //         // si11.setSelected(true);
+    //         // jLabel28.setForeground(Color.red);
+    //         problemasOftalmologicos = true;
+    //         problemasOftalmologicosRed = true;
+    //         nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //     }
 
-    } else {
-        if ((vcercacod === "20/20" && vcercacoi === "20/20")
-            || (vcercacod === "20/20-1" && vcercacoi === "20/20-1")
-            || (vcercacod === "20/20-2" && vcercacoi === "20/20-2")
-            || (vcercacod === "20/20-3" && vcercacoi === "20/20-3")
-            || (vcercacod === "20/20-1" && vcercacoi === "20/20")
-            || (vcercacod === "20/20" && vcercacoi === "20/20-1")
-            || (vcercacod === "20/20" && vcercacoi === "20/20-2")
-            || (vcercacod === "20/20-2" && vcercacoi === "20/20")
-            || (vcercacod === "20/20" && vcercacoi === "20/20-3")
-            || (vcercacod === "20/20-3" && vcercacoi === "20/20")
-            || (vcercacod === "20/20-1" && vcercacoi === "20/20-2")
-            || (vcercacod === "20/20-2" && vcercacoi === "20/20-1")
-            || (vcercacod === "20/20-1" && vcercacoi === "20/20-3")
-            || (vcercacod === "20/20-3" && vcercacoi === "20/20-1")
-            || (vcercacod === "20/20-2" && vcercacoi === "20/20-3")
-            || (vcercacod === "20/20-3" && vcercacoi === "20/20-2")) {
-            if (vlejoscod === "00" && vlejoscoi === "00") {
-                if ((vlejossod === "20/20" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
-                    || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
-                    || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
-                    // no11.setSelected(true);
-                    // jLabel28.setForeground(Color.black);
-                    problemasOftalmologicos = false;
-                    problemasOftalmologicosRed = false;
-                } else {
-                    // si11.setSelected(true);
-                    // jLabel28.setForeground(Color.red);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = true;
-                    nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                }
-            } else {
-                if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
-                    || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
-                    || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
-                    // no11.setSelected(true);
-                    // jLabel28.setForeground(Color.black);
-                    problemasOftalmologicos = false;
-                    problemasOftalmologicosRed = false;
-                } else {
-                    // si11.setSelected(true);
-                    // jLabel28.setForeground(Color.red);
-                    problemasOftalmologicos = true;
-                    problemasOftalmologicosRed = true;
-                    nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-                }
-            }
-        } else {
-            // si11.setSelected(true); 
-            // jLabel28.setForeground(Color.red); 
-            problemasOftalmologicos = true;
-            problemasOftalmologicosRed = true;
-            nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
-        }
+    // } else {
+    //     if ((vcercacod === "20/20" && vcercacoi === "20/20")
+    //         || (vcercacod === "20/20-1" && vcercacoi === "20/20-1")
+    //         || (vcercacod === "20/20-2" && vcercacoi === "20/20-2")
+    //         || (vcercacod === "20/20-3" && vcercacoi === "20/20-3")
+    //         || (vcercacod === "20/20-1" && vcercacoi === "20/20")
+    //         || (vcercacod === "20/20" && vcercacoi === "20/20-1")
+    //         || (vcercacod === "20/20" && vcercacoi === "20/20-2")
+    //         || (vcercacod === "20/20-2" && vcercacoi === "20/20")
+    //         || (vcercacod === "20/20" && vcercacoi === "20/20-3")
+    //         || (vcercacod === "20/20-3" && vcercacoi === "20/20")
+    //         || (vcercacod === "20/20-1" && vcercacoi === "20/20-2")
+    //         || (vcercacod === "20/20-2" && vcercacoi === "20/20-1")
+    //         || (vcercacod === "20/20-1" && vcercacoi === "20/20-3")
+    //         || (vcercacod === "20/20-3" && vcercacoi === "20/20-1")
+    //         || (vcercacod === "20/20-2" && vcercacoi === "20/20-3")
+    //         || (vcercacod === "20/20-3" && vcercacoi === "20/20-2")) {
+    //         if (vlejoscod === "00" && vlejoscoi === "00") {
+    //             if ((vlejossod === "20/20" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-2")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-1" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-1")
+    //                 || (vlejossod === "20/20-2" && vlejossoi === "20/20-3")
+    //                 || (vlejossod === "20/20-3" && vlejossoi === "20/20-2")) {
+    //                 // no11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.black);
+    //                 problemasOftalmologicos = false;
+    //                 problemasOftalmologicosRed = false;
+    //             } else {
+    //                 // si11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.red);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = true;
+    //                 nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //             }
+    //         } else {
+    //             if ((vlejoscod === "20/20" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-2")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20" && vlejoscoi === "20/20-2")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-2")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20-1" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-1")
+    //                 || (vlejoscod === "20/20-2" && vlejoscoi === "20/20-3")
+    //                 || (vlejoscod === "20/20-3" && vlejoscoi === "20/20-2")) {
+    //                 // no11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.black);
+    //                 problemasOftalmologicos = false;
+    //                 problemasOftalmologicosRed = false;
+    //             } else {
+    //                 // si11.setSelected(true);
+    //                 // jLabel28.setForeground(Color.red);
+    //                 problemasOftalmologicos = true;
+    //                 problemasOftalmologicosRed = true;
+    //                 nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //             }
+    //         }
+    //     } else {
+    //         // si11.setSelected(true); 
+    //         // jLabel28.setForeground(Color.red); 
+    //         problemasOftalmologicos = true;
+    //         problemasOftalmologicosRed = true;
+    //         nuevasObservaciones += "- CORREGIR AGUDEZA VISUAL.\n";
+    //     }
+    // }
+
+    if (res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNO") ||
+        res.enfermedadesOcularesOftalmo_e_oculares.toUpperCase().includes("NINGUNA")) {
+        problemasOftalmologicos = true;
+        problemasOftalmologicosRed = true;
+        nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
     }
 
     // Evaluación del IMC - Convertido desde Java
@@ -572,16 +584,16 @@ function evaluarObservacionesEditar(res, set) {
     }
 
     // Evaluación oftalmológica - Convertido desde Java
-    if (
-        (res.odccOftalmologia_odcc && res.odccOftalmologia_odcc !== "00" && res.odccOftalmologia_odcc !== "") ||
-        (res.oiccOftalmologia_oicc && res.oiccOftalmologia_oicc !== "00" && res.oiccOftalmologia_oicc !== "") ||
-        (res.odlcOftalmologia_odlc && res.odlcOftalmologia_odlc !== "00" && res.odlcOftalmologia_odlc !== "") ||
-        (res.oilcOftalmologia_oilc && res.oilcOftalmologia_oilc !== "00" && res.oilcOftalmologia_oilc !== "")
-    ) {
-        problemasOftalmologicos = true;
-        problemasOftalmologicosRed = true;
-        nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
-    }
+    // if (
+    //     (res.odccOftalmologia_odcc && res.odccOftalmologia_odcc !== "00" && res.odccOftalmologia_odcc !== "") ||
+    //     (res.oiccOftalmologia_oicc && res.oiccOftalmologia_oicc !== "00" && res.oiccOftalmologia_oicc !== "") ||
+    //     (res.odlcOftalmologia_odlc && res.odlcOftalmologia_odlc !== "00" && res.odlcOftalmologia_odlc !== "") ||
+    //     (res.oilcOftalmologia_oilc && res.oilcOftalmologia_oilc !== "00" && res.oilcOftalmologia_oilc !== "")
+    // ) {
+    //     problemasOftalmologicos = true;
+    //     problemasOftalmologicosRed = true;
+    //     nuevasObservaciones += "- USO DE LENTES CORRECTORES.\n";
+    // }
 
     // Evaluación de presión arterial - Convertido desde Java
     let sistolica = res.sistolicaTriaje_sistolica || "";
