@@ -122,7 +122,7 @@ export default function FichaPsicologica3() {
     handlePrintDefault,
     handleClear,
     setForm,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "fichaPsicologicaAnexo3" });
 
   const handleSave = () => {
     SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);

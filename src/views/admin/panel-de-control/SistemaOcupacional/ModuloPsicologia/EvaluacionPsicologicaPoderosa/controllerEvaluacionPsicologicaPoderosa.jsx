@@ -33,6 +33,7 @@ export const GetInfoServicio = async (
             ...prev,
             ...res,
             norden: res.norden,
+           
         }));
     }
 };
@@ -45,16 +46,16 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
-    if (!form.norden) {
-        await Swal.fire("Error", "Datos Incompletos", "error");
+    if (form.aptitud === undefined || form.aptitud === "") {
+        Swal.fire({
+            icon: "error",
+            title: "Datos Incompletos",
+            text: "Por favor, seleccione la aptitud.",
+        });
         return;
     }
-    if (form.esApto === undefined) {
-        Swal.fire({
-            icon: "warning",
-            title: "Advertencia",
-            text: "Por favor, marque si es apto o no apto.",
-        });
+    if (!form.norden) {
+        await Swal.fire("Error", "Datos Incompletos", "error");
         return;
     }
     const body = {
@@ -68,7 +69,7 @@ export const SubmitDataService = async (
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloPsicologia/ExamenEspacioConfinado/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/ModuloPsicologia/EvaluacionPsicologicaPoderosa/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -76,7 +77,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../../jaspers/ModuloPsicologia/ExamenEspacioConfinado"
+        "../../../../../jaspers/ModuloPsicologia/EvaluacionPsicologicaPoderosa"
     );
 };
 
@@ -96,7 +97,7 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
             GetInfoServicio(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de Examen de Espacio Confinado.",
+                    "Este paciente ya cuenta con registros de Evaluación Psicológica Poderosa.",
                     "warning"
                 );
             });

@@ -14,7 +14,7 @@ export default function RadioTable({
   return (
     <div>
       {/* Encabezados de columna */}
-      <div className={`grid ${gridColsClass} bg-gray-100 border-b rounded-lg`}>
+      <div className={`grid ${gridColsClass} bg-gray-100 border-b rounded-t-lg`}>
         <div className={`p-3 font-semibold text-gray-700 ${labelColSpanClass}`}></div>
         {options.map((option, index) => (
           <div key={index} className="p-3 text-center font-semibold ">
@@ -27,8 +27,8 @@ export default function RadioTable({
       {items.map((item, itemIndex) => (
         <div
           key={itemIndex}
-          className={`grid ${gridColsClass} ${itemIndex < items.length - 1 ? 'border-b border-gray-200' : ''
-            } hover:bg-gray-200`}
+          className={`grid ${gridColsClass} ${itemIndex < items.length - 1 ? 'border-b border-gray-200 ' : 'rounded-b-lg'
+            } hover:bg-gray-200 `}
         >
           {/* Columna de texto (ocupa labelColumns columnas) */}
           <div className={`p-3 font-semibold ${labelColSpanClass}`}>

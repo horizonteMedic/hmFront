@@ -11,7 +11,6 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaPsicologica2";
-import Swal from "sweetalert2";
 
 const tabla = "ficha_psicologica_anexo02"
 const today = getToday()
@@ -88,17 +87,9 @@ export default function FichaPsicologica2() {
         handleClear,
         handleRadioButtonBoolean,
         handleRadioButton,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "fichaPsicologicaAnexo2" });
 
     const handleSave = () => {
-        if (form.esApto === undefined) {
-            Swal.fire({
-                icon: "warning",
-                title: "Advertencia",
-                text: "Por favor, marque si es apto o no apto.",
-            });
-            return;
-        }
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 

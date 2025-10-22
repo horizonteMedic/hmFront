@@ -100,7 +100,7 @@ export default function InformePsicolaboral() {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-  } = useForm(initialFormState);
+  } = useForm(initialFormState, { storageKey: "informePsicolaboralPsicologia" });
 
   const tabs = [
     { id: 0, name: "Criterios Psicológicos I", icon: faBrain, component: CriteriosPsicologicosI },
