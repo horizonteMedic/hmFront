@@ -42,7 +42,7 @@ export default function PoderosaTabSelector({ tieneVista }) {
         {
             id: 5,
             permission: "Certificado Medico Manipuladores de Alimentos",
-            label: "Certificado Manipuladores de Alimentos",
+            label: "Cert. Manipuladores de Alimentos",
             component: CMManipuladoresAlimentos
         },
         {
