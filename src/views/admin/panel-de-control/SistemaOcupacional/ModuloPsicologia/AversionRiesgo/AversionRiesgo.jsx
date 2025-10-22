@@ -3,6 +3,20 @@ import InputTextOneLine from "../../../../../components/reusableComponents/Input
 import { useForm } from "../../../../../hooks/useForm"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import InputsRadioGroup from "../../../../../components/reusableComponents/InputsRadioGroup";
+import RadioTable from "../../../../../components/reusableComponents/RadioTable";
+
+// Arrays para RadioTable de Orientación
+const orientacionItems = [
+    { name: "orientacionTiempo", label: "Practica y Funcional" },
+    { name: "orientacionEspacio", label: "Recursividad" },
+    { name: "orientacionPersona", label: "Capacidad de atención y concentración" }
+];
+
+const orientacionOptions = [
+    { value: "DESORIENTADO", label: "Bajo" },
+    { value: "ORIENTADO", label: "Medio" },
+    { value: "ORIENTADO", label: "Alto" }
+];
 
 const AversionRiesgo = () => {
 
@@ -129,49 +143,65 @@ const AversionRiesgo = () => {
                             <div className="w-1/2 flex-col">
                                 <h1 className="text-blue-600 pl-4 ml-4 font-semibold mt-4">ASPECTOS INTELECTUALES</h1>
                                 <section className="border bg-gray-50 border-gray-200 rounded-lg mt-0 p-4 m-4 gap-4">
-                                    <h4 className="text-blue-600 font-semibold text-[11px] mb-2">1.- Practica y Funcional</h4>
-                                    <div className="flex gap-4 justify-center py-3 items-center w-full">
-                                        <InputsRadioGroup
-                                            name="presentacion"
-                                            value={form.presentacion}
-                                            onChange={handleRadioButton}
-                                            options={[
-                                            { label: "Bajo", value: "Bajo" },
-                                            { label: "Media", value: "MEDIA" },
-                                            { label: "Alto", value: "ALTO"}
-                                            ]}
-                                        />
-                                    </div>
-                                    <h4 className="text-blue-600 font-semibold text-[11px] mb-2">2.- Recursividad</h4>
-                                    <div className="flex gap-4 justify-center py-3 items-center w-full">
-                                        <InputsRadioGroup
-                                            name="presentacion"
-                                            value={form.presentacion}
-                                            onChange={handleRadioButton}
-                                            options={[
-                                            { label: "Bajo", value: "Bajo" },
-                                            { label: "Media", value: "MEDIA" },
-                                            { label: "Alto", value: "ALTO"}
-                                            ]}
-                                        />
-                                    </div>
-                                    <h4 className="text-blue-600 font-semibold text-[11px] mb-2">3.- Capacidad de atención y concentración</h4>
-                                    <div className="flex gap-4 justify-center py-3 items-center w-full">
-                                        <InputsRadioGroup
-                                            name="presentacion"
-                                            value={form.presentacion}
-                                            onChange={handleRadioButton}
-                                            options={[
-                                            { label: "Bajo", value: "Bajo" },
-                                            { label: "Media", value: "MEDIA" },
-                                            { label: "Alto", value: "ALTO"}
-                                            ]}
-                                        />
-                                    </div>
+                                    <RadioTable
+                                        items={[
+                                            { name: "orientacionTiempo", label: "Practica y Funcional" },
+                                            { name: "orientacionEspacio", label: "Recursividad" },
+                                            { name: "orientacionPersona", label: "Capacidad de atención y concentración" }
+                                        ]}
+                                        options={[
+                                            { value: "DESORIENTADO", label: "Bajo" },
+                                            { value: "ORIENTADO", label: "Medio" },
+                                            { value: "ORIENTADO", label: "Alto" }
+                                        ]}
+                                        form={form}
+                                        handleRadioButton={handleRadioButton}
+                                        labelColumns={2}
+                                    />
+                                </section>
+                                <h1 className="text-blue-600 pl-4 ml-4 font-semibold mt-4">ASPECTOS EMOCIONALES</h1>
+                                <section className="border bg-gray-50 border-gray-200 rounded-lg mt-0 p-4 m-4 gap-4">
+                                    <RadioTable
+                                        items={[
+                                            { name: "orientacionTiempo", label: "Estabilidad emocional - madurez" },
+                                            { name: "orientacionEspacio", label: "Flexibilidad en el manejo de las emociones" },
+                                            { name: "orientacionPersona", label: "Control de impulsos" }
+                                        ]}
+                                        options={[
+                                            { value: "DESORIENTADO", label: "Bajo" },
+                                            { value: "ORIENTADO", label: "Medio" },
+                                            { value: "ORIENTADO", label: "Alto" }
+                                        ]}
+                                        form={form}
+                                        handleRadioButton={handleRadioButton}
+                                        labelColumns={2}
+                                    />
                                 </section>
                             </div>
                             <div className="w-1/2 flex-col">
-
+                                <h1 className="text-blue-600 pl-4 ml-4 font-semibold mt-4">COMP. ESP. CONDUCTA SEGURA</h1>
+                                <section className="border bg-gray-50 border-gray-200 rounded-lg mt-0 p-4 m-4 gap-4">
+                                    <RadioTable
+                                        items={[
+                                            { name: "orientacionTiempo", label: "Capacidad de subordinación" },
+                                            { name: "orientacionEspacio", label: "Adecuación a las normas y procedimientos" },
+                                            { name: "orientacionPersona", label: "Consideración de terceros" },
+                                            { name: "orientacionEspacio", label: "Autonomía para trabajar" },
+                                            { name: "orientacionPersona", label: "Proactividad" },
+                                            { name: "orientacionEspacio", label: "Capacidad para trabajar bajo presión" },
+                                            { name: "orientacionPersona", label: "Capacidad para evaluar riesgos" },
+                                            { name: "orientacionEspacio", label: "Motivación por el cargo" },
+                                        ]}
+                                        options={[
+                                            { value: "DESORIENTADO", label: "Bajo" },
+                                            { value: "ORIENTADO", label: "Medio" },
+                                            { value: "ORIENTADO", label: "Alto" },
+                                        ]}
+                                        form={form}
+                                        handleRadioButton={handleRadioButton}
+                                        labelColumns={2}
+                                    />
+                                </section>
                             </div>
                         </section>
                         <section className="bg-white border border-gray-200 rounded-lg flex w-[40%] gap-4">

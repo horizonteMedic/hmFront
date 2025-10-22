@@ -5,6 +5,7 @@ import FichaPsicologica3 from "./FichaPsicologica3/FichaPsicologica3";
 import InformePsicolaboral from "./InformePsicolaboral/InformePsicolaboral";
 import InformePsicologicoADECO from "./InformePsicologicoADECO/InformePsicologicoADECO";
 import ExamenEspacioConfinado from "./ExamenEspacioConfinado/ExamenEspacioConfinado";
+import EvaluacionPsicologicaPoderosa from "./EvaluacionPsicologicaPoderosa/EvaluacionPsicologicaPoderosa";
 
 export default function PsicologiaTabSelector({ tieneVista }) {
     const tabsConfig = [
@@ -43,6 +44,12 @@ export default function PsicologiaTabSelector({ tieneVista }) {
             permission: "Examen Espacio Confinado",
             label: "Examen Espacio Confinado",
             component: ExamenEspacioConfinado
+        },
+        {
+            id: 6,
+            permission: "Examen Espacio Confinado",
+            label: "Evaluacion Psicologica Poderosa",
+            component: EvaluacionPsicologicaPoderosa
         }
     ];
     return (
