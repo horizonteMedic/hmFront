@@ -15,6 +15,7 @@ const Navbar = () => {
   const setuserlogued = useAuthStore((state) => state.setuserlogued);
 
   const [diasParaPago, setDiasParaPago] = useState(0);
+  const [diasParaFinMes, setDiasParaFinMes] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Función para calcular días hasta el próximo pago (5 de cada mes)
@@ -43,6 +44,27 @@ const Navbar = () => {
     setDiasParaPago(dias);
     
     // Si es día de pago (0 días), activar animación
+    if (dias === 0) {
+      setShowCelebration(true);
+    }
+  };
+
+  // Función para calcular días hasta el fin de este mes
+  const calcularDiasParaFinMes = () => {
+    const hoy = new Date();
+    const añoActual = hoy.getFullYear();
+    const mesActual = hoy.getMonth(); // 0-11
+    
+    // Obtener el último día del mes actual
+    const ultimoDiaMes = new Date(añoActual, mesActual + 1, 0);
+    
+    // Calcular diferencia en días
+    const diferenciaTiempo = ultimoDiaMes.getTime() - hoy.getTime();
+    const dias = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
+    
+    setDiasParaFinMes(dias);
+
+    // Si es el último día del mes (0 días), activar animación para Viviana
     if (dias === 0) {
       setShowCelebration(true);
     }
@@ -96,6 +118,7 @@ const Navbar = () => {
 
   useEffect(() => {
     calcularDiasParaPago();
+    calcularDiasParaFinMes();
   }, []);
 
   const handleNavLinkClick = (to) => {
@@ -147,18 +170,24 @@ const Navbar = () => {
         {URLAzure == "https://testbackendhm.azurewebsites.net" && (
           <>
             <p className='font-bold mr-5'>DEVELOPER</p>
-            <div className={`text-white px-3 py-1 rounded-full flex items-center mr-5 ${
+            <div className={`text-white px-4 py-2 rounded-full flex items-center mr-5 ${
               diasParaPago === 0 ? 'bg-green-600' : 
               diasParaPago <= 3 ? 'bg-yellow-500' : 
               diasParaPago <= 7 ? 'bg-orange-500' : 
               'bg-red-500'
             }`}>
-              <FontAwesomeIcon icon={faCalendarAlt} className="mr-2" />
-              <span className="font-bold">
+              <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-lg" />
+              <span className="font-bold text-lg">
                 {diasParaPago === 0 ? "¡Hoy es pago! 🎉" : 
                  diasParaPago <= 3 ? `${diasParaPago} días para pago 🚀` : 
                  diasParaPago <= 7 ? `${diasParaPago} días para pago ⏰` : 
                  `${diasParaPago} días para pago 📅`}
+              </span>
+            </div>
+            <div className="text-white px-4 py-2 rounded-full flex items-center mr-5 bg-blue-500">
+              <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-lg" />
+              <span className="font-bold text-lg">
+                Falta {diasParaFinMes} días para dormir a VIVIANA 🥳
               </span>
             </div>
           </>
@@ -170,7 +199,7 @@ const Navbar = () => {
           <FontAwesomeIcon icon={faRetweet} className="w-5 h-5 " />
         </button> */}
         <button
-          className='bg-white text-[#233245] hover:scale-110 ease-in-out py-2 px-3 rounded-full flex items-center justify-center duration-300 mr-5'
+          className='bg-white text-[#233245] hover:scale-110 ease-in-out py-2 px-4 rounded-full flex items-center justify-center duration-300 mr-5 w-28'
           title="Limpiar datos"
           onClick={handleClickReload}
         >
