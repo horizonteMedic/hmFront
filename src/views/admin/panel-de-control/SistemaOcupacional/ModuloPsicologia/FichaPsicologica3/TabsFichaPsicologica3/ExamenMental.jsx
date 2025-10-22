@@ -4,9 +4,22 @@ import {
   InputsRadioGroup,
   InputTextArea,
   InputTextOneLine,
-  InputCheckbox
+  InputCheckbox,
+  RadioTable
 } from "../../../../../../components/reusableComponents/ResusableComponents";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+// Arrays para RadioTable de Orientación
+const orientacionItems = [
+  { name: "orientacionTiempo", label: "Tiempo" },
+  { name: "orientacionEspacio", label: "Espacio" },
+  { name: "orientacionPersona", label: "Persona" }
+];
+
+const orientacionOptions = [
+  { value: "DESORIENTADO", label: "Desorientado" },
+  { value: "ORIENTADO", label: "Orientado" }
+];
 
 export default function ExamenMental({
   form,
@@ -117,56 +130,14 @@ export default function ExamenMental({
                 </div>
 
                 {/* Orientación */}
-                <div className="bg-gray-50 border border-gray-300 rounded p-3">
-                  <h4 className="text-blue-600 font-semibold text-[11px] mb-2">Orientación</h4>
-
-                  {/* Tiempo */}
-                  <div className="mb-3">
-                    <h5 className="font-semibold text-[11px] mb-1">Tiempo</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="orientacionTiempo"
-                        value={form.orientacionTiempo}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Orientado", value: "ORIENTADO" },
-                          { label: "Desorientado", value: "DESORIENTADO" }
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Espacio */}
-                  <div className="mb-3">
-                    <h5 className="font-semibold text-[11px] mb-1">Espacio</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="orientacionEspacio"
-                        value={form.orientacionEspacio}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Orientado", value: "ORIENTADO" },
-                          { label: "Desorientado", value: "DESORIENTADO" }
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Persona */}
-                  <div>
-                    <h5 className="font-semibold text-[11px] mb-1">Persona</h5>
-                    <div className="flex gap-4">
-                      <InputsRadioGroup
-                        name="orientacionPersona"
-                        value={form.orientacionPersona}
-                        onChange={handleRadioButton}
-                        options={[
-                          { label: "Orientado", value: "ORIENTADO" },
-                          { label: "Desorientado", value: "DESORIENTADO" }
-                        ]}
-                      />
-                    </div>
-                  </div>
+                <div className="border rounded p-3 ">
+                  <h5 className="font-semibold mb-4">Orientación</h5>
+                  <RadioTable
+                    items={orientacionItems}
+                    options={orientacionOptions}
+                    form={form}
+                    handleRadioButton={handleRadioButton}
+                  />
                 </div>
 
                 {/* Área Cognitiva */}

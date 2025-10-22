@@ -220,6 +220,7 @@ export default function UsoRespiradores(data = {}) {
     // Datos adicionales para header
     numeroFicha: String(data.norden ?? ""),
     sede: data.sede || data.nombreSede || "",
+    supervisor: String(data.datosRespiradores?.supervisor_m_supervisor ?? ""),
     // Mapeo específico de campos "Otros:" según contexto (solo campos que existen en el JSON)
     otrosCondicionesEspecialesTrabajo: String(data.datosRespiradores?.otrosCondicionesEspecialesDescripcion_t_otros0 ?? ""),
     otrosProblemasPulmonares: String(data.datosRespiradores?.personalEmpleado1Otros3Descripcion_t_otros1 ?? ""),
@@ -465,7 +466,7 @@ export default function UsoRespiradores(data = {}) {
   let yPos = tablaInicioY;
 
   // Altura general para todas las filas
-  const filaAltura = 4; // Reducida de 5 a 3.5
+  const filaAltura = 4.5; // Reducida de 5 a 3.5
 
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {
@@ -1922,6 +1923,7 @@ export default function UsoRespiradores(data = {}) {
 
 
   doc.text("Supervisor:", tablaInicioX + tablaAncho / 2 + 2, yPos - 1.5);
+  doc.text(datosFinales.supervisor, tablaInicioX + tablaAncho / 2 + 20, yPos - 1.5);
 
 
   // === SECCIÓN CON FONDO NARANJA - EVALUACIÓN MÉDICA ===
@@ -2088,38 +2090,38 @@ export default function UsoRespiradores(data = {}) {
   justificarTexto(textoDeclaracion, tablaInicioX + 2, yPos + 3, 55, 2.5);
 
   // === COLUMNA 2: FIRMA Y HUELLA DEL TRABAJADOR ===
-  // const firmaTrabajadorY = yPos + 3;
+  const firmaTrabajadorY = yPos + 3;
 
   // Calcular centro de la columna 2 para centrar las imágenes
-  // const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
+  const centroColumna2X = tablaInicioX + 60 + (60 / 2); // Centro de la columna 2
 
   // Agregar firma del trabajador (lado izquierdo) con fallback
-  // let firmaTrabajadorUrl = getSign(data, "FIRMAP");
-  // if (firmaTrabajadorUrl) {
-  //   try {
-  //     const imgWidth = 30;
-  //     const imgHeight = 20;
-  //     const x = centroColumna2X - 20;
-  //     const y = firmaTrabajadorY;
-  //     doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
-  //   } catch (error) {
-  //     console.log("Error cargando firma del trabajador:", error);
-  //   }
-  // }
+  let firmaTrabajadorUrl = getSign(data, "FIRMAP");
+  if (firmaTrabajadorUrl) {
+    try {
+      const imgWidth = 30;
+      const imgHeight = 20;
+      const x = centroColumna2X - 20;
+      const y = firmaTrabajadorY;
+      doc.addImage(firmaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando firma del trabajador:", error);
+    }
+  }
 
   // Agregar huella del trabajador (lado derecho, vertical) con fallback
-  // let huellaTrabajadorUrl = getSign(data, "HUELLA");
-  // if (huellaTrabajadorUrl) {
-  //   try {
-  //     const imgWidth = 12;
-  //     const imgHeight = 20;
-  //     const x = centroColumna2X + 8;
-  //     const y = firmaTrabajadorY;
-  //     doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
-  //   } catch (error) {
-  //     console.log("Error cargando huella del trabajador:", error);
-  //   }
-  // }
+  let huellaTrabajadorUrl = getSign(data, "HUELLA");
+  if (huellaTrabajadorUrl) {
+    try {
+      const imgWidth = 12;
+      const imgHeight = 20;
+      const x = centroColumna2X + 8;
+      const y = firmaTrabajadorY;
+      doc.addImage(huellaTrabajadorUrl, 'PNG', x, y, imgWidth, imgHeight);
+    } catch (error) {
+      console.log("Error cargando huella del trabajador:", error);
+    }
+  }
 
   doc.setFont("helvetica", "normal").setFontSize(7);
   const centroColumna2 = tablaInicioX + 60 + (60 / 2);

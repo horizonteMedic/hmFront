@@ -19,7 +19,8 @@ export function SubmitHistoriaOcupacional(data,registros,user,token) {
             superficie: reg.superficie || '',
             socavon: reg.socavon || '',
             riesgo: reg.riesgo || '',
-            proteccion: reg.proteccion || ''
+            proteccion: reg.proteccion || '',
+            causaRetiro: reg.causaRetiro || ''
         }))
     };    
 

@@ -10,6 +10,8 @@ import { getHoraActual } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
     "/api/v01/ct/anexos/fichaAnexo16/obtenerReporteFichaAnexo16";
+const obtenerReporteResumenMedicoUrl =
+    "/api/v01/ct/anexos/obtenerReporteResumenMedico";
 const registrarUrl =
     "/api/v01/ct/anexos/fichaAnexo16/registrarActualizarFichaAnexo16";
 
@@ -201,6 +203,18 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         obtenerReporteUrl,
         jasperModules,
         "../../../../../jaspers/Ficha_Anexo16"
+    );
+};
+export const PrintHojaR2 = (nro, token, tabla, datosFooter) => {
+    const jasperModules = import.meta.glob("../../../../../jaspers/Ficha_Anexo16/ResumenMedico/*.jsx");
+    PrintHojaRDefault(
+        nro,
+        token,
+        tabla,
+        datosFooter,
+        obtenerReporteResumenMedicoUrl,
+        jasperModules,
+        "../../../../../jaspers/Ficha_Anexo16/ResumenMedico"
     );
 };
 

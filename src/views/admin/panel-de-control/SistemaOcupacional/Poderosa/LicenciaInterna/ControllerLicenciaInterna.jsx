@@ -1,5 +1,6 @@
 import Swal from "sweetalert2";
 import {
+    GetInfoPacDefault,
     GetInfoServicioDefault,
     LoadingDefault,
     PrintHojaRDefault,
@@ -9,24 +10,21 @@ import { getFetch } from "../../../../../utils/apiHelpers";
 import { getHoraActual, getToday } from "../../../../../utils/helpers";
 
 const obtenerReporteUrl =
-    "/api/v01/ct/certificadoAptitudMedicoOcupacional/obtenerReporteCertificadoMedicoOcupacional";
+    "/api/v01/ct/aptitudLicenciaConducir/obtenerReporteAptitudLicenciaConducir";
 const registrarUrl =
-    "/api/v01/ct/certificadoAptitudMedicoOcupacional/registrarActualizarCertificadoAptitudMedicoOcupacional";
+    "/api/v01/ct/aptitudLicenciaConducir/registrarActualizarAptitudLicenciaConducir";
 const today = getToday();
 
 export const GetInfoServicio = async (
     nro,
-    tabla,
     set,
     token,
-    onFinish = () => { }
+    sede
 ) => {
-    const res = await GetInfoServicioDefault(
+    const res = await GetInfoPacDefault(
         nro,
-        tabla,
         token,
-        obtenerReporteUrl,
-        onFinish
+        sede
     );
     console.log(res)
     if (res) {
@@ -34,20 +32,16 @@ export const GetInfoServicio = async (
         set((prev) => ({
             ...prev,
             ...res,
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            nombres: res.nombresApellidos,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            dniPaciente: res.dniPaciente,
-            edadPaciente: res.edadPaciente,
-            nombreExamen: res.nombreExamen,
+            dniPaciente: res.dni,
+            edadPaciente: res.edad,
+            nombreExamen: res.nomExam,
             empresa: res.empresa,
             contrata: res.contrata,
-            cargoPaciente: res.cargoPaciente,
-            ocupacionPaciente: res.ocupacionPaciente,
-            apto: "APTO",
-            fechaExamen: `${res.fechaExamen ? res.fechaExamen : today}`,
-            fechaDesde: `${res.fechaDesde ? res.fechaDesde : today}`,
-            fechahasta: `${res.fechahasta ? res.fechahasta : today}`,
-            nombreMedico: res.nombreMedico ? res.nombreMedico : prev.nombreMedico
+            cargoPaciente: res.cargo,
+            ocupacionPaciente: res.areaO,
+            fechaExamen: prev.fechaExamen
 
         }));
     }
@@ -73,12 +67,12 @@ export const GetInfoServicioEditar = async (
             ...prev,
             ...res,
             // Header
-            nombres: `${res.nombrePaciente} ${res.apellidoPaciente}`,
+            nombres: `${res.nombresPaciente} ${res.apellidosPaciente}`,
             sexo: `${res.sexoPaciente === "F" ? "Femenino" : "Masculino"}`,
-            PA: `${res.sistolica}/${res.diastolica}`,
-            edadPaciente: `${res.edadPaciente} AÑOS`,
+            edadPaciente: res.edadPaciente,
             dniUser: res.dniUsuario,
-            apto: res.apto ? "APTO" : res.aptoconrestriccion ? "APTOCONRESTRICCION" : "NOAPTO"
+            nombre_medico: res.nombreMedico,
+            apto: res.apto ? "APTO" : res.aptoRestriccion ? "APTOCONRESTRICCION" : res.aptoTemporal ? "NOAPTOTEMPORAL" : res.noApto ? "NOAPTO" : ""
         }));
     }
 };
@@ -98,16 +92,17 @@ export const SubmitDataService = async (
     }
     const body = {
         "norden": form.norden,
-        "dniPaciente": form.dniPaciente,
-        "fecha": form.fechaDesde,
-        "nombreMedico": form.nombreMedico,
+        "dni": form.dniPaciente,
+        "fechaExamen": form.fechaExamen,
+        "fechaHasta": form.fechaHasta,
+        "nombreMedico": form.nombre_medico,
         "apto": form.apto === "APTO" ? true : false,
-        "aptoConRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
+        "aptoRestriccion": form.apto === "APTOCONRESTRICCION" ? true : false,
+        "noAptoTemporal": form.apto === "NOAPTOTEMPORAL" ? true : false,
         "noApto": form.apto === "NOAPTO" ? true : false,
+        "observaciones": form.observaciones,
         "horaSalida": getHoraActual(),
-        "fechaHasta": form.fechahasta,
-        "conclusiones": form.conclusiones,
-        "usuarioRegistro": user
+        "usuarioRegistro": form.userlogued
     };
 
     await SubmitDataServiceDefault(token, limpiar, body, registrarUrl, () => {
@@ -122,7 +117,7 @@ export const GetInfoServicioTabla = (nro, tabla, set, token) => {
 };
 
 export const PrintHojaR = (nro, token, tabla, datosFooter) => {
-    const jasperModules = import.meta.glob("../../../../jaspers/CertificadoMedicoOcupacional/*.jsx");
+    const jasperModules = import.meta.glob("../../../../../jaspers/AptitudLicenciaInterna/*.jsx");
     PrintHojaRDefault(
         nro,
         token,
@@ -130,7 +125,7 @@ export const PrintHojaR = (nro, token, tabla, datosFooter) => {
         datosFooter,
         obtenerReporteUrl,
         jasperModules,
-        "../../../../jaspers/CertificadoMedicoOcupacional"
+        "../../../../../jaspers/AptitudLicenciaInterna"
     );
 };
 
@@ -143,14 +138,14 @@ export const VerifyTR = async (nro, tabla, token, set, sede) => {
         sede,
         () => {
             //NO Tiene registro
-            GetInfoServicio(nro, tabla, set, token, () => { Swal.close(); });
+            GetInfoServicio(nro, set, token, sede);
         },
         () => {
             //Tiene registro
             GetInfoServicioEditar(nro, tabla, set, token, () => {
                 Swal.fire(
                     "Alerta",
-                    "Este paciente ya cuenta con registros de C. Medico Ocupacional",
+                    "Este paciente ya cuenta con registros de Aptitud Licencia Interna",
                     "warning"
                 );
             });

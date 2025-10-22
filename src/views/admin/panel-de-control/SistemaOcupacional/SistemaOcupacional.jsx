@@ -74,9 +74,6 @@ import {
   faSuitcaseMedical,
   faTruckMedical,
   faMaskVentilator,
-  faFireFlameCurved,
-  faIdCard,
-  faP,
   faPersonRifle,
 } from "@fortawesome/free-solid-svg-icons";
 import styles from "./SistemaOcupacional.module.css";
@@ -304,7 +301,7 @@ const TabComponent = () => {
                   .map((item) => (
                     <div
                       key={item.vista}
-                      className={`${styles.gridItem} ${activeTab === item.tab ? styles.active : ""}`}
+                      className={`flex flex-col items-center justify-center bg-[#edeff2] rounded-xl w-[120px] h-[120px] transition-all delay-100 duration-200 ease-out cursor-pointer border-2 border-transparent hover:scale-105 hover:-translate-y-2 ${activeTab === item.tab ? "border-[#fc6b03] shadow-[0_2px_8px_rgba(255,128,0,0.10)]" : ""}`}
                       onClick={() => setActiveTab(item.tab)}
                     >
                       <span className={styles.icon}>
@@ -312,7 +309,7 @@ const TabComponent = () => {
                           <FontAwesomeIcon key={idx} icon={ic.icon} className={ic.className} />
                         ))}
                       </span>
-                      <span className={styles.title}>{item.label}</span>
+                      <span className={`${styles.title} font-bold`}>{item.label}</span>
                     </div>
                   ));
               })()}

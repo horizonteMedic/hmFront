@@ -45,7 +45,7 @@ import Anexo16A from "./views/admin/panel-de-control/SistemaOcupacional/Anexo16A
 
 
 //SIMULADOR DE jaspers
-import Ficha from "./views/jaspers/ResumenMedicoPoderosa/ResumenAnexo7CP_Digitalizado.jsx"
+import Ficha from "./views/jaspers/Poderosa/CertificadoMedicoManipuladoresAlimentos.jsx"
 
 
 

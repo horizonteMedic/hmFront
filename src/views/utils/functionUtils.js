@@ -59,12 +59,13 @@ export const PrintHojaRDefault = (nro, token, tabla, datosFooter, obtenerReporte
     )
         .then(async (res) => {
             if (res.norden || res.norden_n_orden|| res.n_orden) {
-                const nombre = res.nameJasper;
+                const nombre = res.nameJasper||res.namejasper;
                 console.log(nombre)
                 console.log(res)
                 const modulo = await jasperModules[
                     `${nombreCarpeta}/${nombre}.jsx`
                 ]();
+                console.log(modulo)
                 // Ejecuta la función exportada por default con los datos
                 if (typeof modulo.default === "function") {
                     modulo.default({ ...res, ...datosFooter });
@@ -112,6 +113,31 @@ export const VerifyTRDefault = async (nro, tabla, token, set, sede, noTieneRegis
         if (res.id === 0) {
             //No tiene registro previo 
             noTieneRegistro();//datos paciente
+        } else {
+            tieneRegistro();//obtener data servicio
+        }
+    });
+};
+
+export const VerifyTRPerzonalizadoDefault = async (nro, tabla, token, set, sede, noTieneRegistro = () => { }, tieneRegistro = () => { }, necesitaExamen = () => { }) => {
+    if (!nro) {
+        await Swal.fire(
+            "Error",
+            "Debe Introducir un Nro de Historia Clínica válido",
+            "error"
+        );
+        return;
+    }
+    LoadingDefault("Validando datos");
+    getFetch(
+        `/api/v01/ct/consentDigit/existenciaExamenes?nOrden=${nro}&nomService=${tabla}`,
+        token
+    ).then((res) => {
+        if (res.id === 0) {
+            //No tiene registro previo 
+            noTieneRegistro();//datos paciente
+        } else if (res.id === 2) {
+            necesitaExamen();
         } else {
             tieneRegistro();//obtener data servicio
         }

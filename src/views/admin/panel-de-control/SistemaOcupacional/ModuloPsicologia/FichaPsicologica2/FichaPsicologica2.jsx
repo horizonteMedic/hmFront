@@ -5,6 +5,7 @@ import {
     InputTextArea,
     InputsBooleanRadioGroup,
     InputsRadioGroup,
+    RadioTable,
 } from "../../../../../components/reusableComponents/ResusableComponents";
 import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
@@ -14,6 +15,18 @@ import Swal from "sweetalert2";
 
 const tabla = "ficha_psicologica_anexo02"
 const today = getToday()
+
+// Arrays para RadioTable de Orientación
+const orientacionItems = [
+    { name: "orientacionTiempo", label: "Tiempo" },
+    { name: "orientacionEspacio", label: "Espacio" },
+    { name: "orientacionPersona", label: "Persona" }
+];
+
+const orientacionOptions = [
+    { value: "DESORIENTADO", label: "Desorientado" },
+    { value: "ORIENTADO", label: "Orientado" }
+];
 
 export default function FichaPsicologica2() {
     const { token, userlogued, selectedSede, datosFooter, userCompleto } =
@@ -337,46 +350,15 @@ export default function FichaPsicologica2() {
                                             </div>
 
                                             {/* Orientación */}
-                                            <div className="border rounded p-3 ">
-                                                <h5 className="font-semibold mb-2">Orientación</h5>
-                                                <div className="grid  gap-3">
-                                                    <div className="space-y-1">
-                                                        <p className="font-semibold">Tiempo</p>
-                                                        <InputsRadioGroup
-                                                            name="orientacionTiempo"
-                                                            value={form.orientacionTiempo}
-                                                            onChange={handleRadioButton}
-                                                            options={[
-                                                                { label: "Orientado", value: "ORIENTADO" },
-                                                                { label: "Desorientado", value: "DESORIENTADO" },
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <p className="font-semibold">Espacio</p>
-                                                        <InputsRadioGroup
-                                                            name="orientacionEspacio"
-                                                            value={form.orientacionEspacio}
-                                                            onChange={handleRadioButton}
-                                                            options={[
-                                                                { label: "Orientado", value: "ORIENTADO" },
-                                                                { label: "Desorientado", value: "DESORIENTADO" },
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <p className="font-semibold">Persona</p>
-                                                        <InputsRadioGroup
-                                                            name="orientacionPersona"
-                                                            value={form.orientacionPersona}
-                                                            onChange={handleRadioButton}
-                                                            options={[
-                                                                { label: "Orientado", value: "ORIENTADO" },
-                                                                { label: "Desorientado", value: "DESORIENTADO" },
-                                                            ]}
-                                                        />
-                                                    </div>
-                                                </div>
+                                            <div className="border rounded p-3">
+                                                <h5 className="font-semibold mb-4">Orientación</h5>
+                                                <RadioTable
+                                                    items={orientacionItems}
+                                                    options={orientacionOptions}
+                                                    form={form}
+                                                    handleRadioButton={handleRadioButton}
+                                                    labelColumns={1}
+                                                />
                                             </div>
                                         </div>
                                     </section>

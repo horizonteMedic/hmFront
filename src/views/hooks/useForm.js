@@ -210,6 +210,33 @@ export const useForm = (initialFormState, options = {}) => {
       [name]: checked,
     }));
   };
+
+  const handleCheckBoxWriteOnText = (e, textInput, mapText) => {
+    const { name, checked } = e.target;
+    setForm((prev) => {
+      const next = { ...prev, [name]: checked };
+      // Obtenemos las líneas existentes
+      const existentes = (prev[textInput] || "")
+        .split(/\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+      // Texto asociado al checkbox
+      const texto = mapText[name];
+      let nuevasLineas = [...existentes];
+      if (checked) {
+        // Si se marca y aún no está, lo agregamos al final
+        if (!nuevasLineas.includes(texto)) {
+          nuevasLineas.push(texto);
+        }
+      } else {
+        // Si se desmarca, lo quitamos
+        nuevasLineas = nuevasLineas.filter((l) => l !== texto);
+      }
+      const nuevoTexto = nuevasLineas.join("\n");
+      return { ...next, [textInput]: nuevoTexto };
+    });
+  };
+
   const handlePrintDefault = (confirmarImpresion = () => { }) => {
     if (!form.norden)
       return Swal.fire("Error", "Debe colocar un N° Orden", "error");
@@ -244,6 +271,7 @@ export const useForm = (initialFormState, options = {}) => {
     handleClear,
     handleClearnotO,
     handlePrintDefault,
-    handleRadioButtonBoolean
+    handleRadioButtonBoolean,
+    handleCheckBoxWriteOnText
   };
 };

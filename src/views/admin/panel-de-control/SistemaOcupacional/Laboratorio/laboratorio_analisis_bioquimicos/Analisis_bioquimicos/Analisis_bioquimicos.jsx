@@ -52,7 +52,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
       hdl = '-';
     } else if (form.colesterolTotal) {
       const colesterolTotal = parseFloat(form.colesterolTotal);
-      hdl = !isNaN(colesterolTotal) ? (colesterolTotal * 0.25).toFixed(2) : '';
+      hdl = !isNaN(colesterolTotal) ? (colesterolTotal * 0.25).toFixed(1) : '';
     }
 
     // VLDL depende solo de trigliceridos
@@ -61,7 +61,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
       vldl = '-';
     } else if (form.trigliceridos) {
       const trigliceridos = parseFloat(form.trigliceridos);
-      vldl = !isNaN(trigliceridos) ? (trigliceridos / 5).toFixed(2) : '';
+      vldl = !isNaN(trigliceridos) ? (trigliceridos / 5).toFixed(1) : '';
     }
 
     // LDL depende de colesterolTotal, vldl y hdl
@@ -77,7 +77,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
       const vldlNum = parseFloat(vldl);
       const hdlNum = parseFloat(hdl);
       if (!isNaN(colesterolTotal) && !isNaN(vldlNum) && !isNaN(hdlNum)) {
-        ldl = (colesterolTotal - vldlNum - hdlNum).toFixed(2);
+        ldl = (colesterolTotal - vldlNum - hdlNum).toFixed(1);
       }
     }
 
@@ -367,7 +367,7 @@ export default function AnalisisBioquimicos({ token, selectedSede, userlogued })
                   <span className="text-gray-500 text-lg">(V.N. {hint})</span>
                 </div>
                 {/* Validación visual para dos decimales */}
-                {['hdl','ldl','vldl'].includes(key) && form[key] && form[key] !== '-' && !/^-?\d*\.\d{2}$/.test(form[key]) && (
+                {['hdl','ldl','vldl'].includes(key) && form[key] && form[key] !== '-' && !/^-?\d*\.\d{1}$/.test(form[key]) && (
                   <span className="text-red-500 text-xs ml-[150px]">Debe tener dos decimales, ej: 9.00</span>
                 )}
               </div>

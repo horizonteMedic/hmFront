@@ -37,7 +37,7 @@ const HojaConsultaExterna = () => {
         nombre_medico: userCompleto?.datos?.nombres_user?.toUpperCase(),
     }
 
-    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton} = useForm(InitialForm)
+    const { form, setForm, handleChangeNumber, handleChangeSimple, handleClearnotO, handleClear, handleChange, handlePrintDefault, handleRadioButton} = useForm(InitialForm, { storageKey: "Hoja_Consulta_Externa_form" })
 
     const handleSearch = (e) => {
         if (e.key === "Enter") {
@@ -87,7 +87,6 @@ const HojaConsultaExterna = () => {
                                         label="Fecha de Examen"
                                         name="fechaExamen"
                                         type="date"
-                                        disabled
                                         value={form?.fechaExamen}
                                         labelWidth="100px"
                                         onChange={handleChangeSimple}
@@ -166,7 +165,7 @@ const HojaConsultaExterna = () => {
                                         />
                                         <InputTextOneLine
                                         label=""
-                                        disabled
+                                        disabled={form.cajon !== "OTROS"}
                                         name="otrosDescripcion"
                                         value={form?.otrosDescripcion}
                                         onChange={handleChange}
@@ -203,10 +202,10 @@ const HojaConsultaExterna = () => {
                                 <div className="w-full flex justify-around items-center gap-1 p-4 mt-0 m-4">
                                     <InputTextOneLine
                                         label="Medico que Certifica"
-                                        name="nombreMedico"
+                                        name="nombre_medico"
                                         disabled
                                         className="mt-2 w-full"
-                                        value={form?.nombreMedico}
+                                        value={form?.nombre_medico}
                                         onChange={handleChange}
                                         />
                                     <div className="flex gap-1">

@@ -90,12 +90,12 @@
   margin-right: auto;
 }
 
-.gridItem {
+/* .gridItem {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #edeff2;
+  background-color: #233245;
   border-radius: 0.75rem;
   width: 120px;
   height: 120px;
@@ -103,16 +103,16 @@
   cursor: pointer;
   box-shadow: none;
   border: 2px solid transparent;
-}
+} */
 
-.gridItem:hover {
+/* .gridItem:hover {
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
+} */
 
-.gridItem.active {
+/* .gridItem.active {
   border: 2px solid #fc6b03;
   box-shadow: 0 2px 8px rgba(255,128,0,0.10);
-}
+} */
 
 .icon {
   color: #fc6b03;
@@ -124,7 +124,7 @@
 }
 
 .title {
-  font-weight: 700;
+  font-weight: bold;
   font-size: 1rem;
   color: #1a2536;
   text-align: center;

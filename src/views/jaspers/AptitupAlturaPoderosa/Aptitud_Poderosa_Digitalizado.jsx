@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
-import { formatearFechaCorta } from "../../utils/formatDateUtils";
-import { getSign, convertirGenero } from "../../utils/helpers";
+import { formatearFechaCorta } from "../../utils/formatDateUtils.js";
+import { convertirGenero } from "../../utils/helpers.js";
 import drawColorBox from '../components/ColorBox.jsx';
 import CabeceraLogo from '../components/CabeceraLogo.jsx';
 import footerTR from '../components/footerTR.jsx';
@@ -87,11 +87,16 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
     // Datos para tipo de trabajo
     tipoTrabajo: data.tipoTrabajo || "superficie", // "superficie", "planta", "subsuelo"
     // Datos para resultado de evaluación
-    resultadoEvaluacion: data.resultadoEvaluacion || "apto", // "apto", "aptoConRestriccion", "noAptoTemporal", "noApto"
+    resultadoEvaluacion: (() => {
+      if (data.apto) return "apto";
+      if (data.aptoRestriccion) return "aptoConRestriccion";
+      if (data.aptoTemporal) return "noAptoTemporal";
+      return "noApto";
+    })(),
     // Datos para observaciones
     observaciones: data.observaciones || "",
     // Datos para fechas
-    fechaCaducidad: formatearFechaCorta(data.fechaCaducidad || "")
+    fechaCaducidad: formatearFechaCorta(data.fechaHasta || "")
   };
 
   // Usar datos reales si existen, sino usar datos de prueba
@@ -503,7 +508,7 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   
   if (lineasObservaciones.length > 0) {
     lineasObservaciones.forEach(linea => {
-      const textoConGuion = `- ${linea.trim()}`;
+      const textoConGuion = `${linea.trim()}`;
       yTextoObservaciones = dibujarTextoConSaltoLinea(textoConGuion, tablaInicioX + 2, yTextoObservaciones, anchoMaximoObservaciones);
       yTextoObservaciones += 3; // Espaciado entre líneas
     });
@@ -555,8 +560,15 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   // Calcular centro de la columna 1 para centrar las imágenes
   const centroColumna1X = tablaInicioX + (95 / 2); // Centro de la columna 1
   
+  // Función para obtener URL de digitalización por nombre
+  const getDigitalizacionUrl = (digitalizaciones, nombre) => {
+    if (!digitalizaciones || !Array.isArray(digitalizaciones)) return null;
+    const item = digitalizaciones.find(d => d.nombreDigitalizacion === nombre);
+    return item ? item.url : null;
+  };
+
   // Agregar firma del trabajador (lado izquierdo)
-  let firmaTrabajadorUrl = getSign(datosFinales, "FIRMAP");
+  let firmaTrabajadorUrl = getDigitalizacionUrl(data.digitalizacion, "FIRMAP");
   if (firmaTrabajadorUrl) {
     try {
       const imgWidth = 30;
@@ -570,7 +582,7 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   }
 
   // Agregar huella del trabajador (lado derecho, vertical)
-  let huellaTrabajadorUrl = getSign(datosFinales, "HUELLA");
+  let huellaTrabajadorUrl = getDigitalizacionUrl(data.digitalizacion, "HUELLA");
   if (huellaTrabajadorUrl) {
     try {
       const imgWidth = 12;
@@ -591,7 +603,7 @@ export default function Aptitud_Poderosa_Digitalizado(data = {}) {
   const firmaMedicoY = yFirmas + 3;
   
   // Agregar firma y sello médico
-  let firmaMedicoUrl = getSign(datosFinales, "SELLOFIRMA");
+  let firmaMedicoUrl = getDigitalizacionUrl(data.digitalizacion, "SELLOFIRMA");
   if (firmaMedicoUrl) {
     try {
       const imgWidth = 45;
