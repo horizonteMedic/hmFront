@@ -271,7 +271,7 @@ export default function FichaPsicologica2() {
                                     {/* Observación de Conductas */}
                                     <section className="bg-white border border-gray-200 rounded-lg p-3">
                                         <h4 className="font-semibold mb-2">Observación de Conductas</h4>
-                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                                             {/* Presentación */}
                                             <div className="border rounded p-3">
                                                 <h5 className="font-semibold mb-2">Presentación</h5>
@@ -350,7 +350,7 @@ export default function FichaPsicologica2() {
                                             </div>
 
                                             {/* Orientación */}
-                                            <div className="border rounded p-3">
+                                            <div className="border rounded p-3 col-span-3">
                                                 <h5 className="font-semibold mb-4">Orientación</h5>
                                                 <RadioTable
                                                     items={orientacionItems}
