@@ -35,7 +35,7 @@ export const GetInfoServicio = async (
             codigoAntecedentesPatologicos_cod_ap: res.codigoAntecedentesPatologicos_cod_ap,
             nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
             sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
-            edad: res.edad_edad + " años",
+            edad: res.edad_edad + " AÑOS",
             boroo: res.esBoro ?? false,
 
             enfermedadesOculares: res.enfermedadesocularesoftalmo_e_oculares,
@@ -83,7 +83,7 @@ export const GetInfoServicioEditar = async (
             fechaExam: res.fechaAntecedentesPatologicos_fecha_ap,
             nombres: res.nombres_nombres_pa + " " + res.apellidos_apellidos_pa,
             sexo: res.sexo_sexo_pa == "M" ? "MASCULINO" : "FEMENINO",
-            edad: res.edad_edad + " años",
+            edad: res.edad_edad + " AÑOS",
             boroo: res.esBoro ?? false,
 
             covid19: res.covid_chkcovid,
@@ -356,7 +356,7 @@ export const SubmitDataService = async (
     const body = {
         norden: form.norden,
         codigoAntecedentesPatologicos: form.codigoAntecedentesPatologicos_cod_ap,
-        edad: form.edad,
+        edad: form.edad.replace(" AÑOS", ""),
         fechaAntecedentesPatologicos: form.fechaExam,
         dniUsuario: form.dniUsuario,
         alergias: form.alergias,

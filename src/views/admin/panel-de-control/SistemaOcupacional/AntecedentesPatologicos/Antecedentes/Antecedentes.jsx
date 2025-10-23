@@ -181,102 +181,97 @@ export default function Antecedentes({
       </div>
 
       {/* Sección de Antecedentes de Reproducción - Solo cuando BOROO NO está activado */}
-      {!form?.boroo && (
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold mb-4">Antecedentes de Reproducción</h4>
-          {/* Tab Navigation */}
-          <nav className="flex bg-white border-b border-gray-200 mb-4">
-            {tabsReproduccion.map((tab) => (
-              <button
-                key={tab.id}
-                className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTabReproduccion === tab.id
-                  ? "border-red-500 font-semibold text-red-600"
-                  : "border-transparent"
-                  }`}
-                onClick={() => setActiveTabReproduccion(tab.id)}
-              >
-                <FontAwesomeIcon icon={tab.icon} className="mr-2" />
-                {tab.name}
-              </button>
-            ))}
-          </nav>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold mb-4">Antecedentes de Reproducción</h4>
+        {/* Tab Navigation */}
+        <nav className="flex bg-white border-b border-gray-200 mb-4">
+          {tabsReproduccion.map((tab) => (
+            <button
+              key={tab.id}
+              className={`flex-1 px-4 py-3 uppercase tracking-wider border-b-4 transition-colors duration-200 cursor-pointer hover:bg-gray-100 ${activeTabReproduccion === tab.id
+                ? "border-red-500 font-semibold text-red-600"
+                : "border-transparent"
+                }`}
+              onClick={() => setActiveTabReproduccion(tab.id)}
+            >
+              <FontAwesomeIcon icon={tab.icon} className="mr-2" />
+              {tab.name}
+            </button>
+          ))}
+        </nav>
 
-          {/* Tab Content */}
-          <div className="max-w-full">
-            {tabsReproduccion.map((tab) => {
-              const Component = tab.component;
-              return (
-                activeTabReproduccion === tab.id && (
-                  <Component
-                    key={tab.id}
-                    form={form}
-                    setForm={setForm}
-                    handleChange={handleChange}
-                    handleChangeNumber={handleChangeNumber}
-                    handleRadioButton={handleRadioButton}
-                    handleCheckBoxChange={handleCheckBoxChange}
-                    handleChangeSimple={handleChangeSimple}
-                    handleRadioButtonBoolean={handleRadioButtonBoolean}
-                  />
-                )
-              );
-            })}
-          </div>
+        {/* Tab Content */}
+        <div className="max-w-full">
+          {tabsReproduccion.map((tab) => {
+            const Component = tab.component;
+            return (
+              activeTabReproduccion === tab.id && (
+                <Component
+                  key={tab.id}
+                  form={form}
+                  setForm={setForm}
+                  handleChange={handleChange}
+                  handleChangeNumber={handleChangeNumber}
+                  handleRadioButton={handleRadioButton}
+                  handleCheckBoxChange={handleCheckBoxChange}
+                  handleChangeSimple={handleChangeSimple}
+                  handleRadioButtonBoolean={handleRadioButtonBoolean}
+                />
+              )
+            );
+          })}
         </div>
-      )}
+      </div>
 
       {/* Sección de Antecedentes Patológicos Familiares - Solo cuando BOROO está activado */}
-      {form?.boroo && (
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold mb-4">ANTECEDENTES PATOLÓGICOS FAMILIARES:</h4>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold mb-4">ANTECEDENTES PATOLÓGICOS FAMILIARES:</h4>
 
-          <div className="space-y-4">
-            <InputTextOneLine
-              label="Padre Especifique"
-              name="padre"
-              value={form.padre}
-              onChange={handleChange}
-              labelWidth="180px"
-            />
-            <InputTextOneLine
-              label="Madre Especifique"
-              name="madre"
-              value={form.madre}
-              onChange={handleChange}
-              labelWidth="180px"
-            />
-            <InputTextOneLine
-              label="Hermanos Especifique"
-              name="hermanos"
-              value={form.hermanos}
-              onChange={handleChange}
-              labelWidth="180px"
-            />
-            <InputTextOneLine
-              label="Hijos Especifique"
-              name="hijos"
-              value={form.hijos}
-              onChange={handleChange}
-              labelWidth="180px"
-            />
-            <InputTextOneLine
-              label="Esposa/Cónyuge Especifique"
-              name="esposaConyuge"
-              value={form.esposaConyuge}
-              onChange={handleChange}
-              labelWidth="180px"
-            />
-            <InputTextOneLine
-              label="Si posee Carné de CONADIS, especifique"
-              name="carnetConadis"
-              value={form.carnetConadis}
-              onChange={handleChange}
-              labelWidth="180px"
-            />
-          </div>
+        <div className="space-y-4">
+          <InputTextOneLine
+            label="Padre Especifique"
+            name="padre"
+            value={form.padre}
+            onChange={handleChange}
+            labelWidth="180px"
+          />
+          <InputTextOneLine
+            label="Madre Especifique"
+            name="madre"
+            value={form.madre}
+            onChange={handleChange}
+            labelWidth="180px"
+          />
+          <InputTextOneLine
+            label="Hermanos Especifique"
+            name="hermanos"
+            value={form.hermanos}
+            onChange={handleChange}
+            labelWidth="180px"
+          />
+          <InputTextOneLine
+            label="Hijos Especifique"
+            name="hijos"
+            value={form.hijos}
+            onChange={handleChange}
+            labelWidth="180px"
+          />
+          <InputTextOneLine
+            label="Esposa/Cónyuge Especifique"
+            name="esposaConyuge"
+            value={form.esposaConyuge}
+            onChange={handleChange}
+            labelWidth="180px"
+          />
+          <InputTextOneLine
+            label="Si posee Carné de CONADIS, especifique"
+            name="carnetConadis"
+            value={form.carnetConadis}
+            onChange={handleChange}
+            labelWidth="180px"
+          />
         </div>
-      )}
-
+      </div>
       {/* Fila de dos columnas: Médico e Imprimir */}
       <div className="bg-white border border-gray-200 rounded-lg p-3 ">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

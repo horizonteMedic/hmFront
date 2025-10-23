@@ -14,23 +14,23 @@ const tabla = ""
 const today = getToday();
 // Áreas de Evaluación: Inteligencia
 const inteligenciaItems = [
-    { name: "intelCoeficiente", label: "Coeficiente Intelectual" },
-    { name: "intelComprension", label: "Comprensión" },
-    { name: "intelAtencion", label: "Nivel de atención / Concentración" },
-    { name: "intelMemoria", label: "Memoria a corto, mediano y largo plazo" },
-    { name: "intelVisomotora", label: "Coordinación viso-motora" },
-    { name: "intelOrientacionEspacial", label: "Orientación espacial" },
-    { name: "intelDiscriminarDetalles", label: "Capacidad para discriminar detalles" },
-    { name: "intelAprendizaje", label: "Capacidad de aprendizaje" },
-    { name: "intelAnalisisSintesis", label: "Capacidad de análisis y síntesis" }
+    { name: "intelCoeficiente", label: "1. Coeficiente Intelectual" },
+    { name: "intelComprension", label: "2. Comprensión" },
+    { name: "intelAtencion", label: "3. Nivel de atención / Concentración" },
+    { name: "intelMemoria", label: "4. Memoria a corto, mediano y largo plazo" },
+    { name: "intelVisomotora", label: "5. Coordinación viso-motora" },
+    { name: "intelOrientacionEspacial", label: "6. Orientación espacial" },
+    { name: "intelDiscriminarDetalles", label: "7. Capacidad para discriminar detalles" },
+    { name: "intelAprendizaje", label: "8. Capacidad de aprendizaje" },
+    { name: "intelAnalisisSintesis", label: "9. Capacidad de análisis y síntesis" }
 ];
 // Áreas de Evaluación: Personalidad
 const personalidadItems = [
-    { name: "persEstabilidad", label: "Estabilidad emocional" },
-    { name: "persAfrontaEstres", label: "Afrontamiento al estrés" },
-    { name: "persAfrontaRiesgo", label: "Afrontamiento al riesgo" },
-    { name: "persRelaciones", label: "Relaciones interpersonales / Adaptación al medio" },
-    { name: "persNormasReglas", label: "Disposición para acatar normas y reglas" },
+    { name: "persEstabilidad", label: "1. Estabilidad emocional" },
+    { name: "persAfrontaEstres", label: "2. Afrontamiento al estrés" },
+    { name: "persAfrontaRiesgo", label: "3. Afrontamiento al riesgo" },
+    { name: "persRelaciones", label: "4. Relaciones interpersonales / Adaptación al medio" },
+    { name: "persNormasReglas", label: "5. Disposición para acatar normas y reglas" },
 ];
 // Opciones estandarizadas S / NPS / NP / NPI
 const evalOptions = [
@@ -145,7 +145,7 @@ export default function EvaluacionPsicologicaPoderosa() {
                                 labelWidth="120px"
                             />
                             <InputTextOneLine
-                                label="Nombre examen"
+                                label="Nombre Examen"
                                 name="nombreExamen"
                                 value={form.nombreExamen}
                                 disabled
@@ -193,7 +193,7 @@ export default function EvaluacionPsicologicaPoderosa() {
                             {/* Derecha */}
                             <div className="space-y-3">
                                 <InputTextOneLine label="Domicilio Actual" name="domicilioActual" value={form.domicilioActual} disabled labelWidth="160px" />
-                                <InputTextOneLine label="Edad" name="edad" value={form.edad} disabled labelWidth="160px" />
+                                <InputTextOneLine label="Edad (años)" name="edad" value={form.edad} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Estado Civil" name="estadoCivil" value={form.estadoCivil} disabled labelWidth="160px" />
                                 <InputTextOneLine label="Nivel de Estudios" name="nivelEstudios" value={form.nivelEstudios} disabled labelWidth="160px" />
                             </div>
