@@ -11,7 +11,6 @@ import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { useForm } from "../../../../../hooks/useForm";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerExamenEspacioConfinado";
-import Swal from "sweetalert2";
 
 const tabla = "psicologia_espacios_confinados";
 const today = getToday();
@@ -68,7 +67,6 @@ export default function ExamenEspacioConfinado() {
         handleChangeNumber,
         handleRadioButton,
         handleChangeSimple,
-        handleCheckBoxChange,
         handleRadioButtonBoolean,
         handleClear,
         handleClearnotO,
@@ -76,14 +74,6 @@ export default function ExamenEspacioConfinado() {
     } = useForm(initialFormState);
 
     const handleSave = () => {
-        if (form.esApto === undefined) {
-            Swal.fire({
-                icon: "warning",
-                title: "Advertencia",
-                text: "Por favor, marque si es apto o no apto.",
-            });
-            return;
-        }
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
@@ -100,15 +90,6 @@ export default function ExamenEspacioConfinado() {
         });
     };
 
-    // Opciones para los radio groups
-    const criteriosOptions = [
-        { label: "I", value: "I" },
-        { label: "NPI", value: "NPI" },
-        { label: "NP", value: "NP" },
-        { label: "NPS", value: "NPS" },
-        { label: "S", value: "S" },
-    ];
-
     // Arrays para RadioTable - Aspecto Intelectual
     const aspectoIntelectualItems = [
         { name: "razonamiento", label: "1.- RAZONAMIENTO:" },
@@ -117,7 +98,6 @@ export default function ExamenEspacioConfinado() {
         { name: "coordinacionVisoMotora", label: "4.- COORDINACIÓN VISO-MOTORA:" },
         { name: "orientacionEspacial", label: "5.- ORIENTACIÓN ESPACIAL:" }
     ];
-
 
     const aspectoIntelectualOptions = [
         { label: "I", value: "I" },

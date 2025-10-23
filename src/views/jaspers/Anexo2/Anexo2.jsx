@@ -492,7 +492,7 @@ export default function Anexo2(data = {}) {
 
     // === PÁGINA 2: EXAMEN FÍSICO POR SISTEMAS ===
     examenFisicoSistemas: {
-      oidos: data.diagnosticoAudiometria_diagnostico ?? "",
+      oidos: data.oidos_txtoidos ?? "",
       nariz: data.nariz_txtnariz ?? "",
       boca: data.boca_txtboca ?? "",
       faringe: data.faringe_txtfaringe ?? "",

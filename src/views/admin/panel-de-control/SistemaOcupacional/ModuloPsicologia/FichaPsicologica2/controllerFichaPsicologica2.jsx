@@ -41,7 +41,7 @@ export const GetInfoServicio = async (
             lugarNacimiento: res.lugarNacimientoPaciente,
             domicilioActual: res.direccionPaciente,
             edad: res.edadPaciente,
-            estadoCivil: res.estadoCivil, 
+            estadoCivil: res.estadoCivil,
             nivelEstudios: res.nivelEstudioPaciente,
 
             // Datos laborales
@@ -98,6 +98,14 @@ export const SubmitDataService = async (
     tabla,
     datosFooter
 ) => {
+    if (form.esApto === undefined||form.esApto === "") {
+        Swal.fire({
+            icon: "Error",
+            title: "Datos Incompletos",
+            text: "Por favor, marque la aptitud.",
+        });
+        return;
+    }
     if (!form.norden) {
         await Swal.fire("Error", "Datos Incompletos", "error");
         return;

@@ -11,7 +11,6 @@ import { useForm } from "../../../../../hooks/useForm";
 import { useSessionData } from "../../../../../hooks/useSessionData";
 import { getToday } from "../../../../../utils/helpers";
 import { PrintHojaR, SubmitDataService, VerifyTR } from "./controllerFichaPsicologica2";
-import Swal from "sweetalert2";
 
 const tabla = "ficha_psicologica_anexo02"
 const today = getToday()
@@ -88,17 +87,9 @@ export default function FichaPsicologica2() {
         handleClear,
         handleRadioButtonBoolean,
         handleRadioButton,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "fichaPsicologicaAnexo2" });
 
     const handleSave = () => {
-        if (form.esApto === undefined) {
-            Swal.fire({
-                icon: "warning",
-                title: "Advertencia",
-                text: "Por favor, marque si es apto o no apto.",
-            });
-            return;
-        }
         SubmitDataService(form, token, userlogued, handleClear, tabla, datosFooter);
     };
 
@@ -271,7 +262,7 @@ export default function FichaPsicologica2() {
                                     {/* Observación de Conductas */}
                                     <section className="bg-white border border-gray-200 rounded-lg p-3">
                                         <h4 className="font-semibold mb-2">Observación de Conductas</h4>
-                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
                                             {/* Presentación */}
                                             <div className="border rounded p-3">
                                                 <h5 className="font-semibold mb-2">Presentación</h5>
@@ -350,7 +341,7 @@ export default function FichaPsicologica2() {
                                             </div>
 
                                             {/* Orientación */}
-                                            <div className="border rounded p-3">
+                                            <div className="border rounded p-3 col-span-3">
                                                 <h5 className="font-semibold mb-4">Orientación</h5>
                                                 <RadioTable
                                                     items={orientacionItems}

@@ -466,7 +466,7 @@ export default function UsoRespiradores(data = {}) {
   let yPos = tablaInicioY;
 
   // Altura general para todas las filas
-  const filaAltura = 4.5; // Reducida de 5 a 3.5
+  const filaAltura = 4.2; // Reducida de 5 a 3.5
 
   // Función general para dibujar header de sección con fondo gris
   const dibujarHeaderSeccion = (titulo, yPos, alturaHeader = 4) => {

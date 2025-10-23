@@ -108,7 +108,7 @@ export default function InformePsicologico() {
         handleRadioButtonBoolean,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState);
+    } = useForm(initialFormState, { storageKey: "informePsicologicoPsicologia" });
 
     // Estado para el select de recomendaciones predefinidas
     const [selectedRecomendacion, setSelectedRecomendacion] = useState("");

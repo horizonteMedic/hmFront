@@ -66,8 +66,7 @@ export default function InformePsicologicoADECO() {
         handleClear,
         handleClearnotO,
         handlePrintDefault,
-    } = useForm(initialFormState);//, { storageKey: "informe_psicologico_adeco" }
-
+    } = useForm(initialFormState, { storageKey: "informePsicologicoADECOPsicologia" });
     const handleSave = () => {
         if (form.esApto === undefined) {
             Swal.fire({
