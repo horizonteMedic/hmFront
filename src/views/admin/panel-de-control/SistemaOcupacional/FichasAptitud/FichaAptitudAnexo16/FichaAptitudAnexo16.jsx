@@ -14,6 +14,7 @@ import useRealTime from "../../../../../hooks/useRealTime";
 import { PrintHojaR, PrintHojaR2, SubmitDataService, VerifyTR } from "./controllerFichaAptitudAnexo16";
 
 const tabla = "certificado_aptitud_medico_ocupacional"
+const tabla2 = "resumen_medico_poderosa"
 const today = getToday();
 
 export default function FichaAptitudAnexo16({ MedicosMulti }) {
@@ -115,7 +116,7 @@ export default function FichaAptitudAnexo16({ MedicosMulti }) {
   };
   const handlePrint2 = () => {
     handlePrintDefault(() => {
-      PrintHojaR2(form.norden, token, tabla, datosFooter);
+      PrintHojaR2(form.norden, token, tabla2, datosFooter);
     });
   };
 

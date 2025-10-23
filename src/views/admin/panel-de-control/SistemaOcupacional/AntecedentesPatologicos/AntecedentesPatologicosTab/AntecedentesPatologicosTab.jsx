@@ -21,75 +21,70 @@ export default function AntecedentesPatologicosTab({
 
         {/* Barra de información del paciente */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
-          <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onKeyUp={handleSearch} onChange={handleChangeNumber} labelWidth="70px" />
-          <InputTextOneLine label="Fecha" name="fechaExam" type="date" value={form?.fechaExam} onChange={handleChangeSimple} labelWidth="50px" />
-          <InputTextOneLine label="Nombres" name="nombres" value={form?.nombres} disabled labelWidth="70px" />
-          <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled labelWidth="40px" />
-          <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled labelWidth="40px" />
+          <InputTextOneLine label="N° Orden" name="norden" value={form?.norden} onKeyUp={handleSearch} onChange={handleChangeNumber} labelWidth="60px" />
+          <InputTextOneLine label="Fecha" name="fechaExam" type="date" value={form?.fechaExam} onChange={handleChangeSimple} labelWidth="60px" />
+          <InputTextOneLine label="Nombres" name="nombres" value={form?.nombres} disabled labelWidth="60px" />
+          <div className="grid md:grid-cols-2 gap-4">
+            <InputTextOneLine label="Sexo" name="sexo" value={form?.sexo} disabled labelWidth="60px" />
+            <InputTextOneLine label="Edad" name="edad" value={form?.edad} disabled labelWidth="60px" />
+          </div>
         </div>
 
         <div className="flex items-center justify-between mb-3">
           <h1 className="font-semibold">1. ANTECEDENTES PATOLÓGICOS PERSONALES</h1>
           <div className="flex items-center gap-2">
-            <InputCheckbox
-              label="BOROO"
-              name="boroo"
-              checked={form?.boroo}
-              disabled
-            />
+
           </div>
         </div>
 
         {/* COVID 19, Fecha y Severidad */}
-        {!form?.boroo && (
-          <div className="flex items-center gap-4 mb-4">
-            <div className="flex items-center gap-2">
-              <InputCheckbox
-                label="COVID 19"
-                name="covid19"
-                checked={form?.covid19}
-                onChange={(e) => {
-                  const today = getToday();
-                  setForm(prev => ({
-                    ...prev,
-                    severidadCovid: "",
-                    fechaCovid: today,
-                    dosisVacunas: "",
-                  }));
-                  handleCheckBoxChange(e)
-                }}
-              />
-            </div>
-            <InputTextOneLine
-              label="Fecha"
-              name="fechaCovid"
-              type="date"
-              value={form?.fechaCovid}
-              onChange={handleChangeSimple}
-              disabled={!form?.covid19}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-2">
+            <InputCheckbox
+              label="COVID 19"
+              name="covid19"
+              checked={form?.covid19}
+              onChange={(e) => {
+                const today = getToday();
+                setForm(prev => ({
+                  ...prev,
+                  severidadCovid: "",
+                  fechaCovid: today,
+                  dosisVacunas: "",
+                }));
+                handleCheckBoxChange(e)
+              }}
             />
-            <div className="flex items-center gap-4">
-              <InputsRadioGroup
-                name="severidadCovid"
-                value={form?.severidadCovid}
-                disabled={!form?.covid19}
-                options={[
-                  { label: "Leve", value: "LEVE" },
-                  { label: "Moderada", value: "MODERADA" },
-                  { label: "Severa", value: "SEVERA" },
-                ]}
-                onChange={handleRadioButton}
-              />
-            </div>
-            <InputTextOneLine
-              label="Dosis de vacunas"
-              name="dosisVacunas"
-              value={form?.dosisVacunas}
-              onChange={handleChangeNumber}
+          </div>
+          <InputTextOneLine
+            label="Fecha"
+            name="fechaCovid"
+            type="date"
+            value={form?.fechaCovid}
+            onChange={handleChangeSimple}
+            disabled={!form?.covid19}
+          />
+          <div className="flex items-center gap-4">
+            <InputsRadioGroup
+              name="severidadCovid"
+              value={form?.severidadCovid}
               disabled={!form?.covid19}
-              labelWidth="120px" />
-          </div>)}
-
+              options={[
+                { label: "Leve", value: "LEVE" },
+                { label: "Moderada", value: "MODERADA" },
+                { label: "Severa", value: "SEVERA" },
+              ]}
+              onChange={handleRadioButton}
+            />
+          </div>
+          <InputTextOneLine
+            label="Dosis de vacunas"
+            name="dosisVacunas"
+            value={form?.dosisVacunas}
+            onChange={handleChangeNumber}
+            disabled={!form?.covid19}
+            labelWidth="120px" />
+        </div>
 
 
         <div className="mb-2 font-semibold text-red-600">
@@ -231,200 +226,133 @@ export default function AntecedentesPatologicosTab({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Enfermedades normales */}
-          {!form?.boroo && (
-            <>
-              {/* Columna 1 */}
-              <div className="space-y-1">
-                {[
-                  ["alergias", "Alergias"],
-                  ["amigdalitisCronica", "Amigdalitis crónica"],
-                  ["arritmiasCardiacas", "Arritmias cardiacas"],
-                  ["asma", "Asma"],
-                  ["bocio", "Bocio"],
-                  ["bronconeumonia", "Bronconeumonía"],
-                  ["bronquitisRepeticion", "Bronquitis a repetición"],
-                  ["cariesGingivitis", "Caries o gingivitis"],
-                  ["colecistitis", "Colecistitis"],
-                  ["dermatitis", "Dermatitis"],
-                  ["diabetes", "Diabetes"],
-                  ["disenteria", "Disentería"],
-                  ["enfCorazon", "Enfermedades del corazón"],
-                  ["enfOculares", "Enf. Oculares"],
-                  ["epilepsiaConvulsiones", "Epilepsia o convulsiones"],
-                  ["faringitisCronica", "Faringitis crónica"],
-                  ["fiebreMalta", "Fiebre malta"],
-                  ["fiebreTifoidea", "Fiebre tifoidea"],
-                  ["fiebreReumatica", "Fiebre Reumática"],
-                  ["forunculosis", "Forunculosis"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 border rounded p-3">
+          {/* Columna 1 */}
+          <div className="space-y-1">
+            {[
+              ["alergias", "Alergias"],
+              ["amigdalitisCronica", "Amigdalitis crónica"],
+              ["arritmiasCardiacas", "Arritmias cardiacas"],
+              ["asma", "Asma"],
+              ["bocio", "Bocio"],
+              ["bronconeumonia", "Bronconeumonía"],
+              ["bronquitisRepeticion", "Bronquitis a repetición"],
+              ["cariesGingivitis", "Caries o gingivitis"],
+              ["colecistitis", "Colecistitis"],
+              ["dermatitis", "Dermatitis"],
+              ["diabetes", "Diabetes"],
+              ["disenteria", "Disentería"],
+              ["enfCorazon", "Enfermedades del corazón"],
+              ["enfOculares", "Enf. Oculares"],
+              ["epilepsiaConvulsiones", "Epilepsia o convulsiones"],
+              ["faringitisCronica", "Faringitis crónica"],
+              ["fiebreMalta", "Fiebre malta"],
+              ["fiebreTifoidea", "Fiebre tifoidea"],
+              ["fiebreReumatica", "Fiebre Reumática"],
+              ["forunculosis", "Forunculosis"],
+              ["ima", "IMA (Infarto agudo al miocardio)"],
+              ["acv", "ACV (Acc. Cerebro Vascular)"],
+              ["tbc", "TBC"],
+              ["ets", "ETS"],
+              ["vih", "VIH"],
+              ["fobias", "Fobias"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
+          </div>
 
-              {/* Columna 2 */}
-              <div className="space-y-1">
-                {[
-                  ["gastritisCronica", "Gastritis crónica"],
-                  ["gonorrea", "Gonorrea"],
-                  ["gota", "Gota"],
-                  ["hemorroides", "Hemorroides"],
-                  ["hepatitis", "Hepatitis"],
-                  ["hernias", "Hernias"],
-                  ["hipertensionArterial", "Hipertensión Arterial"],
-                  ["infUrinariasRepetidas", "Inf. Urinarias repetidas"],
-                  ["intoxicaciones", "Intoxicaciones"],
-                  ["insuficienciaCardiaca", "Insuficiencia Cardíaca"],
-                  ["insuficienciaCoronariaCronica", "Insuficiencia Coronaria Crónica"],
-                  ["insuficienciaRenalCronica", "Insuficiencia Renal Crónica"],
-                  ["litiasisUrinaria", "Litiasis Urinaria"],
-                  ["meningitis", "Meningitis"],
-                  ["neuritisRepeticion", "Neuritis a Repetición"],
-                  ["otitisMedia", "Otitis Media"],
-                  ["presionAltaBaja", "Presión alta o baja"],
-                  ["paludismoMalaria", "Paludismo o malaria"],
-                  ["parasitosisIntestinal", "Parasitosis Intestinal"],
-                  ["parotiditis", "Parotiditis"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
+          {/* Columna 2 */}
+          <div className="space-y-1">
+            {[
+              ["gastritisCronica", "Gastritis crónica"],
+              ["gonorrea", "Gonorrea"],
+              ["gota", "Gota"],
+              ["hemorroides", "Hemorroides"],
+              ["hepatitis", "Hepatitis"],
+              ["hernias", "Hernias"],
+              ["hipertensionArterial", "Hipertensión Arterial"],
+              ["infUrinariasRepetidas", "Inf. Urinarias repetidas"],
+              ["intoxicaciones", "Intoxicaciones"],
+              ["insuficienciaCardiaca", "Insuficiencia Cardíaca"],
+              ["insuficienciaCoronariaCronica", "Insuficiencia Coronaria Crónica"],
+              ["insuficienciaRenalCronica", "Insuficiencia Renal Crónica"],
+              ["litiasisUrinaria", "Litiasis Urinaria"],
+              ["meningitis", "Meningitis"],
+              ["neuritisRepeticion", "Neuritis a Repetición"],
+              ["otitisMedia", "Otitis Media"],
+              ["presionAltaBaja", "Presión alta o baja"],
+              ["paludismoMalaria", "Paludismo o malaria"],
+              ["parasitosisIntestinal", "Parasitosis Intestinal"],
+              ["parotiditis", "Parotiditis"],
+              ["vertigos", "Vértigos"],
+              ["tifoidea", "Tifoidea"],
+              ["neoplasias", "Neoplasias"],
+              ["quemaduras", "Quemaduras"],
+              ["discopatias", "Discopatías"],
+              ["columna", "Columna"],
+              ["enfPsiquiatricas", "Enf Psiquiátricas"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
+          </div>
 
-              {/* Columna 3 */}
-              <div className="space-y-1">
-                {[
-                  ["pleuresia", "Pleuresia"],
-                  ["plumbismo", "Plumbismo"],
-                  ["poliomielitis", "Poliomielitis"],
-                  ["portadorMarcapaso", "Portador de Marcapaso"],
-                  ["protesisCardiacasValvulares", "Prótesis Cardiacas Valvulares"],
-                  ["resfriosFrecuentes", "Resfríos frecuentes"],
-                  ["reumatismoRepeticion", "Reumatismo a repetición"],
-                  ["sarampion", "Sarampión"],
-                  ["sifilis", "Sífilis"],
-                  ["silicosis", "Silicosis"],
-                  ["sinusitisCronica", "Sinusitis crónica"],
-                  ["tosConvulsiva", "Tos convulsiva"],
-                  ["trastornosNerviosos", "Trastornos Nerviosos"],
-                  ["traumatismoEncefalocraneano", "Traumatismo encefalocraneano"],
-                  ["tuberculosis", "Tuberculosis"],
-                  ["tumoresQuistes", "Tumores - quistes"],
-                  ["ulceraPeptica", "Ulcera péptica"],
-                  ["varicela", "Varicela"],
-                  ["varices", "Várices"],
-                  ["varicocele", "Varicocele"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
-            </>
-          )}
-
-          {/* Enfermedades BOROO */}
-          {form?.boroo && (
-            <>
-              {/* Columna 1 - BOROO */}
-              <div className="space-y-1">
-                {[
-                  ["gastritisCronica", "Gastritis crónica"],
-                  ["alergias", "Alergias"],
-                  ["asma", "Asma"],
-                  ["bronquitisRepeticion", "Bronquitis a repetición"],
-                  ["diabetes", "Diabetes"],
-                  ["enfCorazon", "Enfermedades del corazón"],
-                  ["enfOculares", "Enf. Oculares"],
-                  ["epilepsiaConvulsiones", "Epilepsia o convulsiones"],
-                  ["ima", "IMA (Infarto agudo al miocardio)"],
-                  ["acv", "ACV (Acc. Cerebro Vascular)"],
-                  ["tbc", "TBC"],
-                  ["ets", "ETS"],
-                  ["vih", "VIH"],
-                  ["fobias", "Fobias"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
-
-              {/* Columna 2 - BOROO */}
-              <div className="space-y-1">
-                {[
-                  ["hepatitis", "Hepatitis"],
-                  ["hernias", "Hernias"],
-                  ["hipertensionArterial", "Hipertención Arterial"],
-                  ["traumatismoEncefalocraneano", "Traumatismo encefalocraneano"],
-                  ["tuberculosis", "Tuberculosis"],
-                  ["ulceraPeptica", "Ulcera péptica"],
-                  ["vertigos", "Vértigos"],
-                  ["tifoidea", "Tifoidea"],
-                  ["neoplasias", "Neoplasias"],
-                  ["quemaduras", "Quemaduras"],
-                  ["discopatias", "Discopatías"],
-                  ["columna", "Columna"],
-                  ["enfPsiquiatricas", "Enf Psiquiátricas"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
-
-              {/* Columna 3 - BOROO */}
-              <div className="space-y-1">
-                {[
-                  ["enfReumatica", "Enf Reumática"],
-                  ["enfPulmonares", "Enf Pulmonares"],
-                  ["enfPiel", "Enf de la Piel"],
-                  ["tendinitis", "Tendinitis"],
-                  ["onicomicosis", "Onicomicosis"],
-                  ["fracturas", "Fracturas"],
-                  ["anemia", "Anemia"],
-                  ["obesidad", "Obesidad"],
-                  ["dislipidemia", "Dislipidemia"],
-                  ["intoxicaciones", "Intoxicaciones"],
-                  ["amputacion", "Amputación"],
-                  ["sordera", "Sordera"],
-                  ["migrana", "Migraña"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
-            </>
-          )}
+          {/* Columna 3 */}
+          <div className="space-y-1">
+            {[
+              ["pleuresia", "Pleuresia"],
+              ["plumbismo", "Plumbismo"],
+              ["poliomielitis", "Poliomielitis"],
+              ["portadorMarcapaso", "Portador de Marcapaso"],
+              ["protesisCardiacasValvulares", "Prótesis Cardiacas Valvulares"],
+              ["resfriosFrecuentes", "Resfríos frecuentes"],
+              ["reumatismoRepeticion", "Reumatismo a repetición"],
+              ["sarampion", "Sarampión"],
+              ["sifilis", "Sífilis"],
+              ["silicosis", "Silicosis"],
+              ["sinusitisCronica", "Sinusitis crónica"],
+              ["tosConvulsiva", "Tos convulsiva"],
+              ["trastornosNerviosos", "Trastornos Nerviosos"],
+              ["traumatismoEncefalocraneano", "Traumatismo encefalocraneano"],
+              ["tuberculosis", "Tuberculosis"],
+              ["tumoresQuistes", "Tumores - quistes"],
+              ["ulceraPeptica", "Ulcera péptica"],
+              ["varicela", "Varicela"],
+              ["varices", "Várices"],
+              ["varicocele", "Varicocele"],
+              ["enfReumatica", "Enf Reumática"],
+              ["enfPulmonares", "Enf Pulmonares"],
+              ["enfPiel", "Enf de la Piel"],
+              ["tendinitis", "Tendinitis"],
+              ["onicomicosis", "Onicomicosis"],
+              ["fracturas", "Fracturas"],
+              ["anemia", "Anemia"],
+              ["obesidad", "Obesidad"],
+              ["dislipidemia", "Dislipidemia"],
+              ["amputacion", "Amputación"],
+              ["sordera", "Sordera"],
+              ["migrana", "Migraña"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
+          </div>
         </div>
 
         {/* Otras Patologías */}
@@ -436,16 +364,15 @@ export default function AntecedentesPatologicosTab({
             onChange={handleChange}
             labelWidth="200px"
           />
-          {form?.boroo && (
-            <InputTextOneLine
-              label="Especifique detalles o tratamiento marcada"
-              name="detallesTratamiento"
-              value={form?.detallesTratamiento}
-              onChange={handleChange}
-              labelWidth="200px"
-            />)}
+          <InputTextOneLine
+            label="Especifique detalles o tratamiento marcada"
+            name="detallesTratamiento"
+            value={form?.detallesTratamiento}
+            onChange={handleChange}
+            labelWidth="200px"
+          />
         </div>
-        {form?.boroo && (<>
+        <>
           {/* Alergias */}
           <div className="mt-6 space-y-4">
             <div className="flex items-center gap-4">
@@ -597,7 +524,6 @@ export default function AntecedentesPatologicosTab({
             </div>
           </div>
         </>
-        )}
       </div>
     </div>
   );

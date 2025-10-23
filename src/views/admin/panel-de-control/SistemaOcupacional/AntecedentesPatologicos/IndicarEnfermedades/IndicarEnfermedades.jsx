@@ -6,171 +6,144 @@ export default function IndicarEnfermedades({
   handleChange,
   handleChangeNumber,
   handleCheckBoxChange,
-  handleChangeSimple,
-  handleRadioButton,
   handleRadioButtonBoolean
 }) {
   return (
     <div className="space-y-4">
       {/* Sección normal - solo se muestra cuando BOROO NO está activado */}
-      {!form?.boroo && (
-        <div className="bg-white border border-gray-200 rounded-lg p-3">
-          <h4 className="font-semibold mb-3">Indicar las enfermedades que ha tenido o tiene, con cierta frecuencia</h4>
+      <div className="bg-white border border-gray-200 rounded-lg p-3">
+        <h4 className="font-semibold mb-3">Indicar las enfermedades que ha tenido o tiene, con cierta frecuencia</h4>
 
-          {/* Lista de síntomas en 3 columnas */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            {/* Columna 1 */}
-            <div className="space-y-1">
-              {[
-                ["perdidaMemoria", "Pérdida de memoria"],
-                ["preocupacionesAngustia", "Preocupaciones o angustia"],
-                ["doloresArticulares", "Dolores articulares y/o huesos"],
-                ["aumentoDisminucionPeso", "Aumento o disminución de peso"],
-                ["dolorCabeza", "Dolor de cabeza"],
-                ["diarrea", "Diarrea"],
-                ["agitacionEjercicios", "Agitación al hacer ejercicios"],
-                ["dolorOcular", "Dolor ocular"],
-                ["dolorOpresivoTorax", "Dolor Opresivo Tórax"],
-                ["hinchazonPiesManos", "Hinchazón de pies o manos"],
-              ].map(([name, label]) => (
-                <InputCheckbox
-                  key={name}
-                  label={label}
-                  name={name}
-                  checked={form?.[name]}
-                  onChange={handleCheckBoxChange}
-                />
-              ))}
-            </div>
-
-            {/* Columna 2 */}
-            <div className="space-y-1">
-              {[
-                ["estrenimiento", "Estreñimiento"],
-                ["vomitosSangre", "Vómitos con sangre"],
-                ["sangradoOrina", "Sangrado por orina"],
-                ["tosSangre", "Tos con sangre"],
-                ["coloracionAmarilla", "Coloración amarilla de la piel"],
-                ["indigestionFrecuente", "Indigestión frecuente"],
-                ["insomnio", "Insomnio"],
-                ["lumbalgias", "Lumbalgias o dolor de cintura"],
-                ["mareosDesmayos", "Mareos-Desmayos-Vértigos"],
-                ["hecesNegras", "Heces negras"],
-              ].map(([name, label]) => (
-                <InputCheckbox
-                  key={name}
-                  label={label}
-                  name={name}
-                  checked={form?.[name]}
-                  onChange={handleCheckBoxChange}
-                />
-              ))}
-            </div>
-
-            {/* Columna 3 */}
-            <div className="space-y-1">
-              {[
-                ["orinaDolorArdor", "Orina con dolor o ardor"],
-                ["orinaInvoluntaria", "Orina involuntaria"],
-                ["dolorOido", "Dolor de oído"],
-                ["secrecionesOido", "Secreciones por el oído"],
-                ["palpitaciones", "Palpitaciones"],
-                ["adormecimientos", "Adormecimientos"],
-                ["pesadillasFrecuentes", "Pesadillas frecuentes"],
-                ["doloresMusculares", "Dolores musculares"],
-                ["tosCronica", "Tos crónica"],
-                ["sangradoEncias", "Sangrado por encías"],
-              ].map(([name, label]) => (
-                <InputCheckbox
-                  key={name}
-                  label={label}
-                  name={name}
-                  checked={form?.[name]}
-                  onChange={handleCheckBoxChange}
-                />
-              ))}
-            </div>
+        {/* Lista de síntomas en 3 columnas */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Columna 1 */}
+          <div className="space-y-1">
+            {[
+              ["perdidaMemoria", "Pérdida de memoria"],
+              ["preocupacionesAngustia", "Preocupaciones o angustia"],
+              ["doloresArticulares", "Dolores articulares y/o huesos"],
+              ["aumentoDisminucionPeso", "Aumento o disminución de peso"],
+              ["dolorCabeza", "Dolor de cabeza"],
+              ["diarrea", "Diarrea"],
+              ["agitacionEjercicios", "Agitación al hacer ejercicios"],
+              ["dolorOcular", "Dolor ocular"],
+              ["dolorOpresivoTorax", "Dolor Opresivo Tórax"],
+              ["hinchazonPiesManos", "Hinchazón de pies o manos"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
           </div>
-          <InputTextOneLine
-            label="Otras enfermedades"
-            name="otrasEnfermedades"
-            value={form?.otrasEnfermedades}
-            onChange={handleChange}
-            labelWidth="120px"
-          />
+
+          {/* Columna 2 */}
+          <div className="space-y-1">
+            {[
+              ["estrenimiento", "Estreñimiento"],
+              ["vomitosSangre", "Vómitos con sangre"],
+              ["sangradoOrina", "Sangrado por orina"],
+              ["tosSangre", "Tos con sangre"],
+              ["coloracionAmarilla", "Coloración amarilla de la piel"],
+              ["indigestionFrecuente", "Indigestión frecuente"],
+              ["insomnio", "Insomnio"],
+              ["lumbalgias", "Lumbalgias o dolor de cintura"],
+              ["mareosDesmayos", "Mareos-Desmayos-Vértigos"],
+              ["hecesNegras", "Heces negras"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
+          </div>
+
+          {/* Columna 3 */}
+          <div className="space-y-1">
+            {[
+              ["orinaDolorArdor", "Orina con dolor o ardor"],
+              ["orinaInvoluntaria", "Orina involuntaria"],
+              ["dolorOido", "Dolor de oído"],
+              ["secrecionesOido", "Secreciones por el oído"],
+              ["palpitaciones", "Palpitaciones"],
+              ["adormecimientos", "Adormecimientos"],
+              ["pesadillasFrecuentes", "Pesadillas frecuentes"],
+              ["doloresMusculares", "Dolores musculares"],
+              ["tosCronica", "Tos crónica"],
+              ["sangradoEncias", "Sangrado por encías"],
+            ].map(([name, label]) => (
+              <InputCheckbox
+                key={name}
+                label={label}
+                name={name}
+                checked={form?.[name]}
+                onChange={handleCheckBoxChange}
+              />
+            ))}
+          </div>
         </div>
-      )}
+        <InputTextOneLine
+          label="Otras enfermedades"
+          name="otrasEnfermedades"
+          value={form?.otrasEnfermedades}
+          onChange={handleChange}
+          labelWidth="120px"
+        />
+      </div>
 
       {/* Secciones adicionales cuando BOROO está activado */}
-      {form?.boroo && (
-        <>
-          {/* Antecedentes Inmunológicos / Vacunas */}
-          <div className="bg-white border border-gray-200 rounded-lg p-3">
-            <h4 className="font-semibold mb-4">ANTECEDENTES INMUNOLÓGICOS / VACUNAS:</h4>
+      <>
+        {/* Antecedentes Inmunológicos / Vacunas */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3">
+          <h4 className="font-semibold mb-4">ANTECEDENTES INMUNOLÓGICOS / VACUNAS:</h4>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Columna 1 - Vacunas */}
-              <div className="space-y-1">
-                {[
-                  ["antitetanica", "Antitetánica"],
-                  ["fiebreAmarilla", "Fiebre Amarilla"],
-                  ["influenza", "Influenza"],
-                  ["hepatitisA", "Hepatitis A"],
-                  ["hepatitisB", "Hepatitis B"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Columna 1 - Vacunas */}
+            <div className="space-y-1">
+              {[
+                ["antitetanica", "Antitetánica"],
+                ["fiebreAmarilla", "Fiebre Amarilla"],
+                ["influenza", "Influenza"],
+                ["hepatitisA", "Hepatitis A"],
+                ["hepatitisB", "Hepatitis B"],
+              ].map(([name, label]) => (
+                <InputCheckbox
+                  key={name}
+                  label={label}
+                  name={name}
+                  checked={form?.[name]}
+                  onChange={handleCheckBoxChange}
+                />
+              ))}
+            </div>
 
-              {/* Columna 2 - Vacunas */}
-              <div className="space-y-1">
-                {[
-                  ["gripeInfluenza", "Gripe/Influenza"],
-                  ["neumococo", "Neumococo"],
-                  ["rabia", "Rabia"],
-                  ["papilomaHumano", "Papiloma Humano"],
-                ].map(([name, label]) => (
-                  <InputCheckbox
-                    key={name}
-                    label={label}
-                    name={name}
-                    checked={form?.[name]}
-                    onChange={handleCheckBoxChange}
-                  />
-                ))}
+            {/* Columna 2 - Vacunas */}
+            <div className="space-y-1">
+              {[
+                ["gripeInfluenza", "Gripe/Influenza"],
+                ["neumococo", "Neumococo"],
+                ["rabia", "Rabia"],
+                ["papilomaHumano", "Papiloma Humano"],
+              ].map(([name, label]) => (
+                <InputCheckbox
+                  key={name}
+                  label={label}
+                  name={name}
+                  checked={form?.[name]}
+                  onChange={handleCheckBoxChange}
+                />
+              ))}
 
-                {/* COVID 19 con campos especiales */}
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2 mr-5">
-                    <InputCheckbox
-                      label="COVID 19"
-                      name="covid19"
-                      checked={form?.covid19}
-                      onChange={handleCheckBoxChange}
-                    />
-                    {form?.covid19 && (
-                      <InputTextOneLine
-                        label="N° Dosis"
-                        name="dosisVacunas"
-                        value={form?.dosisVacunas}
-                        onChange={handleChangeNumber}
-                        labelWidth="50px"
-                        className="ml-8"
-                      />
-                    )}
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
-        </>
-      )}
+        </div>
+      </>
 
       {/* Hábitos Nocivos */}
       <div className="bg-white border border-gray-200 rounded-lg p-3">
@@ -271,7 +244,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: (prev.tipoLicor??"") + " RON,"
+                        tipoLicor: (prev.tipoLicor ?? "") + " RON,"
                       }))
                     }}>
                     RON
@@ -281,7 +254,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: (prev.tipoLicor??"") + " CERVEZA,"
+                        tipoLicor: (prev.tipoLicor ?? "") + " CERVEZA,"
                       }))
                     }}>
                     CERVEZA
@@ -291,7 +264,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: (prev.tipoLicor??"") + " VINO,"
+                        tipoLicor: (prev.tipoLicor ?? "") + " VINO,"
                       }))
                     }}>
                     VINO
@@ -301,7 +274,7 @@ export default function IndicarEnfermedades({
                     onClick={() => {
                       setForm(prev => ({
                         ...prev,
-                        tipoLicor: (prev.tipoLicor??"") + " WISKY,"
+                        tipoLicor: (prev.tipoLicor ?? "") + " WISKY,"
                       }))
                     }}>
                     WISKY
@@ -415,61 +388,59 @@ export default function IndicarEnfermedades({
         </div>
       </div>
       {/* Secciones adicionales cuando BOROO está activado - Solo Medicamentos y Actividad Física */}
-      {form?.boroo && (
-        <>
-          {/* Medicamentos y Actividad Física */}
-          <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
-            <div className="space-y-6">
-              {/* Medicamentos */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold">Medicamentos:</span>
-                  <InputsBooleanRadioGroup
-                    name="medicamentos"
-                    value={form?.medicamentos}
-                    onChange={(e, value) => {
-                      if (value == false)
-                        setForm(prev => ({ ...prev, especifiqueMedicamentos: "" }));
-                      handleRadioButtonBoolean(e, value)
-                    }
-                    }
-                  />
-                </div>
-                <InputTextOneLine
-                  label="Especifique"
-                  name="especifiqueMedicamentos"
-                  value={form?.especifiqueMedicamentos}
-                  disabled={!form?.medicamentos}
-                  onChange={handleChange}
+      <>
+        {/* Medicamentos y Actividad Física */}
+        <div className="mt-6 bg-white border border-gray-200 rounded-lg p-3">
+          <div className="space-y-6">
+            {/* Medicamentos */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-4">
+                <span className="font-semibold">Medicamentos:</span>
+                <InputsBooleanRadioGroup
+                  name="medicamentos"
+                  value={form?.medicamentos}
+                  onChange={(e, value) => {
+                    if (value == false)
+                      setForm(prev => ({ ...prev, especifiqueMedicamentos: "" }));
+                    handleRadioButtonBoolean(e, value)
+                  }
+                  }
                 />
               </div>
+              <InputTextOneLine
+                label="Especifique"
+                name="especifiqueMedicamentos"
+                value={form?.especifiqueMedicamentos}
+                disabled={!form?.medicamentos}
+                onChange={handleChange}
+              />
+            </div>
 
-              {/* Actividad Física */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-4">
-                  <span className="font-semibold">Actividad Física:</span>
-                  <InputsBooleanRadioGroup
-                    name="actividadFisica"
-                    value={form?.actividadFisica}
-                    onChange={(e, value) => {
-                      if (value == false)
-                        setForm(prev => ({ ...prev, especifiqueActividadFisica: "" }));
-                      handleRadioButtonBoolean(e, value)
-                    }}
-                  />
-                </div>
-                <InputTextOneLine
-                  label="Especifique"
-                  name="especifiqueActividadFisica"
-                  value={form?.especifiqueActividadFisica}
-                  disabled={!form?.actividadFisica}
-                  onChange={handleChange}
+            {/* Actividad Física */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-4">
+                <span className="font-semibold">Actividad Física:</span>
+                <InputsBooleanRadioGroup
+                  name="actividadFisica"
+                  value={form?.actividadFisica}
+                  onChange={(e, value) => {
+                    if (value == false)
+                      setForm(prev => ({ ...prev, especifiqueActividadFisica: "" }));
+                    handleRadioButtonBoolean(e, value)
+                  }}
                 />
               </div>
+              <InputTextOneLine
+                label="Especifique"
+                name="especifiqueActividadFisica"
+                value={form?.especifiqueActividadFisica}
+                disabled={!form?.actividadFisica}
+                onChange={handleChange}
+              />
             </div>
           </div>
-        </>
-      )}
+        </div>
+      </>
     </div>
   );
 }
