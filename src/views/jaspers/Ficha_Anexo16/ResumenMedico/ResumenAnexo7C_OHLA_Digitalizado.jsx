@@ -11,128 +11,124 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   // Contador de páginas dinámico
   let numeroPagina = 1;
 
+  // Función para convertir texto a formato gramaticalmente correcto (primera letra mayúscula, resto minúsculas)
+  const formatearTextoGramatical = (texto) => {
+    if (!texto || typeof texto !== 'string' || texto === 'undefined' || texto === 'null') return '';
+    
+    // Lista de textos que deben mantenerse en mayúsculas
+    const textosMayusculas = ['N/A', 'O.D', 'O.I', 'RCRR', 'HRH', 'B/D', 'RHA(+)'];
+    
+    // Dividir por líneas para manejar listas con viñetas
+    const lineas = texto.split('\n');
+    const lineasFormateadas = lineas.map(linea => {
+      if (!linea.trim()) return linea; // Mantener líneas vacías
+      
+      // Si la línea empieza con "- " (viñeta), formatear después del guión
+      if (linea.trim().startsWith('- ')) {
+        const contenido = linea.trim().substring(2); // Quitar "- "
+        return '- ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
+      }
+      
+      // Si la línea empieza con ". " (punto), formatear después del punto
+      if (linea.trim().startsWith('. ')) {
+        const contenido = linea.trim().substring(2); // Quitar ". "
+        return '. ' + contenido.charAt(0).toUpperCase() + contenido.slice(1).toLowerCase();
+      }
+      
+      // Para líneas normales, formatear palabra por palabra respetando textos específicos
+      const palabras = linea.split(' ');
+      const palabrasFormateadas = palabras.map((palabra, index) => {
+        // Verificar si la palabra (sin puntuación) está en la lista de mayúsculas
+        const palabraSinPuntuacion = palabra.replace(/[.,:;()[\]{}]/g, '');
+        const debeSerMayuscula = textosMayusculas.some(texto => 
+          texto.toLowerCase() === palabraSinPuntuacion.toLowerCase()
+        );
+        
+        if (debeSerMayuscula) {
+          // Mantener la palabra en mayúsculas
+          return palabra.toUpperCase();
+        } else if (index === 0) {
+          // Primera palabra: primera letra mayúscula, resto minúsculas
+          return palabra.charAt(0).toUpperCase() + palabra.slice(1).toLowerCase();
+        } else {
+          // Palabras siguientes: minúsculas
+          return palabra.toLowerCase();
+        }
+      });
+      
+      return palabrasFormateadas.join(' ');
+    });
+    
+    return lineasFormateadas.join('\n');
+  };
+
+  // Función para formatear con terminaciones médicas
+  const formatearConTerminacion = (valor, terminacion) => {
+    if (!valor || valor === 'undefined' || valor === 'null') return '';
+    return formatearTextoGramatical(String(valor)) + terminacion;
+  };
+
   // Normalizador único de datos de entrada
   function buildDatosFinales(raw) {
     const datosReales = {
       apellidosNombres: String((((raw?.apellidosPaciente ?? '') + ' ' + (raw?.nombresPaciente ?? '')).trim())),
-      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista ?? ''), 
-      tipoExamen: String(raw?.nombreExamen ?? ''),
-      sexo: convertirGenero(raw?.sexoPaciente ?? ''),
-      documentoIdentidad: String(raw?.dniPaciente ?? ''),
-      edad: String(raw?.edadPaciente ?? ''),
-      fechaNacimiento: formatearFechaCorta(raw?.fechaNacimientoPaciente ?? ''),
-      domicilio: String(raw?.direccionPaciente ?? ''),
-      areaTrabajo: String(raw?.areaPaciente ?? ''),
-      puestoTrabajo: String(raw?.cargoPaciente ?? ''),
-      empresa: String(raw?.empresa ?? ''),
-      contrata: String(raw?.contrata ?? ''),
-      sede: String(raw?.sede ?? ''),
-      numeroFicha: String(raw?.norden ?? ""),
-      color: Number(raw?.color ?? 0),
-      codigoColor: String(raw?.codigoColor ?? ''),
-      textoColor: String(raw?.textoColor ?? ''),
-      apto: (typeof raw?.aprobo === 'boolean') ? raw.aprobo : false,
-      // Mapeo de antecedentes médicos
-      antecedentesPersonales: String(raw?.antecedentesPersonales ?? raw?.antecedentesPersonalesDescripcion ?? '-'),
-      antecedentesPatologicos: String(raw?.antecedentesPatologicos ?? raw?.antecedentesPatologicosDescripcion ?? '-'),
-      antecedentesFamiliares: String(raw?.antecedentesFamiliares ?? raw?.antecedentesFamiliaresDescripcion ?? '-'),
-      // Mapeo de signos vitales
-      fc: String(raw?.frecuenciaCardiaca ?? ''),
-      fr: String(raw?.frecuenciaRespiratoriaTriaje_f_respiratoria ?? ''),
-      pa: String((raw?.sistolica ?? '') + "/" + (raw?.diastolica ?? '')),
-      talla: String(raw?.tallaTriaje ?? ''),
-      peso: String(raw?.pesoTriaje ?? ''),
-      imc: String(raw?.imcTriaje ?? ''),
-      satO2: String(raw?.saturacionOxigeno ?? ''),
-      // Mapeo de exámenes complementarios
-      estadoNutricional: String(raw?.estadoNutricional ?? ''),
-      medicina: String(raw?.medicina ?? ''),
-      examenOftalmologico: String(raw?.examenOftalmologico ?? ''),
-      examenOdontologico: String(raw?.examenOdontologico ?? ''),
-      evaluacionPsicologica: String(raw?.evaluacionPsicologica ?? ''),
-      audiometria: String(raw?.audiometria ?? ''),
-      radiografiaTorax: String(raw?.radiografiaTorax ?? ''),
-      electrocardiograma: String(raw?.electrocardiograma ?? ''),
-      espirometria: String(raw?.espirometria ?? ''),
-      // Mapeo de exámenes de laboratorio
-      grupoFactorSanguineo: String(raw?.grupoFactorSanguineo ?? ''),
-      hemograma: String(raw?.hemograma ?? ''),
-      hemoglobina: String(raw?.hemoglobina ?? ''),
-      hematocrito: String(raw?.hematocrito ?? ''),
-      colesterol: String(raw?.colesterol ?? ''),
-      trigliceridos: String(raw?.trigliceridos ?? ''),
-      examenOrina: String(raw?.examenOrina ?? ''),
-      glucosa: String(raw?.glucosa ?? ''),
-      colinesterasaSerica: String(raw?.colinesterasaSerica ?? ''),
-      // Mapeo de hallazgos
-      hallazgos: String(raw?.hallazgos ?? raw?.hallazgosDescripcion ?? ''),
-      // Mapeo de recomendaciones
-      recomendaciones: String(raw?.recomendaciones ?? raw?.recomendacionesDescripcion ?? ''),
-      // Mapeo de nota
-      nota: String(raw?.nota ?? raw?.notaDescripcion ?? '-')
+      fechaExamen: formatearFechaCorta(raw?.fechaEntrevista), 
+      tipoExamen: String(raw?.nombreExamen),
+      sexo: convertirGenero(raw?.sexoPaciente),
+      documentoIdentidad: String(raw?.dniPaciente),
+      edad: String(raw?.edadPaciente),
+      fechaNacimiento: formatearFechaCorta(raw?.fechaNacimientoPaciente),
+      domicilio: String(raw?.direccionPaciente),
+      areaTrabajo: String(raw?.areaPaciente),
+      puestoTrabajo: String(raw?.cargoPaciente),
+      empresa: String(raw?.empresa),
+      contrata: String(raw?.contrata),
+      sede: String(raw?.sede),
+      numeroFicha: String(raw?.norden),
+      color: Number(raw?.color),
+      codigoColor: String(raw?.codigoColor),
+      textoColor: String(raw?.textoColor),
+      apto: (typeof raw?.aproboPsicologico_aprobo_inf === 'boolean') ? raw.aproboPsicologico_aprobo_inf : false,
+      // Mapeo de antecedentes médicos - usando los campos correctos
+      antecedentesPersonales: formatearTextoGramatical(raw?.antecedentesPersonales2Anexo7c_txtantecedentespersonales2),
+      antecedentesPatologicos: formatearTextoGramatical(raw?.antecedentesPatologicos_ante_patologicos),
+      antecedentesFamiliares: formatearTextoGramatical(raw?.antecedentesFamiliaresAnexo7c_txtantecedentesfamiliares),
+      // Mapeo de signos vitales - usando los campos correctos
+      fc: String(raw?.frecuenciaCardiacaTriaje_f_cardiaca),
+      fr: String(raw?.frecuenciaRespiratoriaTriaje_f_respiratoria),
+      pa: String((raw?.sistolicatriaje_sistolica) + "/" + (raw?.diastolicatriaje_diastolica)),
+      talla: String(raw?.tallatriaje_talla),
+      peso: String(raw?.pesotriaje_peso),
+      imc: String(raw?.imctriaje_imc),
+      satO2: String(raw?.saturacionoxigenotriaje_sat_02),
+      // Mapeo de exámenes complementarios - usando los campos correctos
+      estadoNutricional: formatearTextoGramatical(raw?.conclusionImc),
+      medicina: formatearTextoGramatical(raw?.conclusionAnexo7c_txtconclusion),
+      examenOftalmologico: formatearTextoGramatical(raw?.enfermedadesocularesoftalmo_e_oculares),
+      examenOdontologico: formatearTextoGramatical(raw?.observacionesOdontograma_txtobservaciones),
+      evaluacionPsicologica: formatearTextoGramatical(raw?.aproboPsicologico_aprobo_inf ? 'APTO' : 'NO APTO'),
+      audiometria: formatearTextoGramatical(raw?.diagnosticoAudiometria_diagnostico),
+      radiografiaTorax: formatearTextoGramatical(raw?.conclusionesRadiograficas),
+      electrocardiograma: formatearTextoGramatical(raw?.hallazgosInformeElectroCardiograma_hallazgo),
+      espirometria: formatearTextoGramatical(raw?.conclusionAnexo7c_txtconclusion),
+      // Mapeo de exámenes de laboratorio - usando los campos correctos
+      grupoFactorSanguineo: formatearTextoGramatical(raw?.grupoFactorSanguineo_grupofactor),
+      hemograma: formatearTextoGramatical(raw?.hematiesematologiaLabClinico_txthematiesematologia),
+      hemoglobina: formatearConTerminacion(raw?.hemoglobinaLaboratorioClinico_txthemoglobina, " gr %"),
+      hematocrito: formatearTextoGramatical(raw?.vsgLaboratorioClinico_txtvsg),
+      colesterol: formatearConTerminacion(raw?.colesterolAnalisisBioquimico_txtcolesterol, " mg/dl"),
+      trigliceridos: formatearConTerminacion(raw?.trigliseridosAnalisisBioquimico_txttrigliseridos, " mg/dl"),
+      examenOrina: formatearTextoGramatical(raw?.positivoLaboratorioClinico_chkpositivo ? 'POSITIVO' : 'NEGATIVO'),
+      glucosa: formatearConTerminacion(raw?.glucosaLaboratorioClinico_txtglucosabio, " mg/dl"),
+      colinesterasaSerica: formatearTextoGramatical(raw?.marihuanaLaboratorioClinico_txtmarihuana),
+      // Mapeo de hallazgos y recomendaciones - usando los campos correctos
+      hallazgos: formatearTextoGramatical(raw?.observacionesFichaMedicaAnexo7c_txtobservacionesfm),
+      recomendaciones: formatearTextoGramatical(raw?.recomendacionesAnalisisBioquimico_txtrecomendaciones),
+      // Mapeo de nota - texto fijo
+      nota: "SE SUGIERE EL CUMPLIMIENTO DE LOS PROTOCOLOS DE PREVENCIÓN PARA COVID-19 SEGÚN NORMATIVA VIGENTE."
     };
 
-    const datosPrueba = {
-      apellidosNombres: 'MARTÍNEZ RODRÍGUEZ, CARLOS ALBERTO',
-      fechaExamen: '20/11/2025',
-      tipoExamen: 'PRE-OCUPACIONAL',
-      sexo: 'Masculino',
-      documentoIdentidad: '12345678',
-      edad: '35',
-      fechaNacimiento: '15/08/1990',
-      domicilio: 'Av. Los Olivos 123 - Lima',
-      areaTrabajo: 'Minería',
-      puestoTrabajo: 'Supervisor de Operaciones',
-      empresa: 'OHLA PERÚ S.A.C.',
-      contrata: 'CONSTRUCCIONES INTEGRALES S.R.L.',
-      sede: 'Lima - San Isidro',
-      numeroFicha: '000789',
-      color: 2,
-      codigoColor: '#2196F3',
-      textoColor: 'O',
-      apto: true,
-      // Datos de antecedentes médicos
-      antecedentesPersonales: '-',
-      antecedentesPatologicos: '-',
-      antecedentesFamiliares: '-',
-      // Datos de signos vitales
-      fc: '72',
-      fr: '16',
-      pa: '120/80',
-      talla: '175',
-      peso: '70',
-      imc: '22.86',
-      satO2: '98',
-      // Datos de exámenes complementarios
-      estadoNutricional: 'OBESIDAD I',
-      medicina: 'APTO CON RESTRICCIÓN',
-      examenOftalmologico: 'PTERIGIÓN BILATERAL GRADO I',
-      examenOdontologico: '4 CARIES DENTAL SIMPLES (PZAS. 24-26-36-47) - TRATAMIENTO SUGERIDO:',
-      evaluacionPsicologica: 'CUMPLE CON EL PERFIL DEL PUESTO',
-      audiometria: 'HIPOACUSIA MIXTA MODERADA OÍDO DERECHO Y NEUROSENSORIAL LEVE OÍDO IZQUIERDO',
-      radiografiaTorax: 'NORMAL',
-      electrocardiograma: 'DENTRO DE PARÁMETROS NORMALES',
-      espirometria: 'ESPIROMETRÍA NORMAL',
-      // Datos de exámenes de laboratorio
-      grupoFactorSanguineo: 'O - +',
-      hemograma: 'NORMAL',
-      hemoglobina: '14.5 gr %',
-      hematocrito: '45',
-      colesterol: '199.5',
-      trigliceridos: '280.6',
-      examenOrina: 'NORMAL',
-      glucosa: '109.0 mg/dl',
-      colinesterasaSerica: '8,500 U/L',
-      // Datos de hallazgos
-      hallazgos: '1. PTERIGIÓN BILATERAL GRADO I en el examen oftalmológico.\n2. CARIES DENTAL SIMPLES en piezas 24, 26, 36 y 47 que requieren tratamiento odontológico.\n3. HIPOACUSIA MIXTA MODERADA en oído derecho y neurosensorial leve en oído izquierdo según audiometría.\n4. OBESIDAD GRADO I según evaluación nutricional.\n5. Todos los demás exámenes complementarios y de laboratorio se encuentran dentro de parámetros normales.',
-      // Datos de recomendaciones
-      recomendaciones: '1. TOMAR FENOFIBRATO 160 MG 01 TAB C/24H POR 1 MES. DIETA HIPOCALORICA, HIPOGRASA Y EJERCICIOS. EVALUACION EN 03 MESES CON PERFIL LIPIDICO.\n2. TOMAR OMEGA 3 01 TAB VO C/24H POR 3 MESES. NO HACER TRABAJOS SOBRE 1.8 M.S.N. PISO. CAMBIO DE ESTILO DE VIDA: DIETA HIPOCALORICA Y EJERCICIOS 3 VECES X SEMANA. CONTROL DE PESO MENSUAL.\n3. TRATAMIENTO SUGERIDO: RESTAURACIONES SIMPLES.\n4. USO DE EPP AUDITIVO ANTE EXPOSICION A RUIDO >=85 DB. EVALUACION AUDIOMETRICA SEMESTRAL.\n5. SE SUGIERE USO DE LENTES CON PROTECCION UV. EVALUACION ANUAL POR OFTALMOLOGIA.',
-      // Datos de nota
-      nota: 'SE SUGIERE EL CUMPLIMIENTO DE LOS PROTOCOLOS DE PREVENCIÓN PARA COVID 19 SEGÚN NORMATIVA VIGENTE.'
-    };
-
-    const selected = (raw && (raw.norden)) ? datosReales : datosPrueba;
-    return selected;
+    return datosReales;
   }
 
   const datosFinales = buildDatosFinales(data);
@@ -881,7 +877,7 @@ export default function ResumenAnexo7C_OHLA_Digitalizado(data = {}) {
   doc.line(tablaInicioX, yPos + alturaFilaInstructivaNota, tablaInicioX + tablaAncho, yPos + alturaFilaInstructivaNota);
 
   // Contenido de la fila instructiva
-  doc.setFont("helvetica", "normal").setFontSize(7);
+  doc.setFont("helvetica", "normal").setFontSize(8);
   const textoInstructivo = "Si deseara alguna aclaración o información adicional con respecto al presente informe, no dude en llamarnos al teléfono 044-767608 de 8:00 - 1:00 p.m. y 3:00 – 6:00 p.m.";
   dibujarTextoConSaltoLinea(textoInstructivo, tablaInicioX + 2, yPos + 3, tablaAncho - 4);
   yPos += alturaFilaInstructivaNota;
