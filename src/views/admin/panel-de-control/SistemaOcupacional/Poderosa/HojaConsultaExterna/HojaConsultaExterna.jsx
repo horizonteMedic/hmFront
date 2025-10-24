@@ -194,6 +194,7 @@ const HojaConsultaExterna = () => {
                                     label="Observaciones"
                                     value={form?.observaciones}
                                     onChange={handleChangeSimple}
+                                    onBlur={()=>{setForm(prev=>({...prev, observaciones: form.observaciones.toUpperCase()}))}}
                                     classNameLabel="text-blue-600"
                                     rows={15}
                                     name="observaciones"

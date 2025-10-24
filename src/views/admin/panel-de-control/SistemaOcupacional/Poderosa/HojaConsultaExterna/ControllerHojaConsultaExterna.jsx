@@ -131,7 +131,7 @@ export const SubmitDataService = async (
         "paraiso": form.cajon === "PARAISO" ? true : false,
         "otros": form.cajon === "OTROS" ? true : false,
         "otrosDescripcion": form.otrosDescripcion,
-        "observaciones": form.observaciones.toUpperCase(),
+        "observaciones": form.observaciones,
         "usuarioRegistro": user
     };
 

@@ -5,6 +5,7 @@ export default function InputTextArea({
   onChange,
   onKeyUp,
   disabled = false,
+  onBlur,
   rows = 1,
   className = "",
   classNameLabel = "",
@@ -22,6 +23,7 @@ export default function InputTextArea({
         name={name}
         rows={rows}
         value={value ?? ""}
+        onBlur={onBlur}
         onKeyUp={onKeyUp}
         onChange={onChange}
         disabled={disabled}
